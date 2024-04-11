@@ -25,13 +25,15 @@ from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
 from django.db.utils import IntegrityError
+from arches.app.const import IntegrityCheck
 from arches.app.models import models
 from arches.app.models.resource import Resource, UnpublishedModelError
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from django.utils.translation import ugettext as _
+from arches.app.utils.i18n import LanguageSynchronizer
+from django.utils.translation import gettext as _
 from pyld.jsonld import compact, JsonLdError
 from django.db.models.base import Deferred
 from django.utils import translation
@@ -297,6 +299,7 @@ class Graph(models.GraphModel):
             node.issearchable = nodeobj.get("issearchable", True)
             node.isrequired = nodeobj.get("isrequired", False)
             node.exportable = nodeobj.get("exportable", False)
+            node.sortorder = nodeobj.get("sortorder", 0)
             node.fieldname = nodeobj.get("fieldname", "")
             node.hascustomalias = nodeobj.get("hascustomalias", False)
             node.sourcebranchpublication_id = nodeobj.get("sourcebranchpublication_id", None)
@@ -713,6 +716,12 @@ class Graph(models.GraphModel):
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
         card = None
 
+        if self.publication:
+            raise GraphValidationError(
+                _("Please unpublish your graph before adding a node."),
+                1012,
+            )
+
         if not settings.OVERRIDE_RESOURCE_MODEL_LOCK:
             tile_count = models.TileModel.objects.filter(nodegroup_id=nodeToAppendTo.nodegroup_id).count()
             if tile_count > 0:
@@ -1049,7 +1058,7 @@ class Graph(models.GraphModel):
 
     def can_append(self, graphToAppend, nodeToAppendTo):
         """
-        can_append - test to see whether or not a graph can be appened to this graph at a specific location
+        can_append - test to see whether or not a graph can be appended to this graph at a specific location
 
         returns true if the graph can be appended, false otherwise
 
@@ -1060,6 +1069,11 @@ class Graph(models.GraphModel):
         """
 
         found = False
+        if nodeToAppendTo.graph.publication:
+            raise GraphValidationError(
+                _("Please unpublish your graph before adding a branch."),
+                1012,
+            )
         if self.ontology is not None and graphToAppend.ontology is None:
             raise GraphValidationError(_("The graph you wish to append needs to define an ontology"))
 
@@ -1724,7 +1738,8 @@ class Graph(models.GraphModel):
             for node_id, node in self.nodes.items():
                 if node.ontologyclass is not None:
                     raise GraphValidationError(
-                        _("You have assigned ontology classes to your graph nodes but not assigned an ontology to your graph."), 1005
+                        _("You have assigned ontology classes to your graph nodes but not assigned an ontology to your graph."),
+                        IntegrityCheck.NODE_HAS_ONTOLOGY_GRAPH_DOES_NOT.value,
                     )
 
         # make sure the supplied json-ld context is valid
@@ -1752,12 +1767,46 @@ class Graph(models.GraphModel):
             if graphs_with_matching_slug.exists() and graphs_with_matching_slug[0].graphid != self.graphid:
                 raise GraphValidationError(_("Another resource model already uses the slug '{self.slug}'").format(**locals()), 1007)
 
+    def update_published_graphs(self):
+        """
+        Changes information in in GraphPublication models without creating
+        a new entry in graphs_x_published_graphs table
+        """
+        with transaction.atomic():
+            LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
+            published_graphs = models.PublishedGraph.objects.filter(publication_id=self.publication_id)
+
+            for language_tuple in settings.LANGUAGES:
+                translation.activate(language=language_tuple[0])
+
+                serialized_graph = JSONDeserializer().deserialize(
+                    JSONSerializer().serialize(self, force_recalculation=True)
+                )
+
+                published_graph_query = published_graphs.filter(language=language_tuple[0])
+                if not len(published_graph_query):
+                    published_graph = models.PublishedGraph.objects.create(
+                        publication_id=self.publication_id,
+                        serialized_graph=serialized_graph,
+                        language=models.Language.objects.get(code=language_tuple[0]),
+                    )
+                elif len(published_graph_query) == 1:
+                    published_graph = published_graph_query[0]
+                    published_graph.serialized_graph = serialized_graph
+                else:
+                    raise GraphPublicationError(message=_('Multiple published graphs returned for language and publication_id'))
+
+                published_graph.save()
+                translation.deactivate()
+
     def publish(self, user, notes=None):
         """
         Adds a row to the GraphXPublishedGraph table
         Assigns GraphXPublishedGraph id to Graph
         """
         with transaction.atomic():
+            LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
+
             try:
                 publication = models.GraphXPublishedGraph.objects.create(
                     graph=self,
@@ -1793,6 +1842,15 @@ class Graph(models.GraphModel):
         self.publication = None
         self.save(validate=False)
 
+
+class GraphPublicationError(Exception):
+    def __init__(self, message, code=None):
+        self.title = _("Graph Publication Error")
+        self.message = message
+        self.code = code
+
+    def __str__(self):
+        return repr(self.message)
 
 class GraphValidationError(Exception):
     def __init__(self, message, code=None):

@@ -27,7 +27,7 @@ from django.core.cache import cache
 from django.db import connection
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
-from django.utils.translation import get_language, ugettext as _
+from django.utils.translation import get_language, gettext as _
 from django.utils.decorators import method_decorator
 from arches.app.models import models
 from arches.app.models.concept import Concept
@@ -36,7 +36,7 @@ from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, MaxAgg, Aggregation
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, MaxAgg, Aggregation
 from arches.app.search.search_export import SearchResultsExporter
 from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
@@ -139,7 +139,7 @@ def search_terms(request):
         boolquery = Bool()
 
         if lang != "*":
-            boolquery.must(Match(field="language", query=lang, type="phrase_prefix"))
+            boolquery.must(Term(field="language", term=lang))
 
         boolquery.should(Match(field="value", query=searchString.lower(), type="phrase_prefix"))
         boolquery.should(Match(field="value.folded", query=searchString.lower(), type="phrase_prefix"))
@@ -172,7 +172,10 @@ def search_terms(request):
                 if len(result["top_concept"]["buckets"]) > 0:
                     for top_concept in result["top_concept"]["buckets"]:
                         top_concept_id = top_concept["key"]
-                        top_concept_label = get_preflabel_from_conceptid(top_concept["key"], lang)["value"]
+                        top_concept_label = get_preflabel_from_conceptid(
+                            top_concept["key"],
+                            lang=lang if lang != "*" else None
+                        )["value"]
                         for concept in top_concept["conceptid"]["buckets"]:
                             ret[index].append(
                                 {
@@ -257,12 +260,18 @@ def export_results(request):
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format, report_link)
         wb = export_files[0]["outputfile"]
-        with NamedTemporaryFile() as tmp:
-            wb.save(tmp.name)
-            tmp.seek(0)
-            stream = tmp.read()
-            export_files[0]["outputfile"] = tmp
-            return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
+        try:
+            with NamedTemporaryFile(delete=False) as tmp:
+                wb.save(tmp.name)
+                tmp.seek(0)
+                stream = tmp.read()
+                export_files[0]["outputfile"] = tmp
+                result = zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
+        except OSError:
+            logger.error("Temp file could not be created.")
+            raise
+        os.unlink(tmp.name)
+        return result
     else:
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format, report_link)
@@ -318,7 +327,7 @@ def search_results(request, returnDsl=False):
         append_instance_permission_filter_dsl(request, search_results_object)
     except Exception as err:
         logger.exception(err)
-        return JSONErrorResponse(message=err)
+        return JSONErrorResponse(message=str(err))
 
     dsl = search_results_object.pop("query", None)
     if returnDsl:

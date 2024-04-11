@@ -7,6 +7,7 @@ define([
     'views/components/search/base-filter',
     'templates/views/components/search/advanced-search.htm',
     'bindings/let',
+    'bindings/key-events-click',
 ], function($, _, ko, koMapping, arches, BaseFilter, advancedSearchTemplate) {
     var componentName = 'advanced-search';
     const viewModel = BaseFilter.extend({
@@ -24,6 +25,10 @@ define([
                 facets: ko.observableArray()
             };
             this.cardNameDict = {};
+            var pathData = {};
+            this.selectedNodegroupId = ko.observable();
+            this.cardPath = ko.observableArray();
+            this.expandPath = ko.observable(false);
             var createLookup = function(list, idKey) {
                 return _.reduce(list, function(lookup, item) {
                     lookup[item[idKey]] = item;
@@ -31,6 +36,67 @@ define([
                 }, {});
             };
             self.widgetLookup = null;
+
+            this.filter.facets.subscribe(function(facets){
+                if(facets.length === 0){
+                    $('.facets-container .list-filter input').focus();
+                }else{
+                    $('#facet-filter-'+(facets.length-1)).focus();
+                }
+            });
+
+            this.removeFacet = function(facet){
+                self.filter.facets.remove(facet);
+            };
+
+            var aliasToNodeName = function(path, pathData, graphid) {
+
+                var lookupName = function(alias) {
+                    var namePath = pathData[graphid].filter((cardData) => 
+                    cardData[3] === alias
+                    );
+                    return namePath[0][4];
+                }
+
+                self.cardPath(path.map((alias) => 
+                    lookupName(alias)
+                    )
+                );
+            }
+
+            this.requestPathData = function(graph_id, nodegroup_id) {
+                $.ajax({
+                    type: "GET",
+                    url: arches.urls.api_get_nodegroup_tree, 
+                    data: {graphid: graph_id},
+                    context: this
+                }).done(function(response) {
+                    pathData[graph_id] = response['path'];
+                    var graphPath = pathData[graph_id].filter((d) => d[1] === nodegroup_id)
+                    aliasToNodeName(graphPath[0][6].split(' - '), pathData, graph_id);  
+               })
+            };
+
+            this.expandPath = ko.pureComputed(function() {
+                return self.selectedNodegroupId();
+            }); 
+
+            this.getNodegroupPath = function() {
+                if (self.selectedNodegroupId() === this.nodegroup_id) {
+                    self.selectedNodegroupId(undefined);
+                }
+                else if (self.selectedNodegroupId() !== this.nodegroup_id) {
+                    self.selectedNodegroupId(undefined);
+                    self.selectedNodegroupId(this.nodegroup_id);
+                    if (!(this.graph_id in pathData)) {
+                        self.requestPathData(this.graph_id, this.nodegroup_id);
+                    }
+                    else {
+                        var graphPath = pathData[this.graph_id].filter((d) => d[1] === this.nodegroup_id)
+                        aliasToNodeName(graphPath[0][6].split(' - '), pathData, this.graph_id);                
+                    }   
+                }
+            };
 
             $.ajax({
                 type: "GET",
@@ -50,6 +116,7 @@ define([
                     card.nodes = _.filter(response.nodes, function(node) {
                         return node.nodegroup_id === card.nodegroup_id;
                     });
+                    card.nodeNamesConcatenated = card.nodes.map(node => node.name).join(' ');
                     card.addFacet = function() {
                         _.each(card.nodes, function(node) {
                             if (self.cardNameDict[node.nodegroup_id] && node.nodeid === node.nodegroup_id) {
@@ -63,6 +130,7 @@ define([
                             }
                         }).sort((a, b) => a.sortorder - b.sortorder);
                         self.newFacet(card);
+                        $('#facet-filter-'+(self.filter.facets().length-1)).focus();
                     };
                 }, this);
                 var graphs = response.graphs.sort(function(a,b) {
@@ -89,7 +157,7 @@ define([
                                 if (facetFilterText) {
                                     graph.collapsed(false);
                                     return _.filter(graphCards, function(card) {
-                                        return card.name.toLowerCase().indexOf(facetFilterText) > -1;
+                                        return card.name.toLowerCase().indexOf(facetFilterText) > -1 || card.nodeNamesConcatenated.toLowerCase().indexOf(facetFilterText) > -1;
                                     });
                                 } else {
                                     return graphCards;

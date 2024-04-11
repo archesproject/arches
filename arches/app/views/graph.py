@@ -23,13 +23,14 @@ import uuid
 import logging
 from django.db import transaction
 from django.shortcuts import redirect, render
-from django.db.models import Q
-from django.utils.translation import ugettext as _
+from django.db.models import F, Func, Q
+from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
 from django.http import HttpResponseNotFound, HttpResponse
 from django.views.generic import View, TemplateView
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -186,6 +187,11 @@ class GraphDesignerView(GraphBaseView):
         return ontology_namespaces
 
     def get(self, request, graphid):
+        
+        if graphid == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+            if not request.user.groups.filter(name="System Administrator").exists():
+                raise PermissionDenied
+
         self.graph = Graph.objects.get(graphid=graphid)
         serialized_graph = self.graph.serialize(force_recalculation=True)  # calling `serialize` directly returns a dict
 
@@ -345,7 +351,7 @@ class GraphDataView(View):
             if self.action == "import_graph":
                 graph_file = request.FILES.get("importedGraph").read()
                 graphs = JSONDeserializer().deserialize(graph_file)["graph"]
-                ret = GraphImporter.import_graph(graphs)
+                ret = GraphImporter.import_graph(graphs, user=request.user)
             else:
                 if graphid is not None:
                     graph = Graph.objects.get(graphid=graphid)
@@ -359,9 +365,24 @@ class GraphDataView(View):
 
                 elif self.action == "update_node":
                     old_node_data = graph.nodes.get(uuid.UUID(data["nodeid"]))
+
+                    if old_node_data.datatype != 'semantic' and old_node_data.datatype != data['datatype']:
+                        return JSONErrorResponse(
+                            _("Datatype Error"),
+                            _(
+                                """If you want to change the datatype of an existing node.
+                                Delete and then re-create the node, or export the branch then edit the datatype and re-import the branch."""
+                            ),
+                        )
+                    
                     nodegroup_changed = str(old_node_data.nodegroup_id) != data["nodegroup_id"]
                     updated_values = graph.update_node(data)
                     if "nodeid" in data and nodegroup_changed is False:
+                        if not self.validate_images_only_config(old_node_data, data):
+                            return JSONErrorResponse(
+                                _("Datatype Error"),
+                                _("This node cannot be restricted to images only as it holds non-images already."),
+                            )
                         graph.save(nodeid=data["nodeid"])
                     else:
                         graph.save()
@@ -430,14 +451,6 @@ class GraphDataView(View):
             return JSONErrorResponse(e.title, e.message, {"status": "Failed"})
         except PublishedModelError as e:
             return JSONErrorResponse(e.title, e.message)
-        except RequestError as e:
-            return JSONErrorResponse(
-                _("Elasticsearch indexing error"),
-                _(
-                    """If you want to change the datatype of an existing node.
-                    Delete and then re-create the node, or export the branch then edit the datatype and re-import the branch."""
-                ),
-            )
 
     @method_decorator(group_required("Graph Editor"), name="dispatch")
     def delete(self, request, graphid):
@@ -479,6 +492,23 @@ class GraphDataView(View):
                 return JSONErrorResponse(e.title, e.message)
 
         return HttpResponseNotFound()
+
+    @staticmethod
+    def validate_images_only_config(old_node_data, new_node_data):
+        if old_node_data.config.get("imagesOnly", None) is False and new_node_data["config"]["imagesOnly"]:
+            nodegroup_id = new_node_data["nodegroup_id"]
+            for file_type in models.TileModel.objects.filter(
+                nodegroup_id=nodegroup_id,
+                data__has_key=str(old_node_data.pk),
+            ).annotate(
+                file_data=Func(
+                    F(f"data__{old_node_data.pk}"),
+                    function="JSONB_ARRAY_ELEMENTS",
+                )
+            ).values_list(F("file_data__type"), flat=True).distinct():
+                if not file_type.startswith("image/"):
+                    return False
+        return True
 
 
 class GraphPublicationView(View):

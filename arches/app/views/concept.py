@@ -23,7 +23,7 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllow
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.utils.module_loading import import_string
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.translation import get_language
 from arches.app.models import models
 from arches.app.models.system_settings import settings
@@ -275,7 +275,7 @@ def concept(request, conceptid):
 
                 return JSONResponse(concept)
 
-    return HttpResponseNotFound
+    return HttpResponseNotFound()
 
 
 def export(request, conceptid):
@@ -393,43 +393,6 @@ def paged_dropdown(request):
         for d in data
     ]
 
-    # This try/except block trys to find an exact match to the concept the user is searching and if found
-    # it will insert it into the results as the first item so that users don't have to scroll to find it.
-    # See: https://github.com/archesproject/arches/issues/8355
-    try:
-        if page == 1:
-            found = False
-            for i, d in enumerate(data):
-                if i <= 7 and d["text"].lower() == query.lower():
-                    found = True
-                    break
-            if not found:
-                languageid = get_language().lower()
-                cursor = connection.cursor()
-                cursor.execute(
-                    """
-                        SELECT value, valueid
-                        FROM
-                        (
-                            SELECT *, CASE WHEN LOWER(languageid) = %(languageid)s THEN 10
-                            WHEN LOWER(languageid) like %(short_languageid)s THEN 5
-                            ELSE 0
-                            END score
-                            FROM values
-                        ) as vals
-                        WHERE LOWER(value)=%(query)s AND score > 0
-                        AND valuetype in ('prefLabel')
-                        ORDER BY score desc limit 1
-                    """,
-                    {"languageid": languageid, "short_languageid": languageid.split("-")[0] + "%", "query": query.lower()},
-                )
-                rows = cursor.fetchall()
-
-                if len(rows) == 1:
-                    data.insert(0, {"id": str(rows[0][1]), "text": rows[0][0], "depth": 1, "collector": False})
-    except:
-        pass
-
     return JSONResponse({"results": data, "more": offset + limit < total_count})
 
 
@@ -443,7 +406,7 @@ def search(request):
     searchString = request.GET["q"]
     removechildren = request.GET.get("removechildren", None)
     query = Query(se, start=0, limit=100)
-    phrase = Match(field="value", query=searchString.lower(), type="phrase_prefix")
+    phrase = Match(field="value.folded", query=searchString.lower(), type="phrase_prefix")
     query.add_query(phrase)
     results = query.search(index=CONCEPTS_INDEX)
 
@@ -571,4 +534,4 @@ def concept_value(request):
         value = models.Value.objects.get(pk=valueid)
         return JSONResponse(value)
 
-    return HttpResponseNotFound
+    return HttpResponseNotFound()

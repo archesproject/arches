@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from django.shortcuts import render, redirect
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -33,13 +33,25 @@ class PluginView(MapBaseManagerView):
             plugin = models.Plugin.objects.get(slug=slug)
         else:
             plugin = models.Plugin.objects.get(pk=pluginid)
+
         if not request.user.has_perm("view_plugin", plugin):
             if slug is not None:
                 return redirect("/auth?next=/plugins/{}".format(slug))
             if slug is not None:
                 return redirect("/auth?next=/plugins/{}".format(pluginid))
-        if request.GET.get("json", False):
+
+        if request.GET.get("json"):
             return JSONResponse(plugin)
+        
+        if plugin.config.get('is_standalone'):
+            context = self.get_context_data(
+                plugin=plugin,
+                plugin_json=JSONSerializer().serialize(plugin),
+                main_script="views/plugin-standalone",
+            )
+
+            return render(request, "views/plugin-standalone.htm", context)
+        
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)

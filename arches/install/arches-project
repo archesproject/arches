@@ -5,7 +5,6 @@ import argparse
 import codecs
 import django
 import errno
-import imp
 import os
 import sys
 import subprocess
@@ -56,7 +55,7 @@ class ArchesCommand(TemplateCommand):
         options["arches_version"] = "master"
         if complete_version[3] == 'final':
             options["arches_version"] = f"stable/{arches.__version__}"
-        elif complete_version[3] == 'beta':
+        elif complete_version[3] in ['alpha','beta','rc']:
             options["arches_version"] = f"dev/{complete_version[0]}.{complete_version[1]}.x"
         options["arches_semantic_version"] = ".".join([str(arches.VERSION[0]), str(arches.VERSION[1]), str(arches.VERSION[2])])
         super(ArchesCommand, self).handle('project', project_name, target, **options)
@@ -121,6 +120,16 @@ parser_start.add_argument(
     help='name of your new arches application',
     type=str,
     default='',)
+
+parser_start.add_argument(
+    '--exclude', '-x',
+    default='.git',  # defaulting to `.git` here so hidden directories such as `.github` will be copied over
+    nargs='?', 
+    help=(
+        'The directory name(s) to exclude, in addition to .git and '
+        '__pycache__. Can be used multiple times.'
+    ),
+)
 
 parser.add_argument('-v', '--verbosity', action='store', dest='verbosity', default='1',
                     type=int, choices=[0, 1, 2, 3],

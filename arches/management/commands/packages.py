@@ -2,15 +2,12 @@ import json
 import pyprind
 import csv
 import shutil
-import subprocess
 import glob
 import uuid
 import sys
 import urllib.request, urllib.parse, urllib.error
 import os
-import imp
 import logging
-import requests
 from arches.setup import unzip_file
 from arches.management.commands import utils
 from arches.app.utils.i18n import LanguageSynchronizer
@@ -25,7 +22,6 @@ from arches.app.utils.data_management.resources.formats.csvfile import (
     MissingConfigException,
     TileCsvReader,
 )
-from arches.app.utils.data_management.resources.formats.format import MissingGraphException
 from arches.app.utils.data_management.resources.formats.format import Reader as RelationImporter
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.models.system_settings import settings
@@ -33,9 +29,7 @@ from arches.app.models import models
 from arches.app.models.fields.i18n import I18n_String
 import arches.app.utils.data_management.resource_graphs.importer as graph_importer
 import arches.app.utils.data_management.resource_graphs.exporter as graph_exporter
-import arches.app.utils.data_management.resources.remover as resource_remover
 import arches.app.utils.task_management as task_management
-from django.forms.models import model_to_dict
 from django.db.utils import IntegrityError
 from django.db import transaction, connection
 from django.utils.module_loading import import_string
@@ -79,7 +73,6 @@ class Command(BaseCommand):
             "--operation",
             action="store",
             dest="operation",
-            default="setup",
             choices=[
                 "setup",
                 "install",
@@ -108,12 +101,31 @@ class Command(BaseCommand):
             + "'install'=Runs the setup file defined in your package root",
         )
 
-        parser.add_argument(
-            "-s", "--source", action="store", dest="source", default="", help="Directory or file for processing",
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument(
+            "-s",
+            "--source",
+            action="store",
+            dest="source",
+            default="",
+            help="Directory or file for processing",
+        )
+        group.add_argument(
+            "-a",
+            "--arches-application",
+            action="store",
+            dest="arches_application",
+            default="",
+            help="Name of Arches Application",
         )
 
         parser.add_argument(
-            "-f", "--format", action="store", dest="format", default="arches", help="Format: shp or arches",
+            "-f",
+            "--format",
+            action="store",
+            dest="format",
+            default="arches",
+            help="Format: shp or arches",
         )
 
         parser.add_argument(
@@ -147,7 +159,12 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-c", "--config_file", action="store", dest="config_file", default=None, help="Usually an export mapping file.",
+            "-c",
+            "--config_file",
+            action="store",
+            dest="config_file",
+            default=None,
+            help="Usually an export mapping file.",
         )
 
         parser.add_argument(
@@ -245,6 +262,10 @@ class Command(BaseCommand):
         parser.add_argument("--languages", action="store", dest="languages", help="languages desired as a comma separated list")
 
     def handle(self, *args, **options):
+        if options["operation"] is None:
+            self.print_help("manage.py", "packages")
+            return
+        
         print("operation: " + options["operation"])
         package_name = settings.PACKAGE_NAME
         celery_worker_running = task_management.check_if_celery_available()
@@ -317,7 +338,7 @@ class Command(BaseCommand):
                 path = utils.get_valid_path(options["config_file"])
                 mapping = json.load(open(path, "r"))
                 graphid = mapping["resource_model_id"]
-                management.call_command("es", "index_resources_by_type", resource_types=[graphid])
+                management.call_command("es", "index_resources_by_type", resource_types=[graphid], recalculate_descriptors=True)
 
         if options["operation"] == "import_node_value_data":
             self.import_node_value_data(options["source"], options["overwrite"])
@@ -333,7 +354,10 @@ class Command(BaseCommand):
 
         if options["operation"] == "add_mapbox_layer":
             self.add_mapbox_layer(
-                options["layer_name"], options["mapbox_json_path"], options["layer_icon"], options["is_basemap"],
+                options["layer_name"],
+                options["mapbox_json_path"],
+                options["layer_icon"],
+                options["is_basemap"],
             )
 
         if options["operation"] == "delete_mapbox_layer":
@@ -343,16 +367,23 @@ class Command(BaseCommand):
             self.create_mapping_file(options["dest_dir"], options["graphs"])
 
         if options["operation"] in ["load", "load_package"]:
-            defer_indexing = False if str(options["defer_indexing"])[0].lower() == "f" else True
+            arches_application = options["arches_application"]
+            arches_application_path = None
+
+            if arches_application:
+                application_origin = os.path.split(sys.modules[arches_application].__spec__.origin)[0]
+                arches_application_path = os.path.join(application_origin, "pkg")
+
             self.load_package(
-                options["source"],
+                arches_application_path or options["source"],
                 options["setup_db"],
                 options["overwrite"],
                 options["bulk_load"],
                 options["stage"],
                 options["yes"],
                 options["dev"],
-                defer_indexing,
+                False if str(options["defer_indexing"])[0].lower() == "f" else True,
+                False if arches_application_path is None else True,
             )
 
         if options["operation"] in ["create", "create_package"]:
@@ -400,7 +431,8 @@ class Command(BaseCommand):
                 output_graph = {"graph": [graph], "metadata": system_metadata()}
                 graph_json = JSONSerializer().serialize(output_graph, indent=4)
                 if graph["graphid"] not in existing_resource_graphs:
-                    output_file = os.path.join(dest_dir, str(I18n_String(graph["name"])) + ".json")
+                    graph_name = str(I18n_String(graph["name"])).replace("/", "-")
+                    output_file = os.path.join(dest_dir, graph_name + ".json")
                     with open(output_file, "w") as f:
                         print("writing", output_file)
                         f.write(graph_json)
@@ -534,8 +566,8 @@ class Command(BaseCommand):
         yes=False,
         dev=False,
         defer_indexing=True,
+        is_application=False,
     ):
-
         celery_worker_running = task_management.check_if_celery_available()
 
         # only defer indexing if the celery worker ISN'T running because celery processes
@@ -596,16 +628,17 @@ class Command(BaseCommand):
                             resource2resourceid=uuid.UUID(relationship["resource2resourceid"]),
                         )
                 except json.decoder.JSONDecodeError as e:
-                    logger.warn("Invalid syntax in package_config.json. Please inspect and then re-run command.")
-                    logger.warn(e)
+                    logger.warning("Invalid syntax in package_config.json. Please inspect and then re-run command.")
+                    logger.warning(e)
                     sys.exit()
 
         @transaction.atomic
         def load_sql(package_dir, sql_dir):
-            sql_files = glob.glob(os.path.join(package_dir, sql_dir, "*.sql"))
+            sql_files = sorted(glob.glob(os.path.join(package_dir, sql_dir, "*.sql")))
             try:
                 with connection.cursor() as cursor:
                     for sql_file in sql_files:
+                        print("  %s" % sql_file)
                         with open(sql_file, "r") as f:
                             sql = f.read()
                             cursor.execute(sql)
@@ -614,10 +647,11 @@ class Command(BaseCommand):
                 print("Failed to load sql files")
 
         def load_resource_views(package_dir):
-            resource_views = glob.glob(os.path.join(package_dir, "business_data", "resource_views", "*.sql"))
+            resource_views = sorted(glob.glob(os.path.join(package_dir, "business_data", "resource_views", "*.sql")))
             try:
                 with connection.cursor() as cursor:
                     for view in resource_views:
+                        print("  %s" % view)
                         with open(view, "r") as f:
                             sql = f.read()
                             cursor.execute(sql)
@@ -757,7 +791,7 @@ class Command(BaseCommand):
                 self.import_business_data_relations(relation)
 
             uploaded_files = glob.glob(os.path.join(package_dir, "business_data", "files", "*"))
-            dest_files_dir = os.path.join(settings.MEDIA_ROOT, "uploadedfiles")
+            dest_files_dir = os.path.join(settings.MEDIA_ROOT, settings.UPLOADED_FILES_DIR)
             if os.path.exists(dest_files_dir) is False:
                 os.makedirs(dest_files_dir)
             for f in uploaded_files:
@@ -792,14 +826,22 @@ class Command(BaseCommand):
                     else:
                         logger.info("Not loading {0} from package. Extension already exists".format(components[0]))
 
-                modules = glob.glob(os.path.join(extension, "*.json"))
+                modules = []
+                if not os.path.isdir(extension):
+                    modules.append(extension)
+                modules.extend(glob.glob(os.path.join(extension, "*.json")))
                 modules.extend(glob.glob(os.path.join(extension, "*.py")))
 
                 if len(modules) > 0:
+                    if os.path.exists(module_dir) is False:
+                        os.mkdir(module_dir)
                     dest_path = os.path.join(module_dir, os.path.basename(modules[0]))
-                    if os.path.exists(dest_path) is False:
+                    if os.path.exists(dest_path) is False and not is_application:
                         module = modules[0]
-                        shutil.copy(module, module_dir)
+                        shutil.copy(module, dest_path)
+                        management.call_command(cmd, "register", source=module)
+                    elif is_application:  # do not copy, register source application function
+                        module = modules[0]
                         management.call_command(cmd, "register", source=module)
                     else:
                         logger.info("Not loading {0} from package. Extension already exists".format(modules[0]))
@@ -809,10 +851,14 @@ class Command(BaseCommand):
             root = settings.APP_ROOT if settings.APP_ROOT is not None else os.path.join(settings.ROOT_DIR, "app")
             dest_dir = os.path.join(root, "search_indexes")
 
+            if index_files:
+                module_name = "package_settings"
+                file_path = os.path.join(settings.APP_ROOT, "package_settings.py")
+                utils.load_source(module_name, file_path)
+
             for index_file in index_files:
                 shutil.copy(index_file, dest_dir)
-                package_settings = imp.load_source("", os.path.join(settings.APP_ROOT, "package_settings.py"))
-                for index in package_settings.ELASTICSEARCH_CUSTOM_INDEXES:
+                for index in sys.modules[module_name].ELASTICSEARCH_CUSTOM_INDEXES:
                     es_index = import_class_from_string(index["module"])(index["name"])
                     es_index.prepare_index()
 
@@ -864,6 +910,14 @@ class Command(BaseCommand):
                 except CommandError as e:
                     print(e)
 
+        def load_templates(package_dir):
+            templates = glob.glob(os.path.join(package_dir, "templates", "*.yaml"))
+            for template in templates:
+                try:
+                    management.call_command("load_template", "-s", template)
+                except CommandError as e:
+                    print(e)  # ok to fail, template engine may not be installed
+
         def handle_source(source):
             if os.path.isdir(source):
                 return source
@@ -897,9 +951,8 @@ class Command(BaseCommand):
             raise Exception("this is an invalid package source")
 
         if setup_db:
-            management.call_command("setup_db", force=True)
-        if dev:
-            management.call_command("add_test_users")
+            management.call_command("setup_db", force=True, dev=dev)
+
         load_ontologies(package_location)
         print("loading Kibana objects")
         load_kibana_objects(package_location)
@@ -957,9 +1010,11 @@ class Command(BaseCommand):
         update_resource_geojson_geometries()
         print("loading post sql")
         load_sql(package_location, "post_sql")
+        print("loading templates")
+        load_templates(package_location)
         if defer_indexing is True:
             print("indexing database")
-            management.call_command("es", "reindex_database")
+            management.call_command("es", "reindex_database", recalculate_descriptors=True)
         if celery_worker_running:
             print("Celery detected: Resource instances loading. Log in to arches to be notified on completion.")
         else:
@@ -1226,7 +1281,7 @@ class Command(BaseCommand):
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
                 print(os.path.join(path))
-                with open(path, "rU") as f:
+                with open(path, "r") as f:
                     archesfile = JSONDeserializer().deserialize(f)
                     errs, importer = ResourceGraphImporter(archesfile["graph"], overwrite_graphs)
                     errors.extend(errs)
@@ -1234,7 +1289,7 @@ class Command(BaseCommand):
                 file_paths = [file_path for file_path in os.listdir(path) if file_path.endswith(".json")]
                 for file_path in file_paths:
                     print(os.path.join(path, file_path))
-                    with open(os.path.join(path, file_path), "rU") as f:
+                    with open(os.path.join(path, file_path), "r") as f:
                         archesfile = JSONDeserializer().deserialize(f)
                         errs, importer = ResourceGraphImporter(archesfile["graph"], overwrite_graphs)
                         errors.extend(errs)
@@ -1280,7 +1335,6 @@ class Command(BaseCommand):
         graph=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID,
         single_file=False,
     ):
-
         resource_exporter = ResourceExporter(file_format, configs=config_file, single_file=single_file)
         if data_dest == ".":
             data_dest = os.path.dirname(settings.SYSTEM_SETTINGS_LOCAL_PATH)
@@ -1371,6 +1425,6 @@ class Command(BaseCommand):
 
         for path in source:
             if os.path.isfile(os.path.join(path)):
-                with open(path, "rU") as f:
+                with open(path, "r") as f:
                     mapping_file = json.load(f)
                     graph_importer.import_mapping_file(mapping_file)

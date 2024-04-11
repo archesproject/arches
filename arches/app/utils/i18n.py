@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import List
 from arches.app.models.system_settings import settings
 from arches.app.models.fields.i18n import I18n_String
-from arches.app.models.models import CardModel, CardXNodeXWidget, GraphModel, Language, PublishedGraph
+from arches.app.models.models import CardModel, CardXNodeXWidget, Language, PublishedGraph
 from django.contrib.gis.db.models import Model
 from django.utils.translation import get_language, get_language_info
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -99,6 +99,38 @@ def get_localized_value(obj, lang=None, return_lang=False):
             raise Exception()
 
         return {found_lang: obj[found_lang]} if return_lang else obj[found_lang]
+
+
+def rank_label(kind="prefLabel", source_lang="", target_lang=""):
+    """Rank a label language, preferring prefLabel over altLabel,
+    the target language over the system language, and both of those
+    languages over other languages.
+    """
+
+    if kind == "prefLabel":
+        rank = 10
+    elif kind == "altLabel":
+        rank = 4
+    else:
+        rank = 1
+
+    label_language_exact = source_lang.lower()
+    label_language_fuzzy = source_lang.split("-")[0].lower()
+    user_language_exact = (target_lang or get_language()).lower()
+    user_language_fuzzy = user_language_exact.split("-")[0].lower()
+    system_language_exact = settings.LANGUAGE_CODE.lower()
+    system_language_fuzzy = settings.LANGUAGE_CODE.split("-")[0].lower()
+
+    if label_language_exact == user_language_exact:
+        rank *= 10
+    elif label_language_fuzzy == user_language_fuzzy:
+        rank *= 5
+    elif label_language_exact == system_language_exact:
+        rank *= 3
+    elif label_language_fuzzy == system_language_fuzzy:
+        rank *= 2
+
+    return rank
 
 
 class ArchesPOFileFetcher:
@@ -268,7 +300,9 @@ class ArchesPOLoader:
 
 
 class LanguageSynchronizer:
-    def synchronize_settings_with_db():
+    def synchronize_settings_with_db(update_published_graphs=True):
+        from arches.app.models.graph import Graph  # avoids circular import
+
         if settings.LANGUAGES:
             for lang in settings.LANGUAGES:
                 found_language = Language.objects.filter(code=lang[0]).first()
@@ -286,18 +320,7 @@ class LanguageSynchronizer:
                     isdefault=False,
                 )
 
-            for lang in settings.LANGUAGES:
-                for graph in GraphModel.objects.all():
-                    if graph.publication:
-                        found_language_published_graph = graph.get_published_graph(language=lang[0])
-
-                        # no need to add the language if it already exists
-                        if found_language_published_graph:
-                            continue
-
-                        publication_language = Language.objects.filter(code=lang[0]).first()
-                        PublishedGraph.objects.create(
-                            language=publication_language,
-                            serialized_graph=JSONDeserializer().deserialize(JSONSerializer().serialize(graph, force_recalculation=True)),
-                            publication=graph.publication,
-                        )
+            if update_published_graphs:
+                for graph in Graph.objects.all():
+                    if graph.publication_id:
+                        graph.update_published_graphs()

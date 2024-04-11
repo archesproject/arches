@@ -8,6 +8,7 @@ import sys
 import arches
 import inspect
 import semantic_version
+from datetime import datetime, timedelta
 from django.utils.translation import gettext_lazy as _
 
 try:
@@ -21,10 +22,6 @@ APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe(
 MIN_ARCHES_VERSION = arches.__version__
 MAX_ARCHES_VERSION = arches.__version__
 
-STATICFILES_DIRS =  (
-    os.path.join(APP_ROOT, 'media', 'build'),
-    os.path.join(APP_ROOT, 'media'),
-) + STATICFILES_DIRS
 
 WEBPACK_LOADER = {
     "DEFAULT": {
@@ -36,14 +33,13 @@ DATATYPE_LOCATIONS.append('{{ project_name }}.datatypes')
 FUNCTION_LOCATIONS.append('{{ project_name }}.functions')
 ETL_MODULE_LOCATIONS.append('{{ project_name }}.etl_modules')
 SEARCH_COMPONENT_LOCATIONS.append('{{ project_name }}.search_components')
-TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'functions', 'templates'))
-TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'widgets', 'templates'))
-TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
 
 LOCALE_PATHS.append(os.path.join(APP_ROOT, 'locale'))
 
 FILE_TYPE_CHECKING = False
 FILE_TYPES = ["bmp", "gif", "jpg", "jpeg", "pdf", "png", "psd", "rtf", "tif", "tiff", "xlsx", "csv", "zip"]
+FILENAME_GENERATOR = "arches.app.utils.storage_filename_generator.generate_filename"
+UPLOADED_FILES_DIR = "uploadedfiles"
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '{{ secret_key }}'
@@ -54,7 +50,19 @@ DEBUG = True
 ROOT_URLCONF = '{{ project_name }}.urls'
 
 # Modify this line as needed for your project to connect to elasticsearch with a password that you generate
-ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
+ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
+
+# If you need to connect to Elasticsearch via an API key instead of username/password, use the syntax below:
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": "<ENCODED_API_KEY>"}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": ("<ID>", "<API_KEY>")}
+
+# Your Elasticsearch instance needs to be configured with xpack.security.enabled=true to use API keys - update elasticsearch.yml or .env file and restart.
+
+# Set the ELASTIC_PASSWORD environment variable in either the docker-compose.yml or .env file to the password you set for the elastic user,
+# otherwise a random password will be generated.
+
+# API keys can be generated via the Elasticsearch API: https://www.elastic.co/guide/en/elasticsearch/reference/current/security-api-create-api-key.html
+# Or Kibana: https://www.elastic.co/guide/en/kibana/current/api-keys.html
 
 # a prefix to append to all elasticsearch indexes, note: must be lower case
 ELASTICSEARCH_PREFIX = '{{ project_name }}'
@@ -72,6 +80,11 @@ KIBANA_CONFIG_BASEPATH = "kibana"  # must match Kibana config.yml setting (serve
 
 LOAD_DEFAULT_ONTOLOGY = False
 LOAD_PACKAGE_ONTOLOGIES = True
+
+# This is the namespace to use for export of data (for RDF/XML for example)
+# It must point to the url where you host your site
+# Make sure to use a trailing slash
+ARCHES_NAMESPACE_FOR_DATA_EXPORT = "http://localhost:8000/"
 
 DATABASES = {
     "default": {
@@ -96,6 +109,8 @@ DATABASES = {
     }
 }
 
+SEARCH_THUMBNAILS = False
+
 INSTALLED_APPS = (
     "webpack_loader",
     "django.contrib.admin",
@@ -114,10 +129,11 @@ INSTALLED_APPS = (
     "corsheaders",
     "oauth2_provider",
     "django_celery_results",
-    "compressor",
     # "silk",
     "{{ project_name }}",
 )
+
+ARCHES_APPLICATIONS = ()
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -135,6 +151,19 @@ MIDDLEWARE = [
     "arches.app.utils.middleware.SetAnonymousUser",
     # "silk.middleware.SilkyMiddleware",
 ]
+
+STATICFILES_DIRS = build_staticfiles_dirs(
+    root_dir=ROOT_DIR,
+    app_root=APP_ROOT,
+    arches_applications=ARCHES_APPLICATIONS,
+)
+
+TEMPLATES = build_templates_config(
+    root_dir=ROOT_DIR,
+    debug=DEBUG,
+    app_root=APP_ROOT,
+    arches_applications=ARCHES_APPLICATIONS,
+)
 
 ALLOWED_HOSTS = []
 
@@ -194,6 +223,10 @@ LOGGING = {
     }
 }
 
+# Rate limit for authentication views
+# See options (including None or python callables):
+# https://django-ratelimit.readthedocs.io/en/stable/rates.html#rates-chapter
+RATE_LIMIT = "5/m"
 
 # Sets default max upload size to 15MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
@@ -225,7 +258,11 @@ DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d" # Custom date format for dates imported f
 EXPORT_DATA_FIELDS_IN_CARD_ORDER = False
 
 #Identify the usernames and duration (seconds) for which you want to cache the time wheel
-CACHE_BY_USER = {'anonymous': 3600 * 24}
+CACHE_BY_USER = {
+    "default": 3600 * 24, #24hrs
+    "anonymous": 3600 * 24 #24hrs
+    }
+
 TILE_CACHE_TIMEOUT = 600 #seconds
 CLUSTER_DISTANCE_MAX = 5000 #meters
 GRAPH_MODEL_CACHE_TIMEOUT = None
@@ -275,10 +312,35 @@ CELERY_BEAT_SCHEDULE = {
 # way of monitoring celery so you can detect the background task not being available.
 CELERY_CHECK_ONLY_INSPECT_BROKER = False
 
-CANTALOUPE_DIR = os.path.join(ROOT_DIR, "uploadedfiles")
+CANTALOUPE_DIR = os.path.join(ROOT_DIR, UPLOADED_FILES_DIR)
 CANTALOUPE_HTTP_ENDPOINT = "http://localhost:8182/"
 
 ACCESSIBILITY_MODE = False
+
+RENDERERS = [
+    {
+        "name": "imagereader",
+        "title": "Image Reader",
+        "description": "Displays most image file types",
+        "id": "5e05aa2e-5db0-4922-8938-b4d2b7919733",
+        "iconclass": "fa fa-camera",
+        "component": "views/components/cards/file-renderers/imagereader",
+        "ext": "",
+        "type": "image/*",
+        "exclude": "tif,tiff,psd",
+    },
+    {
+        "name": "pdfreader",
+        "title": "PDF Reader",
+        "description": "Displays pdf files",
+        "id": "09dec059-1ee8-4fbd-85dd-c0ab0428aa94",
+        "iconclass": "fa fa-file",
+        "component": "views/components/cards/file-renderers/pdfreader",
+        "ext": "pdf",
+        "type": "application/pdf",
+        "exclude": "tif,tiff,psd",
+    },
+]
 
 # By setting RESTRICT_MEDIA_ACCESS to True, media file requests outside of Arches will checked against nodegroup permissions.
 RESTRICT_MEDIA_ACCESS = False
@@ -287,6 +349,12 @@ RESTRICT_MEDIA_ACCESS = False
 # to export search results above the SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
 # value and is not signed in with a user account then the request will not be allowed.
 RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER = False
+
+# Dictionary containing any additional context items for customising email templates
+EXTRA_EMAIL_CONTEXT = {
+    "salutation": _("Hi"),
+    "expiration":(datetime.now() + timedelta(seconds=CELERY_SEARCH_EXPORT_EXPIRES)).strftime("%A, %d %B %Y")
+}
 
 # see https://docs.djangoproject.com/en/1.9/topics/i18n/translation/#how-django-discovers-language-preference
 # to see how LocaleMiddleware tries to determine the user's language preference
@@ -328,7 +396,7 @@ SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
 try:
     from .package_settings import *
 except ImportError:
-    try: 
+    try:
         from package_settings import *
     except ImportError as e:
         pass
@@ -336,21 +404,19 @@ except ImportError:
 try:
     from .settings_local import *
 except ImportError as e:
-    try: 
+    try:
         from settings_local import *
     except ImportError as e:
         pass
 
 # returns an output that can be read by NODEJS
 if __name__ == "__main__":
-    print(
-        json.dumps({
-            'ARCHES_NAMESPACE_FOR_DATA_EXPORT': ARCHES_NAMESPACE_FOR_DATA_EXPORT,
-            'STATIC_URL': STATIC_URL,
-            'ROOT_DIR': ROOT_DIR,
-            'APP_ROOT': APP_ROOT,
-            'WEBPACK_DEVELOPMENT_SERVER_PORT': WEBPACK_DEVELOPMENT_SERVER_PORT,
-        })
+    transmit_webpack_django_config(
+        root_dir=ROOT_DIR,
+        app_root=APP_ROOT,
+        arches_applications=ARCHES_APPLICATIONS,
+        public_server_address=PUBLIC_SERVER_ADDRESS,
+        static_url=STATIC_URL,
+        webpack_development_server_port=WEBPACK_DEVELOPMENT_SERVER_PORT,
     )
-    sys.stdout.flush()
 

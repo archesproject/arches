@@ -27,7 +27,6 @@ define([
     var GraphDesignerView = BaseManagerView.extend({
         initialize: function(options) {
             var viewModel = options.viewModel;
-
             viewModel.graphid = ko.observable(data.graphid);
             viewModel.activeTab = ko.observable('graph');
             viewModel.viewState = ko.observable('design');
@@ -50,7 +49,7 @@ define([
                 else if (viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty()) {
                     shouldShowGraphPublishButtons = false;
                 }
-                else if (viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false) {
+                else if (viewModel.isNodeDirty()) {
                     shouldShowGraphPublishButtons = false;
                 }
                 else if (ko.unwrap(viewModel.cardTree.selection)) {
@@ -67,6 +66,10 @@ define([
                 return shouldShowGraphPublishButtons;
             });
             viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
+
+            viewModel.isNodeDirty = ko.pureComputed(function() {
+                return viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false;
+            });
 
             var resources = ko.utils.arrayFilter(viewData.graphs, function(graph) {
                 return graph.isresource;
@@ -279,6 +282,21 @@ define([
             viewModel.selectedNode = viewModel.graphModel.get('selectedNode');
             viewModel.updatedCardinalityData = ko.observable();
 
+            // ctrl+S to save any edited/dirty nodes 
+            var keyListener = function(e) {
+                if (e.ctrlKey && e.key === "s") {
+                    e.preventDefault();
+                    if (viewModel.isNodeDirty() || viewModel.graphSettingsViewModel.dirty()) {
+                        viewModel.saveSelectedNode();
+                    }
+                }
+            };
+            document.addEventListener("keydown", keyListener)
+            // dispose of eventlistener
+            this.dispose = function(){
+                document.removeEventListener("keydown", keyListener);
+            };
+
             viewModel.saveNode = function(node) {
                 if (node) {
                     viewModel.loading(true);
@@ -289,9 +307,9 @@ define([
                         else {
                             viewModel.cardTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
                             viewModel.permissionTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
+                            viewModel.updatedCardinalityData([data.responseJSON, viewModel.graphSettingsViewModel]);
                         }
 
-                        viewModel.updatedCardinalityData([data.responseJSON, viewModel.graphSettingsViewModel]);
                         viewModel.loading(false);
                     });
                 }

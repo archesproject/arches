@@ -17,6 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+from contextlib import contextmanager
+
 from django.test import TestCase
 from arches.app.models.graph import Graph
 from arches.app.models.models import Ontology
@@ -27,8 +29,9 @@ from arches.app.utils.data_management.resources.importer import BusinessDataImpo
 from tests import test_settings
 from arches.app.utils.context_processors import app_settings
 from django.db import connection
-from django.contrib.auth.models import User
 from django.core import management
+from django.test.runner import DiscoverRunner
+
 from arches.app.search.mappings import (
     prepare_terms_index,
     delete_terms_index,
@@ -49,64 +52,41 @@ CREATE_TOKEN_SQL = """
             token, expires, scope, application_id, user_id, created, updated)
             VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018');
     """
+DELETE_TOKEN_SQL = "DELETE FROM public.oauth2_provider_accesstoken WHERE application_id = 44;"
 
 
-def setUpTestPackage():
-    """
-    see https://nose.readthedocs.io/en/latest/writing_tests.html#test-packages
-    this is called from __init__.py
-    """
+class ArchesTestRunner(DiscoverRunner):
+    def __init__(self, *args, **kwargs) -> None:
+        kwargs["debug_mode"] = True
+        # Unless the user has something other than the Django default, give them
+        # what they probably want.
+        if kwargs["pattern"] == "test*.py":
+            kwargs["pattern"] = "*.py"
+        super().__init__(*args, **kwargs)
 
-    cursor = connection.cursor()
-    sql = """
-        INSERT INTO public.oauth2_provider_application(
-            id,client_id, redirect_uris, client_type, authorization_grant_type,
-            client_secret,
-            name, user_id, skip_authorization, created, updated)
-        VALUES (
-            44,'{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
-            '{oauth_client_secret}',
-            'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000');
-    """
+    def setup_databases(self, **kwargs):
+        ret = super().setup_databases(**kwargs)
 
-    sql = sql.format(user_id=1, oauth_client_id=OAUTH_CLIENT_ID, oauth_client_secret=OAUTH_CLIENT_SECRET)
-    cursor.execute(sql)
+        app_settings()  # adds languages to system
+        prepare_terms_index(create=True)
+        prepare_concepts_index(create=True)
+        prepare_search_index(create=True)
 
-    app_settings()  # adds languages to system
-    prepare_terms_index(create=True)
-    prepare_concepts_index(create=True)
-    prepare_search_index(create=True)
+        return ret
 
+    def teardown_databases(self, old_config, **kwargs):
+        delete_terms_index()
+        delete_concepts_index()
+        delete_search_index()
 
-def tearDownTestPackage():
-    """
-    see https://nose.readthedocs.io/en/latest/writing_tests.html#test-packages
-    this is called from __init__.py
-    """
-
-    delete_terms_index()
-    delete_concepts_index()
-    delete_search_index()
-
-
-def setUpModule():
-    # This doesn't appear to be called because ArchesTestCase is never called directly
-    # See setUpTestPackage above
-    pass
-
-
-def tearDownModule():
-    # This doesn't appear to be called because ArchesTestCase is never called directly
-    # See tearDownTestPackage above
-    pass
-
+        super().teardown_databases(old_config, **kwargs)
 
 class ArchesTestCase(TestCase):
     def __init__(self, *args, **kwargs):
         super(ArchesTestCase, self).__init__(*args, **kwargs)
         if settings.DEFAULT_BOUNDS is None:
             management.call_command("migrate")
-            with open(os.path.join("tests/fixtures/system_settings/Arches_System_Settings_Model.json"), "rU") as f:
+            with open(os.path.join("tests/fixtures/system_settings/Arches_System_Settings_Model.json"), "r") as f:
                 archesfile = JSONDeserializer().deserialize(f)
             ResourceGraphImporter(archesfile["graph"], True)
             BusinessDataImporter("tests/fixtures/system_settings/Arches_System_Settings_Local.json").import_business_data()
@@ -120,11 +100,31 @@ class ArchesTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        pass
+        cursor = connection.cursor()
+        sql = """
+            INSERT INTO public.oauth2_provider_application(
+                id, client_id, redirect_uris, client_type, authorization_grant_type,
+                client_secret,
+                name, user_id, skip_authorization, created, updated, algorithm)
+            VALUES (
+                44, '{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
+                '{oauth_client_secret}',
+                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000', '{jwt_algorithm}');
+        """
+
+        sql = sql.format(
+            user_id=1,
+            oauth_client_id=OAUTH_CLIENT_ID,
+            oauth_client_secret=OAUTH_CLIENT_SECRET,
+            jwt_algorithm=test_settings.JWT_ALGORITHM,
+        )
+        cursor.execute(sql)
 
     @classmethod
     def tearDownClass(cls):
-        pass
+        cursor = connection.cursor()
+        sql = "DELETE FROM public.oauth2_provider_application WHERE id = 44;"
+        cursor.execute(sql)
 
     @classmethod
     def deleteGraph(cls, root):
@@ -136,3 +136,20 @@ class ArchesTestCase(TestCase):
 
     def tearDown(self):
         pass
+
+
+@contextmanager
+def sync_overridden_test_settings_to_arches():
+    """Django's @override_settings test util acts on django.conf.settings,
+    which is not enough for us, because we use SystemSettings at runtime.
+
+    This context manager swaps in the overridden django.conf.settings for SystemSettings.
+    """
+    from django.conf import settings as patched_settings
+
+    original_settings_wrapped = settings._wrapped
+    try:
+        settings._wrapped = patched_settings._wrapped
+        yield
+    finally:
+        settings._wrapped = original_settings_wrapped

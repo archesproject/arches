@@ -32,6 +32,8 @@ ROOT_DIR = os.path.normpath(os.path.join(ROOT_DIR, "..", "arches"))
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 APP_ROOT = ""
 
+ARCHES_APPLICATIONS = ()
+
 MIN_ARCHES_VERSION = arches.__version__
 MAX_ARCHES_VERSION = arches.__version__
 
@@ -64,8 +66,7 @@ CACHES = {
 
 ELASTICSEARCH_PREFIX = "test"
 
-# Use nose to run all tests
-TEST_RUNNER = "django_nose.NoseTestSuiteRunner"
+TEST_RUNNER = "tests.base_test.ArchesTestRunner"
 
 # could add Chrome, PhantomJS etc... here
 LOCAL_BROWSERS = []  # ['Firefox']
@@ -100,11 +101,6 @@ OVERRIDE_RESOURCE_MODEL_LOCK = True
 ENABLE_TWO_FACTOR_AUTHENTICATION = False
 FORCE_TWO_FACTOR_AUTHENTICATION = False
 
-# Tell nose to measure coverage on the 'foo' and 'bar' apps
-NOSE_ARGS = ["--with-coverage", "--nologcapture", "--cover-package=arches", "--verbosity=1", "--cover-erase", "--cover-xml", "-s"]
-
-INSTALLED_APPS = INSTALLED_APPS + ("django_nose",)
-
 DATATYPE_LOCATIONS.append("tests.fixtures.datatypes")
 ELASTICSEARCH_HOSTS = [{"scheme": "http", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
 LANGUAGES = [
@@ -115,10 +111,15 @@ LANGUAGES = [
     ("ar", _("Arabic")),
 ]
 
+DOCKER = False
+
 try:
-    from .settings_local import *
+    from arches.settings_local import *
 except ImportError:
+    pass
+
+if DOCKER:
     try:
-        from .settings_docker import *
+        from arches.settings_docker import *
     except ImportError:
         pass

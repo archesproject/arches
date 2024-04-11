@@ -1,3 +1,4 @@
+import importlib
 import os
 import logging
 import shutil
@@ -9,9 +10,10 @@ from django.core import management
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.http import HttpRequest
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.utils import import_class_from_string
+from arches.app.utils.message_contexts import return_message_context
 from tempfile import NamedTemporaryFile
 
 
@@ -43,6 +45,7 @@ def export_search_results(self, userid, request_values, format, report_link):
     from arches.app.search.search_export import SearchResultsExporter
     from arches.app.models.system_settings import settings
 
+    logger = logging.getLogger(__name__)
     settings.update_from_db()
 
     create_user_task_record(self.request.id, self.name, userid)
@@ -65,12 +68,17 @@ def export_search_results(self, userid, request_values, format, report_link):
         exporter = SearchResultsExporter(search_request=new_request)
         export_files, export_info = exporter.export(format, report_link)
         wb = export_files[0]["outputfile"]
-        with NamedTemporaryFile() as tmp:
-            wb.save(tmp.name)
-            tmp.seek(0)
-            stream = tmp.read()
-            export_files[0]["outputfile"] = tmp
-            exportid = exporter.write_export_zipfile(export_files, export_info, export_name)
+        try:
+            with NamedTemporaryFile(delete=False) as tmp:
+                wb.save(tmp.name)
+                tmp.seek(0)
+                stream = tmp.read()
+                export_files[0]["outputfile"] = tmp
+                exportid = exporter.write_export_zipfile(export_files, export_info, export_name)
+        except OSError:
+            logger.error("Temp file could not be created.")
+            raise
+        os.unlink(tmp.name)
     else:
         exporter = SearchResultsExporter(search_request=new_request)
         files, export_info = exporter.export(format, report_link)
@@ -78,22 +86,27 @@ def export_search_results(self, userid, request_values, format, report_link):
 
     search_history_obj = models.SearchExportHistory.objects.get(pk=exportid)
 
+    expiration_date = datetime.now() + timedelta(seconds=settings.CELERY_SEARCH_EXPORT_EXPIRES)
+    formatted_expiration_date = expiration_date.strftime("%A, %d %B %Y")
+
+    context = return_message_context(
+        greeting=_("Hello,\nYour request to download a set of search results is now ready. You have until {} to access this download, after which time it'll be deleted.".format(formatted_expiration_date)),
+        closing_text=_("Thank you"),
+        email=email,
+        additional_context={
+            "link":str(exportid),
+            "button_text":_("Download Now"),
+            "name":export_name,
+            "email_link":str(settings.PUBLIC_SERVER_ADDRESS).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),
+            "username":_user.first_name or _user.username
+        },
+    )
+
     return {
         "taskid": self.request.id,
-        "msg": _(
-            "Your search {} is ready for download. You have 24 hours to access this file, after which we'll automatically remove it."
-        ).format(export_name),
+        "msg": _("Your search '{}' is ready for download. You have until {} to access this file, after which we'll automatically remove it.".format(export_name, formatted_expiration_date)),
         "notiftype_name": "Search Export Download Ready",
-        "context": dict(
-            greeting=_("Hello,\nYour request to download a set of search results is now ready."),
-            link=exportid,
-            button_text=_("Download Now"),
-            closing=_("Thank you"),
-            email=email,
-            name=export_name,
-            email_link=str(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT).rstrip("/") + "/files/" + str(search_history_obj.downloadfile),
-        ),
-    }
+        "context":context}
 
 
 @shared_task(bind=True)
@@ -134,19 +147,21 @@ def index_resource(self, module, index_name, resource_id, tile_ids):
 
 
 @shared_task
-def package_load_complete(*args, **kwargs):
+def package_load_complete(*args, **kwargs):    
     valid_resource_paths = kwargs.get("valid_resource_paths")
-
+    
     msg = _("Resources have completed loading.")
     notifytype_name = "Package Load Complete"
     user = User.objects.get(id=1)
-    context = dict(
+    context = return_message_context(
         greeting=_("Hello,\nYour package has successfully loaded into your Arches project."),
-        loaded_resources=[os.path.basename(os.path.normpath(resource_path)) for resource_path in valid_resource_paths],
-        link="",
-        link_text=_("Log me in"),
-        closing=_("Thank you"),
-        email="",
+        closing_text=_("Thank you"),
+        email=user.email,
+        additional_context={
+            "link":"",
+            "loaded_resource":[os.path.basename(os.path.normpath(resource_path)) for resource_path in valid_resource_paths],
+            "link_text":_("Log me in")
+        }
     )
     notify_completion(msg, user, notifytype_name, context)
 
@@ -176,7 +191,7 @@ def update_user_task_record(arg_dict={}):
 @shared_task
 def log_error(request, exc, traceback, msg=None):
     logger = logging.getLogger(__name__)
-    logger.warn(exc)
+    logger.warning(exc)
     try:
         task_obj = models.UserXTask.objects.get(taskid=request.id)
         task_obj.status = "ERROR"
@@ -192,22 +207,16 @@ def log_error(request, exc, traceback, msg=None):
 @shared_task
 def on_chord_error(request, exc, traceback):
     logger = logging.getLogger(__name__)
-    logger.warn(exc)
-    logger.warn(traceback)
+    logger.warning(exc)
+    logger.warning(traceback)
     msg = f"Package Load erred on import_business_data. Exception: {exc}. See logs for details."
     user = User.objects.get(id=1)
     notify_completion(msg, user)
 
-
-@shared_task
-def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
-    from arches.app.etl_modules import branch_csv_importer
-
+def load_excel_data(import_module, importer_name, userid, files, summary, result, temp_dir, loadid):
     logger = logging.getLogger(__name__)
-
     try:
-        BranchCsvImporter = branch_csv_importer.BranchCsvImporter(request=None, loadid=loadid, temp_dir=temp_dir)
-        BranchCsvImporter.run_load_task(files, summary, result, temp_dir, loadid)
+        import_module.run_load_task(userid, files, summary, result, temp_dir, loadid)
 
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
@@ -218,10 +227,61 @@ def load_branch_csv(userid, files, summary, result, temp_dir, loadid):
         load_event.save()
         status = _("Failed")
     finally:
-        msg = _("Branch Excel Import: {} [{}]").format(summary["name"], status)
+        msg = _("{}: {} [{}]").format(importer_name, summary["name"], status)
         user = User.objects.get(id=userid)
         notify_completion(msg, user)
 
+
+@shared_task
+def load_branch_excel(userid, files, summary, result, temp_dir, loadid):
+    from arches.app.etl_modules import branch_excel_importer
+
+    BranchExcelImporter = branch_excel_importer.BranchExcelImporter(request=None, loadid=loadid, temp_dir=temp_dir)
+    load_excel_data(BranchExcelImporter, "Branch Excel Import", userid, files, summary, result, temp_dir, loadid)
+
+
+@shared_task
+def load_tile_excel(userid, files, summary, result, temp_dir, loadid):
+    from arches.app.etl_modules import tile_excel_importer
+
+    TileExcelImporter = tile_excel_importer.TileExcelImporter(request=None, loadid=loadid, temp_dir=temp_dir)
+    load_excel_data(TileExcelImporter, "Tile Excel Import", userid, files, summary, result, temp_dir, loadid)
+
+
+@shared_task
+def export_excel_data(import_module, user_id, load_id, graph_id, graph_name, resource_ids, export_concepts_as=None, filename=None):
+    logger = logging.getLogger(__name__)
+
+    status = _("Failed")
+    try:
+        import_module.run_export_task(load_id, graph_id, graph_name, resource_ids, export_concepts_as=export_concepts_as, filename=filename)
+
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        load_event.status = "failed"
+        load_event.save()
+    finally:
+        msg = _("Excel Export: {}").format(status)
+        user = User.objects.get(id=user_id)
+        notify_completion(msg, user)
+
+@shared_task
+def export_branch_excel(userid, load_id, graph_id, graph_name, resource_ids, filename=None):
+    from arches.app.etl_modules import branch_excel_exporter
+
+    BranchExcelExporter = branch_excel_exporter.BranchExcelExporter(request=None, loadid=load_id)
+    export_excel_data(BranchExcelExporter, userid, load_id, graph_id, graph_name, resource_ids, filename)
+
+
+@shared_task
+def export_tile_excel(userid, load_id, graph_id, graph_name, resource_ids, export_concepts_as, filename=None):
+    from arches.app.etl_modules import tile_excel_exporter
+
+    TileExcelExporter = tile_excel_exporter.TileExcelExporter(request=None, loadid=load_id)
+    export_excel_data(TileExcelExporter, userid, load_id, graph_id, graph_name, resource_ids, export_concepts_as, filename)
 
 @shared_task
 def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label):
@@ -230,8 +290,8 @@ def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_mappin
     logger = logging.getLogger(__name__)
 
     try:
-        ImportSingleCsv = import_single_csv.ImportSingleCsv()
-        ImportSingleCsv.run_load_task(loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
+        ImportSingleCsv = import_single_csv.ImportSingleCsv(loadid=loadid)
+        ImportSingleCsv.run_load_task(userid, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
 
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
@@ -248,14 +308,14 @@ def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_mappin
 
 
 @shared_task
-def edit_bulk_string_data(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids, userid):
+def edit_bulk_string_data(userid, load_id, module_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids):
     from arches.app.etl_modules import base_data_editor
 
     logger = logging.getLogger(__name__)
 
     try:
         BulkStringEditor = base_data_editor.BulkStringEditor(loadid=load_id)
-        BulkStringEditor.run_load_task(load_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
+        BulkStringEditor.run_load_task(userid, load_id, module_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids)
 
         load_event = models.LoadEvent.objects.get(loadid=load_id)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
@@ -267,6 +327,75 @@ def edit_bulk_string_data(load_id, graph_id, node_id, operation, language_code, 
         status = _("Failed")
     finally:
         msg = _("Bulk Data Edit: {} [{}]").format(operation, status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
+
+@shared_task
+def bulk_data_deletion(userid, load_id, graph_id, nodegroup_id, resourceids):
+    from arches.app.etl_modules import bulk_data_deletion
+
+    logger = logging.getLogger(__name__)
+
+    try:
+        BulkDataDeletion = bulk_data_deletion.BulkDataDeletion(loadid=load_id)
+        BulkDataDeletion.run_bulk_task(userid, load_id, graph_id, nodegroup_id, resourceids)
+
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        load_event.status = "failed"
+        load_event.save()
+        status = _("Failed")
+    finally:
+        msg = _("Bulk Data Deletion: [{}]").format(status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
+
+
+@shared_task
+def run_task(module_name=None, class_name=None, method_to_run=None, **kwargs):
+    """
+        this allows the user to run any method as a celery task
+        module_name, class_name, and method_to_run are required
+        pass any additional arguments to the method via the kwargs parameter
+    """
+
+    theClass = getattr(importlib.import_module(module_name), class_name)
+    theMethod = getattr(theClass(), method_to_run)
+    theMethod(**kwargs)
+
+
+@shared_task
+def run_etl_task(**kwargs):
+    """
+        this allows the user to run the custom etl module
+        import_module, import_class, loadid, userid are the required string parameter
+        importer_name can be added (not required) for messaging purpose
+    """
+
+    logger = logging.getLogger(__name__)
+
+    import_module = kwargs.pop("import_module")
+    import_class = kwargs.pop("import_class")
+    importer_name = kwargs.pop("importer_name", import_class)
+    loadid = kwargs.get("loadid")
+    userid = kwargs.get("userid")
+
+    try:
+        run_task(module_name=import_module, class_name=import_class, method_to_run="run_load_task", **kwargs)
+
+        load_event = models.LoadEvent.objects.get(loadid=loadid)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.get(loadid=loadid)
+        load_event.status = "failed"
+        load_event.save()
+        status = _("Failed")
+    finally:
+        msg = _("{}: {}").format(importer_name, status)
         user = User.objects.get(id=userid)
         notify_completion(msg, user)
 
@@ -285,7 +414,7 @@ def create_user_task_record(taskid, taskname, userid):
         new_task_record = models.UserXTask.objects.create(user=user, taskid=taskid, datestart=datetime.now(), name=taskname)
     except Exception as e:
         logger = logging.getLogger(__name__)
-        logger.warn(e)
+        logger.warning(e)
 
 
 def notify_completion(msg, user, notiftype_name=None, context=None):

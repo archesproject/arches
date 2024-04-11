@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.db import transaction
 from django.shortcuts import render
 from django.http import Http404
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
 from guardian.shortcuts import get_users_with_perms, get_groups_with_perms
 from revproxy.views import ProxyView

@@ -26,7 +26,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.utils.translation import get_language
 from arches.app.models import models
 from arches.app.models.models import EditLog
@@ -51,6 +51,8 @@ from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
     get_restricted_users,
     get_restricted_instances,
+    user_can_read_graph,
+    get_nodegroups_by_perm,
 )
 from arches.app.datatypes.datatypes import DataTypeFactory
 
@@ -72,6 +74,7 @@ class Resource(models.ResourceInstance):
         self.descriptor_function = None
         self.serialized_graph = None
         self.node_datatypes = None
+
 
     def get_serialized_graph(self):
         if not self.serialized_graph:
@@ -119,6 +122,7 @@ class Resource(models.ResourceInstance):
             self.name = {}
 
         requested_language = None
+
         if context and "language" in context:
             requested_language = context["language"]
         language = requested_language or get_language()
@@ -146,36 +150,37 @@ class Resource(models.ResourceInstance):
             except KeyError:
                 pass
 
-        self.calculate_descriptors(context=context)
-        return self.descriptors[language][descriptor]
-
-    def calculate_descriptors(self, descriptors=("name", "description", "map_popup"), context=None):
+    def save_descriptors(self, descriptors=("name", "description", "map_popup"), context=None):
         """
         descriptors -- iterator with descriptors to be calculated
-        context -- Dictionary which may have:
-            language -- Language code in which the descriptor should be returned (e.g. 'en').
-                This occurs when handling concept values.
-            any key:value pairs needed to control the behavior of a custom descriptor function
+        context -- Dictionary with any key:value pairs needed to control the behavior of a custom descriptor function
 
         """
 
-        language = self.get_descriptor_language(context)
-
-        if not self.descriptor_function:
+        if self.descriptor_function is None:  # might be empty queryset
             self.descriptor_function = models.FunctionXGraph.objects.filter(
                 graph_id=self.graph_id, function__functiontype="primarydescriptors"
             ).select_related("function")
 
-        for descriptor in descriptors:
-            if len(self.descriptor_function) == 1:
-                module = self.descriptor_function[0].function.get_class_module()()
-                self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
-                    self, self.descriptor_function[0].config["descriptor_types"][descriptor], context
-                )
-                if descriptor == "name" and self.descriptors[language][descriptor] is not None:
-                    self.name[language] = self.descriptors[language][descriptor]
+        for lang in settings.LANGUAGES:
+            language = self.get_descriptor_language({"language":lang[0]})
+            if context:
+                context["language"] = language
             else:
-                self.descriptors[language][descriptor] = None
+                context = {"language": language}
+
+            for descriptor in descriptors:
+                if len(self.descriptor_function) == 1:
+                    module = self.descriptor_function[0].function.get_class_module()()
+                    self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
+                        self, self.descriptor_function[0].config["descriptor_types"][descriptor], context, descriptor
+                    )
+                    if descriptor == "name" and self.descriptors[language][descriptor] is not None:
+                        self.name[language] = self.descriptors[language][descriptor]
+                else:
+                    self.descriptors[language][descriptor] = None
+        
+        super(Resource, self).save()
 
     def displaydescription(self, context=None):
         return self.get_descriptor("description", context)
@@ -223,9 +228,11 @@ class Resource(models.ResourceInstance):
         context = kwargs.pop("context", None)
         transaction_id = kwargs.pop("transaction_id", None)
         super(Resource, self).save(*args, **kwargs)
+        self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
+
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
-            tile.save(request=request, index=False, transaction_id=transaction_id, context=context)
+            tile.save(request=request, index=False, resource_creation=True, transaction_id=transaction_id, context=context)
         if request is None:
             if user is None:
                 user = {}
@@ -238,11 +245,10 @@ class Resource(models.ResourceInstance):
         except NotUserNorGroup:
             pass
 
-        self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
         if index is True:
             self.index(context)
 
-    def load_tiles(self, user=None, perm=None):
+    def load_tiles(self, user=None, perm='read_nodegroup'):
         """
         Loads the resource's tiles array with all the tiles from the database as a flat list
 
@@ -250,7 +256,8 @@ class Resource(models.ResourceInstance):
 
         self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
         if user:
-            self.tiles = [tile for tile in self.tiles if tile.nodegroup_id is not None and user.has_perm(perm, tile.nodegroup)]
+            readable_nodegroups = get_nodegroups_by_perm(user, perm, any_perm=True)
+            self.tiles = [tile for tile in self.tiles if tile.nodegroup is not None and tile.nodegroup in readable_nodegroups]
 
     # # flatten out the nested tiles into a single array
     def get_flattened_tiles(self):
@@ -322,12 +329,6 @@ class Resource(models.ResourceInstance):
         """
 
         if str(self.graph_id) != str(settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
-            for lang in settings.LANGUAGES:
-                if context is None:
-                    context = {}
-                context["language"] = lang[0]
-                self.calculate_descriptors(context=context)
-
             datatype_factory = DataTypeFactory()
 
             node_datatypes = {
@@ -350,8 +351,6 @@ class Resource(models.ResourceInstance):
                         es_index = import_class_from_string(index["module"])(index["name"])
                         doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
                         es_index.index_document(document=doc, id=doc_id)
-
-            super(Resource, self).save()
 
     def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None, context=None):
         """
@@ -428,7 +427,8 @@ class Resource(models.ResourceInstance):
         document["numbers"] = []
         document["date_ranges"] = []
         document["ids"] = []
-        document["provisional_resource"] = "true" if sum([len(t.data) for t in tiles]) == 0 else "false"
+        tiles_have_authoritative_data = any(any(val is not None for val in t.data.values()) for t in tiles)
+        document["provisional_resource"] = "true" if tiles and not tiles_have_authoritative_data else "false"
 
         terms = []
 
@@ -668,15 +668,23 @@ class Resource(models.ResourceInstance):
         restricted_instances = get_restricted_instances(user, se) if user is not None else []
         for relation in resource_relations["relations"]:
             relation = model_to_dict(relation)
-            try:
-                preflabel = get_preflabel_from_valueid(relation["relationshiptype"], lang)
-                relation["relationshiptype_label"] = preflabel["value"] or ""
-            except:
-                relation["relationshiptype_label"] = relation["relationshiptype"] or ""
-
             resourceid_to = relation["resourceinstanceidto"]
             resourceid_from = relation["resourceinstanceidfrom"]
-            if resourceid_to not in restricted_instances and resourceid_from not in restricted_instances:
+            resourceinstanceto_graphid = relation["resourceinstanceto_graphid"]
+            resourceinstancefrom_graphid = relation["resourceinstancefrom_graphid"]
+
+            if (
+                resourceid_to not in restricted_instances 
+                and resourceid_from not in restricted_instances
+                and user_can_read_graph(user, resourceinstanceto_graphid)
+                and user_can_read_graph(user, resourceinstancefrom_graphid)
+            ):
+                try:
+                    preflabel = get_preflabel_from_valueid(relation["relationshiptype"], lang)
+                    relation["relationshiptype_label"] = preflabel["value"] or ""
+                except:
+                    relation["relationshiptype_label"] = relation["relationshiptype"] or ""
+
                 ret["resource_relationships"].append(relation)
                 instanceids.add(str(resourceid_to))
                 instanceids.add(str(resourceid_from))

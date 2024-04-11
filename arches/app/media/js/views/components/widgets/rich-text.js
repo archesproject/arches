@@ -29,6 +29,7 @@ define([
         const currentLanguage = {"code": arches.activeLanguage};
         let currentValue = koMapping.toJS(self.value) || initialCurrent;
         self.currentLanguage = ko.observable(currentLanguage);
+        let updating = false;
 
         if(self.form){
             self.form.on('tile-reset', (x) => {
@@ -71,7 +72,10 @@ define([
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
 
-            if(JSON.stringify(currentValue) != JSON.stringify(ko.toJS(ko.unwrap(self.value)))){
+            if(!updating && (JSON.stringify(currentValue) != JSON.stringify(ko.toJS(ko.unwrap(self.value))))){
+                // Don't attempt to update currentText if we are in the middle of another update.
+                // currentValue will already be correct, and self.value has not yet finished updating.
+                // https://github.com/archesproject/arches/issues/10468
                 self.currentText(newValue?.[currentLanguage.code]?.value || newValue);
             }
         });
@@ -80,17 +84,26 @@ define([
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
 
+            updating = true;
+            if(!currentValue?.[currentLanguage.code]){
+                currentValue[currentLanguage.code] = {};
+            }
             currentValue[currentLanguage.code].value = newValue?.[currentLanguage.code] ? newValue[currentLanguage.code]?.value : newValue;
             if (ko.isObservable(self.value)) {
                 self.value(currentValue);
             } else {
                 self.value[currentLanguage.code].value(newValue);
             }
+            updating = false;
         });
         self.currentDirection.subscribe(newValue => {
             const currentLanguage = self.currentLanguage();
             if(!currentLanguage) { return; }
 
+            updating = true;
+            if(!currentValue?.[currentLanguage.code]){
+                currentValue[currentLanguage.code] = {};
+            }
             currentValue[currentLanguage.code].direction = newValue;
 
             if (ko.isObservable(self.value)) {
@@ -98,6 +111,7 @@ define([
             } else {
                 self.value[currentLanguage.code].direction(newValue);
             }
+            updating = false;
         });
 
         self.currentLanguage.subscribe(() => {

@@ -10,24 +10,31 @@
 
 
 import os
+import sys
 import json
 import uuid
 import datetime
 import logging
+import traceback
+import django.utils.timezone
 
+from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
+from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
 from django.db.models import JSONField
 from django.core.cache import caches
 from django.core.mail import EmailMultiAlternatives
+from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template, render_to_string
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max
 from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
 from django.utils import translation
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
@@ -38,6 +45,25 @@ from guardian.shortcuts import assign_perm
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
 from django.conf import settings
+
+
+logger = logging.getLogger(__name__)
+
+
+def add_to_update_fields(kwargs, field_name):
+    """
+    Update the `update_field` arg inside `kwargs` (if present) in-place
+    with `field_name`.
+    """
+    if (update_fields := kwargs.get("update_fields")) is not None:
+        # Django sends a set from update_or_create()
+        if isinstance(update_fields, set):
+            update_fields.add(field_name)
+        # Arches sends a list from tile POST view
+        else:
+            new = set(update_fields)
+            new.add(field_name)
+            kwargs["update_fields"] = new
 
 
 class BulkIndexQueue(models.Model):
@@ -281,6 +307,9 @@ class EditLog(models.Model):
     class Meta:
         managed = True
         db_table = "edit_log"
+        indexes = [
+            models.Index(fields=["transactionid"]),
+        ]
 
 
 class ExternalOauthToken(models.Model):
@@ -322,13 +351,27 @@ class ResourceRevisionLog(models.Model):
 
 class File(models.Model):
     fileid = models.UUIDField(primary_key=True)
-    path = models.FileField(upload_to="uploadedfiles")
+    path = models.FileField(upload_to=import_class_from_string(settings.FILENAME_GENERATOR))
     tile = models.ForeignKey("TileModel", db_column="tileid", null=True, on_delete=models.CASCADE)
+    thumbnail_data = models.BinaryField(null=True)
 
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args, **kwargs)
         if not self.fileid:
             self.fileid = uuid.uuid4()
+
+    def save(self, *args, **kwargs):
+        self.make_thumbnail(kwargs)
+        super(File, self).save(*args, **kwargs)
+
+    def make_thumbnail(self, kwargs_from_save_call, force=False):
+        try:
+            if ThumbnailGeneratorInstance and (force or self.thumbnail_data is None):
+                self.thumbnail_data = ThumbnailGeneratorInstance.get_thumbnail_data(self.path.file)
+                add_to_update_fields(kwargs_from_save_call, "thumbnail_data")
+        except Exception as e:
+            logger.error(f"Thumbnail not generated for {self.path}: {e}")
+            traceback.print_exc(file=sys.stdout)
 
     class Meta:
         managed = True
@@ -338,15 +381,18 @@ class File(models.Model):
 class TempFile(models.Model):
     fileid = models.UUIDField(primary_key=True)
     path = models.FileField(upload_to="archestemp")
+    created = models.DateTimeField(auto_now_add=True)
+    source = models.TextField()
 
     def __init__(self, *args, **kwargs):
-        super(File, self).__init__(*args, **kwargs)
+        super(TempFile, self).__init__(*args, **kwargs)
         if not self.fileid:
             self.fileid = uuid.uuid4()
 
     class Meta:
         managed = True
         db_table = "files_temporary"
+
 
 # These two event listeners auto-delete files from filesystem when they are unneeded:
 # from http://stackoverflow.com/questions/16041232/django-delete-filefield
@@ -415,7 +461,7 @@ class Function(models.Model):
         return json_string
 
     def get_class_module(self):
-        return get_class_from_modulename(self.modulename, self.classname, settings.FUNCTION_LOCATIONS)
+        return get_class_from_modulename(self.modulename, self.classname, ExtensionType.FUNCTIONS)
 
 
 class FunctionXGraph(models.Model):
@@ -433,6 +479,7 @@ class FunctionXGraph(models.Model):
         managed = True
         db_table = "functions_x_graphs"
         unique_together = ("function", "graph")
+
 
 class GraphModel(models.Model):
     graphid = models.UUIDField(primary_key=True)
@@ -474,13 +521,15 @@ class GraphModel(models.Model):
         else:
             return True
 
-    def get_published_graph(self, language=None):
+    def get_published_graph(self, language=None, raise_if_missing=False):
         if not language:
             language = translation.get_language()
-        
+
         try:
             graph = PublishedGraph.objects.get(publication=self.publication, language=language)
         except PublishedGraph.DoesNotExist:
+            if raise_if_missing:
+                raise
             graph = None
 
         return graph
@@ -928,9 +977,11 @@ class ResourceXResource(models.Model):
 
         if not self.created:
             self.created = datetime.datetime.now()
+            add_to_update_fields(kwargs, "created")
         self.modified = datetime.datetime.now()
+        add_to_update_fields(kwargs, "modified")
 
-        super(ResourceXResource, self).save()
+        super(ResourceXResource, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(ResourceXResource, self).__init__(*args, **kwargs)
@@ -956,7 +1007,8 @@ class ResourceInstance(models.Model):
             self.graph_publication = self.graph.publication
         except ResourceInstance.graph.RelatedObjectDoesNotExist:
             pass
-        super(ResourceInstance, self).save()
+        add_to_update_fields(kwargs, "graph_publication")
+        super(ResourceInstance, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(ResourceInstance, self).__init__(*args, **kwargs)
@@ -994,7 +1046,7 @@ class SearchComponent(models.Model):
         db_table = "search_component"
 
     def get_class_module(self):
-        return get_class_from_modulename(self.modulename, self.classname, settings.SEARCH_COMPONENT_LOCATIONS)
+        return get_class_from_modulename(self.modulename, self.classname, ExtensionType.SEARCH_COMPONENTS)
 
     def toJSON(self):
         from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -1100,14 +1152,23 @@ class TileModel(models.Model):  # Tile
         if not self.tileid:
             self.tileid = uuid.uuid4()
 
+    def is_fully_provisional(self):
+        return bool(self.provisionaledits and not any(self.data.values()))
+
     def save(self, *args, **kwargs):
-        if self.sortorder is None or (self.provisionaledits is not None and self.data == {}):
+        if self.sortorder is None or self.is_fully_provisional():
+            for node in Node.objects.filter(nodegroup_id=self.nodegroup_id):
+                if not str(node.pk) in self.data:
+                    self.data[str(node.pk)] = None
+
             sortorder_max = TileModel.objects.filter(
                 nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id
             ).aggregate(Max("sortorder"))["sortorder__max"]
             self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
+            add_to_update_fields(kwargs, "sortorder")
         if not self.tileid:
             self.tileid = uuid.uuid4()
+            add_to_update_fields(kwargs, "tileid")
         super(TileModel, self).save(*args, **kwargs)  # Call the "real" save() method.
 
 
@@ -1272,7 +1333,7 @@ class MapLayer(models.Model):
     legend = models.TextField(blank=True, null=True)
     searchonly = models.BooleanField(default=False)
     sortorder = models.IntegerField(default=0)
-    ispublic = models.BooleanField(default=False)
+    ispublic = models.BooleanField(default=True)
 
     @property
     def layer_json(self):
@@ -1292,10 +1353,12 @@ class MapLayer(models.Model):
         ordering = ("sortorder", "name")
         db_table = "map_layers"
         default_permissions = ()
-        permissions = (("no_access_to_maplayer", "No Access"),
-                       ("read_maplayer", "Read"),
-                       ("write_maplayer", "Create/Update"),
-                       ("delete_maplayer", "Delete"))
+        permissions = (
+            ("no_access_to_maplayer", "No Access"),
+            ("read_maplayer", "Read"),
+            ("write_maplayer", "Create/Update"),
+            ("delete_maplayer", "Delete"),
+        )
 
 
 class GraphXMapping(models.Model):
@@ -1423,7 +1486,7 @@ class Notification(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     # created.editable = True
     message = models.TextField(blank=True, null=True)
-    context = JSONField(blank=True, null=True, default=dict)
+    context = JSONField(blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
     # TODO: Ideally validate context against a list of keys from NotificationType
     notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE, null=True)
 
@@ -1503,16 +1566,20 @@ def send_email_on_save(sender, instance, **kwargs):
                 email_to = instance.recipient.email
             else:
                 email_to = context["email"]
+
+            if type(email_to) is not list:
+                email_to = [email_to]
+
             subject, from_email, to = instance.notif.notiftype.name, settings.DEFAULT_FROM_EMAIL, email_to
-            msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+            msg = EmailMultiAlternatives(subject, text_content, from_email, to)
             msg.attach_alternative(html_content, "text/html")
             msg.send()
             if instance.notif.notiftype.webnotify is not True:
                 instance.isread = True
                 instance.save()
         except Exception as e:
-            logger = logging.getLogger(__name__)
-            logger.warn("Email Server not correctly set up. See settings to configure.")
+            logger.warning(e)
+            logger.warning("Error occurred sending email.  See previous stack trace and check email configuration in settings.py.")
 
     return False
 
@@ -1535,11 +1602,11 @@ class MapMarker(models.Model):
 
 class Plugin(models.Model):
     pluginid = models.UUIDField(primary_key=True)
-    name = models.TextField()
+    name = I18n_TextField(null=True, blank=True)
     icon = models.TextField(default=None)
     component = models.TextField()
     componentname = models.TextField()
-    config = JSONField(blank=True, null=True, db_column="config")
+    config = I18n_JSONField(blank=True, null=True, db_column="config")
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
     helptemplate = models.TextField(blank=True, null=True)
@@ -1550,11 +1617,26 @@ class Plugin(models.Model):
             self.pluginid = uuid.uuid4()
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     class Meta:
         managed = True
         db_table = "plugins"
+
+
+class WorkflowHistory(models.Model):
+    workflowid = models.UUIDField(primary_key=True)
+    workflowname = models.CharField(null=True, max_length=255)
+    stepdata = JSONField(null=False, default=dict)
+    componentdata = JSONField(null=False, default=dict)
+    # `auto_now_add` marks the field as non-editable, which prevents the field from being serialized, so updating to use `default` instead
+    created = models.DateTimeField(default=django.utils.timezone.now, null=False)
+    user = models.ForeignKey(db_column="userid", null=True, on_delete=models.SET_NULL, to=settings.AUTH_USER_MODEL)
+    completed = models.BooleanField(default=False)
+
+    class Meta:
+        managed = True
+        db_table = "workflow_history"
 
 
 class IIIFManifestValidationError(Exception):
@@ -1566,11 +1648,13 @@ class IIIFManifestValidationError(Exception):
     def __str__(self):
         return repr(self)
 
+
 class IIIFManifest(models.Model):
     label = models.TextField()
     url = models.TextField()
     description = models.TextField(blank=True, null=True)
     manifest = JSONField(blank=True, null=True)
+    globalid = models.UUIDField(default=uuid.uuid4, unique=True)
     transactionid = models.UUIDField(default=uuid.uuid4, null=True)
 
     def __str__(self):
@@ -1592,7 +1676,7 @@ class IIIFManifest(models.Model):
             canvas_labels_in_use = [
                 item["label"] for item in canvases_in_manifest if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
             ]
-            message = _("This manifest cannot be deleted because the following canvases have resource annotations: {}").format(
+            message = _("This image service cannot be deleted because the following canvases have resource annotations: {}").format(
                 ", ".join(canvas_labels_in_use)
             )
             raise IIIFManifestValidationError(message)
@@ -1655,6 +1739,7 @@ class ETLModule(models.Model):
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
     config = JSONField(blank=True, null=True, db_column="config")
+    reversible = models.BooleanField(default=True)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     description = models.TextField(blank=True, null=True)
     helptemplate = models.TextField(blank=True, null=True)
@@ -1668,7 +1753,7 @@ class ETLModule(models.Model):
         db_table = "etl_modules"
 
     def get_class_module(self):
-        return get_class_from_modulename(self.modulename, self.classname, settings.ETL_MODULE_LOCATIONS)
+        return get_class_from_modulename(self.modulename, self.classname, ExtensionType.ETL_MODULES)
 
 
 class LoadEvent(models.Model):
@@ -1703,6 +1788,7 @@ class LoadStaging(models.Model):
     nodegroup_depth = models.IntegerField(default=1)
     source_description = models.TextField(blank=True, null=True)
     error_message = models.TextField(blank=True, null=True)
+    operation = models.TextField(default="insert")
 
     class Meta:
         managed = True
@@ -1723,6 +1809,7 @@ class LoadErrors(models.Model):
     class Meta:
         managed = True
         db_table = "load_errors"
+
 
 class SpatialView(models.Model):
     spatialviewid = models.UUIDField(primary_key=True, default=uuid.uuid1)

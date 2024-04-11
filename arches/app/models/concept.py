@@ -29,8 +29,8 @@ from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.elasticsearch_dsl_builder import Term, Query, Bool, Match, Terms
 from arches.app.search.mappings import CONCEPTS_INDEX
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from django.utils.translation import ugettext as _
-from django.utils.translation import get_language
+from arches.app.utils.i18n import rank_label
+from django.utils.translation import get_language, gettext as _
 from django.db import IntegrityError
 from psycopg2.extensions import AsIs
 
@@ -64,7 +64,7 @@ class Concept(object):
                 try:
                     uuid.UUID(args[0])
                     self.get(args[0])
-                except (ValueError):
+                except ValueError:
                     self.load(JSONDeserializer().deserialize(args[0]))
             elif isinstance(args[0], dict):
                 self.load(args[0])
@@ -123,7 +123,6 @@ class Concept(object):
         pathway_filter=None,
         **kwargs,
     ):
-
         if id != "":
             self.load(models.Concept.objects.get(pk=id))
         elif legacyoid != "":
@@ -329,7 +328,7 @@ class Concept(object):
             for relation in conceptrelations:
                 relation.delete()
 
-            if models.Relation.objects.filter(relations_filter).count() == 0:
+            if not models.Relation.objects.filter(relations_filter).exists():
                 # we've removed all parent concepts so now this concept needs to be promoted to a Concept Scheme
                 concept = models.Concept.objects.get(pk=self.id)
                 concept.nodetype_id = "ConceptScheme"
@@ -468,16 +467,16 @@ class Concept(object):
             conceptid, ["member"], child_valuetypes, offset=offset, limit=limit, order_hierarchically=True, query=query, columns=columns
         )
 
-    def get_child_collections(self, conceptid, child_valuetypes=None, parent_valuetype="prefLabel", columns=None, depth_limit=""):
+    def get_child_collections(self, conceptid, child_valuetypes=None, parent_valuetype="prefLabel", columns=None, depth_limit=None):
         child_valuetypes = child_valuetypes if child_valuetypes else ["prefLabel"]
         columns = columns if columns else "conceptidto::text, valueto, valueidto::text"
         return self.get_child_edges(conceptid, ["member"], child_valuetypes, parent_valuetype, columns, depth_limit)
 
-    def get_child_concepts(self, conceptid, child_valuetypes=None, parent_valuetype="prefLabel", columns=None, depth_limit=""):
+    def get_child_concepts(self, conceptid, child_valuetypes=None, parent_valuetype="prefLabel", columns=None, depth_limit=None):
         columns = columns if columns else "conceptidto::text, valueto, valueidto::text"
         return self.get_child_edges(conceptid, ["narrower", "hasTopConcept"], child_valuetypes, parent_valuetype, columns, depth_limit)
 
-    def get_child_concepts_for_indexing(self, conceptid, child_valuetypes=None, parent_valuetype="prefLabel", depth_limit=""):
+    def get_child_concepts_for_indexing(self, conceptid, child_valuetypes=None, parent_valuetype="prefLabel", depth_limit=None):
         columns = "valueidto::text, conceptidto::text, valuetypeto, categoryto, valueto, languageto"
         data = self.get_child_edges(conceptid, ["narrower", "hasTopConcept"], child_valuetypes, parent_valuetype, columns, depth_limit)
         return [dict(list(zip(["id", "conceptid", "type", "category", "value", "language"], d)), top_concept="") for d in data]
@@ -509,8 +508,8 @@ class Concept(object):
 
         # this interpolation is safe because `relationtypes` is hardcoded in all calls, and not accessible via the API
         relationtypes = " or ".join(["r.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
-        offset_clause = " limit %(limit)s offset %(offset)s" if offset else ""
-        depth_clause = " and depth < %(depth_limit)s" if depth_limit else ""
+        offset_clause = " limit %(limit)s offset %(offset)s" if offset is not None else ""
+        depth_clause = " and depth < %(depth_limit)s" if depth_limit is not None else ""
 
         cursor = connection.cursor()
 
@@ -639,6 +638,13 @@ class Concept(object):
                             JOIN values ON(values.conceptid = c.conceptidto)
                             WHERE LOWER(values.value) like %(query)s
                             AND values.valuetype in ('prefLabel')
+                            AND LOWER(values.value) != %(match)s
+                                UNION
+                            SELECT c.conceptidfrom, c.conceptidto, '0' as row, c.depth, c.collector
+                            FROM children c
+                            JOIN values ON(values.conceptid = c.conceptidto)
+                            WHERE LOWER(values.value) = %(match)s
+                            AND values.valuetype in ('prefLabel')
                                 UNION
                             SELECT c.conceptidfrom, c.conceptidto, c.row, c.depth, c.collector
                             FROM children c
@@ -662,6 +668,7 @@ class Concept(object):
                     "limit": limit,
                     "offset": offset,
                     "query": "%" + query.lower() + "%",
+                    "match": query.lower(),
                     "recursive_table": AsIs(recursive_table),
                     "languageid": languageid,
                     "short_languageid": languageid.split("-")[0] + "%",
@@ -795,32 +802,21 @@ class Concept(object):
         return [atof(c) for c in re.split(r"[+-]?([0-9]+(?:[.][0-9]*)?|[.][0-9]+)", str(text))]
 
     def get_preflabel(self, lang=settings.LANGUAGE_CODE):
-        score = 0
         ranked_labels = []
         if self.values == []:
             concept = Concept().get(id=self.id, include_subconcepts=False, include_parentconcepts=False, include=["label"])
         else:
             concept = self
 
-        for value in concept.values:
-            ranked_label = {"weight": 1, "value": value}
-            if value.type == "prefLabel":
-                ranked_label["weight"] = ranked_label["weight"] * 10
-            elif value.type == "altLabel":
-                ranked_label["weight"] = ranked_label["weight"] * 4
-
-            if value.language == lang:
-                ranked_label["weight"] = ranked_label["weight"] * 10
-            elif value.language.split("-")[0] == lang.split("-")[0]:
-                ranked_label["weight"] = ranked_label["weight"] * 5
-
-            ranked_labels.append(ranked_label)
-
-        ranked_labels = sorted(ranked_labels, key=lambda label: label["weight"], reverse=True)
+        ranked_labels = sorted(
+            concept.values,
+            key=lambda label: rank_label(kind=label.type, source_lang=label.language, target_lang=lang),
+            reverse=True,
+        )
         if len(ranked_labels) == 0:
-            ranked_labels.append({"weight": 1, "value": ConceptValue()})
+            return ConceptValue()
 
-        return ranked_labels[0]["value"]
+        return ranked_labels[0]
 
     def flatten(self, ret=None):
         """
@@ -926,7 +922,10 @@ class Concept(object):
                 delete_concept_values_index(concepts_to_delete)
 
     def concept_tree(
-        self, top_concept="00000000-0000-0000-0000-000000000001", lang=settings.LANGUAGE_CODE, mode="semantic",
+        self,
+        top_concept="00000000-0000-0000-0000-000000000001",
+        lang=settings.LANGUAGE_CODE,
+        mode="semantic",
     ):
         class concept(object):
             def __init__(self, *args, **kwargs):
@@ -1083,7 +1082,11 @@ class Concept(object):
                         }
                     )
                     links.append(
-                        {"target": current_concept.id, "source": parent.id, "relationship": "broader", }
+                        {
+                            "target": current_concept.id,
+                            "source": parent.id,
+                            "relationship": "broader",
+                        }
                     )
                     get_parent_nodes_and_links(parent, _cache)
 
@@ -1099,13 +1102,21 @@ class Concept(object):
 
         for child in self.subconcepts:
             nodes.append(
-                {"concept_id": child.id, "name": child.get_preflabel(lang=lang).value, "type": "Descendant", }
+                {
+                    "concept_id": child.id,
+                    "name": child.get_preflabel(lang=lang).value,
+                    "type": "Descendant",
+                }
             )
             links.append({"source": self.id, "target": child.id, "relationship": "narrower"})
 
         for related in self.relatedconcepts:
             nodes.append(
-                {"concept_id": related.id, "name": related.get_preflabel(lang=lang).value, "type": "Related", }
+                {
+                    "concept_id": related.id,
+                    "name": related.get_preflabel(lang=lang).value,
+                    "type": "Related",
+                }
             )
             links.append({"source": self.id, "target": related.id, "relationship": "related"})
 
@@ -1189,24 +1200,24 @@ class Concept(object):
         cursor.execute(
             """
             WITH RECURSIVE children AS (
-                SELECT d.conceptidfrom, d.conceptidto, c2.value, c2.valueid as valueid, c.value as valueto, c.valueid as valueidto, c.valuetype as vtype, 1 AS depth, array[d.conceptidto] AS conceptpath, array[c.valueid] AS idpath        ---|NonRecursive Part
+                SELECT d.conceptidfrom, d.conceptidto, c2.value, c2.valueid as valueid, c.value as valueto, c.valueid as valueidto, c.valuetype as vtype, c.languageid, 1 AS depth, array[d.conceptidto] AS conceptpath, array[c.valueid] AS idpath        ---|NonRecursive Part
                     FROM relations d
                     JOIN values c ON(c.conceptid = d.conceptidto)
                     JOIN values c2 ON(c2.conceptid = d.conceptidfrom)
                     WHERE d.conceptidfrom = %s
-                    and c2.valuetype = 'prefLabel'
-                    and c.valuetype in ('prefLabel', 'sortorder', 'collector')
+                    and c2.valuetype IN ('prefLabel', 'altLabel')
+                    and c.valuetype IN ('prefLabel', 'altLabel', 'sortorder', 'collector')
                     and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
                     UNION
-                    SELECT d.conceptidfrom, d.conceptidto, v2.value, v2.valueid as valueid, v.value as valueto, v.valueid as valueidto, v.valuetype as vtype, depth+1, (conceptpath || d.conceptidto), (idpath || v.valueid)   ---|RecursivePart
+                    SELECT d.conceptidfrom, d.conceptidto, v2.value, v2.valueid as valueid, v.value as valueto, v.valueid as valueidto, v.valuetype as vtype, v.languageid, depth+1, (conceptpath || d.conceptidto), (idpath || v.valueid)   ---|RecursivePart
                     FROM relations  d
                     JOIN children b ON(b.conceptidto = d.conceptidfrom)
                     JOIN values v ON(v.conceptid = d.conceptidto)
                     JOIN values v2 ON(v2.conceptid = d.conceptidfrom)
-                    WHERE  v2.valuetype = 'prefLabel'
-                    and v.valuetype in ('prefLabel','sortorder', 'collector')
+                    WHERE  v2.valuetype IN ('prefLabel', 'altLabel')
+                    and v.valuetype IN ('prefLabel', 'altLabel', 'sortorder', 'collector')
                     and (d.relationtype = 'member' or d.relationtype = 'hasTopConcept')
-                ) SELECT conceptidfrom::text, conceptidto::text, value, valueid::text, valueto, valueidto::text, depth, idpath::text, conceptpath::text, vtype FROM children ORDER BY depth, conceptpath;
+                ) SELECT conceptidfrom::text, conceptidto::text, value, valueid::text, valueto, valueidto::text, languageid, depth, idpath::text, conceptpath::text, vtype FROM children ORDER BY depth, conceptpath;
             """,
             [conceptid],
         )
@@ -1219,6 +1230,7 @@ class Concept(object):
             "valueid",
             "valueto",
             "valueidto",
+            "languageid",
             "depth",
             "idpath",
             "conceptpath",
@@ -1243,7 +1255,7 @@ class Concept(object):
                     new_val = Val(rec["conceptidto"])
                     if rec["vtype"] == "sortorder":
                         new_val.sortorder = rec["valueto"]
-                    elif rec["vtype"] == "prefLabel":
+                    elif rec["vtype"] in ("prefLabel", "altLabel"):
                         new_val.text = rec["valueto"]
                         new_val.id = rec["valueidto"]
                     elif rec["vtype"] == "collector":
@@ -1255,7 +1267,7 @@ class Concept(object):
                             if conceptid == path[-1]:
                                 if rec["vtype"] == "sortorder":
                                     child.sortorder = rec["valueto"]
-                                elif rec["vtype"] == "prefLabel":
+                                elif rec["vtype"] in ("prefLabel", "altLabel"):
                                     child.text = rec["valueto"]
                                     child.id = rec["valueidto"]
                                 elif rec["vtype"] == "collector":
@@ -1264,8 +1276,13 @@ class Concept(object):
                             _findNarrower(child, path, rec)
                 val.children.sort(key=lambda x: (x.sortorder, x.text))
 
-        for row in rows:
-            rec = dict(list(zip(column_names, row)))
+        def best_language_last(rec):
+            """_findNarrower updates via recursive search, so sort the best language last."""
+            label_rank = rank_label(kind=rec["vtype"], source_lang=rec["languageid"])
+            return (rec["depth"], rec["conceptpath"], label_rank)
+
+        records = [dict(list(zip(column_names, row))) for row in rows]
+        for rec in sorted(records, key=best_language_last):
             path = rec["conceptpath"][1:-1].split(",")
             _findNarrower(result, path, rec)
 
@@ -1313,7 +1330,7 @@ class ConceptValue(object):
                 try:
                     uuid.UUID(args[0])
                     self.get(args[0])
-                except (ValueError):
+                except ValueError:
                     self.load(JSONDeserializer().deserialize(args[0]))
             elif isinstance(args[0], object):
                 self.load(args[0])
@@ -1401,7 +1418,6 @@ class ConceptValue(object):
 
 
 def get_preflabel_from_conceptid(conceptid, lang):
-    ret = None
     default = {
         "category": "",
         "conceptid": "",
@@ -1416,21 +1432,22 @@ def get_preflabel_from_conceptid(conceptid, lang):
     bool_query.filter(Terms(field="conceptid", terms=[conceptid]))
     query.add_query(bool_query)
     preflabels = query.search(index=CONCEPTS_INDEX)["hits"]["hits"]
-    for preflabel in preflabels:
-        default = preflabel["_source"]
-        if preflabel["_source"]["language"] is not None and lang is not None:
-            # get the label in the preferred language, otherwise get the label in the default language
-            if preflabel["_source"]["language"] == lang:
-                return preflabel["_source"]
-            if preflabel["_source"]["language"].split("-")[0] == lang.split("-")[0]:
-                ret = preflabel["_source"]
-            if preflabel["_source"]["language"] == settings.LANGUAGE_CODE and ret is None:
-                ret = preflabel["_source"]
-    return default if ret is None else ret
+
+    ranked = sorted(
+        preflabels,
+        key=lambda prefLabel: rank_label(kind=prefLabel["_source"]["type"],
+                                         source_lang=prefLabel["_source"]["language"],
+                                         target_lang=lang,
+                                         ),
+        reverse=True,
+    )
+
+    if not ranked:
+        return default
+    return ranked[0]["_source"]
 
 
 def get_valueids_from_concept_label(label, conceptid=None, lang=None):
-
     def exact_val_match(val, conceptid=None):
         # exact term match, don't care about relevance ordering.
         # due to language formating issues, and with (hopefully) small result sets
@@ -1440,11 +1457,16 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
         else:
             return {
                 "query": {
-                    "bool": {"filter": [{"match_phrase": {"value": val}}, {"term": {"conceptid": conceptid}}, ]}
+                    "bool": {
+                        "filter": [
+                            {"match_phrase": {"value": val}},
+                            {"term": {"conceptid": conceptid}},
+                        ]
+                    }
                 }
             }
 
-    concept_label_results = se.search(index=CONCEPTS_INDEX, body=exact_val_match(label, conceptid))
+    concept_label_results = se.search(index=CONCEPTS_INDEX, **exact_val_match(label, conceptid))
     if concept_label_results is None:
         print("Found no matches for label:'{0}' and concept_id: '{1}'".format(label, conceptid))
         return

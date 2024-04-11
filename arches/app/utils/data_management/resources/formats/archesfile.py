@@ -145,9 +145,10 @@ class ArchesFileReader(Reader):
 
     def import_business_data_without_mapping(self, business_data, reporter, overwrite="append", prevent_indexing=False):
         errors = []
+        last_resource = None  # only set if prevent_indexing=False
         for resource in business_data["resources"]:
             if resource["resourceinstance"] is not None:
-                if GraphModel.objects.filter(graphid=str(resource["resourceinstance"]["graph_id"])).count() > 0:
+                if GraphModel.objects.filter(graphid=str(resource["resourceinstance"]["graph_id"])).exists():
                     resourceinstanceid = uuid.UUID(str(resource["resourceinstance"]["resourceinstanceid"]))
                     defaults = {
                         "graph_id": uuid.UUID(str(resource["resourceinstance"]["graph_id"])),
@@ -201,7 +202,13 @@ class ArchesFileReader(Reader):
                         for tile in [k for k in resource["tiles"] if k["parenttile_id"] is None]:
                             update_or_create_tile(tile)
 
-                    resourceinstance.save(index=(not prevent_indexing))
+                    resourceinstance.save(index=False)
+
+                    if not prevent_indexing:
+                        last_resource = self.save_descriptors_and_index(
+                            resourceinstance, last_resource=last_resource
+                        )
+
                     reporter.update_resources_saved()
 
     def get_blank_tile(self, sourcetilegroup, blanktilecache, tiles, resourceinstanceid):
@@ -233,6 +240,7 @@ class ArchesFileReader(Reader):
                 for nodegroup in JSONSerializer().serializeToPython(NodeGroup.objects.all()):
                     target_nodegroup_cardinalities[nodegroup["nodegroupid"]] = nodegroup["cardinality"]
 
+                last_resource = None  # only set if prevent_indexing=False
                 for resource in business_data["resources"]:
                     reporter.update_tiles(len(resource["tiles"]))
                     parenttileids = []
@@ -365,7 +373,13 @@ class ArchesFileReader(Reader):
                         createdtime=datetime.datetime.now(),
                     )
                     newresourceinstance.tiles = populated_tiles
-                    newresourceinstance.save(index=(not prevent_indexing), transaction_id=transaction_id)
+                    newresourceinstance.save(index=False, transaction_id=transaction_id)
+
+                    if not prevent_indexing:
+                        last_resource = self.save_descriptors_and_index(
+                            newresourceinstance, last_resource=last_resource
+                        )
+
                     reporter.update_resources_saved()
 
         except (KeyError, TypeError) as e:
@@ -373,6 +387,16 @@ class ArchesFileReader(Reader):
 
         finally:
             reporter.report_results()
+
+
+    def save_descriptors_and_index(self, this_resource, last_resource):
+        # Reuse the queryset for FunctionXGraph rows if the graph is the same.
+        if last_resource and (last_resource.graph_id == this_resource.graph_id):
+            this_resource.descriptor_function = last_resource.descriptor_function
+        this_resource.save_descriptors()
+        this_resource.index()
+        return this_resource
+
 
     def import_all(self):
         errors = []

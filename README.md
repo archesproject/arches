@@ -1,4 +1,4 @@
-# Arches [![Build Status](https://travis-ci.org/archesproject/arches.svg?branch=master)](https://travis-ci.org/archesproject/arches) [![Coverage Status](https://coveralls.io/repos/github/archesproject/arches/badge.svg?branch=master)](https://coveralls.io/github/archesproject/arches?branch=master)
+# Arches
 
 Arches is a web-based, geospatial information system for cultural heritage inventory and management. Arches is purpose-built for the international cultural heritage field, and designed to record all types of immovable heritage, including archaeological sites, buildings and other historic structures, landscapes, and heritage ensembles or districts. For more information and background on the Arches project, please visit [archesproject.org](http://archesproject.org/).
 
@@ -12,7 +12,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 7.4.0 release notes](https://github.com/archesproject/arches/blob/dev/7.4.x/releases/7.4.0.md)
+[Version 7.5.1 release notes](https://github.com/archesproject/arches/blob/stable/7.5.0/releases/7.5.1.md)
 
 #### Quick Install
 
@@ -45,7 +45,7 @@ to create a frontend asset bundle. This process should complete in less than 2 m
 
 Finally, visit `localhost:8000` in a browser (only Chrome is fully supported at this time).
 
-If you run into problems, please review our the full [installation documentation](http://arches.readthedocs.io/en/stable/installation/)
+If you run into problems, please review our full [installation documentation](http://arches.readthedocs.io/en/stable/installation/)
 
 #### Release Cycle
 
@@ -63,45 +63,23 @@ Our general release cycle will typically be a functional release (either major i
 
 The following a general plan for the Arches project. Be aware this plan is tentative and subject to change
 
-## 7.4 - Release date: June 15, 2023
-- Initial accessibility support for WCAG 2.2 level AA
-- Bulk Data Manager - Default data editing scripts for common string editing functions: case editing, search & replace
-- Bulk Data Manager - Import improvements
-  - better i18n support
-  - improved error handling and feedback
-- Added support for custom resource relationship types
-- Updates to JSONLD loader
-- Improved ETL/indexing performance 
-- Improved API/application performance
-- Enhancements to the relational data model
-- Improved documentation
-- Added map layer permissions
-- Improvements to spatial views
-- Improved term matching (relevance) in search 
-- Project version support
-- Improved null searches (ability to search for absence data)
-- Templating engine v0.1 release
-
-## 7.5 - Release date: December 15, 2023 
-- Continued accessibility improvements
-- Improved package management
-- Relationship transversal search
-- Search component redesign
-- Search UI redesign
-- Tabular search results
-- Ability to define search views
-- Support for editing and publishing graphs (removing instance restrictions)
-- Support for viewing and restoring previous graph publications
-- Support for editing/localizing UI labels and permissions for published graphs
-- Business data migrations that correspond to graph changes
-- Security enhancements
-- Support for component authoring in Vue Javascript framework
-
-## 7.6 - Release date: June 15, 2024
+## 7.6 LTS - Release date: Sept 15, 2024
+- Arches Application improvements
 - Activity stream edit logs
-- User specific saved searches
+- Security enhancements
+- Default deny permissions
+- Support for pluggable permissions frameworks
+- Standalone plugins
 
-## 8.0 - Release date: December 15, 2024
-- Migrate Arches UI Framework
-- RDM Redesign
+## 8.0 - Release date: June 15, 2025
+- Support for editing and publishing graphs without having to remove resource instances
+- Support for viewing and restoring previous graph publications
+- Support for configuring currently published graphs
+- Support for search by resource relationship
+- Implementation of the Controlled List Manager and reference data type
+- Persistent uris for resource instance data
+- Implementation of logical deletion of resources
+- Bulk Data Manager CLI interface
 
+## 9.0 - Release date: Sept 15, 2027
+- Full migration to Vue

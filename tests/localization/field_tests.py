@@ -1,4 +1,6 @@
 import json
+
+from arches.app.models.models import DDataType
 from arches.app.models.fields.i18n import I18n_String, I18n_TextField, I18n_JSON, I18n_JSONField
 from tests.base_test import ArchesTestCase
 from django.contrib.gis.db import models
@@ -6,12 +8,14 @@ from django.utils import translation
 from django.db import connection
 
 # these tests can be run from the command line via
-# python manage.py test tests/localization/field_tests.py --settings="tests.test_settings"
+# python manage.py test tests.localization.field_tests --settings="tests.test_settings"
 
 
 class Customi18nTextFieldTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         sql = """
         CREATE TABLE public._localization_test_model
         (
@@ -36,6 +40,12 @@ class Customi18nTextFieldTests(ArchesTestCase):
 
         cursor = connection.cursor()
         cursor.execute(sql)
+
+    @classmethod
+    def tearDownClass(cls):
+        cursor = connection.cursor()
+        cursor.execute("DROP TABLE public._localization_test_model")
+        super().tearDownClass()
 
     class LocalizationTestModel(models.Model):
         name = I18n_TextField(null=False)
@@ -183,6 +193,23 @@ class Customi18nTextFieldTests(ArchesTestCase):
         self.assertEqual(str(m.name), "Marco")
         self.assertEqual(m.name.raw_value, {"en": "Marco"})
 
+    def test_quoted_string_i18n_text_field_data_consistency_before_and_after_save(self):
+        # re https://github.com/archesproject/arches/issues/9623
+        translation.activate("en")
+        m = self.LocalizationTestModel()
+        m.name = "\"Hello World\""
+        m.id = 11
+        self.assertEqual(str(m.name),"\"Hello World\"")
+        m.save()
+
+        # test that post save everything is the same
+        self.assertEqual(str(m.name), "\"Hello World\"")
+
+        # test that the object retrieved from the database is the same
+        m = self.LocalizationTestModel.objects.get(pk=11)
+        self.assertEqual(str(m.name), "\"Hello World\"")
+        self.assertEqual(m.name.raw_value, {"en": "\"Hello World\""})
+
     def test_equality(self):
         value = I18n_String("toast")
         self.assertEqual(value, "toast")
@@ -197,6 +224,8 @@ class Customi18nTextFieldTests(ArchesTestCase):
 class Customi18nJSONFieldTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         sql = """
         CREATE TABLE public._localization_test_json_model
         (
@@ -211,6 +240,12 @@ class Customi18nJSONFieldTests(ArchesTestCase):
 
         cursor = connection.cursor()
         cursor.execute(sql)
+
+    @classmethod
+    def tearDownClass(cls):
+        cursor = connection.cursor()
+        cursor.execute("DROP TABLE public._localization_test_json_model")
+        super().tearDownClass()
 
     class LocalizationTestJsonModel(models.Model):
         config = I18n_JSONField(null=False)
@@ -338,3 +373,54 @@ class Customi18nJSONFieldTests(ArchesTestCase):
         m.save()
         m = self.LocalizationTestJsonModel.objects.get(pk=3)
         self.assertEqual(m.config.raw_value, expected_output_json)
+
+
+class I18nJSONFieldBulkUpdateTests(ArchesTestCase):
+    def test_bulk_update_node_config_homogenous_value(self):
+        new_config = I18n_JSON({
+            "en": "some",
+            "zh": "json",
+        })
+        for_bulk_update = []
+        for dt in DDataType.objects.all()[:3]:
+            dt.defaultconfig = new_config
+            for_bulk_update.append(dt)
+
+        DDataType.objects.bulk_update(for_bulk_update, fields=["defaultconfig"])
+
+        for i, obj in enumerate(for_bulk_update):
+            with self.subTest(obj_index=i):
+                obj.refresh_from_db()
+                self.assertEqual(str(obj.defaultconfig), str(new_config))
+
+    def test_bulk_update_heterogenous_values(self):
+        new_configs = [
+            I18n_JSON({
+                "en": "some",
+                "zh": "json",
+            }),
+            I18n_JSON({}),
+            None,
+        ]
+        for_bulk_update = []
+        for i, dt in enumerate(DDataType.objects.all()[:3]):
+            dt.defaultconfig = new_configs[i]
+            for_bulk_update.append(dt)
+
+        with self.assertRaises(NotImplementedError):
+            DDataType.objects.bulk_update(for_bulk_update, fields=["defaultconfig"])
+
+        # If the above starts failing, it's likely the underlying Django
+        # regression was fixed.
+        # https://code.djangoproject.com/ticket/35167
+        
+        # In that case, remove the with statement, de-indent the bulk_update,
+        # and comment the following code back in:
+
+        # for i, obj in enumerate(for_bulk_update):
+        #     new_config_as_string = str(new_configs[i])
+        #     with self.subTest(new_config=new_config_as_string):
+        #         obj.refresh_from_db()
+        #         self.assertEqual(str(obj.defaultconfig), new_config_as_string)
+
+        # Also consider removing the code at the top of I18n_JSON._parse()

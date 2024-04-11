@@ -31,9 +31,10 @@ setup(
     author="Farallon Geographics, Inc",
     author_email="dev@fargeo.com",
     license="GNU AGPL3",
-    scripts=["arches/install/arches-project"],
+    scripts=["arches/install/arches-project", "arches/install/arches-admin"],
     cmdclass={"install": post_install},
     install_requires=requirements,
+    python_requires=">=3.10",
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         # How mature is this project? Common values are
@@ -46,8 +47,10 @@ setup(
         "Intended Audience :: Information Technology",
         "Topic :: Software Development :: Build Tools",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
-        "Framework :: Django :: 1.11",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Framework :: Django :: 4.2",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     ],
     # What does your project relate to?

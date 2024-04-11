@@ -17,17 +17,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+from unittest.mock import Mock
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from rdflib import Namespace
 from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection, ActivityStreamCollectionPage
 
-# mocking libraries
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.models.models import ResourceInstance
 from arches.app.utils.skos import SKOSReader
-from mock import Mock
 from uuid import uuid4
 from itertools import cycle
 from datetime import datetime
@@ -97,6 +96,8 @@ class ActivityStreamCollectionTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         ResourceInstance.objects.all().delete()
 
         for skospath in ["tests/fixtures/data/rdf_export_thesaurus.xml", "tests/fixtures/data/rdf_export_collections.xml"]:
@@ -106,7 +107,7 @@ class ActivityStreamCollectionTests(ArchesTestCase):
 
         # Models
         for model_name in ["object_model", "document_model"]:
-            with open(os.path.join("tests/fixtures/resource_graphs/rdf_export_{0}.json".format(model_name)), "rU") as f:
+            with open(os.path.join("tests/fixtures/resource_graphs/rdf_export_{0}.json".format(model_name)), "r") as f:
                 archesfile = JSONDeserializer().deserialize(f)
             ResourceGraphImporter(archesfile["graph"])
 

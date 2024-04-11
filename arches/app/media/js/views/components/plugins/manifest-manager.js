@@ -20,8 +20,9 @@ define([
             this.metadataValues = ko.observable('');
             this.mainMenu = ko.observable(true);
 
-            this.shouldShowEditService = params.shouldShowEditService || ko.observable(true);
-            this.editService = ko.observable(false);
+            // params.shouldShowEditService is deprecated, but retained for backward compatibility for other projects that may have used it.  Use params.shouldShowSelectService instead.
+            this.shouldShowSelectService = params.shouldShowSelectService || params.shouldShowEditService || ko.observable(true);
+            this.selectService = ko.observable(false);
             
             this.shouldShowCreateService = params.shouldShowCreateService || ko.observable(true);
             this.createService = ko.observable(true);
@@ -58,7 +59,7 @@ define([
                 );});
 
             this.isCanvasDirty = ko.computed(function() {
-                return (ko.unwrap(self.canvasLabel) !== self.origCanvasLabel);
+                return !self.compareMode() && (self.canvasLabel() !== self.origCanvasLabel());
             });
 
             this.uniqueId = uuid.generate();
@@ -108,7 +109,7 @@ define([
                 self.manifestAttribution(self.origManifestAttribution);
                 self.manifestLogo(self.origManifestLogo);
                 self.manifestDescription(self.origManifestDescription);
-                self.canvasLabel(self.origCanvasLabel);
+                self.canvasLabel(self.origCanvasLabel());
                 if (self.origManifestMetadata) {
                     self.manifestMetadata.removeAll();
                     JSON.parse(self.origManifestMetadata).forEach(function(entry){
@@ -121,6 +122,9 @@ define([
             };
 
             this.submitToManifest = function(onSuccess, onError){
+                if (params.manifestManagerFormData) {
+                    params.manifestManagerFormData(self.formData);
+                }
                 $.ajax({
                     type: "POST",
                     url: arches.urls.manifest_manager,
@@ -218,20 +222,22 @@ define([
                 self.formData.append("manifest_attribution", ko.unwrap(self.manifestAttribution));
                 self.formData.append("manifest_logo", ko.unwrap(self.manifestLogo));
                 self.formData.append("manifest", ko.unwrap(self.manifest));
-                self.formData.append("canvas_label", ko.unwrap(self.canvasLabel)); //new label for canvas
+                self.formData.append("canvas_label", ko.unwrap(self.canvasLabel) ?? ''); //new label for canvas
                 self.formData.append("canvas_id", ko.unwrap(self.canvas)); //canvas id for label change
                 self.formData.append("metadata", JSON.stringify(koMapping.toJS(self.manifestMetadata)));
                 self.updateCanvas = false;
                 self.submitToManifest();
             };
 
-            this.manifestSelectConfig.placeholder = 'Select an Image Service';
             this.manifest.subscribe(function(val){
                 self.getManifestData(val);
                 self.mainMenu(false);
             });
 
             this.manifestData.subscribe(function(manifestData) {
+                if (manifestData) {
+                    self.selectCanvas(manifestData.sequences[0].canvases[0]);
+                }
                 if (params.manifestData && ko.isObservable(params.manifestData)) {
                     params.manifestData(manifestData);
                 }

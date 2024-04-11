@@ -1,8 +1,52 @@
+@import "abstracts/functions";
+
+body {
+    overflow-x: hidden;
+    @include break-at(small-desktop) {
+        overflow-x: auto;
+    }
+}
+
+#container {
+    height: 100vh;
+    @include break-at(small-desktop-max) {
+        height: auto;
+    }
+}
+
 .ep-help,
 .ep-notifs {
     width: 100%;
-
-    @include break-at(desktop) {
+    @include break-at(small-desktop) {
         width: 40vw;
     }
+}
+
+.form-control,
+.dropdown-menu,
+.btn,
+.chosen-container,
+.jstree-container-ul,
+.popover {
+    font-size: 1.3rem;
+}
+
+// Focus indicator
+div.chosen-container-active:not(.chosen-with-drop) a.chosen-single,
+ul.chosen-results li.highlighted,
+ul.select2-results li.select2-highlighted,
+a[href]:focus-visible,
+area[href]:focus-visible,
+input:focus-visible:not(.select2-search__field),
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+iframe:focus-visible,
+object:focus-visible,
+embed:focus-visible,
+*[tabindex]:focus-visible:not(.select2-search__field),
+*[contenteditable]:focus-visible,
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    outline: 2px solid #005ecc !important;
+    outline-offset: -2px !important;
 }

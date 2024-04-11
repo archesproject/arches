@@ -28,13 +28,21 @@ define([
         };
 
         this.load_details = params.load_details;
+        this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
+        this.statusDetails = this.selectedLoadEvent()?.load_description?.split("|");
+        this.showStatusDetails = ko.observable(false);
+        this.editHistoryUrl = `${arches.urls.edit_history}?transactionid=${ko.unwrap(params.selectedLoadEvent)?.loadid}`;
         this.state = params.state;
         this.loading = params.loading || ko.observable();
         this.alert = params.alert;
         this.moduleId = params.etlmoduleid;
+        this.formatTime = params.formatTime;
+        this.timeDifference = params.timeDifference;
+        this.config = params.config;
         this.loading(true);
+        this.previewing = ko.observable();
         this.languages = ko.observable(arches.languages);
-        this.selectedLanguage = ko.observable();
+        this.selectedLanguage = ko.observable(this.languages().find(lang => lang.code === arches.activeLanguage));
         this.graphs = ko.observable();
         this.selectedGraph = ko.observable();
         this.nodes = ko.observable();
@@ -49,12 +57,14 @@ define([
         this.loadId = params.loadId || uuid.generate();
         this.resourceids = ko.observable();
         this.previewValue = ko.observable();
+        this.previewLimit = ko.observable();
         this.showPreview = ko.observable(false);
         this.searchUrl = ko.observable();
         this.caseInsensitive = ko.observable();
+        this.wholeWord = ko.observable();
         this.trim = ko.observable();
-        this.numberOfResources = ko.observable();
-        this.numberOfTiles = ko.observable();
+        this.numberOfResources = ko.observable(0);
+        this.numberOfTiles = ko.observable(0);
         this.selectedCaseOperation = ko.observable();
 
         this.caseOperations = [
@@ -83,8 +93,30 @@ define([
         this.ready = ko.computed(() => {
             const ready = !!self.selectedGraph() &&
                 !!self.selectedNode() &&
+                !self.previewing() &&
                 ((self.operation() == 'replace' && !!self.oldText() && !!self.newText() || self.operation() != 'replace'));
             return ready;
+        });
+
+        this.clearResults = ko.computed(() => {
+            // if any of these values change then clear the preview results
+            self.showPreview(false);
+            // we don't actually care about the results of the following
+            let clearResults = '';
+            [self.selectedGraph(),
+                self.selectedCaseOperation(),
+                self.selectedNode(),
+                self.searchUrl(),
+                self.selectedLanguage(),
+                ((self.operation() == 'replace' && !!self.oldText() && !!self.newText() || self.operation() != 'replace'))
+            ].forEach(function(item){
+                clearResults += item?.toString();
+            });
+            return clearResults;
+        });
+
+        this.allowEditOperation = ko.computed(() => {
+            return self.ready() && self.numberOfTiles() > 0 && self.showPreview();
         });
 
         this.addAllFormData = () => {
@@ -99,6 +131,7 @@ define([
             if (self.selectedGraph()) { self.formData.append('graph_id', self.selectedGraph()); }
             if (self.selectedLanguage()) { self.formData.append('language_code', self.selectedLanguage().code); }
             if (self.caseInsensitive()) { self.formData.append('case_insensitive', self.caseInsensitive()); }
+            if (self.wholeWord()) { self.formData.append('whole_word', self.wholeWord()); }
             if (self.trim()) { self.formData.append('also_trim', self.trim()); }
             if (self.oldText()) { self.formData.append('old_text', self.oldText()); }
             if (self.newText()) { self.formData.append('new_text', self.newText()); }
@@ -113,6 +146,7 @@ define([
             self.formData.delete('graph_id');
             self.formData.delete('language_code');
             self.formData.delete('case_insensitive');
+            self.formData.delete('whole_word');
             self.formData.delete('also_trim');
             self.formData.delete('old_text');
             self.formData.delete('new_text');
@@ -147,6 +181,11 @@ define([
             if (!self.ready()) {
                 return;
             }
+
+            self.previewing(true);
+            self.showPreview(false);
+            self.previewValue([]);
+
             if (self.operation() === 'replace' && (!self.oldText() || !self.newText())){
                 self.alert(
                     new AlertViewModel(
@@ -166,15 +205,24 @@ define([
                 self.showPreview(true);
                 self.numberOfResources(data.result.number_of_resources);
                 self.numberOfTiles(data.result.number_of_tiles);
+                self.previewLimit(data.result.preview_limit);
             }).fail(function(err) {
-                console.log(err);
+                self.alert(
+                    new JsonErrorAlertViewModel(
+                        'ep-alert-red',
+                        err.responseJSON["data"],
+                        null,
+                        function(){}
+                    )
+                );
             }).always(function() {
+                self.previewing(false);
                 self.deleteAllFormData();
             });
         };
 
         this.write = function() {
-            if (!self.ready()) {
+            if (!self.allowEditOperation()) {
                 return;
             }
             if (self.operation() === 'replace' && (!self.oldText() || !self.newText())){
@@ -191,10 +239,9 @@ define([
             }
 
             self.addAllFormData();
-            self.loading(true);
+            params.activeTab("import");
             self.submit('write').then(data => {
-                params.activeTab("import");
-                console.log(data.result);
+                //console.log(data.result);
             }).fail( function(err) {
                 self.alert(
                     new JsonErrorAlertViewModel(

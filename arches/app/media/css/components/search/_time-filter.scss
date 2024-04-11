@@ -1,0 +1,59 @@
+.time-filter-title {
+    margin-bottom: 8px;
+
+    >span{
+        flex-grow: 1;
+    }
+}
+
+.time-search-container {
+    background: #fff;
+    #calendar {
+        display: flex;
+        flex-wrap: wrap;
+        .calendar {
+            display: block;
+            width: inherit;
+            padding-left: 5px;
+            max-width: 152px;
+            .search-label {
+                margin-top: 10px;
+                font-weight: 400;
+                font-size: 1.5rem;
+                margin-bottom: 3px;
+            }
+            &.picker {
+                max-width: 175px;
+                min-width: 175px;
+                position: relative;
+            }
+            div {
+                .form-control[disabled] {
+                    background: #f7f7f7;
+                    border: 1px solid #ddd;
+                    color: #777;
+                }
+            }
+        }
+        .chosen-container-single {
+            .chosen-single {
+                height: 35px;
+                padding-top: 8px;
+            }
+            div {
+                b:before {
+                    vertical-align: -70%;
+                }
+            }
+        }
+    }
+}
+
+.hide-datepicker-time-option .bootstrap-datetimepicker-widget .picker-switch.accordion-toggle {
+    display: none;
+}
+
+.datepicker-inline {
+    background: #fff;
+    border-width: 0px;
+}

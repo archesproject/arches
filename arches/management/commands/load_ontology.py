@@ -22,7 +22,7 @@ import json
 import os
 import uuid
 import shutil
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.core.management.base import BaseCommand, CommandError
 from django.core.files import File
 from django.db import transaction
@@ -191,6 +191,6 @@ class Command(BaseCommand):
             if settings.ONTOLOGY_DIR in os.path.abspath(data_source):
                 ret = os.path.abspath(data_source).replace(settings.ONTOLOGY_DIR, "").lstrip(os.sep)
         except Exception as e:
-            print("Something when wrong in getting the path to the ontology file", e)
+            print("Something went wrong in getting the path to the ontology file", e)
 
         return ret

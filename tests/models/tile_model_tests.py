@@ -31,10 +31,9 @@ from django.core import management
 from django.contrib.auth.models import User
 from django.db.utils import ProgrammingError
 from django.http import HttpRequest
-from arches.app.models.tile import Tile
+from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.resource import Resource
-from arches.app.models.models import ResourceXResource
-
+from arches.app.models.models import CardModel, CardXNodeXWidget, Node, NodeGroup, ResourceXResource, TileModel, Widget
 
 
 # these tests can be run from the command line via
@@ -44,6 +43,8 @@ from arches.app.models.models import ResourceXResource
 class TileTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
             management.call_command("packages", operation="import_graphs", source=path)
 
@@ -62,6 +63,9 @@ class TileTests(ArchesTestCase):
 
         INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
             VALUES ('21111111-0000-0000-0000-000000000000', '', 'n');
+
+        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
+            VALUES ('41111111-0000-0000-0000-000000000000', '', 'n');
         """
 
         cursor = connection.cursor()
@@ -74,7 +78,8 @@ class TileTests(ArchesTestCase):
         WHERE nodegroupid = '99999999-0000-0000-0000-000000000001' OR
         nodegroupid = '32999999-0000-0000-0000-000000000000' OR
         nodegroupid = '19999999-0000-0000-0000-000000000000' OR
-        nodegroupid = '21111111-0000-0000-0000-000000000000';
+        nodegroupid = '21111111-0000-0000-0000-000000000000' OR
+        nodegroupid = '42999999-0000-0000-0000-000000000000';
 
         DELETE FROM public.resource_instances
         WHERE resourceinstanceid = '40000000-0000-0000-0000-000000000000';
@@ -83,6 +88,8 @@ class TileTests(ArchesTestCase):
 
         cursor = connection.cursor()
         cursor.execute(sql)
+
+        super().tearDownClass()
 
     def setUp(self):
         cursor = connection.cursor()
@@ -296,6 +303,26 @@ class TileTests(ArchesTestCase):
         self.assertEqual(provisionaledits[str(self.user.id)]["action"], "update")
         self.assertEqual(provisionaledits[str(self.user.id)]["status"], "review")
 
+    def test_update_sortorder_provisional_tile(self):
+        self.user = User.objects.create_user(username="testuser", password="TestingTesting123!")
+        json = {
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": "",
+            "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+            "tileid": "",
+            "data": {"72048cb3-adbc-11e6-9ccf-14109fd34195": {"en": {"value": "PROVISIONAL", "direction": "ltr"}}},
+        }
+        provisional_tile = Tile(json)
+        request = HttpRequest()
+        request.user = self.user
+        provisional_tile.save(index=False, request=request)
+        self.assertEqual(provisional_tile.sortorder, 0)
+
+        obj, _ = TileModel.objects.update_or_create(pk=provisional_tile.pk, nodegroup=provisional_tile.nodegroup)
+        obj.refresh_from_db()  # give test opportunity to fail on Django 4.2+
+
+        self.assertEqual(obj.sortorder, 1)
+
     def test_tile_cardinality(self):
         """
         Tests that the tile is not saved if the cardinality is violated
@@ -408,6 +435,16 @@ class TileTests(ArchesTestCase):
         tile2.delete(request=reviewer_request)
 
         self.assertEqual(len(Tile.objects.all()), 0)
+
+    def test_delete_empty_tile(self):
+        tile = Tile({
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": "",
+            "nodegroup_id": "72048cb3-adbc-11e6-9ccf-14109fd34195",
+            "tileid": "",
+            "data": {},
+        })
+        tile.delete()
 
     def test_provisional_deletion(self):
         """
@@ -582,3 +619,42 @@ class TileTests(ArchesTestCase):
 
         #     t2 = Tile(json)
         #     self.assertFalse(t2.validate()['is_valid'])
+
+    def test_check_for_missing_nodes(self):
+        # Required file list node.
+        node_group = NodeGroup.objects.get(pk=UUID("41111111-0000-0000-0000-000000000000"))
+        required_file_list_node = Node(
+            name="Required file list",
+            datatype="file-list",
+            nodegroup=node_group,
+            isrequired=True,
+            istopnode=False,
+        )
+        required_file_list_node.save()
+
+        json = {
+            "resourceinstance_id": "40000000-0000-0000-0000-000000000000",
+            "parenttile_id": "",
+            "nodegroup_id": str(node_group.pk),
+            "tileid": "",
+            "data": {required_file_list_node.nodeid: []},
+        }
+        tile = Tile(json)
+
+        with self.assertRaisesMessage(TileValidationError, "Required file list"):  # node name
+            tile.check_for_missing_nodes()
+
+        # Add a widget label, should appear in error msg in lieu of node name
+        card = CardModel.objects.create(
+            nodegroup=node_group,
+            graph_id=UUID("2f7f8e40-adbc-11e6-ac7f-14109fd34195"),
+        )
+        CardXNodeXWidget.objects.create(
+            card=card,
+            node_id=required_file_list_node.nodeid,
+            widget=Widget.objects.first(),
+            label="Widget name",
+        )
+
+        with self.assertRaisesMessage(TileValidationError, "Widget name"):
+            tile.check_for_missing_nodes()
