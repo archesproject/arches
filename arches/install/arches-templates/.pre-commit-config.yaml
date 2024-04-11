@@ -1,0 +1,8 @@
+---
+repos:
+    - repo: local
+      hooks:
+          - id: prettier
+            name: prettier
+            entry: ./{{ project_name }}/media/node_modules/.bin/prettier ./{{ project_name }}/src --write
+            language: system

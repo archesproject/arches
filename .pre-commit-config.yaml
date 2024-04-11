@@ -1,0 +1,9 @@
+---
+repos:
+    - repo: local
+      hooks:
+          - id: prettier
+            name: prettier
+            entry: arches/app/media/node_modules/.bin/prettier
+            args: [arches/app/src, --write, --ignore-unknown]
+            language: system
