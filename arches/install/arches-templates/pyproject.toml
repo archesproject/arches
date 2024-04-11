@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "{{ project_name }}"
+readme = "README.md"
+authors = []
+license = {text = "GNU AGPL3"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "arches>={{ arches_semantic_version }},<{{ arches_next_minor_version }}",
+]
+version = "0.0.1"
+
+[tool.setuptools]
+packages = ["{{ project_name }}"]
