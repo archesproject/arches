@@ -51,22 +51,13 @@ export const postListToServer = async (
     $gettext: GetText
 ) => {
     let errorText;
-
-    // need to delete children, as they might prevent
-    // stringification if circular references exist.
-    const flatList = {
-        ...list,
-        items: list.items.map((item) => {
-            return { ...item, children: [] };
-        }),
-    };
     try {
         const response = await fetch(arches.urls.controlled_list(list.id), {
             method: "POST",
             headers: {
                 "X-CSRFToken": Cookies.get("csrftoken"),
             },
-            body: JSON.stringify(flatList),
+            body: JSON.stringify(list),
         });
         if (!response.ok) {
             errorText = response.statusText;

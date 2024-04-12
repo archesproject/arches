@@ -101,7 +101,6 @@ export const reorderItem = (
     const indexInSiblings = siblings.indexOf(item);
     const itemsToLeft = siblings.slice(0, indexInSiblings);
     const itemsToRight = siblings.slice(indexInSiblings + 1);
-    const minSortOrder = siblings[0].sortorder;
 
     let reorderedSiblings: ControlledListItem[];
     if (up) {
@@ -115,7 +114,8 @@ export const reorderItem = (
         reorderedSiblings = [...itemsToLeft, rightNeighbor, item, ...rest];
     }
 
-    const recalculateSortOrderRecursive = (acc: number, items: ControlledListItem[]) => {
+    let acc = 0;
+    const recalculateSortOrderRecursive = (items: ControlledListItem[]) => {
         // Patch in the reordered siblings.
         if (items.some(x => x.id === item.id)) {
             items = reorderedSiblings;
@@ -123,10 +123,9 @@ export const reorderItem = (
         for (const thisItem of items) {
             thisItem.sortorder = acc;
             acc += 1;
-            recalculateSortOrderRecursive(acc, thisItem.children);
+            recalculateSortOrderRecursive(thisItem.children);
         }
-        return acc;
     };
 
-    recalculateSortOrderRecursive(minSortOrder, list.items);
+    recalculateSortOrderRecursive(list.items);
 };

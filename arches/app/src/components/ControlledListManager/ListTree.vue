@@ -131,13 +131,13 @@ const addChild = async (parent_id: string) => {
         if (response.ok) {
             const newItem = await response.json();
             const parent = findNodeInTree(tree.value, parent_id);
-            parent.children.unshift(itemAsNode(newItem, selectedLanguage.value));
+            parent.children.push(itemAsNode(newItem, selectedLanguage.value));
             if (parent.data.name) {
                 // Parent node is a list
-                parent.data.items.unshift(newItem);
+                parent.data.items.push(newItem);
             } else {
                 // Parent node is an item
-                parent.data.children.unshift(newItem);
+                parent.data.children.push(newItem);
             }
             expandedKeys.value = {
                 ...expandedKeys.value,
