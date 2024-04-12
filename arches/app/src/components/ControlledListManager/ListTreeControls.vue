@@ -6,7 +6,7 @@ import { useGettext } from "vue3-gettext";
 
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
 import {
-    findItemInTree,
+    findNodeInTree,
     itemAsNode,
     listAsNode,
 } from "@/components/ControlledListManager/utils.ts";
@@ -118,7 +118,7 @@ const addChild = async (parent_id: string) => {
         });
         if (response.ok) {
             const newItem = await response.json();
-            const parent = findItemInTree(controlledListItemsTree.value, parent_id);
+            const parent = findNodeInTree(controlledListItemsTree.value, parent_id);
             parent.children.unshift(itemAsNode(newItem, selectedLanguage.value));
             if (parent.data.name) {
                 // Parent node is a list

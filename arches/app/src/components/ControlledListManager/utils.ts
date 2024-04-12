@@ -18,7 +18,7 @@ export const bestLabel = (item: ControlledListItem, languageCode: string) => {
     return bestLabel;
 };
 
-export const findItemInTree = (tree: typeof TreeNode[], itemId: string) => {
+export const findNodeInTree = (tree: typeof TreeNode[], itemId: string) => {
     function recurse (items: typeof TreeNode[]) : typeof TreeNode | undefined {
         for (const item of items) {
             if (item.data.id === itemId) {

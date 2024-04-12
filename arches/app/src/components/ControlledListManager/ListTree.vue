@@ -10,7 +10,7 @@ import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 import ListTreeControls from "@/components/ControlledListManager/ListTreeControls.vue";
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
 import { postListToServer } from "@/components/ControlledListManager/api.ts";
-import { bestLabel, findItemInTree, listAsNode } from "@/components/ControlledListManager/utils.ts";
+import { bestLabel, findNodeInTree, listAsNode } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "@/types/Ref";
 import type {
@@ -89,11 +89,11 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
     in the JSON data.
     */
 
-    const list: ControlledList = findItemInTree(tree.value, item.controlled_list_id).data;
+    const list: ControlledList = findNodeInTree(tree.value, item.controlled_list_id).data;
 
     const siblings: ControlledListItem[] = (
         item.parent_id
-        ? findItemInTree(tree.value, item.parent_id).children
+        ? findNodeInTree(tree.value, item.parent_id).children.map(child => child.data)
         : list.items
     );
 
@@ -147,8 +147,8 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
 const isFirstItem = (item: ControlledListItem) => {
     const siblings: typeof TreeNode[] = (
         item.parent_id
-        ? findItemInTree(tree.value, item.parent_id).data.children
-        : findItemInTree(tree.value, item.controlled_list_id).data.items
+        ? findNodeInTree(tree.value, item.parent_id).data.children
+        : findNodeInTree(tree.value, item.controlled_list_id).data.items
     );
     if (!siblings) {
         throw new Error("Unexpected lack of siblings");
@@ -160,8 +160,8 @@ const isFirstItem = (item: ControlledListItem) => {
 const isLastItem = (item: ControlledListItem) => {
     const siblings: typeof TreeNode[] = (
         item.parent_id
-        ? findItemInTree(tree.value, item.parent_id).data.children
-        : findItemInTree(tree.value, item.controlled_list_id).data.items
+        ? findNodeInTree(tree.value, item.parent_id).data.children
+        : findNodeInTree(tree.value, item.controlled_list_id).data.items
     );
     if (!siblings) {
         throw new Error("Unexpected lack of siblings");
