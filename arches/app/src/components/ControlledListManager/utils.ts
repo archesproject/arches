@@ -61,3 +61,72 @@ export const listAsNode = (
         data: list,
     };
 };
+
+export const reorderItem = (
+    list: ControlledList,
+    item: ControlledListItem,
+    siblings: ControlledListItem[],
+    up: boolean,
+) => {
+    /* This isn't child's play because sort order is "flat", whereas
+    reordering involves moving hierarchy subsets.
+
+    With this tree:
+        1
+        |- 2
+        |- 3
+        4
+        5
+
+    Moving the first item "down" one should result in:
+        1
+        2
+        |- 3
+        |- 4
+        5
+
+        (1 -> 4)
+        (2 -> 1)
+        (3 -> 2)
+        (4 -> 3)
+        (5 -> 5)
+
+    We're going to accomplish this by reordering the moved item among
+    its immediate siblings, and then recalculating sort order through the
+    entire list. The python view will just care that the sortorder
+    value is correct, not that the items actually present in that order
+    in the JSON data.
+    */
+
+    const indexInSiblings = siblings.indexOf(item);
+    const itemsToLeft = siblings.slice(0, indexInSiblings);
+    const itemsToRight = siblings.slice(indexInSiblings + 1);
+    const minSortOrder = siblings[0].sortorder;
+
+    let reorderedSiblings: ControlledListItem[];
+    if (up) {
+        const leftNeighbor = itemsToLeft.pop();
+        if (!leftNeighbor) {  // should be impossible, not localized
+            throw new Error('Cannot shift upward - already at top');
+        }
+        reorderedSiblings = [...itemsToLeft, item, leftNeighbor, ...itemsToRight];
+    } else {
+        const [rightNeighbor, ...rest] = itemsToRight;
+        reorderedSiblings = [...itemsToLeft, rightNeighbor, item, ...rest];
+    }
+
+    const recalculateSortOrderRecursive = (acc: number, items: ControlledListItem[]) => {
+        // Patch in the reordered siblings.
+        if (items.some(x => x.id === item.id)) {
+            items = reorderedSiblings;
+        }
+        for (const thisItem of items) {
+            thisItem.sortorder = acc;
+            acc += 1;
+            recalculateSortOrderRecursive(acc, thisItem.children);
+        }
+        return acc;
+    };
+
+    recalculateSortOrderRecursive(minSortOrder, list.items);
+};
