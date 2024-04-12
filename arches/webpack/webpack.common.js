@@ -41,6 +41,19 @@ module.exports = () => {
             const PUBLIC_SERVER_ADDRESS = parsedData['PUBLIC_SERVER_ADDRESS']
             const WEBPACK_DEVELOPMENT_SERVER_PORT = parsedData['WEBPACK_DEVELOPMENT_SERVER_PORT']
 
+            // BEGIN workaround for handling node_modules paths in arches-core vs projects
+
+            let PROJECT_RELATIVE_NODE_MODULES_PATH;
+            if (APP_ROOT.includes(ROOT_DIR)) {  // should only return truthy for running Arches-core without a project
+                PROJECT_RELATIVE_NODE_MODULES_PATH = Path.resolve(APP_ROOT, '..', '..', 'node_modules')
+            }
+            else {
+                PROJECT_RELATIVE_NODE_MODULES_PATH = Path.resolve(APP_ROOT, '..', 'node_modules')
+            }
+
+            console.log(PROJECT_RELATIVE_NODE_MODULES_PATH)
+
+            // END workaround for handling node_modules paths in arches-core vs projects
             // BEGIN create entry point configurations
         
             const archesCoreEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'js'), {});
@@ -82,7 +95,7 @@ module.exports = () => {
 
             let archesCorePackageJSONFilepath = Path.resolve(__dirname, ROOT_DIR, '..', 'package.json')
             if (!fs.existsSync(archesCorePackageJSONFilepath)) {
-                archesCorePackageJSONFilepath = Path.resolve(__dirname, APP_ROOT, '..', 'node_modules', 'arches', 'package.json')
+                archesCorePackageJSONFilepath = Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, 'arches', 'package.json')
             }
 
             const archesCorePackageJSON = require(archesCorePackageJSONFilepath);
@@ -93,7 +106,7 @@ module.exports = () => {
                     acc[alias] = Path.resolve(__dirname, ROOT_DIR, 'app', 'media', subPath);
                 }
                 else {
-                    acc[alias] = Path.resolve(__dirname, APP_ROOT, '..', subPath);
+                    acc[alias] = Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, '..', subPath);
                 }
                 return acc;
             }, {});
@@ -101,7 +114,7 @@ module.exports = () => {
             let parsedProjectNodeModulesAliases = {};
             let projectPackageJSON;
 
-            const projectJSONFilepath = Path.resolve(__dirname, APP_ROOT, '..', 'package.json');
+            const projectJSONFilepath = Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, 'package.json');
             if (fs.existsSync(projectJSONFilepath)) {  // handles running Arches without a project
                 projectPackageJSON = require(projectJSONFilepath);
                 parsedPackageJSONFilepaths[Path.join(projectPackageJSON.name, 'package.json').replace(/\\/g, '/')] = projectJSONFilepath;
@@ -114,7 +127,7 @@ module.exports = () => {
                         )
                     }
                     else {
-                        acc[alias] = Path.resolve(__dirname, APP_ROOT, '..', subPath);
+                        acc[alias] = Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, '..', subPath);
                     }
                     return acc;
                 }, {});
@@ -130,7 +143,7 @@ module.exports = () => {
                         archesApplicationJSONFilepath = Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], '..', 'package.json');
                     }
                     else {
-                        archesApplicationJSONFilepath = Path.resolve(__dirname, APP_ROOT, '..', 'node_modules', archesApplication, 'package.json')
+                        archesApplicationJSONFilepath = Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, archesApplication, 'package.json')
                     }
                     
                     const archesApplicationPackageJSON = require(archesApplicationJSONFilepath);
@@ -148,7 +161,7 @@ module.exports = () => {
                             )
                         }
                         else {
-                            parsedArchesApplicationsNodeModulesAliases[alias] = Path.resolve(__dirname, APP_ROOT, '..', subPath);
+                            parsedArchesApplicationsNodeModulesAliases[alias] = Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, '..', subPath);
                         }
                     }
                 } catch (error) {
@@ -284,9 +297,9 @@ module.exports = () => {
                         __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'
                     }),
                     new webpack.ProvidePlugin({
-                        $:  Path.resolve(__dirname, APP_ROOT, '..', 'node_modules', 'jquery', 'dist', 'jquery.min'),
-                        jQuery:  Path.resolve(__dirname, APP_ROOT, '..', 'node_modules', 'jquery', 'dist', 'jquery.min'),
-                        jquery:  Path.resolve(__dirname, APP_ROOT, '..', 'node_modules', 'jquery', 'dist', 'jquery.min')
+                        $:  Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, 'jquery', 'dist', 'jquery.min'),
+                        jQuery:  Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, 'jquery', 'dist', 'jquery.min'),
+                        jquery:  Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, 'jquery', 'dist', 'jquery.min')
                     }),
                     new MiniCssExtractPlugin(),
                     new BundleTracker({ filename: Path.resolve(__dirname, `webpack-stats.json`) }),
@@ -298,7 +311,7 @@ module.exports = () => {
                     }
                 },
                 resolve: {
-                    modules: [Path.resolve(__dirname, APP_ROOT, '..', 'node_modules')],
+                    modules: [Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH)],
                     alias: {
                         ...javascriptRelativeFilepathToAbsoluteFilepathLookup,
                         ...templateFilepathLookup,
@@ -306,7 +319,7 @@ module.exports = () => {
                         ...nodeModulesAliases,
                         ...parsedPackageJSONFilepaths,
                         '@': [Path.resolve(__dirname, APP_ROOT, 'src'), ...archesApplicationsVuePaths, Path.resolve(__dirname, ROOT_DIR, 'app', 'src')],
-                        'node_modules': Path.resolve(__dirname, APP_ROOT, '..', 'node_modules')
+                        'node_modules': Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH)
                     },
                 },
                 module: {
@@ -314,7 +327,7 @@ module.exports = () => {
                         {
                             test: /\.tsx?$/,
                             exclude: /node_modules/,
-                            loader: Path.join(APP_ROOT, '..', 'node_modules', 'ts-loader'),
+                            loader: Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'ts-loader'),
                             options: { 
                                 appendTsSuffixTo: [/\.vue$/],
                                 transpileOnly: true
@@ -323,7 +336,7 @@ module.exports = () => {
                         {
                             test: /\.vue$/,
                             exclude: /node_modules/,
-                            loader:Path.join(APP_ROOT, '..', 'node_modules', 'vue-loader'),
+                            loader:Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'vue-loader'),
                         },
                         {
                             test: /\.mjs$/,
@@ -333,10 +346,10 @@ module.exports = () => {
                         {
                             test: /\.js$/,
                             exclude: [/node_modules/, /load-component-dependencies/],
-                            loader: Path.join(APP_ROOT, '..', 'node_modules', 'babel-loader'),
+                            loader: Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'babel-loader'),
                             options: {
                                 presets: ['@babel/preset-env'],
-                                cacheDirectory: Path.join(APP_ROOT, '..', 'node_modules', '.cache', 'babel-loader'),
+                                cacheDirectory: Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, '.cache', 'babel-loader'),
                             }
                         },
                         {
@@ -349,10 +362,10 @@ module.exports = () => {
                             ],
                             use: [
                                 {
-                                    'loader': Path.join(APP_ROOT, '..', 'node_modules', 'style-loader'),
+                                    'loader': Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'style-loader'),
                                 },
                                 {
-                                    'loader': Path.join(APP_ROOT, '..', 'node_modules', 'css-loader'),
+                                    'loader': Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'css-loader'),
                                 },
                             ],
                         },
@@ -369,13 +382,13 @@ module.exports = () => {
                                     'loader': MiniCssExtractPlugin.loader,
                                 },
                                 {
-                                    'loader': Path.join(APP_ROOT, '..', 'node_modules', 'css-loader'),
+                                    'loader': Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'css-loader'),
                                 },
                                 {
-                                    'loader': Path.join(APP_ROOT, '..', 'node_modules', 'postcss-loader'),
+                                    'loader': Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'postcss-loader'),
                                 },
                                 {
-                                    'loader': Path.join(APP_ROOT, '..', 'node_modules', 'sass-loader'),
+                                    'loader': Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'sass-loader'),
                                     options: {
                                         sassOptions: {
                                             indentWidth: 4,
@@ -392,7 +405,7 @@ module.exports = () => {
                         {
                             test: /\.html?$/i,
                             exclude: /node_modules/,
-                            loader: Path.join(APP_ROOT, '..', 'node_modules', 'html-loader'),
+                            loader: Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'html-loader'),
                             options: {
                                 esModule: false,
                                 minimize: {
@@ -483,7 +496,7 @@ module.exports = () => {
                         {
                             test: /\.(txt|DS_Store)$/i,
                             exclude: /node_modules/,
-                            use: Path.join(APP_ROOT, '..', 'node_modules', 'raw-loader'),
+                            use: Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'raw-loader'),
                         },
                         {
                             test: /\.(png|svg|jpg|jpeg|gif)$/i,
