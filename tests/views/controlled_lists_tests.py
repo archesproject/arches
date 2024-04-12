@@ -134,7 +134,7 @@ class ControlledListTests(ArchesTestCase):
             ]
         )
 
-        cls.graph = GraphModel.objects.create(isresource=True)
+        cls.graph = GraphModel.objects.create(isresource=True, name="My Graph")
         cls.nodegroup = NodeGroup.objects.get(pk="20000000-0000-0000-0000-100000000000")
         cls.node_using_list1 = Node(
             pk="a3c5b7d3-ef2c-4f8b-afd5-f8d4636b8834",
@@ -203,6 +203,7 @@ class ControlledListTests(ArchesTestCase):
                     "name": self.node_using_list1.name,
                     "nodegroup_id": str(self.nodegroup.pk),
                     "graph_id": str(self.graph.graphid),
+                    "graph_name": "My Graph",
                 },
             ],
         )

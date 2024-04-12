@@ -42,6 +42,12 @@ const { $gettext } = useGettext();
             >
                 <ReferenceNodeLink :node />
             </div>
+            <div
+                v-if="displayedRow.nodes.length === 0"
+                :style="{ fontSize: 'small' }"
+            >
+                {{ $gettext('None') }}
+            </div>
         </div>
     </div>
 </template>

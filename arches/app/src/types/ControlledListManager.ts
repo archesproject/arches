@@ -48,4 +48,5 @@ export type ReferencingNode = {
     name: string,
     nodegroup_id: string,
     graph_id: string,
+    graph_name: string,
 };

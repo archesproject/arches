@@ -31,18 +31,13 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-def serialize(obj, depth_map=None, flat=False, nodes=False):
+def serialize(obj, depth_map=None, flat=False):
     """
     This is a recursive function. The first caller (you) doesn't need
     to provide a `depth_map`, but the recursive calls (see below) do.
 
     flat=False provides a tree representation.
     flat=True is just that, flat (used in reference datatype widget).
-
-    nodes=True assumes a controlled list model instance has been
-    .annotate()'d with various node-related arrays. (The default
-    nodes=False is mainly here to facilitate reusing this as a helper
-    method when setting up unit tests; the view should set nodes=True.
     """
     if depth_map is None:
         depth_map = defaultdict(int)
@@ -62,23 +57,37 @@ def serialize(obj, depth_map=None, flat=False, nodes=False):
                     key=lambda d: d["sortorder"],
                 ),
             }
-            if nodes:
-                data["nodes"] = []
-                for node_id, node_name, nodegroup_id, graph_id in zip(
-                    obj.node_ids,
-                    obj.node_names,
-                    obj.nodegroup_ids,
-                    obj.graph_ids,
-                    strict=True,
-                ):
-                    data["nodes"].append(
-                        {
-                            "id": node_id,
-                            "name": node_name,
-                            "nodegroup_id": nodegroup_id,
-                            "graph_id": graph_id,
-                        }
+            if hasattr(obj, "node_ids"):
+                data["nodes"] = [
+                    {
+                        "id": node_id,
+                        "name": node_name,
+                        "nodegroup_id": nodegroup_id,
+                        "graph_id": graph_id,
+                        "graph_name": graph_name,
+                    }
+                    for node_id, node_name, nodegroup_id, graph_id, graph_name in zip(
+                        obj.node_ids,
+                        obj.node_names,
+                        obj.nodegroup_ids,
+                        obj.graph_ids,
+                        obj.graph_names,
+                        strict=True,
                     )
+                ]
+            else:
+                data["nodes"] = [
+                    {
+                        "id": str(node.pk),
+                        "name": node.name,
+                        "nodegroup_id": node.nodegroup_id,
+                        "graph_id": node.graph_id,
+                        "graph_name": str(node.graph.name),
+                    }
+                    for node in Node.with_controlled_list.filter(
+                        controlled_list=obj.pk
+                    ).select_related("graph")
+                ]
             return data
         case ControlledListItem():
             if obj.parent_id:
@@ -197,13 +206,12 @@ class ControlledListsView(View):
             .annotate(node_names=self.node_subquery("name"))
             .annotate(nodegroup_ids=self.node_subquery("nodegroup_id"))
             .annotate(graph_ids=self.node_subquery("graph_id"))
+            .annotate(graph_names=self.node_subquery("graph__name"))
             .order_by("name")
             .prefetch_related(*prefetch_terms(request))
         )
         serialized_lists = [
-            serialize(
-                obj, nodes=True, flat=str_to_bool(request.GET.get("flat", "false"))
-            )
+            serialize(obj, flat=str_to_bool(request.GET.get("flat", "false")))
             for obj in lists
         ]
         filtered = self.filter_permitted_nodegroups(serialized_lists, request)
@@ -215,6 +223,7 @@ class ControlledListsView(View):
     def node_subquery(node_field: str = "pk"):
         return ArraySubquery(
             Node.with_controlled_list.filter(controlled_list=OuterRef("id"))
+            .select_related("graph" if node_field.startswith("graph__") else None)
             .order_by("pk")
             .values(node_field)
         )
@@ -253,7 +262,10 @@ class ControlledListView(View):
     def post(self, request, **kwargs):
         if not (list_id := kwargs.get("id", None)):
             # Add a new list.
-            lst = ControlledList(name=_("Untitled List: ") + datetime.now().isoformat())
+            lst = ControlledList(
+                name=_("Untitled List: ")
+                + datetime.now().isoformat(sep=" ", timespec="seconds")
+            )
             lst.save()
             return JSONResponse(serialize(lst))
 
@@ -351,7 +363,8 @@ class ControlledListItemView(View):
                 )
                 ControlledListItemLabel.objects.create(
                     controlled_list_item=item,
-                    value=_("New Item: ") + datetime.now().isoformat(),
+                    value=_("New Item: ")
+                    + datetime.now().isoformat(sep=" ", timespec="seconds"),
                     value_type_id="prefLabel",
                     language_id=get_language(),
                 )
