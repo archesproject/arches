@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import arches from "arches";
+import Cookies from "js-cookie";
 import { inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
@@ -13,6 +15,7 @@ import { postListToServer } from "@/components/ControlledListManager/api.ts";
 import {
     bestLabel,
     findNodeInTree,
+    itemAsNode,
     listAsNode,
     reorderItem,
 } from "@/components/ControlledListManager/utils.ts";
@@ -27,6 +30,7 @@ import type {
 import type {
     ControlledList,
     ControlledListItem,
+    NewItem,
 } from "@/types/ControlledListManager";
 
 const tree: Ref<typeof TreeNode[]> = ref([]);
@@ -38,6 +42,7 @@ const selectedLanguage = inject(selectedLanguageKey);
 
 const toast = useToast();
 const { $gettext } = useGettext();
+const ERROR = "error";  // not user-facing
 
 const collapseNodesRecursive = (node: typeof TreeNode) => {
     if (node.children && node.children.length) {
@@ -101,7 +106,6 @@ const isFirstItem = (item: ControlledListItem) => {
     return siblings[0].id === item.id;
 };
 
-
 const isLastItem = (item: ControlledListItem) => {
     const siblings: typeof TreeNode[] = (
         item.parent_id
@@ -112,6 +116,42 @@ const isLastItem = (item: ControlledListItem) => {
         throw new Error("Unexpected lack of siblings");
     }
     return siblings[siblings.length - 1].id === item.id;
+};
+
+const addChild = async (parent_id: string) => {
+    const newItem: NewItem = { parent_id };
+    try {
+        const response = await fetch(arches.urls.controlled_list_item_add, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": Cookies.get("csrftoken"),
+            },
+            body: JSON.stringify(newItem),
+        });
+        if (response.ok) {
+            const newItem = await response.json();
+            const parent = findNodeInTree(tree.value, parent_id);
+            parent.children.unshift(itemAsNode(newItem, selectedLanguage.value));
+            if (parent.data.name) {
+                // Parent node is a list
+                parent.data.items.unshift(newItem);
+            } else {
+                // Parent node is an item
+                parent.data.children.unshift(newItem);
+            }
+            expandedKeys.value = {
+                ...expandedKeys.value,
+                [parent.key]: true,
+            };
+        } else {
+            throw new Error();
+        }
+    } catch {
+        toast.add({
+            severity: ERROR,
+            summary: $gettext("Item creation failed"),
+        });
+    }
 };
 </script>
 
@@ -151,6 +191,14 @@ const isLastItem = (item: ControlledListItem) => {
         <template #default="slotProps">
             <span class="label-and-actions">
                 {{ slotProps.node.data.name ?? bestLabel(slotProps.node.data, selectedLanguage.code).value }}
+                <Button
+                    v-if="slotProps.node.key in selectedKeys"
+                    type="button"
+                    class="add-child-button"
+                    icon="fa fa-plus"
+                    :aria-label="$gettext('Add child item')"
+                    @click="addChild(slotProps.node.key)"
+                />
                 <span
                     v-if="!slotProps.node.data.name"
                     class="move-buttons"
@@ -184,6 +232,13 @@ const isLastItem = (item: ControlledListItem) => {
     display: inline-flex;
     align-items: center;
     gap: 1rem;
+}
+.add-child-button {
+    background-color: aliceblue;
+    color: black;
+    height: 2rem;
+    width: 2rem;
+    border-radius: 50%;
 }
 .move-buttons {
     display: flex;

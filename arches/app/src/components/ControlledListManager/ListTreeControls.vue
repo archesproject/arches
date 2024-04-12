@@ -1,15 +1,11 @@
 <script setup lang="ts">
 import arches from "arches";
 import Cookies from "js-cookie";
-import { computed, inject } from "vue";
+import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
-import {
-    findNodeInTree,
-    itemAsNode,
-    listAsNode,
-} from "@/components/ControlledListManager/utils.ts";
+import { listAsNode } from "@/components/ControlledListManager/utils.ts";
 
 import Button from "primevue/button";
 import ConfirmDialog from "primevue/confirmdialog";
@@ -19,7 +15,7 @@ import { useToast } from "primevue/usetoast";
 
 import type { TreeExpandedKeys, TreeSelectionKeys, TreeNode } from "primevue/tree/Tree";
 import type { Ref } from "@/types/Ref";
-import type { ControlledList, NewItem } from "@/types/ControlledListManager";
+import type { ControlledList } from "@/types/ControlledListManager";
 
 const ERROR = "error";  // not user-facing
 
@@ -31,8 +27,6 @@ const expandedKeys: Ref<typeof TreeExpandedKeys> = defineModel("expandedKeys");
 const selectedKeys: Ref<typeof TreeSelectionKeys> = defineModel("selectedKeys");
 
 const { $gettext, $ngettext } = useGettext();
-const ADD_NEW_LIST = $gettext("Add New List");
-const ADD_CHILD_ITEM = $gettext("Add Child Item");
 const lightGray = "#f4f4f4"; // todo: import from theme somewhere
 const buttonGreen = "#10b981";
 const buttonPink = "#ed7979";
@@ -102,42 +96,6 @@ const createList = async () => {
         toast.add({
             severity: ERROR,
             summary: $gettext("List creation failed"),
-        });
-    }
-};
-
-const addChild = async (parent_id: string) => {
-    const newItem: NewItem = { parent_id };
-    try {
-        const response = await fetch(arches.urls.controlled_list_item_add, {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
-            body: JSON.stringify(newItem),
-        });
-        if (response.ok) {
-            const newItem = await response.json();
-            const parent = findNodeInTree(controlledListItemsTree.value, parent_id);
-            parent.children.unshift(itemAsNode(newItem, selectedLanguage.value));
-            if (parent.data.name) {
-                // Parent node is a list
-                parent.data.items.unshift(newItem);
-            } else {
-                // Parent node is an item
-                parent.data.children.unshift(newItem);
-            }
-            expandedKeys.value = {
-                ...expandedKeys.value,
-                [parent.key]: true,
-            };
-        } else {
-            throw new Error();
-        }
-    } catch {
-        toast.add({
-            severity: ERROR,
-            summary: $gettext("Item creation failed"),
         });
     }
 };
@@ -214,28 +172,6 @@ const deleteItems = async (itemIds: string[]) => {
     }
 };
 
-
-const addLabel = computed(() => {
-    const selectedKeysList = Object.keys(selectedKeys.value);
-    if (selectedKeysList.length === 0) {
-        return ADD_NEW_LIST;
-    }
-    return ADD_CHILD_ITEM;
-});
-
-const onCreate = async () => {
-    if (!selectedKeys.value) {
-        return;
-    }
-    const ids = Object.keys(selectedKeys.value);
-    if (ids.length === 0) {
-        await createList();
-    } else {
-        // Button should have been disabled if there were >1 selected
-        await addChild(ids[0]);
-    }
-};
-
 const deleteSelected = async () => {
     if (!selectedKeys.value) {
         return;
@@ -284,12 +220,11 @@ await fetchLists();
     <div class="controls">
         <Button
             class="list-button"
-            :label="addLabel"
+            :label="$gettext('Add New List')"
             raised
-            :disabled="Object.keys(selectedKeys).length > 1"
             style="font-size: inherit"
             :pt="{ root: { style: { background: buttonGreen } } }"
-            @click="onCreate"
+            @click="createList"
         />
         <ConfirmDialog :draggable="false" />
         <Button
