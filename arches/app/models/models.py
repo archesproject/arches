@@ -1928,7 +1928,7 @@ class ControlledList(models.Model):
 
 class ControlledListItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    uri = models.URLField(max_length=2048, null=True, blank=True, unique=True)
+    uri = models.URLField(max_length=2048, null=True, blank=True)
     controlled_list = models.ForeignKey(
         ControlledList,
         db_column="listid",
@@ -1950,6 +1950,10 @@ class ControlledListItem(models.Model):
                 fields=["controlled_list", "sortorder"],
                 name="unique_list_sortorder",
                 deferrable=Deferrable.DEFERRED,
+            ),
+            models.UniqueConstraint(
+                fields=["controlled_list", "uri"],
+                name="unique_list_uri",
             ),
         ]
 

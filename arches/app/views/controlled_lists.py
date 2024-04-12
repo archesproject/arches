@@ -181,13 +181,13 @@ def handle_items(item_dicts):
     for item_dict in item_dicts:
         handle_item(item_dict)
 
-    # Consider skipping uniqueness checks and just letting IntegrityError
-    # bubble up. But doing Django validation provides a localized error.
     for item_to_save in items_to_save:
-        item_to_save.full_clean(exclude=["parent", "controlled_list", "id"])
+        item_to_save.full_clean(validate_constraints=False)
+        # Sortorder uniqueness is deferred.
+        item_to_save.validate_constraints(exclude=["sortorder"])
 
     ControlledListItem.objects.bulk_update(
-        items_to_save, fields=["uri", "sortorder", "parent"]
+        items_to_save, fields=["guide", "uri", "sortorder", "parent"]
     )
     ControlledListItemLabel.objects.bulk_update(
         labels_to_save, fields=["value", "value_type", "language"]
