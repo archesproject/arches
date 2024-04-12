@@ -137,6 +137,10 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
             listAsNode(newList, selectedLanguage.value),
             ...tree.value.slice(oldListIndex + 1),
         ];
+        selectedKeys.value = {
+            ...selectedKeys.value,
+            [item.id]: true,
+        };
     }
 };
 
