@@ -140,6 +140,21 @@ define([
         doQuery: function() {
             var queryObj = JSON.parse(this.queryString());
 
+            let sortOrderDict = {}, sortedQueryObj = {};
+            for (let filter of Object.values(SearchComponents)) {
+                sortOrderDict[filter.componentname] = filter.sortorder;
+            }
+            const sortedKeys = Object.keys(queryObj).sort((a, b) => {
+                // Utilizing sortOrderDict for sorting. If a key is not found in sortOrderDict, assign a default sort order
+                const orderA = sortOrderDict[a] || Infinity; // Using Infinity to place unknown items at the end
+                const orderB = sortOrderDict[b] || Infinity;
+                return orderA - orderB;
+            });
+            sortedKeys.forEach(key => {
+                sortedQueryObj[key] = queryObj[key];
+            });
+            queryObj = JSON.parse(JSON.stringify(sortedQueryObj));
+
             if (this.updateRequest) {
                 this.updateRequest.abort();
             }
