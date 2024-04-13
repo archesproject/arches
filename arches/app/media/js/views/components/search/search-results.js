@@ -238,6 +238,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                             relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
                             ontologyclass: result._source.root_ontology_class,
                             relatable: this.isResourceRelatable(result._source.graph_id),
+                            resultRelatedResource: !!result.related,
                             point: point,
                             mapLinkClicked: function() {
                                 self.selectedResourceId(result._source.resourceinstanceid);
