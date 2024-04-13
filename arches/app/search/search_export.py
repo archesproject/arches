@@ -26,7 +26,7 @@ import re
 from django.contrib.gis.geos import GeometryCollection, GEOSGeometry
 from django.core.files import File
 from django.utils.translation import gettext as _
-from django.urls import reverse
+from django.urls import reverse, resolve
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -36,7 +36,6 @@ from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.response import JSONResponse
 import arches.app.utils.zip as zip_utils
-from arches.app.views import search as SearchView
 from arches.app.models.system_settings import settings
 
 logger = logging.getLogger(__name__)
