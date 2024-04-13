@@ -85,7 +85,7 @@ class ResultsRelatedResourcesFilter(BaseSearchFilter):
             hit["related"] = True
         
         results["hits"]["hits"] += new_results["hits"]["hits"]
-        results["hits"]["total"]["value"] += new_results["hits"]["total"]["value"]
+        results["hits"]["total"]["value"] = len(results["hits"]["hits"])
 
     def view_data(self):
         return {"resources": get_resource_types_by_perm(self.request.user, "read_nodegroup")}
