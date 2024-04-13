@@ -404,7 +404,7 @@ def search_results(request, returnDsl=False):
 
         ret["reviewer"] = user_is_resource_reviewer(request.user)
         ret["timestamp"] = datetime.now()
-        ret["total_results"] = dsl.count(index=RESOURCES_INDEX)
+        ret["total_results"] = results["hits"]["total"]["value"]
         ret["userid"] = request.user.id
         return JSONResponse(ret)
 

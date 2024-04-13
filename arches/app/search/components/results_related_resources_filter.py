@@ -61,14 +61,17 @@ class ResultsRelatedResourcesFilter(BaseSearchFilter):
         new_dsl.add_query(Ids(ids=related_resources))
         new_dsl.include("graph_id")
         new_dsl.include("root_ontology_class")
-        new_dsl.include("permissions.users_without_edit_perm")
+        new_dsl.include("resourceinstanceid")
+        new_dsl.include("points")
         new_dsl.include("permissions.users_without_read_perm")
-        new_dsl.include("permissions.users_with_no_access")
+        new_dsl.include("permissions.users_without_edit_perm")
         new_dsl.include("permissions.users_without_delete_perm")
-        new_dsl.include("provisional_resource")
+        new_dsl.include("permissions.users_with_no_access")
+        new_dsl.include("geometries")
         new_dsl.include("displayname")
         new_dsl.include("displaydescription")
         new_dsl.include("map_popup")
+        new_dsl.include("provisional_resource")
         new_results = new_dsl.search(index=RESOURCES_INDEX, limit=10000, scroll="1m")
         new_scroll_id = new_results["_scroll_id"]
         scroll_size = new_results["hits"]["total"]["value"]
@@ -78,13 +81,11 @@ class ResultsRelatedResourcesFilter(BaseSearchFilter):
             scroll_size = len(page["hits"]["hits"])
             new_results["hits"]["hits"] += page["hits"]["hits"]
         
-        # print("__printing related hits__")
         for hit in new_results["hits"]["hits"]:
             hit["related"] = True
-            # pprint(hit)
         
         results["hits"]["hits"] += new_results["hits"]["hits"]
-        results["hits"]["total"]["value"] = len(results["hits"]["hits"])
+        results["hits"]["total"]["value"] += new_results["hits"]["total"]["value"]
 
     def view_data(self):
         return {"resources": get_resource_types_by_perm(self.request.user, "read_nodegroup")}
