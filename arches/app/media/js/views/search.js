@@ -138,7 +138,7 @@ define([
         },
 
         doQuery: function() {
-            var queryString = JSON.parse(this.queryString());
+            var queryObj = JSON.parse(this.queryString());
 
             if (this.updateRequest) {
                 this.updateRequest.abort();
@@ -147,7 +147,7 @@ define([
             this.updateRequest = $.ajax({
                 type: "GET",
                 url: arches.urls.search_results,
-                data: queryString,
+                data: queryObj,
                 context: this,
                 success: function(response) {
                     _.each(this.viewModel.sharedStateObject.searchResults, function(value, key, results) {
@@ -175,7 +175,7 @@ define([
                 },
                 complete: function(request, status) {
                     this.updateRequest = undefined;
-                    window.history.pushState({}, '', '?' + $.param(queryString).split('+').join('%20'));
+                    window.history.pushState({}, '', '?' + $.param(queryObj).split('+').join('%20'));
                 }
             });
         }
