@@ -305,16 +305,6 @@ class Resource(models.ResourceInstance):
 
         print(f"Time to bulk create tiles and resources: {datetime.timedelta(seconds=time() - start)}")
 
-        start = time()
-        for resource in resources:
-            resource.save_edit(edit_type="create", transaction_id=transaction_id)
-
-        resources[0].tiles[0].save_edit(
-            note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create", transaction_id=transaction_id
-        )
-
-        print("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
-
         for resource in resources:
             start = time()
             document, terms = resource.get_documents_to_index(
