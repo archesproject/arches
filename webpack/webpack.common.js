@@ -51,8 +51,6 @@ module.exports = () => {
                 PROJECT_RELATIVE_NODE_MODULES_PATH = Path.resolve(APP_ROOT, '..', 'node_modules')
             }
 
-            console.log(PROJECT_RELATIVE_NODE_MODULES_PATH)
-
             // END workaround for handling node_modules paths in arches-core vs projects
             // BEGIN create entry point configurations
         
@@ -123,7 +121,7 @@ module.exports = () => {
                     if (parsedArchesCoreNodeModulesAliases[alias]) {
                         console.warn(
                             '\x1b[33m%s\x1b[0m',  // yellow
-                            `"${alias}" has failed to load, it has already been defined in the Arches application.`
+                            `Skipped loading "${alias}", it has already been defined in the Arches core application.`
                         )
                     }
                     else {
@@ -508,9 +506,12 @@ module.exports = () => {
             });
         };
 
+        // BEGIN get data from `settings.py`
+        const parentDir = Path.basename(Path.dirname(__dirname));
+
         let projectSettings = spawn(
             'python',
-            [Path.resolve(__dirname, Path.parse(__dirname)['dir'], 'settings.py')]
+            [Path.resolve(Path.dirname(__dirname), parentDir, 'settings.py')]
         );
         projectSettings.stderr.on("data", process.stderr.write);
         projectSettings.stdout.on("data", createWebpackConfig);
@@ -518,11 +519,11 @@ module.exports = () => {
         projectSettings.on('error', () => {
             projectSettings = spawn(
                 'python3',
-                [Path.resolve(__dirname, Path.parse(__dirname)['dir'], 'settings.py')]
+                [Path.resolve(Path.dirname(__dirname), parentDir, 'settings.py')]
             );
             projectSettings.stderr.on("data", process.stderr.write);
             projectSettings.stdout.on("data", createWebpackConfig);
         });
-
+        // END get data from `settings.py`
     });
 };
