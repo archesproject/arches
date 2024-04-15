@@ -107,6 +107,10 @@ class Command(BaseCommand):
             if os.path.exists(os.path.join(settings.APP_ROOT, file)):
                 print("Ensuring {} is deleted from project sub-directory".format(file))
                 os.remove(os.path.join(settings.APP_ROOT, file))
+
+        if os.path.isdir(os.path.join(settings.APP_ROOT, 'media', 'node_modules')):
+            print("Removing media/node_modules directory")
+            shutil.rmtree(os.path.join(settings.APP_ROOT, 'media', 'node_modules'), ignore_errors=True)
     
         if not os.path.isfile(os.path.join(settings.APP_ROOT, "src", "declarations.d.ts")):
             print("Creating /src/declarations.d.ts")
