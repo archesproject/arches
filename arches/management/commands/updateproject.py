@@ -87,9 +87,11 @@ class Command(BaseCommand):
 
     def update_to_v7_6(self):
         # ensure project has a `messages.pot` file
-        for dotfile in ["nodemon.json", "tsconfig.json"]:
+        for dotfile in [
+            "nodemon.json", "tsconfig.json", ".babelrc", ".browerslistrc", ".eslintignore", ".eslintrc.js", "stylelintrc.json", "LICENSE", "MANIFEST.in", "pyproject.toml"
+        ]:
             print("Copying {} to project root directory".format(dotfile))
-            shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", dotfile), settings.APP_ROOT)
+            shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", dotfile), os.join(settings.APP_ROOT, '..'))
     
         if not os.path.isfile(os.path.join(settings.APP_ROOT, "src", "declarations.d.ts")):
             print("Creating /src/declarations.d.ts")
@@ -107,4 +109,14 @@ class Command(BaseCommand):
 
         if not os.path.isfile(os.path.join(settings.APP_ROOT, "gettext.config.js")):
             print("Copying gettext config to project root directory")
-            shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", "gettext.config.js"), settings.APP_ROOT)
+            shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", "gettext.config.js"), os.join(settings.APP_ROOT, '..'))
+
+        print("Removing previous webpack directory")
+        shutil.rmtree(os.path.join(settings.APP_ROOT, 'webpack'), ignore_errors=True)
+        if os.path.isdir(os.path.join(settings.APP_ROOT, '..', 'webpack')):
+            print("Root-level webpack directory detected! Removing...")
+            shutil.rmtree(os.path.join(settings.APP_ROOT, '..', 'webpack'), ignore_errors=True)
+
+        print("Creating updated webpack directory at root")
+        shutil.copytree(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "webpack"), os.path.join(settings.APP_ROOT, '..', 'webpack'))
+        
