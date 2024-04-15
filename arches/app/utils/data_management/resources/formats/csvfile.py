@@ -35,6 +35,7 @@ import arches.app.utils.task_management as task_management
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from django.db.models import Q
+from django.db.models.functions import Lower
 from django.utils.translation import gettext as _, get_language
 
 logger = logging.getLogger(__name__)
@@ -101,8 +102,9 @@ class CsvWriter(Writer):
         language_codes = Language.objects.values_list("code", flat=True)
 
         if not (languages is None or languages == "all"):
+            lowered_language_codes = [lang.lower() for lang in language_codes]
             try:
-                requested_languages = [value for value in languages.split(",") if value in Language.objects.values_list("code", flat=True)]
+                requested_languages = [value for value in languages.split(",") if value.lower() in lowered_language_codes]
                 if len(requested_languages) > 0:
                     language_codes = requested_languages
             except:
@@ -471,7 +473,7 @@ class CsvReader(Reader):
             match = column_regex.match(column)
             if match is not None:
                 new_language_candidate = match.groups()[0]
-                language_exists = Language.objects.filter(code=new_language_candidate).exists()
+                language_exists = Language.objects.filter(code__iexact=new_language_candidate).exists()
                 if not language_exists:
                     new_languages.append(new_language_candidate)
 

@@ -85,13 +85,13 @@ def get_sparql_providers(endpoint=None):
 
 def sort_languages(languages, lang):
     """
-    Sorts languages from the d_languages model by name. If there is more than one
+    Sorts languages from the languages model by name. If there is more than one
     default language or no default language, the default language is defined by lang
     """
 
     if len([l for l in languages if l.isdefault == True]) != 1:
         for l in languages:
-            if l.code == lang:
+            if l.code.lower() == lang.lower():
                 l.isdefault = True
             else:
                 l.isdefault = False

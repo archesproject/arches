@@ -305,7 +305,7 @@ class LanguageSynchronizer:
 
         if settings.LANGUAGES:
             for lang in settings.LANGUAGES:
-                found_language = Language.objects.filter(code=lang[0]).first()
+                found_language = Language.objects.filter(code__iexact=lang[0]).first()
 
                 # no need to add the language if it already exists
                 if found_language:

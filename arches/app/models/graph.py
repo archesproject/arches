@@ -1784,7 +1784,7 @@ class Graph(models.GraphModel):
                     published_graph = models.PublishedGraph.objects.create(
                         publication_id=self.publication_id,
                         serialized_graph=serialized_graph,
-                        language=models.Language.objects.get(code=language_tuple[0]),
+                        language=models.Language.objects.get(code__iexact=language_tuple[0]),
                     )
                 elif len(published_graph_query) == 1:
                     published_graph = published_graph_query[0]
@@ -1815,7 +1815,7 @@ class Graph(models.GraphModel):
                 self.save(validate=False)
 
                 for language_tuple in settings.LANGUAGES:
-                    language = models.Language.objects.get(code=language_tuple[0])
+                    language = models.Language.objects.get(code__iexact=language_tuple[0])
 
                     translation.activate(language=language_tuple[0])
 

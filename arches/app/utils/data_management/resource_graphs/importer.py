@@ -162,7 +162,7 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                         graph.save()
 
                         for language_tuple in settings.LANGUAGES:
-                            language = Language.objects.get(code=language_tuple[0])
+                            language = Language.objects.get(code__iexact=language_tuple[0])
 
                             translation.activate(language=language_tuple[0])
 

@@ -123,13 +123,13 @@ class StringDataType(BaseDataType):
         return errors
 
     def rdf_transform(self, value):
-        default_language = models.Language.objects.get(code=get_language())
+        default_language = models.Language.objects.get(code__iexact=get_language())
         incoming_value = {}
         for val in value:
             if ("language" in val and val["language"] is not None) or ("@language" in val and val["@language"] is not None):
                 try:
                     language_code = val["language"] if "language" in val else val["@language"]
-                    language = models.Language.objects.get(code=language_code)
+                    language = models.Language.objects.get(code__iexact=language_code)
                     incoming_value = {
                         **incoming_value,
                         language.code: {
@@ -310,7 +310,7 @@ class StringDataType(BaseDataType):
             return parsed_value
         except AttributeError:
             if language is not None:
-                language_objects = list(models.Language.objects.filter(code=language))
+                language_objects = list(models.Language.objects.filter(code__iexact=language))
                 if len(language_objects) > 0:
                     return {language: {"value": value, "direction": language_objects[0].default_direction}}
 
