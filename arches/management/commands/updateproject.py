@@ -96,8 +96,17 @@ class Command(BaseCommand):
         for dotfile in [
             "nodemon.json", "tsconfig.json", ".babelrc", ".browserslistrc", ".eslintignore", ".eslintrc.js", ".stylelintrc.json", "LICENSE", "MANIFEST.in", "pyproject.toml"
         ]:
+            if os.path.exists(os.path.join(settings.APP_ROOT, dotfile)):
+                print("Deleting {} from project sub-directory".format(dotfile))
+                os.remove(os.path.join(settings.APP_ROOT, dotfile))
+
             print("Copying {} to project root directory".format(dotfile))
             shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", dotfile), os.path.join(settings.APP_ROOT, '..'))
+
+        for file in [".yarnrc", "yarn.lock"]:
+            if os.path.exists(os.path.join(settings.APP_ROOT, file)):
+                print("Ensuring {} is deleted from project sub-directory".format(file))
+                os.remove(os.path.join(settings.APP_ROOT, file))
     
         if not os.path.isfile(os.path.join(settings.APP_ROOT, "src", "declarations.d.ts")):
             print("Creating /src/declarations.d.ts")
