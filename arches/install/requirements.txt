@@ -24,7 +24,7 @@ requests[security]>=2.31.0
 python-slugify==7.0.0
 pillow>=7.0.0
 arcgis2geojson==2.0.0
-openpyxl==3.0.10
+openpyxl==3.1.2
 django-libsass==0.9
 django-webpack-loader==2.0.1
 filetype==1.0.13
