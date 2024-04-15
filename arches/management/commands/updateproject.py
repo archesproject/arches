@@ -94,7 +94,7 @@ class Command(BaseCommand):
     def update_to_v7_6(self):
         # ensure project has a `messages.pot` file
         for dotfile in [
-            "nodemon.json", "tsconfig.json", ".babelrc", ".browserslistrc", ".eslintignore", ".eslintrc.js", ".stylelintrc.json", "LICENSE", "MANIFEST.in", "pyproject.toml"
+            "nodemon.json", "tsconfig.json", ".babelrc", ".browserslistrc", "eslint.config.js", ".stylelintrc.json", "LICENSE", "MANIFEST.in", "pyproject.toml"
         ]:
             if os.path.exists(os.path.join(settings.APP_ROOT, dotfile)):
                 print("Deleting {} from project sub-directory".format(dotfile))
@@ -103,7 +103,7 @@ class Command(BaseCommand):
             print("Copying {} to project root directory".format(dotfile))
             shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", dotfile), os.path.join(settings.APP_ROOT, '..'))
 
-        for file in [".yarnrc", "yarn.lock"]:
+        for file in [".yarnrc", "yarn.lock", ".eslintignore", ".eslintrc.js",]:
             if os.path.exists(os.path.join(settings.APP_ROOT, file)):
                 print("Ensuring {} is deleted from project sub-directory".format(file))
                 os.remove(os.path.join(settings.APP_ROOT, file))
