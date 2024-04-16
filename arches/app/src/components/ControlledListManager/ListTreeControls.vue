@@ -27,7 +27,6 @@ const expandedKeys: Ref<typeof TreeExpandedKeys> = defineModel("expandedKeys");
 const selectedKeys: Ref<typeof TreeSelectionKeys> = defineModel("selectedKeys");
 
 const { $gettext, $ngettext } = useGettext();
-const lightGray = "#f4f4f4"; // todo: import from theme somewhere
 const buttonGreen = "#10b981";
 const buttonPink = "#ed7979";
 
@@ -287,7 +286,7 @@ await fetchLists();
 .secondary-button {
     flex: 0.33;
     border: 0;
-    background: v-bind(lightGray);
+    background: #f4f4f4;
     height: 3rem;
     margin: 0.5rem;
     justify-content: center;
