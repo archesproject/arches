@@ -15,6 +15,6 @@ console.log($gettext('Hello from the <script> tag!'));
 
 <style scoped>
 .header {
-   color: red;
+    color: red;
 }
 </style>
