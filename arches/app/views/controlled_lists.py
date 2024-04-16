@@ -150,12 +150,14 @@ def prefetch_terms(request):
 
 
 def handle_items(item_dicts):
+    max_sortorder = 0
     items_to_save = []
     labels_to_save = []
 
     def handle_item(item_dict):
         nonlocal items_to_save
         nonlocal labels_to_save
+        nonlocal max_sortorder
 
         # Deletion/insertion of list items not yet implemented.
         labels = item_dict.pop("labels")
@@ -166,6 +168,10 @@ def handle_items(item_dicts):
         item_to_save = ControlledListItem(**item_dict)
         item_to_save._state.adding = False  # allows checking uniqueness
         items_to_save.append(item_to_save)
+
+        if item_to_save.sortorder < 0:
+            item_to_save.sortorder = max_sortorder + 1
+        max_sortorder = max(max_sortorder, item_to_save.sortorder)
 
         if len({item.controlled_list_id for item in items_to_save}) > 1:
             raise MixedListsException

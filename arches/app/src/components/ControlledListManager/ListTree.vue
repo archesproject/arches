@@ -175,16 +175,16 @@ const addChild = async (parent_id: string) => {
 
 const setParent = async (parentNode: typeof TreeNode) => {
     let errorText;
-    const setListRecursive = (child: ControlledListItem) => {
+    const setListAndSortOrderRecursive = (child: ControlledListItem) => {
         child.controlled_list_id = parentNode.key;
-        child.children.forEach(grandchild => setListRecursive(grandchild));
+        child.sortorder = -1;  // tells backend to renumber
+        child.children.forEach(grandchild => setListAndSortOrderRecursive(grandchild));
     };
 
     const item = itemToAdjustParent.value.data;
 
     if (parentNode.data.name) {
-        item.controlled_list_id = parentNode.key;
-        item.children.forEach(setListRecursive);
+        setListAndSortOrderRecursive(item);
     } else {
         item.parent_id = parentNode.key;
     }
