@@ -1,6 +1,5 @@
 {
     "name": "{{ project_name }}",
-    "type": "module",
     "license": "AGPL-3.0-only",
     "scripts": {
         "build_development": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js",
