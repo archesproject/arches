@@ -64,6 +64,10 @@ class mappedCSVFileImportTests(ArchesTestCase):
         self.assertNotEqual(new_languages, None)
         self.assertEqual(len(new_languages), 2)
 
+    def test_language_differs_only_in_case(self):
+        new_languages = BusinessDataImporter("tests/fixtures/data/csv/mixed_case_language_codes.csv").scan_for_new_languages()
+        self.assertEqual(new_languages, ["en-ZA"])
+
     def test_single_1(self):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():

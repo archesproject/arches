@@ -133,6 +133,13 @@ def rank_label(kind="prefLabel", source_lang="", target_lang=""):
     return rank
 
 
+def capitalize_region(code):
+    """Normalize a code such as en-us to en-US."""
+    if len(code) == 5 and code[2] == '-' and code[3:].islower():
+        return code[:3] + code[3:].upper()
+    return code
+
+
 class ArchesPOFileFetcher:
     """Gets PO files for processing"""
 

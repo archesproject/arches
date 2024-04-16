@@ -31,6 +31,7 @@ from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.i18n import capitalize_region
 
 # define the ARCHES namespace
 ARCHES = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
@@ -378,9 +379,7 @@ class SKOSReader(object):
             for existing_code in allowed_languages:
                 if existing_code.lower() == newlang.code.lower():
                     return True
-            # Otherwise, normalize xx-xx to xx-XX from the get-go
-            if len(newlang.code) == 5 and newlang.code[2] == '-' and newlang.code[3:].islower():
-                newlang.code = newlang.code[:3] + newlang.code[3:].upper()
+            newlang.code = capitalize_region(newlang.code)
 
             if language_info:
                 newlang.name = language_info["name"]

@@ -27,6 +27,7 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import DDataType, Language, ResourceXResource, ResourceInstance
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.i18n import capitalize_region
 from arches.setup import unzip_file
 from .formats.csvfile import CsvReader
 from .formats.archesfile import ArchesFileReader
@@ -162,7 +163,7 @@ class BusinessDataImporter(object):
         if file_reader is not None and data is not None:
             language_list = file_reader.scan_for_new_languages(business_data=data)
             if language_list is not None:
-                return list(set(language_list))
+                return list(set(capitalize_region(code) for code in language_list))
 
         return []
 
