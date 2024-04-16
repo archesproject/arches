@@ -397,16 +397,19 @@ class ControlledListItemView(View):
                     handle_items([data])
                     break
                 else:
-                    JSONErrorResponse(status=404)
+                    return JSONErrorResponse(status=404)
+                serialized_item = serialize(item)
 
         except ValidationError as e:
             return JSONErrorResponse(message=" ".join(e.messages), status=400)
         except MixedListsException:
             return JSONErrorResponse(message=_("Items must belong to the same list."), status=400)
+        except RecursionError:
+            return JSONErrorResponse(message=_("Recursive structure detected."), status=400)
         except:
             return JSONErrorResponse()
 
-        return JSONResponse(serialize(item))
+        return JSONResponse(serialized_item)
 
     def delete(self, request, **kwargs):
         item_id = kwargs.get("id")

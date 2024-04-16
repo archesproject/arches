@@ -1,5 +1,6 @@
 import json
 import uuid
+import sys
 from collections import defaultdict
 
 from django.contrib.auth.models import Group, User
@@ -343,6 +344,31 @@ class ControlledListTests(ArchesTestCase):
             response = self.client.post(
                 reverse("controlled_list", kwargs={"id": str(self.list2.pk)}),
                 serialized_list,
+                content_type="application/json",
+            )
+        self.assertEqual(response.status_code, 400)
+
+    def test_recursive_cycles(self):
+        self.client.force_login(self.admin)
+        serialized_list = serialize(self.list2, depth_map=defaultdict(int), flat=False)
+
+        parent = serialized_list["items"][0]
+        parent_id = str(parent["id"])
+        child = serialized_list["items"][0]["children"][0]
+        child_id = str(parent["id"])
+
+        parent["parent_id"] = child_id
+        child["parent_id"] = parent_id
+
+        # Speed up test by lowering recursion limit
+        original_limit = sys.getrecursionlimit()
+        sys.setrecursionlimit(200)
+        self.addCleanup(sys.setrecursionlimit, original_limit)
+
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.post(
+                reverse("controlled_list_item", kwargs={"id": parent_id}),
+                parent,
                 content_type="application/json",
             )
         self.assertEqual(response.status_code, 400)
