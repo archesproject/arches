@@ -25,6 +25,7 @@ const selectedLanguage = inject(selectedLanguageKey);
 const controlledListItemsTree = defineModel();
 const expandedKeys: Ref<typeof TreeExpandedKeys> = defineModel("expandedKeys");
 const selectedKeys: Ref<typeof TreeSelectionKeys> = defineModel("selectedKeys");
+const movingItem: Ref<typeof TreeNode> = defineModel("movingItem");
 
 const { $gettext, $ngettext } = useGettext();
 const buttonGreen = "#10b981";
@@ -235,7 +236,23 @@ await fetchLists();
             @click="confirmDelete"
         />
     </div>
-    <div class="controls">
+
+    <div
+        v-if="movingItem.key"
+        class="action-banner"
+    >
+        {{ $gettext("Selecting new parent for: %{item}", { item: movingItem.label }) }}
+        <Button
+            type="button"
+            class="banner-button"
+            :label="$gettext('Abandon')"
+            @click="movingItem = {}"
+        />
+    </div>
+    <div
+        v-else
+        class="controls"
+    >
         <Button
             class="secondary-button"
             type="button"
@@ -267,6 +284,22 @@ await fetchLists();
 </template>
 
 <style scoped>
+.action-banner {
+    background: yellow;
+    font-weight: 800;
+    height: 5rem;
+    font-size: small;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    align-items: center;
+}
+.banner-button {
+    height: 3rem;
+    background: darkslategray;
+    color: white;
+    text-wrap: nowrap;
+}
 .controls {
     display: flex;
     background: #f3fbfd;

@@ -35,7 +35,7 @@ import type {
 const tree: Ref<typeof TreeNode[]> = ref([]);
 const selectedKeys: Ref<typeof TreeSelectionKeys> = ref({});
 const expandedKeys: Ref<typeof TreeExpandedKeys> = ref({});
-const itemToAdjustParent: Ref<typeof TreeNode> = ref({});
+const movingItem: Ref<typeof TreeNode> = ref({});
 const refetcher = ref(0);
 
 const { setDisplayedRow } = inject(displayedRowKey);
@@ -47,16 +47,12 @@ const ERROR = "error";  // not user-facing
 
 const showMoveHereButton = (rowId: string) => {
     return (
-        itemToAdjustParent.value.key
+        movingItem.value.key
         && rowId in selectedKeys.value
-        && rowId !== itemToAdjustParent.value.key
-        && rowId !== itemToAdjustParent.value.data.parent_id
-        && rowId !== itemToAdjustParent.value.data.controlled_list_id
+        && rowId !== movingItem.value.key
+        && rowId !== movingItem.value.data.parent_id
+        && rowId !== movingItem.value.data.controlled_list_id
     );
-};
-
-const showAbandonMoveButton = (rowId: string) => {
-    return rowId in selectedKeys.value || rowId === itemToAdjustParent.value.key;
 };
 
 const collapseNodesRecursive = (node: typeof TreeNode) => {
@@ -181,7 +177,7 @@ const setParent = async (parentNode: typeof TreeNode) => {
         child.children.forEach(grandchild => setListAndSortOrderRecursive(grandchild));
     };
 
-    const item = itemToAdjustParent.value.data;
+    const item = movingItem.value.data;
 
     if (parentNode.data.name) {
         setListAndSortOrderRecursive(item);
@@ -198,7 +194,7 @@ const setParent = async (parentNode: typeof TreeNode) => {
             body: JSON.stringify(item),
         });
         if (response.ok) {
-            itemToAdjustParent.value = {};
+            movingItem.value = {};
             refetcher.value += 1;
         } else {
             errorText = response.statusText;
@@ -221,6 +217,7 @@ const setParent = async (parentNode: typeof TreeNode) => {
         v-model="tree"
         v-model:expanded-keys="expandedKeys"
         v-model:selected-keys="selectedKeys"
+        v-model:moving-item="movingItem"
         :selected-keys
     />
     <Tree
@@ -249,26 +246,19 @@ const setParent = async (parentNode: typeof TreeNode) => {
         </template>
         <template #default="slotProps">
             <span
-                :class="slotProps.node.key === itemToAdjustParent.key ? 'is-adjusting-parent' : ''"
+                :class="slotProps.node.key === movingItem.key ? 'is-adjusting-parent' : ''"
             >
                 {{ slotProps.node.data.name ?? bestLabel(slotProps.node.data, selectedLanguage.code).value }}
                 <div
-                    v-if="itemToAdjustParent.key"
+                    v-if="movingItem.key"
                     class="actions"
                 >
                     <Button
                         v-if="showMoveHereButton(slotProps.node.key)"
                         type="button"
                         class="move-button"
-                        :label="$gettext('Move %{item} here', { item: itemToAdjustParent.label })"
+                        :label="$gettext('Move %{item} here', { item: movingItem.label })"
                         @click="setParent(slotProps.node)"
-                    />
-                    <Button
-                        v-if="showAbandonMoveButton(slotProps.node.key)"
-                        type="button"
-                        class="move-button"
-                        :label="$gettext('Abandon move')"
-                        @click="itemToAdjustParent = {}"
                     />
                 </div>
                 <div
@@ -311,7 +301,7 @@ const setParent = async (parentNode: typeof TreeNode) => {
                         type="button"
                         icon="fa fa-arrows-alt"
                         :aria-label="$gettext('Change item parent')"
-                        @click="itemToAdjustParent = slotProps.node"
+                        @click="movingItem = slotProps.node"
                     />
                 </div>
             </span>
