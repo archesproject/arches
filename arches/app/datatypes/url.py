@@ -270,3 +270,15 @@ class URLDataType(BaseDataType):
     def pre_tile_save(self, tile, nodeid):
         if (tile_val := tile.data[nodeid]) and "url_label" not in tile_val:
             tile_val["url_label"] = ""
+
+    def clean(self, tile, nodeid):
+        if (data := tile.data[nodeid]):
+            try:
+                if not any([val.strip() for val in data.values()]):
+                    tile.data[nodeid] = None
+            except:
+                pass # Let self.validate handle malformed data
+
+    def pre_structure_tile_data(self, tile, nodeid, **kwargs):
+        if (tile_val := tile.data[nodeid]) and "url_label" not in tile_val:
+            tile_val["url_label"] = ""
