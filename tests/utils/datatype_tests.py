@@ -124,3 +124,39 @@ class URLDataTypeTests(ArchesTestCase):
         self.assertIsNotNone(tile2.data[nodeid])
         self.assertTrue("url_label" in tile2.data[nodeid])
         self.assertTrue(tile2.data[nodeid]["url_label"])
+
+    def test_clean(self):
+        url = DataTypeFactory().get_instance("url")
+
+        nodeid = "c0ed4b2a-c4cc-11ee-9626-00155de1df34"
+        resourceinstanceid = "40000000-0000-0000-0000-000000000000"
+
+        empty_data = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid,
+            "tileid": "",
+            "data": {nodeid: {"url": "", "url_label": ""}},
+        }
+        tile1 = Tile(empty_data)
+        url.clean(tile1, nodeid)
+        self.assertIsNone(tile1.data[nodeid])
+
+    def test_pre_structure_tile_data(self):
+        url = DataTypeFactory().get_instance("url")
+
+        nodeid = "c0ed4b2a-c4cc-11ee-9626-00155de1df34"
+        resourceinstanceid = "40000000-0000-0000-0000-000000000000"
+
+        data_without_label = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid,
+            "tileid": "",
+            "data": {nodeid: {"url": ""}},
+        }
+        tile1 = Tile(data_without_label)
+        url.pre_structure_tile_data(tile1, nodeid)
+        self.assertIsNotNone(tile1.data[nodeid])
+        self.assertTrue("url_label" in tile1.data[nodeid])
+        self.assertFalse(tile1.data[nodeid]["url_label"])
