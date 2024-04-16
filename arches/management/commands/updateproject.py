@@ -94,7 +94,7 @@ class Command(BaseCommand):
     def update_to_v7_6(self):
         # ensure project has a `messages.pot` file
         for dotfile in [
-            "nodemon.json", "tsconfig.json", ".babelrc", ".browserslistrc", "eslint.config.js", ".stylelintrc.json", "LICENSE", "MANIFEST.in", "pyproject.toml"
+            "nodemon.json", "tsconfig.json", ".babelrc", ".browserslistrc", "eslint.config.mjs", ".stylelintrc.json", "LICENSE", "MANIFEST.in", "pyproject.toml"
         ]:
             if os.path.exists(os.path.join(settings.APP_ROOT, dotfile)):
                 print("Deleting {} from project sub-directory".format(dotfile))
