@@ -282,18 +282,16 @@ class ControlledListView(View):
         data = JSONDeserializer().deserialize(request.body)
 
         qs = (
-            ControlledListItem.objects.filter(controlled_list_id=list_id)
-            .select_related("controlled_list")
-            .select_for_update()
+            ControlledList.objects.filter(pk=list_id)
+            .annotate(max_sortorder=Max(
+                "controlled_list_items__sortorder", default=-1
+            ))
         )
-        # Does not currently bother to lock labels.
 
         try:
             with transaction.atomic():
                 try:
-                    clist = qs[0].controlled_list
-                except (IndexError, ControlledListItem.DoesNotExist):
-                    clist = ControlledList.objects.get(pk=list_id)
+                    clist = qs.get()
                 except ControlledList.DoesNotExist:
                     return JSONErrorResponse(status=404)
 
@@ -301,7 +299,7 @@ class ControlledListView(View):
                 clist.search_only = data["search_only"]
                 clist.name = data["name"]
 
-                handle_items(data["items"])
+                handle_items(data["items"], max_sortorder=clist.max_sortorder)
 
                 clist.save()
         except ValidationError as e:

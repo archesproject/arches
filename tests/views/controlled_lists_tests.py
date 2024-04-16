@@ -309,18 +309,20 @@ class ControlledListTests(ArchesTestCase):
             [1, 0, 2, 3, 4],
         )
 
-    def test_reorder_list_items_invalid_negative(self):
+    def test_list_items_sortorder_recalculated(self):
         self.client.force_login(self.admin)
         serialized_list = serialize(self.list1, depth_map=defaultdict(int), flat=False)
 
-        serialized_list["items"][0]["sortorder"] = -1
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
-                reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
-                serialized_list,
-                content_type="application/json",
-            )
-        self.assertEqual(response.status_code, 400)
+        serialized_list["items"][-1]["sortorder"] = -1
+        response = self.client.post(
+            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
+            serialized_list,
+            content_type="application/json",
+        )
+        result = json.loads(response.content)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(result["items"][-1]["sortorder"], 5)  # was 4, but gaps are OK
 
     def test_list_items_mixed_parents(self):
         self.client.force_login(self.admin)
