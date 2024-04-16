@@ -149,8 +149,7 @@ def prefetch_terms(request):
     return terms
 
 
-def handle_items(item_dicts):
-    max_sortorder = 0
+def handle_items(item_dicts, max_sortorder=-1):
     items_to_save = []
     labels_to_save = []
 
@@ -171,7 +170,6 @@ def handle_items(item_dicts):
 
         if item_to_save.sortorder < 0:
             item_to_save.sortorder = max_sortorder + 1
-        max_sortorder = max(max_sortorder, item_to_save.sortorder)
 
         if len({item.controlled_list_id for item in items_to_save}) > 1:
             raise MixedListsException
@@ -395,12 +393,22 @@ class ControlledListItemView(View):
         # Update list item
         data = JSONDeserializer().deserialize(request.body)
 
+        controlled_list = (
+            ControlledList.objects.filter(pk=data["controlled_list_id"])
+            .annotate(
+                max_sortorder=Max(
+                    "controlled_list_items__sortorder", default=-1
+                )
+            )
+            .get()
+        )
+
         try:
             with transaction.atomic():
                 for item in ControlledListItem.objects.filter(
                     pk=item_id
                 ).select_for_update():
-                    handle_items([data])
+                    handle_items([data], max_sortorder=controlled_list.max_sortorder)
                     break
                 else:
                     return JSONErrorResponse(status=404)
