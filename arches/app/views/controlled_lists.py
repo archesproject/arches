@@ -30,6 +30,9 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+class MixedListsException(Exception):
+    pass
+
 
 def serialize(obj, depth_map=None, flat=False):
     """
@@ -164,6 +167,9 @@ def handle_items(item_dicts):
         item_to_save._state.adding = False  # allows checking uniqueness
         items_to_save.append(item_to_save)
 
+        if len({item.controlled_list_id for item in items_to_save}) > 1:
+            raise MixedListsException
+
         for label in labels:
             label["language_id"] = label.pop("language")
             label["value_type_id"] = label.pop("valuetype")
@@ -187,7 +193,7 @@ def handle_items(item_dicts):
         item_to_save.validate_constraints(exclude=["sortorder"])
 
     ControlledListItem.objects.bulk_update(
-        items_to_save, fields=["guide", "uri", "sortorder", "parent"]
+        items_to_save, fields=["controlled_list_id", "guide", "uri", "sortorder", "parent"]
     )
     ControlledListItemLabel.objects.bulk_update(
         labels_to_save, fields=["value", "value_type", "language"]
@@ -291,13 +297,13 @@ class ControlledListView(View):
                 clist.search_only = data["search_only"]
                 clist.name = data["name"]
 
-                for item in data["items"]:
-                    item["controlled_list_id"] = list_id
                 handle_items(data["items"])
 
                 clist.save()
         except ValidationError as e:
             return JSONErrorResponse(message=" ".join(e.messages), status=400)
+        except MixedListsException:
+            return JSONErrorResponse(message=_("Items must belong to the same list."), status=400)
         except:
             return JSONErrorResponse()
 
@@ -395,6 +401,8 @@ class ControlledListItemView(View):
 
         except ValidationError as e:
             return JSONErrorResponse(message=" ".join(e.messages), status=400)
+        except MixedListsException:
+            return JSONErrorResponse(message=_("Items must belong to the same list."), status=400)
         except:
             return JSONErrorResponse()
 

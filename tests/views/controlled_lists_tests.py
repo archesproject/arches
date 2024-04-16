@@ -320,3 +320,29 @@ class ControlledListTests(ArchesTestCase):
                 content_type="application/json",
             )
         self.assertEqual(response.status_code, 400)
+
+    def test_list_items_mixed_parents(self):
+        self.client.force_login(self.admin)
+        serialized_list = serialize(self.list1, depth_map=defaultdict(int), flat=False)
+
+        serialized_list["items"][-1]["controlled_list_id"] = str(self.list2.pk)
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.post(
+                reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
+                serialized_list,
+                content_type="application/json",
+            )
+        self.assertEqual(response.status_code, 400)
+
+    def test_child_items_incorrect_parent(self):
+        self.client.force_login(self.admin)
+        serialized_list = serialize(self.list2, depth_map=defaultdict(int), flat=False)
+
+        serialized_list["items"][0]["children"][-1]["controlled_list_id"] = str(self.list1.pk)
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.post(
+                reverse("controlled_list", kwargs={"id": str(self.list2.pk)}),
+                serialized_list,
+                content_type="application/json",
+            )
+        self.assertEqual(response.status_code, 400)

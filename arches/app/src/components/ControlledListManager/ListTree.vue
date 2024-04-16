@@ -22,7 +22,6 @@ import {
 
 import type { Ref } from "@/types/Ref";
 import type {
-    TreeContext,
     TreeExpandedKeys,
     TreeNode,
     TreeSelectionKeys,
@@ -36,6 +35,8 @@ import type {
 const tree: Ref<typeof TreeNode[]> = ref([]);
 const selectedKeys: Ref<typeof TreeSelectionKeys> = ref({});
 const expandedKeys: Ref<typeof TreeExpandedKeys> = ref({});
+const itemToAdjustParent: Ref<typeof TreeNode> = ref({});
+const refetcher = ref(0);
 
 const { setDisplayedRow } = inject(displayedRowKey);
 const selectedLanguage = inject(selectedLanguageKey);
@@ -43,6 +44,20 @@ const selectedLanguage = inject(selectedLanguageKey);
 const toast = useToast();
 const { $gettext } = useGettext();
 const ERROR = "error";  // not user-facing
+
+const showMoveHereButton = (rowId: string) => {
+    return (
+        itemToAdjustParent.value.key
+        && rowId in selectedKeys.value
+        && rowId !== itemToAdjustParent.value.key
+        && rowId !== itemToAdjustParent.value.data.parent_id
+        && rowId !== itemToAdjustParent.value.data.controlled_list_id
+    );
+};
+
+const showAbandonMoveButton = (rowId: string) => {
+    return rowId in selectedKeys.value || rowId === itemToAdjustParent.value.key;
+};
 
 const collapseNodesRecursive = (node: typeof TreeNode) => {
     if (node.children && node.children.length) {
@@ -119,6 +134,7 @@ const isLastItem = (item: ControlledListItem) => {
 };
 
 const addChild = async (parent_id: string) => {
+    let errorText;
     const newItem: NewItem = { parent_id };
     try {
         const response = await fetch(arches.urls.controlled_list_item_add, {
@@ -144,12 +160,56 @@ const addChild = async (parent_id: string) => {
                 [parent.key]: true,
             };
         } else {
+            errorText = response.statusText;
+            const body = await response.json();
+            errorText = body.message;
             throw new Error();
         }
     } catch {
         toast.add({
             severity: ERROR,
-            summary: $gettext("Item creation failed"),
+            summary: errorText || $gettext("Item creation failed"),
+        });
+    }
+};
+
+const setParent = async (parentNode: typeof TreeNode) => {
+    let errorText;
+    const setListRecursive = (child: ControlledListItem) => {
+        child.controlled_list_id = parentNode.key;
+        child.children.forEach(grandchild => setListRecursive(grandchild));
+    };
+
+    const item = itemToAdjustParent.value.data;
+
+    if (parentNode.data.name) {
+        item.controlled_list_id = parentNode.key;
+        item.children.forEach(setListRecursive);
+    } else {
+        item.parent_id = parentNode.key;
+    }
+
+    try {
+        const response = await fetch(arches.urls.controlled_list_item(item.id), {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": Cookies.get("csrftoken"),
+            },
+            body: JSON.stringify(item),
+        });
+        if (response.ok) {
+            itemToAdjustParent.value = {};
+            refetcher.value += 1;
+        } else {
+            errorText = response.statusText;
+            const body = await response.json();
+            errorText = body.message;
+            throw new Error();
+        }
+    } catch {
+        toast.add({
+            severity: ERROR,
+            summary: errorText || $gettext("Move failed"),
         });
     }
 };
@@ -157,6 +217,7 @@ const addChild = async (parent_id: string) => {
 
 <template>
     <ListTreeControls
+        :key="refetcher"
         v-model="tree"
         v-model:expanded-keys="expandedKeys"
         v-model:selected-keys="selectedKeys"
@@ -178,9 +239,7 @@ const addChild = async (parent_id: string) => {
             },
             wrapper: { style: { overflowY: 'auto', maxHeight: '100%' } },
             container: { style: { fontSize: '14px' } },
-            content: ({ context }) : { context: TreeContext } => ({
-                style: { height: '4rem' },
-            }),
+            content: { style: { height: '4rem' } },
             label: { style: { textWrap: 'nowrap', marginLeft: '0.5rem' } },
         }"
         @node-select="onRowSelect"
@@ -189,67 +248,107 @@ const addChild = async (parent_id: string) => {
             <LetterCircle :labelled="slotProps.node.data" />
         </template>
         <template #default="slotProps">
-            <span class="label-and-actions">
+            <span
+                :class="slotProps.node.key === itemToAdjustParent.key ? 'is-adjusting-parent' : ''"
+            >
                 {{ slotProps.node.data.name ?? bestLabel(slotProps.node.data, selectedLanguage.code).value }}
-                <Button
-                    v-if="slotProps.node.key in selectedKeys"
-                    type="button"
-                    class="add-child-button"
-                    icon="fa fa-plus"
-                    :aria-label="$gettext('Add child item')"
-                    @click="addChild(slotProps.node.key)"
-                />
-                <span
-                    v-if="!slotProps.node.data.name"
-                    class="move-buttons"
+                <div
+                    v-if="itemToAdjustParent.key"
+                    class="actions"
+                >
+                    <Button
+                        v-if="showMoveHereButton(slotProps.node.key)"
+                        type="button"
+                        class="move-button"
+                        :label="$gettext('Move %{item} here', { item: itemToAdjustParent.label })"
+                        @click="setParent(slotProps.node)"
+                    />
+                    <Button
+                        v-if="showAbandonMoveButton(slotProps.node.key)"
+                        type="button"
+                        class="move-button"
+                        :label="$gettext('Abandon move')"
+                        @click="itemToAdjustParent = {}"
+                    />
+                </div>
+                <div
+                    v-else
+                    class="actions"
                 >
                     <Button
                         v-if="slotProps.node.key in selectedKeys"
                         type="button"
-                        class="move-button"
-                        icon="fa fa-caret-up"
-                        :aria-label="$gettext('Move up')"
-                        :disabled="isFirstItem(slotProps.node.data)"
-                        @click="onReorder(slotProps.node.data, true)"
+                        class="add-child-button"
+                        icon="fa fa-plus"
+                        :aria-label="$gettext('Add child item')"
+                        @click="addChild(slotProps.node.key)"
                     />
+                    <span
+                        v-if="!slotProps.node.data.name"
+                        class="reorder-buttons"
+                    >
+                        <Button
+                            v-if="slotProps.node.key in selectedKeys"
+                            type="button"
+                            class="reorder-button"
+                            icon="fa fa-caret-up"
+                            :aria-label="$gettext('Move up')"
+                            :disabled="isFirstItem(slotProps.node.data)"
+                            @click="onReorder(slotProps.node.data, true)"
+                        />
+                        <Button
+                            v-if="slotProps.node.key in selectedKeys"
+                            type="button"
+                            class="reorder-button"
+                            icon="fa fa-caret-down"
+                            :aria-label="$gettext('Move down')"
+                            :disabled="isLastItem(slotProps.node.data)"
+                            @click="onReorder(slotProps.node.data, false)"
+                        />
+                    </span>
                     <Button
-                        v-if="slotProps.node.key in selectedKeys"
+                        v-if="!slotProps.node.data.name && slotProps.node.key in selectedKeys"
                         type="button"
-                        class="move-button"
-                        icon="fa fa-caret-down"
-                        :aria-label="$gettext('Move down')"
-                        :disabled="isLastItem(slotProps.node.data)"
-                        @click="onReorder(slotProps.node.data, false)"
+                        icon="fa fa-arrows-alt"
+                        :aria-label="$gettext('Change item parent')"
+                        @click="itemToAdjustParent = slotProps.node"
                     />
-                </span>
+                </div>
             </span>
         </template>
     </Tree>
 </template>
 
 <style scoped>
-.label-and-actions {
+.actions {
     display: inline-flex;
     align-items: center;
     gap: 1rem;
+    margin-left: 1rem;
 }
-.add-child-button {
+.p-button {
     background-color: aliceblue;
     color: black;
     height: 2rem;
+}
+.add-child-button {
     width: 2rem;
     border-radius: 50%;
 }
-.move-buttons {
+.reorder-buttons {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
 }
-.move-button {
-    background-color: aliceblue;
-    color: black;
+.reorder-button {
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
     height: 1.5rem;
+}
+.move-button {
+    height: 2.5rem;
+}
+.is-adjusting-parent {
+    color: red;
 }
 </style>
