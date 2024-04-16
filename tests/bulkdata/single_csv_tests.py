@@ -30,12 +30,12 @@ from django.core.files.storage import default_storage
 from django.db import connection
 from django.http import HttpRequest
 from django.test import override_settings
-from tests.base_test import ArchesTestCase
+from django.test import TransactionTestCase
 # these tests can be run from the command line via
 # python manage.py test tests.bulkdata.single_csv_tests --settings="tests.test_settings"
 
 
-class SingleCSVTests(ArchesTestCase):
+class SingleCSVTests(TransactionTestCase):
 
     @classmethod
     def setUpClass(cls):
