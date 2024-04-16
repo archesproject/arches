@@ -84,9 +84,9 @@ class ResourceTests(ArchesTestCase):
             "subconcepts": [
                 {
                     "values": [
-                        {"value": "Mock concept", "language": "en-US", "category": "label", "type": "prefLabel", "id": "", "conceptid": ""},
-                        {"value": "1950", "language": "en-US", "category": "note", "type": "min_year", "id": "", "conceptid": ""},
-                        {"value": "1980", "language": "en-US", "category": "note", "type": "max_year", "id": "", "conceptid": ""},
+                        {"value": "Mock concept", "language": "en", "category": "label", "type": "prefLabel", "id": "", "conceptid": ""},
+                        {"value": "1950", "language": "en", "category": "note", "type": "min_year", "id": "", "conceptid": ""},
+                        {"value": "1980", "language": "en", "category": "note", "type": "max_year", "id": "", "conceptid": ""},
                     ],
                     "relationshiptype": "hasTopConcept",
                     "nodetype": "Concept",
