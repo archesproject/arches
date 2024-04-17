@@ -1,8 +1,8 @@
 from datetime import datetime
 import json
 from openpyxl import load_workbook
-from openpyxl.writer.excel import save_virtual_workbook
 import os
+from tempfile import NamedTemporaryFile
 
 from django.core.exceptions import ValidationError
 import uuid
@@ -211,8 +211,12 @@ class TileExcelImporter(BaseImportModule):
         format = request.POST.get("format")
         if format == "xls":
             wb = create_tile_excel_workbook(request.POST.get("id"))
-            response = HttpResponse(save_virtual_workbook(wb), content_type="application/vnd.ms-excel")
-            response["Content-Disposition"] = "attachment"
+            with NamedTemporaryFile(suffix='.xlsx', delete=False) as tmp:
+                wb.save(tmp.name)
+                tmp.seek(0)
+                response = HttpResponse(tmp.read(), content_type="application/vnd.ms-excel")
+                response["Content-Disposition"] = "attachment"
+            os.unlink(tmp.name)
             return {"success": True, "raw": response}
         else:
             return {"success": False, "data": "failed"}

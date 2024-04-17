@@ -20,9 +20,7 @@ import json
 import os
 import time
 
-from tests import test_settings
 from django.contrib.auth.models import User, Group
-from django.core import management
 from django.db import connection
 from django.urls import reverse
 from django.test.client import Client
@@ -295,7 +293,7 @@ class ResourceTests(ArchesTestCase):
                 CaptureQueriesContext(connection) as queries,
             ):
                 index_resources_using_singleprocessing(
-                    resources, recalculate_descriptors=True
+                    resources, recalculate_descriptors=True, quiet=True
                 )
 
                 function_x_graph_selects = [
