@@ -79,6 +79,16 @@ define([
             }
             return null;
         }
+        this.guessAllMappings = function() {
+            if (self.headers()) {
+                self.headers().forEach((header, i) => {
+                    const bestMatchNode = self.suggestField(i);
+                    if (bestMatchNode && self.fieldMapping().length > i) {
+                        self.fieldMapping()[i].node(bestMatchNode);
+                    }
+                });
+            }
+        };
 
         this.createTableConfig = function(col) {
             return {
