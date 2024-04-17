@@ -474,7 +474,7 @@ class GraphDataView(View):
                 return JSONResponse(
                     {
                         "success": True,
-                        "message": "All the resources associated with the Model '{0}' have been successfully deleted.".format(graph.name),
+                        "message": f"All {resource_count} resources associated with the Model '{graph.name}' have been successfully deleted.",
                         "title": "Resources Successfully Deleted.",
                     }
                 )
