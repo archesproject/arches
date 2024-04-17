@@ -89,6 +89,9 @@
             'leaflet-draw': {
                 deps: ['leaflet']
             },
+            'slick': {
+                deps: ['jquery']
+            },
             'leaflet-fullscreen': {
                 deps: ['leaflet']
             }
@@ -611,7 +614,7 @@
         provisional='{% trans "Provisional" as provisional %} "{{ provisional|escapejs }}"'
         card-name='{% trans "Card Name" as cardName %} "{{ cardName|escapejs }}"'
         add-tab='{% trans "Add Tab" as addTab %} "{{ addTab|escapejs }}"'
-        tab-name='{% trans "Tab Name" as tabName %} "{{ tabName|escapejs }}"' 
+        tab-name='{% trans "Tab Name" as tabName %} "{{ tabName|escapejs }}"'
         find-a-resource='{% trans "Find a resource..." as findAResource %} "{{ findAResource|escapejs }}"'
         find-an-icon='{% trans "Find an icon" as findAnIcon %} "{{ findAnIcon|escapejs }}"'
         select-tab-icon='{% trans "Select Tab icon" as selectTabIcon %} "{{ selectTabIcon|escapejs }}"'
