@@ -184,11 +184,13 @@ def index_resources_using_multiprocessing(
         pool.join()
 
 
-def optimize_resource_iteration(resources: Iterable[Resource]):
+def optimize_resource_iteration(resources: Iterable[Resource], chunk_size: int):
     """
     - select related graphs
     - prefetch tiles (onto .prefetched_tiles)
     - prefetch primary descriptors (onto graph.descriptor_function)
+    - apply chunk_size to reduce memory footprint and spread the work
+      of prefetching tiles across multiple queries
 
     The caller is responsible for moving the descriptor function
     prefetch from the graph to the resource instance--a symptom of
@@ -212,6 +214,7 @@ def optimize_resource_iteration(resources: Iterable[Resource]):
         return (
             resources.select_related("graph")
             .prefetch_related(tiles_prefetch, descriptor_prefetch)
+            .iterator(chunk_size=chunk_size)
         )
     else:  # public API that arches itself does not currently use
         for r in resources:
@@ -232,7 +235,7 @@ def index_resources_using_singleprocessing(
             if quiet is False:
                 bar = pyprind.ProgBar(len(resources), bar_char="█", title=title) if len(resources) > 1 else None
 
-            for resource in optimize_resource_iteration(resources):
+            for resource in optimize_resource_iteration(resources, chunk_size=batch_size // 8):
                 resource.tiles = resource.prefetched_tiles
                 resource.descriptor_function = resource.graph.descriptor_function
                 resource.set_node_datatypes(node_datatypes)
