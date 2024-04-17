@@ -20,9 +20,7 @@ import json
 import os
 import time
 
-from tests import test_settings
 from django.contrib.auth.models import User, Group
-from django.core import management
 from django.db import connection
 from django.urls import reverse
 from django.test.client import Client
@@ -41,7 +39,7 @@ from tests.base_test import ArchesTestCase
 
 
 # these tests can be run from the command line via
-# python manage.py test tests/models/resource_test.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.models.resource_test --settings="tests.test_settings"
 
 
 class ResourceTests(ArchesTestCase):
@@ -277,7 +275,7 @@ class ResourceTests(ArchesTestCase):
         r2.descriptor_function = None
 
         with CaptureQueriesContext(connection) as queries:
-            index_resources_using_singleprocessing([r1, r2], recalculate_descriptors=True)
+            index_resources_using_singleprocessing([r1, r2], recalculate_descriptors=True, quiet=True)
 
         function_x_graph_selects = [
             q for q in queries if q['sql'].startswith('SELECT "functions_x_graphs"."id"')
