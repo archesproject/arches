@@ -21,12 +21,6 @@ SET client_min_messages = warning;
 --
 
 INSERT INTO d_languages VALUES ('en', 'ENGLISH', true);
-INSERT INTO d_languages VALUES ('fr', 'FRENCH', true);
-INSERT INTO d_languages VALUES ('zh', 'CHINESE', true);
-INSERT INTO d_languages VALUES ('de', 'GERMAN', true);
-INSERT INTO d_languages VALUES ('pt', 'PORTUGUESE', true);
-INSERT INTO d_languages VALUES ('ru', 'RUSSIAN', true);
-INSERT INTO d_languages VALUES ('el', 'GREEK', true);
 
 
 --
