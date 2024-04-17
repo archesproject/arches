@@ -9,11 +9,11 @@ def merge_differently_cased_language_codes(apps, schema_editor):
     PublishedGraph = apps.get_model("models", "PublishedGraph")
 
     for lang in list(Language.objects.all()):
-        distinctly_cased = list(Language.objects.filter(code__iexact=lang.code).order_by("-isdefault", "-code"))
+        # Sort en-US before en-us
+        distinctly_cased = list(Language.objects.filter(code__iexact=lang.code).order_by("-code"))
         if len(distinctly_cased) > 1:
             other_values = {
-                # Ignore isdefault. If two language rows differ only by case-insensitive
-                # code and isdefault, let the isdefault=True row survive. See order_by()
+                # Ignore variation in isdefault column.
                 (l.name, l.default_direction, l.scope)
                 for l in distinctly_cased
             }
@@ -23,8 +23,14 @@ def merge_differently_cased_language_codes(apps, schema_editor):
                     + str([x.code for x in distinctly_cased])
                     + "\nHINT: Ensure fields other than code and isdefault are identical."
                 )
-            deletes = distinctly_cased[1:]
+
             preserve = distinctly_cased[0]
+            deletes = distinctly_cased[1:]
+
+            if any([delete.isdefault for delete in deletes]):
+                preserve.isdefault = True
+                preserve.save()
+
             for delete in deletes:
                 # Be careful! These FK's cascade delete.
                 Value.objects.filter(language=delete.code).update(language=preserve.code)
