@@ -570,12 +570,15 @@ class Graph(models.GraphModel):
         """
         if verbose is True:
             bar = pyprind.ProgBar(Resource.objects.filter(graph_id=self.graphid).count())
+        delete_count = 0
         for resource in Resource.objects.filter(graph_id=self.graphid):
             resource.delete()
+            delete_count += 1
             if verbose is True:
                 bar.update()
         if verbose is True:
             print(bar)
+        return delete_count
 
     def get_tree(self, root=None):
         """
