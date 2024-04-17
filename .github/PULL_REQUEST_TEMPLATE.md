@@ -26,19 +26,19 @@ Closes #
 -   [ ] My test fails on the target branch
 
 #### Accessibility Checklist
-<!-- Place a mark in the appropriate column for each topic -->
+<!-- If your changes impacted the following areas, mark the appropriate columns. -->
 [Developer Guide](https://arches.readthedocs.io/en/stable/developing/advanced/accessibility/)
 
-| Topic            | Unchanged | Retested |
-| ---------------- | --------- | -------- |
-| Color contrast   |           |          |
-| Form fields      |           |          |
-| Headings         |           |          |
-| Links            |           |          |
-| Keyboard         |           |          |
-| Responsive Design|           |          |
-| HTML validation  |           |          |
-| Screen reader    |           |          |
+| Topic            | Changed | Retested |
+| ---------------- | ------- | -------- |
+| Color contrast   |         |          |
+| Form fields      |         |          |
+| Headings         |         |          |
+| Links            |         |          |
+| Keyboard         |         |          |
+| Responsive Design|         |          |
+| HTML validation  |         |          |
+| Screen reader    |         |          |
 
 
 #### Ticket Background
