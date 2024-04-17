@@ -3,6 +3,7 @@ define([
     'knockout-mapping',
     'jquery',
     'dropzone',
+    'string-similarity',
     'uuid',
     'arches',
     'viewmodels/alert-json',
@@ -11,7 +12,7 @@ define([
     'bindings/datatable',
     'bindings/dropzone',
     'bindings/resizable-sidepanel',
-], function(ko, koMapping, $, dropzone, uuid, arches, JsonErrorAlertViewModel, importSingleCSVTemplate) {
+], function(ko, koMapping, $, dropzone, stringSimilarity, uuid, arches, JsonErrorAlertViewModel, importSingleCSVTemplate) {
     const viewModel = function(params) {
         const self = this;
         this.loadDetails = params.load_details || ko.observable();
