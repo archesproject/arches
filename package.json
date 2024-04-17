@@ -82,6 +82,7 @@
         "requirejs-text": "~2.0.16",
         "select-woo": "jadu/selectWoo",
         "select2": "3.5.1",
+        "string-similarity": "4.0.4",
         "underscore": "~1.13.6",
         "uuidjs": "^3.3.0",
         "vue": "^3.4.21",
