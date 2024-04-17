@@ -264,7 +264,7 @@ define([
                 inverseOntologyProperty = graph.config.inverseOntologyProperty;
 
                 if (self.node && (!ontologyProperty || !inverseOntologyProperty) ) {
-                    self.relationship(self.node.config.graphs()?.[0]?.useOntologyRelationship);
+                    self.relationship(!!self.node.ontologyclass());
                     var ontologyProperties = self.node.config.graphs().find(function(nodeConfigGraph) {
                         return nodeConfigGraph.graphid === graph.graphid;
                     });
