@@ -83,7 +83,7 @@
         "leaflet-side-by-side": "plugins/leaflet-side-by-side/index",
         "themepunch-tools": "plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min",
         "revolution-slider": "plugins/revolution-slider",
-        "slick": "plugins/slick",
+        "slick": "plugins/slick/slick.min",
         "async": "node_modules/requirejs-plugins/src/async",
         "text": "node_modules/requirejs-text/text",
         "jquery": "node_modules/jquery/dist/jquery.min",
