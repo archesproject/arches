@@ -50,6 +50,7 @@ define([
             urlparams.reportlink = self.reportlink();
             urlparams.precision = self.precision();
             urlparams.total = self.total();
+            urlparams.conceptuuidformat = self.exportConceptValuesAsIDs();
             url = url + '?' + $.param(urlparams);
             return url;
         });
