@@ -13,24 +13,18 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-Replace this with more appropriate tests for your application.
-"""
-
 import os
-import json
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.core import management
 from django.urls import reverse
 from django.test.client import RequestFactory, Client
+from django.test.utils import captured_stdout
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
-from arches.app.models.models import ResourceInstance, Node
+from arches.app.models.models import GraphModel, ResourceInstance, Node
 from arches.app.models.resource import Resource
 from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
@@ -41,7 +35,7 @@ from arches.app.utils.permission_backend import user_has_resource_model_permissi
 from arches.app.utils.permission_backend import get_restricted_users
 
 # these tests can be run from the command line via
-# python manage.py test tests/permissions/permission_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.permissions.permission_tests --settings="tests.test_settings"
 
 
 class PermissionTests(ArchesTestCase):
@@ -76,7 +70,6 @@ class PermissionTests(ArchesTestCase):
             try:
                 user = User.objects.create_user(username=profile["name"], email=profile["email"], password=profile["password"])
                 user.save()
-                print(("Added: {0}, password: {1}".format(user.username, user.password)))
 
                 for group_name in profile["groups"]:
                     group = Group.objects.get(name=group_name)
@@ -87,10 +80,15 @@ class PermissionTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        cls.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
+        if not GraphModel.objects.filter(pk=cls.data_type_graphid).exists():
+            # TODO: Fix this to run inside transaction, i.e. after super().setUpClass()
+            # https://github.com/archesproject/arches/issues/10719
+            test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
+            with captured_stdout():
+                management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
 
-        test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
-        management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
+        super().setUpClass()
         cls.add_users()
 
 
