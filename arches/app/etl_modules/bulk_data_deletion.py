@@ -131,6 +131,7 @@ class BulkDataDeletion(BaseBulkEditor):
 
     def delete_resources(self, userid, loadid, graphid, resourceids):
         result = {"success": False}
+        deleted_count = 0
         user = User.objects.get(id=userid)
         try:
             if resourceids and graphid:
@@ -141,7 +142,10 @@ class BulkDataDeletion(BaseBulkEditor):
                 resources = Resource.objects.filter(pk__in=resourceids)
             for resource in resources.iterator(chunk_size=2000):
                 resource.delete(user=user, index=False, transaction_id=loadid)
+                deleted_count += 1
             result["success"] = True
+            result["deleted_count"] = deleted_count
+            result["message"] = _(f"Successfully deleted {deleted_count} resources")
         except Exception as e:
             logger.exception(e)
             result["message"] = _("Unable to delete resources: {}").format(str(e))
