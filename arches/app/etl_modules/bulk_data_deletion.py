@@ -132,7 +132,10 @@ class BulkDataDeletion(BaseBulkEditor):
     def delete_resources(self, userid, loadid, graphid, resourceids):
         result = {"success": False}
         deleted_count = 0
-        user = User.objects.get(id=userid)
+        try:
+            user = User.objects.get(id=userid)
+        except ValueError:
+            user = None
         try:
             if resourceids and graphid:
                 resources = Resource.objects.filter(graph_id=graphid).filter(pk__in=resourceids)
