@@ -568,17 +568,13 @@ class Graph(models.GraphModel):
         deletes all associated resource instances
 
         """
-        resources_to_delete = list(Resource.objects.filter(graph_id=self.graphid))
-        delete_count = len(resources_to_delete)
-        if verbose is True:
-            bar = pyprind.ProgBar(delete_count)
-        for resource in resources_to_delete:
-            resource.delete()
-            if verbose is True:
-                bar.update()
-        if verbose is True:
-            print(bar)
-        return delete_count
+        from arches.app.etl_modules.bulk_data_deletion import BulkDataDeletion
+        bulk_deleter = BulkDataDeletion()
+        loadid = uuid.uuid4()
+        resp = bulk_deleter.delete_resources(request.user.id, loadid, self.graphid)
+        bulk_deleter.index_resource_deletion(loadid)
+
+        return resp
 
     def get_tree(self, root=None):
         """
