@@ -563,7 +563,7 @@ class Graph(models.GraphModel):
                 )
             )
 
-    def delete_instances(self, request, verbose=False):
+    def delete_instances(self, userid=None, verbose=False):
         """
         deletes all associated resource instances
 
@@ -571,7 +571,7 @@ class Graph(models.GraphModel):
         from arches.app.etl_modules.bulk_data_deletion import BulkDataDeletion
         bulk_deleter = BulkDataDeletion()
         loadid = uuid.uuid4()
-        resp = bulk_deleter.delete_resources(request.user.id, loadid, self.graphid)
+        resp = bulk_deleter.delete_resources(userid, loadid, self.graphid)
         bulk_deleter.index_resource_deletion(loadid)
 
         return resp
