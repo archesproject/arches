@@ -51,6 +51,11 @@ class SearchResultsExporter(object):
         self.report_link = search_request.GET.get("reportlink", False)
         self.format = search_request.GET.get("format", "tilecsv")
         self.concept_uuid_format = search_request.GET.get("conceptuuidformat", False)
+        if self.concept_uuid_format:
+            try:
+                self.concept_uuid_format = json.loads(self.concept_uuid_format)
+            except:
+                pass
         self.compact = search_request.GET.get("compact", True)
         self.precision = int(search_request.GET.get("precision", 5))
         if self.format == "shp" and self.compact is not True:
