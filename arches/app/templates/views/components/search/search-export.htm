@@ -107,6 +107,20 @@
                 <!-- /ko -->
             </div>
         </div>
+        <div class="form-text form-normal"
+            data-bind="
+                component: { 
+                    name: 'views/components/simple-switch', 
+                    params: {
+                        value: exportConceptValuesAsIDs, 
+                        config: { 
+                            label: $root.translations.exportConceptValuesAsIDsLabel,
+                            subtitle: $root.translations.exportConceptValuesAsIDsSubtitle
+                        }
+                    }
+                }
+            "
+        ></div>
 
         <!-- 2. Coordinate Precision -->
         <div class="instruction">
