@@ -18,8 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os, json, uuid
 from django.contrib.auth.models import User
-from django.core import management
-from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
@@ -27,7 +25,7 @@ from arches.app.models.card import Card
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
-# python manage.py test tests/models/graph_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.models.graph_tests --settings="tests.test_settings"
 
 
 class GraphTests(ArchesTestCase):
@@ -36,9 +34,7 @@ class GraphTests(ArchesTestCase):
         super().setUpClass()
 
         cls.loadOntology()
-
-        for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
-            management.call_command("packages", operation="import_graphs", source=path)
+        cls.ensure_resource_test_model_loaded()
 
         cls.NODE_NODETYPE_GRAPHID = "22000000-0000-0000-0000-000000000001"
         cls.SINGLE_NODE_GRAPHID = "22000000-0000-0000-0000-000000000000"
@@ -1075,7 +1071,6 @@ class GraphTests(ArchesTestCase):
         graph = Graph.objects.get(node=self.rootNode)
         admin = User.objects.get(username="admin")
         graph.publish(user=admin)
-        self.addCleanup(graph.unpublish)
 
         with self.assertRaises(GraphValidationError) as cm:
             graph.append_node()
@@ -1089,6 +1084,5 @@ class GraphTests(ArchesTestCase):
         admin = User.objects.get(username="admin")
         branch = Graph.objects.get(graphid=self.NODE_NODETYPE_GRAPHID)
         branch.publish(user=admin)
-        self.addCleanup(branch.unpublish)
 
         graph.append_branch("http://www.nasa.gov/", graphid=self.NODE_NODETYPE_GRAPHID)

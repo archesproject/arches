@@ -85,6 +85,7 @@ def save_to_tiles(userid, loadid):
         finally:
             log_event_details(cursor, loadid, "done|Reenabling the triggers in the tile table...")
             cursor.execute("""
+                COMMIT;
                 ALTER TABLE TILES ENABLE TRIGGER __arches_check_excess_tiles_trigger;
                 ALTER TABLE TILES ENABLE TRIGGER __arches_trg_update_spatial_attributes;
             """)
