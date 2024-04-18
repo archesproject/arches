@@ -576,6 +576,8 @@ class Graph(models.GraphModel):
             resource.delete()
             if verbose is True:
                 bar.update()
+        if verbose is True:
+            print(bar)
         return delete_count
 
     def get_tree(self, root=None):
