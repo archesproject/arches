@@ -17,7 +17,8 @@ function buildJavascriptFilepathLookup(path, outerAcc, javascriptDirectoryPath) 
             );
         }
         else {
-            let subPath = Path.join(path, name).split(/\/js(.*)/s)[1];  // splits only on first occurrence
+            const regex = new RegExp(`${Path.sep}js(.*)`, 's');
+            let subPath = Path.join(path, name).split(regex)[1];  // splits only on first occurrence
             subPath = subPath.substring(1);
             const parsedPath = Path.parse(subPath);
 

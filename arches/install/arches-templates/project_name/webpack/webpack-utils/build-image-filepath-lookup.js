@@ -18,7 +18,8 @@ const buildImageFilePathLookup = function(publicPath, path, outerAcc, imageDirec
             );
         }
         else {
-            let subPath = Path.join(path, name).split(/\/img(.*)/s)[1];  // splits only on first occurrence
+            const regex = new RegExp(`${Path.sep}img(.*)`, 's');
+            let subPath = Path.join(path, name).split(regex)[1];  // splits only on first occurrence
             subPath = subPath.substring(1);
             
             const parsedPath = Path.parse(subPath);
