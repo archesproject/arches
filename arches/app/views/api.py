@@ -1002,6 +1002,10 @@ class IIIFManifest(APIBase):
         response = JSONResponse({"results": manifests, "count": count, "more": more})
         return response
 
+class TestMe(APIBase):
+    def get(self, request):
+        response = JSONResponse({"results": "I do not have a test"})
+        return response
 
 class IIIFAnnotations(APIBase):
     def get(self, request):
