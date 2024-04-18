@@ -563,7 +563,7 @@ class Graph(models.GraphModel):
                 )
             )
 
-    def delete_instances(self, verbose=False):
+    def delete_instances(self, verbose=False, request=None):
         """
         deletes all associated resource instances
 
