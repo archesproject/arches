@@ -6,8 +6,37 @@ on:
   workflow_dispatch:
 
 jobs:
+  check-base-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check base branch
+        run: |
+          git fetch origin --prune
+          
+          CURRENT_BRANCH=${{ github.event.pull_request.head.ref }}
+          TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
+
+          COMMON_ANCESTOR=$(git merge-base origin/$CURRENT_BRANCH origin/$TARGET_BRANCH)
+          COMMITS_BEHIND=$(git rev-list --count origin/$TARGET_BRANCH ^$COMMON_ANCESTOR)
+
+          if [ "$COMMITS_BEHIND" -eq 0 ]; then
+            echo "Your branch is up-to-date with the target branch."
+          elif [ "$COMMITS_BEHIND" -eq 1 ]; then
+            echo "Your branch is 1 commit behind the target branch."
+            exit 1
+          else
+            echo "Your branch is $COMMITS_BEHIND commits behind the target branch."
+            exit 1
+          fi
+
   build:
     runs-on: ubuntu-latest
+    needs: [check-base-branch]
+
     services:
       postgres:
         image: postgis/postgis:13-3.0
@@ -78,7 +107,8 @@ jobs:
 
   check-coverage:
     runs-on: ubuntu-latest
-    needs: [build]
+    needs: [check-base-branch, build]
+
     steps:
       - uses: actions/checkout@v4
 
