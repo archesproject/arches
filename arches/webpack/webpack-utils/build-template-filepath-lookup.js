@@ -17,9 +17,8 @@ const buildTemplateFilePathLookup = function(path, outerAcc, templateDirectoryPa
             );
         }
         else {
-            const regex = new RegExp(`${Path.sep}templates(.*)`, 's');
-            let subPath = Path.join(path, name).split(regex)[1];  // splits only on first occurrence
-            subPath = subPath.substring(1);
+            const regex = new RegExp(`${Path.sep}templates${Path.sep}(.*)`, 's');
+            const subPath = Path.join(path, name).split(regex)[1];  // splits only on first occurrence
 
             const parsedPath = Path.parse(subPath);
             const filename = parsedPath['dir'] ? Path.join(parsedPath['dir'], parsedPath['base']) : parsedPath['base'];
