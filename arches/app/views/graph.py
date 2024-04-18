@@ -469,7 +469,7 @@ class GraphDataView(View):
         elif self.action == "delete_instances":
             try:
                 graph = Graph.objects.get(graphid=graphid)
-                deleted_resource_count = graph.delete_instances()
+                resp = graph.delete_instances(request=request)
                 return JSONResponse(
                     {
                         "success": True,
