@@ -17,7 +17,7 @@ function buildCSSFilepathLookup(path, outerAcc, cssDirectoryPath) {
             );
         }
         else {
-            let subPath = Path.join(path, name).split(/css(.*)/s)[1];  // splits only on first occurance
+            let subPath = Path.join(path, name).split(/css(.*)/s)[1];  // splits only on first occurrence
             subPath = subPath.substring(1);
             const parsedPath = Path.parse(subPath);
 
