@@ -26,6 +26,7 @@ define([
         this.hasExportHtmlTemplates = ko.observable(arches.exportHtmlTemplates.length > 0);
         this.downloadPending = ko.observable(false);
         this.hasResourceTypeFilter = ko.observable(!!params.query()['resource-type-filter']);
+        this.exportConceptValuesAsIDs = ko.observable(false);
 
         this.query.subscribe(function(val) {
             if (val['resource-type-filter']) {
@@ -71,6 +72,7 @@ define([
             payload.total = this.total();
             payload.email = this.emailInput();
             payload.exportName = this.exportName() || "Arches Export";
+            payload.conceptuuidformat = this.exportConceptValuesAsIDs();
             $.ajax({
                 type: "GET",
                 url: arches.urls.export_results,
