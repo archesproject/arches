@@ -10,7 +10,7 @@ import { displayedRowKey, selectedLanguageKey, ALT_LABEL, PREF_LABEL, URI } from
 import { itemKey } from "@/components/ControlledListManager/const.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
-import type { ControlledListItem, Label } from "@/types/ControlledListManager";
+import type { ControlledListItem, Label, NewLabel } from "@/types/ControlledListManager";
 
 const { displayedRow: item } = inject(displayedRowKey);
 const selectedLanguage = inject(selectedLanguageKey);
@@ -18,10 +18,10 @@ const selectedLanguage = inject(selectedLanguageKey);
 const { $gettext } = useGettext();
 
 const appendItemLabel = computed(() => {
-    return (newLabel: Label) => { item.value.labels.push(newLabel); };
+    return (newLabel: Label | NewLabel) => { item.value.labels.push(newLabel); };
 });
 const removeItemLabel = computed(() => {
-    return (removedLabel: Label) => {
+    return (removedLabel: Label | NewLabel) => {
         const toDelete = item.value.labels.findIndex((l: Label) => l.id === removedLabel.id);
         item.value.labels.splice(toDelete, 1);
     };
@@ -52,6 +52,7 @@ const iconLabel = (item: ControlledListItem) => {
     </span>
     <LabelEditor :type="PREF_LABEL" />
     <LabelEditor :type="ALT_LABEL" />
+    <!-- TODO(jtw) redesign URI entry, uncouple from LabelEditor -->
     <LabelEditor
         :type="URI"
         :style="{ marginBottom: 0 }"

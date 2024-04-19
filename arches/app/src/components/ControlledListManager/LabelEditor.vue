@@ -1,22 +1,36 @@
 <script setup lang="ts">
-import { computed, inject } from "vue";
+import arches from "arches";
+import { computed, inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
+import Column from "primevue/column";
+import DataTable from "primevue/datatable";
+import Dropdown from "primevue/dropdown";
+import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
-import { deleteLabel } from "@/components/ControlledListManager/api.ts";
+import { deleteLabel, upsertLabel } from "@/components/ControlledListManager/api.ts";
 import AddLabel from "@/components/ControlledListManager/AddLabel.vue";
-import LabelRow from "@/components/ControlledListManager/LabelRow.vue";
 
 import { itemKey, ALT_LABEL, PREF_LABEL, URI } from "@/components/ControlledListManager/const.ts";
 
+import type { DataTableRowEditInitEvent } from "primevue/datatable";
 import type {
+    ControlledListItem,
     Label,
+    NewLabel,
     ValueType,
 } from "@/types/ControlledListManager";
+import type { Ref } from "@/types/Ref";
 
 const props: { type: ValueType | "URI" } = defineProps(["type"]);
-const { item, removeItemLabel } = inject(itemKey);
+const { item, appendItemLabel, updateItemLabel, removeItemLabel } : {
+    item: Ref<ControlledListItem>,
+    appendItemLabel: Ref<(appendedLabel: Label | NewLabel) => undefined>,
+    updateItemLabel: Ref<(updatedLabel: Label) => undefined>,
+    removeItemLabel: Ref<(removedLabel: Label | NewLabel) => undefined>,
+} = inject(itemKey);
+const editingRows = ref([]);
 
 const toast = useToast();
 const { $gettext } = useGettext();
@@ -53,7 +67,39 @@ const headings: { heading: string; subheading: string } = computed(() => {
     }
 });
 
-const onDelete = async (label: Label) => {
+const labels = computed(() => {
+    if (!item.value) {
+        return [];
+    }
+    return item.value.labels.filter(
+        label => label.valuetype === props.type
+    );
+});
+
+const onSave = async (event: DataTableRowEditInitEvent) => {
+    // normalize new label numbers (starting at 1000) to null
+    const normalizedNewData: Label = {
+        ...event.newData,
+        id: typeof event.newData.id === 'string' ? event.newData.id : null,
+    };
+    const upsertedLabel: Label = await upsertLabel(
+        normalizedNewData,
+        toast,
+        $gettext,
+    );
+    if (normalizedNewData.id) {
+        updateItemLabel.value(upsertedLabel);
+    } else {
+        appendItemLabel.value(upsertedLabel);
+        removeItemLabel.value(event.newData);
+    }
+};
+
+const onDelete = async (label: NewLabel | Label) => {
+    if (typeof label.id === 'number') {
+        removeItemLabel.value(label);
+        return;
+    }
     const deleted = await deleteLabel(label, toast, $gettext);
     if (deleted) {
         removeItemLabel.value(label);
@@ -65,17 +111,60 @@ const onDelete = async (label: Label) => {
     <div class="label-editor-container">
         <h4>{{ headings.heading }}</h4>
         <h5>{{ headings.subheading }}</h5>
-        <div
-            v-for="label in item.labels.filter(
-                label => label.valuetype === props.type
-            )"
-            :key="label.id"
+        <DataTable
+            v-if="type !== URI"
+            v-model:editingRows="editingRows"
+            :value="labels"
+            data-key="id"
+            edit-mode="row"
+            striped-rows
+            scrollable
+            :style="{ fontSize: 'small' }"
+            @row-edit-save="onSave"
         >
-            <LabelRow
-                :label
-                :on-delete="() => { onDelete(label) }"
+            <Column field="value">
+                <template #editor="{ data, field }">
+                    <InputText
+                        v-model="data[field]"
+                        style="width: 90%"
+                    />
+                </template>
+            </Column>
+            <Column
+                field="language"
+                :header="$gettext('Language')"
+                style="width: 10%; min-width: 12rem; height: 4rem;"
+            >
+                <template #editor="{ data, field }">
+                    <Dropdown
+                        v-model="data[field]"
+                        :options="arches.languages"
+                        option-label="name"
+                        option-value="code"
+                        :pt="{
+                            input: { style: { fontFamily: 'inherit', fontSize: 'small' } },
+                            panel: { style: { fontSize: 'small' } },
+                        }"
+                    />
+                </template>
+            </Column>
+            <Column
+                :row-editor="true"
+                style="width: 10%; min-width: 8rem;"
             />
-        </div>
+            <Column style="width: 5%;">
+                <template #body="slotProps">
+                    <i
+                        class="fa fa-trash"
+                        role="button"
+                        tabindex="0"
+                        :aria-label="$gettext('Delete')"
+                        @click="onDelete(slotProps.data)"
+                        @key.enter="onDelete(slotProps.data)"
+                    />
+                </template>
+            </Column>
+        </DataTable>
         <AddLabel
             v-if="type !== URI"
             :type="type"
@@ -98,5 +187,9 @@ h4 {
 h5 {
     font-weight: normal;
     margin-top: 0;
+}
+
+:deep(.p-editable-column) {
+    padding-left: 0.5rem;
 }
 </style>

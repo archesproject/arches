@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import arches from "arches";
-import { computed, inject, ref } from "vue";
+import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
-
-import EditLabel from "@/components/ControlledListManager/EditLabel.vue";
 
 import { itemKey, ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
 
 import type {
+    Label,
     NewLabel,
     ValueType,
 } from "@/types/ControlledListManager";
@@ -15,14 +14,18 @@ import type {
 const props: { type: ValueType } = defineProps(["type"]);
 const { item } = inject(itemKey);
 
-const modalVisible = ref(false);
-
 const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
 const newLabel: NewLabel = computed(() => {
+    const maxOtherNewLabelId = Math.max(
+        ...item.value.labels.filter(
+            (l: NewLabel | Label) => typeof l.id === "number"
+        ).map((l: NewLabel) => l.id),
+        1000,
+    );
     return {
-        id: null,
+        id: maxOtherNewLabelId + 1,
         valuetype: props.type,
         language: arches.activeLanguage,
         value: '',
@@ -45,7 +48,7 @@ const buttonLabel = computed(() => {
 <template>
     <button
         class="add-label"
-        @click="modalVisible = true"
+        @click="item.labels.push(newLabel)"
     >
         <i
             class="fa fa-plus-circle"
@@ -55,12 +58,6 @@ const buttonLabel = computed(() => {
             {{ buttonLabel }}
         </span>
     </button>
-    <EditLabel
-        v-model="modalVisible"
-        :header="buttonLabel"
-        :label="newLabel"
-        :is-insert="true"
-    />
 </template>
 
 <style scoped>

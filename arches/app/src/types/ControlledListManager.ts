@@ -7,7 +7,7 @@ export type Label = {
 }
 
 export type NewLabel = {
-    id: null,
+    id: number,
     valuetype: string,
     language: string,
     value: string,
