@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.db import migrations, models
-import django.db.models.deletion
-import uuid
+from django.db import migrations
 
 
 class Migration(migrations.Migration):
