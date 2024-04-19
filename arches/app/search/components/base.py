@@ -22,7 +22,7 @@ class BaseSearchFilter:
     def __init__(self, request=None):
         self.request = request
 
-    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
+    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional, request):
         """
         used to append ES query dsl to the search request
 
