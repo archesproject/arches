@@ -239,6 +239,8 @@ class BulkStringEditor(BaseBulkEditor):
         request.method = "GET"
         request.GET["paging-filter"] = 1
         request.GET["tiles"] = True
+        request.GET["core-search"] = True
+        request.GET["localize-descriptors"] = True
 
 
         if search_url:
