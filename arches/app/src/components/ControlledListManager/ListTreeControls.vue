@@ -10,6 +10,7 @@ import { listAsNode } from "@/components/ControlledListManager/utils.ts";
 import Button from "primevue/button";
 import ConfirmDialog from "primevue/confirmdialog";
 import Dropdown from "primevue/dropdown";
+import SplitButton from "primevue/splitbutton";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
@@ -18,7 +19,9 @@ import type { TreeNode } from "primevue/tree/Tree/TreeNode";
 import type { Ref } from "@/types/Ref";
 import type { ControlledList } from "@/types/ControlledListManager";
 
-const ERROR = "error";  // not user-facing
+// not user-facing
+const DANGER = "danger";
+const ERROR = "error";
 
 const { setDisplayedRow } = inject(displayedRowKey);
 const selectedLanguage = inject(selectedLanguageKey);
@@ -27,13 +30,22 @@ const controlledListItemsTree = defineModel();
 const expandedKeys: Ref<TreeExpandedKeys> = defineModel("expandedKeys");
 const selectedKeys: Ref<TreeSelectionKeys> = defineModel("selectedKeys");
 const movingItem: Ref<typeof TreeNode> = defineModel("movingItem");
+const isMultiSelecting = defineModel("isMultiSelecting");
 
 const { $gettext, $ngettext } = useGettext();
 const buttonGreen = "#10b981";
-const buttonPink = "#ed7979";
 
 const confirm = useConfirm();
 const toast = useToast();
+
+const deleteDropdownOptions = [
+    {
+        label: $gettext("Delete Multiple"),
+        command: () => {
+            isMultiSelecting.value = true;
+        },
+    },
+];
 
 const expandAll = () => {
     for (const node of controlledListItemsTree.value) {
@@ -178,18 +190,16 @@ const deleteSelected = async () => {
         return;
     }
     const deletes = Object.keys(selectedKeys.value);
-    if (deletes.length !== 1) {
-        throw new Error('Mass deletion not yet implemented.');
-    }
-    const toDelete = deletes[0];
+    const allListIds = controlledListItemsTree.value.map((node: typeof TreeNode) => node.data.id);
+
+    const listIdsToDelete = deletes.filter(id => allListIds.includes(id));
+    const itemIdsToDelete = deletes.filter(id => !listIdsToDelete.includes(id));
+
     selectedKeys.value = {};
 
-    const allListIds = controlledListItemsTree.value.map((node: typeof TreeNode) => node.data.id);
-    if (allListIds.includes(toDelete)) {
-        await deleteLists(deletes);
-    } else {
-        await deleteItems(deletes);
-    }
+    // Do items first so that cascade deletion doesn't cause item deletion to fail.
+    await deleteItems(itemIdsToDelete);
+    await deleteLists(listIdsToDelete);
 };
 
 const confirmDelete = () => {
@@ -227,12 +237,15 @@ await fetchLists();
             @click="createList"
         />
         <ConfirmDialog :draggable="false" />
-        <Button
+        <SplitButton
             class="list-button"
             :label="$gettext('Delete')"
             raised
+            style="font-size: inherit"
             :disabled="!Object.keys(selectedKeys).length"
-            :pt="{ root: { style: { background: buttonPink } } }"
+            :severity="DANGER"
+            :model="deleteDropdownOptions"
+            :menu-button-props="{ disabled: !Object.keys(selectedKeys).length || movingItem.key || isMultiSelecting }"
             @click="confirmDelete"
         />
     </div>
@@ -247,6 +260,18 @@ await fetchLists();
             class="banner-button"
             :label="$gettext('Abandon')"
             @click="movingItem = {}"
+        />
+    </div>
+    <div
+        v-else-if="isMultiSelecting"
+        class="action-banner"
+    >
+        {{ $gettext("Select additional items to delete") }}
+        <Button
+            type="button"
+            class="banner-button"
+            :label="$gettext('Abandon')"
+            @click="isMultiSelecting = false"
         />
     </div>
     <div
@@ -307,7 +332,7 @@ await fetchLists();
     font-size: small;
     padding: 0.5rem;
 }
-.list-button {
+.list-button, .p-splitbutton {
     height: 4rem;
     margin: 0.5rem;
     flex: 0.5;
@@ -329,6 +354,12 @@ await fetchLists();
 </style>
 
 <style>
+.p-tieredmenu.p-tieredmenu-overlay {
+    font-size: inherit;
+}
+.p-tieredmenu-root-list {
+    margin: 0;  /* override arches css */
+}
 .p-confirm-dialog {
     font-size: small;
 }

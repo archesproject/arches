@@ -36,6 +36,7 @@ const tree: Ref<typeof TreeNode[]> = ref([]);
 const selectedKeys: Ref<TreeSelectionKeys> = ref({});
 const expandedKeys: Ref<TreeExpandedKeys> = ref({});
 const movingItem: Ref<typeof TreeNode> = ref({});
+const isMultiSelecting = ref(false);
 const refetcher = ref(0);
 
 const { setDisplayedRow } = inject(displayedRowKey);
@@ -218,6 +219,7 @@ const setParent = async (parentNode: typeof TreeNode) => {
         v-model:expanded-keys="expandedKeys"
         v-model:selected-keys="selectedKeys"
         v-model:moving-item="movingItem"
+        v-model:is-multi-selecting="isMultiSelecting"
         :selected-keys
     />
     <Tree
@@ -228,7 +230,7 @@ const setParent = async (parentNode: typeof TreeNode) => {
         :filter="true"
         filter-mode="lenient"
         :filter-placeholder="$gettext('Find')"
-        selection-mode="single"
+        :selection-mode="isMultiSelecting ? 'multiple' : 'single'"
         :pt="{
             root: { style: { flexGrow: 1, border: 0, overflowY: 'hidden' } },
             input: {
