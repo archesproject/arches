@@ -53,13 +53,13 @@ class SearchResultsFilter(BaseSearchFilter):
         nested_agg.add_aggregation(nested_agg_filter)
         search_results_object["query"].add_aggregation(nested_agg)
 
-    def post_search_hook(self, search_results_object, results, permitted_nodegroups):
+    def post_search_hook(self, search_results_object, response_object, permitted_nodegroups):
         user_is_reviewer = user_is_resource_reviewer(self.request.user)
 
         # only reuturn points and geometries a user is allowed to view
         geojson_nodes = get_nodegroups_by_datatype_and_perm(self.request, "geojson-feature-collection", "read_nodegroup")
 
-        for result in results["hits"]["hits"]:
+        for result in response_object["results"]["hits"]["hits"]:
             result["_source"]["points"] = select_geoms_for_results(result["_source"]["points"], geojson_nodes, user_is_reviewer)
             result["_source"]["geometries"] = select_geoms_for_results(result["_source"]["geometries"], geojson_nodes, user_is_reviewer)
             try:
