@@ -5,6 +5,19 @@ from arches.app.utils.permission_backend import user_is_resource_reviewer
 from datetime import datetime
 import json
 
+details = {
+    "searchcomponentid": "69695d63-6f03-4536-8da9-841b07116381",
+    "name": "Core Search",
+    "icon": "",
+    "modulename": "core_search.py",
+    "classname": "CoreSearchFilter",
+    "type": "",
+    "componentpath": "",
+    "componentname": "core-search",
+    "sortorder": "0",
+    "enabled": True,
+}
+
 class CoreSearchFilter(BaseSearchFilter):
     def view_data():
         pass
