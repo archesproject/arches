@@ -44,7 +44,7 @@ class BaseSearchFilter:
         """
         pass
 
-    def post_search_hook(self, search_results_object, results, permitted_nodegroups):
+    def post_search_hook(self, search_results_object, response_object, permitted_nodegroups):
         """
         code to run after the search results have been retrieved
 
