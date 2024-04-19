@@ -20,7 +20,7 @@ details = {
 
 
 class SearchResultsFilter(BaseSearchFilter):
-    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
+    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional, request):
         nested_agg = NestedAgg(path="points", name="geo_aggs")
         nested_agg_filter = FiltersAgg(name="inner")
         geo_agg_filter = Bool()
@@ -53,7 +53,7 @@ class SearchResultsFilter(BaseSearchFilter):
         nested_agg.add_aggregation(nested_agg_filter)
         search_results_object["query"].add_aggregation(nested_agg)
 
-    def post_search_hook(self, search_results_object, results, permitted_nodegroups):
+    def post_search_hook(search_results_object, response_object, permitted_nodegroups, request):
         user_is_reviewer = user_is_resource_reviewer(self.request.user)
 
         # only reuturn points and geometries a user is allowed to view

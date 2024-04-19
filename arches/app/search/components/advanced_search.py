@@ -20,7 +20,7 @@ details = {
 
 
 class AdvancedSearch(BaseSearchFilter):
-    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
+    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional, request):
         querysting_params = self.request.GET.get(details["componentname"], "")
         advanced_filters = JSONDeserializer().deserialize(querysting_params)
         datatype_factory = DataTypeFactory()

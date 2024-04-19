@@ -20,7 +20,7 @@ details = {
 
 
 class TermFilter(BaseSearchFilter):
-    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
+    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional, request):
         search_query = Bool()
         querysting_params = self.request.GET.get(details["componentname"], "")
         language = self.request.GET.get("language", "*")
