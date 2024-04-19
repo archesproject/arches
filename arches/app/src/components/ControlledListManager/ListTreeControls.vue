@@ -13,7 +13,8 @@ import Dropdown from "primevue/dropdown";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
-import type { TreeExpandedKeys, TreeSelectionKeys, TreeNode } from "primevue/tree/Tree";
+import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
+import type { TreeNode } from "primevue/tree/Tree/TreeNode";
 import type { Ref } from "@/types/Ref";
 import type { ControlledList } from "@/types/ControlledListManager";
 
@@ -23,8 +24,8 @@ const { setDisplayedRow } = inject(displayedRowKey);
 const selectedLanguage = inject(selectedLanguageKey);
 
 const controlledListItemsTree = defineModel();
-const expandedKeys: Ref<typeof TreeExpandedKeys> = defineModel("expandedKeys");
-const selectedKeys: Ref<typeof TreeSelectionKeys> = defineModel("selectedKeys");
+const expandedKeys: Ref<TreeExpandedKeys> = defineModel("expandedKeys");
+const selectedKeys: Ref<TreeSelectionKeys> = defineModel("selectedKeys");
 const movingItem: Ref<typeof TreeNode> = defineModel("movingItem");
 
 const { $gettext, $ngettext } = useGettext();
@@ -205,7 +206,6 @@ const confirmDelete = () => {
         rejectLabel: $gettext("Cancel"),
         rejectClass: "p-button-secondary p-button-outlined",
         acceptLabel: $gettext("Delete"),
-        draggable: false,
         accept: async () => {
             await deleteSelected().then(fetchLists);
         },

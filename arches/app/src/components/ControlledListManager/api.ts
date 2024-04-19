@@ -1,7 +1,7 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 
-import Toast from "primevue/toast";
+import type { ToastServiceMethods } from "primevue/toastservice";
 import type {
     ControlledList,
     ControlledListItem,
@@ -14,7 +14,7 @@ type GetText = (s: string) => string;
 
 export const postItemToServer = async (
     item: ControlledListItem,
-    toast: typeof Toast,
+    toast: ToastServiceMethods,
     $gettext: GetText
 ) => {
     let errorText;
@@ -47,7 +47,7 @@ export const postItemToServer = async (
 
 export const postListToServer = async (
     list: ControlledList,
-    toast: typeof Toast,
+    toast: ToastServiceMethods,
     $gettext: GetText
 ) => {
     let errorText;
@@ -77,7 +77,7 @@ export const postListToServer = async (
 
 export const upsertLabel = async (
     label: NewLabel,
-    toast: typeof Toast,
+    toast: ToastServiceMethods,
     $gettext: GetText
 ) => {
     let errorText;
@@ -110,7 +110,7 @@ export const upsertLabel = async (
 
 export const deleteLabel = async (
     label: Label,
-    toast: typeof Toast,
+    toast: ToastServiceMethods,
     $gettext: GetText
 ) => {
     let errorText;

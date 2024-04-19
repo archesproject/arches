@@ -23,9 +23,9 @@ import {
 import type { Ref } from "@/types/Ref";
 import type {
     TreeExpandedKeys,
-    TreeNode,
     TreeSelectionKeys,
 } from "primevue/tree/Tree";
+import type { TreeNode } from "primevue/tree/Tree/TreeNode";
 import type {
     ControlledList,
     ControlledListItem,
@@ -33,8 +33,8 @@ import type {
 } from "@/types/ControlledListManager";
 
 const tree: Ref<typeof TreeNode[]> = ref([]);
-const selectedKeys: Ref<typeof TreeSelectionKeys> = ref({});
-const expandedKeys: Ref<typeof TreeExpandedKeys> = ref({});
+const selectedKeys: Ref<TreeSelectionKeys> = ref({});
+const expandedKeys: Ref<TreeExpandedKeys> = ref({});
 const movingItem: Ref<typeof TreeNode> = ref({});
 const refetcher = ref(0);
 

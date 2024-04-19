@@ -3,7 +3,7 @@ import type {
     ControlledList,
     ControlledListItem,
 } from "@/types/ControlledListManager";
-import type { TreeNode } from "primevue/tree/Tree";
+import type { TreeNode } from "primevue/tree/Tree/TreeNode";
 
 export const bestLabel = (item: ControlledListItem, languageCode: string) => {
     const labelsInLang = item.labels.filter(l => l.language === languageCode);
