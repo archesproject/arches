@@ -153,7 +153,7 @@ class JSONSerializer(object):
         elif hasattr(object, "__dict__"):
             # call an objects serialize method if it exists
             if hasattr(object, "serialize"):
-                return getattr(object, "serialize")(object)
+                return getattr(object, "serialize")()
             else:
                 return self.handle_dictionary(object.__dict__)
         else:
