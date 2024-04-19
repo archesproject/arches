@@ -331,10 +331,15 @@ def search_results(request, returnDsl=False):
             if search_filter:
                 search_filter.post_search_hook(search_results_object, ret, permitted_nodegroups)
 
-        for key, value in list(search_results_object.items()):
-            ret[key] = value
-
-        return JSONResponse(ret)
+        if isinstance(ret, dict):
+            for key, value in list(search_results_object.items()):
+                ret[key] = value
+            return JSONResponse(ret)
+        elif isinstance(ret, str): # response_object is json str, potentially from cache
+            return JSONResponse(content=ret, content_type="application/json")
+        else:
+            ret = {"message": _("Search Response Object malformed by one or more search filters")}
+            return JSONResponse(ret, status=500)
 
     else:
         ret = {"message": _("There was an error retrieving the search results")}
