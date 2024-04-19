@@ -22,7 +22,7 @@ details = {
 
 
 class TimeFilter(BaseSearchFilter):
-    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional, request):
+    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         search_query = Bool()
         querysting_params = self.request.GET.get(details["componentname"], "")
         temporal_filter = JSONDeserializer().deserialize(querysting_params)

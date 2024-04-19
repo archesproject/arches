@@ -17,7 +17,7 @@ details = {
 
 
 class SortResults(BaseSearchFilter):
-    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional, request):
+    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         sort_param = self.request.GET.get(details["componentname"], None)
 
         if sort_param is not None and sort_param is not "":
