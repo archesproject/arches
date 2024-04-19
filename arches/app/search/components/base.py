@@ -38,7 +38,7 @@ class BaseSearchFilter:
 
         pass
 
-    def execute_query(self):
+    def execute_query(self, search_results_object, request, response_object):
         """
         code responsible for execution of the search query and initial mutation of response object
         """
