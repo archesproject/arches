@@ -316,7 +316,8 @@ def search_results(request, returnDsl=False):
     if returnDsl:
         return search_results_object.pop("query", None)
     
-    ret = {"results": None}
+    ret = dict()
+    ret["results"] = None
 
     for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
         search_filter = search_filter_factory.get_filter(filter_type)
