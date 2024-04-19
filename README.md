@@ -12,7 +12,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 7.5.1 release notes](https://github.com/archesproject/arches/blob/stable/7.5.0/releases/7.5.1.md)
+[Version 7.5.2 release notes](https://github.com/archesproject/arches/blob/stable/7.5.2/releases/7.5.2.md)
 
 #### Quick Install
 
@@ -61,7 +61,7 @@ Our general release cycle will typically be a functional release (either major i
 
 #### Feature roadmap
 
-The following a general plan for the Arches project. Be aware this plan is tentative and subject to change
+The following a general plan for the Arches project. Be aware this plan is tentative and subject to change.
 
 ## 7.6 LTS - Release date: Sept 15, 2024
 - Arches Application improvements
