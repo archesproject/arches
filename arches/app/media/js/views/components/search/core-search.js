@@ -1,20 +1,18 @@
 define([
     'jquery',
     'knockout',
-    'arches',
-], function($, ko, arches) {
+    'templates/views/components/search/core-search.htm',
+], function($, ko, coreSearchTemplate) {
     const componentName = 'core-search';
-    const viewModel = BaseFilter.extend({
-        initialize: function(options) {
-            options.name = 'Core Search';
-            BaseFilter.prototype.initialize.call(this, options);
-            this.filter = true;
-            this.filters[componentName](this);
-        } 
-    });
+    const viewModel = function(params) {
+        this.query = params.query;
+        let queryObj = this.query();
+        queryObj[componentName] = true;
+        this.query(queryObj);
+    };
 
     return ko.components.register(componentName, {
         viewModel: viewModel,
-        template: '',
+        template: coreSearchTemplate,
     });
 });

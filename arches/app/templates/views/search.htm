@@ -156,6 +156,15 @@
                         </div>
                         <!-- /ko -->
                     </div>
+
+                    <div style="display:none;" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: false">
+                    <!-- ko if: filter.type === 'backend' && filter.enabled -->
+                    <div style="display:none;" data-bind="component: {
+                        name: filter.componentname,
+                        params: $parent.sharedStateObject
+                    }"></div>
+                    <!-- /ko -->
+                    </div>
                 </div>
             </div>
         </section>
