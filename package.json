@@ -20,7 +20,7 @@
         "type": "git"
     },
     "devDependencies": {
-        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.6.x"
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#alpha/7.6.0a3"
     },
     "dependencies": {
         "@babel/runtime": "^7.17.2",
