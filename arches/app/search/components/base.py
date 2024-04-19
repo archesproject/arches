@@ -38,6 +38,12 @@ class BaseSearchFilter:
 
         pass
 
+    def execute_query(self):
+        """
+        code responsible for execution of the search query and initial mutation of response object
+        """
+        pass
+
     def post_search_hook(self, search_results_object, results, permitted_nodegroups):
         """
         code to run after the search results have been retrieved
