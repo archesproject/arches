@@ -88,12 +88,15 @@
         "vue3-gettext": "^3.0.0-beta.4",
         "webpack-bundle-tracker": "^1.4.0"
     },
+    "resolutions": {
+        "@vue/compiler-sfc": "^3.4.21"
+    },
     "nodeModulesPaths": {
         "nifty": "plugins/nifty",
         "leaflet-side-by-side": "plugins/leaflet-side-by-side/index",
         "themepunch-tools": "plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min",
         "revolution-slider": "plugins/revolution-slider",
-        "slick": "plugins/slick",
+        "slick": "plugins/slick/slick.min",
         "async": "node_modules/requirejs-plugins/src/async",
         "text": "node_modules/requirejs-text/text",
         "jquery": "node_modules/jquery/dist/jquery.min",

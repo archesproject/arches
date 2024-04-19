@@ -12,7 +12,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 7.5.1 release notes](https://github.com/archesproject/arches/blob/stable/7.5.0/releases/7.5.1.md)
+[Version 7.5.2 release notes](https://github.com/archesproject/arches/blob/stable/7.5.2/releases/7.5.2.md)
 
 #### Quick Install
 
@@ -61,29 +61,25 @@ Our general release cycle will typically be a functional release (either major i
 
 #### Feature roadmap
 
-The following a general plan for the Arches project. Be aware this plan is tentative and subject to change
+The following a general plan for the Arches project. Be aware this plan is tentative and subject to change.
 
-## 7.5 - Release date: December 15, 2023 
-- Continued accessibility improvements
-- Arches application support
-- Bulk Data Manager export
-- Bulk Data Manager deletion
-- Tile Excel format added to Bulk Data Manager
-- Improved Bulk Data Manager data edting
-- Workflow history tracking
-- Image configuration of file-list datatype
-- Performance Improvements
-- Support for compiling Vue components
-- Display of file thumbnails for formats other than images
-
-## 7.6 LTS - Release date: June 15, 2024
+## 7.6 LTS - Release date: Sept 15, 2024
+- Arches Application improvements
 - Activity stream edit logs
 - Security enhancements
+- Default deny permissions
+- Support for pluggable permissions frameworks
+- Standalone plugins
 
-## 8.0 - Release date: December 15, 2024
-- Support for editing and publishing graphs (removing instance restrictions)
+## 8.0 - Release date: June 15, 2025
+- Support for editing and publishing graphs without having to remove resource instances
 - Support for viewing and restoring previous graph publications
-- Support for editing/localizing UI labels and permissions for published graphs
-- Business data migrations that correspond to graph changes
-- RDM Redesign
+- Support for configuring currently published graphs
+- Support for search by resource relationship
+- Implementation of the Controlled List Manager and reference data type
+- Persistent uris for resource instance data
+- Implementation of logical deletion of resources
+- Bulk Data Manager CLI interface
 
+## 9.0 - Release date: Sept 15, 2027
+- Full migration to Vue

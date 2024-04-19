@@ -17,21 +17,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import time
-import uuid
+from django.test.utils import captured_stdout
+
 from tests.base_test import ArchesTestCase
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
 
 # these tests can be run from the command line via
-# python manage.py test tests/search/search_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.search.search_tests --settings="tests.test_settings"
 
 
 class SearchTests(ArchesTestCase):
     @classmethod
     def tearDownClass(cls):
         se = SearchEngineFactory().create()
-        se.delete_index(index="test")
-        se.delete_index(index="bulk")
+        with captured_stdout():
+            se.delete_index(index="test")
+            se.delete_index(index="bulk")
         super().tearDownClass()
 
     def test_delete_by_query(self):
@@ -65,7 +67,8 @@ class SearchTests(ArchesTestCase):
         """
 
         se = SearchEngineFactory().create()
-        se.create_index(index="test")
+        with captured_stdout():
+            se.create_index(index="test")
 
         documents = []
         count_before = se.count(index="test")
@@ -83,7 +86,8 @@ class SearchTests(ArchesTestCase):
 
     def test_bulk_indexer(self):
         se = SearchEngineFactory().create()
-        se.create_index(index="bulk")
+        with captured_stdout():
+            se.create_index(index="bulk")
 
         with se.BulkIndexer(batch_size=500, refresh=True) as bulk_indexer:
             for i in range(1001):
