@@ -179,6 +179,8 @@ class BaseBulkEditor:
         request.user = self.request.user
         request.method = "GET"
         request.GET["export"] = True
+        request.GET["core-search"] = True
+        request.GET["localize-descriptors"] = True
         validate = URLValidator()
         try:
             validate(search_url)
