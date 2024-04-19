@@ -84,26 +84,26 @@ class JSONSerializer(object):
 
         return result.encode("utf-8") if self.utf_encode else result
 
-    def handle_object(self, object, **kwargs):
+    def handle_object(self, obj, **kwargs):
         """Called to handle everything, looks for the correct handling"""
-        # print type(object)
-        # print object
-        # print inspect.isclass(object)
-        # print inspect.ismethod(object)
-        # print inspect.isfunction(object)
-        # print inspect.isbuiltin(object)
-        # print inspect.isroutine(object)
-        # print inspect.isabstract(object)
-        # print type(object) == 'staticmethod'
-        if inspect.isroutine(object) or inspect.isbuiltin(object) or inspect.isclass(object):
-            raise UnableToSerializeMethodTypesError(type(object))
-        elif isinstance(object, dict):
-            return self.handle_dictionary(object)
-        elif isinstance(object, list) or isinstance(object, tuple) or isinstance(object, set):
-            return self.handle_list(object)
-        elif isinstance(object, Model):
-            if hasattr(object, "serialize"):
-                serialize_function = getattr(object, "serialize")
+        # print type(obj)
+        # print obj
+        # print inspect.isclass(obj)
+        # print inspect.ismethod(obj)
+        # print inspect.isfunction(obj)
+        # print inspect.isbuiltin(obj)
+        # print inspect.isroutine(obj)
+        # print inspect.isabstract(obj)
+        # print type(obj) == 'staticmethod'
+        if inspect.isroutine(obj) or inspect.isbuiltin(obj) or inspect.isclass(obj):
+            raise UnableToSerializeMethodTypesError(type(obj))
+        elif isinstance(obj, dict):
+            return self.handle_dictionary(obj)
+        elif isinstance(obj, list) or isinstance(obj, tuple) or isinstance(obj, set):
+            return self.handle_list(obj)
+        elif isinstance(obj, Model):
+            if hasattr(obj, "serialize"):
+                serialize_function = getattr(obj, "serialize")
 
                 # if the model's `serialize` method leverages a cache, force it recalculate all fields instead if arg is supplied
                 if self.force_recalculation:
@@ -115,49 +115,49 @@ class JSONSerializer(object):
 
                 return self.handle_object(serialize_function(**kwargs), **kwargs)
             else:
-                return self.handle_model(object, **kwargs)
-            # return PythonSerializer().serialize([object],**self.options.copy())[0]['fields']
-        elif isinstance(object, QuerySet):
-            # return super(JSONSerializer,self).serialize(object, **self.options.copy())[0]
+                return self.handle_model(obj, **kwargs)
+            # return PythonSerializer().serialize([obj],**self.options.copy())[0]['fields']
+        elif isinstance(obj, QuerySet):
+            # return super(JSONSerializer,self).serialize(obj, **self.options.copy())[0]
             ret = []
-            for item in object:
+            for item in obj:
                 ret.append(self.handle_object(item, **kwargs))
             return ret
-        elif isinstance(object, bytes):
-            return object.decode("utf-8")
+        elif isinstance(obj, bytes):
+            return obj.decode("utf-8")
         elif (
-            isinstance(object, int)
-            or isinstance(object, float)
-            or isinstance(object, int)
-            or isinstance(object, str)
-            or isinstance(object, bool)
-            or object is None
+            isinstance(obj, int)
+            or isinstance(obj, float)
+            or isinstance(obj, int)
+            or isinstance(obj, str)
+            or isinstance(obj, bool)
+            or obj is None
         ):
-            return object
+            return obj
         elif (
-            isinstance(object, datetime.datetime)
-            or isinstance(object, datetime.date)
-            or isinstance(object, datetime.time)
-            or isinstance(object, decimal.Decimal)
+            isinstance(obj, datetime.datetime)
+            or isinstance(obj, datetime.date)
+            or isinstance(obj, datetime.time)
+            or isinstance(obj, decimal.Decimal)
         ):
-            return DjangoJSONEncoder().default(object)
-        elif isinstance(object, GEOSGeometry):
-            return getattr(object, self.geom_format)
-        elif isinstance(object, File):
-            return object.name
-        elif isinstance(object, uuid.UUID):
-            return str(object)
-        elif isinstance(object, I18n_JSON) or isinstance(object, I18n_String):
+            return DjangoJSONEncoder().default(obj)
+        elif isinstance(obj, GEOSGeometry):
+            return getattr(obj, self.geom_format)
+        elif isinstance(obj, File):
+            return obj.name
+        elif isinstance(obj, uuid.UUID):
+            return str(obj)
+        elif isinstance(obj, I18n_JSON) or isinstance(obj, I18n_String):
             use_raw_i18n_json = kwargs.get("use_raw_i18n_json", False)
-            return getattr(object, "serialize")(use_raw_i18n_json)
-        elif hasattr(object, "__dict__"):
+            return getattr(obj, "serialize")(use_raw_i18n_json)
+        elif hasattr(obj, "__dict__"):
             # call an objects serialize method if it exists
-            if hasattr(object, "serialize"):
-                return getattr(object, "serialize")(object)
+            if hasattr(obj, "serialize"):
+                return getattr(obj, "serialize")(obj)
             else:
-                return self.handle_dictionary(object.__dict__)
+                return self.handle_dictionary(obj.__dict__)
         else:
-            raise UnableToSerializeError(type(object))
+            raise UnableToSerializeError(type(obj))
 
     def handle_dictionary(self, d):
         """Called to handle a Dictionary"""
@@ -270,31 +270,31 @@ class JSONDeserializer(object):
 
         return ret
 
-    def handle_object(self, object, fields=None, exclude=None):
+    def handle_object(self, obj, fields=None, exclude=None):
         """Called to handle everything, looks for the correct handling"""
-        if isinstance(object, dict):
-            if "pk" in object and "model" in object and "fields" in object:
+        if isinstance(obj, dict):
+            if "pk" in obj and "model" in obj and "fields" in obj:
                 # assume that this is a serialized django model
-                return self.handle_model(object)
+                return self.handle_model(obj)
             else:
-                return self.handle_dictionary(object)
-        elif isinstance(object, list) or isinstance(object, tuple):
-            return self.handle_list(object)
+                return self.handle_dictionary(obj)
+        elif isinstance(obj, list) or isinstance(obj, tuple):
+            return self.handle_list(obj)
         elif (
-            isinstance(object, int)
-            or isinstance(object, float)
-            or isinstance(object, int)
-            or isinstance(object, str)
-            or isinstance(object, bool)
-            or object is None
+            isinstance(obj, int)
+            or isinstance(obj, float)
+            or isinstance(obj, int)
+            or isinstance(obj, str)
+            or isinstance(obj, bool)
+            or obj is None
         ):
-            return object
-        # elif isinstance(object, tuple):
+            return obj
+        # elif isinstance(obj, tuple):
         #    return tuple(self.serialize([item for item in obj]))
-        elif hasattr(object, "__dict__"):
-            return self.handle_dictionary(object.__dict__)
+        elif hasattr(obj, "__dict__"):
+            return self.handle_dictionary(obj.__dict__)
         else:
-            raise UnableToSerializeError(type(object))
+            raise UnableToSerializeError(type(obj))
 
     def handle_dictionary(self, d):
         """Called to handle a Dictionary"""
