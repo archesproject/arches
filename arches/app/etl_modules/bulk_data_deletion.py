@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 import logging
+import pyprind
 import uuid
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -129,7 +130,7 @@ class BulkDataDeletion(BaseBulkEditor):
 
         return sample_data[0:5]
 
-    def delete_resources(self, userid, loadid, graphid, resourceids):
+    def delete_resources(self, userid, loadid, graphid, resourceids, verbose=False):
         result = {"success": False}
         deleted_count = 0
         try:
@@ -143,9 +144,18 @@ class BulkDataDeletion(BaseBulkEditor):
                 resources = Resource.objects.filter(graph_id=graphid)
             elif resourceids:
                 resources = Resource.objects.filter(pk__in=resourceids)
+            if verbose is True:
+                resources_to_delete_ct = resources.count()
+                deleted_count = resources_to_delete_ct
+                bar = pyprind.ProgBar(resources_to_delete_ct)
             for resource in resources.iterator(chunk_size=2000):
                 resource.delete(user=user, index=False, transaction_id=loadid)
-                deleted_count += 1
+                if verbose is True:
+                    bar.update()
+                else:
+                    deleted_count += 1
+            if verbose is True:
+                print(bar)
             result["success"] = True
             result["deleted_count"] = deleted_count
             result["message"] = _(f"Successfully deleted {deleted_count} resources")
