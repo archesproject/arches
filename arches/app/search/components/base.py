@@ -50,7 +50,7 @@ class BaseSearchFilter:
 class SearchFilterFactory(object):
     def __init__(self, request=None):
         self.request = request
-        self.search_filters = {search_filter.componentname: search_filter for search_filter in models.SearchComponent.objects.all()}
+        self.search_filters = {search_filter.componentname: search_filter for search_filter in models.SearchComponent.objects.filter(enabled=True)}
         self.search_filters_instances = {}
 
     def get_filter(self, componentname):
