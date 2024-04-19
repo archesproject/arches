@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     ]
 
     sql = """
-        update search_component where sortorder = 0 set sortorder = 1;
+        update search_component set sortorder = sortorder + 1;
         insert into search_component (
             searchcomponentid,
             name,
@@ -53,6 +53,7 @@ class Migration(migrations.Migration):
             '69695d63-6f03-4536-8da9-841b07116381',
             'ada062d9-092d-400c-bcf7-94a931d1f271'
         );
+        update search_component set sortorder = sortorder - 1 where sortorder > 0;
     """
 
     operations = [
