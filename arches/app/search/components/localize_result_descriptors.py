@@ -2,6 +2,19 @@ from arches.app.models.system_settings import settings
 from arches.app.search.components.base import BaseSearchFilter
 from django.utils.translation import get_language, gettext as _
 
+details = {
+    "searchcomponentid": "ada062d9-092d-400c-bcf7-94a931d1f271",
+    "name": "Localize Result Descriptors",
+    "icon": "",
+    "modulename": "localize_result_descriptors.py",
+    "classname": "LocalizeResultDescriptors",
+    "type": "",
+    "componentpath": "",
+    "componentname": "localize-descriptors",
+    "sortorder": "0",
+    "enabled": True,
+}
+
 class LocalizeResultDescriptors(BaseSearchFilter):
     def view_data(self):
         pass
