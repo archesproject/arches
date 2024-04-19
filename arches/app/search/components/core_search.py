@@ -22,7 +22,7 @@ class CoreSearchFilter(BaseSearchFilter):
     def view_data():
         pass
 
-    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional, request):
+    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         search_results_object["query"].include("graph_id")
         search_results_object["query"].include("root_ontology_class")
         search_results_object["query"].include("resourceinstanceid")
@@ -36,7 +36,7 @@ class CoreSearchFilter(BaseSearchFilter):
         search_results_object["query"].include("displaydescription")
         search_results_object["query"].include("map_popup")
         search_results_object["query"].include("provisional_resource")
-        load_tiles = request.GET.get("tiles", False)
+        load_tiles = self.request.GET.get("tiles", False)
         if load_tiles:
             try:
                 load_tiles = json.loads(load_tiles)
@@ -46,11 +46,11 @@ class CoreSearchFilter(BaseSearchFilter):
             search_results_object["query"].include("tiles")
 
     
-    def execute_query(self, search_results_object, response_object, request):
-        for_export = request.GET.get("export", None)
-        pages = request.GET.get("pages", None)
-        total = int(request.GET.get("total", "0"))
-        resourceinstanceid = request.GET.get("id", None)
+    def execute_query(self, search_results_object, response_object):
+        for_export = self.request.GET.get("export", None)
+        pages = self.request.GET.get("pages", None)
+        total = int(self.request.GET.get("total", "0"))
+        resourceinstanceid = self.request.GET.get("id", None)
         dsl = search_results_object["query"]
         if for_export or pages:
             results = dsl.search(index=RESOURCES_INDEX, scroll="1m")
@@ -74,10 +74,10 @@ class CoreSearchFilter(BaseSearchFilter):
                     results = {"hits": {"hits": [results]}}
         response_object["results"] = results
     
-    def post_search_hook(search_results_object, response_object, permitted_nodegroups, request):
+    def post_search_hook(self, search_results_object, response_object, permitted_nodegroups):
         dsl = search_results_object["query"]
-        response_object["reviewer"] = user_is_resource_reviewer(request.user)
+        response_object["reviewer"] = user_is_resource_reviewer(self.request.user)
         response_object["timestamp"] = datetime.now()
         response_object["total_results"] = dsl.count(index=RESOURCES_INDEX)
-        response_object["userid"] = request.user.id
+        response_object["userid"] = self.request.user.id
     

@@ -19,7 +19,7 @@ class LocalizeResultDescriptors(BaseSearchFilter):
     def view_data(self):
         pass
 
-    def post_search_hook(self, search_results_object, response_object, permitted_nodegroups, request):
+    def post_search_hook(self, search_results_object, response_object, permitted_nodegroups):
         
         def get_localized_descriptor(resource, descriptor_type, language_codes):
             descriptor = resource["_source"][descriptor_type]

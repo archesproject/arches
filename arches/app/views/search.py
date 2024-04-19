@@ -307,7 +307,7 @@ def search_results(request, returnDsl=False):
         for filter_type, querystring in list(request.GET.items()) + list(request.POST.items()) + [("search-results", "")]:
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
-                search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional, request)
+                search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
         append_instance_permission_filter_dsl(request, search_results_object)
     except Exception as err:
         logger.exception(err)
@@ -321,7 +321,7 @@ def search_results(request, returnDsl=False):
     for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
         search_filter = search_filter_factory.get_filter(filter_type)
         if search_filter:
-            search_filter.execute_query(search_results_object, ret, request)
+            search_filter.execute_query(search_results_object, ret)
 
     if ret["results"] is not None:
 
@@ -329,7 +329,7 @@ def search_results(request, returnDsl=False):
         for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
-                search_filter.post_search_hook(search_results_object, ret, permitted_nodegroups, request)
+                search_filter.post_search_hook(search_results_object, ret, permitted_nodegroups)
 
         for key, value in list(search_results_object.items()):
             ret[key] = value
