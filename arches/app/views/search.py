@@ -316,8 +316,7 @@ def search_results(request, returnDsl=False):
     if returnDsl:
         return search_results_object.pop("query", None)
     
-    ret = dict()
-    ret["results"] = None
+    ret = {"results": None}
 
     for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
         search_filter = search_filter_factory.get_filter(filter_type)
@@ -332,6 +331,7 @@ def search_results(request, returnDsl=False):
             if search_filter:
                 search_filter.post_search_hook(search_results_object, ret, permitted_nodegroups)
 
+        search_results_object.pop("query")
         if isinstance(ret, dict):
             for key, value in list(search_results_object.items()):
                 ret[key] = value
