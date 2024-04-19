@@ -571,7 +571,7 @@ class Graph(models.GraphModel):
         from arches.app.etl_modules.bulk_data_deletion import BulkDataDeletion
         bulk_deleter = BulkDataDeletion()
         loadid = uuid.uuid4()
-        resp = bulk_deleter.delete_resources(userid, loadid, self.graphid)
+        resp = bulk_deleter.delete_resources(userid, loadid, self.graphid, verbose=verbose)
         bulk_deleter.index_resource_deletion(loadid)
 
         return resp
