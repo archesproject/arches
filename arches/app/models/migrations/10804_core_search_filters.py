@@ -29,8 +29,8 @@ class Migration(migrations.Migration):
             '',
             'core_search.py.py',
             'CoreSearchFilter',
-            '',
-            '',
+            'backend',
+            'views/components/search/core-search',
             'core-search',
             0,
             true
@@ -41,8 +41,8 @@ class Migration(migrations.Migration):
             '',
             'localize_result_descriptors.py',
             'LocalizeResultDescriptors',
-            '',
-            '',
+            'backend',
+            'views/components/search/localize-descriptors',
             'localize-descriptors',
             99,
             true
