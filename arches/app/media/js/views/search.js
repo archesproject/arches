@@ -69,6 +69,9 @@ define([
             }, this);
             this.query({"paging-filter": "1", tiles: "true"});
         };
+        this.queryString = ko.computed(function() {
+            return JSON.stringify(this.query());
+        }, this);
         this.filterApplied = ko.pureComputed(function(){
             var self = this;
             var filterNames = Object.keys(this.filters);
