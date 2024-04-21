@@ -3,13 +3,11 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
-    'arches',
-    'viewmodels/alert',
     'search-components',
     'views/base-manager',
     'utils/aria',
     'datatype-config-components'
-], function($, _, ko, koMapping, arches, AlertViewModel, SearchComponents, BaseManagerView, ariaUtils) {
+], function($, _, ko, koMapping, SearchComponents, BaseManagerView, ariaUtils) {
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
     //
@@ -122,6 +120,8 @@ define([
             this.viewModel.hits = ko.observable();
             _.extend(this, this.viewModel.sharedStateObject);
             this.viewModel.sharedStateObject.total = this.viewModel.total;
+            this.viewModel.sharedStateObject.hits = this.viewModel.hits;
+            this.viewModel.sharedStateObject.alert = this.viewModel.alert;
             this.viewModel.sharedStateObject.loading = this.viewModel.loading;
             this.viewModel.sharedStateObject.resources = this.viewModel.resources;
             this.viewModel.sharedStateObject.userCanEditResources = this.viewModel.userCanEditResources;
