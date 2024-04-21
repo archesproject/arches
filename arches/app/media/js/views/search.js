@@ -127,61 +127,10 @@ define([
             this.viewModel.sharedStateObject.userCanEditResources = this.viewModel.userCanEditResources;
             this.viewModel.sharedStateObject.userCanReadResources = this.viewModel.userCanReadResources;
             this.shiftFocus = ariaUtils.shiftFocus;
-            this.queryString = ko.computed(function() {
-                return JSON.stringify(this.query());
-            }, this);
-            
-            this.queryString.subscribe(function() {
-                this.doQuery();
-            }, this);
-
             this.viewModel.loading(true);
 
             BaseManagerView.prototype.initialize.call(this, options);
         },
-
-        doQuery: function() {
-            var queryString = JSON.parse(this.queryString());
-
-            if (this.updateRequest) {
-                this.updateRequest.abort();
-            }
-
-            this.updateRequest = $.ajax({
-                type: "GET",
-                url: arches.urls.search_results,
-                data: queryString,
-                context: this,
-                success: function(response) {
-                    _.each(this.viewModel.sharedStateObject.searchResults, function(value, key, results) {
-                        if (key !== 'timestamp') {
-                            delete this.viewModel.sharedStateObject.searchResults[key];
-                        }
-                    }, this);
-                    _.each(response, function(value, key, response) {
-                        if (key !== 'timestamp') {
-                            this.viewModel.sharedStateObject.searchResults[key] = value;
-                        }
-                    }, this);
-                    this.viewModel.sharedStateObject.searchResults.timestamp(response.timestamp);
-                    this.viewModel.sharedStateObject.userIsReviewer(response.reviewer);
-                    this.viewModel.sharedStateObject.userid(response.userid);
-                    this.viewModel.total(response.total_results);
-                    this.viewModel.hits(response.results.hits.hits.length);
-                    this.viewModel.alert(false);
-                },
-                error: function(response, status, error) {
-                    const alert = new AlertViewModel('ep-alert-red', arches.translations.requestFailed.title, response.responseJSON?.message);
-                    if(this.updateRequest.statusText !== 'abort'){
-                        this.viewModel.alert(alert);
-                    }
-                },
-                complete: function(request, status) {
-                    this.updateRequest = undefined;
-                    window.history.pushState({}, '', '?' + $.param(queryString).split('+').join('%20'));
-                }
-            });
-        }
     });
 
     return new SearchView();
