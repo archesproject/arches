@@ -155,7 +155,7 @@ class BulkDataDeletion(BaseBulkEditor):
                 print(bar)
             result["success"] = True
             result["deleted_count"] = deleted_count
-            result["message"] = _(f"Successfully deleted {deleted_count} resources")
+            result["message"] = _("Successfully deleted {} resources").format(str(deleted_count))
         except Exception as e:
             logger.exception(e)
             result["message"] = _("Unable to delete resources: {}").format(str(e))
