@@ -144,15 +144,16 @@ class BulkDataDeletion(BaseBulkEditor):
                 resources = Resource.objects.filter(graph_id=graphid)
             elif resourceids:
                 resources = Resource.objects.filter(pk__in=resourceids)
+            
+            deleted_count = resources.count()
+
             if verbose is True:
-                deleted_count = resources.count()
                 bar = pyprind.ProgBar(deleted_count)
             for resource in resources.iterator(chunk_size=2000):
                 resource.delete(user=user, index=False, transaction_id=loadid)
                 if verbose is True:
                     bar.update()
-                else:
-                    deleted_count += 1
+
             if verbose is True:
                 print(bar)
             result["success"] = True
