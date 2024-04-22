@@ -74,7 +74,7 @@ const listOrItemView = computed(() => {
             <SplitterPanel
                 :size="60"
                 :min-size="25"
-                :style="{ margin: '1rem' }"
+                :style="{ margin: '1rem', overflowY: 'auto' }"
             >
                 <component
                     :is="listOrItemView"

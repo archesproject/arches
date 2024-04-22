@@ -3,6 +3,8 @@ import arches from "arches";
 import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
+import Button from "primevue/button";
+
 import { itemKey, ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
 
 import type {
@@ -48,8 +50,9 @@ const buttonLabel = computed(() => {
 </script>
 
 <template>
-    <button
+    <Button
         class="add-label"
+        raised
         @click="item.labels.push(newLabel)"
     >
         <i
@@ -59,15 +62,16 @@ const buttonLabel = computed(() => {
         <span class="add-label-text">
             {{ buttonLabel }}
         </span>
-    </button>
+    </Button>
 </template>
 
 <style scoped>
 .add-label {
     display: flex;
-    width: 100%;
-    height: 4rem;
+    height: 3rem;
     color: v-bind(slateBlue);
+    background-color: #f3fbfd;
+    margin-top: 1rem;
 }
 .add-label > i,
 .add-label > span {

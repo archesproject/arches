@@ -104,6 +104,7 @@ const onDelete = async (label: NewLabel | Label) => {
         <h4>{{ headings.heading }}</h4>
         <p>{{ headings.subheading }}</p>
         <DataTable
+            v-if="labels.length"
             v-model:editingRows="editingRows"
             :value="labels"
             data-key="id"
