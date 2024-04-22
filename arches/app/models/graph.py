@@ -30,6 +30,7 @@ from arches.app.models import models
 from arches.app.models.resource import Resource, UnpublishedModelError
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.etl_modules.bulk_data_deletion import BulkDataDeletion
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.i18n import LanguageSynchronizer
@@ -568,7 +569,7 @@ class Graph(models.GraphModel):
         deletes all associated resource instances
 
         """
-        from arches.app.etl_modules.bulk_data_deletion import BulkDataDeletion
+
         bulk_deleter = BulkDataDeletion()
         loadid = uuid.uuid4()
         resp = bulk_deleter.delete_resources(userid, loadid, self.graphid, verbose=verbose)
