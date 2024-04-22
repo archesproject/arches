@@ -15,6 +15,7 @@ import AddLabel from "@/components/ControlledListManager/AddLabel.vue";
 import { ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
 
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
+import type { Language } from "@/types/arches";
 import type {
     ControlledListItem,
     Label,
@@ -97,6 +98,10 @@ const onDelete = async (label: NewLabel | Label) => {
         props.removeItemLabel(label);
     }
 };
+
+const languageName = (code: string) => {
+    return arches.languages.find((lang: Language) => lang.code === code).name;
+};
 </script>
 
 <template>
@@ -114,7 +119,10 @@ const onDelete = async (label: NewLabel | Label) => {
             :style="{ fontSize: 'small' }"
             @row-edit-save="onSave"
         >
-            <Column field="value">
+            <Column
+                field="value"
+                style="min-width: 8rem"
+            >
                 <template #editor="{ data, field }">
                     <InputText
                         v-model="data[field]"
@@ -125,7 +133,7 @@ const onDelete = async (label: NewLabel | Label) => {
             <Column
                 field="language"
                 :header="$gettext('Language')"
-                style="width: 10%; min-width: 12rem; height: 4rem;"
+                style="width: 10%; min-width: 8rem; height: 4rem;"
             >
                 <template #editor="{ data, field }">
                     <Dropdown
@@ -138,6 +146,9 @@ const onDelete = async (label: NewLabel | Label) => {
                             panel: { style: { fontSize: 'small' } },
                         }"
                     />
+                </template>
+                <template #body="slotProps">
+                    {{ languageName(slotProps.data.language) }}
                 </template>
             </Column>
             <Column
