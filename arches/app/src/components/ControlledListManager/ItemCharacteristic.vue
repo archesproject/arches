@@ -11,8 +11,7 @@ import { itemKey } from "@/components/ControlledListManager/const.ts";
 const props: {
     editable: boolean;
     field: "uri";
-    label: string;
-} = defineProps(["editable", "field", "label"]);
+} = defineProps(["editable", "field"]);
 const { item } = inject(itemKey);
 
 const editing = ref(false);
@@ -52,7 +51,6 @@ const onCancel = () => {
 
 <template>
     <div class="characteristic">
-        <h4>{{ props.label }}</h4>
         <InputText
             v-model="inputValue"
             type="text"
@@ -96,7 +94,6 @@ const onCancel = () => {
 </template>
 
 <style scoped>
-h4,
 input {
     font-size: 1.25rem;
 }

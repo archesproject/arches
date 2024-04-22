@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import arches from "arches";
-import { computed, inject, ref } from "vue";
+import { computed, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Column from "primevue/column";
@@ -12,7 +12,7 @@ import { useToast } from "primevue/usetoast";
 import { deleteLabel, upsertLabel } from "@/components/ControlledListManager/api.ts";
 import AddLabel from "@/components/ControlledListManager/AddLabel.vue";
 
-import { itemKey, ALT_LABEL, PREF_LABEL, URI } from "@/components/ControlledListManager/const.ts";
+import { ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
 
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
 import type {
@@ -21,15 +21,14 @@ import type {
     NewLabel,
     ValueType,
 } from "@/types/ControlledListManager";
-import type { Ref } from "@/types/Ref";
 
-const props: { type: ValueType | "URI" } = defineProps(["type"]);
-const { item, appendItemLabel, updateItemLabel, removeItemLabel } : {
-    item: Ref<ControlledListItem>,
-    appendItemLabel: Ref<(appendedLabel: Label | NewLabel) => undefined>,
-    updateItemLabel: Ref<(updatedLabel: Label) => undefined>,
-    removeItemLabel: Ref<(removedLabel: Label | NewLabel) => undefined>,
-} = inject(itemKey);
+const props: {
+    type: ValueType,
+    item: ControlledListItem,
+    appendItemLabel: (appendedLabel: Label | NewLabel) => undefined,
+    updateItemLabel: (updatedLabel: Label) => undefined,
+    removeItemLabel: (removedLabel: Label | NewLabel) => undefined,
+} = defineProps(["type", "item", "appendItemLabel", "updateItemLabel", "removeItemLabel"]);
 const editingRows = ref([]);
 
 const toast = useToast();
@@ -52,13 +51,6 @@ const headings: { heading: string; subheading: string } = computed(() => {
                     "Optionally, you can provide additional label/language labels for your list item. Useful if you want to make searching for labels with synonyms or common misspellings of your preferred label(s) easier."
                 ),
             };
-        case URI:
-            return {
-                heading: $gettext("List Item URI"),
-                subheading: $gettext(
-                    "Optionally, provide a URI for your list item. Useful if your list item is formally defined in a thesaurus or authority document."
-                ),
-            };
         default:
             return {
                 heading: "",
@@ -68,10 +60,10 @@ const headings: { heading: string; subheading: string } = computed(() => {
 });
 
 const labels = computed(() => {
-    if (!item.value) {
+    if (!props.item) {
         return [];
     }
-    return item.value.labels.filter(
+    return props.item.labels.filter(
         label => label.valuetype === props.type
     );
 });
@@ -88,21 +80,21 @@ const onSave = async (event: DataTableRowEditInitEvent) => {
         $gettext,
     );
     if (normalizedNewData.id) {
-        updateItemLabel.value(upsertedLabel);
+        props.updateItemLabel(upsertedLabel);
     } else {
-        appendItemLabel.value(upsertedLabel);
-        removeItemLabel.value(event.newData);
+        props.appendItemLabel(upsertedLabel);
+        props.removeItemLabel(event.newData);
     }
 };
 
 const onDelete = async (label: NewLabel | Label) => {
     if (typeof label.id === 'number') {
-        removeItemLabel.value(label);
+        props.removeItemLabel(label);
         return;
     }
     const deleted = await deleteLabel(label, toast, $gettext);
     if (deleted) {
-        removeItemLabel.value(label);
+        props.removeItemLabel(label);
     }
 };
 </script>
@@ -110,9 +102,8 @@ const onDelete = async (label: NewLabel | Label) => {
 <template>
     <div class="label-editor-container">
         <h4>{{ headings.heading }}</h4>
-        <h5>{{ headings.subheading }}</h5>
+        <p>{{ headings.subheading }}</p>
         <DataTable
-            v-if="type !== URI"
             v-model:editingRows="editingRows"
             :value="labels"
             data-key="id"
@@ -165,10 +156,7 @@ const onDelete = async (label: NewLabel | Label) => {
                 </template>
             </Column>
         </DataTable>
-        <AddLabel
-            v-if="type !== URI"
-            :type="type"
-        />
+        <AddLabel :type="type" />
     </div>
 </template>
 
@@ -184,9 +172,10 @@ h4 {
     font-size: small;
 }
 
-h5 {
+p {
     font-weight: normal;
     margin-top: 0;
+    font-size: small;
 }
 
 :deep(.p-editable-column) {

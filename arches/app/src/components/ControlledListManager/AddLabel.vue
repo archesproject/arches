@@ -18,10 +18,12 @@ const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
 const newLabel: NewLabel = computed(() => {
+    const otherNewLabels = item.value.labels.filter(
+        (l: NewLabel | Label) => typeof l.id === "number"
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any 
+    ) as any as NewLabel[];
     const maxOtherNewLabelId = Math.max(
-        ...item.value.labels.filter(
-            (l: NewLabel | Label) => typeof l.id === "number"
-        ).map((l: NewLabel) => l.id),
+        ...otherNewLabels.map(l => l.id),
         1000,
     );
     return {
