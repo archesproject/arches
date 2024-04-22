@@ -103,6 +103,16 @@ define([
                 self.selectedProvisionalEdit(val);
                 koMapping.fromJS(val['value'], self.selectedTile().data);
                 self.selectedTile().parent.params.handlers['tile-reset'].forEach(handler => handler(self.selectedTile()));
+                self.selectedTile().parent.widgets().forEach(
+                    function(w){
+                        var defaultconfig = w.widgetLookup[w.widget_id()].defaultconfig;
+                        if (defaultconfig.rerender === true && self.selectedTile().parent.allowProvisionalEditRerender() === true) {
+                            w.label.valueHasMutated();
+                        } 
+                    });
+                if (self.selectedTile().parent.triggerUpdate) {
+                    self.selectedTile().parent.triggerUpdate();
+                }
             }
         };
 
