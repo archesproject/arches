@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import arches from "arches";
+import Cookies from "js-cookie";
 import { computed, inject, provide } from "vue";
 import { useGettext } from "vue3-gettext";
+
+import FileUpload from "primevue/fileupload";
 
 import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacteristic.vue";
 import LabelEditor from "@/components/ControlledListManager/LabelEditor.vue";
@@ -15,6 +19,7 @@ import {
 } from "@/components/ControlledListManager/const.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
+import type { FileUploadBeforeSendEvent } from "primevue/fileupload";
 import type { ControlledListItem, Label, NewLabel } from "@/types/ControlledListManager";
 
 const { displayedRow: item } = inject(displayedRowKey);
@@ -45,6 +50,10 @@ provide(itemKey, { item });
 const iconLabel = (item: ControlledListItem) => {
     return item.guide ? $gettext("Guide Item") : $gettext("Indexable Item");
 };
+
+const addHeader = (event: FileUploadBeforeSendEvent) => {
+    event.xhr.setRequestHeader("X-CSRFToken", Cookies.get("csrftoken"));
+};
 </script>
 
 <template>
@@ -70,7 +79,7 @@ const iconLabel = (item: ControlledListItem) => {
         :remove-item-label
         :update-item-label
     />
-    <div class="uri-editor-container">
+    <div class="field-editor-container">
         <h4>{{ $gettext("List Item URI") }}</h4>
         <p>
             {{ $gettext(
@@ -83,6 +92,20 @@ const iconLabel = (item: ControlledListItem) => {
         field="uri"
         :style="{ display: 'flex', alignItems: 'center', width: '80%' }"
     />
+    <div class="field-editor-container">
+        <h4>{{ $gettext("Images") }}</h4>
+        <FileUpload
+            accept="image/*"
+            :url="arches.urls.controlled_list_item_images(item.id)"
+            :auto="true"
+            :max-file-size="5e6"
+            :file-limit="10"
+            :preview-width="250"
+            :with-credentials="true"
+            name="item_image"
+            @before-send="addHeader($event)"
+        />
+    </div>
 </template>
 
 <style scoped>
@@ -118,8 +141,14 @@ p {
     font-weight: 200;
 }
 
-.uri-editor-container {
+.field-editor-container {
     margin: 1rem 1rem 3rem 1rem;
     width: 80%;
+}
+
+:deep(input[type=file]) {
+    /* override arches.css */
+    /* PrimeVue uses a hidden input for screen readers */
+    display: none;
 }
 </style>

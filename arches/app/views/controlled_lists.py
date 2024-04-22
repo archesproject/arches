@@ -434,6 +434,21 @@ class ControlledListItemView(View):
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
+class ControlledListItemImagesView(View):
+    def get(self, request):
+        return JSONResponse(status=200)
+
+    def post(self, request, id):
+        uploaded_file = request.FILES["item_image"]
+        # f = File(controlled_list_item_id=id)
+        # FileValue?
+        # f.save()
+        return JSONResponse(status=200)
+
+
+@method_decorator(
+    group_required("RDM Administrator", raise_exception=True), name="dispatch"
+)
 class ControlledListItemLabelView(View):
     def add_new_label(self, request):
         data = JSONDeserializer().deserialize(request.body)
