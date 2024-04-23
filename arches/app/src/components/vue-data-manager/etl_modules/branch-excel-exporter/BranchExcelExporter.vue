@@ -7,7 +7,7 @@ import uuid from "uuid";
 import arches from "arches";
 import Cookies from "js-cookie";
 
-const props = defineProps(["etlModuleId"]);
+const props = defineProps({etlModuleId: {type: Array, default: () => []}});
 
 const selectedGraph = ref();
 const fileName = ref();
@@ -56,7 +56,7 @@ const submit = (action) => {
     formData.append("load_id", loadid);
     formData.append("module", moduleId);
 
-    if (fileName) {
+    if (fileName.value) {
         formData.append("filename", fileName.value);
     }
 
@@ -75,7 +75,11 @@ const submit = (action) => {
     <div class="etl-module-component-container">
         <div class="etl-module-body">
             <h2>
-                <span Export Branch Excel></span>
+                <span 
+                    Export 
+                    Branch 
+                    Excel
+                />
             </h2>
             <section class="etl-module-component">
                 <div class="etl-module-component-block">
@@ -85,8 +89,8 @@ const submit = (action) => {
                     <Dropdown
                         v-model="selectedGraph"
                         :options="graphs"
-                        optionLabel="name"
-                        optionValue="graphid"
+                        option-label="name"
+                        option-value="graphid"
                         placeholder="Select a Resource Model"
                         class="w-full md:w-14rem target-model-dropdown"
                     />
@@ -97,12 +101,15 @@ const submit = (action) => {
                             Choose a name for the exported file (optional)
                         </label>
                     </h3>
-                    <InputText class="file-name-input" v-model="fileName" />
+                    <InputText 
+                        v-model="fileName" 
+                        class="file-name-input"
+                    />
                 </div>
                 <div
                     v-if="selectedGraph"
-                    @click="exportResources"
                     style="margin-top: 40px"
+                    @click="exportResources"
                 >
                     <Button label="Submit" />
                 </div>

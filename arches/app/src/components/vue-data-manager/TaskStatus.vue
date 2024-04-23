@@ -14,7 +14,7 @@ const emit = defineEmits([
     "stopEtl",
     "updateSelectedLoadEvent",
 ]);
-const { loadEvents } = defineProps(["loadEvents"]);
+const { loadEvents } = defineProps({loadEvents: {type: Array, default: () => []}});
 
 const formatTime = (timeString) => {
     if (timeString) {
@@ -53,7 +53,10 @@ const emitSelectedLoadEvent = (event) => {
 <template>
     <div class="task-status">
         <div class="status-panel">
-            <Splitter style="height: 85vh" class="mb-5 job-list">
+            <Splitter 
+                style="height: 85vh"
+                class="mb-5 job-list"
+            >
                 <SplitterPanel
                     class="flex align-items-center justify-content-center task-list"
                 >
@@ -68,9 +71,9 @@ const emitSelectedLoadEvent = (event) => {
                     </div>
                     <div class="etl-jobs-container">
                         <div
+                            v-for="(event, index) in loadEvents" 
+                            :key="index"
                             class="etl-job"
-                            v-if="loadEvents"
-                            v-for="event in loadEvents"
                         >
                             <div
                                 class="etl-job-metadata"
@@ -121,7 +124,7 @@ const emitSelectedLoadEvent = (event) => {
                                         v-if="
                                             (event.status == 'completed' ||
                                                 event.status == 'indexed') &&
-                                            event.etl_module.reversible
+                                                event.etl_module.reversible
                                         "
                                         @click="
                                             emitReversedTransaction(
@@ -131,13 +134,13 @@ const emitSelectedLoadEvent = (event) => {
                                             )
                                         "
                                     >
-                                        <span v-text="$gettext('undo')"></span>
+                                        <span v-text="$gettext('undo')" />
                                     </a>
                                     <a
                                         v-if="
                                             event.status == 'unloaded' ||
-                                            event.status == 'failed' ||
-                                            event.status == 'cancelled'
+                                                event.status == 'failed' ||
+                                                event.status == 'cancelled'
                                         "
                                         @click="
                                             emitCleanLoadEvent(event.loadid)
@@ -147,13 +150,13 @@ const emitSelectedLoadEvent = (event) => {
                                             v-text="
                                                 $gettext('remove from history')
                                             "
-                                        ></span>
+                                        />
                                     </a>
                                     <a
                                         v-if="event.status == 'running'"
                                         @click="emitStopEtl(event.loadid)"
                                     >
-                                        <span v-text="$gettext('stop')"></span>
+                                        <span v-text="$gettext('stop')" />
                                     </a>
                                 </div>
                                 <div class="status">
@@ -162,27 +165,21 @@ const emitSelectedLoadEvent = (event) => {
                                         class="btn btn-warning"
                                         style="width: 150px"
                                     >
-                                        <span
-                                            v-text="$gettext('Indexing')"
-                                        ></span>
+                                        <span v-text="$gettext('Indexing')" />
                                     </button>
                                     <button
                                         v-if="event.status == 'validated'"
                                         class="btn btn-warning"
                                         style="width: 150px"
                                     >
-                                        <span
-                                            v-text="$gettext('Running')"
-                                        ></span>
+                                        <span v-text="$gettext('Running')" />
                                     </button>
                                     <button
                                         v-if="event.status == 'indexed'"
                                         class="btn btn-success"
                                         style="width: 150px"
                                     >
-                                        <span
-                                            v-text="$gettext('Completed')"
-                                        ></span>
+                                        <span v-text="$gettext('Completed')" />
                                     </button>
                                     <button
                                         v-if="event.status == 'unindexed'"
@@ -193,52 +190,42 @@ const emitSelectedLoadEvent = (event) => {
                                             v-text="
                                                 $gettext('loaded but unindexed')
                                             "
-                                        ></span>
+                                        />
                                     </button>
                                     <button
                                         v-if="event.status == 'failed'"
                                         class="btn btn-danger"
                                         style="width: 150px"
                                     >
-                                        <span
-                                            v-text="$gettext('failed')"
-                                        ></span>
+                                        <span v-text="$gettext('failed')" />
                                     </button>
                                     <button
                                         v-if="event.status == 'running'"
                                         class="btn btn-warning"
                                         style="width: 150px"
                                     >
-                                        <span
-                                            v-text="$gettext('validating')"
-                                        ></span>
+                                        <span v-text="$gettext('validating')" />
                                     </button>
                                     <button
                                         v-if="event.status == 'reversing'"
                                         class="btn btn-warning"
                                         style="width: 150px"
                                     >
-                                        <span
-                                            v-text="$gettext('unloading')"
-                                        ></span>
+                                        <span v-text="$gettext('unloading')" />
                                     </button>
                                     <button
                                         v-if="event.status == 'unloaded'"
                                         class="btn btn-sucess"
                                         style="width: 150px"
                                     >
-                                        <span
-                                            v-text="$gettext('unloaded')"
-                                        ></span>
+                                        <span v-text="$gettext('unloaded')" />
                                     </button>
                                     <button
                                         v-if="event.status == 'cancelled'"
                                         class="btn btn-sucess"
                                         style="width: 150px"
                                     >
-                                        <span
-                                            v-text="$gettext('cancelled')"
-                                        ></span>
+                                        <span v-text="$gettext('cancelled')" />
                                     </button>
                                 </div>
                             </div>
@@ -247,9 +234,9 @@ const emitSelectedLoadEvent = (event) => {
                     <Paginator
                         v-if="loadEvents"
                         :rows="10"
-                        :totalRecords="loadEvents.length"
-                        :rowsPerPageOptions="[10, 20, 30]"
-                    ></Paginator>
+                        :total-records="loadEvents.length"
+                        :rows-per-page-options="[10, 20, 30]"
+                    />
                 </SplitterPanel>
                 <SplitterPanel
                     class="flex align-items-center justify-content-center"

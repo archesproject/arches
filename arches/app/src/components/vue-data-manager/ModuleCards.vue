@@ -1,5 +1,5 @@
 <script setup>
-const props = defineProps(["filteredModules"]);
+const props = defineProps({filteredModules: {type: Array, default: () => []}});
 const emit = defineEmits(["selectModule"]);
 
 const emitSelectModule = (etlModule) => {
@@ -8,7 +8,10 @@ const emitSelectModule = (etlModule) => {
 </script>
 <template>
     <div class="vue-manager-card-container">
-        <template v-for="etlModule in filteredModules">
+        <template 
+            v-for="(etlModule, index) in props.filteredModules" 
+            :key="index"
+        >
             <div
                 class="vue-manager-card"
                 :style="{ backgroundColor: etlModule.config.bgColor }"
@@ -26,7 +29,7 @@ const emitSelectModule = (etlModule) => {
                     <div
                         class="vue-manager-card-icon"
                         :class="etlModule.icon"
-                    ></div>
+                    />
                 </div>
                 <div class="vue-manager-card-subtitle">
                     {{ etlModule.description }}

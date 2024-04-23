@@ -128,7 +128,7 @@ const cleanLoadEvent = (loadid) => {
 const fetchLoadEvent = (page) => {
     if (activeTab.value === 2) {
         if (!page) {
-            page = paginator.vlaue?.current_page
+            page = paginator.value?.current_page
                 ? paginator.value.current_page
                 : 1;
         }
@@ -255,16 +255,17 @@ setInterval(fetchLoadEvent, 5000);
             <div class="data-manager-button-container">
                 <div class="data-manager-button-container">
                     <Button
-                        v-for="ModuleTypeButton in ModuleTypeButtons"
+                        v-for="(ModuleTypeButton, index) in ModuleTypeButtons"
+                        :key="index"
                         :label="ModuleTypeButton['label']"
                         @click="selectModuleType(ModuleTypeButton['value'])"
                     />
                 </div>
-                <ModuleSearch @moduleSearch="moduleSearch" />
+                <ModuleSearch @module-search="moduleSearch" />
             </div>
             <ModuleCards
-                :filteredModules="filteredModules"
-                @selectModule="selectModule"
+                :filtered-modules="filteredModules"
+                @select-module="selectModule"
             />
         </TabPanel>
         <TabPanel
@@ -272,22 +273,25 @@ setInterval(fetchLoadEvent, 5000);
             :disabled="!selectedModule"
         >
             <component
-                v-if="selectedModule"
                 :is="modules[selectedModule.classname]"
-                :etlModuleId="[selectedModule.etlmoduleid]"
+                v-if="selectedModule"
+                :etl-module-id="[selectedModule.etlmoduleid]"
             />
         </TabPanel>
         <TabPanel :header="$gettext('Task Status')">
             <TaskStatus
-                :loadEvents="loadEvents"
-                :selectedLoadEvent="selectedLoadEvent"
-                @reverseTransactions="reverseTransactions"
-                @cleanLoadEvent="cleanLoadEvent"
-                @stopEtl="stopEtl"
-                @updateSelectedLoadEvent="updateSelectedLoadEvent"
+                :load-events="loadEvents"
+                :selected-load-events="selectedLoadEvent"
+                @reverse-transactions="reverseTransactions"
+                @clean-load-event="cleanLoadEvent"
+                @stop-etl="stopEtl"
+                @update-selected-load-event="updateSelectedLoadEvent"
             />
         </TabPanel>
-        <TabPanel :header="$gettext('Templates')" disabled="true">
+        <TabPanel 
+            :header="$gettext('Templates')" 
+            disabled="true"
+        >
             <p class="m-0">
                 At vero eos et accusamus et iusto odio dignissimos ducimus qui
                 blanditiis praesentium voluptatum deleniti atque corrupti quos

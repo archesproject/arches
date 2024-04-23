@@ -33,7 +33,7 @@ const fileAdded = ref(false);
 const hasHeaders = ref(true);
 
 const ready = computed(() => {
-    return selectedResourceModel && fieldMapping.value.find((v) => v.node);
+    return selectedResourceModel.value && fieldMapping.value.find((v) => v.node);
 });
 
 const prepRequest = (ev) => {
@@ -71,7 +71,7 @@ const submit = function (action) {
 watch(csvArray, async (val) => {
     numOfRows.value = val.length;
     numOfCols.value = val[0].length;
-    if (hasHeaders) {
+    if (hasHeaders.value) {
         columnHeaders.value = val[0];
         csvBody.value = val.slice(1);
     } else {
@@ -179,7 +179,7 @@ const addFile = function (file) {
         });
 };
 const write = function () {
-    if (!ready) {
+    if (!ready.value) {
         return;
     }
     const fieldnames = fieldMapping.value.map((fieldname) => {
@@ -221,23 +221,26 @@ onMounted(async () => {
                     v-if="!fileAdded"
                     mode="basic"
                     name="file"
+                    choose-label="Browse"
                     :url="arches.urls.root"
-                    :maxFileSize="1000000"
-                    @upload="addFile($event.files[0])"
+                    :max-file-size="1000000"
                     :auto="true"
-                    chooseLabel="Browse"
-                    @before-send="prepRequest($event)"
                     :multiple="true"
+                    @upload="addFile($event.files[0])"
+                    @before-send="prepRequest($event)"
                 />
             </div>
         </div>
 
         <div class="import-single-csv-component-container">
-            <Card v-if="fileAdded" style="box-shadow: none">
-                <template class="title-text">
+            <Card 
+                v-if="fileAdded" 
+                style="box-shadow: none"
+            >
+                <div class="title-text">
                     <h4>File Summary</h4>
-                </template>
-                <template>
+                </div>
+                <div>
                     <div>
                         <span class="etl-loading-metadata-key">File Name:</span>
                         <span class="etl-loading-metadata-value">{{
@@ -258,68 +261,73 @@ onMounted(async () => {
                             numOfRows
                         }}</span>
                     </div>
-                </template>
+                </div>
             </Card>
         </div>
 
         <div
+            v-if="fileAdded"
             class="import-single-csv-component-container"
             style="margin: 20px"
-            v-if="fileAdded"
         >
             <h4>Target Model</h4>
             <Dropdown
                 v-model="selectedResourceModel"
                 :options="allResourceModels"
-                optionLabel="name"
-                optionValue="graphid"
+                option-label="name"
+                option-value="graphid"
                 placeholder="Select a Resource Model"
                 class="w-full md:w-14rem target-model-dropdown"
             />
         </div>
         <div
+            v-if="fileAdded && selectedResourceModel"
             class="import-single-csv-component-container"
             style="margin: 20px"
-            v-if="fileAdded && selectedResourceModel"
         >
-            <h4 style="margin-bottom: 15px">Import Details</h4>
+            <h4 style="margin-bottom: 15px">
+                Import Details
+            </h4>
             <div
                 class="card flex justify-content-center"
                 style="display: flex; align-items: baseline"
             >
                 <InputSwitch v-model="hasHeaders" />
-                <p class="content-text">Column names in the first row</p>
+                <p class="content-text">
+                    Column names in the first row
+                </p>
             </div>
         </div>
         <div
+            v-if="fileAdded && selectedResourceModel"
             class="import-single-csv-component-container"
             style="margin: 20px"
-            v-if="fileAdded && selectedResourceModel"
         >
             <div class="csv-mapping-table-container">
                 <table class="table table-striped csv-mapping-table">
                     <thead>
                         <tr>
                             <th
+                                v-for="(mapping, index) in fieldMapping" 
+                                v-if="nodes"
+                                :key="index"
                                 style="
                                     border-bottom: 1px solid #ddd;
                                     vertical-align: top;
                                 "
-                                v-if="nodes"
-                                v-for="mapping in fieldMapping"
                             >
                                 <Dropdown
                                     v-model="mapping.node"
                                     :options="nodes"
-                                    optionLabel="name"
-                                    optionValue="alias"
+                                    option-label="name"
+                                    option-value="alias"
                                     placeholder="Select a Node"
                                 />
                                 <Dropdown
                                     v-if="stringNodes.includes(mapping.node)"
                                     v-model="mapping.language"
                                     :options="languages"
-                                    :optionLabel="
+                                    :option-label="
                                         function (item) {
                                             return (
                                                 item.name +
@@ -329,15 +337,15 @@ onMounted(async () => {
                                             );
                                         }
                                     "
-                                >
-                                </Dropdown>
+                                />
                             </th>
                         </tr>
                     </thead>
                     <thead>
                         <tr class="column-names">
                             <th
-                                v-for="col in columnHeaders"
+                                v-for="(col, index) in columnHeaders" 
+                                :key="index"
                                 style="border-bottom: 1px solid #ddd"
                             >
                                 {{ col }}
@@ -346,9 +354,13 @@ onMounted(async () => {
                     </thead>
 
                     <tbody>
-                        <tr v-for="row in csvExample">
+                        <tr 
+                            v-for="(row, index) in csvExample" 
+                            :key="index"
+                        >
                             <td
-                                v-for="cell in row"
+                                v-for="(cell, child_index) in row"
+                                :key="child_index"
                                 style="vertical-align: text-top"
                             >
                                 {{ cell }}
@@ -358,8 +370,15 @@ onMounted(async () => {
                 </table>
             </div>
         </div>
-        <div class="import-single-csv-component-container" v-if="ready">
-            <Button @click="write" :disabled="!!!ready" label="Submit" />
+        <div 
+            v-if="ready"
+            class="import-single-csv-component-container" 
+        >
+            <Button 
+                :disabled="!!!ready" 
+                label="Submit" 
+                @click="write" 
+            />
         </div>
     </div>
 </template>
