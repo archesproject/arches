@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref } from "vue";
 import Button from "primevue/button";
 import Dropdown from "primevue/dropdown";
 import InputText from "primevue/inputtext";
@@ -9,7 +9,6 @@ import Cookies from "js-cookie";
 
 const props = defineProps(["etlModuleId"]);
 
-const graphid = ref();
 const selectedGraph = ref();
 const fileName = ref();
 const exportConceptsAs = ref("uuids");
@@ -94,10 +93,9 @@ const submit = (action) => {
                 </div>
                 <div style="padding-top: 16px">
                     <h3>
-                        <label
-                            >Choose a name for the exported file
-                            (optional)</label
-                        >
+                        <label>
+                            Choose a name for the exported file (optional)
+                        </label>
                     </h3>
                     <InputText class="file-name-input" v-model="fileName" />
                 </div>

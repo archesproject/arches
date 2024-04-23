@@ -1,6 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from "vue";
-import { useGettext } from "vue3-gettext";
+import { ref, watch } from "vue";
 import InputText from "primevue/inputtext";
 
 const emit = defineEmits(["moduleSearch"]);

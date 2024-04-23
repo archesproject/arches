@@ -1,6 +1,4 @@
 <script setup>
-import { useGettext } from "vue3-gettext";
-
 const props = defineProps(["filteredModules"]);
 const emit = defineEmits(["selectModule"]);
 

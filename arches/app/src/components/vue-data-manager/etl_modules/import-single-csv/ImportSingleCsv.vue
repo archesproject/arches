@@ -234,10 +234,10 @@ onMounted(async () => {
 
         <div class="import-single-csv-component-container">
             <Card v-if="fileAdded" style="box-shadow: none">
-                <template #title class="title-text">
+                <template class="title-text">
                     <h4>File Summary</h4>
                 </template>
-                <template #content>
+                <template>
                     <div>
                         <span class="etl-loading-metadata-key">File Name:</span>
                         <span class="etl-loading-metadata-value">{{
@@ -251,9 +251,9 @@ onMounted(async () => {
                         }}</span>
                     </div>
                     <div>
-                        <span class="etl-loading-metadata-key"
-                            >Number of Rows:</span
-                        >
+                        <span class="etl-loading-metadata-key">
+                            Number of Rows:
+                        </span>
                         <span class="etl-loading-metadata-value">{{
                             numOfRows
                         }}</span>
