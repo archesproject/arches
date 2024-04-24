@@ -75,15 +75,18 @@ RUN set -ex \
         python3.10-venv \
     " \
     && apt-get update -y \
-    && apt-get install -y --no-install-recommends curl \
-    && curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+    && apt-get install -y --no-install-recommends curl ca-certificates gnupg \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+    && NODE_MAJOR=16 \
+    && (echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" > /etc/apt/sources.list.d/nodesource.list) \
     && curl -sL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main" \
     && apt-get update -y \
     && apt-get install -y --no-install-recommends $RUN_DEPS \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
     && python3.10 get-pip.py \
-    && apt-get install -y nodejs \
+    && apt-get -y install --no-install-recommends nodejs \
     && npm install -g yarn
 
 # Install Yarn components
