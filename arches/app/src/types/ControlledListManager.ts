@@ -4,7 +4,7 @@ export type Label = {
     language: string,
     value: string,
     item_id: string,
-}
+};
 
 export type NewLabel = {
     id: number,
@@ -12,9 +12,23 @@ export type NewLabel = {
     language: string,
     value: string,
     item_id: string,
-}
+};
 
 export type ValueType = "prefLabel" | "altLabel";
+
+export type ControlledListItemImageMetadata = {
+    id: string,
+    image_id: string,
+    language: string,
+    metadata_type: string,
+};
+
+export type ControlledListItemImage = {
+    id: string,
+    item_id: string,
+    url: string,
+    metadata: ControlledListItemImageMetadata[],
+};
 
 export type ControlledListItem = {
     id: string,
@@ -23,6 +37,7 @@ export type ControlledListItem = {
     sortorder: number,
     guide: boolean,
     labels: Label[],
+    images: ControlledListItemImage[],
     children: ControlledListItem[],
     parent_id: string,
     depth: number,

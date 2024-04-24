@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from django.contrib.postgres.expressions import ArraySubquery
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
-from django.db.models import Max, OuterRef
+from django.db.models import Max, OuterRef, Prefetch
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language, gettext as _
@@ -14,7 +14,9 @@ from django.utils.translation import get_language, gettext as _
 from arches.app.models.models import (
     ControlledList,
     ControlledListItem,
+    ControlledListItemImage,
     ControlledListItemLabel,
+    ControlledListItemImageMetadata,
     Language,
     Node,
 )
@@ -105,6 +107,10 @@ def serialize(obj, depth_map=None, flat=False):
                     serialize(label, depth_map)
                     for label in obj.controlled_list_item_labels.all()
                 ],
+                "images": [
+                    serialize(image, depth_map)
+                    for image in obj.controlled_list_item_images.all()
+                ],
                 "parent_id": str(obj.parent_id) if obj.parent_id else None,
                 "depth": depth_map[obj.id],
             }
@@ -122,6 +128,21 @@ def serialize(obj, depth_map=None, flat=False):
                 "value": obj.value,
                 "item_id": obj.controlled_list_item_id,
             }
+        case ControlledListItemImage():
+            return {
+                "id": str(obj.id),
+                "item_id": obj.controlled_list_item_id,
+                "url": obj.value.url,
+                "metadata": [
+                    serialize(metadata, depth_map)
+                    for metadata in obj.controlled_list_item_image_metadata.all()
+                ]
+            }
+        case ControlledListItemImageMetadata():
+            return {
+                field: str(value)
+                for (field, value) in vars(obj).items() if not field.startswith("_")
+            }
 
 
 def prefetch_terms(request):
@@ -136,14 +157,30 @@ def prefetch_terms(request):
             terms.extend(
                 [
                     "controlled_list_items",
-                    "controlled_list_items__controlled_list_item_labels",
+                    Prefetch(
+                        "controlled_list_items__controlled_list_item_labels",
+                        queryset=ControlledListItemLabel.labels.all(),
+                    ),
+                    Prefetch(
+                        "controlled_list_items__controlled_list_item_images",
+                        queryset=ControlledListItemLabel.images.all(),
+                    ),
+                    "controlled_list_items__controlled_list_item_images__controlled_list_item_image_metadata",
                 ]
             )
         elif find_children:
             terms.extend(
                 [
                     f"controlled_list_items{'__children' * i}",
-                    f"controlled_list_items{'__children' * i}__controlled_list_item_labels",
+                    Prefetch(
+                        f"controlled_list_items{'__children' * i}__controlled_list_item_labels",
+                        queryset=ControlledListItemLabel.objects.exclude(value_type_id="image")
+                    ),
+                    Prefetch(
+                        f"controlled_list_items{'__children' * i}__controlled_list_item_images",
+                        queryset=ControlledListItemLabel.objects.filter(value_type_id="image")
+                    ),
+                    f"controlled_list_items{'__children' * i}__controlled_list_item_images__controlled_list_item_image_metadata",
                 ]
             )
     return terms
@@ -152,14 +189,16 @@ def prefetch_terms(request):
 def handle_items(item_dicts, max_sortorder=-1):
     items_to_save = []
     labels_to_save = []
+    image_metadata_to_save = []
 
     def handle_item(item_dict):
         nonlocal items_to_save
         nonlocal labels_to_save
+        nonlocal image_metadata_to_save
         nonlocal max_sortorder
 
-        # Deletion/insertion of list items not yet implemented.
         labels = item_dict.pop("labels")
+        images = item_dict.pop("images")
         # Altering hierarchy is done by altering parents.
         children = item_dict.pop("children", None)
         item_dict.pop("depth", None)
@@ -183,6 +222,16 @@ def handle_items(item_dicts, max_sortorder=-1):
                     controlled_list_item_id=item_to_save.id, **label
                 )
             )
+        for image in images:
+            for metadata in image["metadata"]:
+                metadata["language_id"] = label.pop("language")
+                metadata.pop("controlled_list_item_label_id")
+                image_metadata_to_save.append(
+                    ControlledListItemImageMetadata(
+                        controlled_list_item_image_id=image.id, **metadata
+                    )
+                )
+
 
         # Recurse
         for child in children:
@@ -201,6 +250,9 @@ def handle_items(item_dicts, max_sortorder=-1):
     )
     ControlledListItemLabel.objects.bulk_update(
         labels_to_save, fields=["value", "value_type", "language"]
+    )
+    ControlledListItemImageMetadata.objects.bulk_update(
+        image_metadata_to_save, fields=["value", "metadata_type", "language"]
     )
 
 
@@ -277,7 +329,7 @@ class ControlledListView(View):
                 + datetime.now().isoformat(sep=" ", timespec="seconds")
             )
             lst.save()
-            return JSONResponse(serialize(lst))
+            return JSONResponse(serialize(lst), status=201)
 
         data = JSONDeserializer().deserialize(request.body)
 
@@ -382,7 +434,7 @@ class ControlledListItemView(View):
             logger.error(e)
             return JSONErrorResponse()
 
-        return JSONResponse(serialize(item))
+        return JSONResponse(serialize(item), status=201)
 
     def post(self, request, **kwargs):
         if not (item_id := kwargs.get("id", None)):
@@ -434,21 +486,6 @@ class ControlledListItemView(View):
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
-class ControlledListItemImagesView(View):
-    def get(self, request):
-        return JSONResponse(status=200)
-
-    def post(self, request, id):
-        uploaded_file = request.FILES["item_image"]
-        # f = File(controlled_list_item_id=id)
-        # FileValue?
-        # f.save()
-        return JSONResponse(status=200)
-
-
-@method_decorator(
-    group_required("RDM Administrator", raise_exception=True), name="dispatch"
-)
 class ControlledListItemLabelView(View):
     def add_new_label(self, request):
         data = JSONDeserializer().deserialize(request.body)
@@ -468,7 +505,7 @@ class ControlledListItemLabelView(View):
         except:
             return JSONErrorResponse()
 
-        return JSONResponse(serialize(label))
+        return JSONResponse(serialize(label), status=201)
 
     def post(self, request, **kwargs):
         if not (label_id := kwargs.get("id", None)):
@@ -513,3 +550,23 @@ class ControlledListItemLabelView(View):
             )
         label.delete()
         return JSONResponse(status=204)
+
+
+@method_decorator(
+    group_required("RDM Administrator", raise_exception=True), name="dispatch"
+)
+class ControlledListItemImageView(View):
+    def add_new_image(self, request):
+        uploaded_file = request.FILES["item_image"]
+        img = ControlledListItemImage(
+            controlled_list_item_id=request.POST["item_id"],
+            value_type_id="image",
+            value=uploaded_file,
+        )
+        img.save()
+        return JSONResponse(status=201)
+
+    def post(self, request, **kwargs):
+        if not (image_id := kwargs.get("id", None)):
+            return self.add_new_image(request)
+        raise NotImplementedError

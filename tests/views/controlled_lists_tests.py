@@ -173,18 +173,22 @@ class ControlledListTests(ArchesTestCase):
         self.assertEqual(response.status_code, 403)
 
         self.client.force_login(self.admin)
-        with self.assertNumQueries(11):
+        with self.assertNumQueries(15):
             # 1: session
             # 2: auth
             # 3: SELECT FROM controlled_lists
             # 4: prefetch items
             # 5: prefetch labels
-            # 6: prefetch children: items
-            # 7: prefetch children: labels
-            # 8: prefetch grandchildren: items
+            # 6: prefetch images
+            # 7: prefetch image metadata
+            # 8: prefetch children: items
+            # 9: prefetch children: labels
+            # 10: prefetch children: images
+            # 11: prefetch children: image metadata
+            # 12: prefetch grandchildren: items
             # there are no grandchildren, so no labels to get
-            # 9: get permitted nodegroups
-            # 10-11: permission checks
+            # 13: get permitted nodegroups
+            # 14-15: permission checks
             response = self.client.get(
                 reverse("controlled_lists"), kwargs={"prefetchDepth": 3}
             )

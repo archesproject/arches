@@ -53,6 +53,7 @@ const iconLabel = (item: ControlledListItem) => {
 
 const addHeader = (event: FileUploadBeforeSendEvent) => {
     event.xhr.setRequestHeader("X-CSRFToken", Cookies.get("csrftoken"));
+    event.formData.set("item_id", item.value.id);
 };
 </script>
 
@@ -96,7 +97,7 @@ const addHeader = (event: FileUploadBeforeSendEvent) => {
         <h4>{{ $gettext("Images") }}</h4>
         <FileUpload
             accept="image/*"
-            :url="arches.urls.controlled_list_item_images(item.id)"
+            :url="arches.urls.controlled_list_item_image_add"
             :auto="true"
             :max-file-size="5e6"
             :file-limit="10"

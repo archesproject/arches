@@ -1971,13 +1971,14 @@ class ControlledListItemLabel(models.Model):
         related_name="controlled_list_item_labels",
     )
     value_type = models.ForeignKey(
-        DValueType, on_delete=models.PROTECT, limit_choices_to={"category": "label"}
+        DValueType, on_delete=models.PROTECT, limit_choices_to=Q(category__in=("label", "image"))
     )
     language = models.ForeignKey(
         Language,
         db_column="languageid",
         to_field="code",
         on_delete=models.PROTECT,
+        null=True,
     )
     value = models.CharField(max_length=1024, null=False)
 
@@ -1992,5 +1993,78 @@ class ControlledListItemLabel(models.Model):
                 fields=["controlled_list_item", "language"],
                 condition=Q(value_type="prefLabel"),
                 name="unique_item_preflabel_language",
+            ),
+            models.CheckConstraint(
+                check=Q(language_id__isnull=False) | Q(value_type="image"),
+                name="only_images_nullable_language",
+            ),
+        ]
+
+    class LabelManager(models.Manager):
+        def get_queryset(self):
+            return super().get_queryset().exclude(value_type_id="image")
+
+    class ImageManager(models.Manager):
+        def get_queryset(self):
+            return super().get_queryset().filter(value_type_id="image")
+
+    objects = models.Manager()
+    labels = LabelManager()
+    images = ImageManager()
+
+
+class ControlledListItemImage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    controlled_list_item = models.ForeignKey(
+        ControlledListItem,
+        db_column="itemid",
+        on_delete=models.CASCADE,
+        related_name="controlled_list_item_images",
+    )
+    value_type = models.ForeignKey(
+        DValueType, on_delete=models.PROTECT, limit_choices_to={"category": "image"}
+    )
+    language = models.ForeignKey(
+        Language,
+        db_column="languageid",
+        to_field="code",
+        on_delete=models.PROTECT,
+    )
+    value = models.FileField(upload_to="controlled_list_item_images")
+
+    class Meta:
+        managed = False
+        db_table = "controlled_list_item_labels"
+
+
+class ControlledListItemImageMetadata(models.Model):
+    class MetadataChoices(models.TextChoices):
+        TITLE = "title", _("Title")
+        DESCRIPTION = "desc", _("Description")
+        ATTRIBUTION = "attr", _("Attribution")
+        ALT_TEXT = "alt", _("Alternative text")
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    controlled_list_item_image = models.ForeignKey(
+        ControlledListItemLabel,
+        db_column="labelid",
+        on_delete=models.CASCADE,
+        related_name="controlled_list_item_image_metadata",
+    )
+    language = models.ForeignKey(
+        Language,
+        db_column="languageid",
+        to_field="code",
+        on_delete=models.PROTECT,
+    )
+    metadata_type = models.CharField(max_length=5, choices=MetadataChoices.choices)
+    value = models.CharField(max_length=2048)
+
+    class Meta:
+        db_table = "controlled_list_item_image_metadata"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["controlled_list_item_image", "value", "metadata_type", "language"],
+                name="unique_image_metadata_valuetype_language",
             ),
         ]
