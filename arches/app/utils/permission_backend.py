@@ -355,3 +355,12 @@ def get_perms(user_or_group, obj):
 
 def process_new_user(instance, created):
     return _get_permission_framework().process_new_user(instance, created)
+
+def update_groups_for_user(instance):
+    return _get_permission_framework().update_groups_for_user(instance)
+
+def update_permissions_for_user(instance):
+    return _get_permission_framework().update_permissions_for_user(instance)
+
+def update_permissions_for_group(instance):
+    return _get_permission_framework().update_permissions_for_group(instance)
