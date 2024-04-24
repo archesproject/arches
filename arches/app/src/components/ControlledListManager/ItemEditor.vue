@@ -91,10 +91,20 @@ const addHeader = (event: FileUploadBeforeSendEvent) => {
     <ItemCharacteristic
         :editable="true"
         field="uri"
-        :style="{ display: 'flex', alignItems: 'center', width: '80%' }"
+        :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '80%' }"
     />
     <div class="field-editor-container">
         <h4>{{ $gettext("Images") }}</h4>
+        <div class="images">
+            <!-- todo(jtw): all metadata, metadata by active language -->
+            <img
+                v-for="image in item.images"
+                :key="image.id"
+                :src="image.url"
+                :alt="image.metadata[0]?.alt"
+                width="200"
+            >
+        </div>
         <FileUpload
             accept="image/*"
             :url="arches.urls.controlled_list_item_image_add"
@@ -145,6 +155,15 @@ p {
 .field-editor-container {
     margin: 1rem 1rem 3rem 1rem;
     width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.images {
+    display: flex;
+    gap: 20px;
+    /* todo(jtw): wrap... */
 }
 
 :deep(input[type=file]) {
