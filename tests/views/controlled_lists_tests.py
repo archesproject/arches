@@ -11,7 +11,7 @@ from guardian.shortcuts import assign_perm
 from arches.app.models.models import (
     ControlledList,
     ControlledListItem,
-    ControlledListItemLabel,
+    ControlledListItemValue,
     DValueType,
     GraphModel,
     Language,
@@ -88,12 +88,12 @@ class ControlledListTests(ArchesTestCase):
             child.save()
 
         # Create a prefLabel and altLabel per item. (20)
-        ControlledListItemLabel.objects.bulk_create(
+        ControlledListItemValue.objects.bulk_create(
             [
-                ControlledListItemLabel(
+                ControlledListItemValue(
                     value=f"label{num}-pref",
                     language=cls.first_language,
-                    value_type=cls.pref_label,
+                    valuetype=cls.pref_label,
                     controlled_list_item=ControlledListItem.objects.filter(
                         controlled_list=cls.list1
                     )[num],
@@ -101,10 +101,10 @@ class ControlledListTests(ArchesTestCase):
                 for num in range(5)
             ]
             + [
-                ControlledListItemLabel(
+                ControlledListItemValue(
                     value=f"label{num}-alt",
                     language=cls.first_language,
-                    value_type=cls.alt_label,
+                    valuetype=cls.alt_label,
                     controlled_list_item=ControlledListItem.objects.filter(
                         controlled_list=cls.list1
                     )[num],
@@ -112,10 +112,10 @@ class ControlledListTests(ArchesTestCase):
                 for num in range(5)
             ]
             + [
-                ControlledListItemLabel(
+                ControlledListItemValue(
                     value=f"label{num}-pref",
                     language=cls.first_language,
-                    value_type=cls.pref_label,
+                    valuetype=cls.pref_label,
                     controlled_list_item=ControlledListItem.objects.filter(
                         controlled_list=cls.list2
                     )[num],
@@ -123,10 +123,10 @@ class ControlledListTests(ArchesTestCase):
                 for num in range(5)
             ]
             + [
-                ControlledListItemLabel(
+                ControlledListItemValue(
                     value=f"label{num}-alt",
                     language=cls.first_language,
-                    value_type=cls.alt_label,
+                    valuetype=cls.alt_label,
                     controlled_list_item=ControlledListItem.objects.filter(
                         controlled_list=cls.list2
                     )[num],
@@ -178,15 +178,15 @@ class ControlledListTests(ArchesTestCase):
             # 2: auth
             # 3: SELECT FROM controlled_lists
             # 4: prefetch items
-            # 5: prefetch labels
-            # 6: prefetch images
+            # 5: prefetch item labels
+            # 6: prefetch item images
             # 7: prefetch image metadata
             # 8: prefetch children: items
-            # 9: prefetch children: labels
-            # 10: prefetch children: images
+            # 9: prefetch children: item labels
+            # 10: prefetch children: item images
             # 11: prefetch children: image metadata
             # 12: prefetch grandchildren: items
-            # there are no grandchildren, so no labels to get
+            # there are no grandchildren, so no values/metadata to get
             # 13: get permitted nodegroups
             # 14-15: permission checks
             response = self.client.get(

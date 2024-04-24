@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from django.contrib.postgres.expressions import ArraySubquery
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
-from django.db.models import Max, OuterRef, Prefetch
+from django.db.models import Max, OuterRef
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.utils.translation import get_language, gettext as _
@@ -15,8 +15,8 @@ from arches.app.models.models import (
     ControlledList,
     ControlledListItem,
     ControlledListItemImage,
-    ControlledListItemLabel,
     ControlledListItemImageMetadata,
+    ControlledListItemValue,
     Language,
     Node,
 )
@@ -105,7 +105,8 @@ def serialize(obj, depth_map=None, flat=False):
                 "guide": obj.guide,
                 "labels": [
                     serialize(label, depth_map)
-                    for label in obj.controlled_list_item_labels.all()
+                    for label in obj.controlled_list_item_values.all()
+                    if label.valuetype_id != "image"
                 ],
                 "images": [
                     serialize(image, depth_map)
@@ -120,11 +121,11 @@ def serialize(obj, depth_map=None, flat=False):
                     key=lambda d: d["sortorder"],
                 )
             return data
-        case ControlledListItemLabel():
+        case ControlledListItemValue():
             return {
                 "id": str(obj.id),
-                "valuetype": obj.value_type_id,
-                "language": obj.language_id,
+                "valuetype_id": obj.valuetype_id,
+                "language_id": obj.language_id,
                 "value": obj.value,
                 "item_id": obj.controlled_list_item_id,
             }
@@ -157,14 +158,8 @@ def prefetch_terms(request):
             terms.extend(
                 [
                     "controlled_list_items",
-                    Prefetch(
-                        "controlled_list_items__controlled_list_item_labels",
-                        queryset=ControlledListItemLabel.labels.all(),
-                    ),
-                    Prefetch(
-                        "controlled_list_items__controlled_list_item_images",
-                        queryset=ControlledListItemLabel.images.all(),
-                    ),
+                    "controlled_list_items__controlled_list_item_values",
+                    "controlled_list_items__controlled_list_item_images",
                     "controlled_list_items__controlled_list_item_images__controlled_list_item_image_metadata",
                 ]
             )
@@ -172,14 +167,8 @@ def prefetch_terms(request):
             terms.extend(
                 [
                     f"controlled_list_items{'__children' * i}",
-                    Prefetch(
-                        f"controlled_list_items{'__children' * i}__controlled_list_item_labels",
-                        queryset=ControlledListItemLabel.objects.exclude(value_type_id="image")
-                    ),
-                    Prefetch(
-                        f"controlled_list_items{'__children' * i}__controlled_list_item_images",
-                        queryset=ControlledListItemLabel.objects.filter(value_type_id="image")
-                    ),
+                    f"controlled_list_items{'__children' * i}__controlled_list_item_values",
+                    f"controlled_list_items{'__children' * i}__controlled_list_item_images",
                     f"controlled_list_items{'__children' * i}__controlled_list_item_images__controlled_list_item_image_metadata",
                 ]
             )
@@ -214,17 +203,14 @@ def handle_items(item_dicts, max_sortorder=-1):
             raise MixedListsException
 
         for label in labels:
-            label["language_id"] = label.pop("language")
-            label["value_type_id"] = label.pop("valuetype")
             label.pop("item_id")  # trust the item, not the label
             labels_to_save.append(
-                ControlledListItemLabel(
+                ControlledListItemValue(
                     controlled_list_item_id=item_to_save.id, **label
                 )
             )
         for image in images:
             for metadata in image["metadata"]:
-                metadata["language_id"] = label.pop("language")
                 metadata.pop("controlled_list_item_label_id")
                 image_metadata_to_save.append(
                     ControlledListItemImageMetadata(
@@ -248,8 +234,8 @@ def handle_items(item_dicts, max_sortorder=-1):
     ControlledListItem.objects.bulk_update(
         items_to_save, fields=["controlled_list_id", "guide", "uri", "sortorder", "parent"]
     )
-    ControlledListItemLabel.objects.bulk_update(
-        labels_to_save, fields=["value", "value_type", "language"]
+    ControlledListItemValue.objects.bulk_update(
+        labels_to_save, fields=["value", "valuetype", "language"]
     )
     ControlledListItemImageMetadata.objects.bulk_update(
         image_metadata_to_save, fields=["value", "metadata_type", "language"]
@@ -421,11 +407,11 @@ class ControlledListItemView(View):
                     sortorder=controlled_list.max_sortorder + 1,
                     parent_id=None if controlled_list_id == parent_id else parent_id,
                 )
-                ControlledListItemLabel.objects.create(
+                ControlledListItemValue.objects.create(
                     controlled_list_item=item,
                     value=_("New Item: ")
                     + datetime.now().isoformat(sep=" ", timespec="seconds"),
-                    value_type_id="prefLabel",
+                    valuetype_id="prefLabel",
                     language_id=get_language(),
                 )
         except ControlledList.DoesNotExist:
@@ -490,10 +476,10 @@ class ControlledListItemLabelView(View):
     def add_new_label(self, request):
         data = JSONDeserializer().deserialize(request.body)
 
-        label = ControlledListItemLabel(
+        label = ControlledListItemValue(
             controlled_list_item_id=data["item_id"],
-            value_type_id=data["valuetype"],
-            language=Language.objects.get(code=data["language"]),
+            valuetype_id=data["valuetype_id"],
+            language_id=data["language_id"],
             value=data["value"],
         )
         try:
@@ -515,29 +501,29 @@ class ControlledListItemLabelView(View):
         data = JSONDeserializer().deserialize(request.body)
 
         try:
-            ControlledListItemLabel.objects.filter(pk=label_id).update(
-                value=data["value"], language_id=data["language"]
+            ControlledListItemValue.labels.filter(pk=label_id).update(
+                value=data["value"], language_id=data["language_id"]
             )
-        except ControlledListItemLabel.DoesNotExist:
+        except ControlledListItemValue.DoesNotExist:
             return JSONErrorResponse(status=404)
         except IntegrityError as e:
             return JSONErrorResponse(message=" ".join(e.args), status=400)
         except:
             return JSONErrorResponse()
 
-        return JSONResponse(serialize(ControlledListItemLabel.objects.get(pk=label_id)))
+        return JSONResponse(serialize(ControlledListItemValue.labels.get(pk=label_id)))
 
     def delete(self, request, **kwargs):
         label_id = kwargs.get("id")
         try:
-            label = ControlledListItemLabel.objects.get(pk=label_id)
+            label = ControlledListItemValue.labels.get(pk=label_id)
         except:
             return JSONErrorResponse(status=404)
         if (
-            label.value_type_id == "prefLabel"
+            label.valuetype_id == "prefLabel"
             and len(
-                label.controlled_list_item.controlled_list_item_labels.filter(
-                    value_type="prefLabel"
+                label.controlled_list_item.controlled_list_item_values.filter(
+                    valuetype_id="prefLabel"
                 )
             )
             < 2
@@ -560,7 +546,7 @@ class ControlledListItemImageView(View):
         uploaded_file = request.FILES["item_image"]
         img = ControlledListItemImage(
             controlled_list_item_id=request.POST["item_id"],
-            value_type_id="image",
+            valuetype_id="image",
             value=uploaded_file,
         )
         img.save()

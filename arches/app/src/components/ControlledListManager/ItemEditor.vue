@@ -40,7 +40,7 @@ const removeItemLabel = computed(() => {
 const updateItemLabel = computed(() => {
     return (updatedLabel: Label) => {
         const toUpdate = item.value.labels.find((l: Label) => l.id === updatedLabel.id);
-        toUpdate.language = updatedLabel.language;
+        toUpdate.language_id = updatedLabel.language_id;
         toUpdate.value = updatedLabel.value;
     };
 });

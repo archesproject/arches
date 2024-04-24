@@ -30,8 +30,8 @@ const newLabel: NewLabel = computed(() => {
     );
     return {
         id: maxOtherNewLabelId + 1,
-        valuetype: props.type,
-        language: arches.activeLanguage,
+        valuetype_id: props.type,
+        language_id: arches.activeLanguage,
         value: '',
         item_id: item.value.id,
     };

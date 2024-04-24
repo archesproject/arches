@@ -1,15 +1,15 @@
 export type Label = {
     id: string,
-    valuetype: string,
-    language: string,
+    valuetype_id: string,
+    language_id: string,
     value: string,
     item_id: string,
 };
 
 export type NewLabel = {
     id: number,
-    valuetype: string,
-    language: string,
+    valuetype_id: string,
+    language_id: string,
     value: string,
     item_id: string,
 };
@@ -18,8 +18,8 @@ export type ValueType = "prefLabel" | "altLabel";
 
 export type ControlledListItemImageMetadata = {
     id: string,
-    image_id: string,
-    language: string,
+    controlled_list_image_id: string,
+    language_id: string,
     metadata_type: string,
 };
 

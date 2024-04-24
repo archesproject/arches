@@ -65,7 +65,7 @@ const labels = computed(() => {
         return [];
     }
     return props.item.labels.filter(
-        label => label.valuetype === props.type
+        label => label.valuetype_id === props.type
     );
 });
 
@@ -131,7 +131,7 @@ const languageName = (code: string) => {
                 </template>
             </Column>
             <Column
-                field="language"
+                field="language_id"
                 :header="$gettext('Language')"
                 style="width: 10%; min-width: 8rem; height: 4rem;"
             >
@@ -148,7 +148,7 @@ const languageName = (code: string) => {
                     />
                 </template>
                 <template #body="slotProps">
-                    {{ languageName(slotProps.data.language) }}
+                    {{ languageName(slotProps.data.language_id) }}
                 </template>
             </Column>
             <Column

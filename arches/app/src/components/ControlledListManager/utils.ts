@@ -6,11 +6,11 @@ import type {
 import type { TreeNode } from "primevue/tree/Tree/TreeNode";
 
 export const bestLabel = (item: ControlledListItem, languageCode: string) => {
-    const labelsInLang = item.labels.filter(l => l.language === languageCode);
+    const labelsInLang = item.labels.filter(l => l.language_id === languageCode);
     const bestLabel = (
-        labelsInLang.find(l => l.valuetype === "prefLabel")
-        ?? labelsInLang.find(l => l.valuetype === "altLabel")
-        ?? item.labels.find(l => l.valuetype === "prefLabel")
+        labelsInLang.find(l => l.valuetype_id === "prefLabel")
+        ?? labelsInLang.find(l => l.valuetype_id === "altLabel")
+        ?? item.labels.find(l => l.valuetype_id === "prefLabel")
     );
     if (!bestLabel) {
         throw new Error();
