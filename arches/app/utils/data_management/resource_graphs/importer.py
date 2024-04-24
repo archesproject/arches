@@ -66,7 +66,7 @@ class GraphImportException(Exception):
     pass
 
 
-def import_graph(graphs, overwrite_graphs=True, user=None):
+def import_graph(graphs, overwrite_graphs=True, user=None, strict=False):
     reporter = GraphImportReporter(graphs)
 
     def check_default_configs(default_configs, configs):
@@ -181,11 +181,15 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
             except GraphImportException as ge:
                 logger.exception(ge)
                 errors.append(ge)
+                if strict:
+                    raise
             except Exception as e:
                 import traceback
                 traceback.print_exc()
                 errors.append(str(e))
                 logger.exception(e)
+                if strict:
+                    raise
             # try/except block here until all graphs have a resource_2_resource_constraints object.
             try:
                 if not hasattr(graph, "resource_2_resource_constraints"):
@@ -196,7 +200,8 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                     for resource_2_resource_constraint in graph.resource_2_resource_constraints:
                         resource2resourceconstraint = Resource2ResourceConstraint.objects.update_or_create(**resource_2_resource_constraint)
             except:
-                pass
+                if strict:
+                    raise
 
         return errors, reporter
 
