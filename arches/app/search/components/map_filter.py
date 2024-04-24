@@ -4,8 +4,10 @@ from django.db import connection
 from django.utils.translation import gettext as _
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Terms, GeoShape
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, GeoShape
 from arches.app.search.components.base import BaseSearchFilter
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.mappings import RESOURCES_INDEX
 
 logger = logging.getLogger(__name__)
 
