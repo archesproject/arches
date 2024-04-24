@@ -62,14 +62,18 @@ jobs:
         run: |
           python manage.py makemigrations --check
 
+      - name: Ensure previous coverage data is erased
+        run: |
+          coverage erase
+
       - name: Run unit tests
         run: |
           python -W default::DeprecationWarning -m coverage run manage.py test tests --settings="tests.test_settings"
 
       - name: Generate report coverage
         run: |
-          coverage erase
           coverage json
+          cat coverage.json
 
       - name: Upload coverage report as artifact
         uses: actions/upload-artifact@v4
@@ -123,7 +127,7 @@ jobs:
             echo "Coverage decreased from $baseline_coverage% to $current_coverage%"
             exit 1
           else
-            echo "Current branch coverage($current_coverage%) >= Target branch coverage ($baseline_coverage%). Committing new coverage.json."
+            echo "Current branch coverage ($current_coverage%) >= Target branch coverage ($baseline_coverage%). Committing new coverage.json."
 
             git config user.name github-actions
             git config user.email github-actions@github.com
