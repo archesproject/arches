@@ -65,6 +65,41 @@ class MapFilter(BaseSearchFilter):
                     spatial_query.filter(Terms(field="geometries.provisional", terms=["true"]))
 
                 search_query.filter(Nested(path="geometries", query=spatial_query))
+    
+        elif "featureid" in spatial_filter and "resourceid" in spatial_filter:
+            se = SearchEngineFactory().create()
+            main_query = Query(se)
+            nested_query = Nested(path="geometries")
+            match_feature = Match(field="geometries.geom.features.id", query=spatial_filter["featureid"])
+
+            # Create a Bool query for conditions inside the nested path
+            bool_nested_query = Bool()
+            bool_nested_query.must(match_feature.dsl)
+            nested_query.add_query(bool_nested_query.dsl)
+
+            bool_query = Bool()
+            match_resource = Term(field="resourceinstanceid", term=spatial_filter["resourceid"])
+            bool_query.must(match_resource.dsl)  # Match resource instance ID at the document level
+            bool_query.must(nested_query.dsl)  # Add the nested query
+            
+            # Set the entire bool query to the main query object
+            main_query.add_query(bool_query.dsl)
+
+            response = main_query.search(index=RESOURCES_INDEX)
+            geometries = []
+            for hit in response['hits']['hits']:
+                geometries.extend(hit['_source']['geometries'][0]['geom']['features'])
+
+            feature_geom = geometries[0]["geometry"]
+            spatial_query = create_geoshape_query(feature_geom, spatial_filter)
+            spatial_query.filter(Terms(field="geometries.nodegroup_id", terms=permitted_nodegroups))
+
+            if include_provisional is False:
+                spatial_query.filter(Terms(field="geometries.provisional", terms=["false"]))
+            elif include_provisional == "only provisional":
+                spatial_query.filter(Terms(field="geometries.provisional", terms=["true"]))
+
+            search_query.filter(Nested(path="geometries", query=spatial_query))
 
         search_results_object["query"].add_query(search_query)
 
