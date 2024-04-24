@@ -233,7 +233,14 @@ def index_resources_using_singleprocessing(
     with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
         with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
             if quiet is False:
-                bar = pyprind.ProgBar(len(resources), bar_char="█", title=title) if len(resources) > 1 else None
+                if isinstance(resources, QuerySet):
+                    resource_count = resources.count()
+                else:
+                    resource_count = len(resources)
+                if resource_count > 1:
+                    bar = pyprind.ProgBar(resource_count, bar_char="█", title=title)
+                else:
+                    bar = None
 
             for resource in optimize_resource_iteration(resources, chunk_size=batch_size // 8):
                 resource.tiles = resource.prefetched_tiles
