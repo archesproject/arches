@@ -37,7 +37,7 @@ from arches.app.views.base import BaseManagerView
 from arches.app.utils.forms import ArchesUserProfileForm
 from arches.app.utils.message_contexts import return_message_context
 from arches.app.utils.response import JSONResponse
-from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.utils.permission_backend import user_is_resource_reviewer, _get_permission_framework
 
 import logging
 
@@ -128,12 +128,72 @@ class UserManagerView(BaseManagerView):
             return render(request, "views/user-profile-manager.htm", context)
 
     def post(self, request):
+
         if self.action == "get_user_names":
             data = {}
             if self.request.user.is_authenticated and user_is_resource_reviewer(request.user):
                 userids = json.loads(request.POST.get("userids", "[]"))
                 data = {u.id: u.username for u in User.objects.filter(id__in=userids)}
                 return JSONResponse(data)
+
+        if self.action == "get_user_roles":
+            data = {}
+            if self.request.user.is_authenticated:
+                userids = json.loads(request.POST.get("userids", "[]"))
+                if not bool(userids):
+                    userids = [request.user.pk]
+                if user_is_resource_reviewer(request.user) or userids == [request.user.pk]:
+                    permission_framework = _get_permission_framework()
+
+                    perm_map = {}
+                    users = User.objects.filter(id__in=userids)
+                    groups = set()
+                    data = {}
+                    for user in users:
+                        data[str(user.pk)] = {
+                            str(g.pk): {
+                                "name": g.name,
+                                "primary": True,
+                                "permissions": {}
+                            }
+                            for g in user.groups.all()
+                        }
+                        if hasattr(permission_framework, "_get_perms"):
+                            for subj, obj, act in permission_framework._get_perms(user, None):
+                                perm_map.setdefault(subj, {})
+                                typ, ent = obj.split(":", 1)
+                                if typ == "ct":
+                                    act = ent
+                                perm_map[subj].setdefault(typ, {})
+                                perm_map[subj][typ].setdefault(act, 0)
+                                perm_map[subj][typ][act] += 1
+                                if subj.startswith("g:"):
+                                    groupid = subj[2:]
+                                    groups.add(groupid)
+                                    data[str(user.pk)].setdefault(groupid, {"primary": False})
+                                    data[str(user.pk)][groupid]["permissions"] = perm_map[f"g:{groupid}"]
+
+                    groups = {str(g.pk): g.name for g in Group.objects.filter(pk__in=groups)}
+                    for userid, user in data.items():
+                        for groupid, group in user.items():
+                            if "name" not in group:
+                                group["name"] = groups.get(groupid, f"(missing: {groupid})")
+                        if f"u:{userid}" in perm_map:
+                            data[userid][""] = {
+                                "permissions": perm_map[f"u:{userid}"],
+                                "primary": False
+                            }
+
+                        for group in data[userid].values():
+                            group["permissions"] = [
+                                {"grouping": k, "summary": ", ".join(f"{act} ({n})" for act, n in v.items())}
+                                for k, v in group["permissions"].items()
+                            ]
+
+                    return JSONResponse(data)
+                else:
+                    return JSONResponse({"error": "User only has permission to retrieve own roles. Access denied."}, status=403)
+
 
         if self.request.user.is_authenticated and self.request.user.username != "anonymous":
             context = self.get_context_data(

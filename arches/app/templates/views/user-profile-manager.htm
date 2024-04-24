@@ -410,6 +410,47 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- Notification Settings -->
+                <section>
+                    <div class="profile-list">
+                        <div class="profile-header">
+                            {% trans 'Roles' %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-9 col-sm-offset-3 profile-notif-settings">
+                                <table class="notif-table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>{% trans 'Role' %}</th>
+                                            <td>{% trans 'Direct?' %}</td>
+                                            <td>&nbsp;</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- ko foreach: roleObservables -->
+                                        <tr>
+                                            <td data-bind="text:name"></td>
+                                            <td data-bind="text:primary"></td>
+                                            <td>
+                                                <div data-bind="foreach:permissions">
+                                                    <ul>
+                                                        <li>
+                                                            <p data-bind="text:grouping"></p>
+                                                            <p data-bind="text:summary"></p>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <!-- /ko -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
 
         </div>

@@ -234,6 +234,7 @@ urlpatterns = [
     re_path(r"^feature_popup_content$", main.feature_popup_content, name="feature_popup_content"),
     re_path(r"^user$", UserManagerView.as_view(), name="user_profile_manager"),
     re_path(r"^user/get_user_names$", UserManagerView.as_view(action="get_user_names"), name="get_user_names"),
+    re_path(r"^user/get_user_roles$", UserManagerView.as_view(action="get_user_roles"), name="get_user_roles"),
     re_path(r"^notifications$", NotificationView.as_view(), name="get_notifications"),
     re_path(r"^notifications/dismiss$", NotificationView.as_view(action="dismiss"), name="dismiss_notifications"),
     re_path(r"^notifications/get_types$", NotificationView.as_view(action="get_types"), name="get_notification_types"),

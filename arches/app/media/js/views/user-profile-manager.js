@@ -22,6 +22,7 @@ define([
             self.viewModel.mismatchedPasswords = ko.observable();
             self.viewModel.changePasswordSuccess = ko.observable();
             self.viewModel.notifTypeObservables = ko.observableArray();
+            self.viewModel.roleObservables = ko.observableArray();
 
             self.viewModel.isTwoFactorAuthenticationEnabled = data.two_factor_authentication_settings['ENABLE_TWO_FACTOR_AUTHENTICATION'];
             self.viewModel.isTwoFactorAuthenticationForced = data.two_factor_authentication_settings['FORCE_TWO_FACTOR_AUTHENTICATION'];
@@ -54,6 +55,33 @@ define([
                 });
             };
             self.viewModel.getNotifTypes();
+
+            self.viewModel.getRoles = function() {
+                self.viewModel.roleObservables.removeAll();
+                $.ajax({
+                    url: arches.urls.get_user_roles,
+                    context: this,
+                    data: { userids: [] },
+                    method: 'POST',
+                    dataType: 'json'
+                }).done(function(data) {
+                    var koType;
+                    var user = Object.keys(data);
+                    console.log(user);
+                    console.log(data);
+                    if (user.length == 1) {
+                        const userId = user[0];
+                        Object.values(data[userId]).forEach(function(role) {
+                            if (!role.name || role.name === "") {
+                                role.name = "(direct)";
+                            }
+                            koRole = ko.mapping.fromJS(role);
+                            self.viewModel.roleObservables.push(koRole);
+                        });
+                    }
+                });
+            };
+            self.viewModel.getRoles();
 
             self.viewModel.updateNotifTypes = function() {
                 var modified;
