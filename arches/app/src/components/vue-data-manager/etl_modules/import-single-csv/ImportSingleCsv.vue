@@ -1,5 +1,4 @@
 <script setup>
-import Card from "primevue/card";
 import Button from "primevue/button";
 import Dropdown from "primevue/dropdown";
 import FileUpload from "primevue/fileupload";
@@ -54,18 +53,34 @@ const getGraphs = function () {
     });
 };
 
-const submit = function (action) {
+const submit = async function (action) {
     formData.append("action", action);
     formData.append("load_id", loadid);
     formData.append("module", moduleid);
-    return $.ajax({
-        type: "POST",
-        url: arches.urls.etl_manager,
-        data: formData,
-        cache: false,
+    // return $.ajax({
+    //     type: "POST",
+    //     url: arches.urls.etl_manager,
+    //     data: formData,
+    //     cache: false,
+    //     processData: false,
+    //     contentType: false,
+    // });
+
+    const response = await fetch(arches.urls.etl_manager, {
+        method: "POST",
+        body: formData,
+        cache: "no-cache",
         processData: false,
         contentType: false,
+        credentials: 'same-origin',
+        headers: {
+            "X-CSRFToken": Cookies.get("csrftoken")
+        }
     });
+    if (!response.ok) {
+        console.log(response);
+    }
+    return await response.json();
 };
 
 watch(csvArray, async (val) => {
@@ -160,25 +175,24 @@ const formatSize = function (size) {
     );
 };
 
-const addFile = function (file) {
+const addFile = async function (file) {
     fileInfo.value = { name: file.name, size: file.size };
     formData.append("file", file, file.name);
-    submit("read")
-        .then(function (response) {
-            csvArray.value = response.result.csv;
-            csvFileName.value = response.result.csv_file;
-            if (response.result.config) {
-                fieldMapping.value = response.result.config.mapping;
-                selectedResourceModel.value = response.result.config.graph;
-            }
-            formData.delete("file");
-            fileAdded.value = true;
-        })
-        .fail(function (err) {
-            console.log(err);
-        });
+    const response = await submit("read");
+    if (!response.ok) {
+        // add error handling
+        console.log(response);
+    }
+    csvArray.value = response.result.csv;
+    csvFileName.value = response.result.csv_file;
+    if (response.result.config) {
+        fieldMapping.value = response.result.config.mapping;
+        selectedResourceModel.value = response.result.config.graph;
+        }
+    formData.delete("file");
+    fileAdded.value = true;
 };
-const write = function () {
+const write = async function () {
     if (!ready.value) {
         return;
     }
@@ -191,21 +205,17 @@ const write = function () {
     formData.append("graphid", selectedResourceModel.value);
     formData.append("csvFileName", csvFileName.value);
     // loading(true);
-    submit("start")
-        .then((data) => {
-            // activeTab.value = 2;
-            formData.append("async", true);
-            submit("write")
-                .then((data) => {
-                    console.log(data.result);
-                })
-                .fail(function (err) {
-                    console.log(err);
-                });
-        })
-        .fail((error) => console.log(error));
-
-    console.log(fieldnames);
+    const start = await submit("start");
+    if (!start.ok) {
+        // add error handling
+        console.log(start);
+    }
+    formData.append("async", true);
+    const response = await submit("write");
+    if (!response.ok) {
+        // add error handling
+        console.log(response);
+    }
 };
 
 onMounted(async () => {
@@ -232,9 +242,11 @@ onMounted(async () => {
             </div>
         </div>
 
-        <div class="import-single-csv-component-container">
-            <Card 
-                v-if="fileAdded" 
+        <div 
+            v-if="fileAdded"
+            class="import-single-csv-component-container"
+        >
+            <div 
                 style="box-shadow: none"
             >
                 <div class="title-text">
@@ -249,9 +261,10 @@ onMounted(async () => {
                     </div>
                     <div>
                         <span class="etl-loading-metadata-key">File Size:</span>
-                        <span class="etl-loading-metadata-value">{{
-                            fileInfo.size
-                        }}</span>
+                        <span 
+                            class="etl-loading-metadata-value"
+                            v-html="formatSize(fileInfo.size)"
+                        /> 
                     </div>
                     <div>
                         <span class="etl-loading-metadata-key">
@@ -262,7 +275,7 @@ onMounted(async () => {
                         }}</span>
                     </div>
                 </div>
-            </Card>
+            </div>
         </div>
 
         <div
@@ -306,10 +319,11 @@ onMounted(async () => {
             <div class="csv-mapping-table-container">
                 <table class="table table-striped csv-mapping-table">
                     <thead>
-                        <tr>
+                        <tr
+                            v-if="nodes"
+                        >
                             <th
                                 v-for="(mapping, index) in fieldMapping" 
-                                v-if="nodes"
                                 :key="index"
                                 style="
                                     border-bottom: 1px solid #ddd;
