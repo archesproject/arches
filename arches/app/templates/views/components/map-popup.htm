@@ -58,6 +58,12 @@
             <span data-bind="text: $root.translations.edit"></span>
         </a>
         <!--/ko-->
+        <a data-bind="click: function() {
+            mapCard.filterByFeatureGeom(ko.unwrap(geometries)); 
+        }" href="#">
+            <i class="fa fa-map-pin"></i>
+            <span data-bind="text: $root.translations.searchNearHere"></span>
+        </a>
         </div>
         <!-- ko if: $parent.popupFeatures.length > 1 -->
         <div style="display: flex; flex-direction: row; width: 60px; justify-content: space-evenly; font-weight: 500;">
