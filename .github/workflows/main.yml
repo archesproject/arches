@@ -76,6 +76,9 @@ jobs:
           coverage json
           cat coverage.json
 
+          coverage xml
+          cat coverage.xml
+
       - name: Upload coverage report as artifact
         uses: actions/upload-artifact@v4
         with:
@@ -154,6 +157,9 @@ jobs:
         run: |
           coverage json
           cat coverage.json
+
+          coverage xml
+          cat coverage.xml
 
       - name: Upload coverage report as artifact
         uses: actions/upload-artifact@v4

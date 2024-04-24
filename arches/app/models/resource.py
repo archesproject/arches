@@ -207,13 +207,6 @@ class Resource(models.ResourceInstance):
         edit.edittype = edit_type
         edit.save()
 
-
-    def foobar(self, foo):
-        if foo == 1:
-            return 'bar'
-        else:
-            return 'baz'
-
     def save(self, *args, **kwargs):
         """
         Saves and indexes a single resource
@@ -237,15 +230,7 @@ class Resource(models.ResourceInstance):
         super(Resource, self).save(*args, **kwargs)
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
 
-        # for tile in self.tiles:
-        sortorder = {}
         for tile in self.tiles:
-            try:
-                sortorder[tile.nodegroup_id] += 1
-                tile.sortorder = sortorder[tile.nodegroup_id]
-            except:
-                sortorder[tile.nodegroup_id] = 0
-                tile.sortorder = sortorder[tile.nodegroup_id]
             tile.resourceinstance_id = self.resourceinstanceid
             tile.save(request=request, index=False, resource_creation=True, transaction_id=transaction_id, context=context)
         if request is None:
