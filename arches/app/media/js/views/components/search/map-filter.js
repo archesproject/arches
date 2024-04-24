@@ -277,13 +277,11 @@ define([
             this.filterByFeatureGeom = function(resourceid, geoms) {
                 let feature;
                 if (geoms.length) {
-                    for (let i = 0; i < geoms.length; i++) {
-                        if (geoms[i].geom.features[0].geometry.type == 'Polygon') {
-                            feature = geoms[i].geom.features[0];
-                        } else if (geoms[i].geom.features[0].geometry.type == 'Point') {
-                            feature = geoms[i].geom.features[0];
-                            self.buffer(100);
-                        }
+                    if (geoms[0].geom.features[0].geometry.type == 'Polygon') {
+                        feature = geoms[0].geom.features[0];
+                    } else if (geoms[0].geom.features[0].geometry.type == 'Point') {
+                        feature = geoms[0].geom.features[0];
+                        self.buffer(100);
                     }
                 }
                 if (!feature) { return; }
