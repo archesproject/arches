@@ -1,3 +1,4 @@
+import re
 import os
 import sys
 import csv
@@ -65,6 +66,7 @@ class BusinessDataImporter(object):
         if mapping_file is None:
             try:
                 mapping_file_base = os.path.splitext(file[0])[0]
+                mapping_file_base = re.sub(r"_[0-9]+$", "", mapping_file_base)
                 mapping_file = [f"{mapping_file_base}.mapping"]
             except:
                 print("*" * 80)

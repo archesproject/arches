@@ -107,6 +107,7 @@ class Graph(models.GraphModel):
 
                 if "functions_x_graphs" in args[0]:
                     for function in args[0]["functions_x_graphs"]:
+                        print("!!!!!")
                         function_x_graph_config = function["config"]
                         default_config = models.Function.objects.get(functionid=function["function_id"]).defaultconfig
                         function["config"] = check_default_configs(default_config, function_x_graph_config)

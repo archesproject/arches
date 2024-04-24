@@ -38,3 +38,5 @@ from arches.app.models.system_settings import settings
 from arches.app.models import permissions
 
 settings.update_from_db()
+import logging
+logging.disable(logging.NOTSET)

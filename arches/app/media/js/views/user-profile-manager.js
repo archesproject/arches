@@ -67,8 +67,6 @@ define([
                 }).done(function(data) {
                     var koType;
                     var user = Object.keys(data);
-                    console.log(user);
-                    console.log(data);
                     if (user.length == 1) {
                         const userId = user[0];
                         Object.values(data[userId]).forEach(function(role) {

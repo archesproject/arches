@@ -321,16 +321,21 @@ class Command(BaseCommand):
                 concept_count = models.Value.objects.count()
                 relation_count = models.ResourceXResource.objects.count()
 
-            self.import_business_data(
-                options["source"],
-                options["config_file"],
-                options["overwrite"],
-                options["bulk_load"],
-                options["create_concepts"],
-                use_multiprocessing=options["use_multiprocessing"],
-                force=options["yes"],
-                prevent_indexing=prevent_indexing,
-            )
+            try:
+                self.import_business_data(
+                    options["source"],
+                    options["config_file"],
+                    options["overwrite"],
+                    options["bulk_load"],
+                    options["create_concepts"],
+                    use_multiprocessing=options["use_multiprocessing"],
+                    force=options["yes"],
+                    prevent_indexing=prevent_indexing,
+                )
+            except Exception as exc:
+                import traceback
+                traceback.print_exception()
+                raise
 
             if defer_indexing and not prevent_indexing:
                 # index concepts if new concepts created

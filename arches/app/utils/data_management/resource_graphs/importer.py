@@ -182,6 +182,8 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                 logger.exception(ge)
                 errors.append(ge)
             except Exception as e:
+                import traceback
+                traceback.print_exc()
                 errors.append(str(e))
                 logger.exception(e)
             # try/except block here until all graphs have a resource_2_resource_constraints object.
