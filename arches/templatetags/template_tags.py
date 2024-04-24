@@ -1,6 +1,7 @@
 from arches.app.utils.permission_backend import get_editable_resource_types
 from arches.app.utils.permission_backend import get_createable_resource_types
 from arches.app.utils.permission_backend import get_resource_types_by_perm
+from arches.app.utils.permission_backend import user_in_group_by_name
 from django import template
 from django.utils.html import escapejs
 from django.templatetags.i18n import do_translate, TranslateNode
@@ -12,7 +13,7 @@ register = template.Library()
 @register.filter(name="has_group")
 def has_group(user, group_names):
     if user.is_authenticated:
-        if user.is_superuser or bool(user.groups.filter(name__in=group_names.split(","))):
+        if user.is_superuser or user_in_group_by_name(user, group_names.split(",")):
             return True
     return False
 
