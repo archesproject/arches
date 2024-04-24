@@ -277,12 +277,8 @@ define([
             this.filterByFeatureGeom = function(resourceid, geoms) {
                 let feature;
                 if (geoms.length) {
-                    if (geoms[0].geom.features[0].geometry.type == 'Polygon') {
-                        feature = geoms[0].geom.features[0];
-                    } else if (geoms[0].geom.features[0].geometry.type == 'Point') {
-                        feature = geoms[0].geom.features[0];
-                        self.buffer(100);
-                    }
+                    feature = geoms[0].geom.features[0];
+                    if (feature.geometry.type == 'Point') { self.buffer(100); }
                 }
                 if (!feature) { return; }
                 let currentSearchGeoms = self.searchGeometries();
