@@ -274,6 +274,33 @@ define([
                 }
             }, this);
 
+            this.filterByFeatureGeom = function(geoms) {
+                let feature;
+                if (geoms.length) {
+                    for (let i = 0; i < geoms.length; i++) {
+                        if (geoms[i].geom.features[0].geometry.type == 'Polygon') {
+                            feature = geoms[i].geom.features[0];
+                        } else if (geoms[i].geom.features[0].geometry.type == 'Point') {
+                            feature = geoms[i].geom.features[0];
+                            self.buffer(100);
+                        }
+                    }
+                }
+                if (!feature) { return; }
+                let currentSearchGeoms = self.searchGeometries();
+                this.draw.set({
+                    "type": "FeatureCollection",
+                    "features": [feature]
+                });
+                if (currentSearchGeoms != null) {
+                    currentSearchGeoms.push(feature);
+                } else {
+                    currentSearchGeoms = [feature];
+                }
+                self.searchGeometries(currentSearchGeoms);
+                self.updateFilter();
+            };
+
             var updateSearchResultPointLayer = function() {
                 var pointSource = self.map().getSource('search-results-points');
                 var agg = ko.unwrap(self.searchAggregations);
