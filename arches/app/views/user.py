@@ -167,7 +167,7 @@ class UserManagerView(BaseManagerView):
                                 perm_map[subj].setdefault(typ, {})
                                 perm_map[subj][typ].setdefault(act, 0)
                                 perm_map[subj][typ][act] += 1
-                                if subj.startswith("g:"):
+                                if subj.startswith("dg:"):
                                     groupid = subj[2:]
                                     groups.add(groupid)
                                     data[str(user.pk)].setdefault(groupid, {"primary": False})
