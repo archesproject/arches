@@ -366,6 +366,140 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         """Hook for spotting permission updates on a group."""
         ...
 
+    def user_has_resource_model_permissions(self, user, perms, resource):
+        """
+        Checks if a user has any explicit permissions to a model's nodegroups
+
+        Arguments:
+        user -- the user to check
+        perms -- the permssion string eg: "read_nodegroup" or list of strings
+        resource -- a resource instance to check if a user has permissions to that resource's type specifically
+
+        """
+
+        nodegroups = self.get_nodegroups_by_perm(user, perms)
+        nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=resource.graph_id).select_related("graph")
+        return nodes.exists()
+
+
+    def user_can_read_resource(self, user, resourceid=None):
+        """
+        Requires that a user be able to read an instance and read a single nodegroup of a resource
+
+        """
+        if user.is_authenticated:
+            if user.is_superuser:
+                return True
+            if resourceid not in [None, ""]:
+                result = self.check_resource_instance_permissions(user, resourceid, "view_resourceinstance")
+                if result is not None:
+                    if result["permitted"] == "unknown":
+                        return self.user_has_resource_model_permissions(user, ["models.read_nodegroup"], result["resource"])
+                    else:
+                        return result["permitted"]
+                else:
+                    return None
+
+            return len(self.get_resource_types_by_perm(user, ["models.read_nodegroup"])) > 0
+        return False
+
+    def get_resource_types_by_perm(self, user, perms):
+        graphs = set()
+        nodegroups = self.get_nodegroups_by_perm(user, perms)
+        for node in Node.objects.filter(nodegroup__in=nodegroups).prefetch_related("graph"):
+            if node.graph.isresource and str(node.graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+                graphs.add(node.graph)
+        return list(graphs)
+
+
+    def user_can_edit_resource(self, user, resourceid=None):
+        """
+        Requires that a user be able to edit an instance and delete a single nodegroup of a resource
+
+        """
+        if user.is_authenticated:
+            if user.is_superuser:
+                return True
+            if resourceid not in [None, ""]:
+                result = self.check_resource_instance_permissions(user, resourceid, "change_resourceinstance")
+                if result is not None:
+                    if result["permitted"] == "unknown":
+                        return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or self.user_can_edit_model_nodegroups(
+                            user, result["resource"]
+                        )
+                    else:
+                        return result["permitted"]
+                else:
+                    return None
+
+            return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or len(self.get_editable_resource_types(user)) > 0
+        return False
+
+
+    def user_can_delete_resource(self, user, resourceid=None):
+        """
+        Requires that a user be permitted to delete an instance
+
+        """
+        if user.is_authenticated:
+            if user.is_superuser:
+                return True
+            if resourceid not in [None, ""]:
+                result = self.check_resource_instance_permissions(user, resourceid, "delete_resourceinstance")
+                if result is not None:
+                    if result["permitted"] == "unknown":
+                        nodegroups = self.get_nodegroups_by_perm(user, "models.delete_nodegroup")
+                        tiles = TileModel.objects.filter(resourceinstance_id=resourceid)
+                        protected_tiles = {str(tile.nodegroup_id) for tile in tiles} - set(nodegroups)
+                        if len(protected_tiles) > 0:
+                            return False
+                        return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or self.user_can_delete_model_nodegroups(
+                            user, result["resource"]
+                        )
+                    else:
+                        return result["permitted"]
+                else:
+                    return None
+        return False
+
+
+    def user_can_read_concepts(self, user):
+        """
+        Requires that a user is a part of the RDM Administrator group
+
+        """
+
+        if user.is_authenticated:
+            return user.groups.filter(name="RDM Administrator").exists()
+        return False
+
+
+    def user_is_resource_editor(self, user):
+        """
+        Single test for whether a user is in the Resource Editor group
+        """
+
+        return user.groups.filter(name="Resource Editor").exists()
+
+
+    def user_is_resource_reviewer(self, user):
+        """
+        Single test for whether a user is in the Resource Reviewer group
+        """
+
+        return user.groups.filter(name="Resource Reviewer").exists()
+
+
+    def user_is_resource_exporter(self, user):
+        """
+        Single test for whether a user is in the Resource Exporter group
+        """
+
+        return user.groups.filter(name="Resource Exporter").exists()
+
+    def user_in_group_by_name(self, user, names):
+        return bool(user.groups.filter(name__in=names))
+
 
 
 class PermissionBackend(ObjectPermissionBackend):
