@@ -36,24 +36,8 @@ class MapFilter(BaseSearchFilter):
                 feature_properties = {}
                 if "properties" in spatial_filter["features"][0]:
                     feature_properties = spatial_filter["features"][0]["properties"]
-                buffer = {"width": 0, "unit": "ft"}
-                if "buffer" in feature_properties:
-                    buffer = feature_properties["buffer"]
-                search_buffer = _buffer(feature_geom, buffer["width"], buffer["unit"])
-                feature_geom = JSONDeserializer().deserialize(search_buffer.geojson)
-                geoshape = GeoShape(
-                    field="geometries.geom.features.geometry", type=feature_geom["type"], coordinates=feature_geom["coordinates"]
-                )
 
-                invert_spatial_search = False
-                if "inverted" in feature_properties:
-                    invert_spatial_search = feature_properties["inverted"]
-
-                spatial_query = Bool()
-                if invert_spatial_search is True:
-                    spatial_query.must_not(geoshape)
-                else:
-                    spatial_query.filter(geoshape)
+                spatial_query = create_geoshape_query(feature_geom, feature_properties)
 
                 # get the nodegroup_ids that the user has permission to search
                 spatial_query.filter(Terms(field="geometries.nodegroup_id", terms=permitted_nodegroups))
