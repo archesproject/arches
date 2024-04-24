@@ -207,6 +207,12 @@ class Resource(models.ResourceInstance):
         edit.edittype = edit_type
         edit.save()
 
+    def foo(self, bar):
+        if bar == 1:
+            return 'foo'
+        else:
+            return 'bar'
+
     def save(self, *args, **kwargs):
         """
         Saves and indexes a single resource
