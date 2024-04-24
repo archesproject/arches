@@ -293,6 +293,7 @@ define([
                 }
                 self.searchGeometries(currentSearchGeoms);
                 self.updateFilter();
+                self.draw.changeMode('static');
             };
 
             var updateSearchResultPointLayer = function() {
