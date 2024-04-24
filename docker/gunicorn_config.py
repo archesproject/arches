@@ -157,8 +157,37 @@ tmp_upload_dir = get_optional_env_variable("GUNICORN_TMP_UPLOAD_DIR") or None
 errorlog = get_optional_env_variable("GUNICORN_ERRORLOG") or "-"
 loglevel = get_optional_env_variable("GUNICORN_LOGLEVEL") or "info"
 accesslog = get_optional_env_variable("GUNICORN_ACCESSLOG") or "-"
+disable_redirect_access_to_syslog = True
 access_log_format = get_optional_env_variable("GUNICORN_ACCESS_LOG_FORMAT") or '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
+capture_output = True
+enable_stdio_inheritance = True
 
+logconfig_dict = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'loggers': {
+        'gunicorn.access': {
+            'handlers': ['console'],
+            'level': loglevel.upper(),
+            'propagate': False
+        },
+        'gunicorn.error': {
+            'handlers': ['console'],
+            'level': loglevel.upper(),
+            'propagate': False
+        },
+        'django': {
+            'handlers': ['console'],
+            'level': loglevel.upper(),
+            'propagate': True
+        },
+        'arches': {
+            'handlers': ['console'],
+            'level': loglevel.upper(),
+            'propagate': False
+        },
+    }
+}
 #
 # Process naming
 #
