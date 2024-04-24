@@ -31,7 +31,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template, render_to_string
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max
-from django.db.models.signals import post_delete, pre_save, post_save
+from django.db.models.signals import post_delete, pre_save, post_save, m2m_changed
 from django.dispatch import receiver
 from django.utils import translation
 from django.utils.translation import gettext as _
@@ -1535,6 +1535,27 @@ def create_permissions_for_new_users(sender, instance, created, **kwargs):
 
     if created:
         process_new_user(instance, created)
+
+@receiver(m2m_changed, sender=User.groups.through)
+def update_groups_for_user(sender, instance, action, **kwargs):
+    from arches.app.utils.permission_backend import update_groups_for_user
+
+    if action in ("post_add", "post_remove"):
+        update_groups_for_user(instance)
+
+@receiver(m2m_changed, sender=User.user_permissions.through)
+def update_permissions_for_user(sender, instance, action, **kwargs):
+    from arches.app.utils.permission_backend import update_permissions_for_user
+
+    if action in ("post_add", "post_remove"):
+        update_permissions_for_user(instance)
+
+@receiver(m2m_changed, sender=Group.permissions.through)
+def update_permissions_for_group(sender, instance, action, **kwargs):
+    from arches.app.utils.permission_backend import update_permissions_for_group
+
+    if action in ("post_add", "post_remove"):
+        update_permissions_for_group(instance)
 
 @receiver(post_save, sender=UserXNotification)
 def send_email_on_save(sender, instance, **kwargs):
