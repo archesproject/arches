@@ -1,6 +1,11 @@
 from arches.app.permissions.arches_standard import ArchesStandardPermissionFramework
+from arches.app.search.components.resource_type_filter import get_permitted_graphids
 
 class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
+    def get_sets_for_user(self, user, perm):
+        # We do not do set filtering - None is allow-all for sets.
+        return None if user and user.username != "anonymous" else set()
+
     def check_resource_instance_permissions(self, user, resourceid, permission):
         result = super().check_resource_instance_permissions(user, resourceid, permission)
 
@@ -22,7 +27,7 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
                     group_permissions = get_group_perms(user, resource)
 
                     # This should correspond to the exact case we wish to flip.
-                    if permission in group_permissions and len(group_permissions) > 1:
+                    if permission in group_permissions:
                         result["permitted"] = True
 
         return result

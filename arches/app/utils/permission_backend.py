@@ -50,25 +50,6 @@ def get_createable_resource_types(user):
         return []
 
 
-def get_resource_types_by_perm(user, perms):
-    """
-    returns a list of graphs for which a user has specific nodegroup permissions
-
-    Arguments:
-    user -- the user to check
-    perms -- the permssion string eg: "read_nodegroup" or list of strings
-    resource -- a resource instance to check if a user has permissions to that resource's type specifically
-
-    """
-
-    graphs = set()
-    nodegroups = get_nodegroups_by_perm(user, perms)
-    for node in Node.objects.filter(nodegroup__in=nodegroups).prefetch_related("graph"):
-        if node.graph.isresource and str(node.graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
-            graphs.add(node.graph)
-    return list(graphs)
-
-
 def user_can_edit_model_nodegroups(user, resource):
     """
     returns a list of graphs of which a user can edit resource instances
@@ -94,131 +75,6 @@ def user_can_delete_model_nodegroups(user, resource):
 
     return user_has_resource_model_permissions(user, ["models.delete_nodegroup"], resource)
 
-
-def user_has_resource_model_permissions(user, perms, resource):
-    """
-    Checks if a user has any explicit permissions to a model's nodegroups
-
-    Arguments:
-    user -- the user to check
-    perms -- the permssion string eg: "read_nodegroup" or list of strings
-    resource -- a resource instance to check if a user has permissions to that resource's type specifically
-
-    """
-
-    nodegroups = get_nodegroups_by_perm(user, perms)
-    nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=resource.graph_id).select_related("graph")
-    return nodes.exists()
-
-
-def user_can_read_resource(user, resourceid=None):
-    """
-    Requires that a user be able to read an instance and read a single nodegroup of a resource
-
-    """
-    if user.is_authenticated:
-        if user.is_superuser:
-            return True
-        if resourceid not in [None, ""]:
-            result = check_resource_instance_permissions(user, resourceid, "view_resourceinstance")
-            if result is not None:
-                if result["permitted"] == "unknown":
-                    return user_has_resource_model_permissions(user, ["models.read_nodegroup"], result["resource"])
-                else:
-                    return result["permitted"]
-            else:
-                return None
-
-        return len(get_resource_types_by_perm(user, ["models.read_nodegroup"])) > 0
-    return False
-
-
-def user_can_edit_resource(user, resourceid=None):
-    """
-    Requires that a user be able to edit an instance and delete a single nodegroup of a resource
-
-    """
-    if user.is_authenticated:
-        if user.is_superuser:
-            return True
-        if resourceid not in [None, ""]:
-            result = check_resource_instance_permissions(user, resourceid, "change_resourceinstance")
-            if result is not None:
-                if result["permitted"] == "unknown":
-                    return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or user_can_edit_model_nodegroups(
-                        user, result["resource"]
-                    )
-                else:
-                    return result["permitted"]
-            else:
-                return None
-
-        return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or len(get_editable_resource_types(user)) > 0
-    return False
-
-
-def user_can_delete_resource(user, resourceid=None):
-    """
-    Requires that a user be permitted to delete an instance
-
-    """
-    if user.is_authenticated:
-        if user.is_superuser:
-            return True
-        if resourceid not in [None, ""]:
-            result = check_resource_instance_permissions(user, resourceid, "delete_resourceinstance")
-            if result is not None:
-                if result["permitted"] == "unknown":
-                    nodegroups = get_nodegroups_by_perm(user, "models.delete_nodegroup")
-                    tiles = TileModel.objects.filter(resourceinstance_id=resourceid)
-                    protected_tiles = {str(tile.nodegroup_id) for tile in tiles} - {str(nodegroup.nodegroupid) for nodegroup in nodegroups}
-                    if len(protected_tiles) > 0:
-                        return False
-                    return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or user_can_delete_model_nodegroups(
-                        user, result["resource"]
-                    )
-                else:
-                    return result["permitted"]
-            else:
-                return None
-    return False
-
-
-def user_can_read_concepts(user):
-    """
-    Requires that a user is a part of the RDM Administrator group
-
-    """
-
-    if user.is_authenticated:
-        return user.groups.filter(name="RDM Administrator").exists()
-    return False
-
-
-def user_is_resource_editor(user):
-    """
-    Single test for whether a user is in the Resource Editor group
-    """
-
-    return user.groups.filter(name="Resource Editor").exists()
-
-
-def user_is_resource_reviewer(user):
-    """
-    Single test for whether a user is in the Resource Reviewer group
-    """
-
-    return user.groups.filter(name="Resource Reviewer").exists()
-
-
-def user_is_resource_exporter(user):
-    """
-    Single test for whether a user is in the Resource Exporter group
-    """
-
-    return user.groups.filter(name="Resource Exporter").exists()
-
-
 def user_created_transaction(user, transactionid):
     if user.is_authenticated:
         if user.is_superuser:
@@ -229,6 +85,7 @@ def user_created_transaction(user, transactionid):
         else:
             return True
     return False
+
 
 class PermissionFramework(metaclass=ABCMeta):
     @abstractmethod
@@ -281,6 +138,46 @@ class PermissionFramework(metaclass=ABCMeta):
 
     @abstractmethod
     def process_new_user(self, instance, created):
+        ...
+
+    @abstractmethod
+    def user_has_resource_model_permissions(self, user, perms, resource):
+        ...
+
+    @abstractmethod
+    def user_can_read_resource(self, user, resourceid=None):
+        ...
+
+    @abstractmethod
+    def user_can_edit_resource(self, user, resourceid=None):
+        ...
+
+    @abstractmethod
+    def user_can_delete_resource(self, user, resourceid=None):
+        ...
+
+    @abstractmethod
+    def user_can_read_concepts(self, user):
+        ...
+
+    @abstractmethod
+    def user_is_resource_editor(self, user):
+        ...
+
+    @abstractmethod
+    def user_is_resource_reviewer(self, user):
+        ...
+
+    @abstractmethod
+    def user_is_resource_exporter(self, user):
+        ...
+
+    @abstractmethod
+    def get_resource_types_by_perm(self, user, perms):
+        ...
+
+    @abstractmethod
+    def user_in_group_by_name(self, user, names):
         ...
 
 _PERMISSION_FRAMEWORK = None
@@ -364,3 +261,33 @@ def update_permissions_for_user(instance):
 
 def update_permissions_for_group(instance):
     return _get_permission_framework().update_permissions_for_group(instance)
+
+def user_has_resource_model_permissions(user, perms, resource):
+    return _get_permission_framework().user_has_resource_model_permissions(user, perms, resource)
+
+def user_can_read_resource(user, resourceid=None):
+    return _get_permission_framework().user_can_read_resource(user, resourceid=resourceid)
+
+def user_can_edit_resource(user, resourceid=None):
+    return _get_permission_framework().user_can_edit_resource(user, resourceid=resourceid)
+
+def user_can_delete_resource(user, resourceid=None):
+    return _get_permission_framework().user_can_delete_resource(user, resourceid=resourceid)
+
+def user_can_read_concepts(user):
+    return _get_permission_framework().user_can_read_concepts(user)
+
+def user_is_resource_editor(user):
+    return _get_permission_framework().user_is_resource_editor(user)
+
+def user_is_resource_reviewer(user):
+    return _get_permission_framework().user_is_resource_reviewer(user)
+
+def user_is_resource_exporter(user):
+    return _get_permission_framework().user_is_resource_exporter(user)
+
+def get_resource_types_by_perm(user, perms):
+    return _get_permission_framework().get_resource_types_by_perm(user, perms)
+
+def user_in_group_by_name(user, names):
+    return _get_permission_framework().user_in_group_by_name(user, names)
