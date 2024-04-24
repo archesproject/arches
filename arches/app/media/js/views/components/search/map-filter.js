@@ -274,7 +274,7 @@ define([
                 }
             }, this);
 
-            this.filterByFeatureGeom = function(geoms) {
+            this.filterByFeatureGeom = function(resourceid, geoms) {
                 let feature;
                 if (geoms.length) {
                     for (let i = 0; i < geoms.length; i++) {
