@@ -554,7 +554,7 @@ class ControlledListItemImageView(View):
             value=uploaded_file,
         )
         img.save()
-        return JSONResponse(status=201)
+        return JSONResponse(serialize(img), status=201)
 
     def post(self, request, **kwargs):
         if not (image_id := kwargs.get("id", None)):

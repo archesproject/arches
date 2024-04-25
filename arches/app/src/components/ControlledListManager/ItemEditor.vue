@@ -19,7 +19,7 @@ import {
 } from "@/components/ControlledListManager/const.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
-import type { FileUploadBeforeSendEvent } from "primevue/fileupload";
+import type { FileUploadBeforeSendEvent, FileUploadUploadEvent } from "primevue/fileupload";
 import type { ControlledListItem, Label, NewLabel } from "@/types/ControlledListManager";
 
 const { displayedRow: item } = inject(displayedRowKey);
@@ -54,6 +54,14 @@ const iconLabel = (item: ControlledListItem) => {
 const addHeader = (event: FileUploadBeforeSendEvent) => {
     event.xhr.setRequestHeader("X-CSRFToken", Cookies.get("csrftoken"));
     event.formData.set("item_id", item.value.id);
+};
+
+const onUpload = (event: FileUploadUploadEvent) => {
+    if (event.xhr.status !== 201) {
+        return;
+    }
+    const newImage = JSON.parse(event.xhr.responseText);
+    item.value.images.push(newImage);
 };
 </script>
 
@@ -121,6 +129,7 @@ const addHeader = (event: FileUploadBeforeSendEvent) => {
             :with-credentials="true"
             name="item_image"
             @before-send="addHeader($event)"
+            @upload="onUpload($event)"
         />
     </div>
 </template>
