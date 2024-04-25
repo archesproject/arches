@@ -843,7 +843,7 @@ class ResourceXResource(models.Model):
     def delete(self, *args, **kwargs):
         # update the resource-instance tile by removing any references to a deleted resource
         deletedResourceId = kwargs.pop("deletedResourceId", None)
-        if deletedResourceId and self.tileid and self.nodeid:
+        if deletedResourceId and self.tileid and self.nodeid and 'resource-instance' in self.nodeid.datatype:
             newTileData = []
             data = self.tileid.data[str(self.nodeid_id)]
             if not isinstance(data, list):
