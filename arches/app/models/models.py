@@ -1391,19 +1391,19 @@ class UserProfile(models.Model):
     def viewable_nodegroups(self):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
-        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ["models.read_nodegroup"], any_perm=True))
+        return set(str(nodegroup_pk) for nodegroup_pk in get_nodegroups_by_perm(self.user, ["models.read_nodegroup"], any_perm=True))
 
     @property
     def editable_nodegroups(self):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
-        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ["models.write_nodegroup"], any_perm=True))
+        return set(str(nodegroup_pk) for nodegroup_pk in get_nodegroups_by_perm(self.user, ["models.write_nodegroup"], any_perm=True))
 
     @property
     def deletable_nodegroups(self):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
-        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ["models.delete_nodegroup"], any_perm=True))
+        return set(str(nodegroup_pk) for nodegroup_pk in get_nodegroups_by_perm(self.user, ["models.delete_nodegroup"], any_perm=True))
 
     class Meta:
         managed = True
