@@ -41,7 +41,7 @@ def merge_differently_cased_language_codes(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9191_string_nonlocalized"),
+        ("models", "10709_refresh_geos_by_transaction"),
     ]
 
     operations = [
