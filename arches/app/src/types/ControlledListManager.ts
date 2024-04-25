@@ -21,6 +21,7 @@ export type ControlledListItemImageMetadata = {
     controlled_list_image_id: string,
     language_id: string,
     metadata_type: string,
+    metadata_label: string,
 };
 
 export type ControlledListItemImage = {

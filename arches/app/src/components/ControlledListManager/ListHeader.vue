@@ -18,11 +18,13 @@ const heading = computed(() => {
         return $gettext(
             "List Editor > %{listName}",
             { listName: displayedRow.value.name },
+            true, // disable HTML escaping: RDM Admins are trusted users
         );
     }
     return $gettext(
         "Item Editor > %{bestLabel}",
         { bestLabel: bestLabel(displayedRow.value, selectedLanguage.value.code).value },
+        true, // disable HTML escaping: RDM Admins are trusted users
     );
 });
 </script>

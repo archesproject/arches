@@ -104,6 +104,12 @@ const addHeader = (event: FileUploadBeforeSendEvent) => {
                 :alt="image.metadata[0]?.alt"
                 width="200"
             >
+            <span
+                v-if="!item.images.length"
+                :style="{ fontSize: 'small'}"
+            >
+                {{ $gettext("No images.") }}
+            </span>
         </div>
         <FileUpload
             accept="image/*"

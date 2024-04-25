@@ -140,9 +140,13 @@ def serialize(obj, depth_map=None, flat=False):
                 ]
             }
         case ControlledListItemImageMetadata():
+            choices = ControlledListItemImageMetadata.MetadataChoices
             return {
                 field: str(value)
                 for (field, value) in vars(obj).items() if not field.startswith("_")
+            } | {
+                # Get localized label for metadata type
+                "metadata_label": str(choices(obj.metadata_type).label)
             }
 
 

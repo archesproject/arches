@@ -133,7 +133,7 @@ const languageName = (code: string) => {
             <Column
                 field="language_id"
                 :header="$gettext('Language')"
-                style="width: 10%; min-width: 8rem; height: 4rem;"
+                style="width: 10%; min-width: 8rem; height: 4rem; padding-left: 1rem;"
             >
                 <template #editor="{ data, field }">
                     <Dropdown

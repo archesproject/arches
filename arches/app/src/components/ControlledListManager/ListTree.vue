@@ -255,11 +255,12 @@ const setParent = async (parentNode: typeof TreeNode) => {
                     v-if="movingItem.key"
                     class="actions"
                 >
+                    <!-- disable HTML escaping: RDM Admins are trusted users -->
                     <Button
                         v-if="showMoveHereButton(slotProps.node.key)"
                         type="button"
                         class="move-button"
-                        :label="$gettext('Move %{item} here', { item: movingItem.label })"
+                        :label="$gettext('Move %{item} here', { item: movingItem.label }, true)"
                         @click="setParent(slotProps.node)"
                     />
                 </div>

@@ -254,7 +254,8 @@ await fetchLists();
         v-if="movingItem.key"
         class="action-banner"
     >
-        {{ $gettext("Selecting new parent for: %{item}", { item: movingItem.label }) }}
+        <!-- disable HTML escaping: RDM Admins are trusted users -->
+        {{ $gettext("Selecting new parent for: %{item}", { item: movingItem.label }, true) }}
         <Button
             type="button"
             class="banner-button"

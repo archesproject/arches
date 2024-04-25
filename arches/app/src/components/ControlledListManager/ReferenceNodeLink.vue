@@ -24,7 +24,7 @@ const { $gettext } = useGettext();
                 class="fa fa-reply"
                 aria-hidden="true"
             />
-            {{ $gettext("Edit node") }}
+            {{ $gettext("Edit graph") }}
         </a>
     </span>
 </template>
