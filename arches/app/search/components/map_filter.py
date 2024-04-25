@@ -37,19 +37,8 @@ class MapFilter(BaseSearchFilter):
                 if "properties" in spatial_filter["features"][0]:
                     feature_properties = spatial_filter["features"][0]["properties"]
 
-                spatial_query = create_geoshape_query(feature_geom, feature_properties)
+                add_geoshape_query_to_search_query(feature_geom, feature_properties, permitted_nodegroups, include_provisional, search_query)
 
-                # get the nodegroup_ids that the user has permission to search
-                spatial_query.filter(Terms(field="geometries.nodegroup_id", terms=permitted_nodegroups))
-
-                if include_provisional is False:
-                    spatial_query.filter(Terms(field="geometries.provisional", terms=["false"]))
-
-                elif include_provisional == "only provisional":
-                    spatial_query.filter(Terms(field="geometries.provisional", terms=["true"]))
-
-                search_query.filter(Nested(path="geometries", query=spatial_query))
-    
         elif "featureid" in spatial_filter and "resourceid" in spatial_filter:
             se = SearchEngineFactory().create()
             main_query = Query(se)
@@ -75,15 +64,7 @@ class MapFilter(BaseSearchFilter):
                 geometries.extend(hit['_source']['geometries'][0]['geom']['features'])
 
             feature_geom = geometries[0]["geometry"]
-            spatial_query = create_geoshape_query(feature_geom, spatial_filter)
-            spatial_query.filter(Terms(field="geometries.nodegroup_id", terms=permitted_nodegroups))
-
-            if include_provisional is False:
-                spatial_query.filter(Terms(field="geometries.provisional", terms=["false"]))
-            elif include_provisional == "only provisional":
-                spatial_query.filter(Terms(field="geometries.provisional", terms=["true"]))
-
-            search_query.filter(Nested(path="geometries", query=spatial_query))
+            add_geoshape_query_to_search_query(feature_geom, spatial_filter, permitted_nodegroups, include_provisional, search_query)
 
         search_results_object["query"].add_query(search_query)
 
@@ -120,7 +101,7 @@ def _buffer(geojson, width=0, unit="ft"):
             geom = GEOSGeometry(res[0], srid=4326)
     return geom
 
-def create_geoshape_query(feature_geom, feature_properties={}):
+def add_geoshape_query_to_search_query(feature_geom, feature_properties, permitted_nodegroups, include_provisional, search_query):
 
     buffer = {"width": 0, "unit": "ft"}
     if "buffer" in feature_properties:
