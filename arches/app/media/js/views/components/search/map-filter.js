@@ -282,15 +282,21 @@ define([
                     if (feature.geometry.type == 'Point') { self.buffer(100); }
                 }
                 if (!feature) { return; }
-                self.searchGeometryFeature({
-                    "featureid":feature.id,
-                    "resourceid":resourceid,
-                    "buffer": {
-                        "width": this.buffer(),
-                        "unit": this.bufferUnit()
-                    },
-                    "inverted": false
-                });
+                if (resourceid) {
+                    self.searchGeometryFeature({
+                        "featureid":feature.id,
+                        "resourceid":resourceid,
+                        "buffer": {
+                            "width": this.buffer(),
+                            "unit": this.bufferUnit()
+                        },
+                        "inverted": this.filter.inverted()
+                    });
+                } else {
+                    const tolerance = 0.1; // Degree of Simplification: Lower numbers are less simplified, preserving more detail
+                    const highQuality = true; // Set to true for a slower but higher quality simplification
+                    turf.simplify(feature.geometry, {tolerance: tolerance, highQuality: highQuality, mutate: true});
+                }
                 let currentSearchGeoms = self.searchGeometries();
                 this.draw.set({
                     "type": "FeatureCollection",
