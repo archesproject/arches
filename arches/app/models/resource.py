@@ -230,7 +230,13 @@ class Resource(models.ResourceInstance):
         super(Resource, self).save(*args, **kwargs)
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
 
+        sortorder = {}
         for tile in self.tiles:
+            try:
+                sortorder[tile.nodegroup_id] += 1
+            except:
+                sortorder[tile.nodegroup_id] = 0
+            tile.sortorder = sortorder[tile.nodegroup_id]
             tile.resourceinstance_id = self.resourceinstanceid
             tile.save(request=request, index=False, resource_creation=True, transaction_id=transaction_id, context=context)
         if request is None:
