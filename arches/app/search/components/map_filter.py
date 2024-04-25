@@ -141,4 +141,13 @@ def create_geoshape_query(feature_geom, feature_properties={}):
     else:
         spatial_query.filter(geoshape)
 
-    return spatial_query
+    # get the nodegroup_ids that the user has permission to search
+    spatial_query.filter(Terms(field="geometries.nodegroup_id", terms=permitted_nodegroups))
+
+    if include_provisional is False:
+        spatial_query.filter(Terms(field="geometries.provisional", terms=["false"]))
+
+    elif include_provisional == "only provisional":
+        spatial_query.filter(Terms(field="geometries.provisional", terms=["true"]))
+
+    search_query.filter(Nested(path="geometries", query=spatial_query))
