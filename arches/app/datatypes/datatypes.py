@@ -2665,18 +2665,18 @@ class ReferenceDataType(BaseDataType):
                 if "labels" in reference:
                     pref_label_languages = []
                     for label in reference["labels"]:
-                        if not all(key in label for key in ("id", "value", "language", "valuetype")):
+                        if not all(key in label for key in ("id", "value", "language_id", "valuetype_id")):
                             errors.append(
                                 {
                                     "type": "ERROR",
                                     "message": _(
-                                        "Reference labels require properties: id(uuid), value(string), language(e.g. 'en'), and valuetype(e.g. 'prefLabel')"
+                                        "Reference labels require properties: id(uuid), value(string), language_id(e.g. 'en'), and valuetype_id(e.g. 'prefLabel')"
                                     ),
                                     "title": title,
                                 }
                             )
-                        if label["valuetype"] == "prefLabel":
-                            pref_label_languages.append(label["language"])
+                        if label["valuetype_id"] == "prefLabel":
+                            pref_label_languages.append(label["language_id"])
                             
                     if len(set(pref_label_languages)) < len(pref_label_languages):
                         errors.append(
@@ -2709,7 +2709,7 @@ class ReferenceDataType(BaseDataType):
         current_language = requested_language or get_language()
         for item in self.get_tile_data(tile)[str(node.nodeid)]:
             for label in item["labels"]:
-                if label["language"] == current_language and label["valuetype"] == "prefLabel":
+                if label["language_id"] == current_language and label["valuetype_id"] == "prefLabel":
                     labels.append(label.get("value", ""))
         return ", ".join(labels)
 

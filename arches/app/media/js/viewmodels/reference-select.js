@@ -18,7 +18,9 @@ define([
         WidgetViewModel.apply(this, [params]);
 
         this.getPrefLabel = function(labels){
-            return koMapping.toJS(labels)?.find(label => label.language===arches.activeLanguage && label.valuetype === 'prefLabel')?.value || arches.translations.unlabeledItem;
+            return koMapping.toJS(labels)?.find(
+                label => label.language_id === arches.activeLanguage && label.valuetype_id === 'prefLabel'
+            )?.value || arches.translations.unlabeledItem;
         }; 
 
         this.displayValue = ko.computed(function() {
@@ -103,7 +105,7 @@ define([
 
                 if (item.uri) {
                     let text = self.getPrefLabel(item.labels) || arches.translations.searching + '...';
-                    NAME_LOOKUP[item.uri] = {"prefLabel": text, "labels": item.labels, "listid": item.listid};
+                    NAME_LOOKUP[item.uri] = {"prefLabel": text, "labels": item.labels, "listid": item.controlled_list_id};
                     text = indentation + text;
                     return text;
                 }

@@ -240,13 +240,13 @@ class ReferenceDataTypeTests(ArchesTestCase):
                     {
                         "id": "23b4efbd-2e46-4b3f-8d75-2f3b2bb96af2",
                         "value": "label",
-                        "language": "en",
-                        "valuetype": "prefLabel"
+                        "language_id": "en",
+                        "valuetype_id": "prefLabel"
                     },
                     {
                         "id": "e8676242-f0c7-4e3d-b031-fded4960cd86",
-                        "language": "de",
-                        "valuetype": "prefLabel"
+                        "language_id": "de",
+                        "valuetype_id": "prefLabel"
                     }
                     ]
                 }
@@ -255,13 +255,13 @@ class ReferenceDataTypeTests(ArchesTestCase):
         self.assertIsNotNone(errors)
 
         data["labels"][1]["value"] = "a label"
-        data["labels"][1]["language"] = "en"
+        data["labels"][1]["language_id"] = "en"
 
         errors = reference.validate(value=[data]) # too many prefLabels per language
         self.assertIsNotNone(errors)
 
         data["labels"][1]["value"] = "ein label"
-        data["labels"][1]["language"] = "de"       
+        data["labels"][1]["language_id"] = "de"       
 
         errors = reference.validate(value=[data]) # data should be valid
         self.assertTrue(len(errors) == 0)
@@ -277,8 +277,8 @@ class ReferenceDataTypeTests(ArchesTestCase):
                         {
                         "id": "23b4efbd-2e46-4b3f-8d75-2f3b2bb96af2",
                         "value": "label",
-                        "language": "en",
-                        "valuetype": "prefLabel"
+                        "language_id": "en",
+                        "valuetype_id": "prefLabel"
                         },
                     ],
                     "listid": "fd9508dc-2aab-4c46-85ae-dccce1200035"
