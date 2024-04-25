@@ -52,7 +52,9 @@ class BaseManagerView(TemplateView):
             if self.request.user.has_perm("view_plugin", plugin):
                 context["plugins"].append(plugin)
 
-        createable = get_createable_resource_types(self.request.user)
+        createable = list(
+            models.GraphModel.objects.filter(pk__in=list(get_createable_resource_types(self.request.user))).all()
+        )
         createable.sort(key=lambda x: x.name.lower())
         context["createable_resources"] = JSONSerializer().serialize(
             createable,

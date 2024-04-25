@@ -1051,7 +1051,7 @@ class IIIFAnnotations(APIBase):
         canvas = request.GET.get("canvas", None)
         resourceid = request.GET.get("resourceid", None)
         nodeid = request.GET.get("nodeid", None)
-        permitted_nodegroups = [nodegroup for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]
+        permitted_nodegroups = get_nodegroups_by_perm(request.user, "models.read_nodegroup")
         annotations = models.VwAnnotation.objects.filter(nodegroup__in=permitted_nodegroups)
         if canvas is not None:
             annotations = annotations.filter(canvas=canvas)
@@ -1086,7 +1086,7 @@ class IIIFAnnotations(APIBase):
 
 class IIIFAnnotationNodes(APIBase):
     def get(self, request, indent=None):
-        permitted_nodegroups = [nodegroup for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]
+        permitted_nodegroups = get_nodegroups_by_perm(request.user, "models.read_nodegroup")
         annotation_nodes = models.Node.objects.filter(nodegroup__in=permitted_nodegroups, datatype="annotation")
         return JSONResponse(
             [
@@ -1373,7 +1373,7 @@ class Tile(APIBase):
             return JSONResponse(str(e), status=404)
 
         # filter tiles from attribute query based on user permissions
-        permitted_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]
+        permitted_nodegroups = get_nodegroups_by_perm(request.user, "models.read_nodegroup")
         if str(tile.nodegroup_id) in permitted_nodegroups:
             return JSONResponse(tile, status=200)
         else:
@@ -1404,7 +1404,7 @@ class NodeGroup(APIBase):
 
         try:
             nodegroup = models.NodeGroup.objects.get(pk=params["nodegroupid"])
-            permitted_nodegroups = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(user, perms)]
+            permitted_nodegroups = get_nodegroups_by_perm(user, perms)
         except Exception as e:
             return JSONResponse(str(e), status=404)
 
@@ -1452,7 +1452,7 @@ class Node(APIBase):
         # try to get nodes by attribute filter and then get nodes by passed in user perms
         try:
             nodes = models.Node.objects.filter(**dict(params)).values()
-            permitted_nodegroups = [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, perms)]
+            permitted_nodegroups = get_nodegroups_by_perm(user, perms)
         except Exception as e:
             return JSONResponse(str(e), status=404)
 
