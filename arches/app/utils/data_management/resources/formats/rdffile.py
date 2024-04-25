@@ -21,7 +21,7 @@ from rdflib import URIRef, Literal
 from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS
 from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand, set_document_loader
-
+from datetime import datetime
 
 # Stop code from looking up the contexts online for every operation
 docCache = {}
@@ -291,6 +291,7 @@ class JsonLdReader(Reader):
         self.print_buf = []
         self.verbosity = kwargs.get("verbosity", 1)
         self.ignore_errors = kwargs.get("ignore_errors", False)
+        self.default_timezone = kwargs.get("default_timezone")
         self.logger = logging.getLogger(__name__)
         for graph in models.GraphModel.objects.filter(isresource=True):
             node = models.Node.objects.get(graph_id=graph.pk, istopnode=True)
@@ -650,6 +651,13 @@ class JsonLdReader(Reader):
                         else:
                             self.printline(f"Could not validate {values} as a {o['datatype']}", indent + 1)
                     else:
+                        if o["datatype"].datatype_name == 'date':
+                            try:
+                                datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+                                value = value + self.default_timezone
+                                vi['@value'] = value                         
+                            except:
+                                pass
                         if len(o["datatype"].validate_from_rdf(value)) == 0:
                             possible.append([o, value])
                         else:

@@ -82,6 +82,15 @@ class Command(BaseCommand):
             help="the name of the block in the model path to load (eg 00), or slice in the form this,total (eg 1,5)",
         )
 
+        parser.add_argument(
+            "-tz",
+            "--default-timezone",
+            default="",
+            action="store",
+            dest="default_timezone",
+            help="Sets the default timezone for data that does not contain a timezone.",
+        )
+
         parser.add_argument("--max", default=-1, type=int, action="store", dest="max", help="Maximum number of records to load per model")
 
         parser.add_argument("--fast", default=0, action="store", type=int, dest="fast", help="Use bulk_save to store n records at a time")
@@ -119,6 +128,8 @@ class Command(BaseCommand):
             print(f"Not loading records > {options['toobig']}kb")
         if options["quiet"]:
             print("Only announcing timing data")
+        if options["default_timezone"]:
+            print(f"Setting default timezone to: {options['default_timezone']}")
         if options["verbosity"] > 1:
             print("Logging detailed error information: set log level to DEBUG to view messages")
             print("Verbosity level 2 will log based on the application's LOGGING settings in settings.py")
@@ -137,7 +148,7 @@ class Command(BaseCommand):
 
     def load_resources(self, options):
 
-        self.reader = JsonLdReader(verbosity=options["verbosity"], ignore_errors=options["ignore_errors"])
+        self.reader = JsonLdReader(verbosity=options["verbosity"], ignore_errors=options["ignore_errors"], default_timezone=options["default_timezone"])
         self.jss = JSONSerializer()
         source = options["source"]
         if options["model"]:
