@@ -21,7 +21,6 @@ from rdflib import URIRef, Literal
 from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS
 from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand, set_document_loader
-from datetime import datetime
 
 # Stop code from looking up the contexts online for every operation
 docCache = {}
@@ -653,7 +652,7 @@ class JsonLdReader(Reader):
                     else:
                         if o["datatype"].datatype_name == 'date':
                             try:
-                                datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+                                datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
                                 value = value + self.default_timezone
                                 vi['@value'] = value                         
                             except:
