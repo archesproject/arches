@@ -207,6 +207,9 @@ class Resource(models.ResourceInstance):
         edit.edittype = edit_type
         edit.save()
 
+    def newTestMethodFor10738():
+        print("here we go!")
+
     def save(self, *args, **kwargs):
         """
         Saves and indexes a single resource
