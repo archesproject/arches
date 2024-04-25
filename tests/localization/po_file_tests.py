@@ -11,7 +11,7 @@ from arches.app.models.system_settings import settings
 from unittest.mock import Mock, MagicMock
 
 # these tests can be run from the command line via
-# python manage.py test tests/localization/po_file_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.localization.po_file_tests --settings="tests.test_settings"
 
 
 class PoFileTests(TestCase):

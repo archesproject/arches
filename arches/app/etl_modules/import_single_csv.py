@@ -91,7 +91,10 @@ class ImportSingleCsv(BaseImportModule):
                         default_storage.save(os.path.join(temp_dir, file.filename), File(zip_ref.open(file)))
                         if file.filename.endswith(".csv"):
                             csv_file_name = file.filename
-            csv_file_path = os.path.join(temp_dir, csv_file_name)
+            try:
+                csv_file_path = os.path.join(temp_dir, csv_file_name)
+            except (TypeError):
+                pass
 
         if csv_file_name is None:
             return {

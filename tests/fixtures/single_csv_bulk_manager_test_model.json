@@ -1,0 +1,273 @@
+{
+    "graph": [
+        {
+            "author": "Dev User",
+            "cards": [
+                {
+                    "active": true,
+                    "cardid": "0e0c3f03-0311-40ab-a735-7786c240eeae",
+                    "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
+                    "config": null,
+                    "constraints": [],
+                    "cssclass": null,
+                    "description": null,
+                    "graph_id": "1bc910b3-99dc-4a5c-8168-61c9e1975658",
+                    "helpenabled": false,
+                    "helptext": {
+                        "en": null
+                    },
+                    "helptitle": {
+                        "en": null
+                    },
+                    "instructions": {
+                        "en": null
+                    },
+                    "is_editable": true,
+                    "name": {
+                        "en": "name"
+                    },
+                    "nodegroup_id": "6e65abdc-ecfd-11ee-bdb7-0242ac120003",
+                    "sortorder": null,
+                    "visible": true
+                },
+                {
+                    "active": true,
+                    "cardid": "f5d2d782-81b5-462d-bc04-238b37d3ae85",
+                    "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
+                    "config": null,
+                    "constraints": [],
+                    "cssclass": null,
+                    "description": null,
+                    "graph_id": "1bc910b3-99dc-4a5c-8168-61c9e1975658",
+                    "helpenabled": false,
+                    "helptext": {
+                        "en": null
+                    },
+                    "helptitle": {
+                        "en": null
+                    },
+                    "instructions": {
+                        "en": null
+                    },
+                    "is_editable": true,
+                    "name": {
+                        "en": "geometry"
+                    },
+                    "nodegroup_id": "7a499d32-ecfd-11ee-8876-0242ac120003",
+                    "sortorder": null,
+                    "visible": true
+                }
+            ],
+            "cards_x_nodes_x_widgets": [
+                {
+                    "card_id": "0e0c3f03-0311-40ab-a735-7786c240eeae",
+                    "config": {
+                        "en": ""
+                    },
+                    "id": "8835fb73-b775-4c6d-9084-e12d6c0c67b4",
+                    "label": {
+                        "en": null
+                    },
+                    "node_id": "6e65abdc-ecfd-11ee-bdb7-0242ac120003",
+                    "sortorder": null,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000001"
+                },
+                {
+                    "card_id": "f5d2d782-81b5-462d-bc04-238b37d3ae85",
+                    "config": {
+                        "en": ""
+                    },
+                    "id": "b3857cb1-8489-41f3-bf55-8fb49970b098",
+                    "label": {
+                        "en": null
+                    },
+                    "node_id": "7a499d32-ecfd-11ee-8876-0242ac120003",
+                    "sortorder": null,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000007"
+                }
+            ],
+            "color": null,
+            "config": {},
+            "deploymentdate": null,
+            "deploymentfile": null,
+            "description": {
+                "en": ""
+            },
+            "edges": [
+                {
+                    "description": null,
+                    "domainnode_id": "3e52b660-ecfd-11ee-a218-0242ac120003",
+                    "edgeid": "68bdff7b-f1d1-4358-8c0b-08e6467a7a49",
+                    "graph_id": "1bc910b3-99dc-4a5c-8168-61c9e1975658",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "7a499d32-ecfd-11ee-8876-0242ac120003"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "3e52b660-ecfd-11ee-a218-0242ac120003",
+                    "edgeid": "d8bc6892-98d5-45ec-a19b-3441c0160b5c",
+                    "graph_id": "1bc910b3-99dc-4a5c-8168-61c9e1975658",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "6e65abdc-ecfd-11ee-bdb7-0242ac120003"
+                }
+            ],
+            "functions_x_graphs": [],
+            "graphid": "1bc910b3-99dc-4a5c-8168-61c9e1975658",
+            "iconclass": "",
+            "is_editable": true,
+            "isresource": true,
+            "jsonldcontext": null,
+            "name": {
+                "en": "single-csv-bulk-manager-test-model"
+            },
+            "nodegroups": [
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
+                    "nodegroupid": "6e65abdc-ecfd-11ee-bdb7-0242ac120003",
+                    "parentnodegroup_id": null
+                },
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
+                    "nodegroupid": "7a499d32-ecfd-11ee-8876-0242ac120003",
+                    "parentnodegroup_id": null
+                }
+            ],
+            "nodes": [
+                {
+                    "alias": null,
+                    "config": {
+                        "en": ""
+                    },
+                    "datatype": "semantic",
+                    "description": "",
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "1bc910b3-99dc-4a5c-8168-61c9e1975658",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": true,
+                    "name": "single-csv-bulk-manager-test-model",
+                    "nodegroup_id": null,
+                    "nodeid": "3e52b660-ecfd-11ee-a218-0242ac120003",
+                    "ontologyclass": null,
+                    "parentproperty": "",
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
+                },
+                {
+                    "alias": "name",
+                    "config": {
+                        "en": ""
+                    },
+                    "datatype": "string",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "1bc910b3-99dc-4a5c-8168-61c9e1975658",
+                    "hascustomalias": false,
+                    "is_collector": true,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "name",
+                    "nodegroup_id": "6e65abdc-ecfd-11ee-bdb7-0242ac120003",
+                    "nodeid": "6e65abdc-ecfd-11ee-bdb7-0242ac120003",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
+                },
+                {
+                    "alias": "geometry",
+                    "config": {
+                        "addToMap": false,
+                        "advancedStyle": "",
+                        "advancedStyling": false,
+                        "clusterDistance": 20,
+                        "clusterMaxZoom": 5,
+                        "clusterMinPoints": 3,
+                        "fillColor": "rgba(130, 130, 130, 0.5)",
+                        "haloRadius": 4,
+                        "haloWeight": 4,
+                        "layerActivated": true,
+                        "layerIcon": "",
+                        "layerLegend": "",
+                        "layerName": "",
+                        "lineColor": "rgba(130, 130, 130, 0.7)",
+                        "lineHaloColor": "rgba(200, 200, 200, 0.5)",
+                        "outlineColor": "rgba(200, 200, 200, 0.7)",
+                        "outlineWeight": 2,
+                        "pointColor": "rgba(130, 130, 130, 0.7)",
+                        "pointHaloColor": "rgba(200, 200, 200, 0.5)",
+                        "radius": 2,
+                        "simplification": 0.3,
+                        "weight": 2
+                    },
+                    "datatype": "geojson-feature-collection",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "1bc910b3-99dc-4a5c-8168-61c9e1975658",
+                    "hascustomalias": false,
+                    "is_collector": true,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "geometry",
+                    "nodegroup_id": "7a499d32-ecfd-11ee-8876-0242ac120003",
+                    "nodeid": "7a499d32-ecfd-11ee-8876-0242ac120003",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
+                }
+            ],
+            "ontology_id": null,
+            "publication": null,
+            "relatable_resource_model_ids": [],
+            "resource_2_resource_constraints": [],
+            "root": {
+                "alias": null,
+                "config": {
+                    "en": ""
+                },
+                "datatype": "semantic",
+                "description": "",
+                "exportable": false,
+                "fieldname": null,
+                "graph_id": "1bc910b3-99dc-4a5c-8168-61c9e1975658",
+                "hascustomalias": false,
+                "is_collector": false,
+                "isrequired": false,
+                "issearchable": true,
+                "istopnode": true,
+                "name": "single-csv-bulk-manager-test-model",
+                "nodegroup_id": null,
+                "nodeid": "3e52b660-ecfd-11ee-a218-0242ac120003",
+                "ontologyclass": null,
+                "sortorder": 0,
+                "sourcebranchpublication_id": null
+            },
+            "slug": null,
+            "subtitle": {
+                "en": ""
+            },
+            "template_id": "50000000-0000-0000-0000-000000000001",
+            "version": ""
+        }
+    ],
+    "metadata": {
+        "db": "PostgreSQL 14.5 (Debian 14.5-1.pgdg110+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 10.2.1-6) 10.2.1 20210110, 64-bit",
+        "git hash": "07833711b 2024-03-26 16:17:00 -0700",
+        "os": "Linux",
+        "os version": "6.5.11-linuxkit"
+    }
+}
