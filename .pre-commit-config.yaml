@@ -12,5 +12,6 @@ repos:
           - id: prettier
             name: prettier
             entry: arches/app/media/node_modules/.bin/prettier
-            args: [arches/app/src, --write, --ignore-unknown]
+            args: [--write, --ignore-unknown]
             language: system
+            exclude: ^arches/app/src
