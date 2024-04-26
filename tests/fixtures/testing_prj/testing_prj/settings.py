@@ -94,7 +94,7 @@ RESOURCE_IMPORT_LOG = os.path.join(APP_ROOT, "logs", "resource_import.log")
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {"console": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s"}}
+    "formatters": {"console": {"format": "%(asctime)s %(name)-12s %(levelname)-8s %(message)s"}},
     "handlers": {
         "file": {
             "level": "WARNING",  # DEBUG, INFO, WARNING, ERROR
