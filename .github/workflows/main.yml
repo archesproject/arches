@@ -58,7 +58,7 @@ jobs:
           rm yarn.lock
           yarn && yarn build_test
 
-      - name: Check formatting of frontend files
+      - name: Check formatting
         run: |
           yarn format --check --no-write
           black . --check --exclude=node_modules
