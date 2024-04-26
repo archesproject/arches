@@ -88,6 +88,9 @@
             'leaflet-draw': {
                 deps: ['leaflet']
             },
+            'slick': {
+                deps: ['jquery']
+            },
             'leaflet-fullscreen': {
                 deps: ['leaflet']
             }
@@ -230,8 +233,6 @@
         continue='{% trans "Continue" as continue %} "{{ continue|escapejs }}"'
         value='{% trans "Value" as value %} "{{ value|escapejs }}"'
         disabled='{% trans "Disabled" as disabled %} "{{ disabled|escapejs }}"'
-        disable-editing='{% trans "Disable Editing" as disableEditing %} "{{ disableEditing|escapejs }}"'
-        prevent-user-from-editing-value='{% trans "Prevent users from editing value" as preventUsersFromEditingValue %} "{{ preventUsersFromEditingValue|escapejs }}"'
         domain-options='{% trans "Domain options" as domainOptions %} "{{ domainOptions|escapejs }}"'
         add-new-option='{% trans "Add new option" as addNewOption %} "{{ addNewOption|escapejs }}"'
         remove-option='{% trans "Remove option" as removeOption %} "{{ removeOption|escapejs }}"'
@@ -326,6 +327,9 @@
         date-format='{% trans "Date Format" as dateFormat %} "{{ dateFormat|escapejs }}"'
         has-no-value='{% trans "Has no value" as hasNoValue %} "{{ hasNoValue|escapejs }}"'
         has-any-value='{% trans "Has any value" as hasAnyValue %} "{{ hasAnyValue|escapejs }}"'
+        has-any-list-value='{% trans "Has any value in list" as hasAnyListValue %} "{{ hasAnyListValue|escapejs }}"'
+        has-all-list-values='{% trans "Has all values in list" as hasAllListValues %} "{{ hasAllListValues|escapejs }}"'
+        has-no-list-values='{% trans "Has no values in list" as hasNoListValues %} "{{ hasNoListValues|escapejs }}"'
         default-value='{% trans "Default Value" as defaultValue %} "{{ defaultValue|escapejs }}"'
         format='{% trans "Format" as format %} "{{ format|escapejs }}"'
         view-valid-formats='{% trans "view valid formats" as viewValidFormats %} "{{ viewValidFormats|escapejs }}"'
@@ -523,7 +527,7 @@
         uploaded-files='{% trans "Uploaded Files" as uploadedFiles %} "{{ uploadedFiles|escapejs }}"'
         allowed-document-formats='{% trans "Allowed document formats:" as allowedDocumentFormats %} "{{ allowedDocumentFormats|escapejs }}"'
         max-file-size-warning='{% trans "You may upload as many documents as you wish, but the maximum size of any single file is" as maxFileSizeWarning %} "{{ maxFileSizeWarning|escapejs }}"'
-        max-photo-size-warning='{% trans "You may upload as many photos as you wish, but the maximum size of any single file is 8MB." as maxPhotoSizeWarning %} "{{ maxPhotoSizeWarning|escapejs }}"'
+        max-photo-size-warning='(maxFilesize) => {return {% trans "You may upload as many photos as you wish, but the maximum size of any single file is ${maxFilesize} MB." as maxPhotoSizeWarning %} `{{ maxPhotoSizeWarning|escapejs }}` }'
         adding-documents-optional='{% trans "Adding documents to this record is optional." as addingDocumentsOptional %} "{{ addingDocumentsOptional|escapejs }}"'
         adding-photos-optional='{% trans "Adding photos to this record is optional." as addingPhotosOptional %} "{{ addingPhotosOptional|escapejs }}"'
         select-files='{% trans "Select Files" as selectFiles %} "{{ selectFiles|escapejs }}"'
@@ -611,7 +615,7 @@
         provisional='{% trans "Provisional" as provisional %} "{{ provisional|escapejs }}"'
         card-name='{% trans "Card Name" as cardName %} "{{ cardName|escapejs }}"'
         add-tab='{% trans "Add Tab" as addTab %} "{{ addTab|escapejs }}"'
-        tab-name='{% trans "Tab Name" as tabName %} "{{ tabName|escapejs }}"' 
+        tab-name='{% trans "Tab Name" as tabName %} "{{ tabName|escapejs }}"'
         find-a-resource='{% trans "Find a resource..." as findAResource %} "{{ findAResource|escapejs }}"'
         find-an-icon='{% trans "Find an icon" as findAnIcon %} "{{ findAnIcon|escapejs }}"'
         select-tab-icon='{% trans "Select Tab icon" as selectTabIcon %} "{{ selectTabIcon|escapejs }}"'

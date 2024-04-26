@@ -27,7 +27,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.search.search_engine_factory import SearchEngineFactory
 
 # these tests can be run from the command line via
-# python manage.py test tests/importer/concept_import_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.importer.concept_import_tests --settings="tests.test_settings"
 
 
 class conceptImportTests(ArchesTestCase):

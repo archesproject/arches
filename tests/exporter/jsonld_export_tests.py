@@ -4,6 +4,7 @@ import os
 
 from django.core import management
 from django.test.client import RequestFactory, Client
+from django.test.utils import captured_stdout
 from django.urls import reverse
 from tests.base_test import ArchesTestCase
 
@@ -14,7 +15,7 @@ from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.utils.skos import SKOSReader
 
 # these tests can be run from the command line via
-# python manage.py test tests/exporter/jsonld_export_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.exporter.jsonld_export_tests --settings="tests.test_settings"
 
 class JsonLDExportTests(ArchesTestCase):
     @classmethod
@@ -43,36 +44,44 @@ class JsonLDExportTests(ArchesTestCase):
         with open(os.path.join('tests/fixtures/jsonld_base/models/test_1_basic_object.json'), 'r') as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile['graph'])
-        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_1_instance.json').import_business_data()
+        with captured_stdout():
+            BusinessDataImporter('tests/fixtures/jsonld_base/data/test_1_instance.json').import_business_data()
 
         with open(os.path.join('tests/fixtures/jsonld_base/models/test_2_complex_object.json'), 'r') as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2['graph'])
-        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_2_instances.json').import_business_data()  
+        with captured_stdout():
+            BusinessDataImporter('tests/fixtures/jsonld_base/data/test_2_instances.json').import_business_data()
 
         with open(os.path.join('tests/fixtures/jsonld_base/models/5136_res_inst_plus_res_inst.json'), 'r') as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2['graph'])
-        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_3_instances.json').import_business_data()  
+        with captured_stdout():
+            BusinessDataImporter('tests/fixtures/jsonld_base/data/test_3_instances.json').import_business_data()
 
         with open(os.path.join('tests/fixtures/jsonld_base/models/nesting_test.json'), 'r') as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2['graph'])
-        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_nest_instances.json').import_business_data()  
+        with captured_stdout():
+            BusinessDataImporter('tests/fixtures/jsonld_base/data/test_nest_instances.json').import_business_data()
 
         with open(os.path.join('tests/fixtures/jsonld_base/models/4564-person.json'), 'r') as f:
             archesfile2 = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile2['graph'])        
+        with captured_stdout():
+            ResourceGraphImporter(archesfile2['graph'])
 
         with open(os.path.join('tests/fixtures/jsonld_base/models/4564-group.json'), 'r') as f:
             archesfile2 = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile2['graph']) 
+        with captured_stdout():
+            ResourceGraphImporter(archesfile2['graph'])
 
         with open(os.path.join('tests/fixtures/jsonld_base/models/4564-referenced.json'), 'r') as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2['graph']) 
-        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_4564_group.json').import_business_data()
-        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_4564_reference.json').import_business_data()
+        with captured_stdout():
+            BusinessDataImporter('tests/fixtures/jsonld_base/data/test_4564_group.json').import_business_data()
+        with captured_stdout():
+            BusinessDataImporter('tests/fixtures/jsonld_base/data/test_4564_reference.json').import_business_data()
 
         management.call_command('datatype', 'register', source='tests/fixtures/datatypes/color.py')
         management.call_command('datatype', 'register', source='tests/fixtures/datatypes/semantic_like.py')
@@ -80,22 +89,14 @@ class JsonLDExportTests(ArchesTestCase):
         with open(os.path.join('tests/fixtures/jsonld_base/models/5299-basic.json'), 'r') as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2['graph']) 
-        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_5299_instances.json').import_business_data()        
+        with captured_stdout():
+            BusinessDataImporter('tests/fixtures/jsonld_base/data/test_5299_instances.json').import_business_data()
 
         with open(os.path.join('tests/fixtures/jsonld_base/models/5299_complex.json'), 'r') as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2['graph']) 
-        BusinessDataImporter('tests/fixtures/jsonld_base/data/test_5299_complex.json').import_business_data()       
-
-
-    def setUp(self):
-        # This runs every test
-        #response = self.client.post(reverse('get_token'), {'username': 'admin', 'password': 'admin'})
-        #self.token = response.content
-        pass
-
-    def tearDown(self):
-        pass
+        with captured_stdout():
+            BusinessDataImporter('tests/fixtures/jsonld_base/data/test_5299_complex.json').import_business_data()
 
     def _create_url(self, resource_id):
         base_url = reverse("resources", kwargs={"resourceid": resource_id})
@@ -106,8 +107,9 @@ class JsonLDExportTests(ArchesTestCase):
         # this 'resources' is from urls.py
         self.client.login(username="admin", password="admin")
         url = self._create_url(resource_id="00000000-f6b5-11e9-8f09-a4d18cec433a")
-        response = self.client.get(url, secure=False)
-        print(f"test missing on {url} gets {response.status_code}")
+        with self.assertLogs("django.request", level="WARNING"):
+            with self.assertLogs("arches.app.views.api", level="ERROR"):
+                response = self.client.get(url, secure=False)
         self.assertTrue(response.status_code == 404)
 
     def test_1_basic_export(self):
@@ -115,7 +117,6 @@ class JsonLDExportTests(ArchesTestCase):
         url = self._create_url(resource_id="e6412598-f6b5-11e9-8f09-a4d18cec433a")
         # response = self.client.get(url, HTTP_AUTHORIZATION=f'Bearer {self.token}')
         response = self.client.get(url, secure=False)
-        print(f"test basic on {url} gets {response.status_code}")
         self.assertTrue(response.status_code == 200)
         js = response.json()
         self.assertTrue("@id" in js)
