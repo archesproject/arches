@@ -14,4 +14,4 @@ repos:
             entry: arches/app/media/node_modules/.bin/prettier
             args: [--write, --ignore-unknown]
             language: system
-            exclude: ^arches/app/src
+            files: arches/app/src
