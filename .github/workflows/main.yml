@@ -58,7 +58,9 @@ jobs:
           yarn && yarn build_test
 
       - name: Check formatting of frontend files
-        run: yarn format --check --no-write
+        run: |
+          yarn format --check --no-write
+          black . --check --exclude=node_modules
 
       - name: Check for missing migrations
         run: |

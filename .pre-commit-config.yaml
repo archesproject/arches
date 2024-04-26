@@ -1,5 +1,12 @@
 ---
 repos:
+    - repo: https://github.com/psf/black
+      rev: 24.4.2
+      hooks:
+          - id: black
+            args: [--quiet]
+            exclude: node_modules
+
     - repo: local
       hooks:
           - id: prettier
