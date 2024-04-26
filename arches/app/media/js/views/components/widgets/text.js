@@ -180,6 +180,10 @@ define([
 
         });
 
+        if (self.currentDefaultText() === "") {
+            self.defaultValue("");
+        }
+
     };
 
     return ko.components.register('text-widget', {
