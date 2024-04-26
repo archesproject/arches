@@ -80,7 +80,7 @@ class Command(BaseCommand):
         else:
             graph = Graph.objects.get(graphid=graphid)
             graph.delete_instances(verbose=True)
-        
+
         return
     
     def clear_edit_log(self):
