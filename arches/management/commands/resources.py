@@ -54,11 +54,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options["operation"] == "remove_resources":
-            self.remove_resources(force=options["yes"], graphid=options["graph"], editlog=options["editlog"])
-        elif options["operation"] == "clear_edit_log":
+            self.remove_resources(force=options["yes"], graphid=options["graph"])
+
+        if options["operation"] == "clear_edit_log":
             self.clear_edit_log()
 
-    def remove_resources(self, load_id="", graphid=None, force=False, editlog=False):
+    def remove_resources(self, load_id="", graphid=None, force=False):
         """
         Runs the resource_remover command found in data_management.resources
         """
@@ -79,9 +80,6 @@ class Command(BaseCommand):
         else:
             graph = Graph.objects.get(graphid=graphid)
             graph.delete_instances(verbose=True)
-
-        if editlog:
-            models.EditLog.objects.all().delete()
         
     def clear_edit_log(self):
         """
