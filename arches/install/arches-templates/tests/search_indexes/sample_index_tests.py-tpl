@@ -2,9 +2,9 @@ from unittest.mock import Mock
 
 from arches.app.search.base_index import BaseIndex
 from {{ project_name }}.{{ project_name }}.search_indexes.sample_index import SampleIndex
-from tests.base_test import ArchesTestCase
+from django.test import TestCase
 
-class TestSampleIndex(ArchesTestCase):
+class TestSampleIndex(TestCase):
     def test_prepare_index(self):
         sample_index = SampleIndex(index_name="Sample Index")
         sample_index.prepare_index()
