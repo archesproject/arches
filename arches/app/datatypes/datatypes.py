@@ -998,7 +998,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 geojson = json.loads(value)
                 if geojson["type"] == "FeatureCollection":
                     for feature in geojson["features"]:
-                        feature["id"] = str(uuid.uuid4())
+                        feature_id = feature.get("id", None)
+                        if not feature_id:
+                            feature["id"] = str(uuid.uuid4())
                     arches_geojson = geojson
                 else:
                     raise TypeError
