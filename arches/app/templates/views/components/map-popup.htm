@@ -58,6 +58,7 @@
             <span data-bind="text: $root.translations.edit"></span>
         </a>
         <!--/ko-->
+        <!-- ko if: ko.unwrap(geometries).length -->
         <a data-bind="click: function() {
             mapCard.filterByFeatureGeom(ko.unwrap(resourceinstanceid), ko.unwrap(geometries)); 
         }" href="#">
@@ -65,6 +66,7 @@
             <span data-bind="text: $root.translations.searchNearHere"></span>
         </a>
         </div>
+        <!-- /ko -->
         <!-- ko if: $parent.popupFeatures.length > 1 -->
         <div style="display: flex; flex-direction: row; width: 60px; justify-content: space-evenly; font-weight: 500;">
             <div class="hover-feature-instance-counter" data-bind="text: 1 + $parent.popupFeatures.findIndex(feature => feature.active());"></div>
