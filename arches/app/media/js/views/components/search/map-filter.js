@@ -276,16 +276,12 @@ define([
             }, this);
 
             this.filterByFeatureGeom = function(resourceid, geoms) {
-                let feature;
-                if (geoms.length) {
-                    feature = geoms[0].geom.features[0];
-                    if (feature.geometry.type == 'Point') { self.buffer(100); }
-                }
-                if (!feature) { return; }
-                if (resourceid) {
+                let feature = geoms[0].geom.features[0];
+                if (feature.geometry.type == 'Point') { self.buffer(100); }
+                if (feature.id) {
                     self.searchGeometryFeature({
-                        "featureid":feature.id,
-                        "resourceid":resourceid,
+                        "featureid": feature.id,
+                        "resourceid": resourceid,
                         "buffer": {
                             "width": this.buffer(),
                             "unit": this.bufferUnit()
