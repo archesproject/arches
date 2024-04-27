@@ -146,6 +146,48 @@ class SearchTests(ArchesTestCase):
         cls.name_resource.tiles.append(tile)
         cls.name_resource.save()
 
+        # spatial filter test data
+        cls.spatial_filter_geom_resourceid = 'cbb1e9df-5110-4f22-933c-9ccbeb57431b'
+        cls.spatial_filter_geom_resource = Resource(graph_id=cls.search_model_graphid, resourceinstanceid=cls.spatial_filter_geom_resourceid)
+        cls.polygon_feature_id = "2190cb9e-7c57-485c-bf1a-7b6f0389f8b1"
+        
+        geom_poly = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "geometry": {"type": "Polygon", "coordinates": [
+                            [-118.22687435396205, 34.04498354472949],
+                            [-118.22673462509519,34.045024944460636],
+                            [-118.22661984555208, 34.044757071199754],
+                            [-118.22675979254618, 34.044715607647184],
+                            [-118.22687435396205, 34.04498354472949]
+                        ]
+                    },
+                    "type": "Feature", 
+                    "id": cls.polygon_feature_id,
+                    "properties": {}
+                }
+            ]
+        }
+        tile = Tile(data={cls.search_model_geom_nodeid: geom_poly}, nodegroup_id=cls.search_model_geom_nodeid)
+        cls.spatial_filter_geom_resource.tiles.append(tile)
+        cls.point_feature_id = "d41e81ac-4a53-4049-b266-c459b7641bc1"
+        geom_point = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "geometry": {"type": "Point", "coordinates": [-118.22687435396206, 34.04498354472948]
+                    },
+                    "type": "Feature", 
+                    "id": cls.point_feature_id,
+                    "properties": {}
+                }
+            ]
+        }
+        tile = Tile(data={cls.search_model_geom_nodeid: geom_point}, nodegroup_id=cls.search_model_geom_nodeid)
+        cls.spatial_filter_geom_resource.tiles.append(tile)
+        cls.spatial_filter_geom_resource.save()
+
         # add delay to allow for indexes to be updated
         time.sleep(1)
 
@@ -461,6 +503,35 @@ class SearchTests(ArchesTestCase):
         response_json = get_response_json(self.client, spatial_filter=spatial_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 0)
         # self.assertCountEqual(extract_pks(response_json), [str(self.name_resource.pk)])
+
+    def test_spatial_search_by_featureid_and_resourceid(self):
+        """
+        Test spatial search functionality using featureid and resourceid to retrieve geometries.
+        """
+        # Simulate spatial filter with featureid and resourceid, not feature collection
+        spatial_filter_poly_feature = {
+            "featureid": self.polygon_feature_id,
+            "resourceid": self.spatial_filter_geom_resourceid,
+            "buffer": {
+                "width": 10,
+                "unit": 'ft'
+            },
+            "inverted": False
+        }
+        response_json = get_response_json(self.client, spatial_filter=spatial_filter_poly_feature)
+        self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
+
+        spatial_filter_point_feature = {
+            "featureid": self.point_feature_id,
+            "resourceid": self.spatial_filter_geom_resourceid,
+            "buffer": {
+                "width": 10,
+                "unit": 'ft'
+            },
+            "inverted": False
+        }
+        response_json = get_response_json(self.client, spatial_filter=spatial_filter_point_feature)
+        self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
 
     #
     # -- ADD TESTS THAT INCLUDE PERMISSIONS REQUIREMENTS -- #
