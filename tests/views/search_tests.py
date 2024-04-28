@@ -155,13 +155,13 @@ class SearchTests(ArchesTestCase):
             "type": "FeatureCollection",
             "features": [
                 {
-                    "geometry": {"type": "Polygon", "coordinates": [
+                    "geometry": {"type": "Polygon", "coordinates": [[
                             [-118.22687435396205, 34.04498354472949],
-                            [-118.22673462509519,34.045024944460636],
+                            [-118.22673462509519, 34.045024944460636],
                             [-118.22661984555208, 34.044757071199754],
                             [-118.22675979254618, 34.044715607647184],
                             [-118.22687435396205, 34.04498354472949]
-                        ]
+                        ]]
                     },
                     "type": "Feature", 
                     "id": cls.polygon_feature_id,
@@ -176,8 +176,7 @@ class SearchTests(ArchesTestCase):
             "type": "FeatureCollection",
             "features": [
                 {
-                    "geometry": {"type": "Point", "coordinates": [-118.22687435396206, 34.04498354472948]
-                    },
+                    "geometry": {"type": "Point", "coordinates": [-118.22687435396206, 34.04498354472948]},
                     "type": "Feature", 
                     "id": cls.point_feature_id,
                     "properties": {}
