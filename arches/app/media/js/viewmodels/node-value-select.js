@@ -121,6 +121,12 @@ define([
             initSelection: function(element, callback) {
                 var id = $(element).val();
                 var tiles = self.tiles();
+                
+                // fixes #10027 where inputted values will be reset after navigating away  
+                if (self.value()) {
+                    id = self.value();
+                }
+                
                 if (id !== "") {
                     var setSelection = function(tiles, callback)   {
                         var selection =  _.find(tiles, function(tile) {

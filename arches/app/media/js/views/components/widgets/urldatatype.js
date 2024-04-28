@@ -11,6 +11,16 @@ define([
          
         WidgetViewModel.apply(this, [params]);
 
+
+        // #10027 assign this.url & this.url_label with value versions for updating UI with edits
+        if (ko.isObservable(this.value) && this.value()) {
+            var valueUrl = this.value().url;
+            var valueUrlLabel = this.value().url_label;
+            this.url(valueUrl);
+            this.url_label(valueUrlLabel);
+        }
+
+
         this.urlPreviewText = ko.pureComputed(function() {
             if (this.url()) {
                 if (this.url_label && this.url_label()) {

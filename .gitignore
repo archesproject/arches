@@ -13,6 +13,7 @@ arches/settings_local.py
 tests/settings_local.py
 arches/logs/authority_file_errors.txt
 .coverage
+coverage.*
 arches.log
 .atom-build.json
 .atom-build.yml
@@ -40,7 +41,6 @@ djcp.sh
 pip-wheel-metadata
 .eggs
 *.code-workspace
-coverage.xml
 webpack-stats.json
 .DS_STORE
 CACHE
