@@ -6,6 +6,7 @@ import { useGettext } from "vue3-gettext";
 
 import FileUpload from "primevue/fileupload";
 
+import ImageEditor from "@/components/ControlledListManager/ImageEditor.vue";
 import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacteristic.vue";
 import LabelEditor from "@/components/ControlledListManager/LabelEditor.vue";
 import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
@@ -102,22 +103,6 @@ const onUpload = (event: FileUploadUploadEvent) => {
     </div>
     <div class="field-editor-container images-container">
         <h4>{{ $gettext("Images") }}</h4>
-        <div class="images">
-            <!-- todo(jtw): all metadata, metadata by active language -->
-            <img
-                v-for="image in item.images"
-                :key="image.id"
-                :src="image.url"
-                :alt="image.metadata[0]?.alt"
-                width="200"
-            >
-            <span
-                v-if="!item.images.length"
-                :style="{ fontSize: 'small'}"
-            >
-                {{ $gettext("No images.") }}
-            </span>
-        </div>
         <FileUpload
             accept="image/*"
             :url="arches.urls.controlled_list_item_image_add"
@@ -130,6 +115,19 @@ const onUpload = (event: FileUploadUploadEvent) => {
             @before-send="addHeader($event)"
             @upload="onUpload($event)"
         />
+        <div class="images">
+            <ImageEditor
+                v-for="image in item.images"
+                :key="image.id"
+                :image="image"
+            />
+            <span
+                v-if="!item.images.length"
+                :style="{ fontSize: 'small'}"
+            >
+                {{ $gettext("No images.") }}
+            </span>
+        </div>
     </div>
 </template>
 
@@ -179,8 +177,8 @@ p {
 
 .images {
     display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+    flex-direction: column;
+    gap: 32px;
 }
 
 :deep(input[type=file]) {

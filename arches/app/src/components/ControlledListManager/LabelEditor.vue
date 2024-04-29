@@ -13,9 +13,9 @@ import { deleteLabel, upsertLabel } from "@/components/ControlledListManager/api
 import AddLabel from "@/components/ControlledListManager/AddLabel.vue";
 
 import { ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
+import { languageName } from "@/components/ControlledListManager/utils.ts";
 
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
-import type { Language } from "@/types/arches";
 import type {
     ControlledListItem,
     Label,
@@ -98,10 +98,6 @@ const onDelete = async (label: NewLabel | Label) => {
         props.removeItemLabel(label);
     }
 };
-
-const languageName = (code: string) => {
-    return arches.languages.find((lang: Language) => lang.code === code).name;
-};
 </script>
 
 <template>
@@ -133,7 +129,7 @@ const languageName = (code: string) => {
             <Column
                 field="language_id"
                 :header="$gettext('Language')"
-                style="width: 10%; min-width: 8rem; height: 4rem; padding-left: 1rem;"
+                style="width: 10%; min-width: 8rem; height: 4rem"
             >
                 <template #editor="{ data, field }">
                     <Dropdown
@@ -190,7 +186,11 @@ p {
     font-size: small;
 }
 
-:deep(.p-editable-column) {
-    padding-left: 0.5rem;
+:deep(th) {
+    font-weight: 600;
+}
+
+:deep(td) {
+    padding-left: 0.75rem;
 }
 </style>

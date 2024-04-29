@@ -18,10 +18,25 @@ export type ValueType = "prefLabel" | "altLabel";
 
 export type ControlledListItemImageMetadata = {
     id: string,
-    controlled_list_image_id: string,
+    controlled_list_item_image_id: string,
     language_id: string,
     metadata_type: string,
     metadata_label: string,
+    value: string,
+};
+
+export type NewControlledListItemImageMetadata = {
+    id: number,
+    controlled_list_item_image_id: string,
+    language_id: string,
+    metadata_type: string,
+    metadata_label: string,
+    value: string,
+};
+
+export type MetadataChoice = {
+    type: 'title' | 'desc' | 'attr' | 'alt',
+    label: string,
 };
 
 export type ControlledListItemImage = {

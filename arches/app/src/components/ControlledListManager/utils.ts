@@ -1,3 +1,5 @@
+import arches from "arches";
+
 import type { Language } from "@/types/arches";
 import type {
     ControlledList,
@@ -16,6 +18,10 @@ export const bestLabel = (item: ControlledListItem, languageCode: string) => {
         throw new Error();
     }
     return bestLabel;
+};
+
+export const languageName = (code: string) => {
+    return arches.languages.find((lang: Language) => lang.code === code).name;
 };
 
 export const findNodeInTree = (tree: typeof TreeNode[], itemId: string) => {
