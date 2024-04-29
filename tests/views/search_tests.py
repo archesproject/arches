@@ -149,6 +149,7 @@ class SearchTests(ArchesTestCase):
         # spatial filter test data
         cls.spatial_filter_geom_resourceid = 'cbb1e9df-5110-4f22-933c-9ccbeb57431b'
         cls.spatial_filter_geom_resource = Resource(graph_id=cls.search_model_graphid, resourceinstanceid=cls.spatial_filter_geom_resourceid)
+        cls.spatial_filter_geom_resource.save()
         cls.polygon_feature_id = "2190cb9e-7c57-485c-bf1a-7b6f0389f8b1"
         
         geom_poly = {
@@ -169,8 +170,9 @@ class SearchTests(ArchesTestCase):
                 }
             ]
         }
-        tile = Tile(data={cls.search_model_geom_nodeid: geom_poly}, nodegroup_id=cls.search_model_geom_nodeid)
-        cls.spatial_filter_geom_resource.tiles.append(tile)
+        tile = Tile.get_blank_tile(cls.search_model_geom_nodeid, resourceid=cls.spatial_filter_geom_resourceid)
+        tile.data[cls.search_model_geom_nodeid] = geom_poly
+        tile.save()
         cls.point_feature_id = "d41e81ac-4a53-4049-b266-c459b7641bc1"
         geom_point = {
             "type": "FeatureCollection",
@@ -183,9 +185,9 @@ class SearchTests(ArchesTestCase):
                 }
             ]
         }
-        tile = Tile(data={cls.search_model_geom_nodeid: geom_point}, nodegroup_id=cls.search_model_geom_nodeid)
-        cls.spatial_filter_geom_resource.tiles.append(tile)
-        cls.spatial_filter_geom_resource.save()
+        tile = Tile.get_blank_tile(cls.search_model_geom_nodeid, resourceid=cls.spatial_filter_geom_resourceid)
+        tile.data[cls.search_model_geom_nodeid] = geom_point
+        tile.save()
 
         # add delay to allow for indexes to be updated
         time.sleep(1)
