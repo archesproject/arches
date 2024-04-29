@@ -572,7 +572,7 @@ class Graph(models.GraphModel):
 
         bulk_deleter = BulkDataDeletion()
         loadid = uuid.uuid4()
-        resp = bulk_deleter.delete_resources(userid, loadid, self.graphid, verbose=verbose)
+        resp = bulk_deleter.delete_resources(userid, loadid, self.graphid, [], verbose=verbose)
         bulk_deleter.index_resource_deletion(loadid)
 
         return resp
