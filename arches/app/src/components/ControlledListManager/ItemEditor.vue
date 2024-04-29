@@ -95,13 +95,12 @@ const onUpload = (event: FileUploadUploadEvent) => {
                 "Optionally, provide a URI for your list item. Useful if your list item is formally defined in a thesaurus or authority document."
             ) }}
         </p>
+        <ItemCharacteristic
+            field="uri"
+            label="URI"
+        />
     </div>
-    <ItemCharacteristic
-        :editable="true"
-        field="uri"
-        :style="{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '80%' }"
-    />
-    <div class="field-editor-container">
+    <div class="field-editor-container images-container">
         <h4>{{ $gettext("Images") }}</h4>
         <div class="images">
             <!-- todo(jtw): all metadata, metadata by active language -->
@@ -172,13 +171,16 @@ p {
     width: 80%;
     display: flex;
     flex-direction: column;
+}
+
+.images-container {
     gap: 20px;
 }
 
 .images {
     display: flex;
+    flex-wrap: wrap;
     gap: 20px;
-    /* todo(jtw): wrap... */
 }
 
 :deep(input[type=file]) {
