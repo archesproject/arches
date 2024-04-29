@@ -9,6 +9,7 @@ omit =
     */urls.py
     */wsgi.py
     */celery.py
+    */__init__.py
 
 [report]
 show_missing = true

@@ -128,12 +128,14 @@ class Command(BaseCommand):
             open(os.path.join(settings.APP_ROOT, "locale", "messages.pot"), 'w').close()
 
         if not os.path.isfile(os.path.join(settings.APP_ROOT, "gettext.config.js")):
-            print("Copying gettext config to project root directory")
-            shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "gettext.config.js"), os.path.join(settings.APP_ROOT, 'install'))
+            print("Copying gettext config to project directory")
+            shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "gettext.config.js"), os.path.join(settings.APP_ROOT, '..'))
 
         # updates all instances of `{{ project_name }}` with project name
         path_to_project = os.path.join(settings.APP_ROOT, "..")
-        for relative_file_path in ['.coveragerc', "tsconfig.json", ".yarnrc", "tests/test_settings.py", "tests/search_indexes/sample_index_tests.py"]:  # relative to app root directory
+        for relative_file_path in [
+            '.coveragerc', '.gitignore', "tsconfig.json", ".yarnrc", "tests/test_settings.py", "tests/search_indexes/sample_index_tests.py"
+        ]:  # relative to app root directory
             try:
                 file = open(os.path.join(path_to_project, relative_file_path),'r')
                 file_data = file.read()
