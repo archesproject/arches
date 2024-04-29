@@ -3,6 +3,7 @@ import arches from "arches";
 import { computed, inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
+import Button from "primevue/button";
 import Column from "primevue/column";
 import Dropdown from "primevue/dropdown";
 import DataTable from "primevue/datatable";
@@ -12,14 +13,28 @@ import { useToast } from "primevue/usetoast";
 import AddMetadata from "@/components/ControlledListManager/AddMetadata.vue";
 
 import { itemKey } from "@/components/ControlledListManager/const.ts";
+import { deleteImage, upsertMetadata, deleteMetadata } from "@/components/ControlledListManager/api.ts";
 import { bestLabel, languageName } from "@/components/ControlledListManager/utils.ts";
 
-import type { ControlledListItemImage } from "@/types/ControlledListManager";
-const { image } : {image: ControlledListItemImage} = defineProps(["image"]);
+import type { DataTableRowEditInitEvent } from "primevue/datatable";
+import type {
+    ControlledListItemImage,
+    ControlledListItemImageMetadata,
+    NewControlledListItemImageMetadata,
+} from "@/types/ControlledListManager";
+
+const { image, removeImage, appendImageMetadata, updateImageMetadata, removeImageMetadata } : {
+    image: ControlledListItemImage,
+    removeImage: (removedImage: ControlledListItemImage) => undefined,
+    appendImageMetadata: (appendedMetadata: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => undefined,
+    updateImageMetadata: (updatedMetadata: ControlledListItemImageMetadata) => undefined,
+    removeImageMetadata: (removedMetadata: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => undefined,
+} = defineProps(["image", "removeImage", "appendImageMetadata", "updateImageMetadata", "removeImageMetadata"]);
 const { item } = inject(itemKey);
 
 const editingRows = ref([]);
 
+const DANGER = "danger";
 const toast = useToast();
 const { $gettext } = useGettext();
 
@@ -48,10 +63,41 @@ const bestAlternativeText = computed(() => {
         || bestLabel(item.value, arches.activeLanguage).value;
 });
 
-const saveMetadata = () => {
+const onSaveMetadata = async (event: DataTableRowEditInitEvent)  => {
+    // normalize new metadata numbers (starting at 1000) to null
+    const normalizedNewData: ControlledListItemImageMetadata = {
+        ...event.newData,
+        id: typeof event.newData.id === 'string' ? event.newData.id : null,
+    };
+    const upsertedMetadata: ControlledListItemImageMetadata = await upsertMetadata(
+        normalizedNewData,
+        toast,
+        $gettext,
+    );
+    if (normalizedNewData.id) {
+        updateImageMetadata(upsertedMetadata);
+    } else {
+        appendImageMetadata(upsertedMetadata);
+        removeImageMetadata(event.newData);
+    }
 };
 
-const deleteMetadata = () => {
+const onDeleteMetadata = async (metadata: NewControlledListItemImageMetadata | ControlledListItemImageMetadata) => {
+    if (typeof metadata.id === 'number') {
+        removeImageMetadata(metadata);
+        return;
+    }
+    const deleted = await deleteMetadata(metadata, toast, $gettext);
+    if (deleted) {
+        removeImageMetadata(metadata);
+    }
+};
+
+const onDeleteImage = async () => {
+    const deleted = await deleteImage(image, toast, $gettext);
+    if (deleted) {
+        removeImage(image);
+    }
 };
 </script>
 
@@ -71,7 +117,7 @@ const deleteMetadata = () => {
                 edit-mode="row"
                 striped-rows
                 :style="{ fontSize: 'small' }"
-                @row-edit-save="saveMetadata"
+                @row-edit-save="onSaveMetadata"
             >
                 <Column
                     field="metadata_type"
@@ -133,16 +179,25 @@ const deleteMetadata = () => {
                             role="button"
                             tabindex="0"
                             :aria-label="$gettext('Delete')"
-                            @click="deleteMetadata(slotProps.data)"
-                            @key.enter="deleteMetadata(slotProps.data)"
+                            @click="onDeleteMetadata(slotProps.data)"
+                            @key.enter="onDeleteMetadata(slotProps.data)"
                         />
                     </template>
                 </Column>
             </DataTable>
-            <AddMetadata
-                :image
-                :choices="METADATA_CHOICES"
-            />
+            <div style="display: flex; gap: 1rem;">
+                <AddMetadata
+                    :image
+                    :choices="METADATA_CHOICES"
+                />
+                <Button
+                    raised
+                    :severity="DANGER"
+                    icon="fa fa-trash"
+                    :label="$gettext('Delete image')"
+                    @click="onDeleteImage"
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -153,5 +208,15 @@ const deleteMetadata = () => {
 }
 :deep(td) {
     padding-left: 0.75rem;
+}
+.p-button {
+    height: 3rem;
+    margin-top: 1rem;
+}
+:deep(.p-button-icon),
+:deep(.p-button-label) {
+    color: white;
+    font-size: small;
+    font-weight: 600;
 }
 </style>

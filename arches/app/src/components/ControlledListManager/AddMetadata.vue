@@ -8,13 +8,14 @@ import Button from "primevue/button";
 import { itemKey } from "@/components/ControlledListManager/const.ts";
 
 import type {
+    ControlledListItemImage,
     ControlledListItemImageMetadata,
     MetadataChoice,
     NewControlledListItemImageMetadata,
 } from "@/types/ControlledListManager";
 
 const { choices: METADATA_CHOICES, image } : {
-    choices: MetadataChoice[], image: ControlledListItemImageMetadata
+    choices: MetadataChoice[], image: ControlledListItemImage
 } = defineProps(["choices", "image"]);
 const { item } = inject(itemKey);
 
@@ -32,7 +33,9 @@ const newMetadata: NewControlledListItemImageMetadata = computed(() => {
     );
 
     const nextMetadataType = METADATA_CHOICES.find(
-        choice => !image.metadata.map(m => m.metadata_type).includes(choice.type)
+        choice => !image.metadata.map(
+            (m: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => m.metadata_type
+        ).includes(choice.type)
     ) ?? METADATA_CHOICES[0];
 
     return {
@@ -73,6 +76,7 @@ const newMetadata: NewControlledListItemImageMetadata = computed(() => {
 .add-metadata > i,
 .add-metadata > span {
     align-self: center;
+    font-size: small;
 }
 .add-metadata-text {
     margin: 1rem;

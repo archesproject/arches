@@ -83,7 +83,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="controlledlistitemimagemetadata",
             constraint=models.UniqueConstraint(
-                fields=("controlled_list_item_image", "value", "metadata_type", "language"), name="unique_image_metadata_valuetype_language"
+                fields=("controlled_list_item_image", "metadata_type", "language"), name="unique_image_metadata_valuetype_language"
             ),
         ),
     ]

@@ -28,6 +28,7 @@ from arches.app.views.controlled_lists import (
     ControlledListView,
     ControlledListsView,
     ControlledListItemImageView,
+    ControlledListItemImageMetadataView,
     ControlledListItemLabelView,
 )
 from arches.app.views.etl_manager import ETLManagerView
@@ -346,6 +347,8 @@ urlpatterns = [
     path("api/controlled_list_item_label/", ControlledListItemLabelView.as_view(), name="controlled_list_item_label_add"),
     path("api/controlled_list_item_image/<uuid:id>/", ControlledListItemImageView.as_view(), name="controlled_list_item_image"),
     path("api/controlled_list_item_image/", ControlledListItemImageView.as_view(), name="controlled_list_item_image_add"),
+    path("api/controlled_list_item_image_metadata/<uuid:id>/", ControlledListItemImageMetadataView.as_view(), name="controlled_list_item_image_metadata"),
+    path("api/controlled_list_item_image_metadata/", ControlledListItemImageMetadataView.as_view(), name="controlled_list_item_image_metadata_add"),
 ]
 
 if settings.DEBUG:

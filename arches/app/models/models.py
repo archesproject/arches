@@ -2067,7 +2067,7 @@ class ControlledListItemImageMetadata(models.Model):
         db_table = "controlled_list_item_image_metadata"
         constraints = [
             models.UniqueConstraint(
-                fields=["controlled_list_item_image", "value", "metadata_type", "language"],
+                fields=["controlled_list_item_image", "metadata_type", "language"],
                 name="unique_image_metadata_valuetype_language",
             ),
         ]

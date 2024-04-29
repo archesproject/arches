@@ -560,3 +560,56 @@ class ControlledListItemImageView(View):
         if not (image_id := kwargs.get("id", None)):
             return self.add_new_image(request)
         raise NotImplementedError
+
+    def delete(self, request, **kwargs):
+        image_id = kwargs.get("id")
+        count, unused = ControlledListItemImage.objects.filter(pk=image_id).delete()
+        if not count:
+            return JSONErrorResponse(status=404)
+        return JSONResponse(status=204)
+
+
+@method_decorator(
+    group_required("RDM Administrator", raise_exception=True), name="dispatch"
+)
+class ControlledListItemImageMetadataView(View):
+    def add_new_metadata(self, request):
+        data = JSONDeserializer().deserialize(request.body)
+        data.pop("metadata_label", None)
+        metadata = ControlledListItemImageMetadata(**data)
+        try:
+            metadata.save()
+        except IntegrityError as e:
+            return JSONErrorResponse(message=" ".join(e.args), status=400)
+        except:
+            return JSONErrorResponse()
+
+        return JSONResponse(serialize(metadata), status=201)
+
+    def post(self, request, **kwargs):
+        if not (metadata_id := kwargs.get("id", None)):
+            return self.add_new_metadata(request)
+
+        # Update metadata
+        data = JSONDeserializer().deserialize(request.body)
+        try:
+            ControlledListItemImageMetadata.objects.filter(pk=metadata_id).update(
+                value=data["value"],
+                language_id=data["language_id"],
+                metadata_type=data["metadata_type"],
+            )
+        except ControlledListItemImageMetadata.DoesNotExist:
+            return JSONErrorResponse(status=404)
+        except IntegrityError as e:
+            return JSONErrorResponse(message=" ".join(e.args), status=400)
+        except:
+            return JSONErrorResponse()
+
+        return JSONResponse(serialize(ControlledListItemImageMetadata.objects.get(pk=metadata_id)))
+
+    def delete(self, request, **kwargs):
+        metadata_id = kwargs.get("id")
+        count, unused = ControlledListItemImageMetadata.objects.filter(pk=metadata_id).delete()
+        if not count:
+            return JSONErrorResponse(status=404)
+        return JSONResponse(status=204)

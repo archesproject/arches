@@ -21,7 +21,14 @@ import {
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
 import type { FileUploadBeforeSendEvent, FileUploadUploadEvent } from "primevue/fileupload";
-import type { ControlledListItem, Label, NewLabel } from "@/types/ControlledListManager";
+import type {
+    ControlledListItem,
+    ControlledListItemImage,
+    ControlledListItemImageMetadata,
+    Label,
+    NewControlledListItemImageMetadata,
+    NewLabel,
+} from "@/types/ControlledListManager";
 
 const { displayedRow: item } = inject(displayedRowKey);
 const selectedLanguage = inject(selectedLanguageKey);
@@ -29,12 +36,14 @@ const selectedLanguage = inject(selectedLanguageKey);
 const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
+provide(itemKey, { item });
+
 const appendItemLabel = computed(() => {
     return (newLabel: Label | NewLabel) => { item.value.labels.push(newLabel); };
 });
 const removeItemLabel = computed(() => {
     return (removedLabel: Label | NewLabel) => {
-        const toDelete = item.value.labels.findIndex((l: Label) => l.id === removedLabel.id);
+        const toDelete = item.value.labels.findIndex((l: Label | NewLabel) => l.id === removedLabel.id);
         item.value.labels.splice(toDelete, 1);
     };
 });
@@ -46,7 +55,44 @@ const updateItemLabel = computed(() => {
     };
 });
 
-provide(itemKey, { item });
+const appendImageMetadata = computed(() => {
+    return (newMetadata: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => {
+        item.value.images.find(
+            (i: ControlledListItemImage) => i.id === newMetadata.controlled_list_item_image_id
+        ).metadata.push(newMetadata);
+    };
+});
+const removeImageMetadata = computed(() => {
+    return (removedMetadata: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => {
+        const imageFromItem = item.value.images.find(
+            (i: ControlledListItemImage) => i.id === removedMetadata.controlled_list_item_image_id
+        );
+        const toDelete = imageFromItem.metadata.findIndex(
+            (m: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => m.id === removedMetadata.id
+        );
+        imageFromItem.metadata.splice(toDelete, 1);
+    };
+});
+const updateImageMetadata = computed(() => {
+    return (updatedMetadata: ControlledListItemImageMetadata) => {
+        const imageFromItem = item.value.images.find(
+            (i: ControlledListItemImage) => i.id === updatedMetadata.controlled_list_item_image_id
+        );
+        const toUpdate = imageFromItem.metadata.find((m: ControlledListItemImageMetadata) => m.id === updatedMetadata.id);
+        toUpdate.metadata_type = updatedMetadata.metadata_type;
+        toUpdate.language_id = updatedMetadata.language_id;
+        toUpdate.value = updatedMetadata.value;
+    };
+});
+
+const removeImage = computed(() => {
+    return (removedImage: ControlledListItemImage) => {
+        const toDelete = item.value.images.findIndex(
+            (i: ControlledListItemImage) => i.id === removedImage.id
+        );
+        item.value.images.splice(toDelete, 1);
+    };
+});
 
 const iconLabel = (item: ControlledListItem) => {
     return item.guide ? $gettext("Guide Item") : $gettext("Indexable Item");
@@ -120,6 +166,10 @@ const onUpload = (event: FileUploadUploadEvent) => {
                 v-for="image in item.images"
                 :key="image.id"
                 :image="image"
+                :remove-image
+                :append-image-metadata
+                :remove-image-metadata
+                :update-image-metadata
             />
             <span
                 v-if="!item.images.length"
