@@ -26,7 +26,7 @@ define([
         this.hasExportHtmlTemplates = ko.observable(arches.exportHtmlTemplates.length > 0);
         this.downloadPending = ko.observable(false);
         this.hasResourceTypeFilter = ko.observable(!!params.query()['resource-type-filter']);
-        this.exportConceptValuesAsIDs = ko.observable(false);
+        this.exportSystemValues = ko.observable(false);
 
         this.query.subscribe(function(val) {
             if (val['resource-type-filter']) {
@@ -50,7 +50,7 @@ define([
             urlparams.reportlink = self.reportlink();
             urlparams.precision = self.precision();
             urlparams.total = self.total();
-            urlparams.conceptuuidformat = self.exportConceptValuesAsIDs();
+            urlparams.exportsystemvalues = self.exportSystemValues();
             url = url + '?' + $.param(urlparams);
             return url;
         });
@@ -73,7 +73,7 @@ define([
             payload.total = this.total();
             payload.email = this.emailInput();
             payload.exportName = this.exportName() || "Arches Export";
-            payload.conceptuuidformat = this.exportConceptValuesAsIDs();
+            payload.exportsystemvalues = this.exportSystemValues();
             $.ajax({
                 type: "GET",
                 url: arches.urls.export_results,
