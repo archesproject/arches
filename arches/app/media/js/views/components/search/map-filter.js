@@ -275,10 +275,9 @@ define([
                 }
             }, this);
 
-            this.filterByFeatureGeom = function(resourceid, geoms) {
-                let feature = geoms[0].geom.features[0];
+            this.filterByFeatureGeom = function(feature, resourceid=null) {
                 if (feature.geometry.type == 'Point') { self.buffer(100); }
-                if (feature.id) {
+                if (feature.id && resourceid) {
                     self.searchGeometryFeature({
                         "featureid": feature.id,
                         "resourceid": resourceid,
@@ -288,10 +287,6 @@ define([
                         },
                         "inverted": this.filter.inverted()
                     });
-                } else {
-                    const tolerance = 0.1; // Degree of Simplification: Lower numbers are less simplified, preserving more detail
-                    const highQuality = true; // Set to true for a slower but higher quality simplification
-                    turf.simplify(feature.geometry, {tolerance: tolerance, highQuality: highQuality, mutate: true});
                 }
                 let currentSearchGeoms = self.searchGeometries();
                 this.draw.set({
