@@ -60,7 +60,7 @@
         <!--/ko-->
         <!-- ko if: ko.unwrap(geometries).length -->
         <a data-bind="click: function() {
-            mapCard.filterByFeatureGeom(ko.unwrap(resourceinstanceid), ko.unwrap(geometries)); 
+            sendFeaturetoMapFilter($data)
         }" href="#">
             <i class="fa fa-map-pin"></i>
             <span data-bind="text: $root.translations.searchNearHere"></span>
