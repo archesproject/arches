@@ -53,7 +53,15 @@ const onCancel = () => {
 <template>
     <div class="characteristic">
         <h4>{{ props.label }}</h4>
+        <!-- TODO https://github.com/archesproject/arches/issues/10847 -->
+        <span
+            v-if="field === 'dynamic'"
+            style="font-size: small;"
+        >
+            False
+        </span>
         <InputText
+            v-else
             v-model="inputValue"
             type="text"
             :disabled="disabled"
@@ -113,7 +121,9 @@ input {
 }
 
 .characteristic input[disabled] {
-    background: var(--gray-400);
+    text-align: left;
+    opacity: 1;
+    border: 0;
 }
 
 .edit-controls {

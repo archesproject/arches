@@ -120,10 +120,7 @@ const onDelete = async (label: NewLabel | Label) => {
                 style="min-width: 8rem"
             >
                 <template #editor="{ data, field }">
-                    <InputText
-                        v-model="data[field]"
-                        style="width: 90%"
-                    />
+                    <InputText v-model="data[field]" />
                 </template>
             </Column>
             <Column
@@ -171,7 +168,7 @@ const onDelete = async (label: NewLabel | Label) => {
 <style scoped>
 .label-editor-container {
     margin: 1rem 1rem 3rem 1rem;
-    width: 80%;
+    width: 100%;
 }
 
 h4 {

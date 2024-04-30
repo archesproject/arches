@@ -50,6 +50,7 @@ const onCancel = () => {
             type="text"
             :disabled="!editing"
             :aria-label="label"
+            :placeholder="$gettext('Enter a URI')"
         />
         <span
             v-if="!editing"

@@ -301,7 +301,7 @@ await fetchLists();
             checkmark
             :highlight-on-select="false"
             :pt="{
-                root: { class: 'secondary-button' },
+                root: { class: 'p-button secondary-button' },
                 input: { style: { fontFamily: 'inherit', fontSize: 'small', textAlign: 'center', alignContent: 'center' } },
                 itemLabel: { style: { fontSize: 'small' } },
             }"

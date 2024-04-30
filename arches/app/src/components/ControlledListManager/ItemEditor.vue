@@ -120,6 +120,15 @@ const onUpload = (event: FileUploadUploadEvent) => {
         />
         <h3>{{ bestLabel(item, selectedLanguage.code).value }}</h3>
         <span class="item-type">{{ iconLabel(item) }}</span>
+        <a
+            v-if="item.uri"
+            :href="item.uri"
+            rel="noreferrer"
+            target="_blank"
+            style="font-size: small; color: blue;"
+        >
+            {{ item.uri }}
+        </a>
     </span>
     <LabelEditor
         :type="PREF_LABEL"
@@ -189,7 +198,7 @@ const onUpload = (event: FileUploadUploadEvent) => {
     margin: 1rem 1rem 0rem 1rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid;
-    width: 80%;
+    width: 100%;
 }
 
 h3 {
@@ -216,7 +225,6 @@ p {
 
 .field-editor-container {
     margin: 1rem 1rem 3rem 1rem;
-    width: 80%;
     display: flex;
     flex-direction: column;
 }
