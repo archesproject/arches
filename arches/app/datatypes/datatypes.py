@@ -915,21 +915,21 @@ class EDTFDataType(BaseDataType):
 class GeojsonFeatureCollectionDataType(BaseDataType):
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         errors = []
-        coord_limit = 1500
-        coordinate_count = 0
+        max_bytes = 32766 # max bytes allowable by Lucene
+        byte_count = 0
 
-        def validate_geom(geom, coordinate_count=0):
+        def validate_geom(geom, byte_count=0):
             try:
-                coordinate_count += geom.num_coords
+                byte_count += len(str(geom).encode("UTF-8"))
                 bbox = Polygon(settings.DATA_VALIDATION_BBOX)
-                if coordinate_count > coord_limit:
+                if byte_count > max_bytes:
                     message = _(
-                        "Geometry has too many coordinates for Elasticsearch ({0}), \
-                        Please limit to less then {1} coordinates of 5 digits of precision or less.".format(
-                            coordinate_count, coord_limit
+                        "Geometry is too large for Elasticsearch ({0} bytes), \
+                        Please limit to less than {1} bytes.".format(
+                            byte_count, max_bytes
                         )
                     )
-                    title = _("Geometry Too Many Coordinates for ES")
+                    title = _("Geometry Too Many Bytes for ES")
                     errors.append(
                         {
                             "type": "ERROR",
@@ -972,7 +972,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             for feature in value["features"]:
                 try:
                     geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
-                    validate_geom(geom, coordinate_count)
+                    validate_geom(geom, byte_count)
                 except Exception:
                     message = _("Unable to serialize some geometry features")
                     title = _("Unable to Serialize Geometry")
