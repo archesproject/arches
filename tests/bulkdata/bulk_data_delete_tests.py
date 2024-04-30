@@ -8,6 +8,8 @@ from yourapp.models import BulkDataDeletion  # Adjust import as necessary
 from tests.arches_test_case import ArchesTestCase
 import os
 import uuid
+# these tests can be run from the command line via
+# python manage.py test tests.bulkdata.bulk_data_delete_tests --settings="tests.test_settings"
 
 class BulkDataDeletionTests(ArchesTestCase):
     def setUpClass(self):
