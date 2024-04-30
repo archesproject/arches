@@ -83,9 +83,12 @@ class Command(BaseCommand):
 
         return
     
-    def clear_edit_log(self):
+    def clear_edit_log(self, graphid=None):
         """
         Clears the edit log
         """
-        models.EditLog.objects.all().delete()
+        if graphid:
+            models.EditLog.objects.filter(resourceclassid=graphid).delete()
+        else:
+            models.EditLog.objects.all().delete()
 
