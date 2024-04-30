@@ -259,6 +259,7 @@ setInterval(fetchLoadEvent, 5000);
                         :key="index"
                         :label="ModuleTypeButton['label']"
                         @click="selectModuleType(ModuleTypeButton['value'])"
+                        class="module-type-button"
                     />
                 </div>
                 <ModuleSearch @module-search="moduleSearch" />
@@ -355,15 +356,16 @@ li.p-tabview-header.p-highlight {
     align-items: center;
 }
 
-.p-button {
+.module-type-button {
     width: 100px;
     background-color: lightgrey;
     border: lightgrey;
     margin: 5px;
 }
 
-.p-button-label {
+.module-type-button .p-button-label {
     font-size: small;
     font-weight: bold;
 }
+
 </style>

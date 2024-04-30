@@ -1,6 +1,8 @@
 <script setup>
+import Toast from 'primevue/toast';
 import Button from "primevue/button";
 import Dropdown from "primevue/dropdown";
+import { useToast } from 'primevue/usetoast';
 import FileUpload from "primevue/fileupload";
 import InputSwitch from "primevue/inputswitch";
 import { ref, onMounted, watch, computed } from "vue";
@@ -8,6 +10,8 @@ import uuid from "uuid";
 import arches from "arches";
 import Cookies from "js-cookie";
 
+const toast = useToast();
+const ERROR = "error";
 const action = "read";
 const loadid = uuid.generate();
 const formData = new FormData();
@@ -29,7 +33,7 @@ const fieldMapping = ref([]);
 const columnHeaders = ref([]);
 const allResourceModels = ref([]);
 const fileAdded = ref(false);
-const hasHeaders = ref(true);
+const hasHeaders = ref(false);
 
 const ready = computed(() => {
     return selectedResourceModel.value && fieldMapping.value.find((v) => v.node);
@@ -57,15 +61,6 @@ const submit = async function (action) {
     formData.append("action", action);
     formData.append("load_id", loadid);
     formData.append("module", moduleid);
-    // return $.ajax({
-    //     type: "POST",
-    //     url: arches.urls.etl_manager,
-    //     data: formData,
-    //     cache: false,
-    //     processData: false,
-    //     contentType: false,
-    // });
-
     const response = await fetch(arches.urls.etl_manager, {
         method: "POST",
         body: formData,
@@ -87,11 +82,11 @@ watch(csvArray, async (val) => {
     numOfRows.value = val.length;
     numOfCols.value = val[0].length;
     if (hasHeaders.value) {
-        columnHeaders.value = val[0];
-        csvBody.value = val.slice(1);
-    } else {
         columnHeaders.value = null;
         csvBody.value = val;
+    } else {
+        columnHeaders.value = val[0];
+        csvBody.value = val.slice(1);
     }
 });
 
@@ -138,14 +133,14 @@ watch(hasHeaders, async (val) => {
     headers.value = null;
     if (val) {
         headers.value = csvArray.value[0];
-        csvBody.value = csvArray.value.slice(1);
+        csvBody.value = csvArray.value;
     } else {
         headers.value = Array.apply(0, Array(csvArray.value[0].length)).map(
             function (_, b) {
                 return b + 1;
             }
         );
-        csvBody.value = csvArray.value;
+        csvBody.value = csvArray.value.slice(1);
     }
 });
 
@@ -178,19 +173,31 @@ const formatSize = function (size) {
 const addFile = async function (file) {
     fileInfo.value = { name: file.name, size: file.size };
     formData.append("file", file, file.name);
-    const response = await submit("read");
-    if (!response.ok) {
-        // add error handling
-        console.log(response);
-    }
-    csvArray.value = response.result.csv;
-    csvFileName.value = response.result.csv_file;
-    if (response.result.config) {
-        fieldMapping.value = response.result.config.mapping;
-        selectedResourceModel.value = response.result.config.graph;
+    let errorTitle;
+    let errorText;
+    try {
+        const response = await submit("read");
+        if (!response.result) {
+            errorTitle = response.title;
+            errorText = response.message;
+            throw new Error();
+        } else {
+            csvArray.value = response.result.csv;
+            csvFileName.value = response.result.csv_file;
+            if (response.result.config) {
+                fieldMapping.value = response.result.config.mapping;
+                selectedResourceModel.value = response.result.config.graph;
+                }
+            formData.delete("file");
+            fileAdded.value = true;
         }
-    formData.delete("file");
-    fileAdded.value = true;
+    } catch {
+        toast.add({
+            severity: ERROR,
+            summary: errorTitle,
+            detail: errorText
+        });
+    }
 };
 const write = async function () {
     if (!ready.value) {
@@ -224,6 +231,7 @@ onMounted(async () => {
 </script>
 
 <template>
+    <Toast />
     <div class="import-single-csv-container">
         <div class="import-single-csv-component-container">
             <div class="card flex justify-content-center">
@@ -398,10 +406,6 @@ onMounted(async () => {
 </template>
 
 <style>
-.card .p-button {
-    width: 200px;
-}
-
 .p-dropdown-items-wrapper {
     max-height: 100% !important;
 }
@@ -429,5 +433,8 @@ onMounted(async () => {
     font-size: 1.5rem;
     font-weight: 100;
     margin-left: 20px;
+}
+input[type=file] {
+    display: none;
 }
 </style>
