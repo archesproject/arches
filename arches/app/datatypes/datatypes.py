@@ -915,7 +915,7 @@ class EDTFDataType(BaseDataType):
 class GeojsonFeatureCollectionDataType(BaseDataType):
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         errors = []
-        max_bytes = 32766 # max bytes allowable by Lucene
+        max_bytes = 32766 # max bytes allowed by Lucene
         byte_count = 0
 
         def validate_geom(geom, byte_count=0):
