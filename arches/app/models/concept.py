@@ -703,8 +703,8 @@ class Concept(object):
                             JOIN children c ON(c.conceptidto = valueto.conceptid)
                             JOIN values valuefrom ON(c.conceptidfrom = valuefrom.conceptid)
                             JOIN d_value_types dtypesfrom ON(dtypesfrom.valuetype = valuefrom.valuetype)
-                        WHERE valueto.valuetype in (%(child_valuetypes)s)
-                        AND valuefrom.valuetype in (%(child_valuetypes)s)
+                        WHERE valueto.valuetype = ANY (%(child_valuetypes)s)
+                        AND valuefrom.valuetype = ANY (%(child_valuetypes)s)
                     )
                     SELECT distinct %(columns)s
                     FROM results {offset_clause}
@@ -727,10 +727,9 @@ class Concept(object):
                 {
                     "conceptid": conceptid,
                     "relationtypes": AsIs(relationtypes),
-                    "child_valuetypes": ("','").join(
-                        child_valuetypes
+                    "child_valuetypes": (child_valuetypes
                         if child_valuetypes
-                        else models.DValueType.objects.filter(category="label").values_list("valuetype", flat=True)
+                        else list(models.DValueType.objects.filter(category="label").values_list("valuetype", flat=True))
                     ),
                     "columns": AsIs(columns),
                     "depth_limit": depth_limit,
