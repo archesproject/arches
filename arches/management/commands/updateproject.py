@@ -134,7 +134,7 @@ class Command(BaseCommand):
         # updates all instances of `{{ project_name }}` with project name
         path_to_project = os.path.join(settings.APP_ROOT, "..")
         for relative_file_path in [
-            '.coveragerc', '.gitignore', "tsconfig.json", ".yarnrc", "tests/test_settings.py", "tests/search_indexes/sample_index_tests.py"
+            'gettext.config.js', '.coveragerc', '.gitignore', "tsconfig.json", ".yarnrc", "tests/test_settings.py", "tests/search_indexes/sample_index_tests.py"
         ]:  # relative to app root directory
             try:
                 file = open(os.path.join(path_to_project, relative_file_path),'r')
