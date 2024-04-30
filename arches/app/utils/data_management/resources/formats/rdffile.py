@@ -422,7 +422,7 @@ class JsonLdReader(Reader):
 
             self.resource = Resource()
             if resourceid is not None:
-                self.resource.pk = resourceid
+                self.resource.pk = uuid.UUID(resourceid)
             self.resource.graph_id = graphid
             self.resources.append(self.resource)
 

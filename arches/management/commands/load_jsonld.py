@@ -260,7 +260,7 @@ class Command(BaseCommand):
                 break
             except:
                 raise
-        if options["fast"] and self.resources:
+        if options["fast"] and not options["dry_run"] and self.resources:
             self.save_resources()
             self.index_resources(options["strip_search"])
             self.resources = []

@@ -16,7 +16,6 @@ from arches.app.models.models import Node, TileModel
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.etl_modules.base_import_module import BaseImportModule, FileValidationError
-from arches.app.etl_modules.base_import_module import BaseImportModule
 import arches.app.tasks as tasks
 from arches.management.commands.etl_template import create_tile_excel_workbook
 

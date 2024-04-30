@@ -13,6 +13,7 @@ from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
 from django.db import connection
 
+from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
 from arches.app.models.models import Node
 from arches.app.models.system_settings import settings
@@ -189,7 +190,19 @@ class BaseImportModule:
         result["summary"] = summary
         return {"success": result["validation"]["success"], "data": result}
 
-    def validate_uploaded_file(self, file, kwarg):
+    @load_data_async
+    def run_load_task_async(self, request):
+        raise NotImplementedError
+
+    def prepare_temp_dir(self, request):
+        self.loadid = request.POST.get("load_id")
+        self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
+        try:
+            self.delete_from_default_storage(self.temp_dir)
+        except FileNotFoundError:
+            pass
+
+    def validate_uploaded_file(self, file):
         pass
 
     ### Actions ###
@@ -207,14 +220,10 @@ class BaseImportModule:
         return {"success": success, "data": row}
 
     def read(self, request):
-        self.loadid = request.POST.get("load_id")
+        self.prepare_temp_dir(request)
         self.cumulative_excel_files_size = 0
         content = request.FILES["file"]
-        self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
-        try:
-            self.delete_from_default_storage(self.temp_dir)
-        except (FileNotFoundError):
-            pass
+
         result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
         validator = FileValidator()
         if len(validator.validate_file_type(content)) > 0:
