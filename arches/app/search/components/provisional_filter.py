@@ -23,7 +23,7 @@ class ProvisionalFilter(BaseSearchFilter):
             provisional_resource_filter = Bool()
 
             if include_provisional is False:
-                provisional_resource_filter.filter(Terms(field="provisional_resource", terms=["false", "partial"]))
+                provisional_resource_filter.filter(Terms(field="provisional_resource", terms=["false"]))
 
             elif include_provisional == "only provisional":
                 provisional_resource_filter.filter(Terms(field="provisional_resource", terms=["true", "partial"]))

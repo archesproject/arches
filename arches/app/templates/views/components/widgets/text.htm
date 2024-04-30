@@ -16,7 +16,12 @@
                     },
                 "
             >
-                <span class="control-label widget-input-label" data-bind="text:label"></span>
+                <span style="flex: 1">
+                    <span class="control-label widget-input-label" data-bind="text:label"></span>
+                    <!-- ko if: node -->
+                    <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
+                    <!-- /ko -->
+                </span>
                 <span>
                     <i class="fa" data-bind="{
                         css: {
