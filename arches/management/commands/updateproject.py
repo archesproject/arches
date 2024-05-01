@@ -18,7 +18,8 @@ class Command(BaseCommand):
         answer = input(
             "This will replace the following files in your project:\n"
             ".babelrc, eslintrc.js, .eslintignore, .browserslistrc, .stylelintrc.json,\n"
-            ".yarnrc, .gitignore, nodemon.json, .prettierrc, tsconfig.json, and the entire webpack directory.\n\n"
+            ".yarnrc, .gitignore, nodemon.json, .prettierrc, .pre-commit-config.yaml,\n"
+            "tsconfig.json, and the entire webpack directory.\n\n"
             "Continue? "
         )
         
@@ -87,7 +88,7 @@ class Command(BaseCommand):
             print("Copying {} to project directory".format(dotfile))
             shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", dotfile), os.path.join(settings.APP_ROOT, ".."))
 
-        for config_file in ["nodemon.json", "tsconfig.json", ".prettierrc", ".coveragerc", ".gitignore"]:
+        for config_file in ["nodemon.json", "tsconfig.json", ".prettierrc", ".coveragerc", ".gitignore", ".pre-commit-config.yaml"]:
             print("Copying {} to project directory".format(config_file))
             shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", config_file), os.path.join(settings.APP_ROOT, ".."))
 
@@ -134,7 +135,9 @@ class Command(BaseCommand):
         # updates all instances of `{{ project_name }}` with project name
         path_to_project = os.path.join(settings.APP_ROOT, "..")
         for relative_file_path in [
-            'gettext.config.js', '.coveragerc', '.gitignore', "tsconfig.json", ".yarnrc", "tests/test_settings.py", "tests/search_indexes/sample_index_tests.py"
+            'gettext.config.js', '.coveragerc', '.gitignore', "tsconfig.json", ".yarnrc",
+            "tests/test_settings.py", "tests/search_indexes/sample_index_tests.py",
+            ".pre-commit-config.yaml",
         ]:  # relative to app root directory
             try:
                 file = open(os.path.join(path_to_project, relative_file_path),'r')
