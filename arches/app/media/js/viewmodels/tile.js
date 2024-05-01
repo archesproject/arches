@@ -84,6 +84,7 @@ define([
         _.extend(this, {
             filter: filter,
             parent: params.card,
+            handlers: params.handlers,
             userisreviewer: params.userisreviewer,
             cards: _.filter(params.cards, function(card) {
                 var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {

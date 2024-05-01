@@ -70,11 +70,6 @@ jobs:
             echo "package.json not found, skipping yarn commands."
           fi
 
-      - name: Check formatting
-        run: |
-          yarn format --check --no-write
-          black . --check --exclude=node_modules
-
       - name: Check for missing migrations
         run: |
           python manage.py makemigrations --check

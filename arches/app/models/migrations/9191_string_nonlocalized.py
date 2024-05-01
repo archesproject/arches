@@ -48,7 +48,10 @@ class Migration(migrations.Migration):
                     "maxLength": null,
                     "uneditable": false,
                     "placeholder": "Enter text",
-                    "defaultValue": ""
+                    "defaultValue": "",
+                    "i18n_properties": [
+                        "placeholder"
+                    ]
                 }'
             ) ON CONFLICT DO NOTHING;
             """,
