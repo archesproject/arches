@@ -77,6 +77,8 @@ class Command(BaseCommand):
 
         if graphid is None:
             resource_remover.clear_resources()
+            if clear_edit_log:
+                self.clear_edit_log()
         else:
             graph = Graph.objects.get(graphid=graphid)
             graph.delete_instances(verbose=True)
