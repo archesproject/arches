@@ -57,7 +57,7 @@ class Command(BaseCommand):
             self.remove_resources(force=options["yes"], graphid=options["graph"], clear_edit_log=options["editlog"])
 
         if options["operation"] == "clear_edit_log":
-            self.clear_edit_log()
+            self.clear_edit_log(graphid=options["graph"])
 
     def remove_resources(self, load_id="", graphid=None, force=False, clear_edit_log=False):
         """
