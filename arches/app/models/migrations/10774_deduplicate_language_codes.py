@@ -3,46 +3,48 @@
 from django.db import migrations
 
 
-def merge_differently_cased_language_codes(apps, schema_editor):
-    Language = apps.get_model("models", "Language")
-    Value = apps.get_model("models", "Value")
-    PublishedGraph = apps.get_model("models", "PublishedGraph")
-
-    for lang in list(Language.objects.all()):
-        # Sort en-US before en-us
-        distinctly_cased = list(Language.objects.filter(code__iexact=lang.code).order_by("-code"))
-        if len(distinctly_cased) > 1:
-            other_values = {
-                # Ignore variation in isdefault column.
-                (l.name, l.default_direction, l.scope)
-                for l in distinctly_cased
-            }
-            if len(other_values) > 1:
-                raise Exception(
-                    "Cannot de-duplicate distinctly cased language codes: \n"
-                    + str([x.code for x in distinctly_cased])
-                    + "\nHINT: Ensure fields other than code and isdefault are identical."
-                )
-
-            preserve = distinctly_cased[0]
-            deletes = distinctly_cased[1:]
-
-            if any([delete.isdefault for delete in deletes]):
-                preserve.isdefault = True
-                preserve.save()
-
-            for delete in deletes:
-                # Be careful! These FK's cascade delete.
-                Value.objects.filter(language=delete.code).update(language=preserve.code)
-                PublishedGraph.objects.filter(language=delete.code).update(language=preserve.code)
-                delete.delete()
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
         ("models", "10709_refresh_geos_by_transaction"),
     ]
+
+    def merge_differently_cased_language_codes(apps, schema_editor):
+        Language = apps.get_model("models", "Language")
+        Value = apps.get_model("models", "Value")
+        PublishedGraph = apps.get_model("models", "PublishedGraph")
+        for lang in list(Language.objects.all()):
+            # Sort en-US before en-us
+            # Don't use order_by() to sort on case, which might vary among OS locales
+            distinctly_cased = sorted(
+                Language.objects.filter(code__iexact=lang.code),
+                key=lambda l: l.code,
+            )
+            if len(distinctly_cased) > 1:
+                other_values = {
+                    # Ignore variation in isdefault column.
+                    (l.name, l.default_direction, l.scope)
+                    for l in distinctly_cased
+                }
+                if len(other_values) > 1:
+                    raise Exception(
+                        "Cannot de-duplicate distinctly cased language codes: \n"
+                        + str([x.code for x in distinctly_cased])
+                        + "\nHINT: Ensure fields other than code and isdefault are identical."
+                    )
+
+                preserve = distinctly_cased[0]
+                deletes = distinctly_cased[1:]
+
+                if any([delete.isdefault for delete in deletes]):
+                    preserve.isdefault = True
+                    preserve.save()
+
+                for delete in deletes:
+                    # Be careful! These FK's cascade delete.
+                    Value.objects.filter(language=delete.code).update(language=preserve.code)
+                    PublishedGraph.objects.filter(language=delete.code).update(language=preserve.code)
+                    delete.delete()
 
     operations = [
         migrations.RunPython(merge_differently_cased_language_codes, migrations.RunPython.noop),
