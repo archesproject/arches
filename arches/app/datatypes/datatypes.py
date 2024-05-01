@@ -991,8 +991,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 tile.data[nodeid] = None
 
     def transform_value_for_tile(self, value, **kwargs):
+        geo_utils = GeoUtils()
         if "format" in kwargs and kwargs["format"] == "esrijson":
-            arches_geojson = GeoUtils().arcgisjson_to_geojson(value)
+            arches_geojson = geo_utils.arcgisjson_to_geojson(value)
         else:
             try:
                 geojson = json.loads(value)
@@ -1003,20 +1004,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 else:
                     raise TypeError
             except (json.JSONDecodeError, KeyError, TypeError):
-                arches_geojson = {}
-                arches_geojson["type"] = "FeatureCollection"
-                arches_geojson["features"] = []
                 try:
                     geometry = GEOSGeometry(value, srid=4326)
                     if geometry.geom_type == "GeometryCollection":
-                        for geom in geometry:
-                            arches_json_geometry = {}
-                            arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
-                            arches_json_geometry["type"] = "Feature"
-                            arches_json_geometry["id"] = str(uuid.uuid4())
-                            arches_json_geometry["properties"] = {}
-                            arches_geojson["features"].append(arches_json_geometry)
+                        arches_geojson = geo_utils.convert_geos_geom_collection_to_feature_collection(geometry)
                     else:
+                        arches_geojson = {}
+                        arches_geojson["type"] = "FeatureCollection"
+                        arches_geojson["features"] = []
                         arches_json_geometry = {}
                         arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
                         arches_json_geometry["type"] = "Feature"
@@ -1042,6 +1037,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return updated_data
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        geo_utils = GeoUtils()
+        max_bytes = 32766 # max bytes allowed by Lucene
+        byte_count = 0
+        byte_count += len(str(nodevalue).encode("UTF-8"))
+
+        if byte_count > max_bytes:
+            nodevalue = geo_utils.reduce_precision(nodevalue, 7)
+            
         document["geometries"].append({"geom": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional, "tileid": tile.pk})
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
