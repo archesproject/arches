@@ -650,7 +650,7 @@ class JsonLdReader(Reader):
                         else:
                             self.printline(f"Could not validate {values} as a {o['datatype']}", indent + 1)
                     else:
-                        if o["datatype"].datatype_name == 'date':
+                        if o["datatype"].datatype_name == 'date' and self.default_timezone:
                             try:
                                 datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
                                 value = value + self.default_timezone
