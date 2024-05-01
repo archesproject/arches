@@ -9662,11 +9662,13 @@ ul.pagination {
 
 .search-listing-footer {
     display: flex;
-    height: 40px;
+    height: fit-content;
     font-size: 1.1rem;
-    padding: 10px 10px 0px 10px;
+    padding: 10px 10px 10px 10px;
     background: #f5f5f5;
     border-top: 1px solid #ddd;
+    flex-flow: row wrap;
+    row-gap: 10px;
 
     a {
         margin-top: -5px;

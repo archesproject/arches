@@ -1,0 +1,5 @@
+livereload
+sst
+coverage
+sauceclient
+django-silk==5.1.0

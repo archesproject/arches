@@ -1,4 +1,7 @@
-[report]
+[run]
+source =
+    {{ project_name }}/
+
 omit =
     */python?.?/*
     */models/migrations/*
@@ -7,5 +10,6 @@ omit =
     */wsgi.py
     */celery.py
     */__init__.py
-    
+
+[report]
 show_missing = true
