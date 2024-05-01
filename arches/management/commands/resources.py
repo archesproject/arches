@@ -49,17 +49,17 @@ class Command(BaseCommand):
             "--editlog",
             action="store_true",
             dest="editlog",
-            help="used to clear the edit log",
+            help="used to clear the edit log. If a graphid is provided, only the edit log for that graph will be cleared.",
         )
 
     def handle(self, *args, **options):
         if options["operation"] == "remove_resources":
-            self.remove_resources(force=options["yes"], graphid=options["graph"])
+            self.remove_resources(force=options["yes"], graphid=options["graph"], clear_edit_log=options["editlog"])
 
         if options["operation"] == "clear_edit_log":
             self.clear_edit_log()
 
-    def remove_resources(self, load_id="", graphid=None, force=False):
+    def remove_resources(self, load_id="", graphid=None, force=False, clear_edit_log=False):
         """
         Runs the resource_remover command found in data_management.resources
         """
@@ -80,6 +80,8 @@ class Command(BaseCommand):
         else:
             graph = Graph.objects.get(graphid=graphid)
             graph.delete_instances(verbose=True)
+            if clear_edit_log:
+                self.clear_edit_log(graphid)
 
         return
     
