@@ -1,5 +1,6 @@
 from abc import abstractmethod, ABCMeta
 
+from arches.app.const import ExtensionType
 from arches.app.models.models import *
 from arches.app.models.system_settings import settings
 
@@ -203,7 +204,7 @@ def _get_permission_framework():
             if "." not in settings.PERMISSION_FRAMEWORK:
                 raise RuntimeError("Permissions frameworks must be a dot-separated module and a class")
             modulename, classname = settings.PERMISSION_FRAMEWORK.split(".", -1)
-            PermissionFramework = get_class_from_modulename(modulename, classname, settings.PERMISSION_FRAMEWORK_LOCATIONS)
+            PermissionFramework = get_class_from_modulename(modulename, classname, ExtensionType.PERMISSIONS_FRAMEWORKS)
             _PERMISSION_FRAMEWORK = PermissionFramework()
         else:
             from arches.app.permissions.arches_standard import ArchesStandardPermissionFramework
