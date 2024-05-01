@@ -19,10 +19,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 import json
 import time
+from pathlib import Path
+
+from django.core.management.base import BaseCommand
+from django.core.files.storage import default_storage
+from django.db import transaction
 
 from arches.app.models import models as archesmodels
-from django.core.management.base import BaseCommand
-from django.db import transaction
 from arches.app.models.resource import Resource
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
 from arches.app.models.models import TileModel
@@ -106,6 +109,22 @@ class Command(BaseCommand):
             help="If a node is set to not be exposed to advanced search, then don't even index it",
         )
 
+        parser.add_argument(
+            "--dry-run",
+            default=False,
+            action="store_true",
+            dest="dry_run",
+            help="Neither save nor index resources, but run all validation with requested logging.",
+        )
+
+        parser.add_argument(
+            "--use-storage",
+            default=False,
+            action="store_true",
+            dest="use_storage",
+            help="Resolve filepaths against Django default_storage.",
+        )
+
     def handle(self, *args, **options):
 
         print("Starting JSON-LD load")
@@ -132,8 +151,13 @@ class Command(BaseCommand):
             print("ERROR: stripping fields not exposed to advanced search only works in fast mode")
             return
 
+        if options["dry_run"]:
+            self.stdout.write("Running in --dry-run mode. Validating only (no saving, no indexing).")
+
         self.resources = []
         self.load_resources(options)
+
+        return self.resources
 
     def load_resources(self, options):
 
@@ -143,7 +167,10 @@ class Command(BaseCommand):
         if options["model"]:
             models = [options["model"]]
         else:
-            models = os.listdir(source)
+            if options["use_storage"]:
+                models = [default_storage.listdir(source)][0]
+            else:
+                models = os.listdir(source)
             models.sort()
             models = [m for m in models if m[0] not in ["_", "."]]
         print(f"Found possible models: {models}")
@@ -168,6 +195,7 @@ class Command(BaseCommand):
 
         for m in models:
             print(f"Loading {m}")
+            model_path = Path(source) / m
             graphid = graph_uuid_map.get(m, None)
             if not graphid:
                 # Check slug
@@ -182,7 +210,10 @@ class Command(BaseCommand):
             if block and "," not in block:
                 blocks = [block]
             else:
-                blocks = os.listdir(f"{source}/{m}")
+                if options["use_storage"]:
+                    blocks = default_storage.listdir(model_path)[0]
+                else:
+                    blocks = os.listdir(model_path)
                 blocks.sort()
                 blocks = [b for b in blocks if b[0] not in ["_", "."]]
                 if "," in block:
@@ -196,7 +227,11 @@ class Command(BaseCommand):
 
             try:
                 for b in blocks:
-                    files = os.listdir(f"{source}/{m}/{b}")
+                    block_path = model_path / b
+                    if options["use_storage"]:
+                        files = default_storage.listdir(block_path)[1]
+                    else:
+                        files = os.listdir(block_path)
                     files.sort()
                     for f in files:
                         if not f.endswith(options["suffix"]):
@@ -210,20 +245,23 @@ class Command(BaseCommand):
                         if seen <= options["skip"]:
                             # Do it this way to keep the counts correct
                             continue
-                        fn = f"{source}/{m}/{b}/{f}"
+                        fn = block_path / f
                         # Check file size of record
                         if not options["quiet"]:
                             print(f"About to import {fn}")
                         if options["toobig"]:
                             sz = os.os.path.getsize(fn)
                             if sz > options["toobig"]:
-                                if not quiet:
+                                if not options["quiet"]:
                                     print(f" ... Skipping due to size:  {sz} > {options['toobig']}")
                                 continue
                         uu = f.replace(f".{options['suffix']}", "")
-                        fh = open(fn)
-                        data = fh.read()
-                        fh.close()
+                        if options["use_storage"]:
+                            with default_storage.open(fn, mode="r") as fh:
+                                data = fh.read()
+                        else:
+                            with open(fn, mode="r") as fh:
+                                data = fh.read()
                         # FIXME Timezone / DateTime Workaround
                         # FIXME The following line should be removed when #5669 / #6346 are closed
                         data = data.replace("T00:00:00Z", "")
@@ -243,9 +281,17 @@ class Command(BaseCommand):
                                         reload=options["force"],
                                         quiet=options["quiet"],
                                         strip_search=options["strip_search"],
+                                        dry_run=options["dry_run"],
                                     )
                                 else:
-                                    l = self.import_resource(uu, graphid, jsdata, reload=options["force"], quiet=options["quiet"])
+                                    l = self.import_resource(
+                                        uu,
+                                        graphid,
+                                        jsdata,
+                                        reload=options["force"],
+                                        quiet=options["quiet"],
+                                        dry_run=options["dry_run"],
+                                    )
                                 loaded += l
                                 loaded_model += l
                             except Exception as e:
@@ -266,7 +312,7 @@ class Command(BaseCommand):
             self.resources = []
         print(f"Total Time: seen {seen} / loaded {loaded} in {time.time()-start} seconds")
 
-    def fast_import_resource(self, resourceid, graphid, data, n=1000, reload="ignore", quiet=True, strip_search=False):
+    def fast_import_resource(self, resourceid, graphid, data, n=1000, reload="ignore", quiet=True, strip_search=False, dry_run=False):
         try:
             resource_instance = Resource.objects.get(pk=resourceid)
             if reload == "ignore":
@@ -276,7 +322,7 @@ class Command(BaseCommand):
             elif reload == "error":
                 print(f"*** Record exists for {resourceid}, and -ow is error")
                 raise FileExistsError(resourceid)
-            else:
+            elif not dry_run:
                 resource_instance.delete()
         except archesmodels.ResourceInstance.DoesNotExist:
             # thrown when resource doesn't exist
@@ -287,13 +333,13 @@ class Command(BaseCommand):
         except:
             print(f"Exception raised while reading {resourceid}...")
             raise
-        if len(self.resources) >= n:
+        if not dry_run and len(self.resources) >= n:
             self.save_resources()
             self.index_resources(strip_search)
             self.resources = []
         return 1
 
-    def import_resource(self, resourceid, graphid, data, reload="ignore", quiet=False):
+    def import_resource(self, resourceid, graphid, data, reload="ignore", quiet=False, dry_run=False):
         with transaction.atomic():
             try:
                 resource_instance = Resource.objects.get(pk=resourceid)
@@ -312,6 +358,8 @@ class Command(BaseCommand):
 
             try:
                 self.reader.read_resource(data, resourceid=resourceid, graphid=graphid)
+                if dry_run:
+                    return 1
                 for resource in self.reader.resources:
                     resource.save(request=None)
             except archesmodels.ResourceInstance.DoesNotExist:

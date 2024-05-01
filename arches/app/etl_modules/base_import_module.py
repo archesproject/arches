@@ -27,11 +27,17 @@ logger = logging.getLogger(__name__)
 
 
 class BaseImportModule:
-    def __init__(self, loadid=None):
+    def __init__(self, request=None, loadid=None):
+        self.request = request
+        self.userid = None
         self.moduleid = None
         self.fileid = None
         self.loadid = loadid
         self.legacyid_lookup = {}
+
+        if self.request:
+            self.userid = request.user.id
+            self.moduleid = request.POST.get("module")
 
     def filesize_format(self, bytes):
         """Convert bytes to readable units"""
@@ -160,8 +166,7 @@ class BaseImportModule:
 
     def run_load_task(self, userid, files, summary, result, temp_dir, loadid):
         with connection.cursor() as cursor:
-            for file in files.keys():
-                self.stage_excel_file(file, summary, cursor)
+            self.stage_files(files, summary, cursor)
             cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
             cursor.execute(
                 """
@@ -205,6 +210,13 @@ class BaseImportModule:
     def validate_uploaded_file(self, file):
         pass
 
+    def stage_files(self, files, summary, cursor):
+        for file in files:
+            self.stage_excel_file(file, summary, cursor)
+
+    def stage_excel_file(self, file, summary, cursor):
+        pass
+
     ### Actions ###
 
     def validate(self, loadid):
@@ -221,7 +233,7 @@ class BaseImportModule:
 
     def read(self, request):
         self.prepare_temp_dir(request)
-        self.cumulative_excel_files_size = 0
+        self.cumulative_files_size = 0
         content = request.FILES["file"]
 
         result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
@@ -238,16 +250,16 @@ class BaseImportModule:
                 files = zip_ref.infolist()
                 for file in files:
                     if file.filename.split(".")[-1] == "xlsx":
-                        self.cumulative_excel_files_size += file.file_size
+                        self.cumulative_files_size += file.file_size
                     if not file.filename.startswith("__MACOSX"):
                         if not file.is_dir():
                             result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
-                            result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
+                            result["summary"]["cumulative_files_size"] = self.cumulative_files_size
                         default_storage.save(os.path.join(self.temp_dir, file.filename), File(zip_ref.open(file)))
         elif content.name.split(".")[-1] == "xlsx":
-            self.cumulative_excel_files_size += content.size
+            self.cumulative_files_size += content.size
             result["summary"]["files"][content.name] = {"size": (self.filesize_format(content.size))}
-            result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
+            result["summary"]["cumulative_files_size"] = self.cumulative_files_size
             default_storage.save(os.path.join(self.temp_dir, content.name), File(content))
 
         has_valid_excel_file = False
@@ -293,7 +305,7 @@ class BaseImportModule:
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
             use_celery_file_size_threshold_in_MB = 0.1
-            if summary["cumulative_excel_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB:
+            if summary["cumulative_files_size"] / 1000000 > use_celery_file_size_threshold_in_MB:
                 response = self.run_load_task_async(request, self.loadid)
             else:
                 response = self.run_load_task(self.userid, files, summary, result, self.temp_dir, self.loadid)
