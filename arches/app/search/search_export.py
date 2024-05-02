@@ -35,7 +35,7 @@ from arches.app.utils.flatten_dict import flatten_dict
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.geo_utils import GeoUtils
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.string_utils import str_to_bool
 import arches.app.utils.zip as zip_utils
 from arches.app.models.system_settings import settings
 
@@ -52,11 +52,8 @@ class SearchResultsExporter(object):
         self.report_link = search_request.GET.get("reportlink", False)
         self.format = search_request.GET.get("format", "tilecsv")
         self.export_system_values = search_request.GET.get("exportsystemvalues", False)
-        if self.export_system_values:
-            try:
-                self.export_system_values = json.loads(self.export_system_values)
-            except:
-                pass
+        if not isinstance(self.export_system_values, bool):
+            self.export_system_values = str_to_bool(self.export_system_values)
         self.compact = search_request.GET.get("compact", True)
         self.precision = int(search_request.GET.get("precision", 5))
         if self.format == "shp" and self.compact is not True:
