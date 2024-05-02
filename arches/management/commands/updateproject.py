@@ -79,6 +79,7 @@ class Command(BaseCommand):
         # Republish to pick up CardsXNodeXWidget changes from
         # migration 10150_add_default_value_file_list.py
         management.call_command("graph", operation="publish", update=True)
+        self.stdout.write("Publishing finished! \n\n")
 
     def update_to_v7_6(self):
         for dotfile in [".eslintrc.js", ".eslintignore", ".babelrc", ".browserslistrc", ".stylelintrc.json", ".yarnrc"]:
@@ -87,8 +88,17 @@ class Command(BaseCommand):
                 self.stdout.write("Deleting {} from project root directory".format(dotfile))
                 os.remove(previous_dotfile_path)
 
-            self.stdout.write("Copying {} to project directory".format(dotfile))
-            shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", dotfile), os.path.join(settings.APP_ROOT, ".."))
+            if dotfile != ".yarnrc":  # `.yarnrc` is removed entirely in this version
+                self.stdout.write("Copying {} to project directory".format(dotfile))
+                shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", dotfile), os.path.join(settings.APP_ROOT, ".."))
+
+        if os.path.exists(os.path.join(settings.APP_ROOT, "yarn.lock")):
+            self.stdout.write("Deleting yarn.lock from project".format(dotfile))
+            os.remove(os.path.join(settings.APP_ROOT, "yarn.lock"))
+
+        if os.path.exists(os.path.join(settings.APP_ROOT, "media", "node_modules")):
+            self.stdout.write("Deleting node_modules folder from media directory".format(dotfile))
+            shutil.rmtree(os.path.join(settings.APP_ROOT, "media", "node_modules"))
 
         for project_metadata_file in ["LICENSE", "MANIFEST.in", "pyproject.toml"]:
             if not os.path.exists(os.path.join(settings.APP_ROOT, '..', project_metadata_file)):
@@ -151,9 +161,12 @@ class Command(BaseCommand):
         shutil.copytree(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "webpack"), os.path.join(settings.APP_ROOT, '..', 'webpack'))
 
         # updates all instances of `{{ project_name }}` with project name
+        arches_semantic_version = ".".join([str(arches.VERSION[0]), str(arches.VERSION[1]), str(arches.VERSION[2])])
+        arches_next_minor_version = ".".join([str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"])
+
         path_to_project = os.path.join(settings.APP_ROOT, "..")
         for relative_file_path in [
-            'gettext.config.js', '.coveragerc', '.gitignore', "tsconfig.json", ".yarnrc", "tests/test_settings.py", "tests/search_indexes/sample_index_tests.py"
+            'gettext.config.js', '.coveragerc', '.gitignore', "tsconfig.json", "tests/test_settings.py", "tests/search_indexes/sample_index_tests.py", "pyproject.toml"
         ]:  # relative to app root directory
             try:
                 file = open(os.path.join(path_to_project, relative_file_path),'r')
@@ -162,6 +175,8 @@ class Command(BaseCommand):
 
                 updated_file_data = (
                     file_data.replace("{{ project_name }}", settings.APP_NAME)
+                    .replace("{{ arches_semantic_version }}", arches_semantic_version)
+                    .replace("{{ arches_next_minor_version }}", arches_next_minor_version)
                 )
 
                 file = open(os.path.join(path_to_project, relative_file_path),'w')
