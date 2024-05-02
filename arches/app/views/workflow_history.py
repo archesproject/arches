@@ -65,9 +65,9 @@ class WorkflowHistoryView(View):
                     return JSONErrorResponse(
                         _("Request Failed"),
                         _("Workflow already completed"),
-                        status=401,
+                        status=400,
                     )
-                
+
                 history.completed = data.get("completed", False)
                 if history.completed:
                     history.user_id = request.user.pk

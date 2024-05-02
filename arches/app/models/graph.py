@@ -432,18 +432,12 @@ class Graph(models.GraphModel):
         Adds a FunctionXGraph record to this graph
 
         Arguments:
-        node -- an object representing a FunctionXGraph instance or an actual models.CardModel instance
+        function -- an object representing a FunctionXGraph instance or an actual FunctionXGraph instance
 
         """
 
         if not isinstance(function, models.FunctionXGraph):
-            if isinstance(function, dict):
-                functionobj = models.FunctionXGraph(**function.copy())
-            else:
-                functionobj = function.copy()
-            function = models.FunctionXGraph()
-            function.function_id = functionobj.function_id
-            function.config = functionobj.config
+            function = models.FunctionXGraph(**function.copy())
 
         function.graph = self
 
@@ -551,7 +545,10 @@ class Graph(models.GraphModel):
                         previous_functionxgraph = previous_functionxgraph_list[0]
                         previous_functionxgraph.delete()
                     
+                try:
                     functionxgraph.save()
+                except:
+                    pass
 
             # edge case for instantiating a serialized_graph that has a publication
             if self.publication and not len(models.GraphXPublishedGraph.objects.filter(publicationid=self.publication_id)):

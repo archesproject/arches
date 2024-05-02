@@ -37,7 +37,9 @@ define([
             viewModel.sourceGraphPublicationDate = new Date(data['source_graph_publication']['published_time']).toLocaleString();
             viewModel.sourceGraphPublicationMostRecentEditDate = data['source_graph_publication_most_recent_edit'] ? new Date(data['source_graph_publication_most_recent_edit']['edit_time']).toLocaleString() : null;
             viewModel.ontologies = ko.observable(data['ontologies']);
-            viewModel.ontologyClasses = ko.observable(data['ontologyClasses']);
+            viewModel.ontologyClasses = ko.pureComputed(function(){
+                return data['ontologyClasses'].filter((cls) => cls.ontology_id === viewModel.graph.ontology_id());
+            });
             viewModel.cardComponents = data.cardComponents;
             viewModel.appliedFunctions = ko.observable(data['appliedFunctions']);
             viewModel.activeLanguageDir = ko.observable(arches.activeLanguageDir);
