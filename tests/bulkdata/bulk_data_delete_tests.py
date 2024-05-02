@@ -1,13 +1,14 @@
+import os
+import uuid
 from django.contrib.auth.models import User
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.models import models
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from yourapp.models import BulkDataDeletion  # Adjust import as necessary
+from arches.app.etl_modules.bulk_data_deletion import BulkDataDeletion
 from tests.arches_test_case import ArchesTestCase
-import os
-import uuid
+
 # these tests can be run from the command line via
 # python manage.py test tests.bulkdata.bulk_data_delete_tests --settings="tests.test_settings"
 
