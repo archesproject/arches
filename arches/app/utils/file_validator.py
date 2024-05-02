@@ -17,9 +17,14 @@ class FileValidator(object):
         errors = []
         match extension:
             case "DS_Store":
-                self.logger.log(
-                    logging.WARN, "DS_Store file encountered, proceeding with caution."
-                )
+                if settings.FILE_TYPE_CHECKING:
+                    if settings.FILE_TYPE_CHECKING == "lenient":
+                        self.logger.log(
+                            logging.WARN,
+                            "DS_Store file encountered, proceeding with caution.",
+                        )
+                    else:
+                        errors.append(f"File type is not permitted: {extension}")
             case _ if extension not in settings.FILE_TYPES:
                 errors.append(f"File type is not permitted: {extension}")
             case "xlsx":
@@ -46,7 +51,8 @@ class FileValidator(object):
                 except json.decoder.JSONDecodeError:
                     errors.append("Invalid json file")
             case _:
-                errors.append("Cannot validate file")
+                if settings.FILE_TYPE_CHECKING != "lenient":
+                    errors.append("Cannot validate file")
 
         for error in errors:
             self.logger.log(logging.ERROR, error)

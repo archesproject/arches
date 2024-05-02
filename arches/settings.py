@@ -674,7 +674,7 @@ ETL_MODULE_LOCATIONS = [
     "arches.app.etl_modules",
 ]
 
-FILE_TYPE_CHECKING = False
+FILE_TYPE_CHECKING = "lenient"
 FILE_TYPES = [
     "bmp",
     "gif",

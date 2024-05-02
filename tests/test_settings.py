@@ -71,6 +71,8 @@ SILENCED_SYSTEM_CHECKS.append(
     "arches.W001"
 )  # Cache backend does not support rate-limiting
 
+FILE_TYPE_CHECKING = "lenient"
+
 # could add Chrome, PhantomJS etc... here
 LOCAL_BROWSERS = []  # ['Firefox']
 
