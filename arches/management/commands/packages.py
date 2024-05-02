@@ -8,6 +8,7 @@ import sys
 import urllib.request, urllib.parse, urllib.error
 import os
 import logging
+import openpyxl
 from arches.setup import unzip_file
 from arches.management.commands import utils
 from arches.app.utils.i18n import LanguageSynchronizer
@@ -83,6 +84,7 @@ class Command(BaseCommand):
                 "delete_mapbox_layer",
                 "create_mapping_file",
                 "import_reference_data",
+                "import_controlled_lists",
                 "import_graphs",
                 "import_business_data",
                 "import_business_data_relations",
@@ -300,6 +302,8 @@ class Command(BaseCommand):
         if options["operation"] == "import_reference_data":
             self.import_reference_data(options["source"], options["overwrite"], options["stage"], options["prevent_indexing"])
 
+        if options["operation"] == "import_controlled_lists":
+            self.import_controlled_lists(options["source"])
         if options["operation"] == "import_graphs":
             self.import_graphs(options["source"])
 
@@ -1114,6 +1118,25 @@ class Command(BaseCommand):
         skos = SKOSReader()
         rdf = skos.read_file(data_source)
         ret = skos.save_concepts_from_skos(rdf, overwrite, stage, prevent_indexing)
+    
+    def import_controlled_lists(self, source):
+        wb = openpyxl.load_workbook(source)
+        for sheet in wb.sheetnames:
+            if sheet == "ControlledList":
+                self.import_sheet_to_model(wb[sheet], models.ControlledList)
+            elif sheet == "ControlledListItem":
+                self.import_sheet_to_model(wb[sheet], models.ControlledListItem)
+            elif sheet == "ControlledListItemValue":
+                self.import_sheet_to_model(wb[sheet], models.ControlledListItemValue)
+        self.stdout.write('Data imported successfully from {0}'.format(source))
+    
+    def import_sheet_to_model(self, sheet, model):
+        fields = [field.name for field in model._meta.fields]
+        for row in sheet.iter_rows(min_row=2, values_only=True):
+            instance = model()
+            for i, field in enumerate(fields):
+                setattr(instance, field, row[i])
+            instance.save()
 
     def import_business_data(
         self,
