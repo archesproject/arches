@@ -15,35 +15,10 @@
                 <h3>
                     <span data-bind="text: $root.translations.jsonldCap"></span>
                 </h3>
-                <h2>
-                    <span data-bind="text: $root.translations.downloadTemplates"></span>
-                </h2>
                 <h4>
                     <span data-bind="text: $root.translations.selectAResourceModel"></span>
                 </h4>
                 <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
-                    <div style="width: 250px; display:flex; flex-direction: column;">
-                        <div>
-                            <!-- ko if: templates().length -->
-                            <select style="display:inline-block;" data-bind="select2Query: {
-                                select2Config: {
-                                    clickBubble: true,
-                                    disabled: false,
-                                    data: templates(),
-                                    value: selectedTemplate,
-                                    allowClear: true,
-                                    multiple: false,
-                                    placeholder: $root.translations.selectTemplate
-                                }}">
-                            </select>
-                            <!--/ko-->
-                        </div>
-                    </div>
-                    <!-- ko if: selectedTemplate() -->
-                    <button style="border-top: 1px solid #c4c4c4; margin: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-download" data-bind="click: downloadTemplate" >
-                        <span data-bind="text: $root.translations.download"></span>
-                    </button>
-                    <!-- /ko -->
                     <div style="margin-top: 15px;">
                         <button class="btn btn-primary btn-labeled btn-lg fa fa-cloud-upload" data-bind="click: toggleDownloadMode">
                             <span data-bind="text: $root.translations.uploadZipFile"></span>
@@ -85,11 +60,6 @@
                     <h5>
                         <span data-bind="text: $root.translations.etlFileUploadMessage"></span>
                     </h5>
-                    <div style="margin-top: 15px;">
-                        <button class="btn btn-primary btn-labeled btn-lg fa fa-download" data-bind="click: toggleDownloadMode">
-                            <span data-bind="text: $root.translations.downloadTemplates"></span>
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>

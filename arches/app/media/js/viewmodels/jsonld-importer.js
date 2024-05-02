@@ -17,7 +17,6 @@ define([
         this.data2 = ko.observable(false);
         this.moduleId = params.etlmoduleid;
         ImporterViewModel.apply(this, arguments);
-        this.selectedTemplate = ko.observable();
         this.loadStatus = ko.observable('ready');
         this.downloadMode = ko.observable(false);
         this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
@@ -26,9 +25,6 @@ define([
         this.validated = params.validated || ko.observable();
         this.getErrorReport = params.getErrorReport;
         this.getNodeError = params.getNodeError;
-        this.templates = ko.observableArray(
-            arches.resources.map(resource => ({text: resource.name, id: resource.graphid}))
-        );
 
         this.toggleDownloadMode = () => {
             this.downloadMode(!this.downloadMode());
@@ -47,39 +43,6 @@ define([
             }
             return decodeURIComponent(xsrfCookies[0].split('=')[1]);
         }
-
-        this.downloadTemplate = async() => {
-            const url = arches.urls.etl_manager;
-            const formData = new window.FormData();
-            formData.append("id", ko.unwrap(this.selectedTemplate));
-            formData.append("format", "xls");
-            formData.append("module", ko.unwrap(self.moduleId));
-            formData.append("action", "download");
-
-            const response = await window.fetch(url, {
-                method: 'POST',
-                body: formData,
-                credentials: 'same-origin',
-                headers: {
-                    "Accept": "application/json",
-                    "X-CSRFToken": getCookie("csrftoken")
-                }
-            });
-
-            const blob = await response.blob();
-            const urlObject = window.URL.createObjectURL(blob);
-            const a = window.document.createElement('a');
-            window.document.body.appendChild(a);
-            a.href = urlObject;
-            a.download = `${this.templates().filter(x => x.id == this.selectedTemplate())[0].text}.xlsx`;
-            a.click();
-
-            setTimeout(() => {
-                window.URL.revokeObjectURL(urlObject);
-                window.document.body.removeChild(a);
-            }, 0);
-            this.loading(false);
-        };
 
         this.showAlert = (data) => {
             self.alert(new AlertViewModel(
