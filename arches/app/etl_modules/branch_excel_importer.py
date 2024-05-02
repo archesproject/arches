@@ -2,6 +2,7 @@ from datetime import datetime
 import json
 import os
 import uuid
+from tempfile import NamedTemporaryFile
 
 from django.http import HttpResponse
 from openpyxl import load_workbook
@@ -16,7 +17,6 @@ from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.management.commands.etl_template import create_workbook
-from openpyxl.writer.excel import save_virtual_workbook
 from arches.app.etl_modules.base_import_module import BaseImportModule, FileValidationError
 
 
@@ -203,8 +203,12 @@ class BranchExcelImporter(BaseImportModule):
         format = request.POST.get("format")
         if format == "xls":
             wb = create_workbook(request.POST.get("id"))
-            response = HttpResponse(save_virtual_workbook(wb), content_type="application/vnd.ms-excel")
-            response["Content-Disposition"] = "attachment"
+            with NamedTemporaryFile(suffix='.xlsx', delete=False) as tmp:
+                wb.save(tmp.name)
+                tmp.seek(0)
+                response = HttpResponse(tmp.read(), content_type="application/vnd.ms-excel")
+                response["Content-Disposition"] = "attachment"
+            os.unlink(tmp.name)
             return {"success": True, "raw": response}
         else:
             return {"success": False, "data": "failed"}

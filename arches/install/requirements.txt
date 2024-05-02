@@ -1,4 +1,4 @@
-Django==4.2.11
+Django>=4.2.11,<5.0.0
 psycopg2==2.9.9
 urllib3<2
 elasticsearch>=8.3.1,<9.0.0
@@ -24,8 +24,7 @@ requests[security]>=2.31.0
 python-slugify==7.0.0
 pillow>=7.0.0
 arcgis2geojson==2.0.0
-openpyxl==3.0.10
-django-libsass==0.9
+openpyxl==3.1.2
 django-webpack-loader==2.0.1
 filetype==1.0.13
 defusedxml==0.7.1

@@ -18,12 +18,15 @@
     "paths": {
       "@/*": [
         "*.ts",
-        "*.vue",
-      ],
-    },
+        "*.vue"
+      ]
+    }
   },
   "include": [
     "**/*.ts",
-    "**/*.vue",
+    "**/*.vue"
   ],
+  "vueCompilerOptions": {
+    "skipTemplateCodegen": true
+  }
 }
