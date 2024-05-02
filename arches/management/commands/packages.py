@@ -85,6 +85,7 @@ class Command(BaseCommand):
                 "create_mapping_file",
                 "import_reference_data",
                 "import_controlled_lists",
+                "export_controlled_lists",
                 "import_graphs",
                 "import_business_data",
                 "import_business_data_relations",
@@ -304,6 +305,10 @@ class Command(BaseCommand):
 
         if options["operation"] == "import_controlled_lists":
             self.import_controlled_lists(options["source"])
+        
+        if options["operation"] == "export_controlled_lists":
+            self.export_controlled_lists(options["dest_dir"])
+
         if options["operation"] == "import_graphs":
             self.import_graphs(options["source"])
 
@@ -541,6 +546,7 @@ class Command(BaseCommand):
                 "preliminary_sql",
                 "reference_data/concepts",
                 "reference_data/collections",
+                "reference_data/controlled_lists",
                 "system_settings",
             ]
             for directory in dirs:
@@ -1137,6 +1143,25 @@ class Command(BaseCommand):
             for i, field in enumerate(fields):
                 setattr(instance, field, row[i])
             instance.save()
+    
+    def export_controlled_lists(self, data_dest=None):
+        wb = openpyxl.Workbook()
+        self.export_model_to_sheet(wb, models.ControlledList)
+        self.export_model_to_sheet(wb, models.ControlledListItem)
+        self.export_model_to_sheet(wb, models.ControlledListItemValue)
+
+        if data_dest:
+            wb.save(os.path.join(data_dest, "controlled_lists.xlsx"))
+        else:
+            wb.save(data_dest = os.path.join(settings.PACKAGE_ROOT, "reference_data/controlled_lists", "controlled_lists.xlsx"))
+        self.stdout.write('Data exported successfully to exported_data.xlsx')
+
+    def export_model_to_sheet(self, wb, model):
+        ws = wb.create_sheet(title=model.__name__)
+        fields = [field.name for field in model._meta.fields]
+        ws.append(fields)
+        for instance in model.objects.all():
+            ws.append([getattr(instance, field) for field in fields])
 
     def import_business_data(
         self,
