@@ -22,7 +22,6 @@ import datetime
 import logging
 from io import StringIO
 from io import BytesIO
-import json
 import re
 from django.contrib.gis.geos import GeometryCollection, GEOSGeometry
 from django.core.files import File
@@ -32,7 +31,7 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.flatten_dict import flatten_dict
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.string_utils import str_to_bool
