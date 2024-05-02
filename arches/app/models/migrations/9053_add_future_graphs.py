@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9191_string_nonlocalized"),
+        ("models", "10709_refresh_geos_by_transaction"),
     ]
 
     operations = [
