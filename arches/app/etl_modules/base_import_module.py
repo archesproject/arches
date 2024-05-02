@@ -242,10 +242,12 @@ class BaseImportModule:
         validator = FileValidator()
         if len(validator.validate_file_type(content)) > 0:
             return {
-                "status": 400,
                 "success": False,
-                "title": _("Invalid excel file/zip specified"),
-                "message": _("Upload a valid excel file"),
+                "data": FileValidationError(
+                    title=_("Invalid excel file/zip specified"),
+                    message=_("Upload a valid excel file"),
+                    code=400,
+                )
             }
         if content.name.split(".")[-1].lower() == "zip":
             with zipfile.ZipFile(content, "r") as zip_ref:

@@ -610,7 +610,7 @@ ETL_MODULE_LOCATIONS = [
 ]
 
 FILE_TYPE_CHECKING = False
-FILE_TYPES = ["bmp", "gif", "jpg", "jpeg", "pdf", "png", "psd", "rtf", "tif", "tiff", "xlsx", "csv", "zip"]
+FILE_TYPES = ["bmp", "gif", "jpg", "jpeg", "json", "pdf", "png", "psd", "rtf", "tif", "tiff", "xlsx", "csv", "zip"]
 FILENAME_GENERATOR = "arches.app.utils.storage_filename_generator.generate_filename"
 UPLOADED_FILES_DIR = "uploadedfiles"
 

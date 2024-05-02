@@ -42,12 +42,13 @@ class JSONLDImporter(BaseImportModule):
             }
         }
         validator = FileValidator()
-        if validator.validate_file_type(content):
+        if (file_type_errors := validator.validate_file_type(content)):
             return {
-                "status": 400,
                 "success": False,
-                "title": _("Invalid Uploaded File"),
-                "message": _("Upload a valid zip file"),
+                "data": FileValidationError(
+                    message=", ".join(file_type_errors),
+                    code=400,
+                )
             }
 
         with zipfile.ZipFile(content, "r") as zip_ref:
