@@ -8,8 +8,7 @@ from arches.app.utils.data_management.resource_graphs.importer import import_gra
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.etl_modules.bulk_data_deletion import BulkDataDeletion
-from tests.arches_test_case import ArchesTestCase
-
+from tests.base_test import ArchesTestCase
 # these tests can be run from the command line via
 # python manage.py test tests.bulkdata.bulk_data_delete_tests --settings="tests.test_settings"
 
