@@ -2123,7 +2123,7 @@ class DomainDataType(BaseDomainDataType):
 
         sql = i18n_json_field.attname
         for prop, value in i18n_json_field.raw_value.items():
-            escaped_value = json.dumps(value).replace("%", "%%")
+            escaped_value = json.dumps(value).replace("%", "%%").replace("'", "''")
             if prop == "options":
                 sql = f"""
                     __arches_i18n_update_jsonb_array('options.text', '{{"options": {escaped_value}}}', {sql}, '{i18n_json_field.lang}')

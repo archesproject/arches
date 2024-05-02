@@ -2,5 +2,10 @@
 omit =
     */python?.?/*
     */models/migrations/*
+    */settings*.py
+    */urls.py
+    */wsgi.py
+    */celery.py
+    */__init__.py
     
 show_missing = true
