@@ -1,6 +1,6 @@
 import json
-import os
 import zipfile
+from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
 
@@ -11,7 +11,7 @@ from django.utils.translation import gettext as _
 
 from arches.app.etl_modules.base_import_module import BaseImportModule, FileValidationError
 from arches.app.etl_modules.decorators import load_data_async
-from arches.app.models.models import GraphModel, LoadErrors, LoadStaging
+from arches.app.models.models import GraphModel, LoadErrors, LoadEvent, LoadStaging
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.file_validator import FileValidator
@@ -82,12 +82,13 @@ class JSONLDImporter(BaseImportModule):
 
     def validate_uploaded_file(self, file):
         path = Path(file.name)
+        slug = path.parts[1]
         try:
-            graph_id_from_slug(path.parts[1])
+            graph_id_from_slug(slug)
         except GraphModel.ObjectDoesNotExist:
             raise FileValidationError(
                 code=404,
-                message=_('The model "{0}" does not exist.').format(path.parts[1])
+                message=_('The model "{0}" does not exist.').format(slug)
             )
 
     def stage_files(self, files, summary, cursor):
@@ -110,18 +111,38 @@ class JSONLDImporter(BaseImportModule):
         graph_id_from_slug.cache_clear()
 
     def handle_block(self, graph_slug, block):
-        # todo(jtw): add try
-        resources = call_command(
-            "load_jsonld",
-            model=graph_slug,
-            block=block,
-            force="overwrite",
-            source=self.temp_dir,
-            quiet=True,
-            fast=True,
-            use_storage=True,
-            dry_run=True,  # don't save the resources
-        ),
+        try:
+            resources = call_command(
+                "load_jsonld",
+                model=graph_slug,
+                block=block,
+                force="overwrite",
+                source=self.temp_dir,
+                quiet=True,
+                fast=True,
+                use_storage=True,
+                dry_run=True,  # don't save the resources
+            )
+        except Exception as e:
+            LoadErrors(
+                load_event_id=self.loadid,
+                type="graph",
+                source="/".join((graph_slug, block)),
+                error=_("Load JSON-LD command error"),
+                message=e.args[0],
+            ).save()
+            # Prevent IntegrityError: https://code.djangoproject.com/ticket/35425
+            LoadEvent.objects.filter(loadid=self.loadid).update(
+                user_id=self.userid,
+                successful=False,
+                status="failed",
+                load_description="/".join((graph_slug, block)),
+                etl_module_id=self.moduleid,
+                error_message=_("Load JSON-LD command error"),
+                load_end_time=datetime.now(),
+            )
+            raise
+
         nodegroup_info, node_info = get_graph_tree_from_slug(graph_slug)
         self.populate_staging_table(resources, nodegroup_info, node_info)
 
@@ -175,7 +196,7 @@ class JSONLDImporter(BaseImportModule):
     def save_validation_errors(self, validation_errors, tile, source_value, datatype, nodeid):
         for error in validation_errors:
             LoadErrors(
-                load_event=self.loadid,
+                load_event_id=self.loadid,
                 nodegroup_id=tile.nodegroup_id,
                 node_id=nodeid,
                 datatype=datatype.pk,
