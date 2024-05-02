@@ -51,14 +51,6 @@ class BulkDataDeletionTests(ArchesTestCase):
 
         # self.bulk_deleter.index_resource_deletion(loadid, resourceids)
 
-    @classmethod
-    def tearDownClass(self):
-        self.user.delete()
-        Tile.objects.filter(nodegroup_id=self.search_model_name_nodeid).delete()
-        Resource.objects.filter(graph_id=self.search_model_graphid).delete()
-        models.GraphModel.objects.filter(pk=self.search_model_graphid).delete()
-        super().tearDownClass()
-
 
 def create_test_resources_and_tiles(graphid, nodeid, transaction_id):
     count = 10
