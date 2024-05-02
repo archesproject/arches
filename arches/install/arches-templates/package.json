@@ -8,9 +8,10 @@
         "eslint:check": "./{{ project_name }}/media/node_modules/.bin/eslint ./{{ project_name }}/src --resolve-plugins-relative-to ./{{ project_name }}/media --ext .vue,.ts --parser ./{{ project_name }}/media/node_modules/vue-eslint-parser/index.js",
         "eslint:watch": "./{{ project_name }}/media/node_modules/.bin/nodemon --watch ./{{ project_name }}/src --ext ts,vue --exec yarn --silent eslint:check",
         "eslint:fix": "./{{ project_name }}/media/node_modules/.bin/eslint ./{{ project_name }}/src --resolve-plugins-relative-to ./{{ project_name }}/media --ext .vue,.ts --parser ./{{ project_name }}/media/node_modules/vue-eslint-parser/index.js --fix",
-        "format": "./{{ project_name }}/media/node_modules/.bin/prettier ./{{ project_name }}/src --write",
         "gettext:extract": "./{{ project_name }}/media/node_modules/.bin/vue-gettext-extract",
         "gettext:compile": "./{{ project_name }}/media/node_modules/.bin/vue-gettext-compile",
+        "prettier:check": "./{{ project_name }}/media/node_modules/.bin/prettier ./{{ project_name }}/src --check",
+        "prettier:fix": "./{{ project_name }}/media/node_modules/.bin/prettier ./{{ project_name }}/src --write",
         "ts:check": "./{{ project_name }}/media/node_modules/.bin/vue-tsc --noEmit",
         "ts:watch": "./{{ project_name }}/media/node_modules/.bin/vue-tsc --watch --noEmit",
         "start": "./{{ project_name }}/media/node_modules/.bin/cross-env NODE_PATH=./{{ project_name }}/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./{{ project_name }}/media/node_modules/.bin/webpack serve --config ./{{ project_name }}/webpack/webpack.config.dev.js"

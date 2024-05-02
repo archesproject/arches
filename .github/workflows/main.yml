@@ -72,7 +72,7 @@ jobs:
 
       - name: Check formatting
         run: |
-          yarn format --check --no-write
+          yarn prettier:check
           black . --check --exclude=node_modules
 
       - name: Check for missing migrations
