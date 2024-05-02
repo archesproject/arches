@@ -28,17 +28,16 @@ class BulkDataDeletionTests(ArchesTestCase):
     def test_get_number_of_deletions_with_no_resourceids(self):
         # Test to ensure deletion count is calculated correctly.
         loadid = str(uuid.uuid4())
-        resourceids = create_test_resources_and_tiles(self.search_model_graphid, self.search_model_name_nodeid, loadid)
+        resourceids, tile_ct = create_test_resources_and_tiles(self.search_model_graphid, self.search_model_name_nodeid, loadid)
         number_of_resource, number_of_tiles = self.bulk_deleter.get_number_of_deletions(self.search_model_graphid, self.search_model_name_nodeid, None)
         
-        self.assertIsInstance(number_of_resource, list)
-        self.assertEqual(number_of_tiles, len(resourceids))
+        self.assertEqual(number_of_resource, len(resourceids))
 
     def test_delete_resources(self):
         # Test to ensure resources are deleted properly.
         loadid = str(uuid.uuid4())
-        resourceids = create_test_resources_and_tiles(self.search_model_graphid, self.search_model_name_nodeid, loadid)
-        result = self.bulk_deleter.delete_resources(self.user.id, loadid, self.search_model_graphid, resourceids, verbose=True)
+        resourceids, tile_ct = create_test_resources_and_tiles(self.search_model_graphid, self.search_model_name_nodeid, loadid)
+        result = self.bulk_deleter.delete_resources(self.user.id, loadid, self.search_model_graphid, resourceids, verbose=False)
 
         self.assertTrue(result['success'])
         self.assertEqual(result['deleted_count'], len(resourceids))
@@ -46,10 +45,11 @@ class BulkDataDeletionTests(ArchesTestCase):
     def test_delete_tiles(self):
         # Test to ensure tiles are deleted properly.
         loadid = str(uuid.uuid4())
-        resourceids = create_test_resources_and_tiles(self.search_model_graphid, self.search_model_name_nodeid, loadid)
+        resourceids, tile_ct = create_test_resources_and_tiles(self.search_model_graphid, self.search_model_name_nodeid, loadid)
         result = self.bulk_deleter.delete_tiles(self.user.id, loadid, self.search_model_name_nodeid, resourceids)
 
         self.assertTrue(result['success'])
+        self.assertEqual(result['deleted_count'], tile_ct)
 
         # self.bulk_deleter.index_resource_deletion(loadid, resourceids)
 
@@ -63,11 +63,12 @@ class BulkDataDeletionTests(ArchesTestCase):
 
 
 def create_test_resources_and_tiles(graphid, nodeid, transaction_id):
-    test_resourceids = [str(uuid.uuid4()) for x in range(10)]
-    for x in range(10):
+    count = 10
+    test_resourceids = [str(uuid.uuid4()) for x in range(count)]
+    for x in range(count):
         r = Resource(graph_id=graphid)
         t = Tile.get_blank_tile(nodeid, resourceid=test_resourceids[x])
         t.data[nodeid] = {"en": {"value": f"testing {x}", "direction": "ltr"}}
         r.tiles.append(t)
         r.save(transaction_id=transaction_id)
-    return test_resourceids
+    return test_resourceids, count
