@@ -165,33 +165,35 @@ class BaseImportModule:
         return lookup
 
     def run_load_task(self, userid, files, summary, result, temp_dir, loadid):
-        with connection.cursor() as cursor:
-            self.stage_files(files, summary, cursor)
-            cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
-            cursor.execute(
-                """
-                INSERT INTO load_errors (type, source, error, loadid, nodegroupid)
-                SELECT 'tile', source_description, error_message, loadid, nodegroupid
-                FROM load_staging
-                WHERE loadid = %s AND passes_validation = false AND error_message IS NOT null
-                """,
-                [loadid],
-            )
-            result["validation"] = self.validate(loadid)
-            if len(result["validation"]["data"]) == 0:
-                self.loadid = loadid  # currently redundant, but be certain
-                save_to_tiles(userid, loadid)
-                cursor.execute("""CALL __arches_update_resource_x_resource_with_graphids();""")
-                cursor.execute("""SELECT __arches_refresh_spatial_views();""")
-                refresh_successful = cursor.fetchone()[0]
-                if not refresh_successful:
-                    raise Exception('Unable to refresh spatial views')
-            else:
+        try:
+            with connection.cursor() as cursor:
+                self.stage_files(files, summary, cursor)
+                cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
                 cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                    ("failed", datetime.now(), loadid),
+                    """
+                    INSERT INTO load_errors (type, source, error, loadid, nodegroupid)
+                    SELECT 'tile', source_description, error_message, loadid, nodegroupid
+                    FROM load_staging
+                    WHERE loadid = %s AND passes_validation = false AND error_message IS NOT null
+                    """,
+                    [loadid],
                 )
-        self.delete_from_default_storage(temp_dir)
+                result["validation"] = self.validate(loadid)
+                if len(result["validation"]["data"]) == 0:
+                    self.loadid = loadid  # currently redundant, but be certain
+                    save_to_tiles(userid, loadid)
+                    cursor.execute("""CALL __arches_update_resource_x_resource_with_graphids();""")
+                    cursor.execute("""SELECT __arches_refresh_spatial_views();""")
+                    refresh_successful = cursor.fetchone()[0]
+                    if not refresh_successful:
+                        raise Exception('Unable to refresh spatial views')
+                else:
+                    cursor.execute(
+                        """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                        ("failed", datetime.now(), loadid),
+                    )
+        finally:
+            self.delete_from_default_storage(temp_dir)
         result["summary"] = summary
         return {"success": result["validation"]["success"], "data": result}
 
