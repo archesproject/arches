@@ -129,55 +129,62 @@ class JSONLDImporter(BaseImportModule):
         load_staging_instances = []
         for resource in resources:
             for tile in resource.get_flattened_tiles():
-                tile_value = {}
-                for nodeid, source_value in tile.data.entries():
-                    datatype = node_info[nodeid]["datatype"]
-                    config = node_info[nodeid]["config"]
-                    value, validation_errors = self.prepare_data_for_loading(
-                        datatype,
-                        source_value,
-                        config,
-                    )
-                    for error in validation_errors:
-                        LoadErrors(
-                            load_event=self.loadid,
-                            nodegroup_id=tile.nodegroup_id,
-                            node_id=nodeid,
-                            datatype=datatype.pk,
-                            type="node",
-                            value=source_value,
-                            source="",
-                            error=error["title"],
-                            message=error["message"],
-                        ).save()
-                    tile_value[nodeid] = {
-                        "value": value,
-                        "valid": len(validation_errors) == 0,
-                        "source": source_value,
-                        "notes": ",".join(validation_errors),
-                        "datatype": datatype,
-                    }
-
                 load_staging_instances.append(
-                    LoadStaging(
-                        nodegroup_id=tile.nodegroup_id,
-                        load_event_id=self.loadid,
-                        value=JSONSerializer().serialize(tile_value),
-                        legacyid=resource.legacyid,
-                        resourceid=resource.pk,
-                        tileid=tile.pk,
-                        parenttileid=tile.parenttile_id,
-                        passes_validation=True,
-                        nodegroup_depth=nodegroup_info[tile.nodegroup_id].depth,
-                        source_description=None,
-                        error_message=None,
-                        operation="insert",
-                    )
+                    self.load_staging_instance_from_tile(tile, resource, nodegroup_info, node_info)
                 )
 
         tile_batch_size = settings.BULK_IMPORT_BATCH_SIZE * 10  # assume 10 tiles/resource
         LoadStaging.objects.bulk_create(load_staging_instances, batch_size=tile_batch_size)
         # todo(jtw): edit log?
+
+    def load_staging_instance_from_tile(self, tile, resource, nodegroup_info, node_info):
+        tile_value = {}
+        for nodeid, source_value in tile.data.entries():
+            datatype = node_info[nodeid]["datatype"]
+            config = node_info[nodeid]["config"]
+            value, validation_errors = self.prepare_data_for_loading(
+                datatype,
+                source_value,
+                config,
+            )
+            self.save_validation_errors(validation_errors, tile, source_value, datatype, nodeid)
+
+            tile_value[nodeid] = {
+                "value": value,
+                "valid": len(validation_errors) == 0,
+                "source": source_value,
+                "notes": ",".join(validation_errors),
+                "datatype": datatype,
+            }
+
+            return LoadStaging(
+                nodegroup_id=tile.nodegroup_id,
+                load_event_id=self.loadid,
+                value=JSONSerializer().serialize(tile_value),
+                legacyid=resource.legacyid,
+                resourceid=resource.pk,
+                tileid=tile.pk,
+                parenttileid=tile.parenttile_id,
+                passes_validation=True,
+                nodegroup_depth=nodegroup_info[tile.nodegroup_id].depth,
+                source_description=None,
+                error_message=None,
+                operation="insert",
+            )
+
+    def save_validation_errors(self, validation_errors, tile, source_value, datatype, nodeid):
+        for error in validation_errors:
+            LoadErrors(
+                load_event=self.loadid,
+                nodegroup_id=tile.nodegroup_id,
+                node_id=nodeid,
+                datatype=datatype.pk,
+                type="node",
+                value=source_value,
+                source="",
+                error=error["title"],
+                message=error["message"],
+            ).save()
 
     @load_data_async
     def run_load_task_async(self, request):
