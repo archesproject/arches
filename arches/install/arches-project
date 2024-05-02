@@ -53,7 +53,7 @@ class ArchesCommand(TemplateCommand):
         # need to manually replace instances of {{ project_name }} in some files
         path_to_project = os.path.join(target) if target else os.path.join(os.getcwd(), project_name)
 
-        for relative_file_path in ['.yarnrc', '.coveragerc', "pyproject.toml"]:  # relative to app root directory
+        for relative_file_path in ['.coveragerc', "pyproject.toml"]:  # relative to app root directory
             file = open(os.path.join(path_to_project, relative_file_path),'r')
             file_data = file.read()
             file.close()
