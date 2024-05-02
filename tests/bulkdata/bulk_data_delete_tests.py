@@ -22,12 +22,8 @@ class BulkDataDeletionTests(ArchesTestCase):
         self.user = User.objects.create(username='testuser', password='securepassword')
         LanguageSynchronizer.synchronize_settings_with_db()
         self.bulk_deleter = BulkDataDeletion()
-
-    @classmethod
-    def setUpTestData(self):
-        with open(os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "r") as f:
-            archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile["graph"])
+        self.loadOntology()
+        self.ensure_resource_test_model_loaded()
 
     def test_get_number_of_deletions_with_no_resourceids(self):
         loadid = str(uuid.uuid4())
@@ -68,7 +64,7 @@ def create_test_resources_and_tiles(graphid, nodeid, transaction_id):
     count = 10
     test_resourceids = [str(uuid.uuid4()) for x in range(count)]
     for x in range(count):
-        r = Resource(graph_id=graphid)
+        r = Resource(graph_id=graphid, resourceinstanceid=test_resourceids[x])
         t = Tile.get_blank_tile(nodeid, resourceid=test_resourceids[x])
         t.data[nodeid] = {"en": {"value": f"testing {x}", "direction": "ltr"}}
         r.tiles.append(t)
