@@ -37,7 +37,7 @@ class BulkDataDeletionTests(ArchesTestCase):
         # Test to ensure resources are deleted properly.
         loadid = str(uuid.uuid4())
         resourceids, tile_ct = create_test_resources_and_tiles(self.search_model_graphid, self.search_model_name_nodeid, loadid)
-        result = self.bulk_deleter.delete_resources(self.user.id, loadid, self.search_model_graphid, resourceids, verbose=False)
+        result = self.bulk_deleter.delete_resources(self.user.id, loadid, graphid=self.search_model_graphid, resourceids=resourceids)
 
         self.assertTrue(result['success'])
         self.assertEqual(result['deleted_count'], len(resourceids))

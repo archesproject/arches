@@ -306,7 +306,7 @@ class BulkDataDeletion(BaseBulkEditor):
         if nodegroup_id:
             deleted = self.delete_tiles(userid, loadid, nodegroup_id, resourceids)
         elif graph_id or resourceids:
-            deleted = self.delete_resources(userid, loadid, graph_id, resourceids)
+            deleted = self.delete_resources(userid, loadid, graphid=graph_id, resourceids=resourceids)
 
         with connection.cursor() as cursor:
             if deleted["success"]:
