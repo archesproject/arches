@@ -110,7 +110,7 @@ class BaseDataType(object):
         if node is None:
             return None
         if query_layer:
-            tileserver_url = urllib.parse.unquote(reverse("mvt", args=(node.nodeid, "{z}", "{x}", "{y}", query_layer["targetnodeid"], query_layer["targetvalue"])))
+            tileserver_url = urllib.parse.unquote(reverse("mvt", args=(node.nodeid, "{z}", "{x}", "{y}"), kwargs={"targetvalue": query_layer["targetvalue"]}))
         source_config = {"type": "vector", "tiles": [tileserver_url]}
         count = None
         if preview == True:

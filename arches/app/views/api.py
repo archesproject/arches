@@ -270,7 +270,7 @@ class MVT(APIBase):
     EARTHCIRCUM = 40075016.6856
     PIXELSPERTILE = 256
 
-    def get(self, request, nodeid, zoom, x, y):
+    def get(self, request, nodeid, zoom, x, y, **kwargs):
         if hasattr(request.user, "userprofile") is not True:
             models.UserProfile.objects.create(user=request.user)
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
@@ -280,7 +280,8 @@ class MVT(APIBase):
             raise Http404()
         search_geom_count = 0
         config = node.config
-        cache_key = MVT.create_mvt_cache_key(node, zoom, x, y, request.user)
+        target_nodevalue = kwargs.pop("targetvalue", None)
+        cache_key = MVT.create_mvt_cache_key(node, zoom, x, y, request.user, target_nodevalue)
         tile = cache.get(cache_key)
         if tile is None:
             resource_ids = get_restricted_instances(request.user, allresources=True)
@@ -398,8 +399,11 @@ class MVT(APIBase):
             raise Http404()
         return HttpResponse(tile, content_type="application/x-protobuf")
 
-    def create_mvt_cache_key(node, zoom, x, y, user):
-        return f"mvt_{str(node.nodeid)}_{zoom}_{x}_{y}_{user.id}"
+    def create_mvt_cache_key(node, zoom, x, y, user, target_nodevalue):
+        if target_nodevalue:
+            return f"mvt_{str(node.nodeid)}_{zoom}_{x}_{y}_{user.id}_{target_nodevalue}"
+        else:
+            return f"mvt_{str(node.nodeid)}_{zoom}_{x}_{y}_{user.id}"
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Graphs(APIBase):
