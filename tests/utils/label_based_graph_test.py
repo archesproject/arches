@@ -16,7 +16,7 @@ from arches.app.utils.label_based_graph import (
 )
 
 # these tests can be run from the command line via
-# python manage.py test tests/utils/label_based_graph_test.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.utils.label_based_graph_test --settings="tests.test_settings"
 
 class LabelBasedNodeTests(TestCase):
     @classmethod

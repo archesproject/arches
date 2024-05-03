@@ -16,13 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
-
 import os
 import json
 import time
@@ -42,7 +35,7 @@ from arches.app.search.elasticsearch_dsl_builder import Query, Term
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
 
 # these tests can be run from the command line via
-# python manage.py test tests/views/search_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.views.search_tests --settings="tests.test_settings"
 
 
 class SearchTests(ArchesTestCase):

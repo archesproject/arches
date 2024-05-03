@@ -5,7 +5,7 @@
 // to this list, ordered by width. For examples: (mobile, tablet, desktop).
 // $mq-show-breakpoints: (mobile, mobileLandscape, tablet, desktop, wide);
 
-//@import '../../node_modules/sass-mq/mq.import';
+//@import url(node_modules/sass-mq/mq.import);
 
 /// Responsive breakpoint manager
 /// @access public

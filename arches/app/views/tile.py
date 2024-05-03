@@ -95,6 +95,7 @@ class TileData(View):
         if self.action == "update_tile":
             json = request.POST.get("data", None)
             accepted_provisional = request.POST.get("accepted_provisional", None)
+            resource_creation = False
             if accepted_provisional is not None:
                 accepted_provisional_edit = JSONDeserializer().deserialize(accepted_provisional)
             if json is not None:
@@ -111,6 +112,7 @@ class TileData(View):
                 try:
                     models.ResourceInstance.objects.get(pk=data["resourceinstance_id"])
                 except ObjectDoesNotExist:
+                    resource_creation = True
                     try:
                         resource = Resource(uuid.UUID(str(data["resourceinstance_id"])))
                     except ValueError:
@@ -141,7 +143,7 @@ class TileData(View):
                             try:
                                 if accepted_provisional is None:
                                     try:
-                                        tile.save(request=request, transaction_id=transaction_id)
+                                        tile.save(request=request, resource_creation=resource_creation, transaction_id=transaction_id)
                                     except TileValidationError as e:
                                         resource_tiles_exist = models.TileModel.objects.filter(resourceinstance=tile.resourceinstance).exists()
                                         if not resource_tiles_exist:
@@ -163,7 +165,7 @@ class TileData(View):
                                             "edit": accepted_provisional_edit,
                                             "provisional_editor": provisional_editor,
                                         }
-                                    tile.save(request=request, provisional_edit_log_details=prov_edit_log_details)
+                                    tile.save(request=request, resource_creation=resource_creation, provisional_edit_log_details=prov_edit_log_details)
 
                                 if tile.provisionaledits is not None and str(request.user.id) in tile.provisionaledits:
                                     tile.data = tile.provisionaledits[str(request.user.id)]["value"]

@@ -10,7 +10,7 @@ import Tooltip from 'primevue/tooltip';
 import { createApp } from 'vue';
 import { createGettext } from "vue3-gettext";
 
-export default async function createVueApp(vueComponent){
+export default async function createVueApplication(vueComponent){
     /**
      * This wrapper allows us to maintain a level of control inside arches-core
      * over Vue apps. For instance this allows us to abstract i18n setup/config

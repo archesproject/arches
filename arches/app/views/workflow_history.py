@@ -1,22 +1,23 @@
 import json
 
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import F, JSONField, Value
 from django.db.models.expressions import CombinedExpression
 from django.db.utils import IntegrityError
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.generic import View
 
-from arches.app.utils.permission_backend import user_is_resource_editor
+from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.models import models
 
 
+@method_decorator(group_required("Resource Editor", raise_exception=True), name="dispatch")
 class WorkflowHistoryView(View):
 
     def get(self, request, workflowid):
-        if not user_is_resource_editor(request.user):
-            return JSONErrorResponse(_("Request Failed"), _("Permission Denied"), status=403)
         try:
             if request.user.is_superuser:
                 workflow_history = models.WorkflowHistory.objects.get(workflowid=workflowid)
@@ -28,9 +29,6 @@ class WorkflowHistoryView(View):
         return JSONResponse(workflow_history, status=200)
 
     def post(self, request, workflowid):
-        if not user_is_resource_editor(request.user):
-            return JSONErrorResponse(_("Request Failed"), _("Permission Denied"), status=403)
-
         data = json.loads(request.body)
         stepdata = data.get("stepdata", {})
         componentdata = data.get("componentdata", {})
@@ -60,16 +58,16 @@ class WorkflowHistoryView(View):
                         workflowid = workflowid,
                     )
                 else:
-                    return JSONErrorResponse(_("Request Failed"), _("Permission Denied"), status=403)
-            
+                    raise PermissionDenied
+
             if not created:
                 if history.completed:
                     return JSONErrorResponse(
                         _("Request Failed"),
                         _("Workflow already completed"),
-                        status=401,
+                        status=400,
                     )
-                
+
                 history.completed = data.get("completed", False)
                 if history.completed:
                     history.user_id = request.user.pk

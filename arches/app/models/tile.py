@@ -171,6 +171,7 @@ class Tile(models.TileModel):
         edit.edittype = edit_type
         edit.newprovisionalvalue = newprovisionalvalue
         edit.oldprovisionalvalue = oldprovisionalvalue
+        edit.note = note
         if transaction_id is not None:
             edit.transactionid = transaction_id
         edit.save()
@@ -391,6 +392,8 @@ class Tile(models.TileModel):
         index = kwargs.pop("index", True)
         user = kwargs.pop("user", None)
         new_resource_created = kwargs.pop("new_resource_created", False)
+        resource_creation = kwargs.pop("resource_creation", False)
+        note = "resource creation" if resource_creation else None
         context = kwargs.pop("context", None)
         transaction_id = kwargs.pop("transaction_id", None)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
@@ -470,6 +473,7 @@ class Tile(models.TileModel):
                     provisional_edit_log_details=provisional_edit_log_details,
                     transaction_id=transaction_id,
                     new_resource_created=new_resource_created,
+                    note=note,
                 )
             else:
                 self.save_edit(
@@ -486,7 +490,7 @@ class Tile(models.TileModel):
             for tile in self.tiles:
                 tile.resourceinstance = self.resourceinstance
                 tile.parenttile = self
-                tile.save(*args, request=request, index=False, **kwargs)
+                tile.save(*args, request=request, resource_creation=resource_creation, index=False, **kwargs)
 
             resource = Resource.objects.get(pk=self.resourceinstance_id)
             resource.save_descriptors(context={'tile': self})

@@ -4,6 +4,7 @@ import datetime
 from django.contrib.auth.models import User
 from django.core import management
 from django.test.client import RequestFactory, Client
+from django.test.utils import captured_stdout
 from django.urls import reverse
 from django.db import connection
 from arches.app.utils.i18n import LanguageSynchronizer
@@ -20,7 +21,7 @@ from arches.app.utils.data_management.resources.formats.rdffile import JsonLdRea
 from pyld.jsonld import expand
 
 # these tests can be run from the command line via
-# python manage.py test tests/importer/jsonld_import_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.importer.jsonld_import_tests --settings="tests.test_settings"
 
 
 class JsonLDImportTests(ArchesTestCase):
@@ -203,9 +204,8 @@ class JsonLDImportTests(ArchesTestCase):
             data = JSONDeserializer().deserialize(data)
             reader = JsonLdReader()
             # import ipdb; ipdb.sset_trace()
-            reader.read_resource(data, resourceid=resource_id, graphid=graph_id)
-
-            print(reader)
+            with captured_stdout():
+                reader.read_resource(data, resourceid=resource_id, graphid=graph_id)
 
     def test_1_basic_import(self):
         """Plain string should import and be automatically converted to i18n string of default language"""
@@ -574,7 +574,8 @@ class JsonLDImportTests(ArchesTestCase):
 
     def test_4_5098_resinst(self):
         # Make instances for this new one to reference
-        BusinessDataImporter("tests/fixtures/jsonld_base/data/test_2_instances.json").import_business_data()
+        with captured_stdout():
+            BusinessDataImporter("tests/fixtures/jsonld_base/data/test_2_instances.json").import_business_data()
         data = """
             {
                 "@id": "http://localhost:8000/resources/abcd1234-1234-1129-b6e7-3af9d3b32b71",
@@ -636,7 +637,8 @@ class JsonLDImportTests(ArchesTestCase):
 
     def test_5_5098_resinst_branch(self):
         # 2019-11-01 - Conversely this fails, as it is in a branch
-        BusinessDataImporter("tests/fixtures/jsonld_base/data/test_2_instances.json").import_business_data()
+        with captured_stdout():
+            BusinessDataImporter("tests/fixtures/jsonld_base/data/test_2_instances.json").import_business_data()
 
         data = """
             {
@@ -777,7 +779,8 @@ class JsonLDImportTests(ArchesTestCase):
     def test_7b_5121_branches(self):
 
         # This loads the referenced resource, 2a615f66...001122
-        BusinessDataImporter("tests/fixtures/jsonld_base/data/test_5121b_reference_instances.json").import_business_data()
+        with captured_stdout():
+            BusinessDataImporter("tests/fixtures/jsonld_base/data/test_5121b_reference_instances.json").import_business_data()
 
         # The third node is the resource-instance, as has_note is required in the semantic branch
         # So none of the three nodes are ambiguous and should all load at the same time
@@ -1074,7 +1077,8 @@ class JsonLDImportTests(ArchesTestCase):
             resource_id="5683f462-107d-11ea-b7e9-acde48001122",
         )
 
-        response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
+        with captured_stdout():
+            response = self.client.put(url, data=data, HTTP_AUTHORIZATION=f"Bearer {self.token}")
         # print(f"\n\n\nTest c response: {response.content}")
 
         self.assertTrue(response.status_code == 201)

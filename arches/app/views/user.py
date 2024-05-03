@@ -59,20 +59,18 @@ class UserManagerView(BaseManagerView):
     def get_user_details(self, user):
         identities = []
         for group in Group.objects.all():
-            users = group.user_set.all()
-            if len(users) > 0:
-                groupUsers = [
-                    {
-                        "id": user.id,
-                        "first_name": user.first_name,
-                        "last_name": user.last_name,
-                        "email": user.email,
-                        "last_login": self.get_last_login(user.last_login),
-                        "username": user.username,
-                        "groups": [gp.id for gp in user.groups.all()],
-                    }
-                    for user in users
-                ]
+            groupUsers = [
+                {
+                    "id": user.id,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "email": user.email,
+                    "last_login": self.get_last_login(user.last_login),
+                    "username": user.username,
+                    "groups": [gp.id for gp in user.groups.all()],
+                }
+                for user in group.user_set.all()
+            ]
             identities.append(
                 {"name": group.name, "type": "group", "id": group.pk, "users": groupUsers, "default_permissions": group.permissions.all()}
             )

@@ -19,7 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from arches.settings import *
 import arches
 import os
-import inspect
 
 try:
     from django.utils.translation import gettext_lazy as _
@@ -27,8 +26,6 @@ except ImportError:  # unable to import prior to installing requirements.txt in 
     pass
 
 PACKAGE_NAME = "arches"
-ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-ROOT_DIR = os.path.normpath(os.path.join(ROOT_DIR, "..", "arches"))
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 APP_ROOT = ""
 
@@ -48,7 +45,7 @@ RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, "fixtures", "resource_graphs
 ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, "fixtures", "ontologies", "test_ontology")
 ONTOLOGY_PATH = os.path.join(TEST_ROOT, "fixtures", "ontologies", "cidoc_crm")
 
-BUSISNESS_DATA_FILES = (
+BUSINESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -64,37 +61,18 @@ CACHES = {
     },
 }
 
+LOGGING["loggers"]["arches"]["level"] = "ERROR"
+
 ELASTICSEARCH_PREFIX = "test"
 
 TEST_RUNNER = "tests.base_test.ArchesTestRunner"
+SILENCED_SYSTEM_CHECKS.append("arches.W001")  # Cache backend does not support rate-limiting
 
 # could add Chrome, PhantomJS etc... here
 LOCAL_BROWSERS = []  # ['Firefox']
 
-# these are set in Travis CI
-SAUCE_USERNAME = os.environ.get("SAUCE_USERNAME")
-SAUCE_ACCESS_KEY = os.environ.get("SAUCE_ACCESS_KEY")
-
 ENABLE_USER_SIGNUP = True
 FORCE_USER_SIGNUP_EMAIL_AUTHENTICATION = True
-
-RUN_LOCAL = True
-if SAUCE_USERNAME and SAUCE_ACCESS_KEY:
-    RUN_LOCAL = False
-
-# browser/os combinations to use with saucelabs
-REMOTE_BROWSERS = [
-    # {"platform": "Windows 8.1",
-    #  "browserName": "internet explorer",
-    #  "version": "11"},
-    # {"platform": "Mac OS X 10.9",
-    #  "browserName": "chrome",
-    #  "version": "53"},
-    # {"platform": "Linux",
-    #  "browserName": "firefox",
-    #  "version": "45"}
-]
-
 
 OVERRIDE_RESOURCE_MODEL_LOCK = True
 

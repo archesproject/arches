@@ -299,6 +299,7 @@ class Graph(models.GraphModel):
             node.issearchable = nodeobj.get("issearchable", True)
             node.isrequired = nodeobj.get("isrequired", False)
             node.exportable = nodeobj.get("exportable", False)
+            node.sortorder = nodeobj.get("sortorder", 0)
             node.fieldname = nodeobj.get("fieldname", "")
             node.hascustomalias = nodeobj.get("hascustomalias", False)
             node.sourcebranchpublication_id = nodeobj.get("sourcebranchpublication_id", None)
@@ -417,18 +418,12 @@ class Graph(models.GraphModel):
         Adds a FunctionXGraph record to this graph
 
         Arguments:
-        node -- an object representing a FunctionXGraph instance or an actual models.CardModel instance
+        function -- an object representing a FunctionXGraph instance or an actual FunctionXGraph instance
 
         """
 
         if not isinstance(function, models.FunctionXGraph):
-            if isinstance(function, dict):
-                functionobj = models.FunctionXGraph(**function.copy())
-            else:
-                functionobj = function.copy()
-            function = models.FunctionXGraph()
-            function.function_id = functionobj.function_id
-            function.config = functionobj.config
+            function = models.FunctionXGraph(**function.copy())
 
         function.graph = self
 
@@ -531,8 +526,10 @@ class Graph(models.GraphModel):
 
             for functionxgraph in self._functions:
                 # Right now this only saves a functionxgraph record if the function is present in the database. Otherwise it silently fails.
-                if functionxgraph.function_id in [str(id) for id in models.Function.objects.values_list("functionid", flat=True)]:
+                try:
                     functionxgraph.save()
+                except:
+                    pass
 
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
