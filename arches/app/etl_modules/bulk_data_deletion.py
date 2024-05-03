@@ -186,7 +186,7 @@ class BulkDataDeletion(BaseBulkEditor):
 
         return result
 
-    def index_resource_deletion(self, loadid, resourceids):
+    def index_resource_deletion(self, loadid, resourceids=None):
         if not resourceids:
             with connection.cursor() as cursor:
                 cursor.execute(
@@ -359,7 +359,7 @@ class BulkDataDeletion(BaseBulkEditor):
             if nodegroup_id:
                 self.index_tile_deletion(loadid)
             else:
-                self.index_resource_deletion(loadid, resourceids)
+                self.index_resource_deletion(loadid, resourceids=resourceids)
         except Exception as e:
             logger.exception(e)
             with connection.cursor() as cursor:
