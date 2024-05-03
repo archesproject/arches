@@ -74,7 +74,7 @@ define([
                             context: '',
                             context_label: '',
                             id: params.term,
-                            text: params.term,
+                            text: arches.translations.containsTerm(params.term),
                             value: params.term
                         });
                         if(data.terms.length > 0){
