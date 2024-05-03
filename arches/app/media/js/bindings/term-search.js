@@ -81,7 +81,7 @@ define([
                             res.push({"text": arches.translations.termSearchTerm, "children": data.terms});
                         }
                         if(data.concepts.length > 0){
-                            res.push({"text": "Concepts", "children": data.concepts});
+                            res.push({"text": arches.translations.termSearchConcept, "children": data.concepts});
                         }
                         return {
                             results: res
