@@ -78,7 +78,7 @@ define([
                             value: params.term
                         });
                         if(data.terms.length > 0){
-                            res.push({"text": "Terms", "children": data.terms});
+                            res.push({"text": arches.translations.termSearchTerm, "children": data.terms});
                         }
                         if(data.concepts.length > 0){
                             res.push({"text": "Concepts", "children": data.concepts});
