@@ -209,6 +209,7 @@ class ConceptDataType(BaseConceptDataType):
             if value == "":
                 value = None
             else:
+                value = value.strip()
                 try:
                     value = self.lookup_labelid_from_label(value, kwargs)
                 except:
@@ -352,6 +353,7 @@ class ConceptListDataType(BaseConceptDataType):
                     if v == "":
                         continue
                     else:
+                        v = v.strip()
                         try:
                             ret.append(self.lookup_labelid_from_label(v, kwargs))
                         except:
