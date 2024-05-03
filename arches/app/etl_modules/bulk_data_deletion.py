@@ -135,12 +135,10 @@ class BulkDataDeletion(BaseBulkEditor):
         deleted_count = 0
         user = User.objects.get(id=userid) if userid else {}
         try:
-            if resourceids and graphid:
-                resources = Resource.objects.filter(graph_id=graphid).filter(pk__in=resourceids)
+            if resourceids:
+                resources = Resource.objects.filter(pk__in=resourceids)
             elif graphid:
                 resources = Resource.objects.filter(graph_id=graphid)
-            elif resourceids:
-                resources = Resource.objects.filter(pk__in=resourceids)
             else:
                 result["message"] = _("Unable to bulk delete resources as no graphid or resourceids specified.")
                 result["deleted_count"] = 0
