@@ -173,7 +173,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
                     
             <!-- ko if: $data.shouldShowGraphPublishButtons() -->
-                <span style="align-self: flex-end;">
+                <span style="align-self: flex-end; display: flex;">
                     <button 
                         style="transition: none;" 
                         class="btn btn-sm btn-primary btn-labeled fa fa-check" 
@@ -185,6 +185,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- ko ifnot: $data.shouldShowUpdatePublishedGraphsButton() -->
                         <span>{% trans "Publish" %}</span>
                         <!-- /ko -->
+                    </button>
+
+                    <button 
+                        style="transition: none;" 
+                        class="btn btn-sm btn-danger btn-labeled fa fa-times" 
+                        data-bind="visible: $data.shouldShowPublishModal, click: function() { $data.shouldShowPublishModal(false); }"
+                    >
+                        <span>{% trans "Cancel" %}</span>
                     </button>
                 </span>
             <!-- /ko -->
