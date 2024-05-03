@@ -197,6 +197,7 @@ def search_terms(request):
                             "id": i,
                             "text": result["key"],
                             "value": result["key"],
+                            "nodegroupid": result["nodegroupid"]["buckets"][0]["key"]
                         }
                     )
                     i = i + 1
