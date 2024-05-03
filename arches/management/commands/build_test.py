@@ -54,7 +54,7 @@ class Command(BaseCommand):
 
                 if options["reinstall_node_modules"] == True:
                     subprocess.call(
-                        'rm -rf ./media/node_modules', 
+                        'rm -rf ./node_modules', 
                         shell=True
                     )
                     subprocess.call(
