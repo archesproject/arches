@@ -1161,7 +1161,21 @@ class Command(BaseCommand):
         fields = [field.name for field in model._meta.fields]
         ws.append(fields)
         for instance in model.objects.all():
-            ws.append([getattr(instance, field) for field in fields])
+            row_data = []
+            for field in fields:
+                value = getattr(instance, field)
+                # Stringify related objects
+                if (isinstance(value, models.ControlledList) or isinstance(value, models.ControlledListItem) or isinstance(value, models.ControlledListItemValue)):
+                    row_data.append(str(getattr(value, 'id')) if value else "")
+                elif isinstance(value, models.Language):
+                    row_data.append(str(value.code)) 
+                elif isinstance(value, models.DValueType):
+                    row_data.append(str(value.valuetype))
+                elif isinstance(value, uuid.UUID):
+                        row_data.append(str(value) if value else "")
+                else:
+                    row_data.append(value if value else "")
+            ws.append(row_data)
 
     def import_business_data(
         self,
