@@ -362,7 +362,7 @@ class SearchTests(ArchesTestCase):
         """
 
         term_filter = [
-            {"type": "term", "context": "", "context_label": "", "id": "test", "text": "test", "value": "test", "inverted": False}
+            {"type": "term", "context": "", "context_label": "", "nodegroupid": self.search_model_name_nodeid, "id": "test", "text": "test", "value": "test", "inverted": False}
         ]
         response_json = get_response_json(self.client, term_filter=term_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 1)
@@ -375,7 +375,7 @@ class SearchTests(ArchesTestCase):
         """
 
         term_filter = [
-            {"type": "term", "context": "", "context_label": "", "id": "test", "text": "test", "value": "test", "inverted": True}
+            {"type": "term", "context": "", "context_label": "", "nodegroupid": self.search_model_name_nodeid, "id": "test", "text": "test", "value": "test", "inverted": True}
         ]
         response_json = get_response_json(self.client, term_filter=term_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 3)
