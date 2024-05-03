@@ -1146,7 +1146,9 @@ class Command(BaseCommand):
     
     def export_controlled_lists(self, data_dest=None):
         wb = openpyxl.Workbook()
-        self.export_model_to_sheet(wb, models.ControlledList)
+        ws = wb.active
+        ws.title = "ControlledList"
+        self.export_model_to_sheet(ws, models.ControlledList)
         self.export_model_to_sheet(wb, models.ControlledListItem)
         self.export_model_to_sheet(wb, models.ControlledListItemValue)
 
@@ -1157,7 +1159,12 @@ class Command(BaseCommand):
         self.stdout.write('Data exported successfully to exported_data.xlsx')
 
     def export_model_to_sheet(self, wb, model):
-        ws = wb.create_sheet(title=model.__name__)
+        # For the first sheet (ControlledList), use blank sheet that is initiallized with workbook
+        # otherwise, append a new sheet
+        if isinstance(wb, openpyxl.worksheet.worksheet.Worksheet):
+            ws = wb
+        else:
+            ws = wb.create_sheet(title=model.__name__)
         fields = [field.name for field in model._meta.fields]
         ws.append(fields)
         for instance in model.objects.all():
