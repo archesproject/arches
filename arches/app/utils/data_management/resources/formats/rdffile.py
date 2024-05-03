@@ -7,6 +7,7 @@ import datetime
 import logging
 from io import StringIO
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from .format import Writer, Reader
 from arches.app.models import models
 from arches.app.models.resource import Resource
@@ -25,6 +26,14 @@ from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand, set_document_l
 
 # Stop code from looking up the contexts online for every operation
 docCache = {}
+
+class ValueErrorWithNodeInfo(ValueError):
+    def __init__(self, *args, value=None, datatype=None, node_id=None, nodegroup_id=None):
+        super().__init__(*args)
+        self.value = value
+        self.datatype = datatype
+        self.node_id = node_id
+        self.nodegroup_id = nodegroup_id
 
 
 def fetch(url):
@@ -685,7 +694,13 @@ class JsonLdReader(Reader):
 
             if not possible:
                 # self.printline(f"Tried: {options}")
-                raise ValueError(f"Data does not match any actual node, despite prop/class combination {k} {clss}:\n{vi}")
+                raise ValueErrorWithNodeInfo(
+                    f"Data does not match any actual node, despite prop/class combination {k} {clss}:\n{vi}",
+                    value=value or uri,
+                    datatype=options[-1]["datatype"].datatype_name,
+                    node_id=options[-1]["node_id"],
+                    nodegroup_id=options[-1]["nodegroup_id"],
+                )
             elif len(possible) > 1:
                 # descend into data to check if there are further clarifying features
                 possible2 = []
@@ -701,7 +716,13 @@ class JsonLdReader(Reader):
                         self.printline(f"Failed due to {e}", indent + 1)
                         pass
                 if not possible2:
-                    raise ValueError("Considering branches, data does not match any node, despite a prop/class combination")
+                    raise ValueErrorWithNodeInfo(
+                        "Considering branches, data does not match any node, despite a prop/class combination",
+                        value=value or uri,
+                        datatype=possible[-1]["datatype"].datatype_name,
+                        node_id=possible[-1]["node_id"] if options else None,
+                        nodegroup_id=possible[-1]["nodegroup_id"] if options else None,
+                    )
                 else:
                     branch = possible2
             else:

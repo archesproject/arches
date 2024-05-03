@@ -9,6 +9,7 @@ from django.core.files.storage import default_storage
 from django.core.management import call_command
 from django.utils.translation import gettext as _
 
+from arches.app.utils.data_management.resources.formats.rdffile import ValueErrorWithNodeInfo
 from arches.app.etl_modules.base_import_module import BaseImportModule, FileValidationError
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.models.models import GraphModel, LoadErrors, LoadEvent, LoadStaging
@@ -100,7 +101,7 @@ class JSONLDImporter(BaseImportModule):
 
             self.handle_block(graph_slug, block)
 
-            summary["files"][file]["resources"].append(resource_id)
+            summary["files"][file]["resources"] = [resource_id]
 
         cursor.execute(
             """UPDATE load_event SET load_details = %s WHERE loadid = %s""",
@@ -125,13 +126,19 @@ class JSONLDImporter(BaseImportModule):
                 dry_run=True,  # don't save the resources
             )
         except Exception as e:
+            has_info = isinstance(e, ValueErrorWithNodeInfo)
             LoadErrors(
                 load_event_id=self.loadid,
                 type="graph",
                 source="/".join((graph_slug, block)),
                 error=_("Load JSON-LD command error"),
                 message=e.args[0],
+                value=str(e.value) if has_info else None,
+                datatype=e.datatype if has_info else None,
+                node_id=e.node_id if has_info else None,
+                nodegroup_id=e.nodegroup_id if has_info else None,
             ).save()
+
             # Prevent IntegrityError: https://code.djangoproject.com/ticket/35425
             LoadEvent.objects.filter(loadid=self.loadid).update(
                 user_id=self.userid,
@@ -142,7 +149,7 @@ class JSONLDImporter(BaseImportModule):
                 error_message=_("Load JSON-LD command error"),
                 load_end_time=datetime.now(),
             )
-            raise
+            return
 
         nodegroup_info, node_info = get_graph_tree_from_slug(graph_slug)
         self.populate_staging_table(resources, nodegroup_info, node_info)
