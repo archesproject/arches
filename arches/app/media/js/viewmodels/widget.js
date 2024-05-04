@@ -75,8 +75,10 @@ define([
             self[key] = obs;
 
             var forwardSubscription = self[key].subscribe(function(val) {
-                if (val && params.graphDesignerHasDirtyWidget) {
-                    params.graphDesignerHasDirtyWidget(true);
+                if (params.hasOwnProperty('graphDesignerHasDirtyWidget')) {
+                    if (val || val === 0) {
+                        params.graphDesignerHasDirtyWidget(true);
+                    }
                 }
 
                 var configObj = self.config();
