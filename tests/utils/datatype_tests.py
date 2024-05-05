@@ -132,3 +132,89 @@ class NonLocalizedStringDataTypeTests(ArchesTestCase):
         self.assertIsNone(tile1.data[nodeid1])
         string.clean(tile1, nodeid2)
         self.assertIsNone(tile1.data[nodeid2])
+
+
+class URLDataTypeTests(ArchesTestCase):
+    def test_validate(self):
+        url = DataTypeFactory().get_instance("url")
+
+        # Valid tile
+        no_errors = url.validate({"url": "https://www.google.com/", "url_label": "Google"})
+        self.assertEqual(len(no_errors), 0)
+        # Invalid URL
+        some_errors_invalid_url = url.validate({"url": "google", "url_label": "Google"})
+        self.assertEqual(len(some_errors_invalid_url), 1)
+        # No URL added - cannot save label without URL
+        some_errors_no_url = url.validate({"url_label": "Google"})
+        self.assertEqual(len(some_errors_no_url), 1)
+        # No URL added - with url empty string in object
+        some_errors_no_url = url.validate({"url": "", "url_label": "Google"})
+        self.assertEqual(len(some_errors_no_url), 1)
+
+    def test_pre_tile_save(self):
+        url = DataTypeFactory().get_instance("url")
+
+        nodeid = "c0ed4b2a-c4cc-11ee-9626-00155de1df34"
+        resourceinstanceid = "40000000-0000-0000-0000-000000000000"
+
+        url_no_label = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid,
+            "tileid": "",
+            "data": {nodeid: {"url": "https://www.google.com/"}},
+        }
+        tile1 = Tile(url_no_label)
+        url.pre_tile_save(tile1, nodeid)
+        self.assertIsNotNone(tile1.data[nodeid])
+        self.assertTrue("url_label" in tile1.data[nodeid])
+        self.assertFalse(tile1.data[nodeid]["url_label"])
+
+        url_with_label = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid,
+            "tileid": "",
+            "data": {nodeid: {"url": "https://www.google.com/", "url_label": "Google"}},
+        }
+        tile2 = Tile(url_with_label)
+        url.pre_tile_save(tile2, nodeid)
+        self.assertIsNotNone(tile2.data[nodeid])
+        self.assertTrue("url_label" in tile2.data[nodeid])
+        self.assertTrue(tile2.data[nodeid]["url_label"])
+
+    def test_clean(self):
+        url = DataTypeFactory().get_instance("url")
+
+        nodeid = "c0ed4b2a-c4cc-11ee-9626-00155de1df34"
+        resourceinstanceid = "40000000-0000-0000-0000-000000000000"
+
+        empty_data = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid,
+            "tileid": "",
+            "data": {nodeid: {"url": "", "url_label": ""}},
+        }
+        tile1 = Tile(empty_data)
+        url.clean(tile1, nodeid)
+        self.assertIsNone(tile1.data[nodeid])
+
+    def test_pre_structure_tile_data(self):
+        url = DataTypeFactory().get_instance("url")
+
+        nodeid = "c0ed4b2a-c4cc-11ee-9626-00155de1df34"
+        resourceinstanceid = "40000000-0000-0000-0000-000000000000"
+
+        data_without_label = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid,
+            "tileid": "",
+            "data": {nodeid: {"url": ""}},
+        }
+        tile1 = Tile(data_without_label)
+        url.pre_structure_tile_data(tile1, nodeid)
+        self.assertIsNotNone(tile1.data[nodeid])
+        self.assertTrue("url_label" in tile1.data[nodeid])
+        self.assertFalse(tile1.data[nodeid]["url_label"])

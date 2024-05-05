@@ -49,6 +49,16 @@ define([
 
         this.fileListNodeId = getfileListNode();
 
+        this.maxFilesize = ko.computed(function(){
+            var mfs = "Missing maxFilesize";
+            self.card.widgets().forEach(function(widget){
+                if (widget.node_id() === self.fileListNodeId) {
+                    mfs = widget.config.maxFilesize() || "--";
+                }
+            });
+            return mfs;
+        });
+
         this.cleanUrl = function(url) {
             const httpRegex = /^https?:\/\//;
             return !url || httpRegex.test(url) || url.startsWith(arches.urls.url_subpath) ? url :

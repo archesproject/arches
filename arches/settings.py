@@ -376,7 +376,7 @@ MIDDLEWARE = [
 
 WEBPACK_LOADER = {
     "DEFAULT": {
-        "STATS_FILE": os.path.join(ROOT_DIR, "webpack/webpack-stats.json"),
+        "STATS_FILE": os.path.join(ROOT_DIR, "..", "webpack/webpack-stats.json"),
     },
 }
 
@@ -502,7 +502,7 @@ TIMEWHEEL_DATE_TIERS = None
 CACHE_BY_USER = {
     "default": 3600 * 24, #24hrs
     "anonymous": 3600 * 24 #24hrs
-    }
+}
 
 BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION = False
 BYPASS_REQUIRED_VALUE_TILE_VALIDATION = False
