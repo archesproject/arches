@@ -2439,23 +2439,6 @@ class ResourceInstanceDataType(BaseDataType):
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)
     
-    def get_search_terms(self, nodevalue, nodeid=None):
-        terms = []
-        default_ontology_lang = "en-US"
-
-        def get_friendly_onotology_name(ontologyproperty):
-            return ontologyproperty.rsplit('/', 1)[-1]
-
-        nodevalues = self.get_nodevalue_as_list(nodevalue)
-        for nodevalue in nodevalues:
-            if nodevalue is not None and isinstance(nodevalue, dict):
-                if nodevalue["ontologyProperty"] and nodevalue["ontologyProperty"] != "":
-                    terms.append(SearchTerm(value=get_friendly_onotology_name(nodevalue["ontologyProperty"]), lang=default_ontology_lang))
-                if nodevalue["inverseOntologyProperty"] and nodevalue["inverseOntologyProperty"] != "":
-                    terms.append(SearchTerm(value=get_friendly_onotology_name(nodevalue["inverseOntologyProperty"]), lang=default_ontology_lang))
-
-        return terms
-
     def append_search_filters(self, value, node, query, request):
         try:
             if value["op"] == "null" or value["op"] == "not_null":
