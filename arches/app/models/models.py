@@ -1220,6 +1220,9 @@ class TileModel(models.Model):  # Tile
             add_to_update_fields(kwargs, "tileid")
         super(TileModel, self).save(*args, **kwargs)  # Call the "real" save() method.
 
+    def serialize(self, fields=None, exclude=['nodegroup'], **kwargs):
+        return JSONSerializer().handle_model(self, fields=fields, exclude=exclude, **kwargs)
+
 
 class Value(models.Model):
     valueid = models.UUIDField(primary_key=True)

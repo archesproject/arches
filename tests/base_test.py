@@ -131,7 +131,8 @@ class ArchesTestCase(TestCase):
             VALUES (
                 44, '{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
                 '{oauth_client_secret}',
-                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000', '{jwt_algorithm}');
+                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000', '{jwt_algorithm}')
+            ON CONFLICT DO NOTHING;
         """
 
         sql = sql.format(
@@ -141,10 +142,7 @@ class ArchesTestCase(TestCase):
             jwt_algorithm=test_settings.JWT_ALGORITHM,
         )
 
-        try:
-            cursor.execute(sql)
-        except psycopg2.errors.UniqueViolation:  # entry already in database
-            pass
+        cursor.execute(sql)
 
     @classmethod
     def tearDownClass(cls):
