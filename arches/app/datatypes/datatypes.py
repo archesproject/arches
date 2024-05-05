@@ -2299,15 +2299,10 @@ class ResourceInstanceDataType(BaseDataType):
 
     """
 
-    def get_related_resource_instance_list(self, nodevalue):
-        if not isinstance(nodevalue, list):
-            nodevalue = [nodevalue]
-        return nodevalue
-
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         if value is not None:
-            resourceXresourceIds = self.get_related_resource_instance_list(value)
+            resourceXresourceIds = self.get_nodevalue_as_list(value)
             for resourceXresourceId in resourceXresourceIds:
                 try:
                     resourceid = resourceXresourceId["resourceId"]
@@ -2376,7 +2371,7 @@ class ResourceInstanceDataType(BaseDataType):
 
         resourceid = None
         data = self.get_tile_data(tile)
-        nodevalue = self.get_related_resource_instance_list(data[str(node.nodeid)])
+        nodevalue = self.get_nodevalue_as_list(data[str(node.nodeid)])
 
         items = []
         for resourceXresource in nodevalue:
@@ -2397,7 +2392,7 @@ class ResourceInstanceDataType(BaseDataType):
 
         data = self.get_tile_data(tile)
         if data:
-            nodevalue = self.get_related_resource_instance_list(data[str(node.nodeid)])
+            nodevalue = self.get_nodevalue_as_list(data[str(node.nodeid)])
 
             for resourceXresource in nodevalue:
                 try:
@@ -2445,7 +2440,7 @@ class ResourceInstanceDataType(BaseDataType):
         def get_friendly_onotology_name(ontologyproperty):
             return ontologyproperty.rsplit('/', 1)[-1]
 
-        nodevalues = self.get_related_resource_instance_list(nodevalue)
+        nodevalues = self.get_nodevalue_as_list(nodevalue)
         for nodevalue in nodevalues:
             if nodevalue is not None and isinstance(nodevalue, dict):
                 if nodevalue["ontologyProperty"] and nodevalue["ontologyProperty"] != "":
@@ -2545,7 +2540,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         resourceid = None
         data = self.get_tile_data(tile)
         if data:
-            nodevalue = self.get_related_resource_instance_list(data[str(node.nodeid)])
+            nodevalue = self.get_nodevalue_as_list(data[str(node.nodeid)])
             items = []
 
             for resourceXresource in nodevalue:
