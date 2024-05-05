@@ -2438,7 +2438,7 @@ class ResourceInstanceDataType(BaseDataType):
 
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)
-    
+
     def append_search_filters(self, value, node, query, request):
         try:
             if value["op"] == "null" or value["op"] == "not_null":
