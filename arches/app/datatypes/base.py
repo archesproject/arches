@@ -377,6 +377,11 @@ class BaseDataType(object):
         """
 
         return False
+    
+    def get_nodevalue_as_list(self, nodevalue):
+        if not isinstance(nodevalue, (list, tuple)):
+            return [nodevalue]
+        return nodevalue
 
     def ignore_keys(self):
         """
