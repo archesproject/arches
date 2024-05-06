@@ -41,7 +41,7 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
             # possible by assigning appropriate group permissions).
             if result["permitted"] == "unknown":
                 result["permitted"] = False
-            elif result["permitted"] == False:
+            elif result["permitted"] is False:
 
                 # This covers the case where one group denies permission and another
                 # allows it. Ideally, the deny would override (as normal in Arches) but
