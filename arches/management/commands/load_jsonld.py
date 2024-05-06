@@ -157,7 +157,13 @@ class Command(BaseCommand):
         self.resources = []
         self.load_resources(options)
 
-        return self.resources
+        if options["dry_run"]:
+            # Return the unused resources to the python caller.
+            # Technically, you are only supposed to return a string,
+            # so that it can be written to self.stdout, but if you
+            # just patch out Django's write() call, you can do as you like.
+            self.stdout.write = lambda unused: None
+            return self.resources
 
     def load_resources(self, options):
 

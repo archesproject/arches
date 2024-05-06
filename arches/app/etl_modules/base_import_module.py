@@ -13,6 +13,7 @@ from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
 from django.db import connection
 
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
 from arches.app.models.models import Node
@@ -34,6 +35,7 @@ class BaseImportModule:
         self.fileid = None
         self.loadid = loadid
         self.legacyid_lookup = {}
+        self.datatype_factory = DataTypeFactory()
 
         if self.request:
             self.userid = request.user.id

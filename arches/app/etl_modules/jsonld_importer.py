@@ -138,20 +138,19 @@ class JSONLDImporter(BaseImportModule):
             self.handle_early_failure(e, graph_slug=graph_slug, block=block)
             return
 
-        nodegroup_info, node_info = get_graph_tree_from_slug(graph_slug)
-        self.populate_staging_table(resources, nodegroup_info, node_info)
+        nodegroup_info, _nodes = get_graph_tree_from_slug(graph_slug)
+        self.populate_staging_table(resources, nodegroup_info)
 
-    def populate_staging_table(self, resources, nodegroup_info, node_info):
+    def populate_staging_table(self, resources, nodegroup_info):
         load_staging_instances = []
         for resource in resources:
             for tile in resource.get_flattened_tiles():
                 load_staging_instances.append(
-                    self.load_staging_instance_from_tile(tile, resource, nodegroup_info, node_info)
+                    self.load_staging_instance_from_tile(tile, resource, nodegroup_info)
                 )
 
         tile_batch_size = settings.BULK_IMPORT_BATCH_SIZE * 10  # assume 10 tiles/resource
         LoadStaging.objects.bulk_create(load_staging_instances, batch_size=tile_batch_size)
-        # todo(jtw): edit log?
 
     def handle_early_failure(self, exception, graph_slug, block):
         """The CLI might have failed well before creating resources and tiles,
@@ -206,40 +205,48 @@ class JSONLDImporter(BaseImportModule):
         ls.clean_fields()
         ls.save()
 
-    def load_staging_instance_from_tile(self, tile, resource, nodegroup_info, node_info):
-        for nodeid, source_value in tile.data.entries():
-            datatype = node_info[nodeid]["datatype"]
-            config = node_info[nodeid]["config"]
+    def load_staging_instance_from_tile(self, tile, resource, nodegroup_info):
+        all_tile_errors = []
+        for nodeid, source_value in tile.data.items():
+            datatype = nodegroup_info[nodeid]["datatype"]
+            datatype_instance = self.datatype_factory.get_instance(datatype)
+            config = nodegroup_info[nodeid]["config"]
+            config["path"] = self.temp_dir
+            config["loadid"] = self.loadid
             value, validation_errors = self.prepare_data_for_loading(
-                datatype,
+                datatype_instance,
                 source_value,
                 config,
             )
             passes_validation = len(validation_errors) == 0
-            self.save_validation_errors(validation_errors, tile, source_value, datatype, nodeid)
+            self.save_validation_errors(validation_errors, tile, source_value, datatype_instance, nodeid)
 
-            tile_info = {
-                "value": value,
-                "valid": passes_validation,
-                "source": source_value,
-                "notes": "|".join(validation_errors),
-                "datatype": datatype,
-            }
+            all_tile_errors.extend(validation_errors)
 
-            return LoadStaging(
-                nodegroup_id=tile.nodegroup_id,
-                load_event_id=self.loadid,
-                value=JSONSerializer().serialize(tile_info),
-                legacyid=resource.legacyid,
-                resourceid=resource.pk,
-                tileid=tile.pk,
-                parenttileid=tile.parenttile_id,
-                passes_validation=passes_validation,
-                nodegroup_depth=nodegroup_info[tile.nodegroup_id].depth,
-                source_description=None,
-                error_message=None,
-                operation="insert",
-            )
+        tile_info = {
+            "value": value,
+            "valid": passes_validation,
+            "source": source_value,
+            "notes": "|".join(validation_errors),
+            "datatype": datatype,
+        }
+
+        ls = LoadStaging(
+            nodegroup_id=tile.nodegroup_id,
+            load_event_id=self.loadid,
+            value=JSONSerializer().serialize(tile_info),
+            legacyid=resource.legacyid,
+            resourceid=resource.pk,
+            tileid=tile.pk,
+            parenttileid=tile.parenttile_id,
+            passes_validation=passes_validation,
+            nodegroup_depth=nodegroup_info[nodeid]["depth"],
+            source_description=None,
+            error_message=None,
+            operation="insert",
+        )
+        ls.clean_fields()
+        return ls
 
     def save_validation_errors(self, validation_errors, tile, source_value, datatype, nodeid):
         for error in validation_errors:
