@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 import logging
+import pyprind
 import uuid
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -129,19 +130,34 @@ class BulkDataDeletion(BaseBulkEditor):
 
         return sample_data[0:5]
 
-    def delete_resources(self, userid, loadid, graphid, resourceids):
+    def delete_resources(self, userid, loadid, graphid=None, resourceids=None, verbose=False):
         result = {"success": False}
-        user = User.objects.get(id=userid)
+        deleted_count = 0
+        user = User.objects.get(id=userid) if userid else {}
         try:
-            if resourceids and graphid:
-                resources = Resource.objects.filter(graph_id=graphid).filter(pk__in=resourceids)
+            if resourceids:
+                resources = Resource.objects.filter(pk__in=resourceids)
             elif graphid:
                 resources = Resource.objects.filter(graph_id=graphid)
-            elif resourceids:
-                resources = Resource.objects.filter(pk__in=resourceids)
+            else:
+                result["message"] = _("Unable to bulk delete resources as no graphid or resourceids specified.")
+                result["deleted_count"] = 0
+                return result
+            
+            deleted_count = resources.count()
+
+            if verbose is True:
+                bar = pyprind.ProgBar(deleted_count)
             for resource in resources.iterator(chunk_size=2000):
                 resource.delete(user=user, index=False, transaction_id=loadid)
+                if verbose is True:
+                    bar.update()
+
+            if verbose is True:
+                print(bar)
             result["success"] = True
+            result["deleted_count"] = deleted_count
+            result["message"] = _("Successfully deleted {} resources").format(str(deleted_count))
         except Exception as e:
             logger.exception(e)
             result["message"] = _("Unable to delete resources: {}").format(str(e))
@@ -168,7 +184,7 @@ class BulkDataDeletion(BaseBulkEditor):
 
         return result
 
-    def index_resource_deletion(self, loadid, resourceids):
+    def index_resource_deletion(self, loadid, resourceids=None):
         if not resourceids:
             with connection.cursor() as cursor:
                 cursor.execute(
@@ -288,7 +304,7 @@ class BulkDataDeletion(BaseBulkEditor):
         if nodegroup_id:
             deleted = self.delete_tiles(userid, loadid, nodegroup_id, resourceids)
         elif graph_id or resourceids:
-            deleted = self.delete_resources(userid, loadid, graph_id, resourceids)
+            deleted = self.delete_resources(userid, loadid, graphid=graph_id, resourceids=resourceids)
 
         with connection.cursor() as cursor:
             if deleted["success"]:
@@ -341,7 +357,7 @@ class BulkDataDeletion(BaseBulkEditor):
             if nodegroup_id:
                 self.index_tile_deletion(loadid)
             else:
-                self.index_resource_deletion(loadid, resourceids)
+                self.index_resource_deletion(loadid, resourceids=resourceids)
         except Exception as e:
             logger.exception(e)
             with connection.cursor() as cursor:
