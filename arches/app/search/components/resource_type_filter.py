@@ -1,7 +1,7 @@
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Terms
 from arches.app.search.components.base import BaseSearchFilter
-from arches.app.models.models import Node
+from arches.app.models.models import Node, GraphModel
 from arches.app.utils.permission_backend import get_resource_types_by_perm
 
 details = {
@@ -59,4 +59,8 @@ class ResourceTypeFilter(BaseSearchFilter):
         search_results_object["query"].add_query(search_query)
 
     def view_data(self):
-        return {"resources": get_resource_types_by_perm(self.user, "read_nodegroup")}
+        return {"resources": list(
+            GraphModel.objects.filter(pk__in=get_resource_types_by_perm(self.user, "read_nodegroup"))
+                .order_by("name")
+                .all()
+        )}

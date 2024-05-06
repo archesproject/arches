@@ -189,10 +189,9 @@ class Graph(models.GraphModel):
 
                 edge_lookup = {edge["edgeid"]: edge for edge in json.loads(JSONSerializer().serialize(edges))}
 
-                for card in cards:
-                    widgets = list(card.cardxnodexwidget_set.all())
-                    for widget in widgets:
-                        self.widgets[widget.pk] = widget
+                widgets = models.CardXNodeXWidget.objects.filter(card__in=cards).all()
+                for widget in widgets:
+                    self.widgets[widget.pk] = widget
 
                 node_lookup = {}
                 for node in nodes:

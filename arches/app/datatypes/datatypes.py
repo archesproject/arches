@@ -2432,10 +2432,16 @@ class ResourceInstanceDataType(BaseDataType):
             return json.loads(value)
         except ValueError:
             # do this if json (invalid) is formatted with single quotes, re #6390
-            try:
-                return ast.literal_eval(value)
-            except:
+            if "'" in value:
+                try:
+                    return ast.literal_eval(value)
+                except:
+                    return value
+            elif isinstance(value, str):
+                return [{"resourceId": val} for val in value.split(";")]
+            else:
                 return value
+
         except TypeError:
             # data should come in as json but python list is accepted as well
             if isinstance(value, list):

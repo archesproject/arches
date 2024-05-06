@@ -75,7 +75,7 @@ class SearchResultsFilter(BaseSearchFilter):
             try:
                 permitted_tiles = []
                 for tile in result["_source"]["tiles"]:
-                    if tile["nodegroup_id"] in permitted_nodegroups or self.user is True:
+                    if str(tile["nodegroup_id"]) in permitted_nodegroups or self.user is True:
                         permitted_tiles.append(tile)
                 result["_source"]["tiles"] = permitted_tiles
             except KeyError:
