@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10121_workflowhistory"),
+        ("models", "10709_refresh_geos_by_transaction"),
     ]
 
     operations = [
