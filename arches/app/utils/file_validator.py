@@ -62,10 +62,15 @@ class FileValidator(object):
                 with zipfile.ZipFile(file, "r") as zip_ref:
                     files = zip_ref.infolist()
                     for zip_file in files:
-                        if not zip_file.filename.startswith("__MACOSX") and not zip_file.is_dir():
-                            errors = errors + self.validate_file_type(
-                                io.BytesIO(zip_ref.open(zip_file.filename).read()), extension=zip_file.filename.split(".")[-1]
-                            )
+                        if (
+                            zip_file.filename.startswith("__MACOSX")
+                            or zip_file.filename.lower().endswith("ds_store")
+                            or zip_file.is_dir()
+                        ):
+                            continue
+                        errors = errors + self.validate_file_type(
+                            io.BytesIO(zip_ref.open(zip_file.filename).read()), extension=zip_file.filename.split(".")[-1]
+                        )
                     if len(errors) > 0:
                         error = "Unsafe zip file contents"
                         errors.append(error)
