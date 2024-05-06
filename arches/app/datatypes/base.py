@@ -202,6 +202,8 @@ class BaseDataType(object):
             return provisionaledits[userid]["value"]
         elif not data:
             logger.exception(_("Tile has no authoritative or provisional data"))
+        else:
+            return data
 
 
     def get_display_value(self, tile, node, **kwargs):
