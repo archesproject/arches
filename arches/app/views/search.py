@@ -465,10 +465,11 @@ def retrieve_search_results(search_filter_factory, search_results_object, dsl, l
                     resource["_source"][descriptor_type] = _("Undefined")
         count = dsl.count(index=RESOURCES_INDEX)
 
-    return search_results_object, count, results
-
         for key, value in list(search_results_object.items()):
             ret[key] = value
+
+    return search_results_object, count, results
+
 
 def get_provisional_type(provisional_filter, user):
     """
