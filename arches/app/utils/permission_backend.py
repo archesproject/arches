@@ -22,74 +22,6 @@ class PermissionBackend:
         return self._backend.get_all_permissions(user_obj, obj=obj)
 
 
-def get_editable_resource_types(user):
-    """
-    returns a list of graphs of which a user can edit resource instances
-
-    Arguments:
-    user -- the user to check
-
-    """
-
-    if user_is_resource_editor(user):
-        return get_resource_types_by_perm(user, ["models.write_nodegroup", "models.delete_nodegroup"])
-    else:
-        return []
-
-
-def get_createable_resource_types(user):
-    """
-    returns a list of graphs of which a user can create resource instances
-
-    Arguments:
-    user -- the user to check
-
-    """
-    if user_is_resource_editor(user):
-        return get_resource_types_by_perm(user, "models.write_nodegroup")
-    else:
-        return []
-
-
-def user_can_edit_model_nodegroups(user, resource):
-    """
-    returns a list of graphs of which a user can edit resource instances
-
-    Arguments:
-    user -- the user to check
-    resource -- an instance of a model
-
-    """
-
-    return user_has_resource_model_permissions(user, ["models.write_nodegroup"], resource)
-
-
-def user_can_delete_model_nodegroups(user, resource):
-    """
-    returns a list of graphs of which a user can edit resource instances
-
-    Arguments:
-    user -- the user to check
-    resource -- an instance of a model
-
-    """
-
-    return user_has_resource_model_permissions(user, ["models.delete_nodegroup"], resource)
-
-
-def user_can_read_graph(user, graph_id):
-    """
-    returns a boolean denoting if a user has permmission to read a model's nodegroups
-
-    Arguments:
-    user -- the user to check
-    graph_id -- a graph id to check if a user has permissions to that graph's type specifically
-
-    """
-
-    return user_has_resource_model_permissions(user, ["models.read_nodegroup"], graph_id=graph_id)
-
-
 def user_created_transaction(user, transactionid):
     if user.is_authenticated:
         if user.is_superuser:
@@ -103,6 +35,26 @@ def user_created_transaction(user, transactionid):
 
 
 class PermissionFramework(metaclass=ABCMeta):
+    @abstractmethod
+    def user_can_read_graph(self, user, graph_id):
+        ...
+
+    @abstractmethod
+    def user_can_delete_model_nodegroups(self, user, resource):
+        ...
+
+    @abstractmethod
+    def user_can_edit_model_nodegroups(self, user, resource):
+        ...
+
+    @abstractmethod
+    def get_createable_resource_types(self, user):
+        ...
+
+    @abstractmethod
+    def get_editable_resource_types(self, user):
+        ...
+
     @abstractmethod
     def assign_perm(self, perm, user_or_group, obj=None):
         ...
@@ -306,3 +258,18 @@ def get_resource_types_by_perm(user, perms):
 
 def user_in_group_by_name(user, names):
     return _get_permission_framework().user_in_group_by_name(user, names)
+
+def user_can_read_graph(user, graph_id):
+    return _get_permission_framework().user_can_read_graph(user, graph_id)
+
+def user_can_delete_model_nodegroups(user, resource):
+    return _get_permission_framework().user_can_delete_model_nodegroups(user, resource)
+
+def user_can_edit_model_nodegroups(user, resource):
+    return _get_permission_framework().user_can_edit_model_nodegroups(user, resource)
+
+def get_createable_resource_types(user):
+    return _get_permission_framework().get_createable_resource_types(user)
+
+def get_editable_resource_types(user):
+    return _get_permission_framework().get_editable_resource_types(user)

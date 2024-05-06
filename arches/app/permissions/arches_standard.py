@@ -474,6 +474,74 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         return False
 
 
+    def get_editable_resource_types(self, user: User) -> list[str]:
+        """
+        returns a list of graphs of which a user can edit resource instances
+
+        Arguments:
+        user -- the user to check
+
+        """
+
+        if self.user_is_resource_editor(user):
+            return self.get_resource_types_by_perm(user, ["models.write_nodegroup", "models.delete_nodegroup"])
+        else:
+            return []
+
+
+    def get_createable_resource_types(self, user: User) -> list[str]:
+        """
+        returns a list of graphs of which a user can create resource instances
+
+        Arguments:
+        user -- the user to check
+
+        """
+        if self.user_is_resource_editor(user):
+            return self.get_resource_types_by_perm(user, "models.write_nodegroup")
+        else:
+            return []
+
+
+    def user_can_edit_model_nodegroups(self, user: User, resource: ResourceInstance) -> bool:
+        """
+        returns a list of graphs of which a user can edit resource instances
+
+        Arguments:
+        user -- the user to check
+        resource -- an instance of a model
+
+        """
+
+        return bool(self.user_has_resource_model_permissions(user, ["models.write_nodegroup"], resource))
+
+
+    def user_can_delete_model_nodegroups(self, user: User, resource: ResourceInstance) -> bool:
+        """
+        returns a list of graphs of which a user can edit resource instances
+
+        Arguments:
+        user -- the user to check
+        resource -- an instance of a model
+
+        """
+
+        return bool(self.user_has_resource_model_permissions(user, ["models.delete_nodegroup"], resource))
+
+
+    def user_can_read_graph(self, user: User, graph_id: str) -> bool:
+        """
+        returns a boolean denoting if a user has permmission to read a model's nodegroups
+
+        Arguments:
+        user -- the user to check
+        graph_id -- a graph id to check if a user has permissions to that graph's type specifically
+
+        """
+
+        return bool(self.user_has_resource_model_permissions(user, ["models.read_nodegroup"], graph_id=graph_id))
+
+
     def user_can_read_concepts(self, user: User) -> bool:
         """
         Requires that a user is a part of the RDM Administrator group
