@@ -1797,8 +1797,8 @@ class LoadStaging(models.Model):
 
 class LoadErrors(models.Model):
     load_event = models.ForeignKey(LoadEvent, db_column="loadid", on_delete=models.CASCADE)
-    nodegroup = models.ForeignKey("NodeGroup", db_column="nodegroupid", null=True, on_delete=models.CASCADE)
-    node = models.ForeignKey("Node", db_column="nodeid", null=True, on_delete=models.CASCADE)
+    nodegroup = models.ForeignKey("NodeGroup", db_column="nodegroupid", null=True, blank=True, on_delete=models.CASCADE)
+    node = models.ForeignKey("Node", db_column="nodeid", null=True, blank=True, on_delete=models.CASCADE)
     type = models.TextField(blank=True, null=True)
     error = models.TextField(blank=True, null=True)
     source = models.TextField(blank=True, null=True)

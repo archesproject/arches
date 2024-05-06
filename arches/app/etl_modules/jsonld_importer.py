@@ -12,7 +12,7 @@ from django.utils.translation import gettext as _
 from arches.app.utils.data_management.resources.formats.rdffile import ValueErrorWithNodeInfo
 from arches.app.etl_modules.base_import_module import BaseImportModule, FileValidationError
 from arches.app.etl_modules.decorators import load_data_async
-from arches.app.models.models import GraphModel, LoadErrors, LoadEvent, LoadStaging, NodeGroup
+from arches.app.models.models import GraphModel, LoadErrors, LoadEvent, LoadStaging, Node
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.file_validator import FileValidator
@@ -33,9 +33,9 @@ def graph_id_from_slug(slug):
 @cache
 def fallback_nodegroup_id():
     """Consider removing this if we make LoadStaging.nodegroup nullable."""
-    return NodeGroup.objects.filter(
+    return Node.objects.filter(
         graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
-    ).first().pk
+    ).first().nodegroup_id
 
 
 class JSONLDImporter(BaseImportModule):
@@ -96,7 +96,7 @@ class JSONLDImporter(BaseImportModule):
         slug = path.parts[1]
         try:
             graph_id_from_slug(slug)
-        except GraphModel.ObjectDoesNotExist:
+        except GraphModel.DoesNotExist:
             raise FileValidationError(
                 code=404,
                 message=_('The model "{0}" does not exist.').format(slug)
@@ -161,9 +161,9 @@ class JSONLDImporter(BaseImportModule):
         early_failure = _("Load JSON-LD command failed before fully parsing a block.")
         exception_message = exception.args[0]
 
-        LoadErrors(
+        le = LoadErrors(
             load_event_id=self.loadid,
-            type="graph",
+            type="JSON-LD block",
             source="/".join((graph_slug, block)),
             error=early_failure,
             message=exception_message,
@@ -171,7 +171,9 @@ class JSONLDImporter(BaseImportModule):
             datatype=exception.datatype if has_info else None,
             node_id=exception.node_id if has_info else None,
             nodegroup_id=exception.nodegroup_id if has_info else None,
-        ).save()
+        )
+        le.clean_fields()
+        le.save()
 
         # Avoid save() to prevent IntegrityError: https://code.djangoproject.com/ticket/35425
         LoadEvent.objects.filter(loadid=self.loadid).update(
@@ -192,7 +194,7 @@ class JSONLDImporter(BaseImportModule):
             "datatype": "",
         }
 
-        LoadStaging(
+        ls = LoadStaging(
             load_event_id=self.loadid,
             nodegroup_id=exception.nodegroup_id if has_info else fallback_nodegroup_id(),
             value=JSONSerializer().serialize(dummy_tile_info),
@@ -200,7 +202,9 @@ class JSONLDImporter(BaseImportModule):
             source_description=early_failure,
             error_message=exception_message,
             operation="insert",
-        ).save()
+        )
+        ls.clean_fields()
+        ls.save()
 
     def load_staging_instance_from_tile(self, tile, resource, nodegroup_info, node_info):
         for nodeid, source_value in tile.data.entries():
@@ -239,7 +243,7 @@ class JSONLDImporter(BaseImportModule):
 
     def save_validation_errors(self, validation_errors, tile, source_value, datatype, nodeid):
         for error in validation_errors:
-            LoadErrors(
+            le = LoadErrors(
                 load_event_id=self.loadid,
                 nodegroup_id=tile.nodegroup_id,
                 node_id=nodeid,
@@ -249,7 +253,9 @@ class JSONLDImporter(BaseImportModule):
                 source="",
                 error=error["title"],
                 message=error["message"],
-            ).save()
+            )
+            le.clean_fields()
+            le.save()
 
     @load_data_async
     def run_load_task_async(self, request):
