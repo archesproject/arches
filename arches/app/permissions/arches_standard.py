@@ -308,6 +308,10 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         return ret
 
 
+    def get_sets_for_user(self, user: User, perm: str) -> set[str] | None:
+        # We do not do set filtering - None is allow-all for sets.
+        return None
+
     def get_users_for_object(self, perm: str, obj: Model) -> list[User]:
         """
         Returns a list of user objects that have the given permission on the given object
