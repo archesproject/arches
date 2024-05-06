@@ -579,6 +579,20 @@ class ArchesStandardPermissionFramework(PermissionFramework):
     def user_in_group_by_name(self, user: User, names: Iterable[str]) -> bool:
         return bool(user.groups.filter(name__in=names))
 
+    def group_required(self, user: User, *group_names: list[str]) -> bool:
+        # To fully reimplement this without Django groups, the following group names must (currently) be handled:
+        #  - Application Administrator
+        #  - RDM Administrator
+        #  - Graph Editor
+        #  - Resource Editor
+        #  - Resource Exporter
+        #  - System Administrator
+
+        if user.is_authenticated:
+            if user.is_superuser or bool(user.groups.filter(name__in=group_names)):
+                return True
+        return False
+
 
 
 class PermissionBackend(ObjectPermissionBackend): # type: ignore

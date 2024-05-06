@@ -147,6 +147,10 @@ class PermissionFramework(metaclass=ABCMeta):
     def user_in_group_by_name(self, user, names):
         ...
 
+    @abstractmethod
+    def group_required(self, user, *group_names):
+        ...
+
 _PERMISSION_FRAMEWORK = None
 
 def _get_permission_framework():
@@ -273,3 +277,6 @@ def get_createable_resource_types(user):
 
 def get_editable_resource_types(user):
     return _get_permission_framework().get_editable_resource_types(user)
+
+def group_required(user, *group_names):
+    return _get_permission_framework().group_required(user, *group_names)
