@@ -1126,15 +1126,19 @@ class Command(BaseCommand):
         ret = skos.save_concepts_from_skos(rdf, overwrite, stage, prevent_indexing)
     
     def import_controlled_lists(self, source):
-        wb = openpyxl.load_workbook(source)
-        for sheet in wb.sheetnames:
-            if sheet == "ControlledList":
-                self.import_sheet_to_model(wb[sheet], models.ControlledList)
-            elif sheet == "ControlledListItem":
-                self.import_sheet_to_model(wb[sheet], models.ControlledListItem)
-            elif sheet == "ControlledListItemValue":
-                self.import_sheet_to_model(wb[sheet], models.ControlledListItemValue)
-        self.stdout.write('Data imported successfully from {0}'.format(source))
+        if os.path.exists(source):
+            wb = openpyxl.load_workbook(source)
+            for sheet in wb.sheetnames:
+                if sheet == "ControlledList":
+                    self.import_sheet_to_model(wb[sheet], models.ControlledList)
+                elif sheet == "ControlledListItem":
+                    self.import_sheet_to_model(wb[sheet], models.ControlledListItem)
+                elif sheet == "ControlledListItemValue":
+                    self.import_sheet_to_model(wb[sheet], models.ControlledListItemValue)
+            self.stdout.write('Data imported successfully from {0}'.format(source))
+        else:
+            self.stdout.write('The source file does not exist. Please rerun this command with a valid source file.')
+            sys.exit()
     
     def import_sheet_to_model(self, sheet, model):
         fields = [{"name": field.name, "datatype": field.get_internal_type()} for field in model._meta.fields]
@@ -1158,19 +1162,22 @@ class Command(BaseCommand):
                     setattr(instance, field["name"], row[i])
             instance.save()
     
-    def export_controlled_lists(self, data_dest=None):
+    def export_controlled_lists(self, data_dest):
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "ControlledList"
         self.export_model_to_sheet(ws, models.ControlledList)
         self.export_model_to_sheet(wb, models.ControlledListItem)
         self.export_model_to_sheet(wb, models.ControlledListItemValue)
-
-        if data_dest:
+        
+        # if data_dest == ".":
+        #     data_dest = os.path.dirname(settings.SYSTEM_SETTINGS_LOCAL_PATH)
+        if data_dest != "" and data_dest != ".":
             wb.save(os.path.join(data_dest, "controlled_lists.xlsx"))
+            self.stdout.write("Data exported successfully to controlled_lists.xlsx")
         else:
-            wb.save(data_dest = os.path.join(settings.PACKAGE_ROOT, "reference_data/controlled_lists", "controlled_lists.xlsx"))
-        self.stdout.write("Data exported successfully to controlled_lists.xlsx")
+            utils.print_message("No destination directory specified. Please rerun this command with the '-d' parameter populated.")
+            sys.exit()
 
     def export_model_to_sheet(self, wb, model):
         # For the first sheet (ControlledList), use blank sheet that is initiallized with workbook
