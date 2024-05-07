@@ -2,17 +2,17 @@
     "name": "{{ project_name }}",
     "license": "AGPL-3.0-only",
     "scripts": {
-        "build_development": "yarn eslint:check && yarn ts:check && ./{{ project_name }}/media/node_modules/.bin/cross-env NODE_PATH=./{{ project_name }}/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./{{ project_name }}/media/node_modules/.bin/webpack --config ./{{ project_name }}/webpack/webpack.config.dev.js",
-        "build_production": "yarn eslint:check && yarn ts:check && ./{{ project_name }}/media/node_modules/.bin/cross-env NODE_PATH=./{{ project_name }}/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 NODE_ENV=production ./{{ project_name }}/media/node_modules/.bin/webpack --config ./{{ project_name }}/webpack/webpack.config.prod.js",
-        "build_test": "yarn eslint:check && yarn ts:check && ./{{ project_name }}/media/node_modules/.bin/cross-env NODE_PATH=./{{ project_name }}/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./{{ project_name }}/media/node_modules/.bin/webpack --config ./{{ project_name }}/webpack/webpack.config.dev.js --env test=true",
-        "eslint:check": "./{{ project_name }}/media/node_modules/.bin/eslint ./{{ project_name }}/src --resolve-plugins-relative-to ./{{ project_name }}/media --ext .vue,.ts --parser ./{{ project_name }}/media/node_modules/vue-eslint-parser/index.js",
-        "eslint:watch": "./{{ project_name }}/media/node_modules/.bin/nodemon --watch ./{{ project_name }}/src --ext ts,vue --exec yarn --silent eslint:check",
-        "eslint:fix": "./{{ project_name }}/media/node_modules/.bin/eslint ./{{ project_name }}/src --resolve-plugins-relative-to ./{{ project_name }}/media --ext .vue,.ts --parser ./{{ project_name }}/media/node_modules/vue-eslint-parser/index.js --fix",
-        "gettext:extract": "./{{ project_name }}/media/node_modules/.bin/vue-gettext-extract",
-        "gettext:compile": "./{{ project_name }}/media/node_modules/.bin/vue-gettext-compile",
-        "ts:check": "./{{ project_name }}/media/node_modules/.bin/vue-tsc --noEmit",
-        "ts:watch": "./{{ project_name }}/media/node_modules/.bin/vue-tsc --watch --noEmit",
-        "start": "./{{ project_name }}/media/node_modules/.bin/cross-env NODE_PATH=./{{ project_name }}/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./{{ project_name }}/media/node_modules/.bin/webpack serve --config ./{{ project_name }}/webpack/webpack.config.dev.js"
+        "build_development": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js",
+        "build_production": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 NODE_ENV=production webpack --config ./webpack/webpack.config.prod.js",
+        "build_test": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js --env test=true",
+        "eslint:check": "eslint . --ext .vue,.ts",
+        "eslint:watch": "nodemon --watch . --ext ts,vue --exec yarn --silent eslint:check",
+        "eslint:fix": "eslint . --ext .vue,.ts --fix",
+        "gettext:extract": "vue-gettext-extract",
+        "gettext:compile": "vue-gettext-compile",
+        "ts:check": "vue-tsc --noEmit",
+        "ts:watch": "vue-tsc --watch --noEmit",
+        "start": "cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack serve --config ./webpack/webpack.config.dev.js"
     },
     "devDependencies": {
         "arches-dev-dependencies": "archesproject/arches-dev-dependencies#{{ arches_version }}"
