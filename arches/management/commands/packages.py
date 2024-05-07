@@ -1165,21 +1165,22 @@ class Command(BaseCommand):
             ws = wb
         else:
             ws = wb.create_sheet(title=model.__name__)
-        fields = [field.name for field in model._meta.fields]
-        ws.append(fields)
+        fields = [{"name": field.name, "datatype": field.get_internal_type()} for field in model._meta.fields]
+        ws.append(field["name"] for field in fields)
         for instance in model.objects.all():
             row_data = []
             for field in fields:
-                value = getattr(instance, field)
-                # Stringify related objects
+                value = getattr(instance, field["name"])
                 if (isinstance(value, models.ControlledList) or isinstance(value, models.ControlledListItem) or isinstance(value, models.ControlledListItemValue)):
-                    row_data.append(str(getattr(value, 'id')) if value else "")
+                    row_data.append(str(getattr(value, "id")) if value else "")
                 elif isinstance(value, models.Language):
                     row_data.append(str(value.code)) 
                 elif isinstance(value, models.DValueType):
                     row_data.append(str(value.valuetype))
-                elif isinstance(value, uuid.UUID):
-                        row_data.append(str(value) if value else "")
+                elif field["datatype"] == "UUIDField":
+                    row_data.append(str(value) if value else "")
+                elif field["datatype"] == "BooleanField":
+                    row_data.append("True" if value else "False")
                 else:
                     row_data.append(value if value else "")
             ws.append(row_data)
