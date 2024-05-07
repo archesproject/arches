@@ -1137,11 +1137,25 @@ class Command(BaseCommand):
         self.stdout.write('Data imported successfully from {0}'.format(source))
     
     def import_sheet_to_model(self, sheet, model):
-        fields = [field.name for field in model._meta.fields]
+        fields = [{"name": field.name, "datatype": field.get_internal_type()} for field in model._meta.fields]
         for row in sheet.iter_rows(min_row=2, values_only=True):
             instance = model()
             for i, field in enumerate(fields):
-                setattr(instance, field, row[i])
+                if row[i] and field["datatype"] == "ForeignKey" and model == models.ControlledListItem:
+                    related_list = models.ControlledList.objects.get(id=uuid.UUID(row[i]))
+                    setattr(instance, field["name"], related_list)
+                elif row[i] and field["datatype"] == "ForeignKey" and model == models.ControlledListItemValue:
+                    if field["name"] == "valuetype":
+                        valuetype = models.DValueType.objects.get(valuetype = row[i])
+                        setattr(instance, field["name"], valuetype)
+                    elif field["name"] == "language":
+                        related_language = models.Language.objects.get(code=row[i])
+                        setattr(instance, field["name"], related_language)
+                    else:
+                        related_list_item = models.ControlledListItem.objects.get(id=row[i])
+                        setattr(instance, field["name"], related_list_item)
+                else:
+                    setattr(instance, field["name"], row[i])
             instance.save()
     
     def export_controlled_lists(self, data_dest=None):
@@ -1156,7 +1170,7 @@ class Command(BaseCommand):
             wb.save(os.path.join(data_dest, "controlled_lists.xlsx"))
         else:
             wb.save(data_dest = os.path.join(settings.PACKAGE_ROOT, "reference_data/controlled_lists", "controlled_lists.xlsx"))
-        self.stdout.write('Data exported successfully to exported_data.xlsx')
+        self.stdout.write("Data exported successfully to controlled_lists.xlsx")
 
     def export_model_to_sheet(self, wb, model):
         # For the first sheet (ControlledList), use blank sheet that is initiallized with workbook
@@ -1180,7 +1194,9 @@ class Command(BaseCommand):
                 elif field["datatype"] == "UUIDField":
                     row_data.append(str(value) if value else "")
                 elif field["datatype"] == "BooleanField":
-                    row_data.append("True" if value else "False")
+                    row_data.append("1" if value else "0")
+                elif field["datatype"] == "IntegerField":
+                    row_data.append(str(value))
                 else:
                     row_data.append(value if value else "")
             ws.append(row_data)
