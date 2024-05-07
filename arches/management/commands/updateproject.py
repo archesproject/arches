@@ -16,13 +16,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         answer = input(
-        """
-        This will replace the following files in your project:
-        .babelrc, eslintrc.js, .eslintignore, .browserslistrc, .stylelintrc.json, 
-        nodemon.json and tsconfig.json, and the entire webpack directory.
-        
-        Continue?
-        """
+            "This will replace the following files in your project:\n"
+            ".babelrc, eslintrc.js, .eslintignore, .browserslistrc, .stylelintrc.json,\n"
+            ".yarnrc, .gitignore, nodemon.json and tsconfig.json, and the entire webpack directory.\n\n"
+            "Continue? "
         )
         
         if answer.lower() in ["y","yes"]:
@@ -30,11 +27,11 @@ class Command(BaseCommand):
             self.update_to_v7_5()
             self.update_to_v7_6()
         else:
-            print("Operation aborted.")
+            self.stdout.write("Operation aborted.")
 
     def update_to_v7(self):
         # copy webpack config files to project
-        print("Copying webpack directory to project root directory")
+        self.stdout.write("Copying webpack directory to project root directory")
         project_webpack_path = os.path.join(settings.APP_ROOT, "webpack")
 
         if os.path.exists(project_webpack_path):
@@ -45,17 +42,9 @@ class Command(BaseCommand):
         if os.path.exists(arches_template_webpack_path):
             shutil.copytree(arches_template_webpack_path, project_webpack_path)
 
-        # copy dotfiles
-        for dotfile in [".eslintrc.js", ".eslintignore", ".babelrc", ".browserslistrc", ".stylelintrc.json"]:
-            dotfile_path = os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", dotfile)
-            if os.path.exists(arches_template_webpack_path):
-
-                print("Copying {} to project root directory".format(dotfile))
-                shutil.copy2(dotfile_path, settings.APP_ROOT)
-
         # ensure project has a `media/img` directory
         if not os.path.isdir(os.path.join(settings.APP_ROOT, "media", "img")):
-            print("Creating /media/img directory")
+            self.stdout.write("Creating /media/img directory")
             os.mkdir(os.path.join(settings.APP_ROOT, "media", "img"))
 
         #  check if temp_graph_status table exists
@@ -90,54 +79,109 @@ class Command(BaseCommand):
         # Republish to pick up CardsXNodeXWidget changes from
         # migration 10150_add_default_value_file_list.py
         management.call_command("graph", operation="publish", update=True)
+        self.stdout.write("Publishing finished! \n\n")
 
     def update_to_v7_6(self):
-        # ensure project has a `messages.pot` file
-        for dotfile in [
-            "nodemon.json", "tsconfig.json", ".babelrc", ".browserslistrc", "eslint.config.mjs", ".stylelintrc.json", "LICENSE", "MANIFEST.in", "pyproject.toml"
-        ]:
-            if os.path.exists(os.path.join(settings.APP_ROOT, dotfile)):
-                print("Deleting {} from project sub-directory".format(dotfile))
-                os.remove(os.path.join(settings.APP_ROOT, dotfile))
+        for dotfile in [".eslintrc.js", ".eslintignore", ".babelrc", ".browserslistrc", ".stylelintrc.json", ".yarnrc"]:
+            previous_dotfile_path = os.path.join(settings.APP_ROOT, dotfile)
+            if os.path.exists(previous_dotfile_path):
+                self.stdout.write("Deleting {} from project root directory".format(dotfile))
+                os.remove(previous_dotfile_path)
 
-            print("Copying {} to project root directory".format(dotfile))
-            shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", dotfile), os.path.join(settings.APP_ROOT, '..'))
+            if dotfile != ".yarnrc":  # `.yarnrc` is removed entirely in this version
+                self.stdout.write("Copying {} to project directory".format(dotfile))
+                shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", dotfile), os.path.join(settings.APP_ROOT, ".."))
 
-        for file in [".yarnrc", "yarn.lock", ".eslintignore", ".eslintrc.js",]:
-            if os.path.exists(os.path.join(settings.APP_ROOT, file)):
-                print("Ensuring {} is deleted from project sub-directory".format(file))
-                os.remove(os.path.join(settings.APP_ROOT, file))
+        if os.path.exists(os.path.join(settings.APP_ROOT, "yarn.lock")):
+            self.stdout.write("Deleting yarn.lock from project".format(dotfile))
+            os.remove(os.path.join(settings.APP_ROOT, "yarn.lock"))
 
-        if os.path.isdir(os.path.join(settings.APP_ROOT, 'media', 'node_modules')):
-            print("Removing media/node_modules directory")
-            shutil.rmtree(os.path.join(settings.APP_ROOT, 'media', 'node_modules'), ignore_errors=True)
+        if os.path.exists(os.path.join(settings.APP_ROOT, "media", "node_modules")):
+            self.stdout.write("Deleting node_modules folder from media directory".format(dotfile))
+            shutil.rmtree(os.path.join(settings.APP_ROOT, "media", "node_modules"))
+
+        for project_metadata_file in ["LICENSE", "MANIFEST.in", "pyproject.toml"]:
+            if not os.path.exists(os.path.join(settings.APP_ROOT, '..', project_metadata_file)):
+                self.stdout.write("Copying {} to project directory".format(project_metadata_file))
+                shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", project_metadata_file), os.path.join(settings.APP_ROOT, ".."))
+
+        for config_file in ["nodemon.json", "tsconfig.json", ".coveragerc", ".gitignore"]:
+            self.stdout.write("Copying {} to project directory".format(config_file))
+            shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", config_file), os.path.join(settings.APP_ROOT, ".."))
+
+        if not os.path.exists(os.path.join(settings.APP_ROOT, "..", ".github")):
+            self.stdout.write("Copying .github directory to project")
+            shutil.copytree(os.path.join(settings.ROOT_DIR, "install", "arches-templates", ".github"), os.path.join(settings.APP_ROOT, "..", ".github"))
+    
+        if not os.path.exists(os.path.join(settings.APP_ROOT, "..", "tests")):
+            self.stdout.write("Copying tests directory to project")
+            test_directory_path = os.path.join(settings.APP_ROOT, "..", "tests")
+
+            shutil.copytree(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "tests"), test_directory_path)
+
+            for dirpath, dirnames, filenames in os.walk(test_directory_path):
+                for filename in filenames:
+                    if filename.endswith('.py-tpl'):
+                        os.rename(
+                            os.path.join(dirpath, filename), 
+                            os.path.join(dirpath, filename[:-7] + '.py')
+                    )
+
+        if not os.path.isfile(os.path.join(settings.APP_ROOT, "install", "requirements_dev.txt")):
+            self.stdout.write("Copying requirements_dev.txt to project install directory")
+            shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", "install", "requirements_dev.txt"), os.path.join(settings.APP_ROOT, 'install'))
     
         if not os.path.isfile(os.path.join(settings.APP_ROOT, "src", "declarations.d.ts")):
-            print("Creating /src/declarations.d.ts")
+            self.stdout.write("Creating /src/declarations.d.ts")
             if not os.path.isdir(os.path.join(settings.APP_ROOT, "src")):
                 os.mkdir(os.path.join(settings.APP_ROOT, "src"))
 
             shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", "src", "declarations.d.ts"), os.path.join(settings.APP_ROOT, 'src'))
 
         if not os.path.isfile(os.path.join(settings.APP_ROOT, "locale", "messages.pot")):
-            print("Creating /locale/messages.pot")
+            self.stdout.write("Creating /locale/messages.pot")
             if not os.path.isdir(os.path.join(settings.APP_ROOT, "locale")):
                 os.mkdir(os.path.join(settings.APP_ROOT, "locale"))
 
             open(os.path.join(settings.APP_ROOT, "locale", "messages.pot"), 'w').close()
 
         if not os.path.isfile(os.path.join(settings.APP_ROOT, "gettext.config.js")):
-            print("Copying gettext config to project root directory")
+            self.stdout.write("Copying gettext config to project root directory")
             shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "gettext.config.js"), os.path.join(settings.APP_ROOT, '..'))
 
         if os.path.isdir(os.path.join(settings.APP_ROOT, 'webpack')):
-            print("Removing previous webpack directory")
+            self.stdout.write("Non-root-level webpack directory detected! Removing...")
             shutil.rmtree(os.path.join(settings.APP_ROOT, 'webpack'), ignore_errors=True)
 
         if os.path.isdir(os.path.join(settings.APP_ROOT, '..', 'webpack')):
-            print("Root-level webpack directory detected! Removing...")
+            self.stdout.write("Removing previous webpack directory")
             shutil.rmtree(os.path.join(settings.APP_ROOT, '..', 'webpack'), ignore_errors=True)
 
-        print("Creating updated webpack directory at root")
+        self.stdout.write("Creating updated webpack directory at root")
         shutil.copytree(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "webpack"), os.path.join(settings.APP_ROOT, '..', 'webpack'))
-        
+
+        # updates all instances of `{{ project_name }}` with project name
+        arches_semantic_version = ".".join([str(arches.VERSION[0]), str(arches.VERSION[1]), str(arches.VERSION[2])])
+        arches_next_minor_version = ".".join([str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"])
+
+        path_to_project = os.path.join(settings.APP_ROOT, "..")
+        for relative_file_path in [
+            'gettext.config.js', '.coveragerc', '.gitignore', "tsconfig.json", "tests/test_settings.py", "tests/search_indexes/sample_index_tests.py", "pyproject.toml"
+        ]:  # relative to app root directory
+            try:
+                file = open(os.path.join(path_to_project, relative_file_path),'r')
+                file_data = file.read()
+                file.close()
+
+                updated_file_data = (
+                    file_data.replace("{{ project_name }}", settings.APP_NAME)
+                    .replace("{{ arches_semantic_version }}", arches_semantic_version)
+                    .replace("{{ arches_next_minor_version }}", arches_next_minor_version)
+                )
+
+                file = open(os.path.join(path_to_project, relative_file_path),'w')
+                file.write(updated_file_data)
+                file.close()
+            except FileNotFoundError:
+                pass
+

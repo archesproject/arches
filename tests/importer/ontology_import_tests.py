@@ -32,7 +32,7 @@ class OntologyModelTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        management.call_command("load_ontology", source=test_settings.ONTOLOGY_FIXTURES)
+        management.call_command("load_ontology", source=test_settings.ONTOLOGY_FIXTURES, verbosity=0)
 
     @classmethod
     def tearDownClass(cls):

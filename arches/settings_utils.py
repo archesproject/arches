@@ -114,7 +114,7 @@ def transmit_webpack_django_config(
             importlib.import_module(arches_application)  # need to import module to find path
             arches_applications_paths[arches_application] = os.path.split(sys.modules[arches_application].__spec__.origin)[0]
 
-    print(
+    sys.stdout.write(
         json.dumps(
             {
                 "APP_ROOT": os.path.realpath(app_root),
