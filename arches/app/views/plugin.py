@@ -55,7 +55,8 @@ class PluginView(MapBaseManagerView):
         resource_graphs = (
             models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(publication=None)
+            .exclude(is_active=False)
+            .exclude(source_identifier__isnull=False)
         )
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()

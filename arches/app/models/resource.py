@@ -217,7 +217,6 @@ class Resource(models.ResourceInstance):
         index -- True(default) to index the resource, otherwise don't index the resource
 
         """
-        # TODO: 7783 cbyrd throw error if graph is unpublished
         # This initializes serialized graph (for use in superclass?). Setup for the above. NOt sure
         if not self.get_serialized_graph():
             pass
@@ -254,10 +253,14 @@ class Resource(models.ResourceInstance):
 
         """
 
-        self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
         if user:
-            readable_nodegroups = get_nodegroups_by_perm(user, perm, any_perm=True)
-            self.tiles = [tile for tile in self.tiles if tile.nodegroup is not None and tile.nodegroup in readable_nodegroups]
+            published_graph = models.PublishedGraph.objects.get(publication=self.graph_publication, language=get_language())
+            nodegroups = [models.NodeGroup(**serialized_nodegroup) for serialized_nodegroup in published_graph.serialized_graph['nodegroups']]
+            readable_nodegroup_ids = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(user, perm, any_perm=True, nodegroups=nodegroups)]
+            self.tiles = list(models.TileModel.objects.filter(resourceinstance=self, nodegroup_id__in=readable_nodegroup_ids))
+        else:
+            self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
+
 
     # # flatten out the nested tiles into a single array
     def get_flattened_tiles(self):
@@ -498,7 +501,6 @@ class Resource(models.ResourceInstance):
         # - that the index for the to-be-deleted resource gets deleted
 
         permit_deletion = False
-        # TODO: 7783 cbyrd throw error if graph is unpublished
         if user != {}:
             user_is_reviewer = user_is_resource_reviewer(user)
             if user_is_reviewer is False:
@@ -622,7 +624,8 @@ class Resource(models.ResourceInstance):
                 models.GraphModel.objects.all()
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 .exclude(isresource=False)
-                .exclude(publication=None)
+                .exclude(is_active=False)
+                .exclude(source_identifier__isnull=False)
             )
 
         graph_lookup = {
@@ -861,23 +864,3 @@ def is_uuid(value_to_test):
         return True
     except Exception:
         return False
-
-
-class PublishedModelError(Exception):
-    def __init__(self, message, code=None):
-        self.title = _("Published Model Error")
-        self.message = message
-        self.code = code
-
-    def __str__(self):
-        return repr(self.message)
-
-
-class UnpublishedModelError(Exception):
-    def __init__(self, message, code=None):
-        self.title = _("Unpublished Model Error")
-        self.message = message
-        self.code = code
-
-    def __str__(self):
-        return repr(self.message)

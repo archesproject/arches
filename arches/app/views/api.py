@@ -31,6 +31,7 @@ from django.urls import reverse
 from django.utils.translation import get_language, gettext as _
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import translation
 from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
 from arches.app.models import models
@@ -199,7 +200,7 @@ class GeoJSON(APIBase):
                 property_node_map[str(node.nodeid)]["name"] = slugify(node.name, max_length=field_name_length, separator="_")
             else:
                 property_node_map[str(node.nodeid)]["name"] = node.fieldname
-        tiles = models.TileModel.objects.filter(nodegroup__in=[node.nodegroup for node in nodes])
+        tiles = models.TileModel.objects.filter(nodegroup_id__in=[node.nodegroup_id for node in nodes])
         last_page = None
         if resourceid is not None:
             tiles = tiles.filter(resourceinstance_id__in=resourceid.split(","))
@@ -421,7 +422,7 @@ class Graphs(APIBase):
         user = request.user
         if graph_id and not self.action:
             graph = Graph.objects.get(graphid=graph_id)
-            graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions)
+            graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["functions"] + exclusions)
 
             if get_cards:
                 datatypes = models.DDataType.objects.all()
@@ -437,7 +438,7 @@ class Graphs(APIBase):
                     for widget in widgets
                 ]
 
-                permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False, exclude=["is_editable"])
+                permitted_cards = JSONSerializer().serializeToPython(permitted_cards, sort_keys=False)
 
                 return JSONResponse({"datatypes": datatypes, "cards": permitted_cards, "graph": graph, "cardwidgets": cardwidgets})
             else:
@@ -445,6 +446,57 @@ class Graphs(APIBase):
         elif self.action == "get_graph_models":
             graphs = models.GraphModel.objects.all()
             return JSONResponse(JSONSerializer().serializeToPython(graphs))
+
+
+class GraphHasUnpublishedChanges(APIBase):
+    def get(self, request, graph_id=None):
+        graph = models.GraphModel.objects.get(pk=graph_id)
+        return JSONResponse(graph.has_unpublished_changes)
+
+    def post(self, request, graph_id=None):
+        has_unpublished_changes = bool(request.POST.get("has_unpublished_changes") == "true")
+        graph = models.GraphModel.objects.filter(pk=graph_id)  # need filter here for `update` to work
+        graph.update(has_unpublished_changes=has_unpublished_changes)
+
+        return JSONResponse({"has_unpublished_changes": has_unpublished_changes})
+
+
+class GraphIsActive(APIBase):
+    def get(self, request, graph_id=None):
+        graph = Graph.objects.get(pk=graph_id)
+
+        if graph.source_identifier:
+            graph = graph.source_identifier
+
+        return JSONResponse(graph.is_active)
+
+    def post(self, request, graph_id=None):
+        try:
+            is_active = bool(request.POST.get("is_active") == "true")
+
+            with transaction.atomic():
+                graph = Graph.objects.get(pk=graph_id)
+
+                if graph.source_identifier:
+                    source_graph = graph.source_identifier
+                    editable_future_graph = graph
+                else:
+                    source_graph = graph
+                    editable_future_graph = Graph.objects.get(source_identifier_id=graph_id)
+
+                if source_graph.is_active != is_active:
+                    source_graph.is_active = is_active
+                    source_graph.save()
+
+                if editable_future_graph.is_active != is_active:
+                    editable_future_graph.is_active = is_active
+                    editable_future_graph.save()
+
+            return JSONResponse(
+                {"is_source_graph_active": source_graph.is_active, "is_editable_future_graph_active": editable_future_graph.is_active}
+            )
+        except:
+            return JSONResponse(status=500)
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -631,7 +683,7 @@ class Resources(APIBase):
                         data = JSONDeserializer().deserialize(request.body)
                         reader = JsonLdReader()
                         if slug is not None:
-                            graphid = models.GraphModel.objects.get(slug=slug).pk
+                            graphid = models.GraphModel.objects.get(slug=slug, source_identifier=None).pk
                         reader.read_resource(data, resourceid=resourceid, graphid=graphid)
                         if reader.errors:
                             response = []
@@ -708,7 +760,7 @@ class Resources(APIBase):
                     data = JSONDeserializer().deserialize(request.body)
                     reader = JsonLdReader()
                     if slug is not None:
-                        graphid = models.GraphModel.objects.get(slug=slug).pk
+                        graphid = models.GraphModel.objects.get(slug=slug, source_identifier=None).pk
                     reader.read_resource(data, graphid=graphid)
                     if reader.errors:
                         response = []
@@ -1131,8 +1183,28 @@ class ResourceReport(APIBase):
         perm = "read_nodegroup"
 
         resource = Resource.objects.get(pk=resourceid)
-        graph = Graph.objects.get(graphid=resource.graph_id)
+        published_graph = models.PublishedGraph.objects.get(publication=resource.graph_publication, language=translation.get_language())
+        graph = Graph(published_graph.serialized_graph)
         template = models.ReportTemplate.objects.get(pk=graph.template_id)
+        graph_has_different_publication = bool(resource.graph.publication_id != published_graph.publication_id)
+
+        # if a user is viewing a report for a resource that does not have the same publication as the current graph publication
+        # ( and therefore is out-of-date ) only allow them to access report details if they have Graph Editor permissions or higher.
+        if (
+            graph_has_different_publication
+            and not request.user.groups.filter(
+                name__in=["Graph Editor", "RDM Administrator", "Application Administrator", "System Administrator"]
+            ).exists()
+        ):
+            return JSONResponse(
+                {
+                    "displayname": resource.displayname(),
+                    "resourceid": resourceid,
+                    "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
+                    "template": template,
+                    "graph": graph,
+                }
+            )
 
         if not template.preload_resource_data:
             return JSONResponse({"template": template, "report_json": resource.to_json(compact=compact, version=version, user=request.user, perm=perm)})
@@ -1143,7 +1215,7 @@ class ResourceReport(APIBase):
             "resourceid": resourceid,
             "graph": graph,
             "hide_empty_nodes": settings.HIDE_EMPTY_NODES_IN_REPORT,
-            "report_json": resource.to_json(compact=compact, version=version),
+            # "report_json": resource.to_json(compact=compact, version=version),
         }
 
         if "template" not in exclude:
@@ -1152,8 +1224,9 @@ class ResourceReport(APIBase):
         if "related_resources" not in exclude:
             resource_models = (
                 models.GraphModel.objects.filter(isresource=True)
-                .exclude(publication=None)
+                .exclude(is_active=False)
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                .exclude(source_identifier__isnull=False)
             )
 
             get_params = request.GET.copy()
@@ -1178,24 +1251,25 @@ class ResourceReport(APIBase):
             resp["tiles"] = permitted_tiles
 
         if "cards" not in exclude:
-            # collect the nodegroups for which this user has perm
-            readable_nodegroups = get_nodegroups_by_perm(request.user, [perm], any_perm=True)
-            
-            # query only the cards whose nodegroups are readable by user
-            permitted_cards = (
-                CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup__in=readable_nodegroups)
-                .prefetch_related("cardxnodexwidget_set")
-                .order_by("sortorder")
-            )
+            nodegroups = [models.NodeGroup(**serialized_nodegroup) for serialized_nodegroup in published_graph.serialized_graph['nodegroups']]
+            readable_nodegroup_ids = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(request.user, perm, any_perm=True, nodegroups=nodegroups)]
+            writable_nodegroup_ids = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(request.user, 'write_nodegroup', any_perm=True, nodegroups=nodegroups)]
 
-            cardwidgets = [
+            permitted_cards = sorted([
+                card 
+                for card 
+                in graph.cards.values() 
+                if str(card.nodegroup_id) in readable_nodegroup_ids
+                and str(card.nodegroup_id) in writable_nodegroup_ids
+            ], key=lambda card: card.sortorder)
+
+            permitted_card_ids = [card.pk for card in permitted_cards]
+            cardwidgets = sorted([
                 widget
-                for widgets in [
-                    sorted(card.cardxnodexwidget_set.all(), key=lambda x: x.sortorder or 0)
-                    for card in permitted_cards
-                ]
-                for widget in widgets
-            ]
+                for widget
+                in graph.widgets
+                if widget['card_id'] in permitted_card_ids
+            ], key=lambda widget: widget['sortorder'])
 
             resp["cards"] = permitted_cards
             resp["cardwidgets"] = cardwidgets
@@ -1275,9 +1349,7 @@ class BulkResourceReport(APIBase):
             graphs_from_database = list(Graph.objects.filter(pk__in=graph_ids_not_in_cache))
 
             for graph in graphs_from_database:
-                serialized_graph = JSONSerializer().serializeToPython(
-                    graph, sort_keys=False, exclude=["is_editable", "functions"] + exclusions
-                )
+                serialized_graph = JSONSerializer().serializeToPython(graph, sort_keys=False, exclude=["functions"] + exclusions)
                 cache.set("serialized_graph_{}".format(graph.pk), serialized_graph)
                 graph_lookup[str(graph.pk)] = serialized_graph
 
@@ -1325,7 +1397,7 @@ class BulkResourceReport(APIBase):
 
             resp[graph_id] = {
                 "graph": graph,
-                "cards": JSONSerializer().serializeToPython(graph_cards, sort_keys=False, exclude=["is_editable"]),
+                "cards": JSONSerializer().serializeToPython(graph_cards, sort_keys=False),
                 "cardwidgets": cardwidgets,
             }
 
