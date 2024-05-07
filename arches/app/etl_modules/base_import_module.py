@@ -116,13 +116,21 @@ class BaseImportModule:
             cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
             rows = cursor.fetchall()
             node_lookup = {str(row[1]): {"depth": int(row[5]), "cardinality": row[7]} for row in rows}
-            nodes = Node.objects.filter(graph_id=graphid)
+            nodes = Node.objects.filter(graph_id=graphid).select_related("nodegroup")
             for node in nodes:
                 nodeid = str(node.nodeid)
                 if nodeid in node_lookup:
                     node_lookup[nodeid]["alias"] = node.alias
                     node_lookup[nodeid]["datatype"] = node.datatype
                     node_lookup[nodeid]["config"] = node.config
+                elif not node.istopnode:
+                    node_lookup[nodeid] = {
+                        "depth": 0,  # ???
+                        "cardinality": node.nodegroup.cardinality,
+                        "alias": node.alias,
+                        "datatype": node.datatype,
+                        "config": node.config,
+                    }
             return node_lookup, nodes
 
     def get_parent_tileid(self, depth, tileid, previous_tile, nodegroup, nodegroup_tile_lookup):
