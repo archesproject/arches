@@ -11,14 +11,31 @@ export default defineConfig({
         },
         coverage: {
             include: [path.join(path.basename(__dirname), 'src', '/')],
+            exclude: [
+                '**/node_modules/**', 
+                '**/dist/**', 
+                '**/cypress/**', 
+                '**/.{idea,git,cache,output,temp}/**', 
+                '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
+                path.join(path.basename(__dirname), 'install', '**')
+            ],
             reporter: [
                 ['clover', { 'file': 'coverage.xml' }],
                 'text',
             ],
-            reportsDirectory: path.join(__dirname, 'coverage', 'vue'),
+            reportsDirectory: path.join(__dirname, 'coverage', 'frontend'),
         },
         environment: "jsdom",
         globals: true,
+        exclude: [
+            '**/node_modules/**', 
+            '**/dist/**', 
+            '**/cypress/**', 
+            '**/.{idea,git,cache,output,temp}/**', 
+            '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
+            path.join(path.basename(__dirname), 'install', '**')
+        ],
+        passWithNoTests: true,
         setupFiles: ['vitest.setup.mts'],
     },
 });

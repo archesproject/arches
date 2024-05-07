@@ -39,7 +39,7 @@ jobs:
           sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk libgdal-dev libxslt-dev
           echo Postgres and ES dependencies installed
 
-      - name: Install python packages
+      - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
           pip install .
@@ -70,29 +70,44 @@ jobs:
             echo "package.json not found, skipping yarn commands."
           fi
 
+      - name: Run frontend tests
+        run: |
+          yarn vitest
+
+      - name: Generate frontend report coverage
+        run: |
+          mv coverage/frontend/coverage.xml feature_branch_frontend_coverage.xml
+
       - name: Check for missing migrations
         run: |
           python manage.py makemigrations --check
 
-      - name: Ensure previous coverage data is erased
+      - name: Ensure previous Python coverage data is erased
         run: |
           coverage erase
 
-      - name: Run unit tests
+      - name: Run Python unit tests
         run: |
           python -W default::DeprecationWarning -m coverage run manage.py test tests --settings="tests.test_settings"
 
-      - name: Generate report coverage
+      - name: Generate Python report coverage
         run: |
           coverage report
           coverage json
-          mv coverage/python/coverage.json feature_branch_coverage.json
+          mv coverage/python/coverage.json feature_branch_python_coverage.json
 
-      - name: Upload coverage report as artifact
+      - name: Upload frontend coverage report as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: feature-branch-coverage-report
-          path: feature_branch_coverage.json
+          name: feature-branch-frontend-coverage-report
+          path: feature_branch_frontend_coverage.xml
+          overwrite: true
+
+      - name: Upload Python coverage report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: feature-branch-python-coverage-report
+          path: feature_branch_python_coverage.json
           overwrite: true
 
   build_target_branch:
@@ -131,7 +146,7 @@ jobs:
           sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk libgdal-dev libxslt-dev
           echo Postgres and ES dependencies installed
 
-      - name: Install python packages
+      - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
           pip install .
@@ -162,35 +177,50 @@ jobs:
             echo "package.json not found, skipping yarn commands."
           fi
 
+      - name: Run frontend tests
+        run: |
+          yarn vitest
+
+      - name: Generate frontend report coverage
+        run: |
+          mv coverage/frontend/coverage.xml target_branch_frontend_coverage.xml
+
       - name: Check for missing migrations
         run: |
           python manage.py makemigrations --check
 
-      - name: Ensure previous coverage data is erased
+      - name: Ensure previous Python coverage data is erased
         run: |
           coverage erase
 
-      - name: Run unit tests
+      - name: Run Python unit tests
         run: |
           python -W default::DeprecationWarning -m coverage run manage.py test tests --settings="tests.test_settings"
 
-      - name: Generate report coverage
+      - name: Generate Python report coverage
         run: |
           coverage report
           coverage json
 
           # handles older target branch
           if [ -f coverage/python/coverage.json ]; then
-            mv coverage/python/coverage.json target_branch_coverage.json
+            mv coverage/python/coverage.json target_branch_python_coverage.json
           else
-            mv coverage.json target_branch_coverage.json
+            mv coverage.json target_branch_python_coverage.json
           fi
 
-      - name: Upload coverage report as artifact
+      - name: Upload frontend coverage report as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: target-branch-coverage-report
-          path: target_branch_coverage.json
+          name: target-branch-frontend-coverage-report
+          path: target_branch_frontend_coverage.xml
+          overwrite: true
+
+      - name: Upload Python coverage report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: target-branch-python-coverage-report
+          path: target_branch_python_coverage.json
           overwrite: true
 
   check_coverage:
@@ -205,28 +235,28 @@ jobs:
           python-version: '3.x' # Use the latest available version
           check-latest: true
 
-      - name: Download feature branch coverage report artifact
+      - name: Download feature branch Python coverage report artifact
         uses: actions/download-artifact@v4
         with:
-          name: feature-branch-coverage-report
+          name: feature-branch-python-coverage-report
           path: .
 
-      - name: Download target branch coverage report artifact
+      - name: Download target branch Python coverage report artifact
         uses: actions/download-artifact@v4
         with:
-          name: target-branch-coverage-report
+          name: target-branch-python-coverage-report
           path: .
 
-      - name: Compare coverage with baseline
+      - name: Compare Python target coverage with baseline
         if: github.event_name == 'pull_request'
         run: |
-          feature_branch_coverage=$(cat feature_branch_coverage.json | grep -o '"totals": {[^}]*' | grep -o '"percent_covered": [0-9.]*' | awk -F ': ' '{print $2}')
-          target_branch_coverage=$(cat target_branch_coverage.json | grep -o '"totals": {[^}]*' | grep -o '"percent_covered": [0-9.]*' | awk -F ': ' '{print $2}')
+          feature_branch_python_coverage=$(cat feature_branch_python_coverage.json | grep -o '"totals": {[^}]*' | grep -o '"percent_covered": [0-9.]*' | awk -F ': ' '{print $2}')
+          target_branch_python_coverage=$(cat target_branch_python_coverage.json | grep -o '"totals": {[^}]*' | grep -o '"percent_covered": [0-9.]*' | awk -F ': ' '{print $2}')
 
           # Compare current coverage with baseline coverage using floating-point comparison
-          if awk -v feature="$feature_branch_coverage" -v target="$target_branch_coverage" 'BEGIN { exit (feature < target) ? 0 : 1 }'; then
-            echo "Coverage decreased from $target_branch_coverage% to $feature_branch_coverage%"
+          if awk -v feature="$feature_branch_python_coverage" -v target="$target_branch_python_coverage" 'BEGIN { exit (feature < target) ? 0 : 1 }'; then
+            echo "Coverage decreased from $target_branch_python_coverage% to $feature_branch_python_coverage%. Please add or update tests to this branch to increase coverage."
             exit 1
           else
-            echo "Feature branch coverage ($feature_branch_coverage%) >= Target branch coverage ($target_branch_coverage%)."
+            echo "Feature branch coverage ($feature_branch_python_coverage%) >= Target branch coverage ($target_branch_python_coverage%)."
           fi

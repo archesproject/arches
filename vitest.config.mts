@@ -23,7 +23,7 @@ export default defineConfig({
                 ['clover', { 'file': 'coverage.xml' }],
                 'text',
             ],
-            reportsDirectory: path.join(__dirname, 'coverage', 'vue'),
+            reportsDirectory: path.join(__dirname, 'coverage', 'frontend'),
         },
         environment: "jsdom",
         globals: true,
@@ -35,6 +35,7 @@ export default defineConfig({
             '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
             path.join(path.basename(__dirname), 'install', '**')
         ],
+        passWithNoTests: true,
         setupFiles: ['vitest.setup.mts'],
     },
 });
