@@ -7,9 +7,10 @@ from pathlib import Path
 from django.core.files import File
 from django.core.files.storage import default_storage
 from django.core.management import call_command
-from django.db import transaction
+from django.db import connection, transaction
 from django.utils.translation import gettext as _
 
+from arches.app.etl_modules.save import _save_to_tiles, disable_tile_triggers, reenable_tile_triggers, _post_save_edit_log
 from arches.app.tasks import load_json_ld
 from arches.app.utils.data_management.resources.formats.rdffile import ValueErrorWithNodeInfo
 from arches.app.etl_modules.base_import_module import BaseImportModule, FileValidationError
@@ -266,11 +267,37 @@ class JSONLDImporter(BaseImportModule):
             le.save()
 
     def check_tile_cardinality(self, cursor):
-        with transaction.atomic():
-            ResourceInstance.objects.filter(
-                pk__in=LoadStaging.objects.filter(load_event_id=self.loadid).values("resourceid")
-            ).delete()
-            return super().check_tile_cardinality(cursor)
+        # Do this later, after any prior resources have been deleted.
+        return None
+
+    def save_to_tiles(self, cursor, userid, loadid):
+        error_saving_tiles = None
+
+        # Disable the tile triggers early, because below we wrap resource
+        # deletion in a transaction. Avoids "pending triger events..." error.
+        disable_tile_triggers(cursor, loadid)
+
+        try:
+            with transaction.atomic():
+                # Prepare for possible resource overwriting
+                ResourceInstance.objects.filter(
+                    pk__in=LoadStaging.objects.filter(load_event_id=self.loadid).values("resourceid")
+                ).delete()
+
+                # Now we can check tile cardinality.
+                super().check_tile_cardinality(cursor)
+
+                error_saving_tiles = _save_to_tiles(cursor, loadid)
+                if error_saving_tiles:
+                    # Revert transaction.
+                    raise RuntimeError
+        except:
+            return error_saving_tiles
+        finally:
+            reenable_tile_triggers(cursor, loadid)
+
+        _post_save_edit_log(cursor, userid, loadid)
+
 
     @load_data_async
     def run_load_task_async(self, request):

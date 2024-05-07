@@ -182,7 +182,7 @@ class BaseImportModule:
                 self.check_tile_cardinality(cursor)
                 result["validation"] = self.validate(loadid)
                 if len(result["validation"]["data"]) == 0:
-                    save_to_tiles(userid, loadid)
+                    self.save_to_tiles(cursor, userid, loadid)
                     cursor.execute("""CALL __arches_update_resource_x_resource_with_graphids();""")
                     cursor.execute("""SELECT __arches_refresh_spatial_views();""")
                     refresh_successful = cursor.fetchone()[0]
@@ -231,6 +231,9 @@ class BaseImportModule:
             """,
             [self.loadid],
         )
+
+    def save_to_tiles(self, cursor, userid, loadid):
+        return save_to_tiles(userid, loadid)
 
     ### Actions ###
 
