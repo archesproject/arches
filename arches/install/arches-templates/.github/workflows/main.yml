@@ -86,7 +86,7 @@ jobs:
         run: |
           coverage report
           coverage json
-          mv coverage.json feature_branch_coverage.json
+          mv coverage/python/coverage.json feature_branch_coverage.json
 
       - name: Upload coverage report as artifact
         uses: actions/upload-artifact@v4
@@ -178,7 +178,13 @@ jobs:
         run: |
           coverage report
           coverage json
-          mv coverage.json target_branch_coverage.json
+
+          # handles older target branch
+          if [ -f coverage/python/coverage.json ]; then
+            mv coverage/python/coverage.json target_branch_coverage.json
+          else
+            mv coverage.json target_branch_coverage.json
+          fi
 
       - name: Upload coverage report as artifact
         uses: actions/upload-artifact@v4
