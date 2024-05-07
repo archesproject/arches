@@ -73,9 +73,6 @@ jobs:
       - name: Run frontend tests
         run: |
           yarn vitest
-
-      - name: Generate frontend report coverage
-        run: |
           mv coverage/frontend/coverage.xml feature_branch_frontend_coverage.xml
 
       - name: Check for missing migrations
@@ -179,11 +176,12 @@ jobs:
 
       - name: Run frontend tests
         run: |
-          yarn vitest
-
-      - name: Generate frontend report coverage
-        run: |
-          mv coverage/frontend/coverage.xml target_branch_frontend_coverage.xml
+          if [ -f vitest.config.json ]; then
+            yarn vitest
+            mv coverage/frontend/coverage.xml target_branch_frontend_coverage.xml
+          else
+            echo "Unable to find vitest config. Skipping frontend tests."
+          fi
 
       - name: Check for missing migrations
         run: |
