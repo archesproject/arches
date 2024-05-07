@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
                 "modulename": "jsonld_importer.py",
                 "classname": "JSONLDImporter",
                 "config": {"bgColor": "#726a5b", "circleColor": "#9f9580", "show": True},
-                "reversible": True,
+                "reversible": False,  # does not support un-overwriting a resource
                 "slug": "jsonld-importer",
                 "description": "Import a zip archive of JSON-LD resources to Arches",
                 "helptemplate": "jsonld-importer-help",

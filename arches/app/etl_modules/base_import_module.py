@@ -175,22 +175,13 @@ class BaseImportModule:
         return lookup
 
     def run_load_task(self, userid, files, summary, result, temp_dir, loadid):
+        self.loadid = loadid  # currently redundant, but be certain
         try:
             with connection.cursor() as cursor:
                 self.stage_files(files, summary, cursor)
-                cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
-                cursor.execute(
-                    """
-                    INSERT INTO load_errors (type, source, error, loadid, nodegroupid)
-                    SELECT 'tile', source_description, error_message, loadid, nodegroupid
-                    FROM load_staging
-                    WHERE loadid = %s AND passes_validation = false AND error_message IS NOT null
-                    """,
-                    [loadid],
-                )
+                self.check_tile_cardinality(cursor)
                 result["validation"] = self.validate(loadid)
                 if len(result["validation"]["data"]) == 0:
-                    self.loadid = loadid  # currently redundant, but be certain
                     save_to_tiles(userid, loadid)
                     cursor.execute("""CALL __arches_update_resource_x_resource_with_graphids();""")
                     cursor.execute("""SELECT __arches_refresh_spatial_views();""")
@@ -228,6 +219,18 @@ class BaseImportModule:
 
     def stage_excel_file(self, file, summary, cursor):
         pass
+
+    def check_tile_cardinality(self, cursor):
+        cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
+        cursor.execute(
+            """
+            INSERT INTO load_errors (type, source, error, loadid, nodegroupid)
+            SELECT 'tile', source_description, error_message, loadid, nodegroupid
+            FROM load_staging
+            WHERE loadid = %s AND passes_validation = false AND error_message IS NOT null
+            """,
+            [self.loadid],
+        )
 
     ### Actions ###
 

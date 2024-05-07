@@ -7,12 +7,13 @@ from pathlib import Path
 from django.core.files import File
 from django.core.files.storage import default_storage
 from django.core.management import call_command
+from django.db import transaction
 from django.utils.translation import gettext as _
 
 from arches.app.utils.data_management.resources.formats.rdffile import ValueErrorWithNodeInfo
 from arches.app.etl_modules.base_import_module import BaseImportModule, FileValidationError
 from arches.app.etl_modules.decorators import load_data_async
-from arches.app.models.models import GraphModel, LoadErrors, LoadEvent, LoadStaging, Node
+from arches.app.models.models import GraphModel, LoadErrors, LoadEvent, LoadStaging, Node, ResourceInstance
 from arches.app.models.system_settings import settings
 from arches.app.utils.file_validator import FileValidator
 
@@ -262,6 +263,13 @@ class JSONLDImporter(BaseImportModule):
             )
             le.clean_fields()
             le.save()
+
+    def check_tile_cardinality(self, cursor):
+        with transaction.atomic():
+            ResourceInstance.objects.filter(
+                pk__in=LoadStaging.objects.filter(load_event_id=self.loadid).values("resourceid")
+            ).delete()
+            return super().check_tile_cardinality(cursor)
 
     @load_data_async
     def run_load_task_async(self, request):
