@@ -240,7 +240,6 @@ jobs:
           path: .
 
       - name: Extract feature branch frontend coverage data
-        id: coverage
         run: |
           statements=$(xmllint --xpath "string(/coverage/project/metrics/@statements)" feature_branch_frontend_coverage.xml)
           coveredstatements=$(xmllint --xpath "string(/coverage/project/metrics/@coveredstatements)" feature_branch_frontend_coverage.xml)
@@ -251,12 +250,12 @@ jobs:
           elements=$(xmllint --xpath "string(/coverage/project/metrics/@elements)" feature_branch_frontend_coverage.xml)
           coveredelements=$(xmllint --xpath "string(/coverage/project/metrics/@coveredelements)" feature_branch_frontend_coverage.xml)
 
-          statement_coverage=$(echo "scale=2; ${{ coveredstatements }} / ${{ statements }} * 100" | bc)
-          conditional_coverage=$(echo "scale=2; ${{ coveredconditionals }} / ${{ conditionals }} * 100" | bc)
-          method_coverage=$(echo "scale=2; ${{ coveredmethods }} / ${{ methods }} * 100" | bc)
-          element_coverage=$(echo "scale=2; ${{ coveredelements }} / ${{ elements }} * 100" | bc)
+          statement_coverage=$(echo "scale=2; $coveredstatements / $statements * 100" | bc)
+          conditional_coverage=$(echo "scale=2; $coveredconditionals / $conditionals * 100" | bc)
+          method_coverage=$(echo "scale=2; $coveredmethods / $methods * 100" | bc)
+          element_coverage=$(echo "scale=2; $coveredelements / $elements * 100" | bc)
 
-          feature_branch_frontend_coverage=$(echo "scale=2; (${{ statement_coverage }} + ${{ conditional_coverage }} + ${{ method_coverage }} + ${{ element_coverage }}) / 4" | bc)
+          feature_branch_frontend_coverage=$(echo "scale=2; ($statement_coverage + $conditional_coverage + $method_coverage + $element_coverage) / 4" | bc)
           
           echo "feature_branch_frontend_coverage=$feature_branch_frontend_coverage" >> $GITHUB_ENV
           echo "Coverage: $feature_branch_frontend_coverage%"
