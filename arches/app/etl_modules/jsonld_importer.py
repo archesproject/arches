@@ -7,7 +7,7 @@ from pathlib import Path
 from django.core.files import File
 from django.core.files.storage import default_storage
 from django.core.management import call_command
-from django.db import connection, transaction
+from django.db import transaction
 from django.utils.translation import gettext as _
 
 from arches.app.etl_modules.save import _save_to_tiles, disable_tile_triggers, reenable_tile_triggers, _post_save_edit_log
@@ -35,9 +35,7 @@ def graph_id_from_slug(slug):
 @cache
 def fallback_nodegroup_id():
     """Consider removing this if we make LoadStaging.nodegroup nullable."""
-    return Node.objects.filter(
-        graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
-    ).first().nodegroup_id
+    return Node.objects.filter(nodegroup__isnull=False).first().nodegroup_id
 
 
 class JSONLDImporter(BaseImportModule):
@@ -206,6 +204,7 @@ class JSONLDImporter(BaseImportModule):
             error_message=exception_message,
             operation="insert",
         )
+        breakpoint()
         ls.clean_fields()
         ls.save()
 

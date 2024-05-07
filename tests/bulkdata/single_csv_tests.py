@@ -29,7 +29,6 @@ from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.db import connection
 from django.http import HttpRequest
-from django.test import override_settings
 from django.test import TransactionTestCase
 # these tests can be run from the command line via
 # python manage.py test tests.bulkdata.single_csv_tests --settings="tests.test_settings"
@@ -47,11 +46,7 @@ class SingleCSVTests(TransactionTestCase):
         graph=Graph.objects.get(graphid="1bc910b3-99dc-4a5c-8168-61c9e1975658")
         admin = User.objects.get(username="admin")
         graph.publish(user=admin)
-    
 
-    @override_settings(
-        MEDIA_ROOT = os.path.join(settings.ROOT_DIR, "..", "tests/fixtures/data")
-    )
     def test_write(self):
         request = HttpRequest()
         request.method = "POST"
