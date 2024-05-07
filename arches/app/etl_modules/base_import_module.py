@@ -242,11 +242,11 @@ class BaseImportModule:
 
         result = {"summary": {"name": content.name, "size": self.filesize_format(content.size), "files": {}}}
         validator = FileValidator()
-        if len(validator.validate_file_type(content)) > 0:
+        extension = content.name.split(".")[-1] or None
+        if len(validator.validate_file_type(content, extension=extension)) > 0:
             return {
                 "success": False,
                 "data": FileValidationError(
-                    title=_("Invalid excel file/zip specified"),
                     message=_("Upload a valid excel file"),
                     code=400,
                 )
