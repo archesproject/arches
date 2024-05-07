@@ -14,7 +14,6 @@ from arches.app.etl_modules.base_import_module import BaseImportModule, FileVali
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.models.models import GraphModel, LoadErrors, LoadEvent, LoadStaging, Node
 from arches.app.models.system_settings import settings
-from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.file_validator import FileValidator
 
 
@@ -186,17 +185,19 @@ class JSONLDImporter(BaseImportModule):
         )
 
         dummy_tile_info = {
-            "value": {},
-            "valid": False,
-            "source": early_failure,
-            "notes": exception_message,
-            "datatype": "",
+            le.node_id: {
+                "value": {},
+                "valid": False,
+                "source": early_failure,
+                "notes": exception_message,
+                "datatype": "",
+            }
         }
 
         ls = LoadStaging(
             load_event_id=self.loadid,
             nodegroup_id=exception.nodegroup_id if has_info else fallback_nodegroup_id(),
-            value=JSONSerializer().serialize(dummy_tile_info),
+            value=dummy_tile_info,
             passes_validation=False,
             source_description=early_failure,
             error_message=exception_message,
@@ -206,7 +207,7 @@ class JSONLDImporter(BaseImportModule):
         ls.save()
 
     def load_staging_instance_from_tile(self, tile, resource, nodegroup_info):
-        all_tile_errors = []
+        tile_info = {}
         for nodeid, source_value in tile.data.items():
             datatype = nodegroup_info[nodeid]["datatype"]
             datatype_instance = self.datatype_factory.get_instance(datatype)
@@ -221,20 +222,18 @@ class JSONLDImporter(BaseImportModule):
             passes_validation = len(validation_errors) == 0
             self.save_validation_errors(validation_errors, tile, source_value, datatype_instance, nodeid)
 
-            all_tile_errors.extend(validation_errors)
-
-        tile_info = {
-            "value": value,
-            "valid": passes_validation,
-            "source": source_value,
-            "notes": "|".join(validation_errors),
-            "datatype": datatype,
-        }
+            tile_info[nodeid] = {
+                "value": value,
+                "valid": passes_validation,
+                "source": source_value,
+                "notes": "|".join(validation_errors),
+                "datatype": datatype,
+            }
 
         ls = LoadStaging(
             nodegroup_id=tile.nodegroup_id,
             load_event_id=self.loadid,
-            value=JSONSerializer().serialize(tile_info),
+            value=tile_info,
             legacyid=resource.legacyid,
             resourceid=resource.pk,
             tileid=tile.pk,
