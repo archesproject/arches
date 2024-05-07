@@ -28,11 +28,11 @@ logger = logging.getLogger(__name__)
 
 
 class BaseImportModule:
-    def __init__(self, request=None, loadid=None):
+    def __init__(self, request=None, loadid=None, userid=None, moduleid=None, fileid=None):
         self.request = request
-        self.userid = None
-        self.moduleid = None
-        self.fileid = None
+        self.userid = userid
+        self.moduleid = moduleid
+        self.fileid = fileid
         self.loadid = loadid
         self.legacyid_lookup = {}
         self.datatype_factory = DataTypeFactory()

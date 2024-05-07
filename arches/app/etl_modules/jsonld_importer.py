@@ -10,6 +10,7 @@ from django.core.management import call_command
 from django.db import transaction
 from django.utils.translation import gettext as _
 
+from arches.app.tasks import load_json_ld
 from arches.app.utils.data_management.resources.formats.rdffile import ValueErrorWithNodeInfo
 from arches.app.etl_modules.base_import_module import BaseImportModule, FileValidationError
 from arches.app.etl_modules.decorators import load_data_async
@@ -273,4 +274,12 @@ class JSONLDImporter(BaseImportModule):
 
     @load_data_async
     def run_load_task_async(self, request):
-        raise NotImplementedError
+        details = json.loads(self.file_details)
+        summary = details["result"]["summary"]
+        files = details["result"]["summary"]["files"]
+        result = {}
+
+        load_task = load_json_ld.apply_async(
+            (self.userid, files, summary, result, self.temp_dir, self.loadid, self.moduleid),
+        )
+        LoadEvent.objects.filter(loadid=self.loadid).update(taskid=load_task.task_id)

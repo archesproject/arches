@@ -308,6 +308,33 @@ def load_single_csv(userid, loadid, graphid, has_headers, fieldnames, csv_mappin
 
 
 @shared_task
+def load_json_ld(userid, files, summary, result, temp_dir, loadid, moduleid):
+    from arches.app.etl_modules import jsonld_importer
+
+    logger = logging.getLogger(__name__)
+
+    try:
+        importer = jsonld_importer.JSONLDImporter(
+            loadid=loadid,
+            userid=userid,
+            moduleid=moduleid,
+        )
+        importer.temp_dir = temp_dir
+        importer.run_load_task(userid, files, summary, result, temp_dir, loadid)
+
+        load_event = models.LoadEvent.objects.get(loadid=loadid)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.filter(loadid=loadid).update(status="failed")
+        status = _("Failed")
+    finally:
+        msg = _("JSON-LD Import: {} [{}]").format(summary["name"], status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
+
+
+@shared_task
 def edit_bulk_string_data(userid, load_id, module_id, graph_id, node_id, operation, language_code, old_text, new_text, resourceids):
     from arches.app.etl_modules import base_data_editor
 
