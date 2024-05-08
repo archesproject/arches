@@ -44,7 +44,15 @@ class SingleCSVTests(TransactionTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         resource_graph_importer(archesfile["graph"])
         graph=Graph.objects.get(graphid="1bc910b3-99dc-4a5c-8168-61c9e1975658")
-        admin = User.objects.get(username="admin")
+
+        try:
+            admin = User.objects.get(username="admin")
+        except User.DoesNotExist:
+            # Might end up here if a prior TransactionTestCase had truncated something
+            admin = User(pk=1, username="admin", is_staff=True, is_superuser=True)
+            # Use bulk_create to avoid headaches with post_save signal and content types
+            User.objects.bulk_create([admin])
+
         graph.publish(user=admin)
 
     def test_write(self):

@@ -7,14 +7,20 @@ from pathlib import Path
 
 from arches.app.etl_modules.jsonld_importer import JSONLDImporter
 from arches.app.models.models import (
+    Concept,
     EditLog,
     ETLModule,
     GraphModel,
+    Language,
     LoadEvent,
+    LoadErrors,
+    LoadStaging,
     Node,
     ResourceInstance,
     TileModel,
+    Value,
 )
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import (
     import_graph as ResourceGraphImporter,
@@ -37,12 +43,36 @@ from django.test.utils import captured_stdout
 
 
 class JSONLDImportTests(TransactionTestCase):
+    """
+    A bit unfortunately we need to use TransactionTestCase because
+    the functionality under test in the etl modules uses a raw cursor to
+    disable triggers in the tiles table, which blows up using TestCase.
+    (Cannot not simply ALTER TABLE during a transaction...)
+    So far so good, but TransactionTestCase truncates tables afterward, including
+    all the stuff we need in migrations.0001_initial for the next test case class.
+    (You do like having datatypes in your DDataType table, right?)
+    - serialize_rollback = True didn't work
+    - migrating to zero and back doesn't work either (and would take too long).
+    So, we tell Django NOT to truncate arches tables, and just pinky-promise to
+    do our best to delete instances in tearDownClass(), unusually.
+    """
+    available_apps = [
+        app for app in settings.INSTALLED_APPS if app not in (
+            "arches.app.models",
+            "django.contrib.contenttypes",
+        )
+    ]
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         ArchesTestCase.loadOntology()
 
         LanguageSynchronizer.synchronize_settings_with_db()
+
+        # See top of class for explanation.
+        cls.concepts_pks_before = [c.pk for c in Concept.objects.all()]
+        cls.value_pks_before = [v.pk for v in Value.objects.all()]
 
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/jsonld_test_thesaurus.xml")
@@ -81,6 +111,24 @@ class JSONLDImportTests(TransactionTestCase):
         )
 
         cls.write_zip_file_to_uploaded_files()
+
+    @classmethod
+    def tearDownClass(cls):
+        """This is unusual. Explanation at top of class."""
+        LoadErrors.objects.all().delete()
+        LoadStaging.objects.all().delete()
+        LoadEvent.objects.all().delete()
+        EditLog.objects.all().delete()
+
+        cls.basic_graph.delete()
+
+        Concept.objects.exclude(pk__in=cls.concepts_pks_before).delete()
+        Value.objects.exclude(pk__in=cls.value_pks_before).delete()
+        # This dupe should go away after
+        # https://github.com/archesproject/arches/issues/10121
+        Language.objects.filter(code="en-us").delete()
+
+        super().tearDownClass()
 
     @classmethod
     def write_zip_file_to_uploaded_files(cls):
