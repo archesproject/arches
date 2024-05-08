@@ -357,8 +357,19 @@ jobs:
       - name: Compare frontend feature coverage with target coverage
         if: github.event_name == 'pull_request'
         run: |
-          feature_branch_frontend_coverage=${{ env.feature_branch_frontend_coverage }}
+          echo "BAR: ${{ env.feature_branch_frontend_coverage }}"
+          echo "BAZ: $feature_branch_frontend_coverage"
 
+          qux=$FEATURE_BRANCH_FRONTEND_COVERAGE
+          echo "QUX: $qux"
+
+          quux=$feature_branch_frontend_coverage
+          echo "QUUX: $quux"
+
+          corge=$(echo "${{ env.feature_branch_frontend_coverage }}")
+          echo "CORGE: $corge"
+          
+          feature_branch_frontend_coverage=${{ env.feature_branch_frontend_coverage }}
           echo "Feature branch coverage:  $feature_branch_frontend_coverage"
 
 
