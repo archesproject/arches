@@ -365,9 +365,9 @@ class SKOSReader(object):
     def language_exists(self, rdf_tag, allowed_languages):
         if (
             hasattr(rdf_tag, "language")
-            and rdf_tag.language not in allowed_languages
             and rdf_tag.language is not None
             and rdf_tag.language.strip() != ""
+            and capitalize_region(rdf_tag.language) not in allowed_languages
         ):
             language_info = translation.get_language_info(rdf_tag.language)
 
