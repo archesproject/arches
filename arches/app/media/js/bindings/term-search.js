@@ -76,7 +76,7 @@ define([
                             context: '',
                             context_label: '',
                             id: value,
-                            text: value,
+                            text: 'Contains Term: '+value,
                             value: value
                         });
                         return {

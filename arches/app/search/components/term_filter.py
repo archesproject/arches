@@ -29,6 +29,7 @@ class TermFilter(BaseSearchFilter):
                 string_filter = Bool()
                 if term["type"] == "term":
                     string_filter.must(Match(field="strings.string", query=term["value"], type="phrase"))
+                    string_filter.must(Match(field="strings.nodegroup_id", query=term["nodegroupid"]))
                 elif term["type"] == "string":
                     string_filter.should(Match(field="strings.string", query=term["value"], type="phrase_prefix"))
                     string_filter.should(Match(field="strings.string.folded", query=term["value"], type="phrase_prefix"))
