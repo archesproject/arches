@@ -1149,8 +1149,7 @@ class Command(BaseCommand):
         fields = [{"name": field.name, "is_fk": field.get_internal_type() == "ForeignKey"} for field in model._meta.fields]
         field_names = [field["name"] for field in fields]
         
-        # Create a list of dictionaries for each row in the sheet
-        # Then sort the rows based on parent-child relationships to create parents before children
+        # Parse the sheet into a list of dictionaries
         import_table = []
         for imported_row in sheet.iter_rows(min_row=2, values_only=True):
             working_row = {}
@@ -1158,8 +1157,9 @@ class Command(BaseCommand):
                 working_row[field] = imported_row[field_names.index(field)]
             import_table.append(working_row)
 
+        # Process row data and create instances of the model
+        instances = []
         list_items_with_parent = {}
-
         for row in import_table:
             instance = model()
             for field in fields:
@@ -1187,9 +1187,11 @@ class Command(BaseCommand):
                 else:
                     setattr(instance, field_name, value)
 
-            # run validation on all non-fk fields
+            # run validation on all non-parent fields & gather for bulk create
             instance.clean_fields(exclude={"parent"})
-            instance.save()
+            instances.append(instance)
+        
+        model.objects.bulk_create(instances)
 
         if model == models.ControlledListItem:
             # Create list item relationships after all list items have been created
