@@ -25,9 +25,13 @@ try:
 except ImportError:  # unable to import prior to installing requirements.txt in setup.py
     pass
 
-PACKAGE_NAME = "arches"
+PACKAGE_NAME = "{{ project_name }}"
+APP_NAME = '{{ project_name }}'
+
+APP_ROOT = os.path.dirname(__file__)
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
-APP_ROOT = ""
+
+ROOT_URLCONF = '{{ project_name }}.{{ project_name }}.urls'
 
 ARCHES_APPLICATIONS = ()
 
@@ -50,6 +54,29 @@ BUSINESS_DATA_FILES = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
+
+DATABASES = {
+    "default": {
+        "ATOMIC_REQUESTS": False,
+        "AUTOCOMMIT": True,
+        "CONN_MAX_AGE": 0,
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+        "HOST": "localhost",
+        "NAME": "{{ project_name }}",
+        "OPTIONS": {},
+        "PASSWORD": "postgis",
+        "PORT": "5432",
+        "POSTGIS_TEMPLATE": "template_postgis",
+        "TEST": {
+            "CHARSET": None,
+            "COLLATION": None,
+            "MIRROR": None,
+            "NAME": None
+        },
+        "TIME_ZONE": None,
+        "USER": "postgres"
+    }
+}
 
 CACHES = {
     "default": {
