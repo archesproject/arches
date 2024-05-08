@@ -272,7 +272,18 @@ jobs:
               $element_coverage = ($coveredelements / $elements) * 100
           }
 
-          $feature_branch_frontend_coverage = ($statement_coverage + $conditional_coverage + $method_coverage + $element_coverage) / 4
+          $nonZeroCount = 0
+          $totalCoverage = 0
+
+          if ($statements -gt 0) { $nonZeroCount++; $totalCoverage += $statement_coverage }
+          if ($conditionals -gt 0) { $nonZeroCount++; $totalCoverage += $conditional_coverage }
+          if ($methods -gt 0) { $nonZeroCount++; $totalCoverage += $method_coverage }
+          if ($elements -gt 0) { $nonZeroCount++; $totalCoverage += $element_coverage }
+
+          $feature_branch_frontend_coverage = 0
+          if ($nonZeroCount -gt 0) {
+              $feature_branch_frontend_coverage = $totalCoverage / $nonZeroCount
+          }
 
           Write-Output "feature_branch_frontend_coverage=$feature_branch_frontend_coverage" | Out-File -Append $env:GITHUB_ENV
           Write-Output "Coverage: $feature_branch_frontend_coverage%"
