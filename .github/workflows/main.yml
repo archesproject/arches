@@ -288,11 +288,11 @@ jobs:
           Write-Output "feature_branch_frontend_coverage=$feature_branch_frontend_coverage" | Out-File -Append $env:GITHUB_ENV
 
       - name: Download target branch frontend coverage report artifact
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: target-branch-frontend-coverage-report
           path: .
-          if-no-files-found: 'warn'
 
       - name: Check if target branch frontend coverage report artifact exists
         id: check-file
