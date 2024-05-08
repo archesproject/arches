@@ -31,7 +31,6 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template, render_to_string
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max
-from django.db.models.functions import Lower
 from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
 from django.utils import translation
@@ -591,9 +590,6 @@ class Language(models.Model):
     class Meta:
         managed = True
         db_table = "languages"
-        constraints = [
-            models.UniqueConstraint(Lower("code"), name="case_insensitive_code"),
-        ]
 
 
 class NodeGroup(models.Model):
