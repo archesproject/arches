@@ -1142,24 +1142,42 @@ class Command(BaseCommand):
     
     def import_sheet_to_model(self, sheet, model):
         fields = [{"name": field.name, "datatype": field.get_internal_type()} for field in model._meta.fields]
-        for row in sheet.iter_rows(min_row=2, values_only=True):
+        field_names = [field["name"] for field in fields]
+        
+        # Create a list of dictionaries for each row in the sheet
+        # Then sort the rows based on parent-child relationships to create parents before children
+        import_table = []
+        for imported_row in sheet.iter_rows(min_row=2, values_only=True):
+            working_row = {}
+            for field in field_names:
+                working_row[field] = imported_row[field_names.index(field)]
+            import_table.append(working_row)
+        
+        if model == models.ControlledListItem:
+            child_parent = [[row["id"], row["parent"]] for row in import_table]
+            import_table = sorted(import_table, key=lambda x: x["parent"])
+
+        for row in import_table:
             instance = model()
             for i, field in enumerate(fields):
-                if row[i] and field["datatype"] == "ForeignKey" and model == models.ControlledListItem:
-                    related_list = models.ControlledList.objects.get(id=uuid.UUID(row[i]))
-                    setattr(instance, field["name"], related_list)
-                elif row[i] and field["datatype"] == "ForeignKey" and model == models.ControlledListItemValue:
-                    if field["name"] == "valuetype":
-                        valuetype = models.DValueType.objects.get(valuetype = row[i])
-                        setattr(instance, field["name"], valuetype)
-                    elif field["name"] == "language":
-                        related_language = models.Language.objects.get(code=row[i])
-                        setattr(instance, field["name"], related_language)
+                datatype = field["datatype"]
+                field_name = field["name"]
+                value = row[field_name]
+                if value and datatype == "ForeignKey" and model == models.ControlledListItem:
+                    related_list = models.ControlledList.objects.get(id=value)
+                    setattr(instance, field_name, related_list)
+                elif value and datatype == "ForeignKey" and model == models.ControlledListItemValue:
+                    if field_name == "valuetype":
+                        valuetype = models.DValueType.objects.get(valuetype = value)
+                        setattr(instance, field_name, valuetype)
+                    elif field_name == "language":
+                        related_language = models.Language.objects.get(code=value)
+                        setattr(instance, field_name, related_language)
                     else:
-                        related_list_item = models.ControlledListItem.objects.get(id=row[i])
-                        setattr(instance, field["name"], related_list_item)
+                        related_list_item = models.ControlledListItem.objects.get(id=value)
+                        setattr(instance, field_name, related_list_item)
                 else:
-                    setattr(instance, field["name"], row[i])
+                    setattr(instance, field_name, value)
             instance.save()
     
     def export_controlled_lists(self, data_dest):
