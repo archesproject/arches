@@ -355,8 +355,8 @@ jobs:
       - name: Compare frontend feature coverage with target coverage
         if: github.event_name == 'pull_request'
         run: |
-          feature_branch_frontend_coverage="${{ env.feature_branch_frontend_coverage }}"
-          target_branch_frontend_coverage="${{ env.target_branch_frontend_coverage || '0.0' }}"
+          feature_branch_frontend_coverage="${feature_branch_frontend_coverage:-0.0}"
+          target_branch_frontend_coverage="${target_branch_frontend_coverage:-0.0}"
 
           # Compare feature coverage with target coverage using floating-point comparison
           if awk -v feature="$feature_branch_frontend_coverage" -v target="$target_branch_frontend_coverage" 'BEGIN { exit (feature < target) ? 0 : 1 }'; then
