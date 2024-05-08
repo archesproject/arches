@@ -1,8 +1,16 @@
 ---
 repos:
+    - repo: https://github.com/psf/black
+      rev: 24.4.2
+      hooks:
+          - id: black
+            args: [--quiet]
+            exclude: node_modules
+
     - repo: local
       hooks:
           - id: prettier
             name: prettier
-            entry: ./{{ project_name }}/media/node_modules/.bin/prettier ./{{ project_name }}/src --write
+            entry: yarn prettier:fix
             language: system
+            files: {{ project_name }}/src

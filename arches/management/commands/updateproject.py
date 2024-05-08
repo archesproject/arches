@@ -166,11 +166,7 @@ class Command(BaseCommand):
         arches_next_minor_version = ".".join([str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"])
 
         path_to_project = os.path.join(settings.APP_ROOT, "..")
-        for relative_file_path in [
-            'gettext.config.js', '.coveragerc', '.gitignore', "tsconfig.json",
-            "tests/test_settings.py", "tests/search_indexes/sample_index_tests.py",
-            "pyproject.toml", ".pre-commit-config.yaml"
-        ]:  # relative to app root directory
+        for relative_file_path in ['gettext.config.js', '.coveragerc', '.gitignore', "tsconfig.json", "tests/test_settings.py", "tests/search_indexes/sample_index_tests.py", "pyproject.toml", ".pre-commit-config.yaml"]:  # relative to app root directory
             try:
                 file = open(os.path.join(path_to_project, relative_file_path),'r')
                 file_data = file.read()

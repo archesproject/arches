@@ -10,8 +10,8 @@
         "eslint:fix": "eslint . --ext .vue,.ts --fix",
         "gettext:extract": "vue-gettext-extract",
         "gettext:compile": "vue-gettext-compile",
-        "prettier:check": "prettier . --check",
-        "prettier:fix": "prettier . --write",
+        "prettier:check": "prettier {{ project_name }}/src --check",
+        "prettier:fix": "prettier {{ project_name }}/src --write",
         "ts:check": "vue-tsc --noEmit",
         "ts:watch": "vue-tsc --watch --noEmit",
         "start": "cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack serve --config ./webpack/webpack.config.dev.js"

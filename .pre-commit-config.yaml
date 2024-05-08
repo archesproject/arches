@@ -11,7 +11,6 @@ repos:
       hooks:
           - id: prettier
             name: prettier
-            entry: arches/app/media/node_modules/.bin/prettier
-            args: [--write, --ignore-unknown]
+            entry: yarn prettier:fix
             language: system
             files: arches/app/src

@@ -7,4 +7,3 @@ declare module "arches";
 // declare filetypes used in `./src/` folder
 declare module "*.ts";
 declare module "*.vue";
-
