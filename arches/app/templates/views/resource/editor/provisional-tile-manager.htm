@@ -7,7 +7,7 @@
         <!-- ko if: provisionalTileViewModel.edits().length > 0 -->
         <h4 class='provisional-edits-list-header ep-form-toolbar-title'><div data-bind="text: provisionalTileViewModel.card.get('name')()"></div><span>{% trans 'Provisional Edits' %}</span></h4>
         <div class='provisional-edit-qa-tool ep-form-toolbar-title'>
-             <div data-bind="component: { name: 'views/components/simple-switch', params: {value: provisionalTileViewModel.declineUnacceptedEdits, config:{label: {% quoted_trans "Decline all unaccepted edits" %}, subtitle: ''}}}"></div>
+             <div data-bind="component: { name: 'views/components/simple-switch', params: {value: provisionalTileViewModel.declineUnacceptedEdits, config:{label: {% quoted_trans _("Decline all unaccepted edits") %}, subtitle: ''}}}"></div>
             </div>
             <!--ko foreach: {data: provisionalTileViewModel.edits, as: 'edit'} -->
             <div class="provisional-edit">
