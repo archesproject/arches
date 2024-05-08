@@ -278,6 +278,7 @@ class Resource(models.ResourceInstance):
         transaction_id -- a uuid identifing the save of these instances as belonging to a collective load or process
 
         """
+        from arches.app.models.tile import Tile
 
         datatype_factory = DataTypeFactory()
         node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
@@ -294,17 +295,15 @@ class Resource(models.ResourceInstance):
         Resource.objects.bulk_create(resources)
         TileModel.objects.bulk_create(tiles)
 
-        print(f"Time to bulk create tiles and resources: {datetime.timedelta(seconds=time() - start)}")
-
-        start = time()
-        for resource in resources:
-            resource.save_edit(edit_type="create", transaction_id=transaction_id)
-
-        resources[0].tiles[0].save_edit(
-            note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create", transaction_id=transaction_id
+        Tile.bulk_save_edits(
+            tiles=tiles,
+            note=f"Bulk created in Resource.bulk_save",
+            edit_type="bulk_create",
+            transaction_id=transaction_id,
+            new_resource_created=True
         )
 
-        print("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
+        print(f"Time to bulk create tiles and resources: {datetime.timedelta(seconds=time() - start)}")
 
         for resource in resources:
             start = time()
