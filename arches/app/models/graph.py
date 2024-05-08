@@ -30,6 +30,7 @@ from arches.app.models import models
 from arches.app.models.resource import Resource, UnpublishedModelError
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.etl_modules.bulk_data_deletion import BulkDataDeletion
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.i18n import LanguageSynchronizer
@@ -563,19 +564,18 @@ class Graph(models.GraphModel):
                 )
             )
 
-    def delete_instances(self, verbose=False):
+    def delete_instances(self, userid=None, verbose=False):
         """
         deletes all associated resource instances
 
         """
-        if verbose is True:
-            bar = pyprind.ProgBar(Resource.objects.filter(graph_id=self.graphid).count())
-        for resource in Resource.objects.filter(graph_id=self.graphid):
-            resource.delete()
-            if verbose is True:
-                bar.update()
-        if verbose is True:
-            print(bar)
+
+        bulk_deleter = BulkDataDeletion()
+        loadid = uuid.uuid4()
+        resp = bulk_deleter.delete_resources(userid, loadid, graphid=self.graphid, verbose=verbose)
+        bulk_deleter.index_resource_deletion(loadid)
+
+        return resp
 
     def get_tree(self, root=None):
         """
