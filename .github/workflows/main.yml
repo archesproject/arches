@@ -355,29 +355,19 @@ jobs:
 
           Write-Output "target_branch_frontend_coverage=$target_branch_frontend_coverage" | Out-File -Append $env:GITHUB_ENV
 
-      - name: Print all environment variables
-        run: printenv
-        
       - name: Compare frontend feature coverage with target coverage
         if: github.event_name == 'pull_request'
         run: |
-          echo "FOOBAR: $FEATURE_BRANCH_FRONTEND_COVERAGE"
-          echo "FOO: ${feature_branch_frontend_coverage}"
+          feature_branch_frontend_coverage=${feature_branch_frontend_coverage}
+          target_branch_frontend_coverage=${target_branch_frontend_coverage:-0.0}
 
-          echo "BAR: ${{ env.feature_branch_frontend_coverage }}"
-          echo "BAZ: $feature_branch_frontend_coverage"
-
-          qux=$FEATURE_BRANCH_FRONTEND_COVERAGE
-          echo "QUX: $qux"
-
-          quux=$feature_branch_frontend_coverage
-          echo "QUUX: $quux"
-
-          corge=$(echo "${{ env.feature_branch_frontend_coverage }}")
-          echo "CORGE: $corge"
-          
-          feature_branch_frontend_coverage=${{ env.feature_branch_frontend_coverage }}
-          echo "Feature branch coverage:  $feature_branch_frontend_coverage"
+          # Compare feature coverage with target coverage using floating-point comparison
+          if awk -v feature="$feature_branch_frontend_coverage" -v target="$target_branch_frontend_coverage" 'BEGIN { exit (feature < target) ? 0 : 1 }'; then
+            echo "Coverage decreased from $target_branch_frontend_coverage% to $feature_branch_frontend_coverage%. Please add or update tests to increase coverage."
+            exit 1
+          else
+            echo "Feature branch coverage ($feature_branch_frontend_coverage%) >= Target branch coverage ($target_branch_frontend_coverage%)."
+          fi
 
 
   # check_python_coverage:
