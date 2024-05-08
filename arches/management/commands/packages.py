@@ -1141,7 +1141,7 @@ class Command(BaseCommand):
             sys.exit()
     
     def import_sheet_to_model(self, sheet, model):
-        fields = [{"name": field.name, "datatype": field.get_internal_type()} for field in model._meta.fields]
+        fields = [{"name": field.name, "is_fk": field.get_internal_type() == "ForeignKey"} for field in model._meta.fields]
         field_names = [field["name"] for field in fields]
         
         # Create a list of dictionaries for each row in the sheet
@@ -1152,21 +1152,23 @@ class Command(BaseCommand):
             for field in field_names:
                 working_row[field] = imported_row[field_names.index(field)]
             import_table.append(working_row)
-        
-        if model == models.ControlledListItem:
-            child_parent = [[row["id"], row["parent"]] for row in import_table]
-            import_table = sorted(import_table, key=lambda x: x["parent"])
+
+        list_items_with_parent = []
 
         for row in import_table:
             instance = model()
-            for i, field in enumerate(fields):
-                datatype = field["datatype"]
+            for field in fields:
+                is_fk = field["is_fk"]
                 field_name = field["name"]
-                value = row[field_name]
-                if value and datatype == "ForeignKey" and model == models.ControlledListItem:
-                    related_list = models.ControlledList.objects.get(id=value)
-                    setattr(instance, field_name, related_list)
-                elif value and datatype == "ForeignKey" and model == models.ControlledListItemValue:
+                value = (row[field_name] if row[field_name] else None) # might be ''
+                if value and is_fk and model == models.ControlledListItem: 
+                    if field_name == "controlled_list":    
+                        related_list = models.ControlledList.objects.get(id=value)
+                        setattr(instance, field_name, related_list)
+                    elif field_name == "parent":
+                        #stash list items with parent relationships to create relationships after all list items have been created
+                        list_items_with_parent.append({"instance":instance, "parent":value})
+                elif value and is_fk and model == models.ControlledListItemValue:
                     if field_name == "valuetype":
                         valuetype = models.DValueType.objects.get(valuetype = value)
                         setattr(instance, field_name, valuetype)
@@ -1178,7 +1180,19 @@ class Command(BaseCommand):
                         setattr(instance, field_name, related_list_item)
                 else:
                     setattr(instance, field_name, value)
+
+            # run validation on all non-fk fields
+            instance.clean_fields(exclude={"parent"})
             instance.save()
+
+        if model == models.ControlledListItem:
+            # Create list item relationships after all list items have been created
+            for list_item in list_items_with_parent:
+                instance = list_item["instance"]
+                instance.parent = models.ControlledListItem.objects.get(id=list_item["parent"])
+                # instance.full_clean()
+                instance.save()
+        
     
     def export_controlled_lists(self, data_dest):
         wb = openpyxl.Workbook()
