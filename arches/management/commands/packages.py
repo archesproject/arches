@@ -1128,18 +1128,19 @@ class Command(BaseCommand):
     def import_controlled_lists(self, source):
         if os.path.exists(source):
             wb = openpyxl.load_workbook(source)
-            for sheet in wb.sheetnames:
-                if sheet == "ControlledList":
-                    self.import_sheet_to_model(wb[sheet], models.ControlledList)
-                elif sheet == "ControlledListItem":
-                    self.import_sheet_to_model(wb[sheet], models.ControlledListItem)
-                elif sheet == "ControlledListItemValue":
-                    self.import_sheet_to_model(wb[sheet], models.ControlledListItemValue)
-            # validate all data
-            for model in [models.ControlledList, models.ControlledListItem, models.ControlledListItemValue]:
-                for instance in model.objects.all():
-                    instance.full_clean()
-            self.stdout.write('Data imported successfully from {0}'.format(source))
+            with transaction.atomic():
+                for sheet in wb.sheetnames:
+                    if sheet == "ControlledList":
+                        self.import_sheet_to_model(wb[sheet], models.ControlledList)
+                    elif sheet == "ControlledListItem":
+                        self.import_sheet_to_model(wb[sheet], models.ControlledListItem)
+                    elif sheet == "ControlledListItemValue":
+                        self.import_sheet_to_model(wb[sheet], models.ControlledListItemValue)
+                # validate all data
+                for model in [models.ControlledList, models.ControlledListItem, models.ControlledListItemValue]:
+                    for instance in model.objects.all():
+                        instance.full_clean()
+                self.stdout.write('Data imported successfully from {0}'.format(source))
         else:
             self.stdout.write('The source file does not exist. Please rerun this command with a valid source file.')
             sys.exit()
