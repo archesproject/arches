@@ -372,14 +372,7 @@ class SKOSReader(object):
             language_info = translation.get_language_info(rdf_tag.language)
 
             newlang = models.Language()
-            newlang.code = rdf_tag.language
-
-            # Languages are now case-insensitive in Arches, so
-            # normalize the object to whatever Arches has
-            for existing_code in allowed_languages:
-                if existing_code.lower() == newlang.code.lower():
-                    return True
-            newlang.code = capitalize_region(newlang.code)
+            newlang.code = capitalize_region(rdf_tag.language)
 
             if language_info:
                 newlang.name = language_info["name"]

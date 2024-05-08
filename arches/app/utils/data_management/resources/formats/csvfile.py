@@ -31,6 +31,7 @@ from arches.app.utils.data_management.resource_graphs import exporter as GraphEx
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.utils.i18n import capitalize_region
 import arches.app.utils.task_management as task_management
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
@@ -470,7 +471,7 @@ class CsvReader(Reader):
             column_regex = re.compile(r"^.+ \(([A-Za-z-]+)\)$")
             match = column_regex.match(column)
             if match is not None:
-                new_language_candidate = match.groups()[0]
+                new_language_candidate = capitalize_region(match.groups()[0])
                 language_exists = Language.objects.filter(code=new_language_candidate).exists()
                 if not language_exists:
                     new_languages.append(new_language_candidate)
