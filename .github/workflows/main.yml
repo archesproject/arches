@@ -355,6 +355,9 @@ jobs:
 
           echo "target_branch_frontend_coverage=$target_branch_frontend_coverage" >> $GITHUB_ENV
 
+      - name: Print all environment variables
+        run: printenv
+        
       - name: Compare frontend feature coverage with target coverage
         if: github.event_name == 'pull_request'
         run: |
