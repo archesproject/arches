@@ -47,7 +47,7 @@ class JSONLDImportTests(TransactionTestCase):
     A bit unfortunately we need to use TransactionTestCase because
     the functionality under test in the etl modules uses a raw cursor to
     disable triggers in the tiles table, which blows up using TestCase.
-    (Cannot not simply ALTER TABLE during a transaction...)
+    (Cannot simply ALTER TABLE during a transaction...)
     So far so good, but TransactionTestCase truncates tables afterward, including
     all the stuff we need in migrations.0001_initial for the next test case class.
     (You do like having datatypes in your DDataType table, right?)
