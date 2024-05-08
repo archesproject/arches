@@ -288,7 +288,7 @@ jobs:
 
           echo "FOO: $feature_branch_frontend_coverage"
 
-          echo "feature_branch_frontend_coverage=$feature_branch_frontend_coverage" >> $GITHUB_ENV
+          Write-Output "feature_branch_frontend_coverage=$feature_branch_frontend_coverage" | Out-File -Append $env:GITHUB_ENV
 
       - name: Download target branch frontend coverage report artifact
         continue-on-error: true
@@ -353,7 +353,7 @@ jobs:
               $target_branch_frontend_coverage = $totalCoverage / $nonZeroCount
           }
 
-          echo "target_branch_frontend_coverage=$target_branch_frontend_coverage" >> $GITHUB_ENV
+          Write-Output "target_branch_frontend_coverage=$target_branch_frontend_coverage" | Out-File -Append $env:GITHUB_ENV
 
       - name: Print all environment variables
         run: printenv
