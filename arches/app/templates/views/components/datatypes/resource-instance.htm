@@ -41,6 +41,7 @@
                             data-bind="
                             click: function() { if($parent.isEditable !== false){self.toggleSelectedResource($data)}; },
                             attr: {'aria-label': $root.translations.configureRelatedResourceRelationship, 'disabled': $parent.isEditable === false,},
+                            style: {color: $parent.isEditable === true || '#aaa'},
                             clickBubble: false," 
                             style="cursor: pointer;">
                             <i class="fa fa-gear"></i>
