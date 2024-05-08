@@ -1981,10 +1981,18 @@ class ResourceInstanceDataType(BaseDataType):
                 document["ids"].append(
                     {"id": relatedResourceItem["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
                 )
-                if "resourceName" in relatedResourceItem and relatedResourceItem["resourceName"] not in document["strings"]:
+                if "resourceName" in relatedResourceItem and relatedResourceItem["resourceName"]:
                     document["strings"].append(
                         {"string": relatedResourceItem["resourceName"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
                     )
+                if relatedResourceItem["ontologyProperty"] and relatedResourceItem["ontologyProperty"] != "":
+                    document["strings"].append({
+                        "string": relatedResourceItem["ontologyProperty"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional
+                    })
+                if relatedResourceItem["inverseOntologyProperty"] and relatedResourceItem["inverseOntologyProperty"] != "":
+                    document["strings"].append({
+                        "string": relatedResourceItem["inverseOntologyProperty"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional
+                    })
 
     def transform_value_for_tile(self, value, **kwargs):
         try:
