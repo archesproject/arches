@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseImportModule:
-    def __init__(self, request=None, loadid=None, userid=None, moduleid=None, fileid=None):
+    def __init__(self, loadid=None, request=None, userid=None, moduleid=None, fileid=None):
         self.request = request
         self.userid = userid
         self.moduleid = moduleid
