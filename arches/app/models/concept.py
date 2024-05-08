@@ -1352,11 +1352,9 @@ class ConceptValue(object):
             value.valuetype_id = self.type  # models.DValueType.objects.get(pk=self.type)
 
             if self.language != "":
-                value.language_id = self.language
                 # need to normalize language ids to the form xx-XX
-                normalized = capitalize_region(self.language)
-                if self.language != normalized and models.Language.objects.filter(code=normalized).exists():
-                    value.language_id = normalized
+                self.language = capitalize_region(self.language)
+                value.language_id = self.language  # models.DLanguage.objects.get(pk=self.language)
             else:
                 value.language_id = settings.LANGUAGE_CODE
 
