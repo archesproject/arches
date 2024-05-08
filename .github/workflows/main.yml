@@ -254,10 +254,23 @@ jobs:
           $elements = [int]$metrics.elements
           $coveredelements = [int]$metrics.coveredelements
 
-          $statement_coverage = ($coveredstatements / $statements) * 100
-          $conditional_coverage = ($coveredconditionals / $conditionals) * 100
-          $method_coverage = ($coveredmethods / $methods) * 100
-          $element_coverage = ($coveredelements / $elements) * 100
+          $statement_coverage = 0
+          $conditional_coverage = 0
+          $method_coverage = 0
+          $element_coverage = 0
+
+          if ($statements -gt 0) {
+              $statement_coverage = ($coveredstatements / $statements) * 100
+          }
+          if ($conditionals -gt 0) {
+              $conditional_coverage = ($coveredconditionals / $conditionals) * 100
+          }
+          if ($methods -gt 0) {
+              $method_coverage = ($coveredmethods / $methods) * 100
+          }
+          if ($elements -gt 0) {
+              $element_coverage = ($coveredelements / $elements) * 100
+          }
 
           $feature_branch_frontend_coverage = ($statement_coverage + $conditional_coverage + $method_coverage + $element_coverage) / 4
 
