@@ -1153,7 +1153,7 @@ class Command(BaseCommand):
                 working_row[field] = imported_row[field_names.index(field)]
             import_table.append(working_row)
 
-        list_items_with_parent = []
+        list_items_with_parent = {}
 
         for row in import_table:
             instance = model()
@@ -1166,8 +1166,9 @@ class Command(BaseCommand):
                         related_list = models.ControlledList.objects.get(id=value)
                         setattr(instance, field_name, related_list)
                     elif field_name == "parent":
-                        #stash list items with parent relationships to create relationships after all list items have been created
-                        list_items_with_parent.append({"instance":instance, "parent":value})
+                        # stash list items with parent relationships to create relationships after all list items have been created
+                        # stashed object in the form of {child_list_item_instance : parent_list_item_pk, ...}
+                        list_items_with_parent[instance] = value
                 elif value and is_fk and model == models.ControlledListItemValue:
                     if field_name == "valuetype":
                         valuetype = models.DValueType.objects.get(valuetype = value)
@@ -1187,11 +1188,10 @@ class Command(BaseCommand):
 
         if model == models.ControlledListItem:
             # Create list item relationships after all list items have been created
-            for list_item in list_items_with_parent:
-                instance = list_item["instance"]
-                instance.parent = models.ControlledListItem.objects.get(id=list_item["parent"])
-                # instance.full_clean()
-                instance.save()
+            for child, parent in list_items_with_parent.items():
+                child.parent = models.ControlledListItem.objects.get(id=parent)
+                child.clean_fields(exclude={field["name"] for field in fields if field["name"] != "parent"})
+                child.save()
         
     
     def export_controlled_lists(self, data_dest):
