@@ -96,7 +96,19 @@ class Command(BaseCommand):
                 self.stdout.write("Copying {} to project directory".format(project_metadata_file))
                 shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", project_metadata_file), os.path.join(settings.APP_ROOT, ".."))
 
-        for config_file in ["nodemon.json", "tsconfig.json", ".coveragerc", ".gitignore", ".babelrc", ".browserslistrc", ".stylelintrc.json", "gettext.config.js"]:
+        for config_file in [
+            "nodemon.json", 
+            "tsconfig.json", 
+            ".coveragerc", 
+            ".gitignore", 
+            ".babelrc", 
+            ".browserslistrc", 
+            ".stylelintrc.json", 
+            "gettext.config.js",
+            "vitest.config.mts",
+            "vitest.setup.mts",
+            "eslint.config.mjs",
+        ]:
             if os.path.exists(os.path.join(settings.APP_ROOT, config_file)):
                 self.stdout.write("Deleting {} from project root directory".format(config_file))
                 os.remove(os.path.join(settings.APP_ROOT, config_file))

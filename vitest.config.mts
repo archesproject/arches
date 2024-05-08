@@ -3,6 +3,16 @@ import vue from "@vitejs/plugin-vue";
 import { defineConfig } from "vitest/config";
 
 
+const exclude = [
+    '**/node_modules/**', 
+    '**/dist/**', 
+    '**/cypress/**', 
+    '**/.{idea,git,cache,output,temp}/**', 
+    '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
+    '**/src/declarations.d.ts',
+    path.join(path.basename(__dirname), 'install', '**')
+];
+
 export default defineConfig({
     plugins: [vue()],
     test: {
@@ -11,14 +21,7 @@ export default defineConfig({
         },
         coverage: {
             include: [path.join(path.basename(__dirname), 'app', 'src', '/')],
-            exclude: [
-                '**/node_modules/**', 
-                '**/dist/**', 
-                '**/cypress/**', 
-                '**/.{idea,git,cache,output,temp}/**', 
-                '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
-                path.join(path.basename(__dirname), 'install', '**')
-            ],
+            exclude: exclude,
             reporter: [
                 ['clover', { 'file': 'coverage.xml' }],
                 'text',
@@ -27,14 +30,7 @@ export default defineConfig({
         },
         environment: "jsdom",
         globals: true,
-        exclude: [
-            '**/node_modules/**', 
-            '**/dist/**', 
-            '**/cypress/**', 
-            '**/.{idea,git,cache,output,temp}/**', 
-            '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
-            path.join(path.basename(__dirname), 'install', '**')
-        ],
+        exclude: exclude,
         passWithNoTests: true,
         setupFiles: ['vitest.setup.mts'],
     },
