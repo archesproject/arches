@@ -361,15 +361,6 @@ jobs:
 
           echo "Feature branch coverage:  $feature_branch_frontend_coverage"
 
-          # target_branch_frontend_coverage=$(echo "${{env.target_branch_frontend_coverage:-0.0}}" )
-
-          # # Compare feature coverage with target coverage using floating-point comparison
-          # if awk -v feature="$feature_branch_frontend_coverage" -v target="$target_branch_frontend_coverage" 'BEGIN { exit (feature < target) ? 0 : 1 }'; then
-          #   echo "Coverage decreased from $target_branch_frontend_coverage% to $feature_branch_frontend_coverage%. Please add or update tests to increase coverage."
-          #   exit 1
-          # else
-          #   echo "Feature branch coverage ($feature_branch_frontend_coverage%) >= Target branch coverage ($target_branch_frontend_coverage%)."
-          # fi
 
   # check_python_coverage:
   #   runs-on: ubuntu-latest
