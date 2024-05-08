@@ -240,25 +240,29 @@ jobs:
           path: .
 
       - name: Extract feature branch frontend coverage data
+        shell: pwsh
         run: |
-          statements=$(xmllint --xpath "string(/coverage/project/metrics/@statements)" feature_branch_frontend_coverage.xml)
-          coveredstatements=$(xmllint --xpath "string(/coverage/project/metrics/@coveredstatements)" feature_branch_frontend_coverage.xml)
-          conditionals=$(xmllint --xpath "string(/coverage/project/metrics/@conditionals)" feature_branch_frontend_coverage.xml)
-          coveredconditionals=$(xmllint --xpath "string(/coverage/project/metrics/@coveredconditionals)" feature_branch_frontend_coverage.xml)
-          methods=$(xmllint --xpath "string(/coverage/project/metrics/@methods)" feature_branch_frontend_coverage.xml)
-          coveredmethods=$(xmllint --xpath "string(/coverage/project/metrics/@coveredmethods)" feature_branch_frontend_coverage.xml)
-          elements=$(xmllint --xpath "string(/coverage/project/metrics/@elements)" feature_branch_frontend_coverage.xml)
-          coveredelements=$(xmllint --xpath "string(/coverage/project/metrics/@coveredelements)" feature_branch_frontend_coverage.xml)
+          [xml]$xml = Get-Content feature_branch_frontend_coverage.xml
+          $metrics = $xml.coverage.project.metrics
 
-          statement_coverage=$(echo "scale=2; $coveredstatements / $statements * 100" | bc)
-          conditional_coverage=$(echo "scale=2; $coveredconditionals / $conditionals * 100" | bc)
-          method_coverage=$(echo "scale=2; $coveredmethods / $methods * 100" | bc)
-          element_coverage=$(echo "scale=2; $coveredelements / $elements * 100" | bc)
+          $statements = [int]$metrics.statements
+          $coveredstatements = [int]$metrics.coveredstatements
+          $conditionals = [int]$metrics.conditionals
+          $coveredconditionals = [int]$metrics.coveredconditionals
+          $methods = [int]$metrics.methods
+          $coveredmethods = [int]$metrics.coveredmethods
+          $elements = [int]$metrics.elements
+          $coveredelements = [int]$metrics.coveredelements
 
-          feature_branch_frontend_coverage=$(echo "scale=2; ($statement_coverage + $conditional_coverage + $method_coverage + $element_coverage) / 4" | bc)
-          
-          echo "feature_branch_frontend_coverage=$feature_branch_frontend_coverage" >> $GITHUB_ENV
-          echo "Coverage: $feature_branch_frontend_coverage%"
+          $statement_coverage = ($coveredstatements / $statements) * 100
+          $conditional_coverage = ($coveredconditionals / $conditionals) * 100
+          $method_coverage = ($coveredmethods / $methods) * 100
+          $element_coverage = ($coveredelements / $elements) * 100
+
+          $feature_branch_frontend_coverage = ($statement_coverage + $conditional_coverage + $method_coverage + $element_coverage) / 4
+
+          Write-Output "feature_branch_frontend_coverage=$feature_branch_frontend_coverage" | Out-File -Append $env:GITHUB_ENV
+          Write-Output "Coverage: $feature_branch_frontend_coverage%"
 
       - name: Download target branch frontend coverage report artifact
         uses: actions/download-artifact@v4
