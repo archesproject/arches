@@ -204,7 +204,6 @@ class JSONLDImporter(BaseImportModule):
             error_message=exception_message,
             operation="insert",
         )
-        breakpoint()
         ls.clean_fields()
         ls.save()
 
@@ -273,7 +272,7 @@ class JSONLDImporter(BaseImportModule):
         error_saving_tiles = None
 
         # Disable the tile triggers early, because below we wrap resource
-        # deletion in a transaction. Avoids "pending triger events..." error.
+        # deletion in a transaction. Avoids "pending trigger events..." error.
         disable_tile_triggers(cursor, loadid)
 
         try:
