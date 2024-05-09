@@ -2386,6 +2386,11 @@ class ResourceInstanceDataType(BaseDataType):
             except:
                 logger.info(f'Resource with id "{resourceid}" not in the system.')
         return ", ".join(items)
+    
+    def get_relationship_display_value(self, relationship_valueid):
+        concept_datatype_instance = self.datatype_factory.get_instance('concept')
+        concept_preflabel = concept_datatype_instance.get_pref_label(relationship_valueid)
+        return concept_preflabel
 
     def to_json(self, tile, node):
         from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
