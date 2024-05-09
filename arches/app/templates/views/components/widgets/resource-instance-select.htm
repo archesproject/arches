@@ -83,17 +83,21 @@
                                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                             </button>
                         </div>
-                        <!-- ko if: self.relationship() -->
-                        <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" tabindex="0" role="button" 
-                            data-bind="onEnterkeyClick, onSpaceClick, click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false,
-                                attr: {'aria-label': $root.translations.expandRelatioshipOntologyOptions($parent.resourceInstanceDisplayName, $data.resourceName()) }
+                        <!-- ko if: self.relationship() || ko.unwrap($data.ontologyProperty) -->
+                        <div class='rr-table-column icon-column'>
+                            <button data-bind="click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false,
+                            attr: {'aria-label': $root.translations.expandRelatioshipOntologyOptions($parent.resourceInstanceDisplayName, $data.resourceName()) }
                             ">
+                                <i class="fa fa-gear" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="rr-table-column" style="flex-grow: 1;">
                             <div class="rr-table-instance-label">
                                 <i class="sm-icon-wrap" data-bind="css: $data.iconClass()"></i><span data-bind="text: $data.resourceName()"></span>
                             </div>
                         </div>
                         <!-- /ko -->
-                        <!-- ko ifnot: self.relationship() -->
+                        <!-- ko if: !self.relationship() && !ko.unwrap($data.ontologyProperty) -->
                         <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;">
                             <div class="rr-table-instance-label">
                                 <i class="sm-icon-wrap" data-bind="css: $data.iconClass()"></i><span data-bind="text: $data.resourceName()"></span>
@@ -321,10 +325,14 @@
                                     <i class="fa fa-info-circle" aria-hidden="true"></i>
                                 </button>
                             </div>
-                            <div class="rr-table-column" style="flex-grow: 1; cursor: pointer;" tabindex="0" role="button"
-                                data-bind="onEnterkeyClick, onSpaceClick, click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false,
-                                    attr: {'aria-label': $root.translations.expandRelatioshipOntologyOptions($parent.resourceInstanceDisplayName, $data.resourceName()) }
+                            <div class='rr-table-column icon-column'>
+                                <button data-bind="onEnterkeyClick, onSpaceClick, click: function() { self.toggleSelectedResourceRelationship($data); }, clickBubble: false,
+                                attr: {'aria-label': $root.translations.expandRelatioshipOntologyOptions($parent.resourceInstanceDisplayName, $data.resourceName()) }
                                 ">
+                                    <i class="fa fa-gear" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <div class="rr-table-column" style="flex-grow: 1;" tabindex="0">
                                 <div class="rr-table-instance-label" data-bind="text: $data.resourceName()">
                                 </div>
                             </div>
