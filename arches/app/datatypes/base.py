@@ -378,7 +378,7 @@ class BaseDataType(object):
 
         return False
     
-    def get_nodevalue_as_list(self, nodevalue):
+    def get_nodevalues(self, nodevalue):
         if nodevalue is None:
             return []
         elif not isinstance(nodevalue, (list, tuple)):

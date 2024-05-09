@@ -2302,7 +2302,7 @@ class ResourceInstanceDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         if value is not None:
-            resourceXresourceIds = self.get_nodevalue_as_list(value)
+            resourceXresourceIds = self.get_nodevalues(value)
             for resourceXresourceId in resourceXresourceIds:
                 try:
                     resourceid = resourceXresourceId["resourceId"]
@@ -2371,7 +2371,7 @@ class ResourceInstanceDataType(BaseDataType):
 
         resourceid = None
         data = self.get_tile_data(tile)
-        nodevalue = self.get_nodevalue_as_list(data[str(node.nodeid)])
+        nodevalue = self.get_nodevalues(data[str(node.nodeid)])
 
         items = []
         for resourceXresource in nodevalue:
@@ -2392,7 +2392,7 @@ class ResourceInstanceDataType(BaseDataType):
 
         data = self.get_tile_data(tile)
         if data:
-            nodevalue = self.get_nodevalue_as_list(data[str(node.nodeid)])
+            nodevalue = self.get_nodevalues(data[str(node.nodeid)])
 
             for resourceXresource in nodevalue:
                 try:
@@ -2404,7 +2404,7 @@ class ResourceInstanceDataType(BaseDataType):
                     logger.info(f'Resource with id "{resourceid}" not in the system.')
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        nodevalue = self.get_nodevalue_as_list(nodevalue)
+        nodevalue = self.get_nodevalues(nodevalue)
         for relatedResourceItem in nodevalue:
             document["ids"].append(
                 {"id": relatedResourceItem["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
@@ -2529,7 +2529,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         resourceid = None
         data = self.get_tile_data(tile)
         if data:
-            nodevalue = self.get_nodevalue_as_list(data[str(node.nodeid)])
+            nodevalue = self.get_nodevalues(data[str(node.nodeid)])
             items = []
 
             for resourceXresource in nodevalue:
