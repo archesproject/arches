@@ -28,10 +28,10 @@ from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.flatten_dict import flatten_dict
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.geo_utils import GeoUtils
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.string_utils import str_to_bool
 import arches.app.utils.zip as zip_utils
 from arches.app.views import search as SearchView
 from arches.app.models.system_settings import settings
@@ -48,6 +48,9 @@ class SearchResultsExporter(object):
         search_request.GET["export"] = True
         self.report_link = search_request.GET.get("reportlink", False)
         self.format = search_request.GET.get("format", "tilecsv")
+        self.export_system_values = search_request.GET.get("exportsystemvalues", False)
+        if not isinstance(self.export_system_values, bool):
+            self.export_system_values = str_to_bool(self.export_system_values)
         self.compact = search_request.GET.get("compact", True)
         self.precision = int(search_request.GET.get("precision", 5))
         if self.format == "shp" and self.compact is not True:
@@ -302,7 +305,10 @@ class SearchResultsExporter(object):
                 node = self.get_node(nodeid)
                 if node.exportable:
                     datatype = datatype_factory.get_instance(node.datatype)
-                    node_value = datatype.get_display_value(tile, node)
+                    if self.export_system_values:
+                        node_value = datatype.transform_export_values(value, **{"concept_export_value_type": "id"})
+                    else:
+                        node_value = datatype.get_display_value(tile, node)
                     label = node.fieldname if use_fieldname is True else node.name
 
                     if compact:

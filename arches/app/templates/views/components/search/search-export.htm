@@ -39,6 +39,20 @@
                 <!-- /ko -->
             </div>
         </div>
+        <div class="form-text form-normal"
+            data-bind="
+                component: { 
+                    name: 'views/components/simple-switch', 
+                    params: {
+                        value: exportSystemValues, 
+                        config: { 
+                            label: 'Export as System Values',
+                            subtitle: 'Export data as their IDs or other format in the database instead of display values'
+                        }
+                    }
+                }
+            "
+        ></div>
 
         <div class="instruction">
                 <h2 class=""> {% trans "2. Coordinate Precision" %} </h2>
