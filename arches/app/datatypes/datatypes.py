@@ -101,7 +101,7 @@ class DataTypeFactory(object):
             datatype_instance = DataTypeFactory._datatype_instances[d_datatype.classname]
         except KeyError:
             class_method = get_class_from_modulename(d_datatype.modulename, d_datatype.classname, ExtensionType.DATATYPES)
-            datatype_instance = class_method(d_datatype)
+            datatype_instance = class_method(d_datatype, datatype_factory=self)
             DataTypeFactory._datatype_instances[d_datatype.classname] = datatype_instance
             self.datatype_instances = DataTypeFactory._datatype_instances
         return datatype_instance
