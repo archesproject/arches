@@ -27,8 +27,8 @@ cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 logger = logging.getLogger(__name__)
 
 class BaseConceptDataType(BaseDataType):
-    def __init__(self, model=None, datatype_instance=None):
-        super(BaseConceptDataType, self).__init__(model=model, datatype_instance=datatype_instance)
+    def __init__(self, model=None, datatype_factory=None):
+        super(BaseConceptDataType, self).__init__(model=model, datatype_factory=datatype_factory)
         self.value_lookup = {}
         self.collection_lookup = {}
         self.collection_by_node_lookup = {}
