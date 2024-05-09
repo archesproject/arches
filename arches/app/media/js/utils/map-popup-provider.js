@@ -40,6 +40,19 @@ define(['arches',
             return features;
         },
 
+        /**
+         * This method enables custom logic for how the feature in the popup should be handled and/or mutated en route to the mapFilter.
+         * @param popupFeatureObject - the javascript object of the feature and its associated contexts (e.g. mapCard).
+         * @required @method mapCard.filterByFeatureGeom()
+         * @required send argument: @param feature - a geojson feature object
+         * @optional send argument: @param resourceid
+         */
+        sendFeaturetoMapFilter: function(popupFeatureObject)
+        {
+            const feature = popupFeatureObject.geometries()[0].geom.features[0];
+            popupFeatureObject.mapCard.filterByFeatureGeom(feature, popupFeatureObject.resourceinstanceid);
+        },
+
     };
     return provider;
 });

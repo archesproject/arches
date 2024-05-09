@@ -106,6 +106,7 @@ define([
                 };
 
                 this.searchGeometries = ko.observableArray(null);
+                this.searchGeometryFeature = ko.observable(null);
                 this.searchAggregations = ko.observable();
                 this.selectedTool = ko.observable();
                 this.geoJSONString = ko.observable(undefined);
@@ -265,6 +266,34 @@ define([
                         this.updateResults();
                     }
                 }, this);
+
+                this.filterByFeatureGeom = function(feature, resourceid=null) {
+                    if (feature.geometry.type == 'Point') { self.buffer(100); }
+                    if (feature.id && resourceid) {
+                        self.searchGeometryFeature({
+                            "featureid": feature.id,
+                            "resourceid": resourceid,
+                            "buffer": {
+                                "width": this.buffer(),
+                                "unit": this.bufferUnit()
+                            },
+                            "inverted": this.filter.inverted()
+                        });
+                    }
+                    let currentSearchGeoms = self.searchGeometries();
+                    this.draw.set({
+                        "type": "FeatureCollection",
+                        "features": [feature]
+                    });
+                    if (currentSearchGeoms != null) {
+                        currentSearchGeoms.push(feature);
+                    } else {
+                        currentSearchGeoms = [feature];
+                    }
+                    self.searchGeometries(currentSearchGeoms);
+                    self.updateFilter();
+                    self.draw.changeMode('static');
+                };
 
                 var updateSearchResultPointLayer = function() {
                     var pointSource = self.map().getSource('search-results-points');
@@ -511,7 +540,11 @@ define([
                         this.getFilter('term-filter').addTag('Map Filter Enabled', this.name, this.filter.inverted);
                     }
                     this.filter.feature_collection().features[0].properties['inverted'] = this.filter.inverted();
-                    queryObj[componentName] = ko.toJSON(this.filter.feature_collection());
+                    if (!!this.searchGeometryFeature()) {
+                        queryObj[componentName] = ko.toJSON(this.searchGeometryFeature());
+                    } else {
+                        queryObj[componentName] = ko.toJSON(this.filter.feature_collection());
+                    }
                 } else {
                     delete queryObj[componentName];
                 }
@@ -566,6 +599,7 @@ define([
             },
 
             clear: function(reset_features) {
+                this.searchGeometryFeature(null);
                 this.filter.feature_collection({
                     "type": "FeatureCollection",
                     "features": []
@@ -577,6 +611,7 @@ define([
                 this.getFilter('term-filter').removeTag('Map Filter Enabled');
                 this.draw.deleteAll();
                 this.searchGeometries([]);
+                this.setupDraw();
             },
 
             fitToAggregationBounds: function() {

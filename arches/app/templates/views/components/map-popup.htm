@@ -58,6 +58,12 @@
             {% trans "Edit" %}
         </a>
         <!--/ko-->
+        <!-- ko if: ko.unwrap(geometries).length -->
+        <a data-bind="click: function() {sendFeaturetoMapFilter($data)}" href="#">
+            <i class="fa fa-map-pin"></i>
+            <span>{% trans "Search Near Here" %}</span>
+        </a>
+        <!-- /ko -->
         </div>
         <!-- ko if: $parent.popupFeatures.length > 1 -->
         <div style="display: flex; flex-direction: row; width: 60px; justify-content: space-evenly; font-weight: 500;">
