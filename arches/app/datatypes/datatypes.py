@@ -2411,6 +2411,8 @@ class ResourceInstanceDataType(BaseDataType):
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         nodevalue = self.get_nodevalues(nodevalue)
         for relatedResourceItem in nodevalue:
+            relationship = None
+            inverse_relationship = None
             document["ids"].append(
                 {"id": relatedResourceItem["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
             )
@@ -2419,12 +2421,30 @@ class ResourceInstanceDataType(BaseDataType):
                     {"string": relatedResourceItem["resourceName"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
                 )
             if relatedResourceItem["ontologyProperty"] and relatedResourceItem["ontologyProperty"] != "":
+                try:
+                    uuid.UUID(relatedResourceItem["ontologyProperty"])
+                    relationship = (
+                        self.get_relationship_display_value(relatedResourceItem["ontologyProperty"])
+                        or
+                        relatedResourceItem["ontologyProperty"]
+                    )
+                except ValueError:
+                    relationship = relatedResourceItem["ontologyProperty"]
                 document["strings"].append({
-                    "string": relatedResourceItem["ontologyProperty"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional
+                    "string": relationship, "nodegroup_id": tile.nodegroup_id, "provisional": provisional
                 })
             if relatedResourceItem["inverseOntologyProperty"] and relatedResourceItem["inverseOntologyProperty"] != "":
+                try:
+                    uuid.UUID(relatedResourceItem["inverseOntologyProperty"])
+                    inverse_relationship = (
+                        self.get_relationship_display_value(relatedResourceItem["inverseOntologyProperty"])
+                        or
+                        relatedResourceItem["inverseOntologyProperty"]
+                    )
+                except ValueError:
+                    inverse_relationship = relatedResourceItem["inverseOntologyProperty"]
                 document["strings"].append({
-                    "string": relatedResourceItem["inverseOntologyProperty"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional
+                    "string": inverse_relationship, "nodegroup_id": tile.nodegroup_id, "provisional": provisional
                 })
 
     def transform_value_for_tile(self, value, **kwargs):
