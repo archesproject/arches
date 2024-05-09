@@ -101,7 +101,7 @@ class DataTypeFactory(object):
             datatype_instance = DataTypeFactory._datatype_instances[d_datatype.classname]
         except KeyError:
             class_method = get_class_from_modulename(d_datatype.modulename, d_datatype.classname, ExtensionType.DATATYPES)
-            datatype_instance = class_method(d_datatype)
+            datatype_instance = class_method(d_datatype, datatype_factory=self)
             DataTypeFactory._datatype_instances[d_datatype.classname] = datatype_instance
             self.datatype_instances = DataTypeFactory._datatype_instances
         return datatype_instance
@@ -1552,8 +1552,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
 
 class FileListDataType(BaseDataType):
-    def __init__(self, model=None):
-        super(FileListDataType, self).__init__(model=model)
+    def __init__(self, model=None, datatype_factory=None):
+        super(FileListDataType, self).__init__(model=model, datatype_factory=datatype_factory)
         self.node_lookup = {}
 
     def validate_file_types(self, request=None, nodeid=None):
@@ -1948,8 +1948,8 @@ class FileListDataType(BaseDataType):
 
 
 class BaseDomainDataType(BaseDataType):
-    def __init__(self, model=None):
-        super(BaseDomainDataType, self).__init__(model=model)
+    def __init__(self, model=None, datatype_factory=None):
+        super(BaseDomainDataType, self).__init__(model=model, datatype_factory=datatype_factory)
         self.value_lookup = {}
 
     def get_option_text(self, node, option_id):

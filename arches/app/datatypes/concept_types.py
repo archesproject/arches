@@ -27,8 +27,8 @@ cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 logger = logging.getLogger(__name__)
 
 class BaseConceptDataType(BaseDataType):
-    def __init__(self, model=None):
-        super(BaseConceptDataType, self).__init__(model=model)
+    def __init__(self, model=None, datatype_factory=None):
+        super(BaseConceptDataType, self).__init__(model=model, datatype_factory=datatype_factory)
         self.value_lookup = {}
         self.collection_lookup = {}
         self.collection_by_node_lookup = {}
@@ -37,7 +37,7 @@ class BaseConceptDataType(BaseDataType):
         ret = label
         collection_values = self.collection_lookup[collectionid]
         for concept in collection_values:
-            if label == concept[1]:
+            if concept[1] in (label, label.strip()):
                 ret = concept[2]
         return ret
 
