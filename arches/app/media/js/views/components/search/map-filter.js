@@ -566,7 +566,21 @@ define([
             var hasSpatialFilter = false;
             if (componentName in query) {
                 var mapQuery = JSON.parse(query[componentName]);
-                if (mapQuery.features.length > 0) {
+                if (mapQuery.featureid && mapQuery.resourceid) {
+                    buffer = mapQuery.buffer;
+                    bufferUnit = mapQuery.bufferUnit;
+                    inverted = mapQuery.inverted;
+                    this.searchGeometryFeature({
+                        "featureid": mapQuery.id,
+                        "resourceid": mapQuery.resourceid,
+                        "buffer": {
+                            "width": buffer,
+                            "unit": bufferUnit
+                        },
+                        "inverted": inverted
+                    });
+                    hasSpatialFilter = true;
+                } else if (mapQuery.features.length > 0) {
                     hasSpatialFilter = true;
                     var properties = mapQuery.features[0].properties;
                     inverted = properties.inverted;
