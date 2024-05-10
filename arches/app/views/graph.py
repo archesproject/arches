@@ -366,7 +366,7 @@ class GraphDataView(View):
                 elif self.action == "update_node":
                     old_node_data = graph.nodes.get(uuid.UUID(data["nodeid"]))
 
-                    if old_node_data.datatype != 'semantic' and old_node_data.datatype != data['datatype']:
+                    if graph.isresource and old_node_data.datatype != 'semantic' and old_node_data.datatype != data['datatype']:
                         return JSONErrorResponse(
                             _("Datatype Error"),
                             _(
