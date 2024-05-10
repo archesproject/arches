@@ -47,7 +47,7 @@ define(['arches',
          * @required send argument: @param feature - a geojson feature object
          * @optional send argument: @param resourceid
          */
-        sendFeaturetoMapFilter: function(popupFeatureObject)
+        sendFeatureToMapFilter: function(popupFeatureObject)
         {
             const feature = popupFeatureObject.geometries()[0].geom.features[0];
             popupFeatureObject.mapCard.filterByFeatureGeom(feature, popupFeatureObject.resourceinstanceid);
