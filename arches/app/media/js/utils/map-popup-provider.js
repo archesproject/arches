@@ -53,6 +53,10 @@ define(['arches',
             popupFeatureObject.mapCard.filterByFeatureGeom(feature, popupFeatureObject.resourceinstanceid);
         },
 
+        showFilterByFeature: function(feature) {
+            return (ko.unwrap(feature.geometries) || []).length > 0;
+        },
+
     };
     return provider;
 });

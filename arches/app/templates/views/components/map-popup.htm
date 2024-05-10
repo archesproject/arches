@@ -58,12 +58,10 @@
                         <span data-bind="text: $root.translations.edit"></span>
                     </a>
                     <!--/ko-->
-                    <!-- ko if: ko.unwrap(geometries).length -->
-                    <a data-bind="click: function() {sendFeaturetoMapFilter($data)}" href="#">
+                    <a data-bind="click: function() {sendFeaturetoMapFilter($data)}, visible: showFilterByFeature($data)" href="#">
                         <i class="fa fa-map-pin"></i>
                         <span data-bind="text: $root.translations.filterByFeature"></span>
                     </a>
-                    <!-- /ko -->
                 </div>
                 <!-- ko if: $parent.popupFeatures.length > 1 -->
                 <div style="display: flex; flex-direction: row; width: 60px; justify-content: space-evenly; font-weight: 500;">
