@@ -12,7 +12,7 @@ from django.db.models.functions import Lower
 from django.db.utils import IntegrityError, ProgrammingError
 from django.utils.translation import ugettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import GraphModel, Node, NodeGroup
+from arches.app.models.models import GraphModel, Node, NodeGroup, ETLModule
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -30,6 +30,7 @@ class ImportSingleCsv(BaseImportModule):
         self.userid = request.user.id if request else None
         self.loadid = request.POST.get("load_id") if request else None
         self.moduleid = request.POST.get("module") if request else None
+        self.config = ETLModule.objects.get(pk=self.moduleid).config if self.moduleid else {}
         self.datatype_factory = DataTypeFactory()
         self.node_lookup = {}
         self.blank_tile_lookup = {}
@@ -153,7 +154,7 @@ class ImportSingleCsv(BaseImportModule):
         temp_dir = os.path.join("uploadedfiles", "tmp", self.loadid)
         csv_file_path = os.path.join(temp_dir, csv_file_name)
         csv_size = default_storage.size(csv_file_path)  # file size in byte
-        use_celery_threshold = 500  # 500 bytes
+        use_celery_threshold = self.config.get("celeryByteSizeLimit", 5000)
 
         if csv_size > use_celery_threshold:
             if task_management.check_if_celery_available():
