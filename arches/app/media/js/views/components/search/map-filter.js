@@ -300,7 +300,8 @@ define([
                 }
                 self.searchGeometries(currentSearchGeoms);
                 self.updateFilter();
-                self.draw.changeMode('static');
+                // if feature is not from a resource-layer, enable feature editing in map
+                if (!!self.searchGeometryFeature()) { self.draw.changeMode('static'); }
             };
 
             var updateSearchResultPointLayer = function() {
