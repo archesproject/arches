@@ -61,7 +61,16 @@ class MapFilter(BaseSearchFilter):
             response = main_query.search(index=RESOURCES_INDEX)
             geometries = []
             for hit in response['hits']['hits']:
-                geometries.extend(hit['_source']['geometries'][0]['geom']['features'])
+                if len(geometries) > 0:
+                    break
+                for geom in hit['_source']['geometries']:
+                    if len(geometries) > 0:
+                        break
+                    for feature in geom['geom']['features']:
+                        if len(geometries) > 0:
+                            break
+                        if feature['id'] == spatial_filter["featureid"]:
+                            geometries.append(feature)
 
             feature_geom = geometries[0]["geometry"]
             add_geoshape_query_to_search_query(feature_geom, spatial_filter, permitted_nodegroups, include_provisional, search_query)
