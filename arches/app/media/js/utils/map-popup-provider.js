@@ -60,6 +60,12 @@ define([
             popupFeatureObject.mapCard.filterByFeatureGeom(feature, popupFeatureObject.resourceinstanceid);
         },
 
+        /**
+         * Return the template that should be used for the
+         * @param popupFeatureObject - the javascript object of the feature and its associated contexts (e.g. mapCard).
+         * @returns {boolean} - whether to show "Filter by Feature" on map popup
+         * typically dependent on at least 1 feature with a geometry and/or a featureid/resourceid combo
+         */
         showFilterByFeature: function(popupFeatureObject) {
             return (ko.unwrap(popupFeatureObject.geometries) || []).length > 0;
         },
