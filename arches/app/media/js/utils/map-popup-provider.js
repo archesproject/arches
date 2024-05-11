@@ -1,7 +1,9 @@
-define(['arches',
+define([
+    'arches',
     'knockout',
+    'turf',
     'templates/views/components/map-popup.htm'
-], function(arches, ko, popupTemplate) {
+], function(arches, ko, turf, popupTemplate) {
 
     var provider = {
 
@@ -49,7 +51,12 @@ define(['arches',
          */
         sendFeatureToMapFilter: function(popupFeatureObject)
         {
-            const feature = popupFeatureObject.geometries()[0].geom.features[0];
+            let feature = popupFeatureObject.geometries()[0].geom.features[0];
+            // Note that polygons with very high vertex-counts can benefit from simplification.
+            // To use turf.js library, uncomment the next 3 lines:
+            // const tolerance = 0.1; // Degree of Simplification: Lower numbers are less simplified, preserving more detail
+            // const highQuality = true; // Set to true for a slower but higher quality simplification
+            // turf.simplify(feature.geometry, {tolerance: tolerance, highQuality: highQuality, mutate: true});
             popupFeatureObject.mapCard.filterByFeatureGeom(feature, popupFeatureObject.resourceinstanceid);
         },
 
