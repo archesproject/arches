@@ -30,6 +30,9 @@ class MapFilter(BaseSearchFilter):
         search_query = Bool()
         querysting_params = self.request.GET.get(details["componentname"], "")
         spatial_filter = JSONDeserializer().deserialize(querysting_params)
+        if details["componentname"] not in search_results_object:
+            search_results_object[details["componentname"]] = {}
+        
         if "features" in spatial_filter:
             if len(spatial_filter["features"]) > 0:
                 feature_geom = spatial_filter["features"][0]["geometry"]
@@ -73,12 +76,10 @@ class MapFilter(BaseSearchFilter):
                             geometries.append(feature)
 
             feature_geom = geometries[0]["geometry"]
-            add_geoshape_query_to_search_query(feature_geom, spatial_filter, permitted_nodegroups, include_provisional, search_query)
+            buffered_feature_geom = add_geoshape_query_to_search_query(feature_geom, spatial_filter, permitted_nodegroups, include_provisional, search_query)
+            search_results_object[details["componentname"]] = buffered_feature_geom
 
         search_results_object["query"].add_query(search_query)
-
-        if details["componentname"] not in search_results_object:
-            search_results_object[details["componentname"]] = {}
 
         try:
             search_results_object[details["componentname"]]["search_buffer"] = feature_geom
@@ -141,3 +142,5 @@ def add_geoshape_query_to_search_query(feature_geom, feature_properties, permitt
         spatial_query.filter(Terms(field="geometries.provisional", terms=["true"]))
 
     search_query.filter(Nested(path="geometries", query=spatial_query))
+
+    return feature_geom
