@@ -626,7 +626,6 @@ define([
                 this.getFilter('term-filter').removeTag('Map Filter Enabled');
                 this.draw.deleteAll();
                 this.searchGeometries([]);
-                this.setupDraw();
             },
 
             fitToAggregationBounds: function() {
