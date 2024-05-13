@@ -1,9 +1,8 @@
 define([
     'arches',
     'knockout',
-    'turf',
     'templates/views/components/map-popup.htm'
-], function(arches, ko, turf, popupTemplate) {
+], function(arches, ko, popupTemplate) {
 
     var provider = {
 
