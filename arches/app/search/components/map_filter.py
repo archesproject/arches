@@ -41,6 +41,7 @@ class MapFilter(BaseSearchFilter):
                     feature_properties = spatial_filter["features"][0]["properties"]
 
                 add_geoshape_query_to_search_query(feature_geom, feature_properties, permitted_nodegroups, include_provisional, search_query)
+                search_results_object["query"].add_query(search_query)
 
         elif "featureid" in spatial_filter and "resourceid" in spatial_filter:
             se = SearchEngineFactory().create()
@@ -75,11 +76,11 @@ class MapFilter(BaseSearchFilter):
                         if feature['id'] == spatial_filter["featureid"]:
                             geometries.append(feature)
 
-            feature_geom = geometries[0]["geometry"]
-            buffered_feature_geom = add_geoshape_query_to_search_query(feature_geom, spatial_filter, permitted_nodegroups, include_provisional, search_query)
-            search_results_object[details["componentname"]] = buffered_feature_geom
-
-        search_results_object["query"].add_query(search_query)
+            if len(geometries) > 0:
+                feature_geom = geometries[0]["geometry"]
+                buffered_feature_geom = add_geoshape_query_to_search_query(feature_geom, spatial_filter, permitted_nodegroups, include_provisional, search_query)
+                search_results_object[details["componentname"]] = buffered_feature_geom
+                search_results_object["query"].add_query(search_query)
 
         try:
             search_results_object[details["componentname"]]["search_buffer"] = feature_geom
