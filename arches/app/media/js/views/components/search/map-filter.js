@@ -276,7 +276,7 @@ define([
             }, this);
 
             this.filterByFeatureGeom = function(feature, resourceid=null) {
-                if (feature.geometry.type == 'Point') { self.buffer(100); }
+                if (feature.geometry.type == 'Point' && this.buffer() == 0) { this.buffer(25); }
                 if (feature.id && resourceid) {
                     self.searchGeometryFeature({
                         "featureid": feature.id,
