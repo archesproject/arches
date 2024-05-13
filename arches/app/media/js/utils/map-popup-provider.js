@@ -48,24 +48,19 @@ define([
          * @required send argument: @param feature - a geojson feature object
          * @optional send argument: @param resourceid
          */
-        sendFeatureToMapFilter: function(popupFeatureObject)
+        sendFeatureToMapFilter: function(popupFeatureObject, featureGeomIndex)
         {
-            let feature = popupFeatureObject.geometries()[0].geom.features[0];
-            // Note that polygons with very high vertex-counts can benefit from simplification.
-            // To use turf.js library, uncomment the next 3 lines:
-            // const tolerance = 0.1; // Degree of Simplification: Lower numbers are less simplified, preserving more detail
-            // const highQuality = true; // Set to true for a slower but higher quality simplification
-            // turf.simplify(feature.geometry, {tolerance: tolerance, highQuality: highQuality, mutate: true});
+            let feature = popupFeatureObject.geometries()[featureGeomIndex].geom.features[0];
             popupFeatureObject.mapCard.filterByFeatureGeom(feature, popupFeatureObject.resourceinstanceid);
         },
 
         /**
-         * Return the template that should be used for the
+         * Determines whether to show the button for Filter By Feature
          * @param popupFeatureObject - the javascript object of the feature and its associated contexts (e.g. mapCard).
          * @returns {boolean} - whether to show "Filter by Feature" on map popup
          * typically dependent on at least 1 feature with a geometry and/or a featureid/resourceid combo
          */
-        showFilterByFeature: function(popupFeatureObject) {
+        showFilterByFeature: function(popupFeatureObject, featureGeomIndex) {
             return (ko.unwrap(popupFeatureObject.geometries) || []).length > 0;
         },
 
