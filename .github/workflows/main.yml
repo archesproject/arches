@@ -74,6 +74,10 @@ jobs:
         run: |
           python manage.py makemigrations --check
 
+      - name: Lint backend
+        run: |
+          PYTHONPATH='.' pylint --load-plugins scripts.uuid_assignment_checker --disable=all --enable=stringified-uuid-assignment arches --recursive=y
+
       - name: Ensure previous coverage data is erased
         run: |
           coverage erase
