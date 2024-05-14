@@ -45,9 +45,14 @@ class ETLManagerView(View):
                 FROM load_errors e
                 JOIN nodes n ON e.nodegroupid = n.nodeid
                 WHERE loadid = %s AND e.type = 'tile'
-                GROUP BY n.name, e.error, e.datatype, e.type, e.nodegroupid);
+                GROUP BY n.name, e.error, e.datatype, e.type, e.nodegroupid)
+                UNION
+                (SELECT e.source, e.error, e.datatype, 0 as count, e.type, e.nodegroupid
+                FROM load_errors e
+                WHERE loadid = %s AND e.type NOT IN ('node', 'tile')
+                GROUP BY e.source, e.error, e.datatype, e.type, e.nodegroupid);
             """,
-                [loadid, loadid],
+                [loadid, loadid, loadid],
             )
             rows = self.dictfetchall(cursor)
         return {"success": True, "data": rows}

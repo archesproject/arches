@@ -171,8 +171,8 @@ class JSONLDImporter(BaseImportModule):
             message=exception_message,
             value=str(exception.value) if has_info else None,
             datatype=exception.datatype if has_info else None,
-            node_id=exception.node_id if has_info else None,
-            nodegroup_id=exception.nodegroup_id if has_info else None,
+            node_id=exception.node_id if has_info else fallback_node().nodeid,
+            nodegroup_id=exception.nodegroup_id if has_info else fallback_node().nodegroup_id,
         )
         le.clean_fields()
         le.save()
