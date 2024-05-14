@@ -14,7 +14,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "baseUrl": "./{{ project_name }}/src/",
+    "baseUrl": "{{ project_name }}/src/",
     "paths": {
       "@/*": [
         "*.ts",

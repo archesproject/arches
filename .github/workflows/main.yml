@@ -39,7 +39,7 @@ jobs:
           sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk libgdal-dev libxslt-dev
           echo Postgres and ES dependencies installed
 
-      - name: Install python packages
+      - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
           pip install .
@@ -70,29 +70,41 @@ jobs:
             echo "package.json not found, skipping yarn commands."
           fi
 
+      - name: Run frontend tests
+        run: |
+          yarn vitest
+          mv coverage/frontend/coverage.xml feature_branch_frontend_coverage.xml
+
       - name: Check for missing migrations
         run: |
           python manage.py makemigrations --check
 
-      - name: Ensure previous coverage data is erased
+      - name: Ensure previous Python coverage data is erased
         run: |
           coverage erase
 
-      - name: Run unit tests
+      - name: Run Python unit tests
         run: |
           python -W default::DeprecationWarning -m coverage run manage.py test tests --settings="tests.test_settings"
 
-      - name: Generate report coverage
+      - name: Generate Python report coverage
         run: |
           coverage report
           coverage json
-          mv coverage.json feature_branch_coverage.json
+          mv coverage/python/coverage.json feature_branch_python_coverage.json
 
-      - name: Upload coverage report as artifact
+      - name: Upload frontend coverage report as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: feature-branch-coverage-report
-          path: feature_branch_coverage.json
+          name: feature-branch-frontend-coverage-report
+          path: feature_branch_frontend_coverage.xml
+          overwrite: true
+
+      - name: Upload Python coverage report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: feature-branch-python-coverage-report
+          path: feature_branch_python_coverage.json
           overwrite: true
 
   build_target_branch:
@@ -111,7 +123,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # python-version: ["3.10", "3.11", "3.12"]
         python-version: ["3.12"]
 
     steps:
@@ -131,7 +142,7 @@ jobs:
           sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk libgdal-dev libxslt-dev
           echo Postgres and ES dependencies installed
 
-      - name: Install python packages
+      - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
           pip install .
@@ -162,32 +173,54 @@ jobs:
             echo "package.json not found, skipping yarn commands."
           fi
 
+      - name: Run frontend tests
+        run: |
+          if [ -f vitest.config.json ]; then
+            yarn vitest
+            mv coverage/frontend/coverage.xml target_branch_frontend_coverage.xml
+          else
+            echo "Unable to find vitest config. Skipping frontend tests."
+          fi
+
       - name: Check for missing migrations
         run: |
           python manage.py makemigrations --check
 
-      - name: Ensure previous coverage data is erased
+      - name: Ensure previous Python coverage data is erased
         run: |
           coverage erase
 
-      - name: Run unit tests
+      - name: Run Python unit tests
         run: |
           python -W default::DeprecationWarning -m coverage run manage.py test tests --settings="tests.test_settings"
 
-      - name: Generate report coverage
+      - name: Generate Python report coverage
         run: |
           coverage report
           coverage json
-          mv coverage.json target_branch_coverage.json
 
-      - name: Upload coverage report as artifact
+          # handles older target branch
+          if [ -f coverage/python/coverage.json ]; then
+            mv coverage/python/coverage.json target_branch_python_coverage.json
+          else
+            mv coverage.json target_branch_python_coverage.json
+          fi
+
+      - name: Upload frontend coverage report as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: target-branch-coverage-report
-          path: target_branch_coverage.json
+          name: target-branch-frontend-coverage-report
+          path: target_branch_frontend_coverage.xml
           overwrite: true
 
-  check_coverage:
+      - name: Upload Python coverage report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: target-branch-python-coverage-report
+          path: target_branch_python_coverage.json
+          overwrite: true
+
+  check_frontend_coverage:
     runs-on: ubuntu-latest
     needs: [build_feature_branch, build_target_branch]
     steps:
@@ -199,28 +232,173 @@ jobs:
           python-version: '3.x' # Use the latest available version
           check-latest: true
 
-      - name: Download feature branch coverage report artifact
+      - name: Download feature branch frontend coverage report artifact
         uses: actions/download-artifact@v4
         with:
-          name: feature-branch-coverage-report
+          name: feature-branch-frontend-coverage-report
           path: .
 
-      - name: Download target branch coverage report artifact
+      - name: Extract feature branch frontend coverage data
+        shell: pwsh
+        run: |
+          [xml]$xml = Get-Content feature_branch_frontend_coverage.xml
+          $metrics = $xml.coverage.project.metrics
+
+          $statements = [double]$metrics.statements
+          $coveredstatements = [double]$metrics.coveredstatements
+          $conditionals = [double]$metrics.conditionals
+          $coveredconditionals = [double]$metrics.coveredconditionals
+          $methods = [double]$metrics.methods
+          $coveredmethods = [double]$metrics.coveredmethods
+          $elements = [double]$metrics.elements
+          $coveredelements = [double]$metrics.coveredelements
+
+          $statement_coverage = 0.0
+          $conditional_coverage = 0.0
+          $method_coverage = 0.0
+          $element_coverage = 0.0
+
+          if ($statements -gt 0) {
+              $statement_coverage = ($coveredstatements / $statements) * 100
+          }
+          if ($conditionals -gt 0) {
+              $conditional_coverage = ($coveredconditionals / $conditionals) * 100
+          }
+          if ($methods -gt 0) {
+              $method_coverage = ($coveredmethods / $methods) * 100
+          }
+          if ($elements -gt 0) {
+              $element_coverage = ($coveredelements / $elements) * 100
+          }
+
+          $nonZeroCount = 0
+          $totalCoverage = 0.0
+
+          if ($statements -gt 0) { $nonZeroCount++; $totalCoverage += $statement_coverage }
+          if ($conditionals -gt 0) { $nonZeroCount++; $totalCoverage += $conditional_coverage }
+          if ($methods -gt 0) { $nonZeroCount++; $totalCoverage += $method_coverage }
+          if ($elements -gt 0) { $nonZeroCount++; $totalCoverage += $element_coverage }
+
+          $feature_branch_frontend_coverage = 0.0
+          if ($nonZeroCount -gt 0) {
+              $feature_branch_frontend_coverage = $totalCoverage / $nonZeroCount
+          }
+
+          Write-Output "feature_branch_frontend_coverage=$feature_branch_frontend_coverage" | Out-File -Append $env:GITHUB_ENV
+
+      - name: Download target branch frontend coverage report artifact
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
-          name: target-branch-coverage-report
+          name: target-branch-frontend-coverage-report
           path: .
 
-      - name: Compare coverage with baseline
+      - name: Check if target branch frontend coverage report artifact exists
+        run: |
+          if [ -f target_branch_frontend_coverage.xml ]; then
+            echo "target_branch_frontend_coverage_artifact_exists=true" >> $GITHUB_ENV
+          else
+            echo "Target branch coverage not found. Defaulting to 0% coverage."
+            echo "target_branch_frontend_coverage_artifact_exists=false" >> $GITHUB_ENV
+          fi
+
+      - name: Extract target branch frontend coverage data
+        if: ${{ env.target_branch_frontend_coverage_artifact_exists == 'true' }}
+        shell: pwsh
+        run: |
+          [xml]$xml = Get-Content target_branch_frontend_coverage.xml
+          $metrics = $xml.coverage.project.metrics
+
+          $statements = [double]$metrics.statements
+          $coveredstatements = [double]$metrics.coveredstatements
+          $conditionals = [double]$metrics.conditionals
+          $coveredconditionals = [double]$metrics.coveredconditionals
+          $methods = [double]$metrics.methods
+          $coveredmethods = [double]$metrics.coveredmethods
+          $elements = [double]$metrics.elements
+          $coveredelements = [double]$metrics.coveredelements
+
+          $statement_coverage = 0.0
+          $conditional_coverage = 0.0
+          $method_coverage = 0.0
+          $element_coverage = 0.0
+
+          if ($statements -gt 0) {
+              $statement_coverage = ($coveredstatements / $statements) * 100
+          }
+          if ($conditionals -gt 0) {
+              $conditional_coverage = ($coveredconditionals / $conditionals) * 100
+          }
+          if ($methods -gt 0) {
+              $method_coverage = ($coveredmethods / $methods) * 100
+          }
+          if ($elements -gt 0) {
+              $element_coverage = ($coveredelements / $elements) * 100
+          }
+
+          $nonZeroCount = 0
+          $totalCoverage = 0.0
+
+          if ($statements -gt 0) { $nonZeroCount++; $totalCoverage += $statement_coverage }
+          if ($conditionals -gt 0) { $nonZeroCount++; $totalCoverage += $conditional_coverage }
+          if ($methods -gt 0) { $nonZeroCount++; $totalCoverage += $method_coverage }
+          if ($elements -gt 0) { $nonZeroCount++; $totalCoverage += $element_coverage }
+
+          $target_branch_frontend_coverage = 0.0
+          if ($nonZeroCount -gt 0) {
+              $target_branch_frontend_coverage = $totalCoverage / $nonZeroCount
+          }
+
+          Write-Output "target_branch_frontend_coverage=$target_branch_frontend_coverage" | Out-File -Append $env:GITHUB_ENV
+
+      - name: Compare frontend feature coverage with target coverage
         if: github.event_name == 'pull_request'
         run: |
-          feature_branch_coverage=$(cat feature_branch_coverage.json | grep -o '"totals": {[^}]*' | grep -o '"percent_covered": [0-9.]*' | awk -F ': ' '{print $2}')
-          target_branch_coverage=$(cat target_branch_coverage.json | grep -o '"totals": {[^}]*' | grep -o '"percent_covered": [0-9.]*' | awk -F ': ' '{print $2}')
+          feature_branch_frontend_coverage=${feature_branch_frontend_coverage}
+          target_branch_frontend_coverage=${target_branch_frontend_coverage:-0.0}
 
-          # Compare current coverage with baseline coverage using floating-point comparison
-          if awk -v feature="$feature_branch_coverage" -v target="$target_branch_coverage" 'BEGIN { exit (feature < target) ? 0 : 1 }'; then
-            echo "Coverage decreased from $target_branch_coverage% to $feature_branch_coverage%"
+          # Compare feature coverage with target coverage using floating-point comparison
+          if awk -v feature="$feature_branch_frontend_coverage" -v target="$target_branch_frontend_coverage" 'BEGIN { exit (feature < target) ? 0 : 1 }'; then
+            echo "Coverage decreased from $target_branch_frontend_coverage% to $feature_branch_frontend_coverage%. Please add or update tests to increase coverage."
             exit 1
           else
-            echo "Feature branch coverage ($feature_branch_coverage%) >= Target branch coverage ($target_branch_coverage%)."
+            echo "Feature branch coverage ($feature_branch_frontend_coverage%) >= Target branch coverage ($target_branch_frontend_coverage%)."
+          fi
+
+  check_python_coverage:
+    runs-on: ubuntu-latest
+    needs: [build_feature_branch, build_target_branch]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x' # Use the latest available version
+          check-latest: true
+
+      - name: Download feature branch Python coverage report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: feature-branch-python-coverage-report
+          path: .
+
+      - name: Download target branch Python coverage report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: target-branch-python-coverage-report
+          path: .
+
+      - name: Compare Python feature coverage with target coverage
+        if: github.event_name == 'pull_request'
+        run: |
+          feature_branch_python_coverage=$(cat feature_branch_python_coverage.json | grep -o '"totals": {[^}]*' | grep -o '"percent_covered": [0-9.]*' | awk -F ': ' '{print $2}')
+          target_branch_python_coverage=$(cat target_branch_python_coverage.json | grep -o '"totals": {[^}]*' | grep -o '"percent_covered": [0-9.]*' | awk -F ': ' '{print $2}')
+
+          # Compare feature coverage with target coverage using floating-point comparison
+          if awk -v feature="$feature_branch_python_coverage" -v target="$target_branch_python_coverage" 'BEGIN { exit (feature < target) ? 0 : 1 }'; then
+            echo "Coverage decreased from $target_branch_python_coverage% to $feature_branch_python_coverage%. Please add or update tests to increase coverage."
+            exit 1
+          else
+            echo "Feature branch coverage ($feature_branch_python_coverage%) >= Target branch coverage ($target_branch_python_coverage%)."
           fi
