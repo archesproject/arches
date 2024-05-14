@@ -1043,7 +1043,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return updated_data
 
     def find_num(self, current_item):
-            if len(current_item) and type(current_item[0]) == float:
+            if len(current_item) and isinstance(current_item[0], float):
                 return decimal.Decimal(str(current_item[0])).as_tuple().exponent
             else:
                 return self.find_num(current_item[0])
