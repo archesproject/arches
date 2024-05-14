@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import json
 import os
 import time
+import uuid
 
 from django.contrib.auth.models import User, Group
 from django.db import connection
@@ -58,7 +59,7 @@ class ResourceTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         resource_graph_importer(archesfile["graph"])
 
-        cls.search_model_graphid = "c9b37a14-17b3-11eb-a708-acde48001122"
+        cls.search_model_graphid = uuid.UUID("c9b37a14-17b3-11eb-a708-acde48001122")
         cls.search_model_cultural_period_nodeid = "c9b3882e-17b3-11eb-a708-acde48001122"
         cls.search_model_creation_date_nodeid = "c9b38568-17b3-11eb-a708-acde48001122"
         cls.search_model_destruction_date_nodeid = "c9b3828e-17b3-11eb-a708-acde48001122"

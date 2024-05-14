@@ -53,7 +53,7 @@
                         <div class="media-body">
                             <div class="menu-item-title">
                                 <i class="fa fa-clone"></i>
-                                <span data-bind="text: graph.isresource() ? {% quoted_trans "Clone Model" %} : {% quoted_trans "Clone Branch" %}"></span>
+                                <span data-bind="text: graph.isresource() ? ' ' + {% quoted_trans "Clone Model" %} : ' ' + {% quoted_trans "Clone Branch" %}"></span>
                             </div>
                             <span 
                                 class="text-muted menu-item-subtitle" 
@@ -68,7 +68,7 @@
                         <div class="media-body">
                             <div class="menu-item-title">
                                 <i class="fa fa-download"></i>
-                                <span data-bind="text: graph.isresource() ? {% quoted_trans "Export Model" %} : {% quoted_trans "Export Branch" %}"></span>
+                                <span data-bind="text: graph.isresource() ? ' ' + {% quoted_trans "Export Model" %} : ' ' + {% quoted_trans "Export Branch" %}"></span>
                             </div>
                             <span 
                                 class="text-muted menu-item-subtitle" 
@@ -131,7 +131,7 @@
                         <div class="media-body">
                             <div class="menu-item-title">
                                 <i class="fa fa-trash"></i>
-                                <span data-bind="text: graph.isresource() ? {% quoted_trans "Delete Model" %} : {% quoted_trans "Delete Branch" %}"></span>
+                                <span data-bind="text: graph.isresource() ? ' ' + {% quoted_trans "Delete Model" %} : ' ' + {% quoted_trans "Delete Branch" %}"></span>
                             </div>
                             <span 
                                 class="text-muted menu-item-subtitle" 

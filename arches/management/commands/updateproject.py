@@ -82,22 +82,13 @@ class Command(BaseCommand):
         self.stdout.write("Publishing finished! \n\n")
 
     def update_to_v7_6(self):
-        for dotfile in [".eslintrc.js", ".eslintignore", ".babelrc", ".browserslistrc", ".stylelintrc.json", ".yarnrc"]:
-            previous_dotfile_path = os.path.join(settings.APP_ROOT, dotfile)
-            if os.path.exists(previous_dotfile_path):
-                self.stdout.write("Deleting {} from project root directory".format(dotfile))
-                os.remove(previous_dotfile_path)
-
-            if dotfile != ".yarnrc":  # `.yarnrc` is removed entirely in this version
-                self.stdout.write("Copying {} to project directory".format(dotfile))
-                shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", dotfile), os.path.join(settings.APP_ROOT, ".."))
-
-        if os.path.exists(os.path.join(settings.APP_ROOT, "yarn.lock")):
-            self.stdout.write("Deleting yarn.lock from project".format(dotfile))
-            os.remove(os.path.join(settings.APP_ROOT, "yarn.lock"))
+        for file_to_delete in [".eslintrc.js", ".eslintignore", ".yarnrc", "yarn.lock"]:
+            if os.path.exists(os.path.join(settings.APP_ROOT, file_to_delete)):
+                self.stdout.write("Deleting {} from project root directory".format(file_to_delete))
+                os.remove(os.path.join(settings.APP_ROOT, file_to_delete))
 
         if os.path.exists(os.path.join(settings.APP_ROOT, "media", "node_modules")):
-            self.stdout.write("Deleting node_modules folder from media directory".format(dotfile))
+            self.stdout.write("Deleting node_modules folder from media directory")
             shutil.rmtree(os.path.join(settings.APP_ROOT, "media", "node_modules"))
 
         for project_metadata_file in ["LICENSE", "MANIFEST.in", "pyproject.toml"]:
@@ -105,7 +96,23 @@ class Command(BaseCommand):
                 self.stdout.write("Copying {} to project directory".format(project_metadata_file))
                 shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", project_metadata_file), os.path.join(settings.APP_ROOT, ".."))
 
-        for config_file in ["nodemon.json", "tsconfig.json", ".coveragerc", ".gitignore"]:
+        for config_file in [
+            "nodemon.json", 
+            "tsconfig.json", 
+            ".coveragerc", 
+            ".gitignore", 
+            ".babelrc", 
+            ".browserslistrc", 
+            ".stylelintrc.json", 
+            "gettext.config.js",
+            "vitest.config.mts",
+            "vitest.setup.mts",
+            "eslint.config.mjs",
+        ]:
+            if os.path.exists(os.path.join(settings.APP_ROOT, config_file)):
+                self.stdout.write("Deleting {} from project root directory".format(config_file))
+                os.remove(os.path.join(settings.APP_ROOT, config_file))
+        
             self.stdout.write("Copying {} to project directory".format(config_file))
             shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", config_file), os.path.join(settings.APP_ROOT, ".."))
 
@@ -144,10 +151,6 @@ class Command(BaseCommand):
                 os.mkdir(os.path.join(settings.APP_ROOT, "locale"))
 
             open(os.path.join(settings.APP_ROOT, "locale", "messages.pot"), 'w').close()
-
-        if not os.path.isfile(os.path.join(settings.APP_ROOT, "gettext.config.js")):
-            self.stdout.write("Copying gettext config to project root directory")
-            shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "gettext.config.js"), os.path.join(settings.APP_ROOT, '..'))
 
         if os.path.isdir(os.path.join(settings.APP_ROOT, 'webpack')):
             self.stdout.write("Non-root-level webpack directory detected! Removing...")
