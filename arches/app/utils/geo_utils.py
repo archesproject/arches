@@ -82,8 +82,20 @@ class GeoUtils(object):
             arches_geojson["features"].append(arches_json_geometry)
         return arches_geojson
 
-    def reduce_precision(self, geom, precision):
-        writer = WKTWriter()
-        writer.precision = precision
-        less_precise_geom = writer.write(GEOSGeometry(self.create_geom_collection_from_geojson(geom)))
-        return self.convert_geos_geom_collection_to_feature_collection(GEOSGeometry(less_precise_geom))
+    def reduce_precision(self, geom, current_precision):
+        if current_precision > 0:
+            writer = WKTWriter()
+            max_bytes = 32766 # max bytes allowed by Lucene
+
+            current_precision -= 1
+            writer.precision = current_precision
+            less_precise_geom = writer.write(GEOSGeometry(self.create_geom_collection_from_geojson(geom)))
+            new_byte_count = len(str(less_precise_geom).encode("UTF-8"))
+            new_geom_collection = self.convert_geos_geom_collection_to_feature_collection(GEOSGeometry(less_precise_geom))
+            if new_byte_count > max_bytes:
+                return self.reduce_precision(new_geom_collection, current_precision)
+            else:
+                return new_geom_collection
+        else:
+            raise Exception('Geometry still too large after reducing to 0 precision.')
+    

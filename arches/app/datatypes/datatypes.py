@@ -915,31 +915,35 @@ class EDTFDataType(BaseDataType):
 class GeojsonFeatureCollectionDataType(BaseDataType):
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         errors = []
-        coord_limit = 1500
-        coordinate_count = 0
+        geo_utils = GeoUtils()
+        max_bytes = 32766 # max bytes allowed by Lucene
+        byte_count = 0
+        byte_count += len(str(value).encode("UTF-8"))
 
-        def validate_geom(geom, coordinate_count=0):
+        def validate_geom_byte_size_can_be_reduced(geom):
+            try: 
+                if len(geom['features']) > 0:
+                    feature_geom = GEOSGeometry(JSONSerializer().serialize(geom['features'][0]['geometry']))
+                    current_precision = abs(self.find_num(feature_geom.coords))
+
+                    geom = geo_utils.reduce_precision(geom, current_precision)
+            except:
+                message = _("Geojson byte size exceeds Lucene 32766 limit.")
+                title = _("Geometry Size Exceeds Elasticsearch Limit")
+                errors.append(
+                    {
+                        "type": "ERROR",
+                        "message": "datatype: {0} {1} - {2}. {3}.".format(
+                            self.datatype_model.datatype, source, message, "This data was not imported."
+                        ),
+                        "title": title,
+                    }
+                )
+
+        def validate_geom_bbox(geom):
             try:
-                coordinate_count += geom.num_coords
                 bbox = Polygon(settings.DATA_VALIDATION_BBOX)
-                if coordinate_count > coord_limit:
-                    message = _(
-                        "Geometry has too many coordinates for Elasticsearch ({0}), \
-                        Please limit to less then {1} coordinates of 5 digits of precision or less.".format(
-                            coordinate_count, coord_limit
-                        )
-                    )
-                    title = _("Geometry Too Many Coordinates for ES")
-                    errors.append(
-                        {
-                            "type": "ERROR",
-                            "message": "datatype: {0} value: {1} {2} - {3}. {4}".format(
-                                self.datatype_model.datatype, value, source, message, "This data was not imported."
-                            ),
-                            "title": title,
-                        }
-                    )
-
+                
                 if bbox.contains(geom) == False:
                     message = _(
                         "Geometry does not fall within the bounding box of the selected coordinate system. \
@@ -969,10 +973,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 )
 
         if value is not None:
+            if byte_count > max_bytes:
+                validate_geom_byte_size_can_be_reduced(value)
             for feature in value["features"]:
                 try:
                     geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
-                    validate_geom(geom, coordinate_count)
+                    validate_geom_bbox(geom)
                 except Exception:
                     message = _("Unable to serialize some geometry features")
                     title = _("Unable to Serialize Geometry")
@@ -1036,14 +1042,25 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         updated_data = tile.data[nodeid]
         return updated_data
 
+    def find_num(self, current_item):
+            if len(current_item) and type(current_item[0]) == float:
+                return decimal.Decimal(str(current_item[0])).as_tuple().exponent
+            else:
+                return self.find_num(current_item[0])
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         geo_utils = GeoUtils()
         max_bytes = 32766 # max bytes allowed by Lucene
         byte_count = 0
         byte_count += len(str(nodevalue).encode("UTF-8"))
 
-        if byte_count > max_bytes:
-            nodevalue = geo_utils.reduce_precision(nodevalue, 7)
+        if len(nodevalue['features']) > 0:
+            feature_geom = GEOSGeometry(JSONSerializer().serialize(nodevalue['features'][0]['geometry']))
+            current_precision = abs(self.find_num(feature_geom.coords))
+
+        if byte_count > max_bytes and current_precision:
+            nodevalue = geo_utils.reduce_precision(nodevalue, current_precision)
+
             
         document["geometries"].append({"geom": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional, "tileid": tile.pk})
         bounds = self.get_bounds_from_value(nodevalue)
