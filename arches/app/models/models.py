@@ -1988,6 +1988,7 @@ class ControlledListItemValue(models.Model):
         to_field="code",
         on_delete=models.PROTECT,
         null=True,
+        blank=True,
     )
     value = models.CharField(max_length=1024, null=False)
 
@@ -2030,6 +2031,8 @@ class ControlledListItemImage(models.Model):
         db_column="languageid",
         to_field="code",
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
     value = models.FileField(upload_to="controlled_list_item_images")
 

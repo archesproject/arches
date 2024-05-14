@@ -1,7 +1,6 @@
 import json
 import uuid
 import sys
-from collections import defaultdict
 
 from django.contrib.auth.models import Group, User
 from django.urls import reverse
@@ -11,6 +10,8 @@ from guardian.shortcuts import assign_perm
 from arches.app.models.models import (
     ControlledList,
     ControlledListItem,
+    ControlledListItemImage,
+    ControlledListItemImageMetadata,
     ControlledListItemValue,
     DValueType,
     GraphModel,
@@ -55,6 +56,13 @@ class ControlledListTests(ArchesTestCase):
         cls.list2 = ControlledList.objects.create(name="list2")
 
         cls.first_language = Language.objects.first()
+        cls.new_language = Language.objects.create(
+            code="eo",
+            name="Esperanto",
+            default_direction="ltr",
+            isdefault=False,
+            scope="system",
+        )
         cls.pref_label = DValueType.objects.get(valuetype="prefLabel")
         cls.alt_label = DValueType.objects.get(valuetype="altLabel")
 
@@ -135,10 +143,24 @@ class ControlledListTests(ArchesTestCase):
             ]
         )
 
+        # Create one image with full metadata for the first item in list 1.
+        cls.image = ControlledListItemImage.objects.create(
+            controlled_list_item=cls.list1.controlled_list_items.first(),
+            value="path/to/image.png",
+            valuetype_id="image",
+        )
+        for metadata in ControlledListItemImageMetadata.MetadataChoices:
+            ControlledListItemImageMetadata(
+                controlled_list_item_image=cls.image,
+                metadata_type=metadata,
+                value=f"{metadata} for {cls.image.value}",
+                language=cls.first_language,
+            ).save()
+
         cls.graph = GraphModel.objects.create(isresource=True, name="My Graph")
         cls.nodegroup = NodeGroup.objects.get(pk="20000000-0000-0000-0000-100000000000")
         cls.node_using_list1 = Node(
-            pk="a3c5b7d3-ef2c-4f8b-afd5-f8d4636b8834",
+            pk=uuid.UUID("a3c5b7d3-ef2c-4f8b-afd5-f8d4636b8834"),
             graph=cls.graph,
             name="Uses list1",
             datatype="reference",
@@ -152,7 +174,7 @@ class ControlledListTests(ArchesTestCase):
         cls.node_using_list1.save()
 
         cls.node_using_list2 = Node(
-            pk="a3c5b7d3-ef2c-4f8b-afd5-f8d4636b8835",
+            pk=uuid.UUID("a3c5b7d3-ef2c-4f8b-afd5-f8d4636b8835"),
             graph=cls.graph,
             name="Uses list2",
             datatype="reference",
@@ -173,7 +195,7 @@ class ControlledListTests(ArchesTestCase):
         self.assertEqual(response.status_code, 403)
 
         self.client.force_login(self.admin)
-        with self.assertNumQueries(13):
+        with self.assertNumQueries(14):
             # 1: session
             # 2: auth
             # 3: SELECT FROM controlled_lists
@@ -182,11 +204,11 @@ class ControlledListTests(ArchesTestCase):
             # 7: prefetch image metadata
             # 8: prefetch children: items
             # 9: prefetch children: item labels/images
-            # 11: prefetch children: image metadata
-            # 12: prefetch grandchildren: items
+            # 10: prefetch children: image metadata
+            # 11: prefetch grandchildren: items
             # there are no grandchildren, so no values/metadata to get
-            # 13: get permitted nodegroups
-            # 14-15: permission checks
+            # 12: get permitted nodegroups
+            # 13-14: permission checks
             response = self.client.get(
                 reverse("controlled_lists"), kwargs={"prefetchDepth": 3}
             )
@@ -291,7 +313,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_reorder_list_items_valid(self):
         self.client.force_login(self.admin)
-        serialized_list = serialize(self.list1, depth_map=defaultdict(int))
+        serialized_list = serialize(self.list1)
 
         serialized_list["items"][0]["sortorder"] = 1
         serialized_list["items"][1]["sortorder"] = 0
@@ -313,7 +335,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_list_items_sortorder_recalculated(self):
         self.client.force_login(self.admin)
-        serialized_list = serialize(self.list1, depth_map=defaultdict(int), flat=False)
+        serialized_list = serialize(self.list1, flat=False)
 
         serialized_list["items"][-1]["sortorder"] = -1
         response = self.client.post(
@@ -328,7 +350,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_list_items_mixed_parents(self):
         self.client.force_login(self.admin)
-        serialized_list = serialize(self.list1, depth_map=defaultdict(int), flat=False)
+        serialized_list = serialize(self.list1, flat=False)
 
         serialized_list["items"][-1]["controlled_list_id"] = str(self.list2.pk)
         with self.assertLogs("django.request", level="WARNING"):
@@ -337,11 +359,11 @@ class ControlledListTests(ArchesTestCase):
                 serialized_list,
                 content_type="application/json",
             )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 400, response._container)
 
     def test_child_items_incorrect_parent(self):
         self.client.force_login(self.admin)
-        serialized_list = serialize(self.list2, depth_map=defaultdict(int), flat=False)
+        serialized_list = serialize(self.list2, flat=False)
 
         serialized_list["items"][0]["children"][-1]["controlled_list_id"] = str(self.list1.pk)
         with self.assertLogs("django.request", level="WARNING"):
@@ -354,7 +376,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_recursive_cycles(self):
         self.client.force_login(self.admin)
-        serialized_list = serialize(self.list2, depth_map=defaultdict(int), flat=False)
+        serialized_list = serialize(self.list2, flat=False)
 
         parent = serialized_list["items"][0]
         parent_id = str(parent["id"])
@@ -375,4 +397,58 @@ class ControlledListTests(ArchesTestCase):
                 parent,
                 content_type="application/json",
             )
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_label_valid(self):
+        self.client.force_login(self.admin)
+        serialized_list = serialize(self.list1, flat=False)
+        label = serialized_list["items"][0]["labels"][0]
+        label["language_id"] = self.new_language.code
+
+        response = self.client.post(
+            reverse("controlled_list_item_label", kwargs={"id": label["id"]}),
+                label,
+                content_type="application/json",
+            )
+        self.assertEqual(response.status_code, 200, response._container)
+
+    def test_update_label_invalid(self):
+        self.client.force_login(self.admin)
+        serialized_list = serialize(self.list1, flat=False)
+        label = serialized_list["items"][0]["labels"][0]
+        label["value"] = "A" * 2049
+
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.post(
+                reverse("controlled_list_item_label", kwargs={"id": label["id"]}),
+                    label,
+                    content_type="application/json",
+                )
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_metadata_valid(self):
+        self.client.force_login(self.admin)
+        serialized_image = serialize(self.image, flat=False)
+        metadatum = serialized_image["metadata"][0]
+        metadatum["language_id"] = self.new_language.code
+
+        response = self.client.post(
+            reverse("controlled_list_item_image_metadata", kwargs={"id": metadatum["id"]}),
+                metadatum,
+                content_type="application/json",
+            )
+        self.assertEqual(response.status_code, 200, response._container)
+
+    def test_update_metadata_invalid(self):
+        self.client.force_login(self.admin)
+        serialized_image = serialize(self.image, flat=False)
+        metadatum = serialized_image["metadata"][0]
+        metadatum["value"] = "A" * 2049
+
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.post(
+                reverse("controlled_list_item_image_metadata", kwargs={"id": metadatum["id"]}),
+                    metadatum,
+                    content_type="application/json",
+                )
         self.assertEqual(response.status_code, 400)

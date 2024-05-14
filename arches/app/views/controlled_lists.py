@@ -1,11 +1,11 @@
 import logging
 from collections import defaultdict
 from datetime import datetime
-from typing import TYPE_CHECKING
+from uuid import UUID
 
 from django.contrib.postgres.expressions import ArraySubquery
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError, transaction
+from django.db import transaction
 from django.db.models import Max, OuterRef
 from django.views.generic import View
 from django.utils.decorators import method_decorator
@@ -26,9 +26,6 @@ from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.utils.string_utils import str_to_bool
 
-
-if TYPE_CHECKING:
-    from uuid import UUID
 
 logger = logging.getLogger(__name__)
 
@@ -197,7 +194,6 @@ def handle_items(item_dicts, max_sortorder=-1):
         item_dict.pop("depth", None)
 
         item_to_save = ControlledListItem(**item_dict)
-        item_to_save._state.adding = False  # allows checking uniqueness
         items_to_save.append(item_to_save)
 
         if item_to_save.sortorder < 0:
@@ -208,20 +204,25 @@ def handle_items(item_dicts, max_sortorder=-1):
 
         for label in labels:
             label.pop("item_id")  # trust the item, not the label
-            labels_to_save.append(
-                ControlledListItemValue(
-                    controlled_list_item_id=item_to_save.id, **label
-                )
+            label_to_save = ControlledListItemValue(
+                controlled_list_item_id=UUID(item_to_save.id),
+                **label,
             )
+            label_to_save._state.adding = False  # allows checking uniqueness
+            label_to_save.full_clean()
+            labels_to_save.append(label_to_save)
+
         for image in images:
             for metadata in image["metadata"]:
-                metadata.pop("controlled_list_item_label_id")
-                image_metadata_to_save.append(
-                    ControlledListItemImageMetadata(
-                        controlled_list_item_image_id=image.id, **metadata
-                    )
+                metadata.pop("controlled_list_item_image_id")
+                metadata.pop("metadata_label", None)  # computed by serialize()
+                metadata_to_save = ControlledListItemImageMetadata(
+                    controlled_list_item_image_id=UUID(image["id"]),
+                    **metadata,
                 )
-
+                metadata_to_save._state.adding = False  # allows checking uniqueness
+                metadata_to_save.full_clean()
+                image_metadata_to_save.append(metadata_to_save)
 
         # Recurse
         for child in children:
@@ -231,6 +232,7 @@ def handle_items(item_dicts, max_sortorder=-1):
         handle_item(item_dict)
 
     for item_to_save in items_to_save:
+        item_to_save._state.adding = False  # allows checking uniqueness
         item_to_save.full_clean(validate_constraints=False)
         # Sortorder uniqueness is deferred.
         item_to_save.validate_constraints(exclude=["sortorder"])
@@ -340,12 +342,13 @@ class ControlledListView(View):
                 clist.dynamic = data["dynamic"]
                 clist.search_only = data["search_only"]
                 clist.name = data["name"]
+                clist.full_clean()
 
                 handle_items(data["items"], max_sortorder=clist.max_sortorder)
 
                 clist.save()
-        except ValidationError as e:
-            return JSONErrorResponse(message=" ".join(e.messages), status=400)
+        except ValidationError as ve:
+            return JSONErrorResponse(message=" ".join(ve.messages), status=400)
         except MixedListsException:
             return JSONErrorResponse(message=_("Items must belong to the same list."), status=400)
         except:
@@ -416,6 +419,7 @@ class ControlledListItemView(View):
                     value=_("New Item: ")
                     + datetime.now().isoformat(sep=" ", timespec="seconds"),
                     valuetype_id="prefLabel",
+                    # todo: update with capitalize_region()
                     language_id=get_language(),
                 )
         except ControlledList.DoesNotExist:
@@ -433,15 +437,18 @@ class ControlledListItemView(View):
         # Update list item
         data = JSONDeserializer().deserialize(request.body)
 
-        controlled_list = (
-            ControlledList.objects.filter(pk=data["controlled_list_id"])
-            .annotate(
-                max_sortorder=Max(
-                    "controlled_list_items__sortorder", default=-1
+        try:
+            controlled_list = (
+                ControlledList.objects.filter(pk=data["controlled_list_id"])
+                .annotate(
+                    max_sortorder=Max(
+                        "controlled_list_items__sortorder", default=-1
+                    )
                 )
+                .get()
             )
-            .get()
-        )
+        except ControlledList.DoesNotExist:
+            return JSONErrorResponse(status=404)
 
         try:
             with transaction.atomic():
@@ -454,8 +461,8 @@ class ControlledListItemView(View):
                     return JSONErrorResponse(status=404)
                 serialized_item = serialize(item)
 
-        except ValidationError as e:
-            return JSONErrorResponse(message=" ".join(e.messages), status=400)
+        except ValidationError as ve:
+            return JSONErrorResponse(message=" ".join(ve.messages), status=400)
         except MixedListsException:
             return JSONErrorResponse(message=_("Items must belong to the same list."), status=400)
         except RecursionError:
@@ -481,19 +488,18 @@ class ControlledListItemLabelView(View):
         data = JSONDeserializer().deserialize(request.body)
 
         label = ControlledListItemValue(
-            controlled_list_item_id=data["item_id"],
+            controlled_list_item_id=UUID(data["item_id"]),
             valuetype_id=data["valuetype_id"],
             language_id=data["language_id"],
             value=data["value"],
         )
         try:
-            label.save()
-        except (ControlledListItem.DoesNotExist, Language.DoesNotExist):
-            return JSONErrorResponse(status=404)
-        except IntegrityError as e:
-            return JSONErrorResponse(message=" ".join(e.args), status=400)
+            label.full_clean()
+        except ValidationError as ve:
+            return JSONErrorResponse(message=" ".join(ve.messages), status=400)
         except:
             return JSONErrorResponse()
+        label.save()
 
         return JSONResponse(serialize(label), status=201)
 
@@ -501,21 +507,28 @@ class ControlledListItemLabelView(View):
         if not (label_id := kwargs.get("id", None)):
             return self.add_new_label(request)
 
-        # Update label
         data = JSONDeserializer().deserialize(request.body)
 
         try:
-            ControlledListItemValue.labels.filter(pk=label_id).update(
-                value=data["value"], language_id=data["language_id"]
-            )
+            value = ControlledListItemValue.labels.get(pk=label_id)
         except ControlledListItemValue.DoesNotExist:
             return JSONErrorResponse(status=404)
-        except IntegrityError as e:
-            return JSONErrorResponse(message=" ".join(e.args), status=400)
+
+        value.value=data["value"]
+        try:
+            value.language = Language.objects.get(code=data["language_id"])
+        except Language.DoesNotExist:
+            return JSONErrorResponse(status=404)
+
+        try:
+            value.full_clean()
+        except ValidationError as ve:
+            return JSONErrorResponse(message=" ".join(ve.messages), status=400)
         except:
             return JSONErrorResponse()
+        value.save()
 
-        return JSONResponse(serialize(ControlledListItemValue.labels.get(pk=label_id)))
+        return JSONResponse(serialize(value))
 
     def delete(self, request, **kwargs):
         label_id = kwargs.get("id")
@@ -549,10 +562,16 @@ class ControlledListItemImageView(View):
     def add_new_image(self, request):
         uploaded_file = request.FILES["item_image"]
         img = ControlledListItemImage(
-            controlled_list_item_id=request.POST["item_id"],
+            controlled_list_item_id=UUID(request.POST["item_id"]),
             valuetype_id="image",
             value=uploaded_file,
         )
+        try:
+            img.full_clean()
+        except ValidationError as ve:
+            return JSONErrorResponse(message=" ".join(ve.messages), status=400)
+        except:
+            return JSONErrorResponse()
         img.save()
         return JSONResponse(serialize(img), status=201)
 
@@ -578,11 +597,12 @@ class ControlledListItemImageMetadataView(View):
         data.pop("metadata_label", None)
         metadata = ControlledListItemImageMetadata(**data)
         try:
-            metadata.save()
-        except IntegrityError as e:
-            return JSONErrorResponse(message=" ".join(e.args), status=400)
+            metadata.full_clean()
+        except ValidationError as ve:
+            return JSONErrorResponse(message="\n".join(ve.messages), status=400)
         except:
             return JSONErrorResponse()
+        metadata.save()
 
         return JSONResponse(serialize(metadata), status=201)
 
@@ -590,22 +610,29 @@ class ControlledListItemImageMetadataView(View):
         if not (metadata_id := kwargs.get("id", None)):
             return self.add_new_metadata(request)
 
-        # Update metadata
         data = JSONDeserializer().deserialize(request.body)
+
         try:
-            ControlledListItemImageMetadata.objects.filter(pk=metadata_id).update(
-                value=data["value"],
-                language_id=data["language_id"],
-                metadata_type=data["metadata_type"],
-            )
+            metadata = ControlledListItemImageMetadata.objects.get(pk=metadata_id)
         except ControlledListItemImageMetadata.DoesNotExist:
             return JSONErrorResponse(status=404)
-        except IntegrityError as e:
-            return JSONErrorResponse(message=" ".join(e.args), status=400)
+
+        metadata.value = data["value"]
+        try:
+            metadata.language = Language.objects.get(code=data["language_id"])
+        except Language.DoesNotExist:
+            return JSONErrorResponse(status=404)
+        metadata.metadata_type=data["metadata_type"]
+
+        try:
+            metadata.full_clean()
+        except ValidationError as ve:
+            return JSONErrorResponse(message="\n".join(ve.messages), status=400)
         except:
             return JSONErrorResponse()
+        metadata.save()
 
-        return JSONResponse(serialize(ControlledListItemImageMetadata.objects.get(pk=metadata_id)))
+        return JSONResponse(serialize(metadata))
 
     def delete(self, request, **kwargs):
         metadata_id = kwargs.get("id")
