@@ -3,6 +3,7 @@ define([
     'knockout-mapping',
     'jquery',
     'dropzone',
+    'string-similarity',
     'uuid',
     'arches',
     'viewmodels/alert-json',
@@ -11,7 +12,7 @@ define([
     'bindings/datatable',
     'bindings/dropzone',
     'bindings/resizable-sidepanel',
-], function(ko, koMapping, $, dropzone, uuid, arches, JsonErrorAlertViewModel, importSingleCSVTemplate) {
+], function(ko, koMapping, $, dropzone, stringSimilarity, uuid, arches, JsonErrorAlertViewModel, importSingleCSVTemplate) {
     const viewModel = function(params) {
         const self = this;
         this.loadDetails = params.load_details || ko.observable();
@@ -56,6 +57,39 @@ define([
         this.ready = ko.computed(() => {
             return self.selectedGraph() && self.fieldMapping().find((mapping) => mapping.node());
         });
+        this.suggestField = function(i) {
+            function normalizeText(text) { return text.toLowerCase().replace(/\W+/g, ''); }
+            let bestMatch = null;
+            let highestScore = 0;
+            if (!!self.headers() && self.headers()[i] != 'resourceid') {
+                const header = normalizeText(self.headers()[i]);
+                self.nodes().forEach(function(node) {
+                    if (node.name) {
+                        const nameNorm = normalizeText(node.name);
+                        const aliasNorm = normalizeText(node.alias);
+                        const nameScore = stringSimilarity.compareTwoStrings(header, nameNorm);
+                        const aliasScore = stringSimilarity.compareTwoStrings(header, aliasNorm);
+                        const bestNodeScore = Math.max(nameScore, aliasScore);
+                        if (bestNodeScore > highestScore) {
+                            highestScore = bestNodeScore;
+                            bestMatch = node;
+                        }
+                    }
+                });
+                if (bestMatch && highestScore > 0.8) { return bestMatch.alias; }
+            }
+            return null;
+        }
+        this.guessAllMappings = function() {
+            if (self.headers()) {
+                self.headers().forEach((header, i) => {
+                    const bestMatchNode = self.suggestField(i);
+                    if (bestMatchNode && self.fieldMapping().length > i) {
+                        self.fieldMapping()[i].node(bestMatchNode);
+                    }
+                });
+            }
+        };
 
         this.createTableConfig = function(col) {
             return {

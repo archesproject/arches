@@ -83,6 +83,7 @@
             <span data-bind="text: $root.translations.importDetails"></span>
         </h4>
         <div data-bind="component: { name: 'views/components/simple-switch', params: {value: hasHeaders, config:{ label: $root.translations.columnNameFirstRow, subtitle: ''}}}"></div>
+        <div><button class="btn btn-primary" data-bind="click: guessAllMappings, text: $root.translations.guessMappableNodes"></button></div>
         <div class="csv-mapping-table-container">
         <table class="table table-striped csv-mapping-table">
             <thead>
