@@ -33,9 +33,9 @@ def graph_id_from_slug(slug):
 
 
 @cache
-def fallback_nodegroup_id():
+def fallback_node():
     """Consider removing this if we make LoadStaging.nodegroup nullable."""
-    return Node.objects.filter(nodegroup__isnull=False).first().nodegroup_id
+    return Node.objects.filter(nodegroup__isnull=False).first()
 
 
 class JSONLDImporter(BaseImportModule):
@@ -189,7 +189,7 @@ class JSONLDImporter(BaseImportModule):
         )
 
         dummy_tile_info = {
-            le.node_id: {
+            str(le.node_id or fallback_node().nodeid): {
                 "value": {},
                 "valid": False,
                 "source": early_failure,
@@ -200,7 +200,7 @@ class JSONLDImporter(BaseImportModule):
 
         ls = LoadStaging(
             load_event_id=self.loadid,
-            nodegroup_id=exception.nodegroup_id if has_info else fallback_nodegroup_id(),
+            nodegroup_id=exception.nodegroup_id if has_info else fallback_node().nodegroup_id,
             value=dummy_tile_info,
             passes_validation=False,
             source_description=early_failure,
