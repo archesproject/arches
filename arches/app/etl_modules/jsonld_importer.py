@@ -1,4 +1,5 @@
 import json
+import sys
 import zipfile
 from datetime import datetime
 from functools import cache, lru_cache
@@ -163,10 +164,15 @@ class JSONLDImporter(BaseImportModule):
         early_failure = _("Load JSON-LD command failed before fully parsing a block.")
         exception_message = exception.args[0]
 
+        if hasattr(exception, "__notes__"):
+            source = exception.__notes__[0]
+        else:
+            source = "/".join((graph_slug, block))
+
         le = LoadErrors(
             load_event_id=self.loadid,
             type="JSON-LD block",
-            source="/".join((graph_slug, block)),
+            source=source,
             error=early_failure,
             message=exception_message,
             value=str(exception.value) if has_info else None,
@@ -182,7 +188,7 @@ class JSONLDImporter(BaseImportModule):
             user_id=self.userid,
             successful=False,
             status="failed",
-            load_description="/".join((graph_slug, block)),
+            load_description=source,
             etl_module_id=self.moduleid,
             error_message=early_failure,
             load_end_time=datetime.now(),

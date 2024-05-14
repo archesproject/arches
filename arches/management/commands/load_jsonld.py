@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import json
+import sys
 import time
 from pathlib import Path
 
@@ -302,6 +303,11 @@ class Command(BaseCommand):
                             except Exception as e:
                                 print(f"*** Failed to load {fn}:\n     {e}\n")
                                 if not options["ignore_errors"]:
+                                    short_path_to_failing_file = f"{Path(m) / b / f}"
+                                    if sys.version_info >= (3, 11):
+                                        e.add_note(short_path_to_failing_file)
+                                    else:
+                                        e.__notes__ = [short_path_to_failing_file]
                                     raise
                         else:
                             print(" ... skipped due to bad data :(")
