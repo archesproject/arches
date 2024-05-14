@@ -83,7 +83,7 @@ class GeoUtils(object):
         return arches_geojson
 
     def reduce_precision(self, geom, current_precision):
-        if current_precision > 0:
+        if current_precision > 5:
             writer = WKTWriter()
             max_bytes = 32766 # max bytes allowed by Lucene
 
