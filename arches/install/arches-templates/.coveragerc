@@ -1,7 +1,7 @@
 [run]
-source = arches
+source =
+    {{ project_name }}/
 
-[report]
 omit =
     */python?.?/*
     */models/migrations/*
@@ -10,5 +10,6 @@ omit =
     */wsgi.py
     */celery.py
     */__init__.py
-    
+
+[report]
 show_missing = true
