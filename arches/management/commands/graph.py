@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from django.core.management.base import BaseCommand
 from arches.app.models.graph import Graph
 from django.contrib.auth.models import User
-from django.db import connection
+from django.db import connection, transaction
 
 
 class Command(BaseCommand):
@@ -34,13 +34,14 @@ class Command(BaseCommand):
             nargs="?",
             choices=[
                 "publish",
-                "unpublish",
+                "create_editable_future_graphs"
             ],
             help="""
             Operation Type
-              'publish' publishes resource models indicated using the --graphs arg.
-              'unpublish' unpublishes resource models indicated using the --graphs arg.
-               Both publish and unpublish apply to all resource models if a --graphs value is not provided",
+                'publish' publishes resource models indicated using the --graphs arg.
+                'create_editable_future_graphs' creates an editable_future_graph for resource models indicated using the --graphs arg.
+
+                Operations apply to all resource models if a --graphs value is not provided,
             """,
         )
         parser.add_argument(
@@ -73,11 +74,12 @@ class Command(BaseCommand):
             help="Do you want to assign new graph publication ids to all corresponding resource instances?",
         )
 
+
     def handle(self, *args, **options):
         if options["graphs"]:
             self.graphs = [Graph(graphid.strip()) for graphid in options["graphs"].split(",")]
         else:
-            self.graphs = Graph.objects.filter(isresource=True)
+            self.graphs = Graph.objects.filter(isresource=True).exclude(source_identifier__isnull=False)
 
         self.update_instances = True if options["update_instances"] else False
         self.update = True if options["update"] else False
@@ -85,22 +87,45 @@ class Command(BaseCommand):
         if options["operation"] == "publish":
             self.publish(options["username"])
 
-        if options["operation"] == "unpublish":
-            self.unpublish()
+        if options["operation"] == "create_editable_future_graphs":
+            self.create_editable_future_graphs()
+
+
+    def create_editable_future_graphs(self):
+        print("\nBEGIN Create editable_future_graphs...")
+
+        with transaction.atomic():
+            for graph in self.graphs:
+                print("\nCreating editable_future_graph for %s..." % graph.name)
+                graph.create_editable_future_graph()
+
+                print("%s has been updated! Creating a new publication for %s." % (graph.name, graph.name))
+                graph.publish()
+
+            print("\nEND Create editable_future_graphs. Success!")
+
 
     def publish(self, username):
         user = User.objects.get(username=username)
-        print("\nPublishing ...")
+
+        if self.update:
+            print("\nUpdating Publications...")
+        else:
+            print("\nPublishing ...")
+
         graphids = []
         for graph in self.graphs:
-            print(graph.name)
+            if not graph.source_identifier_id:
+                graphids.append(str(graph.pk))
             
-            if self.update:
-                if graph.publication_id:
-                    graph.update_published_graphs()
-            else:
-                graph.publish(user)
-
+                print(graph.name)
+                
+                if self.update:
+                    if graph.publication_id:
+                        graph.update_published_graphs()
+                else:
+                    graph.publish(user)
+                    
             graphids.append(str(graph.pk))
         if self.update_instances:
             graphids = tuple(graphids)
@@ -109,9 +134,3 @@ class Command(BaseCommand):
                     "update resource_instances r set graphpublicationid = publicationid from graphs g where r.graphid = g.graphid and g.graphid in %s;",
                     (graphids,),
                 )
-
-    def unpublish(self):
-        print("Unpublishing...")
-        for graph in self.graphs:
-            print(graph.name)
-            graph.unpublish()

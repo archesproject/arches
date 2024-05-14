@@ -1,6 +1,6 @@
 {
     "name": "arches",
-    "version": "7.6.0",
+    "version": "8.0.0",
     "license": "AGPL-3.0-only",
     "scripts": {
         "build_development": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js",
@@ -21,7 +21,7 @@
         "type": "git"
     },
     "devDependencies": {
-        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.6.x"
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/8.0.x"
     },
     "dependencies": {
         "@babel/runtime": "^7.17.2",
