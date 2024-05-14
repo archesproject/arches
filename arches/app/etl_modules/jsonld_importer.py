@@ -74,7 +74,10 @@ class JSONLDImporter(BaseImportModule):
                 result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
                 result["summary"]["cumulative_files_size"] = self.cumulative_files_size
                 with zip_ref.open(file) as opened_file:
-                    self.validate_uploaded_file(opened_file)
+                    try:
+                        self.validate_uploaded_file(opened_file)
+                    except FileValidationError as ve:
+                        return {"success": False, "data": ve}
                     f = File(opened_file)
 
                     # Discard outermost part ("e.g. myzip/")
