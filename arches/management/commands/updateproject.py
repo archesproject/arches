@@ -169,7 +169,7 @@ class Command(BaseCommand):
 
         path_to_project = os.path.join(settings.APP_ROOT, "..")
         for relative_file_path in [
-            'gettext.config.js', '.coveragerc', '.gitignore', "tests/test_settings.py", "tests/search_indexes/sample_index_tests.py", "pyproject.toml"
+            'gettext.config.js', '.coveragerc', '.gitignore', "tsconfig.json", "tests/test_settings.py", "tests/search_indexes/sample_index_tests.py", "pyproject.toml"
         ]:  # relative to app root directory
             try:
                 file = open(os.path.join(path_to_project, relative_file_path),'r')
