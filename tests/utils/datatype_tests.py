@@ -20,7 +20,8 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Language
 from arches.app.models.tile import Tile
 from arches.app.models.system_settings import settings
-from tests.base_test import ArchesTestCase
+from tests.base_test import ArchesTestCase, sync_overridden_test_settings_to_arches
+from django.test import override_settings
 
 
 # these tests can be run from the command line via
@@ -59,46 +60,48 @@ class BooleanDataTypeTests(ArchesTestCase):
 class GeoJsonDataTypeTest(ArchesTestCase):
 
     def test_validate_reduce_byte_size(self):
-        f = open("tests/fixtures/problematic_excessive_vertices.geojson")
-        geom = json.load(f)
+        with open("tests/fixtures/problematic_excessive_vertices.geojson") as f:
+            geom = json.load(f)
         geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
         errors = geom_datatype.validate(geom)
         self.assertEqual(len(errors), 0)        
 
 
+    @override_settings(
+        DATA_VALIDATION_BBOX = [(
+            12.948801570473677,
+            52.666192057898854
+        ),
+        (
+            12.948801570473677,
+            52.26439571958821
+        ),
+        (
+            13.87818788958171,
+            52.26439571958821
+        ),
+        (
+            13.87818788958171,
+            52.666192057898854
+        ),
+        (
+            12.948801570473677,
+            52.666192057898854
+        )]
+    )
     def test_validate_bbox(self):
-        settings.DATA_VALIDATION_BBOX = [(
-              12.948801570473677,
-              52.666192057898854
-            ),
-            (
-              12.948801570473677,
-              52.26439571958821
-            ),
-            (
-              13.87818788958171,
-              52.26439571958821
-            ),
-            (
-              13.87818788958171,
-              52.666192057898854
-            ),
-            (
-              12.948801570473677,
-              52.666192057898854
-            )]
+        with sync_overridden_test_settings_to_arches():
+            geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
 
-        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+            with self.subTest(bbox="invalid"):
+                geom = json.loads('{"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"coordinates": [14.073244400935238,19.967099711627156],"type": "Point"}}]}')
+                errors = geom_datatype.validate(geom)
+                self.assertEqual(len(errors), 1)
 
-        with self.subTest():
-            geom = json.loads('{"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"coordinates": [14.073244400935238,19.967099711627156],"type": "Point"}}]}')
-            errors = geom_datatype.validate(geom)
-            self.assertEqual(len(errors), 1)
-
-        with self.subTest():
-            geom = json.loads('{"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"coordinates": [13.400257324930152,52.50578474077699],"type": "Point"}}]}')
-            errors = geom_datatype.validate(geom)
-            self.assertEqual(len(errors), 0)
+            with self.subTest(bbox="valid"):
+                geom = json.loads('{"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"coordinates": [13.400257324930152,52.50578474077699],"type": "Point"}}]}')
+                errors = geom_datatype.validate(geom)
+                self.assertEqual(len(errors), 0)
 
 
 class StringDataTypeTests(ArchesTestCase):
