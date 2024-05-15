@@ -14,9 +14,9 @@ import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 import ListTree from "@/components/ControlledListManager/ListTree.vue";
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
 
+import type { Ref } from "vue";
 import type { ControlledListItem, Selectable } from "@/types/ControlledListManager";
 import type { Language } from "@/types/arches";
-import type { Ref } from "@/types/Ref";
 
 const lightGray = "#f4f4f4";
 const { $gettext } = useGettext();

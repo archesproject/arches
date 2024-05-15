@@ -20,7 +20,7 @@ import {
     reorderItem,
 } from "@/components/ControlledListManager/utils.ts";
 
-import type { Ref } from "@/types/Ref";
+import type { Ref } from "vue";
 import type {
     TreeExpandedKeys,
     TreeSelectionKeys,
@@ -32,10 +32,10 @@ import type {
     NewItem,
 } from "@/types/ControlledListManager";
 
-const tree: Ref<typeof TreeNode[]> = ref([]);
+const tree: Ref<TreeNode[]> = ref([]);
 const selectedKeys: Ref<TreeSelectionKeys> = ref({});
 const expandedKeys: Ref<TreeExpandedKeys> = ref({});
-const movingItem: Ref<typeof TreeNode> = ref({});
+const movingItem: Ref<TreeNode> = ref({});
 const isMultiSelecting = ref(false);
 const refetcher = ref(0);
 
@@ -56,7 +56,7 @@ const showMoveHereButton = (rowId: string) => {
     );
 };
 
-const collapseNodesRecursive = (node: typeof TreeNode) => {
+const collapseNodesRecursive = (node: TreeNode) => {
     if (node.children && node.children.length) {
         expandedKeys.value = {
             ...expandedKeys.value,
@@ -68,7 +68,7 @@ const collapseNodesRecursive = (node: typeof TreeNode) => {
     }
 };
 
-const onRowSelect = (node: typeof TreeNode) => {
+const onRowSelect = (node: TreeNode) => {
     setDisplayedRow(node.data);
     expandedKeys.value = {
         ...expandedKeys.value,
@@ -85,7 +85,7 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
     const siblings: ControlledListItem[] = (
         item.parent_id
         ? findNodeInTree(tree.value, item.parent_id).children.map(
-            (child: typeof TreeNode) => child.data)
+            (child: TreeNode) => child.data)
         : list.items
     );
 
@@ -107,7 +107,7 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
 };
 
 const isFirstItem = (item: ControlledListItem) => {
-    const siblings: typeof TreeNode[] = (
+    const siblings: TreeNode[] = (
         item.parent_id
         ? findNodeInTree(tree.value, item.parent_id).data.children
         : findNodeInTree(tree.value, item.controlled_list_id).data.items
@@ -119,7 +119,7 @@ const isFirstItem = (item: ControlledListItem) => {
 };
 
 const isLastItem = (item: ControlledListItem) => {
-    const siblings: typeof TreeNode[] = (
+    const siblings: TreeNode[] = (
         item.parent_id
         ? findNodeInTree(tree.value, item.parent_id).data.children
         : findNodeInTree(tree.value, item.controlled_list_id).data.items
@@ -133,12 +133,14 @@ const isLastItem = (item: ControlledListItem) => {
 const addChild = async (parent_id: string) => {
     let errorText;
     const newItem: NewItem = { parent_id };
+    const token = Cookies.get("csrftoken");
+    if (!token) {
+        return;
+    }
     try {
         const response = await fetch(arches.urls.controlled_list_item_add, {
             method: "POST",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
+            headers: { "X-CSRFToken": token },
             body: JSON.stringify(newItem),
         });
         if (response.ok) {
@@ -170,7 +172,7 @@ const addChild = async (parent_id: string) => {
     }
 };
 
-const setParent = async (parentNode: typeof TreeNode) => {
+const setParent = async (parentNode: TreeNode) => {
     let errorText;
     const setListAndSortOrderRecursive = (child: ControlledListItem) => {
         child.controlled_list_id = parentNode.key;
@@ -186,12 +188,14 @@ const setParent = async (parentNode: typeof TreeNode) => {
         item.parent_id = parentNode.key;
     }
 
+    const token = Cookies.get("csrftoken");
+    if (!token) {
+        return;
+    }
     try {
         const response = await fetch(arches.urls.controlled_list_item(item.id), {
             method: "POST",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
+            headers: { "X-CSRFToken": token },
             body: JSON.stringify(item),
         });
         if (response.ok) {

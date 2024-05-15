@@ -5,7 +5,7 @@ import type {
     ControlledList,
     ControlledListItem,
 } from "@/types/ControlledListManager";
-import type { TreeNode } from "primevue/tree/Tree/TreeNode";
+import type TreeNode from "primevue/tree/Tree";
 
 export const bestLabel = (item: ControlledListItem, languageCode: string) => {
     const labelsInLang = item.labels.filter(l => l.language_id === languageCode);
@@ -24,8 +24,8 @@ export const languageName = (code: string) => {
     return arches.languages.find((lang: Language) => lang.code === code).name;
 };
 
-export const findNodeInTree = (tree: typeof TreeNode[], itemId: string) => {
-    function recurse (items: typeof TreeNode[]) : typeof TreeNode | undefined {
+export const findNodeInTree = (tree: TreeNode[], itemId: string) => {
+    function recurse (items: TreeNode[]) : TreeNode | undefined {
         for (const item of items) {
             if (item.data.id === itemId) {
                 return item;
@@ -45,7 +45,7 @@ export const findNodeInTree = (tree: typeof TreeNode[], itemId: string) => {
 export const itemAsNode = (
     item: ControlledListItem,
     selectedLanguage: Language,
-): typeof TreeNode => {
+): TreeNode => {
     return {
         key: item.id,
         label: bestLabel(item, selectedLanguage.code).value,
@@ -57,7 +57,7 @@ export const itemAsNode = (
 export const listAsNode = (
     list: ControlledList,
     selectedLanguage: Language,
-): typeof TreeNode => {
+): TreeNode => {
     return {
         key: list.id,
         label: list.name,

@@ -1,10 +1,6 @@
+import type { InjectionKey } from "vue";
 import type { ControlledList, ControlledListItem } from "@/types/ControlledListManager";
 import type { Language } from "@/types/arches";
-
-// Injection keys
-// Cannot import this from vue? 🤔
-// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/ban-types
-interface InjectionKey<T> extends Symbol {}
 
 export const displayedRowKey = Symbol() as InjectionKey<ControlledList | null>;
 export const itemKey = Symbol() as InjectionKey<ControlledListItem | null>;

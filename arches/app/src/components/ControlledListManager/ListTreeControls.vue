@@ -16,7 +16,7 @@ import { useToast } from "primevue/usetoast";
 
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/tree/Tree/TreeNode";
-import type { Ref } from "@/types/Ref";
+import type { Ref } from "vue";
 import type { ControlledList } from "@/types/ControlledListManager";
 
 // not user-facing
@@ -29,7 +29,7 @@ const selectedLanguage = inject(selectedLanguageKey);
 const controlledListItemsTree = defineModel();
 const expandedKeys: Ref<TreeExpandedKeys> = defineModel("expandedKeys");
 const selectedKeys: Ref<TreeSelectionKeys> = defineModel("selectedKeys");
-const movingItem: Ref<typeof TreeNode> = defineModel("movingItem");
+const movingItem: Ref<TreeNode> = defineModel("movingItem");
 const isMultiSelecting = defineModel("isMultiSelecting");
 
 const { $gettext, $ngettext } = useGettext();
@@ -57,7 +57,7 @@ const collapseAll = () => {
     expandedKeys.value = {};
 };
 
-const expandNode = (node: typeof TreeNode) => {
+const expandNode = (node: TreeNode) => {
     if (node.children && node.children.length) {
         expandedKeys.value[node.key] = true;
 
@@ -92,12 +92,14 @@ const fetchLists = async () => {
 };
 
 const createList = async () => {
+    const token = Cookies.get("csrftoken");
+    if (!token) {
+        return;
+    }
     try {
         const response = await fetch(arches.urls.controlled_list_add, {
             method: "POST",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
+            headers: { "X-CSRFToken": token },
         });
         if (response.ok) {
             const newList = await response.json();
@@ -117,12 +119,14 @@ const deleteLists = async (listIds: string[]) => {
     if (!listIds.length) {
         return;
     }
+    const token = Cookies.get("csrftoken");
+    if (!token) {
+        return;
+    }
     const promises = listIds.map((id) =>
         fetch(arches.urls.controlled_list(id), {
             method: "DELETE",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
+            headers: { "X-CSRFToken": token },
         })
     );
 
@@ -153,12 +157,14 @@ const deleteItems = async (itemIds: string[]) => {
     if (!itemIds.length) {
         return;
     }
+    const token = Cookies.get("csrftoken");
+    if (!token) {
+        return;
+    }
     const promises = itemIds.map((id) =>
         fetch(arches.urls.controlled_list_item(id), {
             method: "DELETE",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
+            headers: { "X-CSRFToken": token },
         })
     );
 
@@ -190,7 +196,7 @@ const deleteSelected = async () => {
         return;
     }
     const deletes = Object.keys(selectedKeys.value);
-    const allListIds = controlledListItemsTree.value.map((node: typeof TreeNode) => node.data.id);
+    const allListIds = controlledListItemsTree.value.map((node: TreeNode) => node.data.id);
 
     const listIdsToDelete = deletes.filter(id => allListIds.includes(id));
     const itemIdsToDelete = deletes.filter(id => !listIdsToDelete.includes(id));

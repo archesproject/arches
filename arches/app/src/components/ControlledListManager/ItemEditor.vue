@@ -99,8 +99,11 @@ const iconLabel = (item: ControlledListItem) => {
 };
 
 const addHeader = (event: FileUploadBeforeSendEvent) => {
-    event.xhr.setRequestHeader("X-CSRFToken", Cookies.get("csrftoken"));
-    event.formData.set("item_id", item.value.id);
+    const token = Cookies.get("csrftoken");
+    if (token) {
+        event.xhr.setRequestHeader("X-CSRFToken", token);
+        event.formData.set("item_id", item.value.id);
+    }
 };
 
 const onUpload = (event: FileUploadUploadEvent) => {
