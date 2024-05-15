@@ -483,9 +483,12 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         """
 
+        print("GEDRT")
         if self.user_is_resource_editor(user):
+            print("GEDRT0", self.get_resource_types_by_perm(user, ["models.write_nodegroup", "models.delete_nodegroup"]))
             return self.get_resource_types_by_perm(user, ["models.write_nodegroup", "models.delete_nodegroup"])
         else:
+            print("GEDRT1")
             return []
 
 
@@ -588,6 +591,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         #  - Resource Exporter
         #  - System Administrator
 
+        print("WAT", user, user.is_authenticated, user.is_superuser, user.groups, group_names)
         if user.is_authenticated:
             if user.is_superuser or bool(user.groups.filter(name__in=group_names)):
                 return True

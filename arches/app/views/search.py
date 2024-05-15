@@ -465,9 +465,6 @@ def retrieve_search_results(search_filter_factory, search_results_object, dsl, l
                     resource["_source"][descriptor_type] = _("Undefined")
         count = dsl.count(index=RESOURCES_INDEX)
 
-        for key, value in list(search_results_object.items()):
-            ret[key] = value
-
     return search_results_object, count, results
 
 
@@ -500,7 +497,8 @@ def get_provisional_type(provisional_filter, user):
 
 
 def get_permitted_nodegroups(user):
-    return get_nodegroups_by_perm(user, "models.read_nodegroup")
+    # Until we can properly separate read/write
+    return get_nodegroups_by_perm(user, "models.write_nodegroup")
 
 
 def buffer(request):

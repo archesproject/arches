@@ -1,7 +1,7 @@
 Django>=4.2.11,<5.0.0
 psycopg2==2.9.9
 urllib3<2
-elasticsearch>=8.3.1,<9.0.0
+elasticsearch>=8.3.1,<8.4.1
 rdflib==4.2.2
 django-guardian==2.4.0
 python-memcached==1.59

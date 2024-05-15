@@ -55,7 +55,7 @@ from arches.app.views.resource import ResourceEditorView, ResourceActivityStream
 from arches.app.views.plugin import PluginView
 from arches.app.views.workflow_history import WorkflowHistoryView
 from arches.app.views.concept import RDMView
-from arches.app.views.user import UserManagerView
+from arches.app.views.user import UserManagerView, UserView
 from arches.app.views.tile import TileData
 from arches.app.views.transaction import ReverseTransaction
 from arches.app.views.notifications import NotificationView
@@ -234,6 +234,7 @@ urlpatterns = [
     re_path(r"^map_layer_manager/*", MapLayerManagerView.as_view(), name="map_layer_manager"),
     re_path(r"^feature_popup_content$", main.feature_popup_content, name="feature_popup_content"),
     re_path(r"^user$", UserManagerView.as_view(), name="user_profile_manager"),
+    re_path(r"^user/get_user_details$", UserView.as_view(), name="get_user_details"),
     re_path(r"^user/get_user_names$", UserManagerView.as_view(action="get_user_names"), name="get_user_names"),
     re_path(r"^user/get_user_roles$", UserManagerView.as_view(action="get_user_roles"), name="get_user_roles"),
     re_path(r"^notifications$", NotificationView.as_view(), name="get_notifications"),
