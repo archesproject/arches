@@ -13,7 +13,7 @@ import type {
     ValueType,
 } from "@/types/ControlledListManager";
 
-const props: { type: ValueType } = defineProps(["type"]);
+const props = defineProps<{ type: ValueType }>();
 const { item } = inject(itemKey);
 
 const { $gettext } = useGettext();

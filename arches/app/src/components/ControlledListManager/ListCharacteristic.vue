@@ -8,12 +8,14 @@ import { useToast } from "primevue/usetoast";
 import { postListToServer } from "@/components/ControlledListManager/api.ts";
 import { displayedRowKey } from "@/components/ControlledListManager/const.ts";
 
-const props: {
+import type { DisplayedRowRefAndSetter } from "@/types/ControlledListManager";
+
+const props = defineProps<{
     editable: boolean;
     field: "name" | "dynamic";
     label: string;
-} = defineProps(["editable", "field", "label"]);
-const { displayedRow } = inject(displayedRowKey);
+}>();
+const { displayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 
 const editing = ref(false);
 const disabled = computed(() => {

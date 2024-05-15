@@ -1,3 +1,5 @@
+import type { Ref } from "vue";
+
 export type Label = {
     id: string,
     valuetype_id: string,
@@ -81,3 +83,9 @@ export type ReferencingNode = {
     graph_id: string,
     graph_name: string,
 };
+
+// Prop injection types
+export interface DisplayedRowRefAndSetter {
+    displayedRow: Ref<Selectable | null>;
+    setDisplayedRow: (val: Selectable | null) => void;
+}

@@ -20,17 +20,19 @@ import {
 } from "@/components/ControlledListManager/const.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
+import type { Ref } from "vue";
 import type { FileUploadBeforeSendEvent, FileUploadUploadEvent } from "primevue/fileupload";
 import type {
     ControlledListItem,
     ControlledListItemImage,
     ControlledListItemImageMetadata,
+    DisplayedRowRefAndSetter,
     Label,
     NewControlledListItemImageMetadata,
     NewLabel,
 } from "@/types/ControlledListManager";
 
-const { displayedRow: item } = inject(displayedRowKey);
+const { displayedRow: item } : { displayedRow: Ref<ControlledListItem> } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 const selectedLanguage = inject(selectedLanguageKey);
 
 const { $gettext } = useGettext();

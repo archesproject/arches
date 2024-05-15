@@ -26,11 +26,11 @@ const ERROR = "error";
 const { setDisplayedRow } = inject(displayedRowKey);
 const selectedLanguage = inject(selectedLanguageKey);
 
-const controlledListItemsTree = defineModel();
-const expandedKeys: Ref<TreeExpandedKeys> = defineModel("expandedKeys");
-const selectedKeys: Ref<TreeSelectionKeys> = defineModel("selectedKeys");
-const movingItem: Ref<TreeNode> = defineModel("movingItem");
-const isMultiSelecting = defineModel("isMultiSelecting");
+const controlledListItemsTree = defineModel<Ref<TreeNode[]>>();
+const expandedKeys = defineModel<Ref<TreeExpandedKeys>>("expandedKeys");
+const selectedKeys = defineModel<Ref<TreeSelectionKeys>>("selectedKeys");
+const movingItem = defineModel<Ref<TreeNode>>("movingItem");
+const isMultiSelecting = defineModel<boolean>("isMultiSelecting");
 
 const { $gettext, $ngettext } = useGettext();
 const buttonGreen = "#10b981";

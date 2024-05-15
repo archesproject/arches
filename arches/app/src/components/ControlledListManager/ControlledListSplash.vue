@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useGettext } from "vue3-gettext";
 
-const props: { description: string } = defineProps(["description"]);
+const props = defineProps<{ description: string }>();
 
 const { $gettext } = useGettext();
 </script>

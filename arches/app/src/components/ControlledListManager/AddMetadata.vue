@@ -14,9 +14,10 @@ import type {
     NewControlledListItemImageMetadata,
 } from "@/types/ControlledListManager";
 
-const { choices: METADATA_CHOICES, image } : {
-    choices: MetadataChoice[], image: ControlledListItemImage
-} = defineProps(["choices", "image"]);
+const { choices: METADATA_CHOICES, image } = defineProps<{
+    choices: MetadataChoice[];
+    image: ControlledListItemImage;
+}>();
 const { item } = inject(itemKey);
 
 const { $gettext } = useGettext();

@@ -23,13 +23,13 @@ import type {
     ValueType,
 } from "@/types/ControlledListManager";
 
-const props: {
-    type: ValueType,
-    item: ControlledListItem,
-    appendItemLabel: (appendedLabel: Label | NewLabel) => undefined,
-    updateItemLabel: (updatedLabel: Label) => undefined,
-    removeItemLabel: (removedLabel: Label | NewLabel) => undefined,
-} = defineProps(["type", "item", "appendItemLabel", "updateItemLabel", "removeItemLabel"]);
+const props = defineProps<{
+    type: ValueType;
+    item: ControlledListItem;
+    appendItemLabel: (appendedLabel: Label | NewLabel) => void;
+    updateItemLabel: (updatedLabel: Label) => void;
+    removeItemLabel: (removedLabel: Label | NewLabel) => void;
+}>();
 const editingRows = ref([]);
 
 const toast = useToast();

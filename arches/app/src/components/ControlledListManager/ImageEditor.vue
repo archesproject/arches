@@ -23,13 +23,13 @@ import type {
     NewControlledListItemImageMetadata,
 } from "@/types/ControlledListManager";
 
-const { image, removeImage, appendImageMetadata, updateImageMetadata, removeImageMetadata } : {
-    image: ControlledListItemImage,
-    removeImage: (removedImage: ControlledListItemImage) => undefined,
-    appendImageMetadata: (appendedMetadata: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => undefined,
-    updateImageMetadata: (updatedMetadata: ControlledListItemImageMetadata) => undefined,
-    removeImageMetadata: (removedMetadata: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => undefined,
-} = defineProps(["image", "removeImage", "appendImageMetadata", "updateImageMetadata", "removeImageMetadata"]);
+const { image, removeImage, appendImageMetadata, updateImageMetadata, removeImageMetadata } = defineProps<{
+    image: ControlledListItemImage;
+    removeImage: (removedImage: ControlledListItemImage) => void;
+    appendImageMetadata: (appendedMetadata: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => void;
+    updateImageMetadata: (updatedMetadata: ControlledListItemImageMetadata) => void;
+    removeImageMetadata: (removedMetadata: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => void;
+}>();
 const { item } = inject(itemKey);
 
 const editingRows = ref([]);

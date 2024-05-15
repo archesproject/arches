@@ -8,7 +8,10 @@ import { useToast } from "primevue/usetoast";
 import { postItemToServer } from "@/components/ControlledListManager/api.ts";
 import { itemKey } from "@/components/ControlledListManager/const.ts";
 
-const props: { field: "uri", label: string } = defineProps(["field", "label"]);
+const props = defineProps<{
+    field: "uri";
+    label: string;
+}>();
 const { item } = inject(itemKey);
 
 const editing = ref(false);
