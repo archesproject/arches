@@ -3,7 +3,6 @@ run-name: Build Arches base
 on: [push]
 env:
   ARCHES_BASE: flaxandteal/arches-base
-  ARCHES_VERSION: "7.5-dev"
   REGISTRY: ghcr.io
 jobs:
   Build-Arches:
@@ -30,7 +29,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
-          images: ${{ env.REGISTRY }}/${{ env.ARCHES_BASE }}-${{ env.ARCHES_VERSION }}
+          images: ${{ env.REGISTRY }}/${{ env.ARCHES_BASE }}
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
