@@ -109,6 +109,11 @@ class BaseDataType(object):
         if node is None:
             return None
         source_config = {"type": "vector", "tiles": [tileserver_url]}
+        node_config = json.loads(node.config.value)
+        for prop in ("minzoom", "maxzoom"):
+            if prop in node_config:
+                source_config[prop] = node_config[prop]
+
         count = None
         if preview == True:
             count = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).count()
