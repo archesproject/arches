@@ -10,30 +10,29 @@ import django.db.models.functions.comparison
 
 from arches.app.models.fields.i18n import I18n_String
 
-def add_plugins(apps, schema_editor):
-    Plugin = apps.get_model("models", "Plugin")
-
-    Plugin(
-        pluginid="60aa3e80-4aea-4042-a76e-5a872b1c36a0",
-        name=I18n_String("Controlled List Manager"),
-        icon="fa fa-list",
-        component="views/components/plugins/controlled-list-manager",
-        componentname="controlled-list-manager",
-        config={"show": True},
-        slug="controlled-list-manager",
-        sortorder=0,
-    ).save()
-
-
-def remove_plugin(apps, schema_editor):
-    Plugin = apps.get_model("models", "Plugin")
-    Plugin.objects.filter(slug="controlled-list-manager").delete()
-
 
 class Migration(migrations.Migration):
     dependencies = [
         ("models", "9525_add_published_graph_edits"),
     ]
+
+    def add_plugins(apps, schema_editor):
+        Plugin = apps.get_model("models", "Plugin")
+
+        Plugin(
+            pluginid="60aa3e80-4aea-4042-a76e-5a872b1c36a0",
+            name=I18n_String("Controlled List Manager"),
+            icon="fa fa-list",
+            component="views/components/plugins/controlled-list-manager",
+            componentname="controlled-list-manager",
+            config={"show": True},
+            slug="controlled-list-manager",
+            sortorder=0,
+        ).save()
+
+    def remove_plugin(apps, schema_editor):
+        Plugin = apps.get_model("models", "Plugin")
+        Plugin.objects.filter(slug="controlled-list-manager").delete()
 
     operations = [
         migrations.RunPython(add_plugins, remove_plugin),
