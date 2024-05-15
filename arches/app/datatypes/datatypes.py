@@ -929,7 +929,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     feature_geom = GEOSGeometry(JSONSerializer().serialize(feature_collection['features'][0]['geometry']))
                     current_precision = abs(self.find_num(feature_geom.coords))
                     feature_collection = self.geo_utils.reduce_precision(feature_collection, current_precision)
-            except Exception as e:
+            except ValueError:
                 message = _("Geojson byte size exceeds Lucene 32766 limit.")
                 title = _("Geometry Size Exceeds Elasticsearch Limit")
                 errors.append(
