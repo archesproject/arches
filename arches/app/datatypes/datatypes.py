@@ -913,21 +913,23 @@ class EDTFDataType(BaseDataType):
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
+    def __init__(self, model=None):  
+        super(GeojsonFeatureCollectionDataType, self).__init__(model=model)  
+        self.geo_utils = GeoUtils()  
+
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         errors = []
-        geo_utils = GeoUtils()
         max_bytes = 32766 # max bytes allowed by Lucene
         byte_count = 0
         byte_count += len(str(value).encode("UTF-8"))
 
-        def validate_geom_byte_size_can_be_reduced(geom):
+        def validate_geom_byte_size_can_be_reduced(feature_collection):
             try: 
-                if len(geom['features']) > 0:
-                    feature_geom = GEOSGeometry(JSONSerializer().serialize(geom['features'][0]['geometry']))
+                if len(feature_collection['features']) > 0:
+                    feature_geom = GEOSGeometry(JSONSerializer().serialize(feature_collection['features'][0]['geometry']))
                     current_precision = abs(self.find_num(feature_geom.coords))
-
-                    geom = geo_utils.reduce_precision(geom, current_precision)
-            except:
+                    feature_collection = self.geo_utils.reduce_precision(feature_collection, current_precision)
+            except Exception as e:
                 message = _("Geojson byte size exceeds Lucene 32766 limit.")
                 title = _("Geometry Size Exceeds Elasticsearch Limit")
                 errors.append(
@@ -997,9 +999,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 tile.data[nodeid] = None
 
     def transform_value_for_tile(self, value, **kwargs):
-        geo_utils = GeoUtils()
         if "format" in kwargs and kwargs["format"] == "esrijson":
-            arches_geojson = geo_utils.arcgisjson_to_geojson(value)
+            arches_geojson = self.geo_utils.arcgisjson_to_geojson(value)
         else:
             try:
                 geojson = json.loads(value)
@@ -1013,7 +1014,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 try:
                     geometry = GEOSGeometry(value, srid=4326)
                     if geometry.geom_type == "GeometryCollection":
-                        arches_geojson = geo_utils.convert_geos_geom_collection_to_feature_collection(geometry)
+                        arches_geojson = self.geo_utils.convert_geos_geom_collection_to_feature_collection(geometry)
                     else:
                         arches_geojson = {}
                         arches_geojson["type"] = "FeatureCollection"
@@ -1049,7 +1050,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 return self.find_num(current_item[0])
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        geo_utils = GeoUtils()
         max_bytes = 32766 # max bytes allowed by Lucene
         byte_count = 0
         byte_count += len(str(nodevalue).encode("UTF-8"))
@@ -1059,9 +1059,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             current_precision = abs(self.find_num(feature_geom.coords))
 
         if byte_count > max_bytes and current_precision:
-            nodevalue = geo_utils.reduce_precision(nodevalue, current_precision)
-
-            
+            nodevalue = self.geo_utils.reduce_precision(nodevalue, current_precision)
+        
         document["geometries"].append({"geom": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional, "tileid": tile.pk})
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:

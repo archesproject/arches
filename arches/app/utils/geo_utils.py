@@ -89,13 +89,18 @@ class GeoUtils(object):
 
             current_precision -= 1
             writer.precision = current_precision
-            less_precise_geom = writer.write(GEOSGeometry(self.create_geom_collection_from_geojson(geom)))
-            new_byte_count = len(str(less_precise_geom).encode("UTF-8"))
-            new_geom_collection = self.convert_geos_geom_collection_to_feature_collection(GEOSGeometry(less_precise_geom))
+            less_precise_geom_collection = writer.write(GEOSGeometry(self.create_geom_collection_from_geojson(geom)))
+            new_byte_count = len(str(less_precise_geom_collection).encode("UTF-8"))
+            new_geos_geom_collection = GEOSGeometry(less_precise_geom_collection)
+            if new_geos_geom_collection.valid:  
+                new_feature_collection = self.convert_geos_geom_collection_to_feature_collection(new_geos_geom_collection)  
+            else:  
+                raise Exception('Geometry is not valid after reducing precision')
+             
             if new_byte_count > max_bytes:
-                return self.reduce_precision(new_geom_collection, current_precision)
+                return self.reduce_precision(new_feature_collection, current_precision)
             else:
-                return new_geom_collection
+                return new_feature_collection
         else:
-            raise Exception('Geometry still too large after reducing to 0 precision.')
+            raise Exception('Geometry still too large after reducing to 5 precision.')
     
