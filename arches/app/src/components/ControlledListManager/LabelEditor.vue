@@ -80,11 +80,13 @@ const onSave = async (event: DataTableRowEditInitEvent) => {
         toast,
         $gettext,
     );
-    if (normalizedNewData.id) {
-        props.updateItemLabel(upsertedLabel);
-    } else {
-        props.appendItemLabel(upsertedLabel);
-        props.removeItemLabel(event.newData);
+    if (upsertedLabel) {
+        if (normalizedNewData.id) {
+            props.updateItemLabel(upsertedLabel);
+        } else {
+            props.appendItemLabel(upsertedLabel);
+            props.removeItemLabel(event.newData);
+        }
     }
 };
 

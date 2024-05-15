@@ -74,11 +74,13 @@ const onSaveMetadata = async (event: DataTableRowEditInitEvent)  => {
         toast,
         $gettext,
     );
-    if (normalizedNewData.id) {
-        updateImageMetadata(upsertedMetadata);
-    } else {
-        appendImageMetadata(upsertedMetadata);
-        removeImageMetadata(event.newData);
+    if (upsertedMetadata) {
+        if (normalizedNewData.id) {
+            updateImageMetadata(upsertedMetadata);
+        } else {
+            appendImageMetadata(upsertedMetadata);
+            removeImageMetadata(event.newData);
+        }
     }
 };
 
