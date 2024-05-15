@@ -16,6 +16,9 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import uuid
+
+from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Language
 from arches.app.models.tile import Tile
@@ -24,6 +27,22 @@ from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
 # python manage.py test tests/utils/datatype_tests.py --pattern="*.py" --settings="tests.test_settings"
+
+class BaseDataTypeTests(ArchesTestCase):
+    def test_get_tile_data_only_none(self):
+        base = BaseDataType()
+        node_id = str(uuid.uuid4())
+        resourceinstance_id = str(uuid.uuid4())
+        tile_data = {node_id: None}
+        tile_holding_only_none = Tile({
+            "resourceinstance_id": resourceinstance_id,
+            "parenttile_id": "",
+            "nodegroup_id": node_id,
+            "tileid": "",
+            "data": tile_data,
+        })
+
+        self.assertEqual(base.get_tile_data(tile_holding_only_none), tile_data)
 
 
 class StringDataTypeTests(ArchesTestCase):
