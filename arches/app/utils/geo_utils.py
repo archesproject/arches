@@ -95,12 +95,11 @@ class GeoUtils(object):
             if new_geos_geom_collection.valid:  
                 new_feature_collection = self.convert_geos_geom_collection_to_feature_collection(new_geos_geom_collection)  
             else:  
-                raise Exception('Geometry is not valid after reducing precision')
-             
+                raise ValueError('Geometry is not valid after reducing precision.')
             if new_byte_count > max_bytes:
                 return self.reduce_precision(new_feature_collection, current_precision)
             else:
                 return new_feature_collection
         else:
-            raise Exception('Geometry still too large after reducing to 5 precision.')
+            raise ValueError('Geometry still too large after reducing to 5 precision.')
     
