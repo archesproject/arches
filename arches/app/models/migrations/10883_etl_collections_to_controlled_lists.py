@@ -11,6 +11,9 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             """
             -- RDM Collections to Controlled Lists & List Items Migration --
+            -- To use, run: 
+            --      select * from __arches_migrate_collections_to_clm(ARRAY['Getty AAT', 'Johns List']);
+
             -- Conceptually:
             --      a collection becomes a list
             --      a concept belonging to a collection becomes a list item
@@ -25,10 +28,31 @@ class Migration(migrations.Migration):
                 collection_names text[] default null -- one or more collections to be migrated to controlled lists
             )
             returns text as $$
-            -- declare 
-            --     list_ids uuid[];
+            declare failed_collections text[];
             begin
+                -- Check if collection_names are provided
+                if collection_names is null or array_length(collection_names, 1) = 0 then
+                    return 'No collection names provided.';
+                end if;
+
+                -- Check if collection_names exist in the database
+                failed_collections := array(
+                    select names
+                    from unnest(collection_names) as names
+                    left join values v on v.value = names
+                    left join concepts c on c.conceptid = v.conceptid
+                    where v.value is Null
+                );
                 
+                if array_length(failed_collections, 1) > 0 then
+                    raise warning 'Failed to find the following collections in the database: %s', array_to_string(failed_collections, ', ');
+                    collection_names := array(
+                        select array_agg(elem)
+                        from unnest(collection_names) elem
+                        where elem <> all(failed_collections)
+                    );
+                end if;
+
                 -- Migrate Collection -> Controlled List
                 insert into controlled_lists (
                     id,
@@ -120,6 +144,7 @@ class Migration(migrations.Migration):
                     (valuetype = 'prefLabel' or valuetype = 'altLabel') and
                     r.conceptidto in (select id from controlled_list_items); -- don't create values for list items that don't exist
 
+                return format('collection(s) %s migrated to controlled list(s)', collection_names);
             end;
             $$ language plpgsql volatile;
             """,
