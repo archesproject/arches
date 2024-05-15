@@ -66,7 +66,6 @@ class GeoJsonDataTypeTest(ArchesTestCase):
         errors = geom_datatype.validate(geom)
         self.assertEqual(len(errors), 0)        
 
-
     @override_settings(
         DATA_VALIDATION_BBOX = [(
             12.948801570473677,
