@@ -41,7 +41,7 @@ const movingItem: Ref<TreeNode> = ref({});
 const isMultiSelecting = ref(false);
 const refetcher = ref(0);
 
-const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
+const { displayedRow, setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
 const toast = useToast();
@@ -71,12 +71,20 @@ const collapseNodesRecursive = (node: TreeNode) => {
 };
 
 const onRowSelect = (node: TreeNode) => {
+    let priorListId;
+    if (displayedRow.value) {
+        priorListId = (displayedRow.value as ControlledListItem).controlled_list_id ?? displayedRow.value.id;
+    }
+
     setDisplayedRow(node.data);
     expandedKeys.value = {
         ...expandedKeys.value,
         [node.key as string]: true,
     };
-    if (node.data.name) {
+    if (
+        node.data.name
+        || (priorListId && (node.data as ControlledListItem).controlled_list_id !== priorListId)
+    ) {
         tree.value.filter(list => list.data.id !== node.data.id)
             .forEach(list => collapseNodesRecursive(list));
     }
