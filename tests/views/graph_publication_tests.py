@@ -4,8 +4,6 @@ from django.contrib.auth.models import User
 from django.test import Client
 from unittest.mock import patch, MagicMock
 from arches.app.models.graph import Graph
-from arches.app.utils.response import JSONResponse, JSONErrorResponse
-from arches.app.utils.betterJSONSerializer import JSONDeserializer
 
 class GraphPublicationViewTest(TestCase):
 
