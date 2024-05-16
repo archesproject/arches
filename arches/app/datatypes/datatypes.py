@@ -1044,10 +1044,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return updated_data
 
     def find_num(self, current_item):
-            if len(current_item) and isinstance(current_item[0], float):
-                return decimal.Decimal(str(current_item[0])).as_tuple().exponent
-            else:
-                return self.find_num(current_item[0])
+        if len(current_item) and isinstance(current_item[0], float):
+            return decimal.Decimal(str(current_item[0])).as_tuple().exponent
+        else:
+            return self.find_num(current_item[0])
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         max_bytes = 32766 # max bytes allowed by Lucene
