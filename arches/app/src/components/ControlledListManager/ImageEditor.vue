@@ -185,7 +185,7 @@ const onDeleteImage = async () => {
                             :aria-label="$gettext('Delete')"
                             @click="onDeleteMetadata(slotProps.data)"
                             @key.enter="onDeleteMetadata(slotProps.data)"
-                        />
+                        ></i>
                     </template>
                 </Column>
             </DataTable>

@@ -61,7 +61,7 @@ const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
         <i
             class="fa fa-plus-circle"
             aria-hidden="true"
-        />
+        ></i>
         <span class="add-metadata-text">
             {{ $gettext("Add metadata") }}
         </span>
