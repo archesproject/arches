@@ -14,6 +14,7 @@ define([
          
         this.total = params.total;
         this.query = params.query;
+        this.selectedPopup = params.selectedPopup;
         this.downloadStarted = ko.observable(false);
         this.reportlink = ko.observable(false);
         this.format = ko.observable('tilecsv');

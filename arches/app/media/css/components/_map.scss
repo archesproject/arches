@@ -1,0 +1,23 @@
+.geojson-editor {
+    border: 1px solid #808080;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.geojson-error-list {
+    padding: 10px;
+    color: rgb(161, 0, 0);
+}
+
+#map-settings {
+    position: relative;
+    margin: -40px -35px 10px -20px;
+}
+
+.map-sidebar-text {
+    font-size: 1.2rem;
+}
+
+.workbench-card-container.map-container {
+    width: calc(100% - 75px);
+}

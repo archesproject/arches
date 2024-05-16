@@ -20,7 +20,7 @@
     </div>
     <div class="workbench-card-sidepanel-border"></div>
     <div class="workbench-card-sidepanel-body">
-    <div data-bind="css: card.model.cssclass">
+    <div data-bind="css: card.model.cssclass" style="height: 100%">
 
         <!-- ko if: reviewer && provisionalTileViewModel.selectedProvisionalEdit() -->
         <div class="edit-message-container" style="margin-left: -16px;">
@@ -47,7 +47,7 @@
 
 
 
-        <div class="new-provisional-edit-card-container">
+        <div class="new-provisional-edit-card-container" style="height: inherit">
             <!-- ko if: reviewer && provisionalTileViewModel.provisionaledits().length > 0 -->
             <!-- ko if: !provisionalTileViewModel.tileIsFullyProvisional() -->
             <div class='new-provisional-edits-list' style="margin-right: -20px">
@@ -101,7 +101,7 @@
                     <button class="btn btn-shim btn-labeled btn-lg fa fa-plus btn-mint" data-bind="css: {
                         disabled: geoJSONErrors().length !== 0
                     }, click: updateGeoJSON">
-                        <span data-bind="text: $root.translations.update"></span>
+                        <span data-bind="text: $root.translations.updateFeatures"></span>
                     </button>
                 </div>
                 <!-- ko if: geoJSONErrors().length !== 0 -->
@@ -142,7 +142,7 @@
                             data:card.widgets, as: 'widget'
                         }">
                         <!-- ko if: ko.unwrap(self.form.nodeLookup[widget.node_id()].datatype) === 'geojson-feature-collection' -->
-                        <div class="row widget-wrapper">
+                        <div class="row widget-wrapper" data-bind="class: self.componentCssClasses(widget)">
                             <div class="form-group">
                                 <label class="control-label widget-input-label" for="" data-bind="text:widget.label"></label>
                                 <i data-bind="css: {'ion-asterisk widget-label-required': self.form.nodeLookup[widget.node_id()].isrequired}"></i>
@@ -150,7 +150,7 @@
                                 <div class="col-xs-12">
                                     <div class="map-card-feature-list">
                                         <div class="add-new-feature">
-                                            <select 
+                                            <select
                                                 data-bind="
                                                     placeholder: $root.translations.addANewFeature + '...',
                                                     value: self.featureLookup[widget.node_id()].selectedTool,
@@ -291,7 +291,8 @@
                             "active": widget.selected,
                             "hover": widget.hovered,
                             "widget-preview": self.preview
-                        }, click: function(data, e) {
+                        }, class: self.componentCssClasses(widget),
+                        click: function(data, e) {
                             if (!widget.selected() && self.preview) widget.selected(true);
                         }, event: {
                             mouseover: function(){

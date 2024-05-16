@@ -17,17 +17,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
-from tests import test_settings
+from unittest.mock import Mock
 from tests.base_test import ArchesTestCase
 from rdflib import Namespace
 from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection, ActivityStreamCollectionPage
 
-# mocking libraries
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
+from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.models.models import ResourceInstance
 from arches.app.utils.skos import SKOSReader
-from mock import Mock
 from uuid import uuid4
 from itertools import cycle
 from datetime import datetime
@@ -97,6 +96,10 @@ class ActivityStreamCollectionTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+        cls.loadOntology()
+        LanguageSynchronizer.synchronize_settings_with_db()
+
         ResourceInstance.objects.all().delete()
 
         for skospath in ["tests/fixtures/data/rdf_export_thesaurus.xml", "tests/fixtures/data/rdf_export_collections.xml"]:
@@ -106,7 +109,7 @@ class ActivityStreamCollectionTests(ArchesTestCase):
 
         # Models
         for model_name in ["object_model", "document_model"]:
-            with open(os.path.join("tests/fixtures/resource_graphs/rdf_export_{0}.json".format(model_name)), "rU") as f:
+            with open(os.path.join("tests/fixtures/resource_graphs/rdf_export_{0}.json".format(model_name)), "r") as f:
                 archesfile = JSONDeserializer().deserialize(f)
             ResourceGraphImporter(archesfile["graph"])
 
@@ -127,4 +130,5 @@ class ActivityStreamCollectionTests(ArchesTestCase):
 
     def test_generate_page(self):
         collection_page = self.C.generate_page(page_1_uris, reversed([x for x in self.EF.get_events(10)]))
-        outtxt = collection_page.to_jsonld()
+        obj = collection_page.to_obj()
+        self.assertIn("id", obj["orderedItems"][0]["object"])

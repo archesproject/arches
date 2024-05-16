@@ -17,8 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% load static %}
 {% load i18n %}
-{% load compress %}
 {% load webpack_static from webpack_loader %}
+{% load render_bundle from webpack_loader %}
 
 <!DOCTYPE html>
 <!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
@@ -46,19 +46,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <link rel="apple-touch-icon" sizes="180x180" href="{% webpack_static 'favicons/apple-touch-icon-180x180.png' %}" />
 
     {% block css %}
-        {% compress css %}
-        <link type="text/x-scss" href="{% webpack_static 'css/arches.scss' %}" rel="stylesheet" media="screen, print">
-        <link type="text/x-scss" href="{% webpack_static 'css/core.scss' %}" rel="stylesheet" media="screen">
+        <!-- POC rough out of PrimeVue theme switcher -->
+        <link rel="stylesheet" href="{% webpack_static 'node_modules/primevue/resources/themes/mdc-light-indigo/theme.css' %}" />
+        {% render_bundle 'css/arches' 'css' %}
+        {% render_bundle 'css/core' 'css' %}
+
         {% if app_settings.ACTIVE_LANGUAGE_DIR == "rtl" %}
-        <link type="text/x-scss" href="{% webpack_static 'css/rtl.scss' %}" rel="stylesheet" media="screen, print">
+            {% render_bundle 'css/rtl' 'css' %}
         {% endif %}
+            
         {% if app_settings.ACCESSIBILITY_MODE %}
-        <link type="text/x-scss" href="{% webpack_static 'css/accessibility.scss' %}" rel="stylesheet" media="screen">
+            {% render_bundle 'css/accessibility' 'css' %}
         {% endif %}
-    	{% endcompress %}
-        <link href="{% webpack_static 'css/package.css' %}" rel="stylesheet">
-        <link href="{% webpack_static 'css/project.css' %}" rel="stylesheet">
-    {% endblock css%}
+        
+        {% render_bundle 'css/package' 'css' %}
+        {% render_bundle 'css/project' 'css' %}
+    {% endblock css %}
 
 </head>
 

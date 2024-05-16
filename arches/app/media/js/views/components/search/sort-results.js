@@ -14,7 +14,7 @@ define([
              
             BaseFilter.prototype.initialize.call(this, options);
 
-            this.filter = ko.observable('asc');
+            this.filter = ko.observable('');
             this.filters[componentName](this);
             
             this.filter.subscribe(function(){

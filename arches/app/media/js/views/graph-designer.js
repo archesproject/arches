@@ -27,7 +27,6 @@ define([
     var GraphDesignerView = BaseManagerView.extend({
         initialize: function(options) {
             var viewModel = options.viewModel;
-
             viewModel.graphid = ko.observable(data.graphid);
             viewModel.activeTab = ko.observable('graph');
             viewModel.viewState = ko.observable('design');
@@ -38,7 +37,9 @@ define([
             viewModel.sourceGraphPublicationDate = new Date(data['source_graph_publication']['published_time']).toLocaleString();
             viewModel.sourceGraphPublicationMostRecentEditDate = data['source_graph_publication_most_recent_edit'] ? new Date(data['source_graph_publication_most_recent_edit']['edit_time']).toLocaleString() : null;
             viewModel.ontologies = ko.observable(data['ontologies']);
-            viewModel.ontologyClasses = ko.observable(data['ontologyClasses']);
+            viewModel.ontologyClasses = ko.pureComputed(function(){
+                return data['ontologyClasses'].filter((cls) => cls.ontology_id === viewModel.graph.ontology_id());
+            });
             viewModel.cardComponents = data.cardComponents;
             viewModel.appliedFunctions = ko.observable(data['appliedFunctions']);
             viewModel.activeLanguageDir = ko.observable(arches.activeLanguageDir);
@@ -51,7 +52,22 @@ define([
             viewModel.shouldShowPublishModal = ko.observable(false);
             viewModel.shouldUpdateResourceInstanceData = ko.observable(false);
 
-            viewModel.hasDirtyWidget = ko.observable();
+            fetch(arches.urls.graph_is_active_api(data.graphid)).then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                else {
+                    viewModel.alert(new AlertViewModel(
+                        'ep-alert-red', 
+                        _("Could not obtain the Resource Model active status"),
+                        _('Please contact your System Administrator'),
+                        null,
+                        function(){},
+                    ));
+                }
+            }).then(responseJSON => {
+                viewModel.isGraphActive(responseJSON);
+            });
 
             viewModel.isGraphActive.subscribe(isGraphActive => {
                 $.ajax({
@@ -76,6 +92,8 @@ define([
                 });
             });
 
+            viewModel.hasDirtyWidget = ko.observable();
+
             viewModel.isDirty = ko.pureComputed(() => {
                 let isDirty = false;
 
@@ -86,6 +104,9 @@ define([
                     isDirty = true;
                 }
                 if (viewModel.graphSettingsViewModel && viewModel.graphSettingsViewModel.dirty()) {
+                    isDirty = true;
+                }
+                if (viewModel.selectedNode() && viewModel.selectedNode().dirty() && viewModel.selectedNode().istopnode == false) {
                     isDirty = true;
                 }
                 if (ko.unwrap(viewModel.cardTree.selection)) {
@@ -193,6 +214,10 @@ define([
                             window.location.reload();
                         });
                         viewModel.alert(alert);
+
+                        // set max z-index on card alert panel so user can acknowledge that graph has been updated && trigger page reload
+                        const cardAlertPanel = document.querySelector('#card-alert-panel');
+                        cardAlertPanel.style.zIndex = 2147483647;
                         
                         viewModel.graphPublicationNotes(null);
                         viewModel.shouldShowPublishModal(false);
@@ -290,11 +315,14 @@ define([
                             window.location.reload();
                         });
                         viewModel.alert(alert);
+
+                        // set max z-index on card alert panel so user can acknowledge that graph has been updated && trigger page reload
+                        const cardAlertPanel = document.querySelector('#card-alert-panel');
+                        cardAlertPanel.style.zIndex = 2147483647;
                         
                         viewModel.shouldShowUpdatePublishedGraphsButton(false);
                         viewModel.graphPublicationNotes(null);
                         viewModel.shouldShowPublishModal(false);
-                        viewModel.loading(false);
                     }
                 });
             };
@@ -419,6 +447,21 @@ define([
 
             viewModel.selectedNode = viewModel.graphModel.get('selectedNode');
             viewModel.updatedCardinalityData = ko.observable();
+
+            // ctrl+S to save any edited/dirty nodes 
+            var keyListener = function(e) {
+                if (e.ctrlKey && e.key === "s") {
+                    e.preventDefault();
+                    if (viewModel.isNodeDirty() || viewModel.graphSettingsViewModel.dirty()) {
+                        viewModel.saveSelectedNode();
+                    }
+                }
+            };
+            document.addEventListener("keydown", keyListener)
+            // dispose of eventlistener
+            this.dispose = function(){
+                document.removeEventListener("keydown", keyListener);
+            };
 
             viewModel.saveNode = function(node) {
                 if (node) {

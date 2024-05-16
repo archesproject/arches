@@ -12,12 +12,10 @@ class ExcelWriter(TileCsvWriter):
         super(TileCsvWriter, self).__init__(**kwargs)
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
-        super(TileCsvWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
+        writer = TileCsvWriter()
+        csv_files = writer.write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
+        writer.set_file_name()
 
-        if graph_id:
-            csv_files = TileCsvWriter().write_resources(graph_id=graph_id)
-        else:
-            csv_files = TileCsvWriter().write_resources(resourceinstanceids=resourceinstanceids)
         wb = Workbook()
 
         for csv_file in csv_files:
@@ -33,6 +31,6 @@ class ExcelWriter(TileCsvWriter):
         wb.save(virtual_workbook)
 
         excel_file_for_export = []
-        excel_file_for_export.append({"name": self.file_name + ".xlsx", "outputfile": wb})
+        excel_file_for_export.append({"name": writer.file_name + ".xlsx", "outputfile": wb})
 
         return excel_file_for_export

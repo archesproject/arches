@@ -27,12 +27,14 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.search.search_engine_factory import SearchEngineFactory
 
 # these tests can be run from the command line via
-# python manage.py test tests/importer/concept_import_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.importer.concept_import_tests --settings="tests.test_settings"
 
 
 class conceptImportTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         se = SearchEngineFactory().create()
         se.delete_index(index="terms,concepts")
         se.create_index(index="terms,concepts")
@@ -43,6 +45,8 @@ class conceptImportTests(ArchesTestCase):
         se = SearchEngineFactory().create()
         se.delete_index(index="terms,concepts")
         se.create_index(index="terms,concepts")
+
+        super().tearDownClass()
 
     # def test_hierarchical_relationships(self):
     #   result = JSONDeserializer().deserialize(JSONSerializer().serialize(Concept().get(id='09bf4b42-51a8-4ff2-9210-c4e4ae0e6755', include_subconcepts=True, depth_limit=1)))

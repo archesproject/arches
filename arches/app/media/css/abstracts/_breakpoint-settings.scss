@@ -1,10 +1,18 @@
 // Name your breakpoints in a way that creates a ubiquitous language
 // across team members. It will improve communication between
 // stakeholders, designers, developers, and testers.
+
+// ----mobile-small|----mobile-portrait|-----mobile|---mobile-max|tablet-----tablet-max|small-desktop-----small-desktop-max|desktop-lg------|wide----
+
 $breakpoints: (
-    mobile: (min-width: 320px),
+    mobile-small: (max-width: 320px),
+    mobile-portrait: (max-width: 385px),
+    mobile: (max-width: 450px),
+    mobile-max: (max-width: 740px),
     tablet: (min-width: 740px),
-    desktop: (min-width: 915px),
+    tablet-max: (max-width: 915px),
+    small-desktop: (min-width: 915px),
+    small-desktop-max: (max-width: 1024px),
+    desktop-lg: (min-width: 1024px),
     wide: (min-width: 1300px),
-    //mobileLandscape: 480px,
 );

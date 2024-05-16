@@ -77,11 +77,12 @@
     </div>
 
     <div data-bind="if: showModeSelector" style="width: 96%; margin: 20px 0px;">
-        <input class="form-control input-lg widget-input"
-            data-bind="value: imageToolSelector,
+        <select class="form-control input-lg widget-input"
+            data-bind="
             select2Query: {
                 select2Config: imageToolConfig
             }">
+        </select>
     </div>
 
     <div class="iiif-image-tool-slider">
@@ -192,11 +193,12 @@
     <div class="iiif-leaflet" data-bind="leaflet: leafletConfig">
         <div class="split-controls left" data-bind="if: secondaryCanvas">
             <div style="width: 200px">
-                <input class="form-control input-lg widget-input"
-                    data-bind="value: canvas(),
+                <select class="form-control input-lg widget-input"
+                    data-bind="
                     select2Query: {
                         select2Config: leftSideSelectConfig
                     }">
+                </select>
             </div>
             <div class="button" data-bind="click: imagePropertyUpdate.bind($data,'left')">
                 <i class="fa fa-picture-o"></i>
@@ -204,11 +206,12 @@
         </div>
         <div class="split-controls right" data-bind="if: secondaryCanvas">
             <div style="width: 200px;">
-                <input class="form-control input-lg widget-input"
-                    data-bind="value: secondaryCanvas(),
+                <select class="form-control input-lg widget-input"
+                    data-bind="
                     select2Query: {
                         select2Config: rightSideSelectConfig
                     }">
+                </select>
             </div>
             <div class="button" data-bind="click: imagePropertyUpdate.bind($data,'right')">
                 <i class="fa fa-picture-o"></i>
@@ -328,7 +331,7 @@
                 <dd class="manifest-metadata-value" data-bind="html: $data"></dd>
                 <!--/ko -->
             </div>
-            <h4 class="manifest-attribution-key" data-bind="text: manifestAttribution"></h4>
+            <h4 class="manifest-attribution-key" data-bind="html: manifestAttribution"></h4>
             <!-- ko if: showLogo -->
             <img class="manifest-logo" data-bind="attr: {src: manifestLogo()}">
             <!-- /ko -->
@@ -341,11 +344,11 @@
                 <span data-bind="text: $root.translations.selectAManifest + ':'"></span>
             </div>
             <div class="manifest-editor-input">
-                <input class="form-control input-lg widget-input"
-                    data-bind="value: manifest,
-                    select2Query: {
+                <select class="form-control input-lg widget-input"
+                    data-bind="select2Query: {
                         select2Config: manifestSelectConfig
                     }">
+                </select>
             </div>
 
             <div class="install-buttons">

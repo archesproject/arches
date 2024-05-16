@@ -1,4 +1,4 @@
-define(['knockout', 'arches'], function(ko, arches) {
+define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
     var ontologyUtils = {
         /**
          * makeFriendly - makes a shortened name from an fully qalified name
@@ -24,10 +24,8 @@ define(['knockout', 'arches'], function(ko, arches) {
                 closeOnSelect: true,
                 allowClear: allowClear || false,
                 ajax: {
-                    url: function() {
-                        return arches.urls.ontology_properties;
-                    },
-                    data: function(term, page) {
+                    url: arches.urls.ontology_properties,
+                    data: function(requestParams) {
                         var data = {
                             'domain_ontology_class': domain,
                             'range_ontology_class': range,
@@ -37,25 +35,36 @@ define(['knockout', 'arches'], function(ko, arches) {
                     },
                     dataType: 'json',
                     quietMillis: 250,
-                    results: function(data, page, query) {
+                    processResults: function(data, params) {
                         var ret = data;
-                        if(query.term !== ""){
+                        if(!!params.term && params.term !== ""){
                             ret = data.filter(function(item){
-                                return item.toUpperCase().includes(query.term.toUpperCase());
+                                return item.toUpperCase().includes(params.term.toUpperCase());
                             });
                         }
+                        ret = ret.map((item) => {
+                            return {id: item, text: item};
+                        });
                         return {
                             results: ret
                         };
                     }
                 },
-                id: function(item) {
-                    return item;
+                templateResult: function(item) {
+                    return ontologyUtils.makeFriendly(item.text);
                 },
-                formatResult: ontologyUtils.makeFriendly,
-                formatSelection: ontologyUtils.makeFriendly,
+                templateSelection: function(item) {
+                    return ontologyUtils.makeFriendly(item.text);
+                },
                 initSelection: function(el, callback) {
-                    callback(value());
+                    if(!!value()){
+                        var data = {id: value(), text: value()};
+                        var option = new Option(data.text, data.id, true, true);
+                        $(el).append(option);
+                        callback([data]);
+                    }else{
+                        callback([]);
+                    }
                 }
             };
         }

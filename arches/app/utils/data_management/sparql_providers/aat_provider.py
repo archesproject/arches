@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import urllib.request, urllib.error, urllib.parse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.models.models import DValueType
 from arches.app.models.concept import Concept, ConceptValue
 from arches.app.models.system_settings import settings

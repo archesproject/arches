@@ -1,28 +1,23 @@
 {% load i18n %}
 <!-- ko if: $data.search -->
 <div class="col-md-4 col-lg-3">
-    <select 
-        class="resources" 
-        tabindex="0" 
-        style="display: none;" 
-        data-bind="
-            value: op, 
-            chosen: {width: '100%', disable_search_threshold: 15},
-            optionsText: 'text',
-            optionsValue: 'value',
-            options: [
-                { text: $root.translations.overlaps, value: 'overlaps' },
-                { text: '=', value: 'eq' },
-                { text: '&gt;', value: 'gt' },
-                { text: '&lt;', value: 'lt' },
-                { text: '&ge;', value: 'gte' },
-                { text: '&le;', value: 'lte' },
-                { text: $root.translations.hasNoValue, value: 'null' },
-                { text: $root.translations.hasAnyValue, value: 'not_null' },
-            ],
-            attr: {'aria-label': $root.translations.searchCriteria},
-        "
-    ></select>
+    <select class="resources" data-bind="
+        attr: {'data-label': node.label},
+        select2Query: {
+            select2Config:{
+                data: [
+                    { text: $root.translations.overlaps, id: 'overlaps' },
+                    { text: '=', id: 'eq' },
+                    { text: '&gt;', id: 'gt' },
+                    { text: '&lt;', id: 'lt' },
+                    { text: '&ge;', id: 'gte' },
+                    { text: '&le;', id: 'lte' },
+                    { text: $root.translations.hasNoValue, id: 'null' },
+                    { text: $root.translations.hasAnyValue, id: 'not_null' },
+                ],
+                value: op
+        }}">
+    </select>
 </div>
 <div class="col-md-8 col-lg-9" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
     <input 
@@ -30,7 +25,7 @@
         class="form-control input-lg" 
         style="height: 36px;" 
         data-bind="
-            attr: {placeholder: $root.translations.name, 'aria-label': $root.translations.name},
+            attr: {placeholder: $root.translations.value, 'aria-label': node.label},
             textInput: searchValue
         "
     >

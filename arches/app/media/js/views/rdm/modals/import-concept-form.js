@@ -36,9 +36,9 @@ define(['jquery', 'backbone', 'arches', 'models/concept'], function($, Backbone,
                     return formatedresult;
                 },
                 escapeMarkup: function(m) { return m; }
-            }).on("select2-selecting", function(e, el) {
-                self.trigger("select2-selecting", e, el);
-                self.$el.find("[name=concept_identifiers]").val(e.val);
+            }).on("select2:selecting", function(e) {
+                self.trigger("select2:selecting", e);
+                self.$el.find("[name=concept_identifiers]").val(e.params.args.data.id);
             });      
 
             this.modal = this.$el.find('form');

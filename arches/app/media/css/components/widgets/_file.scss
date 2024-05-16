@@ -29,10 +29,10 @@
 .dz-previews .file-upload-card {
     border-bottom: 1px solid #D3E5F4;
     border-radius: 2px;
-    padding: 7px 8px 5px 15px;
+    padding: 7px 8px 10px 15px;
     background: #fff;
     color: #666;
-    height: 50px;
+    height: 100%;
 }
 
 .dz-previews .file-upload-card:nth-child(odd) {
@@ -55,7 +55,7 @@
 
 .btn-file-upload-reset {
     color: #489EED;
-    font-size: 12px;
+    font-size: 1.2rem;
 }
 
 .file-upload-card-detail-right {
@@ -70,7 +70,7 @@
 
 .btn-file-upload-limit {
     color: #489EED;
-    font-size: 12px;
+    font-size: 1.2rem;
     float: left;
 }
 
@@ -83,7 +83,6 @@
 .file-upload-footer {
     background: #f1f1f1;
     color: rgb(89, 56, 255);
-    ;
     display: flex;
     justify-content: left;
     align-items: center;
@@ -99,4 +98,23 @@
 .file-select h2,
 .file-select-h2 {
     font-weight: 400;
+}
+
+.file-metadata {
+    padding-top: 8px;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.form-group .file-metadata input {
+    max-width: unset;
+}
+
+.rp-report-tile dt.first, 
+.rp-report-tile dd.first {
+    margin-top: 40px !important;
+
+    &:first-of-type {
+        margin-top: 0px !important;
+    }
 }

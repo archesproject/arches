@@ -4,6 +4,7 @@ define([
     'underscore',
     'arches',
     'views/tree-view',
+    'bindings/clipboard',
 ], function($, ko, _, arches, TreeView) {
     var loading = ko.observable(false);
 
@@ -73,6 +74,7 @@ define([
             this.toggleIds = function() {
                 self.showIds(!self.showIds());
             };
+            this.translations = arches.translations;
             this.showGrid = ko.observable(false);
             this.activeLanguageDir = ko.observable(arches.activeLanguageDir);
             TreeView.prototype.initialize.apply(this, arguments);
@@ -228,8 +230,8 @@ define([
 
         beforeMove: function(e) {
             if (
-                e.sourceParent!==e.targetParent
-                || e.item.is_immutable && !e.item.isCollector() 
+                e.sourceParent !== e.targetParent
+                || (e.item.is_immutable && !e.item.isCollector())
                 || !Boolean(e.item.graph.attributes.source_identifier_id)
             ) {
                 e.cancelDrop = true;
@@ -273,6 +275,7 @@ define([
         toggleGrid: function(){
             this.showGrid(!this.showGrid());
         }
+
     });
     return GraphTree;
 });

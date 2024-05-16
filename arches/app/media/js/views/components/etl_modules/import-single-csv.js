@@ -14,13 +14,11 @@ define([
 ], function(ko, koMapping, $, dropzone, uuid, arches, JsonErrorAlertViewModel, importSingleCSVTemplate) {
     const viewModel = function(params) {
         const self = this;
-
-        this.load_details = params.load_details;
+        this.loadDetails = params.load_details || ko.observable();
         this.state = params.state;
         this.loading = params.loading || ko.observable();
         this.alert = params.alert;
         this.moduleId = params.etlmoduleid;
-        this.loading(true);
         this.graphs = ko.observable();
         this.selectedGraph = ko.observable();
         this.nodes = ko.observable();
@@ -48,10 +46,16 @@ define([
         });
 
         this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
+        this.editHistoryUrl = `${arches.urls.edit_history}?transactionid=${ko.unwrap(params.selectedLoadEvent)?.loadid}`;
         this.validationErrors = params.validationErrors || ko.observable();
         this.validated = params.validated || ko.observable();
         this.getErrorReport = params.getErrorReport;
         this.getNodeError = params.getNodeError;
+        this.formatTime = params.formatTime;
+        this.timeDifference = params.timeDifference;
+        this.ready = ko.computed(() => {
+            return self.selectedGraph() && self.fieldMapping().find((mapping) => mapping.node());
+        });
 
         this.createTableConfig = function(col) {
             return {
@@ -186,6 +190,7 @@ define([
         };
 
         this.write = function(){
+            if (!self.ready()) { return; }
             const fieldnames = koMapping.toJS(self.fieldMapping).map(fieldname => {return fieldname.node;});
             const fieldMapping = koMapping.toJS(self.fieldMapping);
             self.formData.append('fieldnames', fieldnames);
@@ -209,8 +214,9 @@ define([
                             function(){}
                         )
                     );
-                }
-                );
+                }).always(() => {
+                    self.loading(false);
+                });
             }).fail(error => console.log(error.responseJSON.data));
         };
 

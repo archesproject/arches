@@ -17,7 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 
 class Dsl(object):
@@ -98,10 +98,10 @@ class Query(Dsl):
             return self.se.search(index=index, scroll=self.scroll, **self.dsl)
 
     def count(self, index="", **kwargs):
-        return self.se.count(index=index, body=self.dsl)
+        return self.se.count(index=index, **self.dsl)
 
     def delete(self, index="", **kwargs):
-        return self.se.delete(index=index, body=self.dsl, **kwargs)
+        return self.se.delete(index=index, query=self.dsl, **kwargs)
 
     def prepare(self, scroll=False):
         if self.scroll is None:
@@ -398,6 +398,28 @@ class Wildcard(Dsl):
         self.case_insensitive = kwargs.pop("case_insensitive", True)
 
         self.dsl = {"wildcard": {self.field: {"value": self.query, "case_insensitive": self.case_insensitive}}}
+
+
+class Regex(Dsl):
+    """
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html
+
+    """
+
+    def __init__(self, **kwargs):
+        self.field = kwargs.pop("field", "_all")
+        self.query = kwargs.pop("query", "")
+        self.case_insensitive = kwargs.pop("case_insensitive", True)
+
+        self.dsl = {
+            "regexp": {
+                self.field: {
+                    "value": self.query,
+                    "flags": "ALL",
+                    "case_insensitive": self.case_insensitive
+                }
+            }
+        }
 
 
 class Prefix(Dsl):

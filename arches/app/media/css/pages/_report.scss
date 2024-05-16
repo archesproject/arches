@@ -1,0 +1,45 @@
+@import "abstracts/functions";
+
+.resource-report-abstract-container {
+    .resource-component-abstract {
+        height: calc(100vh - 100px);
+        overflow-y: auto;
+        .report-title-bar {
+            .report-toolbar-title {
+                @include break-at(small-desktop-max) {
+                    min-width: 0;
+                    width: auto;
+                    padding: 14px 0 5px 5px;
+                }
+                .report-print-date {
+                    font-size: 1.2rem;
+                }
+            }
+        }
+    }
+}
+
+.report-toolbar-preview {
+    @include break-at(tablet-max) {
+        height: auto;
+    }
+    &.ep-form-toolbar {
+        @include break-at(tablet-max) {
+            display: block;
+        }
+        .report-toolbar-title {
+            @include break-at(tablet-max) {
+                width: 100%;
+            }
+        }
+        .ep-form-toolbar-tools {
+            @include break-at(tablet-max) {
+                padding: 0 0 14px 25px;
+                align-items: flex-start;
+            }
+            .report-print-date {
+                font-size: 1.2rem;
+            }
+        }
+    }   
+}

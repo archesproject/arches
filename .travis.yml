@@ -61,7 +61,7 @@ jobs:
       python: 3.9
       script:
         - wait-on http://localhost:9200/
-        - python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+        - python manage.py test tests --settings="tests.test_settings"
     - name: "Javascript - Cypress.io tests"
       install:
         - yarn --cwd arches/install install

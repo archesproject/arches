@@ -9,11 +9,13 @@ define([
     'viewmodels/alert',
     'views/provisional-history-list',
     'views/notifications-list',
+    'utils/aria',
+    'utils/back-to-top',
     'bindings/scrollTo',
     'bootstrap',
     'bindings/slide',
     'jquery-ui',
-], function($, _, Backbone, ko, moment, arches, viewData, AlertViewModel, ProvisionalHistoryList, NotificationsList) {
+], function($, _, Backbone, ko, moment, arches, viewData, AlertViewModel, ProvisionalHistoryList, NotificationsList, ariaUtils, backToTop) {
     /**
     * A backbone view representing a basic page in arches.  It sets up the
     * viewModel defaults, optionally accepts additional view model data and
@@ -43,6 +45,8 @@ define([
             this.viewModel.helploaded = ko.observable(false);
             this.viewModel.helploading = ko.observable(false);
             this.viewModel.helpOpen = ko.observable(false);
+            this.viewModel.editsOpen = ko.observable(false);
+            this.viewModel.notifsOpen = ko.observable(false);
             this.viewModel.provisionalHistoryList = new ProvisionalHistoryList({
                 items: ko.observableArray(),
                 helploading: this.viewModel.helploading
@@ -64,6 +68,9 @@ define([
                 dirty: ko.observable(false),
                 showConfirmNav: ko.observable(false),
                 navDestination: ko.observable(''),
+                handleEscKey: ariaUtils.handleEscKey,
+                shiftFocus: ariaUtils.shiftFocus,
+                backToTopHandler: backToTop.backToTopHandler,
                 urls: arches.urls,
                 navigate: function(url, bypass) {
                     if (!bypass && self.viewModel.dirty()) {
@@ -87,6 +94,7 @@ define([
                 getHelp: function(template) {
                     self.viewModel.helploading(true);
                     var el = document.createElement('div');
+                    $('.ep-help-content').empty();
                     $('.ep-help-content').append(el);
                     $.ajax({
                         type: "GET",
@@ -106,6 +114,14 @@ define([
                                 iconEl.addClass("fa-chevron-right");
                             }
                             var contentEl = $(sectionEl).find('.ep-help-topic-content').first();
+                            let contentExpanded = contentEl.css('display');
+                            if (contentExpanded) {
+                                if (contentExpanded === 'none') {
+                                    $(this).attr('aria-expanded', 'true');
+                                } else if (contentExpanded === 'block') {
+                                    $(this).attr('aria-expanded', 'false');
+                                }
+                            }
                             contentEl.slideToggle();
                         });
                         $(el).find('.reloadable-img').click(function(){
@@ -113,16 +129,42 @@ define([
                         });
                     });
                 },
-                closeHelp: function() {
-                    var el = $('.ep-help-content');
-                    el.empty();
-                },
                 getProvisionalHistory: function() {
                     self.viewModel.provisionalHistoryList.updateList();
                 },
                 getNotifications: function() {
                     self.viewModel.notifsList.updateList();
-                }
+                },
+                openNotifs: function(openButton, escListenScope, closeButton) {
+                    self.viewModel.getNotifications();
+                    self.viewModel.notifsOpen(!(self.viewModel.notifsOpen()));
+                    setTimeout(() => {self.viewModel.handleEscKey(openButton, escListenScope, closeButton)}, 500);
+                },
+                openEdits: function(openButton, escListenScope, closeButton) {
+                    self.viewModel.getProvisionalHistory();
+                    self.viewModel.editsOpen(!(self.viewModel.editsOpen()));
+                    setTimeout(() => {self.viewModel.handleEscKey(openButton, escListenScope, closeButton)}, 500);
+                },
+                openHelp: function(helpTemplates, openButton, escListenScope, closeButton) {
+                    helpTemplates.forEach(template => self.viewModel.getHelp(template));
+                    self.viewModel.helpOpen(!(self.viewModel.helpOpen()));
+                    setTimeout(() => {self.viewModel.handleEscKey(openButton, escListenScope, closeButton)}, 500);
+                },
+                closeNotifs: function() {
+                    self.viewModel.getNotifications();
+                    self.viewModel.notifsOpen(false);
+                    self.viewModel.shiftFocus('#ep-notifs-button');
+                },
+                closeEdits: function() {
+                    self.viewModel.editsOpen(false);
+                    self.viewModel.shiftFocus('#ep-edits-button');
+                },
+                closeHelp: function() {
+                    let el = $('.ep-help-content');
+                    el.empty();
+                    self.viewModel.helpOpen(false);
+                    self.viewModel.shiftFocus('#ep-help-button');
+                },
             });
             self.viewModel.notifsList.items.subscribe(function(list) {
                 self.viewModel.unreadNotifs((list.length > 0));
@@ -141,15 +183,10 @@ define([
         initialize: function() {
             ko.applyBindings(this.viewModel);
             this.viewModel.getNotifications();
+
             $('[data-toggle="tooltip"]').tooltip();
 
-            $('.ep-edits-toggle').click(function(){
-                $('#ep-edits-panel').toggle('slide', { direction: 'right' });
-            });
-
-            $('.ep-notifs-toggle').click(function(){
-                $('#ep-notifs-panel').toggle('slide', { direction: 'right' });
-            });
+            backToTop.scrollToTopHandler();
         }
     });
     return PageView;

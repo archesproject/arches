@@ -257,9 +257,9 @@
                 <div class='new-provisional-edits-title'>
                     <span data-bind="text: $root.translations.provisionalEdits"></span>
                 </div>
-                <div 
-                    class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all" 
-                    style="padding: 3px;" 
+                <div
+                    class="btn btn-shim btn-danger btn-labeled btn-xs fa fa-trash new-provisional-edits-delete-all"
+                    style="padding: 3px;"
                     data-bind="click: function(){provisionalTileViewModel.deleteAllProvisionalEdits()}"
                 >
                     <span data-bind="text: $root.translations.deleteAllEdits"></span>
@@ -291,7 +291,7 @@
 
                 <!-- ko if: card.model.helpenabled -->
                 <span>
-                    <a data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;"> 
+                    <a data-bind="click: function () {card.model.get('helpactive')(true) }" style="cursor:pointer;">
                         <span data-bind="text: $root.translations.help"></span>
                         <i class="fa fa-question-circle"></i>
                     </a>
@@ -333,7 +333,9 @@
                         }
                     }, css:{ "active": widget.selected, "hover": widget.hovered, "widget-preview": self.preview
                 }, click: function(data, e) { if (!widget.selected() && self.preview) {widget.selected(true);}
-            }, event: { mouseover: function(){ if (self.preview){widget.hovered(true) } }, mouseout: function(){ if (self.preview){widget.hovered(null)} } }, visible: widget.visible'></div>
+            }, event: { mouseover: function(){ if (self.preview){widget.hovered(true) } },
+            mouseout: function(){ if (self.preview){widget.hovered(null)} } }, visible: widget.visible,
+            class: self.componentCssClasses(widget)'></div>
                 </div>
             </form>
             {% endblock form_widgets %}
@@ -389,8 +391,8 @@
             {% block form_buttons %}
             <div class="install-buttons">
                 <!-- ko if: tile.tileid && self.deleteTile -->
-                <button 
-                    class="btn btn-shim btn-labeled btn-lg fa fa-trash" 
+                <button
+                    class="btn btn-shim btn-labeled btn-lg fa fa-trash"
                     data-bind="click: self.deleteTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-warning': card.isWritable }"
                 >
                     <span data-bind="text: $root.translations.deleteThisRecord"></span>
@@ -410,7 +412,7 @@
                     </button>
                     <!-- /ko -->
                 <!-- /ko -->
-                
+
                 <!-- ko if: !tile.tileid && !showChildCards() -->
                 <button class="btn btn-shim btn-labeled btn-lg fa fa-plus" data-bind="click: self.saveTile, css: {disabled: (!card.isWritable && !self.preview), 'btn-mint': card.isWritable }">
                     <span data-bind="text: $root.translations.add"></span>

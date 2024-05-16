@@ -3,20 +3,26 @@ import copy
 from arches.app.models.system_settings import settings
 from arches.app.utils import import_class_from_string
 from django.utils.translation import gettext_lazy as _
+from django.db.migrations.serializer import BaseSerializer, Serializer
 from django.db.models import JSONField
+from django.db.models.functions.comparison import Cast
 from django.db.models.sql.compiler import SQLInsertCompiler
+from django.db.models.sql.where import NothingNode
 from django.utils.translation import get_language
 
 
-class I18n_String(object):
+class I18n_String(NothingNode):
+    """Subclassing NothingNode works around https://code.djangoproject.com/ticket/34745."""
+
     def __init__(self, value=None, lang=None, use_nulls=False, attname=None):
         self.attname = attname
         self.value = value
+        self.use_nulls = use_nulls
         self.raw_value = {}
         self.value_is_primitive = False
         self.lang = get_language() if lang is None else lang
 
-        self._parse(self.value, self.lang, use_nulls)
+        self._parse(self.value, self.lang, self.use_nulls)
 
     def _parse(self, value, lang, use_nulls):
         ret = {}
@@ -212,8 +218,13 @@ class I18n_TextField(JSONField):
 
         return I18n_String(value, attname=self.attname, use_nulls=self.use_nulls)
 
+    def get_db_prep_save(self, value, connection):
+        """Override to avoid the optimization from Django 4.2 that
+        immediately returns `value` if it is None."""
+        return self.get_db_prep_value(value, connection)
 
-class I18n_JSON(object):
+
+class I18n_JSON(NothingNode):
     def __init__(self, value=None, lang=None, use_nulls=False, attname=None):
         self.attname = attname
         self.value = value
@@ -227,6 +238,17 @@ class I18n_JSON(object):
     def _parse(self, value, lang, use_nulls):
         ret = {}
 
+        if isinstance(value, Cast):
+            # Django 4.2 regression: bulk_update() sends Cast expressions
+            # https://code.djangoproject.com/ticket/35167
+            values = set(case.result.value for case in value.source_expressions[0].cases)
+            value = list(values)[0]
+            if len(values) > 1:
+                # Prevent silent data loss.
+                raise NotImplementedError(
+                    "Heterogenous values provided to I18n_JSON field bulk_update():\n"
+                    f"{tuple(str(v) for v in values)}"
+                )
         if isinstance(value, str):
             try:
                 ret = json.loads(value)
@@ -238,6 +260,8 @@ class I18n_JSON(object):
             ret = value.raw_value
         elif isinstance(value, dict):
             ret = value
+        else:
+            raise TypeError(value)
         self.raw_value = ret
 
         if "i18n_properties" in self.raw_value:
@@ -397,3 +421,20 @@ class I18n_JSONField(JSONField):
         """
 
         return I18n_JSON(value, attname=self.attname)
+
+    def get_db_prep_save(self, value, connection):
+        """Override to avoid the optimization from Django 4.2 that
+        immediately returns `value` if it is None."""
+        return self.get_db_prep_value(value, connection)
+
+
+# Register a lighter-weight serializer sufficient for generating migrations.
+class I18NFieldMigrationSerializer(BaseSerializer):
+    def serialize(self):
+        if isinstance(self.value, (I18n_String, I18n_JSONField)):
+            return f'"{self.value.serialize()}"', set()
+        return super().serialize()
+
+
+Serializer.register(I18n_String, I18NFieldMigrationSerializer)
+Serializer.register(I18n_JSONField, I18NFieldMigrationSerializer)

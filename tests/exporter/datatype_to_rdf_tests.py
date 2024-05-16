@@ -17,11 +17,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
-from mock import Mock
+from unittest.mock import Mock
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
+from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.utils.skos import SKOSReader
 from arches.app.models.models import ResourceInstance
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -30,7 +31,7 @@ from rdflib.namespace import RDF, RDFS, XSD
 from django.utils import translation
 
 # these tests can be run from the command line via
-# python manage.py test tests/exporter/datatype_to_rdf_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.exporter.datatype_to_rdf_tests --settings="tests.test_settings"
 
 ARCHES_NS = Namespace(test_settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 CIDOC_NS = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
@@ -43,6 +44,10 @@ class RDFExportUnitTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+        cls.loadOntology()
+        LanguageSynchronizer.synchronize_settings_with_db()
+
         ResourceInstance.objects.all().delete()
 
         for skospath in ["tests/fixtures/data/rdf_export_thesaurus.xml", "tests/fixtures/data/rdf_export_collections.xml"]:
@@ -52,17 +57,13 @@ class RDFExportUnitTests(ArchesTestCase):
 
         # Models
         for model_name in ["object_model", "document_model"]:
-            with open(os.path.join("tests/fixtures/resource_graphs/rdf_export_{0}.json".format(model_name)), "rU") as f:
+            with open(os.path.join("tests/fixtures/resource_graphs/rdf_export_{0}.json".format(model_name)), "r") as f:
                 archesfile = JSONDeserializer().deserialize(f)
             ResourceGraphImporter(archesfile["graph"])
 
     def setUp(self):
         # for RDF/JSON-LD export tests
         self.DT = DataTypeFactory()
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
 
     # test_rdf_* - * = datatype (rdf fragment) or full graph
 
@@ -182,7 +183,7 @@ class RDFExportUnitTests(ArchesTestCase):
         edge.rangenode.ontologyclass = CIDOC_NS["E55_Type"]
 
         graph = dt.to_rdf(edge_info, edge)
-        print(graph.serialize(format="ttl"))
+        # print(graph.serialize(format="ttl"))
         self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, URIRef("http://vocab.getty.edu/aat/300047196")) in graph)
         self.assertTrue((URIRef("http://vocab.getty.edu/aat/300047196"), RDFS.label, Literal("junk sculpture")) in graph)
 

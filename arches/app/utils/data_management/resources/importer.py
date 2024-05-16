@@ -110,7 +110,7 @@ class BusinessDataImporter(object):
                 if isfile(join(path)):
                     self.file_format = os.path.splitext(file[0])[1].strip(".")
                     if self.file_format == "json":
-                        with open(file[0], "rU") as f:
+                        with open(file[0], "r") as f:
                             archesfile = JSONDeserializer().deserialize(f)
                             if "graph" in list(archesfile.keys()):
                                 self.graphs = archesfile["graph"]
@@ -205,7 +205,7 @@ class BusinessDataImporter(object):
                     business_data, mapping=mapping, overwrite=overwrite, prevent_indexing=prevent_indexing, transaction_id=transaction_id
                 )
             elif file_format == "jsonl":
-                with open(self.file[0], "rU") as openf:
+                with open(self.file[0], "r") as openf:
                     lines = openf.readlines()
                     if use_multiprocessing is True:
                         pool = Pool(cpu_count())
@@ -236,7 +236,7 @@ class BusinessDataImporter(object):
                     print("*" * 80)
                     print(
                         f"ERROR: No mapping file detected for {self.file[0]}. Please indicate one \
-                        with the '-c' paramater or place one in the same directory as your business data."
+                        with the '-c' parameter or place one in the same directory as your business data."
                     )
                     print("*" * 80)
 

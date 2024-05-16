@@ -1,0 +1,344 @@
+@import "abstracts/functions";
+
+article.main-search-container {
+    @include break-at(mobile-max) {
+        height: 100%;
+        overflow-x: hidden;
+    }
+    @include break-at(small-desktop-max) {
+        flex-direction: column;
+        overflow-x: hidden;
+    }
+    .search-results-panel {
+        @include break-at(small-desktop-max) {
+            max-width: calc(100vw - 50px);
+        }
+        .search-tools-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            @include break-at(small-desktop-max) {
+                width: 100%;
+            }
+            @include break-at(mobile-small) {
+                height: auto;
+            }
+            .clear-filter {
+                @include break-at(mobile-max) {
+                    width: auto;
+                }
+                span {
+                    @include break-at(mobile-max) {
+                        text-wrap: wrap;
+                        line-height: 13px;
+                        padding: 0;
+                    }
+                }
+            }
+        }
+        .search-control-container {
+            @include break-at(small-desktop-max) {
+                overflow-y: auto;
+            }
+            @include break-at(small-desktop-max) {
+                flex: 1;
+            }
+            .search-results-container {
+                @include break-at(small-desktop-max) {
+                    width: 100%;
+                }
+                @include break-at(mobile-max) {
+                    padding: 10px 10px 20px 10px;
+                    overflow-y: auto;
+                }
+                .search-listing {
+                    @include break-at(small-desktop-max) {
+                        width: 100%;
+                    }
+                }
+            }
+        }
+    }
+    .search-map-container {
+        flex-direction: column;
+        @include break-at(small-desktop-max) {
+            width: calc(100vw - 50px);
+        }
+        .search-toolbar {
+            display: -webkit-flex;
+            display: flex;
+            width: 100%;
+            height: 51px;
+            background: #f4f4f4;
+            border-bottom: solid 1px #bbd1ea;
+            @include break-at(small-desktop-max) {
+                border-top: solid 1px #bbd1ea;
+                height: auto;
+            }
+            @include break-at(mobile-max) {
+                flex-direction: column;
+                height: 52px;
+            }
+            @include break-at(mobile) {
+                height: auto;
+                flex-direction: row;
+            }
+            @include break-at(mobile-portrait){
+                flex-direction: column;
+            }
+            .search-type-btn-panel {
+                @include break-at(small-desktop-max) {
+                    margin-left: 5px;
+                    height: auto;
+                }
+                @include break-at(mobile-portrait) {
+                    display: flex;
+                    justify-content: center;
+                }
+                .search-type-btn {
+                    @include break-at(small-desktop-max) {
+                        height: 20px;
+                        border-top: 1px solid #d8d8d8;
+                        border-bottom: 1px solid #d8d8d8;
+                        margin: 5px 2px;
+                        min-width: 69px;
+                    }
+                    @include break-at(mobile) {
+                        height: 42px;
+                        min-width: 42px;
+                        margin: 0;
+                        top: 1px;
+                    }
+                    i {
+                        @include break-at(small-desktop-max) {
+                            display: none;
+                        }
+                        @include break-at(mobile) {
+                            display: block;
+                        }
+                    }
+                    span {
+                        @include break-at(mobile-max) {
+                            display: block;
+                        }
+                        @include break-at(mobile) {
+                            display: none;
+                        }
+                    }
+                }
+            }
+            .search-type-btn-popup-panel {
+                .popup-panel-row {
+                    @include break-at(small-desktop-max) {
+                        position: relative;
+                        margin-left: 4px;
+                        top: 5px;
+                    }
+                    @include break-at(mobile-max) {
+                        top: -2px;
+                    }
+                    @include break-at(mobile) {
+                        top: 0px;
+                    }
+                    @include break-at(mobile-portrait) {
+                        display: flex;
+                        justify-content: center;
+                    }
+                    .search-type-btn-popup {
+                        @include break-at(small-desktop-max) {
+                            min-width: 90px;
+                            height: 20px;
+                            border: 1px solid #d8d8d8;
+                            margin: 0 4px;
+                        }
+                        @include break-at(mobile) {
+                            height: 42px;
+                            min-width: 42px;
+                            width: auto;
+                            margin: 1px;
+                        }
+                        &.active {
+                            @include break-at(small-desktop-max) {
+                                line-height: inherit;
+                            }
+                        }
+                        i {
+                            @include break-at(small-desktop-max) {
+                                display: none;
+                            }
+                            @include break-at(mobile) {
+                                display: block;
+                            }
+                        }
+                        p {
+                            @include break-at(desktop-lg) {
+                                display: none;
+                            }
+                            @include break-at(mobile-max) {
+                                display: block;
+                            }
+                            @include break-at(mobile) {
+                                display: none;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .card-form-preview-container{
+            @include break-at(mobile) {
+                overflow-y: visible;
+            }
+        }
+        .tab-content {
+            height: calc(100vh - 100px);
+            @include break-at(mobile) {
+                height: unset;
+            }
+            @include break-at(mobile-max) {
+                overflow: visible;
+            }
+            .tab-content-component {
+                height: calc(100vh - 100px);
+                @include break-at(mobile) {
+                    height: 100vh;
+                    overflow: visible;
+                }
+                .workbench-card-wrapper {
+                    @include break-at(mobile) {
+                        height: 100vh;
+                        overflow-y: visible;
+                    }
+                    .workbench-card-container-wrapper {
+                        @include break-at(mobile){
+                            width: 100%;
+                        }
+                        .related-resources-graph-controls {
+                            @include break-at(mobile) {
+                                right: 2px;
+                                top: 5px;
+                            }
+                        }
+                        .related-resources-graph-controls-instructions {
+                            @include break-at(mobile) {
+                                font-size: 1rem;
+                                margin-top: 0px;
+                                right: 2px;
+                                top: 40px;
+                            }
+                        }
+                    }
+                }
+            }
+            .workbench-card-sidebar,
+            div[role="tablist"] {
+                @include break-at(mobile) {
+                    position: static;
+                    display: inline-flex;
+                    height: fit-content;
+                    width: calc(100vw - 50px);
+                    justify-content: center;
+                    border: 0;
+                }
+                .workbench-card-sidebar-tab,
+                div > .workbench-card-sidebar-tab {
+                    @include break-at(mobile) {
+                        border: 1px solid #d8d8d8;
+                        min-width: 50px;
+                        margin: 1px;
+                    }
+                    @include break-at(small-desktop-max) {
+                        height: 3em;
+                        padding: 4px;
+                        min-height: 0;
+                    }
+                }
+            }
+            .workbench-card-container {
+                @include break-at(mobile) {
+                    width: 100%;
+                    height: calc(100vh - 50px);
+                }
+            }
+            .workbench-card-sidepanel {
+                @include break-at(small-desktop-max) {
+                    height: 100%;
+                    width: calc(100% - 75px);
+                }
+                @include break-at(mobile) {
+                    position: absolute;
+                    right: 0;
+                    width: 100%;
+                }
+                .workbench-card-sidepanel-header-container {
+                    @include break-at(small-desktop-max) {
+                        width: 100%;
+                    }
+                }
+                .workbench-card-sidepanel-body {
+                    overflow-y: auto;
+                    @include break-at(small-desktop-max) {
+                        width: 100%;
+                    }
+                    .overlays-listing-container {
+                        @include break-at(small-desktop-max) {
+                            padding: 0 0 16px;
+                        }
+                        .overlay-listing {
+                            .overlay-name {
+                                @include break-at(small-desktop-max) {
+                                    width: 100%;
+                                    white-space: normal;
+                                }
+                            }
+                            .overlay-opacity-control {
+                                position: relative;
+                            }
+                        }
+                    }
+                }
+            }
+            #rr-splash {
+                @include break-at(small-desktop-max) {
+                    padding: 20px;
+                    margin: 20px;   
+                }
+                .rr-splash-description:last-child {
+                    @include break-at(small-desktop-max) {
+                        margin-bottom: 0;
+                    }
+                }
+            }
+            .search-result-details-splash {
+                @include break-at(small-desktop-max) {
+                    padding: 5px 0 0 0;
+                }
+                .rr-splash {
+                    @include break-at(small-desktop-max) {
+                        margin: 20px;
+                        padding: 20px;
+                    }
+                    .rr-splash-description:last-child {
+                        @include break-at(small-desktop-max) {
+                            margin-bottom: 0;
+                        }
+                    }
+                }
+            }
+            .mapboxgl-ctrl-geocoder {
+                @include break-at(mobile) {
+                    margin: 3px;
+                }
+                @include break-at(mobile-max) {
+                    width: 48vw;
+                    min-width: 0;
+                }
+            }
+        }
+        .search-popup-panel {
+            @include break-at(mobile-max) {
+                width: 100%;
+            }
+        }
+    }
+}

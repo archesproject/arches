@@ -17,11 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, PasswordResetForm, SetPasswordForm
+from django.contrib.auth.forms import UserCreationForm, PasswordResetForm, SetPasswordForm, UserChangeForm
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.forms.widgets import PasswordInput, TextInput
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.models import models
 from captcha.fields import ReCaptchaField
 import logging
@@ -42,7 +42,7 @@ class ArchesUserCreationForm(UserCreationForm):
                 self.fields["captcha"] = ReCaptchaField(attrs)
             except Exception as e:
                 logger = logging.getLogger(__name__)
-                logger.warn(e)
+                logger.warning(e)
 
     first_name = forms.CharField()
     last_name = forms.CharField()
@@ -69,7 +69,7 @@ class ArchesUserCreationForm(UserCreationForm):
                 )
 
 
-class ArchesUserProfileForm(ArchesUserCreationForm):
+class ArchesUserProfileForm(UserChangeForm):
     """
     A form that creates a user, with no privileges, from the given username and
     password.

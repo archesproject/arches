@@ -8,10 +8,12 @@ define(['jquery', 'backbone', 'arches', 'models/concept', 'models/value'], funct
 
             // test to see if select2 has already been applied to the dom
             if (! this.$el.find('.select2').attr('id')){
-                this.collectiondropdown = this.$el.find('.select2').select2()
-                    .on("select2-selecting", function(e, el) {
+                this.collectiondropdown = this.$el.find('.select2').select2({
+                    placeholder: arches.translations.selectAnOption
+                })
+                    .on("select2:selecting", function(e) {
                         $.ajax({
-                            url: arches.urls.confirm_delete.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', e.val),
+                            url: arches.urls.confirm_delete.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', e.params.args.data.id),
                             success: function(response) {
                                 self.modal.find('.modal-body [name="additional-info"]').html(response);
                             }

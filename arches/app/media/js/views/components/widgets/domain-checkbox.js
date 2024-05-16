@@ -2,7 +2,6 @@ define([
     'knockout',
     'viewmodels/domain-widget',
     'templates/views/components/widgets/checkbox.htm',
-    'plugins/knockout-select2',
     'bindings/key-events-click',
 ], function(ko, DomainWidgetViewModel, checkboxTemplate) {
     /**

@@ -11,14 +11,13 @@ define([
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             options.name = 'Term Filter';
-
              
             BaseFilter.prototype.initialize.call(this, options);
 
             this.filter.terms = ko.observableArray();
             this.filter.tags = ko.observableArray();
 
-            this.language = ko.observable();
+            this.language = ko.observable("*");
             this.languages = ko.observableArray();
             const languages = arches.languages.slice();
             languages.unshift({"code": "*", "name": "All"});
@@ -65,7 +64,7 @@ define([
             var queryObj = this.query();
             if (terms.length > 0){
                 queryObj[componentName] = ko.toJSON(terms);
-                queryObj['language'] = this.language()?.code;
+                queryObj['language'] = this.language();
             } else {
                 delete queryObj[componentName];
             }
@@ -86,15 +85,17 @@ define([
         },
 
         addTag: function(term, type, inverted){
-            this.filter.tags.unshift({
-                inverted: inverted,
-                type: type,
-                context: '',
-                context_label: '',
-                id: term,
-                text: term,
-                value: term
-            });
+            if(!this.hasTag(term)){
+                this.filter.tags.unshift({
+                    inverted: inverted,
+                    type: type,
+                    context: '',
+                    context_label: '',
+                    id: term,
+                    text: term,
+                    value: term
+                });
+            }
         },
 
         removeTag: function(term){
@@ -105,7 +106,7 @@ define([
 
         hasTag: function(tag_text){
             var has_tag = false;
-            this.filter.terms().forEach(function(term_item){
+            this.filter.tags().forEach(function(term_item){
                 if (term_item.text == tag_text) {
                     has_tag = true;
                 }

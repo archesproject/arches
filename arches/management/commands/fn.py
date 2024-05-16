@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import sys
 import uuid
 from arches.management.commands import utils
 from arches.app.models import models
@@ -58,11 +59,8 @@ class Command(BaseCommand):
         Inserts a function into the arches db
 
         """
-
-        import imp
-
-        fn_config = imp.load_source("", source)
-        details = fn_config.details
+        utils.load_source("fn_config", source)
+        details = sys.modules["fn_config"].details
 
         try:
             uuid.UUID(details["functionid"])

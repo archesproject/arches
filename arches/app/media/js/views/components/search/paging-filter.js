@@ -2,8 +2,9 @@ define([
     'views/components/search/base-filter',
     'knockout',
     'knockout-mapping',
+    'utils/aria',
     'templates/views/components/search/paging-filter.htm',
-], function(BaseFilter, ko, koMapping, pagingFilterTemplate) {
+], function(BaseFilter, ko, koMapping, ariaUtils, pagingFilterTemplate) {
     var componentName = 'paging-filter';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
@@ -24,6 +25,7 @@ define([
                 previous_page_number: null,
                 start_index: 1
             });
+            this.shiftFocus = ariaUtils.shiftFocus;
 
             this.query.subscribe(function() {
                 if (this.preventLoop === false && this.userRequestedNewPage === false && this.pageInitialized === true) {
@@ -58,6 +60,7 @@ define([
             if(page){
                 this.userRequestedNewPage = true;
                 this.page(page);
+                this.shiftFocus('#search-results-list');
             }
         },
 

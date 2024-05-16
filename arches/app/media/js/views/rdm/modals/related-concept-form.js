@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'views/concept-search', 'models/concept'], function($, Backbone, ConceptSearch, ConceptModel) {
+define(['jquery', 'arches', 'backbone', 'views/concept-search', 'models/concept'], function($, arches, Backbone, ConceptSearch, ConceptModel) {
     return ConceptSearch.extend({
 
         initialize: function(){
@@ -6,6 +6,7 @@ define(['jquery', 'backbone', 'views/concept-search', 'models/concept'], functio
             var self = this;
             this.modal = this.$el.find('form');
             this.relationshiptype = this.modal.find('#related-relation-type').select2({
+                placeholder: arches.translations.selectAnOption,
                 minimumResultsForSearch: 10,
                 maximumSelectionSize: 1
             });

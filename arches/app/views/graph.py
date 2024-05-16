@@ -24,14 +24,15 @@ import logging
 from dateutil import tz
 from django.db import transaction
 from django.shortcuts import redirect, render
-from django.db.models import Q
-from django.utils import translation
-from django.utils.translation import ugettext as _
+from django.db.models import F, Func, Q
+from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
 from django.http import HttpResponseNotFound, HttpResponse
 from django.views.generic import View, TemplateView
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.utils import translation
+from django.core.exceptions import PermissionDenied
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -192,6 +193,10 @@ class GraphDesignerView(GraphBaseView):
         return ontology_namespaces
 
     def get(self, request, graphid):
+        if graphid == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+            if not request.user.groups.filter(name="System Administrator").exists():
+                raise PermissionDenied
+            
         self.source_graph = Graph.objects.get(pk=graphid)
         self.editable_future_graph = None
 
@@ -208,10 +213,6 @@ class GraphDesignerView(GraphBaseView):
         primary_descriptor_functions = models.FunctionXGraph.objects.filter(graph=self.graph).filter(
             function__functiontype="primarydescriptors"
         )
-
-        branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
-        if self.graph.ontology is not None:
-            branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
 
         datatypes = models.DDataType.objects.all()
         primary_descriptor_function = JSONSerializer().serialize(
@@ -284,7 +285,7 @@ class GraphDesignerView(GraphBaseView):
 
         context["nav"]["menu"] = True
 
-        context["nav"]["help"] = {"title": help_title, "template": "graph-tab-help"}
+        context["nav"]["help"] = {"title": help_title, "templates": ["graph-tab-help"]}
 
         return render(request, "views/graph-designer.htm", context)
 
@@ -374,9 +375,24 @@ class GraphDataView(View):
 
                 elif self.action == "update_node":
                     old_node_data = graph.nodes.get(uuid.UUID(data["nodeid"]))
+
+                    if old_node_data.datatype != 'semantic' and old_node_data.datatype != data['datatype']:
+                        return JSONErrorResponse(
+                            _("Datatype Error"),
+                            _(
+                                """If you want to change the datatype of an existing node.
+                                Delete and then re-create the node, or export the branch then edit the datatype and re-import the branch."""
+                            ),
+                        )
+                    
                     nodegroup_changed = str(old_node_data.nodegroup_id) != data["nodegroup_id"]
                     updated_values = graph.update_node(data)
                     if "nodeid" in data and nodegroup_changed is False:
+                        if not self.validate_images_only_config(old_node_data, data):
+                            return JSONErrorResponse(
+                                _("Datatype Error"),
+                                _("This node cannot be restricted to images only as it holds non-images already."),
+                            )
                         graph.save(nodeid=data["nodeid"])
                     else:
                         graph.save()
@@ -413,13 +429,14 @@ class GraphDataView(View):
                     graph.save()
 
                 elif self.action == "export_branch":
-                    if graph.source_identifier:
-                        graph = Graph.objects.get(pk=graph.source_identifier_id)
-
                     clone_data = graph.copy(root=data)
                     clone_data["copy"].slug = None
                     clone_data["copy"].save()
-                    ret = {"success": True, "graphid": clone_data["copy"].pk}
+
+                    clone_data['copy'].create_editable_future_graph()
+                    clone_data['copy'].publish()
+
+                    ret = {"success": True, "graphid": clone_data['copy'].pk}
 
                 elif self.action == "clone_graph":
                     if graph.source_identifier:
@@ -431,6 +448,7 @@ class GraphDataView(View):
                     ret.save()
 
                     ret.create_editable_future_graph()
+                    ret.publish()
                     ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
 
                 elif self.action == "reorder_nodes":
@@ -451,14 +469,6 @@ class GraphDataView(View):
             return JSONResponse(ret, force_recalculation=True)
         except GraphValidationError as e:
             return JSONErrorResponse(e.title, e.message, {"status": "Failed"})
-        except RequestError as e:
-            return JSONErrorResponse(
-                _("Elasticsearch indexing error"),
-                _(
-                    """If you want to change the datatype of an existing node.
-                    Delete and then re-create the node, or export the branch then edit the datatype and re-import the branch."""
-                ),
-            )
 
     @method_decorator(group_required("Graph Editor"), name="dispatch")
     def delete(self, request, graphid):
@@ -473,12 +483,13 @@ class GraphDataView(View):
         elif self.action == "delete_instances":
             try:
                 graph = Graph.objects.get(graphid=graphid)
-                graph.delete_instances()
+                resp = graph.delete_instances(userid=request.user.id)
+                success = resp["success"]
                 return JSONResponse(
                     {
-                        "success": True,
-                        "message": "All the resources associated with the Model '{0}' have been successfully deleted.".format(graph.name),
-                        "title": "Resources Successfully Deleted.",
+                        "success": resp["success"],
+                        "message": resp["message"],
+                        "title": f"Resources {'Successfully' if success else 'Unsuccessfully'} Deleted from {graph.name}.",
                     }
                 )
             except GraphValidationError as e:
@@ -487,13 +498,13 @@ class GraphDataView(View):
             try:
                 graph = Graph.objects.get(graphid=graphid)
                 if graph.isresource:
-                    graph.delete_instances()
+                    graph.delete_instances(userid=request.user.id)
                 graph.delete()
 
                 try:
-                    source_graph = models.GraphModel.objects.get(pk=graph.source_identifier_id)
+                    source_graph = Graph.objects.get(pk=graph.source_identifier_id)
                     source_graph.delete()
-                except models.GraphModel.DoesNotExist:
+                except Graph.DoesNotExist:
                     pass  # no sourcee graph to delete
 
                 return JSONResponse({"success": True})
@@ -501,6 +512,23 @@ class GraphDataView(View):
                 return JSONErrorResponse(e.title, e.message)
 
         return HttpResponseNotFound()
+
+    @staticmethod
+    def validate_images_only_config(old_node_data, new_node_data):
+        if old_node_data.config.get("imagesOnly", None) is False and new_node_data["config"]["imagesOnly"]:
+            nodegroup_id = new_node_data["nodegroup_id"]
+            for file_type in models.TileModel.objects.filter(
+                nodegroup_id=nodegroup_id,
+                data__has_key=str(old_node_data.pk),
+            ).annotate(
+                file_data=Func(
+                    F(f"data__{old_node_data.pk}"),
+                    function="JSONB_ARRAY_ELEMENTS",
+                )
+            ).values_list(F("file_data__type"), flat=True).distinct():
+                if not file_type.startswith("image/"):
+                    return False
+        return True
 
 
 class GraphPublicationView(View):
@@ -539,7 +567,7 @@ class GraphPublicationView(View):
                         )
 
                     return JSONResponse(
-                        {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been successfully updated.")}
+                        {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been updated. Please click the OK button to reload the page.")}
                     )
             except Exception as e:
                 logger.exception(e)
@@ -549,7 +577,7 @@ class GraphPublicationView(View):
             try:
                 source_graph.revert()
                 return JSONResponse(
-                    {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been successfully reverted.")}
+                    {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been reverted. Please click the OK button to reload the page.")}
                 )
             except Exception as e:
                 logger.exception(e)
@@ -619,8 +647,14 @@ class ModelHistoryView(GraphBaseView):
         )
 
         user_ids_to_user_data = {}
+        graph_publication_id_to_resource_instance_count = {}
 
         for graph_x_published_graph in graphs_x_published_graphs:
+
+            graph_publication_id_to_resource_instance_count[str(graph_x_published_graph.publicationid)] = models.ResourceInstance.objects.filter(
+                graph_publication_id=graph_x_published_graph.publicationid
+            ).count()
+
             # changes datetime to human-readable format with local timezone
             graph_x_published_graph.published_time = graph_x_published_graph.published_time.astimezone(tz.tzlocal()).strftime(
                 "%Y-%m-%d | %I:%M %p %Z"
@@ -638,9 +672,10 @@ class ModelHistoryView(GraphBaseView):
             graph_publication_id=self.graph.publication_id,
             graphs_x_published_graphs=JSONSerializer().serialize(graphs_x_published_graphs),
             user_ids_to_user_data=JSONSerializer().serialize(user_ids_to_user_data),
+            graph_publication_id_to_resource_instance_count=JSONSerializer().serialize(graph_publication_id_to_resource_instance_count),
         )
         context["nav"]["title"] = self.graph.name
-        context["nav"]["help"] = {"title": _("Managing Published Graphs"), "template": "graph-publications-help"}
+        context["nav"]["help"] = {"title": _("Managing Published Graphs"), "templates": ["graph-publications-help"]}
 
         return render(request, "views/graph/model-history.htm", context)
 

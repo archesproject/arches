@@ -4,15 +4,15 @@ define([
     'views/components/search/base-filter',
     'bootstrap',
     'arches',
-    'select2',
+    'select-woo',
     'knockout',
     'knockout-mapping',
     'models/graph',
     'view-data',
     'templates/views/components/search/search-results.htm',
-    'bootstrap-datetimepicker',
-    'plugins/knockout-select2'],
-function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel, viewdata, searchResultsTemplate) {
+    'utils/aria',
+    'bootstrap-datetimepicker'],
+function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel, viewdata, searchResultsTemplate, ariaUtils) {
     var componentName = 'search-results';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -63,6 +63,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
 
                 this.bulkResourceReportCache = ko.observable({});
                 this.bulkDisambiguatedResourceInstanceCache = ko.observable({});
+                this.shiftFocus = ariaUtils.shiftFocus;
             },
 
             mouseoverInstance: function() {
@@ -71,6 +72,20 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     var resourceinstanceid = resourceinstance.resourceinstanceid || '';
                     self.mouseoverInstanceId(resourceinstanceid);
                 };
+            },
+
+            mouseoverThumbnail: function(_data, event) {
+                const largeThumbnail = event.currentTarget.nextElementSibling;
+                largeThumbnail.style.display = 'block'; 
+
+                const rect = largeThumbnail.getBoundingClientRect();
+                if (rect.bottom > window.innerHeight) {
+                    largeThumbnail.style.top = (window.innerHeight - rect.height - 60) + 'px';
+                }
+            },
+
+            mouseoutThumbnail: function(_data, event) {
+                event.currentTarget.nextElementSibling.style.display = 'none' ;
             },
 
             showRelatedResources: function() {
@@ -86,6 +101,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                     if (self.selectedTab() !== 'related-resources-filter') {
                         self.selectedTab('related-resources-filter');
                     }
+                    self.shiftFocus('#related-resources-filter-tabpanel');
                 };
             },
 
@@ -110,11 +126,13 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                             });
 
                             reportDataLoaded(true);
+                            self.shiftFocus('.resource-report');
                             self.bulkDisambiguatedResourceInstanceCache(instanceCache);
                         });
                     }
                     else {
                         reportDataLoaded(true);
+                        self.shiftFocus('.resource-report');
                     }
                     
                     reportDataLoaded.subscribe(loaded => {
@@ -189,7 +207,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                         return acc;
                     }, []);
 
-                    this.searchResults.results.hits.hits.forEach(function(result){
+                    this.searchResults.results.hits.hits.forEach(async function(result){
                         var graphdata = _.find(viewdata.graphs, function(graphdata){
                             return result._source.graph_id === graphdata.graphid;
                         });
@@ -197,8 +215,14 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                         if (result._source.points.length > 0) {
                             point = result._source.points[0].point;
                         }
+
+                        const thumbnailUrl = `/thumbnail/${result._source.resourceinstanceid}`;
+                        const thumbnailResponse = arches.searchThumbnails == 'True' ? await fetch(thumbnailUrl, {method: 'HEAD'}): undefined;
+                        const thumbnail = thumbnailResponse && thumbnailResponse.ok ? thumbnailUrl: undefined;
+
                         this.results.push({
                             displayname: result._source.displayname,
+                            thumbnail: thumbnail,
                             resourceinstanceid: result._source.resourceinstanceid,
                             displaydescription: result._source.displaydescription,
                             alternativelanguage: result._source.displayname_language != arches.activeLanguage,
@@ -209,6 +233,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                             showrelated: this.showRelatedResources(result._source.resourceinstanceid),
                             showDetails: this.showResourceSummaryReport(result),
                             mouseoverInstance: this.mouseoverInstance(result._source.resourceinstanceid),
+                            mouseoverThumbnail: this.mouseoverThumbnail,
+                            mouseoutThumbnail: this.mouseoutThumbnail,
                             relationshipcandidacy: this.toggleRelationshipCandidacy(result._source.resourceinstanceid),
                             ontologyclass: result._source.root_ontology_class,
                             relatable: this.isResourceRelatable(result._source.graph_id),
@@ -219,6 +245,7 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                                     self.selectedTab('map-filter');
                                 }
                                 self.mapLinkData({'properties':result._source});
+                                self.shiftFocus('canvas.mapboxgl-canvas');
                             },
                             selected: ko.computed(function() {
                                 return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);

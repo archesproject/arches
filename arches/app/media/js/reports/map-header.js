@@ -16,7 +16,7 @@ define([
             var features = [];
             ko.unwrap(params.tiles).forEach(function(tile) {
                 _.each(tile.data, function(val) {
-                    if ('features' in val) {
+                    if (val?.features) {
                         features = features.concat(koMapping.toJS(val.features));
                     }
                 }, this);

@@ -27,7 +27,7 @@ from arches.app.search.search_term import SearchTerm
 from rdflib import ConjunctiveGraph as Graph
 from rdflib import URIRef, Literal, Namespace
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
@@ -41,7 +41,7 @@ default_url_widget = None
 try:
     default_url_widget = Widget.objects.get(name=default_widget_name)
 except Widget.DoesNotExist as e:
-    logger.warn("Setting 'url' datatype's default widget to None ({0} widget not found).".format(default_widget_name))
+    logger.warning("Setting 'url' datatype's default widget to None ({0} widget not found).".format(default_widget_name))
 
 details = {
     "datatype": "url",
@@ -70,9 +70,10 @@ class URLDataType(BaseDataType):
 
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         errors = []
+
         if value is not None:
             try:
-                if value.get("url") is not None:
+                if value.get("url"):
                     # check URL conforms to URL structure
                     url_test = self.URL_REGEX.match(value["url"])
                     if url_test is None:
@@ -82,6 +83,14 @@ class URLDataType(BaseDataType):
                 title = _("Invalid HTTP/HTTPS URL")
                 error_message = self.create_error_message(value, source, row_number, message, title)
                 errors.append(error_message)
+            
+            # raise error if label added without URL (#10592)
+            if value.get("url_label") and not value.get("url"):
+                message = _("URL label cannot be saved without a URL")
+                title = _("No URL added")
+                error_message = self.create_error_message(value, source, row_number, message, title)
+                errors.append(error_message)
+                
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
@@ -172,7 +181,9 @@ class URLDataType(BaseDataType):
             pass
 
     def get_rdf_uri(self, node, data, which="r"):
-        return URIRef(data["url"])
+        if data and "url" in data:
+            return URIRef(data["url"])
+        return None
 
     def accepts_rdf_uri(self, uri):
         return self.URL_REGEX.match(uri) and not (
@@ -255,3 +266,19 @@ class URLDataType(BaseDataType):
                 },
             }
         }
+
+    def pre_tile_save(self, tile, nodeid):
+        if (tile_val := tile.data[nodeid]) and "url_label" not in tile_val:
+            tile_val["url_label"] = ""
+
+    def clean(self, tile, nodeid):
+        if (data := tile.data[nodeid]):
+            try:
+                if not any([val.strip() for val in data.values()]):
+                    tile.data[nodeid] = None
+            except:
+                pass # Let self.validate handle malformed data
+
+    def pre_structure_tile_data(self, tile, nodeid, **kwargs):
+        if (tile_val := tile.data[nodeid]) and "url_label" not in tile_val:
+            tile_val["url_label"] = ""

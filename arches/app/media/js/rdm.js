@@ -20,6 +20,9 @@ require([
     DeleteCollectionForm, BaseManagerView, JsonErrorAlertViewModel) {
     var RDMView = BaseManagerView.extend({
         initialize: function(options){
+            // allow select2 to retain focus when used in a bootsrap modal
+            // see: https://select2.org/troubleshooting/common-problems#select2-does-not-function-properly-when-i-use-it-inside-a-bootst
+            $.fn.modal.Constructor.prototype.enforceFocus = function() {};
             var mode = 'semantic';
 
             // Models and views
@@ -117,9 +120,9 @@ require([
                 }
             });
 
-            conceptsearch.on("select2-selecting", function(e, el) {
+            conceptsearch.on("select2:selecting", function(e) {
                 concept.clear();
-                concept.set('id', e.val);
+                concept.set('id', e.params.args.data.id);
                 conceptTree.render();
                 conceptReport.render();
             }, conceptsearch);

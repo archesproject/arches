@@ -16,13 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
-
 import os
 import json
 import time
@@ -42,12 +35,14 @@ from arches.app.search.elasticsearch_dsl_builder import Query, Term
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
 
 # these tests can be run from the command line via
-# python manage.py test tests/views/search_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.views.search_tests --settings="tests.test_settings"
 
 
 class SearchTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         se = SearchEngineFactory().create()
         q = Query(se=se)
         for indexname in [TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX]:
@@ -58,7 +53,7 @@ class SearchTests(ArchesTestCase):
 
         LanguageSynchronizer.synchronize_settings_with_db()
         models.ResourceInstance.objects.all().delete()
-        with open(os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
@@ -160,6 +155,7 @@ class SearchTests(ArchesTestCase):
         Resource.objects.filter(graph_id=cls.search_model_graphid).delete()
         models.GraphModel.objects.filter(source_identifier=cls.search_model_graphid).delete()
         models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
+        super().tearDownClass()
 
     def test_temporal_only_search_1(self):
         """

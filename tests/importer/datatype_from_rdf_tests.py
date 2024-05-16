@@ -17,21 +17,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+from unittest.mock import Mock
 from tests import test_settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.models.models import ResourceInstance
 from tests.base_test import ArchesTestCase
 from arches.app.utils.skos import SKOSReader
+from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.models.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
 from rdflib import Namespace, URIRef, Literal, Graph
 from rdflib.namespace import RDF, RDFS, XSD
 from arches.app.utils.data_management.resources.formats.rdffile import RdfWriter
-from mock import Mock
 
 # these tests can be run from the command line via
-# python manage.py test tests/importer/datatype_from_rdf_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.importer.datatype_from_rdf_tests --settings="tests.test_settings"
 
 ARCHES_NS = Namespace(test_settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 CIDOC_NS = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
@@ -44,6 +45,9 @@ class RDFImportUnitTests(ArchesTestCase):
 
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+        cls.loadOntology()
+        LanguageSynchronizer.synchronize_settings_with_db()
         ResourceInstance.objects.all().delete()
 
         for skospath in ["tests/fixtures/data/rdf_export_thesaurus.xml", "tests/fixtures/data/rdf_export_collections.xml"]:
@@ -53,7 +57,7 @@ class RDFImportUnitTests(ArchesTestCase):
 
         # Models
         for model_name in ["object_model", "document_model"]:
-            with open(os.path.join("tests/fixtures/resource_graphs/rdf_export_{0}.json".format(model_name)), "rU") as f:
+            with open(os.path.join("tests/fixtures/resource_graphs/rdf_export_{0}.json".format(model_name)), "r") as f:
                 archesfile = JSONDeserializer().deserialize(f)
             ResourceGraphImporter(archesfile["graph"])
         # Fixture Instance Data for tests
@@ -64,10 +68,6 @@ class RDFImportUnitTests(ArchesTestCase):
     def setUp(self):
         # for RDF/JSON-LD export tests
         self.DT = DataTypeFactory()
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
 
     # test_jsonld_* -> focus on jsonld correct framing and export
 

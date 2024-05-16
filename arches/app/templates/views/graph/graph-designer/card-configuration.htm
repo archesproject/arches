@@ -119,10 +119,10 @@
                     <!--ko if: model.constraints().length > 0 -->
                     <div class="constraint-selection" data-bind="foreach: {data: model.constraints(), as: 'constraintvm'}">
                         <div class="dropdown">
-                            <input class="" style="display:inline-block;"
+                            <select class="" style="display:inline-block;"
                             data-bind="select2Query: {
                                 select2Config: getSelect2ConstraintConfig({% quoted_trans "Select Nodes" %})
-                            }">
+                            }"></select>
                         </div>
                         <div data-bind="component: { name: 'views/components/simple-switch', params: {value: constraintvm.constraint.uniquetoallinstances, config:{label: 'Unique to all resource instances?'}}}"></div>
                     </div>

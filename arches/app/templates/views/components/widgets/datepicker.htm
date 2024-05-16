@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper">
+<div class="row widget-wrapper" data-bind="class: nodeCssClasses">
     <div class="form-group">
         <span class="control-labx mesel widget-input-label" data-bind="text:label"></span>
         <!-- ko if: node -->
@@ -12,7 +12,7 @@
         <div class="col-xs-12">
             <div>
                 <div class="input-group date">
-                    <input type="text" data-bind="value: value, placeholder: placeholder, disable: disabled, attr: {'aria-label': label}, 
+                    <input type="text" data-bind="value: value, placeholder: placeholder, disable: disabled, attr: {'aria-label': label},
                         datepicker: {format: dateFormat, viewMode: viewMode, maxDate: maxDate, minDate: minDate}" class="form-control input-lg"
                         ><span class="input-group-addon date-icon"><i class="fa fa-calendar fa-lg date-icon"></i></span>
                 </div>
@@ -24,13 +24,13 @@
 {% endblock form %}
 
 {% block report %}
-<dt data-bind="text: label"></dt>
+<dt data-bind="text: label, class: nodeCssClasses"></dt>
 <!-- ko if: value() !== null -->
-<dd data-bind="date: value(), dateFormat: dateFormat || $root.translations.noDateEntered"></dd>
+<dd data-bind="date: value(), dateFormat: dateFormat || $root.translations.noDateEntered, class: nodeCssClasses"></dd>
 <!-- /ko -->
 <!-- ko if: value() === null -->
 <dd>
-    <span data-bind="text: $root.translations.none"></span>
+    <span data-bind="text: $root.translations.none, class: nodeCssClasses"></span>
 </dd>
 <!-- /ko -->
 {% endblock report %}
@@ -40,12 +40,12 @@
     <span data-bind="text: $root.translations.minimumDate"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input 
-        id="datetimepickermin" 
-        class="form-control input-md widget-input" 
+    <input
+        id="datetimepickermin"
+        class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.minimumDate, 'aria-label': $root.translations.minimumDate},
-            value: minDate, 
+            value: minDate,
             datepicker: {format: 'YYYY-MM-DD', viewMode: viewMode, minDate: false, maxDate: false}
         "
     >
@@ -54,12 +54,12 @@
     <span data-bind="text: $root.translations.maximumDate"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input 
-        id="datetimepickermax" 
-        class="form-control input-md widget-input" 
+    <input
+        id="datetimepickermax"
+        class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.maximumDate, 'aria-label': $root.translations.maximumDate},
-            value: maxDate, 
+            value: maxDate,
             datepicker: {format: 'YYYY-MM-DD', viewMode: viewMode, minDate: false, maxDate: false}
         "
     >
@@ -68,14 +68,14 @@
     <span data-bind="text: $root.translations.viewMode"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <select 
+    <select
         data-bind="
             attr: {placeholder: $root.translations.viewMode, 'aria-label': $root.translations.viewMode},
-            options:viewModeOptions, 
-            optionsText:'name', 
-            optionsValue:'id', 
-            event: {change: onViewModeSelection}, 
-            value: viewMode, 
+            options:viewModeOptions,
+            optionsText:'name',
+            optionsValue:'id',
+            event: {change: onViewModeSelection},
+            value: viewMode,
             chosen: {width: '100%', disable_search: true}
         "
     ></select>
@@ -94,7 +94,7 @@
         </div>
     </div>
     <div class="toggle-container">
-        <span id="default-date-switcher" class="switch switch-small" data-bind="css: {'on': getdefault}, onEnterkeyClick, onSpaceClick, click: setdefault, 
+        <span id="default-date-switcher" class="switch switch-small" data-bind="css: {'on': getdefault}, onEnterkeyClick, onSpaceClick, click: setdefault,
             attr: {'aria-checked': getdefault, 'aria-labeledby': 'default-date-switcher-label', 'aria-describedby': 'default-date-switcher-context'}" tabindex="0" role="switch"><small></small></span>
             <div style="display:flex; flex-direction:row;">
                 <label id="default-date-switcher-label" class="arches-toggle-sm" data-bind="text: $root.translations.useDateOfDataEntry"></label>

@@ -34,7 +34,7 @@ from arches.app.utils.permission_backend import user_is_resource_reviewer
 from django.contrib.auth.models import User
 from django.http import HttpResponseNotFound, HttpResponseBadRequest
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.views.generic import View
 from django.db import transaction
@@ -95,6 +95,7 @@ class TileData(View):
         if self.action == "update_tile":
             json = request.POST.get("data", None)
             accepted_provisional = request.POST.get("accepted_provisional", None)
+            resource_creation = False
             if accepted_provisional is not None:
                 accepted_provisional_edit = JSONDeserializer().deserialize(accepted_provisional)
             if json is not None:
@@ -111,6 +112,7 @@ class TileData(View):
                 try:
                     models.ResourceInstance.objects.get(pk=data["resourceinstance_id"])
                 except ObjectDoesNotExist:
+                    resource_creation = True
                     try:
                         resource = Resource(uuid.UUID(str(data["resourceinstance_id"])))
                     except ValueError:
@@ -137,7 +139,7 @@ class TileData(View):
                             try:
                                 if accepted_provisional is None:
                                     try:
-                                        tile.save(request=request, transaction_id=transaction_id)
+                                        tile.save(request=request, resource_creation=resource_creation, transaction_id=transaction_id)
                                     except TileValidationError as e:
                                         resource_tiles_exist = models.TileModel.objects.filter(resourceinstance=tile.resourceinstance).exists()
                                         if not resource_tiles_exist:
@@ -156,7 +158,7 @@ class TileData(View):
                                             "edit": accepted_provisional_edit,
                                             "provisional_editor": provisional_editor,
                                         }
-                                    tile.save(request=request, provisional_edit_log_details=prov_edit_log_details)
+                                    tile.save(request=request, resource_creation=resource_creation, provisional_edit_log_details=prov_edit_log_details)
 
                                 if tile.provisionaledits is not None and str(request.user.id) in tile.provisionaledits:
                                     tile.data = tile.provisionaledits[str(request.user.id)]["value"]
@@ -191,7 +193,6 @@ class TileData(View):
                                 t.sortorder = sortorder
                                 t.save(update_fields=["sortorder"], request=request)
                                 sortorder = sortorder + 1
-
                     return JSONResponse(data)
 
         if self.action == "delete_provisional_tile":
@@ -226,7 +227,12 @@ class TileData(View):
                     resource_instance = tile.resourceinstance
                     is_active = resource_instance.graph.is_active
                 except ObjectDoesNotExist:
-                    return JSONErrorResponse(_("This tile is no longer available"), _("It was likely already deleted by another user"))
+                    return JSONErrorResponse(
+                        title=_("This tile is no longer available"),
+                        message=_("It was likely already deleted by another user"),
+                        # Not localized (not user-facing)
+                        content={"exception": "TileModel.ObjectDoesNotExist"},
+                    )
                 user_is_reviewer = user_is_resource_reviewer(request.user)
                 if (user_is_reviewer or tile.is_provisional() is True) and is_active is True:
                     if tile.filter_by_perm(request.user, "delete_nodegroup"):

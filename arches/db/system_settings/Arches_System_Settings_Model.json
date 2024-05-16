@@ -472,7 +472,7 @@
                             "prefix",
                             "suffix"
                         ],
-                        "label": "Hexagon Grid Precision (Integer, larger numbers ensuer more precise counts at a performanace cost)",
+                        "label": "Hexagon Grid Precision (Integer, larger numbers ensure more precise counts at a performance cost)",
                         "max": "",
                         "min": "",
                         "placeholder": {
@@ -491,7 +491,7 @@
                     },
                     "id": "0e9006f0-4148-11e7-897a-c4b301baab9f",
                     "label": {
-                        "en": "Hexagon Grid Precision (Integer, larger numbers ensuer more precise counts at a performanace cost)"
+                        "en": "Hexagon Grid Precision (Integer, larger numbers ensure more precise counts at a performance cost)"
                     },
                     "node_id": "0e8ffaf5-4148-11e7-b24d-c4b301baab9f",
                     "sortorder": 1,

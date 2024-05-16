@@ -1,0 +1,17 @@
+@import "abstracts/functions";
+
+.related-resources-graph-workbench {
+	.workbench-card-sidepanel {
+		@include break-at(mobile-max) {
+			width: calc(100% - 75px);
+			overflow-y: auto;
+    		overflow-x: hidden;
+		}
+	}
+
+	.workbench-card-sidepanel-header-container {
+		@include break-at(mobile-max) {
+			width: 100%;
+		}
+	}
+}

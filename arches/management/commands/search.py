@@ -16,10 +16,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
+import sys
 import uuid
-import imp
+
 from arches.app.models import models
+from arches.management.commands import utils
 from django.core.management.base import BaseCommand, CommandError
 
 
@@ -57,10 +58,10 @@ class Command(BaseCommand):
 
         """
 
-        dt_source = imp.load_source("", source)
+        utils.load_source("sc_source", source)
 
-        if getattr(dt_source, "details", None):
-            details = dt_source.details
+        if getattr(sys.modules, "sc_source", None):
+            details = sys.modules["sc_source"].details
 
             try:
                 uuid.UUID(details["searchcomponentid"])
@@ -89,8 +90,8 @@ class Command(BaseCommand):
 
         """
 
-        dt_source = imp.load_source("", source)
-        name = dt_source.details["componentname"]
+        utils.load_source("sc_source", source)
+        name = sys.modules["sc_source"].details["componentname"]
 
         self.unregister(name)
         self.register(source)

@@ -1,10 +1,14 @@
 {% load i18n %}
-<div class="search-container time-search-container">
-
-    <div class="filter-title">
-        <span data-bind="text: $root.translations.dateInterval"></span>
+<div class="time-search-container relative" style="overflow-y: scroll;">
+    <div class="close-popup-panel-container time-filter-title">
+        <span class="close-popup-panel" tabindex="0" role="button" id="time-filter-close-btn"
+            data-bind="onEnterkeyClick, onSpaceClick, 
+                click: function(){selectedPopup(''); $root.shiftFocus('#time-filter-open-btn');},
+                attr: {'aria-label': $root.translations.closeTimeFilter},
+                text: $root.translations.timeFilter,
+        "></span>
         <div class="btn-group">
-            <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="true" data-bind="click: function () { clear(); }"> 
+            <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" data-bind="click: function () { clear(); }"> 
                 <i class="fa fa-close"></i>
                 <span data-bind="text: $root.translations.clear"></span>
             </button>
@@ -15,22 +19,24 @@
 
         <!-- Date Type -->
         <div class="calendar picker">
-            <h3 class="search-label">
+            <div class="search-label">
                 <span data-bind="text: $root.translations.type"></span>
-            </h3>
+            </div>
             <select 
-                id="" class="resources" 
-                tabindex="-1" 
+                class="resources"
                 data-bind="
-                    placeholder: $root.translations.dateType,
-                    value: filter.dateNodeId, 
-                    chosen:{ width: '100%' }, attr: {id:dateDropdownEleId} 
+                    select2Query:{ select2Config:{
+                        value: filter.dateNodeId,
+                        dropdownCssClass: 'select2-zindex',
+                        placeholder: $root.translations.dateType,
+                    }}, 
+                    attr: {id:dateDropdownEleId, 'data-label': $root.translations.searchDateType} 
                 "
             >
-                <option value="" data-bind="text: $root.translations.searchAllDates"></option>
-                <!-- ko foreach: { data: graph_models, as: 'graph' } -->
+                <option data-bind="text: $root.translations.searchAllDates"></option>
+                <!-- ko foreach: { data: graphModels, as: 'graph' } -->
                     <optgroup data-bind="if: (graph.isresource), attr: { label: graph.name }">
-                        <!-- ko foreach: { data: $parent.date_nodes, as: 'node' } -->
+                        <!-- ko foreach: { data: $parent.dateNodes, as: 'node' } -->
                             <!-- ko if: graph.graphid === node.graph_id -->
                                 <option data-bind="attr: { value: node.nodeid }, text: node.label"></option>
                             <!-- /ko -->
@@ -42,31 +48,32 @@
 
         <!-- Date Selector -->
         <div class="calendar picker">
-            <h3 class="search-label">
+            <div class="search-label">
                 <span data-bind="text: $root.translations.within"></span>
-            </h3>
-            <select 
-                id="" 
-                class="resources" 
-                tabindex="-1" 
+            </div>
+            <select class="resources"
                 data-bind="
-                    attr: {placeholder: $root.translations.select},
-                    value: dateRangeType, 
-                    chosen:{ width: '100%' },
-                    optionsText: 'text',
-                    optionsValue: 'value',
-                    options: [
-                        { text: $root.translations.customDateRange, value: 'custom' },
-                        { text: $root.translations.today, value: 'today' },
-                        { text: $root.translations.lastSevenDays, value: 'last-7' },
-                        { text: $root.translations.lastThirtyDays, value: 'last-30' },
-                        { text: $root.translations.thisWeek, value: 'this-week' },
-                        { text: $root.translations.thisMonth, value: 'this-month' },
-                        { text: $root.translations.thisQuarter, value: 'this-quarter' },
-                        { text: $root.translations.thisYear, value: 'this-year' },
-                    ],
-                "
-            ></select>
+                    attr: {'data-label': $root.translations.searchDateRange},
+                    select2Query:{ 
+                        select2Config: {
+                            value: dateRangeType,
+                            dropdownCssClass: 'select2-zindex',
+                            placeholder: $root.translations.select,
+                            minimumResultsForSearch: -1,
+                            data: [
+                                { text: $root.translations.customDateRange, id: 'custom' },
+                                { text: $root.translations.today, id: 'today' },
+                                { text: $root.translations.lastSevenDays, id: 'last-7' },
+                                { text: $root.translations.lastThirtyDays, id: 'last-30' },
+                                { text: $root.translations.thisWeek, id: 'this-week' },
+                                { text: $root.translations.thisMonth, id: 'this-month' },
+                                { text: $root.translations.thisQuarter, id: 'this-quarter' },
+                                { text: $root.translations.thisYear, id: 'this-year' },
+                            ],
+                        }
+                    }
+                ">
+            </select>
         </div>
 
     </div>
@@ -74,28 +81,38 @@
     <div id="calendar">
         <!-- From Date -->
         <div class="calendar picker">
-            <h3 class="search-label">
+            <div class="search-label">
                 <span data-bind="text: $root.translations.from"></span>
-            </h3>
+            </div>
             <div id="search-from-c" class="hide-datepicker-time-option">
-                <input placeholder="" class="form-control input-md" data-bind="value: filter.fromDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
+                <input class="form-control input-md" 
+                    data-bind="
+                        value: filter.fromDate, 
+                        datepicker: {format: format, keepInvalid: true}, 
+                        attr:{'placeholder': format, 'aria-label': $root.translations.fromDate}, 
+                        disable: dateRangeType() !== 'custom'">
             </div>
         </div>
 
         <!-- To Date -->
         <div class="calendar picker">
-            <h3 class="search-label">
+            <div class="search-label">
                 <span data-bind="text: $root.translations.to"></span>
-            </h3>
+            </div>
             <div id="search-from-b" class="hide-datepicker-time-option">
-                <input placeholder="" class="form-control input-md" data-bind="value: filter.toDate, datepicker: {format: format, keepInvalid: true}, attr:{'placeholder': format}, disable: dateRangeType() !== 'custom'">
+                <input class="form-control input-md" 
+                    data-bind="
+                        value: filter.toDate, 
+                        datepicker: {format: format, keepInvalid: true}, 
+                        attr:{'placeholder': format, 'aria-label': $root.translations.toDate}, 
+                        disable: dateRangeType() !== 'custom'">
             </div>
         </div>
     </div>
 
-    <h3 class="time-wheel-title">
+    <div class="time-wheel-title">
         <span data-bind="text: $root.translations.timeWheel"></span>
-    </h3>
+    </div>
     <div class="time-wheel-instructions">
         <span data-bind="text: '(' + $root.translations.timeWheelText + ')'"></span>
     </div>

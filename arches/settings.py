@@ -17,9 +17,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import inspect
-import json
 import os
-import sys
+from datetime import datetime, timedelta
+from contextlib import suppress
+
 
 try:
     from settings_utils import *
@@ -66,14 +67,27 @@ ANONYMOUS_USER_NAME = None
 
 ELASTICSEARCH_HTTP_PORT = 9200  # this should be in increments of 200, eg: 9400, 9600, 9800
 SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
+SEARCH_THUMBNAILS = False
 # see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
 ELASTICSEARCH_HOSTS = [{"scheme": "https", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
 
 # Comment out this line for a development setup after running the ubuntu_setup.sh script
-ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30}
+ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30}
 
 # Uncomment this line for a development setup after running the ubuntu_setup.sh script (do not use in production)
-# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
+
+# If you need to connect to Elasticsearch via an API key instead of username/password, use the syntax below:
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": "<ENCODED_API_KEY>"}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": ("<ID>", "<API_KEY>")}
+
+# Your Elasticsearch instance needs to be configured with xpack.security.enabled=true to use API keys - update elasticsearch.yml or .env file and restart.
+
+# Set the ELASTIC_PASSWORD environment variable in either the docker-compose.yml or .env file to the password you set for the elastic user,
+# otherwise a random password will be generated.
+
+# API keys can be generated via the Elasticsearch API: https://www.elastic.co/guide/en/elasticsearch/reference/current/security-api-create-api-key.html
+# Or Kibana: https://www.elastic.co/guide/en/kibana/current/api-keys.html
 
 # a prefix to append to all elasticsearch indexes, note: must be lower case
 ELASTICSEARCH_PREFIX = "arches"
@@ -90,6 +104,10 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 #     'name': 'my_new_custom_index',
 #     'should_update_asynchronously': False
 # }]
+
+THUMBNAIL_GENERATOR = None #"arches.app.utils.thumbnail_generator.ThumbnailGenerator"
+GENERATE_THUMBNAILS_ON_DEMAND = False # True to generate a thumnail on request if it doens't exist
+MIN_FILE_SIZE_T0_GENERATE_THUMBNAIL = 150000 # yet to be implemented, in bytes eg: 150000 = 150kb
 
 # This should point to the url where you host your site
 # Make sure to use a trailing slash
@@ -245,10 +263,6 @@ LOCALE_PATHS = [
     os.path.join(ROOT_DIR, "locale"),
 ]
 
-# If you set this to False, Django will not format dates, numbers and
-# calendars according to the current locale
-USE_L10N = True
-
 # Sets default max upload size to 15MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 
@@ -296,7 +310,6 @@ TEMPLATES = build_templates_config(root_dir=ROOT_DIR, debug=DEBUG)
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    "compressor.finders.CompressorFinder",
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -341,8 +354,9 @@ INSTALLED_APPS = (
     "corsheaders",
     "oauth2_provider",
     "django_celery_results",
-    "compressor",
 )
+
+ARCHES_APPLICATIONS = ()
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -362,7 +376,7 @@ MIDDLEWARE = [
 
 WEBPACK_LOADER = {
     "DEFAULT": {
-        "STATS_FILE": os.path.join(ROOT_DIR, "webpack/webpack-stats.json"),
+        "STATS_FILE": os.path.join(ROOT_DIR, "..", "webpack/webpack-stats.json"),
     },
 }
 
@@ -401,6 +415,10 @@ LOGGING = {
 }
 
 LOGIN_URL = "auth"
+# Rate limit for authentication views
+# See options (including None or python callables):
+# https://django-ratelimit.readthedocs.io/en/stable/rates.html#rates-chapter
+RATE_LIMIT = "5/m"
 
 PROFILE_LOG_BASE = os.path.join(ROOT_DIR, "logs")
 
@@ -481,7 +499,10 @@ DEFAULT_RESOURCE_IMPORT_USER = {"username": "admin", "userid": 1}
 TIMEWHEEL_DATE_TIERS = None
 
 # Identify the usernames and duration (seconds) for which you want to cache the timewheel
-CACHE_BY_USER = {"anonymous": 3600 * 24}
+CACHE_BY_USER = {
+    "default": 3600 * 24, #24hrs
+    "anonymous": 3600 * 24 #24hrs
+}
 
 BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION = False
 BYPASS_REQUIRED_VALUE_TILE_VALIDATION = False
@@ -590,6 +611,8 @@ ETL_MODULE_LOCATIONS = [
 
 FILE_TYPE_CHECKING = False
 FILE_TYPES = ["bmp", "gif", "jpg", "jpeg", "pdf", "png", "psd", "rtf", "tif", "tiff", "xlsx", "csv", "zip"]
+FILENAME_GENERATOR = "arches.app.utils.storage_filename_generator.generate_filename"
+UPLOADED_FILES_DIR = "uploadedfiles"
 
 MAPBOX_API_KEY = ""  # Put your Mapbox key here!
 
@@ -600,6 +623,9 @@ MAPBOX_GLYPHS = "mapbox://fonts/mapbox/{fontstack}/{range}.pbf"
 DEFAULT_MAP_ZOOM = 0
 MAP_MIN_ZOOM = 0
 MAP_MAX_ZOOM = 20
+
+# Map filter auto adjusts map extent to fit results. If False, map extent will not change when filtering results.
+MAP_FILTER_AUTO_ZOOM_ENABLED = True
 
 # If True, allows users to selectively enable two-factor authentication
 ENABLE_TWO_FACTOR_AUTHENTICATION = False
@@ -655,12 +681,17 @@ TILE_CACHE_TIMEOUT = 600  # seconds
 CLUSTER_DISTANCE_MAX = 5000  # meters
 GRAPH_MODEL_CACHE_TIMEOUT = None  # seconds * hours * days = ~1mo
 
-CANTALOUPE_DIR = os.path.join(ROOT_DIR, "uploadedfiles")
+CANTALOUPE_DIR = os.path.join(ROOT_DIR, UPLOADED_FILES_DIR)
 CANTALOUPE_HTTP_ENDPOINT = "http://localhost:8182/"
 
 ACCESSIBILITY_MODE = False
 
-COMPRESS_PRECOMPILERS = (("text/x-scss", "django_libsass.SassCompiler"),)
+# Dictionary containing any additional context items for customising email templates
+with suppress(NameError):  # need to suppress i18n NameError for test runner
+    EXTRA_EMAIL_CONTEXT = {
+        "salutation": _("Hi"),
+        "expiration":(datetime.now() + timedelta(seconds=CELERY_SEARCH_EXPORT_EXPIRES)).strftime("%A, %d %B %Y")
+    }
 
 RENDERERS = [
     {
@@ -724,6 +755,11 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
+
+##########################################
+### END RUN TIME CONFIGURABLE SETTINGS ###
+##########################################
+
 try:
     from .settings_local import *
 except ImportError:
@@ -731,10 +767,6 @@ except ImportError:
         from arches.settings_local import *
     except ImportError:
         pass
-
-##########################################
-### END RUN TIME CONFIGURABLE SETTINGS ###
-##########################################
 
 # returns an output that can be read by NODEJS
 if __name__ == "__main__":

@@ -3,19 +3,19 @@
 {% load i18n %}
 
 {% block form %}
-<div class="row widget-wrapper" data-bind="let: {uid: Math.random().toString()}">
+<div class="row widget-wrapper" data-bind="let: {uid: Math.random().toString()}, class: nodeCssClasses">
     <!-- ko if: node -->
     <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
     <!-- /ko -->
     <div class="form-group">
-        <div class="widget-inline-tools-collapser" style="max-width: 600px;" 
-            data-bind="onEnterkeyClick, onSpaceClick, 
+        <div class="widget-inline-tools-collapser" style="max-width: 600px;"
+            data-bind="onEnterkeyClick, onSpaceClick,
                 click: function() { showEDTFFormats(!showEDTFFormats()); },
                 attr: {
-                    'aria-expanded': showEDTFFormats().toString(), 
-                    'aria-label': $root.translations.edtfFormats , 
+                    'aria-expanded': showEDTFFormats().toString(),
+                    'aria-label': $root.translations.edtfFormats ,
                     'aria-controls': uid
-                }" 
+                }"
             tabindex="0" role="button"
         >
             <span class="control-label widget-input-label" data-bind="text:label"></span><span>
@@ -46,7 +46,7 @@
 
                     <dl>
                         <dt>
-                            2021-04-12 
+                            2021-04-12
                             <span class="text-thin" data-bind="text: $root.translations.dayPrecisionEncoding"></span>
                         </dt>
                         <dd class="mar-btm">
@@ -54,7 +54,7 @@
                         </dd>
 
                         <dt>
-                            2021-04 
+                            2021-04
                             <span class="text-thin" data-bind="text: $root.translations.monthPrecisionEncoding"></span>
                         </dt>
                         <dd class="mar-btm">
@@ -62,7 +62,7 @@
                         </dd>
 
                         <dt>
-                            2021 
+                            2021
                             <span class="text-thin" data-bind="text: $root.translations.yearPrecisionEncoding"></span>
                         </dt>
                         <dd class="mar-btm">
@@ -115,8 +115,8 @@
           </div>
         <div class="col-xs-12">
             <input type="text" data-bind="
-                textInput: value, 
-                attr: {placeholder: placeholder, disabled: disabled, 'aria-label': label}" 
+                textInput: value,
+                attr: {placeholder: placeholder, disabled: disabled, 'aria-label': label}"
                 class="form-control input-lg widget-input">
         </div>
         <div class="col-xs-12" data-bind="if: value">
@@ -135,8 +135,8 @@
     <span data-bind="text: $root.translations.placeholder"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input 
-        class="form-control input-md widget-input" 
+    <input
+        class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.placeholder, 'aria-label': $root.translations.placeholder},
             textInput: placeholder
@@ -148,8 +148,8 @@
     <span data-bind="text: $root.translations.defaultValue"></span>
 </div>
 <div class="col-xs-12 pad-no crud-widget-container">
-    <input 
-        class="form-control input-md widget-input" 
+    <input
+        class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.defaultValue, 'aria-label': $root.translations.defaultValue},
             textInput: defaultValue

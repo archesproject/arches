@@ -84,6 +84,7 @@ define([
         _.extend(this, {
             filter: filter,
             parent: params.card,
+            handlers: params.handlers,
             userisreviewer: params.userisreviewer,
             cards: _.filter(params.cards, function(card) {
                 var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {
@@ -262,6 +263,7 @@ define([
                 }).done(function(response) {
                     params.card.tiles.remove(self);
                     selection(params.card);
+                    updateDisplayName(params.resourceId, params.displayname);
                     if (typeof onSuccess === 'function') {
                         onSuccess(response);
                     }

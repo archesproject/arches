@@ -1,0 +1,132 @@
+.v5-splash-caption {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px!important;
+    left: 10vw!important;
+}
+
+.v5-splash-caption h2 {
+    font-size: 2.65rem;
+    font-weight: 300;
+    color: #fff;
+    padding-bottom: 5px;
+}
+
+.v5-splash-caption p {
+    font-size: 1.39rem;
+    font-weight: 300;
+    color: #fff;
+    line-height: 0.7;
+    padding: 0px 20px;
+}
+
+.image-attribution {
+    position: absolute; 
+    bottom: 1vh;
+    right: 15px; 
+    color: #bbb; 
+    padding: 10px; 
+    background: rgba(0,0,0,.5);
+    font-size: 0.61rem;
+}
+
+.app-info-block.intro-section h2 {
+    color: #fff;
+    font-size: 2.64rem;
+    padding: 10px 20px;
+}
+
+.down-button {
+    position: absolute;
+    bottom: 10vh;
+    left: calc(50% - 20px);
+    z-index: 100;
+    color: #fff;
+    background: #2a2a2a;
+    border: 1px solid #fff;
+    border-radius: 50%;
+}
+
+.down-button-icon {
+    font-size: 2.1rem;
+    height: 44px;
+    width: 45px;
+    align-items: center;
+    justify-content: center;
+    opacity: .7;
+    line-height: 47px;
+}
+
+.tp-caption {
+    position: absolute;
+    top: auto !important;
+    bottom: 20vh;
+}
+
+.slide-caption {
+    position: absolute;
+    top: auto !important;
+    bottom: 20vh;
+    bottom: 22vh;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+}
+
+.slide-container img {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+}
+
+/* ------------------------------Media queries------------------------------ */
+
+@media (max-width: 1000px) {
+    .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
+        padding-left: 12px;
+        margin-top: 14px;
+    }
+    .app-info-block.intro-section h2 {
+        font-size: 5vw;
+    }
+    .v5-splash-caption p {
+        font-size: 3vw;
+    }
+}
+
+@media screen and (max-height: 640px) {
+    .down-button {
+        display: none;
+    }
+}
+
+@media (max-width: 481px) {
+    .v5-splash-caption {
+        left: 0!important;
+        width: 100%;
+        padding: 10px !important;
+    }
+    .v5-splash-caption p {
+        font-size: 0.6rem;
+    }
+    .app-info-block.intro-section h2 {
+        font-size: 0.87rem;
+    }
+    .image-attribution {
+        right: 0;
+    }
+    .tp-caption h2 {
+        font-size: 0.87rem!important;
+    }
+    .tp-caption p {
+        font-size: 0.6rem!important;
+    }
+}
+
+@media screen and (max-height: 375px) {
+    .v5-splash-caption, .image-attribution {
+        padding: 0 10px !important;
+    }
+    .slide-img-attribution {
+        font-size: 3vw;
+        max-width: 100vw;
+    }
+}

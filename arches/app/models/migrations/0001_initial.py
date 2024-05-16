@@ -92,7 +92,9 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
 
 class Migration(migrations.Migration):
 
-    dependencies = []
+    dependencies = [
+        ("contenttypes", "0002_remove_content_type_name"),
+    ]
 
     initial = True
 

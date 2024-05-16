@@ -19,12 +19,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import json
 import os
 import time
+import uuid
 
-from tests import test_settings
 from django.contrib.auth.models import User, Group
-from django.core import management
+from django.db import connection
 from django.urls import reverse
 from django.test.client import Client
+from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import assign_perm, get_perms
 from arches.app.models import models
 from arches.app.models.graph import Graph
@@ -34,17 +35,19 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
 from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
 from arches.app.utils.i18n import LanguageSynchronizer
-from arches.app.utils.index_database import index_resources_by_type
+from arches.app.utils.index_database import index_resources_by_type, index_resources_using_singleprocessing
 from tests.base_test import ArchesTestCase
 
 
 # these tests can be run from the command line via
-# python manage.py test tests/models/resource_test.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.models.resource_test --settings="tests.test_settings"
 
 
 class ResourceTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         LanguageSynchronizer.synchronize_settings_with_db()
 
         models.ResourceInstance.objects.all().delete()
@@ -52,11 +55,11 @@ class ResourceTests(ArchesTestCase):
         cls.client = Client()
         cls.client.login(username="admin", password="admin")
 
-        with open(os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "rU") as f:
+        with open(os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         resource_graph_importer(archesfile["graph"])
 
-        cls.search_model_graphid = "c9b37a14-17b3-11eb-a708-acde48001122"
+        cls.search_model_graphid = uuid.UUID("c9b37a14-17b3-11eb-a708-acde48001122")
         cls.search_model_cultural_period_nodeid = "c9b3882e-17b3-11eb-a708-acde48001122"
         cls.search_model_creation_date_nodeid = "c9b38568-17b3-11eb-a708-acde48001122"
         cls.search_model_destruction_date_nodeid = "c9b3828e-17b3-11eb-a708-acde48001122"
@@ -124,7 +127,7 @@ class ResourceTests(ArchesTestCase):
         tile = Tile(data={cls.search_model_creation_date_nodeid: "1941-01-01"}, nodegroup_id=cls.search_model_creation_date_nodeid)
         cls.test_resource.tiles.append(tile)
 
-        # Add Gometry
+        # Add Geometry
         cls.geom = {
             "type": "FeatureCollection",
             "features": [{"geometry": {"type": "Point", "coordinates": [0, 0]}, "type": "Feature", "properties": {}}],
@@ -143,6 +146,7 @@ class ResourceTests(ArchesTestCase):
         models.GraphModel.objects.filter(source_identifier=cls.search_model_graphid).delete()
         models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
         cls.user.delete()
+        super().tearDownClass()
 
     def test_get_node_value_string(self):
         """
@@ -218,6 +222,36 @@ class ResourceTests(ArchesTestCase):
 
         self.assertEqual(result, "Passed")
 
+    def test_publication_restored_on_save(self):
+        """
+        If a resource lacks a graph publication, it is restored by a call to save().
+        """
+
+        publication = self.test_resource.graph_publication
+        cursor = connection.cursor()
+        # Hack out the graph publication
+        sql = """
+            UPDATE resource_instances
+            SET graphpublicationid = NULL
+            WHERE resourceinstanceid = '{resource_pk}';
+        """.format(
+            resource_pk=self.test_resource.pk
+        )
+        cursor.execute(sql)
+        self.addCleanup(setattr, self.test_resource, "graph_publication", publication)
+        self.addCleanup(self.test_resource.save)
+        self.test_resource.refresh_from_db()
+        self.assertIsNone(self.test_resource.graph_publication)  # ensure test setup is good
+
+        # update_or_create() delegates to save()
+        obj, created = models.ResourceInstance.objects.filter(pk=self.test_resource.pk).update_or_create(
+            pk=self.test_resource.pk,
+            graph=self.test_resource.graph,
+        )
+        obj.refresh_from_db()  # give test opportunity to fail on Django 4.2+
+
+        self.assertIsNotNone(obj.graph_publication)
+
     def test_creator_has_permissions(self):
         """
         Test user that created instance has full permissions
@@ -231,3 +265,119 @@ class ResourceTests(ArchesTestCase):
         test_resource.save(user=user)
         perms = set(get_perms(user, test_resource))
         self.assertEqual(perms, {"view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"})
+
+    def test_recalculate_descriptors_prefetch_related_objects(self):
+        r1 = Resource(graph_id=self.search_model_graphid)
+        r2 = Resource(graph_id=self.search_model_graphid)
+        r1_tile = Tile(
+            data={self.search_model_creation_date_nodeid: "1941-01-01"},
+            nodegroup_id=self.search_model_creation_date_nodeid,
+        )
+        r1.tiles.append(r1_tile)
+        r2_tile = Tile(
+            data={self.search_model_creation_date_nodeid: "1941-01-01"},
+            nodegroup_id=self.search_model_creation_date_nodeid,
+        )
+        r2.tiles.append(r2_tile)
+        r1.save(index=False)
+        r2.save(index=False)
+
+        # Ensure we start from scratch
+        r1.descriptor_function = None
+        r2.descriptor_function = None
+
+        for test_name, resources in (
+            ("array", [r1, r2]),
+            ("queryset", Resource.objects.filter(pk__in=[r1.pk, r2.pk])),
+        ):
+            with (
+                self.subTest(iterable=test_name),
+                CaptureQueriesContext(connection) as queries,
+            ):
+                index_resources_using_singleprocessing(
+                    resources, recalculate_descriptors=True, quiet=True
+                )
+
+                function_x_graph_selects = [
+                    q
+                    for q in queries
+                    if q["sql"].startswith('SELECT "functions_x_graphs"."id"')
+                ]
+                self.assertEqual(len(function_x_graph_selects), 1)
+
+                tile_selects = [
+                    q for q in queries if q["sql"].startswith('SELECT "tiles"."tileid"')
+                ]
+                self.assertEqual(len(tile_selects), 1)
+
+    def test_self_referring_resource_instance_descriptor(self):
+        # Create a nodegroup with a string node and a resource-instance node.
+        graph = Graph.new(name="Self-referring descriptor test", is_resource=True)
+        nodegroup = models.NodeGroup.objects.create()
+        string_node = models.Node.objects.create(
+            graph=graph,
+            nodegroup=nodegroup,
+            name="String Node",
+            datatype="string",
+            istopnode=False,
+        )
+        resource_instance_node = models.Node.objects.create(
+            graph=graph,
+            nodegroup=nodegroup,
+            name="Resource Node",
+            datatype="resource-instance",
+            istopnode=False,
+        )
+
+        # Configure the primary descriptor to use the string node
+        models.FunctionXGraph.objects.create(
+            graph=graph,
+            function_id="60000000-0000-0000-0000-000000000001",
+            config={
+                "descriptor_types": {
+                    "name": {
+                        "nodegroup_id": str(nodegroup.nodegroupid),
+                        # The bug report did not have <Resource Node> in the descriptor
+                        # template, but including it here to allow the assertion to fail
+                        "string_template": "<String Node> <Resource Node>",
+                    },
+                    "map_popup": {
+                        "nodegroup_id": None,
+                        "string_template": "",
+                    },
+                    "description": {
+                        "nodegroup_id": None,
+                        "string_template": "",
+                    },
+                },
+            },
+        )
+
+        # Create a tile that references itself
+        resource = models.ResourceInstance.objects.create(graph=graph)
+        tile = models.TileModel.objects.create(
+            nodegroup_id=nodegroup.pk,
+            resourceinstance=resource,
+            data={
+                str(string_node.pk): {
+                    "en": {"value": "test value", "direction": "ltr"},
+                },
+                str(resource_instance_node.pk): {
+                    "resourceId": str(resource.pk),
+                    "ontologyProperty": "",
+                    "inverseOntologyProperty": "",
+                },
+            },
+            sortorder=0,
+        )
+        models.ResourceXResource.objects.create(
+            nodeid=resource_instance_node,
+            resourceinstanceidfrom=resource,
+            resourceinstanceidto=resource,
+            tileid=tile,
+        )
+        r = Resource.objects.get(pk=resource.pk)
+        r.save_descriptors()
+
+        # Until 7.4, a RecursionError was caught after this value was repeated many times.
+        self.assertEqual(r.displayname(), "test value ")

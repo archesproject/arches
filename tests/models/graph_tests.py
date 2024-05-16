@@ -18,8 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os, json, uuid
 from django.contrib.auth.models import User
-from django.core import management
-from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
@@ -27,16 +25,16 @@ from arches.app.models.card import Card
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
-# python manage.py test tests/models/graph_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.models.graph_tests --settings="tests.test_settings"
 
 
 class GraphTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.loadOntology()
+        super().setUpClass()
 
-        for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
-            management.call_command("packages", operation="import_graphs", source=path)
+        cls.loadOntology()
+        cls.ensure_resource_test_model_loaded()
 
         cls.NODE_NODETYPE_GRAPHID = "22000000-0000-0000-0000-000000000001"
         cls.SINGLE_NODE_GRAPHID = "22000000-0000-0000-0000-000000000000"
@@ -1090,7 +1088,11 @@ class GraphTests(ArchesTestCase):
                     if type(value) == "dict":
                         self.assertDictEqual(value, updated_source_graph_serialized_card[key])
                     else:
-                        self.assertEqual(value, updated_source_graph_serialized_card[key])
+                        updated_value = updated_source_graph_serialized_card[key]
+                        if updated_value == '{"en": ""}':  # workaround for updated str default values
+                            updated_value = ""
+
+                        self.assertEqual(value, updated_value)
 
             # ensures all superflous values relating to `editable_future_graph` have been deleted
             try:
@@ -1108,7 +1110,11 @@ class GraphTests(ArchesTestCase):
                     if type(value) == "dict":
                         self.assertDictEqual(value, updated_source_graph_serialized_node[key])
                     else:
-                        self.assertEqual(value, updated_source_graph_serialized_node[key])
+                        updated_value = updated_source_graph_serialized_node[key]
+                        if updated_value == '{"en": ""}':  # workaround for updated str default values
+                            updated_value = ""
+
+                        self.assertEqual(value, updated_value)
 
             # ensures all superflous values relating to `editable_future_graph` have been deleted
             try:

@@ -3,7 +3,7 @@ import uuid
 import csv
 import logging
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.models import concept
 from django.core.cache import cache
@@ -37,7 +37,7 @@ class BaseConceptDataType(BaseDataType):
         ret = label
         collection_values = self.collection_lookup[collectionid]
         for concept in collection_values:
-            if label == concept[1]:
+            if concept[1] in (label, label.strip()):
                 ret = concept[2]
         return ret
 
@@ -128,6 +128,12 @@ class BaseConceptDataType(BaseDataType):
         try:
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
+            elif value["op"] == "in_list_any":
+                self.append_in_list_search_filters(value, node, query, match_any=True)
+            elif value["op"] == "in_list_all":
+                self.append_in_list_search_filters(value, node, query, match_any=False)
+            elif value["op"] == "in_list_not":
+                self.append_in_list_search_filters(value, node, query, match_any=None)
             elif value["val"] != "":
                 match_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
                 if "!" in value["op"]:
@@ -136,6 +142,28 @@ class BaseConceptDataType(BaseDataType):
                 else:
                     query.must(match_query)
 
+        except KeyError as e:
+            pass
+
+    def append_in_list_search_filters(self, value, node, query, match_any=True):
+        try:
+            # Extract the list of values from the filter
+            values_list = value.get("val", [])
+
+            if values_list:
+                field_name = f"tiles.data.{str(node.pk)}"
+                for val in values_list:
+                    match_q = Match(field=field_name, type="phrase", query=val)
+
+                    match match_any:
+                        case True:
+                            query.should(match_q)
+                        case False:
+                            query.must(match_q)
+                        case None:
+                            query.must_not(match_q)
+                query.filter(Exists(field=field_name))
+        
         except KeyError as e:
             pass
 
@@ -184,7 +212,7 @@ class ConceptDataType(BaseConceptDataType):
                 try:
                     value = self.lookup_labelid_from_label(value, kwargs)
                 except:
-                    logger.warn(_("Unable to convert {0} to concept label".format(value)))
+                    logger.warning(_("Unable to convert {0} to concept label".format(value)))
         return value
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -328,7 +356,7 @@ class ConceptListDataType(BaseConceptDataType):
                             ret.append(self.lookup_labelid_from_label(v, kwargs))
                         except:
                             ret.append(v)
-                            logger.warn(_("Unable to convert {0} to concept label".format(v)))
+                            logger.warning(_("Unable to convert {0} to concept label".format(v)))
         return ret
 
     def transform_export_values(self, value, *args, **kwargs):

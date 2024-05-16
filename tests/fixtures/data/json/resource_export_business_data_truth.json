@@ -42,12 +42,6 @@
             "data": {
               "677f236e-09cc-11e7-8ff7-6c4008b05c4c": null
             },
-            "nodegroup": {
-              "cardinality": "1",
-              "legacygroupid": null,
-              "nodegroupid": "677f236e-09cc-11e7-8ff7-6c4008b05c4c",
-              "parentnodegroup_id": null
-            },
             "nodegroup_id": "677f236e-09cc-11e7-8ff7-6c4008b05c4c",
             "parenttile_id": null,
             "provisionaledits": null,
@@ -66,12 +60,6 @@
               "ab74affa-fa0e-11e6-9e3e-026d961c88e6": "7949d7b5-6e57-469a-8f38-87aac08e1788",
               "ab74b016-fa0e-11e6-9e3e-026d961c88e6": null
             },
-            "nodegroup": {
-              "cardinality": "n",
-              "legacygroupid": null,
-              "nodegroupid": "ab74afc8-fa0e-11e6-9e3e-026d961c88e6",
-              "parentnodegroup_id": null
-            },
             "nodegroup_id": "ab74afc8-fa0e-11e6-9e3e-026d961c88e6",
             "parenttile_id": null,
             "provisionaledits": null,
@@ -85,12 +73,6 @@
               "ab74afe2-fa0e-11e6-9e3e-026d961c88e6": null,
               "ab74affd-fa0e-11e6-9e3e-026d961c88e6": "9fa56006-6828-480f-8395-ad5c5a84726b"
             },
-            "nodegroup": {
-              "cardinality": "n",
-              "legacygroupid": null,
-              "nodegroupid": "ab74af95-fa0e-11e6-9e3e-026d961c88e6",
-              "parentnodegroup_id": null
-            },
             "nodegroup_id": "ab74af95-fa0e-11e6-9e3e-026d961c88e6",
             "parenttile_id": null,
             "provisionaledits": null,
@@ -101,12 +83,6 @@
           {
             "data": {
               "6ead3ef0-09cc-11e7-a37d-6c4008b05c4c": null
-            },
-            "nodegroup": {
-              "cardinality": "1",
-              "legacygroupid": null,
-              "nodegroupid": "6ead3ef0-09cc-11e7-a37d-6c4008b05c4c",
-              "parentnodegroup_id": null
             },
             "nodegroup_id": "6ead3ef0-09cc-11e7-a37d-6c4008b05c4c",
             "parenttile_id": null,
@@ -135,12 +111,6 @@
                 "type": "FeatureCollection"
               }
             },
-            "nodegroup": {
-              "cardinality": "1",
-              "legacygroupid": null,
-              "nodegroupid": "6ead34dc-09cc-11e7-be0d-6c4008b05c4c",
-              "parentnodegroup_id": "6ead3ef0-09cc-11e7-a37d-6c4008b05c4c"
-            },
             "nodegroup_id": "6ead34dc-09cc-11e7-be0d-6c4008b05c4c",
             "parenttile_id": "726ccc5b-38de-4a05-b565-2192cea8fd12",
             "provisionaledits": null,
@@ -160,12 +130,6 @@
               "677f3c4f-09cc-11e7-92a9-6c4008b05c4c": null,
               "677f3d2b-09cc-11e7-ba91-6c4008b05c4c": null
             },
-            "nodegroup": {
-              "cardinality": "1",
-              "legacygroupid": null,
-              "nodegroupid": "677f1d5e-09cc-11e7-8716-6c4008b05c4c",
-              "parentnodegroup_id": "677f236e-09cc-11e7-8ff7-6c4008b05c4c"
-            },
             "nodegroup_id": "677f1d5e-09cc-11e7-8716-6c4008b05c4c",
             "parenttile_id": "074c5da1-9aad-495a-a5f7-043679f44de6",
             "provisionaledits": null,
@@ -183,12 +147,6 @@
               },
               "677f39a8-09cc-11e7-834a-6c4008b05c4c": "7949d7b5-6e57-469a-8f38-87aac08e1788"
             },
-            "nodegroup": {
-              "cardinality": "n",
-              "legacygroupid": null,
-              "nodegroupid": "677f303d-09cc-11e7-9aa6-6c4008b05c4c",
-              "parentnodegroup_id": "677f236e-09cc-11e7-8ff7-6c4008b05c4c"
-            },
             "nodegroup_id": "677f303d-09cc-11e7-9aa6-6c4008b05c4c",
             "parenttile_id": "074c5da1-9aad-495a-a5f7-043679f44de6",
             "provisionaledits": null,
@@ -205,12 +163,6 @@
               "e4560249-fa36-11e6-9e3e-026d961c88e6": null,
               "e456024f-fa36-11e6-9e3e-026d961c88e6": null
             },
-            "nodegroup": {
-              "cardinality": "n",
-              "legacygroupid": null,
-              "nodegroupid": "e4560237-fa36-11e6-9e3e-026d961c88e6",
-              "parentnodegroup_id": "e456023d-fa36-11e6-9e3e-026d961c88e6"
-            },
             "nodegroup_id": "e4560237-fa36-11e6-9e3e-026d961c88e6",
             "parenttile_id": "fcc6272f-06fd-49ad-869b-ae0ea284a0cb",
             "provisionaledits": null,
@@ -221,12 +173,6 @@
           {
             "data": {
               "e456023d-fa36-11e6-9e3e-026d961c88e6": null
-            },
-            "nodegroup": {
-              "cardinality": "n",
-              "legacygroupid": null,
-              "nodegroupid": "e456023d-fa36-11e6-9e3e-026d961c88e6",
-              "parentnodegroup_id": null
             },
             "nodegroup_id": "e456023d-fa36-11e6-9e3e-026d961c88e6",
             "parenttile_id": null,
@@ -278,12 +224,6 @@
             "data": {
               "6ead3ef0-09cc-11e7-a37d-6c4008b05c4c": null
             },
-            "nodegroup": {
-              "cardinality": "1",
-              "legacygroupid": null,
-              "nodegroupid": "6ead3ef0-09cc-11e7-a37d-6c4008b05c4c",
-              "parentnodegroup_id": null
-            },
             "nodegroup_id": "6ead3ef0-09cc-11e7-a37d-6c4008b05c4c",
             "parenttile_id": null,
             "provisionaledits": null,
@@ -299,12 +239,6 @@
               "e4560246-fa36-11e6-9e3e-026d961c88e6": "fad6f17d-f7c8-4fa1-b358-e8626571599e",
               "e4560249-fa36-11e6-9e3e-026d961c88e6": null,
               "e456024f-fa36-11e6-9e3e-026d961c88e6": null
-            },
-            "nodegroup": {
-              "cardinality": "n",
-              "legacygroupid": null,
-              "nodegroupid": "e4560237-fa36-11e6-9e3e-026d961c88e6",
-              "parentnodegroup_id": "e456023d-fa36-11e6-9e3e-026d961c88e6"
             },
             "nodegroup_id": "e4560237-fa36-11e6-9e3e-026d961c88e6",
             "parenttile_id": "a30e1f76-0468-4004-9a9e-7d77fb5b0c72",
@@ -333,12 +267,6 @@
                 "type": "FeatureCollection"
               }
             },
-            "nodegroup": {
-              "cardinality": "1",
-              "legacygroupid": null,
-              "nodegroupid": "6ead34dc-09cc-11e7-be0d-6c4008b05c4c",
-              "parentnodegroup_id": "6ead3ef0-09cc-11e7-a37d-6c4008b05c4c"
-            },
             "nodegroup_id": "6ead34dc-09cc-11e7-be0d-6c4008b05c4c",
             "parenttile_id": "007e78ea-b2e4-45e8-ac15-ac756fb106e4",
             "provisionaledits": null,
@@ -357,12 +285,6 @@
               "ab74affa-fa0e-11e6-9e3e-026d961c88e6": "9fa56006-6828-480f-8395-ad5c5a84726b",
               "ab74b016-fa0e-11e6-9e3e-026d961c88e6": null
             },
-            "nodegroup": {
-              "cardinality": "n",
-              "legacygroupid": null,
-              "nodegroupid": "ab74afc8-fa0e-11e6-9e3e-026d961c88e6",
-              "parentnodegroup_id": null
-            },
             "nodegroup_id": "ab74afc8-fa0e-11e6-9e3e-026d961c88e6",
             "parenttile_id": null,
             "provisionaledits": null,
@@ -373,12 +295,6 @@
           {
             "data": {
               "677f236e-09cc-11e7-8ff7-6c4008b05c4c": null
-            },
-            "nodegroup": {
-              "cardinality": "1",
-              "legacygroupid": null,
-              "nodegroupid": "677f236e-09cc-11e7-8ff7-6c4008b05c4c",
-              "parentnodegroup_id": null
             },
             "nodegroup_id": "677f236e-09cc-11e7-8ff7-6c4008b05c4c",
             "parenttile_id": null,
@@ -392,12 +308,6 @@
               "ab74af95-fa0e-11e6-9e3e-026d961c88e6": null,
               "ab74afe2-fa0e-11e6-9e3e-026d961c88e6": null,
               "ab74affd-fa0e-11e6-9e3e-026d961c88e6": "fad6f17d-f7c8-4fa1-b358-e8626571599e"
-            },
-            "nodegroup": {
-              "cardinality": "n",
-              "legacygroupid": null,
-              "nodegroupid": "ab74af95-fa0e-11e6-9e3e-026d961c88e6",
-              "parentnodegroup_id": null
             },
             "nodegroup_id": "ab74af95-fa0e-11e6-9e3e-026d961c88e6",
             "parenttile_id": null,
@@ -418,12 +328,6 @@
               "677f3c4f-09cc-11e7-92a9-6c4008b05c4c": null,
               "677f3d2b-09cc-11e7-ba91-6c4008b05c4c": null
             },
-            "nodegroup": {
-              "cardinality": "1",
-              "legacygroupid": null,
-              "nodegroupid": "677f1d5e-09cc-11e7-8716-6c4008b05c4c",
-              "parentnodegroup_id": "677f236e-09cc-11e7-8ff7-6c4008b05c4c"
-            },
             "nodegroup_id": "677f1d5e-09cc-11e7-8716-6c4008b05c4c",
             "parenttile_id": "691178e1-1588-49f6-9dea-c4b69d04d3f7",
             "provisionaledits": null,
@@ -434,12 +338,6 @@
           {
             "data": {
               "e456023d-fa36-11e6-9e3e-026d961c88e6": null
-            },
-            "nodegroup": {
-              "cardinality": "n",
-              "legacygroupid": null,
-              "nodegroupid": "e456023d-fa36-11e6-9e3e-026d961c88e6",
-              "parentnodegroup_id": null
             },
             "nodegroup_id": "e456023d-fa36-11e6-9e3e-026d961c88e6",
             "parenttile_id": null,
@@ -457,12 +355,6 @@
                 }
               },
               "677f39a8-09cc-11e7-834a-6c4008b05c4c": "9fa56006-6828-480f-8395-ad5c5a84726b"
-            },
-            "nodegroup": {
-              "cardinality": "n",
-              "legacygroupid": null,
-              "nodegroupid": "677f303d-09cc-11e7-9aa6-6c4008b05c4c",
-              "parentnodegroup_id": "677f236e-09cc-11e7-8ff7-6c4008b05c4c"
             },
             "nodegroup_id": "677f303d-09cc-11e7-9aa6-6c4008b05c4c",
             "parenttile_id": "691178e1-1588-49f6-9dea-c4b69d04d3f7",

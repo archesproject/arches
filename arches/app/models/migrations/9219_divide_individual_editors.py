@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                 'bulk-trim-editor',
                 'base_data_editor.py',
                 'BulkStringEditor',
-                '{"bgColor": "#2ecc71", "circleColor": "#51D88C", "show": true}',
+                '{"bgColor": "#2ecc71", "circleColor": "#51D88C", "show": true, "previewLimit": 5}',
                 'fa fa-edit',
                 'bulk-trim-editor'
             ),
@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 'bulk-case-editor',
                 'base_data_editor.py',
                 'BulkStringEditor',
-                '{"bgColor": "#7EC8E3", "circleColor": "#AEC6CF", "show": true}',
+                '{"bgColor": "#7EC8E3", "circleColor": "#AEC6CF", "show": true, "previewLimit": 5}',
                 'fa fa-edit',
                 'bulk-case-editor'
             ),
@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 'bulk-replace-editor',
                 'base_data_editor.py',
                 'BulkStringEditor',
-                '{"bgColor": "#27ae60", "circleColor": "#51D88C", "show": true}',
+                '{"bgColor": "#27ae60", "circleColor": "#51D88C", "show": true, "previewLimit": 5}',
                 'fa fa-edit',
                 'bulk-replace-editor'
             );

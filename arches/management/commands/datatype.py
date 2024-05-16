@@ -19,6 +19,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """This module contains commands for building Arches."""
 
 import os
+import sys
+
 from arches.management.commands import utils
 from arches.app.models import models
 from django.core.management.base import BaseCommand, CommandError
@@ -55,11 +57,8 @@ class Command(BaseCommand):
         Inserts a datatype into the arches db
 
         """
-
-        import imp
-
-        dt_source = imp.load_source("", source)
-        details = dt_source.details
+        utils.load_source("dt_source", source)
+        details = sys.modules["dt_source"].details
         self.validate_details(details)
 
         dt = models.DDataType(
@@ -103,11 +102,8 @@ class Command(BaseCommand):
         Updates an existing datatype in the arches db
 
         """
-
-        import imp
-
-        dt_source = imp.load_source("", source)
-        details = dt_source.details
+        utils.load_source("dt_source", source)
+        details = sys.modules["dt_source"].details
         self.validate_details(details)
 
         instance = models.DDataType.objects.get(datatype=details["datatype"])

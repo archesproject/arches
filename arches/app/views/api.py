@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+import site
 import sys
 import uuid
 import traceback
@@ -15,6 +16,7 @@ from rdflib.namespace import SKOS, DCTERMS
 from revproxy.views import ProxyView
 from slugify import slugify
 from urllib import parse
+from collections import OrderedDict
 from django.contrib.auth import authenticate
 from django.shortcuts import render
 from django.views.generic import View
@@ -26,10 +28,12 @@ from django.core import management
 from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import get_language, gettext as _
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import translation
 from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.card import Card as CardProxyModel
@@ -40,7 +44,7 @@ from arches.app.models.tile import Tile as TileProxyModel, TileValidationError
 from arches.app.views.tile import TileData as TileView
 from arches.app.views.resource import RelatedResourcesView, get_resource_relationship_types
 from arches.app.utils.skos import SKOSWriter
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.decorators import can_read_concept, group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
@@ -57,13 +61,10 @@ from arches.app.utils.permission_backend import (
     get_nodegroups_by_perm,
 )
 from arches.app.utils.geo_utils import GeoUtils
+from arches.app.utils.permission_backend import user_is_resource_editor
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from django.utils import translation
-
-
-from arches.celery import app
 
 logger = logging.getLogger(__name__)
 
@@ -107,6 +108,37 @@ class APIBase(View):
         return super(APIBase, self).dispatch(request, *args, **kwargs)
 
 
+class GetFrontendI18NData(APIBase):
+    def get(self, request):
+        user_language = get_language()
+
+        language_file_path = []
+
+        language_file_path.append(os.path.join(settings.APP_ROOT, "locale", user_language + ".json"))
+        
+        for arches_application_name in settings.ARCHES_APPLICATIONS:
+            application_path = os.path.split(sys.modules[arches_application_name].__spec__.origin)[0]
+            language_file_path.append(os.path.join(application_path, "locale", user_language + ".json"))
+        
+        language_file_path.append(os.path.join(settings.ROOT_DIR, "locale", user_language + ".json"))
+
+        localized_strings = {}
+        for lang_file in language_file_path:
+            try:
+                localized_strings = json.load(open(lang_file))[user_language] | localized_strings
+            except FileNotFoundError:
+                pass
+        
+        return JSONResponse({
+            'enabled_languages': {
+                language_tuple[0]: str(language_tuple[1])
+                for language_tuple in settings.LANGUAGES
+            },
+            'translations': {user_language: localized_strings},
+            "language": user_language,
+        })
+    
+
 class GeoJSON(APIBase):
     se = SearchEngineFactory().create()
 
@@ -116,7 +148,7 @@ class GeoJSON(APIBase):
         ).select_related("function")
         if len(graph_function) == 1:
             module = graph_function[0].function.get_class_module()()
-            return module.get_primary_descriptor_from_nodes(self, graph_function[0].config["descriptor_types"]["name"])
+            return module.get_primary_descriptor_from_nodes(self, graph_function[0].config["descriptor_types"]["name"], descriptor="name")
         else:
             return _("Unnamed Resource")
 
@@ -247,8 +279,9 @@ class MVT(APIBase):
             node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
         except models.Node.DoesNotExist:
             raise Http404()
+        search_geom_count = 0
         config = node.config
-        cache_key = f"mvt_{nodeid}_{zoom}_{x}_{y}"
+        cache_key = MVT.create_mvt_cache_key(node, zoom, x, y, request.user)
         tile = cache.get(cache_key)
         if tile is None:
             resource_ids = get_restricted_instances(request.user, allresources=True)
@@ -261,57 +294,90 @@ class MVT(APIBase):
                     distance = arc * float(config["clusterDistance"])
                     min_points = int(config["clusterMinPoints"])
                     distance = settings.CLUSTER_DISTANCE_MAX if distance > settings.CLUSTER_DISTANCE_MAX else distance
-                    cursor.execute(
-                        """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
-                        AS (
-                            SELECT m.*,
-                            ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
-                            FROM (
-                                SELECT tileid,
-                                    resourceinstanceid,
-                                    nodeid,
-                                    geom
-                                FROM geojson_geometries
-                                WHERE nodeid = %s and resourceinstanceid not in %s
-                            ) m
-                        )
 
-                        SELECT ST_AsMVT(
-                            tile,
-                             %s,
-                            4096,
-                            'geom',
-                            'id'
-                        ) FROM (
-                            SELECT resourceinstanceid::text,
-                                row_number() over () as id,
-                                1 as total,
+                    count_query = """
+                    SELECT count(*) FROM geojson_geometries
+                    WHERE
+                    ST_Intersects(geom, TileBBox(%s, %s, %s, 3857))
+                    AND
+                    nodeid = %s and resourceinstanceid not in %s
+                    """
+
+                    # get the count of matching geometries
+                    cursor.execute(count_query, [zoom, x, y, nodeid, resource_ids])
+                    search_geom_count = cursor.fetchone()[0]
+
+                    if search_geom_count >= min_points:
+                        cursor.execute(
+                            """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
+                            AS (
+                                SELECT m.*,
+                                ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
+                                FROM (
+                                    SELECT tileid,
+                                        resourceinstanceid,
+                                        nodeid,
+                                        geom
+                                    FROM geojson_geometries
+                                    WHERE 
+                                    ST_Intersects(geom, TileBBox(%s, %s, %s, 3857))
+                                    AND
+                                    nodeid = %s and resourceinstanceid not in %s
+                                ) m
+                            )
+                            SELECT ST_AsMVT(
+                                tile,
+                                %s,
+                                4096,
+                                'geom',
+                                'id'
+                            ) FROM (
+                                SELECT resourceinstanceid::text,
+                                    row_number() over () as id,
+                                    1 as total,
+                                    ST_AsMVTGeom(
+                                        geom,
+                                        TileBBox(%s, %s, %s, 3857)
+                                    ) AS geom,
+                                    '' AS extent
+                                FROM clusters
+                                WHERE cid is NULL
+                                UNION
+                                SELECT NULL as resourceinstanceid,
+                                    row_number() over () as id,
+                                    count(*) as total,
+                                    ST_AsMVTGeom(
+                                        ST_Centroid(
+                                            ST_Collect(geom)
+                                        ),
+                                        TileBBox(%s, %s, %s, 3857)
+                                    ) AS geom,
+                                    ST_AsGeoJSON(
+                                        ST_Extent(geom)
+                                    ) AS extent
+                                FROM clusters
+                                WHERE cid IS NOT NULL
+                                GROUP BY cid
+                            ) as tile;""",
+                            [distance, min_points, zoom, x, y, nodeid, resource_ids, nodeid, zoom, x, y, zoom, x, y],
+                        )
+                    elif search_geom_count:
+                        cursor.execute(
+                            """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
+                                id,
+                                resourceinstanceid,
+                                nodeid,
                                 ST_AsMVTGeom(
                                     geom,
                                     TileBBox(%s, %s, %s, 3857)
                                 ) AS geom,
-                                '' AS extent
-                            FROM clusters
-                            WHERE cid is NULL
-                            UNION
-                            SELECT NULL as resourceinstanceid,
-                                row_number() over () as id,
-                                count(*) as total,
-                                ST_AsMVTGeom(
-                                    ST_Centroid(
-                                        ST_Collect(geom)
-                                    ),
-                                    TileBBox(%s, %s, %s, 3857)
-                                ) AS geom,
-                                ST_AsGeoJSON(
-                                    ST_Extent(geom)
-                                ) AS extent
-                            FROM clusters
-                            WHERE cid IS NOT NULL
-                            GROUP BY cid
-                        ) as tile;""",
-                        [distance, min_points, nodeid, resource_ids, nodeid, zoom, x, y, zoom, x, y],
-                    )
+                                1 AS total
+                            FROM geojson_geometries
+                            WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
+                            [nodeid, zoom, x, y, nodeid, resource_ids],
+                        )
+                    else:
+                        tile = ""
                 else:
                     cursor.execute(
                         """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
@@ -327,12 +393,14 @@ class MVT(APIBase):
                         WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
                         [nodeid, zoom, x, y, nodeid, resource_ids],
                     )
-                tile = bytes(cursor.fetchone()[0])
+                tile = bytes(cursor.fetchone()[0]) if tile is None else tile
                 cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
         if not len(tile):
             raise Http404()
         return HttpResponse(tile, content_type="application/x-protobuf")
 
+    def create_mvt_cache_key(node, zoom, x, y, user):
+        return f"mvt_{str(node.nodeid)}_{zoom}_{x}_{y}_{user.id}"
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Graphs(APIBase):
@@ -398,9 +466,9 @@ class GraphIsActive(APIBase):
         graph = Graph.objects.get(pk=graph_id)
 
         if graph.source_identifier:
-            grah = graph.source_identifier
+            graph = graph.source_identifier
 
-        return JSONResponse(grah.is_active)
+        return JSONResponse(graph.is_active)
 
     def post(self, request, graph_id=None):
         try:
@@ -596,12 +664,15 @@ class Resources(APIBase):
         return JSONResponse(out, indent=indent)
 
     def put(self, request, resourceid, slug=None, graphid=None):
-        indent = request.GET.get("indent", None)
-
         allowed_formats = ["arches-json", "json-ld"]
+        indent = request.GET.get("indent", None)
         format = request.GET.get("format", "json-ld")
+        
         if format not in allowed_formats:
             return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
+        
+        if format == "json-ld" and slug is None and graphid is None:
+            return JSONResponse({"error": "Need to supply either a graph id or slug in the request url.  See the API reference in the developer documentation at https://arches.readthedocs.io for more details"}, status=400)
 
         if not user_can_edit_resource(user=request.user, resourceid=resourceid):
             return JSONResponse(status=403)
@@ -609,18 +680,10 @@ class Resources(APIBase):
             with transaction.atomic():
                 try:
                     if format == "json-ld":
-                        try:
-                            # DELETE
-                            resource_instance = Resource.objects.get(pk=resourceid)
-                            resource_instance.delete()
-                        except models.ResourceInstance.DoesNotExist:
-                            pass
-
-                        # POST
                         data = JSONDeserializer().deserialize(request.body)
                         reader = JsonLdReader()
                         if slug is not None:
-                            graphid = models.GraphModel.objects.get(slug=slug).pk
+                            graphid = models.GraphModel.objects.get(slug=slug, source_identifier=None).pk
                         reader.read_resource(data, resourceid=resourceid, graphid=graphid)
                         if reader.errors:
                             response = []
@@ -631,6 +694,12 @@ class Resources(APIBase):
                             response = []
                             for resource in reader.resources:
                                 with transaction.atomic():
+                                    try:
+                                        # DELETE
+                                        resource_instance = Resource.objects.get(pk=resource.pk)
+                                        resource_instance.delete()
+                                    except models.ResourceInstance.DoesNotExist:
+                                        pass
                                     resource.save(request=request)
                                 response.append(JSONDeserializer().deserialize(self.get(request, resource.resourceinstanceid).content))
                             return JSONResponse(response, indent=indent, status=201)
@@ -675,19 +744,23 @@ class Resources(APIBase):
                     return JSONResponse({"error": "resource data could not be saved"}, status=500, reason=e)
 
     def post(self, request, resourceid=None, slug=None, graphid=None):
-        indent = request.POST.get("indent", None)
         allowed_formats = ["arches-json", "json-ld"]
+        indent = request.POST.get("indent", None)
         format = request.GET.get("format", "json-ld")
+        
         if format not in allowed_formats:
             return JSONResponse(status=406, reason="incorrect format specified, only %s formats allowed" % allowed_formats)
 
+        if format == "json-ld" and slug is None and graphid is None:
+            return JSONResponse({"error": "Need to supply either a graph id or slug in the request url.  See the API reference in the developer documentation at https://arches.readthedocs.io for more details"}, status=400)
+        
         try:
             if user_can_edit_resource(user=request.user, resourceid=resourceid):
                 if format == "json-ld":
                     data = JSONDeserializer().deserialize(request.body)
                     reader = JsonLdReader()
                     if slug is not None:
-                        graphid = models.GraphModel.objects.get(slug=slug).pk
+                        graphid = models.GraphModel.objects.get(slug=slug, source_identifier=None).pk
                     reader.read_resource(data, graphid=graphid)
                     if reader.errors:
                         response = []
@@ -916,7 +989,20 @@ class Card(APIBase):
         return JSONResponse(context, indent=4)
 
 
+class Plugins(View):
+    def get(self, request, plugin_id=None):
+        if plugin_id:
+            plugins = models.Plugin.objects.filter(pk=plugin_id)
+        else:
+            plugins = models.Plugin.objects.all()
+        
+        plugins = [plugin for plugin in plugins if self.request.user.has_perm("view_plugin", plugin)]
+
+        return JSONResponse(plugins)
+            
+
 class SearchExport(View):
+    @method_decorator(ratelimit(key="header:http-authorization", rate=settings.RATE_LIMIT, block=False))
     def get(self, request):
         from arches.app.search.search_export import SearchResultsExporter  # avoids circular import
 
@@ -924,7 +1010,7 @@ class SearchExport(View):
         download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
         format = request.GET.get("format", "tilecsv")
         report_link = request.GET.get("reportlink", False)
-        if "HTTP_AUTHORIZATION" in request.META:
+        if "HTTP_AUTHORIZATION" in request.META and not request.get("limited", False):
             request_auth = request.META.get("HTTP_AUTHORIZATION").split()
             if request_auth[0].lower() == "basic":
                 user_cred = b64decode(request_auth[1]).decode().split(":")
@@ -991,6 +1077,7 @@ class IIIFManifest(APIBase):
         query = request.GET.get("query", None)
         start = int(request.GET.get("start", 0))
         limit = request.GET.get("limit", None)
+        more = False
 
         manifests = models.IIIFManifest.objects.all()
         if query is not None:
@@ -998,8 +1085,9 @@ class IIIFManifest(APIBase):
         count = manifests.count()
         if limit is not None:
             manifests = manifests[start : start + int(limit)]
+            more = start + int(limit) < count
 
-        response = JSONResponse({"results": manifests, "count": count})
+        response = JSONResponse({"results": manifests, "count": count, "more": more})
         return response
 
 
@@ -1059,8 +1147,13 @@ class IIIFAnnotationNodes(APIBase):
 
 class Manifest(APIBase):
     def get(self, request, id):
-        manifest = models.IIIFManifest.objects.get(id=id).manifest
-        return JSONResponse(manifest)
+        try:
+            uuid.UUID(id)
+            manifest = models.IIIFManifest.objects.get(globalid=id).manifest
+            return JSONResponse(manifest)
+        except:
+            manifest = models.IIIFManifest.objects.get(id=id).manifest
+            return JSONResponse(manifest)
 
 
 class OntologyProperty(APIBase):
@@ -1133,6 +1226,7 @@ class ResourceReport(APIBase):
                 models.GraphModel.objects.filter(isresource=True)
                 .exclude(is_active=False)
                 .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                .exclude(source_identifier__isnull=False)
             )
 
             get_params = request.GET.copy()
@@ -1151,28 +1245,33 @@ class ResourceReport(APIBase):
             resp["related_resources"] = related_resources_summary
 
         if "tiles" not in exclude:
-            permitted_tiles = []
-            for tile in TileProxyModel.objects.filter(resourceinstance=resource).order_by("sortorder"):
-                if request.user.has_perm(perm, tile.nodegroup):
-                    tile.filter_by_perm(request.user, perm)
-                    permitted_tiles.append(tile)
+            resource.load_tiles(user=request.user, perm=perm)
+            permitted_tiles = resource.tiles
 
             resp["tiles"] = permitted_tiles
 
         if "cards" not in exclude:
-            permitted_serialized_cards = []
-            permitted_cards = []
-            for card in sorted([card for card in graph.cards.values()], key=lambda card: (card.sortorder is None, card.sortorder)):
-                if request.user.has_perm(perm, card.nodegroup):
-                    permitted_cards.append(card)
+            nodegroups = [models.NodeGroup(**serialized_nodegroup) for serialized_nodegroup in published_graph.serialized_graph['nodegroups']]
+            readable_nodegroup_ids = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(request.user, perm, any_perm=True, nodegroups=nodegroups)]
+            writable_nodegroup_ids = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(request.user, 'write_nodegroup', any_perm=True, nodegroups=nodegroups)]
 
-            cardwidgets = [
+            permitted_cards = sorted([
+                card 
+                for card 
+                in graph.cards.values() 
+                if str(card.nodegroup_id) in readable_nodegroup_ids
+                and str(card.nodegroup_id) in writable_nodegroup_ids
+            ], key=lambda card: card.sortorder)
+
+            permitted_card_ids = [card.pk for card in permitted_cards]
+            cardwidgets = sorted([
                 widget
-                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
-                for widget in widgets
-            ]
+                for widget
+                in graph.widgets
+                if widget['card_id'] in permitted_card_ids
+            ], key=lambda widget: widget['sortorder'])
 
-            resp["cards"] = permitted_serialized_cards
+            resp["cards"] = permitted_cards
             resp["cardwidgets"] = cardwidgets
 
         return JSONResponse(resp)
@@ -1321,12 +1420,13 @@ class BulkDisambiguatedResourceInstance(APIBase):
         user = request.user
         perm = "read_nodegroup"
 
-        return JSONResponse(
-            {
-                resource.pk: resource.to_json(compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes, user=user, perm=perm)
-                for resource in Resource.objects.filter(pk__in=resource_ids)
-            }
-        )
+        disambiguated_resource_instances = OrderedDict().fromkeys(resource_ids)
+        for resource in Resource.objects.filter(pk__in=resource_ids):
+            disambiguated_resource_instances[str(resource.pk)] = resource.to_json(
+                compact=compact, version=version, hide_hidden_nodes=hide_hidden_nodes, user=user, perm=perm
+            )
+
+        return JSONResponse(disambiguated_resource_instances, sort_keys=False)
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -1496,6 +1596,51 @@ class NodeValue(APIBase):
         return response
 
 
+class UserIncompleteWorkflows(APIBase):
+    def get(self, request):
+        if not user_is_resource_editor(request.user):
+            return JSONErrorResponse(_("Request Failed"), _("Permission Denied"), status=403)
+        
+        if request.user.is_superuser:
+            incomplete_workflows = models.WorkflowHistory.objects.filter(
+                completed=False
+            ).exclude(componentdata__iexact='{}').order_by('created')
+        else:
+            incomplete_workflows = models.WorkflowHistory.objects.filter(
+                user=request.user, 
+                completed=False
+            ).exclude(componentdata__iexact='{}').order_by('created')
+
+        incomplete_workflows_user_ids = [
+            incomplete_workflow.user_id for incomplete_workflow in incomplete_workflows
+        ]
+
+        incomplete_workflows_users = models.User.objects.filter(pk__in=set(incomplete_workflows_user_ids))
+
+        user_ids_to_usernames = {
+            incomplete_workflows_user.pk: incomplete_workflows_user.username
+            for incomplete_workflows_user in incomplete_workflows_users
+        }
+
+        plugins = models.Plugin.objects.all()
+
+        workflow_slug_to_workflow_name = {
+            plugin.componentname: plugin.name 
+            for plugin in plugins
+        }
+
+        incomplete_workflows_json = JSONDeserializer().deserialize(JSONSerializer().serialize(incomplete_workflows))
+
+        for incomplete_workflow in incomplete_workflows_json:
+            incomplete_workflow['username'] = user_ids_to_usernames[incomplete_workflow['user_id']]
+            incomplete_workflow['pluginname'] = workflow_slug_to_workflow_name[incomplete_workflow['workflowname']]
+
+        return JSONResponse({
+            "incomplete_workflows": incomplete_workflows_json,
+            "requesting_user_is_superuser": request.user.is_superuser,
+        })
+
+
 @method_decorator(csrf_exempt, name="dispatch")
 class Validator(APIBase):
     """
@@ -1612,3 +1757,17 @@ class TransformEdtfForTile(APIBase):
             return JSONResponse(str(e), status=500)
 
         return JSONResponse({"data": result})
+    
+class GetNodegroupTree(APIBase):
+    """
+    Returns the path to a nodegroup from the root node. Transforms node alias to node name.
+    """
+    def get(self,request):
+        graphid = request.GET.get('graphid')
+        with connection.cursor() as cursor:
+            cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
+            result = cursor.fetchall()
+            permitted_nodegroups = [nodegroup.pk for nodegroup in get_nodegroups_by_perm(request.user, "models.read_nodegroup")]  
+            permitted_result = [nodegroup for nodegroup in result if nodegroup[0] in permitted_nodegroups]  
+        
+        return JSONResponse({"path": permitted_result})

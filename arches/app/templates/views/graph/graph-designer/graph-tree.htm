@@ -66,6 +66,22 @@
             <!-- /ko -->
             <span class="spacer"></span>
             <!-- ko ifnot: graph.attributes.isresource && ( node.is_immutable || !graph.attributes.source_identifier_id ) -->
+                <i 
+                    class="jstree-node-action-icon ion-ios-copy-outline" 
+                    role="presentation" 
+                    data-bind="
+                        visible: graphTree.showIds(), 
+                        clipboard: {
+                            value: node.nodeid, 
+                            tooltip: true, 
+                            beforeCopiedText: graphTree.translations.copyNodeIdToClipboard, 
+                            afterCopiedText: graphTree.translations.copiedNodeIdToClipboard
+                        }
+                    " 
+                    data-toggle="tooltip" 
+                    data-placement="auto" 
+                    data-container="body"
+                ></i>
                 <!--ko if: graphTree.restrictedNodegroups.includes(node.nodeGroupId()) === false -->
                 <i 
                     class="jstree-node-action-icon fa fa-plus-circle" 
@@ -86,21 +102,23 @@
                     data-original-title="{% trans "Add Branch" %}"
                 ></i>
                 <!-- /ko -->
-                <!-- ko if: !node.istopnode -->
-                <i 
-                    class="jstree-node-action-icon fa" 
-                    role="presentation" 
-                    data-bind="{
-                        click: graphTree.exportBranch.bind(graphTree), 
-                        css: {'fa-arrow-right': graphTree.activeLanguageDir() != 'rtl', 'fa-arrow-left': graphTree.activeLanguageDir() == 'rtl'}
-                    }" 
-                    data-toggle="tooltip" 
-                    data-placement="auto" 
-                    data-container="body" 
-                    data-original-title="{% trans "Export Branch" %}"
-                ></i>
-                <!-- /ko -->
             <!-- /ko -->
+
+            <!-- ko if: graph.attributes.isresource && !graph.attributes.source_identifier_id && !node.istopnode -->
+            <i 
+                class="jstree-node-action-icon fa" 
+                role="presentation" 
+                data-bind="{
+                    click: graphTree.exportBranch.bind(graphTree), 
+                    css: {'fa-arrow-right': graphTree.activeLanguageDir() != 'rtl', 'fa-arrow-left': graphTree.activeLanguageDir() == 'rtl'}
+                }" 
+                data-toggle="tooltip" 
+                data-placement="auto" 
+                data-container="body" 
+                data-original-title="{% trans "Export Branch" %}"
+            ></i>
+            <!-- /ko -->
+
             <!-- ko if: !node.istopnode && graphTree.restrictedNodegroups.includes(node.nodeGroupId()) === false -->
                 <!-- ko if: graph.attributes.source_identifier_id && ( !node.is_immutable || node.is_immutable && node.isCollector() ) -->
                 <i 
