@@ -980,9 +980,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             for feature in value["features"]:
                 try:
                     geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
-                    validate_geom_bbox(geom)
+                    if geom.valid:
+                        validate_geom_bbox(geom)
+                    else:
+                        raise Exception
                 except Exception:
-                    message = _("Unable to serialize some geometry features")
+                    message = _("Unable to serialize some geometry features.")
                     title = _("Unable to Serialize Geometry")
                     error_message = self.create_error_message(value, source, row_number, message, title)
                     errors.append(error_message)
