@@ -229,7 +229,6 @@ const setParent = async (parentNode: TreeNode) => {
         v-model:selected-keys="selectedKeys"
         v-model:moving-item="movingItem"
         v-model:is-multi-selecting="isMultiSelecting"
-        :selected-keys
     />
     <Tree
         v-if="tree"
