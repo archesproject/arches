@@ -7,7 +7,9 @@ import ListCharacteristic from "@/components/ControlledListManager/ListCharacter
 import ReferenceNodeLink from "@/components/ControlledListManager/ReferenceNodeLink.vue";
 import { displayedRowKey } from "@/components/ControlledListManager/const.ts";
 
-const { displayedRow } = inject(displayedRowKey);
+import type { DisplayedListRefAndSetter } from "@/types/ControlledListManager";
+
+const { displayedRow: list } = inject(displayedRowKey) as DisplayedListRefAndSetter;
 
 const { $gettext } = useGettext();
 </script>
@@ -15,20 +17,18 @@ const { $gettext } = useGettext();
 <template>
     <span class="controlled-list-header">
         <LetterCircle
-            v-if="displayedRow"
-            :labelled="displayedRow"
+            v-if="list"
+            :labelled="list"
         />
-        <h3>{{ displayedRow.name }}</h3>
+        <h3>{{ list.name }}</h3>
     </span>
     <div>
         <ListCharacteristic
             :editable="true"
-            field="name"
             :label="$gettext('Name')"
         />
         <ListCharacteristic
             :editable="false"
-            field="dynamic"
             :label="$gettext('Dynamic')"
             :style="{ width: '4rem' }"
         />
@@ -37,13 +37,13 @@ const { $gettext } = useGettext();
         </h4>
         <div class="nodes">
             <div
-                v-for="node in displayedRow.nodes"
+                v-for="node in list.nodes"
                 :key="node.id"
             >
                 <ReferenceNodeLink :node />
             </div>
             <div
-                v-if="displayedRow.nodes.length === 0"
+                v-if="list.nodes.length === 0"
                 :style="{ fontSize: 'small' }"
             >
                 {{ $gettext('None') }}

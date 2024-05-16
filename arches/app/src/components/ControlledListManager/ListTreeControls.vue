@@ -14,23 +14,24 @@ import SplitButton from "primevue/splitbutton";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
-import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
-import type { TreeNode } from "primevue/tree/Tree/TreeNode";
 import type { Ref } from "vue";
-import type { ControlledList } from "@/types/ControlledListManager";
+import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
+import type { TreeNode } from "primevue/treenode";
+import type { Language } from "@/types/arches";
+import type { ControlledList, DisplayedRowRefAndSetter } from "@/types/ControlledListManager";
 
 // not user-facing
 const DANGER = "danger";
 const ERROR = "error";
 
-const { setDisplayedRow } = inject(displayedRowKey);
-const selectedLanguage = inject(selectedLanguageKey);
+const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
+const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
-const controlledListItemsTree = defineModel<Ref<TreeNode[]>>();
-const expandedKeys = defineModel<Ref<TreeExpandedKeys>>("expandedKeys");
-const selectedKeys = defineModel<Ref<TreeSelectionKeys>>("selectedKeys");
-const movingItem = defineModel<Ref<TreeNode>>("movingItem");
-const isMultiSelecting = defineModel<boolean>("isMultiSelecting");
+const controlledListItemsTree = defineModel<TreeNode[]>({ required: true });
+const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", { required: true });
+const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", { required: true });
+const movingItem = defineModel<TreeNode>("movingItem", { required: true });
+const isMultiSelecting = defineModel<boolean>("isMultiSelecting", { required: true });
 
 const { $gettext, $ngettext } = useGettext();
 const buttonGreen = "#10b981";
@@ -59,7 +60,7 @@ const collapseAll = () => {
 
 const expandNode = (node: TreeNode) => {
     if (node.children && node.children.length) {
-        expandedKeys.value[node.key] = true;
+        expandedKeys.value[node.key as string] = true;
 
         for (const child of node.children) {
             expandNode(child);
@@ -215,7 +216,7 @@ const confirmDelete = () => {
             "Are you sure you want to delete %{ numItems } item (including all children)?",
             "Are you sure you want to delete %{ numItems } items (including all children)?",
             numItems,
-            { numItems },
+            { numItems: numItems.toLocaleString() },
         ),
         header: $gettext("Confirm deletion"),
         icon: "fa fa-exclamation-triangle",

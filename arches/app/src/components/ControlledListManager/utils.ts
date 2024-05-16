@@ -1,11 +1,11 @@
 import arches from "arches";
 
+import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/types/arches";
 import type {
     ControlledList,
     ControlledListItem,
 } from "@/types/ControlledListManager";
-import type TreeNode from "primevue/tree/Tree";
 
 export const bestLabel = (item: ControlledListItem, languageCode: string) => {
     const labelsInLang = item.labels.filter(l => l.language_id === languageCode);
@@ -30,7 +30,7 @@ export const findNodeInTree = (tree: TreeNode[], itemId: string) => {
             if (item.data.id === itemId) {
                 return item;
             }
-            for (const child of item.children) {
+            for (const child of item.items ?? item.children) {
                 const maybeFound = recurse([child]);
                 if (maybeFound) {
                     return maybeFound;

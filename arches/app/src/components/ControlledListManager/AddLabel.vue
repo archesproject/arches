@@ -7,19 +7,21 @@ import Button from "primevue/button";
 
 import { itemKey, ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
 
+import type { Ref } from "vue";
 import type {
+    ControlledListItem,
     Label,
     NewLabel,
     ValueType,
 } from "@/types/ControlledListManager";
 
 const props = defineProps<{ type: ValueType }>();
-const { item } = inject(itemKey);
+const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
-const newLabel: NewLabel = computed(() => {
+const newLabel: Ref<NewLabel> = computed(() => {
     const otherNewLabels = item.value.labels.filter(
         (l: NewLabel | Label) => typeof l.id === "number"
     // eslint-disable-next-line @typescript-eslint/no-explicit-any 

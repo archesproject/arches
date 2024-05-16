@@ -8,11 +8,14 @@ import { useToast } from "primevue/usetoast";
 import { postItemToServer } from "@/components/ControlledListManager/api.ts";
 import { itemKey } from "@/components/ControlledListManager/const.ts";
 
+import type { Ref } from "vue";
+import type { ControlledListItem } from "@/types/ControlledListManager";
+
 const props = defineProps<{
     field: "uri";
     label: string;
 }>();
-const { item } = inject(itemKey);
+const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const editing = ref(false);
 

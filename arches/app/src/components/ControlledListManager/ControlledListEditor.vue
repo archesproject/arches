@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import arches from "arches";
 import { computed, provide, ref } from "vue";
-import { useGettext } from "vue3-gettext";
 
 import ProgressSpinner from "primevue/progressspinner";
 import Splitter from "primevue/splitter";
@@ -19,11 +18,6 @@ import type { ControlledListItem, Selectable } from "@/types/ControlledListManag
 import type { Language } from "@/types/arches";
 
 const lightGray = "#f4f4f4";
-const { $gettext } = useGettext();
-
-// Strings: $gettext() is a problem in templates given <SplitterPanel> rerendering
-// https://github.com/archesproject/arches/pull/10569/files#r1496212837
-const SELECT_A_LIST = $gettext("Select a list from the sidebar.");
 
 const displayedRow: Ref<Selectable | null> = ref(null);
 function setDisplayedRow(val: Selectable | null) {
@@ -32,13 +26,13 @@ function setDisplayedRow(val: Selectable | null) {
 provide(displayedRowKey, { displayedRow, setDisplayedRow });
 
 const selectedLanguage: Ref<Language> = ref(
-    (arches.languages as Language[]).find(l => l.code === arches.activeLanguage)
+    (arches.languages as Language[]).find(l => l.code === arches.activeLanguage) as Language
 );
 provide(selectedLanguageKey, selectedLanguage);
 
-const listOrItemView = computed(() => {
+const panel = computed(() => {
     if (!displayedRow.value) {
-        return ListCharacteristics;
+        return ControlledListSplash;
     }
     if ((displayedRow.value as ControlledListItem).depth === undefined) {
         return ListCharacteristics;
@@ -77,13 +71,8 @@ const listOrItemView = computed(() => {
                 :style="{ margin: '1rem 0rem 1rem 1rem', overflowY: 'auto', maxWidth: '1200px', paddingRight: '7%' }"
             >
                 <component
-                    :is="listOrItemView"
-                    v-if="displayedRow"
-                    :key="displayedRow.id"
-                />
-                <ControlledListSplash
-                    v-else
-                    :description="SELECT_A_LIST"
+                    :is="panel"
+                    :key="displayedRow?.id ?? 'splash'"
                 />
             </SplitterPanel>
         </Splitter>

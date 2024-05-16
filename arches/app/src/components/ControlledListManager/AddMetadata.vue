@@ -7,7 +7,9 @@ import Button from "primevue/button";
 
 import { itemKey } from "@/components/ControlledListManager/const.ts";
 
+import type { Ref } from "vue";
 import type {
+    ControlledListItem,
     ControlledListItemImage,
     ControlledListItemImageMetadata,
     MetadataChoice,
@@ -18,12 +20,12 @@ const { choices: METADATA_CHOICES, image } = defineProps<{
     choices: MetadataChoice[];
     image: ControlledListItemImage;
 }>();
-const { item } = inject(itemKey);
+const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
-const newMetadata: NewControlledListItemImageMetadata = computed(() => {
+const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
     const otherNewMetadatas = image.metadata.filter(
         (m: NewControlledListItemImageMetadata | ControlledListItemImageMetadata) => typeof m.id === "number"
     // eslint-disable-next-line @typescript-eslint/no-explicit-any 

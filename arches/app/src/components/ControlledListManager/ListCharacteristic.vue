@@ -8,14 +8,13 @@ import { useToast } from "primevue/usetoast";
 import { postListToServer } from "@/components/ControlledListManager/api.ts";
 import { displayedRowKey } from "@/components/ControlledListManager/const.ts";
 
-import type { DisplayedRowRefAndSetter } from "@/types/ControlledListManager";
+import type { DisplayedListRefAndSetter } from "@/types/ControlledListManager";
 
 const props = defineProps<{
     editable: boolean;
-    field: "name" | "dynamic";
     label: string;
 }>();
-const { displayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
+const { displayedRow: list } = inject(displayedRowKey) as DisplayedListRefAndSetter;
 
 const editing = ref(false);
 const disabled = computed(() => {
@@ -26,7 +25,7 @@ const formValue = ref("");
 
 const inputValue = computed({
     get() {
-        return displayedRow.value[props.field];
+        return list.value!.name;
     },
     set(newVal: string) {
         formValue.value = newVal;
@@ -38,17 +37,17 @@ const { $gettext } = useGettext();
 
 const onSave = async () => {
     editing.value = false;
-    const originalValue = displayedRow.value[props.field];
-    displayedRow.value[props.field] = formValue.value;
-    const success = await postListToServer(displayedRow.value, toast, $gettext);
+    const originalValue = list.value!.name;
+    list.value!.name = formValue.value;
+    const success = await postListToServer(list.value, toast, $gettext);
     if (!success) {
-        displayedRow.value[props.field] = originalValue;
+        list.value!.name = originalValue;
     }
 };
 
 const onCancel = () => {
     editing.value = false;
-    formValue.value = displayedRow.value[props.field];
+    formValue.value = list.value!.name;
 };
 </script>
 
@@ -57,7 +56,7 @@ const onCancel = () => {
         <h4>{{ props.label }}</h4>
         <!-- TODO https://github.com/archesproject/arches/issues/10847 -->
         <span
-            v-if="field === 'dynamic'"
+            v-if="!props.editable"
             style="font-size: small;"
         >
             False

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { useGettext } from "vue3-gettext";
 
-const props = defineProps<{ description: string }>();
-
 const { $gettext } = useGettext();
 </script>
 
@@ -26,7 +24,7 @@ const { $gettext } = useGettext();
 
         <!-- Splash Instructions -->
         <div class="rr-splash-description">
-            {{ props.description }}
+            {{ $gettext("Select a list from the sidebar.") }}
         </div>
     </div>
 </template>

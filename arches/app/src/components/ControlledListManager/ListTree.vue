@@ -25,10 +25,12 @@ import type {
     TreeExpandedKeys,
     TreeSelectionKeys,
 } from "primevue/tree/Tree";
-import type { TreeNode } from "primevue/tree/Tree/TreeNode";
+import type { TreeNode } from "primevue/treenode";
+import type { Language } from "@/types/arches";
 import type {
     ControlledList,
     ControlledListItem,
+    DisplayedRowRefAndSetter,
     NewItem,
 } from "@/types/ControlledListManager";
 
@@ -39,8 +41,8 @@ const movingItem: Ref<TreeNode> = ref({});
 const isMultiSelecting = ref(false);
 const refetcher = ref(0);
 
-const { setDisplayedRow } = inject(displayedRowKey);
-const selectedLanguage = inject(selectedLanguageKey);
+const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
+const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
 const toast = useToast();
 const { $gettext } = useGettext();
@@ -60,7 +62,7 @@ const collapseNodesRecursive = (node: TreeNode) => {
     if (node.children && node.children.length) {
         expandedKeys.value = {
             ...expandedKeys.value,
-            [node.key]: false,
+            [node.key as string]: false,
         };
         for (const child of node.children) {
             collapseNodesRecursive(child);
@@ -72,7 +74,7 @@ const onRowSelect = (node: TreeNode) => {
     setDisplayedRow(node.data);
     expandedKeys.value = {
         ...expandedKeys.value,
-        [node.key]: true,
+        [node.key as string]: true,
     };
     if (node.data.name) {
         tree.value.filter(list => list.data.id !== node.data.id)
@@ -175,6 +177,9 @@ const addChild = async (parent_id: string) => {
 const setParent = async (parentNode: TreeNode) => {
     let errorText;
     const setListAndSortOrderRecursive = (child: ControlledListItem) => {
+        if (!parentNode.key) {
+            return;
+        }
         child.controlled_list_id = parentNode.key;
         child.sortorder = -1;  // tells backend to renumber
         child.children.forEach(grandchild => setListAndSortOrderRecursive(grandchild));

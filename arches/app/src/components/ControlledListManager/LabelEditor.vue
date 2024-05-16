@@ -15,6 +15,7 @@ import AddLabel from "@/components/ControlledListManager/AddLabel.vue";
 import { ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
 import { languageName } from "@/components/ControlledListManager/utils.ts";
 
+import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
 import type {
     ControlledListItem,
@@ -36,7 +37,7 @@ const toast = useToast();
 const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
-const headings: { heading: string; subheading: string } = computed(() => {
+const headings: Ref<{ heading: string; subheading: string }> = computed(() => {
     switch (props.type) {
         case PREF_LABEL:
             return {

@@ -4,20 +4,29 @@ import { useGettext } from "vue3-gettext";
 
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
+
+import type { Ref } from "vue";
+import type { Language } from "@/types/arches";
+import type {
+    ControlledList,
+    ControlledListItem,
+    DisplayedRowRefAndSetter,
+} from "@/types/ControlledListManager";
+
 const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
-const { displayedRow } = inject(displayedRowKey);
-const selectedLanguage = inject(selectedLanguageKey);
+const { displayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
+const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
 const heading = computed(() => {
     if (!displayedRow.value) {
         return $gettext("List Editor");
     }
-    if (displayedRow.value.depth === undefined) {
+    if ((displayedRow.value as ControlledListItem).depth === undefined) {
         return $gettext(
             "List Editor > %{listName}",
-            { listName: displayedRow.value.name },
+            { listName: (displayedRow.value as ControlledList).name },
             true, // disable HTML escaping: RDM Admins are trusted users
         );
     }

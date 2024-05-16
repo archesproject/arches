@@ -88,4 +88,14 @@ export type ReferencingNode = {
 export interface DisplayedRowRefAndSetter {
     displayedRow: Ref<Selectable | null>;
     setDisplayedRow: (val: Selectable | null) => void;
-}
+};
+
+export interface DisplayedListRefAndSetter {
+    displayedRow: Ref<ControlledList | null>;
+    setDisplayedRow: (val: Selectable | null) => void;
+};
+
+export interface DisplayedListItemRefAndSetter {
+    displayedRow: Ref<ControlledListItem | null>;
+    setDisplayedRow: (val: Selectable | null) => void;
+};

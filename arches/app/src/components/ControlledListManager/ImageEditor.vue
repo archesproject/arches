@@ -16,8 +16,10 @@ import { itemKey } from "@/components/ControlledListManager/const.ts";
 import { deleteImage, upsertMetadata, deleteMetadata } from "@/components/ControlledListManager/api.ts";
 import { bestLabel, languageName } from "@/components/ControlledListManager/utils.ts";
 
+import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
 import type {
+    ControlledListItem,
     ControlledListItemImage,
     ControlledListItemImageMetadata,
     NewControlledListItemImageMetadata,
@@ -30,7 +32,7 @@ const { image, removeImage, appendImageMetadata, updateImageMetadata, removeImag
     updateImageMetadata: (updatedMetadata: ControlledListItemImageMetadata) => void;
     removeImageMetadata: (removedMetadata: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => void;
 }>();
-const { item } = inject(itemKey);
+const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const editingRows = ref([]);
 

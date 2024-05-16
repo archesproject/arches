@@ -22,77 +22,93 @@ import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
 import type { FileUploadBeforeSendEvent, FileUploadUploadEvent } from "primevue/fileupload";
+import type { Language } from "@/types/arches";
 import type {
     ControlledListItem,
     ControlledListItemImage,
     ControlledListItemImageMetadata,
-    DisplayedRowRefAndSetter,
+    DisplayedListItemRefAndSetter,
     Label,
     NewControlledListItemImageMetadata,
     NewLabel,
 } from "@/types/ControlledListManager";
 
-const { displayedRow: item } : { displayedRow: Ref<ControlledListItem> } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
-const selectedLanguage = inject(selectedLanguageKey);
+const { displayedRow: item } = inject(displayedRowKey) as DisplayedListItemRefAndSetter;
+const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
 const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
-provide(itemKey, { item });
+provide(itemKey, item);
 
 const appendItemLabel = computed(() => {
-    return (newLabel: Label | NewLabel) => { item.value.labels.push(newLabel); };
+    return (newLabel: Label) => { item.value!.labels.push(newLabel); };
 });
 const removeItemLabel = computed(() => {
     return (removedLabel: Label | NewLabel) => {
-        const toDelete = item.value.labels.findIndex((l: Label | NewLabel) => l.id === removedLabel.id);
-        item.value.labels.splice(toDelete, 1);
+        const toDelete = item.value!.labels.findIndex((l: Label | NewLabel) => l.id === removedLabel.id);
+        item.value!.labels.splice(toDelete, 1);
     };
 });
 const updateItemLabel = computed(() => {
     return (updatedLabel: Label) => {
-        const toUpdate = item.value.labels.find((l: Label) => l.id === updatedLabel.id);
-        toUpdate.language_id = updatedLabel.language_id;
-        toUpdate.value = updatedLabel.value;
+        const toUpdate = item.value!.labels.find((l: Label) => l.id === updatedLabel.id);
+        if (toUpdate) {
+            toUpdate.language_id = updatedLabel.language_id;
+            toUpdate.value = updatedLabel.value;
+        }
     };
 });
 
 const appendImageMetadata = computed(() => {
-    return (newMetadata: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => {
-        item.value.images.find(
+    return (newMetadata: ControlledListItemImageMetadata) => {
+        const imageFromItem = item.value!.images.find(
             (i: ControlledListItemImage) => i.id === newMetadata.controlled_list_item_image_id
-        ).metadata.push(newMetadata);
+        );
+        if (imageFromItem) {
+            imageFromItem.metadata.push(newMetadata);
+        }
     };
 });
 const removeImageMetadata = computed(() => {
     return (removedMetadata: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => {
-        const imageFromItem = item.value.images.find(
+        const imageFromItem = item.value!.images.find(
             (i: ControlledListItemImage) => i.id === removedMetadata.controlled_list_item_image_id
         );
-        const toDelete = imageFromItem.metadata.findIndex(
-            (m: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => m.id === removedMetadata.id
-        );
-        imageFromItem.metadata.splice(toDelete, 1);
+        if (imageFromItem) {
+            const toDelete = imageFromItem.metadata.findIndex(
+                (m: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => m.id === removedMetadata.id
+            );
+            if (toDelete === -1) {
+                return;
+            }
+            imageFromItem.metadata.splice(toDelete, 1);
+        }
     };
 });
 const updateImageMetadata = computed(() => {
     return (updatedMetadata: ControlledListItemImageMetadata) => {
-        const imageFromItem = item.value.images.find(
+        const imageFromItem = item.value!.images.find(
             (i: ControlledListItemImage) => i.id === updatedMetadata.controlled_list_item_image_id
         );
-        const toUpdate = imageFromItem.metadata.find((m: ControlledListItemImageMetadata) => m.id === updatedMetadata.id);
-        toUpdate.metadata_type = updatedMetadata.metadata_type;
-        toUpdate.language_id = updatedMetadata.language_id;
-        toUpdate.value = updatedMetadata.value;
+        if (imageFromItem) {
+            const toUpdate = imageFromItem.metadata.find((m: ControlledListItemImageMetadata) => m.id === updatedMetadata.id);
+            if (!toUpdate) {
+                return;
+            }
+            toUpdate.metadata_type = updatedMetadata.metadata_type;
+            toUpdate.language_id = updatedMetadata.language_id;
+            toUpdate.value = updatedMetadata.value;
+        }
     };
 });
 
 const removeImage = computed(() => {
     return (removedImage: ControlledListItemImage) => {
-        const toDelete = item.value.images.findIndex(
+        const toDelete = item.value!.images.findIndex(
             (i: ControlledListItemImage) => i.id === removedImage.id
         );
-        item.value.images.splice(toDelete, 1);
+        item.value!.images.splice(toDelete, 1);
     };
 });
 
@@ -104,7 +120,7 @@ const addHeader = (event: FileUploadBeforeSendEvent) => {
     const token = Cookies.get("csrftoken");
     if (token) {
         event.xhr.setRequestHeader("X-CSRFToken", token);
-        event.formData.set("item_id", item.value.id);
+        event.formData.set("item_id", item.value!.id);
     }
 };
 
@@ -113,7 +129,7 @@ const onUpload = (event: FileUploadUploadEvent) => {
         return;
     }
     const newImage = JSON.parse(event.xhr.responseText);
-    item.value.images.push(newImage);
+    item.value!.images.push(newImage);
 };
 </script>
 
