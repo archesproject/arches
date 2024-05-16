@@ -16,10 +16,16 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import json
+import uuid
+
+from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Language
 from arches.app.models.tile import Tile
-from tests.base_test import ArchesTestCase
+from arches.app.models.system_settings import settings
+from tests.base_test import ArchesTestCase, sync_overridden_test_settings_to_arches
+from django.test import override_settings
 
 
 # these tests can be run from the command line via
@@ -54,6 +60,67 @@ class BooleanDataTypeTests(ArchesTestCase):
 
         with self.assertRaises(ValueError):
             boolean.transform_value_for_tile(None)
+
+class GeoJsonDataTypeTest(ArchesTestCase):
+
+    def test_validate_reduce_byte_size(self):
+        with open("tests/fixtures/problematic_excessive_vertices.geojson") as f:
+            geom = json.load(f)
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+        errors = geom_datatype.validate(geom)
+        self.assertEqual(len(errors), 0)        
+
+    @override_settings(
+        DATA_VALIDATION_BBOX = [(
+            12.948801570473677,
+            52.666192057898854
+        ),
+        (
+            12.948801570473677,
+            52.26439571958821
+        ),
+        (
+            13.87818788958171,
+            52.26439571958821
+        ),
+        (
+            13.87818788958171,
+            52.666192057898854
+        ),
+        (
+            12.948801570473677,
+            52.666192057898854
+        )]
+    )
+    def test_validate_bbox(self):
+        with sync_overridden_test_settings_to_arches():
+            geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+
+            with self.subTest(bbox="invalid"):
+                geom = json.loads('{"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"coordinates": [14.073244400935238,19.967099711627156],"type": "Point"}}]}')
+                errors = geom_datatype.validate(geom)
+                self.assertEqual(len(errors), 1)
+
+            with self.subTest(bbox="valid"):
+                geom = json.loads('{"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"coordinates": [13.400257324930152,52.50578474077699],"type": "Point"}}]}')
+                errors = geom_datatype.validate(geom)
+                self.assertEqual(len(errors), 0)
+
+class BaseDataTypeTests(ArchesTestCase):
+    def test_get_tile_data_only_none(self):
+        base = BaseDataType()
+        node_id = str(uuid.uuid4())
+        resourceinstance_id = str(uuid.uuid4())
+        tile_data = {node_id: None}
+        tile_holding_only_none = Tile({
+            "resourceinstance_id": resourceinstance_id,
+            "parenttile_id": "",
+            "nodegroup_id": node_id,
+            "tileid": "",
+            "data": tile_data,
+        })
+
+        self.assertEqual(base.get_tile_data(tile_holding_only_none), tile_data)
 
 
 class StringDataTypeTests(ArchesTestCase):
