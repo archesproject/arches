@@ -241,8 +241,8 @@ const setParent = async (parentNode: TreeNode) => {
     <Tree
         v-if="tree"
         v-model:selectionKeys="selectedKeys"
+        v-model:expandedKeys="expandedKeys"
         :value="tree"
-        :expanded-keys
         :filter="true"
         filter-mode="lenient"
         :filter-placeholder="$gettext('Find')"
