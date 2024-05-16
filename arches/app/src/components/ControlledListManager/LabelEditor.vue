@@ -190,7 +190,11 @@ p {
     font-weight: 600;
 }
 
-:deep(td) {
+:deep(td:first-child) {
     padding-left: 0.75rem;
+}
+
+:deep(td > input) {
+    width: 95%;
 }
 </style>

@@ -126,6 +126,7 @@ const onDeleteImage = async () => {
                 <Column
                     field="metadata_type"
                     :header="$gettext('Metadata type')"
+                    style="width: 20%;"
                 >
                     <template #editor="{ data, field }">
                         <Dropdown
@@ -134,6 +135,7 @@ const onDeleteImage = async () => {
                             option-label="label"
                             option-value="type"
                             :pt="{
+                                root: { style: { width: '90%' } },
                                 input: { style: { fontFamily: 'inherit', fontSize: 'small' } },
                                 panel: { style: { fontSize: 'small' } },
                             }"
@@ -143,12 +145,12 @@ const onDeleteImage = async () => {
                         {{ METADATA_CHOICES.find(choice => choice.type === slotProps.data.metadata_type).label }}
                     </template>
                 </Column>
-                <Column field="value">
+                <Column
+                    field="value"
+                    style="width: 40%; min-width: 8rem;"
+                >
                     <template #editor="{ data, field }">
-                        <InputText
-                            v-model="data[field]"
-                            style="width: 75%"
-                        />
+                        <InputText v-model="data[field]"/>
                     </template>
                 </Column>
                 <Column
@@ -210,8 +212,11 @@ const onDeleteImage = async () => {
 :deep(th) {
     font-weight: 600;
 }
-:deep(td) {
+:deep(td:first-child) {
     padding-left: 0.75rem;
+}
+:deep(td > input) {
+    width: 95%;
 }
 .p-button {
     height: 3rem;
