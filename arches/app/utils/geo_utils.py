@@ -86,7 +86,6 @@ class GeoUtils(object):
         if current_precision > 5:
             writer = WKTWriter()
             max_bytes = 32766 # max bytes allowed by Lucene
-
             current_precision -= 1
             writer.precision = current_precision
             less_precise_geom_collection = writer.write(GEOSGeometry(self.create_geom_collection_from_geojson(geom)))
@@ -101,5 +100,5 @@ class GeoUtils(object):
             else:
                 return new_feature_collection
         else:
-            raise ValueError('Geometry still too large after reducing to 5 precision.')
+            raise ValueError('Geometry still too large after reducing precision to 5 places after the decimal.')
     
