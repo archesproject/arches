@@ -28,6 +28,9 @@ def build_staticfiles_dirs(root_dir, app_root=None, arches_applications=None, ad
     if app_root:
         directories.append(os.path.join(app_root, "media", "build"))
         directories.append(os.path.join(app_root, "media"))
+        directories.append(
+            ('node_modules', os.path.join(app_root, "..", "node_modules"))
+        )
 
     if arches_applications:
         for arches_application in arches_applications:
@@ -37,6 +40,9 @@ def build_staticfiles_dirs(root_dir, app_root=None, arches_applications=None, ad
 
     directories.append(os.path.join(root_dir, "app", "media", "build"))
     directories.append(os.path.join(root_dir, "app", "media"))
+    directories.append(
+        ('node_modules', os.path.join(root_dir, "..", "node_modules"))
+    )
 
     return tuple(directories)
 
@@ -108,7 +114,7 @@ def transmit_webpack_django_config(
             importlib.import_module(arches_application)  # need to import module to find path
             arches_applications_paths[arches_application] = os.path.split(sys.modules[arches_application].__spec__.origin)[0]
 
-    print(
+    sys.stdout.write(
         json.dumps(
             {
                 "APP_ROOT": os.path.realpath(app_root),

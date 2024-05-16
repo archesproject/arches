@@ -542,12 +542,19 @@ class Resources(APIBase):
 
             elif format == "json-ld":
                 try:
-                    models.ResourceInstance.objects.get(pk=resourceid)  # check for existance
+                    resource = models.ResourceInstance.objects.select_related("graph").get(pk=resourceid)
+                    if not resource.graph.ontology_id:
+                        return JSONErrorResponse(
+                            message=_(
+                                "The graph '{0}' does not have an ontology. JSON-LD requires one."
+                            ).format(resource.graph.name),
+                            status=400,
+                        )
                     exporter = ResourceExporter(format=format)
                     output = exporter.writer.write_resources(resourceinstanceids=[resourceid], indent=indent, user=request.user)
                     out = output[0]["outputfile"].getvalue()
                 except models.ResourceInstance.DoesNotExist:
-                    logger.error(_("The specified resource '{0}' does not exist. JSON-LD export failed.".format(resourceid)))
+                    logger.error(_("The specified resource '{0}' does not exist. JSON-LD export failed.").format(resourceid))
                     return JSONResponse(status=404)
 
         else:

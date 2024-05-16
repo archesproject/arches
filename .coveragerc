@@ -1,6 +1,29 @@
-[report]
+[run]
+source =
+    arches/
+
 omit =
     */python?.?/*
     */models/migrations/*
-    
+    */settings*.py
+    */urls.py
+    */wsgi.py
+    */celery.py
+    */__init__.py
+
+data_file = coverage/python/.coverage
+
+[report]
 show_missing = true
+
+exclude_lines =
+    pragma: no cover
+
+[html]
+directory = coverage/python/htmlcov
+
+[xml]
+output = coverage/python/coverage.xml
+
+[json]
+output = coverage/python/coverage.json

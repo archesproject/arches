@@ -16,10 +16,16 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import json
+import uuid
+
+from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Language
 from arches.app.models.tile import Tile
-from tests.base_test import ArchesTestCase
+from arches.app.models.system_settings import settings
+from tests.base_test import ArchesTestCase, sync_overridden_test_settings_to_arches
+from django.test import override_settings
 
 
 # these tests can be run from the command line via
@@ -54,6 +60,67 @@ class BooleanDataTypeTests(ArchesTestCase):
 
         with self.assertRaises(ValueError):
             boolean.transform_value_for_tile(None)
+
+class GeoJsonDataTypeTest(ArchesTestCase):
+
+    def test_validate_reduce_byte_size(self):
+        with open("tests/fixtures/problematic_excessive_vertices.geojson") as f:
+            geom = json.load(f)
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+        errors = geom_datatype.validate(geom)
+        self.assertEqual(len(errors), 0)        
+
+    @override_settings(
+        DATA_VALIDATION_BBOX = [(
+            12.948801570473677,
+            52.666192057898854
+        ),
+        (
+            12.948801570473677,
+            52.26439571958821
+        ),
+        (
+            13.87818788958171,
+            52.26439571958821
+        ),
+        (
+            13.87818788958171,
+            52.666192057898854
+        ),
+        (
+            12.948801570473677,
+            52.666192057898854
+        )]
+    )
+    def test_validate_bbox(self):
+        with sync_overridden_test_settings_to_arches():
+            geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+
+            with self.subTest(bbox="invalid"):
+                geom = json.loads('{"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"coordinates": [14.073244400935238,19.967099711627156],"type": "Point"}}]}')
+                errors = geom_datatype.validate(geom)
+                self.assertEqual(len(errors), 1)
+
+            with self.subTest(bbox="valid"):
+                geom = json.loads('{"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"coordinates": [13.400257324930152,52.50578474077699],"type": "Point"}}]}')
+                errors = geom_datatype.validate(geom)
+                self.assertEqual(len(errors), 0)
+
+class BaseDataTypeTests(ArchesTestCase):
+    def test_get_tile_data_only_none(self):
+        base = BaseDataType()
+        node_id = str(uuid.uuid4())
+        resourceinstance_id = str(uuid.uuid4())
+        tile_data = {node_id: None}
+        tile_holding_only_none = Tile({
+            "resourceinstance_id": resourceinstance_id,
+            "parenttile_id": "",
+            "nodegroup_id": node_id,
+            "tileid": "",
+            "data": tile_data,
+        })
+
+        self.assertEqual(base.get_tile_data(tile_holding_only_none), tile_data)
 
 
 class StringDataTypeTests(ArchesTestCase):
@@ -132,3 +199,89 @@ class NonLocalizedStringDataTypeTests(ArchesTestCase):
         self.assertIsNone(tile1.data[nodeid1])
         string.clean(tile1, nodeid2)
         self.assertIsNone(tile1.data[nodeid2])
+
+
+class URLDataTypeTests(ArchesTestCase):
+    def test_validate(self):
+        url = DataTypeFactory().get_instance("url")
+
+        # Valid tile
+        no_errors = url.validate({"url": "https://www.google.com/", "url_label": "Google"})
+        self.assertEqual(len(no_errors), 0)
+        # Invalid URL
+        some_errors_invalid_url = url.validate({"url": "google", "url_label": "Google"})
+        self.assertEqual(len(some_errors_invalid_url), 1)
+        # No URL added - cannot save label without URL
+        some_errors_no_url = url.validate({"url_label": "Google"})
+        self.assertEqual(len(some_errors_no_url), 1)
+        # No URL added - with url empty string in object
+        some_errors_no_url = url.validate({"url": "", "url_label": "Google"})
+        self.assertEqual(len(some_errors_no_url), 1)
+
+    def test_pre_tile_save(self):
+        url = DataTypeFactory().get_instance("url")
+
+        nodeid = "c0ed4b2a-c4cc-11ee-9626-00155de1df34"
+        resourceinstanceid = "40000000-0000-0000-0000-000000000000"
+
+        url_no_label = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid,
+            "tileid": "",
+            "data": {nodeid: {"url": "https://www.google.com/"}},
+        }
+        tile1 = Tile(url_no_label)
+        url.pre_tile_save(tile1, nodeid)
+        self.assertIsNotNone(tile1.data[nodeid])
+        self.assertTrue("url_label" in tile1.data[nodeid])
+        self.assertFalse(tile1.data[nodeid]["url_label"])
+
+        url_with_label = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid,
+            "tileid": "",
+            "data": {nodeid: {"url": "https://www.google.com/", "url_label": "Google"}},
+        }
+        tile2 = Tile(url_with_label)
+        url.pre_tile_save(tile2, nodeid)
+        self.assertIsNotNone(tile2.data[nodeid])
+        self.assertTrue("url_label" in tile2.data[nodeid])
+        self.assertTrue(tile2.data[nodeid]["url_label"])
+
+    def test_clean(self):
+        url = DataTypeFactory().get_instance("url")
+
+        nodeid = "c0ed4b2a-c4cc-11ee-9626-00155de1df34"
+        resourceinstanceid = "40000000-0000-0000-0000-000000000000"
+
+        empty_data = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid,
+            "tileid": "",
+            "data": {nodeid: {"url": "", "url_label": ""}},
+        }
+        tile1 = Tile(empty_data)
+        url.clean(tile1, nodeid)
+        self.assertIsNone(tile1.data[nodeid])
+
+    def test_pre_structure_tile_data(self):
+        url = DataTypeFactory().get_instance("url")
+
+        nodeid = "c0ed4b2a-c4cc-11ee-9626-00155de1df34"
+        resourceinstanceid = "40000000-0000-0000-0000-000000000000"
+
+        data_without_label = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid,
+            "tileid": "",
+            "data": {nodeid: {"url": ""}},
+        }
+        tile1 = Tile(data_without_label)
+        url.pre_structure_tile_data(tile1, nodeid)
+        self.assertIsNotNone(tile1.data[nodeid])
+        self.assertTrue("url_label" in tile1.data[nodeid])
+        self.assertFalse(tile1.data[nodeid]["url_label"])
