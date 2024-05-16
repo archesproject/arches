@@ -138,7 +138,12 @@
                                     <i class="fa fa-info-circle"></i>
                                 </button>
                             </div>
-                            <div class="rr-table-column" style="flex-grow: 1;" data-bind="click: self.toggleSelectedResourceRelationship, clickBubble: false">
+                            <div class='rr-table-column icon-column'>
+                                <button data-bind="click: self.toggleSelectedResourceRelationship, clickBubble: false, attr: {'aria-label': $root.translations.configureRelatedResourceRelationship}">
+                                    <i class="fa fa-gear"></i>
+                                </button>
+                            </div>
+                            <div class="rr-table-column" style="flex-grow: 1;">
                                 <div class="rr-table-instance-label" data-bind="text: resource.displayname"></div>
                             </div>
                         </div>
@@ -159,7 +164,7 @@
                                         <span class="col-sm-4">
                                             <select style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, $root.translations.select-ontology-property)
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, $root.translations.selectOntologyProperty)
                                                 }">
                                             </select>
                                         </span>
@@ -177,7 +182,7 @@
                                         <span class="col-sm-4">
                                             <select style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, $root.translations.select-ontology-property)
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, $root.translations.selectOntologyProperty)
                                                 }">
                                             </select>
                                         </span>
@@ -196,7 +201,7 @@
                                         <span class="col-sm-4">
                                             <select style="width:30%; display:inline-block;" data-bind="
                                                 select2Query: {
-                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, $root.translations.select-ontology-property)
+                                                    select2Config: self.getSelect2ConfigForOntologyProperties(relationship.inverserelationshiptype, self.rootOntologyClass, relationship.resource.root_ontology_class, $root.translations.selectOntologyProperty)
                                                 }">
                                             </select>
                                         </span>
@@ -214,7 +219,7 @@
                                             <span class="col-sm-4">
                                                 <select style="width:30%; display:inline-block;" data-bind="
                                                     select2Query: {
-                                                        select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, $root.translations.select-ontology-property)
+                                                        select2Config: self.getSelect2ConfigForOntologyProperties(relationship.relationshiptype, relationship.resource.root_ontology_class, self.rootOntologyClass, $root.translations.selectOntologyProperty)
                                                     }">
                                                 </select>
                                             </span>

@@ -218,8 +218,7 @@ def optimize_resource_iteration(resources: Iterable[Resource], chunk_size: int):
         )
     else:  # public API that arches itself does not currently use
         for r in resources:
-            # retrieve graph -- better for this to have been selected already
-            r.graph
+            r.clean_fields()  # ensure strings become UUIDs
 
         prefetch_related_objects(resources, tiles_prefetch, descriptor_prefetch)
         return resources
