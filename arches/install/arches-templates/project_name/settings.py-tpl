@@ -25,7 +25,7 @@ MAX_ARCHES_VERSION = arches.__version__
 
 WEBPACK_LOADER = {
     "DEFAULT": {
-        "STATS_FILE": os.path.join(APP_ROOT, 'webpack/webpack-stats.json'),
+        "STATS_FILE": os.path.join(APP_ROOT, '..', 'webpack/webpack-stats.json'),
     },
 }
 
@@ -129,7 +129,6 @@ INSTALLED_APPS = (
     "corsheaders",
     "oauth2_provider",
     "django_celery_results",
-    "compressor",
     # "silk",
     "{{ project_name }}",
 )

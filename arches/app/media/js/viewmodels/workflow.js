@@ -448,8 +448,8 @@ define([
             self.alert(
                 new AlertViewModel(
                     'ep-alert-red',
-                    'Are you sure you would like to delete this workflow?',
-                    'All data created during the course of this workflow will be deleted.',
+                    arches.translations.deleteWorkflowTitle,
+                    arches.translations.deleteWorkflowWarning,
                     function(){}, //does nothing when canceled
                     self.reverseWorkflowTransactions,
                 )

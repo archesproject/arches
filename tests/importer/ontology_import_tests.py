@@ -25,18 +25,20 @@ from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 # these tests can be run from the command line via
-# python manage.py test tests/importer/ontology_import_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.importer.ontology_import_tests --settings="tests.test_settings"
 
 
 class OntologyModelTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
-        management.call_command("load_ontology", source=test_settings.ONTOLOGY_FIXTURES)
+        super().setUpClass()
+        management.call_command("load_ontology", source=test_settings.ONTOLOGY_FIXTURES, verbosity=0)
 
     @classmethod
     def tearDownClass(cls):
         ontology = models.Ontology.objects.get(pk="11111111-0000-0000-0000-000000000000")
         ontology.delete()
+        super().tearDownClass()
 
     def test_load_ontology(self):
         ontology_class = models.OntologyClass.objects.get(

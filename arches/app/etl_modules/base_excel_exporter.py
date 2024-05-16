@@ -1,8 +1,9 @@
 from datetime import datetime
 from io import BytesIO
 import json
+import os
 import zipfile
-from openpyxl.writer.excel import save_virtual_workbook
+from tempfile import NamedTemporaryFile
 from django.core.files import File as DjangoFile
 from django.db import connection
 from arches.app.etl_modules.decorators import load_data_async
@@ -55,9 +56,14 @@ class BaseExcelExporter:
             for f in download_files:
                 f["downloadfile"].seek(0)
                 zip.writestr(f["name"], f["downloadfile"].read())
-            zip.writestr(excel_file_name, save_virtual_workbook(wb))
 
-        zip.close()
+            with NamedTemporaryFile(suffix='.xlsx', delete=False) as tmp_excel_file:
+                wb.save(tmp_excel_file.name)
+                with open(tmp_excel_file.name, 'rb') as excel_file:
+                    zip.writestr(excel_file_name, excel_file.read())
+
+        os.unlink(tmp_excel_file.name)
+
         buffer.flush()
         zip_stream = buffer.getvalue()
         buffer.close()
@@ -96,7 +102,7 @@ class BaseExcelExporter:
             response = self.run_export_task(self.loadid, graph_id, graph_name, resource_ids, export_concepts_as=export_concepts_as)
 
         return response
-    
+
     @load_data_async
     def run_load_task_async(self, request, load_id, *args, **kwargs):
         pass

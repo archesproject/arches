@@ -258,6 +258,7 @@ urlpatterns = [
         api.BulkDisambiguatedResourceInstance.as_view(),
         name="api_bulk_disambiguated_resource_instance",
     ),
+    re_path(r"^api/get_frontend_i18n_data$", api.GetFrontendI18NData.as_view(), name="get_frontend_i18n_data"),
     re_path(r"^api/search/export_results$", api.SearchExport.as_view(), name="api_export_results"),
     re_path(r"^api/user_incomplete_workflows$", api.UserIncompleteWorkflows.as_view(), name="api_user_incomplete_workflows"),
     re_path(r"^api/plugins/(?P<pluginid>%s)?$" % uuid_regex, api.Plugins.as_view(), name="api_plugins"),
@@ -287,7 +288,6 @@ urlpatterns = [
     # re_path(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     # Uncomment the next line to enable the admin:
     re_path(r"^admin/", admin.site.urls),
-    path("i18n/", include("django.conf.urls.i18n")),
     re_path(r"^password_reset/$",PasswordResetView.as_view(),name="password_reset",),
     re_path(r"^password_reset/done/$", auth_views.PasswordResetDoneView.as_view(), name="password_reset_done"),
     path(

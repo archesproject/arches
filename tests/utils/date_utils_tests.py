@@ -21,7 +21,7 @@ from tests.base_test import ArchesTestCase
 from arches.app.utils.date_utils import ExtendedDateFormat
 
 # these tests can be run from the command line via
-# python manage.py test tests/utils/date_utils_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.utils.date_utils_tests --settings="tests.test_settings"
 
 EDTF_DATES = (
     # ******************************* LEVEL 0 *********************************
@@ -223,7 +223,6 @@ class SortableDateTests(ArchesTestCase):
         else:
             o = i
 
-        print("parsing '%s'" % i)
         f = ExtendedDateFormat(i)
 
         if len(test_case) == 2:
@@ -253,20 +252,25 @@ class SortableDateTests(ArchesTestCase):
 
     def test_edtf_parsing(self):
         for test_case in EDTF_DATES:
-            self.parse(test_case)
+            with self.subTest(dates=test_case):
+                self.parse(test_case)
 
     def test_negative_date_parsing(self):
         for test_case in NEGATIVE_DATES:
-            self.parse(test_case)
+            with self.subTest(dates=test_case):
+                self.parse(test_case)
 
     def test_leap_year_parsing(self):
         for test_case in LEAP_YEARS:
-            self.parse(test_case)
+            with self.subTest(dates=test_case):
+                self.parse(test_case)
 
     def test_non_edtf_parsing(self):
         for test_case in NON_EDTF_DATES:
-            self.parse(test_case)
+            with self.subTest(dates=test_case):
+                self.parse(test_case)
 
     def test_invalid_edtf_parsing(self):
         for test_case in INVALID_EDTF_DATES:
-            self.parse(test_case)
+            with self.subTest(dates=test_case):
+                self.parse(test_case)

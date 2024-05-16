@@ -16,17 +16,95 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import json
 import uuid
 
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Language
 from arches.app.models.tile import Tile
-from tests.base_test import ArchesTestCase
+from arches.app.models.system_settings import settings
+from tests.base_test import ArchesTestCase, sync_overridden_test_settings_to_arches
+from django.test import override_settings
 
 
 # these tests can be run from the command line via
-# python manage.py test tests/utils/datatype_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.utils.datatype_tests --settings="tests.test_settings"
+
+
+class BooleanDataTypeTests(ArchesTestCase):
+    def test_validate(self):
+        boolean = DataTypeFactory().get_instance("boolean")
+
+        for good in ["true", "false", "yes", "no", None]:
+            with self.subTest(input=good):
+                no_errors = boolean.validate(good)
+                self.assertEqual(len(no_errors), 0)
+
+        for bad in ["garbage", "True", "False", "None"]:
+            with self.subTest(input=bad):
+                errors = boolean.validate(bad)
+                self.assertEqual(len(errors), 1)
+
+    def test_tile_transform(self):
+        boolean = DataTypeFactory().get_instance("boolean")
+
+        truthy_values = []
+        falsy_values = []
+        for truthy in truthy_values:
+            with self.subTest(input=truthy):
+                self.assertTrue(boolean.transform_value_for_tile(truthy))
+        for falsy in falsy_values:
+            with self.subTest(input=falsy):
+                self.assertFalse(boolean.transform_value_for_tile(falsy))
+
+        with self.assertRaises(ValueError):
+            boolean.transform_value_for_tile(None)
+
+class GeoJsonDataTypeTest(ArchesTestCase):
+
+    def test_validate_reduce_byte_size(self):
+        with open("tests/fixtures/problematic_excessive_vertices.geojson") as f:
+            geom = json.load(f)
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+        errors = geom_datatype.validate(geom)
+        self.assertEqual(len(errors), 0)        
+
+    @override_settings(
+        DATA_VALIDATION_BBOX = [(
+            12.948801570473677,
+            52.666192057898854
+        ),
+        (
+            12.948801570473677,
+            52.26439571958821
+        ),
+        (
+            13.87818788958171,
+            52.26439571958821
+        ),
+        (
+            13.87818788958171,
+            52.666192057898854
+        ),
+        (
+            12.948801570473677,
+            52.666192057898854
+        )]
+    )
+    def test_validate_bbox(self):
+        with sync_overridden_test_settings_to_arches():
+            geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+
+            with self.subTest(bbox="invalid"):
+                geom = json.loads('{"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"coordinates": [14.073244400935238,19.967099711627156],"type": "Point"}}]}')
+                errors = geom_datatype.validate(geom)
+                self.assertEqual(len(errors), 1)
+
+            with self.subTest(bbox="valid"):
+                geom = json.loads('{"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"coordinates": [13.400257324930152,52.50578474077699],"type": "Point"}}]}')
+                errors = geom_datatype.validate(geom)
+                self.assertEqual(len(errors), 0)
 
 class BaseDataTypeTests(ArchesTestCase):
     def test_get_tile_data_only_none(self):
@@ -93,6 +171,34 @@ class StringDataTypeTests(ArchesTestCase):
         string.clean(tile2, nodeid)
 
         self.assertIsNotNone(tile2.data[nodeid])
+
+
+class NonLocalizedStringDataTypeTests(ArchesTestCase):
+    def test_string_validate(self):
+        string = DataTypeFactory().get_instance("non-localized-string")
+        some_errors = string.validate(float(1.2))
+        self.assertGreater(len(some_errors), 0)
+        no_errors = string.validate("Hello World")
+        self.assertEqual(len(no_errors), 0)
+
+    def test_string_clean(self):
+        string = DataTypeFactory().get_instance("non-localized-string")
+        nodeid1 = "72048cb3-adbc-11e6-9ccf-14109fd34195"
+        nodeid2 = "72048cb3-adbc-11e6-9ccf-14109fd34196"
+        resourceinstanceid = "40000000-0000-0000-0000-000000000000"
+
+        json_empty_strings = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid1,
+            "tileid": "",
+            "data": {nodeid1: "''", nodeid2: ""},
+        }
+        tile1 = Tile(json_empty_strings)
+        string.clean(tile1, nodeid1)
+        self.assertIsNone(tile1.data[nodeid1])
+        string.clean(tile1, nodeid2)
+        self.assertIsNone(tile1.data[nodeid2])
 
 
 class URLDataTypeTests(ArchesTestCase):

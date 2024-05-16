@@ -79,7 +79,7 @@ class CsvWriter(Writer):
 
         # for export of multilingual nodes/columns
         if column:
-            lang_regex = re.compile(".+ \(([A-Za-z-]+)\)")
+            lang_regex = re.compile(r".+ \(([A-Za-z-]+)\)")
             matches = lang_regex.match(column)
             if len(matches.groups()) > 0:
                 lang = matches.groups()[0]
@@ -467,7 +467,7 @@ class CsvReader(Reader):
         new_languages = []
         first_business_data_row = next(iter(business_data))
         for column in first_business_data_row.keys():
-            column_regex = re.compile("^.+ \(([A-Za-z-]+)\)$")
+            column_regex = re.compile(r"^.+ \(([A-Za-z-]+)\)$")
             match = column_regex.match(column)
             if match is not None:
                 new_language_candidate = match.groups()[0]
@@ -797,7 +797,7 @@ class CsvReader(Reader):
                                 # is used to push this value deeper into the import process.  A later check will retrieve this
                                 # value and add it to the i18n string object
                                 else:
-                                    column_regex = re.compile("{column} \(([A-Za-z-]+)\)$".format(column=row["file_field_name"].upper()))
+                                    column_regex = re.compile(r"{column} \(([A-Za-z-]+)\)$".format(column=row["file_field_name"].upper()))
                                     column_match = column_regex.match(key.upper())
                                     if column_match is not None:
                                         language = column_match.groups()[0]

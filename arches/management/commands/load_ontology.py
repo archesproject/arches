@@ -191,6 +191,6 @@ class Command(BaseCommand):
             if settings.ONTOLOGY_DIR in os.path.abspath(data_source):
                 ret = os.path.abspath(data_source).replace(settings.ONTOLOGY_DIR, "").lstrip(os.sep)
         except Exception as e:
-            print("Something when wrong in getting the path to the ontology file", e)
+            print("Something went wrong in getting the path to the ontology file", e)
 
         return ret

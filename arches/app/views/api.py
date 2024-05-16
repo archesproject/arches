@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import re
+import site
 import sys
 import uuid
 import traceback
@@ -27,7 +28,7 @@ from django.core import management
 from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.urls import reverse
-from django.utils.translation import gettext as _
+from django.utils.translation import get_language, gettext as _
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -63,10 +64,6 @@ from arches.app.utils.permission_backend import user_is_resource_editor
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from django.utils import translation
-
-
-from arches.celery import app
 
 logger = logging.getLogger(__name__)
 
@@ -109,6 +106,37 @@ class APIBase(View):
 
         return super(APIBase, self).dispatch(request, *args, **kwargs)
 
+
+class GetFrontendI18NData(APIBase):
+    def get(self, request):
+        user_language = get_language()
+
+        language_file_path = []
+
+        language_file_path.append(os.path.join(settings.APP_ROOT, "locale", user_language + ".json"))
+        
+        for arches_application_name in settings.ARCHES_APPLICATIONS:
+            application_path = os.path.split(sys.modules[arches_application_name].__spec__.origin)[0]
+            language_file_path.append(os.path.join(application_path, "locale", user_language + ".json"))
+        
+        language_file_path.append(os.path.join(settings.ROOT_DIR, "locale", user_language + ".json"))
+
+        localized_strings = {}
+        for lang_file in language_file_path:
+            try:
+                localized_strings = json.load(open(lang_file))[user_language] | localized_strings
+            except FileNotFoundError:
+                pass
+        
+        return JSONResponse({
+            'enabled_languages': {
+                language_tuple[0]: str(language_tuple[1])
+                for language_tuple in settings.LANGUAGES
+            },
+            'translations': {user_language: localized_strings},
+            "language": user_language,
+        })
+    
 
 class GeoJSON(APIBase):
     se = SearchEngineFactory().create()
@@ -250,8 +278,9 @@ class MVT(APIBase):
             node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
         except models.Node.DoesNotExist:
             raise Http404()
+        search_geom_count = 0
         config = node.config
-        cache_key = f"mvt_{nodeid}_{zoom}_{x}_{y}"
+        cache_key = MVT.create_mvt_cache_key(node, zoom, x, y, request.user)
         tile = cache.get(cache_key)
         if tile is None:
             resource_ids = get_restricted_instances(request.user, allresources=True)
@@ -264,57 +293,90 @@ class MVT(APIBase):
                     distance = arc * float(config["clusterDistance"])
                     min_points = int(config["clusterMinPoints"])
                     distance = settings.CLUSTER_DISTANCE_MAX if distance > settings.CLUSTER_DISTANCE_MAX else distance
-                    cursor.execute(
-                        """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
-                        AS (
-                            SELECT m.*,
-                            ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
-                            FROM (
-                                SELECT tileid,
-                                    resourceinstanceid,
-                                    nodeid,
-                                    geom
-                                FROM geojson_geometries
-                                WHERE nodeid = %s and resourceinstanceid not in %s
-                            ) m
-                        )
 
-                        SELECT ST_AsMVT(
-                            tile,
-                             %s,
-                            4096,
-                            'geom',
-                            'id'
-                        ) FROM (
-                            SELECT resourceinstanceid::text,
-                                row_number() over () as id,
-                                1 as total,
+                    count_query = """
+                    SELECT count(*) FROM geojson_geometries
+                    WHERE
+                    ST_Intersects(geom, TileBBox(%s, %s, %s, 3857))
+                    AND
+                    nodeid = %s and resourceinstanceid not in %s
+                    """
+
+                    # get the count of matching geometries
+                    cursor.execute(count_query, [zoom, x, y, nodeid, resource_ids])
+                    search_geom_count = cursor.fetchone()[0]
+
+                    if search_geom_count >= min_points:
+                        cursor.execute(
+                            """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
+                            AS (
+                                SELECT m.*,
+                                ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
+                                FROM (
+                                    SELECT tileid,
+                                        resourceinstanceid,
+                                        nodeid,
+                                        geom
+                                    FROM geojson_geometries
+                                    WHERE 
+                                    ST_Intersects(geom, TileBBox(%s, %s, %s, 3857))
+                                    AND
+                                    nodeid = %s and resourceinstanceid not in %s
+                                ) m
+                            )
+                            SELECT ST_AsMVT(
+                                tile,
+                                %s,
+                                4096,
+                                'geom',
+                                'id'
+                            ) FROM (
+                                SELECT resourceinstanceid::text,
+                                    row_number() over () as id,
+                                    1 as total,
+                                    ST_AsMVTGeom(
+                                        geom,
+                                        TileBBox(%s, %s, %s, 3857)
+                                    ) AS geom,
+                                    '' AS extent
+                                FROM clusters
+                                WHERE cid is NULL
+                                UNION
+                                SELECT NULL as resourceinstanceid,
+                                    row_number() over () as id,
+                                    count(*) as total,
+                                    ST_AsMVTGeom(
+                                        ST_Centroid(
+                                            ST_Collect(geom)
+                                        ),
+                                        TileBBox(%s, %s, %s, 3857)
+                                    ) AS geom,
+                                    ST_AsGeoJSON(
+                                        ST_Extent(geom)
+                                    ) AS extent
+                                FROM clusters
+                                WHERE cid IS NOT NULL
+                                GROUP BY cid
+                            ) as tile;""",
+                            [distance, min_points, zoom, x, y, nodeid, resource_ids, nodeid, zoom, x, y, zoom, x, y],
+                        )
+                    elif search_geom_count:
+                        cursor.execute(
+                            """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
+                                id,
+                                resourceinstanceid,
+                                nodeid,
                                 ST_AsMVTGeom(
                                     geom,
                                     TileBBox(%s, %s, %s, 3857)
                                 ) AS geom,
-                                '' AS extent
-                            FROM clusters
-                            WHERE cid is NULL
-                            UNION
-                            SELECT NULL as resourceinstanceid,
-                                row_number() over () as id,
-                                count(*) as total,
-                                ST_AsMVTGeom(
-                                    ST_Centroid(
-                                        ST_Collect(geom)
-                                    ),
-                                    TileBBox(%s, %s, %s, 3857)
-                                ) AS geom,
-                                ST_AsGeoJSON(
-                                    ST_Extent(geom)
-                                ) AS extent
-                            FROM clusters
-                            WHERE cid IS NOT NULL
-                            GROUP BY cid
-                        ) as tile;""",
-                        [distance, min_points, nodeid, resource_ids, nodeid, zoom, x, y, zoom, x, y],
-                    )
+                                1 AS total
+                            FROM geojson_geometries
+                            WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
+                            [nodeid, zoom, x, y, nodeid, resource_ids],
+                        )
+                    else:
+                        tile = ""
                 else:
                     cursor.execute(
                         """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
@@ -330,12 +392,14 @@ class MVT(APIBase):
                         WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
                         [nodeid, zoom, x, y, nodeid, resource_ids],
                     )
-                tile = bytes(cursor.fetchone()[0])
+                tile = bytes(cursor.fetchone()[0]) if tile is None else tile
                 cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
         if not len(tile):
             raise Http404()
         return HttpResponse(tile, content_type="application/x-protobuf")
 
+    def create_mvt_cache_key(node, zoom, x, y, user):
+        return f"mvt_{str(node.nodeid)}_{zoom}_{x}_{y}_{user.id}"
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Graphs(APIBase):
@@ -1108,24 +1172,28 @@ class ResourceReport(APIBase):
             resp["related_resources"] = related_resources_summary
 
         if "tiles" not in exclude:
-            permitted_tiles = []
-            for tile in TileProxyModel.objects.filter(resourceinstance=resource).select_related("nodegroup").order_by("sortorder"):
-                if request.user.has_perm(perm, tile.nodegroup):
-                    tile.filter_by_perm(request.user, perm)
-                    permitted_tiles.append(tile)
+            resource.load_tiles(user=request.user, perm=perm)
+            permitted_tiles = resource.tiles
 
             resp["tiles"] = permitted_tiles
 
         if "cards" not in exclude:
-            permitted_cards = []
-            for card in CardProxyModel.objects.filter(graph_id=resource.graph_id).select_related("nodegroup").order_by("sortorder"):
-                if request.user.has_perm(perm, card.nodegroup):
-                    card.filter_by_perm(request.user, perm)
-                    permitted_cards.append(card)
+            # collect the nodegroups for which this user has perm
+            readable_nodegroups = get_nodegroups_by_perm(request.user, [perm], any_perm=True)
+            
+            # query only the cards whose nodegroups are readable by user
+            permitted_cards = (
+                CardProxyModel.objects.filter(graph_id=resource.graph_id, nodegroup__in=readable_nodegroups)
+                .prefetch_related("cardxnodexwidget_set")
+                .order_by("sortorder")
+            )
 
             cardwidgets = [
                 widget
-                for widgets in [card.cardxnodexwidget_set.order_by("sortorder").all() for card in permitted_cards]
+                for widgets in [
+                    sorted(card.cardxnodexwidget_set.all(), key=lambda x: x.sortorder or 0)
+                    for card in permitted_cards
+                ]
                 for widget in widgets
             ]
 

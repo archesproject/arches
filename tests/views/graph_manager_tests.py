@@ -30,12 +30,14 @@ from arches.app.models.models import Node, NodeGroup, GraphModel, CardModel, Edg
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
-# python manage.py test tests/views/graph_manager_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.views.graph_manager_tests --settings="tests.test_settings"
 
 
 class GraphManagerViewTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        super().setUpClass()
+
         cls.loadOntology()
 
     def setUp(self):
@@ -228,6 +230,7 @@ class GraphManagerViewTests(ArchesTestCase):
         graph = json.loads(response.content)
 
         graph["name"] = "new graph name"
+        graph["root"] = {"datatype": "semantic", "config": None}
         graph["nodegroups"] = []
         post_data = {"graph": graph, "relatable_resource_ids": [str(self.ROOT_ID)]}
         post_data = JSONSerializer().serialize(post_data)

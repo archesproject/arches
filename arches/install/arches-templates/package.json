@@ -1,0 +1,26 @@
+{
+    "name": "{{ project_name }}",
+    "license": "AGPL-3.0-only",
+    "scripts": {
+        "build_development": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js",
+        "build_production": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 NODE_ENV=production webpack --config ./webpack/webpack.config.prod.js",
+        "build_test": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js --env test=true",
+        "eslint:check": "eslint **/src",
+        "eslint:fix": "eslint **/src --fix",
+        "eslint:watch": "nodemon --watch . --ext ts,vue --exec yarn --silent eslint:check",
+        "gettext:extract": "vue-gettext-extract",
+        "gettext:compile": "vue-gettext-compile",
+        "ts:check": "vue-tsc --noEmit",
+        "ts:watch": "vue-tsc --watch --noEmit",
+        "start": "cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack serve --config ./webpack/webpack.config.dev.js",
+        "vitest": "vitest --run --coverage"
+    },
+    "devDependencies": {
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#{{ arches_version }}"
+    },
+    "dependencies": {
+        "arches": "archesproject/arches#{{ arches_version }}"
+    },
+    "nodeModulesPaths": {
+    }
+}

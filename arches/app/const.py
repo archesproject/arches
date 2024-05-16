@@ -13,3 +13,10 @@ class IntegrityCheck(Enum):
 
     def __str__(self):
         return IntegrityCheckDescriptions[self.value]
+
+
+class ExtensionType(Enum):
+    DATATYPES = "datatypes"
+    ETL_MODULES = "etl_modules"
+    FUNCTIONS = "functions"
+    SEARCH_COMPONENTS = "search_components"

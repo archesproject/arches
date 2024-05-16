@@ -23,7 +23,7 @@ Please add the [appropriate labels](https://github.com/archesproject/arches/wiki
 We use ZenHub in our repo to enhance our issue tracking, and generate statistics for our progress.
 
 ### <a name="contribute-code"></a> Contributing Code
-We strongly encourage code contributions. To begin, you should begin by **forking the Arches repo**. Then, follow our guide for [creating a development environment](https://arches.readthedocs.io/en/latest/creating-a-development-environment/) and clone your own fork, not the official archesproject repo. Once you have Arches fully installed locally using your own fork of the repo, you are ready to begin.
+We strongly encourage code contributions. To begin, you should begin by **forking the Arches repo**. Then, follow our guide for [creating a development environment](https://arches.readthedocs.io/en/stable/developing/getting-started/creating-a-development-environment/) and clone your own fork, not the official archesproject repo. Once you have Arches fully installed locally using your own fork of the repo, you are ready to begin.
 
 #### Submitting Code
 
@@ -49,7 +49,7 @@ If I am working on ticket "Cool New Feature (ticket #1231)" my branch may be nam
     Note 2: If you have created or deleted files in the file system, you'll have to precede this `commit` command with `git add .` which with add these new (or deleted) files to your git index.
 * Test your changes locally to ensure all the tests pass (make sure your virtual environment is activate first):
     ```shell
-   python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
+   python manage.py test tests --settings="tests.test_settings"
    ```
 * Push your branch to GitHub:
     ```shell

@@ -641,7 +641,7 @@ define([
         this.saving = ko.observable(false);
 
         this.savedComponentPaths = {};
-        this.value = ko.observable();
+        this.value = ko.observable(null);
 
         this.complete = ko.observable(false);
         this.error = ko.observable();
@@ -657,7 +657,7 @@ define([
             }
         });
 
-        this.savedData = ko.observable();
+        this.savedData = ko.observable(null);
         this.savedData.subscribe(function(savedData) {
             self.setToWorkflowHistory('value', savedData);
         });

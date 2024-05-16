@@ -83,4 +83,3 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 
 ## 9.0 - Release date: Sept 15, 2027
 - Full migration to Vue
-
