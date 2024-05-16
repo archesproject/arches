@@ -616,7 +616,13 @@ class JsonLdReader(Reader):
                             clss = self.get_cached_reference(uri)
                             vi["@type"] = clss
                         except:
-                            raise ValueError(f"Multiple possible branches and no @type given: {vi}")
+                            raise ValueErrorWithNodeInfo(
+                                f"Multiple possible branches and no @type given: {vi}",
+                                value=uri,
+                                datatype=tree_node["datatype_type"],
+                                node_id=tree_node["node_id"],
+                                nodegroup_id=None if tree_node["nodegroup_id"] == "None" else tree_node["nodegroup_id"],
+                            )
 
                 value = None
                 is_literal = False
@@ -634,9 +640,21 @@ class JsonLdReader(Reader):
                 # model has xsd:string, default is rdfs:Literal
                 key = f"{k} http://www.w3.org/2001/XMLSchema#string"
                 if not key in tree_node["children"]:
-                    raise ValueError(f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}")
+                    raise ValueErrorWithNodeInfo(
+                        f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}",
+                        value=value or uri,
+                        datatype=tree_node["datatype_type"],
+                        node_id=tree_node["node_id"],
+                        nodegroup_id=None if tree_node["nodegroup_id"] == "None" else tree_node["nodegroup_id"],
+                    )
             elif not key in tree_node["children"]:
-                raise ValueError(f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}")
+                raise ValueErrorWithNodeInfo(
+                    f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}",
+                    value=value or uri,
+                    datatype=tree_node["datatype_type"],
+                    node_id=tree_node["node_id"],
+                    nodegroup_id=None if tree_node["nodegroup_id"] == "None" else tree_node["nodegroup_id"],
+                )
 
             # if we made it this far then it means that we've found at least 1 match
             # options is a list of potential matches in the graph tree
