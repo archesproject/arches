@@ -651,12 +651,14 @@ class JsonLdReader(Reader):
                             self.printline(f"Could not validate {values} as a {o['datatype']}", indent + 1)
                     else:
                         if o["datatype"].datatype_name == 'date' and self.default_timezone:
-                            try:
-                                datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
-                                value = value + self.default_timezone
-                                vi['@value'] = value                         
-                            except:
-                                pass
+                            tz_formats = ["%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"]
+                            for tz_format in tz_formats:
+                                try:
+                                    datetime.datetime.strptime(value, tz_format)
+                                    value = value + self.default_timezone
+                                    vi['@value'] = value                         
+                                except:
+                                    pass
                         if len(o["datatype"].validate_from_rdf(value)) == 0:
                             possible.append([o, value])
                         else:
