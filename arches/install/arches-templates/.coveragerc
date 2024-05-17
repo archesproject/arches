@@ -1,6 +1,6 @@
 [run]
 source =
-    arches/
+    {{ project_name }}/
 
 omit =
     */python?.?/*

@@ -37,7 +37,7 @@ class BaseConceptDataType(BaseDataType):
         ret = label
         collection_values = self.collection_lookup[collectionid]
         for concept in collection_values:
-            if label == concept[1]:
+            if concept[1] in (label, label.strip()):
                 ret = concept[2]
         return ret
 
