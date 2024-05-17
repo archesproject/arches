@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ConfirmDialog from "primevue/confirmdialog";
 import Toast from "primevue/toast";
 
 import ControlledListsMain from "@/controlled-lists/components/ControlledListsMain.vue";
@@ -11,7 +12,9 @@ import ControlledListsMain from "@/controlled-lists/components/ControlledListsMa
             <ControlledListsMain />
         </div>
     </div>
+    <ConfirmDialog :draggable="false" />
     <Toast />
+    <RouterView />
 </template>
 
 <!-- Not scoped: workaround for lack of font-family in <body> -->

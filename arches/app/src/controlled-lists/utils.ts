@@ -40,22 +40,32 @@ export const languageNameFromCode = (code: string) => {
     return arches.languages.find((lang: Language) => lang.code === code).name;
 };
 
-export const findNodeInTree = (tree: TreeNode[], itemId: string) => {
+export const findNodeInTree = (
+    tree: TreeNode[],
+    itemId: string,
+): {
+    found: TreeNode | undefined;
+    path: TreeNode[];
+} => {
+    const path: TreeNode[] = [];
+
     function recurse(items: TreeNode[]): TreeNode | undefined {
         for (const item of items) {
             if (item.data.id === itemId) {
                 return item;
             }
             for (const child of item.items ?? item.children) {
-                const maybeFound = recurse([child]);
-                if (maybeFound) {
-                    return maybeFound;
+                const found = recurse([child]);
+                if (found) {
+                    path.push(item);
+                    return found;
                 }
             }
         }
     }
 
-    return recurse(tree);
+    const found = recurse(tree);
+    return { found, path };
 };
 
 export const itemAsNode = (

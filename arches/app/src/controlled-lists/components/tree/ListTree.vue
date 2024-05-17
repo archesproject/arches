@@ -55,6 +55,10 @@ const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 
 const updateSelectedAndExpanded = (node: TreeNode) => {
+    if (isMultiSelecting.value || movingItem.value?.key) {
+        return;
+    }
+
     setDisplayedRow(node.data);
     expandedKeys.value = {
         ...expandedKeys.value,
@@ -158,7 +162,7 @@ const filterCallbackWrapped = computed(() => {
 <template>
     <ListTreeControls
         :key="refetcher"
-        v-model="tree"
+        v-model:tree="tree"
         v-model:rerender-tree="rerenderTree"
         v-model:expanded-keys="expandedKeys"
         v-model:selected-keys="selectedKeys"

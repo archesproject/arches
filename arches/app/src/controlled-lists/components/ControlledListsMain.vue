@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import arches from "arches";
 import { computed, provide, ref } from "vue";
+import { useRouter } from "vue-router";
 
 import ProgressSpinner from "primevue/progressspinner";
 import Splitter from "primevue/splitter";
@@ -9,6 +10,7 @@ import SplitterPanel from "primevue/splitterpanel";
 import { LIGHT_GRAY } from "@/arches/theme.ts";
 import {
     displayedRowKey,
+    routes,
     selectedLanguageKey,
 } from "@/controlled-lists/constants.ts";
 import { dataIsList } from "@/controlled-lists/utils.ts";
@@ -19,14 +21,21 @@ import ListHeader from "@/controlled-lists/components/misc/ListHeader.vue";
 import ListTree from "@/controlled-lists/components/tree/ListTree.vue";
 
 import type { Ref } from "vue";
+import type { ControlledListItem, Selectable } from "@/controlled-lists/types";
 import type { Language } from "@/arches/types";
-import type { Selectable } from "@/controlled-lists/types";
 
-const splash = "splash";
+const router = useRouter();
 
 const displayedRow: Ref<Selectable | null> = ref(null);
 function setDisplayedRow(val: Selectable | null) {
     displayedRow.value = val;
+    if (val === null) {
+        router.push({ name: routes.splash });
+    } else if ((val as ControlledListItem).controlled_list_id) {
+        router.push({ name: routes.item, params: { id: val.id } });
+    } else {
+        router.push({ name: routes.list, params: { id: val.id } });
+    }
 }
 provide(displayedRowKey, { displayedRow, setDisplayedRow });
 
@@ -85,7 +94,7 @@ const panel = computed(() => {
             >
                 <component
                     :is="panel"
-                    :key="displayedRow?.id ?? splash"
+                    :key="displayedRow?.id ?? routes.splash"
                 />
             </SplitterPanel>
         </Splitter>
