@@ -34,7 +34,6 @@ export default async function createVueApplication(vueComponent){
             availableLanguages: respJSON['enabled_languages'],
             defaultLanguage: respJSON['language'],
             translations: respJSON['translations'],
-            silent: true,
         });
 
         const app = createApp(vueComponent);
