@@ -1,4 +1,5 @@
 import ko from 'knockout';
+import ControlledListsMain from '@/controlled-lists/components/ControlledListsMain.vue';
 import ControlledListManager from '@/arches/plugins/ControlledListManager.vue';
 import createVueApp from 'utils/create-vue-application';
 import ControlledListManagerTemplate from 'templates/views/components/plugins/controlled-list-manager.htm';
@@ -6,9 +7,9 @@ import ControlledListManagerTemplate from 'templates/views/components/plugins/co
 import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
-  { path: '/plugins/controlled-list-manager', name: 'splash', component: ControlledListManager },
-  { path: '/plugins/controlled-list-manager/list/:id', name: 'list', component: ControlledListManager },
-  { path: '/plugins/controlled-list-manager/item/:id', name: 'item', component: ControlledListManager },
+  { path: '/plugins/controlled-list-manager', name: 'splash', component: ControlledListsMain },
+  { path: '/plugins/controlled-list-manager/list/:id', name: 'list', component: ControlledListsMain },
+  { path: '/plugins/controlled-list-manager/item/:id', name: 'item', component: ControlledListsMain },
 ];
 
 const router = createRouter({
