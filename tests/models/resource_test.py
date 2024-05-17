@@ -265,6 +265,20 @@ class ResourceTests(ArchesTestCase):
         perms = set(get_perms(user, test_resource))
         self.assertEqual(perms, {"view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"})
 
+    def test_provisional_user_can_delete_own_resource(self):
+        """
+        Test provisional user can delete resource instance they created
+        """
+    
+        user = User.objects.create_user(username="sam", email="sam@samsclub.com", password="Test12345!")
+        user.save()
+        group = Group.objects.get(name="Resource Reviewer")
+        group.user_set.add(user)
+        test_resource = Resource(graph_id=self.search_model_graphid)
+        test_resource.save(user=user)
+        perms = set(get_perms(user, test_resource))
+        self.assertEqual(perms, {"view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"})
+
     def test_recalculate_descriptors_prefetch_related_objects(self):
         r1 = Resource(graph_id=self.search_model_graphid)
         r2 = Resource(graph_id=self.search_model_graphid)
