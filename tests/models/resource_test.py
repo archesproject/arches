@@ -272,15 +272,15 @@ class ResourceTests(ArchesTestCase):
     
         user = User.objects.create_user(username="sam", email="sam@samsclub.com", password="Test12345!")
         user.save()
-        group = Group.objects.get(name="Resource Reviewer")
+        group = Group.objects.get(name="Resource Editor")
         group.user_set.add(user)
         test_resource = Resource(graph_id=self.search_model_graphid)
         test_resource.save(user=user)
 
         other_user = User.objects.create_user(username="fred", email="fred@samsclub.com", password="Test12345!")
         other_user.save()
-        group = Group.objects.get(name="Resource Reviewer")
-        group.user_set.add(user)
+        group = Group.objects.get(name="Resource Editor")
+        group.user_set.add(other_user)
 
         with self.subTest(user="can't delete"):
             result = test_resource.delete(user=other_user)
