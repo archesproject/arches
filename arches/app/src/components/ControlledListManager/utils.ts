@@ -8,11 +8,11 @@ import type {
 } from "@/types/ControlledListManager";
 
 export const bestLabel = (item: ControlledListItem, languageCode: string) => {
-    const labelsInLang = item.labels.filter(l => l.language_id === languageCode);
+    const labelsInLang = item.labels.filter(label => label.language_id === languageCode);
     const bestLabel = (
-        labelsInLang.find(l => l.valuetype_id === "prefLabel")
-        ?? labelsInLang.find(l => l.valuetype_id === "altLabel")
-        ?? item.labels.find(l => l.valuetype_id === "prefLabel")
+        labelsInLang.find(label => label.valuetype_id === "prefLabel")
+        ?? labelsInLang.find(label => label.valuetype_id === "altLabel")
+        ?? item.labels.find(label => label.valuetype_id === "prefLabel")
     );
     if (!bestLabel) {
         throw new Error();
@@ -123,7 +123,7 @@ export const reorderItem = (
     let acc = 0;
     const recalculateSortOrderRecursive = (items: ControlledListItem[]) => {
         // Patch in the reordered siblings.
-        if (items.some(x => x.id === item.id)) {
+        if (items.some(itemCandidate => itemCandidate.id === item.id)) {
             items = reorderedSiblings;
         }
         for (const thisItem of items) {

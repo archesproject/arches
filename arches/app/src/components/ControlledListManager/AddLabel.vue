@@ -22,12 +22,11 @@ const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
 const newLabel: Ref<NewLabel> = computed(() => {
-    const otherNewLabels = item.value.labels.filter(
-        (l: NewLabel | Label) => typeof l.id === "number"
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any 
-    ) as any as NewLabel[];
+    const otherNewLabelIds = item.value.labels.filter(
+        (label: NewLabel | Label) => typeof label.id === "number"
+    ).map(label => label.id as unknown as number);
     const maxOtherNewLabelId = Math.max(
-        ...otherNewLabels.map(l => l.id),
+        ...otherNewLabelIds,
         1000,
     );
     return {

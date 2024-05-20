@@ -18,6 +18,10 @@ export type NewLabel = {
 
 export type ValueType = "prefLabel" | "altLabel";
 
+export type NewOrExistingControlledListItemImageMetadata = (
+    ControlledListItemImageMetadata | NewControlledListItemImageMetadata
+);
+
 export type ControlledListItemImageMetadata = {
     id: string,
     controlled_list_item_image_id: string,
@@ -45,7 +49,7 @@ export type ControlledListItemImage = {
     id: string,
     item_id: string,
     url: string,
-    metadata: ControlledListItemImageMetadata[],
+    metadata: NewOrExistingControlledListItemImageMetadata[],
 };
 
 export type ControlledListItem = {

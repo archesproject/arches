@@ -11,7 +11,6 @@ import type { Ref } from "vue";
 import type {
     ControlledListItem,
     ControlledListItemImage,
-    ControlledListItemImageMetadata,
     MetadataChoice,
     NewControlledListItemImageMetadata,
 } from "@/types/ControlledListManager";
@@ -26,18 +25,17 @@ const { $gettext } = useGettext();
 const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
 const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
-    const otherNewMetadatas = image.metadata.filter(
-        (m: NewControlledListItemImageMetadata | ControlledListItemImageMetadata) => typeof m.id === "number"
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any 
-    ) as any as NewControlledListItemImageMetadata[];
+    const otherNewMetadataIds = image.metadata.filter(
+        (metadatum) => typeof metadatum.id === "number"
+    ).map(metadatum => metadatum.id as unknown as number);
     const maxOtherNewMetadataId = Math.max(
-        ...otherNewMetadatas.map(m => m.id),
+        ...otherNewMetadataIds,
         1000,
     );
 
     const nextMetadataType = METADATA_CHOICES.find(
         choice => !image.metadata.map(
-            (m: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => m.metadata_type
+            (metadatum) => metadatum.metadata_type
         ).includes(choice.type)
     ) ?? METADATA_CHOICES[0];
 
@@ -50,13 +48,19 @@ const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
         value: '',
     };
 });
+
+const onAdd = () => {
+    item.value.images.find(
+        imageFromItem => imageFromItem.id === image.id
+    )!.metadata.push(newMetadata.value);
+};
 </script>
 
 <template>
     <Button
         class="add-metadata"
         raised
-        @click="item.images.find(i => i.id === image.id).metadata.push(newMetadata)"
+        @click="onAdd"
     >
         <i
             class="fa fa-plus-circle"

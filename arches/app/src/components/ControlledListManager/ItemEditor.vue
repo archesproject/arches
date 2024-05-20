@@ -29,7 +29,7 @@ import type {
     ControlledListItemImageMetadata,
     DisplayedListItemRefAndSetter,
     Label,
-    NewControlledListItemImageMetadata,
+    NewOrExistingControlledListItemImageMetadata,
     NewLabel,
 } from "@/types/ControlledListManager";
 
@@ -46,13 +46,13 @@ const appendItemLabel = computed(() => {
 });
 const removeItemLabel = computed(() => {
     return (removedLabel: Label | NewLabel) => {
-        const toDelete = item.value!.labels.findIndex((l: Label | NewLabel) => l.id === removedLabel.id);
+        const toDelete = item.value!.labels.findIndex(labelFromItem => labelFromItem.id === removedLabel.id);
         item.value!.labels.splice(toDelete, 1);
     };
 });
 const updateItemLabel = computed(() => {
     return (updatedLabel: Label) => {
-        const toUpdate = item.value!.labels.find((l: Label) => l.id === updatedLabel.id);
+        const toUpdate = item.value!.labels.find(labelFromItem => labelFromItem.id === updatedLabel.id);
         if (toUpdate) {
             toUpdate.language_id = updatedLabel.language_id;
             toUpdate.value = updatedLabel.value;
@@ -63,7 +63,8 @@ const updateItemLabel = computed(() => {
 const appendImageMetadata = computed(() => {
     return (newMetadata: ControlledListItemImageMetadata) => {
         const imageFromItem = item.value!.images.find(
-            (i: ControlledListItemImage) => i.id === newMetadata.controlled_list_item_image_id
+            (imageCandidateFromItem) =>
+                imageCandidateFromItem.id === newMetadata.controlled_list_item_image_id
         );
         if (imageFromItem) {
             imageFromItem.metadata.push(newMetadata);
@@ -71,13 +72,14 @@ const appendImageMetadata = computed(() => {
     };
 });
 const removeImageMetadata = computed(() => {
-    return (removedMetadata: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => {
+    return (removedMetadata: NewOrExistingControlledListItemImageMetadata) => {
         const imageFromItem = item.value!.images.find(
-            (i: ControlledListItemImage) => i.id === removedMetadata.controlled_list_item_image_id
+            (imageCandidateFromItem) =>
+                imageCandidateFromItem.id === removedMetadata.controlled_list_item_image_id
         );
         if (imageFromItem) {
             const toDelete = imageFromItem.metadata.findIndex(
-                (m: ControlledListItemImageMetadata | NewControlledListItemImageMetadata) => m.id === removedMetadata.id
+                (metadatum) => metadatum.id === removedMetadata.id
             );
             if (toDelete === -1) {
                 return;
@@ -89,10 +91,13 @@ const removeImageMetadata = computed(() => {
 const updateImageMetadata = computed(() => {
     return (updatedMetadata: ControlledListItemImageMetadata) => {
         const imageFromItem = item.value!.images.find(
-            (i: ControlledListItemImage) => i.id === updatedMetadata.controlled_list_item_image_id
+            (imageCandidateFromItem) =>
+                imageCandidateFromItem.id === updatedMetadata.controlled_list_item_image_id
         );
         if (imageFromItem) {
-            const toUpdate = imageFromItem.metadata.find((m: ControlledListItemImageMetadata) => m.id === updatedMetadata.id);
+            const toUpdate = imageFromItem.metadata.find(
+                (metadatum) => metadatum.id === updatedMetadata.id
+            );
             if (!toUpdate) {
                 return;
             }
@@ -106,7 +111,7 @@ const updateImageMetadata = computed(() => {
 const removeImage = computed(() => {
     return (removedImage: ControlledListItemImage) => {
         const toDelete = item.value!.images.findIndex(
-            (i: ControlledListItemImage) => i.id === removedImage.id
+            (imageFromItem) => imageFromItem.id === removedImage.id
         );
         item.value!.images.splice(toDelete, 1);
     };

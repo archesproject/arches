@@ -80,7 +80,7 @@ const fetchLists = async () => {
         } else {
             await response.json().then((data) => {
                 controlledListItemsTree.value = (data.controlled_lists as ControlledList[]).map(
-                    l => listAsNode(l, selectedLanguage.value)
+                    list => listAsNode(list, selectedLanguage.value)
                 );
             });
         }

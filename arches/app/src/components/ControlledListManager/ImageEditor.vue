@@ -60,8 +60,8 @@ const METADATA_CHOICES = [
 ];
 
 const bestAlternativeText = computed(() => {
-    return image.metadata.filter(m => m.metadata_type === "alt")
-        .find(m => m.language_id === arches.activeLanguage)?.value
+    return image.metadata.filter(metadatum => metadatum.metadata_type === "alt")
+        .find(altText => altText.language_id === arches.activeLanguage)?.value
         || bestLabel(item.value, arches.activeLanguage).value;
 });
 

@@ -26,7 +26,7 @@ function setDisplayedRow(val: Selectable | null) {
 provide(displayedRowKey, { displayedRow, setDisplayedRow });
 
 const selectedLanguage: Ref<Language> = ref(
-    (arches.languages as Language[]).find(l => l.code === arches.activeLanguage) as Language
+    (arches.languages as Language[]).find(lang => lang.code === arches.activeLanguage) as Language
 );
 provide(selectedLanguageKey, selectedLanguage);
 
