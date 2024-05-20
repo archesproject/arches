@@ -46,6 +46,8 @@ const panel = computed(() => {
 <template>
     <div class="list-editor-container">
         <ListHeader />
+        <!-- Magic 97% is workaround re: last item in left nav dropping below screen -->
+        <!-- https://github.com/archesproject/arches/issues/10531 -->
         <Splitter
             :pt="{
                 root: { style: { height: '97%' } },
@@ -70,7 +72,7 @@ const panel = computed(() => {
             <SplitterPanel
                 :size="60"
                 :min-size="25"
-                :style="{ margin: '1rem 0rem 1rem 1rem', overflowY: 'auto', maxWidth: '1200px', paddingRight: '7%' }"
+                :style="{ margin: '1rem 0rem 1rem 1rem', overflowY: 'auto', paddingRight: '4rem' }"
             >
                 <component
                     :is="panel"
