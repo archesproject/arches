@@ -51,7 +51,7 @@ const headings: Ref<{ heading: string; subheading: string }> = computed(() => {
             return {
                 heading: $gettext("Alternate Label(s)"),
                 subheading: $gettext(
-                    "Optionally, you can provide additional label/language labels for your list item. Useful if you want to make searching for labels with synonyms or common misspellings of your preferred label(s) easier."
+                    "Optionally, you can provide additional labels for your list item. Useful if you want to make searching for labels with synonyms or common misspellings of your preferred label(s) easier."
                 ),
             };
         default:
