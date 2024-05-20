@@ -150,7 +150,7 @@ const onDeleteImage = async () => {
                     style="width: 40%; min-width: 8rem;"
                 >
                     <template #editor="{ data, field }">
-                        <InputText v-model="data[field]"/>
+                        <InputText v-model="data[field]" />
                     </template>
                 </Column>
                 <Column
