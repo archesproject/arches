@@ -38,6 +38,8 @@ const editingRows = ref([]);
 
 const toast = useToast();
 const { $gettext } = useGettext();
+const metadataTypeHeader = $gettext('Metadata type');
+const languageHeader = $gettext('Language');
 
 const labeledMetadataChoices = [
     {
@@ -124,7 +126,7 @@ const onDeleteImage = async () => {
             >
                 <Column
                     field="metadata_type"
-                    :header="$gettext('Metadata type')"
+                    :header="metadataTypeHeader"
                     style="width: 20%;"
                 >
                     <template #editor="{ data, field }">
@@ -146,7 +148,7 @@ const onDeleteImage = async () => {
                 </Column>
                 <Column
                     field="value"
-                    style="width: 40%; min-width: 8rem;"
+                    style="width: 60%; min-width: 8rem;"
                 >
                     <template #editor="{ data, field }">
                         <InputText v-model="data[field]" />
@@ -154,7 +156,7 @@ const onDeleteImage = async () => {
                 </Column>
                 <Column
                     field="language_id"
-                    :header="$gettext('Language')"
+                    :header="languageHeader"
                     style="width: 10%; min-width: 8rem; height: 4rem; padding-left: 1rem;"
                 >
                     <template #editor="{ data, field }">
@@ -175,9 +177,9 @@ const onDeleteImage = async () => {
                 </Column>
                 <Column
                     :row-editor="true"
-                    style="width: 10%; min-width: 8rem;"
+                    style="width: 5%; min-width: 8rem; text-align: center;"
                 />
-                <Column style="width: 5%;">
+                <Column style="width: 5%; text-align: center;">
                     <template #body="slotProps">
                         <i
                             class="fa fa-trash"

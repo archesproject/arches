@@ -70,7 +70,7 @@ const panel = computed(() => {
             <SplitterPanel
                 :size="60"
                 :min-size="25"
-                :style="{ margin: '1rem 0rem 1rem 1rem', overflowY: 'auto', paddingRight: '4rem' }"
+                :style="{ margin: '1rem 0rem 4rem 1rem', overflowY: 'auto', paddingRight: '4rem' }"
             >
                 <component
                     :is="panel"

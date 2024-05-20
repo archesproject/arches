@@ -37,6 +37,7 @@ const editingRows = ref([]);
 
 const toast = useToast();
 const { $gettext } = useGettext();
+const languageHeader = $gettext('Language');
 
 const headings: Ref<{ heading: string; subheading: string }> = computed(() => {
     switch (props.type) {
@@ -129,7 +130,7 @@ const onDelete = async (label: NewLabel | Label) => {
             </Column>
             <Column
                 field="language_id"
-                :header="$gettext('Language')"
+                :header="languageHeader"
                 style="width: 10%; min-width: 8rem; height: 4rem"
             >
                 <template #editor="{ data, field }">
@@ -150,9 +151,9 @@ const onDelete = async (label: NewLabel | Label) => {
             </Column>
             <Column
                 :row-editor="true"
-                style="width: 10%; min-width: 8rem;"
+                style="width: 5%; min-width: 8rem; text-align: center;"
             />
-            <Column style="width: 5%;">
+            <Column style="width: 5%; text-align: center;">
                 <template #body="slotProps">
                     <i
                         class="fa fa-trash"
