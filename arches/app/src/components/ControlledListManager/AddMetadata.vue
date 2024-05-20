@@ -5,6 +5,7 @@ import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 
+import { ARCHES_CHROME_BLUE } from "@/theme.ts";
 import { itemKey } from "@/components/ControlledListManager/const.ts";
 
 import type { Ref } from "vue";
@@ -22,7 +23,6 @@ const { choices: METADATA_CHOICES, image } = defineProps<{
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
-const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
 const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
     const otherNewMetadataIds = image.metadata.filter(
@@ -76,7 +76,7 @@ const onAdd = () => {
 .add-metadata {
     display: flex;
     height: 3rem;
-    color: v-bind(slateBlue);
+    color: v-bind(ARCHES_CHROME_BLUE);
     background-color: #f3fbfd;
     margin-top: 1rem;
 }

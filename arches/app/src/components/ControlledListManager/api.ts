@@ -1,6 +1,8 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 
+import { ERROR } from "@/components/ControlledListManager/const.ts";
+
 import type { ToastServiceMethods } from "primevue/toastservice";
 import type {
     ControlledList,
@@ -12,7 +14,6 @@ import type {
     NewLabel,
 } from "@/types/ControlledListManager";
 
-const ERROR = "error";
 type GetText = (s: string) => string;
 
 export const postItemToServer = async (

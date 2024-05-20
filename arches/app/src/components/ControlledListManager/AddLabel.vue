@@ -5,6 +5,7 @@ import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 
+import { ARCHES_CHROME_BLUE } from "@/theme.ts";
 import { itemKey, ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
 
 import type { Ref } from "vue";
@@ -19,7 +20,6 @@ const props = defineProps<{ type: ValueType }>();
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
-const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
 const newLabel: Ref<NewLabel> = computed(() => {
     const otherNewLabelIds = item.value.labels.filter(
@@ -70,7 +70,7 @@ const buttonLabel = computed(() => {
 .add-label {
     display: flex;
     height: 3rem;
-    color: v-bind(slateBlue);
+    color: v-bind(ARCHES_CHROME_BLUE);
     background-color: #f3fbfd;
     margin-top: 1rem;
 }

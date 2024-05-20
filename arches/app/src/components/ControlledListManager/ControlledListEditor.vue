@@ -13,11 +13,13 @@ import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 import ListTree from "@/components/ControlledListManager/ListTree.vue";
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
 
+import { LIGHT_GRAY } from "@/theme.ts";
+
 import type { Ref } from "vue";
 import type { ControlledListItem, Selectable } from "@/types/ControlledListManager";
 import type { Language } from "@/types/arches";
 
-const lightGray = "#f4f4f4";
+const splash = 'splash';
 
 const displayedRow: Ref<Selectable | null> = ref(null);
 function setDisplayedRow(val: Selectable | null) {
@@ -47,8 +49,8 @@ const panel = computed(() => {
         <Splitter
             :pt="{
                 root: { style: { height: '97%' } },
-                gutter: { style: { background: lightGray } },
-                gutterHandler: { style: { background: lightGray } },
+                gutter: { style: { background: LIGHT_GRAY } },
+                gutterHandler: { style: { background: LIGHT_GRAY } },
             }"
         >
             <SplitterPanel
@@ -72,7 +74,7 @@ const panel = computed(() => {
             >
                 <component
                     :is="panel"
-                    :key="displayedRow?.id ?? 'splash'"
+                    :key="displayedRow?.id ?? splash"
                 />
             </SplitterPanel>
         </Splitter>

@@ -12,7 +12,7 @@ import { useToast } from "primevue/usetoast";
 
 import AddMetadata from "@/components/ControlledListManager/AddMetadata.vue";
 
-import { itemKey } from "@/components/ControlledListManager/const.ts";
+import { DANGER, itemKey } from "@/components/ControlledListManager/const.ts";
 import { deleteImage, upsertMetadata, deleteMetadata } from "@/components/ControlledListManager/api.ts";
 import { bestLabel, languageName } from "@/components/ControlledListManager/utils.ts";
 
@@ -36,7 +36,6 @@ const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const editingRows = ref([]);
 
-const DANGER = "danger";
 const toast = useToast();
 const { $gettext } = useGettext();
 

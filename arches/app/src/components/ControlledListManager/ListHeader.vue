@@ -2,6 +2,7 @@
 import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
+import { ARCHES_CHROME_BLUE } from "@/theme.ts";
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
@@ -14,7 +15,6 @@ import type {
 } from "@/types/ControlledListManager";
 
 const { $gettext } = useGettext();
-const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
 const { displayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
@@ -41,7 +41,7 @@ const heading = computed(() => {
 <template>
     <div
         class="header"
-        :style="{ background: slateBlue }"
+        :style="{ background: ARCHES_CHROME_BLUE }"
     >
         <i
             class="fa fa-inverse fa-list"

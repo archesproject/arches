@@ -10,3 +10,5 @@ export const selectedLanguageKey = Symbol() as InjectionKey<Language | null>;
 export const PREF_LABEL = "prefLabel";
 export const ALT_LABEL = "altLabel";
 export const URI = "URI";
+export const ERROR = "error";
+export const DANGER = "danger";

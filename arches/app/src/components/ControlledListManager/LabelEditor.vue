@@ -15,6 +15,8 @@ import AddLabel from "@/components/ControlledListManager/AddLabel.vue";
 import { ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
 import { languageName } from "@/components/ControlledListManager/utils.ts";
 
+import { ARCHES_CHROME_BLUE } from "@/theme.ts";
+
 import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
 import type {
@@ -35,7 +37,6 @@ const editingRows = ref([]);
 
 const toast = useToast();
 const { $gettext } = useGettext();
-const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
 const headings: Ref<{ heading: string; subheading: string }> = computed(() => {
     switch (props.type) {
@@ -175,7 +176,7 @@ const onDelete = async (label: NewLabel | Label) => {
 }
 
 h4 {
-    color: v-bind(slateBlue);
+    color: v-bind(ARCHES_CHROME_BLUE);
     margin-top: 0;
     font-size: small;
 }

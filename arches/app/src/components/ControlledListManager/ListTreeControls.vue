@@ -5,6 +5,7 @@ import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
+import { DANGER, ERROR } from "@/components/ControlledListManager/const.ts";
 import { listAsNode } from "@/components/ControlledListManager/utils.ts";
 
 import Button from "primevue/button";
@@ -20,9 +21,7 @@ import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/types/arches";
 import type { ControlledList, DisplayedRowRefAndSetter } from "@/types/ControlledListManager";
 
-// not user-facing
-const DANGER = "danger";
-const ERROR = "error";
+import { BUTTON_GREEN } from "@/theme.ts";
 
 const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
@@ -34,7 +33,6 @@ const movingItem = defineModel<TreeNode>("movingItem", { required: true });
 const isMultiSelecting = defineModel<boolean>("isMultiSelecting", { required: true });
 
 const { $gettext, $ngettext } = useGettext();
-const buttonGreen = "#10b981";
 
 const confirm = useConfirm();
 const toast = useToast();
@@ -240,7 +238,7 @@ await fetchLists();
             :label="$gettext('Add New List')"
             raised
             style="font-size: inherit"
-            :pt="{ root: { style: { background: buttonGreen } } }"
+            :pt="{ root: { style: { background: BUTTON_GREEN } } }"
             @click="createList"
         />
         <ConfirmDialog :draggable="false" />

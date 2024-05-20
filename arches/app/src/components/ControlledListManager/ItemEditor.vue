@@ -11,6 +11,7 @@ import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacter
 import LabelEditor from "@/components/ControlledListManager/LabelEditor.vue";
 import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 
+import { ARCHES_CHROME_BLUE } from "@/theme.ts";
 import {
     displayedRowKey,
     itemKey,
@@ -37,7 +38,6 @@ const { displayedRow: item } = inject(displayedRowKey) as DisplayedListItemRefAn
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
 const { $gettext } = useGettext();
-const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
 provide(itemKey, item);
 
@@ -233,7 +233,7 @@ h3 {
 }
 
 h4 {
-    color: v-bind(slateBlue);
+    color: v-bind(ARCHES_CHROME_BLUE);
     margin-top: 0;
     font-size: small;
 }

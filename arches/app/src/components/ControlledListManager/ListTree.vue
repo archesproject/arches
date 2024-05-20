@@ -10,7 +10,7 @@ import { useToast } from "primevue/usetoast";
 
 import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 import ListTreeControls from "@/components/ControlledListManager/ListTreeControls.vue";
-import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
+import { ERROR, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
 import { postListToServer } from "@/components/ControlledListManager/api.ts";
 import {
     bestLabel,
@@ -46,7 +46,6 @@ const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
 const toast = useToast();
 const { $gettext } = useGettext();
-const ERROR = "error";  // not user-facing
 
 const showMoveHereButton = (rowId: string) => {
     return (
