@@ -60,7 +60,7 @@ const buttonLabel = computed(() => {
         <i
             class="fa fa-plus-circle"
             aria-hidden="true"
-        ></i>
+        />
         <span class="add-label-text">
             {{ buttonLabel }}
         </span>

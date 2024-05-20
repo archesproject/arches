@@ -46,7 +46,7 @@ const heading = computed(() => {
         <i
             class="fa fa-inverse fa-list"
             aria-hidden="true"
-        ></i>
+        />
         <h2>{{ heading }}</h2>
     </div>
 </template>

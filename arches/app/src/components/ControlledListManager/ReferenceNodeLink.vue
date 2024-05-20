@@ -23,7 +23,7 @@ const { $gettext } = useGettext();
             <i
                 class="fa fa-reply"
                 aria-hidden="true"
-            ></i>
+            />
             {{ $gettext("Edit graph") }}
         </a>
     </span>

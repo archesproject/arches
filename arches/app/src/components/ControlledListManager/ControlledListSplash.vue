@@ -14,7 +14,7 @@ const { $gettext } = useGettext();
             aria-hidden="true"
             class="img-lg img-circle rr-splash-img-container"
         >
-            <i class="fa fa-list"></i>
+            <i class="fa fa-list" />
         </div>
 
         <!-- Splash Title -->

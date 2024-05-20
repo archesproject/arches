@@ -160,7 +160,7 @@ const onDelete = async (label: NewLabel | Label) => {
                         :aria-label="$gettext('Delete')"
                         @click="onDelete(slotProps.data)"
                         @key.enter="onDelete(slotProps.data)"
-                    ></i>
+                    />
                 </template>
             </Column>
         </DataTable>
