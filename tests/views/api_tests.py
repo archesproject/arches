@@ -66,7 +66,7 @@ class APITests(ArchesTestCase):
             cls.phase_type_assignment_graph.publish(user=None)
             cls.phase_type_assignment_graph.save()
 
-        cls.data_type_graph = Graph.objects.get(name="Data Type Testing Model")
+        cls.data_type_graph = Graph.objects.get(pk=cls.data_type_graphid)
         cls.test_prj_user = (
             models.ResourceInstance.objects.filter(graph=cls.data_type_graph).first()
         )
