@@ -251,7 +251,7 @@ const setParent = async (parentNode: TreeNode) => {
             input: {
                 style: { height: '3.5rem', fontSize: '14px' },
             },
-            wrapper: { style: { overflowY: 'auto', maxHeight: '100%' } },
+            wrapper: { style: { overflowY: 'auto', maxHeight: '100%', paddingBottom: '1rem' } },
             container: { style: { fontSize: '14px' } },
             content: { style: { height: '4rem' } },
             label: { style: { textWrap: 'nowrap', marginLeft: '0.5rem' } },
