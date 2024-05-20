@@ -6,7 +6,7 @@ import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
 import { postItemToServer } from "@/components/ControlledListManager/api.ts";
-import { itemKey } from "@/components/ControlledListManager/const.ts";
+import { itemKey } from "@/components/ControlledListManager/constants.ts";
 
 import type { Ref } from "vue";
 import type { ControlledListItem } from "@/types/ControlledListManager";

@@ -12,7 +12,7 @@ import { useToast } from "primevue/usetoast";
 import { deleteLabel, upsertLabel } from "@/components/ControlledListManager/api.ts";
 import AddLabel from "@/components/ControlledListManager/AddLabel.vue";
 
-import { ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
+import { ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/constants.ts";
 import { languageName } from "@/components/ControlledListManager/utils.ts";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";

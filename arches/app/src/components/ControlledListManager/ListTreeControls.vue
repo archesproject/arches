@@ -4,8 +4,8 @@ import Cookies from "js-cookie";
 import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
-import { DANGER, ERROR } from "@/components/ControlledListManager/const.ts";
+import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
+import { DANGER, ERROR } from "@/components/ControlledListManager/constants.ts";
 import { listAsNode } from "@/components/ControlledListManager/utils.ts";
 
 import Button from "primevue/button";

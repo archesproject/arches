@@ -10,7 +10,7 @@ import { useToast } from "primevue/usetoast";
 
 import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 import ListTreeControls from "@/components/ControlledListManager/ListTreeControls.vue";
-import { ERROR, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
+import { ERROR, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import { postListToServer } from "@/components/ControlledListManager/api.ts";
 import {
     bestLabel,

@@ -3,7 +3,7 @@ import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
-import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
+import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";

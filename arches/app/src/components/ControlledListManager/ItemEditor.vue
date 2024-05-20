@@ -18,7 +18,7 @@ import {
     selectedLanguageKey,
     ALT_LABEL,
     PREF_LABEL,
-} from "@/components/ControlledListManager/const.ts";
+} from "@/components/ControlledListManager/constants.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";

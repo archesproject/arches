@@ -6,7 +6,7 @@ import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
 import { postListToServer } from "@/components/ControlledListManager/api.ts";
-import { displayedRowKey } from "@/components/ControlledListManager/const.ts";
+import { displayedRowKey } from "@/components/ControlledListManager/constants.ts";
 
 import type { DisplayedListRefAndSetter } from "@/types/ControlledListManager";
 

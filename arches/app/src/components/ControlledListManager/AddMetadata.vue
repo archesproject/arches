@@ -6,7 +6,7 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
-import { itemKey } from "@/components/ControlledListManager/const.ts";
+import { itemKey } from "@/components/ControlledListManager/constants.ts";
 
 import type { Ref } from "vue";
 import type {

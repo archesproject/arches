@@ -12,7 +12,7 @@ import { useToast } from "primevue/usetoast";
 
 import AddMetadata from "@/components/ControlledListManager/AddMetadata.vue";
 
-import { DANGER, METADATA_CHOICES, itemKey } from "@/components/ControlledListManager/const.ts";
+import { DANGER, METADATA_CHOICES, itemKey } from "@/components/ControlledListManager/constants.ts";
 import { deleteImage, upsertMetadata, deleteMetadata } from "@/components/ControlledListManager/api.ts";
 import { bestLabel, languageName } from "@/components/ControlledListManager/utils.ts";
 

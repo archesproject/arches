@@ -11,7 +11,7 @@ import ItemEditor from "@/components/ControlledListManager/ItemEditor.vue";
 import ListCharacteristics from "@/components/ControlledListManager/ListCharacteristics.vue";
 import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 import ListTree from "@/components/ControlledListManager/ListTree.vue";
-import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
+import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 
 import { LIGHT_GRAY } from "@/theme.ts";
 
