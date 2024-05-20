@@ -122,7 +122,7 @@ const isFirstItem = (item: ControlledListItem) => {
         : findNodeInTree(tree.value, item.controlled_list_id).data.items
     );
     if (!siblings) {
-        throw new Error("Unexpected lack of siblings");
+        throw new Error();
     }
     return siblings[0].id === item.id;
 };
@@ -134,7 +134,7 @@ const isLastItem = (item: ControlledListItem) => {
         : findNodeInTree(tree.value, item.controlled_list_id).data.items
     );
     if (!siblings) {
-        throw new Error("Unexpected lack of siblings");
+        throw new Error();
     }
     return siblings[siblings.length - 1].id === item.id;
 };

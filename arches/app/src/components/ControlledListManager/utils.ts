@@ -111,8 +111,9 @@ export const reorderItem = (
     let reorderedSiblings: ControlledListItem[];
     if (up) {
         const leftNeighbor = itemsToLeft.pop();
-        if (!leftNeighbor) {  // should be impossible, not localized
-            throw new Error('Cannot shift upward - already at top');
+        if (!leftNeighbor) {
+            // Cannot shift upward - already at top
+            throw new Error();
         }
         reorderedSiblings = [...itemsToLeft, item, leftNeighbor, ...itemsToRight];
     } else {
