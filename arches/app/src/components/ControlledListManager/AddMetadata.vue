@@ -16,13 +16,14 @@ import type {
     NewControlledListItemImageMetadata,
 } from "@/types/ControlledListManager";
 
-const { choices: METADATA_CHOICES, image } = defineProps<{
-    choices: MetadataChoice[];
+const { labeledMetadataChoices, image } = defineProps<{
+    labeledMetadataChoices: MetadataChoice[];
     image: ControlledListItemImage;
 }>();
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
+const addMetadata = $gettext("Add metadata");
 
 const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
     const otherNewMetadataIds = image.metadata.filter(
@@ -33,11 +34,11 @@ const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
         1000,
     );
 
-    const nextMetadataType = METADATA_CHOICES.find(
+    const nextMetadataType = labeledMetadataChoices.find(
         choice => !image.metadata.map(
             (metadatum) => metadatum.metadata_type
         ).includes(choice.type)
-    ) ?? METADATA_CHOICES[0];
+    ) ?? labeledMetadataChoices[0];
 
     return {
         id: maxOtherNewMetadataId + 1,
@@ -67,7 +68,7 @@ const onAdd = () => {
             aria-hidden="true"
         />
         <span class="add-metadata-text">
-            {{ $gettext("Add metadata") }}
+            {{ addMetadata }}
         </span>
     </Button>
 </template>

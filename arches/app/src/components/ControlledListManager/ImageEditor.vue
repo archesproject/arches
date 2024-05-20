@@ -12,7 +12,7 @@ import { useToast } from "primevue/usetoast";
 
 import AddMetadata from "@/components/ControlledListManager/AddMetadata.vue";
 
-import { DANGER, itemKey } from "@/components/ControlledListManager/const.ts";
+import { DANGER, METADATA_CHOICES, itemKey } from "@/components/ControlledListManager/const.ts";
 import { deleteImage, upsertMetadata, deleteMetadata } from "@/components/ControlledListManager/api.ts";
 import { bestLabel, languageName } from "@/components/ControlledListManager/utils.ts";
 
@@ -39,21 +39,21 @@ const editingRows = ref([]);
 const toast = useToast();
 const { $gettext } = useGettext();
 
-const METADATA_CHOICES = [
+const labeledMetadataChoices = [
     {
-        type: 'title',
+        type: METADATA_CHOICES.title,
         label: $gettext('Title'),
     },
     {
-        type: 'alt',
+        type: METADATA_CHOICES.alternativeText,
         label: $gettext('Alternative text'),
     },
     {
-        type: 'desc',
+        type: METADATA_CHOICES.description,
         label: $gettext('Description'),
     },
     {
-        type: 'attr',
+        type: METADATA_CHOICES.attribution,
         label: $gettext('Attribution'),
     },
 ];
@@ -130,7 +130,7 @@ const onDeleteImage = async () => {
                     <template #editor="{ data, field }">
                         <Dropdown
                             v-model="data[field]"
-                            :options="METADATA_CHOICES"
+                            :options="labeledMetadataChoices"
                             option-label="label"
                             option-value="type"
                             :pt="{
@@ -141,7 +141,7 @@ const onDeleteImage = async () => {
                         />
                     </template>
                     <template #body="slotProps">
-                        {{ METADATA_CHOICES.find(choice => choice.type === slotProps.data.metadata_type).label }}
+                        {{ labeledMetadataChoices.find(choice => choice.type === slotProps.data.metadata_type).label }}
                     </template>
                 </Column>
                 <Column
@@ -193,7 +193,7 @@ const onDeleteImage = async () => {
             <div style="display: flex; gap: 1rem;">
                 <AddMetadata
                     :image
-                    :choices="METADATA_CHOICES"
+                    :labeled-metadata-choices
                 />
                 <Button
                     raised

@@ -12,3 +12,11 @@ export const ALT_LABEL = "altLabel";
 export const URI = "URI";
 export const ERROR = "error";
 export const DANGER = "danger";
+
+// Django model choices
+export const METADATA_CHOICES = {
+    title: 'title',
+    alternativeText: 'alt',
+    description: 'desc',
+    attribution: 'attr',
+};
