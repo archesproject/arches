@@ -13,6 +13,6 @@ define([
 
     return ko.components.register(componentName, {
         viewModel: viewModel,
-        template: localizeDescriptorsTemplate,
+        template: '<div style="display:none;"></div>',
     });
 });
