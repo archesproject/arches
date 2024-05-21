@@ -2,7 +2,7 @@
 {% load template_tags %}
 {% load static %}
 
-<article class="main-search-container content-panel flexrow" data-bind="click:function() { menuActive(false); }, visible: true", style="display:none;" aria-label="{% trans 'Search page contents' %}">
+<article class="main-search-container content-panel flexrow" data-bind="click:function() { sharedStateObject.menuActive(false); }, visible: true", style="display:none;" aria-label="{% trans 'Search page contents' %}">
         <section class="flex search-results-panel" aria-label="{% trans 'Search results' %}">
             <div class="search-attribute-widget">
                 <div class="search-dropdown" data-bind="component: {
@@ -64,10 +64,9 @@
             <!-- Title Block -->
             <div class="search-toolbar">
                 <div class="search-type-btn-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}" role="tablist">
-                    <!-- ko if: filter.type === 'filter' && filter.enabled -->
-                    {% if user_can_read %}
+                    <!-- ko if: filter.type === 'filter' && filter.enabled && $parent.sharedStateObject.userCanReadResources -->
                     <button class="search-type-btn relative" role="tab" data-bind="onEnterkeyClick, onSpaceClick,
-                        css: {'active': $parent.$parent.sharedStateObject.selectedTab() === filter.componentname}, 
+                        css: {'active': $parent.sharedStateObject.selectedTab() === filter.componentname}, 
                         click: function(){
                             $parent.sharedStateObject.selectedTab(filter.componentname); 
                             $root.shiftFocus('#' + filter.componentname + '-tabpanel');
@@ -80,14 +79,12 @@
                         <i data-bind="css: filter.icon"></i>
                         <span data-bind="text: filter.name"></span>
                     </button>
-                    {% endif %}
                     <!-- /ko -->
                 </div>
 
                 <div class="search-type-btn-popup-panel">
                     <div class="popup-panel-row" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}" role="tablist">
-                        <!-- ko if: filter.type === 'popup' && filter.enabled -->
-                        {% if user_can_read %}
+                        <!-- ko if: filter.type === 'popup' && filter.enabled && $parent.sharedStateObject.userCanReadResources -->
                         <button class="saved-search-container search-type-btn-popup relative" role="tab" data-bind="onEnterkeyClick, onSpaceClick,
                             css: {'active': $parent.sharedStateObject.selectedPopup() === filter.componentname}, 
                             click: function(data, event){
@@ -112,7 +109,6 @@
                                 <p data-bind="text: filter.name"></p>
                             </div>
                         </button>
-                        {% endif %}
                         <!-- /ko -->
                     </div>
                 </div>

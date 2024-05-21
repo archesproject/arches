@@ -130,6 +130,7 @@ define([
             this.viewModel.loading(true);
 
             BaseManagerView.prototype.initialize.call(this, options);
+            this.viewModel.sharedStateObject.menuActive = this.viewModel.menuActive;
         },
     });
 
