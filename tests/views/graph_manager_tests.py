@@ -304,8 +304,10 @@ class GraphManagerViewTests(ArchesTestCase):
 
         self.assertEqual(len(response_json["nodes"]), self.NODE_COUNT)
         
+        cloned_graph = Graph.objects.get(pk=response_json['graphid'])
+
         original_graph_node_ids = [str(node.pk) for node in self.graph.nodes.values()]
-        cloned_graph_node_ids = [node["nodeid"] for node in response_json["nodes"]]
+        cloned_graph_node_ids = [str(node.pk) for node in cloned_graph.nodes.values()]
 
         self.assertFalse(set(original_graph_node_ids) & set(cloned_graph_node_ids))
 
@@ -328,8 +330,10 @@ class GraphManagerViewTests(ArchesTestCase):
 
         self.assertEqual(len(response_json["nodes"]), self.NODE_COUNT)
 
+        cloned_graph = Graph.objects.get(pk=response_json['graphid'])
+
         original_graph_node_ids = [str(node.pk) for node in self.graph.nodes.values()]
-        cloned_graph_node_ids = [node["nodeid"] for node in response_json["nodes"]]
+        cloned_graph_node_ids = [str(node.pk) for node in cloned_graph.nodes.values()]
 
         self.assertFalse(set(original_graph_node_ids) & set(cloned_graph_node_ids))
 
