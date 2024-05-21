@@ -209,7 +209,7 @@ const isLastItem = (item: ControlledListItem) => {
             v-if="movingItem.key"
             class="actions"
         >
-            <!-- disable HTML escaping: RDM Admins are trusted users -->
+            <!-- turn off escaping: vue template sanitizes -->
             <Button
                 v-if="showMoveHereButton(node.key)"
                 type="button"

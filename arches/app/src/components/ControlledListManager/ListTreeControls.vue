@@ -267,7 +267,7 @@ await fetchLists();
         v-if="movingItem.key"
         class="action-banner"
     >
-        <!-- disable HTML escaping: RDM Admins are trusted users -->
+        <!-- turn off escaping: vue template sanitizes -->
         {{ $gettext("Selecting new parent for: %{item}", { item: movingItem.label ?? '' }, true) }}
         <Button
             type="button"
