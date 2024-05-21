@@ -76,7 +76,6 @@ class Migration(migrations.Migration):
             '{"placeholder": "Select an option", "i18n_properties": ["placeholder"]}'
         )
         ON CONFLICT DO NOTHING;
-
         """
     )
 
@@ -192,7 +191,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunSQL(
-            sql="\n            INSERT INTO d_data_types(\n                datatype,\n                iconclass,\n                modulename,\n                classname,\n                defaultconfig,\n                configcomponent,\n                configname,\n                isgeometric,\n                defaultwidget,\n                issearchable\n            ) VALUES (\n                'reference',\n                'fa fa-list',\n                'datatypes.py',\n                'ReferenceDataType',\n                '{\"controlledList\": null, \"multiValue\": false}',\n                'views/components/datatypes/reference',\n                'reference-datatype-config',\n                FALSE,\n                '19e56148-82b8-47eb-b66e-f6243639a1a8',\n                TRUE\n            )\n            ON CONFLICT DO NOTHING;\n\n            INSERT INTO widgets(\n                widgetid,\n                name,\n                component,\n                datatype,\n                defaultconfig\n            ) VALUES (\n                '19e56148-82b8-47eb-b66e-f6243639a1a8',\n                'reference-select-widget',\n                'views/components/widgets/reference-select',\n                'reference',\n                '{\"placeholder\": \"Select an option\", \"i18n_properties\": [\"placeholder\"]}'\n            )\n            ON CONFLICT DO NOTHING;\n\n            ",
+            sql=add_reference_datatype,
             reverse_sql=migrations.RunSQL.noop,
         ),
         migrations.AddConstraint(
