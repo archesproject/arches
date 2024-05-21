@@ -16,6 +16,11 @@ details = {
 }
 
 class LocalizeResultDescriptors(BaseSearchFilter):
+    """
+    The logic in this search component is strongly recommended in some form.
+    The only recommended change or re-implementation should approach issues of performance
+    to suit the implementation of other search component logic.
+    """
 
     def post_search_hook(self, search_results_object, response_object, permitted_nodegroups):
         
