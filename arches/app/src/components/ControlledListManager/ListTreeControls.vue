@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import arches from "arches";
 import Cookies from "js-cookie";
-import { inject } from "vue";
+import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
@@ -45,6 +45,14 @@ const deleteDropdownOptions = [
         },
     },
 ];
+
+const multiDeleteDisabled = computed(() => {
+    return (
+        Object.keys(selectedKeys.value).length === 0
+        || !!movingItem.value.key
+        || isMultiSelecting.value
+    );
+});
 
 const expandAll = () => {
     for (const node of controlledListItemsTree.value) {
@@ -250,7 +258,7 @@ await fetchLists();
             :disabled="!Object.keys(selectedKeys).length"
             :severity="DANGER"
             :model="deleteDropdownOptions"
-            :menu-button-props="{ disabled: !Object.keys(selectedKeys).length || movingItem.key || isMultiSelecting }"
+            :menu-button-props="{ disabled: multiDeleteDisabled }"
             @click="confirmDelete"
         />
     </div>
@@ -260,7 +268,7 @@ await fetchLists();
         class="action-banner"
     >
         <!-- disable HTML escaping: RDM Admins are trusted users -->
-        {{ $gettext("Selecting new parent for: %{item}", { item: movingItem.label }, true) }}
+        {{ $gettext("Selecting new parent for: %{item}", { item: movingItem.label ?? '' }, true) }}
         <Button
             type="button"
             class="banner-button"

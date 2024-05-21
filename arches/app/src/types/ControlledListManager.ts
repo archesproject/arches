@@ -16,11 +16,8 @@ export type NewLabel = {
     item_id: string,
 };
 
+export type NewOrExistingLabel = Label | NewLabel;
 export type ValueType = "prefLabel" | "altLabel";
-
-export type NewOrExistingControlledListItemImageMetadata = (
-    ControlledListItemImageMetadata | NewControlledListItemImageMetadata
-);
 
 export type ControlledListItemImageMetadata = {
     id: string,
@@ -40,6 +37,10 @@ export type NewControlledListItemImageMetadata = {
     value: string,
 };
 
+export type NewOrExistingControlledListItemImageMetadata = (
+    ControlledListItemImageMetadata | NewControlledListItemImageMetadata
+);
+
 export type MetadataChoice = {
     type: 'title' | 'desc' | 'attr' | 'alt',
     label: string,
@@ -58,7 +59,7 @@ export type ControlledListItem = {
     uri: string,
     sortorder: number,
     guide: boolean,
-    labels: Label[],
+    labels: NewOrExistingLabel[],
     images: ControlledListItemImage[],
     children: ControlledListItem[],
     parent_id: string,

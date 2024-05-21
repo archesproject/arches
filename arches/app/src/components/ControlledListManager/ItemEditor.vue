@@ -57,43 +57,42 @@ const updateItemLabel = computed(() => {
 </script>
 
 <template>
-    <span class="item-header">
-        <LetterCircle
-            v-if="item"
-            :labelled="item"
+    <template v-if="item">
+        <span class="item-header">
+            <LetterCircle :labelled="item" />
+            <h3>{{ bestLabel(item, selectedLanguage.code).value }}</h3>
+            <span class="item-type">{{ iconLabel(item) }}</span>
+            <a
+                v-if="item.uri"
+                :href="item.uri"
+                rel="noreferrer"
+                target="_blank"
+                style="font-size: small; color: blue;"
+            >
+                {{ item.uri }}
+            </a>
+        </span>
+        <LabelEditor
+            :type="PREF_LABEL"
+            :item
+            :append-item-label
+            :remove-item-label
+            :update-item-label
         />
-        <h3>{{ bestLabel(item, selectedLanguage.code).value }}</h3>
-        <span class="item-type">{{ iconLabel(item) }}</span>
-        <a
-            v-if="item.uri"
-            :href="item.uri"
-            rel="noreferrer"
-            target="_blank"
-            style="font-size: small; color: blue;"
-        >
-            {{ item.uri }}
-        </a>
-    </span>
-    <LabelEditor
-        :type="PREF_LABEL"
-        :item
-        :append-item-label
-        :remove-item-label
-        :update-item-label
-    />
-    <LabelEditor
-        :type="ALT_LABEL"
-        :item
-        :append-item-label
-        :remove-item-label
-        :update-item-label
-    />
-    <div class="field-editor-container">
-        <ItemURI />
-    </div>
-    <div class="field-editor-container images-container">
-        <ItemImages />
-    </div>
+        <LabelEditor
+            :type="ALT_LABEL"
+            :item
+            :append-item-label
+            :remove-item-label
+            :update-item-label
+        />
+        <div class="field-editor-container">
+            <ItemURI />
+        </div>
+        <div class="field-editor-container images-container">
+            <ItemImages />
+        </div>
+    </template>
 </template>
 
 <style scoped>

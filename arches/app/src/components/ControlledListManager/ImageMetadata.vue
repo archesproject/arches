@@ -32,9 +32,13 @@ const languageHeader = $gettext('Language');
 const item = inject(itemKey) as Ref<ControlledListItem>;
 const { labeledMetadataChoices, metadata } = defineProps<{
     labeledMetadataChoices: MetadataChoice[];
-    metadata: ControlledListItemImageMetadata;
+    metadata: ControlledListItemImageMetadata[];
 }>();
 const editingRows = ref([]);
+
+const metadataLabel = (metadataType: string) => {
+    return labeledMetadataChoices.find(choice => choice.type === metadataType)!.label;
+};
 
 const onSaveMetadata = async (event: DataTableRowEditInitEvent)  => {
     // normalize new metadata numbers (starting at 1000) to null
@@ -142,7 +146,7 @@ const updateImageMetadata = (updatedMetadata: ControlledListItemImageMetadata) =
                 />
             </template>
             <template #body="slotProps">
-                {{ labeledMetadataChoices.find(choice => choice.type === slotProps.data.metadata_type).label }}
+                {{ metadataLabel(slotProps.data.metadata_type) }}
             </template>
         </Column>
         <Column

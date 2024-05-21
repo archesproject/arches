@@ -15,41 +15,43 @@ const { $gettext } = useGettext();
 </script>
 
 <template>
-    <span class="controlled-list-header">
-        <LetterCircle
-            v-if="list"
-            :labelled="list"
-        />
-        <h3>{{ list.name }}</h3>
-    </span>
-    <div>
-        <ListCharacteristic
-            :editable="true"
-            :label="$gettext('Name')"
-        />
-        <ListCharacteristic
-            :editable="false"
-            :label="$gettext('Dynamic')"
-            :style="{ width: '4rem' }"
-        />
-        <h4 class="nodes-heading">
-            {{ $gettext("List used by these nodes") }}
-        </h4>
-        <div class="nodes">
-            <div
-                v-for="node in list.nodes"
-                :key="node.id"
-            >
-                <ReferenceNodeLink :node />
-            </div>
-            <div
-                v-if="list.nodes.length === 0"
-                :style="{ fontSize: 'small' }"
-            >
-                {{ $gettext('None') }}
+    <template v-if="list">
+        <span class="controlled-list-header">
+            <LetterCircle
+                v-if="list"
+                :labelled="list"
+            />
+            <h3>{{ list.name }}</h3>
+        </span>
+        <div>
+            <ListCharacteristic
+                :editable="true"
+                :label="$gettext('Name')"
+            />
+            <ListCharacteristic
+                :editable="false"
+                :label="$gettext('Dynamic')"
+                :style="{ width: '4rem' }"
+            />
+            <h4 class="nodes-heading">
+                {{ $gettext("List used by these nodes") }}
+            </h4>
+            <div class="nodes">
+                <div
+                    v-for="node in list.nodes"
+                    :key="node.id"
+                >
+                    <ReferenceNodeLink :node />
+                </div>
+                <div
+                    v-if="list.nodes.length === 0"
+                    :style="{ fontSize: 'small' }"
+                >
+                    {{ $gettext('None') }}
+                </div>
             </div>
         </div>
-    </div>
+    </template>
 </template>
 
 <style scoped>

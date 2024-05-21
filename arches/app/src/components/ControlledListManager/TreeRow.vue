@@ -201,6 +201,7 @@ const isLastItem = (item: ControlledListItem) => {
 
 <template>
     <span
+        v-if="node.key"
         :class="node.key === movingItem.key ? 'is-adjusting-parent' : ''"
     >
         {{ rowLabel }}
@@ -213,7 +214,7 @@ const isLastItem = (item: ControlledListItem) => {
                 v-if="showMoveHereButton(node.key)"
                 type="button"
                 class="move-button"
-                :label="$gettext('Move %{item} here', { item: movingItem.label }, true)"
+                :label="$gettext('Move %{item} here', { item: movingItem.label ?? '' }, true)"
                 @click="setParent(node)"
             />
         </div>
