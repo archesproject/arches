@@ -11,7 +11,7 @@ details = {
     "icon": "",
     "modulename": "core_search.py",
     "classname": "CoreSearchFilter",
-    "type": "backend",
+    "type": "core",
     "componentpath": "views/components/search/core-search",
     "componentname": "core-search",
     "sortorder": "0",
