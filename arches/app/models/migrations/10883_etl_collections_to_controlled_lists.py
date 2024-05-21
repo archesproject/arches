@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '10556_image_language_nullable'),
+        ('models', '10541_controlled_list_manager'),
     ]
 
     operations = [
