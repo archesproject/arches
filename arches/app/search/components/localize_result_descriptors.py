@@ -16,8 +16,6 @@ details = {
 }
 
 class LocalizeResultDescriptors(BaseSearchFilter):
-    def view_data(self):
-        pass
 
     def post_search_hook(self, search_results_object, response_object, permitted_nodegroups):
         

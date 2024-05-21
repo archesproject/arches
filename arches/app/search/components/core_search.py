@@ -19,8 +19,6 @@ details = {
 }
 
 class CoreSearchFilter(BaseSearchFilter):
-    def view_data():
-        pass
 
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         search_results_object["query"].include("graph_id")
