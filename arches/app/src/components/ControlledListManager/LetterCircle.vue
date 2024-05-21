@@ -3,7 +3,7 @@ import { computed } from "vue";
 
 import type { ControlledList, ControlledListItem, Selectable } from "@/types/ControlledListManager";
 
-const props: { labelled: Selectable } = defineProps(["labelled"]);
+const props = defineProps<{ labelled: Selectable }>();
 
 const color = computed(() => {
     if ((props.labelled as ControlledList).search_only !== undefined) {

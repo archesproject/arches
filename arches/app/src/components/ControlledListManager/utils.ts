@@ -1,18 +1,18 @@
 import arches from "arches";
 
+import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/types/arches";
 import type {
     ControlledList,
     ControlledListItem,
 } from "@/types/ControlledListManager";
-import type { TreeNode } from "primevue/tree/Tree/TreeNode";
 
 export const bestLabel = (item: ControlledListItem, languageCode: string) => {
-    const labelsInLang = item.labels.filter(l => l.language_id === languageCode);
+    const labelsInLang = item.labels.filter(label => label.language_id === languageCode);
     const bestLabel = (
-        labelsInLang.find(l => l.valuetype_id === "prefLabel")
-        ?? labelsInLang.find(l => l.valuetype_id === "altLabel")
-        ?? item.labels.find(l => l.valuetype_id === "prefLabel")
+        labelsInLang.find(label => label.valuetype_id === "prefLabel")
+        ?? labelsInLang.find(label => label.valuetype_id === "altLabel")
+        ?? item.labels.find(label => label.valuetype_id === "prefLabel")
     );
     if (!bestLabel) {
         throw new Error();
@@ -24,13 +24,13 @@ export const languageName = (code: string) => {
     return arches.languages.find((lang: Language) => lang.code === code).name;
 };
 
-export const findNodeInTree = (tree: typeof TreeNode[], itemId: string) => {
-    function recurse (items: typeof TreeNode[]) : typeof TreeNode | undefined {
+export const findNodeInTree = (tree: TreeNode[], itemId: string) => {
+    function recurse (items: TreeNode[]) : TreeNode | undefined {
         for (const item of items) {
             if (item.data.id === itemId) {
                 return item;
             }
-            for (const child of item.children) {
+            for (const child of item.items ?? item.children) {
                 const maybeFound = recurse([child]);
                 if (maybeFound) {
                     return maybeFound;
@@ -45,7 +45,7 @@ export const findNodeInTree = (tree: typeof TreeNode[], itemId: string) => {
 export const itemAsNode = (
     item: ControlledListItem,
     selectedLanguage: Language,
-): typeof TreeNode => {
+): TreeNode => {
     return {
         key: item.id,
         label: bestLabel(item, selectedLanguage.code).value,
@@ -57,7 +57,7 @@ export const itemAsNode = (
 export const listAsNode = (
     list: ControlledList,
     selectedLanguage: Language,
-): typeof TreeNode => {
+): TreeNode => {
     return {
         key: list.id,
         label: list.name,
@@ -111,8 +111,9 @@ export const reorderItem = (
     let reorderedSiblings: ControlledListItem[];
     if (up) {
         const leftNeighbor = itemsToLeft.pop();
-        if (!leftNeighbor) {  // should be impossible, not localized
-            throw new Error('Cannot shift upward - already at top');
+        if (!leftNeighbor) {
+            // Cannot shift upward - already at top
+            throw new Error();
         }
         reorderedSiblings = [...itemsToLeft, item, leftNeighbor, ...itemsToRight];
     } else {
@@ -123,7 +124,7 @@ export const reorderItem = (
     let acc = 0;
     const recalculateSortOrderRecursive = (items: ControlledListItem[]) => {
         // Patch in the reordered siblings.
-        if (items.some(x => x.id === item.id)) {
+        if (items.some(itemCandidate => itemCandidate.id === item.id)) {
             items = reorderedSiblings;
         }
         for (const thisItem of items) {

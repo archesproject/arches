@@ -2,22 +2,31 @@
 import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
+import { ARCHES_CHROME_BLUE } from "@/theme.ts";
+import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
-const { $gettext } = useGettext();
-const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
-const { displayedRow } = inject(displayedRowKey);
-const selectedLanguage = inject(selectedLanguageKey);
+import type { Ref } from "vue";
+import type { Language } from "@/types/arches";
+import type {
+    ControlledList,
+    ControlledListItem,
+    DisplayedRowRefAndSetter,
+} from "@/types/ControlledListManager";
+
+const { $gettext } = useGettext();
+
+const { displayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
+const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
 const heading = computed(() => {
     if (!displayedRow.value) {
         return $gettext("List Editor");
     }
-    if (displayedRow.value.depth === undefined) {
+    if ((displayedRow.value as ControlledListItem).depth === undefined) {
         return $gettext(
             "List Editor > %{listName}",
-            { listName: displayedRow.value.name },
+            { listName: (displayedRow.value as ControlledList).name },
             true, // disable HTML escaping: RDM Admins are trusted users
         );
     }
@@ -32,7 +41,7 @@ const heading = computed(() => {
 <template>
     <div
         class="header"
-        :style="{ background: slateBlue }"
+        :style="{ background: ARCHES_CHROME_BLUE }"
     >
         <i
             class="fa fa-inverse fa-list"

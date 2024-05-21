@@ -4,7 +4,7 @@ import { useGettext } from "vue3-gettext";
 
 import type { ReferencingNode } from "@/types/ControlledListManager";
 
-const props: { node: ReferencingNode } = defineProps(["node"]);
+const props = defineProps<{ node: ReferencingNode }>();
 
 const { $gettext } = useGettext();
 </script>

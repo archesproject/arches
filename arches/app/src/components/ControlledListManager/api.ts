@@ -1,6 +1,8 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 
+import { ERROR } from "@/components/ControlledListManager/constants.ts";
+
 import type { ToastServiceMethods } from "primevue/toastservice";
 import type {
     ControlledList,
@@ -12,7 +14,6 @@ import type {
     NewLabel,
 } from "@/types/ControlledListManager";
 
-const ERROR = "error";
 type GetText = (s: string) => string;
 
 export const postItemToServer = async (
@@ -21,14 +22,16 @@ export const postItemToServer = async (
     $gettext: GetText
 ) => {
     let errorText;
+    const token = Cookies.get("csrftoken");
+    if (!token) {
+        return;
+    }
     try {
         const response = await fetch(
             arches.urls.controlled_list_item(item.id),
             {
                 method: "POST",
-                headers: {
-                    "X-CSRFToken": Cookies.get("csrftoken"),
-                },
+                headers: { "X-CSRFToken": token },
                 body: JSON.stringify(item),
             }
         );
@@ -54,12 +57,14 @@ export const postListToServer = async (
     $gettext: GetText
 ) => {
     let errorText;
+    const token = Cookies.get("csrftoken");
+    if (!token) {
+        return;
+    }
     try {
         const response = await fetch(arches.urls.controlled_list(list.id), {
             method: "POST",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
+            headers: { "X-CSRFToken": token },
             body: JSON.stringify(list),
         });
         if (!response.ok) {
@@ -87,12 +92,14 @@ export const upsertLabel = async (
     const url = label.id
         ? arches.urls.controlled_list_item_label(label.id)
         : arches.urls.controlled_list_item_label_add;
+    const token = Cookies.get("csrftoken");
+    if (!token) {
+        return;
+    }
     try {
         const response = await fetch(url, {
             method: "POST",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
+            headers: { "X-CSRFToken": token },
             body: JSON.stringify(label),
         });
         if (!response.ok) {
@@ -117,14 +124,16 @@ export const deleteLabel = async (
     $gettext: GetText
 ) => {
     let errorText;
+    const token = Cookies.get("csrftoken");
+    if (!token) {
+        return;
+    }
     try {
         const response = await fetch(
             arches.urls.controlled_list_item_label(label.id),
             {
                 method: "DELETE",
-                headers: {
-                    "X-CSRFToken": Cookies.get("csrftoken"),
-                },
+                headers: { "X-CSRFToken": token },
             }
         );
         if (!response.ok) {
@@ -152,12 +161,14 @@ export const upsertMetadata = async (
     const url = metadata.id
         ? arches.urls.controlled_list_item_image_metadata(metadata.id)
         : arches.urls.controlled_list_item_image_metadata_add;
+    const token = Cookies.get("csrftoken");
+    if (!token) {
+        return;
+    }
     try {
         const response = await fetch(url, {
             method: "POST",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
+            headers: { "X-CSRFToken": token },
             body: JSON.stringify(metadata),
         });
         if (!response.ok) {
@@ -182,14 +193,16 @@ export const deleteMetadata = async (
     $gettext: GetText,
 ) => {
     let errorText;
+    const token = Cookies.get("csrftoken");
+    if (!token) {
+        return;
+    }
     try {
         const response = await fetch(
             arches.urls.controlled_list_item_image_metadata(metadata.id),
             {
                 method: "DELETE",
-                headers: {
-                    "X-CSRFToken": Cookies.get("csrftoken"),
-                },
+                headers: { "X-CSRFToken": token },
             }
         );
         if (!response.ok) {
@@ -214,14 +227,16 @@ export const deleteImage = async(
     $gettext: GetText,
 ) => {
     let errorText;
+    const token = Cookies.get("csrftoken");
+    if (!token) {
+        return;
+    }
     try {
         const response = await fetch(
             arches.urls.controlled_list_item_image(image.id),
             {
                 method: "DELETE",
-                headers: {
-                    "X-CSRFToken": Cookies.get("csrftoken"),
-                },
+                headers: { "X-CSRFToken": token },
             }
         );
         if (!response.ok) {
