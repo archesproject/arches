@@ -18,6 +18,7 @@ define([
         this.userid = params.userid;
         this.hits = params.hits;
         this.alert = params.alert;
+        this.sharedStateObject = params;
         let localQueryObj = this.query();
         localQueryObj[componentName] = true;
         this.query(localQueryObj);
