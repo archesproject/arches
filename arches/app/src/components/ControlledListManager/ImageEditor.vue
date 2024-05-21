@@ -55,8 +55,13 @@ const labeledMetadataChoices = [
     },
 ];
 
+const bestTitle = computed(() => {
+    return image.metadata.filter(metadatum => metadatum.metadata_type === METADATA_CHOICES.title)
+        .find(title => title.language_id === arches.activeLanguage)?.value;
+});
+
 const bestAlternativeText = computed(() => {
-    return image.metadata.filter(metadatum => metadatum.metadata_type === "alt")
+    return image.metadata.filter(metadatum => metadatum.metadata_type === METADATA_CHOICES.alternativeText)
         .find(altText => altText.language_id === arches.activeLanguage)?.value
         || bestLabel(item.value, arches.activeLanguage).value;
 });
@@ -156,6 +161,7 @@ const removeImage = (removedImage: ControlledListItemImage) => {
     <div>
         <img
             :src="image.url"
+            :title="bestTitle"
             :alt="bestAlternativeText"
             width="200"
         >
