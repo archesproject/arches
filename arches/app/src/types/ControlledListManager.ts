@@ -1,3 +1,5 @@
+import type { Ref } from "vue";
+
 export type Label = {
     id: string,
     valuetype_id: string,
@@ -14,6 +16,7 @@ export type NewLabel = {
     item_id: string,
 };
 
+export type NewOrExistingLabel = Label | NewLabel;
 export type ValueType = "prefLabel" | "altLabel";
 
 export type ControlledListItemImageMetadata = {
@@ -34,6 +37,10 @@ export type NewControlledListItemImageMetadata = {
     value: string,
 };
 
+export type NewOrExistingControlledListItemImageMetadata = (
+    ControlledListItemImageMetadata | NewControlledListItemImageMetadata
+);
+
 export type MetadataChoice = {
     type: 'title' | 'desc' | 'attr' | 'alt',
     label: string,
@@ -43,7 +50,7 @@ export type ControlledListItemImage = {
     id: string,
     item_id: string,
     url: string,
-    metadata: ControlledListItemImageMetadata[],
+    metadata: NewOrExistingControlledListItemImageMetadata[],
 };
 
 export type ControlledListItem = {
@@ -52,7 +59,7 @@ export type ControlledListItem = {
     uri: string,
     sortorder: number,
     guide: boolean,
-    labels: Label[],
+    labels: NewOrExistingLabel[],
     images: ControlledListItemImage[],
     children: ControlledListItem[],
     parent_id: string,
@@ -80,4 +87,20 @@ export type ReferencingNode = {
     nodegroup_id: string,
     graph_id: string,
     graph_name: string,
+};
+
+// Prop injection types
+export interface DisplayedRowRefAndSetter {
+    displayedRow: Ref<Selectable | null>;
+    setDisplayedRow: (val: Selectable | null) => void;
+};
+
+export interface DisplayedListRefAndSetter {
+    displayedRow: Ref<ControlledList | null>;
+    setDisplayedRow: (val: Selectable | null) => void;
+};
+
+export interface DisplayedListItemRefAndSetter {
+    displayedRow: Ref<ControlledListItem | null>;
+    setDisplayedRow: (val: Selectable | null) => void;
 };

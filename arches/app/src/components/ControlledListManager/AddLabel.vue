@@ -5,27 +5,28 @@ import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 
-import { itemKey, ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
+import { ARCHES_CHROME_BLUE } from "@/theme.ts";
+import { itemKey, ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/constants.ts";
 
+import type { Ref } from "vue";
 import type {
+    ControlledListItem,
     Label,
     NewLabel,
     ValueType,
 } from "@/types/ControlledListManager";
 
-const props: { type: ValueType } = defineProps(["type"]);
-const { item } = inject(itemKey);
+const props = defineProps<{ type: ValueType }>();
+const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
-const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
 
-const newLabel: NewLabel = computed(() => {
-    const otherNewLabels = item.value.labels.filter(
-        (l: NewLabel | Label) => typeof l.id === "number"
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any 
-    ) as any as NewLabel[];
+const newLabel: Ref<NewLabel> = computed(() => {
+    const otherNewLabelIds = item.value.labels.filter(
+        (label: NewLabel | Label) => typeof label.id === "number"
+    ).map(label => label.id as unknown as number);
     const maxOtherNewLabelId = Math.max(
-        ...otherNewLabels.map(l => l.id),
+        ...otherNewLabelIds,
         1000,
     );
     return {
@@ -69,7 +70,7 @@ const buttonLabel = computed(() => {
 .add-label {
     display: flex;
     height: 3rem;
-    color: v-bind(slateBlue);
+    color: v-bind(ARCHES_CHROME_BLUE);
     background-color: #f3fbfd;
     margin-top: 1rem;
 }

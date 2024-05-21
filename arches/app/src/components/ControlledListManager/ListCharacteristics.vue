@@ -5,51 +5,53 @@ import { useGettext } from "vue3-gettext";
 import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 import ListCharacteristic from "@/components/ControlledListManager/ListCharacteristic.vue";
 import ReferenceNodeLink from "@/components/ControlledListManager/ReferenceNodeLink.vue";
-import { displayedRowKey } from "@/components/ControlledListManager/const.ts";
+import { displayedRowKey } from "@/components/ControlledListManager/constants.ts";
 
-const { displayedRow } = inject(displayedRowKey);
+import type { DisplayedListRefAndSetter } from "@/types/ControlledListManager";
+
+const { displayedRow: list } = inject(displayedRowKey) as DisplayedListRefAndSetter;
 
 const { $gettext } = useGettext();
 </script>
 
 <template>
-    <span class="controlled-list-header">
-        <LetterCircle
-            v-if="displayedRow"
-            :labelled="displayedRow"
-        />
-        <h3>{{ displayedRow.name }}</h3>
-    </span>
-    <div>
-        <ListCharacteristic
-            :editable="true"
-            field="name"
-            :label="$gettext('Name')"
-        />
-        <ListCharacteristic
-            :editable="false"
-            field="dynamic"
-            :label="$gettext('Dynamic')"
-            :style="{ width: '4rem' }"
-        />
-        <h4 class="nodes-heading">
-            {{ $gettext("List used by these nodes") }}
-        </h4>
-        <div class="nodes">
-            <div
-                v-for="node in displayedRow.nodes"
-                :key="node.id"
-            >
-                <ReferenceNodeLink :node />
-            </div>
-            <div
-                v-if="displayedRow.nodes.length === 0"
-                :style="{ fontSize: 'small' }"
-            >
-                {{ $gettext('None') }}
+    <template v-if="list">
+        <span class="controlled-list-header">
+            <LetterCircle
+                v-if="list"
+                :labelled="list"
+            />
+            <h3>{{ list.name }}</h3>
+        </span>
+        <div>
+            <ListCharacteristic
+                :editable="true"
+                :label="$gettext('Name')"
+            />
+            <ListCharacteristic
+                :editable="false"
+                :label="$gettext('Dynamic')"
+                :style="{ width: '4rem' }"
+            />
+            <h4 class="nodes-heading">
+                {{ $gettext("List used by these nodes") }}
+            </h4>
+            <div class="nodes">
+                <div
+                    v-for="node in list.nodes"
+                    :key="node.id"
+                >
+                    <ReferenceNodeLink :node />
+                </div>
+                <div
+                    v-if="list.nodes.length === 0"
+                    :style="{ fontSize: 'small' }"
+                >
+                    {{ $gettext('None') }}
+                </div>
             </div>
         </div>
-    </div>
+    </template>
 </template>
 
 <style scoped>

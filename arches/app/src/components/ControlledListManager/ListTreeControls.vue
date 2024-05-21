@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import arches from "arches";
 import Cookies from "js-cookie";
-import { inject } from "vue";
+import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/const.ts";
+import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
+import { DANGER, ERROR } from "@/components/ControlledListManager/constants.ts";
 import { listAsNode } from "@/components/ControlledListManager/utils.ts";
 
 import Button from "primevue/button";
@@ -14,26 +15,24 @@ import SplitButton from "primevue/splitbutton";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
+import type { Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
-import type { TreeNode } from "primevue/tree/Tree/TreeNode";
-import type { Ref } from "@/types/Ref";
-import type { ControlledList } from "@/types/ControlledListManager";
+import type { TreeNode } from "primevue/treenode";
+import type { Language } from "@/types/arches";
+import type { ControlledList, DisplayedRowRefAndSetter } from "@/types/ControlledListManager";
 
-// not user-facing
-const DANGER = "danger";
-const ERROR = "error";
+import { BUTTON_GREEN } from "@/theme.ts";
 
-const { setDisplayedRow } = inject(displayedRowKey);
-const selectedLanguage = inject(selectedLanguageKey);
+const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
+const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
-const controlledListItemsTree = defineModel();
-const expandedKeys: Ref<TreeExpandedKeys> = defineModel("expandedKeys");
-const selectedKeys: Ref<TreeSelectionKeys> = defineModel("selectedKeys");
-const movingItem: Ref<typeof TreeNode> = defineModel("movingItem");
-const isMultiSelecting = defineModel("isMultiSelecting");
+const controlledListItemsTree = defineModel<TreeNode[]>({ required: true });
+const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", { required: true });
+const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", { required: true });
+const movingItem = defineModel<TreeNode>("movingItem", { required: true });
+const isMultiSelecting = defineModel<boolean>("isMultiSelecting", { required: true });
 
 const { $gettext, $ngettext } = useGettext();
-const buttonGreen = "#10b981";
 
 const confirm = useConfirm();
 const toast = useToast();
@@ -47,6 +46,14 @@ const deleteDropdownOptions = [
     },
 ];
 
+const multiDeleteDisabled = computed(() => {
+    return (
+        Object.keys(selectedKeys.value).length === 0
+        || !!movingItem.value.key
+        || isMultiSelecting.value
+    );
+});
+
 const expandAll = () => {
     for (const node of controlledListItemsTree.value) {
         expandNode(node);
@@ -57,9 +64,9 @@ const collapseAll = () => {
     expandedKeys.value = {};
 };
 
-const expandNode = (node: typeof TreeNode) => {
+const expandNode = (node: TreeNode) => {
     if (node.children && node.children.length) {
-        expandedKeys.value[node.key] = true;
+        expandedKeys.value[node.key as string] = true;
 
         for (const child of node.children) {
             expandNode(child);
@@ -79,7 +86,7 @@ const fetchLists = async () => {
         } else {
             await response.json().then((data) => {
                 controlledListItemsTree.value = (data.controlled_lists as ControlledList[]).map(
-                    l => listAsNode(l, selectedLanguage.value)
+                    list => listAsNode(list, selectedLanguage.value)
                 );
             });
         }
@@ -92,12 +99,14 @@ const fetchLists = async () => {
 };
 
 const createList = async () => {
+    const token = Cookies.get("csrftoken");
+    if (!token) {
+        return;
+    }
     try {
         const response = await fetch(arches.urls.controlled_list_add, {
             method: "POST",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
+            headers: { "X-CSRFToken": token },
         });
         if (response.ok) {
             const newList = await response.json();
@@ -117,12 +126,14 @@ const deleteLists = async (listIds: string[]) => {
     if (!listIds.length) {
         return;
     }
+    const token = Cookies.get("csrftoken");
+    if (!token) {
+        return;
+    }
     const promises = listIds.map((id) =>
         fetch(arches.urls.controlled_list(id), {
             method: "DELETE",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
+            headers: { "X-CSRFToken": token },
         })
     );
 
@@ -153,12 +164,14 @@ const deleteItems = async (itemIds: string[]) => {
     if (!itemIds.length) {
         return;
     }
+    const token = Cookies.get("csrftoken");
+    if (!token) {
+        return;
+    }
     const promises = itemIds.map((id) =>
         fetch(arches.urls.controlled_list_item(id), {
             method: "DELETE",
-            headers: {
-                "X-CSRFToken": Cookies.get("csrftoken"),
-            },
+            headers: { "X-CSRFToken": token },
         })
     );
 
@@ -190,7 +203,7 @@ const deleteSelected = async () => {
         return;
     }
     const deletes = Object.keys(selectedKeys.value);
-    const allListIds = controlledListItemsTree.value.map((node: typeof TreeNode) => node.data.id);
+    const allListIds = controlledListItemsTree.value.map((node: TreeNode) => node.data.id);
 
     const listIdsToDelete = deletes.filter(id => allListIds.includes(id));
     const itemIdsToDelete = deletes.filter(id => !listIdsToDelete.includes(id));
@@ -209,7 +222,7 @@ const confirmDelete = () => {
             "Are you sure you want to delete %{ numItems } item (including all children)?",
             "Are you sure you want to delete %{ numItems } items (including all children)?",
             numItems,
-            { numItems },
+            { numItems: numItems.toLocaleString() },
         ),
         header: $gettext("Confirm deletion"),
         icon: "fa fa-exclamation-triangle",
@@ -233,7 +246,7 @@ await fetchLists();
             :label="$gettext('Add New List')"
             raised
             style="font-size: inherit"
-            :pt="{ root: { style: { background: buttonGreen } } }"
+            :pt="{ root: { style: { background: BUTTON_GREEN } } }"
             @click="createList"
         />
         <ConfirmDialog :draggable="false" />
@@ -245,7 +258,7 @@ await fetchLists();
             :disabled="!Object.keys(selectedKeys).length"
             :severity="DANGER"
             :model="deleteDropdownOptions"
-            :menu-button-props="{ disabled: !Object.keys(selectedKeys).length || movingItem.key || isMultiSelecting }"
+            :menu-button-props="{ disabled: multiDeleteDisabled }"
             @click="confirmDelete"
         />
     </div>
@@ -255,7 +268,7 @@ await fetchLists();
         class="action-banner"
     >
         <!-- disable HTML escaping: RDM Admins are trusted users -->
-        {{ $gettext("Selecting new parent for: %{item}", { item: movingItem.label }, true) }}
+        {{ $gettext("Selecting new parent for: %{item}", { item: movingItem.label ?? '' }, true) }}
         <Button
             type="button"
             class="banner-button"

@@ -399,6 +399,19 @@ class ControlledListTests(ArchesTestCase):
             )
         self.assertEqual(response.status_code, 400)
 
+    def test_update_uri_blank(self):
+        self.client.force_login(self.admin)
+        serialized_list = serialize(self.list1, flat=False)
+        for item in serialized_list["items"]:
+            item["uri"] = ""
+
+        response = self.client.post(
+            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
+                serialized_list,
+                content_type="application/json",
+            )
+        self.assertEqual(response.status_code, 200, response._container)
+
     def test_update_label_valid(self):
         self.client.force_login(self.admin)
         serialized_list = serialize(self.list1, flat=False)

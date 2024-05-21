@@ -5,11 +5,14 @@ import { useGettext } from "vue3-gettext";
 import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
+import { ARCHES_CHROME_BLUE } from "@/theme.ts";
 import { postItemToServer } from "@/components/ControlledListManager/api.ts";
-import { itemKey } from "@/components/ControlledListManager/const.ts";
+import { itemKey } from "@/components/ControlledListManager/constants.ts";
 
-const props: { field: "uri", label: string } = defineProps(["field", "label"]);
-const { item } = inject(itemKey);
+import type { Ref } from "vue";
+import type { ControlledListItem } from "@/types/ControlledListManager";
+
+const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const editing = ref(false);
 
@@ -17,7 +20,7 @@ const formValue = ref("");
 
 const inputValue = computed({
     get() {
-        return item.value[props.field];
+        return item.value.uri;
     },
     set(newVal: string) {
         formValue.value = newVal;
@@ -27,29 +30,34 @@ const inputValue = computed({
 const toast = useToast();
 const { $gettext } = useGettext();
 
+const uriHeading = $gettext("List Item URI");
+const uriSubheading = $gettext("Optionally, provide a URI for your list item. Useful if your list item is formally defined in a thesaurus or authority document.");
+
 const onSave = async () => {
     editing.value = false;
-    const originalValue = item.value[props.field];
-    item.value[props.field] = formValue.value;
+    const originalValue = item.value.uri;
+    item.value.uri = formValue.value;
     const success = await postItemToServer(item.value, toast, $gettext);
     if (!success) {
-        item.value[props.field] = originalValue;
+        item.value.uri = originalValue;
     }
 };
 
 const onCancel = () => {
     editing.value = false;
-    formValue.value = item.value[props.field];
+    formValue.value = item.value.uri;
 };
 </script>
 
 <template>
+    <h4>{{ uriHeading }}</h4>
+    <p>{{ uriSubheading }}</p>
     <div class="characteristic">
         <InputText
             v-model="inputValue"
             type="text"
             :disabled="!editing"
-            :aria-label="label"
+            :aria-label="$gettext('URI')"
             :placeholder="$gettext('Enter a URI')"
         />
         <span
@@ -90,6 +98,18 @@ const onCancel = () => {
 </template>
 
 <style scoped>
+h4 {
+    color: v-bind(ARCHES_CHROME_BLUE);
+    margin-top: 0;
+    font-size: small;
+}
+
+p {
+    font-weight: normal;
+    margin-top: 0;
+    font-size: small;
+}
+
 input {
     font-size: 1.25rem;
 }

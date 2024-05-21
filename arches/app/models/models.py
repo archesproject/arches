@@ -1961,6 +1961,11 @@ class ControlledListItem(models.Model):
         if not self.controlled_list_item_values.filter(valuetype="prefLabel").exists():
             raise ValidationError(_("At least one preferred label is required."))
 
+    def clean_fields(self, exclude=None):
+        super().clean_fields(exclude=exclude)
+        if "uri" not in exclude and not self.uri:
+            self.uri = None
+
 
 class LabelManager(models.Manager):
     def get_queryset(self):

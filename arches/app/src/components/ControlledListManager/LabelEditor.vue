@@ -12,9 +12,12 @@ import { useToast } from "primevue/usetoast";
 import { deleteLabel, upsertLabel } from "@/components/ControlledListManager/api.ts";
 import AddLabel from "@/components/ControlledListManager/AddLabel.vue";
 
-import { ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/const.ts";
+import { ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/constants.ts";
 import { languageName } from "@/components/ControlledListManager/utils.ts";
 
+import { ARCHES_CHROME_BLUE } from "@/theme.ts";
+
+import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
 import type {
     ControlledListItem,
@@ -23,20 +26,20 @@ import type {
     ValueType,
 } from "@/types/ControlledListManager";
 
-const props: {
-    type: ValueType,
-    item: ControlledListItem,
-    appendItemLabel: (appendedLabel: Label | NewLabel) => undefined,
-    updateItemLabel: (updatedLabel: Label) => undefined,
-    removeItemLabel: (removedLabel: Label | NewLabel) => undefined,
-} = defineProps(["type", "item", "appendItemLabel", "updateItemLabel", "removeItemLabel"]);
+const props = defineProps<{
+    type: ValueType;
+    item: ControlledListItem;
+    appendItemLabel: (appendedLabel: Label | NewLabel) => void;
+    updateItemLabel: (updatedLabel: Label) => void;
+    removeItemLabel: (removedLabel: Label | NewLabel) => void;
+}>();
 const editingRows = ref([]);
 
 const toast = useToast();
 const { $gettext } = useGettext();
-const slateBlue = "#2d3c4b"; // todo: import from theme somewhere
+const languageHeader = $gettext('Language');
 
-const headings: { heading: string; subheading: string } = computed(() => {
+const headings: Ref<{ heading: string; subheading: string }> = computed(() => {
     switch (props.type) {
         case PREF_LABEL:
             return {
@@ -49,7 +52,7 @@ const headings: { heading: string; subheading: string } = computed(() => {
             return {
                 heading: $gettext("Alternate Label(s)"),
                 subheading: $gettext(
-                    "Optionally, you can provide additional label/language labels for your list item. Useful if you want to make searching for labels with synonyms or common misspellings of your preferred label(s) easier."
+                    "Optionally, you can provide additional labels for your list item. Useful if you want to make searching for labels with synonyms or common misspellings of your preferred label(s) easier."
                 ),
             };
         default:
@@ -127,7 +130,7 @@ const onDelete = async (label: NewLabel | Label) => {
             </Column>
             <Column
                 field="language_id"
-                :header="$gettext('Language')"
+                :header="languageHeader"
                 style="width: 10%; min-width: 8rem; height: 4rem"
             >
                 <template #editor="{ data, field }">
@@ -148,9 +151,9 @@ const onDelete = async (label: NewLabel | Label) => {
             </Column>
             <Column
                 :row-editor="true"
-                style="width: 10%; min-width: 8rem;"
+                style="width: 5%; min-width: 8rem; text-align: center;"
             />
-            <Column style="width: 5%;">
+            <Column style="width: 5%; text-align: center;">
                 <template #body="slotProps">
                     <i
                         class="fa fa-trash"
@@ -174,7 +177,7 @@ const onDelete = async (label: NewLabel | Label) => {
 }
 
 h4 {
-    color: v-bind(slateBlue);
+    color: v-bind(ARCHES_CHROME_BLUE);
     margin-top: 0;
     font-size: small;
 }
@@ -189,7 +192,11 @@ p {
     font-weight: 600;
 }
 
-:deep(td) {
+:deep(td:first-child) {
     padding-left: 0.75rem;
+}
+
+:deep(td > input) {
+    width: 95%;
 }
 </style>
