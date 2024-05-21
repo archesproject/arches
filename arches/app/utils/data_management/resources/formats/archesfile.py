@@ -176,6 +176,7 @@ class ArchesFileReader(Reader):
                                 "resourceinstance": resourceinstance,
                                 "parenttile_id": str(src_tile["parenttile_id"]) if src_tile["parenttile_id"] else None,
                                 "nodegroup_id": str(src_tile["nodegroup_id"]) if src_tile["nodegroup_id"] else None,
+                                "sortorder": int(src_tile["sortorder"]) if src_tile["sortorder"] else 0,
                                 "data": src_tile["data"],
                             }
                             new_values = {"tileid": uuid.UUID(str(src_tile["tileid"]))}

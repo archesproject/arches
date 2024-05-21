@@ -218,8 +218,7 @@ def optimize_resource_iteration(resources: Iterable[Resource], chunk_size: int):
         )
     else:  # public API that arches itself does not currently use
         for r in resources:
-            # retrieve graph -- better for this to have been selected already
-            r.graph
+            r.clean_fields()  # ensure strings become UUIDs
 
         prefetch_related_objects(resources, tiles_prefetch, descriptor_prefetch)
         return resources
@@ -233,7 +232,14 @@ def index_resources_using_singleprocessing(
     with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
         with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
             if quiet is False:
-                bar = pyprind.ProgBar(len(resources), bar_char="█", title=title) if len(resources) > 1 else None
+                if isinstance(resources, QuerySet):
+                    resource_count = resources.count()
+                else:
+                    resource_count = len(resources)
+                if resource_count > 1:
+                    bar = pyprind.ProgBar(resource_count, bar_char="█", title=title)
+                else:
+                    bar = None
 
             for resource in optimize_resource_iteration(resources, chunk_size=batch_size // 8):
                 resource.tiles = resource.prefetched_tiles

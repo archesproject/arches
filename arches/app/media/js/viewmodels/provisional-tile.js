@@ -102,17 +102,17 @@ define([
             if (self.selectedProvisionalEdit() != val) {
                 self.selectedProvisionalEdit(val);
                 koMapping.fromJS(val['value'], self.selectedTile().data);
-                self.selectedTile()._tileData.valueHasMutated();
+                self.selectedTile().parent.params.handlers['tile-reset'].forEach(handler => handler(self.selectedTile()));
                 self.selectedTile().parent.widgets().forEach(
                     function(w){
                         var defaultconfig = w.widgetLookup[w.widget_id()].defaultconfig;
-                        if (JSON.parse(defaultconfig).rerender === true && self.selectedTile().parent.allowProvisionalEditRerender() === true) {
-                            self.selectedTile().parent.widgets()[0].label.valueHasMutated();
+                        if (defaultconfig.rerender === true && self.selectedTile().parent.allowProvisionalEditRerender() === true) {
+                            w.label.valueHasMutated();
                         } 
-                        if (self.selectedTile().parent.triggerUpdate) {
-                            self.selectedTile().parent.triggerUpdate();
-                        }
                     });
+                if (self.selectedTile().parent.triggerUpdate) {
+                    self.selectedTile().parent.triggerUpdate();
+                }
             }
         };
 

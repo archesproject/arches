@@ -130,4 +130,5 @@ class ActivityStreamCollectionTests(ArchesTestCase):
 
     def test_generate_page(self):
         collection_page = self.C.generate_page(page_1_uris, reversed([x for x in self.EF.get_events(10)]))
-        outtxt = collection_page.to_jsonld()
+        obj = collection_page.to_obj()
+        self.assertIn("id", obj["orderedItems"][0]["object"])
