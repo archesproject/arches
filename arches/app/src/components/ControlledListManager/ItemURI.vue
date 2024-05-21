@@ -57,7 +57,7 @@ const onCancel = () => {
             v-model="inputValue"
             type="text"
             :disabled="!editing"
-            :aria-label="label"
+            :aria-label="$gettext('URI')"
             :placeholder="$gettext('Enter a URI')"
         />
         <span
