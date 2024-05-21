@@ -1,17 +1,12 @@
 <script setup lang="ts">
-import arches from "arches";
-import Cookies from "js-cookie";
 import { computed, inject, provide } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import FileUpload from "primevue/fileupload";
-
-import ImageEditor from "@/components/ControlledListManager/ImageEditor.vue";
-import ItemCharacteristic from "@/components/ControlledListManager/ItemCharacteristic.vue";
+import ItemImages from "@/components/ControlledListManager/ItemImages.vue";
+import ItemURI from "@/components/ControlledListManager/ItemURI.vue";
 import LabelEditor from "@/components/ControlledListManager/LabelEditor.vue";
 import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 
-import { ARCHES_CHROME_BLUE } from "@/theme.ts";
 import {
     displayedRowKey,
     itemKey,
@@ -22,15 +17,11 @@ import {
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
-import type { FileUploadBeforeSendEvent, FileUploadUploadEvent } from "primevue/fileupload";
 import type { Language } from "@/types/arches";
 import type {
     ControlledListItem,
-    ControlledListItemImage,
-    ControlledListItemImageMetadata,
     DisplayedListItemRefAndSetter,
     Label,
-    NewOrExistingControlledListItemImageMetadata,
     NewLabel,
 } from "@/types/ControlledListManager";
 
@@ -40,6 +31,10 @@ const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 const { $gettext } = useGettext();
 
 provide(itemKey, item);
+
+const iconLabel = (item: ControlledListItem) => {
+    return item.guide ? $gettext("Guide Item") : $gettext("Indexable Item");
+};
 
 const appendItemLabel = computed(() => {
     return (newLabel: Label) => { item.value!.labels.push(newLabel); };
@@ -59,83 +54,6 @@ const updateItemLabel = computed(() => {
         }
     };
 });
-
-const appendImageMetadata = computed(() => {
-    return (newMetadata: ControlledListItemImageMetadata) => {
-        const imageFromItem = item.value!.images.find(
-            (imageCandidateFromItem) =>
-                imageCandidateFromItem.id === newMetadata.controlled_list_item_image_id
-        );
-        if (imageFromItem) {
-            imageFromItem.metadata.push(newMetadata);
-        }
-    };
-});
-const removeImageMetadata = computed(() => {
-    return (removedMetadata: NewOrExistingControlledListItemImageMetadata) => {
-        const imageFromItem = item.value!.images.find(
-            (imageCandidateFromItem) =>
-                imageCandidateFromItem.id === removedMetadata.controlled_list_item_image_id
-        );
-        if (imageFromItem) {
-            const toDelete = imageFromItem.metadata.findIndex(
-                (metadatum) => metadatum.id === removedMetadata.id
-            );
-            if (toDelete === -1) {
-                return;
-            }
-            imageFromItem.metadata.splice(toDelete, 1);
-        }
-    };
-});
-const updateImageMetadata = computed(() => {
-    return (updatedMetadata: ControlledListItemImageMetadata) => {
-        const imageFromItem = item.value!.images.find(
-            (imageCandidateFromItem) =>
-                imageCandidateFromItem.id === updatedMetadata.controlled_list_item_image_id
-        );
-        if (imageFromItem) {
-            const toUpdate = imageFromItem.metadata.find(
-                (metadatum) => metadatum.id === updatedMetadata.id
-            );
-            if (!toUpdate) {
-                return;
-            }
-            toUpdate.metadata_type = updatedMetadata.metadata_type;
-            toUpdate.language_id = updatedMetadata.language_id;
-            toUpdate.value = updatedMetadata.value;
-        }
-    };
-});
-
-const removeImage = computed(() => {
-    return (removedImage: ControlledListItemImage) => {
-        const toDelete = item.value!.images.findIndex(
-            (imageFromItem) => imageFromItem.id === removedImage.id
-        );
-        item.value!.images.splice(toDelete, 1);
-    };
-});
-
-const iconLabel = (item: ControlledListItem) => {
-    return item.guide ? $gettext("Guide Item") : $gettext("Indexable Item");
-};
-
-const addHeader = (event: FileUploadBeforeSendEvent) => {
-    const token = Cookies.get("csrftoken");
-    if (token) {
-        event.xhr.setRequestHeader("X-CSRFToken", token);
-        event.formData.set("item_id", item.value!.id);
-    }
-};
-
-const onUpload = (event: FileUploadUploadEvent) => {
-    if (event.xhr.status !== 201) {
-        return;
-    }
-    const newImage = JSON.parse(event.xhr.responseText);
-    item.value!.images.push(newImage);
-};
 </script>
 
 <template>
@@ -171,48 +89,10 @@ const onUpload = (event: FileUploadUploadEvent) => {
         :update-item-label
     />
     <div class="field-editor-container">
-        <h4>{{ $gettext("List Item URI") }}</h4>
-        <p>
-            {{ $gettext(
-                "Optionally, provide a URI for your list item. Useful if your list item is formally defined in a thesaurus or authority document."
-            ) }}
-        </p>
-        <ItemCharacteristic
-            field="uri"
-            label="URI"
-        />
+        <ItemURI />
     </div>
     <div class="field-editor-container images-container">
-        <h4>{{ $gettext("Images") }}</h4>
-        <FileUpload
-            accept="image/*"
-            :url="arches.urls.controlled_list_item_image_add"
-            :auto="true"
-            :max-file-size="5e6"
-            :file-limit="10"
-            :preview-width="250"
-            :with-credentials="true"
-            name="item_image"
-            @before-send="addHeader($event)"
-            @upload="onUpload($event)"
-        />
-        <div class="images">
-            <ImageEditor
-                v-for="image in item.images"
-                :key="image.id"
-                :image="image"
-                :remove-image
-                :append-image-metadata
-                :remove-image-metadata
-                :update-image-metadata
-            />
-            <span
-                v-if="!item.images.length"
-                :style="{ fontSize: 'small'}"
-            >
-                {{ $gettext("No images.") }}
-            </span>
-        </div>
+        <ItemImages />
     </div>
 </template>
 
@@ -232,18 +112,6 @@ h3 {
     margin: 0;
 }
 
-h4 {
-    color: v-bind(ARCHES_CHROME_BLUE);
-    margin-top: 0;
-    font-size: small;
-}
-
-p {
-    font-weight: normal;
-    margin-top: 0;
-    font-size: small;
-}
-
 .item-type {
     font-size: small;
     font-weight: 200;
@@ -258,17 +126,5 @@ p {
 
 .images-container {
     gap: 20px;
-}
-
-.images {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-}
-
-:deep(input[type=file]) {
-    /* override arches.css */
-    /* PrimeVue uses a hidden input for screen readers */
-    display: none;
 }
 </style>
