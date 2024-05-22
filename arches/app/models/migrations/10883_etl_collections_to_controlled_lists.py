@@ -141,7 +141,7 @@ class Migration(migrations.Migration):
                     listid,
                     parent_id
                 )
-                select id,
+                select distinct on (id) id,
                     null as uri, -- TODO: dynamic handling of URI generation/ETL
                     sortorder,
                     false as guide, -- What does this mean in context of CLM?
@@ -158,7 +158,7 @@ class Migration(migrations.Migration):
                     languageid,
                     valuetype_id
                 )
-                select v.valueid as id,
+                select distinct (v.valueid) id,
                     value,
                     r.conceptidto as itemid,
                     languageid,
