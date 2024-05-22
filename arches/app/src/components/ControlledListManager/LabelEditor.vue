@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import arches from "arches";
-import { computed, ref } from "vue";
+import { computed, inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Column from "primevue/column";
@@ -12,7 +12,7 @@ import { useToast } from "primevue/usetoast";
 import { deleteLabel, upsertLabel } from "@/components/ControlledListManager/api.ts";
 import AddLabel from "@/components/ControlledListManager/AddLabel.vue";
 
-import { ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/constants.ts";
+import { ALT_LABEL, PREF_LABEL, itemKey } from "@/components/ControlledListManager/constants.ts";
 import { languageName } from "@/components/ControlledListManager/utils.ts";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
@@ -26,21 +26,17 @@ import type {
     ValueType,
 } from "@/types/ControlledListManager";
 
-const props = defineProps<{
-    type: ValueType;
-    item: ControlledListItem;
-    appendItemLabel: (appendedLabel: Label | NewLabel) => void;
-    updateItemLabel: (updatedLabel: Label) => void;
-    removeItemLabel: (removedLabel: Label | NewLabel) => void;
-}>();
+const { valueType } = defineProps<{ valueType: ValueType }>();
 const editingRows = ref([]);
+
+const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const toast = useToast();
 const { $gettext } = useGettext();
 const languageHeader = $gettext('Language');
 
 const headings: Ref<{ heading: string; subheading: string }> = computed(() => {
-    switch (props.type) {
+    switch (valueType) {
         case PREF_LABEL:
             return {
                 heading: $gettext("Preferred Label(s)"),
@@ -64,11 +60,11 @@ const headings: Ref<{ heading: string; subheading: string }> = computed(() => {
 });
 
 const labels = computed(() => {
-    if (!props.item) {
+    if (!item.value) {
         return [];
     }
-    return props.item.labels.filter(
-        label => label.valuetype_id === props.type
+    return item.value.labels.filter(
+        label => label.valuetype_id === valueType
     );
 });
 
@@ -85,22 +81,37 @@ const onSave = async (event: DataTableRowEditInitEvent) => {
     );
     if (upsertedLabel) {
         if (normalizedNewData.id) {
-            props.updateItemLabel(upsertedLabel);
+            updateItemLabel(upsertedLabel);
         } else {
-            props.appendItemLabel(upsertedLabel);
-            props.removeItemLabel(event.newData);
+            appendItemLabel(upsertedLabel);
+            removeItemLabel(event.newData);
         }
     }
 };
 
 const onDelete = async (label: NewLabel | Label) => {
     if (typeof label.id === 'number') {
-        props.removeItemLabel(label);
+        removeItemLabel(label);
         return;
     }
     const deleted = await deleteLabel(label, toast, $gettext);
     if (deleted) {
-        props.removeItemLabel(label);
+        removeItemLabel(label);
+    }
+};
+
+const appendItemLabel = (newLabel: Label) => { item.value.labels.push(newLabel); };
+
+const removeItemLabel = (removedLabel: Label | NewLabel) => {
+    const toDelete = item.value.labels.findIndex(labelFromItem => labelFromItem.id === removedLabel.id);
+    item.value.labels.splice(toDelete, 1);
+};
+
+const updateItemLabel = (updatedLabel: Label) => {
+    const toUpdate = item.value.labels.find(labelFromItem => labelFromItem.id === updatedLabel.id);
+    if (toUpdate) {
+        toUpdate.language_id = updatedLabel.language_id;
+        toUpdate.value = updatedLabel.value;
     }
 };
 </script>
@@ -166,7 +177,7 @@ const onDelete = async (label: NewLabel | Label) => {
                 </template>
             </Column>
         </DataTable>
-        <AddLabel :type="type" />
+        <AddLabel :type="valueType" />
     </div>
 </template>
 

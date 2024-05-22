@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, provide } from "vue";
+import { inject, provide } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import ItemImages from "@/components/ControlledListManager/ItemImages.vue";
@@ -21,8 +21,6 @@ import type { Language } from "@/types/arches";
 import type {
     ControlledListItem,
     DisplayedListItemRefAndSetter,
-    Label,
-    NewLabel,
 } from "@/types/ControlledListManager";
 
 const { displayedRow: item } = inject(displayedRowKey) as DisplayedListItemRefAndSetter;
@@ -35,25 +33,6 @@ provide(itemKey, item);
 const iconLabel = (item: ControlledListItem) => {
     return item.guide ? $gettext("Guide Item") : $gettext("Indexable Item");
 };
-
-const appendItemLabel = computed(() => {
-    return (newLabel: Label) => { item.value!.labels.push(newLabel); };
-});
-const removeItemLabel = computed(() => {
-    return (removedLabel: Label | NewLabel) => {
-        const toDelete = item.value!.labels.findIndex(labelFromItem => labelFromItem.id === removedLabel.id);
-        item.value!.labels.splice(toDelete, 1);
-    };
-});
-const updateItemLabel = computed(() => {
-    return (updatedLabel: Label) => {
-        const toUpdate = item.value!.labels.find(labelFromItem => labelFromItem.id === updatedLabel.id);
-        if (toUpdate) {
-            toUpdate.language_id = updatedLabel.language_id;
-            toUpdate.value = updatedLabel.value;
-        }
-    };
-});
 </script>
 
 <template>
@@ -72,20 +51,8 @@ const updateItemLabel = computed(() => {
                 {{ item.uri }}
             </a>
         </span>
-        <LabelEditor
-            :type="PREF_LABEL"
-            :item
-            :append-item-label
-            :remove-item-label
-            :update-item-label
-        />
-        <LabelEditor
-            :type="ALT_LABEL"
-            :item
-            :append-item-label
-            :remove-item-label
-            :update-item-label
-        />
+        <LabelEditor :value-type="PREF_LABEL" />
+        <LabelEditor :value-type="ALT_LABEL" />
         <div class="field-editor-container">
             <ItemURI />
         </div>
