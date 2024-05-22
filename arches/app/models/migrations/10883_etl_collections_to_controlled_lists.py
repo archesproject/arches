@@ -18,7 +18,8 @@ class Migration(migrations.Migration):
             begin
                 -- RDM Collections to Controlled Lists & List Items Migration --
                 -- To use, run: 
-                --      select * from __arches_migrate_collections_to_clm(ARRAY['Getty AAT', 'Johns List']);
+                --      select * from __arches_migrate_collections_to_clm(ARRAY['Getty AAT', 'http://vocab.getty.edu/aat']);
+                -- where the input values are concept prefLabels or identifiers
 
                 -- Conceptually:
                 --      a collection becomes a list
@@ -65,6 +66,15 @@ class Migration(migrations.Migration):
                     dynamic,
                     search_only
                 )
+                with identifier_conceptids as (
+                    select c.conceptid
+                    from concepts c
+                    full join values v on
+                        c.conceptid = v.conceptid
+                    where nodetype = 'Collection' and
+                        v.valuetype = 'identifier' and
+                        value = ANY(collection_names)
+                    )
                 select c.conceptid as id,
                     value as name,
                     false as dynamic,
@@ -74,7 +84,10 @@ class Migration(migrations.Migration):
                     c.conceptid = v.conceptid
                 where nodetype = 'Collection' and
                     v.valuetype = 'prefLabel' and
-                    value = ANY(collection_names);       
+                    (
+                        c.conceptid in (select * from identifier_conceptids) or
+                        value = ANY(collection_names)
+                    );
 
                 -- Migrate Concepts participating in Collections -> Controlled List Items & Controlled List Item Values
 
