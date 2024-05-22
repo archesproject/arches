@@ -315,8 +315,8 @@ urlpatterns = [
 ]
 
 if settings.SHOW_LANGUAGE_SWITCH is True:
-    # If running Arches without a project. This must be included in core to keep webpack happy,
-    # but cannot be appended when running a project, see https://github.com/archesproject/arches/pull/10754
+    # This must be included in core to keep webpack happy, but cannot be appended when running a project.
+    # See https://github.com/archesproject/arches/pull/10754
     directory_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
     if directory_path == settings.APP_ROOT:
