@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
 
                 -- Check if collection_names are provided
                 if collection_names is null or array_length(collection_names, 1) = 0 then
-                    return 'No collection names provided.';
+                    return 'No collection names or identifiers provided.';
                 end if;
 
                 -- Check if input collection names or identifiers exist in the database
@@ -50,9 +50,15 @@ class Migration(migrations.Migration):
                     )
                 );
                 
+                -- If all provided names do not match any collections, end operation
+                if array_length(collection_names, 1) = array_length(failed_collections, 1) then
+                    raise exception 'Failed to find the following collections in the database: %', array_to_string(failed_collections, ', ')
+                    using hint = 'Please ensure the provided name or identifier matches a valid collection';
+                end if;
+                
                 -- Remove user provided values from collection_names if they aren't a collection (identifier or prefLabel)
                 if array_length(failed_collections, 1) > 0 then
-                    raise warning 'Failed to find the following collections in the database: %s', array_to_string(failed_collections, ', ');
+                    raise warning 'Failed to find the following collections in the database: %', array_to_string(failed_collections, ', ');
                     collection_names := array(
                         select array_agg(elem)
                         from unnest(collection_names) elem
