@@ -68,7 +68,6 @@ define([
 
         this.clearQuery = function(){
             Object.values(this.sharedStateObject.filters).forEach(function(value){
-                console.log(value());
                 if (value()){
                     if (value().clear){
                         value().clear();
@@ -132,14 +131,12 @@ define([
         },
 
         updateQuery = function() {
-            console.log("updateQuery");
             let queryObj = this.query();
             queryObj[componentName] = true;
             this.query(queryObj);
         },
 
         restoreState = function(){
-            console.log("restoreState");
             if (!this.query()[componentName]) {
                 this.updateQuery();
             }
