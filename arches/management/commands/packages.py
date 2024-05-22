@@ -1143,7 +1143,6 @@ class Command(BaseCommand):
                 self.stdout.write('Data imported successfully from {0}'.format(source))
         else:
             self.stdout.write('The source file does not exist. Please rerun this command with a valid source file.')
-            sys.exit()
     
     def import_sheet_to_model(self, sheet, model):
         fields = [{"name": field.name, "is_fk": field.get_internal_type() == "ForeignKey"} for field in model._meta.fields]
@@ -1166,7 +1165,7 @@ class Command(BaseCommand):
                 is_fk = field["is_fk"]
                 field_name = field["name"]
                 value = (row[field_name] if row[field_name] else None) # might be ''
-                if value and is_fk and model == models.ControlledListItem: 
+                if value and is_fk and model is models.ControlledListItem: 
                     if field_name == "controlled_list":    
                         related_list = models.ControlledList.objects.get(id=value)
                         setattr(instance, field_name, related_list)
@@ -1174,7 +1173,7 @@ class Command(BaseCommand):
                         # stash list items with parent relationships to create relationships after all list items have been created
                         # stashed object in the form of {child_list_item_instance : parent_list_item_pk, ...}
                         list_items_with_parent[instance] = value
-                elif value and is_fk and model == models.ControlledListItemValue:
+                elif value and is_fk and model is models.ControlledListItemValue:
                     if field_name == "valuetype":
                         valuetype = models.DValueType.objects.get(valuetype = value)
                         setattr(instance, field_name, valuetype)
@@ -1193,7 +1192,7 @@ class Command(BaseCommand):
         
         model.objects.bulk_create(instances)
 
-        if model == models.ControlledListItem:
+        if model is models.ControlledListItem:
             # Create list item relationships after all list items have been created
             for child, parent in list_items_with_parent.items():
                 child.parent = models.ControlledListItem.objects.get(id=parent)
@@ -1215,8 +1214,7 @@ class Command(BaseCommand):
             wb.save(os.path.join(data_dest, "controlled_lists.xlsx"))
             self.stdout.write("Data exported successfully to controlled_lists.xlsx")
         else:
-            utils.print_message("No destination directory specified. Please rerun this command with the '-d' parameter populated.")
-            sys.exit()
+            self.stdout.write("No destination directory specified. Please rerun this command with the '-d' parameter populated.")
 
     def export_model_to_sheet(self, wb, model):
         # For the first sheet (ControlledList), use blank sheet that is initiallized with workbook
@@ -1231,7 +1229,7 @@ class Command(BaseCommand):
             row_data = []
             for field in fields:
                 value = getattr(instance, field["name"])
-                if (isinstance(value, models.ControlledList) or isinstance(value, models.ControlledListItem) or isinstance(value, models.ControlledListItemValue)):
+                if isinstance(value, (models.ControlledList, models.ControlledListItem, models.ControlledListItemValue)):
                     row_data.append(str(getattr(value, "id")) if value else "")
                 elif isinstance(value, models.Language):
                     row_data.append(str(value.code)) 
