@@ -74,7 +74,7 @@ define([
                     }
                 }
             }, this);
-            this.query({"paging-filter": "1", tiles: "true"});
+            this.query({"paging-filter": "1", "core-search": true, "localize-descriptors": true, tiles: "true"});
         };
 
         this.selectPopup = function(componentname) {
@@ -89,11 +89,7 @@ define([
             let queryObj = JSON.parse(this.queryString());
             queryObj[componentName] = true;
             queryObj['localize-descriptors'] = true;
-
-            if (self.updateRequest) {
-                self.updateRequest.abort();
-            }
-
+            if (self.updateRequest) { self.updateRequest.abort(); }
             self.updateRequest = $.ajax({
                 type: "GET",
                 url: arches.urls.search_results,
