@@ -486,7 +486,7 @@ class ControlledListItemView(View):
 class ControlledListItemValueView(View):
     def add_new_value(self, request):
         data = JSONDeserializer().deserialize(request.body)
-        breakpoint()
+
         value = ControlledListItemValue(
             controlled_list_item_id=UUID(data["item_id"]),
             valuetype_id=data["valuetype_id"],
