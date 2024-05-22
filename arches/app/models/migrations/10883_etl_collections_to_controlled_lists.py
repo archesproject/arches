@@ -131,12 +131,14 @@ class Migration(migrations.Migration):
                     id,
                     uri,
                     sortorder,
+                    guide,
                     listid,
                     parent_id
                 )
                 select id,
                     null as uri, -- TODO: dynamic handling of URI generation/ETL
                     sortorder,
+                    false as guide, -- What does this mean in context of CLM?
                     listid,
                     parent_id
                 from alpha_sorted_list_item_hierarchy;
