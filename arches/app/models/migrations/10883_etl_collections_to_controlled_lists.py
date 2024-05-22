@@ -10,26 +10,26 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             """
-            -- RDM Collections to Controlled Lists & List Items Migration --
-            -- To use, run: 
-            --      select * from __arches_migrate_collections_to_clm(ARRAY['Getty AAT', 'Johns List']);
-
-            -- Conceptually:
-            --      a collection becomes a list
-            --      a concept belonging to a collection becomes a list item
-            --      a concept at the top of a collection does NOT have a parent list item and should have a depth of 0
-            --      a concept below the top concepts of the collection will have a parent list item and should have a depth of > 0
-            --      a prefLabel and any altLabels for a concept become list item values
-
-            --      in the RDM concepts are sorted alphabetically, but are explicitly ordered using a list item's sortorder...
-            --      sort order is calculated at the list level and ordered alphabetically within each leaf of the hierarchy
-
             create or replace function __arches_migrate_collections_to_clm(
                 collection_names text[] default null -- one or more collections to be migrated to controlled lists
             )
             returns text as $$
             declare failed_collections text[];
             begin
+                -- RDM Collections to Controlled Lists & List Items Migration --
+                -- To use, run: 
+                --      select * from __arches_migrate_collections_to_clm(ARRAY['Getty AAT', 'Johns List']);
+
+                -- Conceptually:
+                --      a collection becomes a list
+                --      a concept belonging to a collection becomes a list item
+                --      a concept at the top of a collection does NOT have a parent list item and should have a depth of 0
+                --      a concept below the top concepts of the collection will have a parent list item and should have a depth of > 0
+                --      a prefLabel and any altLabels for a concept become list item values
+
+                --      in the RDM concepts are sorted alphabetically, but are explicitly ordered using a list item's sortorder...
+                --      sort order is calculated at the list level and ordered alphabetically within each leaf of the hierarchy
+
                 -- Check if collection_names are provided
                 if collection_names is null or array_length(collection_names, 1) = 0 then
                     return 'No collection names provided.';
