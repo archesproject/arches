@@ -10,6 +10,7 @@ import {
     displayedRowKey,
     itemKey,
     ALT_LABEL,
+    NOTE,
     PREF_LABEL,
 } from "@/components/ControlledListManager/constants.ts";
 
@@ -24,6 +25,7 @@ provide(itemKey, item);
         <ItemHeader />
         <ValueEditor :value-type="PREF_LABEL" />
         <ValueEditor :value-type="ALT_LABEL" />
+        <ValueEditor :value-category="NOTE" />
         <ItemURI />
         <ItemImages />
     </template>

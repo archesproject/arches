@@ -415,11 +415,11 @@ class ControlledListTests(ArchesTestCase):
     def test_update_label_valid(self):
         self.client.force_login(self.admin)
         serialized_list = serialize(self.list1, flat=False)
-        label = serialized_list["items"][0]["labels"][0]
+        label = serialized_list["items"][0]["values"][0]
         label["language_id"] = self.new_language.code
 
         response = self.client.post(
-            reverse("controlled_list_item_label", kwargs={"id": label["id"]}),
+            reverse("controlled_list_item_value", kwargs={"id": label["id"]}),
                 label,
                 content_type="application/json",
             )
@@ -428,12 +428,12 @@ class ControlledListTests(ArchesTestCase):
     def test_update_label_invalid(self):
         self.client.force_login(self.admin)
         serialized_list = serialize(self.list1, flat=False)
-        label = serialized_list["items"][0]["labels"][0]
+        label = serialized_list["items"][0]["values"][0]
         label["value"] = "A" * 2049
 
         with self.assertLogs("django.request", level="WARNING"):
             response = self.client.post(
-                reverse("controlled_list_item_label", kwargs={"id": label["id"]}),
+                reverse("controlled_list_item_value", kwargs={"id": label["id"]}),
                     label,
                     content_type="application/json",
                 )

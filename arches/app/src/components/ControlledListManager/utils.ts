@@ -8,11 +8,11 @@ import type {
 } from "@/types/ControlledListManager";
 
 export const bestLabel = (item: ControlledListItem, languageCode: string) => {
-    const labelsInLang = item.labels.filter(label => label.language_id === languageCode);
+    const valuesInLang = item.values.filter(value => value.language_id === languageCode);
     const bestLabel = (
-        labelsInLang.find(label => label.valuetype_id === "prefLabel")
-        ?? labelsInLang.find(label => label.valuetype_id === "altLabel")
-        ?? item.labels.find(label => label.valuetype_id === "prefLabel")
+        valuesInLang.find(value => value.valuetype_id === "prefLabel")
+        ?? valuesInLang.find(value => value.valuetype_id === "altLabel")
+        ?? item.values.find(value => value.valuetype_id === "prefLabel")
     );
     if (!bestLabel) {
         throw new Error();

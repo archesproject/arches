@@ -23,11 +23,15 @@ define([
             )?.value || arches.translations.unlabeledItem;
         }; 
 
+        this.isLabel = function (value) {
+            return ['prefLabel', 'altLabel'].includes(value.valuetype_id);
+        };
+
         this.displayValue = ko.computed(function() {
             const val = self.value();
             let name = '';
             if (val) {
-                name = val.map(item=>self.getPrefLabel(item.labels)).join(", ");
+                name = val.map(item=>self.getPrefLabel(item.values)).join(", ");
             }
             return val ? name : null;
         });
@@ -46,7 +50,7 @@ define([
                 if (self.valueAndSelectionDiffer(self.value, selection)) {
                     const newItem = selection.map(uri => {
                         return {
-                            "labels": NAME_LOOKUP[uri].labels,
+                            "labels": NAME_LOOKUP[uri].values.filter(val => this.isLabel(val)),
                             "listid": NAME_LOOKUP[uri]["listid"],
                             "uri": uri
                         };
@@ -104,8 +108,8 @@ define([
                 }
 
                 if (item.uri) {
-                    let text = self.getPrefLabel(item.labels) || arches.translations.searching + '...';
-                    NAME_LOOKUP[item.uri] = {"prefLabel": text, "labels": item.labels, "listid": item.controlled_list_id};
+                    let text = self.getPrefLabel(item.values) || arches.translations.searching + '...';
+                    NAME_LOOKUP[item.uri] = {"prefLabel": text, "labels": item.values.filter(val => this.isLabel(val)), "listid": item.controlled_list_id};
                     text = indentation + text;
                     return text;
                 }
@@ -125,8 +129,8 @@ define([
                     const valueData = koMapping.toJS(self.value());
                     valueData.forEach(function(value) {
                         NAME_LOOKUP[value.uri] = {
-                                "prefLabel": self.getPrefLabel(value.labels),
-                                "labels": value.labels,
+                                "prefLabel": self.getPrefLabel(value.values),
+                                "labels": value.values.filter(val => this.isLabel(val)),
                                 "listid": value.listid 
                             };
                     });
@@ -134,7 +138,7 @@ define([
                     if(!self.select2Config.initComplete){
                         valueData.forEach(function(data) {
                             const option = new Option(
-                                self.getPrefLabel(data.labels),
+                                self.getPrefLabel(data.values),
                                 data.uri,
                                 true, 
                                 true

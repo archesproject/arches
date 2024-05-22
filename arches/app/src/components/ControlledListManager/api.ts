@@ -9,9 +9,9 @@ import type {
     ControlledListItem,
     ControlledListItemImage,
     ControlledListItemImageMetadata,
-    Label,
+    Value,
     NewControlledListItemImageMetadata,
-    NewLabel,
+    NewValue,
 } from "@/types/ControlledListManager";
 
 type GetText = (s: string) => string;
@@ -83,15 +83,15 @@ export const postListToServer = async (
     }
 };
 
-export const upsertLabel = async (
-    label: NewLabel,
+export const upsertValue = async (
+    value: NewValue,
     toast: ToastServiceMethods,
     $gettext: GetText
 ) => {
     let errorText;
-    const url = label.id
-        ? arches.urls.controlled_list_item_label(label.id)
-        : arches.urls.controlled_list_item_label_add;
+    const url = value.id
+        ? arches.urls.controlled_list_item_value(value.id)
+        : arches.urls.controlled_list_item_value_add;
     const token = Cookies.get("csrftoken");
     if (!token) {
         return;
@@ -100,7 +100,7 @@ export const upsertLabel = async (
         const response = await fetch(url, {
             method: "POST",
             headers: { "X-CSRFToken": token },
-            body: JSON.stringify(label),
+            body: JSON.stringify(value),
         });
         if (!response.ok) {
             errorText = response.statusText;
@@ -113,13 +113,13 @@ export const upsertLabel = async (
     } catch {
         toast.add({
             severity: ERROR,
-            summary: errorText || $gettext("Label save failed"),
+            summary: errorText || $gettext("Value save failed"),
         });
     }
 };
 
-export const deleteLabel = async (
-    label: Label,
+export const deleteValue = async (
+    value: Value,
     toast: ToastServiceMethods,
     $gettext: GetText
 ) => {
@@ -130,7 +130,7 @@ export const deleteLabel = async (
     }
     try {
         const response = await fetch(
-            arches.urls.controlled_list_item_label(label.id),
+            arches.urls.controlled_list_item_value(value.id),
             {
                 method: "DELETE",
                 headers: { "X-CSRFToken": token },
@@ -147,7 +147,7 @@ export const deleteLabel = async (
     } catch {
         toast.add({
             severity: ERROR,
-            summary: errorText || $gettext("Label deletion failed"),
+            summary: errorText || $gettext("Value deletion failed"),
         });
     }
 };

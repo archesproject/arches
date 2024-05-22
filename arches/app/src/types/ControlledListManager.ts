@@ -1,6 +1,6 @@
 import type { Ref } from "vue";
 
-export type Label = {
+export type Value = {
     id: string,
     valuetype_id: string,
     language_id: string,
@@ -8,7 +8,7 @@ export type Label = {
     item_id: string,
 };
 
-export type NewLabel = {
+export type NewValue = {
     id: number,
     valuetype_id: string,
     language_id: string,
@@ -16,8 +16,9 @@ export type NewLabel = {
     item_id: string,
 };
 
-export type NewOrExistingLabel = Label | NewLabel;
-export type ValueType = "prefLabel" | "altLabel";
+export type NewOrExistingValue = Value | NewValue;
+export type ValueCategory = string;
+export type ValueType = string;
 
 export type ControlledListItemImageMetadata = {
     id: string,
@@ -59,7 +60,7 @@ export type ControlledListItem = {
     uri: string,
     sortorder: number,
     guide: boolean,
-    labels: NewOrExistingLabel[],
+    values: NewOrExistingValue[],
     images: ControlledListItemImage[],
     children: ControlledListItem[],
     parent_id: string,

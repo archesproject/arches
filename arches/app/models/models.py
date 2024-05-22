@@ -1967,7 +1967,7 @@ class ControlledListItem(models.Model):
             self.uri = None
 
 
-class LabelManager(models.Manager):
+class ValuesWithoutImagesManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().exclude(valuetype="image")
 
@@ -1985,7 +1985,7 @@ class ControlledListItemValue(models.Model):
         related_name="controlled_list_item_values",
     )
     valuetype = models.ForeignKey(
-        DValueType, on_delete=models.PROTECT, limit_choices_to=Q(category__in=("label", "image"))
+        DValueType, on_delete=models.PROTECT, limit_choices_to=Q(category__in=("label", "image", "note"))
     )
     language = models.ForeignKey(
         Language,
@@ -2016,7 +2016,7 @@ class ControlledListItemValue(models.Model):
         ]
 
     objects = models.Manager()
-    labels = LabelManager()
+    values_without_images = ValuesWithoutImagesManager()
     images = ImageManager()
 
 

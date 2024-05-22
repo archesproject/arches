@@ -9,10 +9,10 @@ import Dropdown from "primevue/dropdown";
 import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
-import { deleteLabel, upsertLabel } from "@/components/ControlledListManager/api.ts";
+import { deleteValue, upsertValue } from "@/components/ControlledListManager/api.ts";
 import AddValue from "@/components/ControlledListManager/AddValue.vue";
 
-import { ALT_LABEL, PREF_LABEL, itemKey } from "@/components/ControlledListManager/constants.ts";
+import { ALT_LABEL, NOTE, PREF_LABEL, itemKey } from "@/components/ControlledListManager/constants.ts";
 import { languageName } from "@/components/ControlledListManager/utils.ts";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
@@ -21,12 +21,17 @@ import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
 import type {
     ControlledListItem,
-    Label,
-    NewLabel,
+    Value,
+    ValueCategory,
+    NewValue,
     ValueType,
 } from "@/types/ControlledListManager";
 
-const { valueType } = defineProps<{ valueType: ValueType }>();
+const { valueType, valueCategory } = defineProps<{
+    valueType?: ValueType;
+    valueCategory?: ValueCategory;
+
+}>();
 const editingRows = ref([]);
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
@@ -59,71 +64,79 @@ const headings: Ref<{ heading: string; subheading: string }> = computed(() => {
     }
 });
 
-const labels = computed(() => {
+const values = computed(() => {
     if (!item.value) {
         return [];
     }
-    return item.value.labels.filter(
-        label => label.valuetype_id === valueType
+    if (!valueType) {
+        if (valueCategory === NOTE) {
+        // Show everything but labels for now. We're not returning category from the API.
+            return item.value.values.filter(
+                value => ![PREF_LABEL, ALT_LABEL].includes(value.valuetype_id)
+            );
+        }
+    }
+    return item.value.values.filter(
+        value => value.valuetype_id === valueType
     );
 });
 
 const onSave = async (event: DataTableRowEditInitEvent) => {
-    // normalize new label numbers (starting at 1000) to null
-    const normalizedNewData: Label = {
+    // normalize new value numbers (starting at 1000) to null
+    const normalizedNewData: Value = {
         ...event.newData,
         id: typeof event.newData.id === 'string' ? event.newData.id : null,
     };
-    const upsertedLabel: Label = await upsertLabel(
+    const upsertedValue: Value = await upsertValue(
         normalizedNewData,
         toast,
         $gettext,
     );
-    if (upsertedLabel) {
+    if (upsertedValue) {
         if (normalizedNewData.id) {
-            updateItemLabel(upsertedLabel);
+            updateItemValue(upsertedValue);
         } else {
-            appendItemLabel(upsertedLabel);
-            removeItemLabel(event.newData);
+            appendItemValue(upsertedValue);
+            removeItemValue(event.newData);
         }
     }
 };
 
-const onDelete = async (label: NewLabel | Label) => {
-    if (typeof label.id === 'number') {
-        removeItemLabel(label);
+const onDelete = async (value: NewValue | Value) => {
+    if (typeof value.id === 'number') {
+        removeItemValue(value);
         return;
     }
-    const deleted = await deleteLabel(label, toast, $gettext);
+    const deleted = await deleteValue(value, toast, $gettext);
     if (deleted) {
-        removeItemLabel(label);
+        removeItemValue(value);
     }
 };
 
-const appendItemLabel = (newLabel: Label) => { item.value.labels.push(newLabel); };
+const appendItemValue = (newValue: Value) => { item.value.values.push(newValue); };
 
-const removeItemLabel = (removedLabel: Label | NewLabel) => {
-    const toDelete = item.value.labels.findIndex(labelFromItem => labelFromItem.id === removedLabel.id);
-    item.value.labels.splice(toDelete, 1);
+const removeItemValue = (removedValue: Value | NewValue) => {
+    const toDelete = item.value.values.findIndex(valueFromItem => valueFromItem.id === removedValue.id);
+    item.value.values.splice(toDelete, 1);
 };
 
-const updateItemLabel = (updatedLabel: Label) => {
-    const toUpdate = item.value.labels.find(labelFromItem => labelFromItem.id === updatedLabel.id);
+const updateItemValue = (updatedValue: Value) => {
+    const toUpdate = item.value.values.find(valueFromItem => valueFromItem.id === updatedValue.id);
     if (toUpdate) {
-        toUpdate.language_id = updatedLabel.language_id;
-        toUpdate.value = updatedLabel.value;
+        toUpdate.language_id = updatedValue.language_id;
+        toUpdate.value = updatedValue.value;
     }
 };
 </script>
 
 <template>
-    <div class="label-editor-container">
+    <div class="value-editor-container">
         <h4>{{ headings.heading }}</h4>
         <p>{{ headings.subheading }}</p>
         <DataTable
-            v-if="labels.length"
+            v-if="values.length"
             v-model:editingRows="editingRows"
-            :value="labels"
+            :value="values"
             data-key="id"
             edit-mode="row"
             striped-rows
@@ -177,12 +190,12 @@ const updateItemLabel = (updatedLabel: Label) => {
                 </template>
             </Column>
         </DataTable>
-        <AddValue :type="valueType" />
+        <AddValue :value-type />
     </div>
 </template>
 
 <style scoped>
-.label-editor-container {
+.value-editor-container {
     margin: 1rem 1rem 3rem 1rem;
     width: 100%;
 }

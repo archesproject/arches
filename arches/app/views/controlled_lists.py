@@ -100,10 +100,10 @@ def serialize(obj, depth_map=None, flat=False):
                 "uri": obj.uri,
                 "sortorder": obj.sortorder,
                 "guide": obj.guide,
-                "labels": [
-                    serialize(label, depth_map)
-                    for label in obj.controlled_list_item_values.all()
-                    if label.valuetype_id != "image"
+                "values": [
+                    serialize(value, depth_map)
+                    for value in obj.controlled_list_item_values.all()
+                    if value.valuetype_id != "image"
                 ],
                 "images": [
                     serialize(image, depth_map)
@@ -178,16 +178,16 @@ def prefetch_terms(request):
 
 def handle_items(item_dicts, max_sortorder=-1):
     items_to_save = []
-    labels_to_save = []
+    values_to_save = []
     image_metadata_to_save = []
 
     def handle_item(item_dict):
         nonlocal items_to_save
-        nonlocal labels_to_save
+        nonlocal values_to_save
         nonlocal image_metadata_to_save
         nonlocal max_sortorder
 
-        labels = item_dict.pop("labels")
+        values = item_dict.pop("values")
         images = item_dict.pop("images")
         # Altering hierarchy is done by altering parents.
         children = item_dict.pop("children", None)
@@ -202,15 +202,15 @@ def handle_items(item_dicts, max_sortorder=-1):
         if len({item.controlled_list_id for item in items_to_save}) > 1:
             raise MixedListsException
 
-        for label in labels:
-            label.pop("item_id")  # trust the item, not the label
-            label_to_save = ControlledListItemValue(
+        for value in values:
+            value.pop("item_id")  # trust the item, not the label
+            value_to_save = ControlledListItemValue(
                 controlled_list_item_id=UUID(item_to_save.id),
-                **label,
+                **value,
             )
-            label_to_save._state.adding = False  # allows checking uniqueness
-            label_to_save.full_clean()
-            labels_to_save.append(label_to_save)
+            value_to_save._state.adding = False  # allows checking uniqueness
+            value_to_save.full_clean()
+            values_to_save.append(value_to_save)
 
         for image in images:
             for metadata in image["metadata"]:
@@ -241,7 +241,7 @@ def handle_items(item_dicts, max_sortorder=-1):
         items_to_save, fields=["controlled_list_id", "guide", "uri", "sortorder", "parent"]
     )
     ControlledListItemValue.objects.bulk_update(
-        labels_to_save, fields=["value", "valuetype", "language"]
+        values_to_save, fields=["value", "valuetype", "language"]
     )
     ControlledListItemImageMetadata.objects.bulk_update(
         image_metadata_to_save, fields=["value", "metadata_type", "language"]
@@ -483,34 +483,34 @@ class ControlledListItemView(View):
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
-class ControlledListItemLabelView(View):
-    def add_new_label(self, request):
+class ControlledListItemValueView(View):
+    def add_new_value(self, request):
         data = JSONDeserializer().deserialize(request.body)
-
-        label = ControlledListItemValue(
+        breakpoint()
+        value = ControlledListItemValue(
             controlled_list_item_id=UUID(data["item_id"]),
             valuetype_id=data["valuetype_id"],
             language_id=data["language_id"],
             value=data["value"],
         )
         try:
-            label.full_clean()
+            value.full_clean()
         except ValidationError as ve:
             return JSONErrorResponse(message=" ".join(ve.messages), status=400)
         except:
             return JSONErrorResponse()
-        label.save()
+        value.save()
 
-        return JSONResponse(serialize(label), status=201)
+        return JSONResponse(serialize(value), status=201)
 
     def post(self, request, **kwargs):
-        if not (label_id := kwargs.get("id", None)):
-            return self.add_new_label(request)
+        if not (value_id := kwargs.get("id", None)):
+            return self.add_new_value(request)
 
         data = JSONDeserializer().deserialize(request.body)
 
         try:
-            value = ControlledListItemValue.labels.get(pk=label_id)
+            value = ControlledListItemValue.values_without_images.get(pk=value_id)
         except ControlledListItemValue.DoesNotExist:
             return JSONErrorResponse(status=404)
 
@@ -531,15 +531,15 @@ class ControlledListItemLabelView(View):
         return JSONResponse(serialize(value))
 
     def delete(self, request, **kwargs):
-        label_id = kwargs.get("id")
+        value_id = kwargs.get("id")
         try:
-            label = ControlledListItemValue.labels.get(pk=label_id)
+            value = ControlledListItemValue.values_without_images.get(pk=value_id)
         except:
             return JSONErrorResponse(status=404)
         if (
-            label.valuetype_id == "prefLabel"
+            value.valuetype_id == "prefLabel"
             and len(
-                label.controlled_list_item.controlled_list_item_values.filter(
+                value.controlled_list_item.controlled_list_item_values.filter(
                     valuetype_id="prefLabel"
                 )
             )
@@ -551,7 +551,7 @@ class ControlledListItemLabelView(View):
                 ),
                 status=400,
             )
-        label.delete()
+        value.delete()
         return JSONResponse(status=204)
 
 
