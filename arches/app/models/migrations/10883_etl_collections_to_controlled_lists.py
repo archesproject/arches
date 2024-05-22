@@ -144,7 +144,7 @@ class Migration(migrations.Migration):
                 select distinct on (id) id,
                     null as uri, -- TODO: dynamic handling of URI generation/ETL
                     sortorder,
-                    false as guide, -- What does this mean in context of CLM?
+                    false as guide,
                     listid,
                     parent_id
                 from alpha_sorted_list_item_hierarchy;
