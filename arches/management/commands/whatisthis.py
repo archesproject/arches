@@ -43,7 +43,7 @@ class Command(BaseCommand):
         self.stdout.write("This UUID is the primary key for {} object{}:".format(len(objs), "s" if len(objs) > 1 else ""))
         for o in objs:
             self.stdout.write(80 * "-")
-            self.stdout.write(o)
+            self.stdout.write(str(o))
             keys = list(vars(o).keys())
             keys.sort()
             for k in keys:
