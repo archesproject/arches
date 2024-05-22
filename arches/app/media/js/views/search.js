@@ -50,67 +50,15 @@ define([
         Object.values(SearchComponents).forEach(function(component) {
             this.filters[component.componentname] = ko.observable(null);
         }, this);
-        var firstEnabledFilter = _.find(this.filtersList, function(filter) {
-            return filter.type === 'filter' && filter.enabled === true;
-        }, this);
-        this.selectedTab = ko.observable(firstEnabledFilter.componentname);
-        this.selectedPopup = ko.observable('');
-        this.resultsExpanded = ko.observable(true);
         this.query = ko.observable(getQueryObject());
-        this.clearQuery = function(){
-            Object.values(this.filters).forEach(function(value){
-                if (value()){
-                    if (value().clear){
-                        value().clear();
-                    }
-                }
-            }, this);
-            this.query({"paging-filter": "1", tiles: "true"});
-        };
         this.queryString = ko.computed(function() {
             return JSON.stringify(this.query());
-        }, this);
-        this.filterApplied = ko.pureComputed(function(){
-            var self = this;
-            var filterNames = Object.keys(this.filters);
-            return filterNames.some(function(filterName){
-                if (ko.unwrap(self.filters[filterName]) && filterName !== 'paging-filter') {
-                    return !!ko.unwrap(self.filters[filterName]).query()[filterName];
-                } else {
-                    return false;
-                }
-            });
         }, this);
         this.mouseoverInstanceId = ko.observable();
         this.mapLinkData = ko.observable(null);
         this.userIsReviewer = ko.observable(false);
         this.userid = ko.observable(null);
         this.searchResults = {'timestamp': ko.observable()};
-        this.selectPopup = function(componentname) {
-            if(this.selectedPopup() !== '' && componentname === this.selectedPopup()) {
-                this.selectedPopup('');
-            } else {
-                this.selectedPopup(componentname);
-            }
-        };
-        this.isResourceRelatable = function(graphId) {
-            var relatable = false;
-            if (this.graph) {
-                relatable = _.contains(this.graph.relatable_resource_model_ids, graphId);
-            }
-            return relatable;
-        };
-        this.toggleRelationshipCandidacy = function() {
-            var self = this;
-            return function(resourceinstanceid){
-                var candidate = _.contains(self.relationshipCandidates(), resourceinstanceid);
-                if (candidate) {
-                    self.relationshipCandidates.remove(resourceinstanceid);
-                } else {
-                    self.relationshipCandidates.push(resourceinstanceid);
-                }
-            };
-        };
     };
     
     var SearchView = BaseManagerView.extend({

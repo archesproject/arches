@@ -1,8 +1,7 @@
 define([
     'jquery',
     'knockout',
-    'templates/views/components/search/localize-descriptors.htm',
-], function($, ko, localizeDescriptorsTemplate) {
+], function($, ko) {
     const componentName = 'localize-descriptors';
     const viewModel = function(params) {
         this.query = params.query;

@@ -25,9 +25,71 @@ define([
         this.queryString.subscribe(function() {
             this.doQuery();
         }, this);
+        this.selectedPopup = ko.observable('');
+        this.sharedStateObject.selectedPopup = this.selectedPopup;
+        var firstEnabledFilter = _.find(this.sharedStateObject.filtersList, function(filter) {
+            return filter.type === 'filter' && filter.enabled === true;
+        }, this);
+        this.selectedTab = ko.observable(firstEnabledFilter.componentname);
+        this.sharedStateObject.selectedTab = this.selectedTab;
+
+        this.filterApplied = ko.pureComputed(function(){
+            var self = this;
+            var filterNames = Object.keys(this.sharedStateObject.filters);
+            return filterNames.some(function(filterName){
+                if (ko.unwrap(self.sharedStateObject.filters[filterName]) && filterName !== 'paging-filter') {
+                    return !!ko.unwrap(self.sharedStateObject.filters[filterName]).query()[filterName];
+                } else {
+                    return false;
+                }
+            });
+        }, this);
+        this.resultsExpanded = ko.observable(true);
+        this.isResourceRelatable = function(graphId) {
+            var relatable = false;
+            if (this.graph) {
+                relatable = _.contains(this.graph.relatable_resource_model_ids, graphId);
+            }
+            return relatable;
+        };
+        this.sharedStateObject.isResourceRelatable = this.isResourceRelatable;
+        this.toggleRelationshipCandidacy = function() {
+            var self = this;
+            return function(resourceinstanceid){
+                var candidate = _.contains(self.relationshipCandidates(), resourceinstanceid);
+                if (candidate) {
+                    self.relationshipCandidates.remove(resourceinstanceid);
+                } else {
+                    self.relationshipCandidates.push(resourceinstanceid);
+                }
+            };
+        };
+        this.sharedStateObject.toggleRelationshipCandidacy = this.toggleRelationshipCandidacy;
+
+        this.clearQuery = function(){
+            Object.values(this.sharedStateObject.filters).forEach(function(value){
+                console.log(value());
+                if (value()){
+                    if (value().clear){
+                        value().clear();
+                    }
+                }
+            }, this);
+            this.query({"paging-filter": "1", tiles: "true"});
+        };
+
+        this.selectPopup = function(componentname) {
+            if(this.selectedPopup() !== '' && componentname === this.selectedPopup()) {
+                this.selectedPopup('');
+            } else {
+                this.selectedPopup(componentname);
+            }
+        };
 
         this.doQuery = function() {
-            const queryObj = JSON.parse(this.queryString());
+            let queryObj = JSON.parse(this.queryString());
+            queryObj[componentName] = true;
+            queryObj['localize-descriptors'] = true;
 
             if (self.updateRequest) {
                 self.updateRequest.abort();
@@ -67,6 +129,20 @@ define([
                     window.history.pushState({}, '', '?' + $.param(queryObj).split('+').join('%20'));
                 }
             });
+        },
+
+        updateQuery = function() {
+            console.log("updateQuery");
+            let queryObj = this.query();
+            queryObj[componentName] = true;
+            this.query(queryObj);
+        },
+
+        restoreState = function(){
+            console.log("restoreState");
+            if (!this.query()[componentName]) {
+                this.updateQuery();
+            }
         }
     };
 
