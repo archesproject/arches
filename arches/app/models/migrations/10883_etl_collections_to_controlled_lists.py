@@ -50,6 +50,7 @@ class Migration(migrations.Migration):
                     )
                 );
                 
+                -- Remove user provided values from collection_names if they aren't a collection (identifier or prefLabel)
                 if array_length(failed_collections, 1) > 0 then
                     raise warning 'Failed to find the following collections in the database: %s', array_to_string(failed_collections, ', ');
                     collection_names := array(
