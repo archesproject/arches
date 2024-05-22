@@ -56,7 +56,7 @@ class BaseSearchFilter:
 class SearchFilterFactory(object):
     def __init__(self, request=None):
         self.request = request
-        self.search_filters = {search_filter.componentname: search_filter for search_filter in models.SearchComponent.objects.filter(enabled=True)}
+        self.search_filters = {search_filter.componentname: search_filter for search_filter in models.SearchComponent.objects.filter(enabled=True).order_by("sortorder")}
         self.search_filters_instances = {}
 
     def get_filter(self, componentname):
@@ -75,3 +75,14 @@ class SearchFilterFactory(object):
             return filter_instance
         else:
             return None
+        
+    def get_sorted_query_dict(self, key_value_pairs):
+        # Sort the list of (key, value) tuples according to the key's order in self.search_filters
+        return dict(
+            sorted(
+                key_value_pairs,
+                key=lambda item: list(self.search_filters.keys()).index(item[0])
+                if item[0] in self.search_filters
+                else len(self.search_filters)
+            )
+        )
