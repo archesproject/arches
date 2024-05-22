@@ -10,7 +10,7 @@ import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
 import { deleteLabel, upsertLabel } from "@/components/ControlledListManager/api.ts";
-import AddLabel from "@/components/ControlledListManager/AddLabel.vue";
+import AddValue from "@/components/ControlledListManager/AddValue.vue";
 
 import { ALT_LABEL, PREF_LABEL, itemKey } from "@/components/ControlledListManager/constants.ts";
 import { languageName } from "@/components/ControlledListManager/utils.ts";
@@ -53,8 +53,8 @@ const headings: Ref<{ heading: string; subheading: string }> = computed(() => {
             };
         default:
             return {
-                heading: "",
-                subheading: "",
+                heading: $gettext("Notes"),
+                subheading: $gettext("Optionally, you can provide notes for your list item."),
             };
     }
 });
@@ -177,7 +177,7 @@ const updateItemLabel = (updatedLabel: Label) => {
                 </template>
             </Column>
         </DataTable>
-        <AddLabel :type="valueType" />
+        <AddValue :type="valueType" />
     </div>
 </template>
 

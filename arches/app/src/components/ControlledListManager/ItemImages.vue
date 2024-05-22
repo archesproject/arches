@@ -37,35 +37,45 @@ const onUpload = (event: FileUploadUploadEvent) => {
 </script>
 
 <template>
-    <h4>{{ $gettext("Images") }}</h4>
-    <FileUpload
-        accept="image/*"
-        :url="arches.urls.controlled_list_item_image_add"
-        :auto="true"
-        :max-file-size="5e6"
-        :file-limit="10"
-        :preview-width="250"
-        :with-credentials="true"
-        name="item_image"
-        @before-send="addHeader($event)"
-        @upload="onUpload($event)"
-    />
-    <div class="images">
-        <ImageEditor
-            v-for="image in item.images"
-            :key="image.id"
-            :image="image"
+    <div class="images-container">
+        <h4>{{ $gettext("Images") }}</h4>
+        <FileUpload
+            accept="image/*"
+            :url="arches.urls.controlled_list_item_image_add"
+            :auto="true"
+            :max-file-size="5e6"
+            :file-limit="10"
+            :preview-width="250"
+            :with-credentials="true"
+            name="item_image"
+            @before-send="addHeader($event)"
+            @upload="onUpload($event)"
         />
-        <span
-            v-if="!item.images.length"
-            :style="{ fontSize: 'small'}"
-        >
-            {{ $gettext("No images.") }}
-        </span>
+        <div class="images">
+            <ImageEditor
+                v-for="image in item.images"
+                :key="image.id"
+                :image="image"
+            />
+            <span
+                v-if="!item.images.length"
+                :style="{ fontSize: 'small'}"
+            >
+                {{ $gettext("No images.") }}
+            </span>
+        </div>
     </div>
 </template>
 
 <style scoped>
+.images-container {
+    margin: 1rem 1rem 3rem 1rem;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 20px;
+}
+
 h4 {
     color: v-bind(ARCHES_CHROME_BLUE);
     margin-top: 0;

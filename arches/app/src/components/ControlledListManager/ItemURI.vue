@@ -50,54 +50,62 @@ const onCancel = () => {
 </script>
 
 <template>
-    <h4>{{ uriHeading }}</h4>
-    <p>{{ uriSubheading }}</p>
-    <div class="characteristic">
-        <InputText
-            v-model="inputValue"
-            type="text"
-            :disabled="!editing"
-            :aria-label="$gettext('URI')"
-            :placeholder="$gettext('Enter a URI')"
-        />
-        <span
-            v-if="!editing"
-            class="edit-controls"
-        >
-            <i
-                role="button"
-                tabindex="0"
-                class="fa fa-pencil"
-                :aria-label="$gettext('Edit')"
-                @click="editing = true"
-                @keyup.enter="editing = true"
+    <div class="uri-container">
+        <h4>{{ uriHeading }}</h4>
+        <p>{{ uriSubheading }}</p>
+        <div class="characteristic">
+            <InputText
+                v-model="inputValue"
+                type="text"
+                :disabled="!editing"
+                :aria-label="$gettext('URI')"
+                :placeholder="$gettext('Enter a URI')"
             />
-        </span>
-        <span
-            v-if="editing"
-            class="edit-controls"
-        >
-            <i
-                role="button"
-                tabindex="0"
-                class="fa fa-check"
-                :aria-label="$gettext('Save edit')"
-                @click="onSave"
-                @keyup.enter="onSave"
-            />
-            <i
-                role="button"
-                tabindex="0"
-                class="fa fa-times"
-                :aria-label="$gettext('Cancel edit')"
-                @click="onCancel"
-                @keyup.enter="onCancel"
-            />
-        </span>
+            <span
+                v-if="!editing"
+                class="edit-controls"
+            >
+                <i
+                    role="button"
+                    tabindex="0"
+                    class="fa fa-pencil"
+                    :aria-label="$gettext('Edit')"
+                    @click="editing = true"
+                    @keyup.enter="editing = true"
+                />
+            </span>
+            <span
+                v-if="editing"
+                class="edit-controls"
+            >
+                <i
+                    role="button"
+                    tabindex="0"
+                    class="fa fa-check"
+                    :aria-label="$gettext('Save edit')"
+                    @click="onSave"
+                    @keyup.enter="onSave"
+                />
+                <i
+                    role="button"
+                    tabindex="0"
+                    class="fa fa-times"
+                    :aria-label="$gettext('Cancel edit')"
+                    @click="onCancel"
+                    @keyup.enter="onCancel"
+                />
+            </span>
+        </div>
     </div>
 </template>
 
 <style scoped>
+.uri-container {
+    margin: 1rem 1rem 3rem 1rem;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
 h4 {
     color: v-bind(ARCHES_CHROME_BLUE);
     margin-top: 0;
