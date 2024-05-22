@@ -302,9 +302,12 @@ def search_results(request, returnDsl=False):
     include_provisional = get_provisional_type(request)
     search_filter_factory = SearchFilterFactory(request)
     search_results_object = {"query": Query(se)}
+    sorted_query_obj = search_filter_factory.get_sorted_query_dict(
+        list(request.GET.items()) + list(request.POST.items()) + [("search-results", "")]
+    )
 
     try:
-        for filter_type, querystring in list(request.GET.items()) + list(request.POST.items()) + [("search-results", "")]:
+        for filter_type, querystring in list(sorted_query_obj.items()):
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
                 search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
@@ -318,7 +321,7 @@ def search_results(request, returnDsl=False):
     
     ret = {"results": None}
 
-    for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
+    for filter_type, querystring in list(sorted_query_obj.items()):
         search_filter = search_filter_factory.get_filter(filter_type)
         if search_filter:
             search_filter.execute_query(search_results_object, ret)
@@ -326,7 +329,7 @@ def search_results(request, returnDsl=False):
     if ret["results"] is not None:
 
         # allow filters to modify the results
-        for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
+        for filter_type, querystring in list(sorted_query_obj.items()):
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
                 search_filter.post_search_hook(search_results_object, ret, permitted_nodegroups)
