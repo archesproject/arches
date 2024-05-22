@@ -29,11 +29,11 @@ define([
 
         this.displayValue = ko.computed(function() {
             const val = self.value();
-            let name = '';
+            let name = null;
             if (val) {
                 name = val.map(item=>self.getPrefLabel(item.values)).join(", ");
             }
-            return val ? name : null;
+            return name;
         });
 
         this.valueAndSelectionDiffer = function(value, selection) {
