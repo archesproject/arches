@@ -10,7 +10,6 @@ define([
         const self = this;
         this.search = params.search;
 
-        this.search = params.search;
         if (this.search) {
             params.config = ko.observable({
                 controlledList:[],
