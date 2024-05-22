@@ -444,10 +444,13 @@ class GraphDataView(View):
                     clone_data = graph.copy()
                     ret = clone_data["copy"]
                     ret.slug = None
+                    ret.publication = None
+
                     ret.save()
 
                     ret.create_editable_future_graph()
                     ret.publish()
+
                     ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
 
                 elif self.action == "reorder_nodes":
