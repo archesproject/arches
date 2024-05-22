@@ -131,7 +131,7 @@ class Migration(migrations.Migration):
                     join relations r on r.conceptidto = ch.child
                     where v.valuetype = 'prefLabel' and 
                         r.relationtype = 'member' and
-                        root_list in (select id from controlled_lists) -- 
+                        root_list in (select id from controlled_lists where name = ANY(collection_names))
                 )
                 insert into controlled_list_items(
                     id,
@@ -167,7 +167,11 @@ class Migration(migrations.Migration):
                 full join values v on r.conceptidto = v.conceptid
                 where relationtype = 'member' and
                     (valuetype = 'prefLabel' or valuetype = 'altLabel') and
-                    r.conceptidto in (select id from controlled_list_items); -- don't create values for list items that don't exist
+                    r.conceptidto in (
+                        select id from controlled_list_items where listid in (
+                            select id from controlled_lists where name = ANY(collection_names)
+                        )
+                    );
 
                 return format('collection(s) %s migrated to controlled list(s)', collection_names);
             end;
