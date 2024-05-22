@@ -35,13 +35,18 @@ class Migration(migrations.Migration):
                     return 'No collection names provided.';
                 end if;
 
-                -- Check if collection_names exist in the database
+                -- Check if input collection names or identifiers exist in the database
                 failed_collections := array(
                     select names
                     from unnest(collection_names) as names
-                    left join values v on v.value = names
-                    left join concepts c on c.conceptid = v.conceptid
-                    where v.value is Null
+                    where names not in (
+                        select value 
+                        from values v
+                        left join concepts c on c.conceptid = v.conceptid
+                        where c.nodetype = 'Collection' and
+                            (v.valuetype = 'prefLabel' or
+                            v.valuetype = 'identifier')
+                    )
                 );
                 
                 if array_length(failed_collections, 1) > 0 then
