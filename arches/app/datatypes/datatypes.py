@@ -2726,15 +2726,10 @@ class ReferenceDataType(BaseDataType):
         }
 
     def validate_node(self, node):
-        valid = False
-        message = ""
-        title = ""
+        from arches.app.models.graph import GraphValidationError # prevent circular import
         try:
             uuid.UUID(node.config["controlledList"])
-            valid = True
         except (TypeError, KeyError):
-            message = _("A reference datatype node must be configured with a controlled list")
-            title = _("Invalid Node Configuration")
-            logger.error(message)
-
-        return {"success": valid, "message": message, "title": title}
+            raise GraphValidationError(
+                _("A reference datatype node requires a controlled list")
+                )

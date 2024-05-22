@@ -1677,10 +1677,7 @@ class Graph(models.GraphModel):
 
     def _validate_node_config(self, node, datatype_factory):
         datatype = datatype_factory.get_instance(node.datatype)
-        validation = datatype.validate_node(node)
-        if validation["success"] is False:
-            message = validation["message"]
-            raise GraphValidationError(message)
+        datatype.validate_node(node)
 
     def create_node_alias(self, node):
         """
