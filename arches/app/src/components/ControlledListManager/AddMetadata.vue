@@ -12,12 +12,12 @@ import type { Ref } from "vue";
 import type {
     ControlledListItem,
     ControlledListItemImage,
-    MetadataChoice,
+    LabeledChoice,
     NewControlledListItemImageMetadata,
 } from "@/types/ControlledListManager";
 
-const { labeledMetadataChoices, image } = defineProps<{
-    labeledMetadataChoices: MetadataChoice[];
+const { labeledChoices, image } = defineProps<{
+    labeledChoices: LabeledChoice[];
     image: ControlledListItemImage;
 }>();
 const item = inject(itemKey) as Ref<ControlledListItem>;
@@ -34,11 +34,11 @@ const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
         1000,
     );
 
-    const nextMetadataType = labeledMetadataChoices.find(
+    const nextMetadataType = labeledChoices.find(
         choice => !image.metadata.map(
             (metadatum) => metadatum.metadata_type
         ).includes(choice.type)
-    ) ?? labeledMetadataChoices[0];
+    ) ?? labeledChoices[0];
 
     return {
         id: maxOtherNewMetadataId + 1,

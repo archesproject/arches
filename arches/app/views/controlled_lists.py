@@ -514,7 +514,8 @@ class ControlledListItemValueView(View):
         except ControlledListItemValue.DoesNotExist:
             return JSONErrorResponse(status=404)
 
-        value.value=data["value"]
+        value.value = data["value"]
+        value.valuetype_id = data["valuetype_id"]
         try:
             value.language = Language.objects.get(code=data["language_id"])
         except Language.DoesNotExist:

@@ -18,7 +18,7 @@ import type { DataTableRowEditInitEvent } from "primevue/datatable";
 import type {
     ControlledListItem,
     ControlledListItemImageMetadata,
-    MetadataChoice,
+    LabeledChoice,
     NewControlledListItemImageMetadata,
     NewOrExistingControlledListItemImageMetadata,
 } from "@/types/ControlledListManager";
@@ -30,14 +30,14 @@ const metadataTypeHeader = $gettext('Metadata type');
 const languageHeader = $gettext('Language');
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
-const { labeledMetadataChoices, metadata } = defineProps<{
-    labeledMetadataChoices: MetadataChoice[];
+const { labeledChoices, metadata } = defineProps<{
+    labeledChoices: LabeledChoice[];
     metadata: ControlledListItemImageMetadata[];
 }>();
 const editingRows = ref([]);
 
 const metadataLabel = (metadataType: string) => {
-    return labeledMetadataChoices.find(choice => choice.type === metadataType)!.label;
+    return labeledChoices.find(choice => choice.type === metadataType)!.label;
 };
 
 const onSaveMetadata = async (event: DataTableRowEditInitEvent)  => {
@@ -135,7 +135,7 @@ const updateImageMetadata = (updatedMetadata: ControlledListItemImageMetadata) =
             <template #editor="{ data, field }">
                 <Dropdown
                     v-model="data[field]"
-                    :options="labeledMetadataChoices"
+                    :options="labeledChoices"
                     option-label="label"
                     option-value="type"
                     :pt="{

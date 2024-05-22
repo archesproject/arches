@@ -12,7 +12,7 @@ import { useToast } from "primevue/usetoast";
 import { deleteValue, upsertValue } from "@/components/ControlledListManager/api.ts";
 import AddValue from "@/components/ControlledListManager/AddValue.vue";
 
-import { ALT_LABEL, NOTE, PREF_LABEL, itemKey } from "@/components/ControlledListManager/constants.ts";
+import { ALT_LABEL, NOTE, NOTE_CHOICES, PREF_LABEL, itemKey } from "@/components/ControlledListManager/constants.ts";
 import { languageName } from "@/components/ControlledListManager/utils.ts";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
@@ -39,6 +39,42 @@ const item = inject(itemKey) as Ref<ControlledListItem>;
 const toast = useToast();
 const { $gettext } = useGettext();
 const languageHeader = $gettext('Language');
+const noteTypeHeader = $gettext('Note type');
+
+const labeledNoteChoices = [
+    {
+        type: NOTE_CHOICES.scope,
+        label: $gettext('Scope note'),
+    },
+    {
+        type: NOTE_CHOICES.definition,
+        label: $gettext('Definition'),
+    },
+    {
+        type: NOTE_CHOICES.example,
+        label: $gettext('Example'),
+    },
+    {
+        type: NOTE_CHOICES.history,
+        label: $gettext('History note'),
+    },
+    {
+        type: NOTE_CHOICES.change,
+        label: $gettext('Change note'),
+    },
+    {
+        type: NOTE_CHOICES.note,
+        label: $gettext('Note'),
+    },
+    {
+        type: NOTE_CHOICES.description,
+        label: $gettext('Description'),
+    },
+];
+
+const noteChoiceLabel = (valueType: string) => {
+    return labeledNoteChoices.find(choice => choice.type === valueType)!.label;
+};
 
 const headings: Ref<{ heading: string; subheading: string }> = computed(() => {
     switch (valueType) {
@@ -70,7 +106,8 @@ const values = computed(() => {
     }
     if (!valueType) {
         if (valueCategory === NOTE) {
-        // Show everything but labels for now. We're not returning category from the API.
+            // Show everything but labels for now.
+            // We're not returning category from the API, and images already excluded.
             return item.value.values.filter(
                 value => ![PREF_LABEL, ALT_LABEL].includes(value.valuetype_id)
             );
@@ -125,6 +162,7 @@ const updateItemValue = (updatedValue: Value) => {
     if (toUpdate) {
         toUpdate.language_id = updatedValue.language_id;
         toUpdate.value = updatedValue.value;
+        toUpdate.valuetype_id = updatedValue.valuetype_id;
     }
 };
 </script>
@@ -145,8 +183,31 @@ const updateItemValue = (updatedValue: Value) => {
             @row-edit-save="onSave"
         >
             <Column
+                v-if="valueCategory"
+                field="valuetype_id"
+                :header="noteTypeHeader"
+                style="width: 20%;"
+            >
+                <template #editor="{ data, field }">
+                    <Dropdown
+                        v-model="data[field]"
+                        :options="labeledNoteChoices"
+                        option-label="label"
+                        option-value="type"
+                        :pt="{
+                            root: { style: { width: '90%' } },
+                            input: { style: { fontFamily: 'inherit', fontSize: 'small' } },
+                            panel: { style: { fontSize: 'small' } },
+                        }"
+                    />
+                </template>
+                <template #body="slotProps">
+                    {{ noteChoiceLabel(slotProps.data.valuetype_id) }}
+                </template>
+            </Column>
+            <Column
                 field="value"
-                style="min-width: 8rem"
+                style="width: 60%; min-width: 8rem;"
             >
                 <template #editor="{ data, field }">
                     <InputText v-model="data[field]" />
@@ -190,7 +251,10 @@ const updateItemValue = (updatedValue: Value) => {
                 </template>
             </Column>
         </DataTable>
-        <AddValue :value-type />
+        <AddValue
+            :value-type
+            :labeled-note-choices
+        />
     </div>
 </template>
 

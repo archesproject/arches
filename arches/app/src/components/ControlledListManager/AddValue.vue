@@ -6,17 +6,23 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
-import { itemKey, ALT_LABEL, PREF_LABEL } from "@/components/ControlledListManager/constants.ts";
+import {
+    itemKey,
+    ALT_LABEL,
+    NOTE_CHOICES,
+    PREF_LABEL,
+} from "@/components/ControlledListManager/constants.ts";
 
 import type { Ref } from "vue";
 import type {
     ControlledListItem,
+    LabeledChoice,
     Value,
     NewValue,
     ValueType,
 } from "@/types/ControlledListManager";
 
-const props = defineProps<{ valueType?: ValueType }>();
+const props = defineProps<{ valueType?: ValueType, labeledChoices: LabeledChoice[]; }>();
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
@@ -31,7 +37,7 @@ const newValue: Ref<NewValue> = computed(() => {
     );
     return {
         id: maxOtherNewValueId + 1,
-        valuetype_id: props.valueType ?? 'scopeNote',  // todo: get real type
+        valuetype_id: props.valueType ?? NOTE_CHOICES.scope,
         language_id: arches.activeLanguage,
         value: '',
         item_id: item.value.id,

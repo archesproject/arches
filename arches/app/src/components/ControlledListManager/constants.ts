@@ -20,4 +20,15 @@ export const METADATA_CHOICES = {
     alternativeText: 'alt',
     description: 'desc',
     attribution: 'attr',
-};
+} as const;
+
+export const NOTE_CHOICES = {
+    scope: 'scopeNote',
+    definition: 'definition',
+    example: 'example',
+    history: 'historyNote',
+    editorial: 'editorialNote',
+    change: 'changeNote',
+    note: 'note',
+    description: 'description',
+} as const;
