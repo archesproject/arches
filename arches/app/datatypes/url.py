@@ -66,7 +66,10 @@ class URLDataType(BaseDataType):
     URL Datatype to store an optionally labelled hyperlink to a (typically) external resource
     """
 
-    URL_REGEX = re.compile(r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)")
+    if settings.DEBUG:
+        URL_REGEX = re.compile(r"https?:\/\/(?:www\.)?(?:[-a-zA-Z0-9@:%._\+~#=]{1,256}|localhost)(?:\:[0-9]{1,5})?(?:\/[-a-zA-Z0-9()@:%_\+.~#?&//=]*)*")
+    else:
+        URL_REGEX = re.compile(r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)")
 
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         errors = []

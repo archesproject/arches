@@ -74,14 +74,14 @@ define([
                             context: '',
                             context_label: '',
                             id: params.term,
-                            text: params.term,
+                            text: arches.translations.containsTerm(params.term),
                             value: params.term
                         });
                         if(data.terms.length > 0){
-                            res.push({"text": "Terms", "children": data.terms});
+                            res.push({"text": arches.translations.termSearchTerm, "children": data.terms});
                         }
                         if(data.concepts.length > 0){
-                            res.push({"text": "Concepts", "children": data.concepts});
+                            res.push({"text": arches.translations.termSearchConcept, "children": data.concepts});
                         }
                         return {
                             results: res

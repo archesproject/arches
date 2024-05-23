@@ -344,7 +344,9 @@ define([
                 var data = feature.properties;
                 var id = data.resourceinstanceid;
                 data.showEditButton = self.canEdit;
-                const descriptionProperties = ['displayname', 'graph_name', 'map_popup'];
+                data.sendFeatureToMapFilter = mapPopupProvider.sendFeatureToMapFilter;
+                data.showFilterByFeature = mapPopupProvider.showFilterByFeature;
+                const descriptionProperties = ['displayname', 'graph_name', 'map_popup', 'geometries'];
                 if (id) {
                     if (!self.resourceLookup[id]){
                         data = _.defaults(data, {
@@ -352,6 +354,7 @@ define([
                             'displayname': '',
                             'graph_name': '',
                             'map_popup': '',
+                            'geometries': [],
                             'feature': feature,
                         });
                         if (data.permissions) {
