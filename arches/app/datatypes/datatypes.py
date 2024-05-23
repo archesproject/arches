@@ -20,6 +20,7 @@ from django.db.models import fields
 from arches.app.const import ExtensionType
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
+from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.system_settings import settings
 from arches.app.models.fields.i18n import I18n_JSONField, I18n_String
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
@@ -2413,6 +2414,13 @@ class ResourceInstanceDataType(BaseDataType):
             except:
                 logger.info(f'Resource with id "{resourceid}" not in the system.')
         return ", ".join(items)
+    
+    def get_relationship_display_value(self, relationship_valueid):
+        preflabel = get_preflabel_from_valueid(relationship_valueid, get_language())
+        if preflabel:
+            return preflabel["value"]
+        else:
+            return None
 
     def to_json(self, tile, node):
         from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
