@@ -20,6 +20,7 @@ from django.db.models import fields
 from arches.app.const import ExtensionType
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
+from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.system_settings import settings
 from arches.app.models.fields.i18n import I18n_JSONField, I18n_String
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
@@ -101,7 +102,7 @@ class DataTypeFactory(object):
             datatype_instance = DataTypeFactory._datatype_instances[d_datatype.classname]
         except KeyError:
             class_method = get_class_from_modulename(d_datatype.modulename, d_datatype.classname, ExtensionType.DATATYPES)
-            datatype_instance = class_method(d_datatype, datatype_factory=self)
+            datatype_instance = class_method(d_datatype)
             DataTypeFactory._datatype_instances[d_datatype.classname] = datatype_instance
             self.datatype_instances = DataTypeFactory._datatype_instances
         return datatype_instance
@@ -913,8 +914,8 @@ class EDTFDataType(BaseDataType):
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
-    def __init__(self, model=None, datatype_factory=None):  
-        super(GeojsonFeatureCollectionDataType, self).__init__(model=model, datatype_factory=datatype_factory)  
+    def __init__(self, model=None):  
+        super(GeojsonFeatureCollectionDataType, self).__init__(model=model)  
         self.geo_utils = GeoUtils()  
 
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
@@ -1574,8 +1575,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
 
 class FileListDataType(BaseDataType):
-    def __init__(self, model=None, datatype_factory=None):
-        super(FileListDataType, self).__init__(model=model, datatype_factory=datatype_factory)
+    def __init__(self, model=None):
+        super(FileListDataType, self).__init__(model=model)
         self.node_lookup = {}
 
     def validate_file_types(self, request=None, nodeid=None):
@@ -1970,8 +1971,8 @@ class FileListDataType(BaseDataType):
 
 
 class BaseDomainDataType(BaseDataType):
-    def __init__(self, model=None, datatype_factory=None):
-        super(BaseDomainDataType, self).__init__(model=model, datatype_factory=datatype_factory)
+    def __init__(self, model=None):
+        super(BaseDomainDataType, self).__init__(model=model)
         self.value_lookup = {}
 
     def get_option_text(self, node, option_id):
@@ -2410,9 +2411,7 @@ class ResourceInstanceDataType(BaseDataType):
         return ", ".join(items)
     
     def get_relationship_display_value(self, relationship_valueid):
-        concept_datatype_instance = self.datatype_factory.get_instance('concept')
-        concept_preflabel = concept_datatype_instance.get_pref_label(relationship_valueid, lang=get_language())
-        return concept_preflabel
+        return get_preflabel_from_valueid(relationship_valueid, get_language())["value"]
 
     def to_json(self, tile, node):
         from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
