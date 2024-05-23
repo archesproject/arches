@@ -2411,7 +2411,7 @@ class ResourceInstanceDataType(BaseDataType):
     
     def get_relationship_display_value(self, relationship_valueid):
         concept_datatype_instance = self.datatype_factory.get_instance('concept')
-        concept_preflabel = concept_datatype_instance.get_pref_label(relationship_valueid)
+        concept_preflabel = concept_datatype_instance.get_pref_label(relationship_valueid, lang=get_language())
         return concept_preflabel
 
     def to_json(self, tile, node):
