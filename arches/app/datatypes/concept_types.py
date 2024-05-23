@@ -99,7 +99,10 @@ class BaseConceptDataType(BaseDataType):
         return cache_value
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        nodevalue = self.get_nodevalues(nodevalue)
+        try:
+            assert isinstance(nodevalue, (list, tuple))  # assert nodevalue is an array
+        except AssertionError:
+            nodevalue = [nodevalue]
         for valueid in nodevalue:
             value = self.get_value(valueid)
             date_range = self.get_concept_dates(value.concept)
