@@ -38,7 +38,7 @@ define([
         
         this.init = async function() {
             const lists = await this.getControlledLists();
-            this.controlledLists(lists.controlled_lists);
+            this.controlledLists(lists?.controlled_lists);
         };
 
         this.init();
