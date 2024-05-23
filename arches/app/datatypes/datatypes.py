@@ -2411,7 +2411,11 @@ class ResourceInstanceDataType(BaseDataType):
         return ", ".join(items)
     
     def get_relationship_display_value(self, relationship_valueid):
-        return get_preflabel_from_valueid(relationship_valueid, get_language())["value"]
+        preflabel = get_preflabel_from_valueid(relationship_valueid, get_language())
+        if preflabel:
+            return preflabel["value"]
+        else:
+            return None
 
     def to_json(self, tile, node):
         from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
