@@ -500,23 +500,23 @@ module.exports = () => {
                     console.error(
                         '\x1b[31m%s\x1b[0m',  // red
                         "Webpack did not receive application data! Aborting..."
-                    )
+                    );
                     return;
                 }
                 
                 const parsedData = JSON.parse(data);
-                console.log('Data imported from settings.py:', parsedData)
+                console.log('Data imported from settings.py:', parsedData);
     
                 global.APP_ROOT = parsedData['APP_ROOT'];
                 global.ARCHES_APPLICATIONS = parsedData['ARCHES_APPLICATIONS'];
                 global.ARCHES_APPLICATIONS_PATHS = parsedData['ARCHES_APPLICATIONS_PATHS'];
                 global.SITE_PACKAGES_DIRECTORY = parsedData['SITE_PACKAGES_DIRECTORY'];
                 global.ROOT_DIR = parsedData['ROOT_DIR'];
-                global.STATIC_URL = parsedData['STATIC_URL']
-                global.PUBLIC_SERVER_ADDRESS = parsedData['PUBLIC_SERVER_ADDRESS']
-                global.WEBPACK_DEVELOPMENT_SERVER_PORT = parsedData['WEBPACK_DEVELOPMENT_SERVER_PORT']
+                global.STATIC_URL = parsedData['STATIC_URL'];
+                global.PUBLIC_SERVER_ADDRESS = parsedData['PUBLIC_SERVER_ADDRESS'];
+                global.WEBPACK_DEVELOPMENT_SERVER_PORT = parsedData['WEBPACK_DEVELOPMENT_SERVER_PORT'];
                 
-                createWebpackConfig()
+                createWebpackConfig();
             });
             projectSettings.on('close', (code) => {
                 if (code !== 0) {
