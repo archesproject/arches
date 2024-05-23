@@ -1,4 +1,5 @@
-define(['arches',
+define([
+    'arches',
     'knockout',
     'templates/views/components/map-popup.htm'
 ], function(arches, ko, popupTemplate) {
@@ -38,6 +39,32 @@ define(['arches',
         processData: function(features)
         {
             return features;
+        },
+
+        /**
+         * This method enables custom logic for how the feature in the popup should be handled and/or mutated en route to the mapFilter.
+         * @param popupFeatureObject - the javascript object of the feature and its associated contexts (e.g. mapCard).
+         * @param featureGeomIndex - int index corresponding to the feature that was clicked, used for lookup against an arry of geoms
+         * @required @method mapCard.filterByFeatureGeom()
+         * @required @send argument: @param feature - a geojson feature object 
+         * with an @optional @property: feature.id corresponding to a uuid for that tile_geometrycollection_feature
+         * @optional @send argument: @param resourceid
+         */
+        sendFeatureToMapFilter: function(popupFeatureObject, featureGeomIndex)
+        {
+            let feature = popupFeatureObject.geometries()[featureGeomIndex].geom.features[0];
+            popupFeatureObject.mapCard.filterByFeatureGeom(feature, popupFeatureObject.resourceinstanceid);
+        },
+
+        /**
+         * Determines whether to show the button for Filter By Feature
+         * @param popupFeatureObject - the javascript object of the feature and its associated contexts (e.g. mapCard).
+         * @param featureGeomIndex - int index corresponding to the feature that was clicked, used for lookup against an arry of geoms
+         * @returns {boolean} - whether to show "Filter by Feature" on map popup
+         * typically dependent on at least 1 feature with a geometry and/or a featureid/resourceid combo
+         */
+        showFilterByFeature: function(popupFeatureObject, featureGeomIndex) {
+            return (ko.unwrap(popupFeatureObject.geometries) || []).length > 0;
         },
 
     };
