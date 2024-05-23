@@ -17,13 +17,12 @@ import type { Ref } from "vue";
 import type { Language } from "@/types/arches";
 import type {
     ControlledListItem,
-    LabeledChoice,
     Value,
     NewValue,
     ValueType,
 } from "@/types/ControlledListManager";
 
-const props = defineProps<{ valueType?: ValueType, labeledChoices: LabeledChoice[]; }>();
+const { valueType } = defineProps<{ valueType?: ValueType }>();
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
@@ -37,21 +36,45 @@ const newValue: Ref<NewValue> = computed(() => {
         1000,
     );
 
-    const nextLanguage = arches.languages.find(
-        (lang: Language) => !item.value.values.map((val) => val.language_id
-    ).includes(lang.code)) ?? arches.activeLanguage;
+    let nextLanguageCode = arches.activeLanguage;
+    if (valueType === PREF_LABEL) {
+        const maybeNextLanguage = arches.languages.find(
+            (lang: Language) => !item.value.values.map(
+                val => val.language_id
+            ).includes(lang.code)
+        );
+        if (maybeNextLanguage) {
+            nextLanguageCode = maybeNextLanguage.code;
+        }
+    }
+
+    let nextValueType = valueType;
+    if (!nextValueType) {
+        const otherUsedValueTypes = item.value.values
+        .map(value => value.valuetype_id)
+        .filter(typeid =>
+            // Labels handled separately.
+            ![PREF_LABEL, ALT_LABEL].includes(typeid)
+        );
+        for (const choice of Object.values(NOTE_CHOICES)) {
+            if (!otherUsedValueTypes.includes(choice)) {
+                nextValueType = choice;
+                break;
+            }
+        }
+    }
 
     return {
         id: maxOtherNewValueId + 1,
-        valuetype_id: props.valueType ?? NOTE_CHOICES.scope,
-        language_id: nextLanguage.code,
+        valuetype_id: nextValueType ?? NOTE_CHOICES.scope,
+        language_id: nextLanguageCode,
         value: '',
         item_id: item.value.id,
     };
 });
 
 const buttonLabel = computed(() => {
-    switch (props.valueType) {
+    switch (valueType) {
         case PREF_LABEL:
             return $gettext("Add Preferred Label");
         case ALT_LABEL:

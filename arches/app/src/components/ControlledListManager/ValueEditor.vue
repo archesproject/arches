@@ -59,6 +59,10 @@ const labeledNoteChoices = [
         label: $gettext('History note'),
     },
     {
+        type: NOTE_CHOICES.editorial,
+        label: $gettext('Editorial note'),
+    },
+    {
         type: NOTE_CHOICES.change,
         label: $gettext('Change note'),
     },
@@ -253,10 +257,7 @@ const updateItemValue = (updatedValue: Value) => {
                 </template>
             </Column>
         </DataTable>
-        <AddValue
-            :value-type
-            :labeled-note-choices
-        />
+        <AddValue :value-type />
     </div>
 </template>
 
