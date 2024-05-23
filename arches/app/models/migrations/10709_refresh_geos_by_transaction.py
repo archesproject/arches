@@ -56,10 +56,7 @@ class Migration(migrations.Migration):
                     
         $BODY$;
 
-        ALTER FUNCTION public.refresh_transaction_geojson_geometries(uuid)
-            OWNER TO postgres;
-
-
+        
         CREATE OR REPLACE FUNCTION public.__arches_staging_to_tile(
             load_id uuid)
             RETURNS boolean
@@ -176,9 +173,6 @@ class Migration(migrations.Migration):
                 RETURN status;
             END;
         $BODY$;
-
-        ALTER FUNCTION public.__arches_staging_to_tile(uuid)
-            OWNER TO postgres;
         """
 
     reverse = """

@@ -300,7 +300,10 @@ module.exports = () => {
                         jquery: Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, 'jquery', 'dist', 'jquery.min')
                     }),
                     new MiniCssExtractPlugin(),
-                    new BundleTracker({ filename: Path.resolve(__dirname, `webpack-stats.json`) }),
+                    new BundleTracker({ 
+                        path: Path.resolve(__dirname),
+                        filename: 'webpack-stats.json' 
+                    }),
                     new VueLoaderPlugin(),
                 ],
                 resolveLoader: {
