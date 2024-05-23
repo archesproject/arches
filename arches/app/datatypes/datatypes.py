@@ -913,8 +913,8 @@ class EDTFDataType(BaseDataType):
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
-    def __init__(self, model=None):  
-        super(GeojsonFeatureCollectionDataType, self).__init__(model=model)  
+    def __init__(self, model=None, datatype_factory=None):  
+        super(GeojsonFeatureCollectionDataType, self).__init__(model=model, datatype_factory=datatype_factory)  
         self.geo_utils = GeoUtils()  
 
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
