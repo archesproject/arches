@@ -14,9 +14,14 @@ import { itemKey, ERROR } from "@/components/ControlledListManager/constants.ts"
 
 import type { Ref } from "vue";
 import type { ControlledListItem } from "@/types/ControlledListManager";
-import type { FileUploadBeforeSendEvent, FileUploadErrorEvent, FileUploadUploadEvent } from "primevue/fileupload";
+import type {
+    FileUploadBeforeSendEvent,
+    FileUploadErrorEvent,
+    FileUploadUploadEvent,
+} from "primevue/fileupload";
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
+const completed = 'Completed';
 
 const { $gettext } = useGettext();
 const toast = useToast();
@@ -58,6 +63,13 @@ const onError = (event?: FileUploadErrorEvent) => {
             :preview-width="250"
             :with-credentials="true"
             name="item_image"
+            :pt="{
+                file: ({ props }) => ({
+                    style: {
+                        display: (props as any).badgeValue === completed ? 'none' : ''
+                    },
+                }),
+            }"
             @before-send="addHeader($event)"
             @upload="onUpload($event)"
             @error="onError($event)"
