@@ -136,6 +136,8 @@ const onSave = async (event: DataTableRowEditInitEvent) => {
             appendItemValue(upsertedValue);
             removeItemValue(event.newData);
         }
+    } else if (normalizedNewData.id === null) {
+        removeItemValue(event.newData);
     }
 };
 

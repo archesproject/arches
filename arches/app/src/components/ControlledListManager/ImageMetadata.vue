@@ -58,6 +58,8 @@ const onSaveMetadata = async (event: DataTableRowEditInitEvent)  => {
             appendImageMetadata(upsertedMetadata);
             removeImageMetadata(event.newData);
         }
+    } else if (normalizedNewData.id === null) {
+        removeImageMetadata(event.newData);
     }
 };
 
