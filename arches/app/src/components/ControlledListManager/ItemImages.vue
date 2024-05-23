@@ -5,19 +5,21 @@ import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import FileUpload from "primevue/fileupload";
+import { useToast } from "primevue/usetoast";
 
 import ImageEditor from "@/components/ControlledListManager/ImageEditor.vue";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
-import { itemKey } from "@/components/ControlledListManager/constants.ts";
+import { itemKey, ERROR } from "@/components/ControlledListManager/constants.ts";
 
 import type { Ref } from "vue";
 import type { ControlledListItem } from "@/types/ControlledListManager";
-import type { FileUploadBeforeSendEvent, FileUploadUploadEvent } from "primevue/fileupload";
+import type { FileUploadBeforeSendEvent, FileUploadErrorEvent, FileUploadUploadEvent } from "primevue/fileupload";
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
+const toast = useToast();
 
 const addHeader = (event: FileUploadBeforeSendEvent) => {
     const token = Cookies.get("csrftoken");
@@ -29,10 +31,18 @@ const addHeader = (event: FileUploadBeforeSendEvent) => {
 
 const onUpload = (event: FileUploadUploadEvent) => {
     if (event.xhr.status !== 201) {
-        return;
+        onError(undefined);
     }
     const newImage = JSON.parse(event.xhr.responseText);
     item.value!.images.push(newImage);
+};
+
+const onError = (event?: FileUploadErrorEvent) => {
+    toast.add({
+        severity: ERROR,
+        life: 8000,
+        summary: event?.xhr?.statusText || $gettext("Image upload failed"),
+    });
 };
 </script>
 
@@ -50,6 +60,7 @@ const onUpload = (event: FileUploadUploadEvent) => {
             name="item_image"
             @before-send="addHeader($event)"
             @upload="onUpload($event)"
+            @error="onError($event)"
         />
         <div class="images">
             <ImageEditor
