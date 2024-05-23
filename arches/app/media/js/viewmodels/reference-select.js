@@ -110,7 +110,7 @@ define([
                 if (item.uri) {
                     let text = self.getPrefLabel(item.values) || arches.translations.searching + '...';
                     NAME_LOOKUP[item.uri] = {"prefLabel": text, "labels": item.values.filter(val => this.isLabel(val)), "listid": item.controlled_list_id};
-                    return text = indentation + text;
+                    return indentation + text;
                 }
             },
             templateSelection: function(item) {
