@@ -14,6 +14,7 @@ import {
 } from "@/components/ControlledListManager/constants.ts";
 
 import type { Ref } from "vue";
+import type { Language } from "@/types/arches";
 import type {
     ControlledListItem,
     LabeledChoice,
@@ -35,10 +36,15 @@ const newValue: Ref<NewValue> = computed(() => {
         ...otherNewValueIds,
         1000,
     );
+
+    const nextLanguage = arches.languages.find(
+        (lang: Language) => !item.value.values.map((val) => val.language_id
+    ).includes(lang.code)) ?? arches.activeLanguage;
+
     return {
         id: maxOtherNewValueId + 1,
         valuetype_id: props.valueType ?? NOTE_CHOICES.scope,
-        language_id: arches.activeLanguage,
+        language_id: nextLanguage.code,
         value: '',
         item_id: item.value.id,
     };
