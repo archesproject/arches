@@ -8,7 +8,7 @@ import Button from "primevue/button";
 import { useToast } from "primevue/usetoast";
 
 import { postListToServer } from "@/components/ControlledListManager/api.ts";
-import { ERROR, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
+import { ERROR, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import {
     bestLabel,
     findNodeInTree,
@@ -26,6 +26,7 @@ import type { TreeNode } from "primevue/treenode";
 import type {
     ControlledList,
     ControlledListItem,
+    DisplayedListItemRefAndSetter,
     NewItem,
 } from "@/types/ControlledListManager";
 import type { Language } from "@/types/arches";
@@ -42,6 +43,7 @@ const movingItem = defineModel<TreeNode>("movingItem", { required: true });
 const refetcher = defineModel<number>("refetcher", { required: true });
 
 const { node } = defineProps<{ node: TreeNode }>();
+const { displayedRow } = inject(displayedRowKey) as DisplayedListItemRefAndSetter;
 
 const rowLabel = computed(() => {
     if (!node.data) {
@@ -199,6 +201,13 @@ const isLastItem = (item: ControlledListItem) => {
     }
     return siblings[siblings.length - 1].id === item.id;
 };
+
+const setMovingItem = (node: TreeNode) => {
+    movingItem.value = findNodeInTree(
+        [itemAsNode(displayedRow.value, selectedLanguage.value)],
+        node.key
+    );
+};
 </script>
 
 <template>
@@ -260,7 +269,7 @@ const isLastItem = (item: ControlledListItem) => {
                 type="button"
                 icon="fa fa-arrows-alt"
                 :aria-label="$gettext('Change item parent')"
-                @click="movingItem = node"
+                @click="setMovingItem(node)"
             />
         </div>
     </span>
