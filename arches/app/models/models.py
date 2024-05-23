@@ -1950,10 +1950,12 @@ class ControlledListItem(models.Model):
                 fields=["controlled_list", "sortorder"],
                 name="unique_list_sortorder",
                 deferrable=Deferrable.DEFERRED,
+                violation_error_message=_("All items in this list must have distinct sort orders.")
             ),
             models.UniqueConstraint(
                 fields=["controlled_list", "uri"],
                 name="unique_list_uri",
+                violation_error_message=_("All items in this list must have distinct URIs.")
             ),
         ]
 
@@ -2003,15 +2005,18 @@ class ControlledListItemValue(models.Model):
             models.UniqueConstraint(
                 fields=["controlled_list_item", "value", "valuetype", "language"],
                 name="unique_item_value_valuetype_language",
+                violation_error_message=_("The same item value cannot be stored twice in the same language.")
             ),
             models.UniqueConstraint(
                 fields=["controlled_list_item", "language"],
                 condition=Q(valuetype="prefLabel"),
                 name="unique_item_preflabel_language",
+                violation_error_message=_("Only one preferred label per language is permitted.")
             ),
             models.CheckConstraint(
                 check=Q(language_id__isnull=False) | Q(valuetype="image"),
                 name="only_images_nullable_language",
+                violation_error_message=_("Item values must be associated with a language.")
             ),
         ]
 
@@ -2077,5 +2082,6 @@ class ControlledListItemImageMetadata(models.Model):
             models.UniqueConstraint(
                 fields=["controlled_list_item_image", "metadata_type", "language"],
                 name="unique_image_metadata_valuetype_language",
+                violation_error_message=_("Only one metadata entry per language and metadata type is permitted.")
             ),
         ]
