@@ -46,6 +46,7 @@ export const postItemToServer = async (
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: errorText || $gettext("Save failed"),
         });
     }
@@ -78,6 +79,7 @@ export const postListToServer = async (
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: errorText || $gettext("Save failed"),
         });
     }
@@ -113,6 +115,7 @@ export const upsertValue = async (
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: errorText || $gettext("Value save failed"),
         });
     }
@@ -147,6 +150,7 @@ export const deleteValue = async (
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: errorText || $gettext("Value deletion failed"),
         });
     }
@@ -182,6 +186,7 @@ export const upsertMetadata = async (
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: errorText || $gettext("Metadata save failed"),
         });
     }
@@ -216,6 +221,7 @@ export const deleteMetadata = async (
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: errorText || $gettext("Metadata deletion failed"),
         });
     }
@@ -250,6 +256,7 @@ export const deleteImage = async(
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: errorText || $gettext("Image deletion failed"),
         });
     }

@@ -93,6 +93,7 @@ const fetchLists = async () => {
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: errorText || $gettext("Unable to fetch lists"),
         });
     }
@@ -117,6 +118,7 @@ const createList = async () => {
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: $gettext("List creation failed"),
         });
     }
@@ -147,6 +149,7 @@ const deleteLists = async (listIds: string[]) => {
                 const body = await response.json();
                 toast.add({
                     severity: ERROR,
+                    life: 8000,
                     summary: $gettext("List deletion failed"),
                     detail: body.message,
                 });
@@ -155,6 +158,7 @@ const deleteLists = async (listIds: string[]) => {
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: $gettext("List deletion failed"),
         });
     }
@@ -185,6 +189,7 @@ const deleteItems = async (itemIds: string[]) => {
                 const body = await response.json();
                 toast.add({
                     severity: ERROR,
+                    life: 8000,
                     summary: $gettext("Item deletion failed"),
                     detail: body.message,
                 });
@@ -193,6 +198,7 @@ const deleteItems = async (itemIds: string[]) => {
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: $gettext("Item deletion failed"),
         });
     }

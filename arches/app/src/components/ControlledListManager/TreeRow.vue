@@ -101,6 +101,7 @@ const setParent = async (parentNode: TreeNode) => {
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: errorText || $gettext("Move failed"),
         });
     }
@@ -143,6 +144,7 @@ const addChild = async (parent_id: string) => {
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: errorText || $gettext("Item creation failed"),
         });
     }
