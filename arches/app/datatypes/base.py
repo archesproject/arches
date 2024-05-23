@@ -10,10 +10,9 @@ logger = logging.getLogger(__name__)
 
 
 class BaseDataType(object):
-    def __init__(self, model=None, datatype_factory=None):
+    def __init__(self, model=None):
         self.datatype_model = model
         self.datatype_name = model.datatype if model else None
-        self.datatype_factory = datatype_factory
 
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         """
