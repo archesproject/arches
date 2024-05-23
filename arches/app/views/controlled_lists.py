@@ -87,7 +87,8 @@ def serialize(obj, depth_map=None, flat=False):
                         "graph_name": str(node.graph.name),
                     }
                     for node in Node.with_controlled_list.filter(
-                        controlled_list=obj.pk
+                        controlled_list=obj.pk,
+                        source_identifier=None,
                     ).select_related("graph")
                 ]
             return data
@@ -276,7 +277,8 @@ class ControlledListsView(View):
     @staticmethod
     def node_subquery(node_field: str = "pk"):
         return ArraySubquery(
-            Node.with_controlled_list.filter(controlled_list=OuterRef("id"))
+            Node.with_controlled_list
+            .filter(controlled_list=OuterRef("id"), source_identifier=None)
             .select_related("graph" if node_field.startswith("graph__") else None)
             .order_by("pk")
             .values(node_field)
