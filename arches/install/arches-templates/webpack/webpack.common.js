@@ -456,7 +456,12 @@ module.exports = () => {
                                                 if (serverAddress.charAt(serverAddress.length - 1) === '/') {
                                                     serverAddress = serverAddress.slice(0, -1)
                                                 }
+                                                
                                                 resp = await fetch(serverAddress + templatePath);
+
+                                                if (resp.status === 500) {
+                                                    throw new Error();
+                                                }
                                             }
                                             catch (e) {
                                                 failureCount += 1;
@@ -468,22 +473,27 @@ module.exports = () => {
                                             }
                                         }
                                         else {
-                                            console.error(
-                                                '\x1b[31m%s\x1b[0m',  // red
-                                                `"${templatePath}" has failed to load! Falling back to un-rendered file.`
-                                            );
-                                            resp = {
-                                                text: () => (
-                                                    new Promise((resolve, _reject) => {
-                                                        /*
-                                                            if run in a test environment, failures will return a empty string which will
-                                                            still allow the bundle to build.
-                                                        */
-
-                                                        resolve(isTestEnvironment ? '' : content);
-                                                    })
-                                                )
-                                            };
+                                            if (!isTestEnvironment) {
+                                                loaderContext.emitError(`Unable to fetch ${templatePath} from the Django server.`)
+                                            }
+                                            else {
+                                                console.warn(
+                                                    '\x1b[31m%s\x1b[0m',  // red
+                                                    `"${templatePath}" has failed to load! Test environment detected, falling back to un-rendered file.`
+                                                );
+                                                resp = {
+                                                    text: () => (
+                                                        new Promise((resolve, _reject) => {
+                                                            /*
+                                                                if run in a test environment, failures will return a empty string which will
+                                                                still allow the bundle to build.
+                                                            */
+    
+                                                            resolve(isTestEnvironment ? '' : content);
+                                                        })
+                                                    )
+                                                };
+                                            }
                                         }
                                     };
 
