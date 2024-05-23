@@ -151,8 +151,11 @@ def serialize(obj, depth_map=None, flat=False):
 def prefetch_terms(request):
     """Children at arbitrary depth will still be returned, but tell
     the ORM to prefetch a certain depth to mitigate N+1 queries after."""
-    prefetch_depth = request.GET.get("prefetchDepth", 3)
     find_children = not str_to_bool(request.GET.get("flat", "false"))
+
+    # Raising the prefetch depth will only save queries, never cause more.
+    # Might add slight python overhead? ~12-14 is enough for Getty AAT.
+    prefetch_depth = 14
 
     terms = []
     for i in range(prefetch_depth):

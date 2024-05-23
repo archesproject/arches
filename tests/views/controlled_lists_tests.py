@@ -214,9 +214,7 @@ class ControlledListTests(ArchesTestCase):
             # there are no grandchildren, so no values/metadata to get
             # 12: get permitted nodegroups
             # 13-14: permission checks
-            response = self.client.get(
-                reverse("controlled_lists"), kwargs={"prefetchDepth": 3}
-            )
+            response = self.client.get(reverse("controlled_lists"))
 
         self.assertEqual(response.status_code, 200)
         result = json.loads(response.content)
