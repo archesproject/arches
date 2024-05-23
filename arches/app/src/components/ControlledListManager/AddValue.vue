@@ -57,8 +57,8 @@ const newValue: Ref<NewValue> = computed(() => {
             ![PREF_LABEL, ALT_LABEL].includes(typeid)
         );
         for (const choice of Object.values(NOTE_CHOICES)) {
-            if (!otherUsedValueTypes.includes(choice)) {
-                nextValueType = choice;
+            if (!otherUsedValueTypes.includes(choice as string)) {
+                nextValueType = choice as string;
                 break;
             }
         }
