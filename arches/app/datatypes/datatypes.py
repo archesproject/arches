@@ -2321,15 +2321,10 @@ class ResourceInstanceDataType(BaseDataType):
 
     """
 
-    def get_id_list(self, nodevalue):
-        if not isinstance(nodevalue, list):
-            nodevalue = [nodevalue]
-        return nodevalue
-
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
         if value is not None:
-            resourceXresourceIds = self.get_id_list(value)
+            resourceXresourceIds = self.get_nodevalues(value)
             for resourceXresourceId in resourceXresourceIds:
                 try:
                     resourceid = resourceXresourceId["resourceId"]
@@ -2398,7 +2393,7 @@ class ResourceInstanceDataType(BaseDataType):
 
         resourceid = None
         data = self.get_tile_data(tile)
-        nodevalue = self.get_id_list(data[str(node.nodeid)])
+        nodevalue = self.get_nodevalues(data[str(node.nodeid)])
 
         items = []
         for resourceXresource in nodevalue:
@@ -2413,13 +2408,18 @@ class ResourceInstanceDataType(BaseDataType):
             except:
                 logger.info(f'Resource with id "{resourceid}" not in the system.')
         return ", ".join(items)
+    
+    def get_relationship_display_value(self, relationship_valueid):
+        concept_datatype_instance = self.datatype_factory.get_instance('concept')
+        concept_preflabel = concept_datatype_instance.get_pref_label(relationship_valueid)
+        return concept_preflabel
 
     def to_json(self, tile, node):
         from arches.app.models.resource import Resource  # import here rather than top to avoid circular import
 
         data = self.get_tile_data(tile)
         if data:
-            nodevalue = self.get_id_list(data[str(node.nodeid)])
+            nodevalue = self.get_nodevalues(data[str(node.nodeid)])
 
             for resourceXresource in nodevalue:
                 try:
@@ -2431,17 +2431,43 @@ class ResourceInstanceDataType(BaseDataType):
                     logger.info(f'Resource with id "{resourceid}" not in the system.')
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        if type(nodevalue) != list and nodevalue is not None:
-            nodevalue = [nodevalue]
-        if nodevalue:
-            for relatedResourceItem in nodevalue:
-                document["ids"].append(
-                    {"id": relatedResourceItem["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+        nodevalue = self.get_nodevalues(nodevalue)
+        for relatedResourceItem in nodevalue:
+            relationship = None
+            inverse_relationship = None
+            document["ids"].append(
+                {"id": relatedResourceItem["resourceId"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+            )
+            if "resourceName" in relatedResourceItem:
+                document["strings"].append(
+                    {"string": relatedResourceItem["resourceName"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
                 )
-                if "resourceName" in relatedResourceItem and relatedResourceItem["resourceName"] not in document["strings"]:
-                    document["strings"].append(
-                        {"string": relatedResourceItem["resourceName"], "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+            if relatedResourceItem["ontologyProperty"] and relatedResourceItem["ontologyProperty"] != "":
+                try:
+                    uuid.UUID(relatedResourceItem["ontologyProperty"])
+                    relationship = (
+                        self.get_relationship_display_value(relatedResourceItem["ontologyProperty"])
+                        or
+                        relatedResourceItem["ontologyProperty"]
                     )
+                except ValueError:
+                    relationship = relatedResourceItem["ontologyProperty"]
+                document["strings"].append({
+                    "string": relationship, "nodegroup_id": tile.nodegroup_id, "provisional": provisional
+                })
+            if relatedResourceItem["inverseOntologyProperty"] and relatedResourceItem["inverseOntologyProperty"] != "":
+                try:
+                    uuid.UUID(relatedResourceItem["inverseOntologyProperty"])
+                    inverse_relationship = (
+                        self.get_relationship_display_value(relatedResourceItem["inverseOntologyProperty"])
+                        or
+                        relatedResourceItem["inverseOntologyProperty"]
+                    )
+                except ValueError:
+                    inverse_relationship = relatedResourceItem["inverseOntologyProperty"]
+                document["strings"].append({
+                    "string": inverse_relationship, "nodegroup_id": tile.nodegroup_id, "provisional": provisional
+                })
 
     def transform_value_for_tile(self, value, **kwargs):
         try:
@@ -2550,7 +2576,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         resourceid = None
         data = self.get_tile_data(tile)
         if data:
-            nodevalue = self.get_id_list(data[str(node.nodeid)])
+            nodevalue = self.get_nodevalues(data[str(node.nodeid)])
             items = []
 
             for resourceXresource in nodevalue:
