@@ -1675,10 +1675,6 @@ class Graph(models.GraphModel):
                     message = _('Duplicate node name: "{0}". All sibling node names must be unique.'.format(node.name))
                     raise GraphValidationError(message)
 
-    def _validate_node_config(self, node, datatype_factory):
-        datatype = datatype_factory.get_instance(node.datatype)
-        datatype.validate_node(node)
-
     def create_node_alias(self, node):
         """
         Assigns a unique, slugified version of a node's name as that node's alias.
@@ -1745,9 +1741,10 @@ class Graph(models.GraphModel):
         fieldnames = {}
         datatype_factory = DataTypeFactory()
 
-        for node_id, node in self.nodes.items():
+        for node in self.nodes.values():
             self._validate_node_name(node)
-            self._validate_node_config(node, datatype_factory)
+            datatype = datatype_factory.get_instance(node.datatype)
+            datatype.validate_node(node)
             if node.exportable is True:
                 if node.fieldname is not None:
                     validated_fieldname = validate_fieldname(node.fieldname, fieldnames)
