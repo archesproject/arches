@@ -421,7 +421,12 @@ class GraphDataView(View):
                 elif self.action == "export_branch":
                     clone_data = graph.copy(root=data)
                     clone_data["copy"].slug = None
+                    clone_data["copy"].publication = None
+
                     clone_data["copy"].save()
+
+                    if bool(graph.publication_id):
+                        clone_data["copy"].publish(user=request.user)
 
                     ret = {"success": True, "graphid": clone_data["copy"].pk}
 
