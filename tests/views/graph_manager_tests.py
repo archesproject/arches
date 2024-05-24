@@ -405,7 +405,9 @@ class GraphManagerViewTests(ArchesTestCase):
     def test_graph_export(self):
         """
         test graph export method
+
         """
+
         self.client.login(username="admin", password="admin")
         url = reverse("export_graph", kwargs={"graphid": self.GRAPH_ID})
         response = self.client.get(url)
