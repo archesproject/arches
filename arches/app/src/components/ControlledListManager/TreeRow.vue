@@ -7,14 +7,14 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 import { useToast } from "primevue/usetoast";
 
-import { postListToServer } from "@/components/ControlledListManager/api.ts";
+import { patchList } from "@/components/ControlledListManager/api.ts";
 import { ERROR, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import {
     bestLabel,
     findNodeInTree,
     itemAsNode,
     listAsNode,
-    reorderItem,
+    reorderItems,
 } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
@@ -161,14 +161,15 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
         : list.items
     );
 
-    reorderItem(list, item, siblings, up);
+    reorderItems(list, item, siblings, up);
+    const field = "sortorder";
 
-    const newList = await postListToServer(list, toast, $gettext);
-    if (newList) {
+    const success = await patchList(list, toast, $gettext, field);
+    if (success) {
         const oldListIndex = tree.value.findIndex(listNode => listNode.data.id === list.id);
         tree.value = [
             ...tree.value.slice(0, oldListIndex),
-            listAsNode(newList, selectedLanguage.value),
+            listAsNode(list, selectedLanguage.value),
             ...tree.value.slice(oldListIndex + 1),
         ];
         selectedKeys.value = {

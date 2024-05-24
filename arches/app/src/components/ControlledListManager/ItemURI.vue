@@ -6,7 +6,7 @@ import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
-import { postItemToServer } from "@/components/ControlledListManager/api.ts";
+import { patchItem } from "@/components/ControlledListManager/api.ts";
 import { itemKey } from "@/components/ControlledListManager/constants.ts";
 
 import type { Ref } from "vue";
@@ -32,12 +32,13 @@ const { $gettext } = useGettext();
 
 const uriHeading = $gettext("List Item URI");
 const uriSubheading = $gettext("Optionally, provide a URI for your list item. Useful if your list item is formally defined in a thesaurus or authority document.");
+const uri = "uri";
 
 const onSave = async () => {
     editing.value = false;
     const originalValue = item.value.uri;
     item.value.uri = formValue.value;
-    const success = await postItemToServer(item.value, toast, $gettext);
+    const success = await patchItem(item.value, toast, $gettext, uri);
     if (!success) {
         item.value.uri = originalValue;
     }

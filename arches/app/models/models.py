@@ -1965,7 +1965,7 @@ class ControlledListItem(models.Model):
 
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)
-        if "uri" not in exclude and not self.uri:
+        if (not exclude or "uri" not in exclude) and not self.uri:
             self.uri = None
 
 

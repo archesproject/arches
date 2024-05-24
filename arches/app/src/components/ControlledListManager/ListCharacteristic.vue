@@ -5,7 +5,7 @@ import { useGettext } from "vue3-gettext";
 import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
-import { postListToServer } from "@/components/ControlledListManager/api.ts";
+import { patchList } from "@/components/ControlledListManager/api.ts";
 import { displayedRowKey } from "@/components/ControlledListManager/constants.ts";
 
 import type { DisplayedListRefAndSetter } from "@/types/ControlledListManager";
@@ -22,6 +22,8 @@ const disabled = computed(() => {
 });
 
 const formValue = ref("");
+// Update fields
+const field = "name";
 
 const inputValue = computed({
     get() {
@@ -39,7 +41,7 @@ const onSave = async () => {
     editing.value = false;
     const originalValue = list.value!.name;
     list.value!.name = formValue.value;
-    const success = await postListToServer(list.value, toast, $gettext);
+    const success = await patchList(list.value, toast, $gettext, field);
     if (!success) {
         list.value!.name = originalValue;
     }
