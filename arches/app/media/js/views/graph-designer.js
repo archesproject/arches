@@ -50,6 +50,23 @@ define([
             viewModel.publicationResourceInstanceCount = ko.observable(data['publication_resource_instance_count']);
             viewModel.isGraphActive = ko.observable();
 
+            const url = new URL(window.location);
+            if (url.searchParams.has('has_been_redirected_from_editable_future_graph')) {
+                viewModel.alert(new AlertViewModel(
+                        'ep-alert-blue', 
+                        arches.translations.graphDesignerRedirectFromEditableFutureGraph.title,
+                        arches.translations.graphDesignerRedirectFromEditableFutureGraph.text,
+                        null,
+                        function(){
+                            // removes query args without reloading page
+                            url.search = '';
+                            window.history.replaceState({}, document.title, url.toString());
+                        },
+                    )
+                );
+            }
+
+
             fetch(arches.urls.graph_is_active_api(data.graphid)).then(response => {
                 if (response.ok) {
                     return response.json();
