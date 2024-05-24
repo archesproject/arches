@@ -128,7 +128,7 @@ class Migration(migrations.Migration):
                         max_length=5,
                     ),
                 ),
-                ("value", models.CharField(max_length=2048)),
+                ("value", models.CharField(max_length=2048, blank=True)),
             ],
             options={
                 "db_table": "controlled_list_item_image_metadata",

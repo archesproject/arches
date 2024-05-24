@@ -10,7 +10,7 @@ from django.db import transaction
 from django.db.models import Max, OuterRef
 from django.views.generic import View
 from django.utils.decorators import method_decorator
-from django.utils.translation import get_language, gettext as _
+from django.utils.translation import gettext as _
 
 from arches.app.models.models import (
     ControlledList,
@@ -466,14 +466,6 @@ class ControlledListItemView(View):
                     controlled_list=controlled_list,
                     sortorder=controlled_list.max_sortorder + 1,
                     parent_id=None if controlled_list_id == parent_id else parent_id,
-                )
-                ControlledListItemValue.objects.create(
-                    controlled_list_item=item,
-                    value=_("New Item: ")
-                    + datetime.now().isoformat(sep=" ", timespec="seconds"),
-                    valuetype_id="prefLabel",
-                    # todo: update with capitalize_region()
-                    language_id=get_language(),
                 )
         except ControlledList.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)

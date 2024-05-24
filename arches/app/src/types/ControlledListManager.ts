@@ -13,7 +13,7 @@ export interface NewValue {
     valuetype_id: string;
     language_id: string;
     value: string;
-    item_id: string;
+    item_id: string | number;
 }
 
 export type NewOrExistingValue = Value | NewValue;
@@ -67,8 +67,17 @@ export interface ControlledListItem {
     depth: number;
 }
 
-export interface NewItem {
-    parent_id: string;  // list or item
+export interface NewControlledListItem {
+    id: number;
+    controlled_list_id: string;
+    uri: string;
+    sortorder: number;
+    guide: boolean;
+    values: NewOrExistingValue[];
+    images: ControlledListItemImage[];
+    children: ControlledListItem[];
+    parent_id: string;
+    depth: number;
 }
 
 export interface ControlledList {
@@ -80,7 +89,7 @@ export interface ControlledList {
     nodes: ReferencingNode[];
 }
 
-export type Selectable = ControlledList | ControlledListItem;
+export type Selectable = ControlledList | ControlledListItem | NewControlledListItem;
 
 export interface ReferencingNode {
     id: string;

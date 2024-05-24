@@ -18,6 +18,7 @@ import type { TreeNode } from "primevue/treenode";
 import type {
     ControlledListItem,
     DisplayedRowRefAndSetter,
+    NewControlledListItem,
 } from "@/types/ControlledListManager";
 
 const tree: Ref<TreeNode[]> = ref([]);
@@ -26,6 +27,11 @@ const expandedKeys: Ref<TreeExpandedKeys> = ref({});
 const movingItem: Ref<TreeNode> = ref({});
 const isMultiSelecting = ref(false);
 const refetcher = ref(0);
+
+// For next new item's pref label (input textbox)
+const newLabelCounter = ref(1000);
+const newLabelFormValue = ref('');
+const nextNewItem = ref<NewControlledListItem>();
 
 const { displayedRow, setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 
@@ -102,6 +108,9 @@ const onRowSelect = (node: TreeNode) => {
                 v-model:selected-keys="selectedKeys"
                 v-model:moving-item="movingItem"
                 v-model:refetcher="refetcher"
+                v-model:nextNewItem="nextNewItem"
+                v-model:newLabelCounter="newLabelCounter"
+                v-model:newLabelFormValue="newLabelFormValue"
                 :node="slotProps.node"
             />
         </template>

@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import arches from "arches";
 import Cookies from "js-cookie";
-import { computed, inject } from "vue";
+import { computed, inject, ref, watch } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
+import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
-import { patchList } from "@/components/ControlledListManager/api.ts";
-import { ERROR, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
+import { createItem, upsertValue, patchList } from "@/components/ControlledListManager/api.ts";
+import { ERROR, PREF_LABEL, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import {
     bestLabel,
     findNodeInTree,
@@ -27,7 +28,7 @@ import type {
     ControlledList,
     ControlledListItem,
     DisplayedListItemRefAndSetter,
-    NewItem,
+    NewControlledListItem,
 } from "@/types/ControlledListManager";
 import type { Language } from "@/types/arches";
 
@@ -41,9 +42,21 @@ const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", { required: t
 const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", { required: true });
 const movingItem = defineModel<TreeNode>("movingItem", { required: true });
 const refetcher = defineModel<number>("refetcher", { required: true });
+const nextNewItem = defineModel<NewControlledListItem>("nextNewItem");
+const newLabelFormValue = defineModel<string>("newLabelFormValue", { required: true });
+const newLabelCounter = defineModel<number>("newLabelCounter", { required: true });
 
 const { node } = defineProps<{ node: TreeNode }>();
-const { displayedRow } = inject(displayedRowKey) as DisplayedListItemRefAndSetter;
+const { displayedRow, setDisplayedRow } = inject(displayedRowKey) as DisplayedListItemRefAndSetter;
+
+// Workaround for autofocusing the new label input box
+// https://github.com/primefaces/primevue/issues/2397
+const newLabelInputRef = ref();
+watch(newLabelInputRef, () => {
+    if (newLabelInputRef.value) {
+        newLabelInputRef.value.$el.focus();
+    }
+});
 
 const rowLabel = computed(() => {
     if (!node.data) {
@@ -109,47 +122,44 @@ const setParent = async (parentNode: TreeNode) => {
     }
 };
 
-const addChild = async (parent_id: string) => {
-    let errorText;
-    const newItem: NewItem = { parent_id };
-    const token = Cookies.get("csrftoken");
-    if (!token) {
-        return;
-    }
-    try {
-        const response = await fetch(arches.urls.controlled_list_item_add, {
-            method: "POST",
-            headers: { "X-CSRFToken": token },
-            body: JSON.stringify(newItem),
-        });
-        if (response.ok) {
-            const newItem = await response.json();
-            const parent = findNodeInTree(tree.value, parent_id);
-            parent.children.push(itemAsNode(newItem, selectedLanguage.value));
-            if (parent.data.name) {
-                // Parent node is a list
-                parent.data.items.push(newItem);
-            } else {
-                // Parent node is an item
-                parent.data.children.push(newItem);
-            }
-            expandedKeys.value = {
-                ...expandedKeys.value,
-                [parent.key]: true,
-            };
-        } else {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
-            throw new Error();
-        }
-    } catch {
-        toast.add({
-            severity: ERROR,
-            life: 8000,
-            summary: errorText || $gettext("Item creation failed"),
-        });
-    }
+const onAddItem = (parent: TreeNode) => {
+    const newItem: NewControlledListItem = {
+        parent_id: parent.key!,
+        id: newLabelCounter.value,
+        controlled_list_id: parent.controlled_list_id ?? parent.id,
+        uri: '',
+        sortorder: 0,
+        guide: false,
+        values: [{
+            id: 0,
+            valuetype_id: PREF_LABEL,
+            language_id: arches.activeLanguage,
+            value: '',
+            item_id: newLabelCounter.value,
+        }],
+        images: [],
+        children: [],
+        depth: !parent.depth ? 0 : parent.depth + 1,
+    };
+
+    nextNewItem.value = newItem;
+    newLabelFormValue.value = '';
+    newLabelCounter.value += 1;
+
+    parent.children!.push(itemAsNode(newItem, selectedLanguage.value));
+    // if (parent.data.name) {
+    //     // Parent node is a list
+    //     parent.data.items.push(newItem);
+    // } else {
+    //     // Parent node is an item
+    //     parent.data.children.push(newItem);
+    // }
+    expandedKeys.value = {
+        ...expandedKeys.value,
+        [parent.key as string]: true,
+    };
+    selectedKeys.value = { [newItem.id]: true };
+    setDisplayedRow(newItem);
 };
 
 const onReorder = async (item: ControlledListItem, up: boolean) => {
@@ -209,6 +219,51 @@ const setMovingItem = (node: TreeNode) => {
         node.key
     );
 };
+
+const isList = (node: TreeNode) => {
+    return !!node.data.name;
+};
+
+const isNewItem = (node: TreeNode) => {
+    return node.data.values && !node.data.values[0].id;
+};
+
+const onBlur = async () => {
+    const newItem = await createItem(nextNewItem.value, toast, $gettext);
+    if (newItem) {
+        const newValue = {
+            ...nextNewItem.value!.values[0],
+            id: 0,
+            item_id: newItem.id,
+            value: newLabelFormValue.value,
+        };
+        const newLabel = await upsertValue(newValue, toast, $gettext);
+
+        if (newLabel) {
+            newItem.values = [newLabel];
+        }
+
+        const parent = findNodeInTree(tree.value, newItem.parent_id ?? newItem.controlled_list_id);
+        parent.children = [
+            ...parent.children.filter((child: TreeNode) => typeof child.key === 'string'),
+            itemAsNode(newItem, selectedLanguage.value),
+        ];
+        if (parent.data.name) {
+            // Parent node is a list
+            parent.data.items.push(newItem);
+        } else {
+            // Parent node is an item
+            parent.data.children.push(newItem);
+        }
+
+        // expandedKeys.value = {
+        //     ...expandedKeys.value,
+        //     [parent.key as string]: true,
+        // };
+        selectedKeys.value = { [newItem.id]: true };
+        setDisplayedRow(newItem);
+    }
+};
 </script>
 
 <template>
@@ -216,7 +271,16 @@ const setMovingItem = (node: TreeNode) => {
         v-if="node.key"
         :class="node.key === movingItem.key ? 'is-adjusting-parent' : ''"
     >
-        {{ rowLabel }}
+        <div v-if="isNewItem(node)">
+            <InputText
+                :key="newLabelCounter"
+                ref="newLabelInputRef"
+                v-model="newLabelFormValue"
+                autofocus
+                @blur="onBlur"
+            />
+        </div>
+        <span v-else>{{ rowLabel }}</span>
         <div
             v-if="movingItem.key"
             class="actions"
@@ -231,7 +295,7 @@ const setMovingItem = (node: TreeNode) => {
             />
         </div>
         <div
-            v-else
+            v-else-if="isList(node) || !isNewItem(node)"
             class="actions"
         >
             <Button
@@ -240,7 +304,7 @@ const setMovingItem = (node: TreeNode) => {
                 class="add-child-button"
                 icon="fa fa-plus"
                 :aria-label="$gettext('Add child item')"
-                @click="addChild(node.key)"
+                @click.stop="onAddItem(node)"
             />
             <span
                 v-if="!node.data.name"

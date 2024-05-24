@@ -1997,7 +1997,7 @@ class ControlledListItemValue(models.Model):
         null=True,
         blank=True,
     )
-    value = models.CharField(max_length=1024, null=False)
+    value = models.CharField(max_length=1024, null=False, blank=True)
 
     class Meta:
         db_table = "controlled_list_item_values"
@@ -2023,6 +2023,10 @@ class ControlledListItemValue(models.Model):
     objects = models.Manager()
     values_without_images = ValuesWithoutImagesManager()
     images = ImageManager()
+
+    def clean(self):
+        if not self.value:
+            self.value = _("New Item: ") + datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
 
 
 class ControlledListItemImage(models.Model):

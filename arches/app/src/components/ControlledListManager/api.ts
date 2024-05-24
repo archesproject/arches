@@ -12,15 +12,15 @@ import type {
     ControlledListItemImageMetadata,
     Value,
     NewControlledListItemImageMetadata,
-    NewValue,
+    NewOrExistingValue,
 } from "@/types/ControlledListManager";
 
 type GetText = (s: string) => string;
 
-export const postItem = async (
+export const createItem = async (
     item: ControlledListItem,
     toast: ToastServiceMethods,
-    $gettext: GetText
+    $gettext: GetText,
 ) => {
     let errorText;
     const token = Cookies.get("csrftoken");
@@ -28,27 +28,24 @@ export const postItem = async (
         return;
     }
     try {
-        const response = await fetch(
-            arches.urls.controlled_list_item(item.id),
-            {
-                method: "POST",
-                headers: { "X-CSRFToken": token },
-                body: JSON.stringify(item),
-            }
-        );
-        if (!response.ok) {
+        const response = await fetch(arches.urls.controlled_list_item_add, {
+            method: "POST",
+            headers: { "X-CSRFToken": token },
+            body: JSON.stringify(item),
+        });
+        if (response.ok) {
+            return await response.json();
+        } else {
             errorText = response.statusText;
             const body = await response.json();
             errorText = body.message;
             throw new Error();
-        } else {
-            return await response.json();
         }
     } catch {
         toast.add({
             severity: ERROR,
             life: 8000,
-            summary: errorText || $gettext("Save failed"),
+            summary: errorText || $gettext("Item creation failed"),
         });
     }
 };
@@ -167,7 +164,7 @@ export const patchList = async(
 };
 
 export const upsertValue = async (
-    value: NewValue,
+    value: NewOrExistingValue,
     toast: ToastServiceMethods,
     $gettext: GetText
 ) => {
