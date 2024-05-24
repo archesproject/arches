@@ -8,7 +8,7 @@ define(['jquery', 'backbone', 'arches', 'models/concept'], function($, Backbone,
             this.endpoint = this.$el.find('#sparql_endpoint').select2({
                 minimumResultsForSearch: -1
             });
-            this.$el.find('input.concept_import').select2({
+            this.$el.find('select.concept_import').select2({
                 // multiple: false,
                 // maximumselectionsize: 1,
                 minimumInputLength: 2,
@@ -16,23 +16,25 @@ define(['jquery', 'backbone', 'arches', 'models/concept'], function($, Backbone,
                 ajax: {
                     url: arches.urls.search_sparql_endpoint,
                     dataType: 'json',
-                    data: function(term, page) {
+                    data: function(requestParams) {
                         return {
-                            terms: term,
+                            terms: requestParams.term,
                             endpoint: self.endpoint.val()
                         };
                     },
-                    results: function(data, page) {
+                    processResults: function(data, page) {
+                        data.results.bindings.forEach((item)=> {
+                            item.id = item.Subject.value;
+                            return item;
+                        });
                         return {results: data.results.bindings};
                     }
                 },
-                formatResult:function(result, container, query, escapeMarkup){
-                    var markup=[];
-                    window.Select2.util.markMatch(result.Term.value, query.term, markup, escapeMarkup);
-                    if (!result.ScopeNote){
-                        result.ScopeNote = {'value': ''};
+                templateResult:function(result, container, query, escapeMarkup){
+                    if (result.loading || result.children) {
+                        return result.text;
                     }
-                    var formatedresult = '<span class="concept_result">' + markup.join("")  + '</span> - <a href="' + result.Subject.value + '" target="_blank">' + result.Subject.value + '</a><div><i class="concept_result_schemaname">(' + result.ScopeNote.value + ')</i></div>';
+                    var formatedresult = '<span class="concept_result">' + result.Term.value + '</span> - <a href="' + result?.Subject?.value + '" target="_blank">' + result?.Subject?.value + '</a><div><i class="concept_result_schemaname">(' + result?.ScopeNote?.value + ')</i></div>';
                     return formatedresult;
                 },
                 escapeMarkup: function(m) { return m; }

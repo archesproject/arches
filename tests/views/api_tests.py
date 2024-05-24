@@ -66,6 +66,11 @@ class APITests(ArchesTestCase):
             cls.phase_type_assignment_graph.publish(user=None)
             cls.phase_type_assignment_graph.save()
 
+        cls.data_type_graph = Graph.objects.get(pk=cls.data_type_graphid)
+        cls.test_prj_user = (
+            models.ResourceInstance.objects.filter(graph=cls.data_type_graph).first()
+        )
+
     def get_tile_by_id(self, tileid, tiles):
         for tile in tiles:
             if tile["tileid"] == tileid:
@@ -389,3 +394,15 @@ class APITests(ArchesTestCase):
         # ==Assert==========================================================================================
         self.assertTrue("Resource matching query does not exist." in str(context_del.exception))  # Check exception message.
         # ==================================================================================================
+
+    def test_get_resource_jsonld_invalid_no_ontology(self):
+        # Bypass validation in .save()
+        Graph.objects.filter(pk=self.data_type_graph.pk).update(ontology=None)
+
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.get(
+                reverse("resources", kwargs={"resourceid": str(self.test_prj_user.pk)})
+                + "?format=json-ld"
+            )
+
+        self.assertEqual(response.status_code, 400)
