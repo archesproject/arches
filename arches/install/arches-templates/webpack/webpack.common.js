@@ -11,6 +11,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { spawn } = require("child_process");
 const { VueLoaderPlugin } = require("vue-loader");
 
+const { findFile } = require('./webpack-utils/find-file');
 const { buildImageFilePathLookup } = require('./webpack-utils/build-image-filepath-lookup');
 const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascript-filepath-lookup');
 const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
@@ -18,29 +19,7 @@ const { buildCSSFilepathLookup } = require('./webpack-utils/build-css-filepath-l
 
 module.exports = () => {
     return new Promise((resolve, _reject) => {
-        const createWebpackConfig = function (data) {  // reads from application's settings.py
-            if (!data) {
-                console.error(
-                    '\x1b[31m%s\x1b[0m',  // red
-                    "Webpack did not receive application data! Aborting..."
-                )
-                return;
-            }
-            // prevents subsequent builds, this usually happens when using application containers.
-            projectSettings.stdout.removeAllListeners()
-
-            const parsedData = JSON.parse(data);
-            console.log('Data imported from settings.py:', parsedData)
-
-            const APP_ROOT = parsedData['APP_ROOT'];
-            const ARCHES_APPLICATIONS = parsedData['ARCHES_APPLICATIONS'];
-            const ARCHES_APPLICATIONS_PATHS = parsedData['ARCHES_APPLICATIONS_PATHS'];
-            const SITE_PACKAGES_DIRECTORY = parsedData['SITE_PACKAGES_DIRECTORY'];
-            const ROOT_DIR = parsedData['ROOT_DIR'];
-            const STATIC_URL = parsedData['STATIC_URL']
-            const PUBLIC_SERVER_ADDRESS = parsedData['PUBLIC_SERVER_ADDRESS']
-            const WEBPACK_DEVELOPMENT_SERVER_PORT = parsedData['WEBPACK_DEVELOPMENT_SERVER_PORT']
-
+        const createWebpackConfig = function () {
             // BEGIN workaround for handling node_modules paths in arches-core vs projects
 
             let PROJECT_RELATIVE_NODE_MODULES_PATH;
@@ -510,23 +489,58 @@ module.exports = () => {
         };
 
         // BEGIN get data from `settings.py`
-        const parentDir = Path.basename(Path.dirname(__dirname));
+        const settingsFilePath = findFile(Path.dirname(__dirname), 'settings.py')
 
-        let projectSettings = spawn(
-            'python',
-            [Path.resolve(Path.dirname(__dirname), parentDir, 'settings.py')]
-        );
-        projectSettings.stderr.on("data", process.stderr.write);
-        projectSettings.stdout.on("data", createWebpackConfig);
-
-        projectSettings.on('error', () => {
-            projectSettings = spawn(
-                'python3',
-                [Path.resolve(Path.dirname(__dirname), parentDir, 'settings.py')]
-            );
+        const runPythonScript = (pythonCommand) => {
+            let projectSettings = spawn(pythonCommand, [settingsFilePath]);
+        
             projectSettings.stderr.on("data", process.stderr.write);
-            projectSettings.stdout.on("data", createWebpackConfig);
-        });
+            projectSettings.stdout.on("data", function(data) {
+                if (!data) {
+                    console.error(
+                        '\x1b[31m%s\x1b[0m',  // red
+                        "Webpack did not receive application data! Aborting..."
+                    );
+                    return;
+                }
+                
+                const parsedData = JSON.parse(data);
+                console.log('Data imported from settings.py:', parsedData);
+    
+                global.APP_ROOT = parsedData['APP_ROOT'];
+                global.ARCHES_APPLICATIONS = parsedData['ARCHES_APPLICATIONS'];
+                global.ARCHES_APPLICATIONS_PATHS = parsedData['ARCHES_APPLICATIONS_PATHS'];
+                global.SITE_PACKAGES_DIRECTORY = parsedData['SITE_PACKAGES_DIRECTORY'];
+                global.ROOT_DIR = parsedData['ROOT_DIR'];
+                global.STATIC_URL = parsedData['STATIC_URL'];
+                global.PUBLIC_SERVER_ADDRESS = parsedData['PUBLIC_SERVER_ADDRESS'];
+                global.WEBPACK_DEVELOPMENT_SERVER_PORT = parsedData['WEBPACK_DEVELOPMENT_SERVER_PORT'];
+                
+                createWebpackConfig();
+            });
+            projectSettings.on('close', (code) => {
+                if (code !== 0) {
+                    console.error(
+                        '\x1b[31m%s\x1b[0m',  // red
+                        `Could not successfully read ${settingsFilePath}, exited with code: ${code}.`
+                    );
+                }
+            });
+        
+            projectSettings.on('error', () => {
+                if (pythonCommand === 'python') {
+                    runPythonScript('python3');
+                } 
+                else {
+                    console.error(
+                        '\x1b[31m%s\x1b[0m',  // red
+                        `Could not successfully read ${settingsFilePath} with ${pythonCommand}, error occurred.`
+                    );
+                }
+            });
+        };
+
+        runPythonScript('python');
         // END get data from `settings.py`
     });
 };
