@@ -81,7 +81,7 @@
         "requirejs": "~2.3.2",
         "requirejs-plugins": "1.0.2",
         "requirejs-text": "~2.0.16",
-        "select-woo": "jadu/selectWoo#stable/3.5",
+        "select-woo": "jadu/selectWoo",
         "underscore": "^1.13.6",
         "uuidjs": "^3.3.0",
         "vue": "^3.4.21",
