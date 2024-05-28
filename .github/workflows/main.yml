@@ -58,7 +58,7 @@ jobs:
             echo "package.json found, building static bundle."
             npm install && npm run build_test
           else
-            echo "package.json not found, skipping NPM commands."
+            echo "package.json not found, skipping npm commands."
           fi
 
       - name: Run frontend tests
@@ -152,7 +152,7 @@ jobs:
             echo "package.json found, building static bundle."
             npm install && npm run build_test
           else
-            echo "package.json not found, skipping NPM commands."
+            echo "package.json not found, skipping npm commands."
           fi
 
       - name: Run frontend tests

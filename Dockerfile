@@ -84,7 +84,7 @@ RUN set -ex \
     && python3.8 get-pip.py \
     && apt-get install -y nodejs \
 
-# Install NPM components
+# Install npm components
 COPY ./arches/install/package.json ${ARCHES_ROOT}/arches/install/package.json
 WORKDIR ${ARCHES_ROOT}/arches/install
 RUN mkdir -p ${ARCHES_ROOT}/node_modules

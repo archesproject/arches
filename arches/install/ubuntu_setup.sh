@@ -4,7 +4,7 @@
 # Tested on Ubuntu 20.04
 
 # Use the yes command if you would like to install postgres/postgis,
-# node/NPM, and elasticsearch.
+# node/npm, and elasticsearch.
 # Example:
 # yes | sudo ./ubuntu_setup.sh
 
@@ -102,13 +102,13 @@ function main {
     echo Skipping Postgres/PostGIS installation
   fi
 
-  echo -n "Would you like to install and nodejs/NPM (y/N)? "
+  echo -n "Would you like to install and nodejs/npm (y/N)? "
   read answer
   if echo "$answer" | grep -iq "^y" ;then
-    echo Yes, installing Node/NPM
+    echo Yes, installing Node/npm
     install_npm
   else
-    echo Skipping Node/NPM installation
+    echo Skipping Node/npm installation
   fi
 }
 

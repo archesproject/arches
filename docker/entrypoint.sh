@@ -21,8 +21,8 @@ if [[ -z ${ARCHES_PROJECT} ]]; then
 	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}/arches/install
 else
 	APP_FOLDER=${WEB_ROOT}/${ARCHES_PROJECT}
-	# due to https://github.com/archesproject/arches/issues/4841, changes were made to NPM install
-	# and module deployment. Using the arches install directory for NPM.
+	# due to https://github.com/archesproject/arches/issues/4841, changes were made to npm install
+	# and module deployment. Using the arches install directory for npm.
 	PACKAGE_JSON_FOLDER=${ARCHES_ROOT}/arches/install
 fi
 
@@ -181,7 +181,7 @@ set_dev_mode() {
 }
 
 
-# NPM
+# npm
 init_npm_components() {
 	if [[ ! -d ${NPM_MODULES_FOLDER} ]] || [[ ! "$(ls ${NPM_MODULES_FOLDER})" ]]; then
 		echo "npm modules do not exist, installing..."
