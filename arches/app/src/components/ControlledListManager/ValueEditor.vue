@@ -32,7 +32,9 @@ const { valueType, valueCategory } = defineProps<{
     valueCategory?: ValueCategory;
 
 }>();
-const editingRows = ref([]);
+const editingRows: Ref<Value[]> = ref([]);
+const rowIndexToFocus: Ref<number> = ref(-1);
+const editorRef: Ref<HTMLDivElement | null> = ref(null); 
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
@@ -171,10 +173,45 @@ const updateItemValue = (updatedValue: Value) => {
         toUpdate.valuetype_id = updatedValue.valuetype_id;
     }
 };
+
+const onEdit = (event: DataTableRowEditInitEvent) => {
+    rowIndexToFocus.value = event.index;
+};
+
+const makeValueEditable = (clickedValue: Value, index: number) => {
+    if (!editingRows.value.includes(clickedValue)) {
+        editingRows.value = [ ...editingRows.value, clickedValue ];
+    }
+    rowIndexToFocus.value = index;
+};
+
+const inputSelector = computed(() => {
+    return `[data-p-index="${rowIndexToFocus.value}"]`;
+});
+
+const focusInput = () => {
+    // The editor (pencil) button immediately hogs focus with a setTimeout of 1,
+    // so we'll get in line behind it to set focus to the input.
+    setTimeout(() => {
+        // Note editor uses the second column.
+        const indexOfInputCol = valueCategory ? 1 : 0;
+        if (rowIndexToFocus.value !== -1) {
+            const editorDiv = editorRef.value;
+            const rowEl = editorDiv!.querySelector(inputSelector.value);
+            const inputEl = rowEl!.children[indexOfInputCol].children[0];
+            // @ts-expect-error focusVisible not yet in typeshed
+            inputEl.focus({ focusVisible: true });
+        }
+        rowIndexToFocus.value = -1;
+    }, 2);
+};
 </script>
 
 <template>
-    <div class="value-editor-container">
+    <div
+        ref="editorRef"
+        class="value-editor-container"
+    >
         <h4>{{ headings.heading }}</h4>
         <p>{{ headings.subheading }}</p>
         <DataTable
@@ -186,8 +223,10 @@ const updateItemValue = (updatedValue: Value) => {
             striped-rows
             scrollable
             :style="{ fontSize: 'small' }"
+            @row-edit-init="onEdit"
             @row-edit-save="onSave"
         >
+            <!-- Note type dropdown (if this is a note editor) -->
             <Column
                 v-if="valueCategory"
                 field="valuetype_id"
@@ -216,7 +255,18 @@ const updateItemValue = (updatedValue: Value) => {
                 style="width: 60%; min-width: 8rem;"
             >
                 <template #editor="{ data, field }">
-                    <InputText v-model="data[field]" />
+                    <InputText
+                        v-model="data[field]"
+                        :pt="{ hooks: { onUpdated: focusInput } }"
+                    />
+                </template>
+                <template #body="slotProps">
+                    <span
+                        class="full-width-pointer"
+                        @click.stop="makeValueEditable(slotProps.data, slotProps.index)"
+                    >
+                        {{ slotProps.data.value }}
+                    </span>
                 </template>
             </Column>
             <Column
@@ -277,6 +327,12 @@ p {
     font-weight: normal;
     margin-top: 0;
     font-size: small;
+}
+
+.full-width-pointer {
+    cursor: pointer;
+    display: flex;
+    width: 100%;
 }
 
 :deep(th) {

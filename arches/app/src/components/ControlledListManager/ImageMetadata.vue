@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import arches from "arches";
-import { ref, inject } from "vue";
+import { computed, ref, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Column from "primevue/column";
@@ -34,7 +34,9 @@ const { labeledChoices, metadata } = defineProps<{
     labeledChoices: LabeledChoice[];
     metadata: ControlledListItemImageMetadata[];
 }>();
-const editingRows = ref([]);
+const editingRows: Ref<ControlledListItemImageMetadata[]> = ref([]);
+const rowIndexToFocus: Ref<number> = ref(-1);
+const editorRef: Ref<HTMLDivElement | null> = ref(null); 
 
 const metadataLabel = (metadataType: string) => {
     return labeledChoices.find(choice => choice.type === metadataType)!.label;
@@ -117,95 +119,148 @@ const updateImageMetadata = (updatedMetadata: ControlledListItemImageMetadata) =
         toUpdate.value = updatedMetadata.value;
     }
 };
+
+const onEdit = (event: DataTableRowEditInitEvent) => {
+    rowIndexToFocus.value = event.index;
+};
+
+const makeValueEditable = (clickedValue: ControlledListItemImageMetadata, index: number) => {
+    if (!editingRows.value.includes(clickedValue)) {
+        editingRows.value = [ ...editingRows.value, clickedValue ];
+    }
+    rowIndexToFocus.value = index;
+};
+
+const inputSelector = computed(() => {
+    return `[data-p-index="${rowIndexToFocus.value}"]`;
+});
+
+const focusInput = () => {
+    // The editor (pencil) button immediately hogs focus with a setTimeout of 1,
+    // so we'll get in line behind it to set focus to the input.
+    setTimeout(() => {
+        if (rowIndexToFocus.value !== -1) {
+            const editorDiv = editorRef.value;
+            const rowEl = editorDiv!.querySelector(inputSelector.value);
+            const inputEl = rowEl!.children[1].children[0];
+            // @ts-expect-error focusVisible not yet in typeshed
+            inputEl.focus({ focusVisible: true });
+        }
+        rowIndexToFocus.value = -1;
+    }, 2);
+};
 </script>
 
 <template>
-    <DataTable
-        v-model:editingRows="editingRows"
-        :value="metadata"
-        data-key="id"
-        edit-mode="row"
-        striped-rows
-        :style="{ fontSize: 'small' }"
-        @row-edit-save="onSaveMetadata"
-    >
-        <Column
-            field="metadata_type"
-            :header="metadataTypeHeader"
-            style="width: 20%;"
+    <div ref="editorRef">
+        <DataTable
+            v-if="metadata.length"
+            v-model:editingRows="editingRows"
+            :value="metadata"
+            data-key="id"
+            edit-mode="row"
+            striped-rows
+            :style="{ fontSize: 'small' }"
+            @row-edit-init="onEdit"
+            @row-edit-save="onSaveMetadata"
         >
-            <template #editor="{ data, field }">
-                <Dropdown
-                    v-model="data[field]"
-                    :options="labeledChoices"
-                    option-label="label"
-                    option-value="type"
-                    :pt="{
-                        root: { style: { width: '90%' } },
-                        input: { style: { fontFamily: 'inherit', fontSize: 'small' } },
-                        panel: { style: { fontSize: 'small' } },
-                    }"
-                />
-            </template>
-            <template #body="slotProps">
-                {{ metadataLabel(slotProps.data.metadata_type) }}
-            </template>
-        </Column>
-        <Column
-            field="value"
-            style="width: 60%; min-width: 8rem;"
-        >
-            <template #editor="{ data, field }">
-                <InputText v-model="data[field]" />
-            </template>
-        </Column>
-        <Column
-            field="language_id"
-            :header="languageHeader"
-            style="width: 10%; min-width: 8rem; height: 4rem; padding-left: 1rem;"
-        >
-            <template #editor="{ data, field }">
-                <Dropdown
-                    v-model="data[field]"
-                    :options="arches.languages"
-                    option-label="name"
-                    option-value="code"
-                    :pt="{
-                        input: { style: { fontFamily: 'inherit', fontSize: 'small' } },
-                        panel: { style: { fontSize: 'small' } },
-                    }"
-                />
-            </template>
-            <template #body="slotProps">
-                {{ languageName(slotProps.data.language_id) }}
-            </template>
-        </Column>
-        <Column
-            :row-editor="true"
-            style="width: 5%; min-width: 8rem; text-align: center;"
-        />
-        <Column style="width: 5%; text-align: center;">
-            <template #body="slotProps">
-                <i
-                    class="fa fa-trash"
-                    role="button"
-                    tabindex="0"
-                    :aria-label="$gettext('Delete')"
-                    @click="onDeleteMetadata(slotProps.data)"
-                    @key.enter="onDeleteMetadata(slotProps.data)"
-                />
-            </template>
-        </Column>
-    </DataTable>
+            <Column
+                field="metadata_type"
+                :header="metadataTypeHeader"
+                style="width: 20%;"
+            >
+                <template #editor="{ data, field }">
+                    <Dropdown
+                        v-model="data[field]"
+                        :options="labeledChoices"
+                        option-label="label"
+                        option-value="type"
+                        :pt="{
+                            root: { style: { width: '90%' } },
+                            input: { style: { fontFamily: 'inherit', fontSize: 'small' } },
+                            panel: { style: { fontSize: 'small' } },
+                        }"
+                    />
+                </template>
+                <template #body="slotProps">
+                    {{ metadataLabel(slotProps.data.metadata_type) }}
+                </template>
+            </Column>
+            <Column
+                field="value"
+                style="width: 60%; min-width: 8rem;"
+            >
+                <template #editor="{ data, field }">
+                    <InputText
+                        v-model="data[field]"
+                        :pt="{ hooks: { onUpdated: focusInput } }"
+                    />
+                </template>
+                <template #body="slotProps">
+                    <span
+                        class="full-width-pointer"
+                        @click.stop="makeValueEditable(slotProps.data, slotProps.index)"
+                    >
+                        {{ slotProps.data.value }}
+                    </span>
+                </template>
+            </Column>
+            <Column
+                field="language_id"
+                :header="languageHeader"
+                style="width: 10%; min-width: 8rem; height: 4rem; padding-left: 1rem;"
+            >
+                <template #editor="{ data, field }">
+                    <Dropdown
+                        v-model="data[field]"
+                        :options="arches.languages"
+                        option-label="name"
+                        option-value="code"
+                        :pt="{
+                            input: { style: { fontFamily: 'inherit', fontSize: 'small' } },
+                            panel: { style: { fontSize: 'small' } },
+                        }"
+                    />
+                </template>
+                <template #body="slotProps">
+                    {{ languageName(slotProps.data.language_id) }}
+                </template>
+            </Column>
+            <Column
+                :row-editor="true"
+                style="width: 5%; min-width: 8rem; text-align: center;"
+            />
+            <Column style="width: 5%; text-align: center;">
+                <template #body="slotProps">
+                    <i
+                        class="fa fa-trash"
+                        role="button"
+                        tabindex="0"
+                        :aria-label="$gettext('Delete')"
+                        @click="onDeleteMetadata(slotProps.data)"
+                        @key.enter="onDeleteMetadata(slotProps.data)"
+                    />
+                </template>
+            </Column>
+        </DataTable>
+    </div>
 </template>
 
 <style scoped>
+.full-width-pointer {
+    cursor: pointer;
+    display: flex;
+    width: 100%;
+}
+
 :deep(th) {
     font-weight: 600;
 }
+
 :deep(td:first-child) {
     padding-left: 0.75rem;
 }
+
 :deep(td > input) {
     width: 95%;
 }
