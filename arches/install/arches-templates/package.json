@@ -24,10 +24,11 @@
     "nodeModulesPaths": {
     },
     "overrides": {
-        "moment-timezone": "^0.5.45",
-        "underscore": "^1.13.6",
         "glob": "^10.4.1",
+        "globby": "14.0.0",
+        "moment-timezone": "^0.5.45",
+        "nomnom": "npm:@gerhobbelt/nomnom",
         "rimraf": "^5.0.7", 
-        "nomnom": "npm:@gerhobbelt/nomnom"
+        "underscore": "^1.13.6"
     }
 }
