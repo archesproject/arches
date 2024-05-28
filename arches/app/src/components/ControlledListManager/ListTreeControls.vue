@@ -317,8 +317,6 @@ await fetchLists();
             :options="arches.languages"
             option-label="name"
             :placeholder="$gettext('Language')"
-            checkmark
-            :highlight-on-select="false"
             :pt="{
                 root: { class: 'p-button secondary-button' },
                 input: { style: { fontFamily: 'inherit', fontSize: 'small', textAlign: 'center', alignContent: 'center' } },
