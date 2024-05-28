@@ -18,6 +18,7 @@ import type { TreeNode } from "primevue/treenode";
 import type {
     ControlledListItem,
     DisplayedRowRefAndSetter,
+    NewControlledListItem,
 } from "@/types/ControlledListManager";
 
 const tree: Ref<TreeNode[]> = ref([]);
@@ -26,6 +27,12 @@ const expandedKeys: Ref<TreeExpandedKeys> = ref({});
 const movingItem: Ref<TreeNode> = ref({});
 const isMultiSelecting = ref(false);
 const refetcher = ref(0);
+const filterValue = ref("");
+
+// For next new item's pref label (input textbox)
+const newLabelCounter = ref(1000);
+const newLabelFormValue = ref('');
+const nextNewItem = ref<NewControlledListItem>();
 
 const { displayedRow, setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 
@@ -87,8 +94,25 @@ const onRowSelect = (node: TreeNode) => {
             },
             wrapper: { style: { overflowY: 'auto', maxHeight: '100%', paddingBottom: '1rem' } },
             container: { style: { fontSize: '14px' } },
-            content: { style: { height: '4rem' } },
+            content: ({ instance, props }) => {
+                if (instance.$el && props.node.key === movingItem.key) {
+                    instance.$el.classList.add('is-adjusting-parent');
+                }
+                return { style: { height: '4rem' } };
+            },
             label: { style: { textWrap: 'nowrap', marginLeft: '0.5rem' } },
+            hooks: {
+                onBeforeUpdate() {
+                    // Snoop on the filterValue, because if we wait to react
+                    // to the emitted filter event, the templated rows will
+                    // have already rendered.
+                    // @ts-ignore
+                    const maybeValue = $el.ownerDocument.getElementsByClassName('p-tree-filter')[0]?.value;
+                    if (maybeValue) {
+                        (filterValue as any) = maybeValue;
+                    }
+                },
+            },
         }"
         @node-select="onRowSelect"
     >
@@ -102,8 +126,18 @@ const onRowSelect = (node: TreeNode) => {
                 v-model:selected-keys="selectedKeys"
                 v-model:moving-item="movingItem"
                 v-model:refetcher="refetcher"
+                v-model:nextNewItem="nextNewItem"
+                v-model:newLabelCounter="newLabelCounter"
+                v-model:newLabelFormValue="newLabelFormValue"
+                v-model:filter-value="filterValue"
                 :node="slotProps.node"
             />
         </template>
     </Tree>
 </template>
+
+<style scoped>
+:deep(.is-adjusting-parent) {
+    border: dashed;
+}
+</style>

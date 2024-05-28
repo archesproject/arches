@@ -1,6 +1,7 @@
 import logging
 from collections import defaultdict
 from datetime import datetime
+from http import HTTPStatus
 from uuid import UUID
 
 from django.contrib.postgres.expressions import ArraySubquery
@@ -9,7 +10,7 @@ from django.db import transaction
 from django.db.models import Max, OuterRef
 from django.views.generic import View
 from django.utils.decorators import method_decorator
-from django.utils.translation import get_language, gettext as _
+from django.utils.translation import gettext as _
 
 from arches.app.models.models import (
     ControlledList,
@@ -31,6 +32,10 @@ logger = logging.getLogger(__name__)
 
 class MixedListsException(Exception):
     pass
+
+
+def field_names(instance):
+    return {f.name for f in instance.__class__._meta.fields}
 
 
 def serialize(obj, depth_map=None, flat=False):
@@ -87,7 +92,8 @@ def serialize(obj, depth_map=None, flat=False):
                         "graph_name": str(node.graph.name),
                     }
                     for node in Node.with_controlled_list.filter(
-                        controlled_list=obj.pk
+                        controlled_list=obj.pk,
+                        source_identifier=None,
                     ).select_related("graph")
                 ]
             return data
@@ -100,10 +106,10 @@ def serialize(obj, depth_map=None, flat=False):
                 "uri": obj.uri,
                 "sortorder": obj.sortorder,
                 "guide": obj.guide,
-                "labels": [
-                    serialize(label, depth_map)
-                    for label in obj.controlled_list_item_values.all()
-                    if label.valuetype_id != "image"
+                "values": [
+                    serialize(value, depth_map)
+                    for value in obj.controlled_list_item_values.all()
+                    if value.valuetype_id != "image"
                 ],
                 "images": [
                     serialize(image, depth_map)
@@ -150,8 +156,11 @@ def serialize(obj, depth_map=None, flat=False):
 def prefetch_terms(request):
     """Children at arbitrary depth will still be returned, but tell
     the ORM to prefetch a certain depth to mitigate N+1 queries after."""
-    prefetch_depth = request.GET.get("prefetchDepth", 3)
     find_children = not str_to_bool(request.GET.get("flat", "false"))
+
+    # Raising the prefetch depth will only save queries, never cause more.
+    # Might add slight python overhead? ~12-14 is enough for Getty AAT.
+    prefetch_depth = 14
 
     terms = []
     for i in range(prefetch_depth):
@@ -178,16 +187,16 @@ def prefetch_terms(request):
 
 def handle_items(item_dicts, max_sortorder=-1):
     items_to_save = []
-    labels_to_save = []
+    values_to_save = []
     image_metadata_to_save = []
 
     def handle_item(item_dict):
         nonlocal items_to_save
-        nonlocal labels_to_save
+        nonlocal values_to_save
         nonlocal image_metadata_to_save
         nonlocal max_sortorder
 
-        labels = item_dict.pop("labels")
+        values = item_dict.pop("values")
         images = item_dict.pop("images")
         # Altering hierarchy is done by altering parents.
         children = item_dict.pop("children", None)
@@ -202,15 +211,15 @@ def handle_items(item_dicts, max_sortorder=-1):
         if len({item.controlled_list_id for item in items_to_save}) > 1:
             raise MixedListsException
 
-        for label in labels:
-            label.pop("item_id")  # trust the item, not the label
-            label_to_save = ControlledListItemValue(
+        for value in values:
+            value.pop("item_id")  # trust the item, not the label
+            value_to_save = ControlledListItemValue(
                 controlled_list_item_id=UUID(item_to_save.id),
-                **label,
+                **value,
             )
-            label_to_save._state.adding = False  # allows checking uniqueness
-            label_to_save.full_clean()
-            labels_to_save.append(label_to_save)
+            value_to_save._state.adding = False  # allows checking uniqueness
+            value_to_save.full_clean()
+            values_to_save.append(value_to_save)
 
         for image in images:
             for metadata in image["metadata"]:
@@ -241,7 +250,7 @@ def handle_items(item_dicts, max_sortorder=-1):
         items_to_save, fields=["controlled_list_id", "guide", "uri", "sortorder", "parent"]
     )
     ControlledListItemValue.objects.bulk_update(
-        labels_to_save, fields=["value", "valuetype", "language"]
+        values_to_save, fields=["value", "valuetype", "language"]
     )
     ControlledListItemImageMetadata.objects.bulk_update(
         image_metadata_to_save, fields=["value", "metadata_type", "language"]
@@ -276,7 +285,8 @@ class ControlledListsView(View):
     @staticmethod
     def node_subquery(node_field: str = "pk"):
         return ArraySubquery(
-            Node.with_controlled_list.filter(controlled_list=OuterRef("id"))
+            Node.with_controlled_list
+            .filter(controlled_list=OuterRef("id"), source_identifier=None)
             .select_related("graph" if node_field.startswith("graph__") else None)
             .order_by("pk")
             .values(node_field)
@@ -308,20 +318,22 @@ class ControlledListView(View):
                 pk=list_id
             )
         except ControlledList.DoesNotExist:
-            return JSONErrorResponse(status=404)
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
         return JSONResponse(
             serialize(lst, flat=str_to_bool(request.GET.get("flat", "false")))
         )
 
+    def add_new_list(self):
+        lst = ControlledList(
+            name=_("Untitled List: ")
+            + datetime.now().isoformat(sep=" ", timespec="seconds")
+        )
+        lst.save()
+        return JSONResponse(serialize(lst), status=HTTPStatus.CREATED)
+
     def post(self, request, **kwargs):
         if not (list_id := kwargs.get("id", None)):
-            # Add a new list.
-            lst = ControlledList(
-                name=_("Untitled List: ")
-                + datetime.now().isoformat(sep=" ", timespec="seconds")
-            )
-            lst.save()
-            return JSONResponse(serialize(lst), status=201)
+            return self.add_new_list()
 
         data = JSONDeserializer().deserialize(request.body)
 
@@ -337,7 +349,7 @@ class ControlledListView(View):
                 try:
                     clist = qs.get()
                 except ControlledList.DoesNotExist:
-                    return JSONErrorResponse(status=404)
+                    return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
                 clist.dynamic = data["dynamic"]
                 clist.search_only = data["search_only"]
@@ -348,13 +360,54 @@ class ControlledListView(View):
 
                 clist.save()
         except ValidationError as ve:
-            return JSONErrorResponse(message=" ".join(ve.messages), status=400)
+            return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
         except MixedListsException:
-            return JSONErrorResponse(message=_("Items must belong to the same list."), status=400)
+            return JSONErrorResponse(message=_("Items must belong to the same list."), status=HTTPStatus.BAD_REQUEST)
         except:
             return JSONErrorResponse()
 
         return JSONResponse(serialize(clist))
+
+    def bulk_update_sortorder(self, sortorder_map):
+        reordered_items = []
+        exclude_fields = set()
+        for item_id, sortorder in sortorder_map.items():
+            item = ControlledListItem(pk=UUID(item_id), sortorder=sortorder)
+            # Just validate sortorder.
+            if not exclude_fields:
+                exclude_fields = {f for f in field_names(item) if f != "sortorder"}
+            item.clean_fields(exclude=exclude_fields)
+            reordered_items.append(item)
+
+        ControlledListItem.objects.bulk_update(reordered_items, fields=["sortorder"])
+
+    def patch(self, request, **kwargs):
+        list_id: UUID = kwargs.get("id")
+        data = JSONDeserializer().deserialize(request.body)
+        data.pop("items", None)
+        sortorder_map = data.pop("sortorder_map", {})
+
+        if sortorder_map:
+            self.bulk_update_sortorder(sortorder_map)
+
+        update_fields = list(data)
+        if not update_fields and not sortorder_map:
+            return JSONResponse(status=HTTPStatus.BAD_REQUEST)
+
+        clist = ControlledList(id=list_id, **data)
+        exclude_fields = {f for f in field_names(clist) if f not in update_fields}
+        try:
+            clist._state.adding = False
+            clist.full_clean(exclude=exclude_fields)
+            clist.save(update_fields=update_fields)
+        except ValidationError as ve:
+            return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
+        except MixedListsException:
+            return JSONErrorResponse(message=_("Items must belong to the same list."), status=HTTPStatus.BAD_REQUEST)
+        except:
+            return JSONErrorResponse()
+
+        return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
     def delete(self, request, **kwargs):
         list_id: UUID = kwargs.get("id")
@@ -362,7 +415,7 @@ class ControlledListView(View):
             try:
                 lst = ControlledList.objects.get(id=list_id)
             except ControlledList.DoesNotExist:
-                return JSONErrorResponse(status=404)
+                return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
             return JSONErrorResponse(
                 message=_(
                     "{controlled_list} could not be deleted: still in use by {graph} - {node}".format(
@@ -371,12 +424,12 @@ class ControlledListView(View):
                         node=node.name,
                     )
                 ),
-                status=400,
+                status=HTTPStatus.BAD_REQUEST,
             )
         objs_deleted, unused = ControlledList.objects.filter(pk=list_id).delete()
         if not objs_deleted:
-            return JSONErrorResponse(status=404)
-        return JSONResponse(status=204)
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
+        return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
 
 @method_decorator(
@@ -414,21 +467,13 @@ class ControlledListItemView(View):
                     sortorder=controlled_list.max_sortorder + 1,
                     parent_id=None if controlled_list_id == parent_id else parent_id,
                 )
-                ControlledListItemValue.objects.create(
-                    controlled_list_item=item,
-                    value=_("New Item: ")
-                    + datetime.now().isoformat(sep=" ", timespec="seconds"),
-                    valuetype_id="prefLabel",
-                    # todo: update with capitalize_region()
-                    language_id=get_language(),
-                )
         except ControlledList.DoesNotExist:
-            return JSONErrorResponse(status=404)
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
         except Exception as e:
             logger.error(e)
             return JSONErrorResponse()
 
-        return JSONResponse(serialize(item), status=201)
+        return JSONResponse(serialize(item), status=HTTPStatus.CREATED)
 
     def post(self, request, **kwargs):
         if not (item_id := kwargs.get("id", None)):
@@ -448,7 +493,7 @@ class ControlledListItemView(View):
                 .get()
             )
         except ControlledList.DoesNotExist:
-            return JSONErrorResponse(status=404)
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
         try:
             with transaction.atomic():
@@ -458,72 +503,93 @@ class ControlledListItemView(View):
                     handle_items([data], max_sortorder=controlled_list.max_sortorder)
                     break
                 else:
-                    return JSONErrorResponse(status=404)
+                    return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
                 serialized_item = serialize(item)
 
         except ValidationError as ve:
-            return JSONErrorResponse(message=" ".join(ve.messages), status=400)
+            return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
         except MixedListsException:
-            return JSONErrorResponse(message=_("Items must belong to the same list."), status=400)
+            return JSONErrorResponse(message=_("Items must belong to the same list."), status=HTTPStatus.BAD_REQUEST)
         except RecursionError:
-            return JSONErrorResponse(message=_("Recursive structure detected."), status=400)
+            return JSONErrorResponse(message=_("Recursive structure detected."), status=HTTPStatus.BAD_REQUEST)
         except:
             return JSONErrorResponse()
 
         return JSONResponse(serialized_item)
 
+    def patch(self, request, **kwargs):
+        item_id: UUID = kwargs.get("id")
+        data = JSONDeserializer().deserialize(request.body)
+        item = ControlledListItem(id=item_id, **data)
+
+        update_fields = list(data)
+        if not update_fields:
+            return
+        exclude_fields = {f for f in field_names(item) if f not in update_fields}
+        try:
+            item._state.adding = False
+            item.full_clean(exclude=exclude_fields)
+            item.save(update_fields=update_fields)
+        except ValidationError as ve:
+            return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
+        except:
+            return JSONErrorResponse()
+
+        return JSONResponse(status=HTTPStatus.NO_CONTENT)
+
     def delete(self, request, **kwargs):
-        item_id = kwargs.get("id")
+        item_id: UUID = kwargs.get("id")
         objs_deleted, unused = ControlledListItem.objects.filter(pk=item_id).delete()
         if not objs_deleted:
-            return JSONErrorResponse(status=404)
-        return JSONResponse(status=204)
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
+        return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
 
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
-class ControlledListItemLabelView(View):
-    def add_new_label(self, request):
+class ControlledListItemValueView(View):
+    def add_new_value(self, request):
         data = JSONDeserializer().deserialize(request.body)
 
-        label = ControlledListItemValue(
+        value = ControlledListItemValue(
             controlled_list_item_id=UUID(data["item_id"]),
             valuetype_id=data["valuetype_id"],
             language_id=data["language_id"],
             value=data["value"],
         )
         try:
-            label.full_clean()
+            value.full_clean()
         except ValidationError as ve:
-            return JSONErrorResponse(message=" ".join(ve.messages), status=400)
+            return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
         except:
             return JSONErrorResponse()
-        label.save()
+        value.save()
 
-        return JSONResponse(serialize(label), status=201)
+        return JSONResponse(serialize(value), status=HTTPStatus.CREATED)
 
     def post(self, request, **kwargs):
-        if not (label_id := kwargs.get("id", None)):
-            return self.add_new_label(request)
+        if not (value_id := kwargs.get("id", None)):
+            return self.add_new_value(request)
 
         data = JSONDeserializer().deserialize(request.body)
 
         try:
-            value = ControlledListItemValue.labels.get(pk=label_id)
+            value = ControlledListItemValue.values_without_images.get(pk=value_id)
         except ControlledListItemValue.DoesNotExist:
-            return JSONErrorResponse(status=404)
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
-        value.value=data["value"]
+        value.value = data["value"]
+        value.valuetype_id = data["valuetype_id"]
         try:
             value.language = Language.objects.get(code=data["language_id"])
         except Language.DoesNotExist:
-            return JSONErrorResponse(status=404)
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
         try:
             value.full_clean()
         except ValidationError as ve:
-            return JSONErrorResponse(message=" ".join(ve.messages), status=400)
+            return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
         except:
             return JSONErrorResponse()
         value.save()
@@ -531,15 +597,15 @@ class ControlledListItemLabelView(View):
         return JSONResponse(serialize(value))
 
     def delete(self, request, **kwargs):
-        label_id = kwargs.get("id")
+        value_id = kwargs.get("id")
         try:
-            label = ControlledListItemValue.labels.get(pk=label_id)
+            value = ControlledListItemValue.values_without_images.get(pk=value_id)
         except:
-            return JSONErrorResponse(status=404)
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
         if (
-            label.valuetype_id == "prefLabel"
+            value.valuetype_id == "prefLabel"
             and len(
-                label.controlled_list_item.controlled_list_item_values.filter(
+                value.controlled_list_item.controlled_list_item_values.filter(
                     valuetype_id="prefLabel"
                 )
             )
@@ -549,10 +615,10 @@ class ControlledListItemLabelView(View):
                 message=_(
                     "Deleting the item's only remaining preferred label is not permitted."
                 ),
-                status=400,
+                status=HTTPStatus.BAD_REQUEST,
             )
-        label.delete()
-        return JSONResponse(status=204)
+        value.delete()
+        return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
 
 @method_decorator(
@@ -569,11 +635,11 @@ class ControlledListItemImageView(View):
         try:
             img.full_clean()
         except ValidationError as ve:
-            return JSONErrorResponse(message=" ".join(ve.messages), status=400)
+            return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
         except:
             return JSONErrorResponse()
         img.save()
-        return JSONResponse(serialize(img), status=201)
+        return JSONResponse(serialize(img), status=HTTPStatus.CREATED)
 
     def post(self, request, **kwargs):
         if not (image_id := kwargs.get("id", None)):
@@ -584,8 +650,8 @@ class ControlledListItemImageView(View):
         image_id = kwargs.get("id")
         count, unused = ControlledListItemImage.objects.filter(pk=image_id).delete()
         if not count:
-            return JSONErrorResponse(status=404)
-        return JSONResponse(status=204)
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
+        return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
 
 @method_decorator(
@@ -599,12 +665,12 @@ class ControlledListItemImageMetadataView(View):
         try:
             metadata.full_clean()
         except ValidationError as ve:
-            return JSONErrorResponse(message="\n".join(ve.messages), status=400)
+            return JSONErrorResponse(message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
         except:
             return JSONErrorResponse()
         metadata.save()
 
-        return JSONResponse(serialize(metadata), status=201)
+        return JSONResponse(serialize(metadata), status=HTTPStatus.CREATED)
 
     def post(self, request, **kwargs):
         if not (metadata_id := kwargs.get("id", None)):
@@ -615,19 +681,19 @@ class ControlledListItemImageMetadataView(View):
         try:
             metadata = ControlledListItemImageMetadata.objects.get(pk=metadata_id)
         except ControlledListItemImageMetadata.DoesNotExist:
-            return JSONErrorResponse(status=404)
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
         metadata.value = data["value"]
         try:
             metadata.language = Language.objects.get(code=data["language_id"])
         except Language.DoesNotExist:
-            return JSONErrorResponse(status=404)
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
         metadata.metadata_type=data["metadata_type"]
 
         try:
             metadata.full_clean()
         except ValidationError as ve:
-            return JSONErrorResponse(message="\n".join(ve.messages), status=400)
+            return JSONErrorResponse(message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
         except:
             return JSONErrorResponse()
         metadata.save()
@@ -638,5 +704,5 @@ class ControlledListItemImageMetadataView(View):
         metadata_id = kwargs.get("id")
         count, unused = ControlledListItemImageMetadata.objects.filter(pk=metadata_id).delete()
         if not count:
-            return JSONErrorResponse(status=404)
-        return JSONResponse(status=204)
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
+        return JSONResponse(status=HTTPStatus.NO_CONTENT)

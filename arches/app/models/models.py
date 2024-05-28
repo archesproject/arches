@@ -1950,10 +1950,12 @@ class ControlledListItem(models.Model):
                 fields=["controlled_list", "sortorder"],
                 name="unique_list_sortorder",
                 deferrable=Deferrable.DEFERRED,
+                violation_error_message=_("All items in this list must have distinct sort orders.")
             ),
             models.UniqueConstraint(
                 fields=["controlled_list", "uri"],
                 name="unique_list_uri",
+                violation_error_message=_("All items in this list must have distinct URIs.")
             ),
         ]
 
@@ -1963,11 +1965,11 @@ class ControlledListItem(models.Model):
 
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)
-        if "uri" not in exclude and not self.uri:
+        if (not exclude or "uri" not in exclude) and not self.uri:
             self.uri = None
 
 
-class LabelManager(models.Manager):
+class ValuesWithoutImagesManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().exclude(valuetype="image")
 
@@ -1985,7 +1987,7 @@ class ControlledListItemValue(models.Model):
         related_name="controlled_list_item_values",
     )
     valuetype = models.ForeignKey(
-        DValueType, on_delete=models.PROTECT, limit_choices_to=Q(category__in=("label", "image"))
+        DValueType, on_delete=models.PROTECT, limit_choices_to=Q(category__in=("label", "image", "note"))
     )
     language = models.ForeignKey(
         Language,
@@ -1995,7 +1997,7 @@ class ControlledListItemValue(models.Model):
         null=True,
         blank=True,
     )
-    value = models.CharField(max_length=1024, null=False)
+    value = models.CharField(max_length=1024, null=False, blank=True)
 
     class Meta:
         db_table = "controlled_list_item_values"
@@ -2003,21 +2005,28 @@ class ControlledListItemValue(models.Model):
             models.UniqueConstraint(
                 fields=["controlled_list_item", "value", "valuetype", "language"],
                 name="unique_item_value_valuetype_language",
+                violation_error_message=_("The same item value cannot be stored twice in the same language.")
             ),
             models.UniqueConstraint(
                 fields=["controlled_list_item", "language"],
                 condition=Q(valuetype="prefLabel"),
                 name="unique_item_preflabel_language",
+                violation_error_message=_("Only one preferred label per language is permitted.")
             ),
             models.CheckConstraint(
                 check=Q(language_id__isnull=False) | Q(valuetype="image"),
                 name="only_images_nullable_language",
+                violation_error_message=_("Item values must be associated with a language.")
             ),
         ]
 
     objects = models.Manager()
-    labels = LabelManager()
+    values_without_images = ValuesWithoutImagesManager()
     images = ImageManager()
+
+    def clean(self):
+        if not self.value:
+            self.value = _("New Item: ") + datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
 
 
 class ControlledListItemImage(models.Model):
@@ -2077,5 +2086,6 @@ class ControlledListItemImageMetadata(models.Model):
             models.UniqueConstraint(
                 fields=["controlled_list_item_image", "metadata_type", "language"],
                 name="unique_image_metadata_valuetype_language",
+                violation_error_message=_("Only one metadata entry per language and metadata type is permitted.")
             ),
         ]

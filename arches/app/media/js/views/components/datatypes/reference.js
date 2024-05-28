@@ -10,7 +10,6 @@ define([
         const self = this;
         this.search = params.search;
 
-        this.search = params.search;
         if (this.search) {
             params.config = ko.observable({
                 controlledList:[],
@@ -39,7 +38,7 @@ define([
         
         this.init = async function() {
             const lists = await this.getControlledLists();
-            this.controlledLists(lists.controlled_lists);
+            this.controlledLists(lists?.controlled_lists);
         };
 
         this.init();

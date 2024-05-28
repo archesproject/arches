@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import arches from "arches";
 import Cookies from "js-cookie";
-import { computed, inject } from "vue";
+import { computed, inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
@@ -31,6 +31,8 @@ const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", { required: t
 const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", { required: true });
 const movingItem = defineModel<TreeNode>("movingItem", { required: true });
 const isMultiSelecting = defineModel<boolean>("isMultiSelecting", { required: true });
+
+const abandonMoveRef = ref();
 
 const { $gettext, $ngettext } = useGettext();
 
@@ -93,6 +95,7 @@ const fetchLists = async () => {
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: errorText || $gettext("Unable to fetch lists"),
         });
     }
@@ -117,6 +120,7 @@ const createList = async () => {
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: $gettext("List creation failed"),
         });
     }
@@ -147,6 +151,7 @@ const deleteLists = async (listIds: string[]) => {
                 const body = await response.json();
                 toast.add({
                     severity: ERROR,
+                    life: 8000,
                     summary: $gettext("List deletion failed"),
                     detail: body.message,
                 });
@@ -155,6 +160,7 @@ const deleteLists = async (listIds: string[]) => {
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: $gettext("List deletion failed"),
         });
     }
@@ -185,6 +191,7 @@ const deleteItems = async (itemIds: string[]) => {
                 const body = await response.json();
                 toast.add({
                     severity: ERROR,
+                    life: 8000,
                     summary: $gettext("Item deletion failed"),
                     detail: body.message,
                 });
@@ -193,6 +200,7 @@ const deleteItems = async (itemIds: string[]) => {
     } catch {
         toast.add({
             severity: ERROR,
+            life: 8000,
             summary: $gettext("Item deletion failed"),
         });
     }
@@ -236,6 +244,15 @@ const confirmDelete = () => {
     });
 };
 
+const abandonMove = () => {
+    movingItem.value = {};
+
+    // Clear custom classes added in <ListTree> pass-through
+    Array.from(
+        abandonMoveRef.value!.$el.ownerDocument.getElementsByClassName('is-adjusting-parent')
+    ).forEach(li => (li as unknown as HTMLElement).classList.remove('is-adjusting-parent'));
+};
+
 await fetchLists();
 </script>
 
@@ -267,13 +284,14 @@ await fetchLists();
         v-if="movingItem.key"
         class="action-banner"
     >
-        <!-- disable HTML escaping: RDM Admins are trusted users -->
+        <!-- turn off escaping: vue template sanitizes -->
         {{ $gettext("Selecting new parent for: %{item}", { item: movingItem.label ?? '' }, true) }}
         <Button
+            ref="abandonMoveRef"
             type="button"
             class="banner-button"
             :label="$gettext('Abandon')"
-            @click="movingItem = {}"
+            @click="abandonMove"
         />
     </div>
     <div
@@ -311,8 +329,6 @@ await fetchLists();
             :options="arches.languages"
             option-label="name"
             :placeholder="$gettext('Language')"
-            checkmark
-            :highlight-on-select="false"
             :pt="{
                 root: { class: 'p-button secondary-button' },
                 input: { style: { fontFamily: 'inherit', fontSize: 'small', textAlign: 'center', alignContent: 'center' } },

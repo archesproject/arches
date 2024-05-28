@@ -2691,8 +2691,7 @@ class ReferenceDataType(BaseDataType):
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
-        ret = value
-        return ret
+        return value
 
     def clean(self, tile, nodeid):
         super().clean(tile, nodeid)
@@ -2700,8 +2699,7 @@ class ReferenceDataType(BaseDataType):
             tile.data[nodeid] = None
 
     def transform_export_values(self, value, *args, **kwargs):
-        new_values = value
-        return ",".join(new_values)
+        return ",".join(value)
     
     def get_display_value(self, tile, node, **kwargs):
         labels = []
@@ -2717,7 +2715,7 @@ class ReferenceDataType(BaseDataType):
         return True
 
     def default_es_mapping(self):
-        mapping = {
+        return {
             "properties": {
                 "uri": {"type": "keyword"},
                 "id": {"type": "keyword"},
@@ -2726,18 +2724,12 @@ class ReferenceDataType(BaseDataType):
                 },
             }
         }
-        return mapping
 
     def validate_node(self, node):
-        valid = False
-        message = ""
-        title = ""
+        from arches.app.models.graph import GraphValidationError # prevent circular import
         try:
             uuid.UUID(node.config["controlledList"])
-            valid = True
         except (TypeError, KeyError):
-            message = _("A reference datatype node must be configured with a controlled list")
-            title = _("Invalid Node Configuration")
-            logger.error(message)
-
-        return {"success": valid, "message": message, "title": title}
+            raise GraphValidationError(
+                _("A reference datatype node requires a controlled list")
+                )

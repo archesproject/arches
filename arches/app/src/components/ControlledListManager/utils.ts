@@ -5,14 +5,15 @@ import type { Language } from "@/types/arches";
 import type {
     ControlledList,
     ControlledListItem,
+    Selectable,
 } from "@/types/ControlledListManager";
 
 export const bestLabel = (item: ControlledListItem, languageCode: string) => {
-    const labelsInLang = item.labels.filter(label => label.language_id === languageCode);
+    const valuesInLang = item.values.filter(value => value.language_id === languageCode);
     const bestLabel = (
-        labelsInLang.find(label => label.valuetype_id === "prefLabel")
-        ?? labelsInLang.find(label => label.valuetype_id === "altLabel")
-        ?? item.labels.find(label => label.valuetype_id === "prefLabel")
+        valuesInLang.find(value => value.valuetype_id === "prefLabel")
+        ?? valuesInLang.find(value => value.valuetype_id === "altLabel")
+        ?? item.values.find(value => value.valuetype_id === "prefLabel")
     );
     if (!bestLabel) {
         throw new Error();
@@ -68,7 +69,25 @@ export const listAsNode = (
     };
 };
 
-export const reorderItem = (
+export const sortOrderMap = (
+    list: ControlledList,
+) => {
+    const ret = {};
+
+    const stripAllButSortOrderRecursive = (
+        items: ControlledListItem[], acc: { [key: string]: number }
+    ) => {
+        for (const item of items) {
+            acc[item.id] = item.sortorder;
+            stripAllButSortOrderRecursive(item.children, acc);
+        }
+    };
+
+    stripAllButSortOrderRecursive(list.items, ret);
+    return ret;
+};
+
+export const reorderItems = (
     list: ControlledList,
     item: ControlledListItem,
     siblings: ControlledListItem[],
@@ -101,7 +120,8 @@ export const reorderItem = (
     its immediate siblings, and then recalculating sort order through the
     entire list. The python view will just care that the sortorder
     value is correct, not that the items actually present in that order
-    in the JSON data.
+    in the JSON data, but we're still going to reorder the JSON so we can
+    use it to update client state if the server returns an empty success msg.
     */
 
     const indexInSiblings = siblings.indexOf(item);
@@ -122,17 +142,22 @@ export const reorderItem = (
     }
 
     let acc = 0;
-    const recalculateSortOrderRecursive = (items: ControlledListItem[]) => {
+    const recalculateSortOrderRecursive = (parent: Selectable, items: ControlledListItem[]) => {
         // Patch in the reordered siblings.
         if (items.some(itemCandidate => itemCandidate.id === item.id)) {
+            if ((parent as ControlledList).items) {
+                (parent as ControlledList).items = reorderedSiblings;
+            } else {
+                (parent as ControlledListItem).children = reorderedSiblings;
+            }
             items = reorderedSiblings;
         }
         for (const thisItem of items) {
             thisItem.sortorder = acc;
             acc += 1;
-            recalculateSortOrderRecursive(thisItem.children);
+            recalculateSortOrderRecursive(thisItem, thisItem.children);
         }
     };
 
-    recalculateSortOrderRecursive(list.items);
+    recalculateSortOrderRecursive(list, list.items);
 };

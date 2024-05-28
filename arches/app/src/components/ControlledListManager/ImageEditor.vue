@@ -25,7 +25,7 @@ const { image } = defineProps<{ image: ControlledListItemImage }>();
 const toast = useToast();
 const { $gettext } = useGettext();
 
-const labeledMetadataChoices = [
+const labeledChoices = [
     {
         type: METADATA_CHOICES.title,
         label: $gettext('Title'),
@@ -81,12 +81,12 @@ const removeImage = (removedImage: ControlledListItemImage) => {
         <div>
             <ImageMetadata
                 :metadata="image.metadata"
-                :labeled-metadata-choices
+                :labeled-choices
             />
             <div style="display: flex; gap: 1rem;">
                 <AddMetadata
                     :image
-                    :labeled-metadata-choices
+                    :labeled-choices
                 />
                 <Button
                     raised

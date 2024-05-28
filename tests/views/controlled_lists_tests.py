@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.test.client import Client
 from guardian.shortcuts import assign_perm
 
+from arches.app.models.graph import Graph
 from arches.app.models.models import (
     ControlledList,
     ControlledListItem,
@@ -14,7 +15,6 @@ from arches.app.models.models import (
     ControlledListItemImageMetadata,
     ControlledListItemValue,
     DValueType,
-    GraphModel,
     Language,
     Node,
     NodeGroup,
@@ -157,11 +157,15 @@ class ControlledListTests(ArchesTestCase):
                 language=cls.first_language,
             ).save()
 
-        cls.graph = GraphModel.objects.create(isresource=True, name="My Graph")
+        cls.graph = Graph.new(name="My Graph")
+        cls.future_graph = cls.graph.create_editable_future_graph()
+        admin = User.objects.get(username="admin")
+        cls.graph.publish(user=admin)
+
         cls.nodegroup = NodeGroup.objects.get(pk="20000000-0000-0000-0000-100000000000")
         cls.node_using_list1 = Node(
             pk=uuid.UUID("a3c5b7d3-ef2c-4f8b-afd5-f8d4636b8834"),
-            graph=cls.graph,
+            graph=cls.future_graph,
             name="Uses list1",
             datatype="reference",
             nodegroup=cls.nodegroup,
@@ -175,7 +179,7 @@ class ControlledListTests(ArchesTestCase):
 
         cls.node_using_list2 = Node(
             pk=uuid.UUID("a3c5b7d3-ef2c-4f8b-afd5-f8d4636b8835"),
-            graph=cls.graph,
+            graph=cls.future_graph,
             name="Uses list2",
             datatype="reference",
             nodegroup=cls.nodegroup,
@@ -186,6 +190,7 @@ class ControlledListTests(ArchesTestCase):
             },
         )
         cls.node_using_list2.save()
+        cls.graph.publish(user=admin)
 
     def test_get_controlled_lists(self):
         self.client.force_login(self.anonymous)
@@ -209,9 +214,7 @@ class ControlledListTests(ArchesTestCase):
             # there are no grandchildren, so no values/metadata to get
             # 12: get permitted nodegroups
             # 13-14: permission checks
-            response = self.client.get(
-                reverse("controlled_lists"), kwargs={"prefetchDepth": 3}
-            )
+            response = self.client.get(reverse("controlled_lists"))
 
         self.assertEqual(response.status_code, 200)
         result = json.loads(response.content)
@@ -227,7 +230,7 @@ class ControlledListTests(ArchesTestCase):
                     "id": str(self.node_using_list1.pk),
                     "name": self.node_using_list1.name,
                     "nodegroup_id": str(self.nodegroup.pk),
-                    "graph_id": str(self.graph.graphid),
+                    "graph_id": str(self.future_graph.graphid),
                     "graph_name": "My Graph",
                 },
             ],
@@ -415,11 +418,11 @@ class ControlledListTests(ArchesTestCase):
     def test_update_label_valid(self):
         self.client.force_login(self.admin)
         serialized_list = serialize(self.list1, flat=False)
-        label = serialized_list["items"][0]["labels"][0]
+        label = serialized_list["items"][0]["values"][0]
         label["language_id"] = self.new_language.code
 
         response = self.client.post(
-            reverse("controlled_list_item_label", kwargs={"id": label["id"]}),
+            reverse("controlled_list_item_value", kwargs={"id": label["id"]}),
                 label,
                 content_type="application/json",
             )
@@ -428,12 +431,12 @@ class ControlledListTests(ArchesTestCase):
     def test_update_label_invalid(self):
         self.client.force_login(self.admin)
         serialized_list = serialize(self.list1, flat=False)
-        label = serialized_list["items"][0]["labels"][0]
+        label = serialized_list["items"][0]["values"][0]
         label["value"] = "A" * 2049
 
         with self.assertLogs("django.request", level="WARNING"):
             response = self.client.post(
-                reverse("controlled_list_item_label", kwargs={"id": label["id"]}),
+                reverse("controlled_list_item_value", kwargs={"id": label["id"]}),
                     label,
                     content_type="application/json",
                 )
