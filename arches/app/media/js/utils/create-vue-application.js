@@ -6,6 +6,7 @@ import FocusTrap from 'primevue/focustrap';
 import StyleClass from 'primevue/styleclass';
 import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
+import arches from 'arches';
 
 import { createApp } from 'vue';
 import { createGettext } from "vue3-gettext";
@@ -24,7 +25,7 @@ export default async function createVueApplication(vueComponent){
      * TODO: cbyrd #10501 - we should add an event listener that will re-fetch i18n data
      * and rebuild the app when a specific event is fired from the LanguageSwitcher component.
     **/ 
-    return fetch('/api/get_frontend_i18n_data').then(resp => {
+    return fetch(arches.urls.api_get_frontend_i18n_data).then(resp => {
         if (!resp.ok) {
             throw new Error(resp.statusText);
         }
