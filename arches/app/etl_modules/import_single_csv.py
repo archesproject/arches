@@ -10,7 +10,7 @@ from django.db import connection
 from django.db.models.functions import Lower
 from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import GraphModel, Node, NodeGroup
+from arches.app.models.models import GraphModel, Node, NodeGroup, ETLModule
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -26,6 +26,7 @@ class ImportSingleCsv(BaseImportModule):
         self.loadid = request.POST.get("load_id") if request else loadid
         self.userid = request.user.id if request else None
         self.moduleid = request.POST.get("module") if request else None
+        self.config = ETLModule.objects.get(pk=self.moduleid).config if self.moduleid else {}
         self.datatype_factory = DataTypeFactory()
         self.node_lookup = {}
         self.blank_tile_lookup = {}
@@ -91,7 +92,10 @@ class ImportSingleCsv(BaseImportModule):
                         default_storage.save(os.path.join(temp_dir, file.filename), File(zip_ref.open(file)))
                         if file.filename.endswith(".csv"):
                             csv_file_name = file.filename
-            csv_file_path = os.path.join(temp_dir, csv_file_name)
+            try:
+                csv_file_path = os.path.join(temp_dir, csv_file_name)
+            except (TypeError):
+                pass
 
         if csv_file_name is None:
             return {
@@ -150,7 +154,7 @@ class ImportSingleCsv(BaseImportModule):
         temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         csv_file_path = os.path.join(temp_dir, csv_file_name)
         csv_size = default_storage.size(csv_file_path)  # file size in byte
-        use_celery_threshold = 500  # 500 bytes
+        use_celery_threshold = self.config.get("celeryByteSizeLimit", 500)
 
         if csv_size > use_celery_threshold:
             response = self.run_load_task_async(request, self.loadid)

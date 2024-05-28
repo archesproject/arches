@@ -41,6 +41,7 @@ subparsers.required = True
 parser_startproject = subparsers.add_parser(
     'startproject',
     help="Create the scaffolding for a new Arches project",
+    aliases=['startapp']
 )
 parser_startproject.add_argument(
     'name',
@@ -83,49 +84,6 @@ parser_startproject.add_argument(
     ),
 )
 
-parser_startapp = subparsers.add_parser(
-    'startapp',
-    help="Create the scaffolding for a new Arches application",
-)
-parser_startapp.add_argument(
-    'name',
-    type=str,
-    help='name of your new application'
-)
-parser_startapp.add_argument(
-    '-d', '--directory',
-    help='destination directory of your new project',
-)
-parser_startapp.add_argument(
-    '-t', '--template',
-    help="Provides the path to a directory with a custom app template file, or a path to an uncompressed archive, a compressed archive, or a URL containing the app template files.",
-    type=str,
-    default=os.path.join(os.path.dirname(arches.__file__), 'install', 'arches-app-templates')
-)
-parser_startapp.add_argument(
-    '-e', '--extension',
-    dest='extensions',
-    help='Specifies which file extensions in the app template should be rendered with the template engine. Defaults to py.',
-    type=str,
-    default='py'
-)
-parser_startapp.add_argument(
-    '-n', '--name',
-    dest='files',
-    help='Specifies which files in the app template (in addition to those matching --extension) should be rendered with the template engine.',
-    type=str,
-    default='',
-)
-parser_startapp.add_argument(
-    '--exclude', '-x',
-    default='.git',  # defaulting to `.git` here so hidden directories such as `.github` will be copied over
-    nargs='?', 
-    help=(
-        'The directory name(s) to exclude, in addition to .git and '
-        '__pycache__. Can be used multiple times.'
-    ),
-)
-
 class ArchesProjectCommand(TemplateCommand):
     help = (
         "Creates a Django project directory structure for the given "
@@ -136,21 +94,6 @@ class ArchesProjectCommand(TemplateCommand):
 
     def handle(self, options):
         project_name, target = options.pop('name'), options.pop('directory')
-        self.validate_name(project_name, "project")
-
-        # Check that the project_name cannot be imported.
-        try:
-            import_module(project_name)
-        except ImportError:
-            pass
-        except:
-            raise CommandError(
-                "%r conflicts with the name of an existing "
-                "Python module and cannot be used as an "
-                "application or project name. Please try "
-                "another name." %
-                project_name
-            )
 
         # Create a random SECRET_KEY to put it in the main settings.
         chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
@@ -165,75 +108,53 @@ class ArchesProjectCommand(TemplateCommand):
             options["arches_version"] = f"stable/{__version__}"
         elif complete_version[3] in ['alpha','beta','rc']:
             options["arches_version"] = f"dev/{complete_version[0]}.{complete_version[1]}.x"
+        options["arches_semantic_version"] = ".".join([str(arches.VERSION[0]), str(arches.VERSION[1]), str(arches.VERSION[2])])
+        options["arches_next_minor_version"] = ".".join([str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"])
 
         super(ArchesProjectCommand, self).handle('project', project_name, target, **options)
-    
-def command_startproject(args):
-    cmd = ArchesProjectCommand()
-    options = vars(args)
-    proj_name = options['name']
-    cmd.handle(options)
-    yarn_path = os.path.join(os.getcwd(), proj_name, proj_name)
-    os.chdir(yarn_path)
-    subprocess.call("yarn install", shell=True)
-    if os.path.isdir(os.path.join(os.getcwd(), 'logs')) is not True:
-        os.mkdir(os.path.join(os.getcwd(), 'logs'))
-    open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
-    open(os.path.join(os.getcwd(), 'logs', 'resource_import.log'), 'w').close()
 
-COMMANDS['startproject'] = command_startproject
+        # need to manually replace instances of {{ project_name }} in some files
+        path_to_project = os.path.join(target) if target else os.path.join(os.getcwd(), project_name)
 
-
-class ArchesAppCommand(TemplateCommand):
-    help = (
-        "Creates a Django application directory structure for the given "
-        "application name in the current directory or optionally in the "
-        "given directory."
-    )
-    missing_args_message = "You must provide a valid name."
-
-    def handle(self, options):
-        app_name, target = options.pop('name'), options.pop('directory')
-        self.validate_name(app_name, "app")
-
-        # Check that the app_name cannot be imported.
-        try:
-            import_module(app_name)
-        except ImportError:
-            pass
-        except Exception as e:
-            raise CommandError(
-                "%r conflicts with the name of an existing "
-                "Python module and cannot be used as an "
-                "application or project name. Please try "
-                "another name." %
-                app_name
-            )
-
-        super(ArchesAppCommand, self).handle('app', app_name, target, **options)
-
-        # need to manually replace instances of {{ app_name }}
-        path_to_project = os.path.join(target, app_name) if target else os.path.join(os.getcwd(), app_name)
-
-        for relative_file_path in ['setup.py', 'package.json', '.yarnrc', 'gettext.config.js']:  # relative to app root directory
+        for relative_file_path in ['.coveragerc', "pyproject.toml"]:  # relative to app root directory
             file = open(os.path.join(path_to_project, relative_file_path),'r')
             file_data = file.read()
             file.close()
 
-            updated_file_data = file_data.replace('{{ app_name }}', app_name)
+            updated_file_data = (
+                file_data.replace("{{ project_name }}", project_name)
+                .replace("{{ arches_semantic_version }}", options["arches_semantic_version"])
+                .replace("{{ arches_next_minor_version }}", options["arches_next_minor_version"])
+            )
 
             file = open(os.path.join(path_to_project, relative_file_path),'w')
             file.write(updated_file_data)
             file.close()
 
-
-
-def command_startapp(args):
-    cmd = ArchesAppCommand()
+    
+def command_startproject(args):
     options = vars(args)
+    name = options['name']
+    directory = options['directory']
+
+    cmd = ArchesProjectCommand()
     cmd.handle(options)
 
-COMMANDS['startapp'] = command_startapp
+    project_path = os.path.join(os.getcwd(), (directory if directory else name))
+
+    os.chdir(project_path)
+    subprocess.call("yarn install", shell=True)
+
+    open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
+
+    os.chdir(os.path.join(project_path, name))
+    if os.path.isdir(os.path.join(os.getcwd(), 'logs')) is not True:
+        os.mkdir(os.path.join(os.getcwd(), 'logs'))
+
+    open(os.path.join(os.getcwd(), 'logs', 'resource_import.log'), 'w').close()
+
+COMMANDS['startproject'] = command_startproject
+COMMANDS['startapp'] = command_startproject
 
 
 class CommandError(Exception):

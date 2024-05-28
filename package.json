@@ -3,16 +3,18 @@
     "version": "7.6.0",
     "license": "AGPL-3.0-only",
     "scripts": {
-        "build_development": "yarn eslint:check && yarn ts:check && ./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack --config ./arches/webpack/webpack.config.dev.js",
-        "build_production": "yarn eslint:check && yarn ts:check && ./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 NODE_ENV=production ./arches/app/media/node_modules/.bin/webpack --config ./arches/webpack/webpack.config.prod.js",
-        "build_test": "yarn eslint:check && yarn ts:check && ./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack --config ./arches/webpack/webpack.config.dev.js --env test=true",
-        "eslint:check": "./arches/app/media/node_modules/.bin/eslint ./arches/app/src --resolve-plugins-relative-to ./arches/app/media --ext .vue,.ts --parser ./arches/app/media/node_modules/vue-eslint-parser/index.js",
-        "eslint:watch": "./arches/app/media/node_modules/.bin/nodemon --watch ./arches/app/src --ext ts,vue --exec yarn --silent eslint:check",
-        "gettext:extract": "./arches/app/media/node_modules/.bin/vue-gettext-extract",
-        "gettext:compile": "./arches/app/media/node_modules/.bin/vue-gettext-compile",
-        "ts:check": "./arches/app/media/node_modules/.bin/vue-tsc --noEmit",
-        "ts:watch": "./arches/app/media/node_modules/.bin/vue-tsc --watch --noEmit",
-        "start": "./arches/app/media/node_modules/.bin/cross-env NODE_PATH=./arches/app/media/node_modules NODE_OPTIONS=--max-old-space-size=2048 ./arches/app/media/node_modules/.bin/webpack serve --config ./arches/webpack/webpack.config.dev.js"
+        "build_development": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js",
+        "build_production": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 NODE_ENV=production webpack --config ./webpack/webpack.config.prod.js",
+        "build_test": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js --env test=true",
+        "eslint:check": "eslint ./arches/app/src",
+        "eslint:fix": "eslint ./arches/app/src --fix",
+        "eslint:watch": "nodemon --watch . --ext ts,vue --exec yarn --silent eslint:check",
+        "gettext:extract": "vue-gettext-extract",
+        "gettext:compile": "vue-gettext-compile",
+        "ts:check": "vue-tsc --noEmit",
+        "ts:watch": "vue-tsc --watch --noEmit",
+        "start": "cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack serve --config ./webpack/webpack.config.dev.js",
+        "vitest": "vitest --run --coverage"
     },
     "repository": {
         "url": "git@github.com:archesproject/arches.git",
@@ -73,9 +75,9 @@
         "moment-timezone": "~0.5.43",
         "nouislider": "11.0.3",
         "numeral": "^2.0.6",
-        "primevue": "^3.50.0",
+        "primevue": "^3.51.0",
         "proj4": "^2.3.15",
-        "regenerator-runtime": "^0.13.9",
+        "regenerator-runtime": "^0.14.1",
         "requirejs": "~2.3.2",
         "requirejs-plugins": "1.0.2",
         "requirejs-text": "~2.0.16",
@@ -85,14 +87,17 @@
         "uuidjs": "^3.3.0",
         "vue": "^3.4.21",
         "vue3-gettext": "^3.0.0-beta.4",
-        "webpack-bundle-tracker": "^1.4.0"
+        "webpack-bundle-tracker": "^3.1.0"
+    },
+    "resolutions": {
+        "@vue/compiler-sfc": "^3.4.21"
     },
     "nodeModulesPaths": {
         "nifty": "plugins/nifty",
         "leaflet-side-by-side": "plugins/leaflet-side-by-side/index",
         "themepunch-tools": "plugins/revolution-slider/rs-plugin/js/jquery.themepunch.tools.min",
         "revolution-slider": "plugins/revolution-slider",
-        "slick": "plugins/slick",
+        "slick": "plugins/slick/slick.min",
         "async": "node_modules/requirejs-plugins/src/async",
         "text": "node_modules/requirejs-text/text",
         "jquery": "node_modules/jquery/dist/jquery.min",

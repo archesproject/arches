@@ -16,13 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
-
 import os
 from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
@@ -30,30 +23,29 @@ from tests.base_test import ArchesTestCase
 from django.urls import reverse
 from django.core import management
 from django.test.client import RequestFactory, Client
+from django.test.utils import captured_stdout
+
 from arches.app.views.api import APIBase
 from arches.app.models import models
 from arches.app.models.graph import Graph
-from arches.app.models.resource import Resource
-from arches.app.models.tile import Tile
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from django.contrib.auth.models import User, Group, AnonymousUser
 
 # these tests can be run from the command line via
-# python manage.py test tests/views/api_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.views.api_tests --settings="tests.test_settings"
 
 
 class APITests(ArchesTestCase):
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
     @classmethod
     def setUpClass(cls):
-        super().setUpClass()
+        cls.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
+        if not models.GraphModel.objects.filter(pk=cls.data_type_graphid).exists():
+            # TODO: Fix this to run inside transaction, i.e. after super().setUpClass()
+            # https://github.com/archesproject/arches/issues/10719
+            test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
+            with captured_stdout():
+                management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
 
-        geojson_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
+        super().setUpClass()
         cls.loadOntology()
         LanguageSynchronizer.synchronize_settings_with_db()
         with open(os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "r") as f:
@@ -74,10 +66,10 @@ class APITests(ArchesTestCase):
             cls.phase_type_assignment_graph.publish(user=None)
             cls.phase_type_assignment_graph.save()
 
-        # Load the test package to provide resources graph.
-        test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
-        management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
-        LanguageSynchronizer.synchronize_settings_with_db()
+        cls.data_type_graph = Graph.objects.get(pk=cls.data_type_graphid)
+        cls.test_prj_user = (
+            models.ResourceInstance.objects.filter(graph=cls.data_type_graph).first()
+        )
 
     def get_tile_by_id(self, tileid, tiles):
         for tile in tiles:
@@ -95,12 +87,14 @@ class APITests(ArchesTestCase):
 
         request = factory.get(reverse("api_node_value", kwargs={}), {"ver": "2.0"})
         request.user = None
-        response = view(request)
+        with self.assertLogs("django.request", level="WARNING"):
+            response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.0")
 
         request = factory.get(reverse("api_node_value"), kwargs={})
         request.user = None
-        response = view(request)
+        with self.assertLogs("django.request", level="WARNING"):
+            response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.1")
 
     def test_api_resources_archesjson(self):
@@ -259,11 +253,12 @@ class APITests(ArchesTestCase):
         # ==POST============================================================================================
 
         # ==Act : POST resource to database (N.B. resourceid supplied will be overwritten by arches)========
-        resp_post = self.client.post(
-            reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json",
-            payload,
-            content_type,
-        )
+        with captured_stdout():
+            resp_post = self.client.post(
+                reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json",
+                payload,
+                content_type,
+            )
         # ==Assert==========================================================================================
         self.assertEqual(resp_post.status_code, 201)  # resource created.
         my_resource = JSONDeserializer().deserialize(resp_post.content)  # get the resourceinstance returned.
@@ -298,19 +293,21 @@ class APITests(ArchesTestCase):
 
         # ==Act : GET confirmation that resource does not exist in database=================================
         with self.assertRaises(models.ResourceInstance.DoesNotExist) as context:
-            resp_get = self.client.get(
-                reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json"
-            )
+            with self.assertLogs("django.request", level="ERROR"):
+                resp_get = self.client.get(
+                    reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json"
+                )
         # ==Assert==========================================================================================
         self.assertTrue("Resource matching query does not exist." in str(context.exception))  # Check exception message.
         # ==================================================================================================
 
         # ==Act : PUT resource changes to database for new resourceinstanceid to create new resource=========
-        resp_put_create = self.client.put(
-            reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json",
-            payload_modified,
-            content_type,
-        )
+        with captured_stdout():
+            resp_put_create = self.client.put(
+                reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json",
+                payload_modified,
+                content_type,
+            )
 
         # ==Assert==========================================================================================
         self.assertEqual(resp_put_create.status_code, 201)  # resource created.
@@ -335,11 +332,12 @@ class APITests(ArchesTestCase):
         # ==================================================================================================
 
         # ==Act : PUT resource changes to database, with invalid URI========================================
-        resp_put_uri_diff = self.client.put(
-            reverse("resources", kwargs={"resourceid": "001fe587-ad3d-4d0d-a3c9-814028766434"}) + "?format=arches-json",
-            payload_modified,
-            content_type,
-        )
+        with self.assertLogs("django.request", level="WARNING"):
+            resp_put_uri_diff = self.client.put(
+                reverse("resources", kwargs={"resourceid": "001fe587-ad3d-4d0d-a3c9-814028766434"}) + "?format=arches-json",
+                payload_modified,
+                content_type,
+            )
         # ==Assert==========================================================================================
         self.assertEqual(resp_put_uri_diff.status_code, 400)  # Bad Request.
         # ==================================================================================================
@@ -352,11 +350,12 @@ class APITests(ArchesTestCase):
         payload_modified = JSONSerializer().serialize(test_resource_simple)
 
         # ==Act : PUT resource changes to initial POST database resource to overwrite=======================
-        resp_put = self.client.put(
-            reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json",
-            payload_modified,
-            content_type,
-        )
+        with captured_stdout():
+            resp_put = self.client.put(
+                reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json",
+                payload_modified,
+                content_type,
+            )
 
         # ==Assert==========================================================================================
         self.assertEqual(resp_put.status_code, 201)  # resource created.
@@ -388,9 +387,22 @@ class APITests(ArchesTestCase):
 
         # ==Act : GET confirmation that resource does not exist in database=================================
         with self.assertRaises(models.ResourceInstance.DoesNotExist) as context_del:
-            resp_get_deleted = self.client.get(
-                reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json"
-            )
+            with self.assertLogs("django.request", level="ERROR"):
+                resp_get_deleted = self.client.get(
+                    reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json"
+                )
         # ==Assert==========================================================================================
         self.assertTrue("Resource matching query does not exist." in str(context_del.exception))  # Check exception message.
         # ==================================================================================================
+
+    def test_get_resource_jsonld_invalid_no_ontology(self):
+        # Bypass validation in .save()
+        Graph.objects.filter(pk=self.data_type_graph.pk).update(ontology=None)
+
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.get(
+                reverse("resources", kwargs={"resourceid": str(self.test_prj_user.pk)})
+                + "?format=json-ld"
+            )
+
+        self.assertEqual(response.status_code, 400)

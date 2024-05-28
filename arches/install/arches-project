@@ -31,18 +31,6 @@ class ArchesCommand(TemplateCommand):
 
     def handle(self, options):
         project_name, target = options.pop('name'), options.pop('directory')
-        self.validate_name(project_name, "project")
-
-        # Check that the project_name cannot be imported.
-        try:
-            import_module(project_name)
-        except ImportError:
-            pass
-        else:
-            raise CommandError("%r conflicts with the name of an existing "
-                               "Python module and cannot be used as a "
-                               "project name. Please try another name." %
-                               project_name)
 
         # Create a random SECRET_KEY to put it in the main settings.
         chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
@@ -58,19 +46,47 @@ class ArchesCommand(TemplateCommand):
         elif complete_version[3] in ['alpha','beta','rc']:
             options["arches_version"] = f"dev/{complete_version[0]}.{complete_version[1]}.x"
         options["arches_semantic_version"] = ".".join([str(arches.VERSION[0]), str(arches.VERSION[1]), str(arches.VERSION[2])])
+        options["arches_next_minor_version"] = ".".join([str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"])
+
         super(ArchesCommand, self).handle('project', project_name, target, **options)
 
+        # need to manually replace instances of {{ project_name }} in some files
+        path_to_project = os.path.join(target) if target else os.path.join(os.getcwd(), project_name)
+
+        for relative_file_path in ['.coveragerc', "pyproject.toml"]:  # relative to app root directory
+            file = open(os.path.join(path_to_project, relative_file_path),'r')
+            file_data = file.read()
+            file.close()
+
+            updated_file_data = (
+                file_data.replace("{{ project_name }}", project_name)
+                .replace("{{ arches_semantic_version }}", options["arches_semantic_version"])
+                .replace("{{ arches_next_minor_version }}", options["arches_next_minor_version"])
+            )
+
+            file = open(os.path.join(path_to_project, relative_file_path),'w')
+            file.write(updated_file_data)
+            file.close()
+
 def command_create_app(args):
-    cmd = ArchesCommand()
     options = vars(args)
-    proj_name = options['name']
+    name = options['name']
+    directory = options['directory']
+
+    cmd = ArchesCommand()
     cmd.handle(options)
-    yarn_path = os.path.join(os.getcwd(), proj_name, proj_name)
-    os.chdir(yarn_path)
+
+    project_path = os.path.join(os.getcwd(), (directory if directory else name))
+
+    os.chdir(project_path)
     subprocess.call("yarn install", shell=True)
+
+    open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
+
+    os.chdir(os.path.join(project_path, name))
     if os.path.isdir(os.path.join(os.getcwd(), 'logs')) is not True:
         os.mkdir(os.path.join(os.getcwd(), 'logs'))
-    open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
+
     open(os.path.join(os.getcwd(), 'logs', 'resource_import.log'), 'w').close()
 
 

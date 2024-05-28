@@ -16,41 +16,32 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
-
 import os
-import uuid
 from tests import test_settings
-from django.test import TestCase
+from django.test.utils import captured_stdout
 from django.core import management
 from arches.app.models import models
-from django.urls import reverse
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from tests.base_test import ArchesTestCase
 from django.test.client import Client
 
 # these tests can be run from the command line via
-# python manage.py test tests/views/command_line_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.views.command_line_tests --settings="tests.test_settings"
 
 
-class CommandLineTests(TestCase):
+class CommandLineTests(ArchesTestCase):
     def setUp(self):
         self.expected_resource_count = 2
-        self.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
         self.client = Client()
-
-    def tearDown(self):
-        models.ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
 
     @classmethod
     def setUpClass(cls):
-        # TODO: pull this up higher so that it's not depending on running outside a transaction
-        test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
-        management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True)
+        cls.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
+        if not models.GraphModel.objects.filter(pk=cls.data_type_graphid).exists():
+            # TODO: Fix this to run inside transaction, i.e. after super().setUpClass()
+            # https://github.com/archesproject/arches/issues/10719
+            test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
+            with captured_stdout():
+                management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
 
         super().setUpClass()
 

@@ -385,6 +385,80 @@ class StringDataType(BaseDataType):
             tile.data[nodeid][code] = {"value": "", "direction": direction_lookup[code]}
 
 
+class NonLocalizedStringDataType(BaseDataType):
+    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
+        errors = []
+        try:
+            if value is not None:
+                value.upper()
+        except:
+            message = _("This is not a string")
+            error_message = self.create_error_message(value, source, row_number, message)
+            errors.append(error_message)
+        return errors
+
+    def clean(self, tile, nodeid):
+        if tile.data[nodeid] in ["", "''"]:
+            tile.data[nodeid] = None
+
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        if nodevalue is not None:
+            val = {
+                "string": nodevalue, 
+                "language": "",
+                "nodegroup_id": tile.nodegroup_id, 
+                "provisional": provisional}
+            document["strings"].append(val)
+
+    def transform_export_values(self, value, *args, **kwargs):
+        if value is not None:
+            return value
+
+    def get_search_terms(self, nodevalue, nodeid=None):
+        terms = []
+
+        if nodevalue is not None:
+            if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue.split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                terms.append(SearchTerm(value=nodevalue, lang=""))
+        return terms
+
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
+                match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
+                match_query = Match(field="tiles.data.%s" % (str(node.pk)), query=value["val"], type=match_type)
+                if "!" in value["op"]:
+                    query.must_not(match_query)
+                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                else:
+                    query.must(match_query)
+        except KeyError as e:
+            pass
+
+    def is_a_literal_in_rdf(self):
+        return True
+
+    def to_rdf(self, edge_info, edge):
+        # returns an in-memory graph object, containing the domain resource, its
+        # type and the string as a string literal
+        g = Graph()
+        if edge_info["range_tile_data"] is not None:
+            g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+            g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(edge_info["range_tile_data"])))
+        return g
+
+    def from_rdf(self, json_ld_node):
+        # returns the string value only
+        # FIXME: Language?
+        value = get_value_from_jsonld(json_ld_node)
+        try:
+            return value[0]
+        except (AttributeError, KeyError) as e:
+            pass
+
+
 class NumberDataType(BaseDataType):
     def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
         errors = []
@@ -839,33 +913,39 @@ class EDTFDataType(BaseDataType):
 
 
 class GeojsonFeatureCollectionDataType(BaseDataType):
+    def __init__(self, model=None):  
+        super(GeojsonFeatureCollectionDataType, self).__init__(model=model)  
+        self.geo_utils = GeoUtils()  
+
     def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
         errors = []
-        coord_limit = 1500
-        coordinate_count = 0
+        max_bytes = 32766 # max bytes allowed by Lucene
+        byte_count = 0
+        byte_count += len(str(value).encode("UTF-8"))
 
-        def validate_geom(geom, coordinate_count=0):
+        def validate_geom_byte_size_can_be_reduced(feature_collection):
+            try: 
+                if len(feature_collection['features']) > 0:
+                    feature_geom = GEOSGeometry(JSONSerializer().serialize(feature_collection['features'][0]['geometry']))
+                    current_precision = abs(self.find_num(feature_geom.coords))
+                    feature_collection = self.geo_utils.reduce_precision(feature_collection, current_precision)
+            except ValueError:
+                message = _("Geojson byte size exceeds Lucene 32766 limit.")
+                title = _("Geometry Size Exceeds Elasticsearch Limit")
+                errors.append(
+                    {
+                        "type": "ERROR",
+                        "message": "datatype: {0} {1} - {2}. {3}.".format(
+                            self.datatype_model.datatype, source, message, "This data was not imported."
+                        ),
+                        "title": title,
+                    }
+                )
+
+        def validate_geom_bbox(geom):
             try:
-                coordinate_count += geom.num_coords
                 bbox = Polygon(settings.DATA_VALIDATION_BBOX)
-                if coordinate_count > coord_limit:
-                    message = _(
-                        "Geometry has too many coordinates for Elasticsearch ({0}), \
-                        Please limit to less then {1} coordinates of 5 digits of precision or less.".format(
-                            coordinate_count, coord_limit
-                        )
-                    )
-                    title = _("Geometry Too Many Coordinates for ES")
-                    errors.append(
-                        {
-                            "type": "ERROR",
-                            "message": "datatype: {0} value: {1} {2} - {3}. {4}".format(
-                                self.datatype_model.datatype, value, source, message, "This data was not imported."
-                            ),
-                            "title": title,
-                        }
-                    )
-
+                
                 if bbox.contains(geom) == False:
                     message = _(
                         "Geometry does not fall within the bounding box of the selected coordinate system. \
@@ -895,12 +975,17 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 )
 
         if value is not None:
+            if byte_count > max_bytes:
+                validate_geom_byte_size_can_be_reduced(value)
             for feature in value["features"]:
                 try:
                     geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
-                    validate_geom(geom, coordinate_count)
+                    if geom.valid:
+                        validate_geom_bbox(geom)
+                    else:
+                        raise Exception
                 except Exception:
-                    message = _("Unable to serialize some geometry features")
+                    message = _("Unable to serialize some geometry features.")
                     title = _("Unable to Serialize Geometry")
                     error_message = self.create_error_message(value, source, row_number, message, title)
                     errors.append(error_message)
@@ -918,7 +1003,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
     def transform_value_for_tile(self, value, **kwargs):
         if "format" in kwargs and kwargs["format"] == "esrijson":
-            arches_geojson = GeoUtils().arcgisjson_to_geojson(value)
+            arches_geojson = self.geo_utils.arcgisjson_to_geojson(value)
         else:
             try:
                 geojson = json.loads(value)
@@ -929,20 +1014,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 else:
                     raise TypeError
             except (json.JSONDecodeError, KeyError, TypeError):
-                arches_geojson = {}
-                arches_geojson["type"] = "FeatureCollection"
-                arches_geojson["features"] = []
                 try:
                     geometry = GEOSGeometry(value, srid=4326)
                     if geometry.geom_type == "GeometryCollection":
-                        for geom in geometry:
-                            arches_json_geometry = {}
-                            arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
-                            arches_json_geometry["type"] = "Feature"
-                            arches_json_geometry["id"] = str(uuid.uuid4())
-                            arches_json_geometry["properties"] = {}
-                            arches_geojson["features"].append(arches_json_geometry)
+                        arches_geojson = self.geo_utils.convert_geos_geom_collection_to_feature_collection(geometry)
                     else:
+                        arches_geojson = {}
+                        arches_geojson["type"] = "FeatureCollection"
+                        arches_geojson["features"] = []
                         arches_json_geometry = {}
                         arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
                         arches_json_geometry["type"] = "Feature"
@@ -967,7 +1046,24 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         updated_data = tile.data[nodeid]
         return updated_data
 
+    def find_num(self, current_item):
+        if len(current_item) and isinstance(current_item[0], float):
+            return decimal.Decimal(str(current_item[0])).as_tuple().exponent
+        else:
+            return self.find_num(current_item[0])
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        max_bytes = 32766 # max bytes allowed by Lucene
+        byte_count = 0
+        byte_count += len(str(nodevalue).encode("UTF-8"))
+
+        if len(nodevalue['features']) > 0:
+            feature_geom = GEOSGeometry(JSONSerializer().serialize(nodevalue['features'][0]['geometry']))
+            current_precision = abs(self.find_num(feature_geom.coords))
+
+        if byte_count > max_bytes and current_precision:
+            nodevalue = self.geo_utils.reduce_precision(nodevalue, current_precision)
+        
         document["geometries"].append({"geom": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional, "tileid": tile.pk})
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
@@ -2049,7 +2145,7 @@ class DomainDataType(BaseDomainDataType):
 
         sql = i18n_json_field.attname
         for prop, value in i18n_json_field.raw_value.items():
-            escaped_value = json.dumps(value).replace("%", "%%")
+            escaped_value = json.dumps(value).replace("%", "%%").replace("'", "''")
             if prop == "options":
                 sql = f"""
                     __arches_i18n_update_jsonb_array('options.text', '{{"options": {escaped_value}}}', {sql}, '{i18n_json_field.lang}')

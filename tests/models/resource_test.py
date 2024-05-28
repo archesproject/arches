@@ -19,10 +19,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import json
 import os
 import time
+import uuid
 
-from tests import test_settings
 from django.contrib.auth.models import User, Group
-from django.core import management
 from django.db import connection
 from django.urls import reverse
 from django.test.client import Client
@@ -41,7 +40,7 @@ from tests.base_test import ArchesTestCase
 
 
 # these tests can be run from the command line via
-# python manage.py test tests/models/resource_test.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.models.resource_test --settings="tests.test_settings"
 
 
 class ResourceTests(ArchesTestCase):
@@ -60,7 +59,7 @@ class ResourceTests(ArchesTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         resource_graph_importer(archesfile["graph"])
 
-        cls.search_model_graphid = "c9b37a14-17b3-11eb-a708-acde48001122"
+        cls.search_model_graphid = uuid.UUID("c9b37a14-17b3-11eb-a708-acde48001122")
         cls.search_model_cultural_period_nodeid = "c9b3882e-17b3-11eb-a708-acde48001122"
         cls.search_model_creation_date_nodeid = "c9b38568-17b3-11eb-a708-acde48001122"
         cls.search_model_destruction_date_nodeid = "c9b3828e-17b3-11eb-a708-acde48001122"
@@ -266,23 +265,49 @@ class ResourceTests(ArchesTestCase):
         perms = set(get_perms(user, test_resource))
         self.assertEqual(perms, {"view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"})
 
-    def test_recalculate_descriptors_one_query_for_descriptor_function(self):
+    def test_recalculate_descriptors_prefetch_related_objects(self):
         r1 = Resource(graph_id=self.search_model_graphid)
         r2 = Resource(graph_id=self.search_model_graphid)
-        r1.save()
-        r2.save()
+        r1_tile = Tile(
+            data={self.search_model_creation_date_nodeid: "1941-01-01"},
+            nodegroup_id=self.search_model_creation_date_nodeid,
+        )
+        r1.tiles.append(r1_tile)
+        r2_tile = Tile(
+            data={self.search_model_creation_date_nodeid: "1941-01-01"},
+            nodegroup_id=self.search_model_creation_date_nodeid,
+        )
+        r2.tiles.append(r2_tile)
+        r1.save(index=False)
+        r2.save(index=False)
 
         # Ensure we start from scratch
         r1.descriptor_function = None
         r2.descriptor_function = None
 
-        with CaptureQueriesContext(connection) as queries:
-            index_resources_using_singleprocessing([r1, r2], recalculate_descriptors=True)
+        for test_name, resources in (
+            ("array", [r1, r2]),
+            ("queryset", Resource.objects.filter(pk__in=[r1.pk, r2.pk])),
+        ):
+            with (
+                self.subTest(iterable=test_name),
+                CaptureQueriesContext(connection) as queries,
+            ):
+                index_resources_using_singleprocessing(
+                    resources, recalculate_descriptors=True, quiet=True
+                )
 
-        function_x_graph_selects = [
-            q for q in queries if q['sql'].startswith('SELECT "functions_x_graphs"."id"')
-        ]
-        self.assertEqual(len(function_x_graph_selects), 1)
+                function_x_graph_selects = [
+                    q
+                    for q in queries
+                    if q["sql"].startswith('SELECT "functions_x_graphs"."id"')
+                ]
+                self.assertEqual(len(function_x_graph_selects), 1)
+
+                tile_selects = [
+                    q for q in queries if q["sql"].startswith('SELECT "tiles"."tileid"')
+                ]
+                self.assertEqual(len(tile_selects), 1)
 
     def test_self_referring_resource_instance_descriptor(self):
         # Create a nodegroup with a string node and a resource-instance node.

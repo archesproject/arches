@@ -637,10 +637,17 @@ class ResourceActivityStreamPageView(BaseManagerView):
             except (ValueError, TypeError) as e:
                 return HttpResponseBadRequest()
 
-        totalItems = models.EditLog.objects.all().exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).count()
-
+        totalItems = (
+            models.EditLog.objects.all()
+            .exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            .exclude(note="resource creation")
+            .count()
+        )
         edits = (
-            models.EditLog.objects.all().exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).order_by("timestamp")[st:end]
+            models.EditLog.objects.all()
+            .exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            .exclude(note="resource creation")
+            .order_by("timestamp")[st:end]
         )
 
         # setting last to be same as first, changing later if there are more pages
@@ -673,7 +680,12 @@ class ResourceActivityStreamCollectionView(BaseManagerView):
         if hasattr(settings, "ACTIVITY_STREAM_PAGE_SIZE"):
             page_size = int(settings.ACTIVITY_STREAM_PAGE_SIZE)
 
-        totalItems = models.EditLog.objects.all().exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).count()
+        totalItems = (
+            models.EditLog.objects.all()
+            .exclude(resourceclassid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            .exclude(note="resource creation")
+            .count()
+        )
 
         uris = {
             "root": request.build_absolute_uri(reverse("as_stream_collection")),

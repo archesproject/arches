@@ -15,19 +15,10 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
-
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
 from uuid import UUID
 from arches.app.utils.betterJSONSerializer import JSONSerializer
-from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.db import connection
-from django.core import management
 from django.contrib.auth.models import User
 from django.db.utils import ProgrammingError
 from django.http import HttpRequest
@@ -37,17 +28,18 @@ from arches.app.models.models import CardModel, CardXNodeXWidget, Node, NodeGrou
 
 
 # these tests can be run from the command line via
-# python manage.py test tests/models/tile_model_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.models.tile_model_tests --settings="tests.test_settings"
 
 
 class TileTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.loadOntology()
+        cls.ensure_resource_test_model_loaded()
 
-        for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
-            management.call_command("packages", operation="import_graphs", source=path)
-
+    @classmethod
+    def setUpTestData(cls):
         sql = """
         INSERT INTO public.resource_instances(resourceinstanceid, legacyid, graphid, createdtime)
             VALUES ('40000000-0000-0000-0000-000000000000', '40000000-0000-0000-0000-000000000000', '2f7f8e40-adbc-11e6-ac7f-14109fd34195', '1/1/2000');
@@ -70,33 +62,6 @@ class TileTests(ArchesTestCase):
 
         cursor = connection.cursor()
         cursor.execute(sql)
-
-    @classmethod
-    def tearDownClass(cls):
-        sql = """
-        DELETE FROM public.node_groups
-        WHERE nodegroupid = '99999999-0000-0000-0000-000000000001' OR
-        nodegroupid = '32999999-0000-0000-0000-000000000000' OR
-        nodegroupid = '19999999-0000-0000-0000-000000000000' OR
-        nodegroupid = '21111111-0000-0000-0000-000000000000' OR
-        nodegroupid = '42999999-0000-0000-0000-000000000000';
-
-        DELETE FROM public.resource_instances
-        WHERE resourceinstanceid = '40000000-0000-0000-0000-000000000000';
-
-        """
-
-        cursor = connection.cursor()
-        cursor.execute(sql)
-
-        super().tearDownClass()
-
-    def setUp(self):
-        cursor = connection.cursor()
-        cursor.execute("Truncate public.tiles Cascade;")
-
-    def tearDown(self):
-        pass
 
     def test_load_from_python_dict(self):
         """
