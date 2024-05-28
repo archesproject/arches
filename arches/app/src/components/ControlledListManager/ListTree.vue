@@ -94,7 +94,12 @@ const onRowSelect = (node: TreeNode) => {
             },
             wrapper: { style: { overflowY: 'auto', maxHeight: '100%', paddingBottom: '1rem' } },
             container: { style: { fontSize: '14px' } },
-            content: { style: { height: '4rem' } },
+            content: ({ instance, props }) => {
+                if (instance.$el && props.node.key === movingItem.key) {
+                    instance.$el.classList.add('is-adjusting-parent');
+                }
+                return { style: { height: '4rem' } };
+            },
             label: { style: { textWrap: 'nowrap', marginLeft: '0.5rem' } },
             hooks: {
                 onBeforeUpdate() {
@@ -130,3 +135,9 @@ const onRowSelect = (node: TreeNode) => {
         </template>
     </Tree>
 </template>
+
+<style scoped>
+:deep(.is-adjusting-parent) {
+    border: dashed;
+}
+</style>

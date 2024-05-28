@@ -267,10 +267,7 @@ const onEnter = () => {
 </script>
 
 <template>
-    <span
-        v-if="node.key"
-        :class="node.key === movingItem.key ? 'is-adjusting-parent' : ''"
-    >
+    <span v-if="node.key">
         <div v-if="isNewItem(node)">
             <InputText
                 :key="newLabelCounter"
@@ -374,8 +371,5 @@ const onEnter = () => {
 }
 .move-button {
     height: 2.5rem;
-}
-.is-adjusting-parent {
-    color: red;
 }
 </style>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import arches from "arches";
 import Cookies from "js-cookie";
-import { computed, inject } from "vue";
+import { computed, inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
@@ -31,6 +31,8 @@ const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", { required: t
 const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", { required: true });
 const movingItem = defineModel<TreeNode>("movingItem", { required: true });
 const isMultiSelecting = defineModel<boolean>("isMultiSelecting", { required: true });
+
+const abandonMoveRef = ref();
 
 const { $gettext, $ngettext } = useGettext();
 
@@ -242,6 +244,15 @@ const confirmDelete = () => {
     });
 };
 
+const abandonMove = () => {
+    movingItem.value = {};
+
+    // Clear custom classes added in <ListTree> pass-through
+    Array.from(
+        abandonMoveRef.value!.$el.ownerDocument.getElementsByClassName('is-adjusting-parent')
+    ).forEach(li => (li as unknown as HTMLElement).classList.remove('is-adjusting-parent'));
+};
+
 await fetchLists();
 </script>
 
@@ -276,10 +287,11 @@ await fetchLists();
         <!-- turn off escaping: vue template sanitizes -->
         {{ $gettext("Selecting new parent for: %{item}", { item: movingItem.label ?? '' }, true) }}
         <Button
+            ref="abandonMoveRef"
             type="button"
             class="banner-button"
             :label="$gettext('Abandon')"
-            @click="movingItem = {}"
+            @click="abandonMove"
         />
     </div>
     <div
