@@ -36,19 +36,15 @@ class Command(BaseCommand):
             dest="operation",
             default="build",
             choices=["build"],
-            help="Operation Type; build=Alias for `yarn build_production` + `collectstatic`",
+            help="Operation Type; build=Alias for `npm run build_production` + `collectstatic`",
         )
 
     def handle(self, *args, **options):
         print("operation: " + options["operation"])
         if options["operation"] == "build":
             if settings.STATIC_ROOT != "":
-                proj_name = settings.APP_NAME
-                yarn_path = os.path.join(os.getcwd(), proj_name)
-                os.chdir(yarn_path)
-
                 subprocess.call(
-                    "yarn build_production", 
+                    "npm run build_production", 
                     shell=True
                 )
                 management.call_command("collectstatic", interactive=False)

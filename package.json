@@ -3,12 +3,12 @@
     "version": "7.6.0",
     "license": "AGPL-3.0-only",
     "scripts": {
-        "build_development": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js",
-        "build_production": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 NODE_ENV=production webpack --config ./webpack/webpack.config.prod.js",
-        "build_test": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js --env test=true",
+        "build_development": "npm run eslint:check && npm run ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js",
+        "build_production": "npm run eslint:check && npm run ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 NODE_ENV=production webpack --config ./webpack/webpack.config.prod.js",
+        "build_test": "npm run eslint:check && npm run ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js --env test=true",
         "eslint:check": "eslint ./arches/app/src",
         "eslint:fix": "eslint ./arches/app/src --fix",
-        "eslint:watch": "nodemon --watch . --ext ts,vue --exec yarn --silent eslint:check",
+        "eslint:watch": "nodemon --watch . --ext ts,vue --exec npm run --silent eslint:check",
         "gettext:extract": "vue-gettext-extract",
         "gettext:compile": "vue-gettext-compile",
         "ts:check": "vue-tsc --noEmit",
@@ -19,9 +19,6 @@
     "repository": {
         "url": "git@github.com:archesproject/arches.git",
         "type": "git"
-    },
-    "devDependencies": {
-        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.6.x"
     },
     "dependencies": {
         "@babel/runtime": "^7.17.2",
@@ -87,6 +84,9 @@
         "vue": "^3.4.21",
         "vue3-gettext": "^3.0.0-beta.4",
         "webpack-bundle-tracker": "^3.1.0"
+    },
+    "devDependencies": {
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.6.x"
     },
     "nodeModulesPaths": {
         "nifty": "plugins/nifty",
