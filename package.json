@@ -105,7 +105,7 @@
         "backbone": "node_modules/backbone/backbone-min",
         "underscore": "node_modules/underscore/underscore-min",
         "jquery-validate": "node_modules/jquery-validation/dist/jquery.validate.min",
-        "d3": "node_modules/d3/dist/d3.min",
+        "d3": "node_modules/d3/src/index.js",
         "dropzone": "node_modules/dropzone/dist/min/dropzone-amd-module.min",
         "ckeditor4": "node_modules/ckeditor4/ckeditor",
         "ckeditor-jquery": "node_modules/ckeditor4/adapters/jquery",
