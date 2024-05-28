@@ -147,13 +147,7 @@ const onAddItem = (parent: TreeNode) => {
     newLabelCounter.value += 1;
 
     parent.children!.push(itemAsNode(newItem, selectedLanguage.value));
-    // if (parent.data.name) {
-    //     // Parent node is a list
-    //     parent.data.items.push(newItem);
-    // } else {
-    //     // Parent node is an item
-    //     parent.data.children.push(newItem);
-    // }
+
     expandedKeys.value = {
         ...expandedKeys.value,
         [parent.key as string]: true,
@@ -256,10 +250,6 @@ const onBlur = async () => {
             parent.data.children.push(newItem);
         }
 
-        // expandedKeys.value = {
-        //     ...expandedKeys.value,
-        //     [parent.key as string]: true,
-        // };
         selectedKeys.value = { [newItem.id]: true };
         setDisplayedRow(newItem);
     }

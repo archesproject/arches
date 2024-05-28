@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         Plugin = apps.get_model("models", "Plugin")
 
         Plugin(
-            pluginid="60aa3e80-4aea-4042-a76e-5a872b1c36a0",
+            pluginid=uuid.UUID("60aa3e80-4aea-4042-a76e-5a872b1c36a0"),
             name=I18n_String("Controlled List Manager"),
             icon="fa fa-list",
             component="views/components/plugins/controlled-list-manager",
@@ -128,7 +128,7 @@ class Migration(migrations.Migration):
                         max_length=5,
                     ),
                 ),
-                ("value", models.CharField(max_length=2048, blank=True)),
+                ("value", models.CharField(max_length=2048)),
             ],
             options={
                 "db_table": "controlled_list_item_image_metadata",
@@ -138,7 +138,7 @@ class Migration(migrations.Migration):
             name="ControlledListItemValue",
             fields=[
                 ("id", models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ("value", models.CharField(max_length=1024)),
+                ("value", models.CharField(max_length=1024, blank=True)),
             ],
             options={
                 "db_table": "controlled_list_item_values",
