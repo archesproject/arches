@@ -29,6 +29,7 @@ class PluginView(MapBaseManagerView):
     action = None
 
     def get(self, request, pluginid=None, slug=None):
+        # import  pdb; pdb.set_trace()
         if slug is not None:
             plugin = models.Plugin.objects.get(slug=slug)
         else:

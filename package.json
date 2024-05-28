@@ -69,7 +69,6 @@
         "mapbox-gl": "^1.8.1",
         "metismenu": "2.7.2",
         "moment": "^2.29.4",
-        "moment-timezone": "^0.5.45",
         "nouislider": "11.0.3",
         "numeral": "^2.0.6",
         "primevue": "^3.51.0",
@@ -151,8 +150,8 @@
         "webcola": "node_modules/webcola/WebCola/cola.min"
     },
     "overrides": {
-        "glob": "^10.4.1",
-        "globby": "11.1.0",
+        "glob": "^9.3.5",
+        "globby": "^11.1.0",
         "moment-timezone": "^0.5.45",
         "nomnom": "npm:@gerhobbelt/nomnom",
         "rimraf": "^5.0.7", 
