@@ -182,7 +182,12 @@ const makeValueEditable = (clickedValue: Value, index: number) => {
     if (!editingRows.value.includes(clickedValue)) {
         editingRows.value = [ ...editingRows.value, clickedValue ];
     }
-    rowIndexToFocus.value = index;
+    if (index === -1) {
+        // Coming from <AddValue>
+        rowIndexToFocus.value = Math.max(values.value.length - 1, 0);
+    } else {
+        rowIndexToFocus.value = index;
+    }
 };
 
 const inputSelector = computed(() => {
@@ -203,7 +208,7 @@ const focusInput = () => {
             inputEl.focus({ focusVisible: true });
         }
         rowIndexToFocus.value = -1;
-    }, 2);
+    }, 10);
 };
 </script>
 
@@ -257,7 +262,7 @@ const focusInput = () => {
                 <template #editor="{ data, field }">
                     <InputText
                         v-model="data[field]"
-                        :pt="{ hooks: { onUpdated: focusInput } }"
+                        :pt="{ hooks: { onMounted: focusInput, onUpdated: focusInput } }"
                     />
                 </template>
                 <template #body="slotProps">
@@ -307,7 +312,10 @@ const focusInput = () => {
                 </template>
             </Column>
         </DataTable>
-        <AddValue :value-type />
+        <AddValue
+            :value-type
+            :new-value-callback="makeValueEditable"
+        />
     </div>
 </template>
 

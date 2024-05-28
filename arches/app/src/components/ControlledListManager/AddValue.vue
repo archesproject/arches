@@ -22,7 +22,10 @@ import type {
     ValueType,
 } from "@/types/ControlledListManager";
 
-const { valueType } = defineProps<{ valueType?: ValueType }>();
+const { valueType, newValueCallback } = defineProps<{
+    valueType?: ValueType,
+    newValueCallback: (newValue: NewValue, index: number) => void,
+}>();
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
@@ -83,13 +86,19 @@ const buttonLabel = computed(() => {
             return $gettext("Add Note");
     }
 });
+
+const onClick = () => {
+    const staticNewValue = { ...newValue.value };
+    item.value.values.push(staticNewValue);
+    newValueCallback(staticNewValue, -1);
+};
 </script>
 
 <template>
     <Button
         class="add-value"
         raised
-        @click="item.values.push(newValue)"
+        @click="onClick"
     >
         <i
             class="fa fa-plus-circle"
