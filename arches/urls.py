@@ -317,9 +317,7 @@ urlpatterns = [
 if settings.SHOW_LANGUAGE_SWITCH is True:
     # This must be included in core to keep webpack happy, but cannot be appended when running a project.
     # See https://github.com/archesproject/arches/pull/10754
-    directory_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-
-    if directory_path == settings.APP_ROOT:
+    if settings.APP_NAME == "Arches" and settings.APP_NAME not in settings.ARCHES_APPLICATIONS:
         urlpatterns = i18n_patterns(*urlpatterns)
         urlpatterns.append(path("i18n/", include("django.conf.urls.i18n")))
 

@@ -13,8 +13,6 @@ urlpatterns = [
 if settings.SHOW_LANGUAGE_SWITCH is True:
     # Only handle i18n routing in active project. This will still handle the routes provided by Arches core and Arches applications,
     # but handling i18n routes in multiple places causes application errors.
-    directory_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-
-    if directory_path == settings.APP_ROOT:
+    if settings.APP_NAME != "Arches" and settings.APP_NAME not in settings.ARCHES_APPLICATIONS:
         urlpatterns = i18n_patterns(*urlpatterns)
         urlpatterns.append(path("i18n/", include("django.conf.urls.i18n")))
