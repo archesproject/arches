@@ -125,7 +125,7 @@ input {
 }
 
 .characteristic {
-    margin: 1rem 1rem 2rem 1rem;
+    margin: 1rem;
     display: flex;
     align-items: center;
 }
