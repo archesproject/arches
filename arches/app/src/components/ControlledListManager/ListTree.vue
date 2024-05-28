@@ -27,6 +27,7 @@ const expandedKeys: Ref<TreeExpandedKeys> = ref({});
 const movingItem: Ref<TreeNode> = ref({});
 const isMultiSelecting = ref(false);
 const refetcher = ref(0);
+const filterValue = ref("");
 
 // For next new item's pref label (input textbox)
 const newLabelCounter = ref(1000);
@@ -95,6 +96,18 @@ const onRowSelect = (node: TreeNode) => {
             container: { style: { fontSize: '14px' } },
             content: { style: { height: '4rem' } },
             label: { style: { textWrap: 'nowrap', marginLeft: '0.5rem' } },
+            hooks: {
+                onBeforeUpdate() {
+                    // Snoop on the filterValue, because if we wait to react
+                    // to the emitted filter event, the templated rows will
+                    // have already rendered.
+                    // @ts-ignore
+                    const maybeValue = $el.ownerDocument.getElementsByClassName('p-tree-filter')[0]?.value;
+                    if (maybeValue) {
+                        (filterValue as any) = maybeValue;
+                    }
+                },
+            },
         }"
         @node-select="onRowSelect"
     >
@@ -111,6 +124,7 @@ const onRowSelect = (node: TreeNode) => {
                 v-model:nextNewItem="nextNewItem"
                 v-model:newLabelCounter="newLabelCounter"
                 v-model:newLabelFormValue="newLabelFormValue"
+                v-model:filter-value="filterValue"
                 :node="slotProps.node"
             />
         </template>

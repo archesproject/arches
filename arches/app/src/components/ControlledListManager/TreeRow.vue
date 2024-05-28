@@ -45,6 +45,7 @@ const refetcher = defineModel<number>("refetcher", { required: true });
 const nextNewItem = defineModel<NewControlledListItem>("nextNewItem");
 const newLabelFormValue = defineModel<string>("newLabelFormValue", { required: true });
 const newLabelCounter = defineModel<number>("newLabelCounter", { required: true });
+const filterValue = defineModel<string>("filterValue", { required: true });
 
 const { node } = defineProps<{ node: TreeNode }>();
 const { displayedRow, setDisplayedRow } = inject(displayedRowKey) as DisplayedListItemRefAndSetter;
@@ -62,7 +63,12 @@ const rowLabel = computed(() => {
     if (!node.data) {
         return '';
     }
-    return node.data.name ?? bestLabel(node.data, selectedLanguage.value.code).value;
+    const unstyledLabel = node.data.name ?? bestLabel(node.data, selectedLanguage.value.code).value;
+    if (!filterValue.value) {
+        return unstyledLabel;
+    }
+    const regex = new RegExp(`(${filterValue.value})`, "gi");
+    return unstyledLabel.replace(regex, "<b>$1</b>");
 });
 
 const showMoveHereButton = (rowId: string) => {
@@ -270,7 +276,12 @@ const onBlur = async () => {
                 @blur="onBlur"
             />
         </div>
-        <span v-else>{{ rowLabel }}</span>
+        <!-- eslint-disable vue/no-v-html -->
+        <span
+            v-else
+            v-html="rowLabel"
+        />
+        <!-- eslint-enable vue/no-v-html -->
         <div
             v-if="movingItem.key"
             class="actions"
