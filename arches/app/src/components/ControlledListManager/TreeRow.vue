@@ -260,6 +260,10 @@ const onBlur = async () => {
         setDisplayedRow(newItem);
     }
 };
+
+const onEnter = () => {
+    newLabelInputRef.value.$el.blur();
+};
 </script>
 
 <template>
@@ -274,6 +278,7 @@ const onBlur = async () => {
                 v-model="newLabelFormValue"
                 autofocus
                 @blur="onBlur"
+                @keyup.enter="onEnter"
             />
         </div>
         <!-- eslint-disable vue/no-v-html -->

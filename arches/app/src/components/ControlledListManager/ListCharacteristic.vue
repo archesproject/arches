@@ -68,6 +68,7 @@ const onCancel = () => {
             v-model="inputValue"
             type="text"
             :disabled="disabled"
+            @keyup.enter="onSave"
         />
         <span
             v-if="props.editable && !editing"

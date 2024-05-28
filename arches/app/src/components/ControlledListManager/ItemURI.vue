@@ -61,6 +61,7 @@ const onCancel = () => {
                 :disabled="!editing"
                 :aria-label="$gettext('URI')"
                 :placeholder="$gettext('Enter a URI')"
+                @keyup.enter="onSave"
             />
             <span
                 v-if="!editing"
