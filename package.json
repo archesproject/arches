@@ -81,17 +81,12 @@
         "requirejs": "~2.3.2",
         "requirejs-plugins": "1.0.2",
         "requirejs-text": "~2.0.16",
-        "select-woo": "jadu/selectWoo",
+        "select-woo": "jadu/selectWoo#stable/3.5",
         "underscore": "^1.13.6",
         "uuidjs": "^3.3.0",
         "vue": "^3.4.21",
         "vue3-gettext": "^3.0.0-beta.4",
         "webpack-bundle-tracker": "^3.1.0"
-    },
-    "overrides": {
-        "moment-timezone": "^0.5.45",
-        "underscore": "^1.13.6",
-        "glob": "^10.4.1"
     },
     "nodeModulesPaths": {
         "nifty": "plugins/nifty",
@@ -155,5 +150,11 @@
         "cytoscape": "node_modules/cytoscape/dist/cytoscape.min",
         "cytoscape-cola": "node_modules/cytoscape-cola/cytoscape-cola",
         "webcola": "node_modules/webcola/WebCola/cola.min"
+    },
+    "overrides": {
+        "moment-timezone": "^0.5.45",
+        "underscore": "^1.13.6",
+        "glob": "^10.4.1",
+        "rimraf": "^5.0.7"
     }
 }
