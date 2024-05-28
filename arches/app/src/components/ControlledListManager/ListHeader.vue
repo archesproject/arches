@@ -27,13 +27,13 @@ const heading = computed(() => {
         return $gettext(
             "List Editor > %{listName}",
             { listName: (displayedRow.value as ControlledList).name },
-            true, // disable HTML escaping: RDM Admins are trusted users
+            true,  // turn off escaping: vue template sanitizes
         );
     }
     return $gettext(
         "Item Editor > %{bestLabel}",
         { bestLabel: bestLabel(displayedRow.value, selectedLanguage.value.code).value },
-        true, // disable HTML escaping: RDM Admins are trusted users
+        true,  // turn off escaping: vue template sanitizes
     );
 });
 </script>

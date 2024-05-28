@@ -465,6 +465,8 @@ class BaseDataType(object):
 
     def validate_node(self, node):
         """
-        Confirms that a node is properly configured to collect data
+        Confirms a node is properly configured to collect data.
+        If improperly configured, this method should raise
+        a GraphValidationError
         """
-        return {"success": True}
+        pass
