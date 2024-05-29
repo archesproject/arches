@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
             """
             create or replace function __arches_migrate_collections_to_clm(
                 collection_names text[] default null, -- one or more collections to be migrated to controlled lists
-                prefered_sort_language text default 'en'
+                preferred_sort_language text default 'en'
             )
             returns text as $$
             declare failed_collections text[];
@@ -125,7 +125,7 @@ class Migration(migrations.Migration):
                         ch.child,
                         ch.depth,
                         v.languageid, v.value, 
-                        ROW_NUMBER() OVER (PARTITION BY ch.child ORDER BY (v.languageid = prefered_sort_language) DESC, languages.id) AS language_rank,
+                        ROW_NUMBER() OVER (PARTITION BY ch.child ORDER BY (v.languageid = preferred_sort_language) DESC, languages.id) AS language_rank,
                         r.conceptidfrom
                     from collection_hierarchy ch
                     left join values v on v.conceptid = ch.child
