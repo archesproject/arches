@@ -11,7 +11,7 @@ JSONLD_IMPORT_MODULE_PK = "1ae62c48-7e56-4df7-a433-2042c6acdf0c"
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10709_refresh_geos_by_transaction"),
+        ("models", "10710_fix_whatisthis"),
     ]
 
     def add_jsonld_module(apps, schema_editor):
