@@ -267,7 +267,10 @@ const onEnter = () => {
 </script>
 
 <template>
-    <span v-if="node.key">
+    <span
+        v-if="node.key"
+        style="display: inline-flex; width: 100%;"
+    >
         <div v-if="isNewItem(node)">
             <InputText
                 :key="newLabelCounter"
@@ -310,8 +313,8 @@ const onEnter = () => {
                 @click.stop="onAddItem(node)"
             />
             <span
-                v-if="!node.data.name"
-                class="reorder-buttons"
+                v-if="!isList(node)"
+                class="move-buttons"
             >
                 <Button
                     v-if="node.key in selectedKeys"
@@ -331,14 +334,14 @@ const onEnter = () => {
                     :disabled="isLastItem(node.data)"
                     @click="onReorder(node.data, false)"
                 />
+                <Button
+                    v-if="!node.data.name && node.key in selectedKeys"
+                    type="button"
+                    icon="fa fa-arrows-alt"
+                    :aria-label="$gettext('Change item parent')"
+                    @click="setMovingItem(node)"
+                />
             </span>
-            <Button
-                v-if="!node.data.name && node.key in selectedKeys"
-                type="button"
-                icon="fa fa-arrows-alt"
-                :aria-label="$gettext('Change item parent')"
-                @click="setMovingItem(node)"
-            />
         </div>
     </span>
 </template>
@@ -346,9 +349,10 @@ const onEnter = () => {
 <style scoped>
 .actions {
     display: inline-flex;
-    align-items: center;
     gap: 1rem;
     margin-left: 1rem;
+    width: 100%;
+    justify-content: space-between;
 }
 .p-button {
     background-color: aliceblue;
@@ -359,15 +363,10 @@ const onEnter = () => {
     width: 2rem;
     border-radius: 50%;
 }
-.reorder-buttons {
+.move-buttons {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-.reorder-button {
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
-    height: 1.5rem;
+    gap: 0.5rem;
+    padding-right: 0.5rem;
 }
 .move-button {
     height: 2.5rem;

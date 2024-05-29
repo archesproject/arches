@@ -100,7 +100,7 @@ const onRowSelect = (node: TreeNode) => {
                 }
                 return { style: { height: '4rem' } };
             },
-            label: { style: { textWrap: 'nowrap', marginLeft: '0.5rem' } },
+            label: { style: { textWrap: 'nowrap', marginLeft: '0.5rem', width: '100%' } },
             hooks: {
                 onBeforeUpdate() {
                     // Snoop on the filterValue, because if we wait to react
