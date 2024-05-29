@@ -320,8 +320,6 @@ Because your volume from `step 4` is laid over the files in your container, file
 In order to install newly added static file packages, run the following command:  
     `docker-compose -f .\docker-compose-local.yml run arches install_npm_components`
 
-##### docker-compose-local.yml
-Here is a link to a working [docker-compose-local.yml](https://gist.github.com/jmunowitch/c63fa39be4651b9bf2f0b1abc69f7479) file
 
 
 
