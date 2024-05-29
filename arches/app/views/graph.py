@@ -36,6 +36,7 @@ from django.core.exceptions import PermissionDenied
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
+from arches.app.utils.update_resource_instance_data_based_on_graph_diff import update_resource_instance_data_based_on_graph_diff
 from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
@@ -554,14 +555,29 @@ class GraphPublicationView(View):
 
         if self.action == "publish":
             try:
-                data = JSONDeserializer().deserialize(request.body)
+                with transaction.atomic():
+                    data = JSONDeserializer().deserialize(request.body)
+                    notes = data.get("notes")
+                    should_update_resource_instance_data = data.get('shouldUpdateResourceInstanceData')
 
-                source_graph.update_from_editable_future_graph()
-                source_graph.publish(notes=data.get("notes"), user=request.user)
+                    if should_update_resource_instance_data:
+                        published_source_graph = source_graph.get_published_graph(language=settings.LANGUAGE_CODE)
 
-                return JSONResponse(
-                    {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been updated. Please click the OK button to reload the page.")}
-                )
+                    source_graph.update_from_editable_future_graph()
+                    source_graph.publish(notes=notes, user=request.user)
+
+                    if should_update_resource_instance_data:
+                        updated_published_source_graph = source_graph.get_published_graph(language=settings.LANGUAGE_CODE)
+                        
+                        update_resource_instance_data_based_on_graph_diff(
+                            initial_graph=published_source_graph.serialized_graph,
+                            updated_graph=updated_published_source_graph.serialized_graph,
+                            user=request.user
+                        )
+
+                    return JSONResponse(
+                        {"graph": editable_future_graph, "title": _("Success!"), "message": _("The graph has been updated. Please click the OK button to reload the page.")}
+                    )
             except Exception as e:
                 logger.exception(e)
                 return JSONErrorResponse(_("Unable to process publication"), _("Please contact your administrator if issue persists"))
@@ -574,7 +590,7 @@ class GraphPublicationView(View):
                 )
             except Exception as e:
                 logger.exception(e)
-                return JSONErrorResponse(str(_("Unable to process publication"), _("Please contact your administrator if issue persists")))
+                return JSONErrorResponse(_("Unable to process publication"), _("Please contact your administrator if issue persists"))
 
         elif self.action == "update_published_graphs":
             try:
@@ -585,7 +601,8 @@ class GraphPublicationView(View):
                     {"graph": source_graph, "title": _("Success!"), "message": _("The published graphs have been successfully updated.")}
                 )
             except Exception as e:
-                return JSONErrorResponse(str(e))
+                logger.exception(e)
+                return JSONErrorResponse(_("Unable to update published graphs"), _("Please contact your administrator if issue persists"))
 
         elif self.action == "restore_state_from_serialized_graph":
             try:
@@ -598,7 +615,8 @@ class GraphPublicationView(View):
                     {"graph": source_graph, "title": _("Success!"), "message": _("The graph has been successfully restored.")}
                 )
             except Exception as e:
-                return JSONErrorResponse(str(e))
+                logger.exception(e)
+                return JSONErrorResponse(_("Unable to restore state from serialized graph"), _("Please contact your administrator if issue persists"))
 
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")

@@ -22,7 +22,7 @@ define([
     'bindings/resizable-sidepanel',
     'views/components/simple-switch',
     'utils/set-csrf-token',
-    'datatype-config-components'
+    'datatype-config-components',
 ], function($, _, ko, koMapping, arches, reportLookup, viewData, data, BaseManagerView, AlertViewModel, JsonErrorAlertViewModel, GraphModel, ReportModel, GraphTree, NodeFormView, BranchListView, CardTreeViewModel, PermissionDesigner, GraphSettingsViewModel, CardViewModel) {
     var GraphDesignerView = BaseManagerView.extend({
         initialize: function(options) {
@@ -48,7 +48,9 @@ define([
             viewModel.primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
             viewModel.graphHasUnpublishedChanges = ko.observable(data['graph']['has_unpublished_changes']);
             viewModel.publicationResourceInstanceCount = ko.observable(data['publication_resource_instance_count']);
-            viewModel.isGraphActive = ko.observable();
+            viewModel.isGraphActive = ko.observable(data['graph']['is_active']);
+            viewModel.shouldShowPublishModal = ko.observable(false);
+            viewModel.shouldUpdateResourceInstanceData = ko.observable(false);
 
             const url = new URL(window.location);
             if (url.searchParams.has('has_been_redirected_from_editable_future_graph')) {
@@ -180,8 +182,6 @@ define([
                 window.open(arches.urls.export_mapping_file(viewModel.graph.graphid()), '_blank');
             };
 
-            viewModel.shouldShowPublishModal = ko.observable(false);
-
             viewModel.toggleLockedState = function() {
                 let url = new URL(window.location.href);
 
@@ -200,7 +200,10 @@ define([
 
                 $.ajax({
                     type: "POST",
-                    data: JSON.stringify({'notes': viewModel.graphPublicationNotes()}),
+                    data: JSON.stringify({
+                        'notes': viewModel.graphPublicationNotes(), 
+                        'shouldUpdateResourceInstanceData': viewModel.shouldUpdateResourceInstanceData()
+                    }),
                     url: arches.urls.publish_graph(viewModel.graph.graphid()),
                     complete: function(response, status) {
                         let alert;
@@ -235,6 +238,8 @@ define([
                         
                         viewModel.graphPublicationNotes(null);
                         viewModel.shouldShowPublishModal(false);
+                        viewModel.shouldUpdateResourceInstanceData(false);
+                        viewModel.loading(false);
                     }
                 });
             };
