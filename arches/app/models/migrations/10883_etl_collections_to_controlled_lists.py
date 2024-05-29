@@ -137,7 +137,7 @@ class Migration(migrations.Migration):
                 -- We also want to take INTO account the child's parent value, so the relations table is joined back to capture the parent.
                 alpha_sorted_list_item_hierarchy as (
                     select child as id,
-                        row_number() over (partition by root_list order by depth, value) - 1 as sortorder,
+                        row_number() over (partition by root_list order by depth, LOWER(value)) - 1 as sortorder,
                         root_list as listid,
                         case when conceptidfrom = root_list then null -- list items at top of hierarchy have no parent list item
                             else conceptidfrom
