@@ -8,7 +8,7 @@ import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
-import { createItem, upsertValue, patchList } from "@/components/ControlledListManager/api.ts";
+import { createItem, createList, upsertValue, patchList } from "@/components/ControlledListManager/api.ts";
 import { ERROR, PREF_LABEL, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import {
     bestLabel,
@@ -45,17 +45,25 @@ const refetcher = defineModel<number>("refetcher", { required: true });
 const nextNewItem = defineModel<NewControlledListItem>("nextNewItem");
 const newLabelFormValue = defineModel<string>("newLabelFormValue", { required: true });
 const newLabelCounter = defineModel<number>("newLabelCounter", { required: true });
+const newListFormValue = defineModel<string>("newListFormValue", { required: true });
+const newListCounter = defineModel<number>("newListCounter", { required: true });
 const filterValue = defineModel<string>("filterValue", { required: true });
 
 const { node } = defineProps<{ node: TreeNode }>();
 const { displayedRow, setDisplayedRow } = inject(displayedRowKey) as DisplayedListItemRefAndSetter;
 
-// Workaround for autofocusing the new label input box
+// Workaround for autofocusing the new list/label input boxes
 // https://github.com/primefaces/primevue/issues/2397
+const newListInputRef = ref();
 const newLabelInputRef = ref();
 watch(newLabelInputRef, () => {
     if (newLabelInputRef.value) {
         newLabelInputRef.value.$el.focus();
+    }
+});
+watch(newListInputRef, () => {
+    if (newListInputRef.value) {
+        newListInputRef.value.$el.focus();
     }
 });
 
@@ -221,14 +229,18 @@ const setMovingItem = (node: TreeNode) => {
 };
 
 const isList = (node: TreeNode) => {
-    return !!node.data.name;
+    return !!node.data.nodes;
+};
+
+const isNewList = (node: TreeNode) => {
+    return isList(node) && typeof node.data.id === 'number';
 };
 
 const isNewItem = (node: TreeNode) => {
     return node.data.values && !node.data.values[0].id;
 };
 
-const onBlur = async () => {
+const onBlurNewItem = async () => {
     const newItem = await createItem(nextNewItem.value, toast, $gettext);
     if (newItem) {
         const newValue = {
@@ -261,8 +273,22 @@ const onBlur = async () => {
     }
 };
 
-const onEnter = () => {
+const onEnterNewItem = () => {
     newLabelInputRef.value.$el.blur();
+};
+
+const onEnterNewList = () => {
+    newListInputRef.value.$el.blur();
+};
+
+const onBlurNewList = async () => {
+    const newList = await createList(newListFormValue.value, toast, $gettext);
+    tree.value = [
+        ...tree.value.filter(lst => typeof lst.data.id === 'string'),
+        listAsNode(newList),
+    ];
+    selectedKeys.value = { [newList.id]: true };
+    setDisplayedRow(newList);
 };
 </script>
 
@@ -277,8 +303,18 @@ const onEnter = () => {
                 ref="newLabelInputRef"
                 v-model="newLabelFormValue"
                 autofocus
-                @blur="onBlur"
-                @keyup.enter="onEnter"
+                @blur="onBlurNewItem"
+                @keyup.enter="onEnterNewItem"
+            />
+        </div>
+        <div v-else-if="isNewList(node)">
+            <InputText
+                :key="newListCounter"
+                ref="newListInputRef"
+                v-model="newListFormValue"
+                autofocus
+                @blur="onBlurNewList"
+                @keyup.enter="onEnterNewList"
             />
         </div>
         <!-- eslint-disable vue/no-v-html -->
@@ -302,7 +338,7 @@ const onEnter = () => {
             />
         </div>
         <div
-            v-else-if="isList(node) || !isNewItem(node)"
+            v-else-if="!isNewList(node) && !isNewItem(node)"
             class="actions"
         >
             <Button

@@ -19,7 +19,7 @@ import type { Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/types/arches";
-import type { ControlledList, DisplayedRowRefAndSetter } from "@/types/ControlledListManager";
+import type { ControlledList, DisplayedRowRefAndSetter, NewControlledList } from "@/types/ControlledListManager";
 
 import { BUTTON_GREEN } from "@/theme.ts";
 
@@ -31,6 +31,9 @@ const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", { required: t
 const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", { required: true });
 const movingItem = defineModel<TreeNode>("movingItem", { required: true });
 const isMultiSelecting = defineModel<boolean>("isMultiSelecting", { required: true });
+const nextNewList = defineModel<NewControlledList>("nextNewList");
+const newListFormValue = defineModel<string>("newListFormValue", { required: true });
+const newListCounter = defineModel<number>("newListCounter", { required: true });
 
 const abandonMoveRef = ref();
 
@@ -101,29 +104,24 @@ const fetchLists = async () => {
     }
 };
 
-const createList = async () => {
-    const token = Cookies.get("csrftoken");
-    if (!token) {
-        return;
-    }
-    try {
-        const response = await fetch(arches.urls.controlled_list_add, {
-            method: "POST",
-            headers: { "X-CSRFToken": token },
-        });
-        if (response.ok) {
-            const newList = await response.json();
-            controlledListItemsTree.value.unshift(listAsNode(newList));
-        } else {
-            throw new Error();
-        }
-    } catch {
-        toast.add({
-            severity: ERROR,
-            life: 8000,
-            summary: $gettext("List creation failed"),
-        });
-    }
+const createList = () => {
+    const newList: NewControlledList = {
+        id: newListCounter.value,
+        name: newListFormValue.value,
+        dynamic: false,
+        search_only: false,
+        items: [],
+        nodes: [],
+    };
+
+    nextNewList.value = newList;
+    newListFormValue.value = '';
+    newListCounter.value += 1;
+
+    controlledListItemsTree.value.push(listAsNode(newList, selectedLanguage.value));
+
+    selectedKeys.value = { [newList.id]: true };
+    setDisplayedRow(newList);
 };
 
 const deleteLists = async (listIds: string[]) => {

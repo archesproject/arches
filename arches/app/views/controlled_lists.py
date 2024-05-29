@@ -323,19 +323,21 @@ class ControlledListView(View):
             serialize(lst, flat=str_to_bool(request.GET.get("flat", "false")))
         )
 
-    def add_new_list(self):
-        lst = ControlledList(
-            name=_("Untitled List: ")
-            + datetime.now().isoformat(sep=" ", timespec="seconds")
-        )
+    @staticmethod
+    def default_name():
+        return _("Untitled List: ") + datetime.now().isoformat(sep=" ", timespec="seconds")
+
+    def add_new_list(self, name):
+        lst = ControlledList(name=name or self.default_name())
         lst.save()
         return JSONResponse(serialize(lst), status=HTTPStatus.CREATED)
 
     def post(self, request, **kwargs):
-        if not (list_id := kwargs.get("id", None)):
-            return self.add_new_list()
-
         data = JSONDeserializer().deserialize(request.body)
+        name = data.get("name", None)
+
+        if not (list_id := kwargs.get("id", None)):
+            return self.add_new_list(name)
 
         qs = (
             ControlledList.objects.filter(pk=list_id)

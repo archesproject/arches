@@ -17,6 +17,35 @@ import type {
 
 type GetText = (s: string) => string;
 
+export const createList = async(
+    name: string,
+    toast: ToastServiceMethods,
+    $gettext: GetText,
+) => {
+    const token = Cookies.get("csrftoken");
+    if (!token) {
+        return;
+    }
+    try {
+        const response = await fetch(arches.urls.controlled_list_add, {
+            method: "POST",
+            headers: { "X-CSRFToken": token },
+            body: JSON.stringify({ name }),
+        });
+        if (response.ok) {
+            return await response.json();
+        } else {
+            throw new Error();
+        }
+    } catch {
+        toast.add({
+            severity: ERROR,
+            life: 8000,
+            summary: $gettext("List creation failed"),
+        });
+    }
+};
+
 export const createItem = async (
     item: ControlledListItem,
     toast: ToastServiceMethods,
