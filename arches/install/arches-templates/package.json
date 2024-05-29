@@ -24,8 +24,6 @@
     "nodeModulesPaths": {
     },
     "overrides": {
-        "glob": "^9.3.5",
-        "globby": "^11.1.0",
         "moment-timezone": "^0.5.45",
         "nomnom": "npm:@gerhobbelt/nomnom",
         "rimraf": "^5.0.7", 
