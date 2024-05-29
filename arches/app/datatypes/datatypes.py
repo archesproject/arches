@@ -1691,9 +1691,9 @@ class FileListDataType(BaseDataType):
             if user is True:
                 user_is_reviewer = True
             elif user:
-                if hasattr(parameters.user, "userprofile") is not True:
-                    models.UserProfile.objects.create(user=parameters.user)
-                user_is_reviewer = user_is_resource_reviewer(parameters.user)
+                if hasattr(user, "userprofile") is not True:
+                    models.UserProfile.objects.create(user=user)
+                user_is_reviewer = user_is_resource_reviewer(user)
             else:
                 # There must be a user to be able to upload files.
                 return
