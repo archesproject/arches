@@ -323,12 +323,9 @@ class ControlledListView(View):
             serialize(lst, flat=str_to_bool(request.GET.get("flat", "false")))
         )
 
-    @staticmethod
-    def default_name():
-        return _("Untitled List: ") + datetime.now().isoformat(sep=" ", timespec="seconds")
-
     def add_new_list(self, name):
-        lst = ControlledList(name=name or self.default_name())
+        lst = ControlledList(name=name)
+        lst.full_clean()  # applies default name
         lst.save()
         return JSONResponse(serialize(lst), status=HTTPStatus.CREATED)
 

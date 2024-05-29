@@ -1918,12 +1918,17 @@ class SpatialView(models.Model):
 ### Controlled List Manager
 class ControlledList(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=127, null=False)
+    name = models.CharField(max_length=127, null=False, blank=True)
     dynamic = models.BooleanField(default=False)
     search_only = models.BooleanField(default=False)
 
     class Meta:
         db_table = "controlled_lists"
+
+    def clean_fields(self, exclude=None):
+        super().clean_fields(exclude=exclude)
+        if (not exclude or "name" not in exclude) and not self.name:
+            self.name = _("Untitled List: ") + datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
 
 
 class ControlledListItem(models.Model):
