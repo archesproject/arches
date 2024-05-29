@@ -40,12 +40,12 @@ class BooleanDataTypeTests(ArchesTestCase):
     def test_validate(self):
         boolean = DataTypeFactory().get_instance("boolean")
 
-        for good in ["true", "false", "yes", "no", None]:
+        for good in ["true", "True", "false", "False", "yes", "no", None]:
             with self.subTest(input=good):
                 no_errors = boolean.validate(good)
                 self.assertEqual(len(no_errors), 0)
 
-        for bad in ["garbage", "True", "False", "None"]:
+        for bad in ["garbage", "str", "None"]:
             with self.subTest(input=bad):
                 errors = boolean.validate(bad)
                 self.assertEqual(len(errors), 1)
