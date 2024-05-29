@@ -125,11 +125,12 @@ class Migration(migrations.Migration):
                         ch.child,
                         ch.depth,
                         v.languageid, v.value, 
-                        ROW_NUMBER() OVER (PARTITION BY ch.child ORDER BY (v.languageid = prefered_sort_language) DESC, v.languageid) AS language_rank,
+                        ROW_NUMBER() OVER (PARTITION BY ch.child ORDER BY (v.languageid = prefered_sort_language) DESC, languages.id) AS language_rank,
                         r.conceptidfrom
                     from collection_hierarchy ch
                     left join values v on v.conceptid = ch.child
-                    join relations r on r.conceptidto = ch.child
+                    left join relations r on r.conceptidto = ch.child
+                    left join languages on v.languageid = languages.code
                     where v.valuetype = 'prefLabel' and 
                         r.relationtype = 'member' 
                 ),
