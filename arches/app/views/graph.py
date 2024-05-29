@@ -198,9 +198,9 @@ class GraphDesignerView(GraphBaseView):
         if self.source_graph.source_identifier_id:
             url = reverse('graph_designer', kwargs={'graphid': self.source_graph.source_identifier_id})
             
-            query_string = urlencode({
-                'has_been_redirected_from_editable_future_graph': True
-            })
+            query_dict = request.GET.copy()
+            query_dict["has_been_redirected_from_editable_future_graph"] = True
+            query_string = query_dict.urlencode()
             
             return redirect("{}?{}".format(url, query_string))
 
