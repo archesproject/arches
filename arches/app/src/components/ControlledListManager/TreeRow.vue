@@ -295,6 +295,7 @@ const onEnter = () => {
             <Button
                 v-if="showMoveHereButton(node.key)"
                 type="button"
+                raised
                 class="move-button"
                 :label="$gettext('Move %{item} here', { item: movingItem.label ?? '' }, true)"
                 @click="setParent(node)"
@@ -307,6 +308,7 @@ const onEnter = () => {
             <Button
                 v-if="node.key in selectedKeys"
                 type="button"
+                raised
                 class="add-child-button"
                 icon="fa fa-plus"
                 :aria-label="$gettext('Add child item')"
@@ -319,6 +321,7 @@ const onEnter = () => {
                 <Button
                     v-if="node.key in selectedKeys"
                     type="button"
+                    raised
                     class="reorder-button"
                     icon="fa fa-caret-up"
                     :aria-label="$gettext('Move up')"
@@ -328,6 +331,7 @@ const onEnter = () => {
                 <Button
                     v-if="node.key in selectedKeys"
                     type="button"
+                    raised
                     class="reorder-button"
                     icon="fa fa-caret-down"
                     :aria-label="$gettext('Move down')"
@@ -337,6 +341,7 @@ const onEnter = () => {
                 <Button
                     v-if="!node.data.name && node.key in selectedKeys"
                     type="button"
+                    raised
                     icon="fa fa-arrows-alt"
                     :aria-label="$gettext('Change item parent')"
                     @click="setMovingItem(node)"
