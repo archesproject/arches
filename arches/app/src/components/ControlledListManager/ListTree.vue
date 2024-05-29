@@ -94,8 +94,8 @@ const onRowSelect = (node: TreeNode) => {
             },
             wrapper: { style: { overflowY: 'auto', maxHeight: '100%', paddingBottom: '1rem' } },
             container: { style: { fontSize: '14px' } },
-            content: ({ instance, props }) => {
-                if (instance.$el && props.node.key === movingItem.key) {
+            content: ({ instance }) => {
+                if (instance.$el && instance.node.key === movingItem.key) {
                     instance.$el.classList.add('is-adjusting-parent');
                 }
                 return { style: { height: '4rem' } };
