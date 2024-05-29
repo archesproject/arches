@@ -11,15 +11,16 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             """
             create or replace function __arches_migrate_collections_to_clm(
-                collection_names text[] default null -- one or more collections to be migrated to controlled lists
+                collection_names text[] default null, -- one or more collections to be migrated to controlled lists
+                prefered_sort_language text default null
             )
             returns text as $$
             declare failed_collections text[];
             begin
                 -- RDM Collections to Controlled Lists & List Items Migration --
                 -- To use, run: 
-                --      select * from __arches_migrate_collections_to_clm(ARRAY['Getty AAT', 'http://vocab.getty.edu/aat']);
-                -- where the input values are concept prefLabels or identifiers
+                --      select * from __arches_migrate_collections_to_clm(ARRAY['Getty AAT', 'http://vocab.getty.edu/aat'], 'en');
+                -- where the input array values are concept prefLabels or identifiers and the optional language is used for sorting
 
                 -- Conceptually:
                 --      a collection becomes a list
@@ -116,22 +117,36 @@ class Migration(migrations.Migration):
                     from collection_hierarchy ch
                     join relations r on ch.child = r.conceptidfrom
                     where relationtype = 'member'
-                ), 
-                -- Once we've assigned our root_list, we want to sort the children (to depth n) alphabetically based on their prefLabel
-                -- We also want to take INTO account the child's parent value, so the relations table is joined back to capture the parent.
-                alpha_sorted_list_item_hierarchy as (
-                    select child as id,
-                        row_number() over (partition by root_list order by depth, v.value) - 1 as sortorder, 
-                        root_list as listid,
-                        case when r.conceptidfrom = root_list then null -- list items at top of hierarchy have no parent list item
-                            else r.conceptidfrom
-                        end as parent_id
+                ),
+                -- Rank prefLabels by user provided language, 
+                -- if no prefLabel in that language exists for a concept, fall back on next prefLabel ordered by languageid
+                ranked_prefLabels as (
+                    select ch.root_list,
+                        ch.child,
+                        ch.depth,
+                        v.languageid, v.value, 
+                        ROW_NUMBER() OVER (PARTITION BY ch.child ORDER BY (v.languageid = prefered_sort_language) DESC, v.languageid) AS language_rank,
+                        r.conceptidfrom
                     from collection_hierarchy ch
                     left join values v on v.conceptid = ch.child
                     join relations r on r.conceptidto = ch.child
                     where v.valuetype = 'prefLabel' and 
-                        r.relationtype = 'member' and
-                        root_list in (select id from controlled_lists where name = ANY(collection_names))
+                        r.relationtype = 'member' 
+                ),
+                -- Once we've assigned our root_list, we want to sort the children (to depth n) alphabetically based on their ranked prefLabel
+                -- We also want to take INTO account the child's parent value, so the relations table is joined back to capture the parent.
+                alpha_sorted_list_item_hierarchy as (
+                    select child as id,
+                        row_number() over (partition by root_list order by depth, value) - 1 as sortorder,
+                        root_list as listid,
+                        case when conceptidfrom = root_list then null -- list items at top of hierarchy have no parent list item
+                            else conceptidfrom
+                        end as parent_id,
+                        depth
+                    from ranked_prefLabels rpl
+                    where language_rank = 1 and
+                -- 		root_list in (select id from controlled_lists where name = ANY(ARRAY['Getty AAT']))
+                        root_list in (select id from controlled_lists where name = ANY(ARRAY['AAT Entries']))
                 )
                 insert into controlled_list_items(
                     id,
@@ -141,7 +156,7 @@ class Migration(migrations.Migration):
                     listid,
                     parent_id
                 )
-                select distinct on (id) id,
+                select id,
                     null as uri, -- TODO: dynamic handling of URI generation/ETL
                     sortorder,
                     false as guide,
