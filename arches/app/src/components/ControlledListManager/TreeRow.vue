@@ -67,6 +67,11 @@ watch(newListInputRef, () => {
     }
 });
 
+const addChildItemLabel = $gettext("Add child item");
+const moveUpLabel = $gettext("Move item up");
+const moveDownLabel = $gettext("Move item down");
+const changeParentLabel = $gettext("Change item parent");
+
 const rowLabel = computed(() => {
     if (!node.data) {
         return '';
@@ -343,11 +348,12 @@ const onBlurNewList = async () => {
         >
             <Button
                 v-if="node.key in selectedKeys"
+                v-tooltip="addChildItemLabel"
                 type="button"
                 raised
                 class="add-child-button"
                 icon="fa fa-plus"
-                :aria-label="$gettext('Add child item')"
+                :aria-label="addChildItemLabel"
                 @click.stop="onAddItem(node)"
             />
             <span
@@ -356,30 +362,33 @@ const onBlurNewList = async () => {
             >
                 <Button
                     v-if="node.key in selectedKeys"
+                    v-tooltip="moveUpLabel"
                     type="button"
                     raised
                     class="reorder-button"
                     icon="fa fa-caret-up"
-                    :aria-label="$gettext('Move up')"
+                    :aria-label="moveUpLabel"
                     :disabled="isFirstItem(node.data)"
                     @click="onReorder(node.data, true)"
                 />
                 <Button
                     v-if="node.key in selectedKeys"
+                    v-tooltip="moveDownLabel"
                     type="button"
                     raised
                     class="reorder-button"
                     icon="fa fa-caret-down"
-                    :aria-label="$gettext('Move down')"
+                    :aria-label="moveDownLabel"
                     :disabled="isLastItem(node.data)"
                     @click="onReorder(node.data, false)"
                 />
                 <Button
                     v-if="!node.data.name && node.key in selectedKeys"
+                    v-tooltip="changeParentLabel"
                     type="button"
                     raised
                     icon="fa fa-arrows-alt"
-                    :aria-label="$gettext('Change item parent')"
+                    :aria-label="changeParentLabel"
                     @click="setMovingItem(node)"
                 />
             </span>
