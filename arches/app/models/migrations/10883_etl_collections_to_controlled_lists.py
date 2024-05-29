@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
             """
             create or replace function __arches_migrate_collections_to_clm(
                 collection_names text[] default null, -- one or more collections to be migrated to controlled lists
-                prefered_sort_language text default null
+                prefered_sort_language text default 'en'
             )
             returns text as $$
             declare failed_collections text[];
