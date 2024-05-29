@@ -145,8 +145,7 @@ class Migration(migrations.Migration):
                         depth
                     from ranked_prefLabels rpl
                     where language_rank = 1 and
-                -- 		root_list in (select id from controlled_lists where name = ANY(ARRAY['Getty AAT']))
-                        root_list in (select id from controlled_lists where name = ANY(ARRAY['AAT Entries']))
+                        root_list in (select id from controlled_lists where name = ANY(collection_names))
                 )
                 insert into controlled_list_items(
                     id,
