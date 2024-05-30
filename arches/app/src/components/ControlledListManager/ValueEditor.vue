@@ -129,6 +129,7 @@ const onSave = async (event: DataTableRowEditInitEvent) => {
     const normalizedNewData: Value = {
         ...event.newData,
         id: typeof event.newData.id === 'string' ? event.newData.id : null,
+        value: event.newData.value.trim(),
     };
     const upsertedValue: Value = await upsertValue(
         normalizedNewData,

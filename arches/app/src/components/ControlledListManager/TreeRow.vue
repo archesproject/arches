@@ -252,7 +252,7 @@ const onBlurNewItem = async () => {
             ...nextNewItem.value!.values[0],
             id: 0,
             item_id: newItem.id,
-            value: newLabelFormValue.value,
+            value: newLabelFormValue.value.trim(),
         };
         const newLabel = await upsertValue(newValue, toast, $gettext);
 
@@ -287,7 +287,7 @@ const onEnterNewList = () => {
 };
 
 const onBlurNewList = async () => {
-    const newList = await createList(newListFormValue.value, toast, $gettext);
+    const newList = await createList(newListFormValue.value.trim(), toast, $gettext);
     tree.value = [
         ...tree.value.filter(lst => typeof lst.data.id === 'string'),
         listAsNode(newList),
