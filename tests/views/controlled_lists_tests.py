@@ -38,7 +38,6 @@ class ControlledListTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.client = Client()
         cls.admin = User.objects.get(username="admin")
         cls.anonymous = User.objects.get(username="anonymous")
 
@@ -253,7 +252,11 @@ class ControlledListTests(ArchesTestCase):
 
     def test_create_list(self):
         self.client.force_login(self.admin)
-        self.client.post(reverse("controlled_list_add"))
+        self.client.post(
+            reverse("controlled_list_add"),
+            {"name": ""},
+            content_type="application/json",
+        )
         self.assertEqual(ControlledList.objects.count(), 3)
         self.assertEqual(
             ControlledList.objects.filter(name__startswith="Untitled List: ").count(), 1
