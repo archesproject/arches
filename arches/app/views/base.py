@@ -26,13 +26,12 @@ from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.permission_backend import (
-    get_createable_resource_types,
+    get_createable_resource_models,
     user_is_resource_reviewer,
     get_editable_resource_types,
     get_resource_types_by_perm,
     user_can_read_map_layers,
 )
-from arches.app.utils.permission_backend import get_createable_resource_types, user_is_resource_reviewer
 
 class BaseManagerView(TemplateView):
 
@@ -52,9 +51,7 @@ class BaseManagerView(TemplateView):
             if self.request.user.has_perm("view_plugin", plugin):
                 context["plugins"].append(plugin)
 
-        createable = list(
-            models.GraphModel.objects.filter(pk__in=list(get_createable_resource_types(self.request.user))).all()
-        )
+        createable = list(get_createable_resource_models(self.request.user))
         createable.sort(key=lambda x: x.name.lower())
         context["createable_resources"] = JSONSerializer().serialize(
             createable,

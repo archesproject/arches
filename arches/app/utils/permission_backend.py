@@ -167,6 +167,9 @@ def _get_permission_framework():
             _PERMISSION_FRAMEWORK = ArchesStandardPermissionFramework()
     return _PERMISSION_FRAMEWORK
 
+def get_createable_resource_models(user):
+    return GraphModel.objects.filter(pk__in=list(get_createable_resource_types(user))).all()
+
 def assign_perm(perm, user_or_group, obj=None):
     return _get_permission_framework().assign_perm(perm, user_or_group, obj=obj)
 
