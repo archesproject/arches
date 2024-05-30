@@ -29,6 +29,7 @@ const movingItem: Ref<TreeNode> = ref({});
 const isMultiSelecting = ref(false);
 const refetcher = ref(0);
 const filterValue = ref("");
+const treeDOMRef: Ref<HTMLElement[] | null> = ref(null);
 
 // For next new item's pref label (input textbox)
 const newLabelCounter = ref(1000);
@@ -88,6 +89,7 @@ const onRowSelect = (node: TreeNode) => {
     />
     <Tree
         v-if="tree"
+        ref="treeDOMRef"
         v-model:selectionKeys="selectedKeys"
         v-model:expandedKeys="expandedKeys"
         :value="tree"
@@ -114,10 +116,12 @@ const onRowSelect = (node: TreeNode) => {
                     // Snoop on the filterValue, because if we wait to react
                     // to the emitted filter event, the templated rows will
                     // have already rendered.
-                    // @ts-ignore
-                    const maybeValue = $el.ownerDocument.getElementsByClassName('p-tree-filter')[0]?.value;
-                    if (maybeValue) {
-                        (filterValue as any) = maybeValue;
+                    if (treeDOMRef !== null) {
+                        // vue-tsc has some trouble with vue types inside hooks
+                        const inputEl = (
+                            (treeDOMRef as any).$el as HTMLElement
+                        ).ownerDocument.getElementsByClassName('p-tree-filter')[0] as HTMLInputElement;
+                        (filterValue as any) = inputEl.value;
                     }
                 },
             },
