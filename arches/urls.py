@@ -15,11 +15,9 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
-
 from arches.app.views.language import LanguageView
-from django.views.decorators.cache import cache_page
+from django.conf.urls.i18n import i18n_patterns
 from django.contrib.auth import views as auth_views
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path, re_path
 from arches.app.views import concept, main, map, search, graph, api
 from arches.app.views.admin import ReIndexResources, ClearUserPermissionCache
@@ -78,7 +76,6 @@ from arches.app.views.auth import (
     ExternalOauth,
 )
 from arches.app.models.system_settings import settings
-from django.views.decorators.cache import cache_page
 from django.urls import path
 
 # Uncomment the next two lines to enable the admin:
@@ -313,6 +310,15 @@ urlpatterns = [
     re_path(r"^clear-user-permission-cache", ClearUserPermissionCache.as_view(), name="clear_user_permission_cache"),
     re_path(r"^transform-edtf-for-tile", api.TransformEdtfForTile.as_view(), name="transform_edtf_for_tile"),
 ]
+
+# This must be included in core to keep webpack happy, but cannot be appended when running a project.
+# See https://github.com/archesproject/arches/pull/10754
+if settings.APP_NAME == "Arches" and settings.APP_NAME not in settings.ARCHES_APPLICATIONS:
+    if settings.SHOW_LANGUAGE_SWITCH is True:
+        urlpatterns = i18n_patterns(*urlpatterns)
+        
+    urlpatterns.append(path("i18n/", include("django.conf.urls.i18n")))
+
 
 if settings.DEBUG:
     try:
