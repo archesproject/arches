@@ -50,7 +50,7 @@ define([
                 if (self.valueAndSelectionDiffer(self.value, selection)) {
                     const newItem = selection.map(uri => {
                         return {
-                            "labels": NAME_LOOKUP[uri].values.filter(val => this.isLabel(val)),
+                            "labels": NAME_LOOKUP[uri].values.filter(val => self.isLabel(val)),
                             "listid": NAME_LOOKUP[uri]["listid"],
                             "uri": uri
                         };
@@ -109,7 +109,7 @@ define([
 
                 if (item.uri) {
                     let text = self.getPrefLabel(item.values) || arches.translations.searching + '...';
-                    NAME_LOOKUP[item.uri] = {"prefLabel": text, "labels": item.values.filter(val => this.isLabel(val)), "listid": item.controlled_list_id};
+                    NAME_LOOKUP[item.uri] = {"prefLabel": text, "labels": item.values.filter(val => self.isLabel(val)), "listid": item.controlled_list_id};
                     return indentation + text;
                 }
             },
@@ -129,7 +129,7 @@ define([
                     valueData.forEach(function(value) {
                         NAME_LOOKUP[value.uri] = {
                                 "prefLabel": self.getPrefLabel(value.values),
-                                "labels": value.values.filter(val => this.isLabel(val)),
+                                "labels": value.values.filter(val => self.isLabel(val)),
                                 "listid": value.listid 
                             };
                     });
