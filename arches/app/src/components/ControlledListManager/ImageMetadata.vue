@@ -223,7 +223,7 @@ const focusInput = () => {
                     />
                 </template>
                 <template #body="slotProps">
-                    {{ languageName(slotProps.data.language_id) }}
+                    {{ `${languageName(slotProps.data.language_id)} (${slotProps.data.language_id})` }}
                 </template>
             </Column>
             <Column
