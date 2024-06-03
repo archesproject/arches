@@ -51,14 +51,6 @@ const deleteDropdownOptions = [
     },
 ];
 
-const multiDeleteDisabled = computed(() => {
-    return (
-        Object.keys(selectedKeys.value).length === 0
-        || !!movingItem.value.key
-        || isMultiSelecting.value
-    );
-});
-
 const expandAll = () => {
     for (const node of controlledListItemsTree.value) {
         expandNode(node);
@@ -204,25 +196,33 @@ const deleteItems = async (itemIds: string[]) => {
     }
 };
 
+const toDelete = computed(() => {
+    if (isMultiSelecting.value) {
+        return Object.entries(selectedKeys.value).filter(([, v]) => v.checked).map(([k,]) => k);
+    }
+    return Object.entries(selectedKeys.value).filter(([, v]) => v).map(([k,]) => k);
+});
+
 const deleteSelected = async () => {
     if (!selectedKeys.value) {
         return;
     }
-    const deletes = Object.keys(selectedKeys.value);
     const allListIds = controlledListItemsTree.value.map((node: TreeNode) => node.data.id);
 
-    const listIdsToDelete = deletes.filter(id => allListIds.includes(id));
-    const itemIdsToDelete = deletes.filter(id => !listIdsToDelete.includes(id));
+    const listIdsToDelete = toDelete.value.filter(id => allListIds.includes(id));
+    const itemIdsToDelete = toDelete.value.filter(id => !listIdsToDelete.includes(id));
 
     selectedKeys.value = {};
 
     // Do items first so that cascade deletion doesn't cause item deletion to fail.
     await deleteItems(itemIdsToDelete);
     await deleteLists(listIdsToDelete);
+
+    isMultiSelecting.value = false;
 };
 
 const confirmDelete = () => {
-    const numItems = Object.keys(selectedKeys.value).length;
+    const numItems = toDelete.value.length;
     confirm.require({
         message: $ngettext(
             "Are you sure you want to delete %{ numItems } item (including all children)?",
@@ -270,10 +270,9 @@ await fetchLists();
             :label="$gettext('Delete')"
             raised
             style="font-size: inherit"
-            :disabled="!Object.keys(selectedKeys).length"
+            :disabled="!toDelete.length"
             :severity="DANGER"
             :model="deleteDropdownOptions"
-            :menu-button-props="{ disabled: multiDeleteDisabled }"
             @click="confirmDelete"
         />
     </div>

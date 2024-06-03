@@ -97,7 +97,7 @@ const onRowSelect = (node: TreeNode) => {
         :filter="true"
         filter-mode="lenient"
         :filter-placeholder="$gettext('Find')"
-        :selection-mode="isMultiSelecting ? 'multiple' : 'single'"
+        :selection-mode="isMultiSelecting ? 'checkbox' : 'single'"
         :pt="{
             root: { style: { flexGrow: 1, border: 0, overflowY: 'hidden' } },
             input: {
@@ -146,6 +146,7 @@ const onRowSelect = (node: TreeNode) => {
                 v-model:newListFormValue="newListFormValue"
                 v-model:filter-value="filterValue"
                 :node="slotProps.node"
+                :is-multi-selecting="isMultiSelecting"
             />
         </template>
     </Tree>

@@ -50,7 +50,7 @@ const newListFormValue = defineModel<string>("newListFormValue", { required: tru
 const newListCounter = defineModel<number>("newListCounter", { required: true });
 const filterValue = defineModel<string>("filterValue", { required: true });
 
-const { node } = defineProps<{ node: TreeNode }>();
+const { isMultiSelecting, node } = defineProps<{ isMultiSelecting: boolean, node: TreeNode }>();
 const { setDisplayedRow } = inject(displayedRowKey) as DisplayedListItemRefAndSetter;
 
 // Workaround for autofocusing the new list/label input boxes
@@ -247,6 +247,7 @@ const onBlurNewList = async () => {
             class="actions"
         >
             <MoveRow
+                v-if="!isMultiSelecting"
                 v-model:tree="tree"
                 v-model:expanded-keys="expandedKeys"
                 v-model:selected-keys="selectedKeys"
