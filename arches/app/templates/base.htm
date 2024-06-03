@@ -46,8 +46,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <link rel="apple-touch-icon" sizes="180x180" href="{% webpack_static 'favicons/apple-touch-icon-180x180.png' %}" />
 
     {% block css %}
-        <!-- POC rough out of PrimeVue theme switcher -->
-        <link rel="stylesheet" href="{% webpack_static 'node_modules/primevue/resources/themes/mdc-light-indigo/theme.css' %}" />
         {% render_bundle 'css/arches' 'css' %}
         {% render_bundle 'css/core' 'css' %}
 
