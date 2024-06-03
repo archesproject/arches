@@ -11,6 +11,6 @@ repos:
       hooks:
           - id: prettier
             name: prettier
-            entry: yarn prettier:fix
+            entry: npm run prettier:fix
             language: system
             files: arches/app/src
