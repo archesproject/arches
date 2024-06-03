@@ -311,14 +311,14 @@ await fetchLists();
             class="secondary-button"
             type="button"
             icon="fa fa-plus"
-            :label="$gettext('Expand')"
+            :label="$gettext('Expand all')"
             @click="expandAll"
         />
         <Button
             class="secondary-button"
             type="button"
             icon="fa fa-minus"
-            :label="$gettext('Collapse')"
+            :label="$gettext('Collapse all')"
             @click="collapseAll"
         />
         <Dropdown
