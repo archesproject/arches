@@ -331,8 +331,7 @@ AUTHENTICATION_BACKENDS = (
     "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
     "oauth2_provider.backends.OAuth2Backend",
     "django.contrib.auth.backends.ModelBackend",  # this is default
-    "arches.app.utils.permission_backend.PermissionBackend",
-    "guardian.backends.ObjectPermissionBackend",
+    "arches.app.permissions.arches_standard.PermissionBackend",
     "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend",
 )
 
@@ -595,6 +594,9 @@ BUSINESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+PERMISSION_LOCATIONS = [
+    "arches.app.permissions",
+]
 DATATYPE_LOCATIONS = [
     "arches.app.datatypes",
 ]
@@ -762,6 +764,7 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
+PERMISSION_FRAMEWORK = "arches_standard.ArchesStandardPermissionFramework"
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###

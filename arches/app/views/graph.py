@@ -45,7 +45,7 @@ from arches.app.utils.data_management.resource_graphs.exporter import get_graphs
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.utils.system_metadata import system_metadata
 from arches.app.views.base import BaseManagerView
-from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
+from arches.app.utils.permission_backend import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 from io import BytesIO
 from elasticsearch.exceptions import RequestError
 from django.core.cache import cache
@@ -189,7 +189,7 @@ class GraphDesignerView(GraphBaseView):
     def get(self, request, graphid):
         
         if graphid == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
-            if not request.user.groups.filter(name="System Administrator").exists():
+            if not group_required("System Administrator", raise_exception=True):
                 raise PermissionDenied
 
         self.graph = Graph.objects.get(graphid=graphid)

@@ -65,7 +65,7 @@ from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
 from elasticsearch import Elasticsearch
-from guardian.shortcuts import (
+from arches.app.utils.permission_backend import (
     assign_perm,
     get_perms,
     remove_perm,

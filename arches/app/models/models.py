@@ -31,7 +31,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template, render_to_string
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max
-from django.db.models.signals import post_delete, pre_save, post_save
+from django.db.models.signals import post_delete, pre_save, post_save, m2m_changed
 from django.dispatch import receiver
 from django.utils import translation
 from django.utils.translation import gettext as _
@@ -39,8 +39,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import validate_slug
-from guardian.models import GroupObjectPermission
-from guardian.shortcuts import assign_perm
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -1393,19 +1391,19 @@ class UserProfile(models.Model):
     def viewable_nodegroups(self):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
-        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ["models.read_nodegroup"], any_perm=True))
+        return set(str(nodegroup_pk) for nodegroup_pk in get_nodegroups_by_perm(self.user, ["models.read_nodegroup"], any_perm=True))
 
     @property
     def editable_nodegroups(self):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
-        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ["models.write_nodegroup"], any_perm=True))
+        return set(str(nodegroup_pk) for nodegroup_pk in get_nodegroups_by_perm(self.user, ["models.write_nodegroup"], any_perm=True))
 
     @property
     def deletable_nodegroups(self):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
-        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ["models.delete_nodegroup"], any_perm=True))
+        return set(str(nodegroup_pk) for nodegroup_pk in get_nodegroups_by_perm(self.user, ["models.delete_nodegroup"], any_perm=True))
 
     class Meta:
         managed = True
@@ -1416,23 +1414,6 @@ class UserProfile(models.Model):
 def save_profile(sender, instance, **kwargs):
     UserProfile.objects.get_or_create(user=instance)
 
-
-@receiver(post_save, sender=User)
-def create_permissions_for_new_users(sender, instance, created, **kwargs):
-    from arches.app.models.resource import Resource
-
-    if created:
-        ct = ContentType.objects.get(app_label="models", model="resourceinstance")
-        resourceInstanceIds = list(GroupObjectPermission.objects.filter(content_type=ct).values_list("object_pk", flat=True).distinct())
-        for resourceInstanceId in resourceInstanceIds:
-            resourceInstanceId = uuid.UUID(resourceInstanceId)
-        resources = ResourceInstance.objects.filter(pk__in=resourceInstanceIds)
-        assign_perm("no_access_to_resourceinstance", instance, resources)
-        for resource_instance in resources:
-            resource = Resource(resource_instance.resourceinstanceid)
-            resource.graph_id = resource_instance.graph_id
-            resource.createdtime = resource_instance.createdtime
-            resource.index()
 
 
 class UserXTask(models.Model):
@@ -1548,6 +1529,33 @@ class UserXNotificationType(models.Model):
         managed = True
         db_table = "user_x_notification_types"
 
+@receiver(post_save, sender=User)
+def create_permissions_for_new_users(sender, instance, created, **kwargs):
+    from arches.app.utils.permission_backend import process_new_user
+
+    if created:
+        process_new_user(instance, created)
+
+@receiver(m2m_changed, sender=User.groups.through)
+def update_groups_for_user(sender, instance, action, **kwargs):
+    from arches.app.utils.permission_backend import update_groups_for_user
+
+    if action in ("post_add", "post_remove"):
+        update_groups_for_user(instance)
+
+@receiver(m2m_changed, sender=User.user_permissions.through)
+def update_permissions_for_user(sender, instance, action, **kwargs):
+    from arches.app.utils.permission_backend import update_permissions_for_user
+
+    if action in ("post_add", "post_remove"):
+        update_permissions_for_user(instance)
+
+@receiver(m2m_changed, sender=Group.permissions.through)
+def update_permissions_for_group(sender, instance, action, **kwargs):
+    from arches.app.utils.permission_backend import update_permissions_for_group
+
+    if action in ("post_add", "post_remove"):
+        update_permissions_for_group(instance)
 
 @receiver(post_save, sender=UserXNotification)
 def send_email_on_save(sender, instance, **kwargs):
