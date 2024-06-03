@@ -3,6 +3,7 @@ import { inject, provide } from "vue";
 
 import ItemHeader from "@/components/ControlledListManager/ItemHeader.vue";
 import ItemImages from "@/components/ControlledListManager/ItemImages.vue";
+import ItemType from "@/components/ControlledListManager/ItemType.vue";
 import ItemURI from "@/components/ControlledListManager/ItemURI.vue";
 import ValueEditor from "@/components/ControlledListManager/ValueEditor.vue";
 
@@ -25,6 +26,7 @@ provide(itemKey, item);
         <ItemHeader />
         <ValueEditor :value-type="PREF_LABEL" />
         <ValueEditor :value-type="ALT_LABEL" />
+        <ItemType />
         <ValueEditor :value-category="NOTE" />
         <ItemURI />
         <ItemImages />

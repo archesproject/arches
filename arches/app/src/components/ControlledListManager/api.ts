@@ -83,7 +83,7 @@ export const patchItem = async(
     item: ControlledListItem,
     toast: ToastServiceMethods,
     $gettext: GetText,
-    field: "uri",
+    field: "uri" | "guide",
 ) => {
     let errorText;
     const token = Cookies.get("csrftoken");

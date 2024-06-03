@@ -92,6 +92,7 @@ define([
                     items.forEach(item => {
                         item["listid"] = item.id;
                         item.id = item.uri;
+                        item.disabled = item.guide;
                     });
                     return {
                         "results": items,
