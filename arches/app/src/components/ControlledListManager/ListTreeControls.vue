@@ -325,7 +325,7 @@ await fetchLists();
         <Dropdown
             v-model="selectedLanguage"
             :options="arches.languages"
-            option-label="name"
+            :option-label="(lang) => `${lang.name} (${lang.code})`"
             :placeholder="$gettext('Language')"
             :pt="{
                 root: { class: 'p-button secondary-button' },

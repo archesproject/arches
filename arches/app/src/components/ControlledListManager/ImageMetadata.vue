@@ -208,13 +208,13 @@ const focusInput = () => {
             <Column
                 field="language_id"
                 :header="languageHeader"
-                style="width: 10%; min-width: 8rem; height: 4rem; padding-left: 1rem;"
+                style="width: 10%; min-width: 8rem; height: 5rem; padding-left: 1rem;"
             >
                 <template #editor="{ data, field }">
                     <Dropdown
                         v-model="data[field]"
                         :options="arches.languages"
-                        option-label="name"
+                        :option-label="(lang) => `${lang.name} (${lang.code})`"
                         option-value="code"
                         :pt="{
                             input: { style: { fontFamily: 'inherit', fontSize: 'small' } },
