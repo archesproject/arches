@@ -1,6 +1,7 @@
 import json
+import uuid
 from arcgis2geojson import arcgis2geojson
-from django.contrib.gis.geos import GEOSGeometry, GeometryCollection
+from django.contrib.gis.geos import GEOSGeometry, GeometryCollection, WKTWriter
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 
@@ -67,3 +68,37 @@ class GeoUtils(object):
             features.append({"type": "Feature", "properties": {}, "geometry": arcgis2geojson(geometry)})
         feature_collection = {"type": "FeatureCollection", "features": features}
         return feature_collection
+    
+    def convert_geos_geom_collection_to_feature_collection(self, geometry):
+        arches_geojson = {}
+        arches_geojson["type"] = "FeatureCollection"
+        arches_geojson["features"] = []
+        for geom in geometry:
+            arches_json_geometry = {}
+            arches_json_geometry["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+            arches_json_geometry["type"] = "Feature"
+            arches_json_geometry["id"] = str(uuid.uuid4())
+            arches_json_geometry["properties"] = {}
+            arches_geojson["features"].append(arches_json_geometry)
+        return arches_geojson
+
+    def reduce_precision(self, geom, current_precision):
+        if current_precision > 5:
+            writer = WKTWriter()
+            max_bytes = 32766 # max bytes allowed by Lucene
+            current_precision -= 1
+            writer.precision = current_precision
+            less_precise_geom_collection = writer.write(GEOSGeometry(self.create_geom_collection_from_geojson(geom)))
+            new_byte_count = len(str(less_precise_geom_collection).encode("UTF-8"))
+            new_geos_geom_collection = GEOSGeometry(less_precise_geom_collection)
+            if new_geos_geom_collection.valid:  
+                new_feature_collection = self.convert_geos_geom_collection_to_feature_collection(new_geos_geom_collection)  
+            else:  
+                raise ValueError('Geometry is not valid after reducing precision.')
+            if new_byte_count > max_bytes:
+                return self.reduce_precision(new_feature_collection, current_precision)
+            else:
+                return new_feature_collection
+        else:
+            raise ValueError('Geometry still too large after reducing precision to 5 places after the decimal.')
+    

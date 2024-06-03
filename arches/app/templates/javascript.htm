@@ -1049,6 +1049,7 @@
         api_resources='(resourceid)=>{return "{% url "resources" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", resourceid)}'
         api_search_component_data='"{% url "api_search_component_data" "aaaa"%}".replace("aaaa", "")'
         api_user_incomplete_workflows="{% url 'api_user_incomplete_workflows' %}"
+        api_get_frontend_i18n_data="{% url 'get_frontend_i18n_data' %}"
         geojson="{% url 'geojson' %}"
         icons="{% url 'icons' %}"
         ontology_properties="{% url 'ontology_properties' %}"

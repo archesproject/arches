@@ -143,7 +143,7 @@ def command_startproject(args):
     project_path = os.path.join(os.getcwd(), (directory if directory else name))
 
     os.chdir(project_path)
-    subprocess.call("yarn install", shell=True)
+    subprocess.call("npm install", shell=True)
 
     open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
 
