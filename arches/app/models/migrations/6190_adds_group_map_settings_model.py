@@ -15,12 +15,28 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="GroupMapSettings",
             fields=[
-                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("min_zoom", models.IntegerField(default=0)),
                 ("max_zoom", models.IntegerField(default=20)),
                 ("default_zoom", models.IntegerField(default=0)),
-                ("group", models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to="auth.Group")),
+                (
+                    "group",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE, to="auth.Group"
+                    ),
+                ),
             ],
-            options={"db_table": "group_map_settings", "managed": True,},
+            options={
+                "db_table": "group_map_settings",
+                "managed": True,
+            },
         ),
     ]

@@ -31,11 +31,24 @@ def clear_resources():
     match_all_query.delete(index=TERMS_INDEX)
     match_all_query.delete(index=RESOURCES_INDEX)
 
-    print("deleting", Resource.objects.exclude(resourceinstanceid=settings.RESOURCE_INSTANCE_ID).count(), "resources")
+    print(
+        "deleting",
+        Resource.objects.exclude(
+            resourceinstanceid=settings.RESOURCE_INSTANCE_ID
+        ).count(),
+        "resources",
+    )
     Resource.objects.exclude(resourceinstanceid=settings.RESOURCE_INSTANCE_ID).delete()
-    print(Resource.objects.exclude(resourceinstanceid=settings.RESOURCE_INSTANCE_ID).count(), "resources remaining")
+    print(
+        Resource.objects.exclude(
+            resourceinstanceid=settings.RESOURCE_INSTANCE_ID
+        ).count(),
+        "resources remaining",
+    )
 
-    print("deleting", models.ResourceXResource.objects.count(), "resource relationships")
+    print(
+        "deleting", models.ResourceXResource.objects.count(), "resource relationships"
+    )
     cursor = connection.cursor()
     cursor.execute("TRUNCATE public.resource_x_resource CASCADE;")
     print(models.ResourceXResource.objects.count(), "resource relationships remaining")

@@ -23,6 +23,7 @@ from django.contrib.auth.models import Permission
 from guardian.shortcuts import assign_perm
 from arches.app.models import models
 
+
 class Command(BaseCommand):
     """
     Commands for adding arches test users
@@ -37,9 +38,24 @@ class Command(BaseCommand):
 
     def add_users(self):
         profiles = (
-            {"name": "tester1", "email": "tester1@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
-            {"name": "tester2", "email": "tester2@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
-            {"name": "tester3", "email": "tester3@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
+            {
+                "name": "tester1",
+                "email": "tester1@test.com",
+                "password": "Test12345!",
+                "groups": ["Graph Editor", "Resource Editor"],
+            },
+            {
+                "name": "tester2",
+                "email": "tester2@test.com",
+                "password": "Test12345!",
+                "groups": ["Graph Editor", "Resource Editor"],
+            },
+            {
+                "name": "tester3",
+                "email": "tester3@test.com",
+                "password": "Test12345!",
+                "groups": ["Graph Editor", "Resource Editor"],
+            },
             {
                 "name": "dev",
                 "email": "dev@test.com",
@@ -61,17 +77,21 @@ class Command(BaseCommand):
         )
 
         try:
-            dev_group = Group.objects.create(name='Developer')
+            dev_group = Group.objects.create(name="Developer")
             dev_perms = Permission.objects.all().values("id")
-            perm_ids = [int(perm['id']) for perm in dev_perms]
+            perm_ids = [int(perm["id"]) for perm in dev_perms]
             for permission in perm_ids:
                 dev_group.permissions.add(permission)
         except Exception as e:
             print(e)
-        
+
         for profile in profiles:
             try:
-                user = User.objects.create_user(username=profile["name"], email=profile["email"], password=profile["password"])
+                user = User.objects.create_user(
+                    username=profile["name"],
+                    email=profile["email"],
+                    password=profile["password"],
+                )
                 if user.username == "dev":
                     user.is_staff = True
                     user.first_name = "Dev"
@@ -83,7 +103,9 @@ class Command(BaseCommand):
                         assign_perm("delete_plugin", user, plugin)
                         assign_perm("view_plugin", user, plugin)
                 user.save()
-                print(f"Added test user: {user.username}, password: {profile['password']}")
+                print(
+                    f"Added test user: {user.username}, password: {profile['password']}"
+                )
 
                 for group_name in profile["groups"]:
                     group = Group.objects.get(name=group_name)

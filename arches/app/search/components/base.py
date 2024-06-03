@@ -22,7 +22,9 @@ class BaseSearchFilter:
     def __init__(self, request=None):
         self.request = request
 
-    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
+    def append_dsl(
+        self, search_results_object, permitted_nodegroups, include_provisional
+    ):
         """
         used to append ES query dsl to the search request
 
@@ -50,22 +52,31 @@ class BaseSearchFilter:
 class SearchFilterFactory(object):
     def __init__(self, request=None):
         self.request = request
-        self.search_filters = {search_filter.componentname: search_filter for search_filter in models.SearchComponent.objects.all()}
+        self.search_filters = {
+            search_filter.componentname: search_filter
+            for search_filter in models.SearchComponent.objects.all()
+        }
         self.search_filters_instances = {}
 
     def get_filter(self, componentname):
         if componentname in self.search_filters:
             search_filter = self.search_filters[componentname]
             try:
-                filter_instance = self.search_filters_instances[search_filter.componentname]
+                filter_instance = self.search_filters_instances[
+                    search_filter.componentname
+                ]
             except:
                 filter_instance = None
                 class_method = get_class_from_modulename(
-                    search_filter.modulename, search_filter.classname, ExtensionType.SEARCH_COMPONENTS
+                    search_filter.modulename,
+                    search_filter.classname,
+                    ExtensionType.SEARCH_COMPONENTS,
                 )
                 if class_method:
                     filter_instance = class_method(self.request)
-                self.search_filters_instances[search_filter.componentname] = filter_instance
+                self.search_filters_instances[search_filter.componentname] = (
+                    filter_instance
+                )
             return filter_instance
         else:
             return None

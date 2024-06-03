@@ -26,7 +26,9 @@ from arches.app.models import models
 from arches.app.models.models import Language
 from arches.app.models.tile import Tile
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
+from arches.app.utils.data_management.resource_graphs.importer import (
+    import_graph as resource_graph_importer,
+)
 from arches.app.utils.i18n import LanguageSynchronizer
 from tests.base_test import ArchesTestCase, sync_overridden_test_settings_to_arches
 from django.test import override_settings
@@ -65,6 +67,7 @@ class BooleanDataTypeTests(ArchesTestCase):
         with self.assertRaises(ValueError):
             boolean.transform_value_for_tile(None)
 
+
 class GeoJsonDataTypeTest(ArchesTestCase):
 
     @classmethod
@@ -72,9 +75,11 @@ class GeoJsonDataTypeTest(ArchesTestCase):
         super().setUpClass()
         LanguageSynchronizer.synchronize_settings_with_db()
 
-        with open(os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "r") as f:
+        with open(
+            os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "r"
+        ) as f:
             archesfile = JSONDeserializer().deserialize(f)
-            
+
         resource_graph_importer(archesfile["graph"])
         cls.search_model_graphid = uuid.UUID("c9b37a14-17b3-11eb-a708-acde48001122")
 
@@ -88,47 +93,38 @@ class GeoJsonDataTypeTest(ArchesTestCase):
             geom = json.load(f)
         geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
         errors = geom_datatype.validate(geom)
-        self.assertEqual(len(errors), 0)        
+        self.assertEqual(len(errors), 0)
 
     @override_settings(
-        DATA_VALIDATION_BBOX = [(
-            12.948801570473677,
-            52.666192057898854
-        ),
-        (
-            12.948801570473677,
-            52.26439571958821
-        ),
-        (
-            13.87818788958171,
-            52.26439571958821
-        ),
-        (
-            13.87818788958171,
-            52.666192057898854
-        ),
-        (
-            12.948801570473677,
-            52.666192057898854
-        )]
+        DATA_VALIDATION_BBOX=[
+            (12.948801570473677, 52.666192057898854),
+            (12.948801570473677, 52.26439571958821),
+            (13.87818788958171, 52.26439571958821),
+            (13.87818788958171, 52.666192057898854),
+            (12.948801570473677, 52.666192057898854),
+        ]
     )
     def test_validate_bbox(self):
         with sync_overridden_test_settings_to_arches():
             geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
 
             with self.subTest(bbox="invalid"):
-                geom = json.loads('{"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"coordinates": [14.073244400935238,19.967099711627156],"type": "Point"}}]}')
+                geom = json.loads(
+                    '{"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"coordinates": [14.073244400935238,19.967099711627156],"type": "Point"}}]}'
+                )
                 errors = geom_datatype.validate(geom)
                 self.assertEqual(len(errors), 1)
 
             with self.subTest(bbox="valid"):
-                geom = json.loads('{"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"coordinates": [13.400257324930152,52.50578474077699],"type": "Point"}}]}')
+                geom = json.loads(
+                    '{"type": "FeatureCollection","features": [{"type": "Feature","properties": {},"geometry": {"coordinates": [13.400257324930152,52.50578474077699],"type": "Point"}}]}'
+                )
                 errors = geom_datatype.validate(geom)
                 self.assertEqual(len(errors), 0)
-    
+
     def test_get_map_source(self):
         geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
-        node = models.Node.objects.get(pk='c9b37f96-17b3-11eb-a708-acde48001122')
+        node = models.Node.objects.get(pk="c9b37f96-17b3-11eb-a708-acde48001122")
         nodeconfig = json.loads(node.config.value)
         nodeconfig["minzoom"] = 12
         nodeconfig["maxzoom"] = 15
@@ -138,10 +134,15 @@ class GeoJsonDataTypeTest(ArchesTestCase):
         map_source = json.loads(result["source"])
 
         with self.subTest(input=result):
-            self.assertEqual(result["name"], 'resources-c9b37f96-17b3-11eb-a708-acde48001122')
+            self.assertEqual(
+                result["name"], "resources-c9b37f96-17b3-11eb-a708-acde48001122"
+            )
 
         with self.subTest(input=map_source):
-            self.assertEqual(map_source["tiles"][0], "/mvt/c9b37f96-17b3-11eb-a708-acde48001122/{z}/{x}/{y}.pbf")
+            self.assertEqual(
+                map_source["tiles"][0],
+                "/mvt/c9b37f96-17b3-11eb-a708-acde48001122/{z}/{x}/{y}.pbf",
+            )
 
         with self.subTest(input=map_source):
             self.assertTrue("minzoom" in map_source and "maxzoom" in map_source)
@@ -153,13 +154,15 @@ class BaseDataTypeTests(ArchesTestCase):
         node_id = str(uuid.uuid4())
         resourceinstance_id = str(uuid.uuid4())
         tile_data = {node_id: None}
-        tile_holding_only_none = Tile({
-            "resourceinstance_id": resourceinstance_id,
-            "parenttile_id": "",
-            "nodegroup_id": node_id,
-            "tileid": "",
-            "data": tile_data,
-        })
+        tile_holding_only_none = Tile(
+            {
+                "resourceinstance_id": resourceinstance_id,
+                "parenttile_id": "",
+                "nodegroup_id": node_id,
+                "tileid": "",
+                "data": tile_data,
+            }
+        )
 
         self.assertEqual(base.get_tile_data(tile_holding_only_none), tile_data)
 
@@ -174,7 +177,9 @@ class StringDataTypeTests(ArchesTestCase):
 
     def test_tile_transform(self):
         string = DataTypeFactory().get_instance("string")
-        new_language = Language(code="fa", name="Fake", default_direction="ltr", scope="system")
+        new_language = Language(
+            code="fa", name="Fake", default_direction="ltr", scope="system"
+        )
         new_language.save()
         tile_value = string.transform_value_for_tile("hello|fa")
         self.assertEqual(type(tile_value), dict)
@@ -203,10 +208,12 @@ class StringDataTypeTests(ArchesTestCase):
             "parenttile_id": "",
             "nodegroup_id": nodeid,
             "tileid": "",
-            "data": {nodeid: {
-                "en": {"value": "", "direction": "ltr"},
-                "de": {"value": "danke", "direction": "ltr"},
-            }},
+            "data": {
+                nodeid: {
+                    "en": {"value": "", "direction": "ltr"},
+                    "de": {"value": "danke", "direction": "ltr"},
+                }
+            },
         }
         tile2 = Tile(json_some_empty_strings)
         string.clean(tile2, nodeid)
@@ -247,7 +254,9 @@ class URLDataTypeTests(ArchesTestCase):
         url = DataTypeFactory().get_instance("url")
 
         # Valid tile
-        no_errors = url.validate({"url": "https://www.google.com/", "url_label": "Google"})
+        no_errors = url.validate(
+            {"url": "https://www.google.com/", "url_label": "Google"}
+        )
         self.assertEqual(len(no_errors), 0)
         # Invalid URL
         some_errors_invalid_url = url.validate({"url": "google", "url_label": "Google"})

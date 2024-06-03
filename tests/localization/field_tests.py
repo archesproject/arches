@@ -2,7 +2,12 @@ import json
 
 from arches.app.models.models import DDataType
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.fields.i18n import I18n_String, I18n_TextField, I18n_JSON, I18n_JSONField
+from arches.app.models.fields.i18n import (
+    I18n_String,
+    I18n_TextField,
+    I18n_JSON,
+    I18n_JSONField,
+)
 from tests.base_test import ArchesTestCase
 from django.contrib.gis.db import models
 from django.utils import translation
@@ -138,7 +143,9 @@ class Customi18nTextFieldTests(ArchesTestCase):
         self.assertEqual(str(m.name), "uno")
 
     def test_init_i18n_text_field_w_json(self):
-        m = self.LocalizationTestModel.objects.create(id=6, name='{"en": "one", "es": "uno"}')
+        m = self.LocalizationTestModel.objects.create(
+            id=6, name='{"en": "one", "es": "uno"}'
+        )
         m.save()
 
         translation.activate("es")
@@ -198,18 +205,18 @@ class Customi18nTextFieldTests(ArchesTestCase):
         # re https://github.com/archesproject/arches/issues/9623
         translation.activate("en")
         m = self.LocalizationTestModel()
-        m.name = "\"Hello World\""
+        m.name = '"Hello World"'
         m.id = 11
-        self.assertEqual(str(m.name),"\"Hello World\"")
+        self.assertEqual(str(m.name), '"Hello World"')
         m.save()
 
         # test that post save everything is the same
-        self.assertEqual(str(m.name), "\"Hello World\"")
+        self.assertEqual(str(m.name), '"Hello World"')
 
         # test that the object retrieved from the database is the same
         m = self.LocalizationTestModel.objects.get(pk=11)
-        self.assertEqual(str(m.name), "\"Hello World\"")
-        self.assertEqual(m.name.raw_value, {"en": "\"Hello World\""})
+        self.assertEqual(str(m.name), '"Hello World"')
+        self.assertEqual(m.name.raw_value, {"en": '"Hello World"'})
 
     def test_equality(self):
         value = I18n_String("toast")
@@ -259,15 +266,29 @@ class Customi18nJSONFieldTests(ArchesTestCase):
 
     def test_i18n_json_class(self):
         test_json = json.dumps(
-            {"i18n_properties": ["placeholder"], "placeholder": {"en": "choose one", "es": "elija uno"}, "min_length": 19}
+            {
+                "i18n_properties": ["placeholder"],
+                "placeholder": {"en": "choose one", "es": "elija uno"},
+                "min_length": 19,
+            }
         )
-        expected_output = json.dumps({"i18n_properties": ["placeholder"], "placeholder": "choose one", "min_length": 19})
+        expected_output = json.dumps(
+            {
+                "i18n_properties": ["placeholder"],
+                "placeholder": "choose one",
+                "min_length": 19,
+            }
+        )
         translation.activate("en")
         j = I18n_JSON(test_json)
         self.assertEqual(str(j), expected_output)
 
     def test_i18n_json_field(self):
-        test_json = {"i18n_properties": ["placeholder"], "placeholder": {"en": "choose an option", "es": "elija uno"}, "min_length": 19}
+        test_json = {
+            "i18n_properties": ["placeholder"],
+            "placeholder": {"en": "choose an option", "es": "elija uno"},
+            "min_length": 19,
+        }
 
         translation.activate("en")
         m = self.LocalizationTestJsonModel()
@@ -277,11 +298,21 @@ class Customi18nJSONFieldTests(ArchesTestCase):
         m = self.LocalizationTestJsonModel.objects.get(pk=1)
         self.assertEqual(m.config.raw_value, test_json)
 
-        updated_input = json.dumps({"i18n_properties": ["placeholder"], "placeholder": "choose one", "min_length": 19})
+        updated_input = json.dumps(
+            {
+                "i18n_properties": ["placeholder"],
+                "placeholder": "choose one",
+                "min_length": 19,
+            }
+        )
         m.config = updated_input
         m.save()
 
-        expected_output = {"i18n_properties": ["placeholder"], "placeholder": {"en": "choose one", "es": "elija uno"}, "min_length": 19}
+        expected_output = {
+            "i18n_properties": ["placeholder"],
+            "placeholder": {"en": "choose one", "es": "elija uno"},
+            "min_length": 19,
+        }
         m = self.LocalizationTestJsonModel.objects.get(pk=1)
         self.assertEqual(m.config.raw_value, expected_output)
 
@@ -304,11 +335,18 @@ class Customi18nJSONFieldTests(ArchesTestCase):
         self.assertEqual(json.loads(str(m.config))["trueLabel"], "verdad")
         self.assertEqual(json.loads(str(m.config))["falseLabel"], "falso")
         self.assertEqual(json.loads(str(m.config))["min_length"], 19)
-        self.assertEqual(json.loads(str(m.config))["i18n_properties"], ["trueLabel", "falseLabel"])
+        self.assertEqual(
+            json.loads(str(m.config))["i18n_properties"], ["trueLabel", "falseLabel"]
+        )
 
         translation.activate("de")
         updated_input = json.dumps(
-            {"i18n_properties": ["trueLabel", "falseLabel"], "trueLabel": "wahr", "falseLabel": "falsch", "min_length": 45}
+            {
+                "i18n_properties": ["trueLabel", "falseLabel"],
+                "trueLabel": "wahr",
+                "falseLabel": "falsch",
+                "min_length": 45,
+            }
         )
         m.config = updated_input
         m.save()
@@ -323,20 +361,28 @@ class Customi18nJSONFieldTests(ArchesTestCase):
         self.assertEqual(m.config.raw_value, expected_output)
 
     def test_i18n_json_class_as_dict(self):
-        test_json = {"i18n_properties": ["placeholder"], "placeholder": {"en": "choose one", "es": "elija uno"}, "min_length": 19}
+        test_json = {
+            "i18n_properties": ["placeholder"],
+            "placeholder": {"en": "choose one", "es": "elija uno"},
+            "min_length": 19,
+        }
         translation.activate("en")
         j = I18n_JSON(test_json)
 
         self.assertEqual(j["min_length"], test_json["min_length"])
         self.assertTrue("min_length" in j)
         self.assertEqual(j.get("min_length"), 19)
-        self.assertEqual(list(j.keys()), ["i18n_properties", "placeholder", "min_length"])
+        self.assertEqual(
+            list(j.keys()), ["i18n_properties", "placeholder", "min_length"]
+        )
         self.assertEqual(j.pop("min_length"), 19)
         self.assertEqual(list(j.keys()), ["i18n_properties", "placeholder"])
 
         # test item assignment
         j["new_property"] = "TACO"
-        self.assertEqual(list(j.keys()), ["i18n_properties", "placeholder", "new_property"])
+        self.assertEqual(
+            list(j.keys()), ["i18n_properties", "placeholder", "new_property"]
+        )
 
     def test_i18nJSONField_can_handle_different_initial_states(self):
         initial_json = {
@@ -378,10 +424,12 @@ class Customi18nJSONFieldTests(ArchesTestCase):
 
 class I18nJSONFieldBulkUpdateTests(ArchesTestCase):
     def test_bulk_update_node_config_homogenous_value(self):
-        new_config = I18n_JSON({
-            "en": "some",
-            "zh": "json",
-        })
+        new_config = I18n_JSON(
+            {
+                "en": "some",
+                "zh": "json",
+            }
+        )
         for_bulk_update = []
         for dt in DDataType.objects.all()[:3]:
             dt.defaultconfig = new_config
@@ -396,10 +444,12 @@ class I18nJSONFieldBulkUpdateTests(ArchesTestCase):
 
     def test_bulk_update_heterogenous_values(self):
         new_configs = [
-            I18n_JSON({
-                "en": "some",
-                "zh": "json",
-            }),
+            I18n_JSON(
+                {
+                    "en": "some",
+                    "zh": "json",
+                }
+            ),
             I18n_JSON({}),
             None,
         ]
@@ -414,7 +464,7 @@ class I18nJSONFieldBulkUpdateTests(ArchesTestCase):
         # If the above starts failing, it's likely the underlying Django
         # regression was fixed.
         # https://code.djangoproject.com/ticket/35167
-        
+
         # In that case, remove the with statement, de-indent the bulk_update,
         # and comment the following code back in:
 
@@ -433,5 +483,5 @@ class AsSqlTests(ArchesTestCase):
         domain_value = I18n_JSON({"en": "it's a bird"})
 
         # Apostrophe in "it's" is doubly-escaped so it doesn't close the string
-        expected = "jsonb_set(None, array[\'en\'], \'\"it\'\'s a bird\"\')"
+        expected = "jsonb_set(None, array['en'], '\"it''s a bird\"')"
         self.assertEqual(datatype.i18n_as_sql(domain_value, None, None), expected)
