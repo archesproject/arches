@@ -7,6 +7,7 @@ import Column from "primevue/column";
 import DataTable from "primevue/datatable";
 import Dropdown from "primevue/dropdown";
 import InputText from "primevue/inputtext";
+import Textarea from "primevue/textarea";
 import { useToast } from "primevue/usetoast";
 
 import { deleteValue, upsertValue } from "@/components/ControlledListManager/api.ts";
@@ -261,7 +262,17 @@ const focusInput = () => {
                 style="width: 60%; min-width: 8rem;"
             >
                 <template #editor="{ data, field }">
+                    <!-- Textarea for notes, input for labels -->
+                    <Textarea
+                        v-if="valueCategory"
+                        v-model="data[field]"
+                        rows="3"
+                        cols="60"
+                        auto-resize
+                        :pt="{ hooks: { onMounted: focusInput, onUpdated: focusInput } }"
+                    />
                     <InputText
+                        v-else
                         v-model="data[field]"
                         :pt="{ hooks: { onMounted: focusInput, onUpdated: focusInput } }"
                     />
@@ -348,11 +359,11 @@ p {
     font-weight: 600;
 }
 
-:deep(td:first-child) {
-    padding-left: 0.75rem;
+:deep(td) {
+    padding: 0.75rem;
 }
 
-:deep(td > input) {
-    width: 95%;
+:deep(td > input, textarea) {
+    width: 100%;
 }
 </style>

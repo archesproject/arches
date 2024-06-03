@@ -54,7 +54,7 @@ const panel = computed(() => {
             }"
         >
             <SplitterPanel
-                :size="40"
+                :size="34"
                 :min-size="25"
                 :pt="{
                     root: { style: { display: 'flex', flexDirection: 'column' } },
@@ -68,7 +68,7 @@ const panel = computed(() => {
                 </Suspense>
             </SplitterPanel>
             <SplitterPanel
-                :size="60"
+                :size="66"
                 :min-size="25"
                 :style="{ margin: '1rem 0rem 4rem 1rem', overflowY: 'auto', paddingRight: '4rem' }"
             >
