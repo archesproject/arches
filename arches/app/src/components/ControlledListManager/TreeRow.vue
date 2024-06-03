@@ -8,14 +8,16 @@ import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
-import { createItem, createList, upsertValue, patchList } from "@/components/ControlledListManager/api.ts";
-import { ERROR, PREF_LABEL, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
+import MoveRow from "@/components/ControlledListManager/MoveRow.vue";
+
+import { createItem, createList, upsertValue } from "@/components/ControlledListManager/api.ts";
+import { ERROR, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import {
     bestLabel,
     findNodeInTree,
     itemAsNode,
+    isList,
     listAsNode,
-    reorderItems,
 } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
@@ -25,7 +27,6 @@ import type {
 } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
 import type {
-    ControlledList,
     ControlledListItem,
     DisplayedListItemRefAndSetter,
     NewControlledListItem,
@@ -50,7 +51,7 @@ const newListCounter = defineModel<number>("newListCounter", { required: true })
 const filterValue = defineModel<string>("filterValue", { required: true });
 
 const { node } = defineProps<{ node: TreeNode }>();
-const { displayedRow, setDisplayedRow } = inject(displayedRowKey) as DisplayedListItemRefAndSetter;
+const { setDisplayedRow } = inject(displayedRowKey) as DisplayedListItemRefAndSetter;
 
 // Workaround for autofocusing the new list/label input boxes
 // https://github.com/primefaces/primevue/issues/2397
@@ -66,11 +67,6 @@ watch(newListInputRef, () => {
         newListInputRef.value.$el.focus();
     }
 });
-
-const addChildItemLabel = $gettext("Add child item");
-const moveUpLabel = $gettext("Move item up");
-const moveDownLabel = $gettext("Move item down");
-const changeParentLabel = $gettext("Change item parent");
 
 const rowLabel = computed(() => {
     if (!node.data) {
@@ -139,102 +135,6 @@ const setParent = async (parentNode: TreeNode) => {
             summary: errorText || $gettext("Move failed"),
         });
     }
-};
-
-const onAddItem = (parent: TreeNode) => {
-    const newItem: NewControlledListItem = {
-        parent_id: parent.key!,
-        id: newLabelCounter.value,
-        controlled_list_id: parent.controlled_list_id ?? parent.id,
-        uri: '',
-        sortorder: 0,
-        guide: false,
-        values: [{
-            id: 0,
-            valuetype_id: PREF_LABEL,
-            language_id: arches.activeLanguage,
-            value: '',
-            item_id: newLabelCounter.value,
-        }],
-        images: [],
-        children: [],
-        depth: !parent.depth ? 0 : parent.depth + 1,
-    };
-
-    nextNewItem.value = newItem;
-    newLabelFormValue.value = '';
-    newLabelCounter.value += 1;
-
-    parent.children!.push(itemAsNode(newItem, selectedLanguage.value));
-
-    expandedKeys.value = {
-        ...expandedKeys.value,
-        [parent.key as string]: true,
-    };
-    selectedKeys.value = { [newItem.id]: true };
-    setDisplayedRow(newItem);
-};
-
-const onReorder = async (item: ControlledListItem, up: boolean) => {
-    const list: ControlledList = findNodeInTree(tree.value, item.controlled_list_id).data;
-    const siblings: ControlledListItem[] = (
-        item.parent_id
-        ? findNodeInTree(tree.value, item.parent_id).children.map(
-            (child: TreeNode) => child.data)
-        : list.items
-    );
-
-    reorderItems(list, item, siblings, up);
-    const field = "sortorder";
-
-    const success = await patchList(list, toast, $gettext, field);
-    if (success) {
-        const oldListIndex = tree.value.findIndex(listNode => listNode.data.id === list.id);
-        tree.value = [
-            ...tree.value.slice(0, oldListIndex),
-            listAsNode(list, selectedLanguage.value),
-            ...tree.value.slice(oldListIndex + 1),
-        ];
-        selectedKeys.value = {
-            ...selectedKeys.value,
-            [item.id]: true,
-        };
-    }
-};
-
-const isFirstItem = (item: ControlledListItem) => {
-    const siblings: TreeNode[] = (
-        item.parent_id
-        ? findNodeInTree(tree.value, item.parent_id).data.children
-        : findNodeInTree(tree.value, item.controlled_list_id).data.items
-    );
-    if (!siblings) {
-        throw new Error();
-    }
-    return siblings[0].id === item.id;
-};
-
-const isLastItem = (item: ControlledListItem) => {
-    const siblings: TreeNode[] = (
-        item.parent_id
-        ? findNodeInTree(tree.value, item.parent_id).data.children
-        : findNodeInTree(tree.value, item.controlled_list_id).data.items
-    );
-    if (!siblings) {
-        throw new Error();
-    }
-    return siblings[siblings.length - 1].id === item.id;
-};
-
-const setMovingItem = (node: TreeNode) => {
-    movingItem.value = findNodeInTree(
-        [itemAsNode(displayedRow.value, selectedLanguage.value)],
-        node.key
-    );
-};
-
-const isList = (node: TreeNode) => {
-    return !!node.data.nodes;
 };
 
 const isNewList = (node: TreeNode) => {
@@ -346,52 +246,16 @@ const onBlurNewList = async () => {
             v-else-if="!isNewList(node) && !isNewItem(node)"
             class="actions"
         >
-            <Button
-                v-if="node.key in selectedKeys"
-                v-tooltip="addChildItemLabel"
-                type="button"
-                raised
-                class="add-child-button"
-                icon="fa fa-plus"
-                :aria-label="addChildItemLabel"
-                @click.stop="onAddItem(node)"
+            <MoveRow
+                v-model:tree="tree"
+                v-model:expanded-keys="expandedKeys"
+                v-model:selected-keys="selectedKeys"
+                v-model:moving-item="movingItem"
+                v-model:next-new-item="nextNewItem"
+                v-model:new-label-form-value="newLabelFormValue"
+                v-model:new-label-counter="newLabelCounter"
+                :node
             />
-            <span
-                v-if="!isList(node)"
-                class="move-buttons"
-            >
-                <Button
-                    v-if="node.key in selectedKeys"
-                    v-tooltip="moveUpLabel"
-                    type="button"
-                    raised
-                    class="reorder-button"
-                    icon="fa fa-caret-up"
-                    :aria-label="moveUpLabel"
-                    :disabled="isFirstItem(node.data)"
-                    @click="onReorder(node.data, true)"
-                />
-                <Button
-                    v-if="node.key in selectedKeys"
-                    v-tooltip="moveDownLabel"
-                    type="button"
-                    raised
-                    class="reorder-button"
-                    icon="fa fa-caret-down"
-                    :aria-label="moveDownLabel"
-                    :disabled="isLastItem(node.data)"
-                    @click="onReorder(node.data, false)"
-                />
-                <Button
-                    v-if="!node.data.name && node.key in selectedKeys"
-                    v-tooltip="changeParentLabel"
-                    type="button"
-                    raised
-                    icon="fa fa-arrows-alt"
-                    :aria-label="changeParentLabel"
-                    @click="setMovingItem(node)"
-                />
-            </span>
         </div>
     </span>
 </template>
@@ -408,17 +272,5 @@ const onBlurNewList = async () => {
     background-color: aliceblue;
     color: black;
     height: 2rem;
-}
-.add-child-button {
-    width: 2rem;
-    border-radius: 50%;
-}
-.move-buttons {
-    display: flex;
-    gap: 0.5rem;
-    padding-right: 0.5rem;
-}
-.move-button {
-    height: 2.5rem;
 }
 </style>
