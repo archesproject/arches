@@ -16,8 +16,8 @@ import {
     bestLabel,
     findNodeInTree,
     itemAsNode,
-    isList,
     listAsNode,
+    nodeIsList,
 } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
@@ -138,7 +138,7 @@ const setParent = async (parentNode: TreeNode) => {
 };
 
 const isNewList = (node: TreeNode) => {
-    return isList(node) && typeof node.data.id === 'number';
+    return nodeIsList(node) && typeof node.data.id === 'number';
 };
 
 const isNewItem = (node: TreeNode) => {

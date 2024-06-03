@@ -11,8 +11,8 @@ import { PREF_LABEL, displayedRowKey, selectedLanguageKey } from "@/components/C
 import {
     findNodeInTree,
     itemAsNode,
-    isList,
     listAsNode,
+    nodeIsList,
     reorderItems,
 } from "@/components/ControlledListManager/utils.ts";
 
@@ -157,7 +157,7 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
         @click.stop="onAddItem(node)"
     />
     <span
-        v-if="!isList(node)"
+        v-if="!nodeIsList(node)"
         class="move-buttons"
     >
         <Button

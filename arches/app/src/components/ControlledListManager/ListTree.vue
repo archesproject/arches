@@ -8,6 +8,7 @@ import ListTreeControls from "@/components/ControlledListManager/ListTreeControl
 import TreeRow from "@/components/ControlledListManager/TreeRow.vue";
 
 import { displayedRowKey } from "@/components/ControlledListManager/constants.ts";
+import { nodeIsList } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
 import type {
@@ -65,11 +66,11 @@ const onRowSelect = (node: TreeNode) => {
         ...expandedKeys.value,
         [node.key as string]: true,
     };
-    if (
-        node.data.name
-        || (priorListId && (node.data as ControlledListItem).controlled_list_id !== priorListId)
-    ) {
+    if (nodeIsList(node)) {
         tree.value.filter(list => list.data.id !== node.data.id)
+            .forEach(list => collapseNodesRecursive(list));
+    } else if ((node.data as ControlledListItem).controlled_list_id !== priorListId) {
+        tree.value.filter(list => list.data.id !== node.data.controlled_list_id)
             .forEach(list => collapseNodesRecursive(list));
     }
 };

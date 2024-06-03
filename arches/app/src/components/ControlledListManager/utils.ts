@@ -25,7 +25,7 @@ export const languageName = (code: string) => {
     return arches.languages.find((lang: Language) => lang.code === code).name;
 };
 
-export const isList = (node: TreeNode) => {
+export const nodeIsList = (node: TreeNode) => {
     return !!node.data.nodes;
 };
 
