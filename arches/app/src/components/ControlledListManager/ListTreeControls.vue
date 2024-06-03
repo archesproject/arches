@@ -307,31 +307,42 @@ await fetchLists();
         v-else
         class="controls"
     >
-        <Button
-            class="secondary-button"
-            type="button"
-            icon="fa fa-plus"
-            :label="$gettext('Expand all')"
-            @click="expandAll"
-        />
-        <Button
-            class="secondary-button"
-            type="button"
-            icon="fa fa-minus"
-            :label="$gettext('Collapse all')"
-            @click="collapseAll"
-        />
-        <Dropdown
-            v-model="selectedLanguage"
-            :options="arches.languages"
-            :option-label="(lang) => `${lang.name} (${lang.code})`"
-            :placeholder="$gettext('Language')"
-            :pt="{
-                root: { class: 'p-button secondary-button' },
-                input: { style: { fontFamily: 'inherit', fontSize: 'small', textAlign: 'center', alignContent: 'center' } },
-                itemLabel: { style: { fontSize: 'small' } },
-            }"
-        />
+        <div style="text-align: center; display: flex; width: 100%;">
+            <Button
+                class="secondary-button"
+                type="button"
+                icon="fa fa-plus"
+                :label="$gettext('Expand all')"
+                @click="expandAll"
+            />
+            <Button
+                class="secondary-button"
+                type="button"
+                icon="fa fa-minus"
+                :label="$gettext('Collapse all')"
+                @click="collapseAll"
+            />
+            <div style="display: flex; flex-grow: 1; justify-content: flex-end;">
+                <span
+                    id="languageSelectLabel"
+                    style="align-self: center; margin-right: 0.25rem;"
+                >
+                    {{ $gettext("Show labels in:") }}
+                </span>
+                <Dropdown
+                    v-model="selectedLanguage"
+                    aria-labelledby="languageSelectLabel"
+                    :options="arches.languages"
+                    :option-label="(lang) => `${lang.name} (${lang.code})`"
+                    :placeholder="$gettext('Language')"
+                    :pt="{
+                        root: { class: 'p-button secondary-button' },
+                        input: { style: { fontFamily: 'inherit', fontSize: 'small', textAlign: 'center', alignContent: 'center' } },
+                        itemLabel: { style: { fontSize: 'small' } },
+                    }"
+                />
+            </div>
+        </div>
     </div>
 </template>
 
@@ -358,6 +369,7 @@ await fetchLists();
     gap: 0.5rem;
     font-size: small;
     padding: 0.5rem;
+    justify-content: space-between;
 }
 .list-button, .p-splitbutton {
     height: 4rem;
@@ -369,7 +381,6 @@ await fetchLists();
     text-wrap: nowrap;
 }
 .secondary-button {
-    flex: 0.33;
     border: 0;
     background: #f4f4f4;
     height: 3rem;
