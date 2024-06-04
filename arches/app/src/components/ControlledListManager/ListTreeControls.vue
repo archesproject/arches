@@ -268,7 +268,7 @@ await fetchLists();
         <SplitButton
             class="list-button"
             :label="$gettext('Delete')"
-            :menuButtonProps="{'aria-label': $gettext('Delete multiple')}"
+            :menu-button-props="{'aria-label': $gettext('Delete multiple')}"
             raised
             style="font-size: inherit"
             :disabled="!toDelete.length"
