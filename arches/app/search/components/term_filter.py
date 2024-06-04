@@ -147,7 +147,7 @@ class TermFilter(BaseSearchFilter):
                     search_query.filter(nested_conceptid_filter)
 
             # Add additional search query if configured
-            if settings.CUSTOM_SEARCH_CLASS:
+            if settings.setting_exists("CUSTOM_SEARCH_CLASS") and settings.CUSTOM_SEARCH_CLASS:
                 custom_index_class = import_class_from_string(settings.CUSTOM_SEARCH_CLASS)
                 custom_index_class.add_search_filter(search_query, term)
 
