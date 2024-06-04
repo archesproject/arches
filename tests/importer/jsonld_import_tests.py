@@ -1609,5 +1609,5 @@ class JsonLDImportTests(ArchesTestCase):
             datetime_value = resource.tiles[1].data["ddb04a66-c163-11ea-8354-3af9d3b32b71"]
             self.assertEqual(datetime_value[-6:], "-09:00")
 
-            datetime_value = resource.tiles[0].data["ddb04a66-c163-11ea-8354-3af9d3b32b71"]
+            datetime_value = resource.tiles[2].data["ddb04a66-c163-11ea-8354-3af9d3b32b71"]
             self.assertEqual(datetime_value[-6:], "-09:00")
