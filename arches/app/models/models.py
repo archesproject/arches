@@ -16,6 +16,7 @@ import uuid
 import datetime
 import logging
 import traceback
+from collections import defaultdict
 import django.utils.timezone
 
 from arches.app.const import ExtensionType
@@ -1930,6 +1931,57 @@ class ControlledList(models.Model):
         if (not exclude or "name" not in exclude) and not self.name:
             self.name = _("Untitled List: ") + datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
 
+    def serialize(self, depth_map=None, flat=False):
+        if depth_map is None:
+            depth_map = defaultdict(int)
+        data = {
+            "id": str(self.id),
+            "name": self.name,
+            "dynamic": self.dynamic,
+            "search_only": self.search_only,
+            "items": sorted(
+                [
+                    item.serialize(depth_map, flat)
+                    for item in self.controlled_list_items.all()
+                    if flat or item.parent_id is None
+                ],
+                key=lambda d: d["sortorder"],
+            ),
+        }
+        if hasattr(self, "node_ids"):
+            data["nodes"] = [
+                {
+                    "id": node_id,
+                    "name": node_name,
+                    "nodegroup_id": nodegroup_id,
+                    "graph_id": graph_id,
+                    "graph_name": graph_name,
+                }
+                for node_id, node_name, nodegroup_id, graph_id, graph_name in zip(
+                    self.node_ids,
+                    self.node_names,
+                    self.nodegroup_ids,
+                    self.graph_ids,
+                    self.graph_names,
+                    strict=True,
+                )
+            ]
+        else:
+            data["nodes"] = [
+                {
+                    "id": str(node.pk),
+                    "name": node.name,
+                    "nodegroup_id": node.nodegroup_id,
+                    "graph_id": node.graph_id,
+                    "graph_name": str(node.graph.name),
+                }
+                for node in Node.with_controlled_list.filter(
+                    controlled_list=self.pk,
+                    source_identifier=None,
+                ).select_related("graph")
+            ]
+        return data
+
 
 class ControlledListItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -1972,6 +2024,36 @@ class ControlledListItem(models.Model):
         super().clean_fields(exclude=exclude)
         if (not exclude or "uri" not in exclude) and not self.uri:
             self.uri = None
+
+    def serialize(self, depth_map=None, flat=False):
+        if depth_map is None:
+            depth_map = defaultdict(int)
+        if self.parent_id:
+            depth_map[self.id] = depth_map[self.parent_id] + 1
+        data = {
+            "id": str(self.id),
+            "controlled_list_id": str(self.controlled_list_id),
+            "uri": self.uri,
+            "sortorder": self.sortorder,
+            "guide": self.guide,
+            "values": [
+                value.serialize()
+                for value in self.controlled_list_item_values.all()
+                if value.valuetype_id != "image"
+            ],
+            "images": [
+                image.serialize()
+                for image in self.controlled_list_item_images.all()
+            ],
+            "parent_id": str(self.parent_id) if self.parent_id else None,
+            "depth": depth_map[self.id],
+        }
+        if not flat:
+            data["children"] = sorted(
+                [child.serialize(depth_map, flat) for child in self.children.all()],
+                key=lambda d: d["sortorder"],
+            )
+        return data
 
 
 class ValuesWithoutImagesManager(models.Manager):
@@ -2033,6 +2115,15 @@ class ControlledListItemValue(models.Model):
         if not self.value:
             self.value = _("New Item: ") + datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
 
+    def serialize(self):
+        return {
+            "id": str(self.id),
+            "valuetype_id": self.valuetype_id,
+            "language_id": self.language_id,
+            "value": self.value,
+            "item_id": self.controlled_list_item_id,
+        }
+
 
 class ControlledListItemImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -2060,6 +2151,17 @@ class ControlledListItemImage(models.Model):
     class Meta:
         managed = False
         db_table = "controlled_list_item_values"
+
+    def serialize(self):
+        return {
+            "id": str(self.id),
+            "item_id": self.controlled_list_item_id,
+            "url": self.value.url,
+            "metadata": [
+                metadata.serialize()
+                for metadata in self.controlled_list_item_image_metadata.all()
+            ]
+        }
 
 
 class ControlledListItemImageMetadata(models.Model):
@@ -2094,3 +2196,13 @@ class ControlledListItemImageMetadata(models.Model):
                 violation_error_message=_("Only one metadata entry per language and metadata type is permitted.")
             ),
         ]
+
+    def serialize(self):
+        choices = ControlledListItemImageMetadata.MetadataChoices
+        return {
+            field: str(value)
+            for (field, value) in vars(self).items() if not field.startswith("_")
+        } | {
+            # Get localized label for metadata type
+            "metadata_label": str(choices(self.metadata_type).label)
+        }
