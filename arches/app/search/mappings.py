@@ -20,6 +20,8 @@ from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils import permission_backend
 from django.db.utils import ProgrammingError
+from arches.app.models.system_settings import settings
+from arches.app.utils import import_class_from_string
 
 
 CONCEPTS_INDEX = "concepts"
@@ -282,6 +284,11 @@ def prepare_search_index(create=False):
             },
         },
     }
+
+    if settings.CUSTOM_SEARCH_CLASS:
+        custom_index_class = import_class_from_string(settings.CUSTOM_SEARCH_CLASS)
+        index_settings['mappings']['properties'][custom_index_class.custom_search_path] = custom_index_class.get_custom_search_config()
+
 
     index_settings["mappings"]["properties"]["permissions"]["properties"].update(
         permission_backend.update_mappings()
