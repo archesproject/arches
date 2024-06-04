@@ -10,7 +10,7 @@ import TreeRow from "@/components/ControlledListManager/TreeRow.vue";
 import { displayedRowKey } from "@/components/ControlledListManager/constants.ts";
 import { nodeIsList } from "@/components/ControlledListManager/utils.ts";
 
-import type { Ref } from "vue";
+import type { ComponentPublicInstance, Ref } from "vue";
 import type {
     TreeExpandedKeys,
     TreeSelectionKeys,
@@ -30,7 +30,7 @@ const movingItem: Ref<TreeNode> = ref({});
 const isMultiSelecting = ref(false);
 const refetcher = ref(0);
 const filterValue = ref("");
-const treeDOMRef: Ref<HTMLElement[] | null> = ref(null);
+const treeDOMRef: Ref<ComponentPublicInstance | null> = ref(null);
 
 // For next new item's pref label (input textbox)
 const newLabelCounter = ref(1000);
@@ -40,6 +40,9 @@ const nextNewItem = ref<NewControlledListItem>();
 const newListCounter = ref(1000);
 const newListFormValue = ref('');
 const nextNewList = ref<NewControlledList>();
+// For rerendering tree to avoid error emitted in PrimeVue tree re: aria-selected
+const rerender = ref(0);
+const nextFilterChangeNeedsExpandAll = ref(false);
 
 const { displayedRow, setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 
@@ -74,6 +77,59 @@ const onRowSelect = (node: TreeNode) => {
             .forEach(list => collapseNodesRecursive(list));
     }
 };
+
+const collapseAll = () => {
+    expandedKeys.value = {};
+};
+
+const expandAll = () => {
+    const newExpandedKeys = {};
+    for (const node of tree.value) {
+        expandNode(node, newExpandedKeys);
+    }
+    expandedKeys.value = { ...newExpandedKeys };
+};
+
+const expandNode = (node: TreeNode, newExpandedKeys: TreeExpandedKeys) => {
+    if (node.children && node.children.length) {
+        newExpandedKeys[node.key as string] = true;
+
+        for (const child of node.children) {
+            expandNode(child, newExpandedKeys);
+        }
+    }
+};
+
+const expandPathsToFilterResults = (newFilterValue: string) => {
+    // https://github.com/primefaces/primevue/issues/3996
+    if (filterValue.value && !newFilterValue) {
+        collapseAll();
+        // Rerender to avoid error emitted in PrimeVue tree re: aria-selected.
+        rerender.value += 1;
+    }
+    // Expand all on the first interaction with the filter, or if the user
+    // has collapsed a node and changes the filter.
+    if (
+        (!filterValue.value && newFilterValue)
+        || (nextFilterChangeNeedsExpandAll.value && (filterValue.value !== newFilterValue))
+    ) {
+        expandAll();
+    }
+    nextFilterChangeNeedsExpandAll.value = false;
+};
+
+const onBeforeUpdate = () => {
+    // Snoop on the filterValue, because if we wait to react
+    // to the emitted filter event, the templated rows will
+    // have already rendered. (<TreeRow> bolds search terms.)
+    if (treeDOMRef.value !== null) {
+        const inputEl = treeDOMRef.value.$el.ownerDocument
+            .getElementsByClassName('p-tree-filter')[0] as HTMLInputElement;
+
+        expandPathsToFilterResults(inputEl.value);
+        filterValue.value = inputEl.value;
+    }
+};
 </script>
 
 <template>
@@ -91,6 +147,7 @@ const onRowSelect = (node: TreeNode) => {
     <Tree
         v-if="tree"
         ref="treeDOMRef"
+        :key="rerender"
         v-model:selectionKeys="selectedKeys"
         v-model:expandedKeys="expandedKeys"
         :value="tree"
@@ -112,21 +169,9 @@ const onRowSelect = (node: TreeNode) => {
                 return { style: { height: '4rem' } };
             },
             label: { style: { textWrap: 'nowrap', marginLeft: '0.5rem', width: '100%' } },
-            hooks: {
-                onBeforeUpdate() {
-                    // Snoop on the filterValue, because if we wait to react
-                    // to the emitted filter event, the templated rows will
-                    // have already rendered.
-                    if (treeDOMRef !== null) {
-                        // vue-tsc has some trouble with vue types inside hooks
-                        const inputEl = (
-                            (treeDOMRef as any).$el as HTMLElement
-                        ).ownerDocument.getElementsByClassName('p-tree-filter')[0] as HTMLInputElement;
-                        (filterValue as any) = inputEl.value;
-                    }
-                },
-            },
+            hooks: { onBeforeUpdate },
         }"
+        @node-collapse="nextFilterChangeNeedsExpandAll = true"
         @node-select="onRowSelect"
     >
         <template #nodeicon="slotProps">
