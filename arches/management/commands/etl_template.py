@@ -170,9 +170,9 @@ def create_tile_excel_workbook(graphid, tiledata=None):
             nodes = Node.objects.filter(nodegroup_id=row["nodegroupid"]).exclude(datatype="semantic").values("datatype", "alias")
             for i, node in enumerate(nodes):
                 sheet.cell(column=i + 4, row=1, value=node["alias"])
-            sheet.cell(column=i+5, row=1, value="sortorder")
-            sheet.cell(column=i+6, row=1, value="provisionaledits")
-            sheet.cell(column=i+7, row=1, value="nodegroup_id")
+                sheet.cell(column=i+5, row=1, value="sortorder")
+                sheet.cell(column=i+6, row=1, value="provisionaledits")
+                sheet.cell(column=i+7, row=1, value="nodegroup_id")
 
         if tiledata is not None:
             for card_name, tiles in tiledata.items():
@@ -186,8 +186,8 @@ def create_tile_excel_workbook(graphid, tiledata=None):
                     for i, node in enumerate(nodes):
                         if tile[node['alias']] is not None:
                             sheet.cell(column=i + 4, row=row_number, value=f"{tile[node['alias']]}")
-                    sheet.cell(column=i+5, row=row_number, value=tile["sortorder"])
-                    sheet.cell(column=i+6, row=row_number, value=tile["provisionaledits"])
-                    sheet.cell(column=i+7, row=row_number, value=str(tile["nodegroupid"]))
+                        sheet.cell(column=i+5, row=row_number, value=tile["sortorder"])
+                        sheet.cell(column=i+6, row=row_number, value=tile["provisionaledits"])
+                        sheet.cell(column=i+7, row=row_number, value=str(tile["nodegroupid"]))
 
     return wb

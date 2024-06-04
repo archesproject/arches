@@ -70,9 +70,6 @@ class Migration(migrations.Migration):
                 true
             );
             """,
-            """
-            DELETE FROM notification_types
-                WHERE typeid in ('441e6ed4-188d-11ea-a35b-784f435179ea');
-            """,
+            migrations.RunSQL.noop,
         ),
     ]

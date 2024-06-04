@@ -42,7 +42,7 @@
                 <li class="edit-menu-item">
                     <a href="{% url 'graph' '' %}" data-bind="click: cloneGraph">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-clone"></i><span data-bind="text: graph.isresource() ? {% quoted_trans "Clone Model" %} : {% quoted_trans "Clone Branch" %} "></span></div>
+                            <div class="menu-item-title"><i class="fa fa-clone"></i> <span data-bind="text: graph.isresource() ? {% quoted_trans "Clone Model" %} : {% quoted_trans "Clone Branch" %} "></span></div>
                             <span class="text-muted menu-item-subtitle" data-bind="text: graph.isresource() ? {% quoted_trans "Clone the existing Resource Model" %} : {% quoted_trans "Clone the existing Branch" %} "></span>
                         </div>
                     </a>
@@ -51,7 +51,7 @@
                 <li class="edit-menu-item">
                     <a href="{% url 'graph' '' %}" data-bind="click: exportGraph">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-download"></i><span data-bind="text: graph.isresource() ? {% quoted_trans "Export Model" %} : {% quoted_trans "Export Branch" %} "></span></div>
+                            <div class="menu-item-title"><i class="fa fa-download"></i> <span data-bind="text: graph.isresource() ? {% quoted_trans "Export Model" %} : {% quoted_trans "Export Branch" %} "></span></div>
                             <span class="text-muted menu-item-subtitle" data-bind="text: graph.isresource() ? {% quoted_trans "Export the existing Resource Model" %} : {% quoted_trans "Export the existing Branch" %} "></span>
                         </div>
                     </a>
@@ -89,7 +89,7 @@
                 <li class="edit-menu-item">
                     <a href="{% url 'graph' '' %}" data-bind="click: deleteGraph">
                         <div class="media-body">
-                            <div class="menu-item-title"><i class="fa fa-trash"></i><span data-bind="text: graph.isresource() ? {% quoted_trans "Delete Model" %} : {% quoted_trans "Delete Branch" %} "></span></div>
+                            <div class="menu-item-title"><i class="fa fa-trash"></i> <span data-bind="text: graph.isresource() ? {% quoted_trans "Delete Model" %} : {% quoted_trans "Delete Branch" %} "></span></div>
                             <span class="text-muted menu-item-subtitle" data-bind="text: graph.isresource() ? {% quoted_trans "Delete the existing Resource Model" %} : {% quoted_trans "Delete the existing Branch" %} "></span>
                         </div>
                     </a>
