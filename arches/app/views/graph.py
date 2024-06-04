@@ -16,7 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
 import zipfile
 import json
 import uuid
@@ -25,6 +24,7 @@ from dateutil import tz
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.db.models import F, Func, Q
+from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
 from django.http import HttpResponseNotFound, HttpResponse
@@ -39,7 +39,6 @@ from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
-from arches.app.models.concept import Concept
 from arches.app.models.fields.i18n import I18n_String
 from arches.app.models.system_settings import settings
 from arches.app.utils.data_management.resource_graphs.exporter import get_graphs_for_export, create_mapping_configuration_file
@@ -48,8 +47,6 @@ from arches.app.utils.system_metadata import system_metadata
 from arches.app.views.base import BaseManagerView
 from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
 from io import BytesIO
-from elasticsearch.exceptions import RequestError
-from django.core.cache import cache
 
 
 logger = logging.getLogger(__name__)
@@ -195,15 +192,24 @@ class GraphDesignerView(GraphBaseView):
         if graphid == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
             if not request.user.groups.filter(name="System Administrator").exists():
                 raise PermissionDenied
-            
+
         self.source_graph = Graph.objects.get(pk=graphid)
+        if self.source_graph.source_identifier_id:
+            url = reverse('graph_designer', kwargs={'graphid': self.source_graph.source_identifier_id})
+            
+            query_dict = request.GET.copy()
+            query_dict["has_been_redirected_from_editable_future_graph"] = True
+            query_string = query_dict.urlencode()
+            
+            return redirect("{}?{}".format(url, query_string))
+
         self.editable_future_graph = None
 
         editable_future_graph_query = Graph.objects.filter(source_identifier_id=graphid)
         if len(editable_future_graph_query):
             self.editable_future_graph = editable_future_graph_query[0]
 
-        if bool(request.GET.get("should_show_source_graph") == "true"):
+        if bool(request.GET.get("should_show_source_graph", "false").lower() == "true"):
             self.graph = self.source_graph
         else:
             self.graph = self.editable_future_graph
@@ -281,7 +287,7 @@ class GraphDesignerView(GraphBaseView):
         context["source_graph_publication_most_recent_edit"] = JSONSerializer().serialize(self.source_graph.publication.most_recent_edit if self.source_graph.publication else {})
 
         context["editable_future_graph_id"] = self.editable_future_graph.pk if self.editable_future_graph else None
-
+        context["has_been_redirected_from_editable_future_graph"] = bool(request.GET.get('has_been_redirected_from_editable_future_graph', 'false').lower() == 'true')
         context["nav"]["menu"] = True
 
         context["nav"]["help"] = {"title": help_title, "templates": ["graph-tab-help"]}
@@ -444,10 +450,13 @@ class GraphDataView(View):
                     clone_data = graph.copy()
                     ret = clone_data["copy"]
                     ret.slug = None
+                    ret.publication = None
+
                     ret.save()
 
                     ret.create_editable_future_graph()
                     ret.publish()
+
                     ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
 
                 elif self.action == "reorder_nodes":
