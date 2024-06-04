@@ -225,8 +225,8 @@ const confirmDelete = () => {
     const numItems = toDelete.value.length;
     confirm.require({
         message: $ngettext(
-            "Are you sure you want to delete %{ numItems } item (including all children)?",
-            "Are you sure you want to delete %{ numItems } items (including all children)?",
+            "Are you sure you want to delete %{numItems} item (including all children)?",
+            "Are you sure you want to delete %{numItems} items (including all children)?",
             numItems,
             { numItems: numItems.toLocaleString() },
         ),
