@@ -59,11 +59,12 @@ label {
 h4 {
     color: v-bind(ARCHES_CHROME_BLUE);
     margin-top: 0;
-    font-size: small;
+    font-size: 1.33rem;
 }
 
 p {
     font-weight: normal;
     margin-top: 0;
+    font-size: 1.2rem;
 }
 </style>

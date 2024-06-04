@@ -108,9 +108,12 @@ const onCancel = () => {
 </template>
 
 <style scoped>
-h4,
+h4 {
+    font-size: 1.33rem;
+}
+
 input {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
 }
 
 .characteristic {
