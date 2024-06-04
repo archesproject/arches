@@ -26,6 +26,7 @@ import type {
     ControlledList,
     ControlledListItem,
     DisplayedListItemRefAndSetter,
+    MoveLabels,
     NewControlledListItem,
 } from "@/types/ControlledListManager";
 import type { Language } from "@/types/arches";
@@ -36,7 +37,10 @@ const { $gettext } = useGettext();
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 const { displayedRow, setDisplayedRow } = inject(displayedRowKey) as DisplayedListItemRefAndSetter;
 
-const { node } = defineProps<{ node: TreeNode }>();
+const { moveLabels, node } = defineProps<{
+    moveLabels: MoveLabels,
+    node: TreeNode,
+}>();
 
 const tree = defineModel<TreeNode[]>("tree", { required: true });
 const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", { required: true });
@@ -45,12 +49,6 @@ const movingItem = defineModel<TreeNode>("movingItem", { required: true });
 const nextNewItem = defineModel<NewControlledListItem>("nextNewItem");
 const newLabelFormValue = defineModel<string>("newLabelFormValue", { required: true });
 const newLabelCounter = defineModel<number>("newLabelCounter", { required: true });
-
-const addChildItemLabel = $gettext("Add child item");
-const moveUpLabel = $gettext("Move item up");
-const moveDownLabel = $gettext("Move item down");
-const changeParentLabel = $gettext("Change item parent");
-
 
 const isFirstItem = (item: ControlledListItem) => {
     const siblings: TreeNode[] = (
@@ -148,12 +146,12 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
 <template>
     <Button
         v-if="selectedKeys && node.key! in selectedKeys"
-        v-tooltip="addChildItemLabel"
+        v-tooltip="moveLabels.addChild"
         type="button"
         raised
         class="add-child-button"
         icon="fa fa-plus"
-        :aria-label="addChildItemLabel"
+        :aria-label="moveLabels.addChild"
         @click.stop="onAddItem(node)"
     />
     <span
@@ -162,33 +160,33 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
     >
         <Button
             v-if="selectedKeys && node.key! in selectedKeys"
-            v-tooltip="moveUpLabel"
+            v-tooltip="moveLabels.moveUp"
             type="button"
             raised
             class="reorder-button"
             icon="fa fa-caret-up"
-            :aria-label="moveUpLabel"
+            :aria-label="moveLabels.moveUp"
             :disabled="isFirstItem(node.data)"
             @click="onReorder(node.data, true)"
         />
         <Button
             v-if="selectedKeys && node.key! in selectedKeys"
-            v-tooltip="moveDownLabel"
+            v-tooltip="moveLabels.moveDown"
             type="button"
             raised
             class="reorder-button"
             icon="fa fa-caret-down"
-            :aria-label="moveDownLabel"
+            :aria-label="moveLabels.moveDown"
             :disabled="isLastItem(node.data)"
             @click="onReorder(node.data, false)"
         />
         <Button
             v-if="!node.data.name && selectedKeys && node.key! in selectedKeys"
-            v-tooltip="changeParentLabel"
+            v-tooltip="moveLabels.changeParent"
             type="button"
             raised
             icon="fa fa-arrows-alt"
-            :aria-label="changeParentLabel"
+            :aria-label="moveLabels.changeParent"
             @click="setMovingItem(node)"
         />
     </span>

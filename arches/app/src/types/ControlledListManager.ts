@@ -108,6 +108,13 @@ export interface ReferencingNode {
     graph_name: string;
 }
 
+export interface MoveLabels {
+    addChild: string,
+    moveUp: string,
+    moveDown: string,
+    changeParent: string,
+}
+
 // Prop injection types
 export interface DisplayedRowRefAndSetter {
     displayedRow: Ref<Selectable | null>;

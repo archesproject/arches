@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { inject, ref } from "vue";
+import { useGettext } from "vue3-gettext";
 
 import Tree from "primevue/tree";
 
@@ -22,6 +23,15 @@ import type {
     NewControlledList,
     NewControlledListItem,
 } from "@/types/ControlledListManager";
+
+const { $gettext } = useGettext();
+
+const moveLabels = Object.freeze({
+    addChild: $gettext("Add child item"),
+    moveUp: $gettext("Move item up"),
+    moveDown: $gettext("Move item down"),
+    changeParent: $gettext("Change item parent"),
+});
 
 const tree: Ref<TreeNode[]> = ref([]);
 const selectedKeys: Ref<TreeSelectionKeys> = ref({});
@@ -190,6 +200,7 @@ const onBeforeUpdate = () => {
                 v-model:newListCounter="newListCounter"
                 v-model:newListFormValue="newListFormValue"
                 v-model:filter-value="filterValue"
+                :move-labels
                 :node="slotProps.node"
                 :is-multi-selecting="isMultiSelecting"
             />

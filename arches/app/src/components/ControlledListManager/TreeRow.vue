@@ -29,6 +29,7 @@ import type { TreeNode } from "primevue/treenode";
 import type {
     ControlledListItem,
     DisplayedListItemRefAndSetter,
+    MoveLabels,
     NewControlledListItem,
 } from "@/types/ControlledListManager";
 import type { Language } from "@/types/arches";
@@ -50,7 +51,11 @@ const newListFormValue = defineModel<string>("newListFormValue", { required: tru
 const newListCounter = defineModel<number>("newListCounter", { required: true });
 const filterValue = defineModel<string>("filterValue", { required: true });
 
-const { isMultiSelecting, node } = defineProps<{ isMultiSelecting: boolean, node: TreeNode }>();
+const { isMultiSelecting, node, moveLabels } = defineProps<{
+    isMultiSelecting: boolean,
+    moveLabels: MoveLabels,
+    node: TreeNode,
+}>();
 const { setDisplayedRow } = inject(displayedRowKey) as DisplayedListItemRefAndSetter;
 
 // Workaround for autofocusing the new list/label input boxes
@@ -256,6 +261,7 @@ const onBlurNewList = async () => {
                 v-model:new-label-form-value="newLabelFormValue"
                 v-model:new-label-counter="newLabelCounter"
                 :node
+                :move-labels
             />
         </div>
     </span>
