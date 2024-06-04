@@ -64,6 +64,8 @@ logger = logging.getLogger(__name__)
 
 
 class Resource(models.ResourceInstance):
+    custom_search_class = None
+
     class Meta:
         proxy = True
 
@@ -632,6 +634,13 @@ class Resource(models.ResourceInstance):
                                                 },
                                             }
                                         )
+
+        if not Resource.custom_search_class and settings.CUSTOM_SEARCH_CLASS:
+            Resource.custom_search_class = import_class_from_string(settings.CUSTOM_SEARCH_CLASS)
+
+        if Resource.custom_search_class:
+            Resource.custom_search_class.add_search_terms(self, document, terms)
+
         return document, terms
 
     def delete(self, user={}, index=True, transaction_id=None):
