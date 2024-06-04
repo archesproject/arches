@@ -53,7 +53,6 @@ export const itemAsNode = (
 ): TreeNode => {
     return {
         key: item.id,
-        label: bestLabel(item, selectedLanguage.code).value,
         children: item.children.map(child => itemAsNode(child, selectedLanguage)),
         data: item,
     };
@@ -65,7 +64,6 @@ export const listAsNode = (
 ): TreeNode => {
     return {
         key: list.id,
-        label: list.name,
         children: list.items.map(
             (item: ControlledListItem) => itemAsNode(item, selectedLanguage)
         ),

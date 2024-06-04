@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, ref } from "vue";
+import { computed, inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Tree from "primevue/tree";
@@ -8,8 +8,8 @@ import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 import ListTreeControls from "@/components/ControlledListManager/ListTreeControls.vue";
 import TreeRow from "@/components/ControlledListManager/TreeRow.vue";
 
-import { displayedRowKey } from "@/components/ControlledListManager/constants.ts";
-import { nodeIsList } from "@/components/ControlledListManager/utils.ts";
+import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
+import { bestLabel, nodeIsList } from "@/components/ControlledListManager/utils.ts";
 
 import type { ComponentPublicInstance, Ref } from "vue";
 import type {
@@ -17,6 +17,7 @@ import type {
     TreeSelectionKeys,
 } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
+import type { Language } from "@/types/arches";
 import type {
     ControlledListItem,
     DisplayedRowRefAndSetter,
@@ -54,6 +55,7 @@ const nextNewList = ref<NewControlledList>();
 const rerender = ref(0);
 const nextFilterChangeNeedsExpandAll = ref(false);
 
+const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 const { displayedRow, setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 
 const collapseNodesRecursive = (node: TreeNode) => {
@@ -140,6 +142,26 @@ const onBeforeUpdate = () => {
         filterValue.value = inputEl.value;
     }
 };
+
+const filterCallbackWrapped = computed(() => {
+    // Access some hidden functionality of the PrimeVue <Tree> to make
+    // filter lookups lazy, that is, making use of the current state of the
+    // label values and the selected language when doing the filtering.
+    // "Hidden", because we need to violate the type of filter-by, which
+    // should be a string. If we abuse it to be something that returns
+    // a 1-element array containing a getter when split() is called on it,
+    // that getter can return the best label to filter against.
+    return {
+        split: () => {
+            return [
+                (node: TreeNode) => {
+                    return nodeIsList(node) ? node.data.name :
+                        bestLabel(node.data, selectedLanguage.value.code).value;
+                }
+            ];
+        },
+    };
+});
 </script>
 
 <template>
@@ -162,6 +184,7 @@ const onBeforeUpdate = () => {
         v-model:expandedKeys="expandedKeys"
         :value="tree"
         :filter="true"
+        :filter-by="filterCallbackWrapped as unknown as string"
         filter-mode="lenient"
         :filter-placeholder="$gettext('Find')"
         :selection-mode="isMultiSelecting ? 'checkbox' : 'single'"
