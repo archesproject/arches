@@ -635,7 +635,8 @@ class Resource(models.ResourceInstance):
                                             }
                                         )
 
-        if not Resource.custom_search_class and settings.CUSTOM_SEARCH_CLASS:
+        if not Resource.custom_search_class and settings.setting_exists(
+               "CUSTOM_SEARCH_CLASS") and settings.CUSTOM_SEARCH_CLASS:
             Resource.custom_search_class = import_class_from_string(settings.CUSTOM_SEARCH_CLASS)
 
         if Resource.custom_search_class:

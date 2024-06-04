@@ -285,9 +285,10 @@ def prepare_search_index(create=False):
         },
     }
 
-    if settings.CUSTOM_SEARCH_CLASS:
+    if settings.setting_exists("CUSTOM_SEARCH_CLASS") and settings.CUSTOM_SEARCH_CLASS:
         custom_index_class = import_class_from_string(settings.CUSTOM_SEARCH_CLASS)
-        index_settings['mappings']['properties'][custom_index_class.custom_search_path] = custom_index_class.get_custom_search_config()
+        index_settings['mappings']['properties'][
+            custom_index_class.custom_search_path] = custom_index_class.get_custom_search_config()
 
 
     index_settings["mappings"]["properties"]["permissions"]["properties"].update(
