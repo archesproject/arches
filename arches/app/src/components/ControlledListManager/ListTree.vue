@@ -166,7 +166,7 @@ const onBeforeUpdate = () => {
         :filter-placeholder="$gettext('Find')"
         :selection-mode="isMultiSelecting ? 'checkbox' : 'single'"
         :pt="{
-            root: { style: { flexGrow: 1, border: 0, overflowY: 'hidden' } },
+            root: { style: { flexGrow: 1, border: 0, overflowY: 'hidden', paddingBottom: '5rem' } },
             input: {
                 style: { height: '3.5rem', fontSize: '14px' },
             },
