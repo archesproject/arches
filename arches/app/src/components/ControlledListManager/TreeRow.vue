@@ -243,7 +243,9 @@ const onBlurNewList = async () => {
                 type="button"
                 raised
                 class="move-button"
-                :label="$gettext('Move %{item} here', { item: movingItem.label ?? '' }, true)"
+                :label="$gettext('Move %{item} here', {
+                    item: bestLabel(movingItem.data, selectedLanguage.code).value
+                }, true)"
                 @click="setParent(node)"
             />
         </div>

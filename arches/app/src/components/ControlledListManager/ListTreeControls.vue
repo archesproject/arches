@@ -6,7 +6,7 @@ import { useGettext } from "vue3-gettext";
 
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import { DANGER, ERROR } from "@/components/ControlledListManager/constants.ts";
-import { listAsNode } from "@/components/ControlledListManager/utils.ts";
+import { bestLabel, listAsNode } from "@/components/ControlledListManager/utils.ts";
 
 import Button from "primevue/button";
 import ConfirmDialog from "primevue/confirmdialog";
@@ -283,7 +283,12 @@ await fetchLists();
         class="action-banner"
     >
         <!-- turn off escaping: vue template sanitizes -->
-        {{ $gettext("Selecting new parent for: %{item}", { item: movingItem.label ?? '' }, true) }}
+        {{ $gettext(
+            "Selecting new parent for: %{item}",
+            { item: bestLabel(movingItem.data, selectedLanguage.code).value },
+            true,
+        )
+        }}
         <Button
             ref="abandonMoveRef"
             type="button"
