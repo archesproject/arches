@@ -406,7 +406,7 @@ class ControlledListItemView(View):
 
         update_fields = list(data)
         if not update_fields:
-            return
+            return JSONErrorResponse()
         exclude_fields = {f for f in field_names(item) if f not in update_fields}
         try:
             item._state.adding = False
