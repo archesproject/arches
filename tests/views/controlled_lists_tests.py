@@ -19,7 +19,7 @@ from arches.app.models.models import (
     Node,
     NodeGroup,
 )
-from arches.app.views.controlled_lists import serialize
+from arches.app.views.api.controlled_lists import serialize
 from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
