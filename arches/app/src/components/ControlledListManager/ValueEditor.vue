@@ -41,6 +41,7 @@ const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const toast = useToast();
 const { $gettext } = useGettext();
+const valueHeader = $gettext('Value');
 const languageHeader = $gettext('Language');
 const noteTypeHeader = $gettext('Note type');
 
@@ -259,6 +260,7 @@ const focusInput = () => {
             </Column>
             <Column
                 field="value"
+                :header="valueHeader"
                 style="width: 60%; min-width: 8rem;"
             >
                 <template #editor="{ data, field }">

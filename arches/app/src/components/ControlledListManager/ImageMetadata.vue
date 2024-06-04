@@ -27,6 +27,7 @@ const toast = useToast();
 const { $gettext } = useGettext();
 
 const metadataTypeHeader = $gettext('Metadata type');
+const metadataValueHeader = $gettext('Value');
 const languageHeader = $gettext('Language');
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
@@ -188,6 +189,7 @@ const focusInput = () => {
             </Column>
             <Column
                 field="value"
+                :header="metadataValueHeader"
                 style="width: 60%; min-width: 8rem;"
             >
                 <template #editor="{ data, field }">
