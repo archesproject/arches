@@ -306,7 +306,7 @@ await fetchLists();
             type="button"
             class="banner-button"
             :label="$gettext('Abandon')"
-            @click="isMultiSelecting = false"
+            @click="isMultiSelecting = false; selectedKeys = {};"
         />
     </div>
     <div
