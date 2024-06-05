@@ -421,7 +421,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         graphs = set()
         nodegroups = self.get_nodegroups_by_perm(user, perms)
         for node in Node.objects.filter(nodegroup__in=nodegroups).prefetch_related("graph"):
-            if node.graph.isresource and str(node.graph_id) != SystemSettings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+            if node.graph.isresource and str(node.graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
                 graphs.add(str(node.graph.pk))
         return list(graphs)
 
