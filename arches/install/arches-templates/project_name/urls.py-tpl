@@ -4,7 +4,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.urls import include, path
 
 urlpatterns = [
-    path('', include('arches.urls')),
+    path('', include('arches.urls')),  # ensure project and Arches-application urls go _above_ this entry
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Only handle i18n routing in active project. This will still handle the routes provided by Arches core and Arches applications,
