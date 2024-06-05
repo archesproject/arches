@@ -128,28 +128,28 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        print("Starting JSON-LD load")
+        self.stdout.write("Starting JSON-LD load")
         if options["model"]:
-            print(f"Only loading {options['model']}")
+            self.stdout.write(f"Only loading {options['model']}")
         if options["block"]:
-            print(f"Only loading {options['block']}")
+            self.stdout.write(f"Only loading {options['block']}")
         if options["force"] == "overwrite":
-            print("Overwriting existing records")
+            self.stdout.write("Overwriting existing records")
         if options["toobig"]:
-            print(f"Not loading records > {options['toobig']}kb")
+            self.stdout.write(f"Not loading records > {options['toobig']}kb")
         if options["quiet"]:
-            print("Only announcing timing data")
+            self.stdout.write("Only announcing timing data")
         if options["verbosity"] > 1:
-            print("Logging detailed error information: set log level to DEBUG to view messages")
-            print("Verbosity level 2 will log based on the application's LOGGING settings in settings.py")
-            print("Verbosity level 3 will include level 2 logging as well as logging to the console")
+            self.stdout.write("Logging detailed error information: set log level to DEBUG to view messages")
+            self.stdout.write("Verbosity level 2 will log based on the application's LOGGING settings in settings.py")
+            self.stdout.write("Verbosity level 3 will include level 2 logging as well as logging to the console")
             resp = input("Logging detailed information can slow down the import process.  Continue anyway? (y/n)")
 
             if "n" in resp.lower():
                 return
 
         if options["strip_search"] and not options["fast"]:
-            print("ERROR: stripping fields not exposed to advanced search only works in fast mode")
+            self.stderr.write("ERROR: stripping fields not exposed to advanced search only works in fast mode")
             return
 
         if options["dry_run"]:
@@ -179,7 +179,7 @@ class Command(BaseCommand):
                 models = os.listdir(source)
             models.sort()
             models = [m for m in models if m[0] not in ["_", "."]]
-        print(f"Found possible models: {models}")
+        self.stdout.write(f"Found possible models: {models}")
 
         # This is boilerplate for any use of get_documents_to_index()
         # Need to add issearchable for strip_search option
@@ -200,7 +200,7 @@ class Command(BaseCommand):
         loaded = 0
 
         for m in models:
-            print(f"Loading {m}")
+            self.stdout.write(f"Loading {m}")
             model_path = Path(source) / m
             graphid = graph_uuid_map.get(m, None)
             if not graphid:
@@ -208,7 +208,7 @@ class Command(BaseCommand):
                 try:
                     graphid = archesmodels.GraphModel.objects.get(slug=m).pk
                 except:
-                    print(f"Couldn't find a model definition for {m}; skipping")
+                    self.stderr.write(f"Couldn't find a model definition for {m}; skipping")
                     continue
             # We have a good model, so build the pre-processed tree once
             self.reader.graphtree = self.reader.process_graph(graphid)
@@ -254,12 +254,12 @@ class Command(BaseCommand):
                         fn = block_path / f
                         # Check file size of record
                         if not options["quiet"]:
-                            print(f"About to import {fn}")
+                            self.stdout.write(f"About to import {fn}")
                         if options["toobig"]:
                             sz = os.os.path.getsize(fn)
                             if sz > options["toobig"]:
                                 if not options["quiet"]:
-                                    print(f" ... Skipping due to size:  {sz} > {options['toobig']}")
+                                    self.stdout.write(f" ... Skipping due to size:  {sz} > {options['toobig']}")
                                 continue
                         uu = f.replace(f".{options['suffix']}", "")
                         if options["use_storage"]:
@@ -301,7 +301,7 @@ class Command(BaseCommand):
                                 loaded += l
                                 loaded_model += l
                             except Exception as e:
-                                print(f"*** Failed to load {fn}:\n     {e}\n")
+                                self.stderr.write(f"*** Failed to load {fn}:\n     {e}\n")
                                 if not options["ignore_errors"]:
                                     short_path_to_failing_file = f"{Path(m) / b / f}"
                                     if sys.version_info >= (3, 11):
@@ -310,9 +310,9 @@ class Command(BaseCommand):
                                         e.__notes__ = [short_path_to_failing_file]
                                     raise
                         else:
-                            print(" ... skipped due to bad data :(")
+                            self.stdout.write(" ... skipped due to bad data :(")
                         if not seen % 100:
-                            print(f" ... seen {seen} / loaded {loaded} in {time.time()-start}")
+                            self.stdout.write(f" ... seen {seen} / loaded {loaded} in {time.time()-start}")
             except StopIteration as e:
                 break
             except:
@@ -321,17 +321,17 @@ class Command(BaseCommand):
             self.save_resources()
             self.index_resources(options["strip_search"])
             self.resources = []
-        print(f"Total Time: seen {seen} / loaded {loaded} in {time.time()-start} seconds")
+        self.stdout.write(f"Total Time: seen {seen} / loaded {loaded} in {time.time()-start} seconds")
 
     def fast_import_resource(self, resourceid, graphid, data, n=1000, reload="ignore", quiet=True, strip_search=False, dry_run=False):
         try:
             resource_instance = Resource.objects.get(pk=resourceid)
             if reload == "ignore":
                 if not quiet:
-                    print(f" ... already loaded")
+                    self.stdout.write(f" ... already loaded")
                 return 0
             elif reload == "error":
-                print(f"*** Record exists for {resourceid}, and -ow is error")
+                self.stderr.write(f"*** Record exists for {resourceid}, and -ow is error")
                 raise FileExistsError(resourceid)
             elif not dry_run:
                 resource_instance.delete()
@@ -342,7 +342,7 @@ class Command(BaseCommand):
             self.reader.read_resource(data, resourceid=resourceid, graphid=graphid)
             self.resources.extend(self.reader.resources)
         except:
-            print(f"Exception raised while reading {resourceid}...")
+            self.stderr.write(f"Exception raised while reading {resourceid}...")
             raise
         if not dry_run and len(self.resources) >= n:
             self.save_resources()
@@ -356,10 +356,10 @@ class Command(BaseCommand):
                 resource_instance = Resource.objects.get(pk=resourceid)
                 if reload == "ignore":
                     if not quiet:
-                        print(f" ... already loaded")
+                        self.stdout.write(f" ... already loaded")
                     return 0
                 elif reload == "error":
-                    print(f"*** Record exists for {resourceid}, and -ow is error")
+                    self.stdout.write(f"*** Record exists for {resourceid}, and -ow is error")
                     raise FileExistsError(resourceid)
                 else:
                     resource_instance.delete()
@@ -374,7 +374,7 @@ class Command(BaseCommand):
                 for resource in self.reader.resources:
                     resource.save(request=None)
             except archesmodels.ResourceInstance.DoesNotExist:
-                print(f"*** Could not find model: {graphid}")
+                self.stderr.write(f"*** Could not find model: {graphid}")
                 return 0
             except Exception as e:
                 raise

@@ -1,5 +1,5 @@
 import json
-import sys
+import logging
 import zipfile
 from datetime import datetime
 from functools import cache, lru_cache
@@ -20,6 +20,8 @@ from arches.app.models.models import GraphModel, LoadErrors, LoadEvent, LoadStag
 from arches.app.models.system_settings import settings
 from arches.app.utils.file_validator import FileValidator
 
+logger = logging.getLogger(__name__)
+
 
 @lru_cache(maxsize=1)
 def get_graph_tree_from_slug(slug):
@@ -37,6 +39,24 @@ def graph_id_from_slug(slug):
 def fallback_node():
     """Consider removing this if we make LoadStaging.nodegroup nullable."""
     return Node.objects.filter(nodegroup__isnull=False).first()
+
+
+class RedirectStdoutToLogger:
+    def write(self, msg):
+        if msg:
+            logger.info(msg)
+
+    def flush(self):
+        pass
+
+
+class RedirectStderrToLogger:
+    def write(self, msg):
+        if msg:
+            logger.error(msg)
+
+    def flush(self):
+        pass
 
 
 class JSONLDImporter(BaseImportModule):
@@ -129,6 +149,8 @@ class JSONLDImporter(BaseImportModule):
         try:
             resources = call_command(
                 "load_jsonld",
+                stdout=RedirectStdoutToLogger(),
+                stderr=RedirectStderrToLogger(),
                 model=graph_slug,
                 block=block,
                 force="overwrite",

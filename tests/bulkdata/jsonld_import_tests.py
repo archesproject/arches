@@ -36,7 +36,6 @@ from django.http import HttpRequest
 from django.urls import reverse
 from django.test import TransactionTestCase
 from django.test.client import Client
-from django.test.utils import captured_stdout
 
 # these tests can be run from the command line via
 # python manage.py test tests.bulkdata.jsonld_import_tests --settings="tests.test_settings"
@@ -194,7 +193,6 @@ class JSONLDImportTests(TransactionTestCase):
         # to uploadedfiles/tmp/basic/58/...
         shutil.copytree(self.dir_to_zip, default_storage.path(Path(importer.temp_dir)))
 
-        with captured_stdout():
-            importer.write(request)
+        importer.write(request)
 
         self.assertEqual(EditLog.objects.filter(transactionid=start_event.pk).count(), 2)
