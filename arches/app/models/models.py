@@ -2078,10 +2078,11 @@ class SpatialView(models.Model):
         ],
         unique=True,
     )
-    description = models.TextField(default="arches spatial view")
+    description = models.TextField(default="arches spatial view")  # provide a description of the spatial view
     geometrynode = models.ForeignKey(
-        Node, on_delete=models.CASCADE, db_column="geometrynodeid"
-    )
+		Node, on_delete=models.CASCADE, db_column="geometrynodeid", 
+		limit_choices_to={'datatype': 'geojson-feature-collection'}
+	)
     ismixedgeometrytypes = models.BooleanField(default=False)
     language = models.ForeignKey(
         Language, db_column="languageid", to_field="code", on_delete=models.CASCADE
