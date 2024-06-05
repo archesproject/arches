@@ -90,10 +90,6 @@ const onRowSelect = (node: TreeNode) => {
     }
 };
 
-const collapseAll = () => {
-    expandedKeys.value = {};
-};
-
 const expandAll = () => {
     const newExpandedKeys = {};
     for (const node of tree.value) {
