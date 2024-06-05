@@ -10,6 +10,7 @@
 
 
 import os
+import re
 import sys
 import json
 import uuid
@@ -24,6 +25,7 @@ from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
+from django.db import connection
 from django.db.models import JSONField
 from django.core.cache import caches
 from django.core.mail import EmailMultiAlternatives
@@ -39,6 +41,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import validate_slug
+from django.core.exceptions import ValidationError
 from guardian.models import GroupObjectPermission
 from guardian.shortcuts import assign_perm
 
@@ -1837,3 +1840,41 @@ class SpatialView(models.Model):
     class Meta:
         managed = True
         db_table = "spatial_views"
+
+    def save(self, *args, **kwargs):
+        """
+        Validate the spatial view before saving it to the database as the database triggers have proved hard to test.
+        """
+        if self.geometrynode:
+            if self.geometrynode.datatype != "geojson-feature-collection":
+                raise ValidationError("Geometry node must be of type geojson-feature-collection")
+            else:
+                graph = self.geometrynode.graph
+                if not self.attributenodes or len(self.attributenodes) == 0:
+                    raise ValidationError("Attribute nodes must have at least one entry")
+                else:
+                    for node in self.attributenodes:
+                        if not Node.objects.filter(pk=node["nodeid"], graph=graph).exists():
+                            raise ValidationError(f"Attribute nodes must belong to the same graph as the geometry node (error nodeid:{str(node.id)})")
+                
+                # language must be be a valid language code beloging to the current publication
+                published_graphs = PublishedGraph.objects.filter(publication=graph.publication)
+                if self.language not in [published_graph.language for published_graph in published_graphs]:
+                    raise ValidationError("Language must belong to a published graph for the graph of the geometry node")
+                
+                # validate the slug
+                if not re.match(r"^[a-zA-Z_]([a-zA-Z0-9_]+)$", self.slug):
+                    raise ValidationError("Slug must contain only letters, numbers and hyphens, but not begin with a number.")
+                
+                # validate the schema is a valid schema in the database
+                with connection.cursor() as cursor:
+                    cursor.execute(f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{self.schema}'")
+                    if cursor.rowcount == 0:
+                        raise ValidationError("Schema does not exist in the database")
+        else:
+            raise ValidationError("Geometry node must be set")
+        
+        super(SpatialView, self).save(*args, **kwargs)
+
+
+
