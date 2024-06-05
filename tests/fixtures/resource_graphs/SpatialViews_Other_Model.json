@@ -1,0 +1,218 @@
+{
+    "graph": [
+        {
+            "author": " ",
+            "cards": [
+                {
+                    "active": true,
+                    "cardid": "42ed618b-7f8d-4605-bee7-958f09860442",
+                    "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
+                    "config": null,
+                    "constraints": [],
+                    "cssclass": null,
+                    "description": null,
+                    "graph_id": "114dd3fb-404d-4fb3-a639-1333b89cf60c",
+                    "helpenabled": false,
+                    "helptext": {
+                        "en": null
+                    },
+                    "helptitle": {
+                        "en": null
+                    },
+                    "instructions": {
+                        "en": null
+                    },
+                    "is_editable": false,
+                    "name": {
+                        "en": "Name"
+                    },
+                    "nodegroup_id": "89e85234-1cf9-11ef-ab82-0242ac130005",
+                    "sortorder": null,
+                    "visible": true
+                }
+            ],
+            "cards_x_nodes_x_widgets": [
+                {
+                    "card_id": "42ed618b-7f8d-4605-bee7-958f09860442",
+                    "config": {
+                        "defaultValue": {
+                            "en": {
+                                "direction": "ltr",
+                                "value": ""
+                            }
+                        },
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
+                        "label": "Name",
+                        "maxLength": null,
+                        "placeholder": {
+                            "en": "Enter text"
+                        },
+                        "uneditable": false,
+                        "width": "100%"
+                    },
+                    "id": "6bb0bcce-23dc-4dba-babb-a6dad9185d94",
+                    "label": {
+                        "en": "Name"
+                    },
+                    "node_id": "89e85234-1cf9-11ef-ab82-0242ac130005",
+                    "sortorder": 0,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000001"
+                }
+            ],
+            "color": null,
+            "config": {},
+            "deploymentdate": null,
+            "deploymentfile": null,
+            "description": {
+                "en": ""
+            },
+            "edges": [
+                {
+                    "description": null,
+                    "domainnode_id": "814a4326-1cf9-11ef-a3bb-0242ac130005",
+                    "edgeid": "4691d5f8-86ba-4460-8df8-2326b714256d",
+                    "graph_id": "114dd3fb-404d-4fb3-a639-1333b89cf60c",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "89e85234-1cf9-11ef-ab82-0242ac130005"
+                }
+            ],
+            "functions_x_graphs": [
+                {
+                    "config": {
+                        "descriptor_types": {
+                            "description": {
+                                "nodegroup_id": "89e85234-1cf9-11ef-ab82-0242ac130005",
+                                "string_template": "<Name>"
+                            },
+                            "map_popup": {
+                                "nodegroup_id": "89e85234-1cf9-11ef-ab82-0242ac130005",
+                                "string_template": "<Name>"
+                            },
+                            "name": {
+                                "nodegroup_id": "89e85234-1cf9-11ef-ab82-0242ac130005",
+                                "string_template": "<Name>"
+                            }
+                        },
+                        "triggering_nodegroups": []
+                    },
+                    "function_id": "60000000-0000-0000-0000-000000000001",
+                    "graph_id": "114dd3fb-404d-4fb3-a639-1333b89cf60c",
+                    "id": "ddff2356-f86f-4935-9e40-ff30615917e1"
+                }
+            ],
+            "graphid": "114dd3fb-404d-4fb3-a639-1333b89cf60c",
+            "iconclass": "",
+            "is_editable": false,
+            "isresource": true,
+            "jsonldcontext": null,
+            "name": {
+                "en": "Other_Model"
+            },
+            "nodegroups": [
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
+                    "nodegroupid": "89e85234-1cf9-11ef-ab82-0242ac130005",
+                    "parentnodegroup_id": null
+                }
+            ],
+            "nodes": [
+                {
+                    "alias": null,
+                    "config": {
+                        "en": ""
+                    },
+                    "datatype": "semantic",
+                    "description": "",
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "114dd3fb-404d-4fb3-a639-1333b89cf60c",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": true,
+                    "name": "Other_Model",
+                    "nodegroup_id": null,
+                    "nodeid": "814a4326-1cf9-11ef-a3bb-0242ac130005",
+                    "ontologyclass": null,
+                    "parentproperty": "",
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
+                },
+                {
+                    "alias": "name",
+                    "config": {
+                        "en": ""
+                    },
+                    "datatype": "string",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "114dd3fb-404d-4fb3-a639-1333b89cf60c",
+                    "hascustomalias": false,
+                    "is_collector": true,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Name",
+                    "nodegroup_id": "89e85234-1cf9-11ef-ab82-0242ac130005",
+                    "nodeid": "89e85234-1cf9-11ef-ab82-0242ac130005",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
+                }
+            ],
+            "ontology_id": null,
+            "publication": {
+                "graph_id": "114dd3fb-404d-4fb3-a639-1333b89cf60c",
+                "notes": null,
+                "publicationid": "91a50b0c-1cf9-11ef-a3bb-0242ac130005",
+                "published_time": "2024-05-28T08:52:48.772"
+            },
+            "relatable_resource_model_ids": [
+                "5db49c51-2c70-47b3-b7be-66afced863c8"
+            ],
+            "resource_2_resource_constraints": [],
+            "root": {
+                "alias": null,
+                "config": {
+                    "en": ""
+                },
+                "datatype": "semantic",
+                "description": "",
+                "exportable": false,
+                "fieldname": null,
+                "graph_id": "114dd3fb-404d-4fb3-a639-1333b89cf60c",
+                "hascustomalias": false,
+                "is_collector": false,
+                "isrequired": false,
+                "issearchable": true,
+                "istopnode": true,
+                "name": "Other_Model",
+                "nodegroup_id": null,
+                "nodeid": "814a4326-1cf9-11ef-a3bb-0242ac130005",
+                "ontologyclass": null,
+                "sortorder": 0,
+                "sourcebranchpublication_id": null
+            },
+            "slug": null,
+            "subtitle": {
+                "en": ""
+            },
+            "template_id": "50000000-0000-0000-0000-000000000001",
+            "version": ""
+        }
+    ],
+    "metadata": {
+        "db": "PostgreSQL 14.5 (Debian 14.5-1.pgdg110+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 10.2.1-6) 10.2.1 20210110, 64-bit",
+        "git hash": "28587d0755 2024-03-27 12:05:45 +0000",
+        "os": "Linux",
+        "os version": "6.6.22-linuxkit"
+    }
+}
