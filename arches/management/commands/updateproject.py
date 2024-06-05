@@ -137,6 +137,10 @@ class Command(BaseCommand):
         if not os.path.isfile(os.path.join(settings.APP_ROOT, "install", "requirements_dev.txt")):
             self.stdout.write("Copying requirements_dev.txt to project install directory")
             shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", "install", "requirements_dev.txt"), os.path.join(settings.APP_ROOT, 'install'))
+
+        if not os.path.isfile(os.path.join(settings.APP_ROOT, "hosts.py")):
+            self.stdout.write("Copying hosts.py to project directory")
+            shutil.copy2(os.path.join(settings.ROOT_DIR, "install", "arches-templates", "project_name", "hosts.py"), os.path.join(settings.APP_ROOT))
     
         if not os.path.isfile(os.path.join(settings.APP_ROOT, "src", "declarations.d.ts")):
             self.stdout.write("Creating /src/declarations.d.ts")
@@ -167,9 +171,16 @@ class Command(BaseCommand):
         arches_semantic_version = ".".join([str(arches.VERSION[0]), str(arches.VERSION[1]), str(arches.VERSION[2])])
         arches_next_minor_version = ".".join([str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"])
 
-        path_to_project = os.path.join(settings.APP_ROOT, "..")
+        path_to_project = os.path.join(settings.APP_ROOT)
         for relative_file_path in [
-            'gettext.config.js', '.coveragerc', '.gitignore', "tsconfig.json", "tests/test_settings.py", "tests/search_indexes/sample_index_tests.py", "pyproject.toml"
+            '../gettext.config.js', 
+            '../.coveragerc', 
+            '../.gitignore', 
+            "../tsconfig.json", 
+            "../tests/test_settings.py", 
+            "../tests/search_indexes/sample_index_tests.py", 
+            "../pyproject.toml"
+            "hosts.py"
         ]:  # relative to app root directory
             try:
                 file = open(os.path.join(path_to_project, relative_file_path),'r')
