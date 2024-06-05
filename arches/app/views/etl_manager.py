@@ -46,11 +46,12 @@ class ETLManagerView(View):
                 JOIN nodes n ON e.nodegroupid = n.nodeid
                 WHERE loadid = %s AND e.type = 'tile'
                 GROUP BY n.name, e.error, e.datatype, e.type, e.nodegroupid)
+                -- Add any errors that are neither node nor tile, e.g. early json-ld failures
                 UNION
-                (SELECT e.source, e.error, e.datatype, 0 as count, e.type, e.nodegroupid
+                (SELECT e.source, e.error, e.datatype, count(e.source), e.type, e.nodeid
                 FROM load_errors e
                 WHERE loadid = %s AND e.type NOT IN ('node', 'tile')
-                GROUP BY e.source, e.error, e.datatype, e.type, e.nodegroupid);
+                GROUP BY e.source, e.error, e.datatype, e.type, e.nodeid);
             """,
                 [loadid, loadid, loadid],
             )
