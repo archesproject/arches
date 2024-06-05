@@ -130,14 +130,31 @@ const expandPathsToFilterResults = (newFilterValue: string) => {
     nextFilterChangeNeedsExpandAll.value = false;
 };
 
+const getInputElement = () => {
+    if (treeDOMRef.value !== null) {
+        return treeDOMRef.value.$el.ownerDocument
+            .getElementsByClassName('p-tree-filter')[0] as HTMLInputElement;
+    }
+};
+
+const onMounted = () => {
+    // The current implementation of collapsing all nodes when
+    // backspacing out the search value relies on rerendering the
+    // <Tree> component. Restore focus to the input element. 
+    if (rerender.value > 0) {
+        const inputEl = getInputElement();
+        if (inputEl) {
+            inputEl.focus();
+        }
+    }
+};
+
 const onBeforeUpdate = () => {
     // Snoop on the filterValue, because if we wait to react
     // to the emitted filter event, the templated rows will
     // have already rendered. (<TreeRow> bolds search terms.)
-    if (treeDOMRef.value !== null) {
-        const inputEl = treeDOMRef.value.$el.ownerDocument
-            .getElementsByClassName('p-tree-filter')[0] as HTMLInputElement;
-
+    const inputEl = getInputElement();
+    if (inputEl) {
         expandPathsToFilterResults(inputEl.value);
         filterValue.value = inputEl.value;
     }
@@ -191,10 +208,10 @@ const filterCallbackWrapped = computed(() => {
         :pt="{
             root: { style: { flexGrow: 1, border: 0, overflowY: 'hidden', paddingBottom: '5rem' } },
             input: {
-                style: { height: '3.5rem', fontSize: '14px' },
+                style: { height: '3.5rem', fontSize: '1.4rem' },
             },
             wrapper: { style: { overflowY: 'auto', maxHeight: '100%', paddingBottom: '1rem' } },
-            container: { style: { fontSize: '14px' } },
+            container: { style: { fontSize: '1.4rem' } },
             content: ({ instance }) => {
                 if (instance.$el && instance.node.key === movingItem.key) {
                     instance.$el.classList.add('is-adjusting-parent');
@@ -202,7 +219,7 @@ const filterCallbackWrapped = computed(() => {
                 return { style: { height: '4rem' } };
             },
             label: { style: { textWrap: 'nowrap', marginLeft: '0.5rem', width: '100%' } },
-            hooks: { onBeforeUpdate },
+            hooks: { onBeforeUpdate, onMounted },
         }"
         @node-collapse="nextFilterChangeNeedsExpandAll = true"
         @node-select="onRowSelect"
