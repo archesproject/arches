@@ -3,12 +3,12 @@
     "version": "7.6.0",
     "license": "AGPL-3.0-only",
     "scripts": {
-        "build_development": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js",
-        "build_production": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 NODE_ENV=production webpack --config ./webpack/webpack.config.prod.js",
-        "build_test": "yarn eslint:check && yarn ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js --env test=true",
+        "build_development": "npm run eslint:check && npm run ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js",
+        "build_production": "npm run eslint:check && npm run ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 NODE_ENV=production webpack --config ./webpack/webpack.config.prod.js",
+        "build_test": "npm run eslint:check && npm run ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js --env test=true",
         "eslint:check": "eslint ./arches/app/src",
         "eslint:fix": "eslint ./arches/app/src --fix",
-        "eslint:watch": "nodemon --watch . --ext ts,vue --exec yarn --silent eslint:check",
+        "eslint:watch": "nodemon --watch . --ext ts,vue --exec npm run --silent eslint:check",
         "gettext:extract": "vue-gettext-extract",
         "gettext:compile": "vue-gettext-compile",
         "ts:check": "vue-tsc --noEmit",
@@ -20,29 +20,26 @@
         "url": "git@github.com:archesproject/arches.git",
         "type": "git"
     },
-    "devDependencies": {
-        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.6.x"
-    },
     "dependencies": {
         "@babel/runtime": "^7.17.2",
         "@mapbox/geojson-extent": "~1.0.1",
-        "@mapbox/geojsonhint": "^3.0.1",
-        "@mapbox/mapbox-gl-draw": "1.1.2",
+        "@mapbox/geojsonhint": "^3.3.0",
+        "@mapbox/mapbox-gl-draw": "^1.4.3",
         "@mapbox/mapbox-gl-geocoder": "^4.4.0",
         "@tmcw/togeojson": "^4.3.0",
-        "@turf/turf": "4.4.0",
+        "@turf/turf": "^6.5.0",
         "backbone": "1.3.3",
         "bootstrap": "3.4.1",
         "bootstrap-colorpicker": "^2.5.3",
         "chosen-js": "1.8.7",
-        "ckeditor4": "ckeditor/ckeditor4-releases#full/4.20.x",
+        "ckeditor4": "ckeditor/ckeditor4-releases#full/4.24.x",
         "codemirror": "^5.65.6",
         "core-js": "^3.21.1",
         "cross-env": "^7.0.3",
         "cross-fetch": "^3.1.5",
         "cytoscape": "^3.18.2",
         "cytoscape-cola": "^2.4.0",
-        "d3": "^6.1.1",
+        "d3": "^7.9.0",
         "datatables.net": "~1.12.1",
         "datatables.net-bs": "~1.13.11",
         "datatables.net-buttons": "~2.4.3",
@@ -72,25 +69,23 @@
         "mapbox-gl": "^1.8.1",
         "metismenu": "2.7.2",
         "moment": "^2.29.4",
-        "moment-timezone": "~0.5.43",
         "nouislider": "11.0.3",
         "numeral": "^2.0.6",
-        "primevue": "^3.51.0",
+        "primevue": "4.0.0-beta.3",
         "proj4": "^2.3.15",
         "regenerator-runtime": "^0.14.1",
         "requirejs": "~2.3.2",
         "requirejs-plugins": "1.0.2",
         "requirejs-text": "~2.0.16",
         "select-woo": "jadu/selectWoo",
-        "select2": "3.5.1",
-        "underscore": "~1.13.6",
+        "underscore": "^1.13.6",
         "uuidjs": "^3.3.0",
         "vue": "^3.4.21",
         "vue3-gettext": "^3.0.0-beta.4",
         "webpack-bundle-tracker": "^3.1.0"
     },
-    "resolutions": {
-        "@vue/compiler-sfc": "^3.4.21"
+    "devDependencies": {
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.6.x"
     },
     "nodeModulesPaths": {
         "nifty": "plugins/nifty",
@@ -102,7 +97,6 @@
         "text": "node_modules/requirejs-text/text",
         "jquery": "node_modules/jquery/dist/jquery.min",
         "js-cookie": "node_modules/js-cookie/src/js.cookie",
-        "select2": "node_modules/select2/select2",
         "select-woo": "node_modules/select-woo/dist/js/selectWoo.full",
         "select-woo-src": "node_modules/select-woo/src/js/select2",
         "bootstrap": "node_modules/bootstrap/dist/js/bootstrap.min",
@@ -110,7 +104,7 @@
         "backbone": "node_modules/backbone/backbone-min",
         "underscore": "node_modules/underscore/underscore-min",
         "jquery-validate": "node_modules/jquery-validation/dist/jquery.validate.min",
-        "d3": "node_modules/d3/dist/d3.min",
+        "d3": "node_modules/d3/src/index.js",
         "dropzone": "node_modules/dropzone/dist/min/dropzone-amd-module.min",
         "ckeditor4": "node_modules/ckeditor4/ckeditor",
         "ckeditor-jquery": "node_modules/ckeditor4/adapters/jquery",
@@ -154,5 +148,11 @@
         "cytoscape": "node_modules/cytoscape/dist/cytoscape.min",
         "cytoscape-cola": "node_modules/cytoscape-cola/cytoscape-cola",
         "webcola": "node_modules/webcola/WebCola/cola.min"
+    },
+    "overrides": {
+        "moment-timezone": "^0.5.45",
+        "nomnom": "npm:@gerhobbelt/nomnom",
+        "rimraf": "^5.0.7", 
+        "underscore": "^1.13.6"
     }
 }

@@ -53,26 +53,17 @@ jobs:
 
       - name: Webpack frontend files
         run: |
-          echo "Checking for yarn.lock file..."
-          if [ -f yarn.lock ]; then
-            echo "Removing yarn.lock due to yarn v1 package resolution issues"
-            echo "https://github.com/iarna/wide-align/issues/63"
-            rm yarn.lock
-          else
-            echo "yarn.lock not found, skipping remove."
-          fi
-
           echo "Checking for package.json..."
           if [ -f package.json ]; then
             echo "package.json found, building static bundle."
-            yarn && yarn build_test
+            npm install && npm run build_test
           else
-            echo "package.json not found, skipping yarn commands."
+            echo "package.json not found, skipping npm commands."
           fi
 
       - name: Run frontend tests
         run: |
-          yarn vitest
+          npm run vitest
           mv coverage/frontend/coverage.xml feature_branch_frontend_coverage.xml
 
       - name: Check for missing migrations
@@ -156,27 +147,18 @@ jobs:
 
       - name: Webpack frontend files
         run: |
-          echo "Checking for yarn.lock file..."
-          if [ -f yarn.lock ]; then
-            echo "Removing yarn.lock due to yarn v1 package resolution issues"
-            echo "https://github.com/iarna/wide-align/issues/63"
-            rm yarn.lock
-          else
-            echo "yarn.lock not found, skipping remove."
-          fi
-
           echo "Checking for package.json..."
           if [ -f package.json ]; then
             echo "package.json found, building static bundle."
-            yarn && yarn build_test
+            npm install && npm run build_test
           else
-            echo "package.json not found, skipping yarn commands."
+            echo "package.json not found, skipping npm commands."
           fi
 
       - name: Run frontend tests
         run: |
           if [ -f vitest.config.json ]; then
-            yarn vitest
+            npm run vitest
             mv coverage/frontend/coverage.xml target_branch_frontend_coverage.xml
           else
             echo "Unable to find vitest config. Skipping frontend tests."
