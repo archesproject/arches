@@ -172,7 +172,7 @@ class Command(BaseCommand):
             'gettext.config.js', 
             '.coveragerc', 
             '.gitignore', 
-            '.github/main.yml'
+            '.github/workflows/main.yml'
             "tsconfig.json", 
             "tests/test_settings.py", 
             "tests/search_indexes/sample_index_tests.py", 
