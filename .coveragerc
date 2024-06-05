@@ -3,14 +3,15 @@ source =
     arches/
 
 omit =
-    */python?.?/*
+    */__init__.py
+    */celery.py
+    */hosts.py
     */models/migrations/*
+    */python?.?/*
     */settings*.py
+    */updateproject.py
     */urls.py
     */wsgi.py
-    */hosts.py
-    */celery.py
-    */__init__.py
 
 data_file = coverage/python/.coverage
 
