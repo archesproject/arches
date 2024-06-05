@@ -214,11 +214,7 @@ class BaseImportModule:
         pass
 
     def stage_files(self, files, summary, cursor):
-        for file in files:
-            self.stage_excel_file(file, summary, cursor)
-
-    def stage_excel_file(self, file, summary, cursor):
-        pass
+        raise NotImplementedError
 
     def check_tile_cardinality(self, cursor):
         cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])

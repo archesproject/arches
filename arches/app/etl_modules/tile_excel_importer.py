@@ -189,6 +189,10 @@ class TileExcelImporter(BaseImportModule):
                     pass
         return graphid
 
+    def stage_files(self, files, summary, cursor):
+        for file in files:
+            self.stage_excel_file(file, summary, cursor)
+
     def stage_excel_file(self, file, summary, cursor):
         if file.endswith("xlsx"):
             summary["files"][file]["worksheets"] = []
