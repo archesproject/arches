@@ -115,7 +115,6 @@ const expandNode = (node: TreeNode, newExpandedKeys: TreeExpandedKeys) => {
 const expandPathsToFilterResults = (newFilterValue: string) => {
     // https://github.com/primefaces/primevue/issues/3996
     if (filterValue.value && !newFilterValue) {
-        collapseAll();
         // Rerender to avoid error emitted in PrimeVue tree re: aria-selected.
         rerender.value += 1;
     }
