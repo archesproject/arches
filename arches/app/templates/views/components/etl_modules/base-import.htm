@@ -93,7 +93,7 @@
                 <th>{% trans "Details" %}</th>
             </tr>
         </thead>
-        <!-- ko if: selectedLoadEvent().error_message && !selectedLoadEvent().error_message.includes('JSON-LD')-->
+        <!-- ko if: selectedLoadEvent().error_message -->
         <tbody>
             <tr>
                 <td colspan="5" data-bind="text: selectedLoadEvent().error_message"></td>
