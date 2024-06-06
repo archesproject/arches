@@ -284,11 +284,11 @@ class ResourceTests(ArchesTestCase):
 
         with self.subTest(user="can't delete"):
             result = test_resource.delete(user=other_user)
-            self.assertEqual(result, False)
+            self.assertFalse(result)
 
         with self.subTest(user="can delete"):
             result = test_resource.delete(user=user)
-            self.assertEqual(result, True)
+            self.assertTrue(result)
 
     def test_recalculate_descriptors_prefetch_related_objects(self):
         r1 = Resource(graph_id=self.search_model_graphid)
