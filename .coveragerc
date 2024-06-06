@@ -9,7 +9,6 @@ omit =
     */models/migrations/*
     */python?.?/*
     */settings*.py
-    */updateproject.py
     */urls.py
     */wsgi.py
 

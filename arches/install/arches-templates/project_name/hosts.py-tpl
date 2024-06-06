@@ -1,5 +1,5 @@
 from django_hosts import patterns, host
 
 host_patterns = patterns('',
-    host(r'{{ project_name }}', '{{ project_name }}.urls', name='{{ project_name }}'),
+    host(r'{{ project_name }}$', '{{ project_name }}.urls', name='{{ project_name }}'),
 )

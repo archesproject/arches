@@ -239,6 +239,7 @@
 
                             {% for p in plugins %}
                                 {% if p.config is not None %}
+                                    {% if p.config.show %}
                                     <!-- ko let: {uid: Math.random().toString()} -->
                                     <li {% if main_script == "views/plugin" and plugin.pluginid == p.pluginid %} class="active-sub" {% endif %}>
                                         {% if p.slug is not None %}
@@ -253,6 +254,7 @@
                                         </a>
                                     </li>
                                     <!-- /ko -->
+                                    {% endif %}
                                 {% else %}
                                 <!-- ko let: {uid: Math.random().toString()} -->
                                 <li {% if main_script == "views/plugin" and plugin.pluginid == p.pluginid %} class="active-sub" {% endif %}>
