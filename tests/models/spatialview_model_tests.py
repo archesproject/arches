@@ -211,3 +211,159 @@ class SpatialViewTests(ArchesTestCase):
         self.assertTrue(SpatialView.objects.filter(spatialviewid=spatialview.spatialviewid).exists())
 
         spatialview.delete()
+
+class SpatialViewTriggerTests(TransactionTestCase):
+
+    # following a pattern used in https://github.com/archesproject/arches/pull/10885/commits/09330d3db7e223336e9727dc8fc508f382a42607
+    # to run tests against functionality thata goes across transactions
+    #
+    # need to make sure that this test manually deletes the spatialview created in the test so
+    # and also the test data and models that are loaded in the setUpClass
+    available_apps = [
+        app for app in settings.INSTALLED_APPS if app not in (
+            "arches.app.models",
+            "django.contrib.contenttypes",
+        )
+    ]
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        LanguageSynchronizer.synchronize_settings_with_db()
+
+        # load test models
+        spatialviews_other_test_model_path = os.path.join(
+            test_settings.TEST_ROOT, "fixtures", "resource_graphs", "SpatialViews_Other_Model.json"
+        )
+        spatialviews_test_model_path = os.path.join(
+            test_settings.TEST_ROOT, "fixtures", "resource_graphs", "SpatialViews_Test_Model.json"
+        )
+        management.call_command("packages", operation="import_graphs", source=spatialviews_other_test_model_path, verbosity=0)
+        management.call_command("packages", operation="import_graphs", source=spatialviews_test_model_path, verbosity=0)
+
+        # load test data
+        spatialviews_other_test_data_path = os.path.join(
+            test_settings.TEST_ROOT, "fixtures", "data", "json", "Spatialviews_Other_Model_Data.json"
+        )
+        spatialviews_test_data_path = os.path.join(
+            test_settings.TEST_ROOT, "fixtures", "data", "json", "SpatialViews_Test_Model_Data.json"
+        )
+        BusinessDataImporter(spatialviews_other_test_data_path).import_business_data()
+        BusinessDataImporter(spatialviews_test_data_path).import_business_data()
+
+        cls.spatialviews_test_model_id = "5db49c51-2c70-47b3-b7be-66afced863c8"
+        cls.spatialviews_other_test_model_id = "114dd3fb-404d-4fb3-a639-1333b89cf60c"
+        cls.spatialview_geometrynode_id = "95b2c8de-1cf8-11ef-971a-0242ac130005"
+
+        # create a spatialview with objects to test triggers
+        cls.spatialview_slug = "spatialviews_test"
+        cls.test_spatial_view = cls.generate_valid_spatiatview()
+        cls.test_spatial_view.save()
+        cls.spatialview_id = cls.test_spatial_view.spatialviewid
+
+    @classmethod
+    def tearDownClass(cls):
+
+        # delete the test spatialview
+        cls.test_spatial_view.delete()
+
+        # delete all resources in models spatialviews_test_model_id and spatialviews_other_test_model_id
+        Resource.objects.filter(graph_id=cls.spatialviews_test_model_id).delete()
+        Resource.objects.filter(graph_id=cls.spatialviews_other_test_model_id).delete()
+
+        # delete the models
+        try:
+            Graph.objects.get(pk=cls.spatialviews_test_model_id).delete()
+        except Graph.DoesNotExist:
+            pass
+
+        try:
+            Graph.objects.get(pk=cls.spatialviews_other_test_model_id).delete()
+        except Graph.DoesNotExist:
+            pass
+
+        super().tearDownClass()
+
+    @classmethod
+    def get_language_instance(cls, language):
+        return models.Language.objects.get(code=language)
+    
+    @classmethod
+    def generate_valid_spatiatview(cls):
+        spatialview = SpatialView()
+        spatialview.spatialviewid = uuid.uuid4()
+        spatialview.schema = "public"
+        spatialview.slug = cls.spatialview_slug
+        spatialview.description = "test description"
+        spatialview.geometrynode = models.Node.objects.get(nodeid="95b2c8de-1cf8-11ef-971a-0242ac130005") #cls.spatialview_geometrynode_id)
+        spatialview.ismixedgeometrytypes = False # Discreet geometry
+        spatialview.language = cls.get_language_instance("en")
+        spatialview.isactive = True
+        spatialview.attributenodes = [
+            {"nodeid": "a379b7ac-1cf8-11ef-ab82-0242ac130005", "description": "gridref"},
+            {"nodeid": "bee90060-1cf8-11ef-971a-0242ac130005", "description": "name"},
+            {"nodeid": "ccfe0a6a-1cf8-11ef-971a-0242ac130005", "description": "date"},
+            {"nodeid": "d1a59230-1cf9-11ef-a1fe-0242ac130005", "description": "concept_list"},
+            {"nodeid": "d2a55a44-1cf9-11ef-a1fe-0242ac130005", "description": "bool"},
+            {"nodeid": "d2f5d474-1cf9-11ef-a1fe-0242ac130005", "description": "non_local_string"},
+            {"nodeid": "e514005a-1cf8-11ef-971a-0242ac130005", "description": "edtf_date"},
+            {"nodeid": "e674837a-1cf8-11ef-971a-0242ac130005", "description": "count"},
+            {"nodeid": "e70850dc-1cf8-11ef-971a-0242ac130005", "description": "url"},
+            {"nodeid": "fe3a586c-1cf9-11ef-a1fe-0242ac130005", "description": "domain"},
+            {"nodeid": "298ef7ac-1cfa-11ef-a1fe-0242ac130005", "description": "file"},
+            {"nodeid": "0e65f1d4-1cf9-11ef-971a-0242ac130005", "description": "concept"},
+            {"nodeid": "0e8d1560-1cfa-11ef-a1fe-0242ac130005", "description": "domain_list"},
+            {"nodeid": "348eb80a-1cf9-11ef-ab82-0242ac130005", "description": "other_spatialviews"},
+            {"nodeid": "54fc2d0c-1cf9-11ef-ab82-0242ac130005", "description": "other_models_list"}
+        ]
+        return spatialview
+
+    def test_check_spatialview_row_values(self):
+        """
+        Test views for the spatial view are created and have the correct values
+        """
+        # check spatial view got created
+        self.assertTrue(SpatialView.objects.filter(spatialviewid=self.spatialview_id).exists())
+        
+        with connection.cursor() as cursor:
+            cursor.execute(f"""
+                SELECT 
+                    gid, 
+                    tileid, 
+                    nodeid, 
+                    geom, 
+                    resourceinstanceid, 
+                    gridref, 
+                    name, 
+                    date, 
+                    concept_list, 
+                    bool, 
+                    non_local_string, 
+                    edtf_date, 
+                    count, 
+                    url, 
+                    domain, 
+                    file, 
+                    concept, 
+                    domain_list, 
+                    other_spatialviews, 
+                    other_models_list 
+                FROM public.{self.test_spatial_view.slug}_polygon""")
+            rows = cursor.fetchall()
+            self.assertTrue(len(rows) == 1)
+            row = rows[0]
+            self.assertTrue(row[5] == "ABC123") # gridref
+            self.assertTrue(row[6] == "Bat Willow") # name
+            self.assertTrue(row[7] == "2024-05-10") # date
+            self.assertTrue(row[8] == "(en) is related to") # concept_list
+            self.assertTrue(row[9] == "true") # bool (disabled as boolean node)
+            self.assertTrue(row[10] == "non-local") # non_local_string
+            self.assertTrue(row[11] == "2010") # edtf_date
+            self.assertTrue(row[12] == "11111") # count
+            self.assertTrue(row[13] == "https://www.cnbc.com")  # url
+            self.assertTrue(row[14] == "1") # domain
+            self.assertTrue(row[15] == "Arches Project, elastic.png") # file
+            self.assertTrue(row[16] == "(en) is related to") # concept
+            self.assertTrue(row[17] == "george, john, ringo, Paul") # domain_list
+            self.assertTrue(row[18] == "Bat Willow") # other_spatialviews
+            self.assertTrue(row[19] == "Other Model 2") # other_models_list
