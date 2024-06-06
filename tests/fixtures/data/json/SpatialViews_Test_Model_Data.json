@@ -354,7 +354,84 @@
                                 "a7f04a34-da45-4113-9619-169f8671af28",
                                 "dada494c-80bd-4bea-8bb6-223bb55fe022"
                             ],
-                            "298ef7ac-1cfa-11ef-a1fe-0242ac130005": null,
+                            "298ef7ac-1cfa-11ef-a1fe-0242ac130005": [
+                                {
+                                    "accepted": true,
+                                    "altText": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": "Test Alt"
+                                        }
+                                    },
+                                    "attribution": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": "Arches Project Team"
+                                        }
+                                    },
+                                    "content": "blob:http://localhost:8002/43ddbe41-6419-4fcc-8920-2fe10e1dd521",
+                                    "description": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": "This is the Arches Logo"
+                                        }
+                                    },
+                                    "file_id": "f10cddfd-1392-491e-bed3-ac88b39233fc",
+                                    "index": 0,
+                                    "lastModified": 1709897713896,
+                                    "name": "Arches_icon_strip-1.svg",
+                                    "path": "uploadedfiles/Arches_icon_strip-1.svg",
+                                    "size": 5835,
+                                    "status": "uploaded",
+                                    "title": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": "Arches Project"
+                                        }
+                                    },
+                                    "type": "image/svg+xml",
+                                    "url": "/files/f10cddfd-1392-491e-bed3-ac88b39233fc"
+                                },
+                                {
+                                    "accepted": true,
+                                    "altText": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": ""
+                                        }
+                                    },
+                                    "attribution": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": ""
+                                        }
+                                    },
+                                    "content": "blob:http://localhost:8002/384240d9-9c79-459b-9cb0-55107a00760e",
+                                    "description": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": ""
+                                        }
+                                    },
+                                    "file_id": "e64c83de-a951-421c-93c6-21d9e740b53e",
+                                    "height": 225,
+                                    "index": 0,
+                                    "lastModified": 1704883367866,
+                                    "name": "elastic.png",
+                                    "path": "uploadedfiles/elastic.png",
+                                    "size": 2349,
+                                    "status": "uploaded",
+                                    "title": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": ""
+                                        }
+                                    },
+                                    "type": "image/png",
+                                    "url": "/files/e64c83de-a951-421c-93c6-21d9e740b53e",
+                                    "width": 225
+                                }
+                            ],
                             "bee90060-1cf8-11ef-971a-0242ac130005": {
                                 "de": {
                                     "direction": "ltr",
@@ -393,7 +470,7 @@
                             "d1a59230-1cf9-11ef-a1fe-0242ac130005": [
                                 "ac41d9be-79db-4256-b368-2f4559cfbe55"
                             ],
-                            "d2a55a44-1cf9-11ef-a1fe-0242ac130005": null,
+                            "d2a55a44-1cf9-11ef-a1fe-0242ac130005": true,
                             "d2f5d474-1cf9-11ef-a1fe-0242ac130005": "non-local",
                             "e514005a-1cf8-11ef-971a-0242ac130005": "2010",
                             "e674837a-1cf8-11ef-971a-0242ac130005": 11111,
