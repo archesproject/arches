@@ -75,17 +75,17 @@ const fetchLists = async () => {
     let errorText;
     try {
         const response = await fetch(arches.urls.controlled_lists);
-        if (!response.ok) {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
-            throw new Error();
-        } else {
+        if (response.ok) {
             await response.json().then((data) => {
                 controlledListItemsTree.value = (data.controlled_lists as ControlledList[]).map(
                     list => listAsNode(list, selectedLanguage.value)
                 );
             });
+        } else {
+            errorText = response.statusText;
+            const body = await response.json();
+            errorText = body.message;
+            throw new Error();
         }
     } catch {
         toast.add({
