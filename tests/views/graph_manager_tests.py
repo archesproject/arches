@@ -365,6 +365,43 @@ class GraphManagerViewTests(ArchesTestCase):
         self.assertEqual(node_count, 0)
         self.assertEqual(edge_count, 0)
 
+    def test_branch_export_on_unpublished_graph(self):
+        self.client.login(username="admin", password="admin")
+        url = reverse("export_branch", kwargs={"graphid": self.GRAPH_ID})
+        node = [value for value in self.graph.nodes.values()][1]
+        post_data = JSONSerializer().serialize(node)
+        content_type = "application/x-www-form-urlencoded"
+
+        response = self.client.post(url, post_data, content_type)
+        
+        exported_branch = Graph.objects.get(pk=response.json()['graphid'])
+
+        original_graph_node_ids = [str(node.pk) for node in self.graph.nodes.values()]
+        export_branch_node_ids = [str(node.pk) for node in exported_branch.nodes.values()]
+
+        self.assertFalse(set(original_graph_node_ids) & set(export_branch_node_ids))
+
+    def test_branch_export_on_published_graph(self):
+        self.client.login(username="admin", password="admin")
+
+        user_id = self.client.session['_auth_user_id']
+        logged_in_user = get_user_model().objects.get(pk=user_id)
+        self.graph.publish(user=logged_in_user)
+
+        url = reverse("export_branch", kwargs={"graphid": self.GRAPH_ID})
+        node = [value for value in self.graph.nodes.values()][1]
+        post_data = JSONSerializer().serialize(node)
+        content_type = "application/x-www-form-urlencoded"
+
+        response = self.client.post(url, post_data, content_type)
+        
+        exported_branch = Graph.objects.get(pk=response.json()['graphid'])
+
+        original_graph_node_ids = [str(node.pk) for node in self.graph.nodes.values()]
+        export_branch_node_ids = [str(node.pk) for node in exported_branch.nodes.values()]
+
+        self.assertFalse(set(original_graph_node_ids) & set(export_branch_node_ids))
+
     def test_graph_export(self):
         """
         test graph export method
