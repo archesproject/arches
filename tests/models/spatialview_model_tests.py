@@ -20,21 +20,25 @@ import random
 import time
 import os, json, uuid
 import django
-from django.test import tag
+from django.test import tag, TransactionTestCase
 from django.contrib.auth.models import User
 from django.db import connection, connections, transaction
 from django.db.utils import InternalError, ProgrammingError, IntegrityError, OperationalError
 from django.core import management
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
+from arches.app.models.resource import Resource
+from arches.app.models.graph import Graph
 from arches.app.models.models import SpatialView
 #from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
+from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
+from django.conf import settings
 
 # these tests can be run from the command line via
 # python manage.py test tests.models.spatialview_model_tests --settings="tests.test_settings"
-SLEEP_TIME = 3
+SLEEP_TIME = 1
 
 class SpatialViewTests(ArchesTestCase):
     @classmethod
@@ -114,8 +118,6 @@ class SpatialViewTests(ArchesTestCase):
         spatialview = self.generate_valid_spatiatview()
 
         spatialview.save()
-        #sleep so arches can create the views
-        time.sleep(SLEEP_TIME)
 
         fetched_spatialview = SpatialView.objects.get(pk=spatialview.spatialviewid)
         self.assertTrue(fetched_spatialview.spatialviewid == spatialview.spatialviewid)
@@ -128,8 +130,6 @@ class SpatialViewTests(ArchesTestCase):
         spatialview = self.generate_valid_spatiatview()
         spatialview.ismixedgeometrytypes = True
         spatialview.save()
-        #sleep so arches can create the views
-        time.sleep(SLEEP_TIME)
 
         fetched_spatialview = SpatialView.objects.get(pk=spatialview.spatialviewid)
         self.assertTrue(fetched_spatialview.spatialviewid == spatialview.spatialviewid and fetched_spatialview.ismixedgeometrytypes == True)
@@ -197,29 +197,16 @@ class SpatialViewTests(ArchesTestCase):
             
 
     def test_spatial_view_isactive_set_to_false_removes_views(self):
-
-        def a_find_postgres_views_with_name(schema_name, view_name):
-            view_count = 0
-            #with connections[f"{test_settings.DATABASES['default']['NAME']}"].cursor() as cursor:
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT viewname FROM pg_views WHERE viewname = %s and schemaname = %s", [view_name, schema_name])
-                views = cursor.fetchall()
-                view_count = len(views)
-            return view_count
         
         # first create a valid spatial view that isactive=True
         spatialview = self.generate_valid_spatiatview()
         spatialview.save()
-        #sleep so arches can create the views
-        time.sleep(SLEEP_TIME)
 
         self.assertTrue(SpatialView.objects.filter(spatialviewid=spatialview.spatialviewid).exists())
 
         # now set isactive=False
         spatialview.isactive = False
         spatialview.save()
-        #sleep so database can handle the views
-        time.sleep(SLEEP_TIME)
 
         self.assertTrue(SpatialView.objects.filter(spatialviewid=spatialview.spatialviewid).exists())
 
