@@ -96,7 +96,9 @@ const showMoveHereButton = (rowId: string) => {
 };
 
 const setParent = async (parentNode: TreeNode) => {
-    let errorText;
+    let error;
+    let response;
+
     const setListAndSortOrderRecursive = (child: ControlledListItem) => {
         if (!parentNode.key) {
             return;
@@ -119,7 +121,7 @@ const setParent = async (parentNode: TreeNode) => {
         return;
     }
     try {
-        const response = await fetch(arches.urls.controlled_list_item(item.id), {
+        response = await fetch(arches.urls.controlled_list_item(item.id), {
             method: "POST",
             headers: { "X-CSRFToken": token },
             body: JSON.stringify(item),
@@ -128,16 +130,15 @@ const setParent = async (parentNode: TreeNode) => {
             movingItem.value = {};
             refetcher.value += 1;
         } else {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
+            error = await response.json();
             throw new Error();
         }
     } catch {
         toast.add({
             severity: ERROR,
             life: 8000,
-            summary: errorText || $gettext("Move failed"),
+            summary: $gettext("Move failed"),
+            detail: error?.message || response?.statusText,
         });
     }
 };

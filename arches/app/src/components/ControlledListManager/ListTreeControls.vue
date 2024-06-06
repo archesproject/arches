@@ -72,9 +72,10 @@ const expandNode = (node: TreeNode) => {
 };
 
 const fetchLists = async () => {
-    let errorText;
+    let error;
+    let response;
     try {
-        const response = await fetch(arches.urls.controlled_lists);
+        response = await fetch(arches.urls.controlled_lists);
         if (response.ok) {
             await response.json().then((data) => {
                 controlledListItemsTree.value = (data.controlled_lists as ControlledList[]).map(
@@ -82,16 +83,15 @@ const fetchLists = async () => {
                 );
             });
         } else {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
+            error = await response.json();
             throw new Error();
         }
     } catch {
         toast.add({
             severity: ERROR,
             life: 8000,
-            summary: errorText || $gettext("Unable to fetch lists"),
+            summary: $gettext("Unable to fetch lists"),
+            detail: error?.message || response?.statusText,
         });
     }
 };

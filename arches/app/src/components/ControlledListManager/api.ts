@@ -25,15 +25,15 @@ function getToken() {
     return token;
 }
 
-
 export const createList = async(
     name: string,
     toast: ToastServiceMethods,
     $gettext: GetText,
 ) => {
-    let errorText;
+    let error;
+    let response;
     try {
-        const response = await fetch(arches.urls.controlled_list_add, {
+        response = await fetch(arches.urls.controlled_list_add, {
             method: "POST",
             headers: { "X-CSRFToken": getToken() },
             body: JSON.stringify({ name }),
@@ -41,16 +41,15 @@ export const createList = async(
         if (response.ok) {
             return await response.json();
         } else {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
+            error = await response.json();
             throw new Error();
         }
     } catch {
         toast.add({
             severity: ERROR,
             life: 8000,
-            summary: errorText || $gettext("List creation failed"),
+            summary: $gettext("List creation failed"),
+            detail: error?.message || response?.statusText,
         });
     }
 };
@@ -60,9 +59,10 @@ export const createItem = async (
     toast: ToastServiceMethods,
     $gettext: GetText,
 ) => {
-    let errorText;
+    let error;
+    let response;
     try {
-        const response = await fetch(arches.urls.controlled_list_item_add, {
+        response = await fetch(arches.urls.controlled_list_item_add, {
             method: "POST",
             headers: { "X-CSRFToken": getToken() },
             body: JSON.stringify(item),
@@ -70,16 +70,15 @@ export const createItem = async (
         if (response.ok) {
             return await response.json();
         } else {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
+            error = await response.json();
             throw new Error();
         }
     } catch {
         toast.add({
             severity: ERROR,
             life: 8000,
-            summary: errorText || $gettext("Item creation failed"),
+            summary: $gettext("Item creation failed"),
+            detail: error?.message || response?.statusText,
         });
     }
 };
@@ -90,9 +89,10 @@ export const patchItem = async(
     $gettext: GetText,
     field: "uri" | "guide",
 ) => {
-    let errorText;
+    let error;
+    let response;
     try {
-        const response = await fetch(arches.urls.controlled_list_item(item.id), {
+        response = await fetch(arches.urls.controlled_list_item(item.id), {
             method: "PATCH",
             headers: { "X-CSRFToken": getToken() },
             body: JSON.stringify({ [field]: item[field] }),
@@ -100,16 +100,15 @@ export const patchItem = async(
         if (response.ok) {
             return true;
         } else {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
+            error = await response.json();
             throw new Error();
         }
     } catch {
         toast.add({
             severity: ERROR,
             life: 8000,
-            summary: errorText || $gettext("Save failed"),
+            summary: $gettext("Save failed"),
+            detail: error?.message || response?.statusText,
         });
     }
 };
@@ -120,9 +119,10 @@ export const postList = async (
     toast: ToastServiceMethods,
     $gettext: GetText,
 ) => {
-    let errorText;
+    let error;
+    let response;
     try {
-        const response = await fetch(arches.urls.controlled_list(list.id), {
+        response = await fetch(arches.urls.controlled_list(list.id), {
             method: "POST",
             headers: { "X-CSRFToken": getToken() },
             body: JSON.stringify(list),
@@ -130,16 +130,15 @@ export const postList = async (
         if (response.ok) {
             return await response.json();
         } else {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
+            error = await response.json();
             throw new Error();
         }
     } catch {
         toast.add({
             severity: ERROR,
             life: 8000,
-            summary: errorText || $gettext("Save failed"),
+            summary: $gettext("Save failed"),
+            detail: error?.message || response?.statusText,
         });
     }
 };
@@ -150,7 +149,9 @@ export const patchList = async(
     $gettext: GetText,
     field: "name" | "sortorder",
 ) => {
-    let errorText;
+    let error;
+    let response;
+
     let body = {};
     switch (field) {
         case "name":
@@ -162,7 +163,7 @@ export const patchList = async(
     }
 
     try {
-        const response = await fetch(arches.urls.controlled_list(list.id), {
+        response = await fetch(arches.urls.controlled_list(list.id), {
             method: "PATCH",
             headers: { "X-CSRFToken": getToken() },
             body: JSON.stringify(body),
@@ -170,16 +171,15 @@ export const patchList = async(
         if (response.ok) {
             return true;
         } else {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
+            error = await response.json();
             throw new Error();
         }
     } catch {
         toast.add({
             severity: ERROR,
             life: 8000,
-            summary: errorText || $gettext("Save failed"),
+            summary: $gettext("Save failed"),
+            detail: error?.message || response?.statusText,
         });
     }
 };
@@ -189,12 +189,13 @@ export const upsertValue = async (
     toast: ToastServiceMethods,
     $gettext: GetText,
 ) => {
-    let errorText;
+    let error;
+    let response;
     const url = value.id
         ? arches.urls.controlled_list_item_value(value.id)
         : arches.urls.controlled_list_item_value_add;
     try {
-        const response = await fetch(url, {
+        response = await fetch(url, {
             method: "POST",
             headers: { "X-CSRFToken": getToken() },
             body: JSON.stringify(value),
@@ -202,16 +203,15 @@ export const upsertValue = async (
         if (response.ok) {
             return await response.json();
         } else {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
+            error = await response.json();
             throw new Error();
         }
     } catch {
         toast.add({
             severity: ERROR,
             life: 8000,
-            summary: errorText || $gettext("Value save failed"),
+            summary: $gettext("Value save failed"),
+            detail: error?.message || response?.statusText,
         });
     }
 };
@@ -221,9 +221,10 @@ export const deleteValue = async (
     toast: ToastServiceMethods,
     $gettext: GetText,
 ) => {
-    let errorText;
+    let error;
+    let response;
     try {
-        const response = await fetch(
+        response = await fetch(
             arches.urls.controlled_list_item_value(value.id),
             {
                 method: "DELETE",
@@ -233,16 +234,15 @@ export const deleteValue = async (
         if (response.ok) {
             return true;
         } else {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
+            error = await response.json();
             throw new Error();
         }
     } catch {
         toast.add({
             severity: ERROR,
             life: 8000,
-            summary: errorText || $gettext("Value deletion failed"),
+            summary: $gettext("Value deletion failed"),
+            detail: error?.message || response?.statusText,
         });
     }
 };
@@ -252,12 +252,13 @@ export const upsertMetadata = async (
     toast: ToastServiceMethods,
     $gettext: GetText,
 ) => {
-    let errorText;
+    let error;
+    let response;
     const url = metadata.id
         ? arches.urls.controlled_list_item_image_metadata(metadata.id)
         : arches.urls.controlled_list_item_image_metadata_add;
     try {
-        const response = await fetch(url, {
+        response = await fetch(url, {
             method: "POST",
             headers: { "X-CSRFToken": getToken() },
             body: JSON.stringify(metadata),
@@ -265,16 +266,15 @@ export const upsertMetadata = async (
         if (response.ok) {
             return await response.json();
         } else {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
+            error = await response.json();
             throw new Error();
         }
     } catch {
         toast.add({
             severity: ERROR,
             life: 8000,
-            summary: errorText || $gettext("Metadata save failed"),
+            summary: $gettext("Metadata save failed"),
+            detail: error?.message || response?.statusText,
         });
     }
 };
@@ -284,9 +284,10 @@ export const deleteMetadata = async (
     toast: ToastServiceMethods,
     $gettext: GetText,
 ) => {
-    let errorText;
+    let error;
+    let response;
     try {
-        const response = await fetch(
+        response = await fetch(
             arches.urls.controlled_list_item_image_metadata(metadata.id),
             {
                 method: "DELETE",
@@ -296,16 +297,15 @@ export const deleteMetadata = async (
         if (response.ok) {
             return true;
         } else {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
+            error = await response.json();
             throw new Error();
         }
     } catch {
         toast.add({
             severity: ERROR,
             life: 8000,
-            summary: errorText || $gettext("Metadata deletion failed"),
+            summary: $gettext("Metadata deletion failed"),
+            detail: error?.message || response?.statusText,
         });
     }
 };
@@ -315,9 +315,10 @@ export const deleteImage = async(
     toast: ToastServiceMethods,
     $gettext: GetText,
 ) => {
-    let errorText;
+    let error;
+    let response;
     try {
-        const response = await fetch(
+        response = await fetch(
             arches.urls.controlled_list_item_image(image.id),
             {
                 method: "DELETE",
@@ -327,16 +328,15 @@ export const deleteImage = async(
         if (response.ok) {
             return true;
         } else {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
+            error = await response.json();
             throw new Error();
         }
     } catch {
         toast.add({
             severity: ERROR,
             life: 8000,
-            summary: errorText || $gettext("Image deletion failed"),
+            summary: $gettext("Image deletion failed"),
+            detail: error?.message || response?.statusText,
         });
     }
 };
