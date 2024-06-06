@@ -499,7 +499,7 @@ module.exports = () => {
         };
 
         // BEGIN get data from `settings.py`
-        const settingsFilePath = findFile(Path.dirname(__dirname), 'settings.py')
+        const settingsFilePath = findFile(Path.dirname(__dirname), 'settings.py', ["node_modules", "build"]);
 
         const runPythonScript = (pythonCommand) => {
             let projectSettings = spawn(pythonCommand, [settingsFilePath]);
