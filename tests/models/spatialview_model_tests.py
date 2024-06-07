@@ -65,6 +65,21 @@ class SpatialViewTests(ArchesTestCase):
         BusinessDataImporter(spatialviews_other_test_data_path).import_business_data()
         BusinessDataImporter(spatialviews_test_data_path).import_business_data()
 
+        # load en concepts value
+        cls.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (%s, '00000000-0000-0000-0000-000000000007', 'prefLabel', '(en) is related to', 'en');", [cls.extra_concept_value_id])
+        cls.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
+    
+    @classmethod
+    def tearDownClass(cls):
+        # delete extra concept value
+        with connection.cursor() as cursor:
+            cursor.execute("DELETE FROM values WHERE valueid = %s;", [cls.extra_concept_value_id])
+
+        super().tearDownClass()
+
+
     def setUp(self):
         # test ids
         self.spatialviews_test_model_id = "5db49c51-2c70-47b3-b7be-66afced863c8"
@@ -255,11 +270,18 @@ class SpatialViewTriggerTests(TransactionTestCase):
         cls.spatialviews_other_test_model_id = "114dd3fb-404d-4fb3-a639-1333b89cf60c"
         cls.spatialview_geometrynode_id = "95b2c8de-1cf8-11ef-971a-0242ac130005"
 
+        # load en concepts value
+        cls.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (%s, '00000000-0000-0000-0000-000000000007', 'prefLabel', '(en) is related to', 'en');", [cls.extra_concept_value_id])
+        cls.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
+        
         # create a spatialview with objects to test triggers
         cls.spatialview_slug = "spatialviews_test"
         cls.test_spatial_view = cls.generate_valid_spatiatview()
         cls.test_spatial_view.save()
         cls.spatialview_id = cls.test_spatial_view.spatialviewid
+
 
     @classmethod
     def tearDownClass(cls):
@@ -281,6 +303,10 @@ class SpatialViewTriggerTests(TransactionTestCase):
             Graph.objects.get(pk=cls.spatialviews_other_test_model_id).delete()
         except Graph.DoesNotExist:
             pass
+
+        # delete extra concept value
+        with connection.cursor() as cursor:
+            cursor.execute("DELETE FROM values WHERE valueid = %s;", [cls.extra_concept_value_id])
 
         super().tearDownClass()
 
