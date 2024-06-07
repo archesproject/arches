@@ -6,10 +6,10 @@ function buildFilePathLookup(path, staticUrlPrefix) {
         return;
     }
 
-    let prefix = path.match(/[^\/]+$/)
-    let staticUrl = !!staticUrlPrefix ? staticUrlPrefix : ""
+    const prefix = path.match(/[^\/]+$/);
+    const staticUrl = !!staticUrlPrefix ? staticUrlPrefix : "";
 
-    let getFileList = function (dirPath) {
+    const getFileList = function (dirPath) {
         return fs.readdirSync(dirPath, { withFileTypes: true }).reduce((fileList,entries) => {
             const childPath = Path.join(dirPath, entries.name)
             if (entries.isDirectory()) {
@@ -23,7 +23,7 @@ function buildFilePathLookup(path, staticUrlPrefix) {
         };
 
     return getFileList(path).reduce((lookup, file) => {
-        let extension = file.match(/[^.]+$/).toString();
+        const extension = file.match(/[^.]+$/).toString();
         if (extension === 'js') {
             lookup[file.replace(path,'').replace(/\\/g, '/').replace(/\.js$/,'').replace(/^\//,'')] = {"import": file, "filename": `${prefix}/[name].${extension}`};
         }

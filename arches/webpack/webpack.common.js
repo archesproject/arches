@@ -356,8 +356,6 @@ module.exports = () => {
                                     removeComments: false,
                                 },
                                 preprocessor: async (content, loaderContext) => {
-                                    // console.log(`content: ${content}`);
-                                    // console.log(`loaderContext: ${loaderContext}`);
                                     const resourcePath = loaderContext['resourcePath'];
 
                                     let templatePath;
