@@ -25,9 +25,7 @@ from tests.base_test import ArchesTestCase
 class SearchExportTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
-        # super().setUpClass()
         cls.factory = RequestFactory()
-        cls.client = Client()
 
         LanguageSynchronizer.synchronize_settings_with_db()
         models.ResourceInstance.objects.all().delete()
@@ -59,7 +57,7 @@ class SearchExportTests(ArchesTestCase):
         new_tile.save()
         time.sleep(1)
 
-        # create test data
+        # TODO: create geospatial test data
 
     def test_search_export_no_request(self):
         """Test SearchResultsExporter without search request"""
