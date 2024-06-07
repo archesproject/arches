@@ -2,7 +2,6 @@ import json
 import time
 import uuid
 import os
-from django.test import Client
 from arches.app.models import models
 from arches.app.models.tile import Tile
 from arches.app.search.search_export import SearchResultsExporter
@@ -28,7 +27,6 @@ class SearchExportTests(ArchesTestCase):
         cls.factory = RequestFactory()
 
         LanguageSynchronizer.synchronize_settings_with_db()
-        models.ResourceInstance.objects.all().delete()
         with open(os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
@@ -41,7 +39,7 @@ class SearchExportTests(ArchesTestCase):
         # cls.search_model_sensitive_info_nodeid = "57446fae-65ff-11e7-b63a-14109fd34195"
         # cls.search_model_geom_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
         
-        cls.user = User.objects.create_user("unpriviliged_user", "unpriviliged_user@archesproject.org", "test")
+        cls.user = User.objects.create_user("unprivilged_user", "unprivilged_user@test.com", "test")
 
         test_resourceinstanceid = uuid.uuid4()
 
@@ -55,7 +53,7 @@ class SearchExportTests(ArchesTestCase):
         }}
         new_tile = Tile(resourceinstance_id=test_resourceinstanceid, data=tile_data, nodegroup_id=cls.search_model_name_nodeid)
         new_tile.save()
-        time.sleep(1)
+        time.sleep(1) # delay to allow for async indexing
 
         # TODO: create geospatial test data
 
@@ -66,14 +64,13 @@ class SearchExportTests(ArchesTestCase):
 
     def test_invalid_format(self):
         """Test SearchResultsExporter with invalid format for shapefile export"""
-        request = self.factory.get('/search?tiles=true&export=true&format=shp&compact=false', HTTP_HOST='testserver')
+        request = self.factory.get('/search?tiles=true&export=true&format=shp&compact=false')
         request.user = self.user
         with self.assertRaisesMessage(Exception, "Results must be compact to export to shapefile"):
             SearchResultsExporter(search_request=request)
 
     def test_export_to_csv(self):
-        # response_json = get_response_json(self.client)
-        request = self.factory.get('/search?tiles=True&export=True&format=tilecsv', HTTP_HOST='testserver')
+        request = self.factory.get('/search?tiles=True&export=True&format=tilecsv')
         request.user = self.user
         exporter = SearchResultsExporter(search_request=request)
         result, _ = exporter.export(format='tilecsv', report_link='false')
@@ -81,7 +78,7 @@ class SearchExportTests(ArchesTestCase):
 
     # def test_export_to_shp(self):
     #     """Test exporting search results to SHP format"""
-    #     request = self.factory.get('/search?tiles=True&export=True&format=shp&compact=True', HTTP_HOST='testserver')
+    #     request = self.factory.get('/search?tiles=True&export=True&format=shp&compact=True')
     #     request.user = self.user
     #     exporter = SearchResultsExporter(search_request=request)
     #     result = exporter.export(format='shp', report_link='false')
@@ -89,7 +86,7 @@ class SearchExportTests(ArchesTestCase):
 
     # def test_export_to_geojson(self):
     #     """Test exporting search results to GeoJSON format"""
-    #     request = self.factory.get('/search?tiles=True&export=True&format=geojson', HTTP_HOST='testserver')
+    #     request = self.factory.get('/search?tiles=True&export=True&format=geojson')
     #     request.user = self.user
     #     exporter = SearchResultsExporter(search_request=request)
     #     result, _ = exporter.export(format='geojson', report_link='false')
@@ -97,7 +94,7 @@ class SearchExportTests(ArchesTestCase):
 
     # def test_link_append(self):
     #     """Test appending report link to export"""
-    #     request = self.factory.get('/search?tiles=True&export=True&format=tilecsv&reportlink=true', HTTP_HOST='testserver')
+    #     request = self.factory.get('/search?tiles=True&export=True&format=tilecsv&reportlink=true')
     #     request.user = self.user
     #     exporter = SearchResultsExporter(search_request=request)
     #     result, _ = exporter.export(format='tilecsv', report_link='true')
@@ -137,24 +134,4 @@ class SearchExportTests(ArchesTestCase):
         response = SearchExport().get(request)
         self.assertEqual(request.user.username, "anonymous")
         self.assertEqual(response.status_code, HTTPStatus.UNAUTHORIZED)
-
-def get_response_json(client, tiles=True, export=True, format='tilecsv', report_link=False, **kwargs):
-    query = {
-        "tiles": tiles,
-        "export": export,
-        "format": format,
-        "report_link": report_link
-    }
-    for key in kwargs:
-        query[key] = kwargs.get(key, None)
-    for k, v in list(query.items()):
-        query[k] = JSONSerializer().serialize(v)
-    resource_reviewer_group = Group.objects.get(name="Resource Exporter")
-    test_user = User.objects.get(username="unpriviliged_user")
-    test_user.groups.add(resource_reviewer_group)
-    client.login(username="unpriviliged_user", password="test")
-    response = client.get("/search/resources", query)
-    response_json = json.loads(response.content)
-    return response_json
-
 
