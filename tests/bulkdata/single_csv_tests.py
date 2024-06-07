@@ -22,6 +22,7 @@ from arches.app.models.models import EditLog
 from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
+from arches.app.utils.transaction import reverse_edit_log_entries
 from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.etl_modules.import_single_csv import ImportSingleCsv
 from arches.app.models.system_settings import settings
@@ -37,6 +38,16 @@ from django.test import TransactionTestCase
 
 class SingleCSVTests(TransactionTestCase):
 
+    # Following a pattern used in https://github.com/archesproject/arches/pull/10885/commits/09330d3db7e223336e9727dc8fc508f382a42607
+    # to run tests against functionality that goes across transactions, but does not truncate all tables for arches models
+    # at the end of the tests in this class, as this breaks other TransactionTestCases requiring data from migrations.
+    available_apps = [
+        app for app in settings.INSTALLED_APPS if app not in (
+            "arches.app.models",
+            "django.contrib.contenttypes",
+        )
+    ]
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -47,7 +58,24 @@ class SingleCSVTests(TransactionTestCase):
         graph=Graph.objects.get(graphid="1bc910b3-99dc-4a5c-8168-61c9e1975658")
         admin = User.objects.get(username="admin")
         graph.publish(user=admin)
+
+        cls.load_id = '2d288e76-ebd3-11ee-85b8-0242ac120005'
     
+    @classmethod
+    def tearDownClass(cls):
+
+        # !! Need to manually teardown loaded data and graph due to the fix mentioned at the top of the class !!
+
+        #reverse transaction
+        reverse_edit_log_entries(cls.load_id)
+
+        #delete graph
+        try:
+            Graph.objects.get(graphid="1bc910b3-99dc-4a5c-8168-61c9e1975658").delete()
+        except Graph.DoesNotExist:
+            pass
+
+        return super().tearDownClass()
 
     @override_settings(
         MEDIA_ROOT = os.path.join(settings.ROOT_DIR, "..", "tests/fixtures/data")
@@ -56,27 +84,26 @@ class SingleCSVTests(TransactionTestCase):
         request = HttpRequest()
         request.method = "POST"
         request.user = User.objects.get(username="admin")
-        load_id = '2d288e76-ebd3-11ee-85b8-0242ac120005'
         csv_file = 'single-csv-test-data.csv'
 
         with connection.cursor() as cursor:
-            cursor.execute("""INSERT INTO load_event (loadid, complete, etl_module_id, user_id) values (%s, FALSE, '0a0cea7e-b59a-431a-93d8-e9f8c41bdd6b', 1)""", [load_id,])
+            cursor.execute("""INSERT INTO load_event (loadid, complete, etl_module_id, user_id) values (%s, FALSE, '0a0cea7e-b59a-431a-93d8-e9f8c41bdd6b', 1)""", [self.load_id,])
 
         request.POST.__setitem__("fieldnames", "name,geometry")
         request.POST.__setitem__("hasHeaders", "true")
         request.POST.__setitem__("csvFileName", csv_file)
         request.POST.__setitem__("graphid", "1bc910b3-99dc-4a5c-8168-61c9e1975658")
-        request.POST.__setitem__("load_id", load_id)
+        request.POST.__setitem__("load_id", self.load_id)
         request.POST.__setitem__("fieldMapping", '[{"field":"name","node":"name","language":{"code":"en","default_direction":"ltr","id":1,"isdefault":true,"name":"English","scope":"system"}},{"field":"geom","node":"geometry","language":{"code":"en","default_direction":"ltr","id":1,"isdefault":true,"name":"English","scope":"system"}},{"field":"resourceid","language":{"code":"en","default_direction":"ltr","id":1,"isdefault":true,"name":"English","scope":"system"}}]')
 
-        tmp_path = default_storage.path(os.path.join(settings.UPLOADED_FILES_DIR, 'tmp', load_id))
+        tmp_path = default_storage.path(os.path.join(settings.UPLOADED_FILES_DIR, 'tmp', self.load_id))
         csv_file = default_storage.path(os.path.join(settings.UPLOADED_FILES_DIR, csv_file))
 
         if not os.path.exists(tmp_path):
             os.makedirs(tmp_path)
 
         shutil.copy(csv_file, tmp_path)
-        importer = ImportSingleCsv(request=request, loadid=load_id)
+        importer = ImportSingleCsv(request=request, loadid=self.load_id)
         importer.write(request)
-        edits = EditLog.objects.filter(transactionid=load_id)
+        edits = EditLog.objects.filter(transactionid=self.load_id)
         self.assertTrue(len(edits)==9)
