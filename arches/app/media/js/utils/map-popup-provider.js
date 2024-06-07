@@ -47,13 +47,11 @@ define([
          * @param featureGeomIndex - int index corresponding to the feature that was clicked, used for lookup against an arry of geoms
          * @required @method mapCard.filterByFeatureGeom()
          * @required @send argument: @param feature - a geojson feature object 
-         * with an @optional @property: feature.id corresponding to a uuid for that tile_geometrycollection_feature
-         * @optional @send argument: @param resourceid
          */
         sendFeatureToMapFilter: function(popupFeatureObject, featureGeomIndex)
         {
             let feature = popupFeatureObject.geometries()[featureGeomIndex].geom.features[0];
-            popupFeatureObject.mapCard.filterByFeatureGeom(feature, popupFeatureObject.resourceinstanceid);
+            popupFeatureObject.mapCard.filterByFeatureGeom(feature);
         },
 
         /**
