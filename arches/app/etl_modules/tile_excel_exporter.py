@@ -110,6 +110,9 @@ class TileExcelExporter(BaseExcelExporter):
         resource_ids = request.POST.get("resource_ids", None)
         export_concepts_as = request.POST.get("export_concepts_as")
         filename = request.POST.get("filename")
+        search_url = request.POST.get("search_url", None)
+        if search_url is not None and resource_ids is None:
+            resource_ids = self.get_resourceids_from_search_url(search_url)
 
         export_task = tasks.export_tile_excel.apply_async(
             (self.userid, self.loadid, graph_id, graph_name, resource_ids, export_concepts_as, filename),

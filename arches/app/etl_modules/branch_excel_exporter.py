@@ -143,6 +143,9 @@ class BranchExcelExporter(BaseExcelExporter):
         graph_name = request.POST.get("graph_name", None)
         resource_ids = request.POST.get("resource_ids", None)
         filename = request.POST.get("filename")
+        search_url = request.POST.get("search_url", None)
+        if search_url is not None and resource_ids is None:
+            resource_ids = self.get_resourceids_from_search_url(search_url)
 
         export_task = tasks.export_branch_excel.apply_async(
             (self.userid, self.loadid, graph_id, graph_name, resource_ids, filename),
