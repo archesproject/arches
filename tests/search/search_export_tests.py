@@ -63,17 +63,15 @@ class SearchExportTests(ArchesTestCase):
 
     def test_search_export_no_request(self):
         """Test SearchResultsExporter without search request"""
-        with self.assertRaises(Exception) as context:
+        with self.assertRaisesMessage(Exception, "Need to pass in a search request"):
             SearchResultsExporter()
-        self.assertTrue('Need to pass in a search request' in str(context.exception))
 
     def test_invalid_format(self):
         """Test SearchResultsExporter with invalid format for shapefile export"""
         request = self.factory.get('/search?tiles=true&export=true&format=shp&compact=false', HTTP_HOST='testserver')
         request.user = self.user
-        with self.assertRaises(Exception) as context:
+        with self.assertRaisesMessage(Exception, "Results must be compact to export to shapefile"):
             SearchResultsExporter(search_request=request)
-        self.assertTrue('Results must be compact to export to shapefile' in str(context.exception))
 
     def test_export_to_csv(self):
         # response_json = get_response_json(self.client)
