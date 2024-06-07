@@ -421,14 +421,26 @@ class GraphDataView(View):
                 elif self.action == "export_branch":
                     clone_data = graph.copy(root=data)
                     clone_data["copy"].slug = None
+                    clone_data["copy"].publication = None
+
                     clone_data["copy"].save()
+
+                    if bool(graph.publication_id):
+                        clone_data["copy"].publish(user=request.user)
+
                     ret = {"success": True, "graphid": clone_data["copy"].pk}
 
                 elif self.action == "clone_graph":
                     clone_data = graph.copy()
                     ret = clone_data["copy"]
                     ret.slug = None
+                    ret.publication = None
+
                     ret.save()
+
+                    if bool(graph.publication_id):
+                        ret.publish(user=request.user)
+
                     ret.copy_functions(graph, [clone_data["nodes"], clone_data["nodegroups"]])
 
                 elif self.action == "reorder_nodes":

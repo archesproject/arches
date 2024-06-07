@@ -1,10 +1,22 @@
 import json
+import time
+import uuid
+import os
 from django.test import Client
-from django.urls import reverse
 from arches.app.models import models
-from django.contrib.auth.models import User
+from arches.app.models.tile import Tile
 from arches.app.search.search_export import SearchResultsExporter
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from base64 import b64encode
+from http import HTTPStatus
+from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
+from arches.app.utils.i18n import LanguageSynchronizer
+
+from django.contrib.auth.models import User, Group
 from django.test.client import RequestFactory
+from django.urls import reverse
+
+from arches.app.views.api import SearchExport
 from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
@@ -13,12 +25,39 @@ from tests.base_test import ArchesTestCase
 class SearchExportTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
+        # super().setUpClass()
         cls.factory = RequestFactory()
         cls.client = Client()
+
+        LanguageSynchronizer.synchronize_settings_with_db()
+        models.ResourceInstance.objects.all().delete()
+        with open(os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "r") as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile["graph"])
+
+        cls.search_model_graphid = "d291a445-fa5f-11e6-afa8-14109fd34195"
+        # cls.search_model_cultural_period_nodeid = "7a182580-fa60-11e6-96d1-14109fd34195"
+        # cls.search_model_creation_date_nodeid = "1c1d05f5-fa60-11e6-887f-14109fd34195"
+        # cls.search_model_destruction_date_nodeid = "e771b8a1-65fe-11e7-9163-14109fd34195"
+        cls.search_model_name_nodeid = "2fe14de3-fa61-11e6-897b-14109fd34195"
+        # cls.search_model_sensitive_info_nodeid = "57446fae-65ff-11e7-b63a-14109fd34195"
+        # cls.search_model_geom_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
         
-        cls.user = User.objects.create_user(username='testuser', email='test@test.com', password='test')
-        cls.search_request = cls.factory.get('/search?tiles=True&export=True&format=tilecsv', HTTP_HOST='testserver')
-        cls.search_request.user = cls.user
+        cls.user = User.objects.create_user("unpriviliged_user", "unpriviliged_user@archesproject.org", "test")
+
+        test_resourceinstanceid = uuid.uuid4()
+
+        cls.loadOntology()
+        cls.ensure_resource_test_model_loaded()
+        models.ResourceInstance.objects.get_or_create(graph_id=cls.search_model_graphid, resourceinstanceid=test_resourceinstanceid)
+        tile_data = {}
+        tile_data[cls.search_model_name_nodeid] = {"en": {
+            "value": "Etiwanda Avenue Street Trees",
+            "direction": "ltr"
+        }}
+        new_tile = Tile(resourceinstance_id=test_resourceinstanceid, data=tile_data, nodegroup_id=cls.search_model_name_nodeid)
+        new_tile.save()
+        time.sleep(1)
 
         # create test data
 
@@ -30,18 +69,19 @@ class SearchExportTests(ArchesTestCase):
 
     def test_invalid_format(self):
         """Test SearchResultsExporter with invalid format for shapefile export"""
-        request = self.factory.get('/search?tiles=True&export=True&format=shp&compact=False', HTTP_HOST='testserver')
+        request = self.factory.get('/search?tiles=true&export=true&format=shp&compact=false', HTTP_HOST='testserver')
         request.user = self.user
         with self.assertRaises(Exception) as context:
             SearchResultsExporter(search_request=request)
         self.assertTrue('Results must be compact to export to shapefile' in str(context.exception))
 
-    # def test_export_to_csv(self):
-    #     request = self.factory.get('/search?tiles=True&export=True&format=tilecsv', HTTP_HOST='testserver')
-    #     request.user = self.user
-    #     exporter = SearchResultsExporter(search_request=request)
-    #     result, _ = exporter.export(format='tilecsv', report_link='false')
-    #     self.assertIn('.csv', result[0]['name'])
+    def test_export_to_csv(self):
+        # response_json = get_response_json(self.client)
+        request = self.factory.get('/search?tiles=True&export=True&format=tilecsv', HTTP_HOST='testserver')
+        request.user = self.user
+        exporter = SearchResultsExporter(search_request=request)
+        result, _ = exporter.export(format='tilecsv', report_link='false')
+        self.assertIn('.csv', result[0]['name'])
 
     # def test_export_to_shp(self):
     #     """Test exporting search results to SHP format"""
@@ -66,4 +106,59 @@ class SearchExportTests(ArchesTestCase):
     #     exporter = SearchResultsExporter(search_request=request)
     #     result, _ = exporter.export(format='tilecsv', report_link='true')
     #     self.assertIn('Link', result[0]['outputfile'].getvalue())
+
+    def test_login_via_basic_auth_good(self):
+        auth_string = "Basic " + b64encode(b"admin:admin").decode("utf-8")
+        request = RequestFactory().get(
+            reverse("api_export_results"),
+            HTTP_AUTHORIZATION=auth_string,
+        )
+        request.user = User.objects.get(username="anonymous")
+        response = SearchExport().get(request)
+        self.assertEqual(request.user.username, "admin")
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+    def test_login_via_basic_auth_rate_limited(self):
+        auth_string = "Basic " + b64encode(b"admin:admin").decode("utf-8")
+        request = RequestFactory().get(
+            reverse("api_export_results"),
+            HTTP_AUTHORIZATION=auth_string,
+            # In reality this would be added by django_ratelimit.
+            QUERY_STRING="limited=True",
+        )
+        request.user = User.objects.get(username="anonymous")
+        response = SearchExport().get(request)
+        self.assertEqual(request.user.username, "anonymous")
+        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+    def test_login_via_basic_auth_invalid(self):
+        bad_auth_string = "Basic " + b64encode(b"admin:garbage").decode("utf-8")
+        request = RequestFactory().get(
+            reverse("api_export_results"),
+            HTTP_AUTHORIZATION=bad_auth_string,
+        )
+        request.user = User.objects.get(username="anonymous")
+        response = SearchExport().get(request)
+        self.assertEqual(request.user.username, "anonymous")
+        self.assertEqual(response.status_code, HTTPStatus.UNAUTHORIZED)
+
+def get_response_json(client, tiles=True, export=True, format='tilecsv', report_link=False, **kwargs):
+    query = {
+        "tiles": tiles,
+        "export": export,
+        "format": format,
+        "report_link": report_link
+    }
+    for key in kwargs:
+        query[key] = kwargs.get(key, None)
+    for k, v in list(query.items()):
+        query[k] = JSONSerializer().serialize(v)
+    resource_reviewer_group = Group.objects.get(name="Resource Exporter")
+    test_user = User.objects.get(username="unpriviliged_user")
+    test_user.groups.add(resource_reviewer_group)
+    client.login(username="unpriviliged_user", password="test")
+    response = client.get("/search/resources", query)
+    response_json = json.loads(response.content)
+    return response_json
+
 
