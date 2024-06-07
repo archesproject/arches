@@ -1,6 +1,7 @@
 import arches
 import os
 import shutil
+import warnings
 
 from django.core.management.base import BaseCommand
 from django.core import management
@@ -174,6 +175,28 @@ class Command(BaseCommand):
                             os.path.join(dirpath, filename[:-7] + ".py"),
                         )
 
+        if os.path.isfile(os.path.join(settings.APP_ROOT, "apps.py")):
+            warnings.warn(
+                "Existing apps.py detected. Manually add is_arches_application=True.",
+                UserWarning,
+            )
+        else:
+            self.stdout.write("Copying apps.py to project root")
+            shutil.copy2(
+                os.path.join(
+                    settings.ROOT_DIR,
+                    "install",
+                    "arches-templates",
+                    "project_name",
+                    "apps.py-tpl",
+                ),
+                settings.APP_ROOT,
+            )
+            os.rename(
+                os.path.join(settings.APP_ROOT, "apps.py-tpl"),
+                os.path.join(settings.APP_ROOT, "apps.py"),
+            )
+
         if not os.path.isfile(
             os.path.join(settings.APP_ROOT, "src", "declarations.d.ts")
         ):
@@ -230,6 +253,7 @@ class Command(BaseCommand):
 
         path_to_project = os.path.join(settings.APP_ROOT, "..")
         for relative_file_path in [
+            os.path.join(settings.APP_NAME, "apps.py"),
             "gettext.config.js",
             ".coveragerc",
             ".gitignore",
@@ -245,7 +269,10 @@ class Command(BaseCommand):
                 file.close()
 
                 updated_file_data = (
-                    file_data.replace("{{ project_name }}", settings.APP_NAME)
+                    file_data.replace(
+                        "{{ project_name_title_case }}", settings.APP_NAME.title()
+                    )
+                    .replace("{{ project_name }}", settings.APP_NAME)
                     .replace("{{ arches_semantic_version }}", arches_semantic_version)
                     .replace(
                         "{{ arches_next_minor_version }}", arches_next_minor_version

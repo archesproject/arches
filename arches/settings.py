@@ -21,14 +21,7 @@ import os
 from datetime import datetime, timedelta
 from contextlib import suppress
 
-
-try:
-    from settings_utils import *
-except ModuleNotFoundError:
-    try:
-        from .settings_utils import *
-    except ModuleNotFoundError:
-        pass
+from arches.settings_utils import *
 
 try:
     from django.utils.translation import gettext_lazy as _
@@ -373,8 +366,6 @@ INSTALLED_APPS = (
     "oauth2_provider",
     "django_celery_results",
 )
-
-ARCHES_APPLICATIONS = ()
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -879,10 +870,4 @@ except ImportError:
 
 # returns an output that can be read by NODEJS
 if __name__ == "__main__":
-    transmit_webpack_django_config(
-        root_dir=ROOT_DIR,
-        app_root=APP_ROOT,
-        public_server_address=PUBLIC_SERVER_ADDRESS,
-        static_url=STATIC_URL,
-        webpack_development_server_port=WEBPACK_DEVELOPMENT_SERVER_PORT,
-    )
+    transmit_webpack_django_config(**locals())
