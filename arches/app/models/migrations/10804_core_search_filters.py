@@ -5,7 +5,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10709_refresh_geos_by_transaction"),
+        ("models", "10710_fix_whatisthis"),
     ]
 
     sql = """
