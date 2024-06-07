@@ -118,6 +118,7 @@ KIBANA_CONFIG_BASEPATH = "kibana"  # must match Kibana config.yml setting (serve
 # also make sure to set server.rewriteBasePath: true
 USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+APP_ROOT = os.path.join(ROOT_DIR, 'app')
 PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
 RESOURCE_IMPORT_LOG = "arches/logs/resource_import.log"
@@ -779,7 +780,7 @@ except ImportError:
 if __name__ == "__main__":
     transmit_webpack_django_config(
         root_dir=ROOT_DIR,
-        app_root=ROOT_DIR + "/app",
+        app_root=APP_ROOT,
         public_server_address=PUBLIC_SERVER_ADDRESS,
         static_url=STATIC_URL,
         webpack_development_server_port=WEBPACK_DEVELOPMENT_SERVER_PORT,

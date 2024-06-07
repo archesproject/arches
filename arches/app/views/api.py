@@ -1,4 +1,3 @@
-from base64 import b64decode
 import importlib
 import json
 import logging
@@ -8,8 +7,9 @@ import site
 import sys
 import uuid
 import traceback
-from io import StringIO
 from oauth2_provider.views import ProtectedResourceView
+from base64 import b64decode
+from http import HTTPStatus
 from pyld.jsonld import compact, frame, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
@@ -965,13 +965,15 @@ class SearchExport(View):
         download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
         format = request.GET.get("format", "tilecsv")
         report_link = request.GET.get("reportlink", False)
-        if "HTTP_AUTHORIZATION" in request.META and not request.get("limited", False):
+        if "HTTP_AUTHORIZATION" in request.META and not request.GET.get("limited", False):
             request_auth = request.META.get("HTTP_AUTHORIZATION").split()
             if request_auth[0].lower() == "basic":
                 user_cred = b64decode(request_auth[1]).decode().split(":")
                 user = authenticate(username=user_cred[0], password=user_cred[1])
                 if user is not None:
                     request.user = user
+                else:
+                    return JSONErrorResponse(status=HTTPStatus.UNAUTHORIZED)
         exporter = SearchResultsExporter(search_request=request)
         export_files, export_info = exporter.export(format, report_link)
         if format == "geojson" and total <= download_limit:

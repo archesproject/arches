@@ -22,8 +22,8 @@ from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
 from arches.app.models.system_settings import settings
 from tests.base_test import ArchesTestCase
+from django.contrib.auth import get_user_model
 from django.test import Client
-from django.core import management
 from django.urls import reverse
 from arches.app.models.graph import Graph
 from arches.app.models.models import Node, NodeGroup, GraphModel, CardModel, Edge
@@ -189,6 +189,8 @@ class GraphManagerViewTests(ArchesTestCase):
         self.GRAPH_ID = str(graph.pk)
         self.NODE_COUNT = 5
 
+        self.graph = graph
+
         self.client = Client()
         LanguageSynchronizer.synchronize_settings_with_db()
 
@@ -288,7 +290,7 @@ class GraphManagerViewTests(ArchesTestCase):
         self.assertEqual(len(graph["nodes"]), 3)
         self.assertEqual(len(graph["edges"]), 2)
 
-    def test_graph_clone(self):
+    def test_graph_clone_on_unpublished_graph(self):
         """
         Test clone a graph (HERITAGE_RESOURCE) via view
 
@@ -299,7 +301,41 @@ class GraphManagerViewTests(ArchesTestCase):
         content_type = "application/x-www-form-urlencoded"
         response = self.client.post(url, post_data, content_type)
         response_json = json.loads(response.content)
+
         self.assertEqual(len(response_json["nodes"]), self.NODE_COUNT)
+        
+        cloned_graph = Graph.objects.get(pk=response_json['graphid'])
+
+        original_graph_node_ids = [str(node.pk) for node in self.graph.nodes.values()]
+        cloned_graph_node_ids = [str(node.pk) for node in cloned_graph.nodes.values()]
+
+        self.assertFalse(set(original_graph_node_ids) & set(cloned_graph_node_ids))
+
+    def test_graph_clone_on_published_graph(self):
+        """
+        Test clone a graph (HERITAGE_RESOURCE) via view
+
+        """
+        self.client.login(username="admin", password="admin")
+
+        user_id = self.client.session['_auth_user_id']
+        logged_in_user = get_user_model().objects.get(pk=user_id)
+        self.graph.publish(user=logged_in_user)
+
+        url = reverse("clone_graph", kwargs={"graphid": self.GRAPH_ID})
+        post_data = {}
+        content_type = "application/x-www-form-urlencoded"
+        response = self.client.post(url, post_data, content_type)
+        response_json = json.loads(response.content)
+
+        self.assertEqual(len(response_json["nodes"]), self.NODE_COUNT)
+
+        cloned_graph = Graph.objects.get(pk=response_json['graphid'])
+
+        original_graph_node_ids = [str(node.pk) for node in self.graph.nodes.values()]
+        cloned_graph_node_ids = [str(node.pk) for node in cloned_graph.nodes.values()]
+
+        self.assertFalse(set(original_graph_node_ids) & set(cloned_graph_node_ids))
 
     def test_new_graph(self):
         """
@@ -328,6 +364,43 @@ class GraphManagerViewTests(ArchesTestCase):
         edge_count = Edge.objects.filter(graph_id=self.GRAPH_ID).count()
         self.assertEqual(node_count, 0)
         self.assertEqual(edge_count, 0)
+
+    def test_branch_export_on_unpublished_graph(self):
+        self.client.login(username="admin", password="admin")
+        url = reverse("export_branch", kwargs={"graphid": self.GRAPH_ID})
+        node = [value for value in self.graph.nodes.values()][1]
+        post_data = JSONSerializer().serialize(node)
+        content_type = "application/x-www-form-urlencoded"
+
+        response = self.client.post(url, post_data, content_type)
+        
+        exported_branch = Graph.objects.get(pk=response.json()['graphid'])
+
+        original_graph_node_ids = [str(node.pk) for node in self.graph.nodes.values()]
+        export_branch_node_ids = [str(node.pk) for node in exported_branch.nodes.values()]
+
+        self.assertFalse(set(original_graph_node_ids) & set(export_branch_node_ids))
+
+    def test_branch_export_on_published_graph(self):
+        self.client.login(username="admin", password="admin")
+
+        user_id = self.client.session['_auth_user_id']
+        logged_in_user = get_user_model().objects.get(pk=user_id)
+        self.graph.publish(user=logged_in_user)
+
+        url = reverse("export_branch", kwargs={"graphid": self.GRAPH_ID})
+        node = [value for value in self.graph.nodes.values()][1]
+        post_data = JSONSerializer().serialize(node)
+        content_type = "application/x-www-form-urlencoded"
+
+        response = self.client.post(url, post_data, content_type)
+        
+        exported_branch = Graph.objects.get(pk=response.json()['graphid'])
+
+        original_graph_node_ids = [str(node.pk) for node in self.graph.nodes.values()]
+        export_branch_node_ids = [str(node.pk) for node in exported_branch.nodes.values()]
+
+        self.assertFalse(set(original_graph_node_ids) & set(export_branch_node_ids))
 
     def test_graph_export(self):
         """
