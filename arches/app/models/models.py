@@ -1414,12 +1414,18 @@ class UserProfile(models.Model):
 
 @receiver(post_save, sender=User)
 def save_profile(sender, instance, **kwargs):
+    if kwargs.get("raw", False):
+        return
+
     UserProfile.objects.get_or_create(user=instance)
 
 
 @receiver(post_save, sender=User)
 def create_permissions_for_new_users(sender, instance, created, **kwargs):
     from arches.app.models.resource import Resource
+
+    if kwargs.get("raw", False):
+        return
 
     if created:
         ct = ContentType.objects.get(app_label="models", model="resourceinstance")
