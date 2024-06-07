@@ -11,11 +11,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameField(
-            model_name='spatialview',
-            old_name='geometrynodeid',
-            new_name='geometrynode',
-        ),
         migrations.AddField(
             model_name='spatialview',
             name='language',
