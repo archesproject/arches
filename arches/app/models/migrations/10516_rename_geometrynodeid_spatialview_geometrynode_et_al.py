@@ -11,6 +11,16 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RenameField(
+            model_name='spatialview',
+            old_name='geometrynodeid',
+            new_name='geometrynode',
+        ),
+        migrations.AlterField(
+            model_name='spatialview',
+            name='geometrynode',
+            field=models.ForeignKey(db_column='geometrynodeid', limit_choices_to={'datatype': 'geojson-feature-collection'}, on_delete=django.db.models.deletion.CASCADE, to='models.node'),
+        ),
         migrations.AddField(
             model_name='spatialview',
             name='language',
