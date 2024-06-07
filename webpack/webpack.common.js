@@ -12,14 +12,12 @@ const { spawn } = require("child_process");
 const { VueLoaderPlugin } = require("vue-loader");
 
 const { findFile } = require('./webpack-utils/find-file');
-const { buildImageFilePathLookup } = require('./webpack-utils/build-image-filepath-lookup');
-const { buildJavascriptFilepathLookup } = require('./webpack-utils/build-javascript-filepath-lookup');
-const { buildTemplateFilePathLookup } = require('./webpack-utils/build-template-filepath-lookup');
+const { buildFilePathLookup } = require('./webpack-utils/build-filepath-lookup');
 const { buildCSSFilepathLookup } = require('./webpack-utils/build-css-filepath-lookup');
 
 module.exports = () => {
     return new Promise((resolve, _reject) => {
-        const createWebpackConfig = function () {
+        const createWebpackConfig = function(data) {  // reads from application's settings.py
             // BEGIN workaround for handling node_modules paths in arches-core vs projects
 
             let PROJECT_RELATIVE_NODE_MODULES_PATH;
@@ -33,13 +31,13 @@ module.exports = () => {
             // END workaround for handling node_modules paths in arches-core vs projects
             // BEGIN create entry point configurations
 
-            const archesCoreEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'js'), {});
-            const projectEntryPointConfiguration = buildJavascriptFilepathLookup(Path.resolve(__dirname, APP_ROOT, 'media', 'js'), {});
+            const archesCoreEntryPointConfiguration = buildFilePathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'js'));
+            const projectEntryPointConfiguration = buildFilePathLookup(Path.resolve(__dirname, APP_ROOT, 'media', 'js'));
 
             const archesApplicationsEntrypointConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {
                 return {
                     ...acc,
-                    ...buildJavascriptFilepathLookup(Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'media', 'js'), {})
+                    ...buildFilePathLookup(Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'media', 'js'))
                 };
             }, {});
 
@@ -47,15 +45,24 @@ module.exports = () => {
             // BEGIN create JavaScript filepath lookups
 
             const archesCoreJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.entries(archesCoreEntryPointConfiguration).reduce((acc, [path, config]) => {
-                acc[path + '$'] = Path.resolve(__dirname, path, config['import']);
+                if ((typeof config) == "object")
+                    acc[path + '$'] = Path.resolve(__dirname, path, config['import']);
+                else
+                    console.log(`Skipping ${path}`)
                 return acc;
             }, {});
             const projectJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.entries(projectEntryPointConfiguration).reduce((acc, [path, config]) => {
-                acc[path + '$'] = Path.resolve(__dirname, path, config['import']);
+                if ((typeof config) == "object")
+                    acc[path + '$'] = Path.resolve(__dirname, path, config['import']);
+                else
+                    console.log(`Skipping ${path}`)
                 return acc;
             }, {});
             const archesApplicationsJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.entries(archesApplicationsEntrypointConfiguration).reduce((acc, [path, config]) => {
-                acc[path + '$'] = Path.resolve(__dirname, path, config['import']);
+                if ((typeof config) == "object")
+                    acc[path + '$'] = Path.resolve(__dirname, path, config['import']);
+                else
+                    console.log(`Skipping ${path}`)
                 return acc;
             }, {});
 
@@ -156,18 +163,18 @@ module.exports = () => {
             // END create node modules aliases
             // BEGIN create template filepath lookup
 
-            const coreArchesTemplatePathConfiguration = buildTemplateFilePathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'templates'), {});
-            const projectTemplatePathConfiguration = buildTemplateFilePathLookup(Path.resolve(__dirname, APP_ROOT, 'templates'), {});
+            const coreArchesTemplatePathConfiguration = buildFilePathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'templates'));
+            const projectTemplatePathConfiguration = buildFilePathLookup(Path.resolve(__dirname, APP_ROOT, 'templates'));
 
             const archesApplicationsTemplatePathConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {
                 return {
                     ...acc,
-                    ...buildTemplateFilePathLookup(Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'templates'), {})
+                    ...buildFilePathLookup(Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'templates'))
                 };
             }, {});
 
             // order is important! Arches core files are overwritten by arches-application files, arches-application files are overwritten by project files
-            const templateFilepathLookup = {
+            const templateFilepathLookup = {                ...coreArchesTemplatePathConfiguration,
                 ...coreArchesTemplatePathConfiguration,
                 ...archesApplicationsTemplatePathConfiguration,
                 ...projectTemplatePathConfiguration,
@@ -176,13 +183,13 @@ module.exports = () => {
             // END create template filepath lookup
             // BEGIN create image filepath lookup
 
-            const coreArchesImagePathConfiguration = buildImageFilePathLookup(STATIC_URL, Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'img'), {});
-            const projectImagePathConfiguration = buildImageFilePathLookup(STATIC_URL, Path.resolve(__dirname, APP_ROOT, 'media', 'img'), {});
+            const coreArchesImagePathConfiguration = buildFilePathLookup(Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'img'), STATIC_URL);
+            const projectImagePathConfiguration = buildFilePathLookup(Path.resolve(__dirname, APP_ROOT, 'media', 'img'), STATIC_URL);
 
             const archesApplicationsImagePathConfiguration = ARCHES_APPLICATIONS.reduce((acc, archesApplication) => {
                 return {
                     ...acc,
-                    ...buildImageFilePathLookup(STATIC_URL, Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'media', 'img'), {})
+                    ...buildFilePathLookup(Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[archesApplication], 'media', 'img'), STATIC_URL)
                 };
             }, {});
 
@@ -279,9 +286,9 @@ module.exports = () => {
                         jquery: Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, 'jquery', 'dist', 'jquery.min')
                     }),
                     new MiniCssExtractPlugin(),
-                    new BundleTracker({ 
+                    new BundleTracker({
                         path: Path.resolve(__dirname),
-                        filename: 'webpack-stats.json' 
+                        filename: 'webpack-stats.json'
                     }),
                     new VueLoaderPlugin(),
                 ],
@@ -426,7 +433,7 @@ module.exports = () => {
 
                                     const renderTemplate = async (failureCount = 0) => {
                                         /*
-                                            Sometimes Django can choke on the number of requests, this function will 
+                                            Sometimes Django can choke on the number of requests, this function will
                                             continue attempting to render the template until successful or 5 failures.
                                         */
                                         if (failureCount < 5) {
@@ -435,7 +442,7 @@ module.exports = () => {
                                                 if (serverAddress.charAt(serverAddress.length - 1) === '/') {
                                                     serverAddress = serverAddress.slice(0, -1)
                                                 }
-                                                
+
                                                 resp = await fetch(serverAddress + templatePath);
 
                                                 if (resp.status === 500) {
@@ -467,7 +474,7 @@ module.exports = () => {
                                                                 if run in a test environment, failures will return a empty string which will
                                                                 still allow the bundle to build.
                                                             */
-    
+
                                                             resolve(isTestEnvironment ? '' : content);
                                                         })
                                                     )
@@ -503,7 +510,7 @@ module.exports = () => {
 
         const runPythonScript = (pythonCommand) => {
             let projectSettings = spawn(pythonCommand, [settingsFilePath]);
-        
+
             projectSettings.stderr.on("data", process.stderr.write);
             projectSettings.stdout.on("data", function(data) {
                 if (!data) {
@@ -513,10 +520,10 @@ module.exports = () => {
                     );
                     return;
                 }
-                
+
                 const parsedData = JSON.parse(data);
                 console.log('Data imported from settings.py:', parsedData);
-    
+
                 global.APP_ROOT = parsedData['APP_ROOT'];
                 global.ARCHES_APPLICATIONS = parsedData['ARCHES_APPLICATIONS'];
                 global.ARCHES_APPLICATIONS_PATHS = parsedData['ARCHES_APPLICATIONS_PATHS'];
@@ -525,7 +532,7 @@ module.exports = () => {
                 global.STATIC_URL = parsedData['STATIC_URL'];
                 global.PUBLIC_SERVER_ADDRESS = parsedData['PUBLIC_SERVER_ADDRESS'];
                 global.WEBPACK_DEVELOPMENT_SERVER_PORT = parsedData['WEBPACK_DEVELOPMENT_SERVER_PORT'];
-                
+
                 createWebpackConfig();
             });
             projectSettings.on('close', (code) => {
@@ -536,11 +543,11 @@ module.exports = () => {
                     );
                 }
             });
-        
+
             projectSettings.on('error', () => {
                 if (pythonCommand === 'python') {
                     runPythonScript('python3');
-                } 
+                }
                 else {
                     console.error(
                         '\x1b[31m%s\x1b[0m',  // red
