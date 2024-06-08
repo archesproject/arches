@@ -7,6 +7,7 @@ from arches.app.etl_modules.decorators import load_data_async
 from arches.app.models.card import Card
 from arches.app.models.models import Node
 from arches.app.models.system_settings import settings
+from arches.app.etl_modules.save import get_resourceids_from_search_url
 import arches.app.tasks as tasks
 from arches.app.utils.db_utils import dictfetchall
 from arches.management.commands.etl_template import create_tile_excel_workbook
@@ -112,7 +113,7 @@ class TileExcelExporter(BaseExcelExporter):
         filename = request.POST.get("filename")
         search_url = request.POST.get("search_url", None)
         if search_url is not None and resource_ids is None:
-            resource_ids = self.get_resourceids_from_search_url(search_url)
+            resource_ids = get_resourceids_from_search_url(search_url, self.request.user)
 
         export_task = tasks.export_tile_excel.apply_async(
             (self.userid, self.loadid, graph_id, graph_name, resource_ids, export_concepts_as, filename),

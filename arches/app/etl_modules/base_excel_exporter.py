@@ -2,19 +2,14 @@ from datetime import datetime
 from io import BytesIO
 import json
 import os
-from urllib.parse import urlsplit, parse_qs
 import zipfile
 from tempfile import NamedTemporaryFile
 from django.core.files import File as DjangoFile
-from django.core.validators import URLValidator
 from django.db import connection
-from django.http import HttpRequest
-from arches.app.etl_modules.base_data_editor import BaseBulkEditor
+from arches.app.etl_modules.save import get_resourceids_from_search_url
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.models.models import File, TempFile
 from arches.app.models.system_settings import settings
-from arches.app.views.search import search_results
-
 
 class BaseExcelExporter:
     def __init__(self, request=None, loadid=None):
@@ -27,23 +22,6 @@ class BaseExcelExporter:
         for node in nodes:
             lookup[str(node.nodeid)] = {"alias": str(node.alias), "datatype": node.datatype, "config": node.config}
         return lookup
-
-    def get_resourceids_from_search_url(self, search_url):
-        request = HttpRequest()
-        request.user = self.request.user
-        request.method = "GET"
-        request.GET["export"] = True
-        validate = URLValidator()
-        try:
-            validate(search_url)
-        except:
-            raise
-        params = parse_qs(urlsplit(search_url).query)
-        for k, v in params.items():
-            request.GET.__setitem__(k, v[0])
-        response = search_results(request)
-        results = json.loads(response.content)['results']['hits']['hits']
-        return [result["_source"]["resourceinstanceid"] for result in results]
 
     def get_files_in_zip_file(self, files, graph_name, wb, user_generated_filename=None):
         file_ids = [file["file_id"] for file in files]
@@ -112,7 +90,7 @@ class BaseExcelExporter:
         export_concepts_as = request.POST.get("export_concepts_as")
         search_url = request.POST.get("search_url", None)
         if search_url is not None and resource_ids is None:
-            resource_ids = self.get_resourceids_from_search_url(search_url)
+            resource_ids = get_resourceids_from_search_url(search_url, self.request.user)
         use_celery = True
 
         with connection.cursor() as cursor:
