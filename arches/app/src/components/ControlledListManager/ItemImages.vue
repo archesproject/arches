@@ -36,13 +36,13 @@ const addHeader = (event: FileUploadBeforeSendEvent) => {
 
 const upload = (event: FileUploadUploadEvent) => {
     if (event.xhr.status !== 201) {
-        showError(undefined);
+        showError(event);
     }
     const newImage = JSON.parse(event.xhr.responseText);
     item.value!.images.push(newImage);
 };
 
-const showError = (event?: FileUploadErrorEvent) => {
+const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
     toast.add({
         severity: ERROR,
         life: 8000,
