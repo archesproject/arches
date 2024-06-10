@@ -44,6 +44,7 @@ define([
         };
 
         this.exportResources = async function() {
+            if (self.searchUrl()) { self.formData.append('search_url', self.searchUrl()); }
             self.formData.append('graph_id', self.selectedGraph());
             self.formData.append('graph_name', self.getGraphName(self.selectedGraph()));
             self.formData.append('export_concepts_as', self.exportConceptsAs());
