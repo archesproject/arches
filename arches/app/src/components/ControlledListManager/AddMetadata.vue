@@ -23,7 +23,6 @@ const { labeledChoices, image } = defineProps<{
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
-const addMetadataLabel = $gettext("Add metadata");
 const newMetadataIdStart = 1000;
 
 const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
@@ -69,7 +68,7 @@ const addMetadata = () => {
             aria-hidden="true"
         />
         <span class="add-metadata-text">
-            {{ addMetadataLabel }}
+            {{ $gettext("Add metadata") }}
         </span>
     </Button>
 </template>

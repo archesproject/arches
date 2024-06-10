@@ -22,9 +22,9 @@ import type {
     ValueType,
 } from "@/types/ControlledListManager";
 
-const { valueType, newValueCallback } = defineProps<{
+const { valueType, makeValueEditable } = defineProps<{
     valueType?: ValueType,
-    newValueCallback: (newValue: NewValue, index: number) => void,
+    makeValueEditable: (newValue: NewValue, index: number) => void,
 }>();
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
@@ -91,7 +91,7 @@ const buttonLabel = computed(() => {
 const addValue = () => {
     const staticNewValue = { ...newValue.value };
     item.value.values.push(staticNewValue);
-    newValueCallback(staticNewValue, -1);
+    makeValueEditable(staticNewValue, -1);
 };
 </script>
 

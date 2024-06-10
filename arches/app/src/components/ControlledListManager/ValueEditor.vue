@@ -328,7 +328,7 @@ const focusInput = () => {
         </DataTable>
         <AddValue
             :value-type
-            :new-value-callback="makeValueEditable"
+            :make-value-editable
         />
     </div>
 </template>

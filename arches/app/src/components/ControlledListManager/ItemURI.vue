@@ -29,9 +29,6 @@ const inputValue = computed({
 
 const toast = useToast();
 const { $gettext } = useGettext();
-
-const uriHeading = $gettext("List Item URI");
-const uriSubheading = $gettext("Optionally, provide a URI for your list item. Useful if your list item is formally defined in a thesaurus or authority document.");
 const uri = "uri";
 
 const save = async () => {
@@ -52,8 +49,8 @@ const cancel = () => {
 
 <template>
     <div class="uri-container">
-        <h4>{{ uriHeading }}</h4>
-        <p>{{ uriSubheading }}</p>
+        <h4>{{ $gettext("List Item URI") }}</h4>
+        <p>{{ $gettext("Optionally, provide a URI for your list item. Useful if your list item is formally defined in a thesaurus or authority document.") }}</p>
         <div class="characteristic">
             <InputText
                 v-model="inputValue"
