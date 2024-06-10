@@ -24,6 +24,7 @@ const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
 const addMetadataLabel = $gettext("Add metadata");
+const newMetadataIdStart = 1000;
 
 const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
     const otherNewMetadataIds = image.metadata.filter(
@@ -31,7 +32,7 @@ const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
     ).map(metadatum => metadatum.id as number);
     const maxOtherNewMetadataId = Math.max(
         ...otherNewMetadataIds,
-        1000,
+        newMetadataIdStart,
     );
 
     const nextMetadataType = labeledChoices.find(

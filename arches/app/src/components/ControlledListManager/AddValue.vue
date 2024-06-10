@@ -29,6 +29,7 @@ const { valueType, newValueCallback } = defineProps<{
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
+const newValueIdStart = 1000;
 
 const newValue: Ref<NewValue> = computed(() => {
     const otherNewValueIds = item.value.values.filter(
@@ -36,7 +37,7 @@ const newValue: Ref<NewValue> = computed(() => {
     ).map(value => value.id as number);
     const maxOtherNewValueId = Math.max(
         ...otherNewValueIds,
-        1000,
+        newValueIdStart,
     );
 
     let nextLanguageCode = arches.activeLanguage;
