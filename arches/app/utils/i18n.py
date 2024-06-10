@@ -7,7 +7,12 @@ from datetime import datetime
 from typing import List
 from arches.app.models.system_settings import settings
 from arches.app.models.fields.i18n import I18n_String
-from arches.app.models.models import CardModel, CardXNodeXWidget, Language, PublishedGraph
+from arches.app.models.models import (
+    CardModel,
+    CardXNodeXWidget,
+    Language,
+    PublishedGraph,
+)
 from django.contrib.gis.db.models import Model
 from django.utils.translation import get_language, get_language_info
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -37,7 +42,11 @@ def localize_complex_input(input):
             for key in obj.keys():
                 try:
                     localized_value = get_localized_value(obj[key])
-                    obj[key] = localized_value["value"] if isinstance(localized_value, dict) else localized_value
+                    obj[key] = (
+                        localized_value["value"]
+                        if isinstance(localized_value, dict)
+                        else localized_value
+                    )
                 except:
                     _recursive_localize(obj[key])
         if isinstance(obj, Model):
@@ -157,7 +166,9 @@ class ArchesPOFileFetcher:
             files.append(ArchesPOFile(lang, self.get_po_file(lang, overwrite)))
         else:
             for language in settings.LANGUAGES:
-                files.append(ArchesPOFile(language[0], self.get_po_file(language[0], overwrite)))
+                files.append(
+                    ArchesPOFile(language[0], self.get_po_file(language[0], overwrite))
+                )
         return files
 
     def setup_file(self, pofile: polib.POFile) -> polib.POFile:
@@ -180,7 +191,9 @@ class ArchesPOFileFetcher:
 class ArchesPOWriter:
     """Writes a PO file from arches graph tables"""
 
-    def __init__(self, pofile: polib.POFile, id_language: str, target_language: str) -> None:
+    def __init__(
+        self, pofile: polib.POFile, id_language: str, target_language: str
+    ) -> None:
         self.pofile = pofile
         self.id_language = id_language
         self.target_language = target_language
@@ -248,7 +261,9 @@ class ArchesPOWriter:
 class ArchesPOLoader:
     """Loads a PO file into arches graph tables"""
 
-    def __init__(self, pofile: polib.POFile, id_language: str, target_language: str) -> None:
+    def __init__(
+        self, pofile: polib.POFile, id_language: str, target_language: str
+    ) -> None:
         self.pofile = pofile
         self.id_language = id_language
         self.target_language = target_language

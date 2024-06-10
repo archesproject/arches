@@ -18,7 +18,11 @@ class Migration(migrations.Migration):
         batch_size = 1000
         counter = 0
         modified_rows = []
-        for row in ResourceXResource.objects.using(db_alias).all().iterator(chunk_size=batch_size):
+        for row in (
+            ResourceXResource.objects.using(db_alias)
+            .all()
+            .iterator(chunk_size=batch_size)
+        ):
             try:
                 row.resourceinstancefrom_graphid = row.resourceinstanceidfrom.graph
             except:
@@ -28,17 +32,23 @@ class Migration(migrations.Migration):
                 row.resourceinstanceto_graphid = row.resourceinstanceidto.graph
             except:
                 pass
-            
+
             modified_rows.append(row)
 
             if len(modified_rows) == batch_size:
-                ResourceXResource.objects.using(db_alias).bulk_update(modified_rows, ["resourceinstanceto_graphid","resourceinstancefrom_graphid"])
+                ResourceXResource.objects.using(db_alias).bulk_update(
+                    modified_rows,
+                    ["resourceinstanceto_graphid", "resourceinstancefrom_graphid"],
+                )
                 counter += len(modified_rows)
                 print("Updated {} rows".format(counter))
                 modified_rows = []
-                
+
         if len(modified_rows) > 0:
-            ResourceXResource.objects.using(db_alias).bulk_update(modified_rows, ["resourceinstanceto_graphid","resourceinstancefrom_graphid"])
+            ResourceXResource.objects.using(db_alias).bulk_update(
+                modified_rows,
+                ["resourceinstanceto_graphid", "resourceinstancefrom_graphid"],
+            )
 
     operations = [
         migrations.AddField(

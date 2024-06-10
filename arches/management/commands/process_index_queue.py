@@ -51,18 +51,24 @@ class Command(BaseCommand):
         bulk_index_queue = BulkIndexQueue.objects.all()
         queued_ids = bulk_index_queue.values_list("resourceinstanceid", flat=True)
         resources = Resource.objects.filter(resourceinstanceid__in=queued_ids)
-        delete_ids = queued_ids.difference(resources.values_list("resourceinstanceid", flat=True))
+        delete_ids = queued_ids.difference(
+            resources.values_list("resourceinstanceid", flat=True)
+        )
 
         # This is for testing delete operations; it deletes a random resource (the first inside the bulk index queue)
         # without indexing the delete.  Do not use this on production systems.
         if options["operation"] == "test_delete":
-            instances = ResourceInstance.objects.filter(resourceinstanceid__in=queued_ids)
+            instances = ResourceInstance.objects.filter(
+                resourceinstanceid__in=queued_ids
+            )
             print(instances[0].resourceinstanceid)
             instances[0].delete()
             return
 
         if len(delete_ids) > 0:
-            from arches.app.search.search_engine_factory import SearchEngineInstance as _se
+            from arches.app.search.search_engine_factory import (
+                SearchEngineInstance as _se,
+            )
 
             deleteq = Query(se=_se)
             for resource_id in delete_ids:
@@ -73,5 +79,7 @@ class Command(BaseCommand):
             deleteq.delete(index=RESOURCE_RELATIONS_INDEX, refresh=True)
             bulk_index_queue.filter(resourceinstanceid__in=delete_ids).delete()
 
-        index_database_util.index_resources_using_singleprocessing(resources, title="Processing Indexing Queue")
+        index_database_util.index_resources_using_singleprocessing(
+            resources, title="Processing Indexing Queue"
+        )
         bulk_index_queue.delete()

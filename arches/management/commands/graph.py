@@ -32,10 +32,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "operation",
             nargs="?",
-            choices=[
-                "publish",
-                "create_editable_future_graphs"
-            ],
+            choices=["publish", "create_editable_future_graphs"],
             help="""
             Operation Type
                 'publish' publishes resource models indicated using the --graphs arg.
@@ -74,12 +71,15 @@ class Command(BaseCommand):
             help="Do you want to assign new graph publication ids to all corresponding resource instances?",
         )
 
-
     def handle(self, *args, **options):
         if options["graphs"]:
-            self.graphs = [Graph(graphid.strip()) for graphid in options["graphs"].split(",")]
+            self.graphs = [
+                Graph(graphid.strip()) for graphid in options["graphs"].split(",")
+            ]
         else:
-            self.graphs = Graph.objects.filter(isresource=True).exclude(source_identifier__isnull=False)
+            self.graphs = Graph.objects.filter(isresource=True).exclude(
+                source_identifier__isnull=False
+            )
 
         self.update_instances = True if options["update_instances"] else False
         self.update = True if options["update"] else False
@@ -90,7 +90,6 @@ class Command(BaseCommand):
         if options["operation"] == "create_editable_future_graphs":
             self.create_editable_future_graphs()
 
-
     def create_editable_future_graphs(self):
         print("\nBEGIN Create editable_future_graphs...")
 
@@ -99,11 +98,13 @@ class Command(BaseCommand):
                 print("\nCreating editable_future_graph for %s..." % graph.name)
                 graph.create_editable_future_graph()
 
-                print("%s has been updated! Creating a new publication for %s." % (graph.name, graph.name))
+                print(
+                    "%s has been updated! Creating a new publication for %s."
+                    % (graph.name, graph.name)
+                )
                 graph.publish()
 
             print("\nEND Create editable_future_graphs. Success!")
-
 
     def publish(self, username):
         user = User.objects.get(username=username)
@@ -117,15 +118,15 @@ class Command(BaseCommand):
         for graph in self.graphs:
             if not graph.source_identifier_id:
                 graphids.append(str(graph.pk))
-            
+
                 print(graph.name)
-                
+
                 if self.update:
                     if graph.publication_id:
                         graph.update_published_graphs()
                 else:
                     graph.publish(user)
-                    
+
             graphids.append(str(graph.pk))
         if self.update_instances:
             graphids = tuple(graphids)

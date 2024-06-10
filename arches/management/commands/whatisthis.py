@@ -6,7 +6,10 @@ import uuid
 
 class Command(BaseCommand):
 
-    help = "finds any arches objects whose primary key is the input uuid and" "returns these objects in the form of a list."
+    help = (
+        "finds any arches objects whose primary key is the input uuid and"
+        "returns these objects in the form of a list."
+    )
 
     def add_arguments(self, parser):
         parser.add_argument("uuid", help="input the uuid string to find")
@@ -40,7 +43,11 @@ class Command(BaseCommand):
 
         ## print summary of found objects
         print(80 * "=")
-        print("This UUID is the primary key for {} object{}:".format(len(objs), "s" if len(objs) > 1 else ""))
+        print(
+            "This UUID is the primary key for {} object{}:".format(
+                len(objs), "s" if len(objs) > 1 else ""
+            )
+        )
         for o in objs:
             print(80 * "-")
             print(o)

@@ -39,11 +39,15 @@ class Command(BaseCommand):
             help="Operation Type; build=Alias for `yarn build_test`",
         )
 
-        parser.add_argument("-r", "--reinstall_node_modules", action="store_true", dest="reinstall_node_modules", help="Reinstall node_modules")
-
+        parser.add_argument(
+            "-r",
+            "--reinstall_node_modules",
+            action="store_true",
+            dest="reinstall_node_modules",
+            help="Reinstall node_modules",
+        )
 
     def handle(self, *args, **options):
-
 
         print("operation: " + options["operation"])
         if options["operation"] == "build":
@@ -53,20 +57,8 @@ class Command(BaseCommand):
                 os.chdir(yarn_path)
 
                 if options["reinstall_node_modules"] == True:
-                    subprocess.call(
-                        'rm -rf ./node_modules', 
-                        shell=True
-                    )
-                    subprocess.call(
-                        'rm yarn.lock', 
-                        shell=True
-                    )
-                    subprocess.call(
-                        "yarn", 
-                        shell=True
-                    )
+                    subprocess.call("rm -rf ./node_modules", shell=True)
+                    subprocess.call("rm yarn.lock", shell=True)
+                    subprocess.call("yarn", shell=True)
 
-                subprocess.call(
-                    "yarn build_test", 
-                    shell=True
-                )
+                subprocess.call("yarn build_test", shell=True)

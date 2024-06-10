@@ -17,8 +17,19 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="SearchExportHistory",
             fields=[
-                ("searchexportid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "searchexportid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
                 ("numberofinstances", models.IntegerField()),
                 ("exporttime", models.DateTimeField(auto_now_add=True)),
                 ("url", models.TextField()),

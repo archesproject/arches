@@ -7,7 +7,7 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9748_branch_excel_exporter'),
+        ("models", "9748_branch_excel_exporter"),
     ]
 
     add_tile_excel_exporter = """
@@ -45,7 +45,6 @@ class Migration(migrations.Migration):
         DELETE FROM load_event WHERE etl_module_id = '63ae4bd2-404a-402f-9917-b18b21215cf2';
         DELETE FROM etl_modules WHERE etlmoduleid = '63ae4bd2-404a-402f-9917-b18b21215cf2';
     """
-
 
     operations = [
         migrations.RunSQL(

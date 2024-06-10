@@ -116,7 +116,9 @@ class ShpWriter(Writer):
         geos_datatypes_to_pyshp_types = {"str": "C", "datetime": "D", "float": "F"}
 
         for geometry_field in geometry_fields:
-            features_by_geom_type = self.sort_by_geometry_type(instances, geometry_field)
+            features_by_geom_type = self.sort_by_geometry_type(
+                instances, geometry_field
+            )
             for geom_type, features in features_by_geom_type.items():
                 if len(features) > 0:
                     shp = BytesIO()
@@ -125,11 +127,17 @@ class ShpWriter(Writer):
                     prj = BytesIO()
 
                     if geom_type == "point":
-                        writer = shapefile.Writer(shp=shp, shx=shx, dbf=dbf, shapeType=shapefile.MULTIPOINT)
+                        writer = shapefile.Writer(
+                            shp=shp, shx=shx, dbf=dbf, shapeType=shapefile.MULTIPOINT
+                        )
                     elif geom_type == "line":
-                        writer = shapefile.Writer(shp=shp, shx=shx, dbf=dbf, shapeType=shapefile.POLYLINE)
+                        writer = shapefile.Writer(
+                            shp=shp, shx=shx, dbf=dbf, shapeType=shapefile.POLYLINE
+                        )
                     elif geom_type == "poly":
-                        writer = shapefile.Writer(shp=shp, shx=shx, dbf=dbf, shapeType=shapefile.POLYGON)
+                        writer = shapefile.Writer(
+                            shp=shp, shx=shx, dbf=dbf, shapeType=shapefile.POLYGON
+                        )
 
                     for header in headers:
                         try:
@@ -161,10 +169,22 @@ class ShpWriter(Writer):
 
                     writer.close()
                     shapefiles_for_export += [
-                        {"name": f"{name}_{geometry_field}_{geom_type}.shp", "outputfile": shp},
-                        {"name": f"{name}_{geometry_field}_{geom_type}.dbf", "outputfile": dbf},
-                        {"name": f"{name}_{geometry_field}_{geom_type}.shx", "outputfile": shx},
-                        {"name": f"{name}_{geometry_field}_{geom_type}.prj", "outputfile": prj},
+                        {
+                            "name": f"{name}_{geometry_field}_{geom_type}.shp",
+                            "outputfile": shp,
+                        },
+                        {
+                            "name": f"{name}_{geometry_field}_{geom_type}.dbf",
+                            "outputfile": dbf,
+                        },
+                        {
+                            "name": f"{name}_{geometry_field}_{geom_type}.shx",
+                            "outputfile": shx,
+                        },
+                        {
+                            "name": f"{name}_{geometry_field}_{geom_type}.prj",
+                            "outputfile": prj,
+                        },
                     ]
 
         return shapefiles_for_export

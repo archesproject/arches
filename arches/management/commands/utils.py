@@ -66,7 +66,8 @@ def print_message(message):
 
 def load_source(module_name, file_path):
     """Replacement for deprecated imp.load_source(). Recipe from
-    https://docs.python.org/3.12/library/importlib.html#importlib.abc.Loader.exec_module"""
+    https://docs.python.org/3.12/library/importlib.html#importlib.abc.Loader.exec_module
+    """
 
     spec = importlib.util.spec_from_file_location(module_name, file_path)
     module = importlib.util.module_from_spec(spec)

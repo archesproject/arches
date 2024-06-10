@@ -8,20 +8,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '2974_provisionaledits_in_editlog'),
+        ("models", "2974_provisionaledits_in_editlog"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='MapMarker',
+            name="MapMarker",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.TextField(unique=True)),
-                ('url', models.TextField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.TextField(unique=True)),
+                ("url", models.TextField()),
             ],
             options={
-                'db_table': 'map_markers',
-                'managed': True,
+                "db_table": "map_markers",
+                "managed": True,
             },
         ),
     ]

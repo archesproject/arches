@@ -180,10 +180,12 @@ class GraphManagerViewTests(ArchesTestCase):
         graph.root.save()
         graph = Graph.objects.get(graphid=graph.pk)
         self.appended_branch_1 = graph.append_branch(
-            "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as", graphid=self.NODE_NODETYPE_GRAPHID
+            "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as",
+            graphid=self.NODE_NODETYPE_GRAPHID,
         )
         self.appended_branch_2 = graph.append_branch(
-            "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as", graphid=self.NODE_NODETYPE_GRAPHID
+            "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as",
+            graphid=self.NODE_NODETYPE_GRAPHID,
         )
         graph.save()
         graph.create_editable_future_graph()
@@ -212,7 +214,12 @@ class GraphManagerViewTests(ArchesTestCase):
         url = reverse("graph", kwargs={"graphid": ""})
         response = self.client.get(url)
         graphs = json.loads(response.context["graphs"])
-        self.assertEqual(len(graphs), GraphModel.objects.all().exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID).count())
+        self.assertEqual(
+            len(graphs),
+            GraphModel.objects.all()
+            .exclude(graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            .count(),
+        )
 
         url = reverse("graph_designer", kwargs={"graphid": self.GRAPH_ID})
         response = self.client.get(url)
@@ -228,16 +235,18 @@ class GraphManagerViewTests(ArchesTestCase):
         self.client.login(username="admin", password="admin")
 
         editable_future_graph = Graph.objects.get(source_identifier_id=self.GRAPH_ID)
-        url = reverse("graph_designer", kwargs={"graphid": editable_future_graph.graphid})
+        url = reverse(
+            "graph_designer", kwargs={"graphid": editable_future_graph.graphid}
+        )
         response = self.client.get(url)
 
-        redirect_url = reverse('graph_designer', kwargs={'graphid': self.GRAPH_ID})
-        query_string = urlencode({
-            'has_been_redirected_from_editable_future_graph': True
-        })
+        redirect_url = reverse("graph_designer", kwargs={"graphid": self.GRAPH_ID})
+        query_string = urlencode(
+            {"has_been_redirected_from_editable_future_graph": True}
+        )
 
         self.assertRedirects(response, "{}?{}".format(redirect_url, query_string))
-            
+
     def test_graph_settings(self):
         """
         Test the graph settings view
@@ -270,12 +279,18 @@ class GraphManagerViewTests(ArchesTestCase):
         url = reverse("update_node", kwargs={"graphid": self.GRAPH_ID})
         node = Node.objects.get(nodeid=str(self.appended_branch_1.root.pk))
         node.name = "new node name"
-        nodegroup, created = NodeGroup.objects.get_or_create(pk=str(self.appended_branch_1.root.pk))
+        nodegroup, created = NodeGroup.objects.get_or_create(
+            pk=str(self.appended_branch_1.root.pk)
+        )
         node.nodegroup = nodegroup
         post_data = JSONSerializer().serializeToPython(node)
-        post_data["parentproperty"] = "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as"
+        post_data["parentproperty"] = (
+            "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as"
+        )
         content_type = "application/x-www-form-urlencoded"
-        response = self.client.post(url, JSONSerializer().serialize(post_data), content_type)
+        response = self.client.post(
+            url, JSONSerializer().serialize(post_data), content_type
+        )
         response_json = json.loads(response.content)
 
         node_count = 0
@@ -320,8 +335,8 @@ class GraphManagerViewTests(ArchesTestCase):
         response_json = json.loads(response.content)
 
         self.assertEqual(len(response_json["nodes"]), self.NODE_COUNT)
-        
-        cloned_graph = Graph.objects.get(pk=response_json['graphid'])
+
+        cloned_graph = Graph.objects.get(pk=response_json["graphid"])
 
         original_graph_node_ids = [str(node.pk) for node in self.graph.nodes.values()]
         cloned_graph_node_ids = [str(node.pk) for node in cloned_graph.nodes.values()]
@@ -335,7 +350,7 @@ class GraphManagerViewTests(ArchesTestCase):
         """
         self.client.login(username="admin", password="admin")
 
-        user_id = self.client.session['_auth_user_id']
+        user_id = self.client.session["_auth_user_id"]
         logged_in_user = get_user_model().objects.get(pk=user_id)
         self.graph.publish(user=logged_in_user)
 
@@ -347,7 +362,7 @@ class GraphManagerViewTests(ArchesTestCase):
 
         self.assertEqual(len(response_json["nodes"]), self.NODE_COUNT)
 
-        cloned_graph = Graph.objects.get(pk=response_json['graphid'])
+        cloned_graph = Graph.objects.get(pk=response_json["graphid"])
 
         original_graph_node_ids = [str(node.pk) for node in self.graph.nodes.values()]
         cloned_graph_node_ids = [str(node.pk) for node in cloned_graph.nodes.values()]
@@ -405,7 +420,12 @@ class GraphManagerViewTests(ArchesTestCase):
 
         self.client.login(username="admin", password="admin")
         url = reverse("import_graph")
-        with open(os.path.join(list(test_settings.RESOURCE_GRAPH_LOCATIONS)[0], "Cardinality Test Model.json")) as f:
+        with open(
+            os.path.join(
+                list(test_settings.RESOURCE_GRAPH_LOCATIONS)[0],
+                "Cardinality Test Model.json",
+            )
+        ) as f:
             response = self.client.post(url, {"importedGraph": f})
         self.assertIsNotNone(response.content)
 
