@@ -1217,7 +1217,9 @@ class SearchExport(View):
         download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
         format = request.GET.get("format", "tilecsv")
         report_link = request.GET.get("reportlink", False)
-        if "HTTP_AUTHORIZATION" in request.META and not request.GET.get("limited", False):
+        if "HTTP_AUTHORIZATION" in request.META and not request.GET.get(
+            "limited", False
+        ):
             request_auth = request.META.get("HTTP_AUTHORIZATION").split()
             if request_auth[0].lower() == "basic":
                 user_cred = b64decode(request_auth[1]).decode().split(":")

@@ -11,6 +11,7 @@ from tests.base_test import ArchesTestCase
 # these tests can be run from the command line via
 # python manage.py test tests.search.search_export_tests --settings="tests.test_settings"
 
+
 class SearchExportTests(ArchesTestCase):
     def test_login_via_basic_auth_good(self):
         auth_string = "Basic " + b64encode(b"admin:admin").decode("utf-8")
