@@ -5,7 +5,7 @@ import { computed, inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
-import { DANGER, ERROR } from "@/components/ControlledListManager/constants.ts";
+import { DANGER, DEFAULT_ERROR_TOAST_LIFE, ERROR } from "@/components/ControlledListManager/constants.ts";
 import { bestLabel, listAsNode } from "@/components/ControlledListManager/utils.ts";
 
 import Button from "primevue/button";
@@ -89,7 +89,7 @@ const fetchLists = async () => {
     } catch {
         toast.add({
             severity: ERROR,
-            life: 8000,
+            life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Unable to fetch lists"),
             detail: error?.message || response?.statusText,
         });
@@ -141,7 +141,7 @@ const deleteLists = async (listIds: string[]) => {
                 const body = await response.json();
                 toast.add({
                     severity: ERROR,
-                    life: 8000,
+                    life: DEFAULT_ERROR_TOAST_LIFE,
                     summary: $gettext("List deletion failed"),
                     detail: body.message,
                 });
@@ -150,7 +150,7 @@ const deleteLists = async (listIds: string[]) => {
     } catch {
         toast.add({
             severity: ERROR,
-            life: 8000,
+            life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("List deletion failed"),
         });
     }
@@ -181,7 +181,7 @@ const deleteItems = async (itemIds: string[]) => {
                 const body = await response.json();
                 toast.add({
                     severity: ERROR,
-                    life: 8000,
+                    life: DEFAULT_ERROR_TOAST_LIFE,
                     summary: $gettext("Item deletion failed"),
                     detail: body.message,
                 });
@@ -190,7 +190,7 @@ const deleteItems = async (itemIds: string[]) => {
     } catch {
         toast.add({
             severity: ERROR,
-            life: 8000,
+            life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Item deletion failed"),
         });
     }

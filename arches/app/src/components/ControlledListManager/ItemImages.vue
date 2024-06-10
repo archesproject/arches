@@ -10,7 +10,7 @@ import { useToast } from "primevue/usetoast";
 import ImageEditor from "@/components/ControlledListManager/ImageEditor.vue";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
-import { itemKey, ERROR } from "@/components/ControlledListManager/constants.ts";
+import { itemKey, DEFAULT_ERROR_TOAST_LIFE, ERROR } from "@/components/ControlledListManager/constants.ts";
 
 import type { Ref } from "vue";
 import type { ControlledListItem } from "@/types/ControlledListManager";
@@ -45,7 +45,7 @@ const upload = (event: FileUploadUploadEvent) => {
 const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
     toast.add({
         severity: ERROR,
-        life: 8000,
+        life: DEFAULT_ERROR_TOAST_LIFE,
         summary: event?.xhr?.statusText || $gettext("Image upload failed"),
     });
 };

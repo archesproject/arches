@@ -11,7 +11,7 @@ import { useToast } from "primevue/usetoast";
 import MoveRow from "@/components/ControlledListManager/MoveRow.vue";
 
 import { createItem, createList, upsertValue } from "@/components/ControlledListManager/api.ts";
-import { ERROR, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
+import { DEFAULT_ERROR_TOAST_LIFE, ERROR, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import {
     bestLabel,
     findNodeInTree,
@@ -136,7 +136,7 @@ const setParent = async (parentNode: TreeNode) => {
     } catch {
         toast.add({
             severity: ERROR,
-            life: 8000,
+            life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Move failed"),
             detail: error?.message || response?.statusText,
         });
