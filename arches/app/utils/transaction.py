@@ -7,15 +7,22 @@ from django.db import transaction, DatabaseError
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
+
 # Given a transaction ID, reverse (delete or update) tiles and resources created/updated during the transaction
 def reverse_edit_log_entries(transaction_id):
-    transaction_changes = EditLog.objects.filter(transactionid=transaction_id).order_by("-timestamp").all()
+    transaction_changes = (
+        EditLog.objects.filter(transactionid=transaction_id)
+        .order_by("-timestamp")
+        .all()
+    )
     number_of_db_changes = 0
     try:
         with transaction.atomic():
             for edit_log in transaction_changes:
                 if edit_log.edittype == "create":
-                    for obj in Resource.objects.filter(resourceinstanceid=edit_log.resourceinstanceid):
+                    for obj in Resource.objects.filter(
+                        resourceinstanceid=edit_log.resourceinstanceid
+                    ):
                         obj.delete()
                         number_of_db_changes += 1
                 elif edit_log.edittype == "tile create":
@@ -37,7 +44,9 @@ def delete_manifests(transaction_id):
     number_of_db_changes = 0
     try:
         with transaction.atomic():
-            transaction_changes = IIIFManifest.objects.filter(transactionid=transaction_id)
+            transaction_changes = IIIFManifest.objects.filter(
+                transactionid=transaction_id
+            )
             for obj in transaction_changes:
                 obj.delete()
                 number_of_db_changes += 1

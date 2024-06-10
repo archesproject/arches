@@ -9,35 +9,35 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4684_adds_config_to_tabbed_report'),
+        ("models", "4684_adds_config_to_tabbed_report"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='tileserverlayer',
-            name='map_layer',
+            model_name="tileserverlayer",
+            name="map_layer",
             field=models.ForeignKey(
-                db_column='map_layerid',
+                db_column="map_layerid",
                 null=True,
                 blank=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to='models.MapLayer'
+                to="models.MapLayer",
             ),
         ),
         migrations.AlterField(
-            model_name='tileserverlayer',
-            name='map_source',
+            model_name="tileserverlayer",
+            name="map_source",
             field=models.ForeignKey(
-                db_column='map_sourceid',
+                db_column="map_sourceid",
                 null=True,
                 blank=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                to='models.MapSource'
+                to="models.MapSource",
             ),
         ),
         migrations.AlterField(
-            model_name='tileserverlayer',
-            name='path',
+            model_name="tileserverlayer",
+            name="path",
             field=models.TextField(null=True, blank=True),
         ),
     ]

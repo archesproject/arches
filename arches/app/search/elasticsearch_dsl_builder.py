@@ -54,7 +54,11 @@ class Query(Dsl):
         self.limit = kwargs.pop("limit", 10)
         self.scroll = None
 
-        self.dsl = {"query": {"match_all": {}}, "source_includes": [], "source_excludes": []}
+        self.dsl = {
+            "query": {"match_all": {}},
+            "source_includes": [],
+            "source_excludes": [],
+        }
 
         for key, value in kwargs.items():
             self.dsl[key] = value
@@ -154,9 +158,15 @@ class Bool(Dsl):
             object = Bool(object)
 
         self.dsl["bool"]["must"] = self.dsl["bool"]["must"] + object.dsl["bool"]["must"]
-        self.dsl["bool"]["should"] = self.dsl["bool"]["should"] + object.dsl["bool"]["should"]
-        self.dsl["bool"]["must_not"] = self.dsl["bool"]["must_not"] + object.dsl["bool"]["must_not"]
-        self.dsl["bool"]["filter"] = self.dsl["bool"]["filter"] + object.dsl["bool"]["filter"]
+        self.dsl["bool"]["should"] = (
+            self.dsl["bool"]["should"] + object.dsl["bool"]["should"]
+        )
+        self.dsl["bool"]["must_not"] = (
+            self.dsl["bool"]["must_not"] + object.dsl["bool"]["must_not"]
+        )
+        self.dsl["bool"]["filter"] = (
+            self.dsl["bool"]["filter"] + object.dsl["bool"]["filter"]
+        )
 
         return self
 
@@ -260,7 +270,13 @@ class GeoShape(Dsl):
         self.type = kwargs.pop("type", "")
         self.coordinates = kwargs.pop("coordinates", "")
 
-        self.dsl = {"geo_shape": {self.field: {"shape": {"type": self.type, "coordinates": self.coordinates}}}}
+        self.dsl = {
+            "geo_shape": {
+                self.field: {
+                    "shape": {"type": self.type, "coordinates": self.coordinates}
+                }
+            }
+        }
 
 
 class Range(Dsl):
@@ -285,8 +301,17 @@ class Range(Dsl):
 
         self.dsl = {"range": {self.field: boost}}
 
-        if self.gte is None and self.gt is None and self.lte is None and self.lt is None:
-            raise RangeDSLException(_("You need at least one of the following operators in a Range expression: gte, gt, lte, or lt"))
+        if (
+            self.gte is None
+            and self.gt is None
+            and self.lte is None
+            and self.lt is None
+        ):
+            raise RangeDSLException(
+                _(
+                    "You need at least one of the following operators in a Range expression: gte, gt, lte, or lt"
+                )
+            )
         if self.gte is not None and self.gt is not None:
             raise RangeDSLException(_("You can only use one of either: gte or gt"))
         if self.lte is not None and self.lt is not None:
@@ -397,7 +422,14 @@ class Wildcard(Dsl):
         self.query = kwargs.pop("query", "")
         self.case_insensitive = kwargs.pop("case_insensitive", True)
 
-        self.dsl = {"wildcard": {self.field: {"value": self.query, "case_insensitive": self.case_insensitive}}}
+        self.dsl = {
+            "wildcard": {
+                self.field: {
+                    "value": self.query,
+                    "case_insensitive": self.case_insensitive,
+                }
+            }
+        }
 
 
 class Regex(Dsl):
@@ -416,7 +448,7 @@ class Regex(Dsl):
                 self.field: {
                     "value": self.query,
                     "flags": "ALL",
-                    "case_insensitive": self.case_insensitive
+                    "case_insensitive": self.case_insensitive,
                 }
             }
         }
@@ -433,7 +465,14 @@ class Prefix(Dsl):
         self.query = kwargs.pop("query", "")
         self.case_insensitive = kwargs.pop("case_insensitive", True)
 
-        self.dsl = {"prefix": {self.field: {"value": self.query, "case_insensitive": self.case_insensitive}}}
+        self.dsl = {
+            "prefix": {
+                self.field: {
+                    "value": self.query,
+                    "case_insensitive": self.case_insensitive,
+                }
+            }
+        }
 
 
 class Aggregation(Dsl):
@@ -451,9 +490,13 @@ class Aggregation(Dsl):
         self.size = kwargs.pop("size", None)
 
         if self.field is not None and self.script is not None:
-            raise AggregationDSLException(_('You need to specify either a "field" or a "script"'))
+            raise AggregationDSLException(
+                _('You need to specify either a "field" or a "script"')
+            )
         if self.name is None:
-            raise AggregationDSLException(_("You need to specify a name for your aggregation"))
+            raise AggregationDSLException(
+                _("You need to specify a name for your aggregation")
+            )
         if self.type is None:
             raise AggregationDSLException(_("You need to specify an aggregation type"))
 
@@ -644,7 +687,9 @@ class NestedAgg(Aggregation):
         self.aggregation = kwargs.pop("agg", {})
         self.path = kwargs.pop("path", None)
         if self.path is None:
-            raise NestedAggDSLException(_("You need to specify a path for your nested aggregation"))
+            raise NestedAggDSLException(
+                _("You need to specify a path for your nested aggregation")
+            )
         super(NestedAgg, self).__init__(type="nested", path=self.path, **kwargs)
 
         if self.name:

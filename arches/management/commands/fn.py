@@ -34,9 +34,23 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("operation", nargs="?")
 
-        parser.add_argument("-s", "--source", action="store", dest="fn_source", default="", help="Function file to be loaded")
+        parser.add_argument(
+            "-s",
+            "--source",
+            action="store",
+            dest="fn_source",
+            default="",
+            help="Function file to be loaded",
+        )
 
-        parser.add_argument("-n", "--name", action="store", dest="fn_name", default="", help="The name of the function to unregister")
+        parser.add_argument(
+            "-n",
+            "--name",
+            action="store",
+            dest="fn_name",
+            default="",
+            help="The name of the function to unregister",
+        )
 
     def handle(self, *args, **options):
         if options["operation"] == "register":
@@ -66,7 +80,9 @@ class Command(BaseCommand):
             uuid.UUID(details["functionid"])
         except:
             details["functionid"] = str(uuid.uuid4())
-            print("Registering function with functionid: {}".format(details["functionid"]))
+            print(
+                "Registering function with functionid: {}".format(details["functionid"])
+            )
 
         fn = models.Function(
             functionid=details["functionid"],

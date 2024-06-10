@@ -4,10 +4,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9892_tile_excel_exporter'),
+        ("models", "9892_tile_excel_exporter"),
     ]
 
-    update_refresh_tile_resource_relationship_function = """
+    update_refresh_tile_resource_relationship_function = (
+        """
         CREATE OR REPLACE FUNCTION __arches_refresh_tile_resource_relationships(tile_id uuid)
         RETURNS boolean AS $$
         DECLARE
@@ -69,6 +70,7 @@ class Migration(migrations.Migration):
         END;
         $$ language plpgsql;
     """,
+    )
 
     revert_refresh_tile_resource_relationship_function = """
         create or replace function __arches_refresh_tile_resource_relationships(
@@ -135,7 +137,6 @@ class Migration(migrations.Migration):
         WHERE r.resourceinstanceid = x.resourceinstanceidto
         AND x.resourceinstanceto_graphid is null;
     """
-
 
     operations = [
         migrations.RunSQL(

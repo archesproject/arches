@@ -6,7 +6,12 @@ from django.utils.translation import gettext as _
 
 logger = logging.getLogger(__name__)
 
-def is_compatible_with_arches(min_arches=settings.MIN_ARCHES_VERSION, max_arches=settings.MAX_ARCHES_VERSION, target="project"):
+
+def is_compatible_with_arches(
+    min_arches=settings.MIN_ARCHES_VERSION,
+    max_arches=settings.MAX_ARCHES_VERSION,
+    target="project",
+):
     """
     Check if the current version of arches falls between a min and max version.
 
@@ -16,7 +21,7 @@ def is_compatible_with_arches(min_arches=settings.MIN_ARCHES_VERSION, max_arches
     target -- A description of what is being checked for compatibility
 
     """
-    
+
     try:
         arches_version = semantic_version.Version(arches.__version__)
     except ValueError:
@@ -25,10 +30,7 @@ def is_compatible_with_arches(min_arches=settings.MIN_ARCHES_VERSION, max_arches
     min_is_valid = True
     max_is_valid = True
 
-    versions = {
-        'minimum': min_arches,
-        'maximum': max_arches
-    }
+    versions = {"minimum": min_arches, "maximum": max_arches}
 
     for key, value in versions.items():
         if value:
@@ -45,9 +47,14 @@ def is_compatible_with_arches(min_arches=settings.MIN_ARCHES_VERSION, max_arches
                 max_is_valid = sem_version >= arches_version
         else:
             logger.warning(
-                _("A {0} Arches version is not specified. Unable to check {0} version {1} compatibility".format(key, target))
+                _(
+                    "A {0} Arches version is not specified. Unable to check {0} version {1} compatibility".format(
+                        key, target
+                    )
+                )
             )
     return min_is_valid and max_is_valid
+
 
 class CompatibilityError(Exception):
     def __init__(self, message, code=None):

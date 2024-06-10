@@ -8,11 +8,11 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '5394_postgis_mvt_api'),
+        ("models", "5394_postgis_mvt_api"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='TileserverLayer',
+            name="TileserverLayer",
         ),
     ]
