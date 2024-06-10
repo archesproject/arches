@@ -1,12 +1,10 @@
-
-
 from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4670_maplayer_legend'),
+        ("models", "4670_maplayer_legend"),
     ]
 
     operations = [

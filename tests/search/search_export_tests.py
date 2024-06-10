@@ -7,7 +7,9 @@ from arches.app.models import models
 from arches.app.models.tile import Tile
 from arches.app.search.search_export import SearchResultsExporter
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
+from arches.app.utils.data_management.resource_graphs.importer import (
+    import_graph as ResourceGraphImporter,
+)
 from arches.app.utils.i18n import LanguageSynchronizer
 
 from django.contrib.auth.models import User
@@ -20,13 +22,16 @@ from tests.base_test import ArchesTestCase
 # these tests can be run from the command line via
 # python manage.py test tests.search.search_export_tests --settings="tests.test_settings"
 
+
 class SearchExportTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         cls.factory = RequestFactory()
 
         LanguageSynchronizer.synchronize_settings_with_db()
-        with open(os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "r") as f:
+        with open(
+            os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "r"
+        ) as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
@@ -37,22 +42,30 @@ class SearchExportTests(ArchesTestCase):
         cls.search_model_name_nodeid = "2fe14de3-fa61-11e6-897b-14109fd34195"
         # cls.search_model_sensitive_info_nodeid = "57446fae-65ff-11e7-b63a-14109fd34195"
         # cls.search_model_geom_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
-        
-        cls.user = User.objects.create_user("unprivileged_user", "unprivileged_user@test.com", "test")
+
+        cls.user = User.objects.create_user(
+            "unprivileged_user", "unprivileged_user@test.com", "test"
+        )
 
         test_resourceinstanceid = uuid.uuid4()
 
         cls.loadOntology()
         cls.ensure_resource_test_model_loaded()
-        models.ResourceInstance.objects.get_or_create(graph_id=cls.search_model_graphid, resourceinstanceid=test_resourceinstanceid)
+        models.ResourceInstance.objects.get_or_create(
+            graph_id=cls.search_model_graphid,
+            resourceinstanceid=test_resourceinstanceid,
+        )
         tile_data = {}
-        tile_data[cls.search_model_name_nodeid] = {"en": {
-            "value": "Etiwanda Avenue Street Trees",
-            "direction": "ltr"
-        }}
-        new_tile = Tile(resourceinstance_id=test_resourceinstanceid, data=tile_data, nodegroup_id=cls.search_model_name_nodeid)
+        tile_data[cls.search_model_name_nodeid] = {
+            "en": {"value": "Etiwanda Avenue Street Trees", "direction": "ltr"}
+        }
+        new_tile = Tile(
+            resourceinstance_id=test_resourceinstanceid,
+            data=tile_data,
+            nodegroup_id=cls.search_model_name_nodeid,
+        )
         new_tile.save()
-        time.sleep(1) # delay to allow for async indexing
+        time.sleep(1)  # delay to allow for async indexing
 
         # TODO: create geospatial test data
 
@@ -63,17 +76,21 @@ class SearchExportTests(ArchesTestCase):
 
     def test_invalid_format(self):
         """Test SearchResultsExporter with invalid format for shapefile export"""
-        request = self.factory.get('/search?tiles=true&export=true&format=shp&compact=false')
+        request = self.factory.get(
+            "/search?tiles=true&export=true&format=shp&compact=false"
+        )
         request.user = self.user
-        with self.assertRaisesMessage(Exception, "Results must be compact to export to shapefile"):
+        with self.assertRaisesMessage(
+            Exception, "Results must be compact to export to shapefile"
+        ):
             SearchResultsExporter(search_request=request)
 
     def test_export_to_csv(self):
-        request = self.factory.get('/search?tiles=True&export=True&format=tilecsv')
+        request = self.factory.get("/search?tiles=True&export=True&format=tilecsv")
         request.user = self.user
         exporter = SearchResultsExporter(search_request=request)
-        result, _ = exporter.export(format='tilecsv', report_link='false')
-        self.assertIn('.csv', result[0]['name'])
+        result, _ = exporter.export(format="tilecsv", report_link="false")
+        self.assertIn(".csv", result[0]["name"])
 
     # def test_export_to_shp(self):
     #     """Test exporting search results to SHP format"""
@@ -133,4 +150,3 @@ class SearchExportTests(ArchesTestCase):
         response = SearchExport().get(request)
         self.assertEqual(request.user.username, "anonymous")
         self.assertEqual(response.status_code, HTTPStatus.UNAUTHORIZED)
-

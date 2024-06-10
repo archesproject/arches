@@ -26,7 +26,9 @@ class ImportSingleCsv(BaseImportModule):
         self.loadid = request.POST.get("load_id") if request else loadid
         self.userid = request.user.id if request else None
         self.moduleid = request.POST.get("module") if request else None
-        self.config = ETLModule.objects.get(pk=self.moduleid).config if self.moduleid else {}
+        self.config = (
+            ETLModule.objects.get(pk=self.moduleid).config if self.moduleid else {}
+        )
         self.datatype_factory = DataTypeFactory()
         self.node_lookup = {}
         self.blank_tile_lookup = {}
@@ -48,10 +50,16 @@ class ImportSingleCsv(BaseImportModule):
         """
 
         def is_top_nodegroup(nodegroupid):
-            return NodeGroup.objects.get(nodegroupid=nodegroupid).parentnodegroup is None
+            return (
+                NodeGroup.objects.get(nodegroupid=nodegroupid).parentnodegroup is None
+            )
 
         graphid = request.POST.get("graphid")
-        nodes = Node.objects.filter(graph_id=graphid).exclude(datatype__in=["semantic"]).order_by(Lower("name"))
+        nodes = (
+            Node.objects.filter(graph_id=graphid)
+            .exclude(datatype__in=["semantic"])
+            .order_by(Lower("name"))
+        )
         filteredNodes = []
         for node in nodes:
             if is_top_nodegroup(node.nodegroup_id):
@@ -73,7 +81,7 @@ class ImportSingleCsv(BaseImportModule):
         temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         try:
             self.delete_from_default_storage(temp_dir)
-        except (FileNotFoundError):
+        except FileNotFoundError:
             pass
 
         csv_file_name = None
@@ -89,12 +97,15 @@ class ImportSingleCsv(BaseImportModule):
                 files = zip_ref.infolist()
                 for file in files:
                     if not file.filename.startswith("__MACOSX"):
-                        default_storage.save(os.path.join(temp_dir, file.filename), File(zip_ref.open(file)))
+                        default_storage.save(
+                            os.path.join(temp_dir, file.filename),
+                            File(zip_ref.open(file)),
+                        )
                         if file.filename.endswith(".csv"):
                             csv_file_name = file.filename
             try:
                 csv_file_path = os.path.join(temp_dir, csv_file_name)
-            except (TypeError):
+            except TypeError:
                 pass
 
         if csv_file_name is None:
@@ -109,7 +120,10 @@ class ImportSingleCsv(BaseImportModule):
             reader = csv.reader(csvfile)
             data = {"csv": [line for line in reader], "csv_file": csv_file_name}
             with connection.cursor() as cursor:
-                cursor.execute("""SELECT load_details FROM load_event WHERE loadid = %s""", [self.loadid])
+                cursor.execute(
+                    """SELECT load_details FROM load_event WHERE loadid = %s""",
+                    [self.loadid],
+                )
                 row = cursor.fetchall()
             if len(row) > 0:
                 data["config"] = row[0][0]
@@ -159,13 +173,40 @@ class ImportSingleCsv(BaseImportModule):
         if csv_size > use_celery_threshold:
             response = self.run_load_task_async(request, self.loadid)
         else:
-            response = self.run_load_task(self.userid, self.loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
+            response = self.run_load_task(
+                self.userid,
+                self.loadid,
+                graphid,
+                has_headers,
+                fieldnames,
+                csv_mapping,
+                csv_file_name,
+                id_label,
+            )
 
         return response
 
-    def run_load_task(self, userid, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label):
+    def run_load_task(
+        self,
+        userid,
+        loadid,
+        graphid,
+        has_headers,
+        fieldnames,
+        csv_mapping,
+        csv_file_name,
+        id_label,
+    ):
 
-        self.populate_staging_table(loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label)
+        self.populate_staging_table(
+            loadid,
+            graphid,
+            has_headers,
+            fieldnames,
+            csv_mapping,
+            csv_file_name,
+            id_label,
+        )
 
         validation = self.validate(loadid)
         if len(validation["data"]) == 0:
@@ -177,11 +218,13 @@ class ImportSingleCsv(BaseImportModule):
             self.loadid = loadid  # currently redundant, but be certain
             response = save_to_tiles(userid, loadid)
             with connection.cursor() as cursor:
-                cursor.execute("""CALL __arches_update_resource_x_resource_with_graphids();""")
+                cursor.execute(
+                    """CALL __arches_update_resource_x_resource_with_graphids();"""
+                )
                 cursor.execute("""SELECT __arches_refresh_spatial_views();""")
                 refresh_successful = cursor.fetchone()[0]
             if not refresh_successful:
-                raise Exception('Unable to refresh spatial views')
+                raise Exception("Unable to refresh spatial views")
             return response
         else:
             with connection.cursor() as cursor:
@@ -203,7 +246,16 @@ class ImportSingleCsv(BaseImportModule):
         id_label = "resourceid"
 
         load_task = tasks.load_single_csv.apply_async(
-            (self.userid, self.loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label),
+            (
+                self.userid,
+                self.loadid,
+                graphid,
+                has_headers,
+                fieldnames,
+                csv_mapping,
+                csv_file_name,
+                id_label,
+            ),
         )
         with connection.cursor() as cursor:
             cursor.execute(
@@ -215,20 +267,43 @@ class ImportSingleCsv(BaseImportModule):
         graphid = request.POST.get("graphid")
         csv_mapping = request.POST.get("fieldMapping")
         csv_file_name = request.POST.get("csvFileName")
-        mapping_details = {"mapping": json.loads(csv_mapping), "graph": graphid, "file_name": csv_file_name}
+        mapping_details = {
+            "mapping": json.loads(csv_mapping),
+            "graph": graphid,
+            "file_name": csv_file_name,
+        }
         with connection.cursor() as cursor:
             cursor.execute(
                 """INSERT INTO load_event (loadid, complete, status, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, False, "running", self.moduleid, json.dumps(mapping_details), datetime.now(), self.userid),
+                (
+                    self.loadid,
+                    False,
+                    "running",
+                    self.moduleid,
+                    json.dumps(mapping_details),
+                    datetime.now(),
+                    self.userid,
+                ),
             )
         message = "load event created"
         return {"success": True, "data": message}
 
-    def populate_staging_table(self, loadid, graphid, has_headers, fieldnames, csv_mapping, csv_file_name, id_label):
+    def populate_staging_table(
+        self,
+        loadid,
+        graphid,
+        has_headers,
+        fieldnames,
+        csv_mapping,
+        csv_file_name,
+        id_label,
+    ):
         temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", loadid)
         csv_file_path = os.path.join(temp_dir, csv_file_name)
         with default_storage.open(csv_file_path, mode="r") as csvfile:
-            reader = csv.reader(csvfile)  # if there is a duplicate field, DictReader will not work
+            reader = csv.reader(
+                csvfile
+            )  # if there is a duplicate field, DictReader will not work
 
             if has_headers:
                 next(reader)
@@ -251,11 +326,17 @@ class ImportSingleCsv(BaseImportModule):
 
                     for i in range(len(fieldnames)):
                         if fieldnames[i] != "" and fieldnames[i] != id_label:
-                            current_node = self.get_node_lookup(graphid).get(alias=fieldnames[i])
+                            current_node = self.get_node_lookup(graphid).get(
+                                alias=fieldnames[i]
+                            )
                             nodegroupid = str(current_node.nodegroup_id)
                             node = str(current_node.nodeid)
-                            datatype = self.node_lookup[graphid].get(nodeid=node).datatype
-                            datatype_instance = self.datatype_factory.get_instance(datatype)
+                            datatype = (
+                                self.node_lookup[graphid].get(nodeid=node).datatype
+                            )
+                            datatype_instance = self.datatype_factory.get_instance(
+                                datatype
+                            )
                             source_value = row[i]
                             config = current_node.config
                             config["nodeid"] = node
@@ -265,28 +346,56 @@ class ImportSingleCsv(BaseImportModule):
                                 if datatype == "string":
                                     try:
                                         code = csv_mapping[i]["language"]["code"]
-                                        direction = csv_mapping[i]["language"]["default_direction"]
-                                        transformed_value = {code: {"value": row[i], "direction": direction}}
+                                        direction = csv_mapping[i]["language"][
+                                            "default_direction"
+                                        ]
+                                        transformed_value = {
+                                            code: {
+                                                "value": row[i],
+                                                "direction": direction,
+                                            }
+                                        }
                                     except:
                                         transformed_value = source_value
                                     value = (
-                                        datatype_instance.transform_value_for_tile(transformed_value, **config) if transformed_value else None
+                                        datatype_instance.transform_value_for_tile(
+                                            transformed_value, **config
+                                        )
+                                        if transformed_value
+                                        else None
                                     )
-                                    errors = datatype_instance.validate(value, nodeid=node)
+                                    errors = datatype_instance.validate(
+                                        value, nodeid=node
+                                    )
                                 else:
-                                    value, errors = self.prepare_data_for_loading(datatype_instance, source_value, config)
+                                    value, errors = self.prepare_data_for_loading(
+                                        datatype_instance, source_value, config
+                                    )
 
                                 valid = True if len(errors) == 0 else False
                                 error_message = ""
                                 for error in errors:
                                     error_message = (
-                                        "{0}|{1}".format(error_message, error["message"]) if error_message != "" else error["message"]
+                                        "{0}|{1}".format(
+                                            error_message, error["message"]
+                                        )
+                                        if error_message != ""
+                                        else error["message"]
                                     )
                                     cursor.execute(
                                         """
                                         INSERT INTO load_errors (type, value, source, error, message, datatype, loadid, nodeid)
                                         VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                                        ("node", source_value, csv_file_name, error["title"], error["message"], datatype, loadid, node),
+                                        (
+                                            "node",
+                                            source_value,
+                                            csv_file_name,
+                                            error["title"],
+                                            error["message"],
+                                            datatype,
+                                            loadid,
+                                            node,
+                                        ),
                                     )
 
                                 if nodegroupid in dict_by_nodegroup:
@@ -323,10 +432,22 @@ class ImportSingleCsv(BaseImportModule):
                             for key in node:
                                 if tile_data[key]:
                                     if tile_data[key]["datatype"] == "string":
-                                        tile_data[key]["value"].update(node[key]["value"])
-                                        tile_data[key]["source"] += " | " + node[key]["source"]
-                                        tile_data[key]["notes"] = " | ".join([tile_data[key]["notes"], node[key]["notes"]])
-                                        tile_data[key]["valid"] = tile_data[key]["valid"] and node[key]["valid"]
+                                        tile_data[key]["value"].update(
+                                            node[key]["value"]
+                                        )
+                                        tile_data[key]["source"] += (
+                                            " | " + node[key]["source"]
+                                        )
+                                        tile_data[key]["notes"] = " | ".join(
+                                            [
+                                                tile_data[key]["notes"],
+                                                node[key]["notes"],
+                                            ]
+                                        )
+                                        tile_data[key]["valid"] = (
+                                            tile_data[key]["valid"]
+                                            and node[key]["valid"]
+                                        )
                                 else:
                                     tile_data[key] = node[key]
                                 if node[key]["valid"] is False:
@@ -359,12 +480,15 @@ class ImportSingleCsv(BaseImportModule):
                                 loadid,
                                 node_depth,
                                 csv_file_name,
-                                'insert',
+                                "insert",
                                 passes_validation,
                             ),
                         )
 
-                cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [loadid])
+                cursor.execute(
+                    """CALL __arches_check_tile_cardinality_violation_for_load(%s)""",
+                    [loadid],
+                )
                 cursor.execute(
                     """
                     INSERT INTO load_errors (type, source, error, loadid, nodegroupid)
@@ -384,7 +508,10 @@ class ImportSingleCsv(BaseImportModule):
         if nodegroupid not in self.blank_tile_lookup.keys():
             self.blank_tile_lookup[nodegroupid] = {}
             with connection.cursor() as cursor:
-                cursor.execute("""SELECT nodeid FROM nodes WHERE datatype <> 'semantic' AND nodegroupid = %s;""", [nodegroupid])
+                cursor.execute(
+                    """SELECT nodeid FROM nodes WHERE datatype <> 'semantic' AND nodegroupid = %s;""",
+                    [nodegroupid],
+                )
                 for row in cursor.fetchall():
                     (nodeid,) = row
                     self.blank_tile_lookup[nodegroupid][str(nodeid)] = None

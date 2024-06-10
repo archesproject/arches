@@ -10,7 +10,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4662_workflow_plugin'),
+        ("models", "4662_workflow_plugin"),
     ]
 
     operations = [
@@ -56,5 +56,6 @@ class Migration(migrations.Migration):
                 'concept-datatype-config',
                 FALSE,
                 '10000000-0000-0000-0000-000000000022');
-            """)
-        ]
+            """,
+        )
+    ]

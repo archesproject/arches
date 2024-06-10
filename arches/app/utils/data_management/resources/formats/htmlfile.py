@@ -25,7 +25,9 @@ class HtmlWriter(Writer):
         get a list of graphids that have html export templates available.
         """
         valid_graphs = []
-        existing_graphids = GraphModel.objects.filter(isresource=True).values_list("graphid", flat=True)
+        existing_graphids = GraphModel.objects.filter(isresource=True).values_list(
+            "graphid", flat=True
+        )
         for existing_graphid in existing_graphids:
             if HtmlWriter.has_html_template(existing_graphid):
                 valid_graphs.append(str(existing_graphid))
@@ -59,7 +61,9 @@ class HtmlWriter(Writer):
                 pass
         return template
 
-    def fetch_resource_objects_list(self, resourceinstanceids=None, user=None, allowed_graph_ids=None):
+    def fetch_resource_objects_list(
+        self, resourceinstanceids=None, user=None, allowed_graph_ids=None
+    ):
         """
         returns a dict containing graph_id keyed lists containing json ready resource objects
 
@@ -126,12 +130,16 @@ class HtmlWriter(Writer):
 
         valid_graphs = HtmlWriter.get_graphids_with_export_template()
         if len(valid_graphs) == 0:
-            logger.warning("There are no valid graph html templates in the project - cannot generate html exports.")
+            logger.warning(
+                "There are no valid graph html templates in the project - cannot generate html exports."
+            )
             return []
 
         user = kwargs.get("user", None)
         resources_list = self.fetch_resource_objects_list(
-            resourceinstanceids=resourceinstanceids, user=user, allowed_graph_ids=valid_graphs
+            resourceinstanceids=resourceinstanceids,
+            user=user,
+            allowed_graph_ids=valid_graphs,
         )
         files = self.generate_html_files(resources_list)
 
@@ -147,6 +155,11 @@ class HtmlWriter(Writer):
             template = self.load_html_template(gid)
             dest = StringIO()
             dest.write(template.render({"resources": resource_object_list[gid]}))
-            files.append({"name": f"{str(GraphModel.objects.get(pk=gid))}.html", "outputfile": dest})
+            files.append(
+                {
+                    "name": f"{str(GraphModel.objects.get(pk=gid))}.html",
+                    "outputfile": dest,
+                }
+            )
 
         return files

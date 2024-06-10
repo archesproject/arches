@@ -6,12 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '10041_limit_number_of_bulk_edit'),
+        ("models", "10041_limit_number_of_bulk_edit"),
     ]
 
     operations = [
         migrations.AddIndex(
-            model_name='editlog',
-            index=models.Index(fields=['transactionid'], name='edit_log_transac_34aa75_idx'),
+            model_name="editlog",
+            index=models.Index(
+                fields=["transactionid"], name="edit_log_transac_34aa75_idx"
+            ),
         ),
     ]

@@ -1,14 +1,15 @@
 from django.db import migrations, models
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '10515_i18n_plugins'),
+        ("models", "10515_i18n_plugins"),
     ]
 
     operations = [
         migrations.RunSQL(
-            sql = """
+            sql="""
             INSERT INTO d_data_types(
                 datatype, 
                 iconclass, 
@@ -55,6 +56,6 @@ class Migration(migrations.Migration):
                 }'
             ) ON CONFLICT DO NOTHING;
             """,
-            reverse_sql=migrations.RunSQL.noop
-            ),
-        ]
+            reverse_sql=migrations.RunSQL.noop,
+        ),
+    ]
