@@ -61,7 +61,7 @@ i {
     margin-top: 0.25rem;
 }
 h2 {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     margin: 1rem;
     color: white;
 }

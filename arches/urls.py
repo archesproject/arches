@@ -23,7 +23,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path, re_path
 from arches.app.views import concept, main, map, search, graph, api
 from arches.app.views.admin import ReIndexResources, ClearUserPermissionCache
-from arches.app.views.controlled_lists import (
+from arches.app.views.api.controlled_lists import (
     ControlledListItemView,
     ControlledListView,
     ControlledListsView,

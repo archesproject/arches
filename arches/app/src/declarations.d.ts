@@ -1,6 +1,6 @@
 // import declarations from other projects or Arches core
 
-// declare modules that have been added to your project (should mirror `package.json`)
+// declare untyped modules that have been added to your project in `package.json`
 declare module 'arches';
 declare module "@babel/runtime";
 declare module "@mapbox/geojsonhint";

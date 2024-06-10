@@ -97,7 +97,7 @@ class Migration(migrations.Migration):
             name="ControlledList",
             fields=[
                 ("id", models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ("name", models.CharField(max_length=127)),
+                ("name", models.CharField(max_length=127, blank=True)),
                 ("dynamic", models.BooleanField(default=False)),
                 ("search_only", models.BooleanField(default=False)),
             ],

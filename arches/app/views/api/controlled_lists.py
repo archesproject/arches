@@ -1,6 +1,4 @@
 import logging
-from collections import defaultdict
-from datetime import datetime
 from http import HTTPStatus
 from uuid import UUID
 
@@ -36,121 +34,6 @@ class MixedListsException(Exception):
 
 def field_names(instance):
     return {f.name for f in instance.__class__._meta.fields}
-
-
-def serialize(obj, depth_map=None, flat=False):
-    """
-    This is a recursive function. The first caller (you) doesn't need
-    to provide a `depth_map`, but the recursive calls (see below) do.
-
-    flat=False provides a tree representation.
-    flat=True is just that, flat (used in reference datatype widget).
-    """
-    if depth_map is None:
-        depth_map = defaultdict(int)
-    match obj:
-        case ControlledList():
-            data = {
-                "id": str(obj.id),
-                "name": obj.name,
-                "dynamic": obj.dynamic,
-                "search_only": obj.search_only,
-                "items": sorted(
-                    [
-                        serialize(item, depth_map, flat)
-                        for item in obj.controlled_list_items.all()
-                        if flat or item.parent_id is None
-                    ],
-                    key=lambda d: d["sortorder"],
-                ),
-            }
-            if hasattr(obj, "node_ids"):
-                data["nodes"] = [
-                    {
-                        "id": node_id,
-                        "name": node_name,
-                        "nodegroup_id": nodegroup_id,
-                        "graph_id": graph_id,
-                        "graph_name": graph_name,
-                    }
-                    for node_id, node_name, nodegroup_id, graph_id, graph_name in zip(
-                        obj.node_ids,
-                        obj.node_names,
-                        obj.nodegroup_ids,
-                        obj.graph_ids,
-                        obj.graph_names,
-                        strict=True,
-                    )
-                ]
-            else:
-                data["nodes"] = [
-                    {
-                        "id": str(node.pk),
-                        "name": node.name,
-                        "nodegroup_id": node.nodegroup_id,
-                        "graph_id": node.graph_id,
-                        "graph_name": str(node.graph.name),
-                    }
-                    for node in Node.with_controlled_list.filter(
-                        controlled_list=obj.pk,
-                        source_identifier=None,
-                    ).select_related("graph")
-                ]
-            return data
-        case ControlledListItem():
-            if obj.parent_id:
-                depth_map[obj.id] = depth_map[obj.parent_id] + 1
-            data = {
-                "id": str(obj.id),
-                "controlled_list_id": str(obj.controlled_list_id),
-                "uri": obj.uri,
-                "sortorder": obj.sortorder,
-                "guide": obj.guide,
-                "values": [
-                    serialize(value, depth_map)
-                    for value in obj.controlled_list_item_values.all()
-                    if value.valuetype_id != "image"
-                ],
-                "images": [
-                    serialize(image, depth_map)
-                    for image in obj.controlled_list_item_images.all()
-                ],
-                "parent_id": str(obj.parent_id) if obj.parent_id else None,
-                "depth": depth_map[obj.id],
-            }
-            if not flat:
-                data["children"] = sorted(
-                    [serialize(child, depth_map, flat) for child in obj.children.all()],
-                    key=lambda d: d["sortorder"],
-                )
-            return data
-        case ControlledListItemValue():
-            return {
-                "id": str(obj.id),
-                "valuetype_id": obj.valuetype_id,
-                "language_id": obj.language_id,
-                "value": obj.value,
-                "item_id": obj.controlled_list_item_id,
-            }
-        case ControlledListItemImage():
-            return {
-                "id": str(obj.id),
-                "item_id": obj.controlled_list_item_id,
-                "url": obj.value.url,
-                "metadata": [
-                    serialize(metadata, depth_map)
-                    for metadata in obj.controlled_list_item_image_metadata.all()
-                ]
-            }
-        case ControlledListItemImageMetadata():
-            choices = ControlledListItemImageMetadata.MetadataChoices
-            return {
-                field: str(value)
-                for (field, value) in vars(obj).items() if not field.startswith("_")
-            } | {
-                # Get localized label for metadata type
-                "metadata_label": str(choices(obj.metadata_type).label)
-            }
 
 
 def prefetch_terms(request):
@@ -274,7 +157,7 @@ class ControlledListsView(View):
             .prefetch_related(*prefetch_terms(request))
         )
         serialized_lists = [
-            serialize(obj, flat=str_to_bool(request.GET.get("flat", "false")))
+            obj.serialize(flat=str_to_bool(request.GET.get("flat", "false")))
             for obj in lists
         ]
         filtered = self.filter_permitted_nodegroups(serialized_lists, request)
@@ -320,22 +203,21 @@ class ControlledListView(View):
         except ControlledList.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
         return JSONResponse(
-            serialize(lst, flat=str_to_bool(request.GET.get("flat", "false")))
+            lst.serialize(flat=str_to_bool(request.GET.get("flat", "false")))
         )
 
-    def add_new_list(self):
-        lst = ControlledList(
-            name=_("Untitled List: ")
-            + datetime.now().isoformat(sep=" ", timespec="seconds")
-        )
+    def add_new_list(self, name):
+        lst = ControlledList(name=name)
+        lst.full_clean()  # applies default name
         lst.save()
-        return JSONResponse(serialize(lst), status=HTTPStatus.CREATED)
+        return JSONResponse(lst.serialize(), status=HTTPStatus.CREATED)
 
     def post(self, request, **kwargs):
-        if not (list_id := kwargs.get("id", None)):
-            return self.add_new_list()
-
         data = JSONDeserializer().deserialize(request.body)
+        name = data.get("name", None)
+
+        if not (list_id := kwargs.get("id", None)):
+            return self.add_new_list(name)
 
         qs = (
             ControlledList.objects.filter(pk=list_id)
@@ -366,7 +248,7 @@ class ControlledListView(View):
         except:
             return JSONErrorResponse()
 
-        return JSONResponse(serialize(clist))
+        return JSONResponse(clist.serialize())
 
     def bulk_update_sortorder(self, sortorder_map):
         reordered_items = []
@@ -473,7 +355,7 @@ class ControlledListItemView(View):
             logger.error(e)
             return JSONErrorResponse()
 
-        return JSONResponse(serialize(item), status=HTTPStatus.CREATED)
+        return JSONResponse(item.serialize(), status=HTTPStatus.CREATED)
 
     def post(self, request, **kwargs):
         if not (item_id := kwargs.get("id", None)):
@@ -504,7 +386,7 @@ class ControlledListItemView(View):
                     break
                 else:
                     return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
-                serialized_item = serialize(item)
+                serialized_item = item.serialize()
 
         except ValidationError as ve:
             return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
@@ -524,7 +406,7 @@ class ControlledListItemView(View):
 
         update_fields = list(data)
         if not update_fields:
-            return
+            return JSONErrorResponse()
         exclude_fields = {f for f in field_names(item) if f not in update_fields}
         try:
             item._state.adding = False
@@ -566,7 +448,7 @@ class ControlledListItemValueView(View):
             return JSONErrorResponse()
         value.save()
 
-        return JSONResponse(serialize(value), status=HTTPStatus.CREATED)
+        return JSONResponse(value.serialize(), status=HTTPStatus.CREATED)
 
     def post(self, request, **kwargs):
         if not (value_id := kwargs.get("id", None)):
@@ -594,7 +476,7 @@ class ControlledListItemValueView(View):
             return JSONErrorResponse()
         value.save()
 
-        return JSONResponse(serialize(value))
+        return JSONResponse(value.serialize())
 
     def delete(self, request, **kwargs):
         value_id = kwargs.get("id")
@@ -639,7 +521,7 @@ class ControlledListItemImageView(View):
         except:
             return JSONErrorResponse()
         img.save()
-        return JSONResponse(serialize(img), status=HTTPStatus.CREATED)
+        return JSONResponse(img.serialize(), status=HTTPStatus.CREATED)
 
     def post(self, request, **kwargs):
         if not (image_id := kwargs.get("id", None)):
@@ -670,7 +552,7 @@ class ControlledListItemImageMetadataView(View):
             return JSONErrorResponse()
         metadata.save()
 
-        return JSONResponse(serialize(metadata), status=HTTPStatus.CREATED)
+        return JSONResponse(metadata.serialize(), status=HTTPStatus.CREATED)
 
     def post(self, request, **kwargs):
         if not (metadata_id := kwargs.get("id", None)):
@@ -698,7 +580,7 @@ class ControlledListItemImageMetadataView(View):
             return JSONErrorResponse()
         metadata.save()
 
-        return JSONResponse(serialize(metadata))
+        return JSONResponse(metadata.serialize())
 
     def delete(self, request, **kwargs):
         metadata_id = kwargs.get("id")

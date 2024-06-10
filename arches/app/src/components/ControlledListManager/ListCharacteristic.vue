@@ -40,7 +40,7 @@ const { $gettext } = useGettext();
 const onSave = async () => {
     editing.value = false;
     const originalValue = list.value!.name;
-    list.value!.name = formValue.value;
+    list.value!.name = formValue.value.trim();
     const success = await patchList(list.value, toast, $gettext, field);
     if (!success) {
         list.value!.name = originalValue;
@@ -108,9 +108,12 @@ const onCancel = () => {
 </template>
 
 <style scoped>
-h4,
+h4 {
+    font-size: 1.33rem;
+}
+
 input {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
 }
 
 .characteristic {
