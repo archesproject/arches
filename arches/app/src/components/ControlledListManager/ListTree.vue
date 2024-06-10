@@ -51,8 +51,7 @@ const nextNewItem = ref<NewControlledListItem>();
 const newListCounter = ref(1000);
 const newListFormValue = ref('');
 const nextNewList = ref<NewControlledList>();
-// For rerendering tree to avoid error emitted in PrimeVue tree re: aria-selected
-const rerender = ref(0);
+const rerenderTree = ref(0);
 const nextFilterChangeNeedsExpandAll = ref(false);
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
@@ -112,7 +111,7 @@ const expandPathsToFilterResults = (newFilterValue: string) => {
     // https://github.com/primefaces/primevue/issues/3996
     if (filterValue.value && !newFilterValue) {
         // Rerender to avoid error emitted in PrimeVue tree re: aria-selected.
-        rerender.value += 1;
+        rerenderTree.value += 1;
     }
     // Expand all on the first interaction with the filter, or if the user
     // has collapsed a node and changes the filter.
@@ -136,7 +135,7 @@ const restoreFocusToInput = () => {
     // The current implementation of collapsing all nodes when
     // backspacing out the search value relies on rerendering the
     // <Tree> component. Restore focus to the input element. 
-    if (rerender.value > 0) {
+    if (rerenderTree.value > 0) {
         const inputEl = getInputElement();
         if (inputEl) {
             inputEl.focus();
@@ -179,6 +178,7 @@ const filterCallbackWrapped = computed(() => {
     <ListTreeControls
         :key="refetcher"
         v-model="tree"
+        v-model:rerender-tree="rerenderTree"
         v-model:expanded-keys="expandedKeys"
         v-model:selected-keys="selectedKeys"
         v-model:moving-item="movingItem"
@@ -190,7 +190,7 @@ const filterCallbackWrapped = computed(() => {
     <Tree
         v-if="tree"
         ref="treeDOMRef"
-        :key="rerender"
+        :key="rerenderTree"
         v-model:selectionKeys="selectedKeys"
         v-model:expandedKeys="expandedKeys"
         :value="tree"

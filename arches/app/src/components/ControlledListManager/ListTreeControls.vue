@@ -27,6 +27,7 @@ const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
 const controlledListItemsTree = defineModel<TreeNode[]>({ required: true });
+const rerenderTree = defineModel<number>("rerenderTree", { required: true });
 const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", { required: true });
 const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", { required: true });
 const movingItem = defineModel<TreeNode>("movingItem", { required: true });
@@ -172,11 +173,8 @@ const confirmDelete = () => {
 
 const abandonMove = () => {
     movingItem.value = {};
-
-    // Clear custom classes added in <ListTree> pass-through
-    Array.from(
-        abandonMoveRef.value!.$el.ownerDocument.getElementsByClassName('is-adjusting-parent')
-    ).forEach(li => (li as unknown as HTMLElement).classList.remove('is-adjusting-parent'));
+    // Clear custom classes added in <Tree> pass-through
+    rerenderTree.value += 1;
 };
 
 await fetchLists();
