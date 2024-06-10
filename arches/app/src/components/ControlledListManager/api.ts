@@ -25,6 +25,30 @@ function getToken() {
     return token;
 }
 
+export const fetchLists = async (
+    toast: ToastServiceMethods,
+    $gettext: GetText,
+) => {
+    let error;
+    let response;
+    try {
+        response = await fetch(arches.urls.controlled_lists);
+        if (response.ok) {
+            return await response.json();
+        } else {
+            error = await response.json();
+            throw new Error();
+        }
+    } catch {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Unable to fetch lists"),
+            detail: error?.message || response?.statusText,
+        });
+    }
+};
+
 export const createList = async(
     name: string,
     toast: ToastServiceMethods,

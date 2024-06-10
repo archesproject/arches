@@ -11,14 +11,8 @@ import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
 import { BUTTON_GREEN } from "@/theme.ts";
-import { deleteItems, deleteLists } from "@/components/ControlledListManager/api.ts";
-import {
-    displayedRowKey,
-    selectedLanguageKey,
-    DANGER,
-    DEFAULT_ERROR_TOAST_LIFE,
-    ERROR,
-} from "@/components/ControlledListManager/constants.ts";
+import { deleteItems, deleteLists, fetchLists } from "@/components/ControlledListManager/api.ts";
+import { displayedRowKey, selectedLanguageKey, DANGER } from "@/components/ControlledListManager/constants.ts";
 import { bestLabel, listAsNode } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
@@ -73,31 +67,6 @@ const expandNode = (node: TreeNode) => {
         for (const child of node.children) {
             expandNode(child);
         }
-    }
-};
-
-const fetchLists = async () => {
-    let error;
-    let response;
-    try {
-        response = await fetch(arches.urls.controlled_lists);
-        if (response.ok) {
-            await response.json().then((data) => {
-                controlledListItemsTree.value = (data.controlled_lists as ControlledList[]).map(
-                    list => listAsNode(list, selectedLanguage.value)
-                );
-            });
-        } else {
-            error = await response.json();
-            throw new Error();
-        }
-    } catch {
-        toast.add({
-            severity: ERROR,
-            life: DEFAULT_ERROR_TOAST_LIFE,
-            summary: $gettext("Unable to fetch lists"),
-            detail: error?.message || response?.statusText,
-        });
     }
 };
 
@@ -181,7 +150,11 @@ const abandonMove = () => {
     rerenderTree.value += 1;
 };
 
-await fetchLists();
+await fetchLists(toast, $gettext).then((data) => {
+    controlledListItemsTree.value = (data.controlled_lists as ControlledList[]).map(
+        list => listAsNode(list, selectedLanguage.value)
+    );
+});
 </script>
 
 <template>
