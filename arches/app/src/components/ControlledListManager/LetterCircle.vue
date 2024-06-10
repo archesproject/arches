@@ -11,7 +11,7 @@ const color = computed(() => {
     }
     const item = props.labelled as ControlledListItem;
     if (item.guide) {
-        return 'bisque';
+        return 'chocolate';
     }
     return 'darkorchid';
 });

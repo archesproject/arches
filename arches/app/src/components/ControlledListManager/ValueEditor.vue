@@ -7,6 +7,7 @@ import Column from "primevue/column";
 import DataTable from "primevue/datatable";
 import Dropdown from "primevue/dropdown";
 import InputText from "primevue/inputtext";
+import Textarea from "primevue/textarea";
 import { useToast } from "primevue/usetoast";
 
 import { deleteValue, upsertValue } from "@/components/ControlledListManager/api.ts";
@@ -40,6 +41,7 @@ const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const toast = useToast();
 const { $gettext } = useGettext();
+const valueHeader = $gettext('Value');
 const languageHeader = $gettext('Language');
 const noteTypeHeader = $gettext('Note type');
 
@@ -129,6 +131,7 @@ const onSave = async (event: DataTableRowEditInitEvent) => {
     const normalizedNewData: Value = {
         ...event.newData,
         id: typeof event.newData.id === 'string' ? event.newData.id : null,
+        value: event.newData.value.trim(),
     };
     const upsertedValue: Value = await upsertValue(
         normalizedNewData,
@@ -257,10 +260,21 @@ const focusInput = () => {
             </Column>
             <Column
                 field="value"
+                :header="valueHeader"
                 style="width: 60%; min-width: 8rem;"
             >
                 <template #editor="{ data, field }">
+                    <!-- Textarea for notes, input for labels -->
+                    <Textarea
+                        v-if="valueCategory"
+                        v-model="data[field]"
+                        rows="3"
+                        cols="60"
+                        auto-resize
+                        :pt="{ hooks: { onMounted: focusInput, onUpdated: focusInput } }"
+                    />
                     <InputText
+                        v-else
                         v-model="data[field]"
                         :pt="{ hooks: { onMounted: focusInput, onUpdated: focusInput } }"
                     />
@@ -277,13 +291,13 @@ const focusInput = () => {
             <Column
                 field="language_id"
                 :header="languageHeader"
-                style="width: 10%; min-width: 8rem; height: 4rem"
+                style="width: 10%; min-width: 8rem; height: 5rem"
             >
                 <template #editor="{ data, field }">
                     <Dropdown
                         v-model="data[field]"
                         :options="arches.languages"
-                        option-label="name"
+                        :option-label="(lang) => `${lang.name} (${lang.code})`"
                         option-value="code"
                         :pt="{
                             input: { style: { fontFamily: 'inherit', fontSize: 'small' } },
@@ -292,7 +306,7 @@ const focusInput = () => {
                     />
                 </template>
                 <template #body="slotProps">
-                    {{ languageName(slotProps.data.language_id) }}
+                    {{ `${languageName(slotProps.data.language_id)} (${slotProps.data.language_id})` }}
                 </template>
             </Column>
             <Column
@@ -328,13 +342,13 @@ const focusInput = () => {
 h4 {
     color: v-bind(ARCHES_CHROME_BLUE);
     margin-top: 0;
-    font-size: small;
+    font-size: 1.33rem;
 }
 
 p {
     font-weight: normal;
     margin-top: 0;
-    font-size: small;
+    font-size: 1.2rem;
 }
 
 .full-width-pointer {
@@ -345,13 +359,14 @@ p {
 
 :deep(th) {
     font-weight: 600;
+    height: 3rem;
 }
 
-:deep(td:first-child) {
-    padding-left: 0.75rem;
+:deep(td) {
+    padding: 0.75rem;
 }
 
-:deep(td > input) {
-    width: 95%;
+:deep(td > input, textarea) {
+    width: 100%;
 }
 </style>

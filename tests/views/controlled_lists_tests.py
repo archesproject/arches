@@ -4,7 +4,6 @@ import sys
 
 from django.contrib.auth.models import Group, User
 from django.urls import reverse
-from django.test.client import Client
 from guardian.shortcuts import assign_perm
 
 from arches.app.models.graph import Graph
@@ -19,7 +18,6 @@ from arches.app.models.models import (
     Node,
     NodeGroup,
 )
-from arches.app.views.controlled_lists import serialize
 from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
@@ -38,7 +36,6 @@ class ControlledListTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.client = Client()
         cls.admin = User.objects.get(username="admin")
         cls.anonymous = User.objects.get(username="anonymous")
 
@@ -253,7 +250,11 @@ class ControlledListTests(ArchesTestCase):
 
     def test_create_list(self):
         self.client.force_login(self.admin)
-        self.client.post(reverse("controlled_list_add"))
+        self.client.post(
+            reverse("controlled_list_add"),
+            {"name": ""},
+            content_type="application/json",
+        )
         self.assertEqual(ControlledList.objects.count(), 3)
         self.assertEqual(
             ControlledList.objects.filter(name__startswith="Untitled List: ").count(), 1
@@ -316,7 +317,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_reorder_list_items_valid(self):
         self.client.force_login(self.admin)
-        serialized_list = serialize(self.list1)
+        serialized_list = self.list1.serialize()
 
         serialized_list["items"][0]["sortorder"] = 1
         serialized_list["items"][1]["sortorder"] = 0
@@ -338,7 +339,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_list_items_sortorder_recalculated(self):
         self.client.force_login(self.admin)
-        serialized_list = serialize(self.list1, flat=False)
+        serialized_list = self.list1.serialize(flat=False)
 
         serialized_list["items"][-1]["sortorder"] = -1
         response = self.client.post(
@@ -353,7 +354,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_list_items_mixed_parents(self):
         self.client.force_login(self.admin)
-        serialized_list = serialize(self.list1, flat=False)
+        serialized_list = self.list1.serialize(flat=False)
 
         serialized_list["items"][-1]["controlled_list_id"] = str(self.list2.pk)
         with self.assertLogs("django.request", level="WARNING"):
@@ -366,7 +367,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_child_items_incorrect_parent(self):
         self.client.force_login(self.admin)
-        serialized_list = serialize(self.list2, flat=False)
+        serialized_list = self.list2.serialize(flat=False)
 
         serialized_list["items"][0]["children"][-1]["controlled_list_id"] = str(self.list1.pk)
         with self.assertLogs("django.request", level="WARNING"):
@@ -379,7 +380,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_recursive_cycles(self):
         self.client.force_login(self.admin)
-        serialized_list = serialize(self.list2, flat=False)
+        serialized_list = self.list2.serialize(flat=False)
 
         parent = serialized_list["items"][0]
         parent_id = str(parent["id"])
@@ -404,7 +405,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_update_uri_blank(self):
         self.client.force_login(self.admin)
-        serialized_list = serialize(self.list1, flat=False)
+        serialized_list = self.list1.serialize(flat=False)
         for item in serialized_list["items"]:
             item["uri"] = ""
 
@@ -417,7 +418,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_update_label_valid(self):
         self.client.force_login(self.admin)
-        serialized_list = serialize(self.list1, flat=False)
+        serialized_list = self.list1.serialize(flat=False)
         label = serialized_list["items"][0]["values"][0]
         label["language_id"] = self.new_language.code
 
@@ -430,7 +431,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_update_label_invalid(self):
         self.client.force_login(self.admin)
-        serialized_list = serialize(self.list1, flat=False)
+        serialized_list = self.list1.serialize(flat=False)
         label = serialized_list["items"][0]["values"][0]
         label["value"] = "A" * 2049
 
@@ -444,7 +445,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_update_metadata_valid(self):
         self.client.force_login(self.admin)
-        serialized_image = serialize(self.image, flat=False)
+        serialized_image = self.image.serialize()
         metadatum = serialized_image["metadata"][0]
         metadatum["language_id"] = self.new_language.code
 
@@ -457,7 +458,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_update_metadata_invalid(self):
         self.client.force_login(self.admin)
-        serialized_image = serialize(self.image, flat=False)
+        serialized_image = self.image.serialize()
         metadatum = serialized_image["metadata"][0]
         metadatum["value"] = "A" * 2049
 

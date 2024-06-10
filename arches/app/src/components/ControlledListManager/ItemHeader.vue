@@ -51,7 +51,7 @@ const iconLabel = (item: ControlledListItem) => {
 }
 
 h3 {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     margin: 0;
 }
 

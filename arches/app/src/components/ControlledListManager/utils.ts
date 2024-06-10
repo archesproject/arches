@@ -25,6 +25,10 @@ export const languageName = (code: string) => {
     return arches.languages.find((lang: Language) => lang.code === code).name;
 };
 
+export const nodeIsList = (node: TreeNode) => {
+    return !!node.data.nodes;
+};
+
 export const findNodeInTree = (tree: TreeNode[], itemId: string) => {
     function recurse (items: TreeNode[]) : TreeNode | undefined {
         for (const item of items) {
@@ -49,7 +53,6 @@ export const itemAsNode = (
 ): TreeNode => {
     return {
         key: item.id,
-        label: bestLabel(item, selectedLanguage.code).value,
         children: item.children.map(child => itemAsNode(child, selectedLanguage)),
         data: item,
     };
@@ -61,7 +64,6 @@ export const listAsNode = (
 ): TreeNode => {
     return {
         key: list.id,
-        label: list.name,
         children: list.items.map(
             (item: ControlledListItem) => itemAsNode(item, selectedLanguage)
         ),

@@ -62,8 +62,10 @@ const onError = (event?: FileUploadErrorEvent) => {
             :file-limit="10"
             :preview-width="250"
             :with-credentials="true"
+            :show-upload-button="false"
             name="item_image"
             :pt="{
+                buttonbar: { style: { border: '1px solid lightgray', borderRadius: '4px' } },
                 file: ({ props }) => ({
                     style: {
                         display: (props as any).badgeValue === completed ? 'none' : ''
@@ -80,12 +82,9 @@ const onError = (event?: FileUploadErrorEvent) => {
                 :key="image.id"
                 :image="image"
             />
-            <span
-                v-if="!item.images.length"
-                :style="{ fontSize: 'small'}"
-            >
+            <p v-if="!item.images.length">
                 {{ $gettext("No images.") }}
-            </span>
+            </p>
         </div>
     </div>
 </template>
@@ -96,13 +95,21 @@ const onError = (event?: FileUploadErrorEvent) => {
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 20px;
+}
+
+.images {
+    margin-top: 1.5rem;
+    gap: 1.5rem;
 }
 
 h4 {
     color: v-bind(ARCHES_CHROME_BLUE);
     margin-top: 0;
-    font-size: small;
+    font-size: 1.33rem;
+}
+
+p {
+    font-size: 1.2rem;
 }
 
 .images {
@@ -114,6 +121,10 @@ h4 {
 :deep(input[type=file]) {
     /* override arches.css */
     /* PrimeVue uses a hidden input for screen readers */
+    display: none;
+}
+
+:deep(.p-fileupload-content:empty) {
     display: none;
 }
 </style>

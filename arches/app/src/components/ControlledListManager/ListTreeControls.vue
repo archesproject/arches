@@ -6,7 +6,7 @@ import { useGettext } from "vue3-gettext";
 
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import { DANGER, ERROR } from "@/components/ControlledListManager/constants.ts";
-import { listAsNode } from "@/components/ControlledListManager/utils.ts";
+import { bestLabel, listAsNode } from "@/components/ControlledListManager/utils.ts";
 
 import Button from "primevue/button";
 import ConfirmDialog from "primevue/confirmdialog";
@@ -19,7 +19,7 @@ import type { Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/types/arches";
-import type { ControlledList, DisplayedRowRefAndSetter } from "@/types/ControlledListManager";
+import type { ControlledList, DisplayedRowRefAndSetter, NewControlledList } from "@/types/ControlledListManager";
 
 import { BUTTON_GREEN } from "@/theme.ts";
 
@@ -31,6 +31,9 @@ const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", { required: t
 const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", { required: true });
 const movingItem = defineModel<TreeNode>("movingItem", { required: true });
 const isMultiSelecting = defineModel<boolean>("isMultiSelecting", { required: true });
+const nextNewList = defineModel<NewControlledList>("nextNewList");
+const newListFormValue = defineModel<string>("newListFormValue", { required: true });
+const newListCounter = defineModel<number>("newListCounter", { required: true });
 
 const abandonMoveRef = ref();
 
@@ -47,14 +50,6 @@ const deleteDropdownOptions = [
         },
     },
 ];
-
-const multiDeleteDisabled = computed(() => {
-    return (
-        Object.keys(selectedKeys.value).length === 0
-        || !!movingItem.value.key
-        || isMultiSelecting.value
-    );
-});
 
 const expandAll = () => {
     for (const node of controlledListItemsTree.value) {
@@ -77,53 +72,48 @@ const expandNode = (node: TreeNode) => {
 };
 
 const fetchLists = async () => {
-    let errorText;
+    let error;
+    let response;
     try {
-        const response = await fetch(arches.urls.controlled_lists);
-        if (!response.ok) {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
-            throw new Error();
-        } else {
+        response = await fetch(arches.urls.controlled_lists);
+        if (response.ok) {
             await response.json().then((data) => {
                 controlledListItemsTree.value = (data.controlled_lists as ControlledList[]).map(
                     list => listAsNode(list, selectedLanguage.value)
                 );
             });
-        }
-    } catch {
-        toast.add({
-            severity: ERROR,
-            life: 8000,
-            summary: errorText || $gettext("Unable to fetch lists"),
-        });
-    }
-};
-
-const createList = async () => {
-    const token = Cookies.get("csrftoken");
-    if (!token) {
-        return;
-    }
-    try {
-        const response = await fetch(arches.urls.controlled_list_add, {
-            method: "POST",
-            headers: { "X-CSRFToken": token },
-        });
-        if (response.ok) {
-            const newList = await response.json();
-            controlledListItemsTree.value.unshift(listAsNode(newList));
         } else {
+            error = await response.json();
             throw new Error();
         }
     } catch {
         toast.add({
             severity: ERROR,
             life: 8000,
-            summary: $gettext("List creation failed"),
+            summary: $gettext("Unable to fetch lists"),
+            detail: error?.message || response?.statusText,
         });
     }
+};
+
+const createList = () => {
+    const newList: NewControlledList = {
+        id: newListCounter.value,
+        name: newListFormValue.value,
+        dynamic: false,
+        search_only: false,
+        items: [],
+        nodes: [],
+    };
+
+    nextNewList.value = newList;
+    newListFormValue.value = '';
+    newListCounter.value += 1;
+
+    controlledListItemsTree.value.push(listAsNode(newList, selectedLanguage.value));
+
+    selectedKeys.value = { [newList.id]: true };
+    setDisplayedRow(newList);
 };
 
 const deleteLists = async (listIds: string[]) => {
@@ -206,29 +196,37 @@ const deleteItems = async (itemIds: string[]) => {
     }
 };
 
+const toDelete = computed(() => {
+    if (isMultiSelecting.value) {
+        return Object.entries(selectedKeys.value).filter(([, v]) => v.checked).map(([k,]) => k);
+    }
+    return Object.entries(selectedKeys.value).filter(([, v]) => v).map(([k,]) => k);
+});
+
 const deleteSelected = async () => {
     if (!selectedKeys.value) {
         return;
     }
-    const deletes = Object.keys(selectedKeys.value);
     const allListIds = controlledListItemsTree.value.map((node: TreeNode) => node.data.id);
 
-    const listIdsToDelete = deletes.filter(id => allListIds.includes(id));
-    const itemIdsToDelete = deletes.filter(id => !listIdsToDelete.includes(id));
+    const listIdsToDelete = toDelete.value.filter(id => allListIds.includes(id));
+    const itemIdsToDelete = toDelete.value.filter(id => !listIdsToDelete.includes(id));
 
     selectedKeys.value = {};
 
     // Do items first so that cascade deletion doesn't cause item deletion to fail.
     await deleteItems(itemIdsToDelete);
     await deleteLists(listIdsToDelete);
+
+    isMultiSelecting.value = false;
 };
 
 const confirmDelete = () => {
-    const numItems = Object.keys(selectedKeys.value).length;
+    const numItems = toDelete.value.length;
     confirm.require({
         message: $ngettext(
-            "Are you sure you want to delete %{ numItems } item (including all children)?",
-            "Are you sure you want to delete %{ numItems } items (including all children)?",
+            "Are you sure you want to delete %{numItems} item (including all children)?",
+            "Are you sure you want to delete %{numItems} items (including all children)?",
             numItems,
             { numItems: numItems.toLocaleString() },
         ),
@@ -270,12 +268,12 @@ await fetchLists();
         <SplitButton
             class="list-button"
             :label="$gettext('Delete')"
+            :menu-button-props="{'aria-label': $gettext('Delete multiple')}"
             raised
             style="font-size: inherit"
-            :disabled="!Object.keys(selectedKeys).length"
+            :disabled="!toDelete.length"
             :severity="DANGER"
             :model="deleteDropdownOptions"
-            :menu-button-props="{ disabled: multiDeleteDisabled }"
             @click="confirmDelete"
         />
     </div>
@@ -285,7 +283,12 @@ await fetchLists();
         class="action-banner"
     >
         <!-- turn off escaping: vue template sanitizes -->
-        {{ $gettext("Selecting new parent for: %{item}", { item: movingItem.label ?? '' }, true) }}
+        {{ $gettext(
+            "Selecting new parent for: %{item}",
+            { item: bestLabel(movingItem.data, selectedLanguage.code).value },
+            true,
+        )
+        }}
         <Button
             ref="abandonMoveRef"
             type="button"
@@ -303,38 +306,49 @@ await fetchLists();
             type="button"
             class="banner-button"
             :label="$gettext('Abandon')"
-            @click="isMultiSelecting = false"
+            @click="isMultiSelecting = false; selectedKeys = {};"
         />
     </div>
     <div
         v-else
         class="controls"
     >
-        <Button
-            class="secondary-button"
-            type="button"
-            icon="fa fa-plus"
-            :label="$gettext('Expand')"
-            @click="expandAll"
-        />
-        <Button
-            class="secondary-button"
-            type="button"
-            icon="fa fa-minus"
-            :label="$gettext('Collapse')"
-            @click="collapseAll"
-        />
-        <Dropdown
-            v-model="selectedLanguage"
-            :options="arches.languages"
-            option-label="name"
-            :placeholder="$gettext('Language')"
-            :pt="{
-                root: { class: 'p-button secondary-button' },
-                input: { style: { fontFamily: 'inherit', fontSize: 'small', textAlign: 'center', alignContent: 'center' } },
-                itemLabel: { style: { fontSize: 'small' } },
-            }"
-        />
+        <div style="text-align: center; display: flex; width: 100%;">
+            <Button
+                class="secondary-button"
+                type="button"
+                icon="fa fa-plus"
+                :label="$gettext('Expand all')"
+                @click="expandAll"
+            />
+            <Button
+                class="secondary-button"
+                type="button"
+                icon="fa fa-minus"
+                :label="$gettext('Collapse all')"
+                @click="collapseAll"
+            />
+            <div style="display: flex; flex-grow: 1; justify-content: flex-end;">
+                <span
+                    id="languageSelectLabel"
+                    style="align-self: center; margin-right: 0.25rem;"
+                >
+                    {{ $gettext("Show labels in:") }}
+                </span>
+                <Dropdown
+                    v-model="selectedLanguage"
+                    aria-labelledby="languageSelectLabel"
+                    :options="arches.languages"
+                    :option-label="(lang) => `${lang.name} (${lang.code})`"
+                    :placeholder="$gettext('Language')"
+                    :pt="{
+                        root: { class: 'p-button secondary-button' },
+                        input: { style: { fontFamily: 'inherit', fontSize: 'small', textAlign: 'center', alignContent: 'center' } },
+                        itemLabel: { style: { fontSize: 'small' } },
+                    }"
+                />
+            </div>
+        </div>
     </div>
 </template>
 
@@ -361,6 +375,7 @@ await fetchLists();
     gap: 0.5rem;
     font-size: small;
     padding: 0.5rem;
+    justify-content: space-between;
 }
 .list-button, .p-splitbutton {
     height: 4rem;
@@ -372,7 +387,6 @@ await fetchLists();
     text-wrap: nowrap;
 }
 .secondary-button {
-    flex: 0.33;
     border: 0;
     background: #f4f4f4;
     height: 3rem;

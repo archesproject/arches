@@ -8,14 +8,16 @@ import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
-import { createItem, upsertValue, patchList } from "@/components/ControlledListManager/api.ts";
-import { ERROR, PREF_LABEL, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
+import MoveRow from "@/components/ControlledListManager/MoveRow.vue";
+
+import { createItem, createList, upsertValue } from "@/components/ControlledListManager/api.ts";
+import { ERROR, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import {
     bestLabel,
     findNodeInTree,
     itemAsNode,
     listAsNode,
-    reorderItems,
+    nodeIsList,
 } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
@@ -25,9 +27,9 @@ import type {
 } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
 import type {
-    ControlledList,
     ControlledListItem,
     DisplayedListItemRefAndSetter,
+    MoveLabels,
     NewControlledListItem,
 } from "@/types/ControlledListManager";
 import type { Language } from "@/types/arches";
@@ -45,17 +47,29 @@ const refetcher = defineModel<number>("refetcher", { required: true });
 const nextNewItem = defineModel<NewControlledListItem>("nextNewItem");
 const newLabelFormValue = defineModel<string>("newLabelFormValue", { required: true });
 const newLabelCounter = defineModel<number>("newLabelCounter", { required: true });
+const newListFormValue = defineModel<string>("newListFormValue", { required: true });
+const newListCounter = defineModel<number>("newListCounter", { required: true });
 const filterValue = defineModel<string>("filterValue", { required: true });
 
-const { node } = defineProps<{ node: TreeNode }>();
-const { displayedRow, setDisplayedRow } = inject(displayedRowKey) as DisplayedListItemRefAndSetter;
+const { isMultiSelecting, node, moveLabels } = defineProps<{
+    isMultiSelecting: boolean,
+    moveLabels: MoveLabels,
+    node: TreeNode,
+}>();
+const { setDisplayedRow } = inject(displayedRowKey) as DisplayedListItemRefAndSetter;
 
-// Workaround for autofocusing the new label input box
+// Workaround for autofocusing the new list/label input boxes
 // https://github.com/primefaces/primevue/issues/2397
+const newListInputRef = ref();
 const newLabelInputRef = ref();
 watch(newLabelInputRef, () => {
     if (newLabelInputRef.value) {
         newLabelInputRef.value.$el.focus();
+    }
+});
+watch(newListInputRef, () => {
+    if (newListInputRef.value) {
+        newListInputRef.value.$el.focus();
     }
 });
 
@@ -82,7 +96,9 @@ const showMoveHereButton = (rowId: string) => {
 };
 
 const setParent = async (parentNode: TreeNode) => {
-    let errorText;
+    let error;
+    let response;
+
     const setListAndSortOrderRecursive = (child: ControlledListItem) => {
         if (!parentNode.key) {
             return;
@@ -105,7 +121,7 @@ const setParent = async (parentNode: TreeNode) => {
         return;
     }
     try {
-        const response = await fetch(arches.urls.controlled_list_item(item.id), {
+        response = await fetch(arches.urls.controlled_list_item(item.id), {
             method: "POST",
             headers: { "X-CSRFToken": token },
             body: JSON.stringify(item),
@@ -114,128 +130,35 @@ const setParent = async (parentNode: TreeNode) => {
             movingItem.value = {};
             refetcher.value += 1;
         } else {
-            errorText = response.statusText;
-            const body = await response.json();
-            errorText = body.message;
+            error = await response.json();
             throw new Error();
         }
     } catch {
         toast.add({
             severity: ERROR,
             life: 8000,
-            summary: errorText || $gettext("Move failed"),
+            summary: $gettext("Move failed"),
+            detail: error?.message || response?.statusText,
         });
     }
 };
 
-const onAddItem = (parent: TreeNode) => {
-    const newItem: NewControlledListItem = {
-        parent_id: parent.key!,
-        id: newLabelCounter.value,
-        controlled_list_id: parent.controlled_list_id ?? parent.id,
-        uri: '',
-        sortorder: 0,
-        guide: false,
-        values: [{
-            id: 0,
-            valuetype_id: PREF_LABEL,
-            language_id: arches.activeLanguage,
-            value: '',
-            item_id: newLabelCounter.value,
-        }],
-        images: [],
-        children: [],
-        depth: !parent.depth ? 0 : parent.depth + 1,
-    };
-
-    nextNewItem.value = newItem;
-    newLabelFormValue.value = '';
-    newLabelCounter.value += 1;
-
-    parent.children!.push(itemAsNode(newItem, selectedLanguage.value));
-
-    expandedKeys.value = {
-        ...expandedKeys.value,
-        [parent.key as string]: true,
-    };
-    selectedKeys.value = { [newItem.id]: true };
-    setDisplayedRow(newItem);
-};
-
-const onReorder = async (item: ControlledListItem, up: boolean) => {
-    const list: ControlledList = findNodeInTree(tree.value, item.controlled_list_id).data;
-    const siblings: ControlledListItem[] = (
-        item.parent_id
-        ? findNodeInTree(tree.value, item.parent_id).children.map(
-            (child: TreeNode) => child.data)
-        : list.items
-    );
-
-    reorderItems(list, item, siblings, up);
-    const field = "sortorder";
-
-    const success = await patchList(list, toast, $gettext, field);
-    if (success) {
-        const oldListIndex = tree.value.findIndex(listNode => listNode.data.id === list.id);
-        tree.value = [
-            ...tree.value.slice(0, oldListIndex),
-            listAsNode(list, selectedLanguage.value),
-            ...tree.value.slice(oldListIndex + 1),
-        ];
-        selectedKeys.value = {
-            ...selectedKeys.value,
-            [item.id]: true,
-        };
-    }
-};
-
-const isFirstItem = (item: ControlledListItem) => {
-    const siblings: TreeNode[] = (
-        item.parent_id
-        ? findNodeInTree(tree.value, item.parent_id).data.children
-        : findNodeInTree(tree.value, item.controlled_list_id).data.items
-    );
-    if (!siblings) {
-        throw new Error();
-    }
-    return siblings[0].id === item.id;
-};
-
-const isLastItem = (item: ControlledListItem) => {
-    const siblings: TreeNode[] = (
-        item.parent_id
-        ? findNodeInTree(tree.value, item.parent_id).data.children
-        : findNodeInTree(tree.value, item.controlled_list_id).data.items
-    );
-    if (!siblings) {
-        throw new Error();
-    }
-    return siblings[siblings.length - 1].id === item.id;
-};
-
-const setMovingItem = (node: TreeNode) => {
-    movingItem.value = findNodeInTree(
-        [itemAsNode(displayedRow.value, selectedLanguage.value)],
-        node.key
-    );
-};
-
-const isList = (node: TreeNode) => {
-    return !!node.data.name;
+const isNewList = (node: TreeNode) => {
+    return nodeIsList(node) && typeof node.data.id === 'number';
 };
 
 const isNewItem = (node: TreeNode) => {
     return node.data.values && !node.data.values[0].id;
 };
 
-const onBlur = async () => {
+const onBlurNewItem = async () => {
     const newItem = await createItem(nextNewItem.value, toast, $gettext);
     if (newItem) {
         const newValue = {
             ...nextNewItem.value!.values[0],
             id: 0,
             item_id: newItem.id,
-            value: newLabelFormValue.value,
+            value: newLabelFormValue.value.trim(),
         };
         const newLabel = await upsertValue(newValue, toast, $gettext);
 
@@ -261,21 +184,48 @@ const onBlur = async () => {
     }
 };
 
-const onEnter = () => {
+const onEnterNewItem = () => {
     newLabelInputRef.value.$el.blur();
+};
+
+const onEnterNewList = () => {
+    newListInputRef.value.$el.blur();
+};
+
+const onBlurNewList = async () => {
+    const newList = await createList(newListFormValue.value.trim(), toast, $gettext);
+    tree.value = [
+        ...tree.value.filter(lst => typeof lst.data.id === 'string'),
+        listAsNode(newList),
+    ];
+    selectedKeys.value = { [newList.id]: true };
+    setDisplayedRow(newList);
 };
 </script>
 
 <template>
-    <span v-if="node.key">
+    <span
+        v-if="node.key"
+        style="display: inline-flex; width: 100%;"
+    >
         <div v-if="isNewItem(node)">
             <InputText
                 :key="newLabelCounter"
                 ref="newLabelInputRef"
                 v-model="newLabelFormValue"
                 autofocus
-                @blur="onBlur"
-                @keyup.enter="onEnter"
+                @blur="onBlurNewItem"
+                @keyup.enter="onEnterNewItem"
+            />
+        </div>
+        <div v-else-if="isNewList(node)">
+            <InputText
+                :key="newListCounter"
+                ref="newListInputRef"
+                v-model="newListFormValue"
+                autofocus
+                @blur="onBlurNewList"
+                @keyup.enter="onEnterNewList"
             />
         </div>
         <!-- eslint-disable vue/no-v-html -->
@@ -292,52 +242,29 @@ const onEnter = () => {
             <Button
                 v-if="showMoveHereButton(node.key)"
                 type="button"
+                raised
                 class="move-button"
-                :label="$gettext('Move %{item} here', { item: movingItem.label ?? '' }, true)"
+                :label="$gettext('Move %{item} here', {
+                    item: bestLabel(movingItem.data, selectedLanguage.code).value
+                }, true)"
                 @click="setParent(node)"
             />
         </div>
         <div
-            v-else-if="isList(node) || !isNewItem(node)"
+            v-else-if="!isNewList(node) && !isNewItem(node)"
             class="actions"
         >
-            <Button
-                v-if="node.key in selectedKeys"
-                type="button"
-                class="add-child-button"
-                icon="fa fa-plus"
-                :aria-label="$gettext('Add child item')"
-                @click.stop="onAddItem(node)"
-            />
-            <span
-                v-if="!node.data.name"
-                class="reorder-buttons"
-            >
-                <Button
-                    v-if="node.key in selectedKeys"
-                    type="button"
-                    class="reorder-button"
-                    icon="fa fa-caret-up"
-                    :aria-label="$gettext('Move up')"
-                    :disabled="isFirstItem(node.data)"
-                    @click="onReorder(node.data, true)"
-                />
-                <Button
-                    v-if="node.key in selectedKeys"
-                    type="button"
-                    class="reorder-button"
-                    icon="fa fa-caret-down"
-                    :aria-label="$gettext('Move down')"
-                    :disabled="isLastItem(node.data)"
-                    @click="onReorder(node.data, false)"
-                />
-            </span>
-            <Button
-                v-if="!node.data.name && node.key in selectedKeys"
-                type="button"
-                icon="fa fa-arrows-alt"
-                :aria-label="$gettext('Change item parent')"
-                @click="setMovingItem(node)"
+            <MoveRow
+                v-if="!isMultiSelecting"
+                v-model:tree="tree"
+                v-model:expanded-keys="expandedKeys"
+                v-model:selected-keys="selectedKeys"
+                v-model:moving-item="movingItem"
+                v-model:next-new-item="nextNewItem"
+                v-model:new-label-form-value="newLabelFormValue"
+                v-model:new-label-counter="newLabelCounter"
+                :node
+                :move-labels
             />
         </div>
     </span>
@@ -346,30 +273,14 @@ const onEnter = () => {
 <style scoped>
 .actions {
     display: inline-flex;
-    align-items: center;
     gap: 1rem;
     margin-left: 1rem;
+    width: 100%;
+    justify-content: space-between;
 }
 .p-button {
     background-color: aliceblue;
     color: black;
     height: 2rem;
-}
-.add-child-button {
-    width: 2rem;
-    border-radius: 50%;
-}
-.reorder-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-.reorder-button {
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
-    height: 1.5rem;
-}
-.move-button {
-    height: 2.5rem;
 }
 </style>

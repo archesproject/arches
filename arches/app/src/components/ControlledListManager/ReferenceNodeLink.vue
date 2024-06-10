@@ -12,7 +12,7 @@ const { $gettext } = useGettext();
 <template>
     <span class="referencing-node">
         {{ $gettext(
-            "%{ graphName }: %{ nodeName }",
+            "%{graphName}: %{nodeName}",
             { graphName: props.node.graph_name, nodeName: props.node.name, }
         )
         }}

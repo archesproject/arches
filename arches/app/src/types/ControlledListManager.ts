@@ -89,7 +89,16 @@ export interface ControlledList {
     nodes: ReferencingNode[];
 }
 
-export type Selectable = ControlledList | ControlledListItem | NewControlledListItem;
+export interface NewControlledList {
+    id: number;
+    name: string;
+    dynamic: boolean;
+    search_only: boolean;
+    items: ControlledListItem[];
+    nodes: ReferencingNode[];
+}
+
+export type Selectable = ControlledList | ControlledListItem | NewControlledList | NewControlledListItem;
 
 export interface ReferencingNode {
     id: string;
@@ -97,6 +106,13 @@ export interface ReferencingNode {
     nodegroup_id: string;
     graph_id: string;
     graph_name: string;
+}
+
+export interface MoveLabels {
+    addChild: string,
+    moveUp: string,
+    moveDown: string,
+    changeParent: string,
 }
 
 // Prop injection types

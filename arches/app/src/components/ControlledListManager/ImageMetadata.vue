@@ -27,6 +27,7 @@ const toast = useToast();
 const { $gettext } = useGettext();
 
 const metadataTypeHeader = $gettext('Metadata type');
+const metadataValueHeader = $gettext('Value');
 const languageHeader = $gettext('Language');
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
@@ -188,6 +189,7 @@ const focusInput = () => {
             </Column>
             <Column
                 field="value"
+                :header="metadataValueHeader"
                 style="width: 60%; min-width: 8rem;"
             >
                 <template #editor="{ data, field }">
@@ -208,13 +210,13 @@ const focusInput = () => {
             <Column
                 field="language_id"
                 :header="languageHeader"
-                style="width: 10%; min-width: 8rem; height: 4rem; padding-left: 1rem;"
+                style="width: 10%; min-width: 8rem; height: 5rem; padding-left: 1rem;"
             >
                 <template #editor="{ data, field }">
                     <Dropdown
                         v-model="data[field]"
                         :options="arches.languages"
-                        option-label="name"
+                        :option-label="(lang) => `${lang.name} (${lang.code})`"
                         option-value="code"
                         :pt="{
                             input: { style: { fontFamily: 'inherit', fontSize: 'small' } },
@@ -223,7 +225,7 @@ const focusInput = () => {
                     />
                 </template>
                 <template #body="slotProps">
-                    {{ languageName(slotProps.data.language_id) }}
+                    {{ `${languageName(slotProps.data.language_id)} (${slotProps.data.language_id})` }}
                 </template>
             </Column>
             <Column
