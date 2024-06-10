@@ -1,17 +1,16 @@
-import json
 import time
 import uuid
 import os
+from base64 import b64encode
+from http import HTTPStatus
 from arches.app.models import models
 from arches.app.models.tile import Tile
 from arches.app.search.search_export import SearchResultsExporter
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from base64 import b64encode
-from http import HTTPStatus
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.i18n import LanguageSynchronizer
 
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from django.urls import reverse
 
@@ -39,7 +38,7 @@ class SearchExportTests(ArchesTestCase):
         # cls.search_model_sensitive_info_nodeid = "57446fae-65ff-11e7-b63a-14109fd34195"
         # cls.search_model_geom_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
         
-        cls.user = User.objects.create_user("unprivilged_user", "unprivilged_user@test.com", "test")
+        cls.user = User.objects.create_user("unprivileged_user", "unprivileged_user@test.com", "test")
 
         test_resourceinstanceid = uuid.uuid4()
 
