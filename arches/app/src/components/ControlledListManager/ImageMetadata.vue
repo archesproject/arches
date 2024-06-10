@@ -11,7 +11,7 @@ import { useToast } from "primevue/usetoast";
 
 import { upsertMetadata, deleteMetadata } from "@/components/ControlledListManager/api.ts";
 import { itemKey } from "@/components/ControlledListManager/constants.ts";
-import { languageName } from "@/components/ControlledListManager/utils.ts";
+import { languageNameFromCode } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
@@ -225,7 +225,7 @@ const focusInput = () => {
                     />
                 </template>
                 <template #body="slotProps">
-                    {{ `${languageName(slotProps.data.language_id)} (${slotProps.data.language_id})` }}
+                    {{ `${languageNameFromCode(slotProps.data.language_id)} (${slotProps.data.language_id})` }}
                 </template>
             </Column>
             <Column

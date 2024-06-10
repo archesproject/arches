@@ -2,7 +2,7 @@ import arches from "arches";
 import Cookies from "js-cookie";
 
 import { DEFAULT_ERROR_TOAST_LIFE, ERROR } from "@/components/ControlledListManager/constants.ts";
-import { sortOrderMap } from "@/components/ControlledListManager/utils.ts";
+import { makeSortOrderMap } from "@/components/ControlledListManager/utils.ts";
 
 import type { ToastServiceMethods } from "primevue/toastservice";
 import type {
@@ -158,7 +158,7 @@ export const patchList = async(
             body = { name: list.name };
             break;
         case "sortorder":
-            body = { sortorder_map: sortOrderMap(list) };
+            body = { sortorder_map: makeSortOrderMap(list) };
             break;
     }
 

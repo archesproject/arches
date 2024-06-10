@@ -14,7 +14,7 @@ import { deleteValue, upsertValue } from "@/components/ControlledListManager/api
 import AddValue from "@/components/ControlledListManager/AddValue.vue";
 
 import { ALT_LABEL, NOTE, NOTE_CHOICES, PREF_LABEL, itemKey } from "@/components/ControlledListManager/constants.ts";
-import { languageName } from "@/components/ControlledListManager/utils.ts";
+import { languageNameFromCode } from "@/components/ControlledListManager/utils.ts";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
 
@@ -306,7 +306,7 @@ const focusInput = () => {
                     />
                 </template>
                 <template #body="slotProps">
-                    {{ `${languageName(slotProps.data.language_id)} (${slotProps.data.language_id})` }}
+                    {{ `${languageNameFromCode(slotProps.data.language_id)} (${slotProps.data.language_id})` }}
                 </template>
             </Column>
             <Column
