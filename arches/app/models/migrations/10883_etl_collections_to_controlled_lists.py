@@ -188,7 +188,7 @@ class Migration(migrations.Migration):
                         )
                     );
 
-                return format('collection(s) %s migrated to controlled list(s)', collection_names);
+                return format('Collection(s) %s migrated to controlled list(s)', array_to_string(collection_names, ', '));
             end;
             $$ language plpgsql volatile;
             """,
