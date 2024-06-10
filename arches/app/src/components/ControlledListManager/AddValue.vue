@@ -33,7 +33,7 @@ const { $gettext } = useGettext();
 const newValue: Ref<NewValue> = computed(() => {
     const otherNewValueIds = item.value.values.filter(
         (value: NewValue | Value) => typeof value.id === "number"
-    ).map(value => value.id as unknown as number);
+    ).map(value => value.id as number);
     const maxOtherNewValueId = Math.max(
         ...otherNewValueIds,
         1000,

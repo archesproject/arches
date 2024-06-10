@@ -28,7 +28,7 @@ const addMetadataLabel = $gettext("Add metadata");
 const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
     const otherNewMetadataIds = image.metadata.filter(
         (metadatum) => typeof metadatum.id === "number"
-    ).map(metadatum => metadatum.id as unknown as number);
+    ).map(metadatum => metadatum.id as number);
     const maxOtherNewMetadataId = Math.max(
         ...otherNewMetadataIds,
         1000,
