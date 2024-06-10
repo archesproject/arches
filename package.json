@@ -87,7 +87,7 @@
         "webpack-bundle-tracker": "^3.1.0"
     },
     "devDependencies": {
-        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#63b8b017886f508167051a663372aa4f654ea064"
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#dev/7.6.x"
     },
     "nodeModulesPaths": {
         "nifty": "plugins/nifty",
