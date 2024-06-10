@@ -34,15 +34,15 @@ const addHeader = (event: FileUploadBeforeSendEvent) => {
     }
 };
 
-const onUpload = (event: FileUploadUploadEvent) => {
+const upload = (event: FileUploadUploadEvent) => {
     if (event.xhr.status !== 201) {
-        onError(undefined);
+        showError(undefined);
     }
     const newImage = JSON.parse(event.xhr.responseText);
     item.value!.images.push(newImage);
 };
 
-const onError = (event?: FileUploadErrorEvent) => {
+const showError = (event?: FileUploadErrorEvent) => {
     toast.add({
         severity: ERROR,
         life: 8000,
@@ -73,8 +73,8 @@ const onError = (event?: FileUploadErrorEvent) => {
                 }),
             }"
             @before-send="addHeader($event)"
-            @upload="onUpload($event)"
-            @error="onError($event)"
+            @upload="upload($event)"
+            @error="showError($event)"
         />
         <div class="images">
             <ImageEditor

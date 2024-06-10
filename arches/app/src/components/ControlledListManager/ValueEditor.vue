@@ -126,7 +126,7 @@ const values = computed(() => {
     );
 });
 
-const onSave = async (event: DataTableRowEditInitEvent) => {
+const saveValue = async (event: DataTableRowEditInitEvent) => {
     // normalize new value numbers (starting at 1000) to null
     const normalizedNewData: Value = {
         ...event.newData,
@@ -150,7 +150,7 @@ const onSave = async (event: DataTableRowEditInitEvent) => {
     }
 };
 
-const onDelete = async (value: NewValue | Value) => {
+const issueDeleteValue = async (value: NewValue | Value) => {
     if (typeof value.id === 'number') {
         removeItemValue(value);
         return;
@@ -177,7 +177,7 @@ const updateItemValue = (updatedValue: Value) => {
     }
 };
 
-const onEdit = (event: DataTableRowEditInitEvent) => {
+const setRowFocus = (event: DataTableRowEditInitEvent) => {
     rowIndexToFocus.value = event.index;
 };
 
@@ -231,8 +231,8 @@ const focusInput = () => {
             striped-rows
             scrollable
             :style="{ fontSize: 'small' }"
-            @row-edit-init="onEdit"
-            @row-edit-save="onSave"
+            @row-edit-init="setRowFocus"
+            @row-edit-save="saveValue"
         >
             <!-- Note type dropdown (if this is a note editor) -->
             <Column
@@ -320,8 +320,8 @@ const focusInput = () => {
                         role="button"
                         tabindex="0"
                         :aria-label="$gettext('Delete')"
-                        @click="onDelete(slotProps.data)"
-                        @key.enter="onDelete(slotProps.data)"
+                        @click="issueDeleteValue(slotProps.data)"
+                        @key.enter="issueDeleteValue(slotProps.data)"
                     />
                 </template>
             </Column>

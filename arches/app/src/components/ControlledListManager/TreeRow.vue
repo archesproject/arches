@@ -151,7 +151,7 @@ const isNewItem = (node: TreeNode) => {
     return node.data.values && !node.data.values[0].id;
 };
 
-const onBlurNewItem = async () => {
+const acceptNewItemShortcutEntry = async () => {
     const newItem = await createItem(nextNewItem.value, toast, $gettext);
     if (newItem) {
         const newValue = {
@@ -184,15 +184,15 @@ const onBlurNewItem = async () => {
     }
 };
 
-const onEnterNewItem = () => {
+const triggerAcceptNewItemShortcut = () => {
     newLabelInputRef.value.$el.blur();
 };
 
-const onEnterNewList = () => {
-    newListInputRef.value.$el.blur();
+const triggerAcceptNewListShortcut = () => {
+    newLabelInputRef.value.$el.blur();
 };
 
-const onBlurNewList = async () => {
+const acceptNewListShortcutEntry = async () => {
     const newList = await createList(newListFormValue.value.trim(), toast, $gettext);
     tree.value = [
         ...tree.value.filter(lst => typeof lst.data.id === 'string'),
@@ -214,8 +214,8 @@ const onBlurNewList = async () => {
                 ref="newLabelInputRef"
                 v-model="newLabelFormValue"
                 autofocus
-                @blur="onBlurNewItem"
-                @keyup.enter="onEnterNewItem"
+                @blur="acceptNewItemShortcutEntry"
+                @keyup.enter="triggerAcceptNewItemShortcut"
             />
         </div>
         <div v-else-if="isNewList(node)">
@@ -224,8 +224,8 @@ const onBlurNewList = async () => {
                 ref="newListInputRef"
                 v-model="newListFormValue"
                 autofocus
-                @blur="onBlurNewList"
-                @keyup.enter="onEnterNewList"
+                @blur="acceptNewListShortcutEntry"
+                @keyup.enter="triggerAcceptNewListShortcut"
             />
         </div>
         <!-- eslint-disable vue/no-v-html -->

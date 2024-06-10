@@ -37,7 +37,7 @@ const inputValue = computed({
 const toast = useToast();
 const { $gettext } = useGettext();
 
-const onSave = async () => {
+const save = async () => {
     editing.value = false;
     const originalValue = list.value!.name;
     list.value!.name = formValue.value.trim();
@@ -47,7 +47,7 @@ const onSave = async () => {
     }
 };
 
-const onCancel = () => {
+const cancel = () => {
     editing.value = false;
     formValue.value = list.value!.name;
 };
@@ -68,7 +68,7 @@ const onCancel = () => {
             v-model="inputValue"
             type="text"
             :disabled="disabled"
-            @keyup.enter="onSave"
+            @keyup.enter="save"
         />
         <span
             v-if="props.editable && !editing"
@@ -92,16 +92,16 @@ const onCancel = () => {
                 tabindex="0"
                 class="fa fa-check"
                 :aria-label="$gettext('Save edit')"
-                @click="onSave"
-                @keyup.enter="onSave"
+                @click="save"
+                @keyup.enter="save"
             />
             <i
                 role="button"
                 tabindex="0"
                 class="fa fa-times"
                 :aria-label="$gettext('Cancel edit')"
-                @click="onCancel"
-                @keyup.enter="onCancel"
+                @click="cancel"
+                @keyup.enter="cancel"
             />
         </span>
     </div>

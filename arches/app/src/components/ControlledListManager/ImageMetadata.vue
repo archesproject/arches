@@ -43,7 +43,7 @@ const metadataLabel = (metadataType: string) => {
     return labeledChoices.find(choice => choice.type === metadataType)!.label;
 };
 
-const onSaveMetadata = async (event: DataTableRowEditInitEvent)  => {
+const saveMetadata = async (event: DataTableRowEditInitEvent)  => {
     // normalize new metadata numbers (starting at 1000) to null
     const normalizedNewData: ControlledListItemImageMetadata = {
         ...event.newData,
@@ -66,7 +66,7 @@ const onSaveMetadata = async (event: DataTableRowEditInitEvent)  => {
     }
 };
 
-const onDeleteMetadata = async (metadata: NewControlledListItemImageMetadata | ControlledListItemImageMetadata) => {
+const issueDeleteMetadata = async (metadata: NewControlledListItemImageMetadata | ControlledListItemImageMetadata) => {
     if (typeof metadata.id === 'number') {
         removeImageMetadata(metadata);
         return;
@@ -121,7 +121,7 @@ const updateImageMetadata = (updatedMetadata: ControlledListItemImageMetadata) =
     }
 };
 
-const onEdit = (event: DataTableRowEditInitEvent) => {
+const setRowFocus = (event: DataTableRowEditInitEvent) => {
     rowIndexToFocus.value = event.index;
 };
 
@@ -162,8 +162,8 @@ const focusInput = () => {
             edit-mode="row"
             striped-rows
             :style="{ fontSize: 'small' }"
-            @row-edit-init="onEdit"
-            @row-edit-save="onSaveMetadata"
+            @row-edit-init="setRowFocus"
+            @row-edit-save="saveMetadata"
         >
             <Column
                 field="metadata_type"
@@ -239,8 +239,8 @@ const focusInput = () => {
                         role="button"
                         tabindex="0"
                         :aria-label="$gettext('Delete')"
-                        @click="onDeleteMetadata(slotProps.data)"
-                        @key.enter="onDeleteMetadata(slotProps.data)"
+                        @click="issueDeleteMetadata(slotProps.data)"
+                        @key.enter="issueDeleteMetadata(slotProps.data)"
                     />
                 </template>
             </Column>

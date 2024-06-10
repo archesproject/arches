@@ -87,7 +87,7 @@ const buttonLabel = computed(() => {
     }
 });
 
-const onClick = () => {
+const addValue = () => {
     const staticNewValue = { ...newValue.value };
     item.value.values.push(staticNewValue);
     newValueCallback(staticNewValue, -1);
@@ -98,7 +98,7 @@ const onClick = () => {
     <Button
         class="add-value"
         raised
-        @click="onClick"
+        @click="addValue"
     >
         <i
             class="fa fa-plus-circle"

@@ -55,7 +55,7 @@ const bestAlternativeText = computed(() => {
         || bestLabel(item.value, arches.activeLanguage).value;
 });
 
-const onDeleteImage = async () => {
+const issueDeleteImage = async () => {
     const deleted = await deleteImage(image, toast, $gettext);
     if (deleted) {
         removeImage(image);
@@ -93,7 +93,7 @@ const removeImage = (removedImage: ControlledListItemImage) => {
                     :severity="DANGER"
                     icon="fa fa-trash"
                     :label="$gettext('Delete image')"
-                    @click="onDeleteImage"
+                    @click="issueDeleteImage"
                 />
             </div>
         </div>

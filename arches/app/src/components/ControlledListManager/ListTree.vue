@@ -70,7 +70,7 @@ const collapseNodesRecursive = (node: TreeNode) => {
     }
 };
 
-const onRowSelect = (node: TreeNode) => {
+const updateSelectedAndExpanded = (node: TreeNode) => {
     let priorListId;
     if (displayedRow.value) {
         priorListId = (displayedRow.value as ControlledListItem).controlled_list_id ?? displayedRow.value.id;
@@ -132,7 +132,7 @@ const getInputElement = () => {
     }
 };
 
-const onMounted = () => {
+const restoreFocusToInput = () => {
     // The current implementation of collapsing all nodes when
     // backspacing out the search value relies on rerendering the
     // <Tree> component. Restore focus to the input element. 
@@ -144,10 +144,9 @@ const onMounted = () => {
     }
 };
 
-const onBeforeUpdate = () => {
-    // Snoop on the filterValue, because if we wait to react
-    // to the emitted filter event, the templated rows will
-    // have already rendered. (<TreeRow> bolds search terms.)
+const snoopOnFilterValue = () => {
+    // If we wait to react to the emitted filter event, the templated rows
+    // will have already rendered. (<TreeRow> bolds search terms.)
     const inputEl = getInputElement();
     if (inputEl) {
         expandPathsToFilterResults(inputEl.value);
@@ -214,10 +213,10 @@ const filterCallbackWrapped = computed(() => {
                 return { style: { height: '4rem' } };
             },
             label: { style: { textWrap: 'nowrap', marginLeft: '0.5rem', width: '100%' } },
-            hooks: { onBeforeUpdate, onMounted },
+            hooks: { onBeforeUpdate: snoopOnFilterValue, onMounted: restoreFocusToInput },
         }"
         @node-collapse="nextFilterChangeNeedsExpandAll = true"
-        @node-select="onRowSelect"
+        @node-select="updateSelectedAndExpanded"
     >
         <template #nodeicon="slotProps">
             <LetterCircle :labelled="slotProps.node.data" />
