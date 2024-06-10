@@ -239,7 +239,7 @@
 
                             {% for p in plugins %}
                                 {% if p.config is not None %}
-                                    {% if p.config.show and not p.config.is_standalone %}
+                                    {% if p.config.show %}
                                     <!-- ko let: {uid: Math.random().toString()} -->
                                     <li {% if main_script == "views/plugin" and plugin.pluginid == p.pluginid %} class="active-sub" {% endif %}>
                                         {% if p.slug is not None %}

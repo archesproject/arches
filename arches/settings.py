@@ -346,6 +346,7 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.gis",
+    "django_hosts",
     "arches",
     "arches.app.models",
     "arches.management",
@@ -359,7 +360,10 @@ INSTALLED_APPS = (
 
 ARCHES_APPLICATIONS = ()
 
+INSTALLED_APPS += ARCHES_APPLICATIONS
+
 MIDDLEWARE = [
+    "django_hosts.middleware.HostsRequestMiddleware",  # this _must_ be first MIDDLEWARE entry
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -375,6 +379,8 @@ MIDDLEWARE = [
     "arches.app.utils.middleware.SetAnonymousUser",
 ]
 
+MIDDLEWARE.append('django_hosts.middleware.HostsResponseMiddleware')  # this _must_ be last MIDDLEWARE entry
+
 WEBPACK_LOADER = {
     "DEFAULT": {
         "STATS_FILE": os.path.join(ROOT_DIR, "..", "webpack/webpack-stats.json"),
@@ -384,6 +390,9 @@ WEBPACK_LOADER = {
 WEBPACK_DEVELOPMENT_SERVER_PORT = 9000
 
 ROOT_URLCONF = "arches.urls"
+ROOT_HOSTCONF = "arches.hosts"
+
+DEFAULT_HOST = "arches"
 
 WSGI_APPLICATION = "arches.wsgi.application"
 
@@ -781,6 +790,7 @@ if __name__ == "__main__":
     transmit_webpack_django_config(
         root_dir=ROOT_DIR,
         app_root=APP_ROOT,
+        arches_applications=ARCHES_APPLICATIONS,
         public_server_address=PUBLIC_SERVER_ADDRESS,
         static_url=STATIC_URL,
         webpack_development_server_port=WEBPACK_DEVELOPMENT_SERVER_PORT,

@@ -49,20 +49,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 <body>
     {% block main_content %}
-        <div id="plugin-mounting-point"></div>
     {% endblock main_content %}
 </body>
 
 {% block javascript %}
     <script src="{% webpack_static 'node_modules/requirejs/require.js' %}"></script>
 
-    {% block pre_require_js %}
-        <div
-            id="pluginData"
-            style="display: none;"
-            pluginData='{{ plugin_json }}'
-        ></div>
-    {% endblock pre_require_js %}
+    {% block arches_modules %}
+        {% include "arches_urls.htm" %}
+    {% endblock arches_modules %}
     
     {% if main_script %}
         <script src="{% webpack_static '' %}build/js/{{main_script}}.js"></script>
