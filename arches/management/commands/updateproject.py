@@ -131,6 +131,7 @@ class Command(BaseCommand):
             "vitest.setup.mts",
             "eslint.config.mjs",
             ".prettierrc",
+            ".pre-commit-config.yaml",
         ]:
             if os.path.exists(os.path.join(settings.APP_ROOT, config_file)):
                 self.stdout.write(
