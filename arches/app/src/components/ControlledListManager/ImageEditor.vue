@@ -45,8 +45,9 @@ const labeledChoices = [
 ];
 
 const bestTitle = computed(() => {
-    return image.metadata.filter(metadatum => metadatum.metadata_type === METADATA_CHOICES.title)
-        .find(title => title.language_id === arches.activeLanguage)?.value;
+    const titles = image.metadata.filter(metadatum => metadatum.metadata_type === METADATA_CHOICES.title);
+    return titles.find(title => title.language_id === arches.activeLanguage)?.value
+        || titles[0]?.value;
 });
 
 const bestAlternativeText = computed(() => {
