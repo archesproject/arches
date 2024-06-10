@@ -110,12 +110,12 @@ class Tile(models.TileModel):
         self.serialized_graph = None
         self.load_serialized_graph()
 
-    def load_serialized_graph(self, raise_if_missing=False):
+    def load_serialized_graph(self):
         try:
             resource = self.resourceinstance
         except models.ResourceInstance.DoesNotExist:
             return
-        published_graph = resource.graph.get_published_graph(raise_if_missing=raise_if_missing)
+        published_graph = resource.graph.get_published_graph()
         if published_graph:
             self.serialized_graph = published_graph.serialized_graph
 
@@ -403,7 +403,7 @@ class Tile(models.TileModel):
         oldprovisionalvalue = None
 
         if not self.serialized_graph:
-            self.load_serialized_graph(raise_if_missing=True)
+            self.load_serialized_graph()
         try:
             if user is None and request is not None:
                 user = request.user
@@ -413,9 +413,14 @@ class Tile(models.TileModel):
 
         with transaction.atomic():
             for nodeid in self.data.keys():
-                node = next(item for item in self.serialized_graph["nodes"] if item["nodeid"] == nodeid)
-                datatype = self.datatype_factory.get_instance(node["datatype"])
+                try:
+                    node = SimpleNamespace(**next((x for x in self.serialized_graph["nodes"] if x["nodeid"] == nodeid), None))
+                except TypeError: #will catch if serialized_graph is None
+                    node = models.Node.objects.get(nodeid=nodeid)
+
+                datatype = self.datatype_factory.get_instance(node.datatype)
                 datatype.pre_tile_save(self, nodeid)
+                
             self.__preSave(request, context=context)
             self.check_for_missing_nodes()
             self.check_for_constraint_violation()
