@@ -6,12 +6,11 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 import { useToast } from "primevue/usetoast";
 
+import { deleteImage } from "@/components/ControlledListManager/api.ts";
+import { DANGER, METADATA_CHOICES, itemKey } from "@/components/ControlledListManager/constants.ts";
+import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 import AddMetadata from "@/components/ControlledListManager/AddMetadata.vue";
 import ImageMetadata from "@/components/ControlledListManager/ImageMetadata.vue";
-
-import { DANGER, METADATA_CHOICES, itemKey } from "@/components/ControlledListManager/constants.ts";
-import { deleteImage } from "@/components/ControlledListManager/api.ts";
-import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
 import type {

@@ -4,12 +4,11 @@ import { useGettext } from "vue3-gettext";
 
 import Tree from "primevue/tree";
 
+import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
+import { bestLabel, nodeIsList } from "@/components/ControlledListManager/utils.ts";
 import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 import ListTreeControls from "@/components/ControlledListManager/ListTreeControls.vue";
 import TreeRow from "@/components/ControlledListManager/TreeRow.vue";
-
-import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
-import { bestLabel, nodeIsList } from "@/components/ControlledListManager/utils.ts";
 
 import type { ComponentPublicInstance, Ref } from "vue";
 import type {

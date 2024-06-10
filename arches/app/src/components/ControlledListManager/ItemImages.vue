@@ -7,10 +7,9 @@ import { useGettext } from "vue3-gettext";
 import FileUpload from "primevue/fileupload";
 import { useToast } from "primevue/usetoast";
 
-import ImageEditor from "@/components/ControlledListManager/ImageEditor.vue";
-
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
 import { itemKey, DEFAULT_ERROR_TOAST_LIFE, ERROR } from "@/components/ControlledListManager/constants.ts";
+import ImageEditor from "@/components/ControlledListManager/ImageEditor.vue";
 
 import type { Ref } from "vue";
 import type { ControlledListItem } from "@/types/ControlledListManager";

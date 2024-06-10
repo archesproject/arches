@@ -10,13 +10,11 @@ import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import { useToast } from "primevue/usetoast";
 
+import { ARCHES_CHROME_BLUE } from "@/theme.ts";
 import { deleteValue, upsertValue } from "@/components/ControlledListManager/api.ts";
-import AddValue from "@/components/ControlledListManager/AddValue.vue";
-
 import { ALT_LABEL, NOTE, NOTE_CHOICES, PREF_LABEL, itemKey } from "@/components/ControlledListManager/constants.ts";
 import { languageNameFromCode } from "@/components/ControlledListManager/utils.ts";
-
-import { ARCHES_CHROME_BLUE } from "@/theme.ts";
+import AddValue from "@/components/ControlledListManager/AddValue.vue";
 
 import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";

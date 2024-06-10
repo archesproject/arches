@@ -8,8 +8,6 @@ import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
-import MoveRow from "@/components/ControlledListManager/MoveRow.vue";
-
 import { createItem, createList, upsertValue } from "@/components/ControlledListManager/api.ts";
 import { DEFAULT_ERROR_TOAST_LIFE, ERROR, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import {
@@ -19,7 +17,9 @@ import {
     listAsNode,
     nodeIsList,
 } from "@/components/ControlledListManager/utils.ts";
+import MoveRow from "@/components/ControlledListManager/MoveRow.vue";
 
+import type { Language } from "@/types/arches";
 import type { Ref } from "vue";
 import type {
     TreeExpandedKeys,
@@ -32,7 +32,6 @@ import type {
     MoveLabels,
     NewControlledListItem,
 } from "@/types/ControlledListManager";
-import type { Language } from "@/types/arches";
 
 const toast = useToast();
 const { $gettext } = useGettext();

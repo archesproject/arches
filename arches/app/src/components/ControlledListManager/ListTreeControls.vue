@@ -3,11 +3,6 @@ import arches from "arches";
 import { computed, inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import { deleteItems, deleteLists } from "@/components/ControlledListManager/api.ts";
-import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
-import { DANGER, DEFAULT_ERROR_TOAST_LIFE, ERROR } from "@/components/ControlledListManager/constants.ts";
-import { bestLabel, listAsNode } from "@/components/ControlledListManager/utils.ts";
-
 import Button from "primevue/button";
 import ConfirmDialog from "primevue/confirmdialog";
 import Dropdown from "primevue/dropdown";
@@ -15,13 +10,22 @@ import SplitButton from "primevue/splitbutton";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
+import { BUTTON_GREEN } from "@/theme.ts";
+import { deleteItems, deleteLists } from "@/components/ControlledListManager/api.ts";
+import {
+    displayedRowKey,
+    selectedLanguageKey,
+    DANGER,
+    DEFAULT_ERROR_TOAST_LIFE,
+    ERROR,
+} from "@/components/ControlledListManager/constants.ts";
+import { bestLabel, listAsNode } from "@/components/ControlledListManager/utils.ts";
+
 import type { Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/types/arches";
 import type { ControlledList, DisplayedRowRefAndSetter, NewControlledList } from "@/types/ControlledListManager";
-
-import { BUTTON_GREEN } from "@/theme.ts";
 
 const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
