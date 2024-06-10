@@ -3,3 +3,5 @@ sst
 coverage
 sauceclient
 django-silk==5.1.0
+pre-commit
+black==24.4.2
