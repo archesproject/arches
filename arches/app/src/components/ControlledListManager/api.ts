@@ -1,7 +1,7 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 
-import { ERROR } from "@/components/ControlledListManager/constants.ts";
+import { DEFAULT_ERROR_TOAST_LIFE, ERROR } from "@/components/ControlledListManager/constants.ts";
 import { sortOrderMap } from "@/components/ControlledListManager/utils.ts";
 
 import type { ToastServiceMethods } from "primevue/toastservice";
@@ -180,6 +180,80 @@ export const patchList = async(
             life: 8000,
             summary: $gettext("Save failed"),
             detail: error?.message || response?.statusText,
+        });
+    }
+};
+
+export const deleteLists = async (
+    listIds: string[],
+    toast: ToastServiceMethods,
+    $gettext: GetText,
+) => {
+    const promises = listIds.map((id) =>
+        fetch(arches.urls.controlled_list(id), {
+            method: "DELETE",
+            headers: { "X-CSRFToken": getToken() },
+        })
+    );
+
+    try {
+        const responses = await Promise.all(promises);
+        if (responses.some((resp) => resp.ok)) {
+            return true;
+        }
+        responses.forEach(async (response) => {
+            if (!response.ok) {
+                const body = await response.json();
+                toast.add({
+                    severity: ERROR,
+                    life: DEFAULT_ERROR_TOAST_LIFE,
+                    summary: $gettext("List deletion failed"),
+                    detail: body.message,
+                });
+            }
+        });
+    } catch {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("List deletion failed"),
+        });
+    }
+};
+
+export const deleteItems = async (
+    itemIds: string[],
+    toast: ToastServiceMethods,
+    $gettext: GetText,
+) => {
+    const promises = itemIds.map((id) =>
+        fetch(arches.urls.controlled_list_item(id), {
+            method: "DELETE",
+            headers: { "X-CSRFToken": getToken() },
+        })
+    );
+
+    try {
+        const responses = await Promise.all(promises);
+        if (responses.some((resp) => resp.ok)) {
+            return true;
+        }
+        responses.forEach(async (response) => {
+            if (!response.ok) {
+                const body = await response.json();
+                toast.add({
+                    severity: ERROR,
+                    life: DEFAULT_ERROR_TOAST_LIFE,
+                    summary: $gettext("Item deletion failed"),
+                    detail: body.message,
+                });
+            }
+        });
+    } catch {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Item deletion failed"),
         });
     }
 };

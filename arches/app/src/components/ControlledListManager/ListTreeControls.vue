@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import arches from "arches";
-import Cookies from "js-cookie";
 import { computed, inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
+import { deleteItems, deleteLists } from "@/components/ControlledListManager/api.ts";
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import { DANGER, DEFAULT_ERROR_TOAST_LIFE, ERROR } from "@/components/ControlledListManager/constants.ts";
 import { bestLabel, listAsNode } from "@/components/ControlledListManager/utils.ts";
@@ -116,86 +116,6 @@ const createList = () => {
     setDisplayedRow(newList);
 };
 
-const deleteLists = async (listIds: string[]) => {
-    if (!listIds.length) {
-        return;
-    }
-    const token = Cookies.get("csrftoken");
-    if (!token) {
-        return;
-    }
-    const promises = listIds.map((id) =>
-        fetch(arches.urls.controlled_list(id), {
-            method: "DELETE",
-            headers: { "X-CSRFToken": token },
-        })
-    );
-
-    try {
-        const responses = await Promise.all(promises);
-        if (responses.some((resp) => resp.ok)) {
-            setDisplayedRow(null);
-        }
-        responses.forEach(async (response) => {
-            if (!response.ok) {
-                const body = await response.json();
-                toast.add({
-                    severity: ERROR,
-                    life: DEFAULT_ERROR_TOAST_LIFE,
-                    summary: $gettext("List deletion failed"),
-                    detail: body.message,
-                });
-            }
-        });
-    } catch {
-        toast.add({
-            severity: ERROR,
-            life: DEFAULT_ERROR_TOAST_LIFE,
-            summary: $gettext("List deletion failed"),
-        });
-    }
-};
-
-const deleteItems = async (itemIds: string[]) => {
-    if (!itemIds.length) {
-        return;
-    }
-    const token = Cookies.get("csrftoken");
-    if (!token) {
-        return;
-    }
-    const promises = itemIds.map((id) =>
-        fetch(arches.urls.controlled_list_item(id), {
-            method: "DELETE",
-            headers: { "X-CSRFToken": token },
-        })
-    );
-
-    try {
-        const responses = await Promise.all(promises);
-        if (responses.some((resp) => resp.ok)) {
-            setDisplayedRow(null);
-        }
-        responses.forEach(async (response) => {
-            if (!response.ok) {
-                const body = await response.json();
-                toast.add({
-                    severity: ERROR,
-                    life: DEFAULT_ERROR_TOAST_LIFE,
-                    summary: $gettext("Item deletion failed"),
-                    detail: body.message,
-                });
-            }
-        });
-    } catch {
-        toast.add({
-            severity: ERROR,
-            life: DEFAULT_ERROR_TOAST_LIFE,
-            summary: $gettext("Item deletion failed"),
-        });
-    }
-};
-
 const toDelete = computed(() => {
     if (isMultiSelecting.value) {
         return Object.entries(selectedKeys.value).filter(([, v]) => v.checked).map(([k,]) => k);
@@ -215,8 +135,16 @@ const deleteSelected = async () => {
     selectedKeys.value = {};
 
     // Do items first so that cascade deletion doesn't cause item deletion to fail.
-    await deleteItems(itemIdsToDelete);
-    await deleteLists(listIdsToDelete);
+    let anyDeleted = false;
+    if (itemIdsToDelete.length) {
+        anyDeleted = await deleteItems(itemIdsToDelete);
+    }
+    if (listIdsToDelete.length) {
+        anyDeleted = await deleteLists(listIdsToDelete) || anyDeleted;
+    }
+    if (anyDeleted) {
+        setDisplayedRow(null);
+    }
 
     isMultiSelecting.value = false;
 };
