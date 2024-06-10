@@ -204,7 +204,6 @@ class GraphManagerView(GraphBaseView):
             context["graphs"] = JSONSerializer().serialize(
                 context["graph_models"], exclude=["functions"]
             )
-
             context["nav"]["title"] = _("Arches Designer")
             context["nav"]["icon"] = "fa-bookmark"
 
@@ -557,6 +556,8 @@ class GraphDataView(View):
                 elif self.action == "export_branch":
                     clone_data = graph.copy(root=data)
                     clone_data["copy"].slug = None
+                    clone_data["copy"].publication = None
+
                     clone_data["copy"].save()
 
                     clone_data["copy"].create_editable_future_graph()

@@ -18,7 +18,8 @@ class Command(BaseCommand):
         answer = input(
             "This will replace the following files in your project:\n"
             ".babelrc, eslintrc.js, .eslintignore, .browserslistrc, .stylelintrc.json,\n"
-            ".yarnrc, .gitignore, nodemon.json and tsconfig.json, and the entire webpack directory.\n\n"
+            ".yarnrc, .gitignore, nodemon.json, .prettierrc, .pre-commit-config.yaml,\n"
+            "tsconfig.json, and the entire webpack directory.\n\n"
             "Continue? "
         )
 
@@ -129,6 +130,8 @@ class Command(BaseCommand):
             "vitest.config.mts",
             "vitest.setup.mts",
             "eslint.config.mjs",
+            ".prettierrc",
+            ".pre-commit-config.yaml",
         ]:
             if os.path.exists(os.path.join(settings.APP_ROOT, config_file)):
                 self.stdout.write(
@@ -251,6 +254,7 @@ class Command(BaseCommand):
             "tests/test_settings.py",
             "tests/search_indexes/sample_index_tests.py",
             "pyproject.toml",
+            ".pre-commit-config.yaml",
         ]:  # relative to app root directory
             try:
                 file = open(os.path.join(path_to_project, relative_file_path), "r")

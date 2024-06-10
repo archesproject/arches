@@ -36,7 +36,7 @@ class Command(BaseCommand):
             dest="operation",
             default="build",
             choices=["build"],
-            help="Operation Type; build=Alias for `yarn build_test`",
+            help="Operation Type; build=Alias for `npm run build_test`",
         )
 
         parser.add_argument(
@@ -52,13 +52,9 @@ class Command(BaseCommand):
         print("operation: " + options["operation"])
         if options["operation"] == "build":
             if settings.STATIC_ROOT != "":
-                proj_name = settings.APP_NAME
-                yarn_path = os.path.join(os.getcwd(), proj_name)
-                os.chdir(yarn_path)
-
                 if options["reinstall_node_modules"] == True:
                     subprocess.call("rm -rf ./node_modules", shell=True)
-                    subprocess.call("rm yarn.lock", shell=True)
-                    subprocess.call("yarn", shell=True)
+                    subprocess.call("rm package-lock.json", shell=True)
+                    subprocess.call("npm install", shell=True)
 
-                subprocess.call("yarn build_test", shell=True)
+                subprocess.call("npm run build_test", shell=True)
