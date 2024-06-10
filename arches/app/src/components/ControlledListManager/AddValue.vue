@@ -29,16 +29,13 @@ const { valueType, makeValueEditable } = defineProps<{
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
-const newValueIdStart = 1000;
 
 const newValue: Ref<NewValue> = computed(() => {
     const otherNewValueIds = item.value.values.filter(
         (value: NewValue | Value) => typeof value.id === "number"
     ).map(value => value.id as number);
-    const maxOtherNewValueId = Math.max(
-        ...otherNewValueIds,
-        newValueIdStart,
-    );
+
+    const maxOtherNewValueId = Math.max(...otherNewValueIds, 0);
 
     let nextLanguageCode = arches.activeLanguage;
     if (valueType === PREF_LABEL) {

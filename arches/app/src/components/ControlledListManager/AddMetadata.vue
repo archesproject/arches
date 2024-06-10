@@ -23,16 +23,13 @@ const { labeledChoices, image } = defineProps<{
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
-const newMetadataIdStart = 1000;
 
 const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
     const otherNewMetadataIds = image.metadata.filter(
         (metadatum) => typeof metadatum.id === "number"
     ).map(metadatum => metadatum.id as number);
-    const maxOtherNewMetadataId = Math.max(
-        ...otherNewMetadataIds,
-        newMetadataIdStart,
-    );
+
+    const maxOtherNewMetadataId = Math.max(...otherNewMetadataIds, 0);
 
     const nextMetadataType = labeledChoices.find(
         choice => !image.metadata.map(
