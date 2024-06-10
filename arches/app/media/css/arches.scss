@@ -9154,10 +9154,9 @@ a.clear-geojson-button:hover {
 }
 
 .saved-search-grid {
-    height: calc(100vh - 105px);
+    height: auto;
     width: 100%;
     min-height: 400px;
-    overflow-y: scroll;
 }
 
 .ss-grid-item:last-child {
@@ -10175,6 +10174,7 @@ table.table.dataTable {
     height: calc(100vh - 100px);
     border-left: solid 1px #dcdcdc;
     padding: 20px;
+    overflow-y: auto;
 }
 
 .rr-splash-img-container .fa {
