@@ -27,9 +27,15 @@ class Migration(migrations.Migration):
         pass
 
     operations = [
-        migrations.AlterField(model_name="ontology", name="path", field=models.TextField(blank=True, null=True),),
+        migrations.AlterField(
+            model_name="ontology",
+            name="path",
+            field=models.TextField(blank=True, null=True),
+        ),
         migrations.AddField(
-            model_name="ontology", name="namespaces", field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True),
+            model_name="ontology",
+            name="namespaces",
+            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True),
         ),
         migrations.RunPython(forwards_func, reverse_func),
     ]

@@ -1,0 +1,29 @@
+---
+repos:
+
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        args: [--quiet]
+        exclude: node_modules
+
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier
+        entry: npm run prettier:fix
+        language: system
+        files: {{ project_name }}/src
+      - id: eslint
+        name: eslint
+        entry: npm run eslint:fix
+        language: system
+      - id: typescript
+        name: typescript
+        entry: npm run ts:check
+        language: system
+        types: [
+          "ts",
+          "vue",
+        ]

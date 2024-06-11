@@ -10,6 +10,8 @@
         "eslint:watch": "nodemon --watch . --ext ts,vue --exec npm run --silent eslint:check",
         "gettext:extract": "vue-gettext-extract",
         "gettext:compile": "vue-gettext-compile",
+        "prettier:check": "prettier {{ project_name }}/src --check",
+        "prettier:fix": "prettier {{ project_name }}/src --write",
         "ts:check": "vue-tsc --noEmit",
         "ts:watch": "vue-tsc --watch --noEmit",
         "start": "cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack serve --config ./webpack/webpack.config.dev.js",
@@ -24,6 +26,8 @@
     "nodeModulesPaths": {
     },
     "overrides": {
+        "glob": "8.1.0",
+        "minimatch": "5.1.2",
         "moment-timezone": "^0.5.45",
         "nomnom": "npm:@gerhobbelt/nomnom",
         "rimraf": "^5.0.7", 

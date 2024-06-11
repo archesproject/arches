@@ -151,9 +151,11 @@
         "webcola": "node_modules/webcola/WebCola/cola.min"
     },
     "overrides": {
+        "glob": "8.1.0",
+        "minimatch": "5.1.2",
         "moment-timezone": "^0.5.45",
         "nomnom": "npm:@gerhobbelt/nomnom",
-        "rimraf": "^5.0.7", 
+        "rimraf": "^5.0.7",
         "underscore": "^1.13.6"
     }
 }

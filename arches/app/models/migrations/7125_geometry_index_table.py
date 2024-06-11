@@ -15,7 +15,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="GeoJSONGeometry",
             fields=[
-                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("geom", django.contrib.gis.db.models.fields.GeometryField(srid=3857)),
             ],
             options={
@@ -26,19 +34,29 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="geojsongeometry",
             name="node",
-            field=models.ForeignKey(db_column="nodeid", on_delete=django.db.models.deletion.CASCADE, to="models.Node"),
+            field=models.ForeignKey(
+                db_column="nodeid",
+                on_delete=django.db.models.deletion.CASCADE,
+                to="models.Node",
+            ),
         ),
         migrations.AddField(
             model_name="geojsongeometry",
             name="resourceinstance",
             field=models.ForeignKey(
-                db_column="resourceinstanceid", on_delete=django.db.models.deletion.CASCADE, to="models.ResourceInstance"
+                db_column="resourceinstanceid",
+                on_delete=django.db.models.deletion.CASCADE,
+                to="models.ResourceInstance",
             ),
         ),
         migrations.AddField(
             model_name="geojsongeometry",
             name="tile",
-            field=models.ForeignKey(db_column="tileid", on_delete=django.db.models.deletion.CASCADE, to="models.TileModel"),
+            field=models.ForeignKey(
+                db_column="tileid",
+                on_delete=django.db.models.deletion.CASCADE,
+                to="models.TileModel",
+            ),
         ),
         migrations.RunSQL(
             """

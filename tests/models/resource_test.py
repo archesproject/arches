@@ -32,10 +32,18 @@ from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
-from arches.app.utils.exceptions import InvalidNodeNameException, MultipleNodesFoundException
+from arches.app.utils.data_management.resource_graphs.importer import (
+    import_graph as resource_graph_importer,
+)
+from arches.app.utils.exceptions import (
+    InvalidNodeNameException,
+    MultipleNodesFoundException,
+)
 from arches.app.utils.i18n import LanguageSynchronizer
-from arches.app.utils.index_database import index_resources_by_type, index_resources_using_singleprocessing
+from arches.app.utils.index_database import (
+    index_resources_by_type,
+    index_resources_using_singleprocessing,
+)
 from tests.base_test import ArchesTestCase
 
 
@@ -55,25 +63,33 @@ class ResourceTests(ArchesTestCase):
         cls.client = Client()
         cls.client.login(username="admin", password="admin")
 
-        with open(os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "r") as f:
+        with open(
+            os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "r"
+        ) as f:
             archesfile = JSONDeserializer().deserialize(f)
         resource_graph_importer(archesfile["graph"])
 
         cls.search_model_graphid = uuid.UUID("c9b37a14-17b3-11eb-a708-acde48001122")
         cls.search_model_cultural_period_nodeid = "c9b3882e-17b3-11eb-a708-acde48001122"
         cls.search_model_creation_date_nodeid = "c9b38568-17b3-11eb-a708-acde48001122"
-        cls.search_model_destruction_date_nodeid = "c9b3828e-17b3-11eb-a708-acde48001122"
+        cls.search_model_destruction_date_nodeid = (
+            "c9b3828e-17b3-11eb-a708-acde48001122"
+        )
         cls.search_model_name_nodeid = "c9b37b7c-17b3-11eb-a708-acde48001122"
         cls.search_model_sensitive_info_nodeid = "c9b38aea-17b3-11eb-a708-acde48001122"
         cls.search_model_geom_nodeid = "c9b37f96-17b3-11eb-a708-acde48001122"
 
-        cls.user = User.objects.create_user("test", "test@archesproject.org", "password")
+        cls.user = User.objects.create_user(
+            "test", "test@archesproject.org", "password"
+        )
         cls.user.groups.add(Group.objects.get(name="Guest"))
 
         graph = Graph.objects.get(pk=cls.search_model_graphid)
         graph.publish(user=cls.user)
 
-        nodegroup = models.NodeGroup.objects.get(pk=cls.search_model_destruction_date_nodeid)
+        nodegroup = models.NodeGroup.objects.get(
+            pk=cls.search_model_destruction_date_nodeid
+        )
         assign_perm("no_access_to_nodegroup", cls.user, nodegroup)
 
         # Add a concept that defines a min and max date
@@ -85,9 +101,30 @@ class ResourceTests(ArchesTestCase):
             "subconcepts": [
                 {
                     "values": [
-                        {"value": "Mock concept", "language": "en-US", "category": "label", "type": "prefLabel", "id": "", "conceptid": ""},
-                        {"value": "1950", "language": "en-US", "category": "note", "type": "min_year", "id": "", "conceptid": ""},
-                        {"value": "1980", "language": "en-US", "category": "note", "type": "max_year", "id": "", "conceptid": ""},
+                        {
+                            "value": "Mock concept",
+                            "language": "en-US",
+                            "category": "label",
+                            "type": "prefLabel",
+                            "id": "",
+                            "conceptid": "",
+                        },
+                        {
+                            "value": "1950",
+                            "language": "en-US",
+                            "category": "note",
+                            "type": "min_year",
+                            "id": "",
+                            "conceptid": "",
+                        },
+                        {
+                            "value": "1980",
+                            "language": "en-US",
+                            "category": "note",
+                            "type": "max_year",
+                            "id": "",
+                            "conceptid": "",
+                        },
                     ],
                     "relationshiptype": "hasTopConcept",
                     "nodetype": "Concept",
@@ -103,7 +140,11 @@ class ResourceTests(ArchesTestCase):
         post_data = JSONSerializer().serialize(concept)
         content_type = "application/x-www-form-urlencoded"
         response = cls.client.post(
-            reverse("concept", kwargs={"conceptid": "00000000-0000-0000-0000-000000000001"}), post_data, content_type
+            reverse(
+                "concept", kwargs={"conceptid": "00000000-0000-0000-0000-000000000001"}
+            ),
+            post_data,
+            content_type,
         )
         response_json = json.loads(response.content)
         valueid = response_json["subconcepts"][0]["values"][0]["id"]
@@ -114,25 +155,45 @@ class ResourceTests(ArchesTestCase):
 
         # Add Name
         tile = Tile(
-            data={cls.search_model_name_nodeid: {"en": {"value": "Test Name 1"}, "es": {"value": "Prueba Nombre 1"}}},
+            data={
+                cls.search_model_name_nodeid: {
+                    "en": {"value": "Test Name 1"},
+                    "es": {"value": "Prueba Nombre 1"},
+                }
+            },
             nodegroup_id=cls.search_model_name_nodeid,
         )
         cls.test_resource.tiles.append(tile)
 
         # Add Cultural Period
-        tile = Tile(data={cls.search_model_cultural_period_nodeid: [valueid]}, nodegroup_id=cls.search_model_cultural_period_nodeid)
+        tile = Tile(
+            data={cls.search_model_cultural_period_nodeid: [valueid]},
+            nodegroup_id=cls.search_model_cultural_period_nodeid,
+        )
         cls.test_resource.tiles.append(tile)
 
         # Add Creation Date
-        tile = Tile(data={cls.search_model_creation_date_nodeid: "1941-01-01"}, nodegroup_id=cls.search_model_creation_date_nodeid)
+        tile = Tile(
+            data={cls.search_model_creation_date_nodeid: "1941-01-01"},
+            nodegroup_id=cls.search_model_creation_date_nodeid,
+        )
         cls.test_resource.tiles.append(tile)
 
         # Add Geometry
         cls.geom = {
             "type": "FeatureCollection",
-            "features": [{"geometry": {"type": "Point", "coordinates": [0, 0]}, "type": "Feature", "properties": {}}],
+            "features": [
+                {
+                    "geometry": {"type": "Point", "coordinates": [0, 0]},
+                    "type": "Feature",
+                    "properties": {},
+                }
+            ],
         }
-        tile = Tile(data={cls.search_model_geom_nodeid: cls.geom}, nodegroup_id=cls.search_model_geom_nodeid)
+        tile = Tile(
+            data={cls.search_model_geom_nodeid: cls.geom},
+            nodegroup_id=cls.search_model_geom_nodeid,
+        )
         cls.test_resource.tiles.append(tile)
 
         cls.test_resource.save()
@@ -178,7 +239,10 @@ class ResourceTests(ArchesTestCase):
         """
 
         test_resource_no_value = Resource(graph_id=self.search_model_graphid)
-        tile = Tile(data={self.search_model_cultural_period_nodeid: ""}, nodegroup_id=self.search_model_cultural_period_nodeid)
+        tile = Tile(
+            data={self.search_model_cultural_period_nodeid: ""},
+            nodegroup_id=self.search_model_cultural_period_nodeid,
+        )
         test_resource_no_value.tiles.append(tile)
         test_resource_no_value.save()
 
@@ -217,7 +281,9 @@ class ResourceTests(ArchesTestCase):
         """
 
         time.sleep(1)
-        result = index_resources_by_type([self.search_model_graphid], clear_index=True, batch_size=4000)
+        result = index_resources_by_type(
+            [self.search_model_graphid], clear_index=True, batch_size=4000
+        )
 
         self.assertEqual(result, "Passed")
 
@@ -240,10 +306,14 @@ class ResourceTests(ArchesTestCase):
         self.addCleanup(setattr, self.test_resource, "graph_publication", publication)
         self.addCleanup(self.test_resource.save)
         self.test_resource.refresh_from_db()
-        self.assertIsNone(self.test_resource.graph_publication)  # ensure test setup is good
+        self.assertIsNone(
+            self.test_resource.graph_publication
+        )  # ensure test setup is good
 
         # update_or_create() delegates to save()
-        obj, created = models.ResourceInstance.objects.filter(pk=self.test_resource.pk).update_or_create(
+        obj, created = models.ResourceInstance.objects.filter(
+            pk=self.test_resource.pk
+        ).update_or_create(
             pk=self.test_resource.pk,
             graph=self.test_resource.graph,
         )
@@ -256,14 +326,23 @@ class ResourceTests(ArchesTestCase):
         Test user that created instance has full permissions
         """
 
-        user = User.objects.create_user(username="sam", email="sam@samsclub.com", password="Test12345!")
+        user = User.objects.create_user(
+            username="sam", email="sam@samsclub.com", password="Test12345!"
+        )
         user.save()
         group = Group.objects.get(name="Resource Editor")
         group.user_set.add(user)
         test_resource = Resource(graph_id=self.search_model_graphid)
         test_resource.save(user=user)
         perms = set(get_perms(user, test_resource))
-        self.assertEqual(perms, {"view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"})
+        self.assertEqual(
+            perms,
+            {
+                "view_resourceinstance",
+                "change_resourceinstance",
+                "delete_resourceinstance",
+            },
+        )
 
     def test_recalculate_descriptors_prefetch_related_objects(self):
         r1 = Resource(graph_id=self.search_model_graphid)

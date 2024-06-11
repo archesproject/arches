@@ -23,7 +23,13 @@ from django.test.utils import captured_stdout
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
+from guardian.shortcuts import (
+    assign_perm,
+    get_perms,
+    remove_perm,
+    get_group_perms,
+    get_user_perms,
+)
 from arches.app.models.models import GraphModel, ResourceInstance, Node
 from arches.app.models.resource import Resource
 from arches.app.utils.permission_backend import get_editable_resource_types
@@ -56,19 +62,33 @@ class PermissionTests(ArchesTestCase):
     @classmethod
     def add_users(cls):
         profiles = (
-            {"name": "ben", "email": "ben@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
+            {
+                "name": "ben",
+                "email": "ben@test.com",
+                "password": "Test12345!",
+                "groups": ["Graph Editor", "Resource Editor"],
+            },
             {
                 "name": "sam",
                 "email": "sam@test.com",
                 "password": "Test12345!",
                 "groups": ["Graph Editor", "Resource Editor", "Resource Reviewer"],
             },
-            {"name": "jim", "email": "jim@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
+            {
+                "name": "jim",
+                "email": "jim@test.com",
+                "password": "Test12345!",
+                "groups": ["Graph Editor", "Resource Editor"],
+            },
         )
 
         for profile in profiles:
             try:
-                user = User.objects.create_user(username=profile["name"], email=profile["email"], password=profile["password"])
+                user = User.objects.create_user(
+                    username=profile["name"],
+                    email=profile["email"],
+                    password=profile["password"],
+                )
                 user.save()
 
                 for group_name in profile["groups"]:
@@ -84,13 +104,20 @@ class PermissionTests(ArchesTestCase):
         if not GraphModel.objects.filter(pk=cls.data_type_graphid).exists():
             # TODO: Fix this to run inside transaction, i.e. after super().setUpClass()
             # https://github.com/archesproject/arches/issues/10719
-            test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
+            test_pkg_path = os.path.join(
+                test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg"
+            )
             with captured_stdout():
-                management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
+                management.call_command(
+                    "packages",
+                    operation="load_package",
+                    source=test_pkg_path,
+                    yes=True,
+                    verbosity=0,
+                )
 
         super().setUpClass()
         cls.add_users()
-
 
     def test_user_cannot_view_without_permission(self):
         """
@@ -98,28 +125,42 @@ class PermissionTests(ArchesTestCase):
         not without explicit permission if a permission other than 'view_resourceinstance' is assigned.
         """
 
-        implicit_permission = user_can_read_resource(self.user, self.resource_instance_id)
-        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
+        implicit_permission = user_can_read_resource(
+            self.user, self.resource_instance_id
+        )
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
         assign_perm("change_resourceinstance", self.group, resource)
-        can_access_without_view_permission = user_can_read_resource(self.user, self.resource_instance_id)
+        can_access_without_view_permission = user_can_read_resource(
+            self.user, self.resource_instance_id
+        )
         assign_perm("view_resourceinstance", self.group, resource)
-        can_access_with_view_permission = user_can_read_resource(self.user, self.resource_instance_id)
+        can_access_with_view_permission = user_can_read_resource(
+            self.user, self.resource_instance_id
+        )
         self.assertTrue(
-            implicit_permission is True and can_access_without_view_permission is False and can_access_with_view_permission is True
+            implicit_permission is True
+            and can_access_without_view_permission is False
+            and can_access_with_view_permission is True
         )
 
     def test_user_has_resource_model_permissions(self):
         """
         Tests that a user cannot access an instance if they have no access to any nodegroup.
-        
+
         """
 
-        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
         nodes = Node.objects.filter(graph_id=resource.graph_id)
         for node in nodes:
             if node.nodegroup:
                 assign_perm("no_access_to_nodegroup", self.group, node.nodegroup)
-        hasperms = user_has_resource_model_permissions(self.user, ["models.read_nodegroup"], resource)
+        hasperms = user_has_resource_model_permissions(
+            self.user, ["models.read_nodegroup"], resource
+        )
         self.assertTrue(hasperms is False)
 
     def test_get_restricted_users(self):
@@ -127,7 +168,9 @@ class PermissionTests(ArchesTestCase):
         Tests that users are properly identified as restricted.
         """
 
-        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
         assign_perm("no_access_to_resourceinstance", self.group, resource)
         ben = self.user
         jim = User.objects.get(username="jim")

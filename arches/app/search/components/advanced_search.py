@@ -20,7 +20,9 @@ details = {
 
 
 class AdvancedSearch(BaseSearchFilter):
-    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
+    def append_dsl(
+        self, search_results_object, permitted_nodegroups, include_provisional
+    ):
         querysting_params = self.request.GET.get(details["componentname"], "")
         advanced_filters = JSONDeserializer().deserialize(querysting_params)
         datatype_factory = DataTypeFactory()
@@ -41,13 +43,21 @@ class AdvancedSearch(BaseSearchFilter):
                         except:
                             pass
 
-                        if ("op" in val and (val["op"] == "null" or val["op"] == "not_null")) or (
-                            "val" in val and (val["val"] == "null" or val["val"] == "not_null")
+                        if (
+                            "op" in val
+                            and (val["op"] == "null" or val["op"] == "not_null")
+                        ) or (
+                            "val" in val
+                            and (val["val"] == "null" or val["val"] == "not_null")
                         ):
                             # don't use a nested query with the null/not null search
-                            datatype.append_search_filters(val, node, null_query, self.request)
+                            datatype.append_search_filters(
+                                val, node, null_query, self.request
+                            )
                         else:
-                            datatype.append_search_filters(val, node, tile_query, self.request)
+                            datatype.append_search_filters(
+                                val, node, tile_query, self.request
+                            )
             nested_query = Nested(path="tiles", query=tile_query)
             if advanced_filter["op"] == "or" and index != 0:
                 grouped_query = Bool()
@@ -62,11 +72,15 @@ class AdvancedSearch(BaseSearchFilter):
     def view_data(self):
         ret = {}
         resource_graphs = (
-            models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            models.GraphModel.objects.exclude(
+                pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+            )
             .exclude(isresource=False)
             .exclude(publication=None)
         )
-        searchable_datatypes = [d.pk for d in models.DDataType.objects.filter(issearchable=True)]
+        searchable_datatypes = [
+            d.pk for d in models.DDataType.objects.filter(issearchable=True)
+        ]
         searchable_nodes = models.Node.objects.filter(
             graph__isresource=True,
             graph__publication__isnull=False,
@@ -74,9 +88,9 @@ class AdvancedSearch(BaseSearchFilter):
             issearchable=True,
         )
 
-        resource_cards = models.CardModel.objects.filter(graph__isresource=True, graph__publication__isnull=False).select_related(
-            "nodegroup"
-        )
+        resource_cards = models.CardModel.objects.filter(
+            graph__isresource=True, graph__publication__isnull=False
+        ).select_related("nodegroup")
         cardwidgets = models.CardXNodeXWidget.objects.filter(node__in=searchable_nodes)
         datatypes = models.DDataType.objects.all()
 

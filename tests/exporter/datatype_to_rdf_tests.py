@@ -21,7 +21,9 @@ from unittest.mock import Mock
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
+from arches.app.utils.data_management.resource_graphs.importer import (
+    import_graph as ResourceGraphImporter,
+)
 from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.utils.skos import SKOSReader
 from arches.app.models.models import ResourceInstance
@@ -50,14 +52,24 @@ class RDFExportUnitTests(ArchesTestCase):
 
         ResourceInstance.objects.all().delete()
 
-        for skospath in ["tests/fixtures/data/rdf_export_thesaurus.xml", "tests/fixtures/data/rdf_export_collections.xml"]:
+        for skospath in [
+            "tests/fixtures/data/rdf_export_thesaurus.xml",
+            "tests/fixtures/data/rdf_export_collections.xml",
+        ]:
             skos = SKOSReader()
             rdf = skos.read_file(skospath)
             ret = skos.save_concepts_from_skos(rdf)
 
         # Models
         for model_name in ["object_model", "document_model"]:
-            with open(os.path.join("tests/fixtures/resource_graphs/rdf_export_{0}.json".format(model_name)), "r") as f:
+            with open(
+                os.path.join(
+                    "tests/fixtures/resource_graphs/rdf_export_{0}.json".format(
+                        model_name
+                    )
+                ),
+                "r",
+            ) as f:
                 archesfile = JSONDeserializer().deserialize(f)
             ResourceGraphImporter(archesfile["graph"])
 
@@ -69,7 +81,13 @@ class RDFExportUnitTests(ArchesTestCase):
 
     def test_rdf_string(self):
         dt = self.DT.get_instance("string")
-        edge_info, edge = mock_edge(1, CIDOC_NS["name"], None, "", {"en": {"value": "test string", "direction": "ltr"}})
+        edge_info, edge = mock_edge(
+            1,
+            CIDOC_NS["name"],
+            None,
+            "",
+            {"en": {"value": "test string", "direction": "ltr"}},
+        )
         graph = dt.to_rdf(edge_info, edge)
         obj = Literal(edge_info["range_tile_data"]["en"]["value"], lang="en")
         self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, obj) in graph)
@@ -77,7 +95,14 @@ class RDFExportUnitTests(ArchesTestCase):
     def test_rdf_string_multi_language(self):
         dt = self.DT.get_instance("string")
         edge_info, edge = mock_edge(
-            1, CIDOC_NS["name"], None, "", {"en": {"value": "test", "direction": "ltr"}, "es": {"value": "prueba", "direction": "ltr"}}
+            1,
+            CIDOC_NS["name"],
+            None,
+            "",
+            {
+                "en": {"value": "test", "direction": "ltr"},
+                "es": {"value": "prueba", "direction": "ltr"},
+            },
         )
         graph = dt.to_rdf(edge_info, edge)
         enObj = Literal(edge_info["range_tile_data"]["en"]["value"], lang="en")
@@ -126,36 +151,68 @@ class RDFExportUnitTests(ArchesTestCase):
 
     def test_rdf_resource(self):
         dt = self.DT.get_instance("resource-instance")
-        edge_info, edge = mock_edge(1, CIDOC_NS["some_value"], None, "", {"resourceId": 2})
+        edge_info, edge = mock_edge(
+            1, CIDOC_NS["some_value"], None, "", {"resourceId": 2}
+        )
         graph = dt.to_rdf(edge_info, edge)
-        self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, edge_info["r_uri"]) in graph)
+        self.assertTrue(
+            (edge_info["d_uri"], edge.ontologyproperty, edge_info["r_uri"]) in graph
+        )
 
     def test_rdf_resource_list(self):
         dt = self.DT.get_instance("resource-instance-list")
-        res_inst_list = [{"resourceId": 2}, {"resourceId": 3}, {"resourceId": 4}, {"resourceId": 5}]
+        res_inst_list = [
+            {"resourceId": 2},
+            {"resourceId": 3},
+            {"resourceId": 4},
+            {"resourceId": 5},
+        ]
         edge_info, edge = mock_edge(1, CIDOC_NS["some_value"], None, "", res_inst_list)
         graph = dt.to_rdf(edge_info, edge)
         for res_inst in res_inst_list:
-            self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, ARCHES_NS["resources/{0}".format(res_inst["resourceId"])]) in graph)
+            self.assertTrue(
+                (
+                    edge_info["d_uri"],
+                    edge.ontologyproperty,
+                    ARCHES_NS["resources/{0}".format(res_inst["resourceId"])],
+                )
+                in graph
+            )
 
     def test_localized_rdf_domain(self):
         dt = self.DT.get_instance("domain-value")
-        edge_info, edge = mock_edge(1, CIDOC_NS["some_value"], None, "", "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3")
+        edge_info, edge = mock_edge(
+            1, CIDOC_NS["some_value"], None, "", "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3"
+        )
         # will have to further mock the range node for domain
         append_domain_config_to_node(edge.rangenode)
 
         translation.activate("en")
         graph = dt.to_rdf(edge_info, edge)
-        self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, Literal("one", lang="en")) in graph)
+        self.assertTrue(
+            (edge_info["d_uri"], edge.ontologyproperty, Literal("one", lang="en"))
+            in graph
+        )
 
         translation.activate("es")
         graph = dt.to_rdf(edge_info, edge)
-        self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, Literal("uno", lang="es")) in graph)
+        self.assertTrue(
+            (edge_info["d_uri"], edge.ontologyproperty, Literal("uno", lang="es"))
+            in graph
+        )
 
     def test_localized_rdf_domain_list(self):
         dt = self.DT.get_instance("domain-value-list")
-        dom_list = ["3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3", "11755d2b-36ee-4de7-8639-6914925a1f86", "ebd99837-c7d9-4be0-b5f5-87f387ae0661"]
-        dom_text = [{"en": "one", "es": "uno"}, {"en": "four", "es": "quatro"}, {"en": "six", "es": "seis"}]
+        dom_list = [
+            "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3",
+            "11755d2b-36ee-4de7-8639-6914925a1f86",
+            "ebd99837-c7d9-4be0-b5f5-87f387ae0661",
+        ]
+        dom_text = [
+            {"en": "one", "es": "uno"},
+            {"en": "four", "es": "quatro"},
+            {"en": "six", "es": "seis"},
+        ]
 
         edge_info, edge = mock_edge(1, CIDOC_NS["some_value"], None, "", dom_list)
         # will have to further mock the range node for domain
@@ -165,8 +222,18 @@ class RDFExportUnitTests(ArchesTestCase):
         graph = dt.to_rdf(edge_info, edge)
 
         for item in dom_text:
-            self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, Literal(item["es"], lang="es")) in graph)
-        self.assertFalse((edge_info["d_uri"], edge.ontologyproperty, Literal("Not Domain Text")) in graph)
+            self.assertTrue(
+                (
+                    edge_info["d_uri"],
+                    edge.ontologyproperty,
+                    Literal(item["es"], lang="es"),
+                )
+                in graph
+            )
+        self.assertFalse(
+            (edge_info["d_uri"], edge.ontologyproperty, Literal("Not Domain Text"))
+            in graph
+        )
 
     def test_rdf_concept(self):
         dt = self.DT.get_instance("concept")
@@ -184,8 +251,22 @@ class RDFExportUnitTests(ArchesTestCase):
 
         graph = dt.to_rdf(edge_info, edge)
         # print(graph.serialize(format="ttl"))
-        self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, URIRef("http://vocab.getty.edu/aat/300047196")) in graph)
-        self.assertTrue((URIRef("http://vocab.getty.edu/aat/300047196"), RDFS.label, Literal("junk sculpture")) in graph)
+        self.assertTrue(
+            (
+                edge_info["d_uri"],
+                edge.ontologyproperty,
+                URIRef("http://vocab.getty.edu/aat/300047196"),
+            )
+            in graph
+        )
+        self.assertTrue(
+            (
+                URIRef("http://vocab.getty.edu/aat/300047196"),
+                RDFS.label,
+                Literal("junk sculpture"),
+            )
+            in graph
+        )
 
     def test_rdf_concept_list(self):
         dt = self.DT.get_instance("concept-list")
@@ -206,21 +287,73 @@ class RDFExportUnitTests(ArchesTestCase):
         edge_info["r_uri"] = ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"]
         graph += dt.to_rdf(edge_info, edge)
 
-        self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, URIRef("http://vocab.getty.edu/aat/300047196")) in graph)
-        self.assertTrue((URIRef("http://vocab.getty.edu/aat/300047196"), RDFS.label, Literal("junk sculpture")) in graph)
-        self.assertTrue((edge_info["d_uri"], edge.ontologyproperty, ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"]) in graph)
-        self.assertTrue((ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"], RDFS.label, Literal("example document type")) in graph)
+        self.assertTrue(
+            (
+                edge_info["d_uri"],
+                edge.ontologyproperty,
+                URIRef("http://vocab.getty.edu/aat/300047196"),
+            )
+            in graph
+        )
+        self.assertTrue(
+            (
+                URIRef("http://vocab.getty.edu/aat/300047196"),
+                RDFS.label,
+                Literal("junk sculpture"),
+            )
+            in graph
+        )
+        self.assertTrue(
+            (
+                edge_info["d_uri"],
+                edge.ontologyproperty,
+                ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"],
+            )
+            in graph
+        )
+        self.assertTrue(
+            (
+                ARCHES_NS["concepts/037daf4d-054a-44d2-9c0a-108b59e39109"],
+                RDFS.label,
+                Literal("example document type"),
+            )
+            in graph
+        )
 
 
 def append_domain_config_to_node(node):
     node.config = {
         "options": [
-            {"id": "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3", "selected": False, "text": {"en": "one", "es": "uno"}},
-            {"id": "eccaa586-284b-4f98-b4db-bdf8bdc9efcb", "selected": False, "text": {"en": "two", "es": "dos"}},
-            {"id": "ac843999-864a-4d43-9bb9-aa3197958c7a", "selected": False, "text": {"en": "three", "es": "tres"}},
-            {"id": "11755d2b-36ee-4de7-8639-6914925a1f86", "selected": False, "text": {"en": "four", "es": "quatro"}},
-            {"id": "848a65b7-51f6-47f2-8ced-4c5398e956d4", "selected": False, "text": {"en": "five", "es": "cinco"}},
-            {"id": "ebd99837-c7d9-4be0-b5f5-87f387ae0661", "selected": False, "text": {"en": "six", "es": "seis"}},
+            {
+                "id": "3f0aaf74-f7d9-44ae-82cf-196c76d8cbc3",
+                "selected": False,
+                "text": {"en": "one", "es": "uno"},
+            },
+            {
+                "id": "eccaa586-284b-4f98-b4db-bdf8bdc9efcb",
+                "selected": False,
+                "text": {"en": "two", "es": "dos"},
+            },
+            {
+                "id": "ac843999-864a-4d43-9bb9-aa3197958c7a",
+                "selected": False,
+                "text": {"en": "three", "es": "tres"},
+            },
+            {
+                "id": "11755d2b-36ee-4de7-8639-6914925a1f86",
+                "selected": False,
+                "text": {"en": "four", "es": "quatro"},
+            },
+            {
+                "id": "848a65b7-51f6-47f2-8ced-4c5398e956d4",
+                "selected": False,
+                "text": {"en": "five", "es": "cinco"},
+            },
+            {
+                "id": "ebd99837-c7d9-4be0-b5f5-87f387ae0661",
+                "selected": False,
+                "text": {"en": "six", "es": "seis"},
+            },
         ]
     }
 

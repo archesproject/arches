@@ -8,24 +8,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '2891_adds_tile_provisional_json'),
+        ("models", "2891_adds_tile_provisional_json"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='editlog',
-            name='resourcedisplayname',
+            model_name="editlog",
+            name="resourcedisplayname",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='editlog',
-            name='user_username',
+            model_name="editlog",
+            name="user_username",
             field=models.TextField(blank=True, null=True),
         ),
-        migrations.RunSQL("""
+        migrations.RunSQL(
+            """
                 UPDATE edit_log SET resourcedisplayname = note WHERE note IS NOT NULL;
             """,
             """
                 UPDATE edit_log SET note = resourcedisplayname WHERE resourcedisplayname IS NOT NULL;
-        """),
+        """,
+        ),
     ]

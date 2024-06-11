@@ -6,7 +6,10 @@ import django.apps
 
 class Command(BaseCommand):
 
-    help = "finds any arches objects whose primary key is the input uuid and" "returns these objects in the form of a list."
+    help = (
+        "finds any arches objects whose primary key is the input uuid and"
+        "returns these objects in the form of a list."
+    )
 
     def add_arguments(self, parser):
         parser.add_argument("uuid", help="input the uuid string to find")
@@ -35,12 +38,18 @@ class Command(BaseCommand):
 
         ## return False if nothing was found
         if not objs:
-            self.stdout.write("  -- this uuid doesn't match any objects in your database")
+            self.stdout.write(
+                "  -- this uuid doesn't match any objects in your database"
+            )
             return False
 
         ## print summary of found objects
         self.stdout.write(80 * "=")
-        self.stdout.write("This UUID is the primary key for {} object{}:".format(len(objs), "s" if len(objs) > 1 else ""))
+        self.stdout.write(
+            "This UUID is the primary key for {} object{}:".format(
+                len(objs), "s" if len(objs) > 1 else ""
+            )
+        )
         for o in objs:
             self.stdout.write(80 * "-")
             self.stdout.write(str(o))

@@ -5,54 +5,54 @@
 import datetime
 from django.db import migrations, models
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '0003_40b4'),
+        ("models", "0003_40b4"),
     ]
 
     operations = [
-    
         migrations.AlterField(
-                model_name='resourcexresource',
-                name='relationshiptype',
-                field=models.TextField(blank=True, null=True),
-            ),
+            model_name="resourcexresource",
+            name="relationshiptype",
+            field=models.TextField(blank=True, null=True),
+        ),
         migrations.AddField(
-            model_name='resourcexresource',
-            name='modified',
+            model_name="resourcexresource",
+            name="modified",
             field=models.DateTimeField(default=datetime.datetime.now()),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='resourcexresource',
-            name='created',
+            model_name="resourcexresource",
+            name="created",
             field=models.DateTimeField(default=datetime.datetime.now()),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='function',
-            name='component',
+            model_name="function",
+            name="component",
             field=models.TextField(blank=True, null=True, unique=True),
         ),
         migrations.AlterField(
-            model_name='geocoder',
-            name='component',
+            model_name="geocoder",
+            name="component",
             field=models.TextField(unique=True),
         ),
         migrations.AlterField(
-            model_name='geocoder',
-            name='name',
+            model_name="geocoder",
+            name="name",
             field=models.TextField(unique=True),
         ),
         migrations.AlterField(
-            model_name='widget',
-            name='component',
+            model_name="widget",
+            name="component",
             field=models.TextField(unique=True),
         ),
         migrations.AlterField(
-            model_name='widget',
-            name='name',
+            model_name="widget",
+            name="name",
             field=models.TextField(unique=True),
         ),
     ]
