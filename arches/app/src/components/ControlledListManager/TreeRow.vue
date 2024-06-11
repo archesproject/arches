@@ -147,7 +147,7 @@ const isNewList = (node: TreeNode) => {
 };
 
 const isNewItem = (node: TreeNode) => {
-    return node.data.values && !node.data.values[0].id;
+    return !nodeIsList(node) && typeof node.data.id === 'number';
 };
 
 const acceptNewItemShortcutEntry = async () => {
@@ -188,7 +188,7 @@ const triggerAcceptNewItemShortcut = () => {
 };
 
 const triggerAcceptNewListShortcut = () => {
-    newLabelInputRef.value.$el.blur();
+    newListInputRef.value.$el.blur();
 };
 
 const acceptNewListShortcutEntry = async () => {
