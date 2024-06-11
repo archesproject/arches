@@ -59,6 +59,16 @@ define([
             return mfs;
         });
 
+        this.acceptedFiles = ko.computed(function(){
+            var aft = "Missing filetypes";
+            self.card.widgets().forEach(function(widget){
+                if (widget.node_id() === self.fileListNodeId) {
+                    aft = widget.config.acceptedFiles() || "--";
+                }
+            });
+            return aft;
+        });
+
         this.cleanUrl = function(url) {
             const httpRegex = /^https?:\/\//;
             return !url || httpRegex.test(url) || url.startsWith(arches.urls.url_subpath) ? url :
@@ -150,31 +160,59 @@ define([
         }
 
         this.addTile = function(file){
-            var newtile;
-            newtile = self.card.getNewTile();
-            var tilevalue = {
-                name: file.name,
-                accepted: true,
-                height: file.height,
-                lastModified: file.lastModified,
-                size: file.size,
-                status: file.status,
-                type: file.type,
-                width: file.width,
-                url: null,
-                file_id: null,
-                index: 0,
-                content: window.URL.createObjectURL(file),
-                error: file.error
-            };
-            newtile.data[self.fileListNodeId]([tilevalue]);
-            newtile.formData.append('file-list_' + self.fileListNodeId, file, file.name);
-            newtile.resourceinstance_id = self.card.resourceinstanceid;
-            if (self.card.tiles().length === 0) {
-                sleep(50);
+            var acceptedFileFormats;
+            var loadFile;
+            acceptedFileFormats = ((ko.unwrap(self.acceptedFiles)).split(',').map(item=>item.trim())).map(format => format.replace('.', ''));
+            if(ko.unwrap(self.acceptedFiles) != "--" && acceptedFileFormats !== undefined && acceptedFileFormats.length > 0){
+                var fileType = file.name.split('.').pop().toLowerCase();
+                if(acceptedFileFormats.includes(fileType)){
+                    loadFile = true;
+                }
+                else{
+                    loadFile = false;
+                }
             }
-            newtile.save();
-            self.card.newTile = undefined;
+            else{
+                loadFile = true;
+            }
+
+            if (loadFile === true) {
+                var newtile;
+                newtile = self.card.getNewTile();
+                var tilevalue = {
+                    name: file.name,
+                    accepted: true,
+                    height: file.height,
+                    lastModified: file.lastModified,
+                    size: file.size,
+                    status: file.status,
+                    type: file.type,
+                    width: file.width,
+                    url: null,
+                    file_id: null,
+                    index: 0,
+                    content: window.URL.createObjectURL(file),
+                    error: file.error
+                };
+                newtile.data[self.fileListNodeId]([tilevalue]);
+                newtile.formData.append('file-list_' + self.fileListNodeId, file, file.name);
+                newtile.resourceinstance_id = self.card.resourceinstanceid;
+                if (self.card.tiles().length === 0) {
+                    sleep(50);
+                }
+                newtile.save();
+                self.card.newTile = undefined;
+            }
+            else{
+
+                params.pageVm.alert(new AlertViewModel(
+                    'ep-alert-red',
+                    "Incorrect File Format",
+                    "The file format is not accepted. Please upload a file in the following formats:" + ko.unwrap(self.acceptedFiles) + ".",
+                    null,
+                    function(){}
+                ));
+            }
         };
 
         this.dropzoneOptions = {
