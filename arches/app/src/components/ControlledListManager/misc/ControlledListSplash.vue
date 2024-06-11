@@ -8,7 +8,7 @@ const { $gettext } = useGettext();
     <div class="controlled-list-splash">
         <div
             aria-hidden="true"
-            class="img-lg img-circle controlled-list-splash-img-container"
+            class="splash-large splash-circle controlled-list-splash-img-container"
         >
             <i class="fa fa-list" />
         </div>
@@ -24,6 +24,15 @@ const { $gettext } = useGettext();
 </template>
 
 <style scoped>
+.splash-large {
+    width: 96px;
+    height: 96px
+}
+
+.splash-circle {
+    border-radius: 50%;
+}
+
 .controlled-list-splash {
     text-align: center;
     margin: 48px 45px 20px 45px;
