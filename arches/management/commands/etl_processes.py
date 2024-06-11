@@ -13,6 +13,7 @@ class Command(BaseCommand):
             "--operation",
             action="store",
             dest="operation",
+            required=True,
             choices=["migrate_collections_to_controlled_lists"],
             help="The operation to perform"
         )
@@ -20,6 +21,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "-co",
             "--collections",
+            action="store",
             dest="collections_to_migrate",
             nargs="*",
             required=True,
@@ -27,21 +29,37 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            "-ow",
+            "--overwrite",
+            action="store_true",
+            dest="overwrite",
+            default=False,
+            help="Overwrite the entire controlled list and its list items/values. Default false."
+        )
+
+        parser.add_argument(
             "-psl",
             "--preferred_sort_language",
+            action="store",
             dest="preferred_sort_language",
             default="en",
-            help="The language to use for sorting preferred labels"
+            help="The language to use for sorting preferred labels. Default 'en'"
         )
 
     def handle(self, *args, **options):
         if options["operation"] == "migrate_collections_to_controlled_lists":
             self.migrate_collections_to_controlled_lists(
                 collections_to_migrate=options["collections_to_migrate"],
-                preferred_sort_language=options["preferred_sort_language"]
+                preferred_sort_language=options["preferred_sort_language"],
+                overwrite=options["overwrite"]
             )
     
-    def migrate_collections_to_controlled_lists(self, collections_to_migrate, preferred_sort_language):
+    def migrate_collections_to_controlled_lists(
+        self,
+        collections_to_migrate,
+        preferred_sort_language,
+        overwrite,
+    ):
         """
         Uses a postgres function to migrate collections to controlled lists
 
@@ -49,7 +67,8 @@ class Command(BaseCommand):
             python manage.py etl_processes 
                 -o migrate_collections_to_controlled_lists 
                 -co 'Johns list' 'Getty AAT'
-                -psl 'en'
+                -psl 'fr'
+                -ov
         """
 
         collections_in_db = list(Value.objects.filter(
@@ -73,10 +92,10 @@ class Command(BaseCommand):
             cursor.execute(
                 """
                 select * from __arches_migrate_collections_to_clm(
-                    ARRAY[%s], %s
+                    ARRAY[%s], %s::boolean, %s
                 );
                 """,
-                [collections_in_db, preferred_sort_language]
+                [collections_in_db, overwrite, preferred_sort_language]
             )
             result = cursor.fetchone()
             self.stdout.write(result[0])
