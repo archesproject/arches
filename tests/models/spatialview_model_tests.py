@@ -34,7 +34,6 @@ from django.conf import settings
 
 # these tests can be run from the command line via
 # python manage.py test tests.models.spatialview_model_tests --settings="tests.test_settings"
-SLEEP_TIME = 1
 
 class SpatialViewTests(ArchesTestCase):
     @classmethod
