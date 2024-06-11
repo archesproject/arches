@@ -1178,8 +1178,12 @@ class Command(BaseCommand):
                         valuetype = models.DValueType.objects.get(valuetype = value)
                         setattr(instance, field_name, valuetype)
                     elif field_name == "language":
-                        related_language = models.Language.objects.get(code=value)
-                        setattr(instance, field_name, related_language)
+                        try:
+                            related_language = models.Language.objects.get(code=value)
+                            setattr(instance, field_name, related_language)
+                        except models.Language.DoesNotExist:
+                            self.stdout.write(f"Language with code {value} does not exist. Please create this language before importing this data.")
+                            sys.exit()
                     else:
                         related_list_item = models.ControlledListItem.objects.get(id=value)
                         setattr(instance, field_name, related_list_item)
