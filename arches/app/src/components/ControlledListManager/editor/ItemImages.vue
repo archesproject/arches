@@ -114,7 +114,7 @@ p {
 .images {
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 3rem;
 }
 
 :deep(input[type=file]) {

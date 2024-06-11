@@ -25,8 +25,8 @@ const { $gettext } = useGettext();
 
 <style scoped>
 .splash-large {
-    width: 96px;
-    height: 96px
+    width: 10rem;
+    height: 10rem;
 }
 
 .splash-circle {
@@ -35,11 +35,11 @@ const { $gettext } = useGettext();
 
 .controlled-list-splash {
     text-align: center;
-    margin: 48px 45px 20px 45px;
+    margin: 5rem 5rem 2rem 5rem;
     border: 1px solid #ddd;
-    padding: 40px 30px;
+    padding: 4rem 3rem;
     background: #f6f6f6;
-    border-radius: 4px;
+    border-radius: 0.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -48,8 +48,8 @@ const { $gettext } = useGettext();
 .controlled-list-splash-title {
     color: #666;
     font-size: 2.8rem;
-    margin-bottom: 30px;
-    margin-top: 25px;
+    margin-bottom: 3rem;
+    margin-top: 2.5rem;
 }
 
 i {
@@ -62,7 +62,7 @@ i {
 }
 
 .controlled-list-splash-img-container {
-    padding: 20px;
+    padding: 2rem;
     background: #fff;
     border: 1px solid steelblue;
     display: inline-block;

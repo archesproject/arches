@@ -142,6 +142,6 @@ input {
 
 .edit-controls i {
     font-size: medium;
-    padding: 4px;
+    padding: 0.5rem;
 }
 </style>
