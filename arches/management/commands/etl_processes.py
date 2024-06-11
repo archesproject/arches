@@ -68,7 +68,7 @@ class Command(BaseCommand):
                 -o migrate_collections_to_controlled_lists 
                 -co 'Johns list' 'Getty AAT'
                 -psl 'fr'
-                -ov
+                -ow
         """
 
         collections_in_db = list(Value.objects.filter(
