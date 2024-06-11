@@ -9,8 +9,8 @@ class Migration(migrations.Migration):
     ]
 
     sql = """
-        update search_component set sortorder = sortorder + 1;
-        insert into search_component (
+        UPDATE search_component SET sortorder = sortorder + 1;
+        INSERT INTO search_component (
             searchcomponentid,
             name,
             icon,
@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
             sortorder,
             enabled,
             config
-        ) values (
+        ) VALUES (
             '69695d63-6f03-4536-8da9-841b07116381',
             'Core Search',
             '',
@@ -46,8 +46,13 @@ class Migration(migrations.Migration):
             'localize-descriptors',
             99,
             true,
-            '{"requiredComponents":[{"name":"core-search","searchcomponentid":"69695d63-6f03-4536-8da9-841b07116381"}]}'
+            '{"requiredComponents":[{"componentname":"core-search","searchcomponentid":"69695d63-6f03-4536-8da9-841b07116381"}]}'
         );
+        UPDATE search_component SET config = '{"requiredComponents":[{"componentname":"core-search","searchcomponentid":"69695d63-6f03-4536-8da9-841b07116381"},{"componentname":"term-filter","searchcomponentid":"1f42f501-ed70-48c5-bae1-6ff7d0d187da"}]}' WHERE componentname = 'provisional-filter';
+        UPDATE search_component SET config = '{"requiredComponents":[{"componentname":"core-search","searchcomponentid":"69695d63-6f03-4536-8da9-841b07116381"},{"componentname":"search-results","searchcomponentid":"00673743-8c1c-4cc0-bd85-c073a52e03ec"}]}' WHERE componentname = 'related-resources-filter';
+        UPDATE search_component SET config = '{"requiredComponents":[{"componentname":"core-search","searchcomponentid":"69695d63-6f03-4536-8da9-841b07116381"},{"componentname":"term-filter","searchcomponentid":"1f42f501-ed70-48c5-bae1-6ff7d0d187da"}]}' WHERE componentname = 'resource-type-filter';
+        UPDATE search_component SET config = '{"requiredComponents":[{"componentname":"core-search","searchcomponentid":"69695d63-6f03-4536-8da9-841b07116381"},{"componentname":"search-results","searchcomponentid":"00673743-8c1c-4cc0-bd85-c073a52e03ec"}]}' WHERE componentname = 'search-result-details';
+        UPDATE search_component SET config = '{"requiredComponents":[{"componentname":"core-search","searchcomponentid":"69695d63-6f03-4536-8da9-841b07116381"},{"componentname":"map-filter","searchcomponentid":"09d97fc6-8c83-4319-9cef-3aaa08c3fbec"}]}' WHERE componentname = 'search-results';
     """
     reverse_sql = """
         delete from search_component where searchcomponentid in (
@@ -58,13 +63,13 @@ class Migration(migrations.Migration):
     """
 
     operations = [
-        migrations.RunSQL(
-            sql,
-            reverse_sql,
-        ),
         migrations.AddField(
             model_name="searchcomponent",
             name="config",
             field=models.JSONField(default={"requiredComponents": []}),
+        ),
+        migrations.RunSQL(
+            sql,
+            reverse_sql,
         ),
     ]

@@ -10,8 +10,7 @@ define([
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             options.name = 'Sort Results';
-
-             
+            options.componentName = componentName;
             BaseFilter.prototype.initialize.call(this, options);
 
             this.filter = ko.observable('');

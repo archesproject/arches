@@ -15,11 +15,9 @@ define([
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             var self = this;
-
-             
             options.name = 'Search Result Details';
-            this.requiredFilters = ['search-results'];
-
+            options.componentName = componentName;
+            // this.requiredFilters = ['search-results'];
             BaseFilter.prototype.initialize.call(this, options);
 
             this.options = options;
