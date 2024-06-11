@@ -10,7 +10,6 @@ import type { Ref } from "vue";
 import type { Language } from "@/types/arches";
 import type {
     ControlledList,
-    ControlledListItem,
     DisplayedRowRefAndSetter,
 } from "@/types/ControlledListManager";
 

@@ -3,7 +3,7 @@ import { computed } from "vue";
 
 import { dataIsList } from "@/components/ControlledListManager/utils.ts";
 
-import type { ControlledList, ControlledListItem, Selectable } from "@/types/ControlledListManager";
+import type { ControlledListItem, Selectable } from "@/types/ControlledListManager";
 
 const props = defineProps<{ labelled: Selectable }>();
 
