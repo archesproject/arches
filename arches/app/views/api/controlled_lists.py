@@ -25,8 +25,8 @@ from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.utils.string_utils import str_to_bool
 
-
 logger = logging.getLogger(__name__)
+
 
 class MixedListsException(Exception):
     pass
@@ -245,8 +245,6 @@ class ControlledListView(View):
             return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
         except MixedListsException:
             return JSONErrorResponse(message=_("Items must belong to the same list."), status=HTTPStatus.BAD_REQUEST)
-        except:
-            return JSONErrorResponse()
 
         return JSONResponse(clist.serialize())
 
@@ -285,9 +283,10 @@ class ControlledListView(View):
         except ValidationError as ve:
             return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
         except MixedListsException:
-            return JSONErrorResponse(message=_("Items must belong to the same list."), status=HTTPStatus.BAD_REQUEST)
-        except:
-            return JSONErrorResponse()
+            return JSONErrorResponse(
+                message=_("Items must belong to the same list."),
+                status=HTTPStatus.BAD_REQUEST
+            )
 
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
@@ -351,9 +350,6 @@ class ControlledListItemView(View):
                 )
         except ControlledList.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
-        except Exception as e:
-            logger.error(e)
-            return JSONErrorResponse()
 
         return JSONResponse(item.serialize(), status=HTTPStatus.CREATED)
 
@@ -394,8 +390,6 @@ class ControlledListItemView(View):
             return JSONErrorResponse(message=_("Items must belong to the same list."), status=HTTPStatus.BAD_REQUEST)
         except RecursionError:
             return JSONErrorResponse(message=_("Recursive structure detected."), status=HTTPStatus.BAD_REQUEST)
-        except:
-            return JSONErrorResponse()
 
         return JSONResponse(serialized_item)
 
@@ -406,7 +400,7 @@ class ControlledListItemView(View):
 
         update_fields = list(data)
         if not update_fields:
-            return JSONErrorResponse()
+            return JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
         exclude_fields = {f for f in field_names(item) if f not in update_fields}
         try:
             item._state.adding = False
@@ -414,8 +408,6 @@ class ControlledListItemView(View):
             item.save(update_fields=update_fields)
         except ValidationError as ve:
             return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
-        except:
-            return JSONErrorResponse()
 
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
@@ -444,8 +436,6 @@ class ControlledListItemValueView(View):
             value.full_clean()
         except ValidationError as ve:
             return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
-        except:
-            return JSONErrorResponse()
         value.save()
 
         return JSONResponse(value.serialize(), status=HTTPStatus.CREATED)
@@ -472,8 +462,6 @@ class ControlledListItemValueView(View):
             value.full_clean()
         except ValidationError as ve:
             return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
-        except:
-            return JSONErrorResponse()
         value.save()
 
         return JSONResponse(value.serialize())
@@ -518,8 +506,6 @@ class ControlledListItemImageView(View):
             img.full_clean()
         except ValidationError as ve:
             return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
-        except:
-            return JSONErrorResponse()
         img.save()
         return JSONResponse(img.serialize(), status=HTTPStatus.CREATED)
 
@@ -548,8 +534,6 @@ class ControlledListItemImageMetadataView(View):
             metadata.full_clean()
         except ValidationError as ve:
             return JSONErrorResponse(message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
-        except:
-            return JSONErrorResponse()
         metadata.save()
 
         return JSONResponse(metadata.serialize(), status=HTTPStatus.CREATED)
@@ -576,8 +560,6 @@ class ControlledListItemImageMetadataView(View):
             metadata.full_clean()
         except ValidationError as ve:
             return JSONErrorResponse(message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
-        except:
-            return JSONErrorResponse()
         metadata.save()
 
         return JSONResponse(metadata.serialize())
