@@ -12,6 +12,7 @@ class Migration(migrations.Migration):
             """
             create or replace function __arches_migrate_collections_to_clm(
                 collection_names text[] default null, -- one or more collections to be migrated to controlled lists
+	            overwrite boolean default FALSE,
                 preferred_sort_language text default 'en'
             )
             returns text as $$
@@ -19,7 +20,7 @@ class Migration(migrations.Migration):
             begin
                 -- RDM Collections to Controlled Lists & List Items Migration --
                 -- To use, run: 
-                --      select * from __arches_migrate_collections_to_clm(ARRAY['Getty AAT', 'http://vocab.getty.edu/aat'], 'en');
+                --      select * from __arches_migrate_collections_to_clm(ARRAY['Getty AAT', 'http://vocab.getty.edu/aat'], True, 'en');
                 -- where the input array values are concept prefLabels or identifiers and the optional language is used for sorting
 
                 -- Conceptually:
@@ -65,6 +66,30 @@ class Migration(migrations.Migration):
                         from unnest(collection_names) elem
                         where elem <> all(failed_collections)
                     );
+                end if;
+
+                -- If overwrite flag is provided, completely recreate the list/items/values
+                if overwrite then
+                    delete from controlled_list_item_values
+                    where itemid in (
+                        select id
+                        from controlled_list_items
+                        where listid in (
+                            select id
+                            from controlled_lists
+                            where name = any(collection_names)
+                        )
+                    );
+
+                    delete from controlled_list_items
+                    where listid in (
+                        select id
+                        from controlled_lists
+                        where name = any(collection_names)
+                    );
+
+                    delete from controlled_lists
+                    where name = any(collection_names);
                 end if;
 
                 -- Migrate Collection -> Controlled List
