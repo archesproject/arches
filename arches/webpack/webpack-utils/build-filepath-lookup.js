@@ -6,8 +6,8 @@ function buildFilepathLookup(path, staticUrlPrefix) {
         return;
     }
 
-    const prefix = path.match(/[^\/]+$/);
-    const staticUrl = !!staticUrlPrefix ? staticUrlPrefix : "";
+    const prefix = path.match(/[^/]+$/);
+    const staticUrl = staticUrlPrefix ? staticUrlPrefix : "";
 
     const getFileList = function (dirPath) {
         return fs.readdirSync(dirPath, { withFileTypes: true }).reduce((fileList,entries) => {

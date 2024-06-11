@@ -46,21 +46,21 @@ module.exports = () => {
             // BEGIN create JavaScript filepath lookups
 
             const archesCoreJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.entries(archesCoreEntryPointConfiguration).reduce((acc, [path, config]) => {
-                if ((typeof config) == "object")
+                if ((typeof config) === "object")
                     acc[path + '$'] = Path.resolve(__dirname, path, config['import']);
                 else
                     console.log(`Skipping ${path}`)
                 return acc;
             }, {});
             const projectJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.entries(projectEntryPointConfiguration).reduce((acc, [path, config]) => {
-                if ((typeof config) == "object")
+                if ((typeof config) === "object")
                     acc[path + '$'] = Path.resolve(__dirname, path, config['import']);
                 else
                     console.log(`Skipping ${path}`)
                 return acc;
             }, {});
             const archesApplicationsJavascriptRelativeFilepathToAbsoluteFilepathLookup = Object.entries(archesApplicationsEntrypointConfiguration).reduce((acc, [path, config]) => {
-                if ((typeof config) == "object")
+                if ((typeof config) === "object")
                     acc[path + '$'] = Path.resolve(__dirname, path, config['import']);
                 else
                     console.log(`Skipping ${path}`)
