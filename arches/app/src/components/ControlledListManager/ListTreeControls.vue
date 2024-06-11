@@ -138,7 +138,7 @@ const confirmDelete = () => {
         rejectClass: "p-button-secondary p-button-outlined",
         acceptLabel: $gettext("Delete"),
         accept: async () => {
-            await deleteSelected().then(fetchLists);
+            await deleteSelected().then(fetchListsAndPopulateTree);
         },
         reject: () => {},
     });
@@ -150,13 +150,17 @@ const abandonMove = () => {
     rerenderTree.value += 1;
 };
 
-await fetchLists(toast, $gettext).then(
-    ({ controlled_lists } : { controlled_lists: ControlledList[] }) => {
-        controlledListItemsTree.value = controlled_lists.map(
-            list => listAsNode(list, selectedLanguage.value)
-        );
-    }
-);
+const fetchListsAndPopulateTree = async () => {
+    await fetchLists(toast, $gettext).then(
+        ({ controlled_lists } : { controlled_lists: ControlledList[] }) => {
+            controlledListItemsTree.value = controlled_lists.map(
+                list => listAsNode(list, selectedLanguage.value)
+            );
+        }
+    );
+};
+
+await fetchListsAndPopulateTree();
 </script>
 
 <template>
