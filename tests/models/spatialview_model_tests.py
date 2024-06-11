@@ -17,21 +17,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import random
-import time
-import os, json, uuid
-import django
-from django.test import tag, TransactionTestCase
-from django.contrib.auth.models import User
-from django.db import connection, connections, transaction
-from django.db.utils import InternalError, ProgrammingError, IntegrityError, OperationalError
+import os, uuid
+from django.test import TransactionTestCase
+from django.test.utils import captured_stdout
+from django.db import connection, connections
 from django.core import management
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
-from arches.app.models.resource import Resource
-from arches.app.models.graph import Graph
 from arches.app.models.models import SpatialView
-#from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
+from arches.app.utils.data_management.resource_graphs.importer import import_graph as resource_graph_importer
 from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
 from django.conf import settings
@@ -42,40 +38,39 @@ SLEEP_TIME = 1
 
 class SpatialViewTests(ArchesTestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(self):
         super().setUpClass()
 
-        # load test models
         spatialviews_other_test_model_path = os.path.join(
             test_settings.TEST_ROOT, "fixtures", "resource_graphs", "SpatialViews_Other_Model.json"
         )
         spatialviews_test_model_path = os.path.join(
             test_settings.TEST_ROOT, "fixtures", "resource_graphs", "SpatialViews_Test_Model.json"
         )
-        management.call_command("packages", operation="import_graphs", source=spatialviews_other_test_model_path, verbosity=0)
-        management.call_command("packages", operation="import_graphs", source=spatialviews_test_model_path, verbosity=0)
 
-        # load test data
         spatialviews_other_test_data_path = os.path.join(
             test_settings.TEST_ROOT, "fixtures", "data", "json", "Spatialviews_Other_Model_Data.json"
         )
         spatialviews_test_data_path = os.path.join(
             test_settings.TEST_ROOT, "fixtures", "data", "json", "SpatialViews_Test_Model_Data.json"
         )
-        BusinessDataImporter(spatialviews_other_test_data_path).import_business_data()
-        BusinessDataImporter(spatialviews_test_data_path).import_business_data()
+        with captured_stdout():
+            management.call_command("packages", operation="import_graphs", source=spatialviews_other_test_model_path, verbosity=0)
+            management.call_command("packages", operation="import_graphs", source=spatialviews_test_model_path, verbosity=0)
+            BusinessDataImporter(spatialviews_other_test_data_path).import_business_data()
+            BusinessDataImporter(spatialviews_test_data_path).import_business_data()
 
         # load en concepts value
-        cls.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
+        self.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
         with connection.cursor() as cursor:
-            cursor.execute("INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (%s, '00000000-0000-0000-0000-000000000007', 'prefLabel', '(en) is related to', 'en');", [cls.extra_concept_value_id])
-        cls.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
+            cursor.execute("INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (%s, '00000000-0000-0000-0000-000000000007', 'prefLabel', '(en) is related to', 'en');", [self.extra_concept_value_id])
+        self.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
     
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(self):
         # delete extra concept value
         with connection.cursor() as cursor:
-            cursor.execute("DELETE FROM values WHERE valueid = %s;", [cls.extra_concept_value_id])
+            cursor.execute("DELETE FROM values WHERE valueid = %s;", [self.extra_concept_value_id])
 
         super().tearDownClass()
 
@@ -229,101 +224,62 @@ class SpatialViewTests(ArchesTestCase):
 
 class SpatialViewTriggerTests(TransactionTestCase):
 
-    # following a pattern used in https://github.com/archesproject/arches/pull/10885/commits/09330d3db7e223336e9727dc8fc508f382a42607
-    # to run tests against functionality thata goes across transactions
-    #
-    # need to make sure that this test manually deletes the spatialview created in the test so
-    # and also the test data and models that are loaded in the setUpClass
-    available_apps = [
-        app for app in settings.INSTALLED_APPS if app not in (
-            "arches.app.models",
-            "django.contrib.contenttypes",
-        )
-    ]
+    serialized_rollback = True
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUp(self):
         LanguageSynchronizer.synchronize_settings_with_db()
 
-        # load test models
         spatialviews_other_test_model_path = os.path.join(
             test_settings.TEST_ROOT, "fixtures", "resource_graphs", "SpatialViews_Other_Model.json"
         )
         spatialviews_test_model_path = os.path.join(
             test_settings.TEST_ROOT, "fixtures", "resource_graphs", "SpatialViews_Test_Model.json"
         )
-        management.call_command("packages", operation="import_graphs", source=spatialviews_other_test_model_path, verbosity=0)
-        management.call_command("packages", operation="import_graphs", source=spatialviews_test_model_path, verbosity=0)
 
-        # load test data
         spatialviews_other_test_data_path = os.path.join(
             test_settings.TEST_ROOT, "fixtures", "data", "json", "Spatialviews_Other_Model_Data.json"
         )
         spatialviews_test_data_path = os.path.join(
             test_settings.TEST_ROOT, "fixtures", "data", "json", "SpatialViews_Test_Model_Data.json"
         )
-        BusinessDataImporter(spatialviews_other_test_data_path).import_business_data()
-        BusinessDataImporter(spatialviews_test_data_path).import_business_data()
+        
+        with captured_stdout():
+            management.call_command("packages", operation="import_graphs", source=spatialviews_other_test_model_path, verbosity=0)
+            management.call_command("packages", operation="import_graphs", source=spatialviews_test_model_path, verbosity=0)
+            BusinessDataImporter(spatialviews_other_test_data_path).import_business_data()
+            BusinessDataImporter(spatialviews_test_data_path).import_business_data()
 
-        cls.spatialviews_test_model_id = "5db49c51-2c70-47b3-b7be-66afced863c8"
-        cls.spatialviews_other_test_model_id = "114dd3fb-404d-4fb3-a639-1333b89cf60c"
-        cls.spatialview_geometrynode_id = "95b2c8de-1cf8-11ef-971a-0242ac130005"
+        self.spatialviews_test_model_id = "5db49c51-2c70-47b3-b7be-66afced863c8"
+        self.spatialviews_other_test_model_id = "114dd3fb-404d-4fb3-a639-1333b89cf60c"
+        self.spatialview_geometrynode_id = "95b2c8de-1cf8-11ef-971a-0242ac130005"
 
         # load en concepts value
-        cls.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
+        self.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
         with connection.cursor() as cursor:
-            cursor.execute("INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (%s, '00000000-0000-0000-0000-000000000007', 'prefLabel', '(en) is related to', 'en');", [cls.extra_concept_value_id])
-        cls.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
+            cursor.execute("INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (%s, '00000000-0000-0000-0000-000000000007', 'prefLabel', '(en) is related to', 'en');", [self.extra_concept_value_id])
+        self.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
         
         # create a spatialview with objects to test triggers
-        cls.spatialview_slug = "spatialviews_test"
-        cls.test_spatial_view = cls.generate_valid_spatiatview()
-        cls.test_spatial_view.save()
-        cls.spatialview_id = cls.test_spatial_view.spatialviewid
+        self.spatialview_slug = "spatialviews_test"
+        self.test_spatial_view = self.generate_valid_spatiatview()
+        self.test_spatial_view.save()
+        self.spatialview_id = self.test_spatial_view.spatialviewid
 
 
-    @classmethod
-    def tearDownClass(cls):
-
-        # delete the test spatialview
-        cls.test_spatial_view.delete()
-
-        # delete all resources in models spatialviews_test_model_id and spatialviews_other_test_model_id
-        Resource.objects.filter(graph_id=cls.spatialviews_test_model_id).delete()
-        Resource.objects.filter(graph_id=cls.spatialviews_other_test_model_id).delete()
-
-        # delete the models
-        try:
-            Graph.objects.get(pk=cls.spatialviews_test_model_id).delete()
-        except Graph.DoesNotExist:
-            pass
-
-        try:
-            Graph.objects.get(pk=cls.spatialviews_other_test_model_id).delete()
-        except Graph.DoesNotExist:
-            pass
-
-        # delete extra concept value
-        with connection.cursor() as cursor:
-            cursor.execute("DELETE FROM values WHERE valueid = %s;", [cls.extra_concept_value_id])
-
-        super().tearDownClass()
-
-    @classmethod
-    def get_language_instance(cls, language):
+    
+    def get_language_instance(self, language):
         return models.Language.objects.get(code=language)
     
-    @classmethod
-    def generate_valid_spatiatview(cls):
+    
+    def generate_valid_spatiatview(self):
         spatialview = SpatialView()
         spatialview.spatialviewid = uuid.uuid4()
         spatialview.schema = "public"
-        spatialview.slug = cls.spatialview_slug
+        spatialview.slug = self.spatialview_slug
         spatialview.description = "test description"
-        spatialview.geometrynode = models.Node.objects.get(nodeid="95b2c8de-1cf8-11ef-971a-0242ac130005") #cls.spatialview_geometrynode_id)
+        spatialview.geometrynode = models.Node.objects.get(nodeid="95b2c8de-1cf8-11ef-971a-0242ac130005") #self.spatialview_geometrynode_id)
         spatialview.ismixedgeometrytypes = False # Discreet geometry
-        spatialview.language = cls.get_language_instance("en")
+        spatialview.language = self.get_language_instance("en")
         spatialview.isactive = True
         spatialview.attributenodes = [
             {"nodeid": "a379b7ac-1cf8-11ef-ab82-0242ac130005", "description": "gridref"},
