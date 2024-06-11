@@ -1,6 +1,7 @@
 import json
 import uuid
 import sys
+from http import HTTPStatus
 
 from django.contrib.auth.models import Group, User
 from django.urls import reverse
@@ -194,7 +195,7 @@ class ControlledListTests(ArchesTestCase):
         with self.assertLogs("django.request", level="WARNING"):
             response = self.client.get(reverse("controlled_lists"))
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN, response.content)
 
         self.client.force_login(self.admin)
         with self.assertNumQueries(14):
@@ -213,10 +214,8 @@ class ControlledListTests(ArchesTestCase):
             # 13-14: permission checks
             response = self.client.get(reverse("controlled_lists"))
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK, response.content)
         result = json.loads(response.content)
-        # from pprint import pprint
-        # pprint(result)
 
         first_list, second_list = result["controlled_lists"]
 
@@ -266,7 +265,7 @@ class ControlledListTests(ArchesTestCase):
             response = self.client.delete(
                 reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
             )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
         del self.node_using_list1.config["controlledList"]
         self.node_using_list1.save()
         response = self.client.delete(
@@ -326,7 +325,7 @@ class ControlledListTests(ArchesTestCase):
             serialized_list,
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK, response.content)
         self.assertEqual(
             [
                 item.sortorder
@@ -352,7 +351,7 @@ class ControlledListTests(ArchesTestCase):
             content_type="application/json",
         )
 
-        self.assertEqual(response.status_code, 204, response.content)
+        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
         self.assertQuerySetEqual(
             self.list1.controlled_list_items.all().order_by("uri")
                 .values_list("sortorder", flat=True),
@@ -371,7 +370,7 @@ class ControlledListTests(ArchesTestCase):
         )
         result = json.loads(response.content)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTPStatus.OK, response.content)
         self.assertEqual(result["items"][-1]["sortorder"], 5)  # was 4, but gaps are OK
 
     def test_list_items_mixed_parents(self):
@@ -385,7 +384,7 @@ class ControlledListTests(ArchesTestCase):
                 serialized_list,
                 content_type="application/json",
             )
-        self.assertEqual(response.status_code, 400, response.content)
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
 
     def test_child_items_incorrect_parent(self):
         self.client.force_login(self.admin)
@@ -398,7 +397,7 @@ class ControlledListTests(ArchesTestCase):
                 serialized_list,
                 content_type="application/json",
             )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
 
     def test_recursive_cycles(self):
         self.client.force_login(self.admin)
@@ -414,7 +413,7 @@ class ControlledListTests(ArchesTestCase):
 
         # Speed up test by lowering recursion limit
         original_limit = sys.getrecursionlimit()
-        sys.setrecursionlimit(200)
+        sys.setrecursionlimit(100)
         self.addCleanup(sys.setrecursionlimit, original_limit)
 
         with self.assertLogs("django.request", level="WARNING"):
@@ -423,7 +422,7 @@ class ControlledListTests(ArchesTestCase):
                 parent,
                 content_type="application/json",
             )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
 
     def test_update_uri_blank(self):
         self.client.force_login(self.admin)
@@ -434,7 +433,7 @@ class ControlledListTests(ArchesTestCase):
                 {"uri": ""},
                 content_type="application/json",
             )
-        self.assertEqual(response.status_code, 204, response.content)
+        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
 
     def test_update_label_valid(self):
         self.client.force_login(self.admin)
@@ -447,7 +446,7 @@ class ControlledListTests(ArchesTestCase):
                 label,
                 content_type="application/json",
             )
-        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.status_code, HTTPStatus.OK, response.content)
 
     def test_update_label_invalid(self):
         self.client.force_login(self.admin)
@@ -461,7 +460,7 @@ class ControlledListTests(ArchesTestCase):
                     label,
                     content_type="application/json",
                 )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
 
     def test_update_metadata_valid(self):
         self.client.force_login(self.admin)
@@ -474,7 +473,7 @@ class ControlledListTests(ArchesTestCase):
                 metadatum,
                 content_type="application/json",
             )
-        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.status_code, HTTPStatus.OK, response.content)
 
     def test_update_metadata_invalid(self):
         self.client.force_login(self.admin)
@@ -488,4 +487,4 @@ class ControlledListTests(ArchesTestCase):
                     metadatum,
                     content_type="application/json",
                 )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
