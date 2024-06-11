@@ -413,7 +413,7 @@ class ControlledListTests(ArchesTestCase):
 
         # Speed up test by lowering recursion limit
         original_limit = sys.getrecursionlimit()
-        sys.setrecursionlimit(100)
+        sys.setrecursionlimit(200)
         self.addCleanup(sys.setrecursionlimit, original_limit)
 
         with self.assertLogs("django.request", level="WARNING"):
