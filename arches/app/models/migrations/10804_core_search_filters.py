@@ -20,7 +20,8 @@ class Migration(migrations.Migration):
             componentpath,
             componentname,
             sortorder,
-            enabled
+            enabled,
+            config
         ) values (
             '69695d63-6f03-4536-8da9-841b07116381',
             'Core Search',
@@ -31,7 +32,8 @@ class Migration(migrations.Migration):
             'views/components/search/core-search',
             'core-search',
             0,
-            true
+            true,
+            '{"requiredComponents":[]}'
         ),
         (
             'ada062d9-092d-400c-bcf7-94a931d1f271',
@@ -43,7 +45,8 @@ class Migration(migrations.Migration):
             'views/components/search/localize-descriptors',
             'localize-descriptors',
             99,
-            true
+            true,
+            '{"requiredComponents":[{"name":"core-search","searchcomponentid":"69695d63-6f03-4536-8da9-841b07116381"}]}'
         );
     """
     reverse_sql = """
