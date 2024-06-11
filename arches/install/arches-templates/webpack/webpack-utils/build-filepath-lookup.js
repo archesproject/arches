@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable */
 
 const Path = require('path');
 const fs = require('fs');
@@ -43,5 +43,4 @@ function buildFilepathLookup(path, staticUrlPrefix) {
     }, {});
 }
 
-// eslint-disable-next-line no-undef
 module.exports = { buildFilepathLookup };
