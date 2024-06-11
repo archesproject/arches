@@ -47,6 +47,25 @@ define([
         this.filtersList = _.sortBy(Object.values(SearchComponents), function(filter) {
             return filter.sortorder;
         }, this);
+        this.requiredFiltersLookup = this.filtersList.reduce((lookup, item) => {
+            if (item.config?.requiredFilters && item.config?.requiredFilters.length > 0) {
+                // Extract the names from requiredFilters and assign them to the lookup object under the component name
+                lookup[item.componentname] = item.config.requiredFilters.map(filter => filter.searchcomponentid);
+            } else {
+                lookup[item.componentname] = [];
+            }
+            return lookup;
+        }, {});
+        this.getRequiredFilters = function(componentname) {
+            // Map these IDs to their corresponding component names from filtersList
+            const requiredComponentNames = this.requiredFiltersLookup[componentname].map(id => {
+                // Find the component in filtersList that matches the id and return its componentname
+                const component = this.filtersList.find(component => component.searchcomponentid == id);
+                return component ? component.componentname : undefined;
+            }).filter(name => name); // This removes any undefined entries in case some IDs don't match any component
+        
+            return requiredComponentNames;
+        };
         Object.values(SearchComponents).forEach(function(component) {
             this.filters[component.componentname] = ko.observable(null);
         }, this);
