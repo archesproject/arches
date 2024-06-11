@@ -23,16 +23,13 @@ const { labeledChoices, image } = defineProps<{
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
-const addMetadata = $gettext("Add metadata");
 
 const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
     const otherNewMetadataIds = image.metadata.filter(
         (metadatum) => typeof metadatum.id === "number"
-    ).map(metadatum => metadatum.id as unknown as number);
-    const maxOtherNewMetadataId = Math.max(
-        ...otherNewMetadataIds,
-        1000,
-    );
+    ).map(metadatum => metadatum.id as number);
+
+    const maxOtherNewMetadataId = Math.max(...otherNewMetadataIds, 0);
 
     const nextMetadataType = labeledChoices.find(
         choice => !image.metadata.map(
@@ -50,7 +47,7 @@ const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
     };
 });
 
-const onAdd = () => {
+const addMetadata = () => {
     item.value.images.find(
         imageFromItem => imageFromItem.id === image.id
     )!.metadata.push(newMetadata.value);
@@ -61,14 +58,14 @@ const onAdd = () => {
     <Button
         class="add-metadata"
         raised
-        @click="onAdd"
+        @click="addMetadata"
     >
         <i
             class="fa fa-plus-circle"
             aria-hidden="true"
         />
         <span class="add-metadata-text">
-            {{ addMetadata }}
+            {{ $gettext("Add metadata") }}
         </span>
     </Button>
 </template>

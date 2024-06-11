@@ -8,10 +8,8 @@ import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
-import MoveRow from "@/components/ControlledListManager/MoveRow.vue";
-
 import { createItem, createList, upsertValue } from "@/components/ControlledListManager/api.ts";
-import { ERROR, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
+import { DEFAULT_ERROR_TOAST_LIFE, ERROR, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import {
     bestLabel,
     findNodeInTree,
@@ -19,7 +17,9 @@ import {
     listAsNode,
     nodeIsList,
 } from "@/components/ControlledListManager/utils.ts";
+import MoveRow from "@/components/ControlledListManager/MoveRow.vue";
 
+import type { Language } from "@/types/arches";
 import type { Ref } from "vue";
 import type {
     TreeExpandedKeys,
@@ -32,7 +32,6 @@ import type {
     MoveLabels,
     NewControlledListItem,
 } from "@/types/ControlledListManager";
-import type { Language } from "@/types/arches";
 
 const toast = useToast();
 const { $gettext } = useGettext();
@@ -136,7 +135,7 @@ const setParent = async (parentNode: TreeNode) => {
     } catch {
         toast.add({
             severity: ERROR,
-            life: 8000,
+            life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Move failed"),
             detail: error?.message || response?.statusText,
         });
@@ -151,7 +150,7 @@ const isNewItem = (node: TreeNode) => {
     return node.data.values && !node.data.values[0].id;
 };
 
-const onBlurNewItem = async () => {
+const acceptNewItemShortcutEntry = async () => {
     const newItem = await createItem(nextNewItem.value, toast, $gettext);
     if (newItem) {
         const newValue = {
@@ -184,15 +183,15 @@ const onBlurNewItem = async () => {
     }
 };
 
-const onEnterNewItem = () => {
+const triggerAcceptNewItemShortcut = () => {
     newLabelInputRef.value.$el.blur();
 };
 
-const onEnterNewList = () => {
-    newListInputRef.value.$el.blur();
+const triggerAcceptNewListShortcut = () => {
+    newLabelInputRef.value.$el.blur();
 };
 
-const onBlurNewList = async () => {
+const acceptNewListShortcutEntry = async () => {
     const newList = await createList(newListFormValue.value.trim(), toast, $gettext);
     tree.value = [
         ...tree.value.filter(lst => typeof lst.data.id === 'string'),
@@ -214,8 +213,8 @@ const onBlurNewList = async () => {
                 ref="newLabelInputRef"
                 v-model="newLabelFormValue"
                 autofocus
-                @blur="onBlurNewItem"
-                @keyup.enter="onEnterNewItem"
+                @blur="acceptNewItemShortcutEntry"
+                @keyup.enter="triggerAcceptNewItemShortcut"
             />
         </div>
         <div v-else-if="isNewList(node)">
@@ -224,8 +223,8 @@ const onBlurNewList = async () => {
                 ref="newListInputRef"
                 v-model="newListFormValue"
                 autofocus
-                @blur="onBlurNewList"
-                @keyup.enter="onEnterNewList"
+                @blur="acceptNewListShortcutEntry"
+                @keyup.enter="triggerAcceptNewListShortcut"
             />
         </div>
         <!-- eslint-disable vue/no-v-html -->

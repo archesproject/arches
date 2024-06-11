@@ -7,10 +7,9 @@ import { useGettext } from "vue3-gettext";
 import FileUpload from "primevue/fileupload";
 import { useToast } from "primevue/usetoast";
 
-import ImageEditor from "@/components/ControlledListManager/ImageEditor.vue";
-
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
-import { itemKey, ERROR } from "@/components/ControlledListManager/constants.ts";
+import { itemKey, DEFAULT_ERROR_TOAST_LIFE, ERROR } from "@/components/ControlledListManager/constants.ts";
+import ImageEditor from "@/components/ControlledListManager/ImageEditor.vue";
 
 import type { Ref } from "vue";
 import type { ControlledListItem } from "@/types/ControlledListManager";
@@ -34,18 +33,18 @@ const addHeader = (event: FileUploadBeforeSendEvent) => {
     }
 };
 
-const onUpload = (event: FileUploadUploadEvent) => {
+const upload = (event: FileUploadUploadEvent) => {
     if (event.xhr.status !== 201) {
-        onError(undefined);
+        showError(event);
     }
     const newImage = JSON.parse(event.xhr.responseText);
     item.value!.images.push(newImage);
 };
 
-const onError = (event?: FileUploadErrorEvent) => {
+const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
     toast.add({
         severity: ERROR,
-        life: 8000,
+        life: DEFAULT_ERROR_TOAST_LIFE,
         summary: event?.xhr?.statusText || $gettext("Image upload failed"),
     });
 };
@@ -73,8 +72,8 @@ const onError = (event?: FileUploadErrorEvent) => {
                 }),
             }"
             @before-send="addHeader($event)"
-            @upload="onUpload($event)"
-            @error="onError($event)"
+            @upload="upload($event)"
+            @error="showError($event)"
         />
         <div class="images">
             <ImageEditor

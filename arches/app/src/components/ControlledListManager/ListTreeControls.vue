@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import arches from "arches";
-import Cookies from "js-cookie";
 import { computed, inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
-
-import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
-import { DANGER, ERROR } from "@/components/ControlledListManager/constants.ts";
-import { bestLabel, listAsNode } from "@/components/ControlledListManager/utils.ts";
 
 import Button from "primevue/button";
 import ConfirmDialog from "primevue/confirmdialog";
@@ -15,18 +10,22 @@ import SplitButton from "primevue/splitbutton";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 
+import { BUTTON_GREEN } from "@/theme.ts";
+import { deleteItems, deleteLists, fetchLists } from "@/components/ControlledListManager/api.ts";
+import { displayedRowKey, selectedLanguageKey, DANGER } from "@/components/ControlledListManager/constants.ts";
+import { bestLabel, listAsNode } from "@/components/ControlledListManager/utils.ts";
+
 import type { Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/types/arches";
 import type { ControlledList, DisplayedRowRefAndSetter, NewControlledList } from "@/types/ControlledListManager";
 
-import { BUTTON_GREEN } from "@/theme.ts";
-
 const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
 const controlledListItemsTree = defineModel<TreeNode[]>({ required: true });
+const rerenderTree = defineModel<number>("rerenderTree", { required: true });
 const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", { required: true });
 const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", { required: true });
 const movingItem = defineModel<TreeNode>("movingItem", { required: true });
@@ -71,31 +70,6 @@ const expandNode = (node: TreeNode) => {
     }
 };
 
-const fetchLists = async () => {
-    let error;
-    let response;
-    try {
-        response = await fetch(arches.urls.controlled_lists);
-        if (response.ok) {
-            await response.json().then((data) => {
-                controlledListItemsTree.value = (data.controlled_lists as ControlledList[]).map(
-                    list => listAsNode(list, selectedLanguage.value)
-                );
-            });
-        } else {
-            error = await response.json();
-            throw new Error();
-        }
-    } catch {
-        toast.add({
-            severity: ERROR,
-            life: 8000,
-            summary: $gettext("Unable to fetch lists"),
-            detail: error?.message || response?.statusText,
-        });
-    }
-};
-
 const createList = () => {
     const newList: NewControlledList = {
         id: newListCounter.value,
@@ -114,86 +88,6 @@ const createList = () => {
 
     selectedKeys.value = { [newList.id]: true };
     setDisplayedRow(newList);
-};
-
-const deleteLists = async (listIds: string[]) => {
-    if (!listIds.length) {
-        return;
-    }
-    const token = Cookies.get("csrftoken");
-    if (!token) {
-        return;
-    }
-    const promises = listIds.map((id) =>
-        fetch(arches.urls.controlled_list(id), {
-            method: "DELETE",
-            headers: { "X-CSRFToken": token },
-        })
-    );
-
-    try {
-        const responses = await Promise.all(promises);
-        if (responses.some((resp) => resp.ok)) {
-            setDisplayedRow(null);
-        }
-        responses.forEach(async (response) => {
-            if (!response.ok) {
-                const body = await response.json();
-                toast.add({
-                    severity: ERROR,
-                    life: 8000,
-                    summary: $gettext("List deletion failed"),
-                    detail: body.message,
-                });
-            }
-        });
-    } catch {
-        toast.add({
-            severity: ERROR,
-            life: 8000,
-            summary: $gettext("List deletion failed"),
-        });
-    }
-};
-
-const deleteItems = async (itemIds: string[]) => {
-    if (!itemIds.length) {
-        return;
-    }
-    const token = Cookies.get("csrftoken");
-    if (!token) {
-        return;
-    }
-    const promises = itemIds.map((id) =>
-        fetch(arches.urls.controlled_list_item(id), {
-            method: "DELETE",
-            headers: { "X-CSRFToken": token },
-        })
-    );
-
-    try {
-        const responses = await Promise.all(promises);
-        if (responses.some((resp) => resp.ok)) {
-            setDisplayedRow(null);
-        }
-        responses.forEach(async (response) => {
-            if (!response.ok) {
-                const body = await response.json();
-                toast.add({
-                    severity: ERROR,
-                    life: 8000,
-                    summary: $gettext("Item deletion failed"),
-                    detail: body.message,
-                });
-            }
-        });
-    } catch {
-        toast.add({
-            severity: ERROR,
-            life: 8000,
-            summary: $gettext("Item deletion failed"),
-        });
-    }
 };
 
 const toDelete = computed(() => {
@@ -215,8 +109,16 @@ const deleteSelected = async () => {
     selectedKeys.value = {};
 
     // Do items first so that cascade deletion doesn't cause item deletion to fail.
-    await deleteItems(itemIdsToDelete);
-    await deleteLists(listIdsToDelete);
+    let anyDeleted = false;
+    if (itemIdsToDelete.length) {
+        anyDeleted = await deleteItems(itemIdsToDelete);
+    }
+    if (listIdsToDelete.length) {
+        anyDeleted = await deleteLists(listIdsToDelete) || anyDeleted;
+    }
+    if (anyDeleted) {
+        setDisplayedRow(null);
+    }
 
     isMultiSelecting.value = false;
 };
@@ -244,14 +146,17 @@ const confirmDelete = () => {
 
 const abandonMove = () => {
     movingItem.value = {};
-
-    // Clear custom classes added in <ListTree> pass-through
-    Array.from(
-        abandonMoveRef.value!.$el.ownerDocument.getElementsByClassName('is-adjusting-parent')
-    ).forEach(li => (li as unknown as HTMLElement).classList.remove('is-adjusting-parent'));
+    // Clear custom classes added in <Tree> pass-through
+    rerenderTree.value += 1;
 };
 
-await fetchLists();
+await fetchLists(toast, $gettext).then(
+    ({ controlled_lists } : { controlled_lists: ControlledList[] }) => {
+        controlledListItemsTree.value = controlled_lists.map(
+            list => listAsNode(list, selectedLanguage.value)
+        );
+    }
+);
 </script>
 
 <template>

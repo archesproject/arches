@@ -10,13 +10,11 @@ import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import { useToast } from "primevue/usetoast";
 
-import { deleteValue, upsertValue } from "@/components/ControlledListManager/api.ts";
-import AddValue from "@/components/ControlledListManager/AddValue.vue";
-
-import { ALT_LABEL, NOTE, NOTE_CHOICES, PREF_LABEL, itemKey } from "@/components/ControlledListManager/constants.ts";
-import { languageName } from "@/components/ControlledListManager/utils.ts";
-
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
+import { deleteValue, upsertValue } from "@/components/ControlledListManager/api.ts";
+import { ALT_LABEL, NOTE, NOTE_CHOICES, PREF_LABEL, itemKey } from "@/components/ControlledListManager/constants.ts";
+import { languageNameFromCode } from "@/components/ControlledListManager/utils.ts";
+import AddValue from "@/components/ControlledListManager/AddValue.vue";
 
 import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
@@ -126,7 +124,7 @@ const values = computed(() => {
     );
 });
 
-const onSave = async (event: DataTableRowEditInitEvent) => {
+const saveValue = async (event: DataTableRowEditInitEvent) => {
     // normalize new value numbers (starting at 1000) to null
     const normalizedNewData: Value = {
         ...event.newData,
@@ -150,7 +148,7 @@ const onSave = async (event: DataTableRowEditInitEvent) => {
     }
 };
 
-const onDelete = async (value: NewValue | Value) => {
+const issueDeleteValue = async (value: NewValue | Value) => {
     if (typeof value.id === 'number') {
         removeItemValue(value);
         return;
@@ -177,7 +175,7 @@ const updateItemValue = (updatedValue: Value) => {
     }
 };
 
-const onEdit = (event: DataTableRowEditInitEvent) => {
+const setRowFocus = (event: DataTableRowEditInitEvent) => {
     rowIndexToFocus.value = event.index;
 };
 
@@ -231,8 +229,8 @@ const focusInput = () => {
             striped-rows
             scrollable
             :style="{ fontSize: 'small' }"
-            @row-edit-init="onEdit"
-            @row-edit-save="onSave"
+            @row-edit-init="setRowFocus"
+            @row-edit-save="saveValue"
         >
             <!-- Note type dropdown (if this is a note editor) -->
             <Column
@@ -306,7 +304,7 @@ const focusInput = () => {
                     />
                 </template>
                 <template #body="slotProps">
-                    {{ `${languageName(slotProps.data.language_id)} (${slotProps.data.language_id})` }}
+                    {{ `${languageNameFromCode(slotProps.data.language_id)} (${slotProps.data.language_id})` }}
                 </template>
             </Column>
             <Column
@@ -320,15 +318,15 @@ const focusInput = () => {
                         role="button"
                         tabindex="0"
                         :aria-label="$gettext('Delete')"
-                        @click="onDelete(slotProps.data)"
-                        @key.enter="onDelete(slotProps.data)"
+                        @click="issueDeleteValue(slotProps.data)"
+                        @key.enter="issueDeleteValue(slotProps.data)"
                     />
                 </template>
             </Column>
         </DataTable>
         <AddValue
             :value-type
-            :new-value-callback="makeValueEditable"
+            :make-value-editable
         />
     </div>
 </template>

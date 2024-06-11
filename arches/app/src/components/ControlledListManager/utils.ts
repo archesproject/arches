@@ -21,7 +21,7 @@ export const bestLabel = (item: ControlledListItem, languageCode: string) => {
     return bestLabel;
 };
 
-export const languageName = (code: string) => {
+export const languageNameFromCode = (code: string) => {
     return arches.languages.find((lang: Language) => lang.code === code).name;
 };
 
@@ -71,9 +71,7 @@ export const listAsNode = (
     };
 };
 
-export const sortOrderMap = (
-    list: ControlledList,
-) => {
+export const makeSortOrderMap = (list: ControlledList) => {
     const ret = {};
 
     const stripAllButSortOrderRecursive = (

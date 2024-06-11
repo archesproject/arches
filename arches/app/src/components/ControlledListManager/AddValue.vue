@@ -22,9 +22,9 @@ import type {
     ValueType,
 } from "@/types/ControlledListManager";
 
-const { valueType, newValueCallback } = defineProps<{
+const { valueType, makeValueEditable } = defineProps<{
     valueType?: ValueType,
-    newValueCallback: (newValue: NewValue, index: number) => void,
+    makeValueEditable: (newValue: NewValue, index: number) => void,
 }>();
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
@@ -33,11 +33,9 @@ const { $gettext } = useGettext();
 const newValue: Ref<NewValue> = computed(() => {
     const otherNewValueIds = item.value.values.filter(
         (value: NewValue | Value) => typeof value.id === "number"
-    ).map(value => value.id as unknown as number);
-    const maxOtherNewValueId = Math.max(
-        ...otherNewValueIds,
-        1000,
-    );
+    ).map(value => value.id as number);
+
+    const maxOtherNewValueId = Math.max(...otherNewValueIds, 0);
 
     let nextLanguageCode = arches.activeLanguage;
     if (valueType === PREF_LABEL) {
@@ -87,10 +85,10 @@ const buttonLabel = computed(() => {
     }
 });
 
-const onClick = () => {
+const addValue = () => {
     const staticNewValue = { ...newValue.value };
     item.value.values.push(staticNewValue);
-    newValueCallback(staticNewValue, -1);
+    makeValueEditable(staticNewValue, -1);
 };
 </script>
 
@@ -98,7 +96,7 @@ const onClick = () => {
     <Button
         class="add-value"
         raised
-        @click="onClick"
+        @click="addValue"
     >
         <i
             class="fa fa-plus-circle"

@@ -2,11 +2,9 @@
 import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
-
 import { itemKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
-
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
+import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 
 import type { Ref } from "vue";
 import type { Language } from "@/types/arches";
