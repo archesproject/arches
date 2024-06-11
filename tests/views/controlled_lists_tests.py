@@ -337,7 +337,29 @@ class ControlledListTests(ArchesTestCase):
             [1, 0, 2, 3, 4],
         )
 
-    def test_list_items_sortorder_recalculated(self):
+    def test_list_items_provide_new_sortorder(self):
+        self.client.force_login(self.admin)
+
+        response = self.client.patch(
+            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
+            # Reverse the sortorder
+            {
+                "sortorder_map": {
+                    str(item.pk): i
+                    for i, item in enumerate(reversed(self.list1.controlled_list_items.all()))
+                },
+            },
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 204, response.content)
+        self.assertQuerySetEqual(
+            self.list1.controlled_list_items.all().order_by("uri")
+                .values_list("sortorder", flat=True),
+            [4, 3, 2, 1, 0],
+        )
+
+    def test_list_items_recalculate_sortorder(self):
         self.client.force_login(self.admin)
         serialized_list = self.list1.serialize(flat=False)
 
@@ -363,7 +385,7 @@ class ControlledListTests(ArchesTestCase):
                 serialized_list,
                 content_type="application/json",
             )
-        self.assertEqual(response.status_code, 400, response._container)
+        self.assertEqual(response.status_code, 400, response.content)
 
     def test_child_items_incorrect_parent(self):
         self.client.force_login(self.admin)
@@ -405,16 +427,14 @@ class ControlledListTests(ArchesTestCase):
 
     def test_update_uri_blank(self):
         self.client.force_login(self.admin)
-        serialized_list = self.list1.serialize(flat=False)
-        for item in serialized_list["items"]:
-            item["uri"] = ""
+        item = self.list1.controlled_list_items.first()
 
-        response = self.client.post(
-            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
-                serialized_list,
+        response = self.client.patch(
+            reverse("controlled_list_item", kwargs={"id": str(item.pk)}),
+                {"uri": ""},
                 content_type="application/json",
             )
-        self.assertEqual(response.status_code, 200, response._container)
+        self.assertEqual(response.status_code, 204, response.content)
 
     def test_update_label_valid(self):
         self.client.force_login(self.admin)
@@ -427,7 +447,7 @@ class ControlledListTests(ArchesTestCase):
                 label,
                 content_type="application/json",
             )
-        self.assertEqual(response.status_code, 200, response._container)
+        self.assertEqual(response.status_code, 200, response.content)
 
     def test_update_label_invalid(self):
         self.client.force_login(self.admin)
@@ -454,7 +474,7 @@ class ControlledListTests(ArchesTestCase):
                 metadatum,
                 content_type="application/json",
             )
-        self.assertEqual(response.status_code, 200, response._container)
+        self.assertEqual(response.status_code, 200, response.content)
 
     def test_update_metadata_invalid(self):
         self.client.force_login(self.admin)
