@@ -230,7 +230,7 @@ const focusInput = () => {
             </Column>
             <Column
                 :row-editor="true"
-                style="width: 5%; min-width: 8rem; text-align: center;"
+                style="width: 5%; min-width: 6rem; text-align: center;"
             />
             <Column style="width: 5%; text-align: center;">
                 <template #body="slotProps">
