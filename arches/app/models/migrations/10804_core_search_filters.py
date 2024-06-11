@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.db import migrations
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -58,5 +58,10 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             sql,
             reverse_sql,
-        )
+        ),
+        migrations.AddField(
+            model_name="searchcomponent",
+            name="config",
+            field=models.JSONField(default={"requiredComponents": []}),
+        ),
     ]
