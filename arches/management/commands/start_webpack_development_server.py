@@ -36,15 +36,11 @@ class Command(BaseCommand):
             dest="operation",
             default="build",
             choices=["build"],
-            help="Operation Type; build=Alias for `yarn start`",
+            help="Operation Type; build=Alias for `npm start`",
         )
 
     def handle(self, *args, **options):
         print("operation: " + options["operation"])
         if options["operation"] == "build":
             if settings.STATIC_ROOT != "":
-                proj_name = settings.APP_NAME
-                yarn_path = os.path.join(os.getcwd(), proj_name)
-                os.chdir(yarn_path)
-
-                subprocess.call("yarn start", shell=True)
+                subprocess.call("npm start", shell=True)

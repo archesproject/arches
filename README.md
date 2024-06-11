@@ -39,7 +39,7 @@ in a separate terminal, activate your virtual environment and navigate to the ro
 ```
 and run
 ```   
-    yarn build_development
+    npm run build_development
 ```
 to create a frontend asset bundle. This process should complete in less than 2 minutes.
 

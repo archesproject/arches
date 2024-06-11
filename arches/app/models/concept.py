@@ -88,7 +88,9 @@ class Concept(object):
             self.id = str(value["id"]) if "id" in value else ""
             self.nodetype = value["nodetype"] if "nodetype" in value else ""
             self.legacyoid = value["legacyoid"] if "legacyoid" in value else ""
-            self.relationshiptype = value["relationshiptype"] if "relationshiptype" in value else ""
+            self.relationshiptype = (
+                value["relationshiptype"] if "relationshiptype" in value else ""
+            )
             if "values" in value:
                 for val in value["values"]:
                     self.addvalue(val)
@@ -130,30 +132,48 @@ class Concept(object):
 
         _cache = kwargs.pop("_cache", {})
         _cache[self.id] = self.__class__(
-            {"id": self.id, "nodetype": self.nodetype, "legacyoid": self.legacyoid, "relationshiptype": self.relationshiptype}
+            {
+                "id": self.id,
+                "nodetype": self.nodetype,
+                "legacyoid": self.legacyoid,
+                "relationshiptype": self.relationshiptype,
+            }
         )
 
         if semantic == True:
             pathway_filter = (
                 pathway_filter
                 if pathway_filter
-                else Q(relationtype__category="Semantic Relations") | Q(relationtype__category="Properties")
+                else Q(relationtype__category="Semantic Relations")
+                | Q(relationtype__category="Properties")
             )
         else:
-            pathway_filter = pathway_filter if pathway_filter else Q(relationtype="member") | Q(relationtype="hasCollection")
+            pathway_filter = (
+                pathway_filter
+                if pathway_filter
+                else Q(relationtype="member") | Q(relationtype="hasCollection")
+            )
 
         if self.id != "":
             nodetype = kwargs.pop("nodetype", self.nodetype)
             uplevel = kwargs.pop("uplevel", 0)
             downlevel = kwargs.pop("downlevel", 0)
             depth_limit = depth_limit if depth_limit is None else int(depth_limit)
-            up_depth_limit = up_depth_limit if up_depth_limit is None else int(up_depth_limit)
+            up_depth_limit = (
+                up_depth_limit if up_depth_limit is None else int(up_depth_limit)
+            )
 
             if include is not None:
                 if len(include) > 0 and len(exclude) > 0:
-                    raise Exception(_("Only include values for include or exclude, but not both"))
+                    raise Exception(
+                        _("Only include values for include or exclude, but not both")
+                    )
                 include = (
-                    include if len(include) != 0 else models.DValueType.objects.distinct("category").values_list("category", flat=True)
+                    include
+                    if len(include) != 0
+                    else models.DValueType.objects.distinct("category").values_list(
+                        "category", flat=True
+                    )
                 )
                 include = set(include).difference(exclude)
                 exclude = []
@@ -164,12 +184,16 @@ class Concept(object):
                         if value.valuetype.category in include:
                             self.values.append(ConceptValue(value))
 
-            hassubconcepts = models.Relation.objects.filter(Q(conceptfrom=self.id), pathway_filter, ~Q(relationtype="related"))[0:1]
+            hassubconcepts = models.Relation.objects.filter(
+                Q(conceptfrom=self.id), pathway_filter, ~Q(relationtype="related")
+            )[0:1]
             if len(hassubconcepts) > 0:
                 self.hassubconcepts = True
 
             if include_subconcepts:
-                conceptrealations = models.Relation.objects.filter(Q(conceptfrom=self.id), pathway_filter, ~Q(relationtype="related"))
+                conceptrealations = models.Relation.objects.filter(
+                    Q(conceptfrom=self.id), pathway_filter, ~Q(relationtype="related")
+                )
                 if depth_limit is None or downlevel < depth_limit:
                     if depth_limit is not None:
                         downlevel = downlevel + 1
@@ -199,13 +223,19 @@ class Concept(object):
                         self.subconcepts.append(subconcept)
 
                     self.subconcepts = sorted(
-                        self.subconcepts, key=lambda concept: self.natural_keys(concept.get_sortkey(lang)), reverse=False
+                        self.subconcepts,
+                        key=lambda concept: self.natural_keys(
+                            concept.get_sortkey(lang)
+                        ),
+                        reverse=False,
                     )
                     # self.subconcepts = sorted(self.subconcepts, key=methodcaller(
                     #     'get_sortkey', lang=lang), reverse=False)
 
             if include_parentconcepts:
-                conceptrealations = models.Relation.objects.filter(Q(conceptto=self.id), pathway_filter, ~Q(relationtype="related"))
+                conceptrealations = models.Relation.objects.filter(
+                    Q(conceptto=self.id), pathway_filter, ~Q(relationtype="related")
+                )
                 if up_depth_limit is None or uplevel < up_depth_limit:
                     if up_depth_limit is not None:
                         uplevel = uplevel + 1
@@ -237,20 +267,31 @@ class Concept(object):
 
             if include_relatedconcepts:
                 conceptrealations = models.Relation.objects.filter(
-                    Q(relationtype="related") | Q(relationtype__category="Mapping Properties"),
+                    Q(relationtype="related")
+                    | Q(relationtype__category="Mapping Properties"),
                     Q(conceptto=self.id) | Q(conceptfrom=self.id),
                 )
                 relations = []
                 for relation in conceptrealations:
-                    if str(relation.conceptto_id) != self.id and str(relation.relationid) not in relations:
+                    if (
+                        str(relation.conceptto_id) != self.id
+                        and str(relation.relationid) not in relations
+                    ):
                         relations.append(str(relation.relationid))
-                        relatedconcept = self.__class__().get(relation.conceptto_id, include=["label"], lang=lang)
+                        relatedconcept = self.__class__().get(
+                            relation.conceptto_id, include=["label"], lang=lang
+                        )
                         relatedconcept.relationshiptype = relation.relationtype_id
 
                         self.relatedconcepts.append(relatedconcept)
-                    if str(relation.conceptfrom_id) != self.id and str(relation.relationid) not in relations:
+                    if (
+                        str(relation.conceptfrom_id) != self.id
+                        and str(relation.relationid) not in relations
+                    ):
                         relations.append(str(relation.relationid))
-                        relatedconcept = self.__class__().get(relation.conceptfrom_id, include=["label"], lang=lang)
+                        relatedconcept = self.__class__().get(
+                            relation.conceptfrom_id, include=["label"], lang=lang
+                        )
                         relatedconcept.relationshiptype = relation.relationtype_id
 
                         self.relatedconcepts.append(relatedconcept)
@@ -258,9 +299,15 @@ class Concept(object):
         return self
 
     def save(self):
-        self.id = self.id if (self.id != "" and self.id is not None) else str(uuid.uuid4())
+        self.id = (
+            self.id if (self.id != "" and self.id is not None) else str(uuid.uuid4())
+        )
         concept, created = models.Concept.objects.get_or_create(
-            pk=self.id, defaults={"legacyoid": self.legacyoid if self.legacyoid != "" else self.id, "nodetype_id": self.nodetype}
+            pk=self.id,
+            defaults={
+                "legacyoid": self.legacyoid if self.legacyoid != "" else self.id,
+                "nodetype_id": self.nodetype,
+            },
         )
 
         for value in self.values:
@@ -283,7 +330,9 @@ class Concept(object):
             concept.save()
             self.load(concept)
 
-            for relation in models.Relation.objects.filter(conceptfrom=concept, relationtype_id="hasTopConcept"):
+            for relation in models.Relation.objects.filter(
+                conceptfrom=concept, relationtype_id="hasTopConcept"
+            ):
                 relation.relationtype_id = "narrower"
                 relation.save()
 
@@ -295,7 +344,9 @@ class Concept(object):
 
                 def applyRelationship(concept):
                     for subconcept in concept.subconcepts:
-                        concept.add_relation(subconcept, relatedconcept.relationshiptype)
+                        concept.add_relation(
+                            subconcept, relatedconcept.relationshiptype
+                        )
 
                 child_concepts.traverse(applyRelationship)
 
@@ -320,7 +371,10 @@ class Concept(object):
 
         for parentconcept in self.parentconcepts:
             relations_filter = (
-                (Q(relationtype__category="Semantic Relations") | Q(relationtype="hasTopConcept"))
+                (
+                    Q(relationtype__category="Semantic Relations")
+                    | Q(relationtype="hasTopConcept")
+                )
                 & Q(conceptfrom=parentconcept.id)
                 & Q(conceptto=self.id)
             )
@@ -335,14 +389,18 @@ class Concept(object):
                 concept.save()
                 self.load(concept)
 
-                for relation in models.Relation.objects.filter(conceptfrom=concept, relationtype_id="narrower"):
+                for relation in models.Relation.objects.filter(
+                    conceptfrom=concept, relationtype_id="narrower"
+                ):
                     relation.relationtype_id = "hasTopConcept"
                     relation.save()
 
         deletedrelatedconcepts = []
         for relatedconcept in self.relatedconcepts:
             conceptrelations = models.Relation.objects.filter(
-                Q(relationtype="related") | Q(relationtype="member") | Q(relationtype__category="Mapping Properties"),
+                Q(relationtype="related")
+                | Q(relationtype="member")
+                | Q(relationtype__category="Mapping Properties"),
                 conceptto=relatedconcept.id,
                 conceptfrom=self.id,
             )
@@ -351,7 +409,9 @@ class Concept(object):
                 deletedrelatedconcepts.append(relatedconcept)
 
             conceptrelations = models.Relation.objects.filter(
-                Q(relationtype="related") | Q(relationtype="member") | Q(relationtype__category="Mapping Properties"),
+                Q(relationtype="related")
+                | Q(relationtype="member")
+                | Q(relationtype__category="Mapping Properties"),
                 conceptfrom=relatedconcept.id,
                 conceptto=self.id,
             )
@@ -386,14 +446,18 @@ class Concept(object):
                         if len(concept.parentconcepts) <= 1:
                             for subconcept in concept.subconcepts:
                                 conceptrelation = models.Relation.objects.get(
-                                    conceptfrom=concept.id, conceptto=subconcept.id, relationtype="member"
+                                    conceptfrom=concept.id,
+                                    conceptto=subconcept.id,
+                                    relationtype="member",
                                 )
                                 conceptrelation.delete()
                                 find_concepts(subconcept)
 
                     find_concepts(concept)
                     # if the concept is a collection, loop through the nodes and delete their rdmCollection values
-                    for node in models.Node.objects.filter(config__rdmCollection=concept.id):
+                    for node in models.Node.objects.filter(
+                        config__rdmCollection=concept.id
+                    ):
                         node.config["rdmCollection"] = None
                         node.save()
 
@@ -407,7 +471,9 @@ class Concept(object):
         """
 
         relation, created = models.Relation.objects.get_or_create(
-            conceptfrom_id=self.id, conceptto_id=concepttorelate.id, relationtype_id=relationtype
+            conceptfrom_id=self.id,
+            conceptto_id=concepttorelate.id,
+            relationtype_id=relationtype,
         )
         return relation
 
@@ -427,7 +493,11 @@ class Concept(object):
         # Here we have to worry about making sure we don't delete nodes that have more than 1 parent
         if concept.nodetype == "Concept":
             concept = Concept().get(
-                id=concept.id, include_subconcepts=True, include_parentconcepts=True, include=["label"], up_depth_limit=1
+                id=concept.id,
+                include_subconcepts=True,
+                include_parentconcepts=True,
+                include=["label"],
+                up_depth_limit=1,
             )
 
             def find_concepts(concept):
@@ -447,7 +517,9 @@ class Concept(object):
                 if row[0] not in concepts_to_delete:
                     concepts_to_delete[row[0]] = Concept({"id": row[0]})
 
-                concepts_to_delete[row[0]].addvalue({"id": row[2], "conceptid": row[0], "value": row[1]})
+                concepts_to_delete[row[0]].addvalue(
+                    {"id": row[2], "conceptid": row[0], "value": row[1]}
+                )
 
         if concept.nodetype == "Collection":
             concepts_to_delete[concept.id] = concept
@@ -456,30 +528,90 @@ class Concept(object):
                 if row[0] not in concepts_to_delete:
                     concepts_to_delete[row[0]] = Concept({"id": row[0]})
 
-                concepts_to_delete[row[0]].addvalue({"id": row[2], "conceptid": row[0], "value": row[1]})
+                concepts_to_delete[row[0]].addvalue(
+                    {"id": row[2], "conceptid": row[0], "value": row[1]}
+                )
 
         return concepts_to_delete
 
-    def get_child_collections_hierarchically(self, conceptid, child_valuetypes=None, offset=0, limit=50, query=None):
+    def get_child_collections_hierarchically(
+        self, conceptid, child_valuetypes=None, offset=0, limit=50, query=None
+    ):
         child_valuetypes = child_valuetypes if child_valuetypes else ["prefLabel"]
         columns = "valueidto::text, conceptidto::text, valueto, valuetypeto, depth, count(*) OVER() AS full_count, collector"
         return self.get_child_edges(
-            conceptid, ["member"], child_valuetypes, offset=offset, limit=limit, order_hierarchically=True, query=query, columns=columns
+            conceptid,
+            ["member"],
+            child_valuetypes,
+            offset=offset,
+            limit=limit,
+            order_hierarchically=True,
+            query=query,
+            columns=columns,
         )
 
-    def get_child_collections(self, conceptid, child_valuetypes=None, parent_valuetype="prefLabel", columns=None, depth_limit=None):
+    def get_child_collections(
+        self,
+        conceptid,
+        child_valuetypes=None,
+        parent_valuetype="prefLabel",
+        columns=None,
+        depth_limit=None,
+    ):
         child_valuetypes = child_valuetypes if child_valuetypes else ["prefLabel"]
         columns = columns if columns else "conceptidto::text, valueto, valueidto::text"
-        return self.get_child_edges(conceptid, ["member"], child_valuetypes, parent_valuetype, columns, depth_limit)
+        return self.get_child_edges(
+            conceptid,
+            ["member"],
+            child_valuetypes,
+            parent_valuetype,
+            columns,
+            depth_limit,
+        )
 
-    def get_child_concepts(self, conceptid, child_valuetypes=None, parent_valuetype="prefLabel", columns=None, depth_limit=None):
+    def get_child_concepts(
+        self,
+        conceptid,
+        child_valuetypes=None,
+        parent_valuetype="prefLabel",
+        columns=None,
+        depth_limit=None,
+    ):
         columns = columns if columns else "conceptidto::text, valueto, valueidto::text"
-        return self.get_child_edges(conceptid, ["narrower", "hasTopConcept"], child_valuetypes, parent_valuetype, columns, depth_limit)
+        return self.get_child_edges(
+            conceptid,
+            ["narrower", "hasTopConcept"],
+            child_valuetypes,
+            parent_valuetype,
+            columns,
+            depth_limit,
+        )
 
-    def get_child_concepts_for_indexing(self, conceptid, child_valuetypes=None, parent_valuetype="prefLabel", depth_limit=None):
+    def get_child_concepts_for_indexing(
+        self,
+        conceptid,
+        child_valuetypes=None,
+        parent_valuetype="prefLabel",
+        depth_limit=None,
+    ):
         columns = "valueidto::text, conceptidto::text, valuetypeto, categoryto, valueto, languageto"
-        data = self.get_child_edges(conceptid, ["narrower", "hasTopConcept"], child_valuetypes, parent_valuetype, columns, depth_limit)
-        return [dict(list(zip(["id", "conceptid", "type", "category", "value", "language"], d)), top_concept="") for d in data]
+        data = self.get_child_edges(
+            conceptid,
+            ["narrower", "hasTopConcept"],
+            child_valuetypes,
+            parent_valuetype,
+            columns,
+            depth_limit,
+        )
+        return [
+            dict(
+                list(
+                    zip(["id", "conceptid", "type", "category", "value", "language"], d)
+                ),
+                top_concept="",
+            )
+            for d in data
+        ]
 
     def get_child_edges(
         self,
@@ -507,8 +639,12 @@ class Concept(object):
             return []
 
         # this interpolation is safe because `relationtypes` is hardcoded in all calls, and not accessible via the API
-        relationtypes = " or ".join(["r.relationtype = '%s'" % (relationtype) for relationtype in relationtypes])
-        offset_clause = " limit %(limit)s offset %(offset)s" if offset is not None else ""
+        relationtypes = " or ".join(
+            ["r.relationtype = '%s'" % (relationtype) for relationtype in relationtypes]
+        )
+        offset_clause = (
+            " limit %(limit)s offset %(offset)s" if offset is not None else ""
+        )
         depth_clause = " and depth < %(depth_limit)s" if depth_limit is not None else ""
 
         cursor = connection.cursor()
@@ -654,7 +790,11 @@ class Concept(object):
             else:
                 subquery = ""
 
-            sql = sql.format(subquery=subquery, offset_clause=offset_clause, depth_clause=depth_clause)
+            sql = sql.format(
+                subquery=subquery,
+                offset_clause=offset_clause,
+                depth_clause=depth_clause,
+            )
 
             recursive_table = "results" if query else "children"
             languageid = get_language() if languageid is None else languageid
@@ -727,9 +867,14 @@ class Concept(object):
                 {
                     "conceptid": conceptid,
                     "relationtypes": AsIs(relationtypes),
-                    "child_valuetypes": (child_valuetypes
+                    "child_valuetypes": (
+                        child_valuetypes
                         if child_valuetypes
-                        else list(models.DValueType.objects.filter(category="label").values_list("valuetype", flat=True))
+                        else list(
+                            models.DValueType.objects.filter(
+                                category="label"
+                            ).values_list("valuetype", flat=True)
+                        )
                     ),
                     "columns": AsIs(columns),
                     "depth_limit": depth_limit,
@@ -764,12 +909,16 @@ class Concept(object):
 
             if direction == "down":
                 for subconcept in self.subconcepts:
-                    ret = subconcept.traverse(func, direction, scope, _cache=_cache, **kwargs)
+                    ret = subconcept.traverse(
+                        func, direction, scope, _cache=_cache, **kwargs
+                    )
                     if ret is not None:
                         return ret
             else:
                 for parentconcept in self.parentconcepts:
-                    ret = parentconcept.traverse(func, direction, scope, _cache=_cache, **kwargs)
+                    ret = parentconcept.traverse(
+                        func, direction, scope, _cache=_cache, **kwargs
+                    )
                     if ret is not None:
                         return ret
 
@@ -798,18 +947,28 @@ class Concept(object):
                 retval = text
             return retval
 
-        return [atof(c) for c in re.split(r"[+-]?([0-9]+(?:[.][0-9]*)?|[.][0-9]+)", str(text))]
+        return [
+            atof(c)
+            for c in re.split(r"[+-]?([0-9]+(?:[.][0-9]*)?|[.][0-9]+)", str(text))
+        ]
 
     def get_preflabel(self, lang=settings.LANGUAGE_CODE):
         ranked_labels = []
         if self.values == []:
-            concept = Concept().get(id=self.id, include_subconcepts=False, include_parentconcepts=False, include=["label"])
+            concept = Concept().get(
+                id=self.id,
+                include_subconcepts=False,
+                include_parentconcepts=False,
+                include=["label"],
+            )
         else:
             concept = self
 
         ranked_labels = sorted(
             concept.values,
-            key=lambda label: rank_label(kind=label.type, source_lang=label.language, target_lang=lang),
+            key=lambda label: rank_label(
+                kind=label.type, source_lang=label.language, target_lang=lang
+            ),
             reverse=True,
         )
         if len(ranked_labels) == 0:
@@ -885,14 +1044,28 @@ class Concept(object):
         if self.nodetype == "ConceptScheme":
             concept = Concept().get(id=self.id, values=["label"])
             concept.index()
-            for topConcept in self.get_child_concepts_for_indexing(self.id, depth_limit=1):
+            for topConcept in self.get_child_concepts_for_indexing(
+                self.id, depth_limit=1
+            ):
                 concept = Concept().get(id=topConcept["conceptid"])
                 scheme = concept.get_context()
                 topConcept["top_concept"] = scheme.id
-                concept_docs.append(se.create_bulk_item(index=CONCEPTS_INDEX, id=topConcept["id"], data=topConcept))
-                for childConcept in concept.get_child_concepts_for_indexing(topConcept["conceptid"]):
+                concept_docs.append(
+                    se.create_bulk_item(
+                        index=CONCEPTS_INDEX, id=topConcept["id"], data=topConcept
+                    )
+                )
+                for childConcept in concept.get_child_concepts_for_indexing(
+                    topConcept["conceptid"]
+                ):
                     childConcept["top_concept"] = scheme.id
-                    concept_docs.append(se.create_bulk_item(index=CONCEPTS_INDEX, id=childConcept["id"], data=childConcept))
+                    concept_docs.append(
+                        se.create_bulk_item(
+                            index=CONCEPTS_INDEX,
+                            id=childConcept["id"],
+                            data=childConcept,
+                        )
+                    )
 
         if self.nodetype == "Concept":
             concept = Concept().get(id=self.id, values=["label"])
@@ -900,7 +1073,11 @@ class Concept(object):
             concept.index(scheme)
             for childConcept in concept.get_child_concepts_for_indexing(self.id):
                 childConcept["top_concept"] = scheme.id
-                concept_docs.append(se.create_bulk_item(index=CONCEPTS_INDEX, id=childConcept["id"], data=childConcept))
+                concept_docs.append(
+                    se.create_bulk_item(
+                        index=CONCEPTS_INDEX, id=childConcept["id"], data=childConcept
+                    )
+                )
 
         se.bulk_index(concept_docs)
 
@@ -954,33 +1131,50 @@ class Concept(object):
 
             if mode == "semantic":
                 conceptrealations = models.Relation.objects.filter(
-                    Q(conceptfrom=conceptid), Q(relationtype__category="Semantic Relations") | Q(relationtype__category="Properties")
+                    Q(conceptfrom=conceptid),
+                    Q(relationtype__category="Semantic Relations")
+                    | Q(relationtype__category="Properties"),
                 )
             if mode == "collections":
                 conceptrealations = models.Relation.objects.filter(
-                    Q(conceptfrom=conceptid), Q(relationtype="member") | Q(relationtype="hasCollection")
+                    Q(conceptfrom=conceptid),
+                    Q(relationtype="member") | Q(relationtype="hasCollection"),
                 )
-            if depth_limit is not None and len(conceptrealations) > 0 and level >= depth_limit:
+            if (
+                depth_limit is not None
+                and len(conceptrealations) > 0
+                and level >= depth_limit
+            ):
                 ret.load_on_demand = True
             else:
                 if depth_limit is not None:
                     level = level + 1
                 for relation in conceptrealations:
-                    ret.children.append(_findNarrowerConcept(relation.conceptto_id, depth_limit=depth_limit, level=level))
+                    ret.children.append(
+                        _findNarrowerConcept(
+                            relation.conceptto_id, depth_limit=depth_limit, level=level
+                        )
+                    )
 
                 ret.children = sorted(
                     ret.children,
-                    key=lambda concept: self.natural_keys(concept.sortorder if concept.sortorder else concept.label),
+                    key=lambda concept: self.natural_keys(
+                        concept.sortorder if concept.sortorder else concept.label
+                    ),
                     reverse=False,
                 )
             return ret
 
         def _findBroaderConcept(conceptid, child_concept, depth_limit=None, level=0):
             conceptrealations = models.Relation.objects.filter(
-                Q(conceptto=conceptid), ~Q(relationtype="related"), ~Q(relationtype__category="Mapping Properties")
+                Q(conceptto=conceptid),
+                ~Q(relationtype="related"),
+                ~Q(relationtype__category="Mapping Properties"),
             )
             if len(conceptrealations) > 0 and conceptid != top_concept:
-                labels = models.Value.objects.filter(concept=conceptrealations[0].conceptfrom_id)
+                labels = models.Value.objects.filter(
+                    concept=conceptrealations[0].conceptfrom_id
+                )
                 ret = concept()
                 temp = Concept()
                 for label in labels:
@@ -991,12 +1185,22 @@ class Concept(object):
                 ret.labelid = label.id
 
                 ret.children.append(child_concept)
-                return _findBroaderConcept(conceptrealations[0].conceptfrom_id, ret, depth_limit=depth_limit, level=level)
+                return _findBroaderConcept(
+                    conceptrealations[0].conceptfrom_id,
+                    ret,
+                    depth_limit=depth_limit,
+                    level=level,
+                )
             else:
                 return child_concept
 
         graph = []
-        if self.id is None or self.id == "" or self.id == "None" or self.id == top_concept:
+        if (
+            self.id is None
+            or self.id == ""
+            or self.id == "None"
+            or self.id == top_concept
+        ):
             if mode == "semantic":
                 concepts = models.Concept.objects.filter(nodetype="ConceptScheme")
                 for conceptmodel in concepts:
@@ -1065,7 +1269,13 @@ class Concept(object):
         return graph_to_paths(self)
 
     def get_node_and_links(self, lang=settings.LANGUAGE_CODE):
-        nodes = [{"concept_id": self.id, "name": self.get_preflabel(lang=lang).value, "type": "Current"}]
+        nodes = [
+            {
+                "concept_id": self.id,
+                "name": self.get_preflabel(lang=lang).value,
+                "type": "Current",
+            }
+        ]
         links = []
 
         def get_parent_nodes_and_links(current_concept, _cache=[]):
@@ -1077,7 +1287,11 @@ class Concept(object):
                         {
                             "concept_id": parent.id,
                             "name": parent.get_preflabel(lang=lang).value,
-                            "type": "Root" if len(parent.parentconcepts) == 0 else "Ancestor",
+                            "type": (
+                                "Root"
+                                if len(parent.parentconcepts) == 0
+                                else "Ancestor"
+                            ),
                         }
                     )
                     links.append(
@@ -1107,7 +1321,9 @@ class Concept(object):
                     "type": "Descendant",
                 }
             )
-            links.append({"source": self.id, "target": child.id, "relationship": "narrower"})
+            links.append(
+                {"source": self.id, "target": child.id, "relationship": "narrower"}
+            )
 
         for related in self.relatedconcepts:
             nodes.append(
@@ -1117,15 +1333,21 @@ class Concept(object):
                     "type": "Related",
                 }
             )
-            links.append({"source": self.id, "target": related.id, "relationship": "related"})
+            links.append(
+                {"source": self.id, "target": related.id, "relationship": "related"}
+            )
 
         # get unique node list and assign unique integer ids for each node (required by d3)
         nodes = list({node["concept_id"]: node for node in nodes}.values())
         for i in range(len(nodes)):
             nodes[i]["id"] = i
             for link in links:
-                link["source"] = i if link["source"] == nodes[i]["concept_id"] else link["source"]
-                link["target"] = i if link["target"] == nodes[i]["concept_id"] else link["target"]
+                link["source"] = (
+                    i if link["source"] == nodes[i]["concept_id"] else link["source"]
+                )
+                link["target"] = (
+                    i if link["target"] == nodes[i]["concept_id"] else link["target"]
+                )
 
         return {"nodes": nodes, "links": links}
 
@@ -1136,7 +1358,9 @@ class Concept(object):
         """
 
         if self.nodetype == "Concept" or self.nodetype == "Collection":
-            concept = Concept().get(id=self.id, include_parentconcepts=True, include=None)
+            concept = Concept().get(
+                id=self.id, include_parentconcepts=True, include=None
+            )
 
             def get_scheme_id(concept):
                 for parentconcept in concept.parentconcepts:
@@ -1298,7 +1522,8 @@ class Concept(object):
         def create_collection(conceptfrom):
             for relation in models.Relation.objects.filter(
                 Q(conceptfrom_id=conceptfrom.id),
-                Q(relationtype__category="Semantic Relations") | Q(relationtype__category="Properties"),
+                Q(relationtype__category="Semantic Relations")
+                | Q(relationtype__category="Properties"),
                 ~Q(relationtype="related"),
             ):
                 conceptto = Concept(relation.conceptto)
@@ -1335,7 +1560,12 @@ class ConceptValue(object):
                 self.load(args[0])
 
     def __repr__(self):
-        return ('%s: %s = "%s" in lang %s') % (self.__class__, self.type, self.value, self.language)
+        return ('%s: %s = "%s" in lang %s') % (
+            self.__class__,
+            self.type,
+            self.value,
+            self.language,
+        )
 
     def get(self, id=""):
         self.load(models.Value.objects.get(pk=id))
@@ -1343,12 +1573,20 @@ class ConceptValue(object):
 
     def save(self):
         if self.value.strip() != "":
-            self.id = self.id if (self.id != "" and self.id is not None) else str(uuid.uuid4())
+            self.id = (
+                self.id
+                if (self.id != "" and self.id is not None)
+                else str(uuid.uuid4())
+            )
             value = models.Value()
             value.pk = self.id
             value.value = self.value
-            value.concept_id = self.conceptid  # models.Concept.objects.get(pk=self.conceptid)
-            value.valuetype_id = self.type  # models.DValueType.objects.get(pk=self.type)
+            value.concept_id = (
+                self.conceptid
+            )  # models.Concept.objects.get(pk=self.conceptid)
+            value.valuetype_id = (
+                self.type
+            )  # models.DValueType.objects.get(pk=self.type)
 
             if self.language != "":
                 # need to normalize language ids to the form xx-XX
@@ -1358,7 +1596,9 @@ class ConceptValue(object):
                 except:
                     pass
                 self.language = "-".join(lang_parts)
-                value.language_id = self.language  # models.DLanguage.objects.get(pk=self.language)
+                value.language_id = (
+                    self.language
+                )  # models.DLanguage.objects.get(pk=self.language)
             else:
                 value.language_id = settings.LANGUAGE_CODE
 
@@ -1397,7 +1637,11 @@ class ConceptValue(object):
             if scheme is None:
                 scheme = self.get_scheme_id()
             if scheme is None:
-                raise Exception(_("Index of label failed.  Index type (scheme id) could not be derived from the label."))
+                raise Exception(
+                    _(
+                        "Index of label failed.  Index type (scheme id) could not be derived from the label."
+                    )
+                )
 
             data["top_concept"] = scheme.id
             se.index_data(index=CONCEPTS_INDEX, body=data, idfield="id")
@@ -1434,10 +1678,11 @@ def get_preflabel_from_conceptid(conceptid, lang):
 
     ranked = sorted(
         preflabels,
-        key=lambda prefLabel: rank_label(kind=prefLabel["_source"]["type"],
-                                         source_lang=prefLabel["_source"]["language"],
-                                         target_lang=lang,
-                                         ),
+        key=lambda prefLabel: rank_label(
+            kind=prefLabel["_source"]["type"],
+            source_lang=prefLabel["_source"]["language"],
+            target_lang=lang,
+        ),
         reverse=True,
     )
 
@@ -1465,9 +1710,15 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
                 }
             }
 
-    concept_label_results = se.search(index=CONCEPTS_INDEX, **exact_val_match(label, conceptid))
+    concept_label_results = se.search(
+        index=CONCEPTS_INDEX, **exact_val_match(label, conceptid)
+    )
     if concept_label_results is None:
-        print("Found no matches for label:'{0}' and concept_id: '{1}'".format(label, conceptid))
+        print(
+            "Found no matches for label:'{0}' and concept_id: '{1}'".format(
+                label, conceptid
+            )
+        )
         return
     return [
         res["_source"]

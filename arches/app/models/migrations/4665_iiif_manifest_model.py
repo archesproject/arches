@@ -10,12 +10,12 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4665_remove_disco_widgets'),
+        ("models", "4665_remove_disco_widgets"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='IIIFManifest',
+            name="IIIFManifest",
         ),
         migrations.RunSQL(
             """
@@ -49,6 +49,6 @@ class Migration(migrations.Migration):
                 'iiif-drawing',
                 '{ "placeholder": "", "options": [], "nameLabel": "Name", "typeLabel": "Type"}'
             );
-            """
-            )
-      ]
+            """,
+        ),
+    ]

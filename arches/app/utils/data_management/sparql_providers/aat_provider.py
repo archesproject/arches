@@ -29,7 +29,9 @@ from rdflib.namespace import SKOS, DCTERMS
 
 class AAT_Provider(Abstract_Provider):
     def __init__(self, **kwargs):
-        super(AAT_Provider, self).__init__("http://vocab.getty.edu/sparql.json", **kwargs)
+        super(AAT_Provider, self).__init__(
+            "http://vocab.getty.edu/sparql.json", **kwargs
+        )
 
         self.name = _("Getty AAT")
         self.setReturnFormat(JSON)
@@ -41,7 +43,10 @@ class AAT_Provider(Abstract_Provider):
         """
 
         default_lang = settings.LANGUAGE_CODE
-        dcterms_identifier_type = DValueType.objects.get(valuetype=str(DCTERMS.identifier).replace(str(DCTERMS), ""), namespace="dcterms")
+        dcterms_identifier_type = DValueType.objects.get(
+            valuetype=str(DCTERMS.identifier).replace(str(DCTERMS), ""),
+            namespace="dcterms",
+        )
 
         concepts = []
         langs = []
@@ -73,7 +78,11 @@ class AAT_Provider(Abstract_Provider):
                 concept.nodetype = "Concept"
                 for result in results["results"]["bindings"]:
                     concept.addvalue(
-                        {"type": result["type"]["value"], "value": result["value"]["value"], "language": result["value"]["xml:lang"]}
+                        {
+                            "type": result["type"]["value"],
+                            "value": result["value"]["value"],
+                            "language": result["value"]["xml:lang"],
+                        }
                     )
                 concept.addvalue(
                     {
@@ -124,7 +133,11 @@ class AAT_Provider(Abstract_Provider):
         # print query
         # return HttpResponse(self.endpoint + '?' + self._getRequestEncodedParameters(("query", self.queryString)))
 
-        req = urllib.request.Request(self.endpoint + "?" + self._getRequestEncodedParameters(("query", self.queryString)))
+        req = urllib.request.Request(
+            self.endpoint
+            + "?"
+            + self._getRequestEncodedParameters(("query", self.queryString))
+        )
         req.add_header("Accept", "application/sparql-results+json")
         f = urllib.request.urlopen(req)
         return JSONDeserializer().deserialize(f.read())

@@ -3,14 +3,16 @@
 
 from django.db import migrations
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '2533_duplicated_concept_relation_import'),
+        ("models", "2533_duplicated_concept_relation_import"),
     ]
 
     operations = [
-        migrations.RunSQL("""
+        migrations.RunSQL(
+            """
             INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
                 VALUES ('adfd15ce-dbab-11e7-86d1-0fcf08612b27', 'edtf-widget', 'views/components/widgets/edtf', 'edtf', '{
                         "placeholder": "",
@@ -26,5 +28,6 @@ class Migration(migrations.Migration):
             """
             DELETE FROM d_data_types WHERE datatype = 'edtf';
             DELETE from widgets WHERE widgetid = 'adfd15ce-dbab-11e7-86d1-0fcf08612b27';
-        """),
+        """,
+        ),
     ]

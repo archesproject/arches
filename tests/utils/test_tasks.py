@@ -11,7 +11,9 @@ from arches.app.tasks import package_load_complete
 
 class TaskTests(TestCase):
     def test_package_load_complete(self):
-        resource_path = os.path.join("tests", "fixtures", "data", "json", "example_source_business_data.json")
+        resource_path = os.path.join(
+            "tests", "fixtures", "data", "json", "example_source_business_data.json"
+        )
         package_load_complete(valid_resource_paths=[resource_path])
 
         notif = models.Notification.objects.all().order_by("-created").first()

@@ -19,20 +19,24 @@ class Migration(migrations.Migration):
     def delete_editable_future_graphs(apps, schema_editor):
         with connection.cursor() as cursor:
             cursor.execute("ALTER TABLE graphs DISABLE TRIGGER ALL;")
-            
+
             cursor.execute("DELETE FROM graphs WHERE source_identifier IS NOT NULL;")
             cursor.execute("DELETE FROM nodes WHERE source_identifier IS NOT NULL;")
             cursor.execute("DELETE FROM edges WHERE source_identifier IS NOT NULL;")
             cursor.execute("DELETE FROM cards WHERE source_identifier IS NOT NULL;")
-            cursor.execute("DELETE FROM cards_x_nodes_x_widgets WHERE source_identifier IS NOT NULL;")
-            cursor.execute("""
+            cursor.execute(
+                "DELETE FROM cards_x_nodes_x_widgets WHERE source_identifier IS NOT NULL;"
+            )
+            cursor.execute(
+                """
                 DELETE FROM node_groups
                 WHERE NOT EXISTS (
                     SELECT 1
                     FROM nodes
                     WHERE nodes.nodegroupid = node_groups.nodegroupid
                 );
-            """)
+            """
+            )
 
             cursor.execute("ALTER TABLE graphs ENABLE TRIGGER ALL;")
 
@@ -44,7 +48,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="PublishedGraphEdit",
             fields=[
-                ("edit_id", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "edit_id",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("edit_time", models.DateTimeField(default=datetime.datetime.now)),
                 ("notes", models.TextField(blank=True, null=True)),
             ],
@@ -57,32 +66,56 @@ class Migration(migrations.Migration):
             model_name="graphxpublishedgraph",
             name="user",
             field=models.ForeignKey(
-                db_column="userid", null=True, on_delete=django.db.models.deletion.DO_NOTHING, to=settings.AUTH_USER_MODEL
+                db_column="userid",
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to=settings.AUTH_USER_MODEL,
             ),
         ),
         migrations.AddField(
             model_name="publishedgraphedit",
             name="publication",
             field=models.ForeignKey(
-                db_column="publicationid", on_delete=django.db.models.deletion.CASCADE, to="models.graphxpublishedgraph"
+                db_column="publicationid",
+                on_delete=django.db.models.deletion.CASCADE,
+                to="models.graphxpublishedgraph",
             ),
         ),
         migrations.AddField(
             model_name="publishedgraphedit",
             name="user",
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
             model_name="graphxpublishedgraph",
             name="most_recent_edit",
             field=models.ForeignKey(
-                blank=True, db_column="edit_id", null=True, on_delete=django.db.models.deletion.DO_NOTHING, to="models.publishedgraphedit"
+                blank=True,
+                db_column="edit_id",
+                null=True,
+                on_delete=django.db.models.deletion.DO_NOTHING,
+                to="models.publishedgraphedit",
             ),
         ),
         migrations.AlterField(
-            model_name='graphmodel',
-            name='slug',
-            field=models.TextField(null=True, validators=[django.core.validators.RegexValidator(re.compile('^[-a-zA-Z0-9_]+\\Z'), 'Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.', 'invalid')]),
+            model_name="graphmodel",
+            name="slug",
+            field=models.TextField(
+                null=True,
+                validators=[
+                    django.core.validators.RegexValidator(
+                        re.compile("^[-a-zA-Z0-9_]+\\Z"),
+                        "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.",
+                        "invalid",
+                    )
+                ],
+            ),
         ),
-        migrations.RunPython(create_editable_future_graphs, delete_editable_future_graphs),
+        migrations.RunPython(
+            create_editable_future_graphs, delete_editable_future_graphs
+        ),
     ]

@@ -1,7 +1,7 @@
 // import declarations from other projects or Arches core
 
 // declare untyped modules that have been added to your project in `package.json`
-declare module 'arches';
+declare module "arches";
 declare module "@babel/runtime";
 declare module "@mapbox/geojsonhint";
 declare module "cross-env";
@@ -16,5 +16,5 @@ declare module "requirejs-text";
 declare module "select-woo";
 
 // declare filetypes used in `./src/` folder
-declare module '*.ts';
-declare module '*.vue';
+declare module "*.ts";
+declare module "*.vue";
