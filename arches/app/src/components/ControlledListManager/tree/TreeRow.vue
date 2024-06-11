@@ -45,9 +45,7 @@ const movingItem = defineModel<TreeNode>("movingItem", { required: true });
 const refetcher = defineModel<number>("refetcher", { required: true });
 const nextNewItem = defineModel<NewControlledListItem>("nextNewItem");
 const newLabelFormValue = defineModel<string>("newLabelFormValue", { required: true });
-const newLabelCounter = defineModel<number>("newLabelCounter", { required: true });
 const newListFormValue = defineModel<string>("newListFormValue", { required: true });
-const newListCounter = defineModel<number>("newListCounter", { required: true });
 const filterValue = defineModel<string>("filterValue", { required: true });
 
 const { isMultiSelecting, node, moveLabels } = defineProps<{
@@ -209,7 +207,6 @@ const acceptNewListShortcutEntry = async () => {
     >
         <div v-if="isNewItem(node)">
             <InputText
-                :key="newLabelCounter"
                 ref="newLabelInputRef"
                 v-model="newLabelFormValue"
                 autofocus
@@ -219,7 +216,6 @@ const acceptNewListShortcutEntry = async () => {
         </div>
         <div v-else-if="isNewList(node)">
             <InputText
-                :key="newListCounter"
                 ref="newListInputRef"
                 v-model="newListFormValue"
                 autofocus
@@ -261,7 +257,6 @@ const acceptNewListShortcutEntry = async () => {
                 v-model:moving-item="movingItem"
                 v-model:next-new-item="nextNewItem"
                 v-model:new-label-form-value="newLabelFormValue"
-                v-model:new-label-counter="newLabelCounter"
                 :node
                 :move-labels
             />

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject } from "vue";
+import { computed, inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { useConfirm } from "primevue/useconfirm";
@@ -31,7 +31,9 @@ const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", { required: 
 const isMultiSelecting = defineModel<boolean>("isMultiSelecting", { required: true });
 const nextNewList = defineModel<NewControlledList>("nextNewList");
 const newListFormValue = defineModel<string>("newListFormValue", { required: true });
-const newListCounter = defineModel<number>("newListCounter", { required: true });
+
+// For new list entry (input textbox)
+const newListCounter = ref(1);
 
 const { $gettext, $ngettext } = useGettext();
 const confirm = useConfirm();

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import arches from "arches";
-import { inject } from "vue";
+import { inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
@@ -48,7 +48,7 @@ const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", { required: 
 const movingItem = defineModel<TreeNode>("movingItem", { required: true });
 const nextNewItem = defineModel<NewControlledListItem>("nextNewItem");
 const newLabelFormValue = defineModel<string>("newLabelFormValue", { required: true });
-const newLabelCounter = defineModel<number>("newLabelCounter", { required: true });
+const newLabelCounter = ref(1);
 
 const isFirstItem = (item: ControlledListItem) => {
     const siblings: TreeNode[] = (

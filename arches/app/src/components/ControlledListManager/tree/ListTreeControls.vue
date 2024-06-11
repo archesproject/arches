@@ -15,7 +15,6 @@ const movingItem = defineModel<TreeNode>("movingItem", { required: true });
 const isMultiSelecting = defineModel<boolean>("isMultiSelecting", { required: true });
 const nextNewList = defineModel<NewControlledList>("nextNewList");
 const newListFormValue = defineModel<string>("newListFormValue", { required: true });
-const newListCounter = defineModel<number>("newListCounter", { required: true });
 
 const expandAll = () => {
     for (const node of controlledListItemsTree.value) {
@@ -46,7 +45,6 @@ const expandNode = (node: TreeNode) => {
             v-model:selected-keys="selectedKeys"
             v-model:next-new-list="nextNewList"
             v-model:new-list-form-value="newListFormValue"
-            v-model:new-list-counter="newListCounter"
         />
     </div>
     <ActionBanner
