@@ -111,10 +111,10 @@ const deleteSelected = async () => {
     // Do items first so that cascade deletion doesn't cause item deletion to fail.
     let anyDeleted = false;
     if (itemIdsToDelete.length) {
-        anyDeleted = await deleteItems(itemIdsToDelete);
+        anyDeleted = await deleteItems(itemIdsToDelete, toast, $gettext);
     }
     if (listIdsToDelete.length) {
-        anyDeleted = await deleteLists(listIdsToDelete) || anyDeleted;
+        anyDeleted = await deleteLists(listIdsToDelete, toast, $gettext) || anyDeleted;
     }
     if (anyDeleted) {
         setDisplayedRow(null);
