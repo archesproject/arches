@@ -43,11 +43,11 @@ const filterValue = ref("");
 const treeDOMRef: Ref<ComponentPublicInstance | null> = ref(null);
 
 // For next new item's pref label (input textbox)
-const newLabelCounter = ref(1000);
+const newLabelCounter = ref(1);
 const newLabelFormValue = ref('');
 const nextNewItem = ref<NewControlledListItem>();
 // For new list entry (input textbox)
-const newListCounter = ref(1000);
+const newListCounter = ref(1);
 const newListFormValue = ref('');
 const nextNewList = ref<NewControlledList>();
 const rerenderTree = ref(0);
