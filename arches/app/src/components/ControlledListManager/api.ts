@@ -1,8 +1,8 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 
-import { ERROR } from "@/components/ControlledListManager/constants.ts";
-import { sortOrderMap } from "@/components/ControlledListManager/utils.ts";
+import { DEFAULT_ERROR_TOAST_LIFE, ERROR } from "@/components/ControlledListManager/constants.ts";
+import { makeSortOrderMap } from "@/components/ControlledListManager/utils.ts";
 
 import type { ToastServiceMethods } from "primevue/toastservice";
 import type {
@@ -24,6 +24,30 @@ function getToken() {
     }
     return token;
 }
+
+export const fetchLists = async (
+    toast: ToastServiceMethods,
+    $gettext: GetText,
+) => {
+    let error;
+    let response;
+    try {
+        response = await fetch(arches.urls.controlled_lists);
+        if (response.ok) {
+            return await response.json();
+        } else {
+            error = await response.json();
+            throw new Error();
+        }
+    } catch {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Unable to fetch lists"),
+            detail: error?.message || response?.statusText,
+        });
+    }
+};
 
 export const createList = async(
     name: string,
@@ -158,7 +182,7 @@ export const patchList = async(
             body = { name: list.name };
             break;
         case "sortorder":
-            body = { sortorder_map: sortOrderMap(list) };
+            body = { sortorder_map: makeSortOrderMap(list) };
             break;
     }
 
@@ -180,6 +204,80 @@ export const patchList = async(
             life: 8000,
             summary: $gettext("Save failed"),
             detail: error?.message || response?.statusText,
+        });
+    }
+};
+
+export const deleteLists = async (
+    listIds: string[],
+    toast: ToastServiceMethods,
+    $gettext: GetText,
+) => {
+    const promises = listIds.map((id) =>
+        fetch(arches.urls.controlled_list(id), {
+            method: "DELETE",
+            headers: { "X-CSRFToken": getToken() },
+        })
+    );
+
+    try {
+        const responses = await Promise.all(promises);
+        if (responses.some((resp) => resp.ok)) {
+            return true;
+        }
+        responses.forEach(async (response) => {
+            if (!response.ok) {
+                const body = await response.json();
+                toast.add({
+                    severity: ERROR,
+                    life: DEFAULT_ERROR_TOAST_LIFE,
+                    summary: $gettext("List deletion failed"),
+                    detail: body.message,
+                });
+            }
+        });
+    } catch {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("List deletion failed"),
+        });
+    }
+};
+
+export const deleteItems = async (
+    itemIds: string[],
+    toast: ToastServiceMethods,
+    $gettext: GetText,
+) => {
+    const promises = itemIds.map((id) =>
+        fetch(arches.urls.controlled_list_item(id), {
+            method: "DELETE",
+            headers: { "X-CSRFToken": getToken() },
+        })
+    );
+
+    try {
+        const responses = await Promise.all(promises);
+        if (responses.some((resp) => resp.ok)) {
+            return true;
+        }
+        responses.forEach(async (response) => {
+            if (!response.ok) {
+                const body = await response.json();
+                toast.add({
+                    severity: ERROR,
+                    life: DEFAULT_ERROR_TOAST_LIFE,
+                    summary: $gettext("Item deletion failed"),
+                    detail: body.message,
+                });
+            }
+        });
+    } catch {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Item deletion failed"),
         });
     }
 };

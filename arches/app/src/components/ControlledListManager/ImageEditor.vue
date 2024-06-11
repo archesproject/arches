@@ -6,12 +6,11 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 import { useToast } from "primevue/usetoast";
 
+import { deleteImage } from "@/components/ControlledListManager/api.ts";
+import { DANGER, METADATA_CHOICES, itemKey } from "@/components/ControlledListManager/constants.ts";
+import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 import AddMetadata from "@/components/ControlledListManager/AddMetadata.vue";
 import ImageMetadata from "@/components/ControlledListManager/ImageMetadata.vue";
-
-import { DANGER, METADATA_CHOICES, itemKey } from "@/components/ControlledListManager/constants.ts";
-import { deleteImage } from "@/components/ControlledListManager/api.ts";
-import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
 import type {
@@ -45,8 +44,9 @@ const labeledChoices = [
 ];
 
 const bestTitle = computed(() => {
-    return image.metadata.filter(metadatum => metadatum.metadata_type === METADATA_CHOICES.title)
-        .find(title => title.language_id === arches.activeLanguage)?.value;
+    const titles = image.metadata.filter(metadatum => metadatum.metadata_type === METADATA_CHOICES.title);
+    return titles.find(title => title.language_id === arches.activeLanguage)?.value
+        || titles[0]?.value;
 });
 
 const bestAlternativeText = computed(() => {
@@ -55,7 +55,7 @@ const bestAlternativeText = computed(() => {
         || bestLabel(item.value, arches.activeLanguage).value;
 });
 
-const onDeleteImage = async () => {
+const issueDeleteImage = async () => {
     const deleted = await deleteImage(image, toast, $gettext);
     if (deleted) {
         removeImage(image);
@@ -93,7 +93,7 @@ const removeImage = (removedImage: ControlledListItemImage) => {
                     :severity="DANGER"
                     icon="fa fa-trash"
                     :label="$gettext('Delete image')"
-                    @click="onDeleteImage"
+                    @click="issueDeleteImage"
                 />
             </div>
         </div>

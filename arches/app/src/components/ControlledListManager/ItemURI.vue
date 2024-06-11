@@ -29,12 +29,9 @@ const inputValue = computed({
 
 const toast = useToast();
 const { $gettext } = useGettext();
-
-const uriHeading = $gettext("List Item URI");
-const uriSubheading = $gettext("Optionally, provide a URI for your list item. Useful if your list item is formally defined in a thesaurus or authority document.");
 const uri = "uri";
 
-const onSave = async () => {
+const save = async () => {
     editing.value = false;
     const originalValue = item.value.uri;
     item.value.uri = formValue.value;
@@ -44,7 +41,7 @@ const onSave = async () => {
     }
 };
 
-const onCancel = () => {
+const cancel = () => {
     editing.value = false;
     formValue.value = item.value.uri;
 };
@@ -52,8 +49,8 @@ const onCancel = () => {
 
 <template>
     <div class="uri-container">
-        <h4>{{ uriHeading }}</h4>
-        <p>{{ uriSubheading }}</p>
+        <h4>{{ $gettext("List Item URI") }}</h4>
+        <p>{{ $gettext("Optionally, provide a URI for your list item. Useful if your list item is formally defined in a thesaurus or authority document.") }}</p>
         <div class="characteristic">
             <InputText
                 v-model="inputValue"
@@ -61,7 +58,7 @@ const onCancel = () => {
                 :disabled="!editing"
                 :aria-label="$gettext('URI')"
                 :placeholder="$gettext('Enter a URI')"
-                @keyup.enter="onSave"
+                @keyup.enter="save"
             />
             <span
                 v-if="!editing"
@@ -85,16 +82,16 @@ const onCancel = () => {
                     tabindex="0"
                     class="fa fa-check"
                     :aria-label="$gettext('Save edit')"
-                    @click="onSave"
-                    @keyup.enter="onSave"
+                    @click="save"
+                    @keyup.enter="save"
                 />
                 <i
                     role="button"
                     tabindex="0"
                     class="fa fa-times"
                     :aria-label="$gettext('Cancel edit')"
-                    @click="onCancel"
-                    @keyup.enter="onCancel"
+                    @click="cancel"
+                    @keyup.enter="cancel"
                 />
             </span>
         </div>

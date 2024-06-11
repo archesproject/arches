@@ -6,14 +6,13 @@ import ProgressSpinner from "primevue/progressspinner";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 
+import { LIGHT_GRAY } from "@/theme.ts";
+import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import ControlledListSplash from "@/components/ControlledListManager/ControlledListSplash.vue";
 import ItemEditor from "@/components/ControlledListManager/ItemEditor.vue";
 import ListCharacteristics from "@/components/ControlledListManager/ListCharacteristics.vue";
 import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
 import ListTree from "@/components/ControlledListManager/ListTree.vue";
-import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
-
-import { LIGHT_GRAY } from "@/theme.ts";
 
 import type { Ref } from "vue";
 import type { ControlledListItem, Selectable } from "@/types/ControlledListManager";

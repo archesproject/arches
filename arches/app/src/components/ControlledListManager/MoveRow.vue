@@ -81,7 +81,7 @@ const setMovingItem = (node: TreeNode) => {
     );
 };
 
-const onAddItem = (parent: TreeNode) => {
+const addItem = (parent: TreeNode) => {
     const newItem: NewControlledListItem = {
         parent_id: parent.key!,
         id: newLabelCounter.value,
@@ -115,7 +115,7 @@ const onAddItem = (parent: TreeNode) => {
     setDisplayedRow(newItem);
 };
 
-const onReorder = async (item: ControlledListItem, up: boolean) => {
+const reorder = async (item: ControlledListItem, up: boolean) => {
     const list: ControlledList = findNodeInTree(tree.value, item.controlled_list_id).data;
     const siblings: ControlledListItem[] = (
         item.parent_id
@@ -152,7 +152,7 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
         class="add-child-button"
         icon="fa fa-plus"
         :aria-label="moveLabels.addChild"
-        @click.stop="onAddItem(node)"
+        @click.stop="addItem(node)"
     />
     <span
         v-if="!nodeIsList(node)"
@@ -167,7 +167,7 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
             icon="fa fa-caret-up"
             :aria-label="moveLabels.moveUp"
             :disabled="isFirstItem(node.data)"
-            @click="onReorder(node.data, true)"
+            @click="reorder(node.data, true)"
         />
         <Button
             v-if="selectedKeys && node.key! in selectedKeys"
@@ -178,7 +178,7 @@ const onReorder = async (item: ControlledListItem, up: boolean) => {
             icon="fa fa-caret-down"
             :aria-label="moveLabels.moveDown"
             :disabled="isLastItem(node.data)"
-            @click="onReorder(node.data, false)"
+            @click="reorder(node.data, false)"
         />
         <Button
             v-if="!node.data.name && selectedKeys && node.key! in selectedKeys"

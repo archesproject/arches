@@ -4,12 +4,11 @@ import { useGettext } from "vue3-gettext";
 
 import Tree from "primevue/tree";
 
+import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
+import { bestLabel, nodeIsList } from "@/components/ControlledListManager/utils.ts";
 import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
 import ListTreeControls from "@/components/ControlledListManager/ListTreeControls.vue";
 import TreeRow from "@/components/ControlledListManager/TreeRow.vue";
-
-import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
-import { bestLabel, nodeIsList } from "@/components/ControlledListManager/utils.ts";
 
 import type { ComponentPublicInstance, Ref } from "vue";
 import type {
@@ -51,8 +50,7 @@ const nextNewItem = ref<NewControlledListItem>();
 const newListCounter = ref(1000);
 const newListFormValue = ref('');
 const nextNewList = ref<NewControlledList>();
-// For rerendering tree to avoid error emitted in PrimeVue tree re: aria-selected
-const rerender = ref(0);
+const rerenderTree = ref(0);
 const nextFilterChangeNeedsExpandAll = ref(false);
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
@@ -70,7 +68,7 @@ const collapseNodesRecursive = (node: TreeNode) => {
     }
 };
 
-const onRowSelect = (node: TreeNode) => {
+const updateSelectedAndExpanded = (node: TreeNode) => {
     let priorListId;
     if (displayedRow.value) {
         priorListId = (displayedRow.value as ControlledListItem).controlled_list_id ?? displayedRow.value.id;
@@ -112,7 +110,7 @@ const expandPathsToFilterResults = (newFilterValue: string) => {
     // https://github.com/primefaces/primevue/issues/3996
     if (filterValue.value && !newFilterValue) {
         // Rerender to avoid error emitted in PrimeVue tree re: aria-selected.
-        rerender.value += 1;
+        rerenderTree.value += 1;
     }
     // Expand all on the first interaction with the filter, or if the user
     // has collapsed a node and changes the filter.
@@ -132,11 +130,11 @@ const getInputElement = () => {
     }
 };
 
-const onMounted = () => {
+const restoreFocusToInput = () => {
     // The current implementation of collapsing all nodes when
     // backspacing out the search value relies on rerendering the
     // <Tree> component. Restore focus to the input element. 
-    if (rerender.value > 0) {
+    if (rerenderTree.value > 0) {
         const inputEl = getInputElement();
         if (inputEl) {
             inputEl.focus();
@@ -144,10 +142,9 @@ const onMounted = () => {
     }
 };
 
-const onBeforeUpdate = () => {
-    // Snoop on the filterValue, because if we wait to react
-    // to the emitted filter event, the templated rows will
-    // have already rendered. (<TreeRow> bolds search terms.)
+const snoopOnFilterValue = () => {
+    // If we wait to react to the emitted filter event, the templated rows
+    // will have already rendered. (<TreeRow> bolds search terms.)
     const inputEl = getInputElement();
     if (inputEl) {
         expandPathsToFilterResults(inputEl.value);
@@ -180,6 +177,7 @@ const filterCallbackWrapped = computed(() => {
     <ListTreeControls
         :key="refetcher"
         v-model="tree"
+        v-model:rerender-tree="rerenderTree"
         v-model:expanded-keys="expandedKeys"
         v-model:selected-keys="selectedKeys"
         v-model:moving-item="movingItem"
@@ -191,7 +189,7 @@ const filterCallbackWrapped = computed(() => {
     <Tree
         v-if="tree"
         ref="treeDOMRef"
-        :key="rerender"
+        :key="rerenderTree"
         v-model:selectionKeys="selectedKeys"
         v-model:expandedKeys="expandedKeys"
         :value="tree"
@@ -214,10 +212,10 @@ const filterCallbackWrapped = computed(() => {
                 return { style: { height: '4rem' } };
             },
             label: { style: { textWrap: 'nowrap', marginLeft: '0.5rem', width: '100%' } },
-            hooks: { onBeforeUpdate, onMounted },
+            hooks: { onBeforeUpdate: snoopOnFilterValue, onMounted: restoreFocusToInput },
         }"
         @node-collapse="nextFilterChangeNeedsExpandAll = true"
-        @node-select="onRowSelect"
+        @node-select="updateSelectedAndExpanded"
     >
         <template #nodeicon="slotProps">
             <LetterCircle :labelled="slotProps.node.data" />
