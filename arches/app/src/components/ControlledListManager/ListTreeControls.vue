@@ -150,11 +150,13 @@ const abandonMove = () => {
     rerenderTree.value += 1;
 };
 
-await fetchLists(toast, $gettext).then((data) => {
-    controlledListItemsTree.value = (data.controlled_lists as ControlledList[]).map(
-        list => listAsNode(list, selectedLanguage.value)
-    );
-});
+await fetchLists(toast, $gettext).then(
+    ({ controlled_lists } : { controlled_lists: ControlledList[] }) => {
+        controlledListItemsTree.value = controlled_lists.map(
+            list => listAsNode(list, selectedLanguage.value)
+        );
+    }
+);
 </script>
 
 <template>
