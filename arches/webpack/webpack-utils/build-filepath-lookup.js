@@ -1,7 +1,7 @@
 const Path = require('path');
 const fs = require('fs');
 
-function buildFilePathLookup(path, staticUrlPrefix) {
+function buildFilepathLookup(path, staticUrlPrefix) {
     if (!fs.existsSync(path)) {
         return;
     }
@@ -36,4 +36,4 @@ function buildFilePathLookup(path, staticUrlPrefix) {
     }, {});
 }
 
-module.exports = { buildFilePathLookup };
+module.exports = { buildFilepathLookup };
