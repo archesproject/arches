@@ -29,7 +29,9 @@ class ManifestManagerView(View):
             return JSONErrorResponse(e.title, e.message)
 
     def post(self, request):
-        def create_manifest(name="", desc="", file_url="file_url", attribution="", logo="", canvases=[]):
+        def create_manifest(
+            name="", desc="", file_url="file_url", attribution="", logo="", canvases=[]
+        ):
             metadata = []  # {"label": "TBD", "value": ["Unknown", ...]}
             sequence_id = f"{self.cantaloupe_uri}/manifest/sequence/TBD.json"
 
@@ -62,8 +64,12 @@ class ManifestManagerView(View):
             canvas_id = f"{self.cantaloupe_uri}/manifest/canvas/{image_id}.json"
             image_id = f"{self.cantaloupe_uri}/manifest/annotation/{image_id}.json"
             thumbnail_width = 300 if image_json["width"] >= 300 else image_json["width"]
-            thumbnail_height = 300 if image_json["height"] >= 300 else image_json["height"]
-            thumbnail_id = f"{file_url}/full/!{thumbnail_width},{thumbnail_height}/0/default.jpg"
+            thumbnail_height = (
+                300 if image_json["height"] >= 300 else image_json["height"]
+            )
+            thumbnail_id = (
+                f"{file_url}/full/!{thumbnail_width},{thumbnail_height}/0/default.jpg"
+            )
 
             return {
                 "@id": canvas_id,
@@ -111,7 +117,10 @@ class ManifestManagerView(View):
             return models.VwAnnotation.objects.filter(canvas=canvas_id).exists()
 
         def delete_canvases(manifest, canvases_to_remove):
-            canvas_ids_remove = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_to_remove]
+            canvas_ids_remove = [
+                canvas["images"][0]["resource"]["service"]["@id"]
+                for canvas in canvases_to_remove
+            ]
             canvases_in_use = []
             for canvas_id in canvas_ids_remove:
                 if check_canvas_in_use(canvas_id):
@@ -119,7 +128,10 @@ class ManifestManagerView(View):
             canvases = manifest.manifest["sequences"][0]["canvases"]
             if len(canvases_in_use) > 0:
                 canvas_labels_in_use = [
-                    item["label"] for item in canvases if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
+                    item["label"]
+                    for item in canvases
+                    if item["images"][0]["resource"]["service"]["@id"]
+                    in canvases_in_use
                 ]
                 raise ManifestValidationError(
                     "The following canvases cannot be deleted because they have resource annotations: {}".format(
@@ -127,7 +139,10 @@ class ManifestManagerView(View):
                     )
                 )
             manifest.manifest["sequences"][0]["canvases"] = [
-                canvas for canvas in canvases if canvas["images"][0]["resource"]["service"]["@id"] not in canvas_ids_remove
+                canvas
+                for canvas in canvases
+                if canvas["images"][0]["resource"]["service"]["@id"]
+                not in canvas_ids_remove
             ]
 
         def create_image(file):
@@ -136,7 +151,9 @@ class ManifestManagerView(View):
             new_image_file.save()
 
             file_name = os.path.basename(new_image_file.path.name)
-            file_url = f"{request.scheme}://{request.get_host()}/iiifserver/iiif/2/{file_name}"
+            file_url = (
+                f"{request.scheme}://{request.get_host()}/iiifserver/iiif/2/{file_name}"
+            )
             file_json_url = f"{self.cantaloupe_uri}/2/{file_name}/info.json"
             image_json = self.fetch(file_json_url)
 
@@ -204,18 +221,29 @@ class ManifestManagerView(View):
                 if os.path.splitext(f.name)[1].lower() in acceptable_types:
                     image_json, image_id, file_url = create_image(f)
 
-                    canvas = create_canvas(image_json, file_url, os.path.splitext(f.name)[0], image_id)
+                    canvas = create_canvas(
+                        image_json, file_url, os.path.splitext(f.name)[0], image_id
+                    )
                     canvases.append(canvas)
                 else:
                     logger.warning("filetype unacceptable: " + f.name)
 
-            pres_dict = create_manifest(name=name, canvases=canvases, file_url=canvases[0]["thumbnail"]["service"]["@id"])
+            pres_dict = create_manifest(
+                name=name,
+                canvases=canvases,
+                file_url=canvases[0]["thumbnail"]["service"]["@id"],
+            )
             manifest_global_id = str(uuid.uuid4())
             json_url = f"/manifest/{manifest_global_id}"
             pres_dict["@id"] = f"{request.scheme}://{request.get_host()}{json_url}"
 
             manifest = models.IIIFManifest.objects.create(
-                label=name, description=desc, manifest=pres_dict, url=json_url, globalid=manifest_global_id, transactionid=transaction_id
+                label=name,
+                description=desc,
+                manifest=pres_dict,
+                url=json_url,
+                globalid=manifest_global_id,
+                transactionid=transaction_id,
             )
 
             return JSONResponse(manifest)
@@ -240,7 +268,9 @@ class ManifestManagerView(View):
                 for f in files:
                     if os.path.splitext(f.name)[1].lower() in acceptable_types:
                         image_json, image_id, file_url = create_image(f)
-                        canvas = create_canvas(image_json, file_url, os.path.splitext(f.name)[0], image_id)
+                        canvas = create_canvas(
+                            image_json, file_url, os.path.splitext(f.name)[0], image_id
+                        )
                         canvases.append(canvas)
                     else:
                         logger.warning("filetype unacceptable: " + f.name)

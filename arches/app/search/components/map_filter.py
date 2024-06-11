@@ -26,7 +26,9 @@ details = {
 
 
 class MapFilter(BaseSearchFilter):
-    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
+    def append_dsl(
+        self, search_results_object, permitted_nodegroups, include_provisional
+    ):
         search_query = Bool()
         querysting_params = self.request.GET.get(details["componentname"], "")
         spatial_filter = JSONDeserializer().deserialize(querysting_params)
@@ -40,14 +42,23 @@ class MapFilter(BaseSearchFilter):
                 if "properties" in spatial_filter["features"][0]:
                     feature_properties = spatial_filter["features"][0]["properties"]
 
-                add_geoshape_query_to_search_query(feature_geom, feature_properties, permitted_nodegroups, include_provisional, search_query)
+                add_geoshape_query_to_search_query(
+                    feature_geom,
+                    feature_properties,
+                    permitted_nodegroups,
+                    include_provisional,
+                    search_query
+                )
                 search_results_object["query"].add_query(search_query)
 
         elif "featureid" in spatial_filter and "resourceid" in spatial_filter:
             se = SearchEngineFactory().create()
             main_query = Query(se)
             nested_query = Nested(path="geometries")
-            match_feature = Match(field="geometries.geom.features.id", query=spatial_filter["featureid"])
+            match_feature = Match(
+                field="geometries.geom.features.id",
+                query=spatial_filter["featureid"]
+            )
 
             # Create a Bool query for conditions inside the nested path
             bool_nested_query = Bool()
@@ -55,7 +66,10 @@ class MapFilter(BaseSearchFilter):
             nested_query.add_query(bool_nested_query.dsl)
 
             bool_query = Bool()
-            match_resource = Term(field="resourceinstanceid", term=spatial_filter["resourceid"])
+            match_resource = Term(
+                field="resourceinstanceid",
+                term=spatial_filter["resourceid"]
+            )
             bool_query.must(match_resource.dsl)  # Match resource instance ID at the document level
             bool_query.must(nested_query.dsl)  # Add the nested query
             
@@ -78,12 +92,19 @@ class MapFilter(BaseSearchFilter):
 
             if len(geometries) > 0:
                 feature_geom = geometries[0]["geometry"]
-                buffered_feature_geom = add_geoshape_query_to_search_query(feature_geom, spatial_filter, permitted_nodegroups, include_provisional, search_query)
+                buffered_feature_geom = add_geoshape_query_to_search_query(
+                    feature_geom, spatial_filter,
+                    permitted_nodegroups,
+                    include_provisional,
+                    search_query
+                )
                 search_results_object[details["componentname"]] = buffered_feature_geom
                 search_results_object["query"].add_query(search_query)
 
         try:
-            search_results_object[details["componentname"]]["search_buffer"] = feature_geom
+            search_results_object[details["componentname"]][
+                "search_buffer"
+            ] = feature_geom
         except NameError:
             logger.info(_("Feature geometry is not defined"))
 
@@ -106,13 +127,23 @@ def _buffer(geojson, width=0, unit="ft"):
                 """SELECT ST_TRANSFORM(
                     ST_BUFFER(ST_TRANSFORM(ST_SETSRID(%s::geometry, 4326), %s), %s),
                 4326)""",
-                (geom.hex.decode("utf-8"), settings.ANALYSIS_COORDINATE_SYSTEM_SRID, width),
+                (
+                    geom.hex.decode("utf-8"),
+                    settings.ANALYSIS_COORDINATE_SYSTEM_SRID,
+                    width,
+                ),
             )
             res = cursor.fetchone()
             geom = GEOSGeometry(res[0], srid=4326)
     return geom
 
-def add_geoshape_query_to_search_query(feature_geom, feature_properties, permitted_nodegroups, include_provisional, search_query):
+def add_geoshape_query_to_search_query(
+        feature_geom,
+        feature_properties,
+        permitted_nodegroups,
+        include_provisional,
+        search_query
+    ):
 
     buffer = {"width": 0, "unit": "ft"}
     if "buffer" in feature_properties:
@@ -121,7 +152,9 @@ def add_geoshape_query_to_search_query(feature_geom, feature_properties, permitt
     search_buffer = _buffer(feature_geom, int(buffer["width"]), buffer["unit"])
     feature_geom = JSONDeserializer().deserialize(search_buffer.geojson)
     geoshape = GeoShape(
-        field="geometries.geom.features.geometry", type=feature_geom["type"], coordinates=feature_geom["coordinates"]
+        field="geometries.geom.features.geometry",
+        type=feature_geom["type"],
+        coordinates=feature_geom["coordinates"]
     )
     invert_spatial_search = False
     if "inverted" in feature_properties:
@@ -134,13 +167,22 @@ def add_geoshape_query_to_search_query(feature_geom, feature_properties, permitt
         spatial_query.filter(geoshape)
 
     # get the nodegroup_ids that the user has permission to search
-    spatial_query.filter(Terms(field="geometries.nodegroup_id", terms=permitted_nodegroups))
+    spatial_query.filter(
+        Terms(
+            field="geometries.nodegroup_id",
+            terms=permitted_nodegroups
+        )
+    )
 
     if include_provisional is False:
-        spatial_query.filter(Terms(field="geometries.provisional", terms=["false"]))
+        spatial_query.filter(
+            Terms(field="geometries.provisional", terms=["false"])
+        )
 
     elif include_provisional == "only provisional":
-        spatial_query.filter(Terms(field="geometries.provisional", terms=["true"]))
+        spatial_query.filter(
+            Terms(field="geometries.provisional", terms=["true"])
+        )
 
     search_query.filter(Nested(path="geometries", query=spatial_query))
 

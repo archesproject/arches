@@ -192,6 +192,7 @@
         select-a-nodegroup='{% trans "Select a nodegroup" as selectANodegroup %} "{{ selectANodegroup|escapejs }}"'
         no-relationships-added='{% trans "No Relationships Added" as noRelationshipsAdded %} "{{ noRelationshipsAdded|escapejs }}"'
         relate-resource='{% trans "Relate Resource" as relateResource %} "{{ relateResource|escapejs }}"'
+        configure-related-resource-relationship='{% trans "Configure Related Resource Relationship" as configureRelatedResourceRelationship %} "{{ configureRelatedResourceRelationship|escapejs }}"'
         cannot-be-related='{% trans "Cannot Be Related" as cannotBeRelated %} "{{ cannotBeRelated|escapejs }}"'
         related-resources='{% trans "Related Resources" as relatedResources %} "{{ relatedResources|escapejs }}"'
         view-related-resources='(resource) => {return {% trans "View resources related to ${resource}" as viewRelatedResources %} `{{ viewRelatedResources|escapejs }}` }'
@@ -1049,6 +1050,7 @@
         api_resources='(resourceid)=>{return "{% url "resources" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", resourceid)}'
         api_search_component_data='"{% url "api_search_component_data" "aaaa"%}".replace("aaaa", "")'
         api_user_incomplete_workflows="{% url 'api_user_incomplete_workflows' %}"
+        api_get_frontend_i18n_data="{% url 'get_frontend_i18n_data' %}"
         geojson="{% url 'geojson' %}"
         icons="{% url 'icons' %}"
         ontology_properties="{% url 'ontology_properties' %}"

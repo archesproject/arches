@@ -215,7 +215,7 @@ This will be used throughout your development process and does not need to be ch
         FROM archesproject/arches:latest  
         COPY . ${WEB_ROOT}  
         WORKDIR ${WEB_ROOT}/${ARCHES_PROJECT}/${ARCHES_PROJECT}  
-        RUN yarn install  
+        RUN npm install  
     ```
 
 8.  Build your Docker image using your favorite command line tool (Powershell, CMD, Linux CLI, etc.).  
@@ -315,13 +315,11 @@ The volume section at **point 4** also mounts a `settings_local.py` into the con
 This ensures some important settings, e.g. database and Elasticsearch endpoints, can still be set through environment variables.  
 **This settings file may be overwritten by your own settings file, presuming you are including these settings as well.**
 
-##### Yarn components
+##### npm components
 Because your volume from `step 4` is laid over the files in your container, files generated during image `build` are hidden.  
 In order to install newly added static file packages, run the following command:  
-    `docker-compose -f .\docker-compose-local.yml run arches install_yarn_components`
+    `docker-compose -f .\docker-compose-local.yml run arches install_npm_components`
 
-##### docker-compose-local.yml
-Here is a link to a working [docker-compose-local.yml](https://gist.github.com/jmunowitch/c63fa39be4651b9bf2f0b1abc69f7479) file
 
 
 

@@ -18,6 +18,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="tilemodel",
             name="provisionaledits",
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column="provisionaledits", null=True),
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                blank=True, db_column="provisionaledits", null=True
+            ),
         ),
     ]

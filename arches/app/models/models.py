@@ -84,13 +84,20 @@ class CardModel(models.Model):
     helpenabled = models.BooleanField(default=False)
     helptitle = I18n_TextField(blank=True, null=True)
     helptext = I18n_TextField(blank=True, null=True)
-    nodegroup = models.ForeignKey("NodeGroup", db_column="nodegroupid", on_delete=models.CASCADE)
-    graph = models.ForeignKey("GraphModel", db_column="graphid", on_delete=models.CASCADE)
+    nodegroup = models.ForeignKey(
+        "NodeGroup", db_column="nodegroupid", on_delete=models.CASCADE
+    )
+    graph = models.ForeignKey(
+        "GraphModel", db_column="graphid", on_delete=models.CASCADE
+    )
     active = models.BooleanField(default=True)
     visible = models.BooleanField(default=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
     component = models.ForeignKey(
-        "CardComponent", db_column="componentid", default=uuid.UUID("f05e4d3a-53c1-11e8-b0ea-784f435179ea"), on_delete=models.SET_DEFAULT
+        "CardComponent",
+        db_column="componentid",
+        default=uuid.UUID("f05e4d3a-53c1-11e8-b0ea-784f435179ea"),
+        on_delete=models.SET_DEFAULT,
     )
     config = JSONField(blank=True, null=True, db_column="config")
 
@@ -130,7 +137,9 @@ class ConstraintModel(models.Model):
 
 class ConstraintXNode(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False)
-    constraint = models.ForeignKey("ConstraintModel", on_delete=models.CASCADE, db_column="constraintid")
+    constraint = models.ForeignKey(
+        "ConstraintModel", on_delete=models.CASCADE, db_column="constraintid"
+    )
     node = models.ForeignKey("Node", on_delete=models.CASCADE, db_column="nodeid")
 
     def __init__(self, *args, **kwargs):
@@ -189,7 +198,9 @@ class CardXNodeXWidget(models.Model):
 
 class Concept(models.Model):
     conceptid = models.UUIDField(primary_key=True)
-    nodetype = models.ForeignKey("DNodeType", db_column="nodetype", on_delete=models.CASCADE)
+    nodetype = models.ForeignKey(
+        "DNodeType", db_column="nodetype", on_delete=models.CASCADE
+    )
     legacyoid = models.TextField(unique=True)
 
     def __init__(self, *args, **kwargs):
@@ -207,7 +218,12 @@ class DDataType(models.Model):
     iconclass = models.TextField()
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
-    defaultwidget = models.ForeignKey(db_column="defaultwidget", to="models.Widget", null=True, on_delete=models.SET_NULL)
+    defaultwidget = models.ForeignKey(
+        db_column="defaultwidget",
+        to="models.Widget",
+        null=True,
+        on_delete=models.SET_NULL,
+    )
     defaultconfig = I18n_JSONField(blank=True, null=True, db_column="defaultconfig")
     configcomponent = models.TextField(blank=True, null=True)
     configname = models.TextField(blank=True, null=True)
@@ -258,9 +274,25 @@ class Edge(models.Model):
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     ontologyproperty = models.TextField(blank=True, null=True)
-    domainnode = models.ForeignKey("Node", db_column="domainnodeid", related_name="edge_domains", on_delete=models.CASCADE)
-    rangenode = models.ForeignKey("Node", db_column="rangenodeid", related_name="edge_ranges", on_delete=models.CASCADE)
-    graph = models.ForeignKey("GraphModel", db_column="graphid", blank=True, null=True, on_delete=models.CASCADE)
+    domainnode = models.ForeignKey(
+        "Node",
+        db_column="domainnodeid",
+        related_name="edge_domains",
+        on_delete=models.CASCADE,
+    )
+    rangenode = models.ForeignKey(
+        "Node",
+        db_column="rangenodeid",
+        related_name="edge_ranges",
+        on_delete=models.CASCADE,
+    )
+    graph = models.ForeignKey(
+        "GraphModel",
+        db_column="graphid",
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+    )
 
     def __init__(self, *args, **kwargs):
         super(Edge, self).__init__(*args, **kwargs)
@@ -286,8 +318,12 @@ class EditLog(models.Model):
     edittype = models.TextField(blank=True, null=True)
     newvalue = JSONField(blank=True, null=True, db_column="newvalue")
     oldvalue = JSONField(blank=True, null=True, db_column="oldvalue")
-    newprovisionalvalue = JSONField(blank=True, null=True, db_column="newprovisionalvalue")
-    oldprovisionalvalue = JSONField(blank=True, null=True, db_column="oldprovisionalvalue")
+    newprovisionalvalue = JSONField(
+        blank=True, null=True, db_column="newprovisionalvalue"
+    )
+    oldprovisionalvalue = JSONField(
+        blank=True, null=True, db_column="oldprovisionalvalue"
+    )
     timestamp = models.DateTimeField(blank=True, null=True)
     userid = models.TextField(blank=True, null=True)
     user_firstname = models.TextField(blank=True, null=True)
@@ -314,7 +350,12 @@ class EditLog(models.Model):
 
 class ExternalOauthToken(models.Model):
     token_id = models.UUIDField(primary_key=True, serialize=False, unique=True)
-    user = models.ForeignKey(db_column="userid", null=False, on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(
+        db_column="userid",
+        null=False,
+        on_delete=models.CASCADE,
+        to=settings.AUTH_USER_MODEL,
+    )
     id_token = models.TextField()
     access_token_expiration = models.DateTimeField()
     access_token = models.TextField()
@@ -335,7 +376,9 @@ class ExternalOauthToken(models.Model):
 class ResourceRevisionLog(models.Model):
     logid = models.UUIDField(primary_key=True)
     resourceid = models.UUIDField(default=uuid.uuid1)
-    revisionid = models.TextField(null=False)  # not a ForeignKey so we can track deletions
+    revisionid = models.TextField(
+        null=False
+    )  # not a ForeignKey so we can track deletions
     synctimestamp = models.DateTimeField(auto_now_add=True, null=False)
     action = models.TextField(blank=True, null=True)
 
@@ -351,8 +394,12 @@ class ResourceRevisionLog(models.Model):
 
 class File(models.Model):
     fileid = models.UUIDField(primary_key=True)
-    path = models.FileField(upload_to=import_class_from_string(settings.FILENAME_GENERATOR))
-    tile = models.ForeignKey("TileModel", db_column="tileid", null=True, on_delete=models.CASCADE)
+    path = models.FileField(
+        upload_to=import_class_from_string(settings.FILENAME_GENERATOR)
+    )
+    tile = models.ForeignKey(
+        "TileModel", db_column="tileid", null=True, on_delete=models.CASCADE
+    )
     thumbnail_data = models.BinaryField(null=True)
 
     def __init__(self, *args, **kwargs):
@@ -367,7 +414,9 @@ class File(models.Model):
     def make_thumbnail(self, kwargs_from_save_call, force=False):
         try:
             if ThumbnailGeneratorInstance and (force or self.thumbnail_data is None):
-                self.thumbnail_data = ThumbnailGeneratorInstance.get_thumbnail_data(self.path.file)
+                self.thumbnail_data = ThumbnailGeneratorInstance.get_thumbnail_data(
+                    self.path.file
+                )
                 add_to_update_fields(kwargs_from_save_call, "thumbnail_data")
         except Exception as e:
             logger.error(f"Thumbnail not generated for {self.path}: {e}")
@@ -461,13 +510,19 @@ class Function(models.Model):
         return json_string
 
     def get_class_module(self):
-        return get_class_from_modulename(self.modulename, self.classname, ExtensionType.FUNCTIONS)
+        return get_class_from_modulename(
+            self.modulename, self.classname, ExtensionType.FUNCTIONS
+        )
 
 
 class FunctionXGraph(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False)
-    function = models.ForeignKey("Function", on_delete=models.CASCADE, db_column="functionid")
-    graph = models.ForeignKey("GraphModel", on_delete=models.CASCADE, db_column="graphid")
+    function = models.ForeignKey(
+        "Function", on_delete=models.CASCADE, db_column="functionid"
+    )
+    graph = models.ForeignKey(
+        "GraphModel", on_delete=models.CASCADE, db_column="graphid"
+    )
     config = JSONField(blank=True, null=True)
 
     def __init__(self, *args, **kwargs):
@@ -494,23 +549,38 @@ class GraphModel(models.Model):
     color = models.TextField(blank=True, null=True)
     subtitle = I18n_TextField(blank=True, null=True)
     ontology = models.ForeignKey(
-        "Ontology", db_column="ontologyid", related_name="graphs", null=True, blank=True, on_delete=models.SET_NULL
+        "Ontology",
+        db_column="ontologyid",
+        related_name="graphs",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
     )
     functions = models.ManyToManyField(to="Function", through="FunctionXGraph")
     jsonldcontext = models.TextField(blank=True, null=True)
     template = models.ForeignKey(
-        "ReportTemplate", db_column="templateid", default="50000000-0000-0000-0000-000000000001", on_delete=models.SET_DEFAULT
+        "ReportTemplate",
+        db_column="templateid",
+        default="50000000-0000-0000-0000-000000000001",
+        on_delete=models.SET_DEFAULT,
     )
     config = JSONField(db_column="config", default=dict)
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
-    publication = models.ForeignKey("GraphXPublishedGraph", db_column="publicationid", null=True, on_delete=models.SET_NULL)
+    publication = models.ForeignKey(
+        "GraphXPublishedGraph",
+        db_column="publicationid",
+        null=True,
+        on_delete=models.SET_NULL,
+    )
 
     @property
     def disable_instance_creation(self):
         if not self.isresource:
             return _("Only resource models may be edited - branches are not editable")
         if not self.publication:
-            return _("This Model is currently unpublished and not available for instance creation.")
+            return _(
+                "This Model is currently unpublished and not available for instance creation."
+            )
         return False
 
     def is_editable(self):
@@ -526,7 +596,9 @@ class GraphModel(models.Model):
             language = translation.get_language()
 
         try:
-            graph = PublishedGraph.objects.get(publication=self.publication, language=language)
+            graph = PublishedGraph.objects.get(
+                publication=self.publication, language=language
+            )
         except PublishedGraph.DoesNotExist:
             if raise_if_missing:
                 raise
@@ -548,10 +620,14 @@ class GraphModel(models.Model):
 
 
 class GraphXPublishedGraph(models.Model):
-    publicationid = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    publicationid = models.UUIDField(
+        primary_key=True, serialize=False, default=uuid.uuid1
+    )
     notes = models.TextField(blank=True, null=True)
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
-    user = models.ForeignKey(User, db_column="userid", null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User, db_column="userid", null=True, on_delete=models.CASCADE
+    )
     published_time = models.DateTimeField(default=datetime.datetime.now, null=False)
 
     class Meta:
@@ -572,7 +648,10 @@ class Icon(models.Model):
 class Language(models.Model):
     LEFT_TO_RIGHT = "ltr"
     RIGHT_TO_LEFT = "rtl"
-    LANGUAGE_DIRECTION_CHOICES = [(LEFT_TO_RIGHT, "Left to Right"), (RIGHT_TO_LEFT, "Right to Left")]
+    LANGUAGE_DIRECTION_CHOICES = [
+        (LEFT_TO_RIGHT, "Left to Right"),
+        (RIGHT_TO_LEFT, "Right to Left"),
+    ]
 
     SYSTEM_SCOPE = "system"
     DATA_SCOPE = "data"
@@ -580,7 +659,9 @@ class Language(models.Model):
     id = models.AutoField(primary_key=True)
     code = models.TextField(unique=True)  # ISO639 code
     name = models.TextField()
-    default_direction = models.TextField(choices=LANGUAGE_DIRECTION_CHOICES, default=LEFT_TO_RIGHT)
+    default_direction = models.TextField(
+        choices=LANGUAGE_DIRECTION_CHOICES, default=LEFT_TO_RIGHT
+    )
     scope = models.TextField(choices=SCOPE_CHOICES, default=SYSTEM_SCOPE)
     isdefault = models.BooleanField(default=False, blank=True)
 
@@ -597,7 +678,11 @@ class NodeGroup(models.Model):
     legacygroupid = models.TextField(blank=True, null=True)
     cardinality = models.TextField(blank=True, default="1")
     parentnodegroup = models.ForeignKey(
-        "self", db_column="parentnodegroupid", blank=True, null=True, on_delete=models.CASCADE
+        "self",
+        db_column="parentnodegroupid",
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
     )  # Allows nodegroups within nodegroups
 
     def __init__(self, *args, **kwargs):
@@ -637,8 +722,16 @@ class Node(models.Model):
     istopnode = models.BooleanField()
     ontologyclass = models.TextField(blank=True, null=True)
     datatype = models.TextField()
-    nodegroup = models.ForeignKey(NodeGroup, db_column="nodegroupid", blank=True, null=True, on_delete=models.CASCADE)
-    graph = models.ForeignKey(GraphModel, db_column="graphid", blank=True, null=True, on_delete=models.CASCADE)
+    nodegroup = models.ForeignKey(
+        NodeGroup,
+        db_column="nodegroupid",
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+    )
+    graph = models.ForeignKey(
+        GraphModel, db_column="graphid", blank=True, null=True, on_delete=models.CASCADE
+    )
     config = I18n_JSONField(blank=True, null=True, db_column="config")
     issearchable = models.BooleanField(default=True)
     isrequired = models.BooleanField(default=False)
@@ -648,7 +741,11 @@ class Node(models.Model):
     alias = models.TextField(blank=True, null=True)
     hascustomalias = models.BooleanField(default=False)
     sourcebranchpublication = models.ForeignKey(
-        GraphXPublishedGraph, db_column="sourcebranchpublicationid", blank=True, null=True, on_delete=models.SET_NULL
+        GraphXPublishedGraph,
+        db_column="sourcebranchpublicationid",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
     )
 
     def get_child_nodes_and_edges(self):
@@ -679,7 +776,9 @@ class Node(models.Model):
 
     @property
     def is_collector(self):
-        return str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup_id is not None
+        return (
+            str(self.nodeid) == str(self.nodegroup_id) and self.nodegroup_id is not None
+        )
 
     def is_editable(self):
         if settings.OVERRIDE_RESOURCE_MODEL_LOCK is True:
@@ -690,12 +789,16 @@ class Node(models.Model):
     def get_relatable_resources(self):
         relatable_resource_ids = [
             r2r.resourceclassfrom
-            for r2r in Resource2ResourceConstraint.objects.filter(resourceclassto_id=self.nodeid)
+            for r2r in Resource2ResourceConstraint.objects.filter(
+                resourceclassto_id=self.nodeid
+            )
             if r2r.resourceclassfrom is not None
         ]
         relatable_resource_ids = relatable_resource_ids + [
             r2r.resourceclassto
-            for r2r in Resource2ResourceConstraint.objects.filter(resourceclassfrom_id=self.nodeid)
+            for r2r in Resource2ResourceConstraint.objects.filter(
+                resourceclassfrom_id=self.nodeid
+            )
             if r2r.resourceclassto is not None
         ]
         return relatable_resource_ids
@@ -705,12 +808,15 @@ class Node(models.Model):
         for old_id in old_ids:
             if old_id not in new_ids:
                 Resource2ResourceConstraint.objects.filter(
-                    Q(resourceclassto_id=self.nodeid) | Q(resourceclassfrom_id=self.nodeid),
+                    Q(resourceclassto_id=self.nodeid)
+                    | Q(resourceclassfrom_id=self.nodeid),
                     Q(resourceclassto_id=old_id) | Q(resourceclassfrom_id=old_id),
                 ).delete()
         for new_id in new_ids:
             if new_id not in old_ids:
-                new_r2r = Resource2ResourceConstraint.objects.create(resourceclassfrom_id=self.nodeid, resourceclassto_id=new_id)
+                new_r2r = Resource2ResourceConstraint.objects.create(
+                    resourceclassfrom_id=self.nodeid, resourceclassto_id=new_id
+                )
                 new_r2r.save()
 
     def __init__(self, *args, **kwargs):
@@ -722,8 +828,12 @@ class Node(models.Model):
         managed = True
         db_table = "nodes"
         constraints = [
-            models.UniqueConstraint(fields=["name", "nodegroup"], name="unique_nodename_nodegroup"),
-            models.UniqueConstraint(fields=["alias", "graph"], name="unique_alias_graph"),
+            models.UniqueConstraint(
+                fields=["name", "nodegroup"], name="unique_nodename_nodegroup"
+            ),
+            models.UniqueConstraint(
+                fields=["alias", "graph"], name="unique_alias_graph"
+            ),
         ]
 
 
@@ -742,7 +852,12 @@ class Ontology(models.Model):
     path = models.TextField(null=True, blank=True)
     namespaces = JSONField(null=True, blank=True)
     parentontology = models.ForeignKey(
-        "Ontology", db_column="parentontologyid", related_name="extensions", null=True, blank=True, on_delete=models.CASCADE
+        "Ontology",
+        db_column="parentontologyid",
+        related_name="extensions",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
     )
 
     def __init__(self, *args, **kwargs):
@@ -795,7 +910,12 @@ class OntologyClass(models.Model):
     ontologyclassid = models.UUIDField(primary_key=True)
     source = models.TextField()
     target = JSONField(null=True)
-    ontology = models.ForeignKey("Ontology", db_column="ontologyid", related_name="ontologyclasses", on_delete=models.CASCADE)
+    ontology = models.ForeignKey(
+        "Ontology",
+        db_column="ontologyid",
+        related_name="ontologyclasses",
+        on_delete=models.CASCADE,
+    )
 
     def __init__(self, *args, **kwargs):
         super(OntologyClass, self).__init__(*args, **kwargs)
@@ -809,9 +929,20 @@ class OntologyClass(models.Model):
 
 
 class PublishedGraph(models.Model):
-    language = models.ForeignKey(Language, db_column="languageid", to_field="code", blank=True, null=True, on_delete=models.CASCADE)
-    publication = models.ForeignKey(GraphXPublishedGraph, db_column="publicationid", on_delete=models.CASCADE)
-    serialized_graph = models.JSONField(blank=True, null=True, db_column="serialized_graph")
+    language = models.ForeignKey(
+        Language,
+        db_column="languageid",
+        to_field="code",
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+    )
+    publication = models.ForeignKey(
+        GraphXPublishedGraph, db_column="publicationid", on_delete=models.CASCADE
+    )
+    serialized_graph = models.JSONField(
+        blank=True, null=True, db_column="serialized_graph"
+    )
 
     class Meta:
         managed = True
@@ -819,9 +950,21 @@ class PublishedGraph(models.Model):
 
 
 class Relation(models.Model):
-    conceptfrom = models.ForeignKey(Concept, db_column="conceptidfrom", related_name="relation_concepts_from", on_delete=models.CASCADE)
-    conceptto = models.ForeignKey(Concept, db_column="conceptidto", related_name="relation_concepts_to", on_delete=models.CASCADE)
-    relationtype = models.ForeignKey(DRelationType, db_column="relationtype", on_delete=models.CASCADE)
+    conceptfrom = models.ForeignKey(
+        Concept,
+        db_column="conceptidfrom",
+        related_name="relation_concepts_from",
+        on_delete=models.CASCADE,
+    )
+    conceptto = models.ForeignKey(
+        Concept,
+        db_column="conceptidto",
+        related_name="relation_concepts_to",
+        on_delete=models.CASCADE,
+    )
+    relationtype = models.ForeignKey(
+        DRelationType, db_column="relationtype", on_delete=models.CASCADE
+    )
     relationid = models.UUIDField(primary_key=True)
 
     def __init__(self, *args, **kwargs):
@@ -870,7 +1013,12 @@ class Resource2ResourceConstraint(models.Model):
         on_delete=models.SET_NULL,
     )
     resourceclassto = models.ForeignKey(
-        Node, db_column="resourceclassto", blank=True, null=True, related_name="resxres_contstraint_classes_to", on_delete=models.SET_NULL
+        Node,
+        db_column="resourceclassto",
+        blank=True,
+        null=True,
+        related_name="resxres_contstraint_classes_to",
+        on_delete=models.SET_NULL,
     )
 
     def __init__(self, *args, **kwargs):
@@ -996,7 +1144,12 @@ class ResourceXResource(models.Model):
 class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(primary_key=True)
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
-    graph_publication = models.ForeignKey(GraphXPublishedGraph, null=True, db_column="graphpublicationid", on_delete=models.PROTECT)
+    graph_publication = models.ForeignKey(
+        GraphXPublishedGraph,
+        null=True,
+        db_column="graphpublicationid",
+        on_delete=models.PROTECT,
+    )
     name = I18n_TextField(blank=True, null=True)
     descriptors = models.JSONField(blank=True, null=True)
     legacyid = models.TextField(blank=True, unique=True, null=True)
@@ -1046,10 +1199,15 @@ class SearchComponent(models.Model):
         db_table = "search_component"
 
     def get_class_module(self):
-        return get_class_from_modulename(self.modulename, self.classname, ExtensionType.SEARCH_COMPONENTS)
+        return get_class_from_modulename(
+            self.modulename, self.classname, ExtensionType.SEARCH_COMPONENTS
+        )
 
     def toJSON(self):
-        from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+        from arches.app.utils.betterJSONSerializer import (
+            JSONSerializer,
+            JSONDeserializer,
+        )
 
         return JSONSerializer().serialize(self)
 
@@ -1060,7 +1218,9 @@ class SearchExportHistory(models.Model):
     exporttime = models.DateTimeField(auto_now_add=True)
     numberofinstances = models.IntegerField()
     url = models.TextField()
-    downloadfile = models.FileField(upload_to="export_deliverables", blank=True, null=True)
+    downloadfile = models.FileField(
+        upload_to="export_deliverables", blank=True, null=True
+    )
 
     def __init__(self, *args, **kwargs):
         super(SearchExportHistory, self).__init__(*args, **kwargs)
@@ -1136,10 +1296,20 @@ class TileModel(models.Model):  # Tile
     """
 
     tileid = models.UUIDField(primary_key=True)
-    resourceinstance = models.ForeignKey(ResourceInstance, db_column="resourceinstanceid", on_delete=models.CASCADE)
-    parenttile = models.ForeignKey("self", db_column="parenttileid", blank=True, null=True, on_delete=models.CASCADE)
+    resourceinstance = models.ForeignKey(
+        ResourceInstance, db_column="resourceinstanceid", on_delete=models.CASCADE
+    )
+    parenttile = models.ForeignKey(
+        "self",
+        db_column="parenttileid",
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+    )
     data = JSONField(blank=True, null=True, db_column="tiledata")
-    nodegroup = models.ForeignKey(NodeGroup, db_column="nodegroupid", on_delete=models.CASCADE)
+    nodegroup = models.ForeignKey(
+        NodeGroup, db_column="nodegroupid", on_delete=models.CASCADE
+    )
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     provisionaledits = JSONField(blank=True, null=True, db_column="provisionaledits")
 
@@ -1162,7 +1332,8 @@ class TileModel(models.Model):  # Tile
                     self.data[str(node.pk)] = None
 
             sortorder_max = TileModel.objects.filter(
-                nodegroup_id=self.nodegroup_id, resourceinstance_id=self.resourceinstance_id
+                nodegroup_id=self.nodegroup_id,
+                resourceinstance_id=self.resourceinstance_id,
             ).aggregate(Max("sortorder"))["sortorder__max"]
             self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
             add_to_update_fields(kwargs, "sortorder")
@@ -1174,10 +1345,21 @@ class TileModel(models.Model):  # Tile
 
 class Value(models.Model):
     valueid = models.UUIDField(primary_key=True)
-    concept = models.ForeignKey("Concept", db_column="conceptid", on_delete=models.CASCADE)
-    valuetype = models.ForeignKey(DValueType, db_column="valuetype", on_delete=models.CASCADE)
+    concept = models.ForeignKey(
+        "Concept", db_column="conceptid", on_delete=models.CASCADE
+    )
+    valuetype = models.ForeignKey(
+        DValueType, db_column="valuetype", on_delete=models.CASCADE
+    )
     value = models.TextField()
-    language = models.ForeignKey(Language, db_column="languageid", to_field="code", blank=True, null=True, on_delete=models.CASCADE)
+    language = models.ForeignKey(
+        Language,
+        db_column="languageid",
+        to_field="code",
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+    )
 
     def __init__(self, *args, **kwargs):
         super(Value, self).__init__(*args, **kwargs)
@@ -1191,10 +1373,21 @@ class Value(models.Model):
 
 class FileValue(models.Model):
     valueid = models.UUIDField(primary_key=True)
-    concept = models.ForeignKey("Concept", db_column="conceptid", on_delete=models.CASCADE)
-    valuetype = models.ForeignKey("DValueType", db_column="valuetype", on_delete=models.CASCADE)
+    concept = models.ForeignKey(
+        "Concept", db_column="conceptid", on_delete=models.CASCADE
+    )
+    valuetype = models.ForeignKey(
+        "DValueType", db_column="valuetype", on_delete=models.CASCADE
+    )
     value = models.FileField(upload_to="concepts")
-    language = models.ForeignKey(Language, db_column="languageid", to_field="code", blank=True, null=True, on_delete=models.CASCADE)
+    language = models.ForeignKey(
+        Language,
+        db_column="languageid",
+        to_field="code",
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+    )
 
     def __init__(self, *args, **kwargs):
         super(FileValue, self).__init__(*args, **kwargs)
@@ -1363,7 +1556,9 @@ class MapLayer(models.Model):
 
 class GraphXMapping(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False)
-    graph = models.ForeignKey("GraphModel", db_column="graphid", on_delete=models.CASCADE)
+    graph = models.ForeignKey(
+        "GraphModel", db_column="graphid", on_delete=models.CASCADE
+    )
     mapping = JSONField(blank=True, null=False)
 
     def __init__(self, *args, **kwargs):
@@ -1393,19 +1588,34 @@ class UserProfile(models.Model):
     def viewable_nodegroups(self):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
-        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ["models.read_nodegroup"], any_perm=True))
+        return set(
+            str(nodegroup.pk)
+            for nodegroup in get_nodegroups_by_perm(
+                self.user, ["models.read_nodegroup"], any_perm=True
+            )
+        )
 
     @property
     def editable_nodegroups(self):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
-        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ["models.write_nodegroup"], any_perm=True))
+        return set(
+            str(nodegroup.pk)
+            for nodegroup in get_nodegroups_by_perm(
+                self.user, ["models.write_nodegroup"], any_perm=True
+            )
+        )
 
     @property
     def deletable_nodegroups(self):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
-        return set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(self.user, ["models.delete_nodegroup"], any_perm=True))
+        return set(
+            str(nodegroup.pk)
+            for nodegroup in get_nodegroups_by_perm(
+                self.user, ["models.delete_nodegroup"], any_perm=True
+            )
+        )
 
     class Meta:
         managed = True
@@ -1423,7 +1633,11 @@ def create_permissions_for_new_users(sender, instance, created, **kwargs):
 
     if created:
         ct = ContentType.objects.get(app_label="models", model="resourceinstance")
-        resourceInstanceIds = list(GroupObjectPermission.objects.filter(content_type=ct).values_list("object_pk", flat=True).distinct())
+        resourceInstanceIds = list(
+            GroupObjectPermission.objects.filter(content_type=ct)
+            .values_list("object_pk", flat=True)
+            .distinct()
+        )
         for resourceInstanceId in resourceInstanceIds:
             resourceInstanceId = uuid.UUID(resourceInstanceId)
         resources = ResourceInstance.objects.filter(pk__in=resourceInstanceIds)
@@ -1554,12 +1768,18 @@ def send_email_on_save(sender, instance, **kwargs):
     """Checks if a notification type needs to send an email, does so if email server exists"""
 
     if instance.notif.notiftype is not None and instance.isread is False:
-        if UserXNotificationType.objects.filter(user=instance.recipient, notiftype=instance.notif.notiftype, emailnotify=False).exists():
+        if UserXNotificationType.objects.filter(
+            user=instance.recipient,
+            notiftype=instance.notif.notiftype,
+            emailnotify=False,
+        ).exists():
             return False
 
         try:
             context = instance.notif.context.copy()
-            text_content = render_to_string(instance.notif.notiftype.emailtemplate, context)
+            text_content = render_to_string(
+                instance.notif.notiftype.emailtemplate, context
+            )
             html_template = get_template(instance.notif.notiftype.emailtemplate)
             html_content = html_template.render(context)
             if context["email"] == instance.recipient.email:
@@ -1570,7 +1790,11 @@ def send_email_on_save(sender, instance, **kwargs):
             if type(email_to) is not list:
                 email_to = [email_to]
 
-            subject, from_email, to = instance.notif.notiftype.name, settings.DEFAULT_FROM_EMAIL, email_to
+            subject, from_email, to = (
+                instance.notif.notiftype.name,
+                settings.DEFAULT_FROM_EMAIL,
+                email_to,
+            )
             msg = EmailMultiAlternatives(subject, text_content, from_email, to)
             msg.attach_alternative(html_content, "text/html")
             msg.send()
@@ -1579,7 +1803,9 @@ def send_email_on_save(sender, instance, **kwargs):
                 instance.save()
         except Exception as e:
             logger.warning(e)
-            logger.warning("Error occurred sending email.  See previous stack trace and check email configuration in settings.py.")
+            logger.warning(
+                "Error occurred sending email.  See previous stack trace and check email configuration in settings.py."
+            )
 
     return False
 
@@ -1631,7 +1857,12 @@ class WorkflowHistory(models.Model):
     componentdata = JSONField(null=False, default=dict)
     # `auto_now_add` marks the field as non-editable, which prevents the field from being serialized, so updating to use `default` instead
     created = models.DateTimeField(default=django.utils.timezone.now, null=False)
-    user = models.ForeignKey(db_column="userid", null=True, on_delete=models.SET_NULL, to=settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(
+        db_column="userid",
+        null=True,
+        on_delete=models.SET_NULL,
+        to=settings.AUTH_USER_MODEL,
+    )
     completed = models.BooleanField(default=False)
 
     class Meta:
@@ -1667,18 +1898,23 @@ class IIIFManifest(models.Model):
     def delete(self, *args, **kwargs):
         all_canvases = {annotation.canvas for annotation in VwAnnotation.objects.all()}
         canvases_in_manifest = self.manifest["sequences"][0]["canvases"]
-        canvas_ids = [canvas["images"][0]["resource"]["service"]["@id"] for canvas in canvases_in_manifest]
+        canvas_ids = [
+            canvas["images"][0]["resource"]["service"]["@id"]
+            for canvas in canvases_in_manifest
+        ]
         canvases_in_use = []
         for canvas_id in canvas_ids:
             if canvas_id in all_canvases:
                 canvases_in_use.append(canvas_id)
         if len(canvases_in_use) > 0:
             canvas_labels_in_use = [
-                item["label"] for item in canvases_in_manifest if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
+                item["label"]
+                for item in canvases_in_manifest
+                if item["images"][0]["resource"]["service"]["@id"] in canvases_in_use
             ]
-            message = _("This image service cannot be deleted because the following canvases have resource annotations: {}").format(
-                ", ".join(canvas_labels_in_use)
-            )
+            message = _(
+                "This image service cannot be deleted because the following canvases have resource annotations: {}"
+            ).format(", ".join(canvas_labels_in_use))
             raise IIIFManifestValidationError(message)
 
         super(IIIFManifest, self).delete()
@@ -1702,8 +1938,12 @@ class VwAnnotation(models.Model):
     feature_id = models.UUIDField(primary_key=True)
     tile = models.ForeignKey(TileModel, on_delete=models.DO_NOTHING, db_column="tileid")
     tiledata = JSONField()
-    resourceinstance = models.ForeignKey(ResourceInstance, on_delete=models.DO_NOTHING, db_column="resourceinstanceid")
-    nodegroup = models.ForeignKey(NodeGroup, on_delete=models.DO_NOTHING, db_column="nodegroupid")
+    resourceinstance = models.ForeignKey(
+        ResourceInstance, on_delete=models.DO_NOTHING, db_column="resourceinstanceid"
+    )
+    nodegroup = models.ForeignKey(
+        NodeGroup, on_delete=models.DO_NOTHING, db_column="nodegroupid"
+    )
     node = models.ForeignKey(Node, on_delete=models.DO_NOTHING, db_column="nodeid")
     feature = JSONField()
     canvas = models.TextField()
@@ -1720,7 +1960,9 @@ class VwAnnotation(models.Model):
 
 class GeoJSONGeometry(models.Model):
     tile = models.ForeignKey(TileModel, on_delete=models.CASCADE, db_column="tileid")
-    resourceinstance = models.ForeignKey(ResourceInstance, on_delete=models.CASCADE, db_column="resourceinstanceid")
+    resourceinstance = models.ForeignKey(
+        ResourceInstance, on_delete=models.CASCADE, db_column="resourceinstanceid"
+    )
     node = models.ForeignKey(Node, on_delete=models.CASCADE, db_column="nodeid")
     geom = models.GeometryField(srid=3857)
 
@@ -1753,7 +1995,9 @@ class ETLModule(models.Model):
         db_table = "etl_modules"
 
     def get_class_module(self):
-        return get_class_from_modulename(self.modulename, self.classname, ExtensionType.ETL_MODULES)
+        return get_class_from_modulename(
+            self.modulename, self.classname, ExtensionType.ETL_MODULES
+        )
 
 
 class LoadEvent(models.Model):
@@ -1777,8 +2021,12 @@ class LoadEvent(models.Model):
 
 
 class LoadStaging(models.Model):
-    nodegroup = models.ForeignKey(NodeGroup, db_column="nodegroupid", on_delete=models.CASCADE)
-    load_event = models.ForeignKey(LoadEvent, db_column="loadid", on_delete=models.CASCADE)
+    nodegroup = models.ForeignKey(
+        NodeGroup, db_column="nodegroupid", on_delete=models.CASCADE
+    )
+    load_event = models.ForeignKey(
+        LoadEvent, db_column="loadid", on_delete=models.CASCADE
+    )
     value = JSONField(blank=True, null=True, db_column="value")
     legacyid = models.TextField(blank=True, null=True)
     resourceid = models.UUIDField(serialize=False, blank=True, null=True)
@@ -1796,9 +2044,15 @@ class LoadStaging(models.Model):
 
 
 class LoadErrors(models.Model):
-    load_event = models.ForeignKey(LoadEvent, db_column="loadid", on_delete=models.CASCADE)
-    nodegroup = models.ForeignKey("NodeGroup", db_column="nodegroupid", null=True, on_delete=models.CASCADE)
-    node = models.ForeignKey("Node", db_column="nodeid", null=True, on_delete=models.CASCADE)
+    load_event = models.ForeignKey(
+        LoadEvent, db_column="loadid", on_delete=models.CASCADE
+    )
+    nodegroup = models.ForeignKey(
+        "NodeGroup", db_column="nodegroupid", null=True, on_delete=models.CASCADE
+    )
+    node = models.ForeignKey(
+        "Node", db_column="nodeid", null=True, on_delete=models.CASCADE
+    )
     type = models.TextField(blank=True, null=True)
     error = models.TextField(blank=True, null=True)
     source = models.TextField(blank=True, null=True)
@@ -1824,11 +2078,17 @@ class SpatialView(models.Model):
         ],
         unique=True,
     )
-    description = models.TextField(default="arches spatial view")  # provide a description of the spatial view
-    geometrynodeid = models.ForeignKey(Node, on_delete=models.CASCADE, db_column="geometrynodeid")
+    description = models.TextField(
+        default="arches spatial view"
+    )  # provide a description of the spatial view
+    geometrynodeid = models.ForeignKey(
+        Node, on_delete=models.CASCADE, db_column="geometrynodeid"
+    )
     ismixedgeometrytypes = models.BooleanField(default=False)
     attributenodes = JSONField(blank=True, null=True, db_column="attributenodes")
-    isactive = models.BooleanField(default=True)  # the view is not created in the DB until set to active.
+    isactive = models.BooleanField(
+        default=True
+    )  # the view is not created in the DB until set to active.
 
     def __str__(self):
         return f"{self.schema}.{self.slug}"

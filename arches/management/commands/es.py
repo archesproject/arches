@@ -36,6 +36,7 @@ import arches.app.utils.index_database as index_database_util
 
 logger = logging.getLogger(__name__)
 
+
 class Command(BaseCommand):
     """
     Commands for running common elasticsearch commands
@@ -73,11 +74,21 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            "-d", "--dest_dir", action="store", dest="dest_dir", default="", help="Directory from where you want to run elasticsearch."
+            "-d",
+            "--dest_dir",
+            action="store",
+            dest="dest_dir",
+            default="",
+            help="Directory from where you want to run elasticsearch.",
         )
 
         parser.add_argument(
-            "-p", "--port", action="store", dest="port", default=settings.ELASTICSEARCH_HTTP_PORT, help="Port to use for elasticsearch."
+            "-p",
+            "--port",
+            action="store",
+            dest="port",
+            default=settings.ELASTICSEARCH_HTTP_PORT,
+            help="Port to use for elasticsearch.",
         )
 
         parser.add_argument(
@@ -126,7 +137,14 @@ class Command(BaseCommand):
             help="Silences the status bar output during certain operations, use in celery operations for example",
         )
 
-        parser.add_argument("-n", "--name ", action="store", dest="name", default=None, help="Name of the custom index")
+        parser.add_argument(
+            "-n",
+            "--name ",
+            action="store",
+            dest="name",
+            default=None,
+            help="Name of the custom index",
+        )
 
         parser.add_argument(
             "-mp",
@@ -191,7 +209,9 @@ class Command(BaseCommand):
             )
 
         if options["operation"] == "index_concepts":
-            index_database_util.index_concepts(clear_index=options["clear_index"], batch_size=options["batch_size"])
+            index_database_util.index_concepts(
+                clear_index=options["clear_index"], batch_size=options["batch_size"]
+            )
 
         if options["operation"] == "index_resources":
             index_database_util.index_resources(
@@ -218,7 +238,9 @@ class Command(BaseCommand):
             try:
                 uuid.UUID(options["transaction"])
             except ValueError:
-                logger.error("A valid transaction id is required. Use -t or --transaction , eg. -t 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'")
+                logger.error(
+                    "A valid transaction id is required. Use -t or --transaction , eg. -t 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'"
+                )
             index_database_util.index_resources_by_transaction(
                 transaction_id=options["transaction"],
                 batch_size=options["batch_size"],
@@ -266,7 +288,13 @@ class Command(BaseCommand):
             )
 
     def reindex_database(
-        self, batch_size, name=None, quiet=False, use_multiprocessing=False, max_subprocesses=0, recalculate_descriptors=False
+        self,
+        batch_size,
+        name=None,
+        quiet=False,
+        use_multiprocessing=False,
+        max_subprocesses=0,
+        recalculate_descriptors=False,
     ):
         self.delete_indexes(name=name)
         self.setup_indexes(name=name)

@@ -7,13 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9979_update_stage_for_bulk_edit'),
+        ("models", "9979_update_stage_for_bulk_edit"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='file',
-            name='path',
-            field=models.FileField(upload_to=arches.app.utils.storage_filename_generator.generate_filename),
+            model_name="file",
+            name="path",
+            field=models.FileField(
+                upload_to=arches.app.utils.storage_filename_generator.generate_filename
+            ),
         ),
     ]

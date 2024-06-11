@@ -19,7 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from arches.settings import *
 import arches
 import os
-import inspect
 
 try:
     from django.utils.translation import gettext_lazy as _
@@ -27,8 +26,6 @@ except ImportError:  # unable to import prior to installing requirements.txt in 
     pass
 
 PACKAGE_NAME = "arches"
-ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-ROOT_DIR = os.path.normpath(os.path.join(ROOT_DIR, "..", "arches"))
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 APP_ROOT = ""
 
@@ -48,7 +45,7 @@ RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, "fixtures", "resource_graphs
 ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, "fixtures", "ontologies", "test_ontology")
 ONTOLOGY_PATH = os.path.join(TEST_ROOT, "fixtures", "ontologies", "cidoc_crm")
 
-BUSISNESS_DATA_FILES = (
+BUSINESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -69,7 +66,9 @@ LOGGING["loggers"]["arches"]["level"] = "ERROR"
 ELASTICSEARCH_PREFIX = "test"
 
 TEST_RUNNER = "tests.base_test.ArchesTestRunner"
-SILENCED_SYSTEM_CHECKS.append("arches.W001")  # Cache backend does not support rate-limiting
+SILENCED_SYSTEM_CHECKS.append(
+    "arches.W001"
+)  # Cache backend does not support rate-limiting
 
 # could add Chrome, PhantomJS etc... here
 LOCAL_BROWSERS = []  # ['Firefox']
@@ -83,7 +82,9 @@ ENABLE_TWO_FACTOR_AUTHENTICATION = False
 FORCE_TWO_FACTOR_AUTHENTICATION = False
 
 DATATYPE_LOCATIONS.append("tests.fixtures.datatypes")
-ELASTICSEARCH_HOSTS = [{"scheme": "http", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
+ELASTICSEARCH_HOSTS = [
+    {"scheme": "http", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}
+]
 LANGUAGES = [
     ("de", _("German")),
     ("en", _("English")),

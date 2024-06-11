@@ -116,7 +116,7 @@ class ArchesProjectCommand(TemplateCommand):
         # need to manually replace instances of {{ project_name }} in some files
         path_to_project = os.path.join(target) if target else os.path.join(os.getcwd(), project_name)
 
-        for relative_file_path in [".yarnrc", "pyproject.toml"]:  # relative to app root directory
+        for relative_file_path in ['.coveragerc', "pyproject.toml", ".pre-commit-config.yaml"]:  # relative to app root directory
             file = open(os.path.join(path_to_project, relative_file_path),'r')
             file_data = file.read()
             file.close()
@@ -143,7 +143,7 @@ def command_startproject(args):
     project_path = os.path.join(os.getcwd(), (directory if directory else name))
 
     os.chdir(project_path)
-    subprocess.call("yarn install", shell=True)
+    subprocess.call("npm install", shell=True)
 
     open(os.path.join(os.getcwd(), 'arches.log'), 'w').close()
 

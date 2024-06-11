@@ -29,8 +29,18 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument("operation", nargs="?", help="operation 'start' starts a celery worker for your project")
-        parser.add_argument("-b", "--beat", action="store_true", dest="beat", help="Includes the beat worker with your celery worker")
+        parser.add_argument(
+            "operation",
+            nargs="?",
+            help="operation 'start' starts a celery worker for your project",
+        )
+        parser.add_argument(
+            "-b",
+            "--beat",
+            action="store_true",
+            dest="beat",
+            help="Includes the beat worker with your celery worker",
+        )
 
     def handle(self, *args, **options):
         if options["operation"] == "start":

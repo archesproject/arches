@@ -35,13 +35,21 @@
                             <i class="fa fa-trash"></i>
                         </button>
                     </div>
-                    <div class="rr-table-column" tabindex="0" role="button" style="flex-grow: 1; padding-left: 10px;"
-                        data-bind="
+                    <div class='rr-table-column icon-column'>
+                        <button 
+                            tabindex="0"    
+                            data-bind="
                             click: function() { if($parent.isEditable !== false){self.toggleSelectedResource($data)}; },
-                            clickBubble: false,
-                            onEnterkeyClick, onSpaceClick," 
-                        style="cursor: pointer;">
+                            attr: {'aria-label': $root.translations.configureRelatedResourceRelationship, 'disabled': $parent.isEditable === false,},
+                            style: {color: $parent.isEditable === true || '#aaa'},
+                            clickBubble: false," 
+                            style="cursor: pointer;">
+                            <i class="fa fa-gear"></i>
+                        </button>
+                    </div>
+                    <div class="rr-table-column" style="flex-grow: 1;">
                         <div class="rr-table-instance-label" data-bind="text: $data.name"></div>
+                        
                     </div>
                 </div>
                 <div class="rr-table-row-panel" data-bind="if: self.selectedResourceType() === $data, visible: self.selectedResourceType() === $data, css: { 'rr-table-border': self.selectedResourceType() === $data} ">
