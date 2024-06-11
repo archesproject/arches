@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { inject, provide } from "vue";
 
-import ItemHeader from "@/components/ControlledListManager/ItemHeader.vue";
-import ItemImages from "@/components/ControlledListManager/ItemImages.vue";
-import ItemType from "@/components/ControlledListManager/ItemType.vue";
-import ItemURI from "@/components/ControlledListManager/ItemURI.vue";
-import ValueEditor from "@/components/ControlledListManager/ValueEditor.vue";
+import ItemHeader from "@/components/ControlledListManager/editor/ItemHeader.vue";
+import ItemImages from "@/components/ControlledListManager/editor/ItemImages.vue";
+import ItemType from "@/components/ControlledListManager/editor/ItemType.vue";
+import ItemURI from "@/components/ControlledListManager/editor/ItemURI.vue";
+import ValueEditor from "@/components/ControlledListManager/editor/ValueEditor.vue";
 
 import {
     displayedRowKey,

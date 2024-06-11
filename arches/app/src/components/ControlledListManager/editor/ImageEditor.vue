@@ -9,8 +9,8 @@ import { useToast } from "primevue/usetoast";
 import { deleteImage } from "@/components/ControlledListManager/api.ts";
 import { DANGER, METADATA_CHOICES, itemKey } from "@/components/ControlledListManager/constants.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
-import AddMetadata from "@/components/ControlledListManager/AddMetadata.vue";
-import ImageMetadata from "@/components/ControlledListManager/ImageMetadata.vue";
+import AddMetadata from "@/components/ControlledListManager/editor/AddMetadata.vue";
+import ImageMetadata from "@/components/ControlledListManager/editor/ImageMetadata.vue";
 
 import type { Ref } from "vue";
 import type {

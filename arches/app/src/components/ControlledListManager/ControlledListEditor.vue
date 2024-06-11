@@ -9,11 +9,11 @@ import SplitterPanel from "primevue/splitterpanel";
 import { LIGHT_GRAY } from "@/theme.ts";
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import { dataIsList } from "@/components/ControlledListManager/utils.ts";
-import ControlledListSplash from "@/components/ControlledListManager/ControlledListSplash.vue";
-import ItemEditor from "@/components/ControlledListManager/ItemEditor.vue";
-import ListCharacteristics from "@/components/ControlledListManager/ListCharacteristics.vue";
-import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
-import ListTree from "@/components/ControlledListManager/ListTree.vue";
+import ControlledListSplash from "@/components/ControlledListManager/misc/ControlledListSplash.vue";
+import ItemEditor from "@/components/ControlledListManager/editor/ItemEditor.vue";
+import ListCharacteristics from "@/components/ControlledListManager/editor/ListCharacteristics.vue";
+import ListHeader from "@/components/ControlledListManager/misc/ListHeader.vue";
+import ListTree from "@/components/ControlledListManager/tree/ListTree.vue";
 
 import type { Ref } from "vue";
 import type { ControlledListItem, Selectable } from "@/types/ControlledListManager";

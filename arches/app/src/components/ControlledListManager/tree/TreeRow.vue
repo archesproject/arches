@@ -17,7 +17,7 @@ import {
     listAsNode,
     nodeIsList,
 } from "@/components/ControlledListManager/utils.ts";
-import MoveRow from "@/components/ControlledListManager/MoveRow.vue";
+import MoveRow from "@/components/ControlledListManager/tree/MoveRow.vue";
 
 import type { Language } from "@/types/arches";
 import type { Ref } from "vue";

@@ -4,7 +4,7 @@ import { useGettext } from "vue3-gettext";
 
 import { itemKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
-import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
+import LetterCircle from "@/components/ControlledListManager/misc/LetterCircle.vue";
 
 import type { Ref } from "vue";
 import type { Language } from "@/types/arches";
