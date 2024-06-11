@@ -220,13 +220,13 @@ export const deleteLists = async (
         })
     );
 
+    let anyDeleted = false;
     try {
         const responses = await Promise.all(promises);
-        if (responses.some((resp) => resp.ok)) {
-            return true;
-        }
         responses.forEach(async (response) => {
-            if (!response.ok) {
+            if (response.ok) {
+                anyDeleted = true;
+            } else {
                 const body = await response.json();
                 toast.add({
                     severity: ERROR,
@@ -243,6 +243,9 @@ export const deleteLists = async (
             summary: $gettext("List deletion failed"),
         });
     }
+    if (anyDeleted) {
+        return true;
+    }
 };
 
 export const deleteItems = async (
@@ -257,13 +260,16 @@ export const deleteItems = async (
         })
     );
 
+    let anyDeleted = false;
     try {
         const responses = await Promise.all(promises);
         if (responses.some((resp) => resp.ok)) {
             return true;
         }
         responses.forEach(async (response) => {
-            if (!response.ok) {
+            if (response.ok) {
+                anyDeleted = true;
+            } else {
                 const body = await response.json();
                 toast.add({
                     severity: ERROR,
@@ -279,6 +285,9 @@ export const deleteItems = async (
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Item deletion failed"),
         });
+    }
+    if (anyDeleted) {
+        return true;
     }
 };
 
