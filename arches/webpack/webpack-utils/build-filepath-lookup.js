@@ -11,7 +11,8 @@ function buildFilepathLookup(path, staticUrlPrefix) {
 
     const getFileList = function (dirPath) {
         return fs.readdirSync(dirPath, { withFileTypes: true }).reduce((fileList,entries) => {
-            const childPath = Path.join(dirPath, entries.name)
+            const childPath = Path.join(dirPath, entries.name);
+
             if (entries.isDirectory()) {
                 fileList.push(...getFileList(childPath, fileList));
             } else
@@ -19,8 +20,8 @@ function buildFilepathLookup(path, staticUrlPrefix) {
                 fileList.push(childPath);
             }
             return fileList;
-            }, [])
-        };
+        }, []);
+    };
 
     return getFileList(path).reduce((lookup, file) => {
         const extension = file.match(/[^.]+$/).toString();
