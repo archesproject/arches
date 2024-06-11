@@ -8,6 +8,7 @@ import SplitterPanel from "primevue/splitterpanel";
 
 import { LIGHT_GRAY } from "@/theme.ts";
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
+import { dataIsList } from "@/components/ControlledListManager/utils.ts";
 import ControlledListSplash from "@/components/ControlledListManager/ControlledListSplash.vue";
 import ItemEditor from "@/components/ControlledListManager/ItemEditor.vue";
 import ListCharacteristics from "@/components/ControlledListManager/ListCharacteristics.vue";
@@ -35,7 +36,7 @@ const panel = computed(() => {
     if (!displayedRow.value) {
         return ControlledListSplash;
     }
-    if ((displayedRow.value as ControlledListItem).depth === undefined) {
+    if (dataIsList(displayedRow.value)) {
         return ListCharacteristics;
     }
     return ItemEditor;

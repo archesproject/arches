@@ -4,7 +4,7 @@ import { useGettext } from "vue3-gettext";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
 import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
-import { bestLabel } from "@/components/ControlledListManager/utils.ts";
+import { bestLabel, dataIsList } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
 import type { Language } from "@/types/arches";
@@ -23,7 +23,7 @@ const heading = computed(() => {
     if (!displayedRow.value) {
         return $gettext("List Editor");
     }
-    if ((displayedRow.value as ControlledListItem).depth === undefined) {
+    if (dataIsList(displayedRow.value)) {
         return $gettext(
             "List Editor > %{listName}",
             { listName: (displayedRow.value as ControlledList).name },

@@ -8,6 +8,17 @@ import type {
     Selectable,
 } from "@/types/ControlledListManager";
 
+// Duck-typing helpers
+export const dataIsList = (data: Selectable) => {
+    return (data as ControlledList).search_only !== undefined;
+};
+export const dataisItem = (data: Selectable) => {
+    return !dataIsList(data);
+};
+export const nodeIsList = (node: TreeNode) => {
+    return dataIsList(node.data);
+};
+
 export const bestLabel = (item: ControlledListItem, languageCode: string) => {
     const valuesInLang = item.values.filter(value => value.language_id === languageCode);
     const bestLabel = (
@@ -23,10 +34,6 @@ export const bestLabel = (item: ControlledListItem, languageCode: string) => {
 
 export const languageNameFromCode = (code: string) => {
     return arches.languages.find((lang: Language) => lang.code === code).name;
-};
-
-export const nodeIsList = (node: TreeNode) => {
-    return !!node.data.nodes;
 };
 
 export const findNodeInTree = (tree: TreeNode[], itemId: string) => {
