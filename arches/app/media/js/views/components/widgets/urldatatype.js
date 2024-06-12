@@ -20,6 +20,16 @@ define([
             this.url_label(valueUrlLabel);
         }
 
+        if(this.form){
+            this.form.on('tile-reset', (x) => {
+                // only needs to affect unsaved tile reset
+                if (ko.isObservable(this.value)) {
+                    this.url(undefined);
+                    this.url_label(undefined);
+                    this.value(null)
+                }
+            });
+        }
 
         this.urlPreviewText = ko.pureComputed(function() {
             if (this.url()) {
