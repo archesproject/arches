@@ -34,7 +34,7 @@
         "bootstrap": "3.4.1",
         "bootstrap-colorpicker": "^2.5.3",
         "chosen-js": "1.8.7",
-        "ckeditor4": "ckeditor/ckeditor4-releases#full/4.24.x",
+        "ckeditor4": "ckeditor/ckeditor4-releases#full/4.22.1",
         "codemirror": "^5.65.6",
         "core-js": "^3.21.1",
         "cross-env": "^7.0.3",
