@@ -151,6 +151,12 @@ class Command(BaseCommand):
             os.path.join(settings.APP_ROOT, "..", ".github", "workflows", "main.yml")
         ):
             self.stdout.write("Copying .github/workflows/main.yml directory to project")
+
+            os.makedirs(
+                os.path.join(settings.APP_ROOT, "..", ".github", "workflows"),
+                exist_ok=True,
+            )
+
             shutil.copy(
                 os.path.join(
                     settings.ROOT_DIR,
