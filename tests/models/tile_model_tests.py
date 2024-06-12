@@ -317,6 +317,7 @@ class TileTests(ArchesTestCase):
                 "value"
             ],
             "AUTHORITATIVE",
+            provisional_tile,
         )
         self.assertEqual(provisionaledits[str(self.user.id)]["action"], "update")
         self.assertEqual(provisionaledits[str(self.user.id)]["status"], "review")
