@@ -130,7 +130,8 @@ def handle_items(item_dicts, max_sortorder=-1):
         item_to_save.validate_constraints(exclude=["sortorder"])
 
     ControlledListItem.objects.bulk_update(
-        items_to_save, fields=["controlled_list_id", "guide", "uri", "sortorder", "parent"]
+        items_to_save,
+        fields=["controlled_list_id", "guide", "uri", "sortorder", "parent"],
     )
     ControlledListItemValue.objects.bulk_update(
         values_to_save, fields=["value", "valuetype", "language"]
@@ -168,8 +169,9 @@ class ControlledListsView(View):
     @staticmethod
     def node_subquery(node_field: str = "pk"):
         return ArraySubquery(
-            Node.with_controlled_list
-            .filter(controlled_list=OuterRef("id"), source_identifier=None)
+            Node.with_controlled_list.filter(
+                controlled_list=OuterRef("id"), source_identifier=None
+            )
             .select_related("graph" if node_field.startswith("graph__") else None)
             .order_by("pk")
             .values(node_field)
@@ -219,11 +221,8 @@ class ControlledListView(View):
         if not (list_id := kwargs.get("id", None)):
             return self.add_new_list(name)
 
-        qs = (
-            ControlledList.objects.filter(pk=list_id)
-            .annotate(max_sortorder=Max(
-                "controlled_list_items__sortorder", default=-1
-            ))
+        qs = ControlledList.objects.filter(pk=list_id).annotate(
+            max_sortorder=Max("controlled_list_items__sortorder", default=-1)
         )
 
         try:
@@ -242,9 +241,14 @@ class ControlledListView(View):
 
                 clist.save()
         except ValidationError as ve:
-            return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
+            return JSONErrorResponse(
+                message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+            )
         except MixedListsException:
-            return JSONErrorResponse(message=_("Items must belong to the same list."), status=HTTPStatus.BAD_REQUEST)
+            return JSONErrorResponse(
+                message=_("Items must belong to the same list."),
+                status=HTTPStatus.BAD_REQUEST,
+            )
 
         return JSONResponse(clist.serialize())
 
@@ -281,11 +285,13 @@ class ControlledListView(View):
             clist.full_clean(exclude=exclude_fields)
             clist.save(update_fields=update_fields)
         except ValidationError as ve:
-            return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
+            return JSONErrorResponse(
+                message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+            )
         except MixedListsException:
             return JSONErrorResponse(
                 message=_("Items must belong to the same list."),
-                status=HTTPStatus.BAD_REQUEST
+                status=HTTPStatus.BAD_REQUEST,
             )
 
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
@@ -364,9 +370,7 @@ class ControlledListItemView(View):
             controlled_list = (
                 ControlledList.objects.filter(pk=data["controlled_list_id"])
                 .annotate(
-                    max_sortorder=Max(
-                        "controlled_list_items__sortorder", default=-1
-                    )
+                    max_sortorder=Max("controlled_list_items__sortorder", default=-1)
                 )
                 .get()
             )
@@ -385,11 +389,19 @@ class ControlledListItemView(View):
                 serialized_item = item.serialize()
 
         except ValidationError as ve:
-            return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
+            return JSONErrorResponse(
+                message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+            )
         except MixedListsException:
-            return JSONErrorResponse(message=_("Items must belong to the same list."), status=HTTPStatus.BAD_REQUEST)
+            return JSONErrorResponse(
+                message=_("Items must belong to the same list."),
+                status=HTTPStatus.BAD_REQUEST,
+            )
         except RecursionError:
-            return JSONErrorResponse(message=_("Recursive structure detected."), status=HTTPStatus.BAD_REQUEST)
+            return JSONErrorResponse(
+                message=_("Recursive structure detected."),
+                status=HTTPStatus.BAD_REQUEST,
+            )
 
         return JSONResponse(serialized_item)
 
@@ -407,7 +419,9 @@ class ControlledListItemView(View):
             item.full_clean(exclude=exclude_fields)
             item.save(update_fields=update_fields)
         except ValidationError as ve:
-            return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
+            return JSONErrorResponse(
+                message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+            )
 
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
@@ -435,7 +449,9 @@ class ControlledListItemValueView(View):
         try:
             value.full_clean()
         except ValidationError as ve:
-            return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
+            return JSONErrorResponse(
+                message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+            )
         value.save()
 
         return JSONResponse(value.serialize(), status=HTTPStatus.CREATED)
@@ -461,7 +477,9 @@ class ControlledListItemValueView(View):
         try:
             value.full_clean()
         except ValidationError as ve:
-            return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
+            return JSONErrorResponse(
+                message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+            )
         value.save()
 
         return JSONResponse(value.serialize())
@@ -505,7 +523,9 @@ class ControlledListItemImageView(View):
         try:
             img.full_clean()
         except ValidationError as ve:
-            return JSONErrorResponse(message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
+            return JSONErrorResponse(
+                message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+            )
         img.save()
         return JSONResponse(img.serialize(), status=HTTPStatus.CREATED)
 
@@ -533,7 +553,9 @@ class ControlledListItemImageMetadataView(View):
         try:
             metadata.full_clean()
         except ValidationError as ve:
-            return JSONErrorResponse(message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
+            return JSONErrorResponse(
+                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+            )
         metadata.save()
 
         return JSONResponse(metadata.serialize(), status=HTTPStatus.CREATED)
@@ -554,19 +576,23 @@ class ControlledListItemImageMetadataView(View):
             metadata.language = Language.objects.get(code=data["language_id"])
         except Language.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
-        metadata.metadata_type=data["metadata_type"]
+        metadata.metadata_type = data["metadata_type"]
 
         try:
             metadata.full_clean()
         except ValidationError as ve:
-            return JSONErrorResponse(message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST)
+            return JSONErrorResponse(
+                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+            )
         metadata.save()
 
         return JSONResponse(metadata.serialize())
 
     def delete(self, request, **kwargs):
         metadata_id = kwargs.get("id")
-        count, unused = ControlledListItemImageMetadata.objects.filter(pk=metadata_id).delete()
+        count, unused = ControlledListItemImageMetadata.objects.filter(
+            pk=metadata_id
+        ).delete()
         if not count:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
         return JSONResponse(status=HTTPStatus.NO_CONTENT)

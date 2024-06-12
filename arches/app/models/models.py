@@ -820,10 +820,14 @@ class Node(models.Model):
     # Node.with_controlled_list.filter(controlled_list=your_list_id_as_uuid)
     class WithControlledListManager(models.Manager):
         def get_queryset(self):
-            return super().get_queryset().annotate(
-                controlled_list=Cast(
-                    KT("config__controlledList"),
-                    output_field=models.UUIDField(),
+            return (
+                super()
+                .get_queryset()
+                .annotate(
+                    controlled_list=Cast(
+                        KT("config__controlledList"),
+                        output_field=models.UUIDField(),
+                    )
                 )
             )
 
@@ -2231,7 +2235,9 @@ class ControlledList(models.Model):
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)
         if (not exclude or "name" not in exclude) and not self.name:
-            self.name = _("Untitled List: ") + datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
+            self.name = _("Untitled List: ") + datetime.datetime.now().isoformat(
+                sep=" ", timespec="seconds"
+            )
 
     def serialize(self, depth_map=None, flat=False):
         if depth_map is None:
@@ -2309,12 +2315,16 @@ class ControlledListItem(models.Model):
                 fields=["controlled_list", "sortorder"],
                 name="unique_list_sortorder",
                 deferrable=Deferrable.DEFERRED,
-                violation_error_message=_("All items in this list must have distinct sort orders.")
+                violation_error_message=_(
+                    "All items in this list must have distinct sort orders."
+                ),
             ),
             models.UniqueConstraint(
                 fields=["controlled_list", "uri"],
                 name="unique_list_uri",
-                violation_error_message=_("All items in this list must have distinct URIs.")
+                violation_error_message=_(
+                    "All items in this list must have distinct URIs."
+                ),
             ),
         ]
 
@@ -2344,8 +2354,7 @@ class ControlledListItem(models.Model):
                 if value.valuetype_id != "image"
             ],
             "images": [
-                image.serialize()
-                for image in self.controlled_list_item_images.all()
+                image.serialize() for image in self.controlled_list_item_images.all()
             ],
             "parent_id": str(self.parent_id) if self.parent_id else None,
             "depth": depth_map[self.id],
@@ -2362,6 +2371,7 @@ class ValuesWithoutImagesManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().exclude(valuetype="image")
 
+
 class ImageManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(valuetype="image")
@@ -2376,7 +2386,9 @@ class ControlledListItemValue(models.Model):
         related_name="controlled_list_item_values",
     )
     valuetype = models.ForeignKey(
-        DValueType, on_delete=models.PROTECT, limit_choices_to=Q(category__in=("label", "image", "note"))
+        DValueType,
+        on_delete=models.PROTECT,
+        limit_choices_to=Q(category__in=("label", "image", "note")),
     )
     language = models.ForeignKey(
         Language,
@@ -2394,18 +2406,24 @@ class ControlledListItemValue(models.Model):
             models.UniqueConstraint(
                 fields=["controlled_list_item", "value", "valuetype", "language"],
                 name="unique_item_value_valuetype_language",
-                violation_error_message=_("The same item value cannot be stored twice in the same language.")
+                violation_error_message=_(
+                    "The same item value cannot be stored twice in the same language."
+                ),
             ),
             models.UniqueConstraint(
                 fields=["controlled_list_item", "language"],
                 condition=Q(valuetype="prefLabel"),
                 name="unique_item_preflabel_language",
-                violation_error_message=_("Only one preferred label per language is permitted.")
+                violation_error_message=_(
+                    "Only one preferred label per language is permitted."
+                ),
             ),
             models.CheckConstraint(
                 check=Q(language_id__isnull=False) | Q(valuetype="image"),
                 name="only_images_nullable_language",
-                violation_error_message=_("Item values must be associated with a language.")
+                violation_error_message=_(
+                    "Item values must be associated with a language."
+                ),
             ),
         ]
 
@@ -2415,7 +2433,9 @@ class ControlledListItemValue(models.Model):
 
     def clean(self):
         if not self.value:
-            self.value = _("New Item: ") + datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
+            self.value = _("New Item: ") + datetime.datetime.now().isoformat(
+                sep=" ", timespec="seconds"
+            )
 
     def serialize(self):
         return {
@@ -2462,7 +2482,7 @@ class ControlledListItemImage(models.Model):
             "metadata": [
                 metadata.serialize()
                 for metadata in self.controlled_list_item_image_metadata.all()
-            ]
+            ],
         }
 
 
@@ -2495,7 +2515,9 @@ class ControlledListItemImageMetadata(models.Model):
             models.UniqueConstraint(
                 fields=["controlled_list_item_image", "metadata_type", "language"],
                 name="unique_image_metadata_valuetype_language",
-                violation_error_message=_("Only one metadata entry per language and metadata type is permitted.")
+                violation_error_message=_(
+                    "Only one metadata entry per language and metadata type is permitted."
+                ),
             ),
         ]
 
@@ -2503,7 +2525,8 @@ class ControlledListItemImageMetadata(models.Model):
         choices = ControlledListItemImageMetadata.MetadataChoices
         return {
             field: str(value)
-            for (field, value) in vars(self).items() if not field.startswith("_")
+            for (field, value) in vars(self).items()
+            if not field.startswith("_")
         } | {
             # Get localized label for metadata type
             "metadata_label": str(choices(self.metadata_type).label)
