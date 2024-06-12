@@ -22,7 +22,6 @@ from arches.app.models.models import (
 from arches.app.models.utils import field_names
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.decorators import group_required
-from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.utils.string_utils import str_to_bool
 
@@ -154,13 +153,12 @@ class ControlledListsView(View):
             .order_by("name")
             .prefetch_related(*prefetch_terms(request))
         )
+        flat = str_to_bool(request.GET.get("flat", "false"))
         serialized_lists = [
-            obj.serialize(flat=str_to_bool(request.GET.get("flat", "false")))
-            for obj in lists
+            obj.serialize(flat=flat, user=request.user) for obj in lists
         ]
-        filtered = self.filter_permitted_nodegroups(serialized_lists, request)
 
-        return JSONResponse({"controlled_lists": filtered})
+        return JSONResponse({"controlled_lists": serialized_lists})
 
     @staticmethod
     def node_subquery(node_field: str = "pk"):
@@ -173,19 +171,6 @@ class ControlledListsView(View):
             .values(node_field)
         )
 
-    def filter_permitted_nodegroups(self, serialized_lists, request):
-        permitted_nodegroups = [
-            ng.pk for ng in get_nodegroups_by_perm(request.user, "read_nodegroup")
-        ]
-
-        for lst in serialized_lists:
-            lst["nodes"] = [
-                node_dict
-                for node_dict in lst["nodes"]
-                if node_dict["nodegroup_id"] in permitted_nodegroups
-            ]
-        return serialized_lists
-
 
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
@@ -194,15 +179,14 @@ class ControlledListView(View):
     def get(self, request, **kwargs):
         """Returns either a flat representation (?flat=true) or a tree (default)."""
         list_id = kwargs.get("id")
+        flat = str_to_bool(request.GET.get("flat", "false"))
         try:
             lst = ControlledList.objects.prefetch_related(*prefetch_terms(request)).get(
                 pk=list_id
             )
         except ControlledList.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
-        return JSONResponse(
-            lst.serialize(flat=str_to_bool(request.GET.get("flat", "false")))
-        )
+        return JSONResponse(lst.serialize(flat=flat, user=request.user))
 
     def add_new_list(self, name):
         lst = ControlledList(name=name)

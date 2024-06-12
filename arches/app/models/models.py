@@ -2213,7 +2213,7 @@ class ControlledList(models.Model):
                 sep=" ", timespec="seconds"
             )
 
-    def serialize(self, depth_map=None, flat=False):
+    def serialize(self, depth_map=None, flat=False, user=None):
         if depth_map is None:
             depth_map = defaultdict(int)
         data = {
@@ -2257,10 +2257,7 @@ class ControlledList(models.Model):
                     "graph_id": node.graph_id,
                     "graph_name": str(node.graph.name),
                 }
-                for node in Node.with_controlled_list.filter(
-                    controlled_list=self.pk,
-                    source_identifier=None,
-                ).select_related("graph")
+                for node in self.find_nodes_using_list(user).select_related("graph")
             ]
         return data
 
@@ -2280,8 +2277,20 @@ class ControlledList(models.Model):
 
         ControlledListItem.objects.bulk_update(reordered_items, fields=["sortorder"])
 
-    def find_nodes_using_list(self):
-        return Node.with_controlled_list.filter(controlled_list=self.pk)
+    def find_nodes_using_list(self, user=None):
+        from arches.app.utils.permission_backend import get_nodegroups_by_perm
+
+        qs = Node.with_controlled_list.filter(
+            controlled_list=self.pk, source_identifier=None
+        )
+
+        if user:
+            permitted_nodegroups = [
+                ng.pk for ng in get_nodegroups_by_perm(user, "read_nodegroup")
+            ]
+            qs = qs.filter(nodegroup_id__in=permitted_nodegroups)
+
+        return qs
 
 
 class ControlledListItem(models.Model):
