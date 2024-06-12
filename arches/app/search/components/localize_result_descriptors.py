@@ -13,7 +13,16 @@ details = {
     "componentname": "localize-descriptors",
     "sortorder": "0",
     "enabled": True,
+    "config": {
+        "requiredComponents": [
+            {
+                "componentname": "core-search",
+                "searchcomponentid": "69695d63-6f03-4536-8da9-841b07116381",
+            }
+        ]
+    },
 }
+
 
 class LocalizeResultDescriptors(BaseSearchFilter):
     """
@@ -22,8 +31,10 @@ class LocalizeResultDescriptors(BaseSearchFilter):
     to suit the implementation of other search component logic.
     """
 
-    def post_search_hook(self, search_results_object, response_object, permitted_nodegroups):
-        
+    def post_search_hook(
+        self, search_results_object, response_object, permitted_nodegroups
+    ):
+
         def get_localized_descriptor(resource, descriptor_type, language_codes):
             descriptor = resource["_source"][descriptor_type]
             result = descriptor[0] if len(descriptor) > 0 else None
@@ -32,16 +43,20 @@ class LocalizeResultDescriptors(BaseSearchFilter):
                     if entry["language"] == language_code and entry["value"] != "":
                         return entry
             return result
-        
+
         descriptor_types = ("displaydescription", "displayname")
         active_and_default_language_codes = (get_language(), settings.LANGUAGE_CODE)
 
         for resource in response_object["results"]["hits"]["hits"]:
             for descriptor_type in descriptor_types:
-                descriptor = get_localized_descriptor(resource, descriptor_type, active_and_default_language_codes)
+                descriptor = get_localized_descriptor(
+                    resource, descriptor_type, active_and_default_language_codes
+                )
                 if descriptor:
                     resource["_source"][descriptor_type] = descriptor["value"]
                     if descriptor_type == "displayname":
-                        resource["_source"]["displayname_language"] = descriptor["language"]
+                        resource["_source"]["displayname_language"] = descriptor[
+                            "language"
+                        ]
                 else:
                     resource["_source"][descriptor_type] = _("Undefined")
