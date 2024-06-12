@@ -280,25 +280,25 @@ class ControlledListView(View):
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
     def delete(self, request, **kwargs):
-        list_id: UUID = kwargs.get("id")
-        for node in Node.with_controlled_list.filter(controlled_list=list_id):
-            try:
-                lst = ControlledList.objects.get(id=list_id)
-            except ControlledList.DoesNotExist:
-                return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
-            return JSONErrorResponse(
-                message=_(
-                    "{controlled_list} could not be deleted: still in use by {graph} - {node}".format(
-                        controlled_list=lst.name,
-                        graph=node.graph.name,
-                        node=node.name,
-                    )
-                ),
-                status=HTTPStatus.BAD_REQUEST,
-            )
-        objs_deleted, unused = ControlledList.objects.filter(pk=list_id).delete()
-        if not objs_deleted:
+        try:
+            list_to_delete = ControlledList.objects.get(pk=kwargs.get("id"))
+        except ControlledList.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
+        errors = [
+            _(
+                "{controlled_list} could not be deleted: still in use by {graph} - {node}".format(
+                    controlled_list=list_to_delete.name,
+                    graph=node.graph.name,
+                    node=node.name,
+                )
+            )
+            for node in list_to_delete.nodes_using_list()
+        ]
+        if errors:
+            return JSONErrorResponse(
+                message=" ".join(errors), status=HTTPStatus.BAD_REQUEST
+            )
+        list_to_delete.delete()
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
 
@@ -370,7 +370,6 @@ class ControlledListItemView(View):
                 else:
                     return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
                 serialized_item = item.serialize()
-
         except ValidationError as ve:
             return JSONErrorResponse(
                 message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
@@ -473,22 +472,13 @@ class ControlledListItemValueView(View):
             value = ControlledListItemValue.values_without_images.get(pk=value_id)
         except:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
-        if (
-            value.valuetype_id == "prefLabel"
-            and len(
-                value.controlled_list_item.controlled_list_item_values.filter(
-                    valuetype_id="prefLabel"
-                )
-            )
-            < 2
-        ):
+
+        try:
+            value.delete()
+        except ValidationError as ve:
             return JSONErrorResponse(
-                message=_(
-                    "Deleting the item's only remaining preferred label is not permitted."
-                ),
-                status=HTTPStatus.BAD_REQUEST,
+                message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
             )
-        value.delete()
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
 

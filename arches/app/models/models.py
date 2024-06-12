@@ -2280,6 +2280,9 @@ class ControlledList(models.Model):
 
         ControlledListItem.objects.bulk_update(reordered_items, fields=["sortorder"])
 
+    def nodes_using_list(self):
+        return Node.with_controlled_list.filter(controlled_list=self.pk)
+
 
 class ControlledListItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -2435,6 +2438,23 @@ class ControlledListItemValue(models.Model):
             "value": self.value,
             "item_id": self.controlled_list_item_id,
         }
+
+    def delete(self):
+        if (
+            self.valuetype_id == "prefLabel"
+            and len(
+                self.controlled_list_item.controlled_list_item_values.filter(
+                    valuetype_id="prefLabel"
+                )
+            )
+            < 2
+        ):
+            raise ValidationError(
+                _(
+                    "Deleting the item's only remaining preferred label is not permitted."
+                )
+            )
+        return super().delete()
 
 
 class ControlledListItemImage(models.Model):
