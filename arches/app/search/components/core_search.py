@@ -19,6 +19,7 @@ details = {
     "config": {"requiredComponents": []},
 }
 
+SEARCH_RESULT_PAGES = int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
 
 class CoreSearchFilter(BaseSearchFilter):
 
@@ -60,12 +61,7 @@ class CoreSearchFilter(BaseSearchFilter):
                 if total <= settings.SEARCH_EXPORT_LIMIT:
                     pages = (total // settings.SEARCH_RESULT_LIMIT) + 1
                 else:
-                    pages = (
-                        int(
-                            settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT
-                        )
-                        - 1
-                    )
+                    pages = SEARCH_RESULT_PAGES
             for page in range(int(pages)):
                 results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
                 results["hits"]["hits"] += results_scrolled["hits"]["hits"]
