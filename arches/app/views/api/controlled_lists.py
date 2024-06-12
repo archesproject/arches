@@ -19,6 +19,7 @@ from arches.app.models.models import (
     Language,
     Node,
 )
+from arches.app.models.utils import field_names
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
@@ -30,10 +31,6 @@ logger = logging.getLogger(__name__)
 
 class MixedListsException(Exception):
     pass
-
-
-def field_names(instance):
-    return {f.name for f in instance.__class__._meta.fields}
 
 
 def prefetch_terms(request):
@@ -162,9 +159,8 @@ class ControlledListsView(View):
             for obj in lists
         ]
         filtered = self.filter_permitted_nodegroups(serialized_lists, request)
-        data = {"controlled_lists": filtered}
 
-        return JSONResponse(data)
+        return JSONResponse({"controlled_lists": filtered})
 
     @staticmethod
     def node_subquery(node_field: str = "pk"):
@@ -252,33 +248,20 @@ class ControlledListView(View):
 
         return JSONResponse(clist.serialize())
 
-    def bulk_update_sortorder(self, sortorder_map):
-        reordered_items = []
-        exclude_fields = set()
-        for item_id, sortorder in sortorder_map.items():
-            item = ControlledListItem(pk=UUID(item_id), sortorder=sortorder)
-            # Just validate sortorder.
-            if not exclude_fields:
-                exclude_fields = {f for f in field_names(item) if f != "sortorder"}
-            item.clean_fields(exclude=exclude_fields)
-            reordered_items.append(item)
-
-        ControlledListItem.objects.bulk_update(reordered_items, fields=["sortorder"])
-
     def patch(self, request, **kwargs):
         list_id: UUID = kwargs.get("id")
         data = JSONDeserializer().deserialize(request.body)
         data.pop("items", None)
         sortorder_map = data.pop("sortorder_map", {})
 
-        if sortorder_map:
-            self.bulk_update_sortorder(sortorder_map)
-
         update_fields = list(data)
         if not update_fields and not sortorder_map:
             return JSONResponse(status=HTTPStatus.BAD_REQUEST)
 
         clist = ControlledList(id=list_id, **data)
+        if sortorder_map:
+            clist.bulk_update_item_sortorders(sortorder_map)
+
         exclude_fields = {f for f in field_names(clist) if f not in update_fields}
         try:
             clist._state.adding = False

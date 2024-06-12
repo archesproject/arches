@@ -1,14 +1,3 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
-#
-# Also note: You'll have to insert the output of 'django-admin sqlcustom [app_label]'
-# into your database.
-
-
 import os
 import sys
 import json
@@ -23,6 +12,7 @@ from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.models.utils import add_to_update_fields, field_names
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
@@ -54,22 +44,6 @@ from django.conf import settings
 
 
 logger = logging.getLogger(__name__)
-
-
-def add_to_update_fields(kwargs, field_name):
-    """
-    Update the `update_field` arg inside `kwargs` (if present) in-place
-    with `field_name`.
-    """
-    if (update_fields := kwargs.get("update_fields")) is not None:
-        # Django sends a set from update_or_create()
-        if isinstance(update_fields, set):
-            update_fields.add(field_name)
-        # Arches sends a list from tile POST view
-        else:
-            new = set(update_fields)
-            new.add(field_name)
-            kwargs["update_fields"] = new
 
 
 class BulkIndexQueue(models.Model):
@@ -2289,6 +2263,22 @@ class ControlledList(models.Model):
                 ).select_related("graph")
             ]
         return data
+
+    def bulk_update_item_sortorders(self, sortorder_map):
+        """Applies new sortorders (keyed on item pk's) to those model instances."""
+        reordered_items = []
+        exclude_fields = set()
+        for item_id, sortorder in sortorder_map.items():
+            item = ControlledListItem(pk=uuid.UUID(item_id), sortorder=sortorder)
+            # Just validate sortorder.
+            if not exclude_fields:
+                exclude_fields = {
+                    name for name in field_names(item) if name != "sortorder"
+                }
+            item.clean_fields(exclude=exclude_fields)
+            reordered_items.append(item)
+
+        ControlledListItem.objects.bulk_update(reordered_items, fields=["sortorder"])
 
 
 class ControlledListItem(models.Model):
