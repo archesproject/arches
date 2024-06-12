@@ -66,7 +66,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="searchcomponent",
             name="config",
-            field=models.JSONField(default={"requiredComponents": []}),
+            field=models.JSONField(default=dict),
         ),
         migrations.RunSQL(
             sql,
