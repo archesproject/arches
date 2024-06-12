@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
             'core-search',
             0,
             true,
-            '{"requiredComponents":[]}'
+            '{"requiredComponents":[{"componentname":"localize-descriptors","searchcomponentid":"ada062d9-092d-400c-bcf7-94a931d1f271"}]}'
         ),
         (
             'ada062d9-092d-400c-bcf7-94a931d1f271',
