@@ -14,15 +14,21 @@ from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.models import models
 
 
-@method_decorator(group_required("Resource Editor", raise_exception=True), name="dispatch")
+@method_decorator(
+    group_required("Resource Editor", raise_exception=True), name="dispatch"
+)
 class WorkflowHistoryView(View):
 
     def get(self, request, workflowid):
         try:
             if request.user.is_superuser:
-                workflow_history = models.WorkflowHistory.objects.get(workflowid=workflowid)
+                workflow_history = models.WorkflowHistory.objects.get(
+                    workflowid=workflowid
+                )
             else:
-                workflow_history = models.WorkflowHistory.objects.get(workflowid=workflowid, user=request.user)
+                workflow_history = models.WorkflowHistory.objects.get(
+                    workflowid=workflowid, user=request.user
+                )
         except models.WorkflowHistory.DoesNotExist:
             workflow_history = {}
 
@@ -39,11 +45,14 @@ class WorkflowHistoryView(View):
             workflowid = data["workflowid"]
             workflowname = data["workflowname"]
             try:
-                history, created = models.WorkflowHistory.objects.select_for_update().get_or_create(
-                    workflowid = workflowid,
-                    workflowname = workflowname,
-                    user = request.user,
-                    defaults = {
+                (
+                    history,
+                    created,
+                ) = models.WorkflowHistory.objects.select_for_update().get_or_create(
+                    workflowid=workflowid,
+                    workflowname=workflowname,
+                    user=request.user,
+                    defaults={
                         "stepdata": stepdata,
                         "componentdata": componentdata,
                         "workflowname": workflowname,
@@ -55,7 +64,7 @@ class WorkflowHistoryView(View):
                 if request.user.is_superuser:
                     created = False
                     history = models.WorkflowHistory.objects.select_for_update().get(
-                        workflowid = workflowid,
+                        workflowid=workflowid,
                     )
                 else:
                     raise PermissionDenied
@@ -86,4 +95,4 @@ class WorkflowHistoryView(View):
                 )
                 history.save()
 
-        return JSONResponse({'success': True}, status=200)
+        return JSONResponse({"success": True}, status=200)

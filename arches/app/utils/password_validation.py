@@ -53,7 +53,8 @@ class HasNumericCharacterValidator:
         res = [x for x in password if x.isdigit() == True]
         if len(res) == 0:
             raise ValidationError(
-                _("Your password must contain at least one number"), code="missing number",
+                _("Your password must contain at least one number"),
+                code="missing number",
             )
 
     def get_help_text(self):
@@ -71,7 +72,8 @@ class HasUpperAndLowerCaseValidator:
         res = [x for x in password if x.isupper() == True]
         if len(res) == 0 or len(res) == len(password):
             raise ValidationError(
-                _("Your password must contain both upper and lower case letters"), code="case error",
+                _("Your password must contain both upper and lower case letters"),
+                code="case error",
             )
 
     def get_help_text(self):

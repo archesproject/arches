@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9670_improve_bulk_load_performance'),
+        ("models", "9670_improve_bulk_load_performance"),
     ]
 
     forward_sql = """

@@ -23,26 +23,27 @@ import type {
 } from "@/types/ControlledListManager";
 
 const { valueType, makeValueEditable } = defineProps<{
-    valueType?: ValueType,
-    makeValueEditable: (newValue: NewValue, index: number) => void,
+    valueType?: ValueType;
+    makeValueEditable: (newValue: NewValue, index: number) => void;
 }>();
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
 
 const newValue: Ref<NewValue> = computed(() => {
-    const otherNewValueIds = item.value.values.filter(
-        (value: NewValue | Value) => typeof value.id === "number"
-    ).map(value => value.id as number);
+    const otherNewValueIds = item.value.values
+        .filter((value: NewValue | Value) => typeof value.id === "number")
+        .map((value) => value.id as number);
 
     const maxOtherNewValueId = Math.max(...otherNewValueIds, 0);
 
     let nextLanguageCode = arches.activeLanguage;
     if (valueType === PREF_LABEL) {
         const maybeNextLanguage = arches.languages.find(
-            (lang: Language) => !item.value.values.map(
-                val => val.language_id
-            ).includes(lang.code)
+            (lang: Language) =>
+                !item.value.values
+                    .map((val) => val.language_id)
+                    .includes(lang.code),
         );
         if (maybeNextLanguage) {
             nextLanguageCode = maybeNextLanguage.code;
@@ -52,11 +53,12 @@ const newValue: Ref<NewValue> = computed(() => {
     let nextValueType = valueType;
     if (!nextValueType) {
         const otherUsedValueTypes = item.value.values
-        .map(value => value.valuetype_id)
-        .filter(typeid =>
-            // Labels handled separately.
-            ![PREF_LABEL, ALT_LABEL].includes(typeid)
-        );
+            .map((value) => value.valuetype_id)
+            .filter(
+                (typeid) =>
+                    // Labels handled separately.
+                    ![PREF_LABEL, ALT_LABEL].includes(typeid),
+            );
         for (const choice of Object.values(NOTE_CHOICES)) {
             if (!otherUsedValueTypes.includes(choice as string)) {
                 nextValueType = choice as string;
@@ -69,7 +71,7 @@ const newValue: Ref<NewValue> = computed(() => {
         id: maxOtherNewValueId + 1,
         valuetype_id: nextValueType ?? NOTE_CHOICES.scope,
         language_id: nextLanguageCode,
-        value: '',
+        value: "",
         item_id: item.value.id,
     };
 });

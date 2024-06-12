@@ -17,7 +17,9 @@ const toast = useToast();
 const { $gettext } = useGettext();
 
 const guide = "guide";
-const guideItemSubheading = $gettext("If this item should only display as an intermediate grouping in the list hierarchy, mark it as a guide item to prevent it from being chosen by a user.");
+const guideItemSubheading = $gettext(
+    "If this item should only display as an intermediate grouping in the list hierarchy, mark it as a guide item to prevent it from being chosen by a user.",
+);
 </script>
 
 <template>

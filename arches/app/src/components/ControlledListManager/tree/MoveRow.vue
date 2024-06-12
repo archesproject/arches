@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import arches from "arches";
-import { inject } from "vue";
+import { inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 import { useToast } from "primevue/usetoast";
 
 import { patchList } from "@/components/ControlledListManager/api.ts";
-import { PREF_LABEL, displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
+import {
+    PREF_LABEL,
+    displayedRowKey,
+    selectedLanguageKey,
+} from "@/components/ControlledListManager/constants.ts";
 import {
     findNodeInTree,
     itemAsNode,
@@ -17,10 +21,7 @@ import {
 } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
-import type {
-    TreeExpandedKeys,
-    TreeSelectionKeys,
-} from "primevue/tree/Tree";
+import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
 import type {
     ControlledList,
@@ -35,27 +36,33 @@ const toast = useToast();
 const { $gettext } = useGettext();
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
-const { displayedRow, setDisplayedRow } = inject(displayedRowKey) as DisplayedListItemRefAndSetter;
+const { displayedRow, setDisplayedRow } = inject(
+    displayedRowKey,
+) as DisplayedListItemRefAndSetter;
 
 const { moveLabels, node } = defineProps<{
-    moveLabels: MoveLabels,
-    node: TreeNode,
+    moveLabels: MoveLabels;
+    node: TreeNode;
 }>();
 
 const tree = defineModel<TreeNode[]>("tree", { required: true });
-const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", { required: true });
-const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", { required: true });
+const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", {
+    required: true,
+});
+const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
+    required: true,
+});
 const movingItem = defineModel<TreeNode>("movingItem", { required: true });
 const nextNewItem = defineModel<NewControlledListItem>("nextNewItem");
-const newLabelFormValue = defineModel<string>("newLabelFormValue", { required: true });
-const newLabelCounter = defineModel<number>("newLabelCounter", { required: true });
+const newLabelFormValue = defineModel<string>("newLabelFormValue", {
+    required: true,
+});
+const newLabelCounter = ref(1);
 
 const isFirstItem = (item: ControlledListItem) => {
-    const siblings: TreeNode[] = (
-        item.parent_id
+    const siblings: TreeNode[] = item.parent_id
         ? findNodeInTree(tree.value, item.parent_id).data.children
-        : findNodeInTree(tree.value, item.controlled_list_id).data.items
-    );
+        : findNodeInTree(tree.value, item.controlled_list_id).data.items;
     if (!siblings) {
         throw new Error();
     }
@@ -63,11 +70,9 @@ const isFirstItem = (item: ControlledListItem) => {
 };
 
 const isLastItem = (item: ControlledListItem) => {
-    const siblings: TreeNode[] = (
-        item.parent_id
+    const siblings: TreeNode[] = item.parent_id
         ? findNodeInTree(tree.value, item.parent_id).data.children
-        : findNodeInTree(tree.value, item.controlled_list_id).data.items
-    );
+        : findNodeInTree(tree.value, item.controlled_list_id).data.items;
     if (!siblings) {
         throw new Error();
     }
@@ -77,7 +82,7 @@ const isLastItem = (item: ControlledListItem) => {
 const setMovingItem = (node: TreeNode) => {
     movingItem.value = findNodeInTree(
         [itemAsNode(displayedRow.value, selectedLanguage.value)],
-        node.key
+        node.key,
     );
 };
 
@@ -86,23 +91,25 @@ const addItem = (parent: TreeNode) => {
         parent_id: parent.key!,
         id: newLabelCounter.value,
         controlled_list_id: parent.controlled_list_id ?? parent.id,
-        uri: '',
+        uri: "",
         sortorder: 0,
         guide: false,
-        values: [{
-            id: 0,
-            valuetype_id: PREF_LABEL,
-            language_id: arches.activeLanguage,
-            value: '',
-            item_id: newLabelCounter.value,
-        }],
+        values: [
+            {
+                id: 0,
+                valuetype_id: PREF_LABEL,
+                language_id: arches.activeLanguage,
+                value: "",
+                item_id: newLabelCounter.value,
+            },
+        ],
         images: [],
         children: [],
         depth: !parent.depth ? 0 : parent.depth + 1,
     };
 
     nextNewItem.value = newItem;
-    newLabelFormValue.value = '';
+    newLabelFormValue.value = "";
     newLabelCounter.value += 1;
 
     parent.children!.push(itemAsNode(newItem, selectedLanguage.value));
@@ -116,20 +123,24 @@ const addItem = (parent: TreeNode) => {
 };
 
 const reorder = async (item: ControlledListItem, up: boolean) => {
-    const list: ControlledList = findNodeInTree(tree.value, item.controlled_list_id).data;
-    const siblings: ControlledListItem[] = (
-        item.parent_id
+    const list: ControlledList = findNodeInTree(
+        tree.value,
+        item.controlled_list_id,
+    ).data;
+    const siblings: ControlledListItem[] = item.parent_id
         ? findNodeInTree(tree.value, item.parent_id).children.map(
-            (child: TreeNode) => child.data)
-        : list.items
-    );
+              (child: TreeNode) => child.data,
+          )
+        : list.items;
 
     reorderItems(list, item, siblings, up);
     const field = "sortorder";
 
     const success = await patchList(list, toast, $gettext, field);
     if (success) {
-        const oldListIndex = tree.value.findIndex(listNode => listNode.data.id === list.id);
+        const oldListIndex = tree.value.findIndex(
+            (listNode) => listNode.data.id === list.id,
+        );
         tree.value = [
             ...tree.value.slice(0, oldListIndex),
             listAsNode(list, selectedLanguage.value),

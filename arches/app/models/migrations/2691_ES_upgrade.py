@@ -8,12 +8,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4658_adds_nodevalue_type_widget_config'),
+        ("models", "4658_adds_nodevalue_type_widget_config"),
     ]
 
     def forwards_func(apps, schema_editor):
         pass
-
 
     def reverse_func(apps, schema_editor):
         pass

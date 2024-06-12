@@ -16,17 +16,23 @@ details = {
 
 
 class ProvisionalFilter(BaseSearchFilter):
-    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
+    def append_dsl(
+        self, search_results_object, permitted_nodegroups, include_provisional
+    ):
         search_query = Bool()
 
         if include_provisional is not True:
             provisional_resource_filter = Bool()
 
             if include_provisional is False:
-                provisional_resource_filter.filter(Terms(field="provisional_resource", terms=["false"]))
+                provisional_resource_filter.filter(
+                    Terms(field="provisional_resource", terms=["false"])
+                )
 
             elif include_provisional == "only provisional":
-                provisional_resource_filter.filter(Terms(field="provisional_resource", terms=["true", "partial"]))
+                provisional_resource_filter.filter(
+                    Terms(field="provisional_resource", terms=["true", "partial"])
+                )
 
             search_query.must(provisional_resource_filter)
             search_results_object["query"].add_query(search_query)

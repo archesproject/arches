@@ -36,14 +36,27 @@ from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, MaxAgg, Aggregation
+from arches.app.search.elasticsearch_dsl_builder import (
+    Bool,
+    Match,
+    Query,
+    Nested,
+    Term,
+    Terms,
+    MaxAgg,
+    Aggregation,
+)
 from arches.app.search.search_export import SearchResultsExporter
 from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import MapBaseManagerView
 from arches.app.models.concept import get_preflabel_from_conceptid
-from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer, user_is_resource_exporter
+from arches.app.utils.permission_backend import (
+    get_nodegroups_by_perm,
+    user_is_resource_reviewer,
+    user_is_resource_exporter,
+)
 from arches.app.utils.decorators import group_required
 import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
@@ -61,7 +74,9 @@ class SearchView(MapBaseManagerView):
     def get(self, request):
         map_markers = models.MapMarker.objects.all()
         resource_graphs = (
-            models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            models.GraphModel.objects.exclude(
+                pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+            )
             .exclude(isresource=False)
             .exclude(is_active=False)
             .exclude(source_identifier__isnull=False)
@@ -70,7 +85,9 @@ class SearchView(MapBaseManagerView):
         if user_is_resource_exporter(request.user):
             search_components = models.SearchComponent.objects.all()
         else:
-            search_components = models.SearchComponent.objects.all().exclude(componentname='search-export')
+            search_components = models.SearchComponent.objects.all().exclude(
+                componentname="search-export"
+            )
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
@@ -112,7 +129,9 @@ class SearchView(MapBaseManagerView):
             "templates": ["search-help"],
         }
         context["celery_running"] = task_management.check_if_celery_available()
-        context["export_html_templates"] = HtmlWriter.get_graphids_with_export_template()
+        context["export_html_templates"] = (
+            HtmlWriter.get_graphids_with_export_template()
+        )
 
         return render(request, "views/search.htm", context)
 
@@ -142,10 +161,21 @@ def search_terms(request):
         if lang != "*":
             boolquery.must(Term(field="language", term=lang))
 
-        boolquery.should(Match(field="value", query=searchString.lower(), type="phrase_prefix"))
-        boolquery.should(Match(field="value.folded", query=searchString.lower(), type="phrase_prefix"))
         boolquery.should(
-            Match(field="value.folded", query=searchString.lower(), fuzziness="AUTO", prefix_length=settings.SEARCH_TERM_SENSITIVITY)
+            Match(field="value", query=searchString.lower(), type="phrase_prefix")
+        )
+        boolquery.should(
+            Match(
+                field="value.folded", query=searchString.lower(), type="phrase_prefix"
+            )
+        )
+        boolquery.should(
+            Match(
+                field="value.folded",
+                query=searchString.lower(),
+                fuzziness="AUTO",
+                prefix_length=settings.SEARCH_TERM_SENSITIVITY,
+            )
         )
 
         if user_is_reviewer is False and index == "terms":
@@ -153,10 +183,18 @@ def search_terms(request):
 
         query.add_query(boolquery)
         base_agg = Aggregation(
-            name="value_agg", type="terms", field="value.raw", size=settings.SEARCH_DROPDOWN_LENGTH, order={"max_score": "desc"}
+            name="value_agg",
+            type="terms",
+            field="value.raw",
+            size=settings.SEARCH_DROPDOWN_LENGTH,
+            order={"max_score": "desc"},
         )
-        nodegroupid_agg = Aggregation(name="nodegroupid", type="terms", field="nodegroupid")
-        top_concept_agg = Aggregation(name="top_concept", type="terms", field="top_concept")
+        nodegroupid_agg = Aggregation(
+            name="nodegroupid", type="terms", field="nodegroupid"
+        )
+        top_concept_agg = Aggregation(
+            name="top_concept", type="terms", field="top_concept"
+        )
         conceptid_agg = Aggregation(name="conceptid", type="terms", field="conceptid")
         max_score_agg = MaxAgg(name="max_score", script="_score")
 
@@ -174,8 +212,7 @@ def search_terms(request):
                     for top_concept in result["top_concept"]["buckets"]:
                         top_concept_id = top_concept["key"]
                         top_concept_label = get_preflabel_from_conceptid(
-                            top_concept["key"],
-                            lang=lang if lang != "*" else None
+                            top_concept["key"], lang=lang if lang != "*" else None
                         )["value"]
                         for concept in top_concept["conceptid"]["buckets"]:
                             ret[index].append(
@@ -229,7 +266,9 @@ def export_results(request):
         download_limit = settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD
 
     if total > download_limit and format != "geojson":
-        if (settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER is True) and (request.user.username == "anonymous"):
+        if (settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER is True) and (
+            request.user.username == "anonymous"
+        ):
             message = _(
                 "Your search exceeds the {download_limit} instance download limit.  \
                 Anonymous users cannot run an export exceeding this limit.  \
@@ -252,9 +291,9 @@ def export_results(request):
                 ).format(**locals())
                 return JSONResponse({"success": True, "message": message})
             else:
-                message = _("Your search exceeds the {download_limit} instance download limit. Please refine your search").format(
-                    **locals()
-                )
+                message = _(
+                    "Your search exceeds the {download_limit} instance download limit. Please refine your search"
+                ).format(**locals())
                 return JSONResponse({"success": False, "message": message})
 
     elif format == "tilexl":
@@ -267,7 +306,9 @@ def export_results(request):
                 tmp.seek(0)
                 stream = tmp.read()
                 export_files[0]["outputfile"] = tmp
-                result = zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
+                result = zip_utils.zip_response(
+                    export_files, zip_file_name=f"{settings.APP_NAME}_export.zip"
+                )
         except OSError:
             logger.error("Temp file could not be created.")
             raise
@@ -286,13 +327,17 @@ def export_results(request):
             dest = StringIO()
             dest.write(message)
             export_files.append({"name": "error.txt", "outputfile": dest})
-        return zip_utils.zip_response(export_files, zip_file_name=f"{settings.APP_NAME}_export.zip")
+        return zip_utils.zip_response(
+            export_files, zip_file_name=f"{settings.APP_NAME}_export.zip"
+        )
 
 
 def append_instance_permission_filter_dsl(request, search_results_object):
     if request.user.is_superuser is False:
         has_access = Bool()
-        terms = Terms(field="permissions.users_with_no_access", terms=[str(request.user.id)])
+        terms = Terms(
+            field="permissions.users_with_no_access", terms=[str(request.user.id)]
+        )
         nested_term_filter = Nested(path="permissions", query=terms)
         has_access.must_not(nested_term_filter)
         search_results_object["query"].add_query(has_access)
@@ -321,10 +366,16 @@ def search_results(request, returnDsl=False):
     search_results_object = {"query": Query(se)}
 
     try:
-        for filter_type, querystring in list(request.GET.items()) + list(request.POST.items()) + [("search-results", "")]:
+        for filter_type, querystring in (
+            list(request.GET.items())
+            + list(request.POST.items())
+            + [("search-results", "")]
+        ):
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
-                search_filter.append_dsl(search_results_object, permitted_nodegroups, include_provisional)
+                search_filter.append_dsl(
+                    search_results_object, permitted_nodegroups, include_provisional
+                )
         append_instance_permission_filter_dsl(request, search_results_object)
     except Exception as err:
         logger.exception(err)
@@ -355,7 +406,10 @@ def search_results(request, returnDsl=False):
             if total <= settings.SEARCH_EXPORT_LIMIT:
                 pages = (total // settings.SEARCH_RESULT_LIMIT) + 1
             if total > settings.SEARCH_EXPORT_LIMIT:
-                pages = int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
+                pages = (
+                    int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT)
+                    - 1
+                )
         for page in range(int(pages)):
             results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
             results["hits"]["hits"] += results_scrolled["hits"]["hits"]
@@ -371,10 +425,14 @@ def search_results(request, returnDsl=False):
                 results = {"hits": {"hits": [results]}}
 
         # allow filters to modify the results
-        for filter_type, querystring in list(request.GET.items()) + [("search-results", "")]:
+        for filter_type, querystring in list(request.GET.items()) + [
+            ("search-results", "")
+        ]:
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
-                search_filter.post_search_hook(search_results_object, results, permitted_nodegroups)
+                search_filter.post_search_hook(
+                    search_results_object, results, permitted_nodegroups
+                )
 
         def get_localized_descriptor(resource, descriptor_type, language_codes):
             descriptor = resource["_source"][descriptor_type]
@@ -390,11 +448,15 @@ def search_results(request, returnDsl=False):
 
         for resource in results["hits"]["hits"]:
             for descriptor_type in descriptor_types:
-                descriptor = get_localized_descriptor(resource, descriptor_type, active_and_default_language_codes)
+                descriptor = get_localized_descriptor(
+                    resource, descriptor_type, active_and_default_language_codes
+                )
                 if descriptor:
                     resource["_source"][descriptor_type] = descriptor["value"]
                     if descriptor_type == "displayname":
-                        resource["_source"]["displayname_language"] = descriptor["language"]
+                        resource["_source"]["displayname_language"] = descriptor[
+                            "language"
+                        ]
                 else:
                     resource["_source"][descriptor_type] = _("Undefined")
 
@@ -422,7 +484,9 @@ def get_provisional_type(request):
     """
 
     result = False
-    provisional_filter = JSONDeserializer().deserialize(request.GET.get("provisional-filter", "[]"))
+    provisional_filter = JSONDeserializer().deserialize(
+        request.GET.get("provisional-filter", "[]")
+    )
     user_is_reviewer = user_is_resource_reviewer(request.user)
     if user_is_reviewer is not False:
         if len(provisional_filter) == 0:
@@ -444,17 +508,34 @@ def get_provisional_type(request):
 
 
 def get_permitted_nodegroups(user):
-    return [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, "models.read_nodegroup")]
+    return [
+        str(nodegroup.pk)
+        for nodegroup in get_nodegroups_by_perm(user, "models.read_nodegroup")
+    ]
 
 
 def buffer(request):
     spatial_filter = JSONDeserializer().deserialize(
-        request.GET.get("filter", {"geometry": {"type": "", "coordinates": []}, "buffer": {"width": "0", "unit": "ft"}})
+        request.GET.get(
+            "filter",
+            {
+                "geometry": {"type": "", "coordinates": []},
+                "buffer": {"width": "0", "unit": "ft"},
+            },
+        )
     )
 
-    if spatial_filter["geometry"]["coordinates"] != "" and spatial_filter["geometry"]["type"] != "":
+    if (
+        spatial_filter["geometry"]["coordinates"] != ""
+        and spatial_filter["geometry"]["type"] != ""
+    ):
         return JSONResponse(
-            _buffer(spatial_filter["geometry"], spatial_filter["buffer"]["width"], spatial_filter["buffer"]["unit"]), geom_format="json"
+            _buffer(
+                spatial_filter["geometry"],
+                spatial_filter["buffer"]["width"],
+                spatial_filter["buffer"]["unit"],
+            ),
+            geom_format="json",
         )
 
     return JSONResponse()
@@ -478,7 +559,11 @@ def _buffer(geojson, width=0, unit="ft"):
                 """SELECT ST_TRANSFORM(
                     ST_BUFFER(ST_TRANSFORM(ST_SETSRID(%s::geometry, 4326), %s), %s),
                 4326)""",
-                (geom.hex.decode("utf-8"), settings.ANALYSIS_COORDINATE_SYSTEM_SRID, width),
+                (
+                    geom.hex.decode("utf-8"),
+                    settings.ANALYSIS_COORDINATE_SYSTEM_SRID,
+                    width,
+                ),
             )
             res = cursor.fetchone()
             geom = GEOSGeometry(res[0], srid=4326)
@@ -511,4 +596,6 @@ def get_export_file(request):
             url = export.downloadfile.url
             return JSONResponse({"message": _("Downloading"), "url": url}, indent=4)
         except ValueError:
-            return JSONResponse({"message": _("The requested file is no longer available")}, indent=4)
+            return JSONResponse(
+                {"message": _("The requested file is no longer available")}, indent=4
+            )

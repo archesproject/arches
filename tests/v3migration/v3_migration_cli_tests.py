@@ -11,10 +11,16 @@ from arches.app.models.models import ResourceInstance, ResourceXResource
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph
-from arches.app.utils.data_management.resources.formats.archesfile import ArchesFileReader
+from arches.app.utils.data_management.resources.formats.archesfile import (
+    ArchesFileReader,
+)
 from arches.app.utils.skos import SKOSReader
 from arches.app.utils import v3utils
-from arches.app.utils.v3migration import v3Importer, v3PreparedResource, DataValueConverter
+from arches.app.utils.v3migration import (
+    v3Importer,
+    v3PreparedResource,
+    DataValueConverter,
+)
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 
@@ -44,8 +50,12 @@ class v3MigrationTests(ArchesTestCase):
 
     def load_v4_reference_data(self, dry_run=False):
 
-        v4_thesaurus = os.path.join(self.pkg, "reference_data", "concepts", "thesaurus.xml")
-        v4_collections = os.path.join(self.pkg, "reference_data", "collections", "collections.xml")
+        v4_thesaurus = os.path.join(
+            self.pkg, "reference_data", "concepts", "thesaurus.xml"
+        )
+        v4_collections = os.path.join(
+            self.pkg, "reference_data", "collections", "collections.xml"
+        )
         for skosfile in [v4_thesaurus, v4_collections]:
             self.assertTrue(os.path.isfile(skosfile))
             if dry_run:
@@ -66,33 +76,57 @@ class v3MigrationTests(ArchesTestCase):
         os.mkdir(os.path.join(self.pkg, "reference_data"))
 
         with captured_stdout():
-            management.call_command("v3", "start-migration", target=self.pkg, overwrite=True, verbose=False)
+            management.call_command(
+                "v3", "start-migration", target=self.pkg, overwrite=True, verbose=False
+            )
 
-        self.assertTrue(os.path.isdir(os.path.join(self.pkg, "v3data", "business_data")))
+        self.assertTrue(
+            os.path.isdir(os.path.join(self.pkg, "v3data", "business_data"))
+        )
         self.assertTrue(os.path.isdir(os.path.join(self.pkg, "v3data", "graph_data")))
-        self.assertTrue(os.path.isdir(os.path.join(self.pkg, "v3data", "reference_data")))
-        self.assertTrue(os.path.isfile(os.path.join(self.pkg, "reference_data", "v3topconcept_lookup.json")))
+        self.assertTrue(
+            os.path.isdir(os.path.join(self.pkg, "v3data", "reference_data"))
+        )
+        self.assertTrue(
+            os.path.isfile(
+                os.path.join(self.pkg, "reference_data", "v3topconcept_lookup.json")
+            )
+        )
 
         # now that its existence is tested, update the topconcept lookup
         # file with the real one, whose contents is expected later
-        fixture_lookup = os.path.join(self.pkg_fixture, "reference_data", "v3topconcept_lookup.json")
-        shutil.copyfile(fixture_lookup, os.path.join(self.pkg, "reference_data", "v3topconcept_lookup.json"))
+        fixture_lookup = os.path.join(
+            self.pkg_fixture, "reference_data", "v3topconcept_lookup.json"
+        )
+        shutil.copyfile(
+            fixture_lookup,
+            os.path.join(self.pkg, "reference_data", "v3topconcept_lookup.json"),
+        )
 
     def test_v3migration_002_generate_rm_configs(self):
         """Test the generation of resource model config file."""
 
         # copy in the resource model files, to mimic a user creating and
         # then exporting them into this package.
-        shutil.copytree(os.path.join(self.pkg_fixture, "graphs", "resource_models"), os.path.join(self.pkg, "graphs", "resource_models"))
+        shutil.copytree(
+            os.path.join(self.pkg_fixture, "graphs", "resource_models"),
+            os.path.join(self.pkg, "graphs", "resource_models"),
+        )
 
         # now run the management command
         with captured_stdout():
-            management.call_command("v3", "generate-rm-configs", target=self.pkg, verbose=False)
+            management.call_command(
+                "v3", "generate-rm-configs", target=self.pkg, verbose=False
+            )
 
         # test that the file has been created, and that it has the correct
         # number of entries to match the number of resource models.
-        self.assertTrue(os.path.isfile(os.path.join(self.pkg, "v3data", "rm_configs.json")))
-        num_rms = len(glob(os.path.join(self.pkg, "graphs", "resource_models", "*.json")))
+        self.assertTrue(
+            os.path.isfile(os.path.join(self.pkg, "v3data", "rm_configs.json"))
+        )
+        num_rms = len(
+            glob(os.path.join(self.pkg, "graphs", "resource_models", "*.json"))
+        )
         with open(os.path.join(self.pkg, "v3data", "rm_configs.json"), "rb") as conf:
             data = json.loads(conf.read())
             self.assertEqual(num_rms, len(list(data.keys())))
@@ -117,15 +151,22 @@ class v3MigrationTests(ArchesTestCase):
         # existing node lookups. this mimics a user action of manually adding
         # the CSV files.
         shutil.rmtree(os.path.join(self.pkg, "v3data", "graph_data"))
-        shutil.copytree(os.path.join(self.pkg_fixture, "v3data", "graph_data"), os.path.join(self.pkg, "v3data", "graph_data"))
-        node_lookups = glob(os.path.join(self.pkg, "v3data", "graph_data", "*_v4_lookup.csv"))
+        shutil.copytree(
+            os.path.join(self.pkg_fixture, "v3data", "graph_data"),
+            os.path.join(self.pkg, "v3data", "graph_data"),
+        )
+        node_lookups = glob(
+            os.path.join(self.pkg, "v3data", "graph_data", "*_v4_lookup.csv")
+        )
         for f in node_lookups:
             os.remove(f)
 
         # generate the lookup files. the fact that the are created is tested here,
         # not their content.
         with captured_stdout():
-            management.call_command("v3", "generate-lookups", target=self.pkg, overwrite=True, verbose=False)
+            management.call_command(
+                "v3", "generate-lookups", target=self.pkg, overwrite=True, verbose=False
+            )
 
         for f in node_lookups:
             self.assertTrue(os.path.isfile(f))
@@ -134,12 +175,17 @@ class v3MigrationTests(ArchesTestCase):
         # mimics a user manually filling out all of the node name matches
         # between v3 resource graphs and v4 resource models.
         shutil.rmtree(os.path.join(self.pkg, "v3data", "graph_data"))
-        shutil.copytree(os.path.join(self.pkg_fixture, "v3data", "graph_data"), os.path.join(self.pkg, "v3data", "graph_data"))
+        shutil.copytree(
+            os.path.join(self.pkg_fixture, "v3data", "graph_data"),
+            os.path.join(self.pkg, "v3data", "graph_data"),
+        )
 
         # run the test-lookups cli command. this tests the command, but NOT
         # the actual configs. that is done in the next section.
         with captured_stdout():
-            management.call_command("v3", "test-lookups", target=self.pkg, verbose=False)
+            management.call_command(
+                "v3", "test-lookups", target=self.pkg, verbose=False
+            )
 
         # now run the function that is used to test the filled out resource
         # configs. This actually tests the configs.
@@ -154,7 +200,10 @@ class v3MigrationTests(ArchesTestCase):
         # package. this mimics the user copy and pasting the v3 export skos
         # into their v3data/reference_data directory.
         shutil.rmtree(os.path.join(self.pkg, "v3data", "reference_data"))
-        shutil.copytree(os.path.join(self.pkg_fixture, "v3data", "reference_data"), os.path.join(self.pkg, "v3data", "reference_data"))
+        shutil.copytree(
+            os.path.join(self.pkg_fixture, "v3data", "reference_data"),
+            os.path.join(self.pkg, "v3data", "reference_data"),
+        )
 
         # create anticipated directory locations
         os.mkdir(os.path.join(self.pkg, "reference_data", "concepts"))
@@ -162,7 +211,9 @@ class v3MigrationTests(ArchesTestCase):
 
         # run the conversion command.
         with captured_stdout():
-            management.call_command("v3", "convert-v3-skos", target=self.pkg, verbose=False)
+            management.call_command(
+                "v3", "convert-v3-skos", target=self.pkg, verbose=False
+            )
 
         # now test that the files exist
         self.load_v4_reference_data(dry_run=True)
@@ -174,7 +225,10 @@ class v3MigrationTests(ArchesTestCase):
         # package. this mimics the user copy and pasting the v3 export files
         # into their v3data/business_data directory.
         shutil.rmtree(os.path.join(self.pkg, "v3data", "business_data"))
-        shutil.copytree(os.path.join(self.pkg_fixture, "v3data", "business_data"), os.path.join(self.pkg, "v3data", "business_data"))
+        shutil.copytree(
+            os.path.join(self.pkg_fixture, "v3data", "business_data"),
+            os.path.join(self.pkg, "v3data", "business_data"),
+        )
 
         # make empty directory to hold business data
         os.mkdir(os.path.join(self.pkg, "business_data"))
@@ -182,17 +236,29 @@ class v3MigrationTests(ArchesTestCase):
 
         # run the conversion command.
         with captured_stdout():
-            management.call_command("v3", "write-v4-relations", target=self.pkg, verbose=False)
+            management.call_command(
+                "v3", "write-v4-relations", target=self.pkg, verbose=False
+            )
 
         # now test that the new relations file exist, and has the right headers
-        v4_relations = os.path.join(self.pkg, "business_data", "relations", "all.relations")
+        v4_relations = os.path.join(
+            self.pkg, "business_data", "relations", "all.relations"
+        )
         self.assertTrue(os.path.isfile(v4_relations))
         v4_ct = 0
         with open(v4_relations, "r") as openfile:
             reader = csv.reader(openfile)
             headers = next(reader)
             self.assertEqual(
-                headers, ["resourceinstanceidfrom", "resourceinstanceidto", "relationshiptype", "datestarted", "dateended", "notes"]
+                headers,
+                [
+                    "resourceinstanceidfrom",
+                    "resourceinstanceidto",
+                    "relationshiptype",
+                    "datestarted",
+                    "dateended",
+                    "notes",
+                ],
             )
             for r in reader:
                 self.assertEqual(len(r), 6)
@@ -200,7 +266,9 @@ class v3MigrationTests(ArchesTestCase):
 
         # get count of v3 relationships for comparison
         v3_ct = 0
-        v3_relations = os.path.join(self.pkg, "v3data", "business_data", "v3sample.relations")
+        v3_relations = os.path.join(
+            self.pkg, "v3data", "business_data", "v3sample.relations"
+        )
         with open(v3_relations, "r") as openfile:
             reader = csv.reader(openfile, delimiter="|")
             headers = next(reader)
@@ -215,15 +283,26 @@ class v3MigrationTests(ArchesTestCase):
         # test run of the command line tool that writes the v4 json
         # this data is not loaded at this time.
         rm_dir = os.path.join(self.pkg, "graphs", "resource_models")
-        all_models = [os.path.splitext(i)[0] for i in os.listdir(rm_dir) if i.endswith(".json")]
+        all_models = [
+            os.path.splitext(i)[0] for i in os.listdir(rm_dir) if i.endswith(".json")
+        ]
 
         temp_file = os.path.join(self.pkg, "business_data", "single_resource.json")
         with captured_stdout():
-            management.call_command("v3", "write-v4-json", target=self.pkg, number=10, resource_models=all_models, verbose=False)
+            management.call_command(
+                "v3",
+                "write-v4-json",
+                target=self.pkg,
+                number=10,
+                resource_models=all_models,
+                verbose=False,
+            )
 
         # basic test to make sure the v4 file has been created. No tests on
         # the actual data load operations are performed up to this point.
-        v4_bd = os.path.join(self.pkg, "business_data", "v3sample-Historic Resource.json")
+        v4_bd = os.path.join(
+            self.pkg, "business_data", "v3sample-Historic Resource.json"
+        )
         self.assertTrue(os.path.isfile(v4_bd))
 
         # return early if the migration data should not actually be loaded
@@ -248,7 +327,12 @@ class v3MigrationTests(ArchesTestCase):
             # test the value and tile counts during this process.
             for res in importer.v3_resources:
 
-                v3_resource = v3PreparedResource(res, importer.v4_graph.graphid, importer.node_lookup, importer.v3_mergenodes)
+                v3_resource = v3PreparedResource(
+                    res,
+                    importer.v4_graph.graphid,
+                    importer.node_lookup,
+                    importer.v3_mergenodes,
+                )
                 v3_value_ct = len(v3_resource.node_list)
 
                 v3_resource.process(importer.v4_nodes)
@@ -259,7 +343,12 @@ class v3MigrationTests(ArchesTestCase):
                     openfile.write(JSONSerializer().serialize(out_json, indent=4))
 
                 existing = ResourceInstance.objects.all().count()
-                management.call_command("packages", operation="import_business_data", source=temp_file, overwrite="overwrite")
+                management.call_command(
+                    "packages",
+                    operation="import_business_data",
+                    source=temp_file,
+                    overwrite="overwrite",
+                )
 
                 self.assertEqual(ResourceInstance.objects.all().count(), existing + 1)
 
@@ -271,11 +360,15 @@ class v3MigrationTests(ArchesTestCase):
         self.assertEqual(ResourceXResource.objects.all().count(), 0)
 
         # run the conversion command.
-        management.call_command("v3", "write-v4-relations", "--import", target=self.pkg, verbose=False)
+        management.call_command(
+            "v3", "write-v4-relations", "--import", target=self.pkg, verbose=False
+        )
 
         # get count of v3 relationships for comparison
         v3_ct = 0
-        v3_relations = os.path.join(self.pkg, "v3data", "business_data", "v3sample.relations")
+        v3_relations = os.path.join(
+            self.pkg, "v3data", "business_data", "v3sample.relations"
+        )
         with open(v3_relations, "rb") as openfile:
             reader = csv.reader(openfile, delimiter="|")
             headers = next(reader)

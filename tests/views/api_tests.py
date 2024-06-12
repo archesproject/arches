@@ -41,35 +41,51 @@ class APITests(ArchesTestCase):
         if not models.GraphModel.objects.filter(pk=cls.data_type_graphid).exists():
             # TODO: Fix this to run inside transaction, i.e. after super().setUpClass()
             # https://github.com/archesproject/arches/issues/10719
-            test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
+            test_pkg_path = os.path.join(
+                test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg"
+            )
             with captured_stdout():
-                management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
+                management.call_command(
+                    "packages",
+                    operation="load_package",
+                    source=test_pkg_path,
+                    yes=True,
+                    verbosity=0,
+                )
 
         super().setUpClass()
         cls.loadOntology()
         LanguageSynchronizer.synchronize_settings_with_db()
-        with open(os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "r") as f:
+        with open(
+            os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "r"
+        ) as f:
             json = JSONDeserializer().deserialize(f)
             cls.unique_graph = Graph(json["graph"][0])
             cls.unique_graph.publish(user=None)
             cls.unique_graph.save()
 
-        with open(os.path.join("tests/fixtures/resource_graphs/ambiguous_graph_shape.json"), "r") as f:
+        with open(
+            os.path.join("tests/fixtures/resource_graphs/ambiguous_graph_shape.json"),
+            "r",
+        ) as f:
             json = JSONDeserializer().deserialize(f)
             cls.ambiguous_graph = Graph(json["graph"][0])
             cls.ambiguous_graph.publish(user=None)
             cls.ambiguous_graph.save()
 
-        with open(os.path.join("tests/fixtures/resource_graphs/phase_type_assignment.json"), "r") as f:
+        with open(
+            os.path.join("tests/fixtures/resource_graphs/phase_type_assignment.json"),
+            "r",
+        ) as f:
             json = JSONDeserializer().deserialize(f)
             cls.phase_type_assignment_graph = Graph(json["graph"][0])
             cls.phase_type_assignment_graph.publish(user=None)
             cls.phase_type_assignment_graph.save()
 
         cls.data_type_graph = Graph.objects.get(pk=cls.data_type_graphid)
-        cls.test_prj_user = (
-            models.ResourceInstance.objects.filter(graph=cls.data_type_graph).first()
-        )
+        cls.test_prj_user = models.ResourceInstance.objects.filter(
+            graph=cls.data_type_graph
+        ).first()
 
     def get_tile_by_id(self, tileid, tiles):
         for tile in tiles:
@@ -116,9 +132,14 @@ class APITests(ArchesTestCase):
                 {
                     "data": {
                         "46f4da0c-95bd-11e8-8f87-acde48001122": None,
-                        "4f553551-95bd-11e8-8b48-acde48001122": {"en": {"value": "Knights of Camelot", "direction": "ltr"}},
+                        "4f553551-95bd-11e8-8b48-acde48001122": {
+                            "en": {"value": "Knights of Camelot", "direction": "ltr"}
+                        },
                         "65f87f4c-95bd-11e8-b7a6-acde48001122": {
-                            "en": {"value": "We're knights of the Round Table, we dance whene'er we're able.", "direction": "ltr"}
+                            "en": {
+                                "value": "We're knights of the Round Table, we dance whene'er we're able.",
+                                "direction": "ltr",
+                            }
                         },
                     },
                     "nodegroup_id": "46f4da0c-95bd-11e8-8f87-acde48001122",
@@ -149,7 +170,10 @@ class APITests(ArchesTestCase):
                     "tileid": "a559fff5-2113-49c6-a34e-2e8b92a08a90",
                 },
                 {
-                    "data": {"e7364d1e-95c4-11e8-9e7c-acde48001122": None, "f08a3057-95c4-11e8-9761-acde48001122": 63.0},
+                    "data": {
+                        "e7364d1e-95c4-11e8-9e7c-acde48001122": None,
+                        "f08a3057-95c4-11e8-9761-acde48001122": 63.0,
+                    },
                     "nodegroup_id": "e7364d1e-95c4-11e8-9e7c-acde48001122",
                     "parenttile_id": None,
                     "provisionaledits": None,
@@ -176,7 +200,13 @@ class APITests(ArchesTestCase):
                         "38870840-95ed-11e8-b2a9-acde48001122": {
                             "features": [
                                 {
-                                    "geometry": {"coordinates": [-122.3368509095547, 37.10722439718975], "type": "Point"},
+                                    "geometry": {
+                                        "coordinates": [
+                                            -122.3368509095547,
+                                            37.10722439718975,
+                                        ],
+                                        "type": "Point",
+                                    },
                                     "id": "c2923742-99bc-48dc-acd0-1236dc728582",
                                     "properties": {},
                                     "type": "Feature",
@@ -255,25 +285,38 @@ class APITests(ArchesTestCase):
         # ==Act : POST resource to database (N.B. resourceid supplied will be overwritten by arches)========
         with captured_stdout():
             resp_post = self.client.post(
-                reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json",
+                reverse(
+                    "resources",
+                    kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"},
+                )
+                + "?format=arches-json",
                 payload,
                 content_type,
             )
         # ==Assert==========================================================================================
         self.assertEqual(resp_post.status_code, 201)  # resource created.
-        my_resource = JSONDeserializer().deserialize(resp_post.content)  # get the resourceinstance returned.
-        self.assertEqual(my_resource[0]["legacyid"], "I have to push the pram a lot.")  # Success, we were returned the right one.
-        my_resource_resourceinstanceid = my_resource[0]["resourceinstanceid"]  # get resourceinstanceid.
+        my_resource = JSONDeserializer().deserialize(
+            resp_post.content
+        )  # get the resourceinstance returned.
+        self.assertEqual(
+            my_resource[0]["legacyid"], "I have to push the pram a lot."
+        )  # Success, we were returned the right one.
+        my_resource_resourceinstanceid = my_resource[0][
+            "resourceinstanceid"
+        ]  # get resourceinstanceid.
         # ==================================================================================================
 
         # ==Act : GET confirmation that resource does now exist in database=================================
         resp_get_confirm = self.client.get(
-            reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json"
+            reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid})
+            + "?format=arches-json"
         )
         # ==Assert==========================================================================================
         self.assertEqual(resp_get_confirm.status_code, 200)  # Success, we got one.
         data_get_confirm = JSONDeserializer().deserialize(resp_get_confirm.content)
-        tile = self.get_tile_by_id("39cd6433-370c-471d-85a7-64de182fce6b", data_get_confirm["tiles"])
+        tile = self.get_tile_by_id(
+            "39cd6433-370c-471d-85a7-64de182fce6b", data_get_confirm["tiles"]
+        )
         self.assertEqual(
             tile["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             "We're knights of the Round Table, we dance whene'er we're able.",
@@ -283,10 +326,17 @@ class APITests(ArchesTestCase):
         # ==Arrange=========================================================================================
 
         # modify test_resource_simple
-        test_resource_simple["tiles"][0]["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"] = {
-            "en": {"value": "We do routines and chorus scenes with footwork impec-cable..", "direction": "ltr"}
+        test_resource_simple["tiles"][0]["data"][
+            "65f87f4c-95bd-11e8-b7a6-acde48001122"
+        ] = {
+            "en": {
+                "value": "We do routines and chorus scenes with footwork impec-cable..",
+                "direction": "ltr",
+            }
         }
-        test_resource_simple["legacyid"] = "we eat ham and jam and Spam a lot."  # legacyid has a unique index constraint.
+        test_resource_simple["legacyid"] = (
+            "we eat ham and jam and Spam a lot."  # legacyid has a unique index constraint.
+        )
         payload_modified = JSONSerializer().serialize(test_resource_simple)
 
         # ==PUT=============================================================================================
@@ -295,36 +345,57 @@ class APITests(ArchesTestCase):
         with self.assertRaises(models.ResourceInstance.DoesNotExist) as context:
             with self.assertLogs("django.request", level="ERROR"):
                 resp_get = self.client.get(
-                    reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json"
+                    reverse(
+                        "resources",
+                        kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"},
+                    )
+                    + "?format=arches-json"
                 )
         # ==Assert==========================================================================================
-        self.assertTrue("Resource matching query does not exist." in str(context.exception))  # Check exception message.
+        self.assertTrue(
+            "Resource matching query does not exist." in str(context.exception)
+        )  # Check exception message.
         # ==================================================================================================
 
         # ==Act : PUT resource changes to database for new resourceinstanceid to create new resource=========
         with captured_stdout():
             resp_put_create = self.client.put(
-                reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json",
+                reverse(
+                    "resources",
+                    kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"},
+                )
+                + "?format=arches-json",
                 payload_modified,
                 content_type,
             )
 
         # ==Assert==========================================================================================
         self.assertEqual(resp_put_create.status_code, 201)  # resource created.
-        resp_put_create_resource = JSONDeserializer().deserialize(resp_put_create.content)  # get the resourceinstance returned.
+        resp_put_create_resource = JSONDeserializer().deserialize(
+            resp_put_create.content
+        )  # get the resourceinstance returned.
         self.assertEqual(
-            resp_put_create_resource[0]["legacyid"], "we eat ham and jam and Spam a lot."
+            resp_put_create_resource[0]["legacyid"],
+            "we eat ham and jam and Spam a lot.",
         )  # Success, we returned the right one.
         # ==================================================================================================
 
         # ==Act : GET confirmation that resource does now exist in database=================================
         resp_put_get_confirm = self.client.get(
-            reverse("resources", kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"}) + "?format=arches-json"
+            reverse(
+                "resources",
+                kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"},
+            )
+            + "?format=arches-json"
         )
         # ==Assert==========================================================================================
         self.assertEqual(resp_put_get_confirm.status_code, 200)  # Success, we got one.
-        data_put_get_confirm = JSONDeserializer().deserialize(resp_put_get_confirm.content)
-        tile = self.get_tile_by_id("39cd6433-370c-471d-85a7-64de182fce6b", data_put_get_confirm["tiles"])
+        data_put_get_confirm = JSONDeserializer().deserialize(
+            resp_put_get_confirm.content
+        )
+        tile = self.get_tile_by_id(
+            "39cd6433-370c-471d-85a7-64de182fce6b", data_put_get_confirm["tiles"]
+        )
         self.assertEqual(
             tile["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             "We do routines and chorus scenes with footwork impec-cable..",
@@ -334,7 +405,11 @@ class APITests(ArchesTestCase):
         # ==Act : PUT resource changes to database, with invalid URI========================================
         with self.assertLogs("django.request", level="WARNING"):
             resp_put_uri_diff = self.client.put(
-                reverse("resources", kwargs={"resourceid": "001fe587-ad3d-4d0d-a3c9-814028766434"}) + "?format=arches-json",
+                reverse(
+                    "resources",
+                    kwargs={"resourceid": "001fe587-ad3d-4d0d-a3c9-814028766434"},
+                )
+                + "?format=arches-json",
                 payload_modified,
                 content_type,
             )
@@ -346,13 +421,18 @@ class APITests(ArchesTestCase):
 
         # modify resourceinstanceid on modified test_resource_simple to that of initial POST resource.
         test_resource_simple["resourceinstanceid"] = my_resource_resourceinstanceid
-        test_resource_simple["legacyid"] = "we sing from the diaphragm a lot."  # legacyid has a unique index constraint.
+        test_resource_simple["legacyid"] = (
+            "we sing from the diaphragm a lot."  # legacyid has a unique index constraint.
+        )
         payload_modified = JSONSerializer().serialize(test_resource_simple)
 
         # ==Act : PUT resource changes to initial POST database resource to overwrite=======================
         with captured_stdout():
             resp_put = self.client.put(
-                reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json",
+                reverse(
+                    "resources", kwargs={"resourceid": my_resource_resourceinstanceid}
+                )
+                + "?format=arches-json",
                 payload_modified,
                 content_type,
             )
@@ -361,18 +441,24 @@ class APITests(ArchesTestCase):
         self.assertEqual(resp_put.status_code, 201)  # resource created.
         data_resp_put_confirm_mod = JSONDeserializer().deserialize(resp_put.content)
         self.assertEqual(
-            data_resp_put_confirm_mod[0]["legacyid"], "we sing from the diaphragm a lot."
+            data_resp_put_confirm_mod[0]["legacyid"],
+            "we sing from the diaphragm a lot.",
         )  # Success, we returned the right one.
         # ==================================================================================================
 
         # ==Act : GET confirmation that resource is now changed in database=================================
         resp_get_confirm_mod = self.client.get(
-            reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json"
+            reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid})
+            + "?format=arches-json"
         )
         # ==Assert==========================================================================================
         self.assertEqual(resp_get_confirm_mod.status_code, 200)  # Success, we got one.
-        data_get_confirm_mod = JSONDeserializer().deserialize(resp_get_confirm_mod.content)
-        tile = self.get_tile_by_id("39cd6433-370c-471d-85a7-64de182fce6b", data_get_confirm_mod["tiles"])
+        data_get_confirm_mod = JSONDeserializer().deserialize(
+            resp_get_confirm_mod.content
+        )
+        tile = self.get_tile_by_id(
+            "39cd6433-370c-471d-85a7-64de182fce6b", data_get_confirm_mod["tiles"]
+        )
         self.assertEqual(
             tile["data"]["65f87f4c-95bd-11e8-b7a6-acde48001122"]["en"]["value"],
             "We do routines and chorus scenes with footwork impec-cable..",
@@ -380,7 +466,9 @@ class APITests(ArchesTestCase):
         # ==================================================================================================
 
         # ==Act : DELETE resource from database=============================================================
-        resp_delete = self.client.delete(reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}))
+        resp_delete = self.client.delete(
+            reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid})
+        )
         # ==Assert==========================================================================================
         self.assertEqual(resp_delete.status_code, 200)  # Success, we got rid of one.
         # ==================================================================================================
@@ -389,10 +477,16 @@ class APITests(ArchesTestCase):
         with self.assertRaises(models.ResourceInstance.DoesNotExist) as context_del:
             with self.assertLogs("django.request", level="ERROR"):
                 resp_get_deleted = self.client.get(
-                    reverse("resources", kwargs={"resourceid": my_resource_resourceinstanceid}) + "?format=arches-json"
+                    reverse(
+                        "resources",
+                        kwargs={"resourceid": my_resource_resourceinstanceid},
+                    )
+                    + "?format=arches-json"
                 )
         # ==Assert==========================================================================================
-        self.assertTrue("Resource matching query does not exist." in str(context_del.exception))  # Check exception message.
+        self.assertTrue(
+            "Resource matching query does not exist." in str(context_del.exception)
+        )  # Check exception message.
         # ==================================================================================================
 
     def test_get_resource_jsonld_invalid_no_ontology(self):

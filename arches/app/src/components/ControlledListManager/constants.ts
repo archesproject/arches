@@ -1,5 +1,8 @@
 import type { InjectionKey } from "vue";
-import type { ControlledList, ControlledListItem } from "@/types/ControlledListManager";
+import type {
+    ControlledList,
+    ControlledListItem,
+} from "@/types/ControlledListManager";
 import type { Language } from "@/types/arches";
 
 export const displayedRowKey = Symbol() as InjectionKey<ControlledList | null>;
@@ -17,19 +20,19 @@ export const DEFAULT_ERROR_TOAST_LIFE = 8000;
 
 // Django model choices
 export const METADATA_CHOICES = {
-    title: 'title',
-    alternativeText: 'alt',
-    description: 'desc',
-    attribution: 'attr',
+    title: "title",
+    alternativeText: "alt",
+    description: "desc",
+    attribution: "attr",
 };
 
 export const NOTE_CHOICES = {
-    scope: 'scopeNote',
-    definition: 'definition',
-    example: 'example',
-    history: 'historyNote',
-    editorial: 'editorialNote',
-    change: 'changeNote',
-    note: 'note',
-    description: 'description',
+    scope: "scopeNote",
+    definition: "definition",
+    example: "example",
+    history: "historyNote",
+    editorial: "editorialNote",
+    change: "changeNote",
+    note: "note",
+    description: "description",
 };

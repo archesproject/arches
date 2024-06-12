@@ -39,7 +39,6 @@ class CompatibilityTests(ArchesTestCase):
         max_version = f"{VERSION[0]},{VERSION[1]},{VERSION[2] - 2}"
         self.assertFalse(is_compatible_with_arches(min_version, max_version))
 
-
     def test_invalid_version(self):
         min_version = f"{VERSION[0]}"
         max_version = f"{VERSION[0]},{VERSION[1]},{VERSION[2] - 2}"

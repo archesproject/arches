@@ -85,7 +85,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="ControlledListItemImage",
             fields=[
-                ("id", models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
                 ("value", models.FileField(upload_to="controlled_list_item_images")),
             ],
             options={
@@ -96,7 +104,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="ControlledList",
             fields=[
-                ("id", models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
                 ("name", models.CharField(max_length=127, blank=True)),
                 ("dynamic", models.BooleanField(default=False)),
                 ("search_only", models.BooleanField(default=False)),
@@ -108,9 +124,22 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="ControlledListItem",
             fields=[
-                ("id", models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
                 ("uri", models.URLField(blank=True, max_length=2048, null=True)),
-                ("sortorder", models.IntegerField(validators=[django.core.validators.MinValueValidator(0)])),
+                (
+                    "sortorder",
+                    models.IntegerField(
+                        validators=[django.core.validators.MinValueValidator(0)]
+                    ),
+                ),
                 ("guide", models.BooleanField(default=False)),
             ],
             options={
@@ -120,11 +149,24 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="ControlledListItemImageMetadata",
             fields=[
-                ("id", models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
                 (
                     "metadata_type",
                     models.CharField(
-                        choices=[("title", "Title"), ("desc", "Description"), ("attr", "Attribution"), ("alt", "Alternative text")],
+                        choices=[
+                            ("title", "Title"),
+                            ("desc", "Description"),
+                            ("attr", "Attribution"),
+                            ("alt", "Alternative text"),
+                        ],
                         max_length=5,
                     ),
                 ),
@@ -137,7 +179,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="ControlledListItemValue",
             fields=[
-                ("id", models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
                 ("value", models.CharField(max_length=1024, blank=True)),
             ],
             options={
@@ -148,7 +198,10 @@ class Migration(migrations.Migration):
             model_name="node",
             index=models.Index(
                 django.db.models.functions.comparison.Cast(
-                    django.db.models.fields.json.KeyTextTransform("controlledList", "config"), output_field=models.UUIDField()
+                    django.db.models.fields.json.KeyTextTransform(
+                        "controlledList", "config"
+                    ),
+                    output_field=models.UUIDField(),
                 ),
                 name="lists_reffed_by_node_idx",
             ),
@@ -198,7 +251,10 @@ class Migration(migrations.Migration):
             model_name="controlledlistitemimagemetadata",
             name="language",
             field=models.ForeignKey(
-                db_column="languageid", on_delete=django.db.models.deletion.PROTECT, to="models.language", to_field="code"
+                db_column="languageid",
+                on_delete=django.db.models.deletion.PROTECT,
+                to="models.language",
+                to_field="code",
             ),
         ),
         migrations.AddField(
@@ -215,7 +271,11 @@ class Migration(migrations.Migration):
             model_name="controlledlistitem",
             name="parent",
             field=models.ForeignKey(
-                blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name="children", to="models.controlledlistitem"
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="children",
+                to="models.controlledlistitem",
             ),
         ),
         migrations.AddConstraint(
@@ -238,7 +298,11 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="controlledlistitemvalue",
             constraint=models.CheckConstraint(
-                check=models.Q(("language_id__isnull", False), ("valuetype", "image"), _connector="OR"),
+                check=models.Q(
+                    ("language_id__isnull", False),
+                    ("valuetype", "image"),
+                    _connector="OR",
+                ),
                 name="only_images_nullable_language",
                 violation_error_message="Item values must be associated with a language.",
             ),

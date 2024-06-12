@@ -12,8 +12,11 @@ def forwards_func(apps, schema_editor):
     tiles = TileModel.objects.all()
     for tile in tiles:
         if tile.provisionaledits is not None:
-            tile.provisionaledits = JSONDeserializer().deserialize(tile.provisionaledits)
+            tile.provisionaledits = JSONDeserializer().deserialize(
+                tile.provisionaledits
+            )
             tile.save()
+
 
 def reverse_func(apps, schema_editor):
     # We get the model from the versioned app registry;
@@ -25,10 +28,11 @@ def reverse_func(apps, schema_editor):
             tile.provisionaledits = JSONSerializer().serialize(tile.provisionaledits)
             tile.save()
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '3201_second_removal_of_node_nodetype_branch'),
+        ("models", "3201_second_removal_of_node_nodetype_branch"),
     ]
 
     operations = [

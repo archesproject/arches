@@ -4,17 +4,20 @@ import { useGettext } from "vue3-gettext";
 
 import Tree from "primevue/tree";
 
-import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
-import { bestLabel, nodeIsList } from "@/components/ControlledListManager/utils.ts";
-import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
-import ListTreeControls from "@/components/ControlledListManager/ListTreeControls.vue";
-import TreeRow from "@/components/ControlledListManager/TreeRow.vue";
+import {
+    displayedRowKey,
+    selectedLanguageKey,
+} from "@/components/ControlledListManager/constants.ts";
+import {
+    bestLabel,
+    nodeIsList,
+} from "@/components/ControlledListManager/utils.ts";
+import LetterCircle from "@/components/ControlledListManager/misc/LetterCircle.vue";
+import ListTreeControls from "@/components/ControlledListManager/tree/ListTreeControls.vue";
+import TreeRow from "@/components/ControlledListManager/tree/TreeRow.vue";
 
 import type { ComponentPublicInstance, Ref } from "vue";
-import type {
-    TreeExpandedKeys,
-    TreeSelectionKeys,
-} from "primevue/tree/Tree";
+import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/types/arches";
 import type {
@@ -43,18 +46,18 @@ const filterValue = ref("");
 const treeDOMRef: Ref<ComponentPublicInstance | null> = ref(null);
 
 // For next new item's pref label (input textbox)
-const newLabelCounter = ref(1000);
-const newLabelFormValue = ref('');
+const newLabelFormValue = ref("");
 const nextNewItem = ref<NewControlledListItem>();
 // For new list entry (input textbox)
-const newListCounter = ref(1000);
-const newListFormValue = ref('');
+const newListFormValue = ref("");
 const nextNewList = ref<NewControlledList>();
 const rerenderTree = ref(0);
 const nextFilterChangeNeedsExpandAll = ref(false);
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
-const { displayedRow, setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
+const { displayedRow, setDisplayedRow } = inject(
+    displayedRowKey,
+) as DisplayedRowRefAndSetter;
 
 const collapseNodesRecursive = (node: TreeNode) => {
     if (node.children && node.children.length) {
@@ -71,7 +74,9 @@ const collapseNodesRecursive = (node: TreeNode) => {
 const updateSelectedAndExpanded = (node: TreeNode) => {
     let priorListId;
     if (displayedRow.value) {
-        priorListId = (displayedRow.value as ControlledListItem).controlled_list_id ?? displayedRow.value.id;
+        priorListId =
+            (displayedRow.value as ControlledListItem).controlled_list_id ??
+            displayedRow.value.id;
     }
 
     setDisplayedRow(node.data);
@@ -80,11 +85,15 @@ const updateSelectedAndExpanded = (node: TreeNode) => {
         [node.key as string]: true,
     };
     if (nodeIsList(node)) {
-        tree.value.filter(list => list.data.id !== node.data.id)
-            .forEach(list => collapseNodesRecursive(list));
-    } else if ((node.data as ControlledListItem).controlled_list_id !== priorListId) {
-        tree.value.filter(list => list.data.id !== node.data.controlled_list_id)
-            .forEach(list => collapseNodesRecursive(list));
+        tree.value
+            .filter((list) => list.data.id !== node.data.id)
+            .forEach((list) => collapseNodesRecursive(list));
+    } else if (
+        (node.data as ControlledListItem).controlled_list_id !== priorListId
+    ) {
+        tree.value
+            .filter((list) => list.data.id !== node.data.controlled_list_id)
+            .forEach((list) => collapseNodesRecursive(list));
     }
 };
 
@@ -115,8 +124,9 @@ const expandPathsToFilterResults = (newFilterValue: string) => {
     // Expand all on the first interaction with the filter, or if the user
     // has collapsed a node and changes the filter.
     if (
-        (!filterValue.value && newFilterValue)
-        || (nextFilterChangeNeedsExpandAll.value && (filterValue.value !== newFilterValue))
+        (!filterValue.value && newFilterValue) ||
+        (nextFilterChangeNeedsExpandAll.value &&
+            filterValue.value !== newFilterValue)
     ) {
         expandAll();
     }
@@ -125,15 +135,16 @@ const expandPathsToFilterResults = (newFilterValue: string) => {
 
 const getInputElement = () => {
     if (treeDOMRef.value !== null) {
-        return treeDOMRef.value.$el.ownerDocument
-            .getElementsByClassName('p-tree-filter')[0] as HTMLInputElement;
+        return treeDOMRef.value.$el.ownerDocument.getElementsByClassName(
+            "p-tree-filter",
+        )[0] as HTMLInputElement;
     }
 };
 
 const restoreFocusToInput = () => {
     // The current implementation of collapsing all nodes when
     // backspacing out the search value relies on rerendering the
-    // <Tree> component. Restore focus to the input element. 
+    // <Tree> component. Restore focus to the input element.
     if (rerenderTree.value > 0) {
         const inputEl = getInputElement();
         if (inputEl) {
@@ -164,9 +175,11 @@ const filterCallbackWrapped = computed(() => {
         split: () => {
             return [
                 (node: TreeNode) => {
-                    return nodeIsList(node) ? node.data.name :
-                        bestLabel(node.data, selectedLanguage.value.code).value;
-                }
+                    return nodeIsList(node)
+                        ? node.data.name
+                        : bestLabel(node.data, selectedLanguage.value.code)
+                              .value;
+                },
             ];
         },
     };
@@ -183,7 +196,6 @@ const filterCallbackWrapped = computed(() => {
         v-model:moving-item="movingItem"
         v-model:is-multi-selecting="isMultiSelecting"
         v-model:nextNewList="nextNewList"
-        v-model:newListCounter="newListCounter"
         v-model:newListFormValue="newListFormValue"
     />
     <Tree
@@ -199,11 +211,24 @@ const filterCallbackWrapped = computed(() => {
         :filter-placeholder="$gettext('Find')"
         :selection-mode="isMultiSelecting ? 'checkbox' : 'single'"
         :pt="{
-            root: { style: { flexGrow: 1, border: 0, overflowY: 'hidden', paddingBottom: '5rem' } },
+            root: {
+                style: {
+                    flexGrow: 1,
+                    border: 0,
+                    overflowY: 'hidden',
+                    paddingBottom: '5rem',
+                },
+            },
             input: {
                 style: { height: '3.5rem', fontSize: '1.4rem' },
             },
-            wrapper: { style: { overflowY: 'auto', maxHeight: '100%', paddingBottom: '1rem' } },
+            wrapper: {
+                style: {
+                    overflowY: 'auto',
+                    maxHeight: '100%',
+                    paddingBottom: '1rem',
+                },
+            },
             container: { style: { fontSize: '1.4rem' } },
             content: ({ instance }) => {
                 if (instance.$el && instance.node.key === movingItem.key) {
@@ -211,8 +236,17 @@ const filterCallbackWrapped = computed(() => {
                 }
                 return { style: { height: '4rem' } };
             },
-            label: { style: { textWrap: 'nowrap', marginLeft: '0.5rem', width: '100%' } },
-            hooks: { onBeforeUpdate: snoopOnFilterValue, onMounted: restoreFocusToInput },
+            label: {
+                style: {
+                    textWrap: 'nowrap',
+                    marginLeft: '0.5rem',
+                    width: '100%',
+                },
+            },
+            hooks: {
+                onBeforeUpdate: snoopOnFilterValue,
+                onMounted: restoreFocusToInput,
+            },
         }"
         @node-collapse="nextFilterChangeNeedsExpandAll = true"
         @node-select="updateSelectedAndExpanded"
@@ -228,9 +262,7 @@ const filterCallbackWrapped = computed(() => {
                 v-model:moving-item="movingItem"
                 v-model:refetcher="refetcher"
                 v-model:nextNewItem="nextNewItem"
-                v-model:newLabelCounter="newLabelCounter"
                 v-model:newLabelFormValue="newLabelFormValue"
-                v-model:newListCounter="newListCounter"
                 v-model:newListFormValue="newListFormValue"
                 v-model:filter-value="filterValue"
                 :move-labels

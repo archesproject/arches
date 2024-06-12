@@ -21,7 +21,15 @@ from django.test.utils import captured_stdout
 
 from tests.base_test import ArchesTestCase
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range
+from arches.app.search.elasticsearch_dsl_builder import (
+    Bool,
+    Match,
+    Query,
+    Nested,
+    Terms,
+    GeoShape,
+    Range,
+)
 
 # these tests can be run from the command line via
 # python manage.py test tests.search.search_tests --settings="tests.test_settings"
@@ -78,7 +86,11 @@ class SearchTests(ArchesTestCase):
                 "type": "prefLabel",
                 "value": "test pref label",
             }
-            documents.append(se.create_bulk_item(op_type="index", index="test", id=doc["id"], data=doc))
+            documents.append(
+                se.create_bulk_item(
+                    op_type="index", index="test", id=doc["id"], data=doc
+                )
+            )
 
         ret = se.bulk_index(documents, refresh=True)
         count_after = se.count(index="test")

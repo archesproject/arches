@@ -28,5 +28,8 @@ class Migration(migrations.Migration):
             name="encrypted_mfa_hash",
             field=models.CharField(blank=True, max_length=128, null=True),
         ),
-        migrations.RunPython(generate_user_profile_for_all_users, reverse_code=undo_generate_user_profile_for_all_users),
+        migrations.RunPython(
+            generate_user_profile_for_all_users,
+            reverse_code=undo_generate_user_profile_for_all_users,
+        ),
     ]
