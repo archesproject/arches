@@ -19,7 +19,10 @@ details = {
     "config": {"requiredComponents": []},
 }
 
-SEARCH_RESULT_PAGES = int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
+SEARCH_RESULT_PAGES = (
+    int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
+)
+
 
 class CoreSearchFilter(BaseSearchFilter):
 
