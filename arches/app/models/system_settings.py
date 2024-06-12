@@ -104,7 +104,9 @@ class SystemSettings(LazySettings):
         n_cardinality_collector_node_names = []
 
         # set any values saved in the instance of the Arches System Settings Graph
-        for tile in models.TileModel.objects.filter(resourceinstance__graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID):
+        for tile in models.TileModel.objects.filter(
+            resourceinstance__graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+        ).order_by("sortorder"):
             if tile.nodegroup.cardinality == "1":
                 for node in tile.nodegroup.node_set.all():
                     if node.datatype != "semantic":
