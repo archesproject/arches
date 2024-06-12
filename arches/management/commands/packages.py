@@ -369,7 +369,7 @@ class Command(BaseCommand):
 
         if options["operation"] == "import_controlled_lists":
             self.import_controlled_lists(options["source"])
-        
+
         if options["operation"] == "export_controlled_lists":
             self.export_controlled_lists(options["dest_dir"])
 
@@ -1434,7 +1434,7 @@ class Command(BaseCommand):
         skos = SKOSReader()
         rdf = skos.read_file(data_source)
         ret = skos.save_concepts_from_skos(rdf, overwrite, stage, prevent_indexing)
-    
+
     def import_controlled_lists(self, source):
         if os.path.exists(source):
             wb = openpyxl.load_workbook(source)
@@ -1445,19 +1445,30 @@ class Command(BaseCommand):
                     elif sheet == "ControlledListItem":
                         self.import_sheet_to_model(wb[sheet], models.ControlledListItem)
                     elif sheet == "ControlledListItemValue":
-                        self.import_sheet_to_model(wb[sheet], models.ControlledListItemValue)
+                        self.import_sheet_to_model(
+                            wb[sheet], models.ControlledListItemValue
+                        )
                 # validate all data
-                for model in [models.ControlledList, models.ControlledListItem, models.ControlledListItemValue]:
+                for model in [
+                    models.ControlledList,
+                    models.ControlledListItem,
+                    models.ControlledListItemValue,
+                ]:
                     for instance in model.objects.all():
                         instance.full_clean()
-                self.stdout.write('Data imported successfully from {0}'.format(source))
+                self.stdout.write("Data imported successfully from {0}".format(source))
         else:
-            self.stdout.write('The source file does not exist. Please rerun this command with a valid source file.')
-    
+            self.stdout.write(
+                "The source file does not exist. Please rerun this command with a valid source file."
+            )
+
     def import_sheet_to_model(self, sheet, model):
-        fields = [{"name": field.name, "is_fk": field.get_internal_type() == "ForeignKey"} for field in model._meta.fields]
+        fields = [
+            {"name": field.name, "is_fk": field.get_internal_type() == "ForeignKey"}
+            for field in model._meta.fields
+        ]
         field_names = [field["name"] for field in fields]
-        
+
         # Parse the sheet into a list of dictionaries
         import_table = []
         for imported_row in sheet.iter_rows(min_row=2, values_only=True):
@@ -1474,9 +1485,9 @@ class Command(BaseCommand):
             for field in fields:
                 is_fk = field["is_fk"]
                 field_name = field["name"]
-                value = (row[field_name] if row[field_name] else None) # might be ''
-                if value and is_fk and model is models.ControlledListItem: 
-                    if field_name == "controlled_list":    
+                value = row[field_name] if row[field_name] else None  # might be ''
+                if value and is_fk and model is models.ControlledListItem:
+                    if field_name == "controlled_list":
                         related_list = models.ControlledList.objects.get(id=value)
                         setattr(instance, field_name, related_list)
                     elif field_name == "parent":
@@ -1485,17 +1496,21 @@ class Command(BaseCommand):
                         list_items_with_parent[instance] = value
                 elif value and is_fk and model is models.ControlledListItemValue:
                     if field_name == "valuetype":
-                        valuetype = models.DValueType.objects.get(valuetype = value)
+                        valuetype = models.DValueType.objects.get(valuetype=value)
                         setattr(instance, field_name, valuetype)
                     elif field_name == "language":
                         try:
                             related_language = models.Language.objects.get(code=value)
                             setattr(instance, field_name, related_language)
                         except models.Language.DoesNotExist:
-                            self.stdout.write(f"Language with code {value} does not exist. Please create this language before importing this data.")
+                            self.stderr.write(
+                                f"Language with code {value} does not exist. Please create this language before importing these data."
+                            )
                             sys.exit()
                     else:
-                        related_list_item = models.ControlledListItem.objects.get(id=value)
+                        related_list_item = models.ControlledListItem.objects.get(
+                            id=value
+                        )
                         setattr(instance, field_name, related_list_item)
                 else:
                     setattr(instance, field_name, value)
@@ -1503,17 +1518,20 @@ class Command(BaseCommand):
             # run validation on all non-parent fields & gather for bulk create
             instance.clean_fields(exclude={"parent"})
             instances.append(instance)
-        
+
         model.objects.bulk_create(instances)
 
         if model is models.ControlledListItem:
             # Create list item relationships after all list items have been created
             for child, parent in list_items_with_parent.items():
                 child.parent = models.ControlledListItem.objects.get(id=parent)
-                child.clean_fields(exclude={field["name"] for field in fields if field["name"] != "parent"})
+                child.clean_fields(
+                    exclude={
+                        field["name"] for field in fields if field["name"] != "parent"
+                    }
+                )
                 child.save()
-        
-    
+
     def export_controlled_lists(self, data_dest):
         wb = openpyxl.Workbook()
         ws = wb.active
@@ -1521,14 +1539,16 @@ class Command(BaseCommand):
         self.export_model_to_sheet(ws, models.ControlledList)
         self.export_model_to_sheet(wb, models.ControlledListItem)
         self.export_model_to_sheet(wb, models.ControlledListItemValue)
-        
+
         # if data_dest == ".":
         #     data_dest = os.path.dirname(settings.SYSTEM_SETTINGS_LOCAL_PATH)
         if data_dest != "" and data_dest != ".":
             wb.save(os.path.join(data_dest, "controlled_lists.xlsx"))
             self.stdout.write("Data exported successfully to controlled_lists.xlsx")
         else:
-            self.stdout.write("No destination directory specified. Please rerun this command with the '-d' parameter populated.")
+            self.stdout.write(
+                "No destination directory specified. Please rerun this command with the '-d' parameter populated."
+            )
 
     def export_model_to_sheet(self, wb, model):
         # For the first sheet (ControlledList), use blank sheet that is initiallized with workbook
@@ -1537,16 +1557,26 @@ class Command(BaseCommand):
             ws = wb
         else:
             ws = wb.create_sheet(title=model.__name__)
-        fields = [{"name": field.name, "datatype": field.get_internal_type()} for field in model._meta.fields]
+        fields = [
+            {"name": field.name, "datatype": field.get_internal_type()}
+            for field in model._meta.fields
+        ]
         ws.append(field["name"] for field in fields)
         for instance in model.objects.all():
             row_data = []
             for field in fields:
                 value = getattr(instance, field["name"])
-                if isinstance(value, (models.ControlledList, models.ControlledListItem, models.ControlledListItemValue)):
+                if isinstance(
+                    value,
+                    (
+                        models.ControlledList,
+                        models.ControlledListItem,
+                        models.ControlledListItemValue,
+                    ),
+                ):
                     row_data.append(str(getattr(value, "id")) if value else "")
                 elif isinstance(value, models.Language):
-                    row_data.append(str(value.code)) 
+                    row_data.append(str(value.code))
                 elif isinstance(value, models.DValueType):
                     row_data.append(str(value.valuetype))
                 elif field["datatype"] == "UUIDField":
