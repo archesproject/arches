@@ -177,7 +177,6 @@ class Migration(migrations.Migration):
         $$;
     """
 
-
     operations = [
         migrations.RunSQL(
             add_limit_to_config,

@@ -9,13 +9,17 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4273_provisional_edit_timestamps'),
+        ("models", "4273_provisional_edit_timestamps"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='mobilesurveymodel',
-            name='datadownloadconfig',
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default='{"download":false, "count":100, "resources":[], "custom":null}', null=True),
+            model_name="mobilesurveymodel",
+            name="datadownloadconfig",
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                blank=True,
+                default='{"download":false, "count":100, "resources":[], "custom":null}',
+                null=True,
+            ),
         ),
     ]

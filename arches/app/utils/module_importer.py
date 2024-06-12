@@ -17,11 +17,15 @@ def get_directories(extension_type: ExtensionType):
     core_and_arches_app_dirs = [core_root_dir]
     for arches_app in settings.ARCHES_APPLICATIONS:
         core_and_arches_app_dirs.append(f"{arches_app}.{extension_type.value}")
-        core_and_arches_app_dirs.append(f"{arches_app}.pkg.extensions.{extension_type.value}")
+        core_and_arches_app_dirs.append(
+            f"{arches_app}.pkg.extensions.{extension_type.value}"
+        )
 
     filtered_settings_dirs = [
-        setting_dir for setting_dir in
-        getattr(settings, extension_type.value.upper()[:-1] + "_LOCATIONS")
+        setting_dir
+        for setting_dir in getattr(
+            settings, extension_type.value.upper()[:-1] + "_LOCATIONS"
+        )
         if setting_dir not in core_and_arches_app_dirs
     ]
 

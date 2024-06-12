@@ -62,11 +62,7 @@ def function_templates(request, template):
 def templates(request, template):
     if not template:
         template = request.GET.get("template")
-
-    try:
-        return render(request, template)
-    except Exception as e:
-        print(e)
+    return render(request, template)
 
 
 def help_templates(request):

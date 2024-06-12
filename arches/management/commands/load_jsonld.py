@@ -55,7 +55,12 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
 
         parser.add_argument(
-            "-s", "--source", default="data/", action="store", dest="source", help="the directory in which the data files are to be found"
+            "-s",
+            "--source",
+            default="data/",
+            action="store",
+            dest="source",
+            help="the directory in which the data files are to be found",
         )
 
         parser.add_argument(
@@ -67,10 +72,22 @@ class Command(BaseCommand):
             help="if overwrite, overwrite records that exist; if ignore, then skip; if error, then halt",
         )
 
-        parser.add_argument("--toobig", default=0, type=int, action="store", dest="toobig", help="Do not attempt to load records > n kb")
+        parser.add_argument(
+            "--toobig",
+            default=0,
+            type=int,
+            action="store",
+            dest="toobig",
+            help="Do not attempt to load records > n kb",
+        )
 
         parser.add_argument(
-            "-m", "--model", default="", action="store", dest="model", help="the name of the model path to load (eg auction_of_lot)",
+            "-m",
+            "--model",
+            default="",
+            action="store",
+            dest="model",
+            help="the name of the model path to load (eg auction_of_lot)",
         )
 
         parser.add_argument(
@@ -82,20 +99,56 @@ class Command(BaseCommand):
             help="the name of the block in the model path to load (eg 00), or slice in the form this,total (eg 1,5)",
         )
 
-        parser.add_argument("--max", default=-1, type=int, action="store", dest="max", help="Maximum number of records to load per model")
-
-        parser.add_argument("--fast", default=0, action="store", type=int, dest="fast", help="Use bulk_save to store n records at a time")
-
-        parser.add_argument("-q", "--quiet", default=False, action="store_true", dest="quiet", help="Don't announce every record")
-
         parser.add_argument(
-            "--skip", default=-1, type=int, action="store", dest="skip", help="Number of records to skip before starting to load"
+            "--max",
+            default=-1,
+            type=int,
+            action="store",
+            dest="max",
+            help="Maximum number of records to load per model",
         )
 
-        parser.add_argument("--suffix", default="json", action="store", dest="suffix", help="file suffix to load if not .json")
+        parser.add_argument(
+            "--fast",
+            default=0,
+            action="store",
+            type=int,
+            dest="fast",
+            help="Use bulk_save to store n records at a time",
+        )
 
         parser.add_argument(
-            "--ignore-errors", default=False, action="store_true", dest="ignore_errors", help="Log but do not terminate on errors"
+            "-q",
+            "--quiet",
+            default=False,
+            action="store_true",
+            dest="quiet",
+            help="Don't announce every record",
+        )
+
+        parser.add_argument(
+            "--skip",
+            default=-1,
+            type=int,
+            action="store",
+            dest="skip",
+            help="Number of records to skip before starting to load",
+        )
+
+        parser.add_argument(
+            "--suffix",
+            default="json",
+            action="store",
+            dest="suffix",
+            help="file suffix to load if not .json",
+        )
+
+        parser.add_argument(
+            "--ignore-errors",
+            default=False,
+            action="store_true",
+            dest="ignore_errors",
+            help="Log but do not terminate on errors",
         )
 
         parser.add_argument(
@@ -120,16 +173,26 @@ class Command(BaseCommand):
         if options["quiet"]:
             print("Only announcing timing data")
         if options["verbosity"] > 1:
-            print("Logging detailed error information: set log level to DEBUG to view messages")
-            print("Verbosity level 2 will log based on the application's LOGGING settings in settings.py")
-            print("Verbosity level 3 will include level 2 logging as well as logging to the console")
-            resp = input("Logging detailed information can slow down the import process.  Continue anyway? (y/n)")
+            print(
+                "Logging detailed error information: set log level to DEBUG to view messages"
+            )
+            print(
+                "Verbosity level 2 will log based on the application's LOGGING settings in settings.py"
+            )
+            print(
+                "Verbosity level 3 will include level 2 logging as well as logging to the console"
+            )
+            resp = input(
+                "Logging detailed information can slow down the import process.  Continue anyway? (y/n)"
+            )
 
             if "n" in resp.lower():
                 return
 
         if options["strip_search"] and not options["fast"]:
-            print("ERROR: stripping fields not exposed to advanced search only works in fast mode")
+            print(
+                "ERROR: stripping fields not exposed to advanced search only works in fast mode"
+            )
             return
 
         self.resources = []
@@ -137,7 +200,9 @@ class Command(BaseCommand):
 
     def load_resources(self, options):
 
-        self.reader = JsonLdReader(verbosity=options["verbosity"], ignore_errors=options["ignore_errors"])
+        self.reader = JsonLdReader(
+            verbosity=options["verbosity"], ignore_errors=options["ignore_errors"]
+        )
         self.jss = JSONSerializer()
         source = options["source"]
         if options["model"]:
@@ -155,12 +220,21 @@ class Command(BaseCommand):
         dt_instance_hash = {}
         self.node_info = {
             str(nodeid): {
-                "datatype": dt_instance_hash.setdefault(datatype, self.datatype_factory.get_instance(datatype)),
+                "datatype": dt_instance_hash.setdefault(
+                    datatype, self.datatype_factory.get_instance(datatype)
+                ),
                 "issearchable": srch,
             }
-            for nodeid, datatype, srch in archesmodels.Node.objects.values_list("nodeid", "datatype", "issearchable")
+            for nodeid, datatype, srch in archesmodels.Node.objects.values_list(
+                "nodeid", "datatype", "issearchable"
+            )
         }
-        self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in archesmodels.Node.objects.values_list("nodeid", "datatype")}
+        self.node_datatypes = {
+            str(nodeid): datatype
+            for nodeid, datatype in archesmodels.Node.objects.values_list(
+                "nodeid", "datatype"
+            )
+        }
 
         start = time.time()
         seen = 0
@@ -218,7 +292,9 @@ class Command(BaseCommand):
                             sz = os.os.path.getsize(fn)
                             if sz > options["toobig"]:
                                 if not quiet:
-                                    print(f" ... Skipping due to size:  {sz} > {options['toobig']}")
+                                    print(
+                                        f" ... Skipping due to size:  {sz} > {options['toobig']}"
+                                    )
                                 continue
                         uu = f.replace(f".{options['suffix']}", "")
                         fh = open(fn)
@@ -245,7 +321,13 @@ class Command(BaseCommand):
                                         strip_search=options["strip_search"],
                                     )
                                 else:
-                                    l = self.import_resource(uu, graphid, jsdata, reload=options["force"], quiet=options["quiet"])
+                                    l = self.import_resource(
+                                        uu,
+                                        graphid,
+                                        jsdata,
+                                        reload=options["force"],
+                                        quiet=options["quiet"],
+                                    )
                                 loaded += l
                                 loaded_model += l
                             except Exception as e:
@@ -255,7 +337,9 @@ class Command(BaseCommand):
                         else:
                             print(" ... skipped due to bad data :(")
                         if not seen % 100:
-                            print(f" ... seen {seen} / loaded {loaded} in {time.time()-start}")
+                            print(
+                                f" ... seen {seen} / loaded {loaded} in {time.time()-start}"
+                            )
             except StopIteration as e:
                 break
             except:
@@ -264,9 +348,20 @@ class Command(BaseCommand):
             self.save_resources()
             self.index_resources(options["strip_search"])
             self.resources = []
-        print(f"Total Time: seen {seen} / loaded {loaded} in {time.time()-start} seconds")
+        print(
+            f"Total Time: seen {seen} / loaded {loaded} in {time.time()-start} seconds"
+        )
 
-    def fast_import_resource(self, resourceid, graphid, data, n=1000, reload="ignore", quiet=True, strip_search=False):
+    def fast_import_resource(
+        self,
+        resourceid,
+        graphid,
+        data,
+        n=1000,
+        reload="ignore",
+        quiet=True,
+        strip_search=False,
+    ):
         try:
             resource_instance = Resource.objects.get(pk=resourceid)
             if reload == "ignore":
@@ -341,14 +436,26 @@ class Command(BaseCommand):
         term_list = []
         for resource in self.resources:
             if strip_search:
-                document, terms = monkey_get_documents_to_index(resource, node_info=self.node_info)
+                document, terms = monkey_get_documents_to_index(
+                    resource, node_info=self.node_info
+                )
             else:
                 document, terms = resource.get_documents_to_index(
-                    fetchTiles=False, datatype_factory=self.datatype_factory, node_datatypes=self.node_datatypes
+                    fetchTiles=False,
+                    datatype_factory=self.datatype_factory,
+                    node_datatypes=self.node_datatypes,
                 )
-            documents.append(se.create_bulk_item(index="resources", id=document["resourceinstanceid"], data=document))
+            documents.append(
+                se.create_bulk_item(
+                    index="resources", id=document["resourceinstanceid"], data=document
+                )
+            )
             for term in terms:
-                term_list.append(se.create_bulk_item(index="terms", id=term["_id"], data=term["_source"]))
+                term_list.append(
+                    se.create_bulk_item(
+                        index="terms", id=term["_id"], data=term["_source"]
+                    )
+                )
         se.bulk_index(documents)
         se.bulk_index(term_list)
 
@@ -384,7 +491,10 @@ def monkey_get_documents_to_index(self, node_info):
     for tile in document["tiles"]:
         for nodeid, nodevalue in tile.data.items():
             # filter out not issearchable
-            if nodevalue not in ["", [], {}, None] and node_info[nodeid]["issearchable"]:
+            if (
+                nodevalue not in ["", [], {}, None]
+                and node_info[nodeid]["issearchable"]
+            ):
                 datatype_instance = node_info[nodeid]["datatype"]
                 datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
                 node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)

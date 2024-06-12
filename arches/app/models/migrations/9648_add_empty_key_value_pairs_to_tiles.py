@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             for node in Node.objects.filter(nodegroup_id=tile.nodegroup_id):
                 if not str(node.pk) in tile.data:
                     tile.data[str(node.pk)] = None
-            tile.save() 
+            tile.save()
 
     def reverse_func(apps, schema_editor):
         TileModel = apps.get_model("models", "TileModel")
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
             if bool(tile.provisionaledits and not any(tile.data.values())):
                 tile.data = {}
                 tile.save()
-                
+
     operations = [
         migrations.RunPython(forwards_func, reverse_func),
     ]

@@ -8,12 +8,12 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4684_tabbed_report_template'),
+        ("models", "4684_tabbed_report_template"),
     ]
 
     operations = [
         migrations.RunSQL(
-                        """
+            """
                         UPDATE report_templates SET defaultconfig = '{
                           "tabs": [
                             {
@@ -24,7 +24,8 @@ class Migration(migrations.Migration):
                           ]
                         }' WHERE templateid = '50000000-0000-0000-0000-000000000004';
                         """,
-                        """
+            """
                         select * from report_templates
-                        """
-        )]
+                        """,
+        )
+    ]
