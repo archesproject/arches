@@ -38,9 +38,9 @@ export interface NewControlledListItemImageMetadata {
     value: string;
 }
 
-export type NewOrExistingControlledListItemImageMetadata = (
-    ControlledListItemImageMetadata | NewControlledListItemImageMetadata
-);
+export type NewOrExistingControlledListItemImageMetadata =
+    | ControlledListItemImageMetadata
+    | NewControlledListItemImageMetadata;
 
 export interface LabeledChoice {
     type: string;
@@ -98,7 +98,11 @@ export interface NewControlledList {
     nodes: ReferencingNode[];
 }
 
-export type Selectable = ControlledList | ControlledListItem | NewControlledList | NewControlledListItem;
+export type Selectable =
+    | ControlledList
+    | ControlledListItem
+    | NewControlledList
+    | NewControlledListItem;
 
 export interface ReferencingNode {
     id: string;
@@ -109,10 +113,10 @@ export interface ReferencingNode {
 }
 
 export interface MoveLabels {
-    addChild: string,
-    moveUp: string,
-    moveDown: string,
-    changeParent: string,
+    addChild: string;
+    moveUp: string;
+    moveDown: string;
+    changeParent: string;
 }
 
 // Prop injection types

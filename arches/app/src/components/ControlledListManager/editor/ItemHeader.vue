@@ -2,7 +2,10 @@
 import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import { itemKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
+import {
+    itemKey,
+    selectedLanguageKey,
+} from "@/components/ControlledListManager/constants.ts";
 import { bestLabel } from "@/components/ControlledListManager/utils.ts";
 import LetterCircle from "@/components/ControlledListManager/misc/LetterCircle.vue";
 
@@ -30,7 +33,7 @@ const iconLabel = (item: ControlledListItem) => {
             :href="item.uri"
             rel="noreferrer"
             target="_blank"
-            style="font-size: small; color: blue;"
+            style="font-size: small; color: blue"
         >
             {{ item.uri }}
         </a>

@@ -9,7 +9,9 @@ import ReferenceNodeLink from "@/components/ControlledListManager/editor/Referen
 
 import type { DisplayedListRefAndSetter } from "@/types/ControlledListManager";
 
-const { displayedRow: list } = inject(displayedRowKey) as DisplayedListRefAndSetter;
+const { displayedRow: list } = inject(
+    displayedRowKey,
+) as DisplayedListRefAndSetter;
 
 const { $gettext } = useGettext();
 </script>
@@ -47,7 +49,7 @@ const { $gettext } = useGettext();
                     v-if="list.nodes.length === 0"
                     :style="{ fontSize: 'small' }"
                 >
-                    {{ $gettext('None') }}
+                    {{ $gettext("None") }}
                 </div>
             </div>
         </div>

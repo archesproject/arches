@@ -3,8 +3,14 @@ import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
-import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
-import { bestLabel, dataIsList } from "@/components/ControlledListManager/utils.ts";
+import {
+    displayedRowKey,
+    selectedLanguageKey,
+} from "@/components/ControlledListManager/constants.ts";
+import {
+    bestLabel,
+    dataIsList,
+} from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
 import type { Language } from "@/types/arches";
@@ -26,13 +32,18 @@ const heading = computed(() => {
         return $gettext(
             "List Editor > %{listName}",
             { listName: (displayedRow.value as ControlledList).name },
-            true,  // turn off escaping: vue template sanitizes
+            true, // turn off escaping: vue template sanitizes
         );
     }
     return $gettext(
         "Item Editor > %{bestLabel}",
-        { bestLabel: bestLabel(displayedRow.value, selectedLanguage.value.code).value },
-        true,  // turn off escaping: vue template sanitizes
+        {
+            bestLabel: bestLabel(
+                displayedRow.value,
+                selectedLanguage.value.code,
+            ).value,
+        },
+        true, // turn off escaping: vue template sanitizes
     );
 });
 </script>

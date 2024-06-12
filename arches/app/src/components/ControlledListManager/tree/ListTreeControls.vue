@@ -9,12 +9,20 @@ import type { NewControlledList } from "@/types/ControlledListManager";
 
 const controlledListItemsTree = defineModel<TreeNode[]>({ required: true });
 const rerenderTree = defineModel<number>("rerenderTree", { required: true });
-const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", { required: true });
-const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", { required: true });
+const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", {
+    required: true,
+});
+const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
+    required: true,
+});
 const movingItem = defineModel<TreeNode>("movingItem", { required: true });
-const isMultiSelecting = defineModel<boolean>("isMultiSelecting", { required: true });
+const isMultiSelecting = defineModel<boolean>("isMultiSelecting", {
+    required: true,
+});
 const nextNewList = defineModel<NewControlledList>("nextNewList");
-const newListFormValue = defineModel<string>("newListFormValue", { required: true });
+const newListFormValue = defineModel<string>("newListFormValue", {
+    required: true,
+});
 
 const expandAll = () => {
     for (const node of controlledListItemsTree.value) {

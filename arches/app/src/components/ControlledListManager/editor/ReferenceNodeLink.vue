@@ -11,10 +11,11 @@ const { $gettext } = useGettext();
 
 <template>
     <span class="referencing-node">
-        {{ $gettext(
-            "%{graphName}: %{nodeName}",
-            { graphName: props.node.graph_name, nodeName: props.node.name, }
-        )
+        {{
+            $gettext("%{graphName}: %{nodeName}", {
+                graphName: props.node.graph_name,
+                nodeName: props.node.name,
+            })
         }}
         <a
             :href="arches.urls.graph_designer(node.graph_id)"

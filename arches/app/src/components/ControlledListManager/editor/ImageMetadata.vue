@@ -9,7 +9,10 @@ import DataTable from "primevue/datatable";
 import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
-import { upsertMetadata, deleteMetadata } from "@/components/ControlledListManager/api.ts";
+import {
+    upsertMetadata,
+    deleteMetadata,
+} from "@/components/ControlledListManager/api.ts";
 import { itemKey } from "@/components/ControlledListManager/constants.ts";
 import { languageNameFromCode } from "@/components/ControlledListManager/utils.ts";
 
@@ -26,9 +29,9 @@ import type {
 const toast = useToast();
 const { $gettext } = useGettext();
 
-const metadataTypeHeader = $gettext('Metadata type');
-const metadataValueHeader = $gettext('Value');
-const languageHeader = $gettext('Language');
+const metadataTypeHeader = $gettext("Metadata type");
+const metadataValueHeader = $gettext("Value");
+const languageHeader = $gettext("Language");
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
 const { labeledChoices, metadata } = defineProps<{
@@ -37,23 +40,20 @@ const { labeledChoices, metadata } = defineProps<{
 }>();
 const editingRows: Ref<ControlledListItemImageMetadata[]> = ref([]);
 const rowIndexToFocus: Ref<number> = ref(-1);
-const editorRef: Ref<HTMLDivElement | null> = ref(null); 
+const editorRef: Ref<HTMLDivElement | null> = ref(null);
 
 const metadataLabel = (metadataType: string) => {
-    return labeledChoices.find(choice => choice.type === metadataType)!.label;
+    return labeledChoices.find((choice) => choice.type === metadataType)!.label;
 };
 
-const saveMetadata = async (event: DataTableRowEditInitEvent)  => {
+const saveMetadata = async (event: DataTableRowEditInitEvent) => {
     // normalize new metadata numbers (starting at 1000) to null
     const normalizedNewData: ControlledListItemImageMetadata = {
         ...event.newData,
-        id: typeof event.newData.id === 'string' ? event.newData.id : null,
+        id: typeof event.newData.id === "string" ? event.newData.id : null,
     };
-    const upsertedMetadata: ControlledListItemImageMetadata = await upsertMetadata(
-        normalizedNewData,
-        toast,
-        $gettext,
-    );
+    const upsertedMetadata: ControlledListItemImageMetadata =
+        await upsertMetadata(normalizedNewData, toast, $gettext);
     if (upsertedMetadata) {
         if (normalizedNewData.id) {
             updateImageMetadata(upsertedMetadata);
@@ -66,8 +66,12 @@ const saveMetadata = async (event: DataTableRowEditInitEvent)  => {
     }
 };
 
-const issueDeleteMetadata = async (metadata: NewControlledListItemImageMetadata | ControlledListItemImageMetadata) => {
-    if (typeof metadata.id === 'number') {
+const issueDeleteMetadata = async (
+    metadata:
+        | NewControlledListItemImageMetadata
+        | ControlledListItemImageMetadata,
+) => {
+    if (typeof metadata.id === "number") {
         removeImageMetadata(metadata);
         return;
     }
@@ -80,21 +84,25 @@ const issueDeleteMetadata = async (metadata: NewControlledListItemImageMetadata 
 const appendImageMetadata = (newMetadata: ControlledListItemImageMetadata) => {
     const imageFromItem = item.value!.images.find(
         (imageCandidateFromItem) =>
-            imageCandidateFromItem.id === newMetadata.controlled_list_item_image_id
+            imageCandidateFromItem.id ===
+            newMetadata.controlled_list_item_image_id,
     );
     if (imageFromItem) {
         imageFromItem.metadata.push(newMetadata);
     }
 };
 
-const removeImageMetadata = (removedMetadata: NewOrExistingControlledListItemImageMetadata) => {
+const removeImageMetadata = (
+    removedMetadata: NewOrExistingControlledListItemImageMetadata,
+) => {
     const imageFromItem = item.value!.images.find(
         (imageCandidateFromItem) =>
-            imageCandidateFromItem.id === removedMetadata.controlled_list_item_image_id
+            imageCandidateFromItem.id ===
+            removedMetadata.controlled_list_item_image_id,
     );
     if (imageFromItem) {
         const toDelete = imageFromItem.metadata.findIndex(
-            (metadatum) => metadatum.id === removedMetadata.id
+            (metadatum) => metadatum.id === removedMetadata.id,
         );
         if (toDelete === -1) {
             return;
@@ -103,14 +111,17 @@ const removeImageMetadata = (removedMetadata: NewOrExistingControlledListItemIma
     }
 };
 
-const updateImageMetadata = (updatedMetadata: ControlledListItemImageMetadata) => {
+const updateImageMetadata = (
+    updatedMetadata: ControlledListItemImageMetadata,
+) => {
     const imageFromItem = item.value!.images.find(
         (imageCandidateFromItem) =>
-            imageCandidateFromItem.id === updatedMetadata.controlled_list_item_image_id
+            imageCandidateFromItem.id ===
+            updatedMetadata.controlled_list_item_image_id,
     );
     if (imageFromItem) {
         const toUpdate = imageFromItem.metadata.find(
-            (metadatum) => metadatum.id === updatedMetadata.id
+            (metadatum) => metadatum.id === updatedMetadata.id,
         );
         if (!toUpdate) {
             return;
@@ -125,9 +136,12 @@ const setRowFocus = (event: DataTableRowEditInitEvent) => {
     rowIndexToFocus.value = event.index;
 };
 
-const makeValueEditable = (clickedValue: ControlledListItemImageMetadata, index: number) => {
+const makeValueEditable = (
+    clickedValue: ControlledListItemImageMetadata,
+    index: number,
+) => {
     if (!editingRows.value.includes(clickedValue)) {
-        editingRows.value = [ ...editingRows.value, clickedValue ];
+        editingRows.value = [...editingRows.value, clickedValue];
     }
     rowIndexToFocus.value = index;
 };
@@ -168,7 +182,7 @@ const focusInput = () => {
             <Column
                 field="metadata_type"
                 :header="metadataTypeHeader"
-                style="width: 20%;"
+                style="width: 20%"
             >
                 <template #editor="{ data, field }">
                     <Dropdown
@@ -178,7 +192,12 @@ const focusInput = () => {
                         option-value="type"
                         :pt="{
                             root: { style: { width: '90%' } },
-                            input: { style: { fontFamily: 'inherit', fontSize: 'small' } },
+                            input: {
+                                style: {
+                                    fontFamily: 'inherit',
+                                    fontSize: 'small',
+                                },
+                            },
                             panel: { style: { fontSize: 'small' } },
                         }"
                     />
@@ -190,7 +209,7 @@ const focusInput = () => {
             <Column
                 field="value"
                 :header="metadataValueHeader"
-                style="width: 60%; min-width: 8rem;"
+                style="width: 60%; min-width: 8rem"
             >
                 <template #editor="{ data, field }">
                     <InputText
@@ -201,7 +220,9 @@ const focusInput = () => {
                 <template #body="slotProps">
                     <span
                         class="full-width-pointer"
-                        @click.stop="makeValueEditable(slotProps.data, slotProps.index)"
+                        @click.stop="
+                            makeValueEditable(slotProps.data, slotProps.index)
+                        "
                     >
                         {{ slotProps.data.value }}
                     </span>
@@ -210,7 +231,12 @@ const focusInput = () => {
             <Column
                 field="language_id"
                 :header="languageHeader"
-                style="width: 10%; min-width: 8rem; height: 5rem; padding-left: 1rem;"
+                style="
+                    width: 10%;
+                    min-width: 8rem;
+                    height: 5rem;
+                    padding-left: 1rem;
+                "
             >
                 <template #editor="{ data, field }">
                     <Dropdown
@@ -219,20 +245,27 @@ const focusInput = () => {
                         :option-label="(lang) => `${lang.name} (${lang.code})`"
                         option-value="code"
                         :pt="{
-                            input: { style: { fontFamily: 'inherit', fontSize: 'small' } },
+                            input: {
+                                style: {
+                                    fontFamily: 'inherit',
+                                    fontSize: 'small',
+                                },
+                            },
                             panel: { style: { fontSize: 'small' } },
                         }"
                     />
                 </template>
                 <template #body="slotProps">
-                    {{ `${languageNameFromCode(slotProps.data.language_id)} (${slotProps.data.language_id})` }}
+                    {{
+                        `${languageNameFromCode(slotProps.data.language_id)} (${slotProps.data.language_id})`
+                    }}
                 </template>
             </Column>
             <Column
                 :row-editor="true"
-                style="width: 5%; min-width: 6rem; text-align: center;"
+                style="width: 5%; min-width: 6rem; text-align: center"
             />
-            <Column style="width: 5%; text-align: center;">
+            <Column style="width: 5%; text-align: center">
                 <template #body="slotProps">
                     <i
                         class="fa fa-trash"

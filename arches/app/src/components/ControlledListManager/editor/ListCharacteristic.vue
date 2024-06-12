@@ -14,7 +14,9 @@ const props = defineProps<{
     editable: boolean;
     label: string;
 }>();
-const { displayedRow: list } = inject(displayedRowKey) as DisplayedListRefAndSetter;
+const { displayedRow: list } = inject(
+    displayedRowKey,
+) as DisplayedListRefAndSetter;
 
 const editing = ref(false);
 const disabled = computed(() => {
@@ -59,7 +61,7 @@ const cancel = () => {
         <!-- TODO https://github.com/archesproject/arches/issues/10847 -->
         <span
             v-if="!props.editable"
-            style="font-size: small;"
+            style="font-size: small"
         >
             False
         </span>

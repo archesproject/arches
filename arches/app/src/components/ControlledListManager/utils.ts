@@ -20,12 +20,13 @@ export const nodeIsList = (node: TreeNode) => {
 };
 
 export const bestLabel = (item: ControlledListItem, languageCode: string) => {
-    const valuesInLang = item.values.filter(value => value.language_id === languageCode);
-    const bestLabel = (
-        valuesInLang.find(value => value.valuetype_id === "prefLabel")
-        ?? valuesInLang.find(value => value.valuetype_id === "altLabel")
-        ?? item.values.find(value => value.valuetype_id === "prefLabel")
+    const valuesInLang = item.values.filter(
+        (value) => value.language_id === languageCode,
     );
+    const bestLabel =
+        valuesInLang.find((value) => value.valuetype_id === "prefLabel") ??
+        valuesInLang.find((value) => value.valuetype_id === "altLabel") ??
+        item.values.find((value) => value.valuetype_id === "prefLabel");
     if (!bestLabel) {
         throw new Error();
     }
@@ -37,7 +38,7 @@ export const languageNameFromCode = (code: string) => {
 };
 
 export const findNodeInTree = (tree: TreeNode[], itemId: string) => {
-    function recurse (items: TreeNode[]) : TreeNode | undefined {
+    function recurse(items: TreeNode[]): TreeNode | undefined {
         for (const item of items) {
             if (item.data.id === itemId) {
                 return item;
@@ -60,7 +61,9 @@ export const itemAsNode = (
 ): TreeNode => {
     return {
         key: item.id,
-        children: item.children.map(child => itemAsNode(child, selectedLanguage)),
+        children: item.children.map((child) =>
+            itemAsNode(child, selectedLanguage),
+        ),
         data: item,
     };
 };
@@ -71,8 +74,8 @@ export const listAsNode = (
 ): TreeNode => {
     return {
         key: list.id,
-        children: list.items.map(
-            (item: ControlledListItem) => itemAsNode(item, selectedLanguage)
+        children: list.items.map((item: ControlledListItem) =>
+            itemAsNode(item, selectedLanguage),
         ),
         data: list,
     };
@@ -82,7 +85,8 @@ export const makeSortOrderMap = (list: ControlledList) => {
     const ret = {};
 
     const stripAllButSortOrderRecursive = (
-        items: ControlledListItem[], acc: { [key: string]: number }
+        items: ControlledListItem[],
+        acc: { [key: string]: number },
     ) => {
         for (const item of items) {
             acc[item.id] = item.sortorder;
@@ -142,16 +146,24 @@ export const reorderItems = (
             // Cannot shift upward - already at top
             throw new Error();
         }
-        reorderedSiblings = [...itemsToLeft, item, leftNeighbor, ...itemsToRight];
+        reorderedSiblings = [
+            ...itemsToLeft,
+            item,
+            leftNeighbor,
+            ...itemsToRight,
+        ];
     } else {
         const [rightNeighbor, ...rest] = itemsToRight;
         reorderedSiblings = [...itemsToLeft, rightNeighbor, item, ...rest];
     }
 
     let acc = 0;
-    const recalculateSortOrderRecursive = (parent: Selectable, items: ControlledListItem[]) => {
+    const recalculateSortOrderRecursive = (
+        parent: Selectable,
+        items: ControlledListItem[],
+    ) => {
         // Patch in the reordered siblings.
-        if (items.some(itemCandidate => itemCandidate.id === item.id)) {
+        if (items.some((itemCandidate) => itemCandidate.id === item.id)) {
             if ((parent as ControlledList).items) {
                 (parent as ControlledList).items = reorderedSiblings;
             } else {

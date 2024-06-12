@@ -12,10 +12,14 @@ import type { TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/types/arches";
 
-const isMultiSelecting = defineModel<boolean>("isMultiSelecting", { required: true });
+const isMultiSelecting = defineModel<boolean>("isMultiSelecting", {
+    required: true,
+});
 const movingItem = defineModel<TreeNode>("movingItem", { required: true });
 const rerenderTree = defineModel<number>("rerenderTree", { required: true });
-const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", { required: true });
+const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
+    required: true,
+});
 
 const abandonMoveRef = ref();
 
@@ -36,11 +40,15 @@ const abandonMove = () => {
         class="action-banner"
     >
         <!-- turn off escaping: vue template sanitizes -->
-        {{ $gettext(
-            "Selecting new parent for: %{item}",
-            { item: bestLabel(movingItem.data, selectedLanguage.code).value },
-            true,
-        )
+        {{
+            $gettext(
+                "Selecting new parent for: %{item}",
+                {
+                    item: bestLabel(movingItem.data, selectedLanguage.code)
+                        .value,
+                },
+                true,
+            )
         }}
         <Button
             ref="abandonMoveRef"
@@ -59,7 +67,10 @@ const abandonMove = () => {
             type="button"
             class="banner-button"
             :label="$gettext('Abandon')"
-            @click="isMultiSelecting = false; selectedKeys = {};"
+            @click="
+                isMultiSelecting = false;
+                selectedKeys = {};
+            "
         />
     </div>
 </template>

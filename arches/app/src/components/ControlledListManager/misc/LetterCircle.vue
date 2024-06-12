@@ -3,31 +3,34 @@ import { computed } from "vue";
 
 import { dataIsList } from "@/components/ControlledListManager/utils.ts";
 
-import type { ControlledListItem, Selectable } from "@/types/ControlledListManager";
+import type {
+    ControlledListItem,
+    Selectable,
+} from "@/types/ControlledListManager";
 
 const props = defineProps<{ labelled: Selectable }>();
 
 const color = computed(() => {
     if (dataIsList(props.labelled)) {
-        return 'midnightblue';
+        return "midnightblue";
     }
     const item = props.labelled as ControlledListItem;
     if (item.guide) {
-        return 'chocolate';
+        return "chocolate";
     }
-    return 'darkorchid';
+    return "darkorchid";
 });
 
 const letter = computed(() => {
     // not translated...
     if (dataIsList(props.labelled)) {
-        return 'L';
+        return "L";
     }
     const item = props.labelled as ControlledListItem;
     if (item.guide) {
-        return 'G';
+        return "G";
     }
-    return 'I';
+    return "I";
 });
 </script>
 

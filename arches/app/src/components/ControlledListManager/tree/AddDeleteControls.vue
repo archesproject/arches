@@ -9,8 +9,16 @@ import ConfirmDialog from "primevue/confirmdialog";
 import SplitButton from "primevue/splitbutton";
 
 import { BUTTON_GREEN } from "@/theme.ts";
-import { deleteItems, deleteLists, fetchLists } from "@/components/ControlledListManager/api.ts";
-import { displayedRowKey, selectedLanguageKey, DANGER } from "@/components/ControlledListManager/constants.ts";
+import {
+    deleteItems,
+    deleteLists,
+    fetchLists,
+} from "@/components/ControlledListManager/api.ts";
+import {
+    displayedRowKey,
+    selectedLanguageKey,
+    DANGER,
+} from "@/components/ControlledListManager/constants.ts";
 import { listAsNode } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
@@ -27,10 +35,16 @@ const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
 const controlledListItemsTree = defineModel<TreeNode[]>({ required: true });
-const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", { required: true });
-const isMultiSelecting = defineModel<boolean>("isMultiSelecting", { required: true });
+const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
+    required: true,
+});
+const isMultiSelecting = defineModel<boolean>("isMultiSelecting", {
+    required: true,
+});
 const nextNewList = defineModel<NewControlledList>("nextNewList");
-const newListFormValue = defineModel<string>("newListFormValue", { required: true });
+const newListFormValue = defineModel<string>("newListFormValue", {
+    required: true,
+});
 
 // For new list entry (input textbox)
 const newListCounter = ref(1);
@@ -59,10 +73,12 @@ const createList = () => {
     };
 
     nextNewList.value = newList;
-    newListFormValue.value = '';
+    newListFormValue.value = "";
     newListCounter.value += 1;
 
-    controlledListItemsTree.value.push(listAsNode(newList, selectedLanguage.value));
+    controlledListItemsTree.value.push(
+        listAsNode(newList, selectedLanguage.value),
+    );
 
     selectedKeys.value = { [newList.id]: true };
     setDisplayedRow(newList);
@@ -70,19 +86,29 @@ const createList = () => {
 
 const toDelete = computed(() => {
     if (isMultiSelecting.value) {
-        return Object.entries(selectedKeys.value).filter(([, v]) => v.checked).map(([k,]) => k);
+        return Object.entries(selectedKeys.value)
+            .filter(([, v]) => v.checked)
+            .map(([k]) => k);
     }
-    return Object.entries(selectedKeys.value).filter(([, v]) => v).map(([k,]) => k);
+    return Object.entries(selectedKeys.value)
+        .filter(([, v]) => v)
+        .map(([k]) => k);
 });
 
 const deleteSelected = async () => {
     if (!selectedKeys.value) {
         return;
     }
-    const allListIds = controlledListItemsTree.value.map(node => node.data.id);
+    const allListIds = controlledListItemsTree.value.map(
+        (node) => node.data.id,
+    );
 
-    const listIdsToDelete = toDelete.value.filter(id => allListIds.includes(id));
-    const itemIdsToDelete = toDelete.value.filter(id => !listIdsToDelete.includes(id));
+    const listIdsToDelete = toDelete.value.filter((id) =>
+        allListIds.includes(id),
+    );
+    const itemIdsToDelete = toDelete.value.filter(
+        (id) => !listIdsToDelete.includes(id),
+    );
 
     selectedKeys.value = {};
 
@@ -92,7 +118,8 @@ const deleteSelected = async () => {
         anyDeleted = await deleteItems(itemIdsToDelete, toast, $gettext);
     }
     if (listIdsToDelete.length) {
-        anyDeleted = await deleteLists(listIdsToDelete, toast, $gettext) || anyDeleted;
+        anyDeleted =
+            (await deleteLists(listIdsToDelete, toast, $gettext)) || anyDeleted;
     }
     if (anyDeleted) {
         setDisplayedRow(null);
@@ -124,11 +151,11 @@ const confirmDelete = () => {
 
 const fetchListsAndPopulateTree = async () => {
     await fetchLists(toast, $gettext).then(
-        ({ controlled_lists } : { controlled_lists: ControlledList[] }) => {
-            controlledListItemsTree.value = controlled_lists.map(
-                list => listAsNode(list, selectedLanguage.value)
+        ({ controlled_lists }: { controlled_lists: ControlledList[] }) => {
+            controlledListItemsTree.value = controlled_lists.map((list) =>
+                listAsNode(list, selectedLanguage.value),
             );
-        }
+        },
     );
 };
 
@@ -148,7 +175,7 @@ await fetchListsAndPopulateTree();
     <SplitButton
         class="list-button"
         :label="$gettext('Delete')"
-        :menu-button-props="{'aria-label': $gettext('Delete multiple')}"
+        :menu-button-props="{ 'aria-label': $gettext('Delete multiple') }"
         raised
         style="font-size: inherit"
         :disabled="!toDelete.length"
@@ -159,7 +186,8 @@ await fetchListsAndPopulateTree();
 </template>
 
 <style scoped>
-.list-button, .p-splitbutton {
+.list-button,
+.p-splitbutton {
     height: 4rem;
     margin: 0.5rem;
     flex: 0.5;
@@ -176,7 +204,7 @@ await fetchListsAndPopulateTree();
 }
 
 .p-tieredmenu-root-list {
-    margin: 0;  /* override arches css */
+    margin: 0; /* override arches css */
 }
 
 .p-confirm-dialog {

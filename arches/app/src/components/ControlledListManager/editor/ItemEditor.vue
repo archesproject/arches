@@ -17,7 +17,9 @@ import {
 
 import type { DisplayedListItemRefAndSetter } from "@/types/ControlledListManager";
 
-const { displayedRow: item } = inject(displayedRowKey) as DisplayedListItemRefAndSetter;
+const { displayedRow: item } = inject(
+    displayedRowKey,
+) as DisplayedListItemRefAndSetter;
 provide(itemKey, item);
 </script>
 

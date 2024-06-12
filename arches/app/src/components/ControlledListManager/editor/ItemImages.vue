@@ -8,7 +8,11 @@ import FileUpload from "primevue/fileupload";
 import { useToast } from "primevue/usetoast";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
-import { itemKey, DEFAULT_ERROR_TOAST_LIFE, ERROR } from "@/components/ControlledListManager/constants.ts";
+import {
+    itemKey,
+    DEFAULT_ERROR_TOAST_LIFE,
+    ERROR,
+} from "@/components/ControlledListManager/constants.ts";
 import ImageEditor from "@/components/ControlledListManager/editor/ImageEditor.vue";
 
 import type { Ref } from "vue";
@@ -20,7 +24,7 @@ import type {
 } from "primevue/fileupload";
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
-const completed = 'Completed';
+const completed = "Completed";
 
 const { $gettext } = useGettext();
 const toast = useToast();
@@ -64,10 +68,18 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
             :show-upload-button="false"
             name="item_image"
             :pt="{
-                buttonbar: { style: { border: '1px solid lightgray', borderRadius: '4px' } },
+                buttonbar: {
+                    style: {
+                        border: '1px solid lightgray',
+                        borderRadius: '4px',
+                    },
+                },
                 file: ({ props }) => ({
                     style: {
-                        display: (props as any).badgeValue === completed ? 'none' : ''
+                        display:
+                            (props as any).badgeValue === completed
+                                ? 'none'
+                                : '',
                     },
                 }),
             }"
@@ -117,7 +129,7 @@ p {
     gap: 3rem;
 }
 
-:deep(input[type=file]) {
+:deep(input[type="file"]) {
     /* override arches.css */
     /* PrimeVue uses a hidden input for screen readers */
     display: none;

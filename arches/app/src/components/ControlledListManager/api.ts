@@ -1,7 +1,10 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 
-import { DEFAULT_ERROR_TOAST_LIFE, ERROR } from "@/components/ControlledListManager/constants.ts";
+import {
+    DEFAULT_ERROR_TOAST_LIFE,
+    ERROR,
+} from "@/components/ControlledListManager/constants.ts";
 import { makeSortOrderMap } from "@/components/ControlledListManager/utils.ts";
 
 import type { ToastServiceMethods } from "primevue/toastservice";
@@ -49,7 +52,7 @@ export const fetchLists = async (
     }
 };
 
-export const createList = async(
+export const createList = async (
     name: string,
     toast: ToastServiceMethods,
     $gettext: GetText,
@@ -107,7 +110,7 @@ export const createItem = async (
     }
 };
 
-export const patchItem = async(
+export const patchItem = async (
     item: ControlledListItem,
     toast: ToastServiceMethods,
     $gettext: GetText,
@@ -136,7 +139,6 @@ export const patchItem = async(
         });
     }
 };
-
 
 export const postList = async (
     list: ControlledList,
@@ -167,7 +169,7 @@ export const postList = async (
     }
 };
 
-export const patchList = async(
+export const patchList = async (
     list: ControlledList,
     toast: ToastServiceMethods,
     $gettext: GetText,
@@ -217,7 +219,7 @@ export const deleteLists = async (
         fetch(arches.urls.controlled_list(id), {
             method: "DELETE",
             headers: { "X-CSRFToken": getToken() },
-        })
+        }),
     );
 
     let anyDeleted = false;
@@ -257,7 +259,7 @@ export const deleteItems = async (
         fetch(arches.urls.controlled_list_item(id), {
             method: "DELETE",
             headers: { "X-CSRFToken": getToken() },
-        })
+        }),
     );
 
     let anyDeleted = false;
@@ -336,7 +338,7 @@ export const deleteValue = async (
             {
                 method: "DELETE",
                 headers: { "X-CSRFToken": getToken() },
-            }
+            },
         );
         if (response.ok) {
             return true;
@@ -399,7 +401,7 @@ export const deleteMetadata = async (
             {
                 method: "DELETE",
                 headers: { "X-CSRFToken": getToken() },
-            }
+            },
         );
         if (response.ok) {
             return true;
@@ -417,7 +419,7 @@ export const deleteMetadata = async (
     }
 };
 
-export const deleteImage = async(
+export const deleteImage = async (
     image: ControlledListItemImage,
     toast: ToastServiceMethods,
     $gettext: GetText,
@@ -430,7 +432,7 @@ export const deleteImage = async(
             {
                 method: "DELETE",
                 headers: { "X-CSRFToken": getToken() },
-            }
+            },
         );
         if (response.ok) {
             return true;

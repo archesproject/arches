@@ -16,13 +16,13 @@ const { $gettext } = useGettext();
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
 const { expandAll, collapseAll } = defineProps<{
-    expandAll: () => void,
-    collapseAll: () => void,
+    expandAll: () => void;
+    collapseAll: () => void;
 }>();
 </script>
 
 <template>
-    <div style="text-align: center; display: flex; width: 100%;">
+    <div style="text-align: center; display: flex; width: 100%">
         <Button
             class="secondary-button"
             type="button"
@@ -37,10 +37,10 @@ const { expandAll, collapseAll } = defineProps<{
             :label="$gettext('Collapse all')"
             @click="collapseAll"
         />
-        <div style="display: flex; flex-grow: 1; justify-content: flex-end;">
+        <div style="display: flex; flex-grow: 1; justify-content: flex-end">
             <span
                 id="languageSelectLabel"
-                style="align-self: center; margin-right: 0.25rem;"
+                style="align-self: center; margin-right: 0.25rem"
             >
                 {{ $gettext("Show labels in:") }}
             </span>
@@ -52,7 +52,14 @@ const { expandAll, collapseAll } = defineProps<{
                 :placeholder="$gettext('Language')"
                 :pt="{
                     root: { class: 'p-button secondary-button' },
-                    input: { style: { fontFamily: 'inherit', fontSize: 'small', textAlign: 'center', alignContent: 'center' } },
+                    input: {
+                        style: {
+                            fontFamily: 'inherit',
+                            fontSize: 'small',
+                            textAlign: 'center',
+                            alignContent: 'center',
+                        },
+                    },
                     itemLabel: { style: { fontSize: 'small' } },
                 }"
             />
