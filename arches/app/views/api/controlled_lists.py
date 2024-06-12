@@ -206,7 +206,12 @@ class ControlledListView(View):
 
     def add_new_list(self, name):
         lst = ControlledList(name=name)
-        lst.full_clean()  # applies default name
+        try:
+            lst.full_clean()  # applies default name
+        except ValidationError as ve:
+            return JSONErrorResponse(
+                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+            )
         lst.save()
         return JSONResponse(lst.serialize(), status=HTTPStatus.CREATED)
 
@@ -234,8 +239,6 @@ class ControlledListView(View):
                 clist.full_clean()
 
                 handle_items(data["items"], max_sortorder=clist.max_sortorder)
-
-                clist.save()
         except ValidationError as ve:
             return JSONErrorResponse(
                 message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
@@ -245,6 +248,8 @@ class ControlledListView(View):
                 message=_("Items must belong to the same list."),
                 status=HTTPStatus.BAD_REQUEST,
             )
+
+        clist.save()
 
         return JSONResponse(clist.serialize())
 
@@ -266,7 +271,6 @@ class ControlledListView(View):
         try:
             clist._state.adding = False
             clist.full_clean(exclude=exclude_fields)
-            clist.save(update_fields=update_fields)
         except ValidationError as ve:
             return JSONErrorResponse(
                 message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
@@ -276,6 +280,8 @@ class ControlledListView(View):
                 message=_("Items must belong to the same list."),
                 status=HTTPStatus.BAD_REQUEST,
             )
+
+        clist.save(update_fields=update_fields)
 
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
