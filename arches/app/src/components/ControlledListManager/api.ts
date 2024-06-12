@@ -110,6 +110,35 @@ export const createItem = async (
     }
 };
 
+export const postItem = async (
+    item: ControlledListItem,
+    toast: ToastServiceMethods,
+    $gettext: GetText,
+) => {
+    let error;
+    let response;
+    try {
+        response = await fetch(arches.urls.controlled_list_item(item.id), {
+            method: "POST",
+            headers: { "X-CSRFToken": getToken() },
+            body: JSON.stringify(item),
+        });
+        if (response.ok) {
+            return true;
+        } else {
+            error = await response.json();
+            throw new Error();
+        }
+    } catch {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Move failed"),
+            detail: error?.message || response?.statusText,
+        });
+    }
+};
+
 export const patchItem = async (
     item: ControlledListItem,
     toast: ToastServiceMethods,

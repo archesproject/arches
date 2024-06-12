@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import arches from "arches";
-import Cookies from "js-cookie";
 import { computed, inject, ref, watch } from "vue";
 import { useGettext } from "vue3-gettext";
 
@@ -11,11 +9,10 @@ import { useToast } from "primevue/usetoast";
 import {
     createItem,
     createList,
+    postItem,
     upsertValue,
 } from "@/components/ControlledListManager/api.ts";
 import {
-    DEFAULT_ERROR_TOAST_LIFE,
-    ERROR,
     displayedRowKey,
     selectedLanguageKey,
 } from "@/components/ControlledListManager/constants.ts";
@@ -111,9 +108,6 @@ const showMoveHereButton = (rowId: string) => {
 };
 
 const setParent = async (parentNode: TreeNode) => {
-    let error;
-    let response;
-
     const setListAndSortOrderRecursive = (child: ControlledListItem) => {
         if (!parentNode.key) {
             return;
@@ -133,30 +127,10 @@ const setParent = async (parentNode: TreeNode) => {
         item.parent_id = parentNode.key;
     }
 
-    const token = Cookies.get("csrftoken");
-    if (!token) {
-        return;
-    }
-    try {
-        response = await fetch(arches.urls.controlled_list_item(item.id), {
-            method: "POST",
-            headers: { "X-CSRFToken": token },
-            body: JSON.stringify(item),
-        });
-        if (response.ok) {
-            movingItem.value = {};
-            refetcher.value += 1;
-        } else {
-            error = await response.json();
-            throw new Error();
-        }
-    } catch {
-        toast.add({
-            severity: ERROR,
-            life: DEFAULT_ERROR_TOAST_LIFE,
-            summary: $gettext("Move failed"),
-            detail: error?.message || response?.statusText,
-        });
+    const succeded = await postItem(item, toast, $gettext);
+    if (succeded) {
+        movingItem.value = {};
+        refetcher.value += 1;
     }
 };
 
