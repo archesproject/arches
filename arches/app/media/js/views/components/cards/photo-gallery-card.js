@@ -9,11 +9,12 @@ define([
     'views/components/workbench',
     'viewmodels/photo-gallery',
     'templates/views/components/cards/photo-gallery-card.htm',
+    'viewmodels/alert',
     'bindings/slide',
     'bindings/fadeVisible',
     'bindings/dropzone',
     'bindings/gallery',
-], function(ko, koMapping, _, arches, Dropzone, uuid, CardComponentViewModel, WorkbenchComponentViewModel, PhotoGallery, photoGalleryCardTemplate) {
+], function(ko, koMapping, _, arches, Dropzone, uuid, CardComponentViewModel, WorkbenchComponentViewModel, PhotoGallery, photoGalleryCardTemplate, AlertViewModel) {
     const viewModel = function(params) {
 
         params.configKeys = ['acceptedFiles', 'maxFilesize'];
@@ -60,13 +61,7 @@ define([
         });
 
         this.acceptedFiles = ko.computed(function(){
-            var aft = "Missing filetypes";
-            self.card.widgets().forEach(function(widget){
-                if (widget.node_id() === self.fileListNodeId) {
-                    aft = widget.config.acceptedFiles() || "--";
-                }
-            });
-            return aft;
+            return self.card.widgets().find(widget=>widget.node_id() === self.fileListNodeId)?.config.acceptedFiles() || 'All Formats Accepted';
         });
 
         this.cleanUrl = function(url) {
@@ -163,7 +158,7 @@ define([
             var acceptedFileFormats;
             var loadFile;
             acceptedFileFormats = ((ko.unwrap(self.acceptedFiles)).split(',').map(item=>item.trim())).map(format => format.replace('.', ''));
-            if(ko.unwrap(self.acceptedFiles) != "--" && acceptedFileFormats !== undefined && acceptedFileFormats.length > 0){
+            if(ko.unwrap(self.acceptedFiles) != "All Formats Accepted" && acceptedFileFormats !== undefined && acceptedFileFormats.length > 0){
                 var fileType = file.name.split('.').pop().toLowerCase();
                 if(acceptedFileFormats.includes(fileType)){
                     loadFile = true;
@@ -204,7 +199,6 @@ define([
                 self.card.newTile = undefined;
             }
             else{
-
                 params.pageVm.alert(new AlertViewModel(
                     'ep-alert-red',
                     "Incorrect File Format",
