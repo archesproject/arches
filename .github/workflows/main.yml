@@ -61,6 +61,11 @@ jobs:
             echo "package.json not found, skipping npm commands."
           fi
 
+      - name: Check formatting
+        run: |
+          npm run prettier:check
+          black . --check --exclude=node_modules
+
       - name: Run frontend tests
         run: |
           npm run vitest

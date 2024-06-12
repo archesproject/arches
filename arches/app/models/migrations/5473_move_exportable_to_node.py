@@ -7,17 +7,17 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '5473_exportable_nodegroup_node_fieldname'),
+        ("models", "5473_exportable_nodegroup_node_fieldname"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='nodegroup',
-            name='exportable',
+            model_name="nodegroup",
+            name="exportable",
         ),
         migrations.AddField(
-            model_name='node',
-            name='exportable',
+            model_name="node",
+            name="exportable",
             field=models.BooleanField(default=False, null=True),
         ),
     ]

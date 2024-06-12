@@ -293,7 +293,6 @@ class Migration(migrations.Migration):
         LANGUAGE plpgsql
     """
 
-
     operations = [
         migrations.RunSQL(
             forward,
