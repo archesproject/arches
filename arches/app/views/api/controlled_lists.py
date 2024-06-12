@@ -238,7 +238,7 @@ class ControlledListView(View):
                 clist.save()
         except ValidationError as ve:
             return JSONErrorResponse(
-                message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
             )
         except MixedListsException:
             return JSONErrorResponse(
@@ -269,7 +269,7 @@ class ControlledListView(View):
             clist.save(update_fields=update_fields)
         except ValidationError as ve:
             return JSONErrorResponse(
-                message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
             )
         except MixedListsException:
             return JSONErrorResponse(
@@ -296,7 +296,7 @@ class ControlledListView(View):
         ]
         if errors:
             return JSONErrorResponse(
-                message=" ".join(errors), status=HTTPStatus.BAD_REQUEST
+                message="\n".join(errors), status=HTTPStatus.BAD_REQUEST
             )
         list_to_delete.delete()
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
@@ -372,7 +372,7 @@ class ControlledListItemView(View):
                 serialized_item = item.serialize()
         except ValidationError as ve:
             return JSONErrorResponse(
-                message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
             )
         except MixedListsException:
             return JSONErrorResponse(
@@ -402,7 +402,7 @@ class ControlledListItemView(View):
             item.save(update_fields=update_fields)
         except ValidationError as ve:
             return JSONErrorResponse(
-                message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
             )
 
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
@@ -432,7 +432,7 @@ class ControlledListItemValueView(View):
             value.full_clean()
         except ValidationError as ve:
             return JSONErrorResponse(
-                message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
             )
         value.save()
 
@@ -460,7 +460,7 @@ class ControlledListItemValueView(View):
             value.full_clean()
         except ValidationError as ve:
             return JSONErrorResponse(
-                message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
             )
         value.save()
 
@@ -477,7 +477,7 @@ class ControlledListItemValueView(View):
             value.delete()
         except ValidationError as ve:
             return JSONErrorResponse(
-                message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
             )
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
@@ -497,7 +497,7 @@ class ControlledListItemImageView(View):
             img.full_clean()
         except ValidationError as ve:
             return JSONErrorResponse(
-                message=" ".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
             )
         img.save()
         return JSONResponse(img.serialize(), status=HTTPStatus.CREATED)
