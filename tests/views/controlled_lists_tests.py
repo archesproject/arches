@@ -411,7 +411,7 @@ class ControlledListTests(ArchesTestCase):
         parent = serialized_list["items"][0]
         parent_id = str(parent["id"])
         child = serialized_list["items"][0]["children"][0]
-        child_id = str(parent["id"])
+        child_id = str(child["id"])
 
         parent["parent_id"] = child_id
         child["parent_id"] = parent_id
@@ -425,6 +425,15 @@ class ControlledListTests(ArchesTestCase):
             response = self.client.post(
                 reverse("controlled_list_item", kwargs={"id": parent_id}),
                 parent,
+                content_type="application/json",
+            )
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
+
+        # Also test PATCH method
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.patch(
+                reverse("controlled_list_item", kwargs={"id": parent_id}),
+                {"parent_id": parent["parent_id"]},
                 content_type="application/json",
             )
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)

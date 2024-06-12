@@ -399,7 +399,16 @@ class ControlledListItemView(View):
         try:
             item._state.adding = False
             item.full_clean(exclude=exclude_fields)
-            item.save(update_fields=update_fields)
+            with transaction.atomic():
+                item.save(update_fields=update_fields)
+                if "parent_id" in update_fields:
+                    # Check for recursive structure
+                    unused = item.parent.serialize()
+        except RecursionError:
+            return JSONErrorResponse(
+                message=_("Recursive structure detected."),
+                status=HTTPStatus.BAD_REQUEST,
+            )
         except ValidationError as ve:
             return JSONErrorResponse(
                 message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
