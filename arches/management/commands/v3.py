@@ -46,12 +46,29 @@ class Command(BaseCommand):
             help="List the names of resource models to process. By default, all are used",
         )
 
-        parser.add_argument("-t", "--target", action="store", default=None, help="Location of v3 data directory.")
-
-        parser.add_argument("-n", "--number", type=int, action="store", default=None, help="Limits the number of resources to load.")
+        parser.add_argument(
+            "-t",
+            "--target",
+            action="store",
+            default=None,
+            help="Location of v3 data directory.",
+        )
 
         parser.add_argument(
-            "-o", "--overwrite", action="store_true", default=False, help="Overwrite existing data with the output of this operation"
+            "-n",
+            "--number",
+            type=int,
+            action="store",
+            default=None,
+            help="Limits the number of resources to load.",
+        )
+
+        parser.add_argument(
+            "-o",
+            "--overwrite",
+            action="store_true",
+            default=False,
+            help="Overwrite existing data with the output of this operation",
         )
 
         parser.add_argument(
@@ -62,19 +79,35 @@ class Command(BaseCommand):
             help="Force the import of the v4 json created with the write-v4-json operation",
         )
 
-        parser.add_argument("--verbose", action="store_true", default=False, help="Enable verbose printing during operation.")
-
         parser.add_argument(
-            "--exclude", nargs="+", action="store", default=[], help="List of resource ids (uuids) to exclude from the write process."
+            "--verbose",
+            action="store_true",
+            default=False,
+            help="Enable verbose printing during operation.",
         )
 
-        parser.add_argument("--only", nargs="+", action="store", default=[], help="List of specific resource ids (uuids) to use.")
+        parser.add_argument(
+            "--exclude",
+            nargs="+",
+            action="store",
+            default=[],
+            help="List of resource ids (uuids) to exclude from the write process.",
+        )
+
+        parser.add_argument(
+            "--only",
+            nargs="+",
+            action="store",
+            default=[],
+            help="List of specific resource ids (uuids) to use.",
+        )
 
         parser.add_argument(
             "--skip-file-check",
             action="store_true",
             default=False,
-            help="Skips the check for the existence of uploaded files " "during the conversion process.",
+            help="Skips the check for the existence of uploaded files "
+            "during the conversion process.",
         )
 
     def handle(self, *args, **options):
@@ -96,7 +129,10 @@ class Command(BaseCommand):
         else:
             dir_path = os.path.abspath(options["target"])
             if not os.path.isdir(dir_path):
-                print("\nInvalid -t/--target value: " + options["target"] + "\n" "This must be a directory.")
+                print(
+                    "\nInvalid -t/--target value: " + options["target"] + "\n"
+                    "This must be a directory."
+                )
                 exit()
 
         op = options["operation"]
@@ -121,7 +157,10 @@ class Command(BaseCommand):
             resource_models = options["resource-models"]
             if "all" in resource_models:
                 resource_graphs = Graph.objects.filter(isresource=True)
-                models = [g.name for g in resource_graphs.exclude(name="Arches System Settings")]
+                models = [
+                    g.name
+                    for g in resource_graphs.exclude(name="Arches System Settings")
+                ]
             else:
                 for rm in resource_models:
                     try:
@@ -186,7 +225,9 @@ class Command(BaseCommand):
         os.mkdir(os.path.join(v3_dir, "reference_data"))
         os.mkdir(os.path.join(v3_dir, "graph_data"))
 
-        with open(os.path.join(full_path, "reference_data", "v3topconcept_lookup.json"), "w") as openfile:
+        with open(
+            os.path.join(full_path, "reference_data", "v3topconcept_lookup.json"), "w"
+        ) as openfile:
             json.dump({}, openfile)
 
     def generate_rm_configs(self, pkg_path):
@@ -217,7 +258,10 @@ class Command(BaseCommand):
         for rm, config in configs.items():
             v3_type = config["v3_entitytypeid"]
             if v3_type.startswith("<") or v3_type.endswith(">"):
-                print("you must fill out the 'v3_entitytypeid' attribute " "for every resource model listed in your v3 configs.")
+                print(
+                    "you must fill out the 'v3_entitytypeid' attribute "
+                    "for every resource model listed in your v3 configs."
+                )
                 exit()
         csv_dir = os.path.join(path, "v3data", "graph_data")
 
@@ -225,7 +269,10 @@ class Command(BaseCommand):
             v3_type = config["v3_entitytypeid"]
             csv_file = os.path.join(csv_dir, "{}_nodes.csv".format(v3_type))
             if not os.path.isfile(csv_file):
-                print("\nCan't find nodes CSV file for {}. Expected name is:" "\n\n  {}".format(v3_type, csv_file))
+                print(
+                    "\nCan't find nodes CSV file for {}. Expected name is:"
+                    "\n\n  {}".format(v3_type, csv_file)
+                )
                 print("\n  -- Have you transferred your v3 nodes files yet?")
                 exit()
 
@@ -267,7 +314,15 @@ class Command(BaseCommand):
         print("PASS")
 
     def write_v4_json(
-        self, package_dir, resource_models, direct_import=False, truncate=None, verbose=False, exclude=[], only=[], skipfilecheck=False
+        self,
+        package_dir,
+        resource_models,
+        direct_import=False,
+        truncate=None,
+        verbose=False,
+        exclude=[],
+        only=[],
+        skipfilecheck=False,
     ):
 
         start = datetime.now()
@@ -278,7 +333,11 @@ class Command(BaseCommand):
         v3_files = glob(os.path.join(package_dir, "v3data", "business_data", "*.json*"))
 
         if len(v3_files) == 0:
-            print("\nThere is no v3 data to import. Put v3 json or jsonl in {}".format(v3_data_dir))
+            print(
+                "\nThere is no v3 data to import. Put v3 json or jsonl in {}".format(
+                    v3_data_dir
+                )
+            )
             exit()
 
         try:
@@ -320,7 +379,12 @@ class Command(BaseCommand):
                     dt_converter=value_converter,
                 )
 
-                outfilename = os.path.splitext(infilename)[0] + "-" + rm + os.path.splitext(infilename)[1]
+                outfilename = (
+                    os.path.splitext(infilename)[0]
+                    + "-"
+                    + rm
+                    + os.path.splitext(infilename)[1]
+                )
                 output_file = os.path.join(package_dir, "business_data", outfilename)
 
                 if ext == ".json":
@@ -330,11 +394,19 @@ class Command(BaseCommand):
 
                 if output is not False:
                     sources.append(output_file)
-                    endmsg += "\n  python manage.py packages -o import_business_data -s " '"{}" -ow overwrite'.format(output)
+                    endmsg += (
+                        "\n  python manage.py packages -o import_business_data -s "
+                        '"{}" -ow overwrite'.format(output)
+                    )
 
         if direct_import:
             for source in sources:
-                management.call_command("packages", operation="import_business_data", source=source, overwrite="overwrite")
+                management.call_command(
+                    "packages",
+                    operation="import_business_data",
+                    source=source,
+                    overwrite="overwrite",
+                )
 
         else:
             print(endmsg + "\n")
@@ -348,28 +420,49 @@ class Command(BaseCommand):
         v3_relations_files = glob(os.path.join(v3_business_dir, "*.relations"))
 
         if len(v3_relations_files) == 0:
-            print("\nThere are no v3 relations to import. Put v3 .relations " "file in {}".format(v3_business_dir))
+            print(
+                "\nThere are no v3 relations to import. Put v3 .relations "
+                "file in {}".format(v3_business_dir)
+            )
             exit()
 
         v3_relations = v3_relations_files[0]
 
         if len(v3_relations_files) > 1:
-            print("\nOnly one v3 relations file can be imported. This file will be used" ":\n\n  {}".format(v3_relations))
+            print(
+                "\nOnly one v3 relations file can be imported. This file will be used"
+                ":\n\n  {}".format(v3_relations)
+            )
 
-        v4_relations = os.path.join(package_dir, "business_data", "relations", "all.relations")
+        v4_relations = os.path.join(
+            package_dir, "business_data", "relations", "all.relations"
+        )
 
         with open(v3_relations, "r") as openv3:
             reader = csv.reader(openv3, delimiter="|")
             next(reader)
             with open(v4_relations, "w") as openv4:
                 writer = csv.writer(openv4)
-                writer.writerow(["resourceinstanceidfrom", "resourceinstanceidto", "relationshiptype", "datestarted", "dateended", "notes"])
+                writer.writerow(
+                    [
+                        "resourceinstanceidfrom",
+                        "resourceinstanceidto",
+                        "relationshiptype",
+                        "datestarted",
+                        "dateended",
+                        "notes",
+                    ]
+                )
                 for row in reader:
                     resfrom, resto, resstart, resend, restype, notes = row
                     writer.writerow([resfrom, resto, restype, resstart, resend, notes])
 
         if direct_import:
-            management.call_command("packages", operation="import_business_data_relations", source=v4_relations)
+            management.call_command(
+                "packages",
+                operation="import_business_data_relations",
+                source=v4_relations,
+            )
         else:
             print(
                 "\n  -- You can load these resources later with:\n"
@@ -381,7 +474,9 @@ class Command(BaseCommand):
 
     def convert_v3_skos(self, package_dir, direct_import=False, verbose=False):
 
-        uuid_collection_file = os.path.join(package_dir, "reference_data", "v3topconcept_lookup.json")
+        uuid_collection_file = os.path.join(
+            package_dir, "reference_data", "v3topconcept_lookup.json"
+        )
         if not os.path.isfile(uuid_collection_file):
             if verbose:
                 print("creating new collection lookup file: " + uuid_collection_file)
@@ -393,7 +488,12 @@ class Command(BaseCommand):
             with open(uuid_collection_file, "rb") as openfile:
                 uuid_data = json.loads(openfile.read())
         except ValueError as e:
-            print("\n  -- JSON parse error in " + uuid_collection_file + ":\n\n    " + e.message)
+            print(
+                "\n  -- JSON parse error in "
+                + uuid_collection_file
+                + ":\n\n    "
+                + e.message
+            )
             exit()
 
         v3_ref_dir = os.path.join(package_dir, "v3data", "reference_data")
@@ -401,17 +501,26 @@ class Command(BaseCommand):
 
         v3_skos_files = glob(os.path.join(v3_ref_dir, "*.xml"))
         if len(v3_skos_files) == 0:
-            print("\nThere is no v3 data to import. Export your concept scheme" " from v3 and place it in {}".format(v3_ref_dir))
+            print(
+                "\nThere is no v3 data to import. Export your concept scheme"
+                " from v3 and place it in {}".format(v3_ref_dir)
+            )
             exit()
 
         if len(v3_skos_files) > 0:
             skos_file = v3_skos_files[0]
 
         if len(v3_skos_files) > 1:
-            print("\nOnly one v3 file can be converted. This file will be used" ":\n\n  {}".format(skos_file))
+            print(
+                "\nOnly one v3 file can be converted. This file will be used"
+                ":\n\n  {}".format(skos_file)
+            )
 
         skos_importer = v3SkosConverter(
-            skos_file, name_space=settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, uuid_lookup=uuid_data, verbose=verbose
+            skos_file,
+            name_space=settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT,
+            uuid_lookup=uuid_data,
+            verbose=verbose,
         )
         skos_importer.write_skos(v4_ref_dir)
         skos_importer.write_uuid_lookup(uuid_collection_file)

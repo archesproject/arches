@@ -115,7 +115,9 @@ class ETLManagerView(View):
                 )
             return {"success": True, "data": result}
         else:
-            err = _("Unable to perform this operation because Celery does not appear to be running. Please contact your administrator.")
+            err = _(
+                "Unable to perform this operation because Celery does not appear to be running. Please contact your administrator."
+            )
             return {"success": False, "data": {"title": _("Error"), "message": err}}
 
     def get(self, request):
@@ -127,20 +129,34 @@ class ETLManagerView(View):
         if action == "modules" or action is None:
             response = []
             for module in ETLModule.objects.all():
-                show = False if "show" in module.config.keys() and module.config["show"] is False else True
+                show = (
+                    False
+                    if "show" in module.config.keys() and module.config["show"] is False
+                    else True
+                )
                 if self.request.user.has_perm("view_etlmodule", module) and show:
                     response.append(module)
         elif action == "loadEvent":
             item_per_page = 5
-            all_events = LoadEvent.objects.all().order_by(("-load_start_time")).prefetch_related("user", "etl_module")
+            all_events = (
+                LoadEvent.objects.all()
+                .order_by(("-load_start_time"))
+                .prefetch_related("user", "etl_module")
+            )
             events = Paginator(all_events, item_per_page).page(page).object_list
             total = len(all_events)
-            paginator, pages = get_paginator(request, all_events, total, page, item_per_page)
+            paginator, pages = get_paginator(
+                request, all_events, total, page, item_per_page
+            )
             page = paginator.page(page)
 
             response = {
                 "events": [
-                    {**model_to_dict(event), "user": {**model_to_dict(event.user)}, "etl_module": {**model_to_dict(event.etl_module)}}
+                    {
+                        **model_to_dict(event),
+                        "user": {**model_to_dict(event.user)},
+                        "etl_module": {**model_to_dict(event.etl_module)},
+                    }
                     for event in events
                 ]
             }
@@ -149,8 +165,12 @@ class ETLManagerView(View):
             response["paginator"]["has_next"] = page.has_next()
             response["paginator"]["has_previous"] = page.has_previous()
             response["paginator"]["has_other_pages"] = page.has_other_pages()
-            response["paginator"]["next_page_number"] = page.next_page_number() if page.has_next() else None
-            response["paginator"]["previous_page_number"] = page.previous_page_number() if page.has_previous() else None
+            response["paginator"]["next_page_number"] = (
+                page.next_page_number() if page.has_next() else None
+            )
+            response["paginator"]["previous_page_number"] = (
+                page.previous_page_number() if page.has_previous() else None
+            )
             response["paginator"]["start_index"] = page.start_index()
             response["paginator"]["end_index"] = page.end_index()
             response["paginator"]["pages"] = pages

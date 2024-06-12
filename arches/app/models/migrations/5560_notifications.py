@@ -8,13 +8,21 @@ import uuid
 
 class Migration(migrations.Migration):
 
-    dependencies = [migrations.swappable_dependency(settings.AUTH_USER_MODEL), ("models", "5533_user_tasks")]
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ("models", "5533_user_tasks"),
+    ]
 
     operations = [
         migrations.CreateModel(
             name="Notification",
             fields=[
-                ("id", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("created", models.DateTimeField(auto_now_add=True, editable=True)),
                 ("message", models.TextField(blank=True, null=True)),
             ],

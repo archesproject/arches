@@ -3,13 +3,15 @@ import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { displayedRowKey } from "@/components/ControlledListManager/constants.ts";
-import LetterCircle from "@/components/ControlledListManager/LetterCircle.vue";
-import ListCharacteristic from "@/components/ControlledListManager/ListCharacteristic.vue";
-import ReferenceNodeLink from "@/components/ControlledListManager/ReferenceNodeLink.vue";
+import LetterCircle from "@/components/ControlledListManager/misc/LetterCircle.vue";
+import ListCharacteristic from "@/components/ControlledListManager/editor/ListCharacteristic.vue";
+import ReferenceNodeLink from "@/components/ControlledListManager/editor/ReferenceNodeLink.vue";
 
 import type { DisplayedListRefAndSetter } from "@/types/ControlledListManager";
 
-const { displayedRow: list } = inject(displayedRowKey) as DisplayedListRefAndSetter;
+const { displayedRow: list } = inject(
+    displayedRowKey,
+) as DisplayedListRefAndSetter;
 
 const { $gettext } = useGettext();
 </script>
@@ -47,7 +49,7 @@ const { $gettext } = useGettext();
                     v-if="list.nodes.length === 0"
                     :style="{ fontSize: 'small' }"
                 >
-                    {{ $gettext('None') }}
+                    {{ $gettext("None") }}
                 </div>
             </div>
         </div>

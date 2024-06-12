@@ -7,18 +7,22 @@ import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 
 import { LIGHT_GRAY } from "@/theme.ts";
-import { displayedRowKey, selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
-import ControlledListSplash from "@/components/ControlledListManager/ControlledListSplash.vue";
-import ItemEditor from "@/components/ControlledListManager/ItemEditor.vue";
-import ListCharacteristics from "@/components/ControlledListManager/ListCharacteristics.vue";
-import ListHeader from "@/components/ControlledListManager/ListHeader.vue";
-import ListTree from "@/components/ControlledListManager/ListTree.vue";
+import {
+    displayedRowKey,
+    selectedLanguageKey,
+} from "@/components/ControlledListManager/constants.ts";
+import { dataIsList } from "@/components/ControlledListManager/utils.ts";
+import ControlledListSplash from "@/components/ControlledListManager/misc/ControlledListSplash.vue";
+import ItemEditor from "@/components/ControlledListManager/editor/ItemEditor.vue";
+import ListCharacteristics from "@/components/ControlledListManager/editor/ListCharacteristics.vue";
+import ListHeader from "@/components/ControlledListManager/misc/ListHeader.vue";
+import ListTree from "@/components/ControlledListManager/tree/ListTree.vue";
 
 import type { Ref } from "vue";
-import type { ControlledListItem, Selectable } from "@/types/ControlledListManager";
+import type { Selectable } from "@/types/ControlledListManager";
 import type { Language } from "@/types/arches";
 
-const splash = 'splash';
+const splash = "splash";
 
 const displayedRow: Ref<Selectable | null> = ref(null);
 function setDisplayedRow(val: Selectable | null) {
@@ -27,7 +31,9 @@ function setDisplayedRow(val: Selectable | null) {
 provide(displayedRowKey, { displayedRow, setDisplayedRow });
 
 const selectedLanguage: Ref<Language> = ref(
-    (arches.languages as Language[]).find(lang => lang.code === arches.activeLanguage) as Language
+    (arches.languages as Language[]).find(
+        (lang) => lang.code === arches.activeLanguage,
+    ) as Language,
 );
 provide(selectedLanguageKey, selectedLanguage);
 
@@ -35,7 +41,7 @@ const panel = computed(() => {
     if (!displayedRow.value) {
         return ControlledListSplash;
     }
-    if ((displayedRow.value as ControlledListItem).depth === undefined) {
+    if (dataIsList(displayedRow.value)) {
         return ListCharacteristics;
     }
     return ItemEditor;
@@ -56,7 +62,9 @@ const panel = computed(() => {
                 :size="34"
                 :min-size="25"
                 :pt="{
-                    root: { style: { display: 'flex', flexDirection: 'column' } },
+                    root: {
+                        style: { display: 'flex', flexDirection: 'column' },
+                    },
                 }"
             >
                 <Suspense>
@@ -69,7 +77,11 @@ const panel = computed(() => {
             <SplitterPanel
                 :size="66"
                 :min-size="25"
-                :style="{ margin: '1rem 0rem 4rem 1rem', overflowY: 'auto', paddingRight: '4rem' }"
+                :style="{
+                    margin: '1rem 0rem 4rem 1rem',
+                    overflowY: 'auto',
+                    paddingRight: '4rem',
+                }"
             >
                 <component
                     :is="panel"

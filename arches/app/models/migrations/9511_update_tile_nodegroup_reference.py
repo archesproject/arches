@@ -19,5 +19,5 @@ class Migration(migrations.Migration):
             model_name="tilemodel",
             old_name="nodegroup",
             new_name="nodegroup_id",
-        )
+        ),
     ]

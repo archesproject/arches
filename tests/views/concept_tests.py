@@ -14,6 +14,8 @@ class ConceptTests(ArchesTestCase):
 
         collection_concept_id = "00000000-0000-0000-0000-000000000005"
         with self.assertLogs("django.request", level="WARNING"):
-            response = client.get(reverse("concept", kwargs={"conceptid": collection_concept_id}))
+            response = client.get(
+                reverse("concept", kwargs={"conceptid": collection_concept_id})
+            )
 
         self.assertEqual(response.status_code, 404)

@@ -30,12 +30,17 @@ class BulkDataDeletion(BaseBulkEditor):
             "language_code": settings.LANGUAGE_CODE,
         }
 
-        resourceids_query = "AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
-        tile_deletion_count = """
+        resourceids_query = (
+            "AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
+        )
+        tile_deletion_count = (
+            """
             SELECT COUNT(DISTINCT resourceinstanceid), COUNT(tileid)
             FROM tiles
             WHERE nodegroupid = %(nodegroup_id)s
-        """ + resourceids_query
+        """
+            + resourceids_query
+        )
 
         resource_deletion_count = """
             SELECT g.name ->> %(language_code)s, COUNT(r.resourceinstanceid)
@@ -62,13 +67,13 @@ class BulkDataDeletion(BaseBulkEditor):
             with connection.cursor() as cursor:
                 cursor.execute(search_url_deletion_count, params)
                 rows = cursor.fetchall()
-            number_of_resource = [{"name":i[0], "count":i[1]} for i in rows]
+            number_of_resource = [{"name": i[0], "count": i[1]} for i in rows]
             number_of_tiles = 0
         else:
             with connection.cursor() as cursor:
                 cursor.execute(resource_deletion_count, params)
                 rows = cursor.fetchall()
-            number_of_resource = [{"name":i[0], "count":i[1]} for i in rows]
+            number_of_resource = [{"name": i[0], "count": i[1]} for i in rows]
             number_of_tiles = 0
 
         return number_of_resource, number_of_tiles
@@ -79,22 +84,32 @@ class BulkDataDeletion(BaseBulkEditor):
             "resourceids": resourceids,
         }
 
-        resourceids_query = "AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
-        get_sample_resource_ids = """
+        resourceids_query = (
+            "AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
+        )
+        get_sample_resource_ids = (
+            """
             SELECT DISTINCT resourceinstanceid
             FROM tiles
             WHERE nodegroupid = %(nodegroup_id)s
-        """ + resourceids_query + """
+        """
+            + resourceids_query
+            + """
             LIMIT 5
         """
+        )
 
-        get_sample_tiledata = """
+        get_sample_tiledata = (
+            """
             SELECT tiledata
             FROM tiles
             WHERE nodegroupid = %(nodegroup_id)s
-        """ + resourceids_query + """
+        """
+            + resourceids_query
+            + """
             LIMIT 5
         """
+        )
 
         with connection.cursor() as cursor:
             cursor.execute(get_sample_resource_ids, params)
@@ -103,26 +118,34 @@ class BulkDataDeletion(BaseBulkEditor):
         sample_data = []
         for resourceid in sample_resource_ids:
             resource = Resource.objects.get(pk=resourceid)
-            resource.tiles = list(TileModel.objects.filter(resourceinstance=resourceid).filter(nodegroup_id=nodegroup_id))
+            resource.tiles = list(
+                TileModel.objects.filter(resourceinstance=resourceid).filter(
+                    nodegroup_id=nodegroup_id
+                )
+            )
             lbg = LabelBasedGraphV2.from_resource(
                 resource=resource,
                 compact=True,
                 hide_empty_nodes=True,
-                hide_hidden_nodes=True
+                hide_hidden_nodes=True,
             )
             for data in lbg["resource"].values():
-                if type(data) == dict: # cardinality-1 card
+                if type(data) == dict:  # cardinality-1 card
                     try:
-                        samples = [data["@display_value"]] # 1-node nodegroup
+                        samples = [data["@display_value"]]  # 1-node nodegroup
                     except KeyError:
-                        samples = [{k: v["@display_value"] for k, v in data.items()}] # multi-node nodegroup
-                elif type(data) == list: # cardinality-n card
+                        samples = [
+                            {k: v["@display_value"] for k, v in data.items()}
+                        ]  # multi-node nodegroup
+                elif type(data) == list:  # cardinality-n card
                     samples = []
                     for datum in data:
                         try:
-                            tile_values = datum["@display_value"] # 1-node nodegroup
+                            tile_values = datum["@display_value"]  # 1-node nodegroup
                         except KeyError:
-                            tile_values = {k: v["@display_value"] for k, v in datum.items()} # multi-node nodegroup
+                            tile_values = {
+                                k: v["@display_value"] for k, v in datum.items()
+                            }  # multi-node nodegroup
                         samples.append(tile_values)
                 sample_data.extend(samples)
             if len(sample_data) >= 5:
@@ -130,7 +153,9 @@ class BulkDataDeletion(BaseBulkEditor):
 
         return sample_data[0:5]
 
-    def delete_resources(self, userid, loadid, graphid=None, resourceids=None, verbose=False):
+    def delete_resources(
+        self, userid, loadid, graphid=None, resourceids=None, verbose=False
+    ):
         result = {"success": False}
         deleted_count = 0
         user = User.objects.get(id=userid) if userid else {}
@@ -140,10 +165,12 @@ class BulkDataDeletion(BaseBulkEditor):
             elif graphid:
                 resources = Resource.objects.filter(graph_id=graphid)
             else:
-                result["message"] = _("Unable to bulk delete resources as no graphid or resourceids specified.")
+                result["message"] = _(
+                    "Unable to bulk delete resources as no graphid or resourceids specified."
+                )
                 result["deleted_count"] = 0
                 return result
-            
+
             deleted_count = resources.count()
 
             if verbose is True:
@@ -157,7 +184,9 @@ class BulkDataDeletion(BaseBulkEditor):
                 print(bar)
             result["success"] = True
             result["deleted_count"] = deleted_count
-            result["message"] = _("Successfully deleted {} resources").format(str(deleted_count))
+            result["message"] = _("Successfully deleted {} resources").format(
+                str(deleted_count)
+            )
         except Exception as e:
             logger.exception(e)
             result["message"] = _("Unable to delete resources: {}").format(str(e))
@@ -170,7 +199,9 @@ class BulkDataDeletion(BaseBulkEditor):
 
         try:
             if resourceids:
-                tiles = Tile.objects.filter(nodegroup_id=nodegroupid).filter(resourceinstance_id__in=resourceids)
+                tiles = Tile.objects.filter(nodegroup_id=nodegroupid).filter(
+                    resourceinstance_id__in=resourceids
+                )
             else:
                 tiles = Tile.objects.filter(nodegroup_id=nodegroupid)
             for tile in tiles.iterator(chunk_size=2000):
@@ -191,17 +222,20 @@ class BulkDataDeletion(BaseBulkEditor):
                     """SELECT DISTINCT resourceinstanceid
                         FROM edit_log
                         WHERE transactionid = %s::uuid;
-                    """, [loadid]
+                    """,
+                    [loadid],
                 )
                 rows = cursor.fetchall()
-                resourceids = [ row[0] for row in rows ]
+                resourceids = [row[0] for row in rows]
 
         resource = Resource()
         for resourceid in resourceids:
             resource.delete_index(resourceid)
 
     def index_tile_deletion(self, loadid):
-        index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True)
+        index_resources_by_transaction(
+            loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True
+        )
 
     def preview(self, request):
         graph_id = request.POST.get("graph_id", None)
@@ -217,13 +251,18 @@ class BulkDataDeletion(BaseBulkEditor):
             except ValidationError:
                 return {
                     "success": False,
-                    "data": {"title": _("Invalid Search Url"), "message": _("Please, enter a valid search url")}
+                    "data": {
+                        "title": _("Invalid Search Url"),
+                        "message": _("Please, enter a valid search url"),
+                    },
                 }
         if resourceids:
             resourceids = tuple(resourceids)
 
-        number_of_resource, number_of_tiles = self.get_number_of_deletions(graph_id, nodegroup_id, resourceids)
-        result = { "resource": number_of_resource, "tile": number_of_tiles }
+        number_of_resource, number_of_tiles = self.get_number_of_deletions(
+            graph_id, nodegroup_id, resourceids
+        )
+        result = {"resource": number_of_resource, "tile": number_of_tiles}
 
         if nodegroup_id:
             try:
@@ -232,7 +271,7 @@ class BulkDataDeletion(BaseBulkEditor):
             except Exception as e:
                 logger.exception(e)
 
-        return { "success": True, "data": result }
+        return {"success": True, "data": result}
 
     def delete(self, request):
         graph_id = request.POST.get("graph_id", None)
@@ -252,7 +291,10 @@ class BulkDataDeletion(BaseBulkEditor):
             except ValidationError:
                 return {
                     "success": False,
-                    "data": {"title": _("Invalid Search Url"), "message": _("Please, enter a valid search url")}
+                    "data": {
+                        "title": _("Invalid Search Url"),
+                        "message": _("Please, enter a valid search url"),
+                    },
                 }
 
         use_celery_bulk_delete = True
@@ -269,7 +311,9 @@ class BulkDataDeletion(BaseBulkEditor):
                 if use_celery_bulk_delete:
                     response = self.run_bulk_task_async(request, self.loadid)
                 else:
-                    response = self.run_bulk_task(self.userid, self.loadid, graph_id, nodegroup_id, resourceids)
+                    response = self.run_bulk_task(
+                        self.userid, self.loadid, graph_id, nodegroup_id, resourceids
+                    )
             else:
                 self.log_event(cursor, "failed")
                 return {"success": False, "data": event_created["message"]}
@@ -304,14 +348,19 @@ class BulkDataDeletion(BaseBulkEditor):
         if nodegroup_id:
             deleted = self.delete_tiles(userid, loadid, nodegroup_id, resourceids)
         elif graph_id or resourceids:
-            deleted = self.delete_resources(userid, loadid, graphid=graph_id, resourceids=resourceids)
+            deleted = self.delete_resources(
+                userid, loadid, graphid=graph_id, resourceids=resourceids
+            )
 
         with connection.cursor() as cursor:
             if deleted["success"]:
                 self.log_event(cursor, "completed")
             else:
                 self.log_event(cursor, "failed")
-                return {"success": False, "data": {"title": _("Error"), "message": deleted["message"]}}
+                return {
+                    "success": False,
+                    "data": {"title": _("Error"), "message": deleted["message"]},
+                }
 
             # count the numbers of deleted resource / tiles
             cursor.execute(
@@ -321,13 +370,14 @@ class BulkDataDeletion(BaseBulkEditor):
                     AND e.transactionid = %s::uuid
                     AND e.edittype = 'delete'
                     GROUP BY g.name;
-                """, [loadid]
+                """,
+                [loadid],
             )
             resources = cursor.fetchall()
             number_of_data = {}
             for resource in resources:
                 graph = json.loads(resource[0])[settings.LANGUAGE_CODE]
-                number_of_data.update({ graph: { "total": resource[1] } })
+                number_of_data.update({graph: {"total": resource[1]}})
             cursor.execute(
                 """SELECT g.name, n.name, COUNT(DISTINCT e.tileinstanceid)
                     FROM edit_log e, nodes n, graphs g
@@ -336,16 +386,26 @@ class BulkDataDeletion(BaseBulkEditor):
                     AND e.transactionid = %s::uuid
                     AND e.edittype = 'tile delete'
                     GROUP BY g.name, n.name;
-                """, [loadid]
+                """,
+                [loadid],
             )
             tiles = cursor.fetchall()
             for tile in tiles:
                 graph = json.loads(tile[0])[settings.LANGUAGE_CODE]
-                number_of_data.setdefault(graph, { "total": 0 }).setdefault('tiles', []).append({'tile': tile[1], 'count': tile[2] })
+                number_of_data.setdefault(graph, {"total": 0}).setdefault(
+                    "tiles", []
+                ).append({"tile": tile[1], "count": tile[2]})
 
             number_of_delete = json.dumps(
-                { "number_of_delete":
-                    [{ "name": k, "total": v["total"], "tiles": v.setdefault("tiles", {}) } for k, v in number_of_data.items()]
+                {
+                    "number_of_delete": [
+                        {
+                            "name": k,
+                            "total": v["total"],
+                            "tiles": v.setdefault("tiles", {}),
+                        }
+                        for k, v in number_of_data.items()
+                    ]
                 }
             )
             cursor.execute(
@@ -362,8 +422,16 @@ class BulkDataDeletion(BaseBulkEditor):
             logger.exception(e)
             with connection.cursor() as cursor:
                 self.log_event(cursor, "unindexed")
-            
-            return {"success": False, "data": {"title": _("Indexing Error"), "message": _("The database may need to be reindexed. Please contact your administrator.")}}
+
+            return {
+                "success": False,
+                "data": {
+                    "title": _("Indexing Error"),
+                    "message": _(
+                        "The database may need to be reindexed. Please contact your administrator."
+                    ),
+                },
+            }
 
         with connection.cursor() as cursor:
             cursor.execute(

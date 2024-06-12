@@ -11,10 +11,19 @@ import Textarea from "primevue/textarea";
 import { useToast } from "primevue/usetoast";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
-import { deleteValue, upsertValue } from "@/components/ControlledListManager/api.ts";
-import { ALT_LABEL, NOTE, NOTE_CHOICES, PREF_LABEL, itemKey } from "@/components/ControlledListManager/constants.ts";
+import {
+    deleteValue,
+    upsertValue,
+} from "@/components/ControlledListManager/api.ts";
+import {
+    ALT_LABEL,
+    NOTE,
+    NOTE_CHOICES,
+    PREF_LABEL,
+    itemKey,
+} from "@/components/ControlledListManager/constants.ts";
 import { languageNameFromCode } from "@/components/ControlledListManager/utils.ts";
-import AddValue from "@/components/ControlledListManager/AddValue.vue";
+import AddValue from "@/components/ControlledListManager/editor/AddValue.vue";
 
 import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
@@ -29,57 +38,57 @@ import type {
 const { valueType, valueCategory } = defineProps<{
     valueType?: ValueType;
     valueCategory?: ValueCategory;
-
 }>();
 const editingRows: Ref<Value[]> = ref([]);
 const rowIndexToFocus: Ref<number> = ref(-1);
-const editorRef: Ref<HTMLDivElement | null> = ref(null); 
+const editorRef: Ref<HTMLDivElement | null> = ref(null);
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const toast = useToast();
 const { $gettext } = useGettext();
-const valueHeader = $gettext('Value');
-const languageHeader = $gettext('Language');
-const noteTypeHeader = $gettext('Note type');
+const valueHeader = $gettext("Value");
+const languageHeader = $gettext("Language");
+const noteTypeHeader = $gettext("Note type");
 
 const labeledNoteChoices = [
     {
         type: NOTE_CHOICES.scope,
-        label: $gettext('Scope note'),
+        label: $gettext("Scope note"),
     },
     {
         type: NOTE_CHOICES.definition,
-        label: $gettext('Definition'),
+        label: $gettext("Definition"),
     },
     {
         type: NOTE_CHOICES.example,
-        label: $gettext('Example'),
+        label: $gettext("Example"),
     },
     {
         type: NOTE_CHOICES.history,
-        label: $gettext('History note'),
+        label: $gettext("History note"),
     },
     {
         type: NOTE_CHOICES.editorial,
-        label: $gettext('Editorial note'),
+        label: $gettext("Editorial note"),
     },
     {
         type: NOTE_CHOICES.change,
-        label: $gettext('Change note'),
+        label: $gettext("Change note"),
     },
     {
         type: NOTE_CHOICES.note,
-        label: $gettext('Note'),
+        label: $gettext("Note"),
     },
     {
         type: NOTE_CHOICES.description,
-        label: $gettext('Description'),
+        label: $gettext("Description"),
     },
 ];
 
 const noteChoiceLabel = (valueType: string) => {
-    return labeledNoteChoices.find(choice => choice.type === valueType)!.label;
+    return labeledNoteChoices.find((choice) => choice.type === valueType)!
+        .label;
 };
 
 const headings: Ref<{ heading: string; subheading: string }> = computed(() => {
@@ -88,20 +97,22 @@ const headings: Ref<{ heading: string; subheading: string }> = computed(() => {
             return {
                 heading: $gettext("Preferred Label(s)"),
                 subheading: $gettext(
-                    "Provide at least one preferred label and language for your list item."
+                    "Provide at least one preferred label and language for your list item.",
                 ),
             };
         case ALT_LABEL:
             return {
                 heading: $gettext("Alternate Label(s)"),
                 subheading: $gettext(
-                    "Optionally, you can provide additional labels for your list item. Useful if you want to make searching for labels with synonyms or common misspellings of your preferred label(s) easier."
+                    "Optionally, you can provide additional labels for your list item. Useful if you want to make searching for labels with synonyms or common misspellings of your preferred label(s) easier.",
                 ),
             };
         default:
             return {
                 heading: $gettext("Notes"),
-                subheading: $gettext("Optionally, you can provide notes for your list item."),
+                subheading: $gettext(
+                    "Optionally, you can provide notes for your list item.",
+                ),
             };
     }
 });
@@ -115,12 +126,13 @@ const values = computed(() => {
             // Show everything but labels for now.
             // We're not returning category from the API, and images already excluded.
             return item.value.values.filter(
-                value => ![PREF_LABEL, ALT_LABEL].includes(value.valuetype_id)
+                (value) =>
+                    ![PREF_LABEL, ALT_LABEL].includes(value.valuetype_id),
             );
         }
     }
     return item.value.values.filter(
-        value => value.valuetype_id === valueType
+        (value) => value.valuetype_id === valueType,
     );
 });
 
@@ -128,7 +140,7 @@ const saveValue = async (event: DataTableRowEditInitEvent) => {
     // normalize new value numbers (starting at 1000) to null
     const normalizedNewData: Value = {
         ...event.newData,
-        id: typeof event.newData.id === 'string' ? event.newData.id : null,
+        id: typeof event.newData.id === "string" ? event.newData.id : null,
         value: event.newData.value.trim(),
     };
     const upsertedValue: Value = await upsertValue(
@@ -149,7 +161,7 @@ const saveValue = async (event: DataTableRowEditInitEvent) => {
 };
 
 const issueDeleteValue = async (value: NewValue | Value) => {
-    if (typeof value.id === 'number') {
+    if (typeof value.id === "number") {
         removeItemValue(value);
         return;
     }
@@ -159,15 +171,21 @@ const issueDeleteValue = async (value: NewValue | Value) => {
     }
 };
 
-const appendItemValue = (newValue: Value) => { item.value.values.push(newValue); };
+const appendItemValue = (newValue: Value) => {
+    item.value.values.push(newValue);
+};
 
 const removeItemValue = (removedValue: Value | NewValue) => {
-    const toDelete = item.value.values.findIndex(valueFromItem => valueFromItem.id === removedValue.id);
+    const toDelete = item.value.values.findIndex(
+        (valueFromItem) => valueFromItem.id === removedValue.id,
+    );
     item.value.values.splice(toDelete, 1);
 };
 
 const updateItemValue = (updatedValue: Value) => {
-    const toUpdate = item.value.values.find(valueFromItem => valueFromItem.id === updatedValue.id);
+    const toUpdate = item.value.values.find(
+        (valueFromItem) => valueFromItem.id === updatedValue.id,
+    );
     if (toUpdate) {
         toUpdate.language_id = updatedValue.language_id;
         toUpdate.value = updatedValue.value;
@@ -181,7 +199,7 @@ const setRowFocus = (event: DataTableRowEditInitEvent) => {
 
 const makeValueEditable = (clickedValue: Value, index: number) => {
     if (!editingRows.value.includes(clickedValue)) {
-        editingRows.value = [ ...editingRows.value, clickedValue ];
+        editingRows.value = [...editingRows.value, clickedValue];
     }
     if (index === -1) {
         // Coming from <AddValue>
@@ -237,7 +255,7 @@ const focusInput = () => {
                 v-if="valueCategory"
                 field="valuetype_id"
                 :header="noteTypeHeader"
-                style="width: 20%;"
+                style="width: 20%"
             >
                 <template #editor="{ data, field }">
                     <Dropdown
@@ -247,7 +265,12 @@ const focusInput = () => {
                         option-value="type"
                         :pt="{
                             root: { style: { width: '90%' } },
-                            input: { style: { fontFamily: 'inherit', fontSize: 'small' } },
+                            input: {
+                                style: {
+                                    fontFamily: 'inherit',
+                                    fontSize: 'small',
+                                },
+                            },
                             panel: { style: { fontSize: 'small' } },
                         }"
                     />
@@ -259,7 +282,7 @@ const focusInput = () => {
             <Column
                 field="value"
                 :header="valueHeader"
-                style="width: 60%; min-width: 8rem;"
+                style="width: 60%; min-width: 8rem"
             >
                 <template #editor="{ data, field }">
                     <!-- Textarea for notes, input for labels -->
@@ -269,18 +292,30 @@ const focusInput = () => {
                         rows="3"
                         cols="60"
                         auto-resize
-                        :pt="{ hooks: { onMounted: focusInput, onUpdated: focusInput } }"
+                        :pt="{
+                            hooks: {
+                                onMounted: focusInput,
+                                onUpdated: focusInput,
+                            },
+                        }"
                     />
                     <InputText
                         v-else
                         v-model="data[field]"
-                        :pt="{ hooks: { onMounted: focusInput, onUpdated: focusInput } }"
+                        :pt="{
+                            hooks: {
+                                onMounted: focusInput,
+                                onUpdated: focusInput,
+                            },
+                        }"
                     />
                 </template>
                 <template #body="slotProps">
                     <span
                         class="full-width-pointer"
-                        @click.stop="makeValueEditable(slotProps.data, slotProps.index)"
+                        @click.stop="
+                            makeValueEditable(slotProps.data, slotProps.index)
+                        "
                     >
                         {{ slotProps.data.value }}
                     </span>
@@ -298,20 +333,27 @@ const focusInput = () => {
                         :option-label="(lang) => `${lang.name} (${lang.code})`"
                         option-value="code"
                         :pt="{
-                            input: { style: { fontFamily: 'inherit', fontSize: 'small' } },
+                            input: {
+                                style: {
+                                    fontFamily: 'inherit',
+                                    fontSize: 'small',
+                                },
+                            },
                             panel: { style: { fontSize: 'small' } },
                         }"
                     />
                 </template>
                 <template #body="slotProps">
-                    {{ `${languageNameFromCode(slotProps.data.language_id)} (${slotProps.data.language_id})` }}
+                    {{
+                        `${languageNameFromCode(slotProps.data.language_id)} (${slotProps.data.language_id})`
+                    }}
                 </template>
             </Column>
             <Column
                 :row-editor="true"
-                style="width: 5%; min-width: 8rem; text-align: center;"
+                style="width: 5%; min-width: 6rem; text-align: center"
             />
-            <Column style="width: 5%; text-align: center;">
+            <Column style="width: 5%; text-align: center">
                 <template #body="slotProps">
                     <i
                         class="fa fa-trash"

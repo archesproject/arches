@@ -31,7 +31,10 @@ class ArchesHelpTextFormatter(argparse.HelpFormatter):
     def _split_lines(self, text, width):
         ret = []
         for line in text.splitlines():
-            ret = ret + [line if index == 0 else f"     {line}" for index, line in enumerate(textwrap.wrap(line.strip(), width))]
+            ret = ret + [
+                line if index == 0 else f"     {line}"
+                for index, line in enumerate(textwrap.wrap(line.strip(), width))
+            ]
         return ret
 
 
@@ -61,16 +64,38 @@ class Command(BaseCommand):
             + " = Loads Kibana objects/dashboards provided by .ndjson files into an existing or new space\n",
         )
 
-        parser.add_argument("-n", "--name", action="store", dest="name", default="", help="Name of Kibana space.")
-
         parser.add_argument(
-            "-s", "--source_dir", action="store", dest="source_dir", default="", help="Directory where Kibana .ndjson files are stored."
+            "-n",
+            "--name",
+            action="store",
+            dest="name",
+            default="",
+            help="Name of Kibana space.",
         )
 
-        parser.add_argument("-ow", "--overwrite", action="store_true", dest="overwrite", help="Overwirte existing objects.")
+        parser.add_argument(
+            "-s",
+            "--source_dir",
+            action="store",
+            dest="source_dir",
+            default="",
+            help="Directory where Kibana .ndjson files are stored.",
+        )
 
         parser.add_argument(
-            "-y", "--yes", action="store_true", dest="yes", help='Used to force a yes answer to any user input "continue? y/n" prompt'
+            "-ow",
+            "--overwrite",
+            action="store_true",
+            dest="overwrite",
+            help="Overwirte existing objects.",
+        )
+
+        parser.add_argument(
+            "-y",
+            "--yes",
+            action="store_true",
+            dest="yes",
+            help='Used to force a yes answer to any user input "continue? y/n" prompt',
         )
 
     def handle(self, *args, **options):
@@ -82,7 +107,10 @@ class Command(BaseCommand):
 
         if options["operation"] == "load":
             self.upload_kibana_objects(
-                space_name=options["name"], source=options["source_dir"], overwrite=options["overwrite"], force=options["yes"]
+                space_name=options["name"],
+                source=options["source_dir"],
+                overwrite=options["overwrite"],
+                force=options["yes"],
             )
 
     def setup_kibana_space(self, space_name=""):
@@ -95,11 +123,17 @@ class Command(BaseCommand):
             }
             req = requests.post(url, data=values, headers=self.headers)
             if req.status_code == 200:
-                self.stdout.write(self.style.SUCCESS(f"Space '{name}' successfully created"))
+                self.stdout.write(
+                    self.style.SUCCESS(f"Space '{name}' successfully created")
+                )
             else:
                 self.stdout.write(self.style.ERROR(f"ERROR - {req.json()['message']}"))
         except requests.exceptions.ConnectionError:
-            self.stdout.write(self.style.WARNING(f"Kibana is not running, the Kibana space wasn't created."))
+            self.stdout.write(
+                self.style.WARNING(
+                    f"Kibana is not running, the Kibana space wasn't created."
+                )
+            )
 
     def delete_kibana_space(self, space_name="", force=False):
         try:
@@ -112,15 +146,27 @@ class Command(BaseCommand):
             if force is True or yes_no.upper() == "Y":
                 req = requests.delete(url=url, headers=self.headers)
                 if req.status_code == 204:
-                    self.stdout.write(self.style.SUCCESS(f"Space '{name}' successfully deleted"))
+                    self.stdout.write(
+                        self.style.SUCCESS(f"Space '{name}' successfully deleted")
+                    )
                 elif req.status_code == 404:
-                    self.stdout.write(self.style.ERROR(f"ERROR - space '{name}' not found"))
+                    self.stdout.write(
+                        self.style.ERROR(f"ERROR - space '{name}' not found")
+                    )
                 else:
-                    self.stdout.write(self.style.ERROR(f"ERROR - {req.json()['message']}"))
+                    self.stdout.write(
+                        self.style.ERROR(f"ERROR - {req.json()['message']}")
+                    )
         except requests.exceptions.ConnectionError:
-            self.stdout.write(self.style.WARNING(f"Kibana is not running, the Kibana space wasn't deleted."))
+            self.stdout.write(
+                self.style.WARNING(
+                    f"Kibana is not running, the Kibana space wasn't deleted."
+                )
+            )
 
-    def upload_kibana_objects(self, space_name="", source="", overwrite=False, force=False):
+    def upload_kibana_objects(
+        self, space_name="", source="", overwrite=False, force=False
+    ):
         try:
             name = settings.ELASTICSEARCH_PREFIX if space_name == "" else space_name
 
@@ -130,7 +176,9 @@ class Command(BaseCommand):
                 if force is True:
                     self.setup_kibana_space(space_name=name)
                 else:
-                    yes_no = input(f'The Kibana space name specified "{name}" doesn\'t exist. Do you want to create it? Y/N:  ')
+                    yes_no = input(
+                        f'The Kibana space name specified "{name}" doesn\'t exist. Do you want to create it? Y/N:  '
+                    )
                     if yes_no.upper() == "Y":
                         self.setup_kibana_space(space_name=name)
 
@@ -145,13 +193,17 @@ class Command(BaseCommand):
                     )
                     return
                 else:
-                    index_files = glob.glob(os.path.join("**", "pkg", "kibana_objects", "*.ndjson"))
+                    index_files = glob.glob(
+                        os.path.join("**", "pkg", "kibana_objects", "*.ndjson")
+                    )
             else:
                 if source.endswith(".ndjson"):
                     if os.path.isfile(source):
                         index_files = [source]
                     else:
-                        self.stdout.write(self.style.ERROR(f"Source file not found at: {source}"))
+                        self.stdout.write(
+                            self.style.ERROR(f"Source file not found at: {source}")
+                        )
                 else:
                     index_files = glob.glob(os.path.join(source, "*.ndjson"))
 
@@ -160,25 +212,55 @@ class Command(BaseCommand):
             if len(index_files) > 0:
                 for index_file in index_files:
                     files = {"file": open(index_file, "rb")}
-                    req = requests.post(url, files=files, headers=self.headers, params={"overwrite": str(overwrite).lower()})
+                    req = requests.post(
+                        url,
+                        files=files,
+                        headers=self.headers,
+                        params={"overwrite": str(overwrite).lower()},
+                    )
                     if req.status_code == 200:
                         if req.json()["success"]:
-                            self.stdout.write(self.style.SUCCESS(f"Loaded: {index_file}"))
+                            self.stdout.write(
+                                self.style.SUCCESS(f"Loaded: {index_file}")
+                            )
                         else:
-                            self.stdout.write(self.style.WARNING(f"Errors when loading: {index_file}"))
-                            self.stdout.write(self.style.SUCCESS(f"{req.json()['successCount']} items loaded successfully"))
+                            self.stdout.write(
+                                self.style.WARNING(f"Errors when loading: {index_file}")
+                            )
+                            self.stdout.write(
+                                self.style.SUCCESS(
+                                    f"{req.json()['successCount']} items loaded successfully"
+                                )
+                            )
                             for error in req.json()["errors"]:
-                                name = error["title"] if "title" in error else error["id"]
-                                self.stdout.write(self.style.ERROR(f"{error['error']['type']} - type: {error['type']} - name/id: {name}"))
+                                name = (
+                                    error["title"] if "title" in error else error["id"]
+                                )
+                                self.stdout.write(
+                                    self.style.ERROR(
+                                        f"{error['error']['type']} - type: {error['type']} - name/id: {name}"
+                                    )
+                                )
                     elif req.status_code == 404:
-                        self.stdout.write(self.style.ERROR(f"ERROR - space '{name}' not found"))
+                        self.stdout.write(
+                            self.style.ERROR(f"ERROR - space '{name}' not found")
+                        )
                     else:
-                        self.stdout.write(self.style.ERROR(f"ERROR - {req.json()['message']}"))
+                        self.stdout.write(
+                            self.style.ERROR(f"ERROR - {req.json()['message']}")
+                        )
             else:
                 self.stdout.write(self.style.ERROR(f"No '.ndjson' files found!"))
         except requests.exceptions.ConnectionError:
-            self.stdout.write(self.style.WARNING(f"Kibana is not running, no objects were loaded."))
+            self.stdout.write(
+                self.style.WARNING(f"Kibana is not running, no objects were loaded.")
+            )
             if force is False:
                 yes_no = input(f"Would you like to start Kibana and try again? Y/N:  ")
                 if yes_no.upper() == "Y":
-                    self.upload_kibana_objects(space_name=space_name, source=source, overwrite=overwrite, force=force)
+                    self.upload_kibana_objects(
+                        space_name=space_name,
+                        source=source,
+                        overwrite=overwrite,
+                        force=force,
+                    )

@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10709_refresh_geos_by_transaction"),
+        ("models", "10710_fix_whatisthis"),
     ]
 
     operations = [
@@ -15,7 +15,11 @@ class Migration(migrations.Migration):
             model_name="graphmodel",
             name="source_identifier",
             field=models.ForeignKey(
-                blank=True, db_column="source_identifier", null=True, on_delete=models.deletion.CASCADE, to="models.graphmodel"
+                blank=True,
+                db_column="source_identifier",
+                null=True,
+                on_delete=models.deletion.CASCADE,
+                to="models.graphmodel",
             ),
         ),
         migrations.AddField(
@@ -32,28 +36,44 @@ class Migration(migrations.Migration):
             model_name="cardmodel",
             name="source_identifier",
             field=models.ForeignKey(
-                blank=True, db_column="source_identifier", null=True, on_delete=models.deletion.CASCADE, to="models.cardmodel"
+                blank=True,
+                db_column="source_identifier",
+                null=True,
+                on_delete=models.deletion.CASCADE,
+                to="models.cardmodel",
             ),
         ),
         migrations.AddField(
             model_name="cardxnodexwidget",
             name="source_identifier",
             field=models.ForeignKey(
-                blank=True, db_column="source_identifier", null=True, on_delete=models.deletion.CASCADE, to="models.cardxnodexwidget"
+                blank=True,
+                db_column="source_identifier",
+                null=True,
+                on_delete=models.deletion.CASCADE,
+                to="models.cardxnodexwidget",
             ),
         ),
         migrations.AddField(
             model_name="edge",
             name="source_identifier",
             field=models.ForeignKey(
-                blank=True, db_column="source_identifier", null=True, on_delete=models.deletion.CASCADE, to="models.edge"
+                blank=True,
+                db_column="source_identifier",
+                null=True,
+                on_delete=models.deletion.CASCADE,
+                to="models.edge",
             ),
         ),
         migrations.AddField(
             model_name="node",
             name="source_identifier",
             field=models.ForeignKey(
-                blank=True, db_column="source_identifier", null=True, on_delete=models.deletion.CASCADE, to="models.node"
+                blank=True,
+                db_column="source_identifier",
+                null=True,
+                on_delete=models.deletion.CASCADE,
+                to="models.node",
             ),
         ),
     ]

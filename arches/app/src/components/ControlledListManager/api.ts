@@ -1,7 +1,10 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 
-import { DEFAULT_ERROR_TOAST_LIFE, ERROR } from "@/components/ControlledListManager/constants.ts";
+import {
+    DEFAULT_ERROR_TOAST_LIFE,
+    ERROR,
+} from "@/components/ControlledListManager/constants.ts";
 import { makeSortOrderMap } from "@/components/ControlledListManager/utils.ts";
 
 import type { ToastServiceMethods } from "primevue/toastservice";
@@ -49,7 +52,7 @@ export const fetchLists = async (
     }
 };
 
-export const createList = async(
+export const createList = async (
     name: string,
     toast: ToastServiceMethods,
     $gettext: GetText,
@@ -107,7 +110,7 @@ export const createItem = async (
     }
 };
 
-export const patchItem = async(
+export const patchItem = async (
     item: ControlledListItem,
     toast: ToastServiceMethods,
     $gettext: GetText,
@@ -136,7 +139,6 @@ export const patchItem = async(
         });
     }
 };
-
 
 export const postList = async (
     list: ControlledList,
@@ -167,7 +169,7 @@ export const postList = async (
     }
 };
 
-export const patchList = async(
+export const patchList = async (
     list: ControlledList,
     toast: ToastServiceMethods,
     $gettext: GetText,
@@ -217,16 +219,16 @@ export const deleteLists = async (
         fetch(arches.urls.controlled_list(id), {
             method: "DELETE",
             headers: { "X-CSRFToken": getToken() },
-        })
+        }),
     );
 
+    let anyDeleted = false;
     try {
         const responses = await Promise.all(promises);
-        if (responses.some((resp) => resp.ok)) {
-            return true;
-        }
         responses.forEach(async (response) => {
-            if (!response.ok) {
+            if (response.ok) {
+                anyDeleted = true;
+            } else {
                 const body = await response.json();
                 toast.add({
                     severity: ERROR,
@@ -243,6 +245,9 @@ export const deleteLists = async (
             summary: $gettext("List deletion failed"),
         });
     }
+    if (anyDeleted) {
+        return true;
+    }
 };
 
 export const deleteItems = async (
@@ -254,16 +259,19 @@ export const deleteItems = async (
         fetch(arches.urls.controlled_list_item(id), {
             method: "DELETE",
             headers: { "X-CSRFToken": getToken() },
-        })
+        }),
     );
 
+    let anyDeleted = false;
     try {
         const responses = await Promise.all(promises);
         if (responses.some((resp) => resp.ok)) {
             return true;
         }
         responses.forEach(async (response) => {
-            if (!response.ok) {
+            if (response.ok) {
+                anyDeleted = true;
+            } else {
                 const body = await response.json();
                 toast.add({
                     severity: ERROR,
@@ -279,6 +287,9 @@ export const deleteItems = async (
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Item deletion failed"),
         });
+    }
+    if (anyDeleted) {
+        return true;
     }
 };
 
@@ -327,7 +338,7 @@ export const deleteValue = async (
             {
                 method: "DELETE",
                 headers: { "X-CSRFToken": getToken() },
-            }
+            },
         );
         if (response.ok) {
             return true;
@@ -390,7 +401,7 @@ export const deleteMetadata = async (
             {
                 method: "DELETE",
                 headers: { "X-CSRFToken": getToken() },
-            }
+            },
         );
         if (response.ok) {
             return true;
@@ -408,7 +419,7 @@ export const deleteMetadata = async (
     }
 };
 
-export const deleteImage = async(
+export const deleteImage = async (
     image: ControlledListItemImage,
     toast: ToastServiceMethods,
     $gettext: GetText,
@@ -421,7 +432,7 @@ export const deleteImage = async(
             {
                 method: "DELETE",
                 headers: { "X-CSRFToken": getToken() },
-            }
+            },
         );
         if (response.ok) {
             return true;

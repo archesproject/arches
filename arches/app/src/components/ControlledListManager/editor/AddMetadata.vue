@@ -25,17 +25,19 @@ const item = inject(itemKey) as Ref<ControlledListItem>;
 const { $gettext } = useGettext();
 
 const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
-    const otherNewMetadataIds = image.metadata.filter(
-        (metadatum) => typeof metadatum.id === "number"
-    ).map(metadatum => metadatum.id as number);
+    const otherNewMetadataIds = image.metadata
+        .filter((metadatum) => typeof metadatum.id === "number")
+        .map((metadatum) => metadatum.id as number);
 
     const maxOtherNewMetadataId = Math.max(...otherNewMetadataIds, 0);
 
-    const nextMetadataType = labeledChoices.find(
-        choice => !image.metadata.map(
-            (metadatum) => metadatum.metadata_type
-        ).includes(choice.type)
-    ) ?? labeledChoices[0];
+    const nextMetadataType =
+        labeledChoices.find(
+            (choice) =>
+                !image.metadata
+                    .map((metadatum) => metadatum.metadata_type)
+                    .includes(choice.type),
+        ) ?? labeledChoices[0];
 
     return {
         id: maxOtherNewMetadataId + 1,
@@ -43,14 +45,14 @@ const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
         metadata_label: nextMetadataType.label,
         language_id: arches.activeLanguage,
         controlled_list_item_image_id: image.id,
-        value: '',
+        value: "",
     };
 });
 
 const addMetadata = () => {
-    item.value.images.find(
-        imageFromItem => imageFromItem.id === image.id
-    )!.metadata.push(newMetadata.value);
+    item.value.images
+        .find((imageFromItem) => imageFromItem.id === image.id)!
+        .metadata.push(newMetadata.value);
 };
 </script>
 

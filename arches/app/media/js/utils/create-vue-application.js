@@ -7,10 +7,25 @@ import StyleClass from 'primevue/styleclass';
 import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
 
+import Aura from 'primevue/themes/aura';
+
 import { createApp } from 'vue';
 import { createGettext } from "vue3-gettext";
 
-export default async function createVueApplication(vueComponent){
+import arches from 'arches';
+
+const DEFAULT_THEME = {
+    theme: {
+        preset: Aura,
+        options: {
+            prefix: 'p',
+            darkModeSelector: 'system',
+            cssLayer: false
+        }
+    }
+};
+
+export default async function createVueApplication(vueComponent, themeConfiguration) {
     /**
      * This wrapper allows us to maintain a level of control inside arches-core
      * over Vue apps. For instance this allows us to abstract i18n setup/config
@@ -18,18 +33,18 @@ export default async function createVueApplication(vueComponent){
      * we'd like to use across the Arches ecosystem will be available. This also
      * Vue apps more easily extensible if we choose to add plugins or logic in
      * the future.
-     **/ 
+    **/
 
     /**
      * TODO: cbyrd #10501 - we should add an event listener that will re-fetch i18n data
      * and rebuild the app when a specific event is fired from the LanguageSwitcher component.
-    **/ 
-    return fetch('/api/get_frontend_i18n_data').then(resp => {
+    **/
+    return fetch(arches.urls.api_get_frontend_i18n_data).then(function(resp) {
         if (!resp.ok) {
             throw new Error(resp.statusText);
         }
         return resp.json();
-    }).then(respJSON => {
+    }).then(function(respJSON) {
         const gettext = createGettext({
             availableLanguages: respJSON['enabled_languages'],
             defaultLanguage: respJSON['language'],
@@ -37,7 +52,8 @@ export default async function createVueApplication(vueComponent){
         });
 
         const app = createApp(vueComponent);
-        app.use(PrimeVue);
+
+        app.use(PrimeVue, themeConfiguration || DEFAULT_THEME);
         app.use(gettext);
         app.use(ConfirmationService);
         app.use(DialogService);

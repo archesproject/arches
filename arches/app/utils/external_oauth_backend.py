@@ -23,14 +23,28 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
                 return None
 
             oauth2_settings = ExternalOauthAuthenticationBackend.get_oauth2_settings()
-            validate_id_token = oauth2_settings["validate_id_token"] if "validate_id_token" in oauth2_settings else True
+            validate_id_token = (
+                oauth2_settings["validate_id_token"]
+                if "validate_id_token" in oauth2_settings
+                else True
+            )
             uid_claim = oauth2_settings["uid_claim"]
             client_id = oauth2_settings["app_id"]
             app_secret = oauth2_settings["app_secret"]
-            redirect_uri = request.build_absolute_uri(reverse("external_oauth_callback"))
-            uid_claim_source = oauth2_settings["uid_claim_source"] if "uid_claim_source" in oauth2_settings else "id_token"
+            redirect_uri = request.build_absolute_uri(
+                reverse("external_oauth_callback")
+            )
+            uid_claim_source = (
+                oauth2_settings["uid_claim_source"]
+                if "uid_claim_source" in oauth2_settings
+                else "id_token"
+            )
 
-            oauth = OAuth2Session(client_id, redirect_uri=redirect_uri, state=request.session["oauth_state"])
+            oauth = OAuth2Session(
+                client_id,
+                redirect_uri=redirect_uri,
+                state=request.session["oauth_state"],
+            )
             try:
                 token_response = oauth.fetch_token(
                     oauth2_settings["token_endpoint"],
@@ -45,18 +59,30 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
             expires_in = token_response["expires_in"]
             id_token = token_response["id_token"]
             access_token = token_response["access_token"]
-            refresh_token = token_response["refresh_token"] if "refresh_token" in token_response else None
+            refresh_token = (
+                token_response["refresh_token"]
+                if "refresh_token" in token_response
+                else None
+            )
 
             if uid_claim_source == "id_token" and id_token is not None:
                 if validate_id_token:
                     alg = jwt.get_unverified_header(id_token)["alg"]
                     jwks_client = PyJWKClient(oauth2_settings["jwks_uri"])
                     signing_key = jwks_client.get_signing_key_from_jwt(id_token)
-                    decoded_id_token = jwt.decode(id_token, signing_key.key, audience=client_id, algorithms=[alg])
+                    decoded_id_token = jwt.decode(
+                        id_token, signing_key.key, audience=client_id, algorithms=[alg]
+                    )
                 else:
-                    decoded_id_token = jwt.decode(id_token, options={"verify_signature": False})
+                    decoded_id_token = jwt.decode(
+                        id_token, options={"verify_signature": False}
+                    )
 
-                username = decoded_id_token[uid_claim] if decoded_id_token and uid_claim in decoded_id_token else None
+                username = (
+                    decoded_id_token[uid_claim]
+                    if decoded_id_token and uid_claim in decoded_id_token
+                    else None
+                )
             else:  # this can be extended to pull user claims from the oidc user endpoint if desired
                 username = None
 
@@ -67,13 +93,38 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
 
             # default_user_groups are used to assign groups to users that don't yet exist.
             if user is None and "default_user_groups" in oauth2_settings:
-                email = decoded_id_token["email"] if "email" in decoded_id_token else None
-                given_name = decoded_id_token["given_name"] if "given_name" in decoded_id_token else ""
-                family_name = decoded_id_token["family_name"] if "family_name" in decoded_id_token else ""
-                is_superuser = True if "create_as_superuser" in oauth2_settings and oauth2_settings["create_as_superuser"] else False
-                is_staff = True if "create_as_staff" in oauth2_settings and oauth2_settings["create_as_staff"] else False
+                email = (
+                    decoded_id_token["email"] if "email" in decoded_id_token else None
+                )
+                given_name = (
+                    decoded_id_token["given_name"]
+                    if "given_name" in decoded_id_token
+                    else ""
+                )
+                family_name = (
+                    decoded_id_token["family_name"]
+                    if "family_name" in decoded_id_token
+                    else ""
+                )
+                is_superuser = (
+                    True
+                    if "create_as_superuser" in oauth2_settings
+                    and oauth2_settings["create_as_superuser"]
+                    else False
+                )
+                is_staff = (
+                    True
+                    if "create_as_staff" in oauth2_settings
+                    and oauth2_settings["create_as_staff"]
+                    else False
+                )
                 user = User.objects.create_user(
-                    username, email=email, first_name=given_name, last_name=family_name, is_staff=is_staff, is_superuser=is_superuser
+                    username,
+                    email=email,
+                    first_name=given_name,
+                    last_name=family_name,
+                    is_staff=is_staff,
+                    is_superuser=is_superuser,
                 )
                 for group in oauth2_settings["default_user_groups"]:
                     django_group = Group.objects.get(name=group)
@@ -128,10 +179,15 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
 
     @receiver(user_logged_in)
     def login(sender, user, request, **kwargs):
-        if user.backend == "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend":
+        if (
+            user.backend
+            == "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend"
+        ):
             try:
                 token = ExternalOauthAuthenticationBackend.get_token(user)
-                request.session.set_expiry((token.access_token_expiration - datetime.now()).total_seconds())
+                request.session.set_expiry(
+                    (token.access_token_expiration - datetime.now()).total_seconds()
+                )
             except ExternalOauthToken.DoesNotExist:
                 pass
 
@@ -143,7 +199,9 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
         except ExternalOauthToken.DoesNotExist:
             return None
 
-    def get_token_for_username(username: str) -> Tuple[ExternalOauthToken, User] or None:
+    def get_token_for_username(
+        username: str,
+    ) -> Tuple[ExternalOauthToken, User] or None:
         """Get the token record (and user) for a particular username"""
         try:
             user = User.objects.get(username=username)
@@ -161,8 +219,12 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
                 response_json = r.json()
                 oauth_settings["jwks_uri"] = response_json["jwks_uri"]
                 oauth_settings["token_endpoint"] = response_json["token_endpoint"]
-                oauth_settings["authorization_endpoint"] = response_json["authorization_endpoint"]
-                oauth_settings["end_session_endpoint"] = response_json["end_session_endpoint"]
+                oauth_settings["authorization_endpoint"] = response_json[
+                    "authorization_endpoint"
+                ]
+                oauth_settings["end_session_endpoint"] = response_json[
+                    "end_session_endpoint"
+                ]
                 return oauth_settings
             except Exception as e:
                 logger = logging.getLogger(__name__)
