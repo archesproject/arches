@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '10541_controlled_list_manager'),
+        ("models", "10541_controlled_list_manager"),
     ]
 
     operations = [
@@ -12,6 +12,7 @@ class Migration(migrations.Migration):
             """
             create or replace function __arches_migrate_collections_to_clm(
                 collection_names text[] default null, -- one or more collections to be migrated to controlled lists
+                host text default 'http://localhost:8000/plugins/controlled-list-manager/item/',
 	            overwrite boolean default FALSE,
                 preferred_sort_language text default 'en'
             )
@@ -20,7 +21,12 @@ class Migration(migrations.Migration):
             begin
                 -- RDM Collections to Controlled Lists & List Items Migration --
                 -- To use, run: 
-                --      select * from __arches_migrate_collections_to_clm(ARRAY['Getty AAT', 'http://vocab.getty.edu/aat'], True, 'en');
+                --      select * from __arches_migrate_collections_to_clm(
+                --          ARRAY['Getty AAT', 'http://vocab.getty.edu/aat'],
+                --          'http://localhost:8000/plugins/controlled-list-manager/item/',
+                --          True,
+                --          'en'
+                --       );
                 -- where the input array values are concept prefLabels or identifiers and the optional language is used for sorting
 
                 -- Conceptually:
@@ -182,7 +188,7 @@ class Migration(migrations.Migration):
                     parent_id
                 )
                 select id,
-                    null as uri, -- TODO: dynamic handling of URI generation/ETL
+                    host || id as uri,
                     sortorder,
                     false as guide,
                     listid,
@@ -217,7 +223,7 @@ class Migration(migrations.Migration):
             end;
             $$ language plpgsql volatile;
             """,
-                """
+            """
                 drop function if exists __arches_migrate_collections_to_clm cascade;
             """,
         )
