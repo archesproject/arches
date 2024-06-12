@@ -140,35 +140,6 @@ export const patchItem = async (
     }
 };
 
-export const postList = async (
-    list: ControlledList,
-    toast: ToastServiceMethods,
-    $gettext: GetText,
-) => {
-    let error;
-    let response;
-    try {
-        response = await fetch(arches.urls.controlled_list(list.id), {
-            method: "POST",
-            headers: { "X-CSRFToken": getToken() },
-            body: JSON.stringify(list),
-        });
-        if (response.ok) {
-            return await response.json();
-        } else {
-            error = await response.json();
-            throw new Error();
-        }
-    } catch {
-        toast.add({
-            severity: ERROR,
-            life: 8000,
-            summary: $gettext("Save failed"),
-            detail: error?.message || response?.statusText,
-        });
-    }
-};
-
 export const patchList = async (
     list: ControlledList,
     toast: ToastServiceMethods,
