@@ -4,6 +4,7 @@ import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
+import ProgressSpinner from "primevue/progressspinner";
 import { useToast } from "primevue/usetoast";
 
 import {
@@ -68,6 +69,7 @@ const { setDisplayedRow } = inject(
     displayedRowKey,
 ) as DisplayedListItemRefAndSetter;
 
+const awaitingMove = ref(false);
 // Workaround for autofocusing the new list/label input boxes
 // https://github.com/primefaces/primevue/issues/2397
 const newListInputRef = ref();
@@ -127,11 +129,13 @@ const setParent = async (parentNode: TreeNode) => {
         item.parent_id = parentNode.key;
     }
 
+    awaitingMove.value = true;
     const succeded = await postItem(item, toast, $gettext);
     if (succeded) {
         movingItem.value = {};
         refetcher.value += 1;
     }
+    awaitingMove.value = false;
 };
 
 const isNewList = (node: TreeNode) => {
@@ -236,9 +240,13 @@ const acceptNewListShortcutEntry = async () => {
             v-if="movingItem.key"
             class="actions"
         >
+            <ProgressSpinner
+                v-if="awaitingMove"
+                style="height: 2rem"
+            />
             <!-- turn off escaping: vue template sanitizes -->
             <Button
-                v-if="showMoveHereButton(node.key)"
+                v-else-if="showMoveHereButton(node.key)"
                 type="button"
                 raised
                 class="move-button"
