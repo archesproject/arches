@@ -298,7 +298,7 @@ class ControlledListView(View):
                     node=node.name,
                 )
             )
-            for node in list_to_delete.nodes_using_list()
+            for node in list_to_delete.find_nodes_using_list()
         ]
         if errors:
             return JSONErrorResponse(

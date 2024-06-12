@@ -2280,7 +2280,7 @@ class ControlledList(models.Model):
 
         ControlledListItem.objects.bulk_update(reordered_items, fields=["sortorder"])
 
-    def nodes_using_list(self):
+    def find_nodes_using_list(self):
         return Node.with_controlled_list.filter(controlled_list=self.pk)
 
 
