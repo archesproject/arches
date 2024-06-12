@@ -1185,7 +1185,7 @@ class SearchComponent(models.Model):
     componentname = models.TextField(unique=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
     enabled = models.BooleanField(default=False)
-    config = models.JSONField(default={"requiredComponents": []})
+    config = models.JSONField(default=dict)
 
     def __str__(self):
         return self.name
