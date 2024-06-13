@@ -28,7 +28,7 @@ from arches.app.utils.string_utils import str_to_bool
 logger = logging.getLogger(__name__)
 
 
-def prefetch_terms(request):
+def _prefetch_terms(request):
     """Children at arbitrary depth will still be returned, but tell
     the ORM to prefetch a certain depth to mitigate N+1 queries after."""
     find_children = not str_to_bool(request.GET.get("flat", "false"))
@@ -75,7 +75,7 @@ class ControlledListsView(View):
                 graph_names="graph__name",
             )
             .order_by("name")
-            .prefetch_related(*prefetch_terms(request))
+            .prefetch_related(*_prefetch_terms(request))
         )
 
         flat = str_to_bool(request.GET.get("flat", "false"))
@@ -97,9 +97,9 @@ class ControlledListView(View):
         """Returns either a flat representation (?flat=true) or a tree (default)."""
         list_id = kwargs.get("id")
         try:
-            lst = ControlledList.objects.prefetch_related(*prefetch_terms(request)).get(
-                pk=list_id
-            )
+            lst = ControlledList.objects.prefetch_related(
+                *_prefetch_terms(request)
+            ).get(pk=list_id)
         except ControlledList.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
