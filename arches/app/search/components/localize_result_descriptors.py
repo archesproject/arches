@@ -13,14 +13,7 @@ details = {
     "componentname": "localize-descriptors",
     "sortorder": "0",
     "enabled": True,
-    "config": {
-        "requiredComponents": [
-            {
-                "componentname": "core-search",
-                "searchcomponentid": "69695d63-6f03-4536-8da9-841b07116381",
-            }
-        ]
-    },
+    "config": {"requiredComponents": []},
 }
 
 
