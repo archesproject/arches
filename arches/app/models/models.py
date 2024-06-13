@@ -2192,6 +2192,9 @@ class ControlledList(models.Model):
     class Meta:
         db_table = "controlled_lists"
 
+    def __str__(self):
+        return str(self.name)
+
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)
         if (not exclude or "name" not in exclude) and not self.name:
@@ -2270,7 +2273,8 @@ class ControlledList(models.Model):
         for item_id, sortorder in sortorder_map.items():
             item = ControlledListItem(pk=uuid.UUID(item_id), sortorder=sortorder)
             if item_id in parent_map:
-                item.parent_id = parent_map[item_id]
+                new_parent = parent_map[item_id]
+                item.parent_id = uuid.UUID(new_parent) if new_parent else None
             item.controlled_list_id = self.pk
             item.clean_fields(exclude=exclude_fields)
             reordered_items.append(item)
@@ -2436,6 +2440,7 @@ class ControlledListItemValue(models.Model):
         }
 
     def delete(self):
+        msg = _("Deleting the item's only remaining preferred label is not permitted.")
         if (
             self.valuetype_id == "prefLabel"
             and len(
@@ -2445,11 +2450,8 @@ class ControlledListItemValue(models.Model):
             )
             < 2
         ):
-            raise ValidationError(
-                _(
-                    "Deleting the item's only remaining preferred label is not permitted."
-                )
-            )
+            raise ValidationError(msg)
+
         return super().delete()
 
 

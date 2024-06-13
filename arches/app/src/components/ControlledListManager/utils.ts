@@ -86,7 +86,7 @@ export const makeParentMap = (list: ControlledList) => {
 
     const stripAllButParentRecursive = (
         items: ControlledListItem[],
-        acc: { [key: string]: string },
+        acc: { [key: string]: string | null },
     ) => {
         for (const item of items) {
             acc[item.id] = item.parent_id;

@@ -121,7 +121,7 @@ const setParent = async (parentNode: TreeNode) => {
     let list: ControlledList;
     let siblings: ControlledListItem[];
     if (nodeIsList(parentNode)) {
-        item.parent_id = "";
+        item.parent_id = null;
         item.controlled_list_id = parentNode.key;
         list = parentNode.data;
         siblings = list.items;
