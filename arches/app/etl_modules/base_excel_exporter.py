@@ -20,10 +20,16 @@ class BaseExcelExporter:
     def get_node_lookup_by_id(self, nodes):
         lookup = {}
         for node in nodes:
-            lookup[str(node.nodeid)] = {"alias": str(node.alias), "datatype": node.datatype, "config": node.config}
+            lookup[str(node.nodeid)] = {
+                "alias": str(node.alias),
+                "datatype": node.datatype,
+                "config": node.config,
+            }
         return lookup
 
-    def get_files_in_zip_file(self, files, graph_name, wb, user_generated_filename=None):
+    def get_files_in_zip_file(
+        self, files, graph_name, wb, user_generated_filename=None
+    ):
         file_ids = [file["file_id"] for file in files]
         file_objects = list(File.objects.filter(pk__in=file_ids))
         for file in files:
@@ -35,20 +41,26 @@ class BaseExcelExporter:
         files_not_found = []
         size_limit = 104857600  # 100MByte
         for file in files:
-            if not file['file'].storage.exists(file['file'].name):
-                files_not_found.append({
-                    "name": file["name"],
-                    "url": settings.MEDIA_URL + file['file'].name,
-                    "fileid": file["file_id"]
-                })
+            if not file["file"].storage.exists(file["file"].name):
+                files_not_found.append(
+                    {
+                        "name": file["name"],
+                        "url": settings.MEDIA_URL + file["file"].name,
+                        "fileid": file["file_id"],
+                    }
+                )
             elif file["file"].size >= size_limit:
-                skipped_files.append({
-                    "name": file["name"],
-                    "url": settings.MEDIA_URL + file['file'].name,
-                    "fileid": file["file_id"]
-                })
+                skipped_files.append(
+                    {
+                        "name": file["name"],
+                        "url": settings.MEDIA_URL + file["file"].name,
+                        "fileid": file["file_id"],
+                    }
+                )
             else:
-                download_files.append({"name": file["name"], "downloadfile": file["file"]})
+                download_files.append(
+                    {"name": file["name"], "downloadfile": file["file"]}
+                )
 
         buffer = BytesIO()
         excel_file_name = "{}_export.xlsx".format(graph_name.replace(" ", "_"))
@@ -57,9 +69,9 @@ class BaseExcelExporter:
                 f["downloadfile"].seek(0)
                 zip.writestr(f["name"], f["downloadfile"].read())
 
-            with NamedTemporaryFile(suffix='.xlsx', delete=False) as tmp_excel_file:
+            with NamedTemporaryFile(suffix=".xlsx", delete=False) as tmp_excel_file:
                 wb.save(tmp_excel_file.name)
-                with open(tmp_excel_file.name, 'rb') as excel_file:
+                with open(tmp_excel_file.name, "rb") as excel_file:
                     zip.writestr(excel_file_name, excel_file.read())
 
         os.unlink(tmp_excel_file.name)
@@ -70,9 +82,13 @@ class BaseExcelExporter:
         f = BytesIO(zip_stream)
 
         if user_generated_filename:
-            name = "{user_generated_filename}.zip".format(user_generated_filename=user_generated_filename)
+            name = "{user_generated_filename}.zip".format(
+                user_generated_filename=user_generated_filename
+            )
         else:
-            name = "{0}-{1}.zip".format(graph_name.replace(" ", "_"), datetime.now().isoformat())
+            name = "{0}-{1}.zip".format(
+                graph_name.replace(" ", "_"), datetime.now().isoformat()
+            )
 
         download = DjangoFile(f)
         zip_file = TempFile()
@@ -93,13 +109,27 @@ class BaseExcelExporter:
         with connection.cursor() as cursor:
             cursor.execute(
                 """INSERT INTO load_event (loadid, complete, status, load_details, etl_module_id, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, False, "validated", json.dumps({"graph": graph_name}), self.moduleid, datetime.now(), self.userid),
+                (
+                    self.loadid,
+                    False,
+                    "validated",
+                    json.dumps({"graph": graph_name}),
+                    self.moduleid,
+                    datetime.now(),
+                    self.userid,
+                ),
             )
 
         if use_celery:
             response = self.run_load_task_async(request, self.loadid)
         else:
-            response = self.run_export_task(self.loadid, graph_id, graph_name, resource_ids, export_concepts_as=export_concepts_as)
+            response = self.run_export_task(
+                self.loadid,
+                graph_id,
+                graph_name,
+                resource_ids,
+                export_concepts_as=export_concepts_as,
+            )
 
         return response
 
@@ -107,6 +137,7 @@ class BaseExcelExporter:
     def run_load_task_async(self, request, load_id, *args, **kwargs):
         pass
 
-
-    def run_export_task(self, load_id, graph_id, graph_name, resource_ids, *args, **kwargs):
+    def run_export_task(
+        self, load_id, graph_id, graph_name, resource_ids, *args, **kwargs
+    ):
         pass

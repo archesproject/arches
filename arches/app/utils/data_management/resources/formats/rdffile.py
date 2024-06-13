@@ -33,7 +33,10 @@ def fetch(url):
 
 
 def use_cache(url):
-    if docCache[url]["expires"] is not None and docCache[url]["expires"] < datetime.datetime.now():
+    if (
+        docCache[url]["expires"] is not None
+        and docCache[url]["expires"] < datetime.datetime.now()
+    ):
         return False
     else:
         return True
@@ -47,7 +50,9 @@ def load_document_and_cache(url, cache=None):
     doc = {"expires": None, "contextUrl": None, "documentUrl": None, "document": ""}
     data = fetch(url)
     doc["document"] = data
-    doc["expires"] = datetime.datetime.now() + datetime.timedelta(minutes=settings.JSONLD_CONTEXT_CACHE_TIMEOUT)
+    doc["expires"] = datetime.datetime.now() + datetime.timedelta(
+        minutes=settings.JSONLD_CONTEXT_CACHE_TIMEOUT
+    )
     docCache[url] = doc
     return doc
 
@@ -62,7 +67,9 @@ class RdfWriter(Writer):
         super(RdfWriter, self).__init__(**kwargs)
 
     def write_resources(self, graph_id=None, resourceinstanceids=None, **kwargs):
-        super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
+        super(RdfWriter, self).write_resources(
+            graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs
+        )
 
         dest = StringIO()
         g = self.get_rdf_graph()
@@ -73,8 +80,14 @@ class RdfWriter(Writer):
 
     def get_rdf_graph(self):
         archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
-        graph_uri = URIRef(archesproject[reverse("graph", args=[self.graph_id]).lstrip("/")])
-        self.logger.debug("Using `{0}` for Arches URI namespace".format(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT))
+        graph_uri = URIRef(
+            archesproject[reverse("graph", args=[self.graph_id]).lstrip("/")]
+        )
+        self.logger.debug(
+            "Using `{0}` for Arches URI namespace".format(
+                settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT
+            )
+        )
         self.logger.debug("Using `{0}` for Graph URI".format(graph_uri))
 
         g = Graph()
@@ -104,7 +117,9 @@ class RdfWriter(Writer):
                 graph = models.GraphModel.objects.get(pk=graphid)
                 nodegroups = set()
                 for node in graph.node_set.all():
-                    graph_cache[graphid]["nodedatatypes"][str(node.nodeid)] = node.datatype
+                    graph_cache[graphid]["nodedatatypes"][
+                        str(node.nodeid)
+                    ] = node.datatype
                     if node.nodegroup:
                         nodegroups.add(node.nodegroup)
                     if node.istopnode:
@@ -112,13 +127,23 @@ class RdfWriter(Writer):
                             if edge.rangenode.nodegroup is None:
                                 graph_cache[graphid]["rootedges"].append(edge)
                 for nodegroup in nodegroups:
-                    graph_cache[graphid]["subgraphs"][nodegroup] = {"edges": [], "inedge": None, "parentnode_nodegroup": None}
-                    graph_cache[graphid]["subgraphs"][nodegroup]["inedge"] = models.Edge.objects.get(rangenode_id=nodegroup.pk)
-                    graph_cache[graphid]["subgraphs"][nodegroup]["parentnode_nodegroup"] = graph_cache[graphid]["subgraphs"][nodegroup][
+                    graph_cache[graphid]["subgraphs"][nodegroup] = {
+                        "edges": [],
+                        "inedge": None,
+                        "parentnode_nodegroup": None,
+                    }
+                    graph_cache[graphid]["subgraphs"][nodegroup]["inedge"] = (
+                        models.Edge.objects.get(rangenode_id=nodegroup.pk)
+                    )
+                    graph_cache[graphid]["subgraphs"][nodegroup][
+                        "parentnode_nodegroup"
+                    ] = graph_cache[graphid]["subgraphs"][nodegroup][
                         "inedge"
                     ].domainnode.nodegroup
-                    graph_cache[graphid]["subgraphs"][nodegroup]["edges"] = get_nodegroup_edges_by_collector_node(
-                        models.Node.objects.get(pk=nodegroup.pk)
+                    graph_cache[graphid]["subgraphs"][nodegroup]["edges"] = (
+                        get_nodegroup_edges_by_collector_node(
+                            models.Node.objects.get(pk=nodegroup.pk)
+                        )
                     )
 
             return graph_cache[graphid]
@@ -138,7 +163,10 @@ class RdfWriter(Writer):
                 pkg["range_tile_data"] = tile.data[str(edge.rangenode_id)]
             if str(edge.domainnode_id) in tile.data:
                 pkg["domain_tile_data"] = tile.data[str(edge.domainnode_id)]
-            elif tile.parenttile is not None and str(edge.domainnode_id) in tile.parenttile.data:
+            elif (
+                tile.parenttile is not None
+                and str(edge.domainnode_id) in tile.parenttile.data
+            ):
                 pkg["domain_tile_data"] = tile.parenttile.data[str(edge.domainnode_id)]
 
             rng_dt = self.datatype_factory.get_instance(pkg["r_datatype"])
@@ -149,11 +177,15 @@ class RdfWriter(Writer):
             # Nothing to do here
             if pkg["r_uri"] is None and pkg["range_tile_data"] is None:
                 return
-            
-            # JSON-LD fails assert if domain node empty while range node has data. 
+
+            # JSON-LD fails assert if domain node empty while range node has data.
             # Unknown!=Undefined, but reasonable substitution to omit edge from null domain.
             if pkg["d_uri"] is None and pkg["range_tile_data"]:
-                self.logger.warning(_("Unable to return range value because domain is None, re https://github.com/archesproject/arches/pull/9783/files"))
+                self.logger.warning(
+                    _(
+                        "Unable to return range value because domain is None, re https://github.com/archesproject/arches/pull/9783/files"
+                    )
+                )
                 return
 
             # FIXME:  Why is this not in datatype.to_rdf()
@@ -163,7 +195,9 @@ class RdfWriter(Writer):
                 for duri in pkg["d_uri"]:
                     graph.add((duri, RDF.type, URIRef(edge.domainnode.ontologyclass)))
             else:
-                graph.add((pkg["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
+                graph.add(
+                    (pkg["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass))
+                )
 
             # Use the range node's datatype.to_rdf() method to generate an RDF representation of it
             # and add its triples to the core graph
@@ -206,27 +240,46 @@ class RdfWriter(Writer):
             for tile in tiles:
                 # add all the edges for a given tile/nodegroup
                 for edge in graph_info["subgraphs"][tile.nodegroup]["edges"]:
-                    domainnode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.domainnode.pk))]
-                    rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
+                    domainnode = archesproject[
+                        "tile/%s/node/%s" % (str(tile.pk), str(edge.domainnode.pk))
+                    ]
+                    rangenode = archesproject[
+                        "tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))
+                    ]
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile, graph_info)
 
                 # add the edge from the parent node to this tile's root node
                 # where the tile has no parent tile, which means the domain node has no tile_id
-                if graph_info["subgraphs"][tile.nodegroup]["parentnode_nodegroup"] is None:
+                if (
+                    graph_info["subgraphs"][tile.nodegroup]["parentnode_nodegroup"]
+                    is None
+                ):
                     edge = graph_info["subgraphs"][tile.nodegroup]["inedge"]
                     if edge.domainnode.istopnode:
-                        domainnode = archesproject[reverse("resources", args=[resourceinstanceid]).lstrip("/")]
+                        domainnode = archesproject[
+                            reverse("resources", args=[resourceinstanceid]).lstrip("/")
+                        ]
                     else:
                         domainnode = archesproject[str(edge.domainnode.pk)]
-                    rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
+                    rangenode = archesproject[
+                        "tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))
+                    ]
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile, graph_info)
 
                 # add the edge from the parent node to this tile's root node
                 # where the tile has a parent tile
-                if graph_info["subgraphs"][tile.nodegroup]["parentnode_nodegroup"] is not None:
+                if (
+                    graph_info["subgraphs"][tile.nodegroup]["parentnode_nodegroup"]
+                    is not None
+                ):
                     edge = graph_info["subgraphs"][tile.nodegroup]["inedge"]
-                    domainnode = archesproject["tile/%s/node/%s" % (str(tile.parenttile.pk), str(edge.domainnode.pk))]
-                    rangenode = archesproject["tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))]
+                    domainnode = archesproject[
+                        "tile/%s/node/%s"
+                        % (str(tile.parenttile.pk), str(edge.domainnode.pk))
+                    ]
+                    rangenode = archesproject[
+                        "tile/%s/node/%s" % (str(tile.pk), str(edge.rangenode.pk))
+                    ]
                     add_edge_to_graph(g, domainnode, rangenode, edge, tile, graph_info)
         return g
 
@@ -234,19 +287,29 @@ class RdfWriter(Writer):
 class JsonLdWriter(RdfWriter):
     def build_json(self, graph_id=None, resourceinstanceids=None, **kwargs):
         # Build the JSON separately serializing it, so we can use internally
-        super(RdfWriter, self).write_resources(graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs)
+        super(RdfWriter, self).write_resources(
+            graph_id=graph_id, resourceinstanceids=resourceinstanceids, **kwargs
+        )
         g = self.get_rdf_graph()
         value = g.serialize(format="nquads").decode("utf-8")
 
         js = from_rdf(value, {"format": "application/nquads", "useNativeTypes": True})
 
-        assert len(resourceinstanceids) == 1  # currently, this should be limited to a single top resource
+        assert (
+            len(resourceinstanceids) == 1
+        )  # currently, this should be limited to a single top resource
 
         archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
-        resource_inst_uri = archesproject[reverse("resources", args=[resourceinstanceids[0]]).lstrip("/")]
+        resource_inst_uri = archesproject[
+            reverse("resources", args=[resourceinstanceids[0]]).lstrip("/")
+        ]
 
         context = self.graph_model.jsonldcontext
-        framing = {"@omitDefault": True, "@omitGraph": False, "@id": str(resource_inst_uri)}
+        framing = {
+            "@omitDefault": True,
+            "@omitGraph": False,
+            "@id": str(resource_inst_uri),
+        }
 
         if context:
             framing["@context"] = context
@@ -266,7 +329,7 @@ class JsonLdWriter(RdfWriter):
         # simulate omitGraph:
         if "@graph" in js and len(js["@graph"]) == 1:
             # merge up
-            for (k, v) in list(js["@graph"][0].items()):
+            for k, v in list(js["@graph"][0].items()):
                 js[k] = v
             del js["@graph"]
         return js
@@ -301,7 +364,12 @@ class JsonLdReader(Reader):
         cdata = Concept().get_child_collections(collection, columns="conceptidto")
         ids = [str(x[0]) for x in cdata]
         for c in cdata:
-            cids = [x.value for x in models.Value.objects.all().filter(concept_id__exact=c[0], valuetype__category="identifiers")]
+            cids = [
+                x.value
+                for x in models.Value.objects.all().filter(
+                    concept_id__exact=c[0], valuetype__category="identifiers"
+                )
+            ]
             ids.extend(cids)
         if value.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT):
             value = value.rsplit("/", 1)[-1]
@@ -317,7 +385,9 @@ class JsonLdReader(Reader):
                 root_node = node
             node["datatype"] = self.datatype_factory.get_instance(n.datatype)
             node["datatype_type"] = n.datatype
-            node["parent_nodegroup"] = str(n.nodegroup.parentnodegroup_id) if n.nodegroup is not None else None
+            node["parent_nodegroup"] = (
+                str(n.nodegroup.parentnodegroup_id) if n.nodegroup is not None else None
+            )
             node["extra_class"] = []
             if node["datatype"].references_resource_type():
                 if "graphs" in n.config and n.config["graphs"]:
@@ -329,7 +399,9 @@ class JsonLdReader(Reader):
                 node["config"]["collection_id"] = str(n.config["rdmCollection"])
             elif n.config and "graphs" in n.config:
                 for entry in n.config["graphs"]:
-                    entry["rootclass"] = self.root_ontologyclass_lookup[entry["graphid"]]
+                    entry["rootclass"] = self.root_ontologyclass_lookup[
+                        entry["graphid"]
+                    ]
                 node["config"]["graphs"] = n.config["graphs"]
             node["required"] = n.isrequired
             node["node_id"] = str(n.nodeid)
@@ -365,7 +437,11 @@ class JsonLdReader(Reader):
 
     def get_resource_id(self, value):
         # Allow local URI or urn:uuid:UUID
-        match = re.match(r".*?%sresources/(?P<resourceid>%s)" % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX), value)
+        match = re.match(
+            r".*?%sresources/(?P<resourceid>%s)"
+            % (settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT, settings.UUID_REGEX),
+            value,
+        )
         if match:
             return match.group("resourceid")
         else:
@@ -373,10 +449,14 @@ class JsonLdReader(Reader):
             if match:
                 return match.groups()[0]
             else:
-                self.logger.debug("Valid resourceid not found within `{0}`".format(value))
+                self.logger.debug(
+                    "Valid resourceid not found within `{0}`".format(value)
+                )
         return None
 
-    def read_resource(self, data, use_ids=False, resourceid=None, graphid=None, expand_data=True):
+    def read_resource(
+        self, data, use_ids=False, resourceid=None, graphid=None, expand_data=True
+    ):
         if graphid is None and self.graphtree is None:
             raise Exception("No graphid supplied to read_resource")
         elif self.graphtree is None:
@@ -404,7 +484,9 @@ class JsonLdReader(Reader):
             self.shouldSortTiles = False
 
         for jsonld_document in data:
-            if expand_data:  # this should always be true, we set this to false just for some unit tests
+            if (
+                expand_data
+            ):  # this should always be true, we set this to false just for some unit tests
                 jsonld_document = expand(jsonld_document)[0]
 
             # Possibly bail very early
@@ -414,11 +496,19 @@ class JsonLdReader(Reader):
             if self.use_ids:
                 resourceinstanceid = self.get_resource_id(jsonld_document["@id"])
                 if resourceinstanceid is None:
-                    self.logger.error("The @id of the resource was not supplied, was null or URI was not correctly formatted")
-                    raise Exception("The @id of the resource was not supplied, was null or URI was not correctly formatted")
-                self.logger.debug("Using resource instance ID found: {0}".format(resourceinstanceid))
+                    self.logger.error(
+                        "The @id of the resource was not supplied, was null or URI was not correctly formatted"
+                    )
+                    raise Exception(
+                        "The @id of the resource was not supplied, was null or URI was not correctly formatted"
+                    )
+                self.logger.debug(
+                    "Using resource instance ID found: {0}".format(resourceinstanceid)
+                )
             else:
-                self.logger.debug("`use_ids` setting is set to False, ignoring @id from the data if any")
+                self.logger.debug(
+                    "`use_ids` setting is set to False, ignoring @id from the data if any"
+                )
 
             self.resource = Resource()
             if resourceid is not None:
@@ -499,7 +589,9 @@ class JsonLdReader(Reader):
                         )
 
             except Exception as e:
-                err_msg_fail = f"FAILED to completely load resource with id: {self.resource.pk}\n"
+                err_msg_fail = (
+                    f"FAILED to completely load resource with id: {self.resource.pk}\n"
+                )
                 self.logger.debug(err_msg_fail)
                 print(err_msg_fail)
                 if self.verbosity > 1:
@@ -513,7 +605,10 @@ class JsonLdReader(Reader):
                     raise
 
     def is_semantic_node(self, graph_node):
-        return self.datatype_factory.datatypes[graph_node["datatype_type"]].defaultwidget is None
+        return (
+            self.datatype_factory.datatypes[graph_node["datatype_type"]].defaultwidget
+            is None
+        )
 
     def is_concept_node(self, uri):
         pcs = settings.PREFERRED_CONCEPT_SCHEMES[:]
@@ -525,7 +620,11 @@ class JsonLdReader(Reader):
 
     def build_reference_cache(self, jsonld_document):
         if "@id" in jsonld_document and "@type" in jsonld_document:
-            dataType = jsonld_document["@type"][0] if isinstance(jsonld_document["@type"], list) else jsonld_document["@type"]
+            dataType = (
+                jsonld_document["@type"][0]
+                if isinstance(jsonld_document["@type"], list)
+                else jsonld_document["@type"]
+            )
             self.idcache[jsonld_document["@id"]] = dataType
         for key, value in jsonld_document.items():
             if key in ["@id", "@type"]:
@@ -558,7 +657,9 @@ class JsonLdReader(Reader):
 
     def find_matching_branch(self, k, v, tree_node, result, tile=None, indent=0):
         branch = None
-        self.printline("Walk down non-literal branches in the data", indent, newline=True)
+        self.printline(
+            "Walk down non-literal branches in the data", indent, newline=True
+        )
         self.printline(f"---" * 20, indent)
         # self.printline(tree_node["name"], indent)
         # self.printline(f"tile={tile}", indent)
@@ -575,7 +676,8 @@ class JsonLdReader(Reader):
             }
             for vi in v
             if "@value" in vi
-            and vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal") == "http://www.w3.org/2000/01/rdf-schema#Literal"
+            and vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal")
+            == "http://www.w3.org/2000/01/rdf-schema#Literal"
         ]
 
         # always a list
@@ -607,7 +709,9 @@ class JsonLdReader(Reader):
                             clss = self.get_cached_reference(uri)
                             vi["@type"] = clss
                         except:
-                            raise ValueError(f"Multiple possible branches and no @type given: {vi}")
+                            raise ValueError(
+                                f"Multiple possible branches and no @type given: {vi}"
+                            )
 
                 value = None
                 is_literal = False
@@ -625,9 +729,13 @@ class JsonLdReader(Reader):
                 # model has xsd:string, default is rdfs:Literal
                 key = f"{k} http://www.w3.org/2001/XMLSchema#string"
                 if not key in tree_node["children"]:
-                    raise ValueError(f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}")
+                    raise ValueError(
+                        f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}"
+                    )
             elif not key in tree_node["children"]:
-                raise ValueError(f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}")
+                raise ValueError(
+                    f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}"
+                )
 
             # if we made it this far then it means that we've found at least 1 match
             # options is a list of potential matches in the graph tree
@@ -635,12 +743,23 @@ class JsonLdReader(Reader):
             options = tree_node["children"][key]
             possible = []
 
-            self.printline(f"Trying to match data value:  '{value or uri}'", indent, newline=True)
+            self.printline(
+                f"Trying to match data value:  '{value or uri}'", indent, newline=True
+            )
             self.printline(f"That has type:  '{k}'", indent)
             for o in options:
-                self.printline(f"Considering match to graph node: '{o['name']}'", indent + 1, newline=True)
-                self.printline(f"New Nodegroup = {o['nodegroup_id'] == o['node_id']}", indent + 1)
-                self.printline(f"Parent tile id = {result['tile'].tileid if 'tile' in result else None}", indent + 1)
+                self.printline(
+                    f"Considering match to graph node: '{o['name']}'",
+                    indent + 1,
+                    newline=True,
+                )
+                self.printline(
+                    f"New Nodegroup = {o['nodegroup_id'] == o['node_id']}", indent + 1
+                )
+                self.printline(
+                    f"Parent tile id = {result['tile'].tileid if 'tile' in result else None}",
+                    indent + 1,
+                )
 
                 if is_literal and o["datatype"].is_a_literal_in_rdf():
                     # import each value separately if there are no languages in the values and this is card n string
@@ -648,15 +767,24 @@ class JsonLdReader(Reader):
                         if len(o["datatype"].validate_from_rdf(values)) == 0:
                             possible.append([o, values])
                         else:
-                            self.printline(f"Could not validate {values} as a {o['datatype']}", indent + 1)
+                            self.printline(
+                                f"Could not validate {values} as a {o['datatype']}",
+                                indent + 1,
+                            )
                     else:
                         if len(o["datatype"].validate_from_rdf(value)) == 0:
                             possible.append([o, value])
                         else:
-                            self.printline(f"Could not validate {value} as a {o['datatype']}", indent + 1)
+                            self.printline(
+                                f"Could not validate {value} as a {o['datatype']}",
+                                indent + 1,
+                            )
                 elif not is_literal and not o["datatype"].is_a_literal_in_rdf():
                     if self.is_concept_node(uri):
-                        self.printline("This is a concept node, so we'll test if the incoming data can fit here", indent + 1)
+                        self.printline(
+                            "This is a concept node, so we'll test if the incoming data can fit here",
+                            indent + 1,
+                        )
                         collid = o["config"]["collection_id"]
                         try:
                             if self.validate_concept_in_collection(uri, collid):
@@ -668,7 +796,10 @@ class JsonLdReader(Reader):
                                     indent + 1,
                                 )
                         except:
-                            self.printline(f"Errored testing concept {uri} in collection {collid}", indent + 1)
+                            self.printline(
+                                f"Errored testing concept {uri} in collection {collid}",
+                                indent + 1,
+                            )
                     elif o["datatype"].accepts_rdf_uri(uri):
                         # self.printline(f"datatype for {o['name']} accepts uri", indent+1)
                         possible.append([o, uri])
@@ -685,7 +816,9 @@ class JsonLdReader(Reader):
 
             if not possible:
                 # self.printline(f"Tried: {options}")
-                raise ValueError(f"Data does not match any actual node, despite prop/class combination {k} {clss}:\n{vi}")
+                raise ValueError(
+                    f"Data does not match any actual node, despite prop/class combination {k} {clss}:\n{vi}"
+                )
             elif len(possible) > 1:
                 # descend into data to check if there are further clarifying features
                 possible2 = []
@@ -695,13 +828,17 @@ class JsonLdReader(Reader):
                         self.printline("Found multiple matches!", indent)
                         # if this doesn't throw an error then keep the possible branch "p"
                         for k, v in vi.items():
-                            matched_branch = self.find_matching_branch(k, v, p[0], {}, tile, indent + 1)
+                            matched_branch = self.find_matching_branch(
+                                k, v, p[0], {}, tile, indent + 1
+                            )
                         possible2.append(p)
                     except Exception as e:
                         self.printline(f"Failed due to {e}", indent + 1)
                         pass
                 if not possible2:
-                    raise ValueError("Considering branches, data does not match any node, despite a prop/class combination")
+                    raise ValueError(
+                        "Considering branches, data does not match any node, despite a prop/class combination"
+                    )
                 else:
                     branch = possible2
             else:
@@ -714,7 +851,11 @@ class JsonLdReader(Reader):
 
         # pre-seed as much of the cache as we can during the data-walk
         if "@id" in data_node and "@type" in data_node:
-            dataType = data_node["@type"][0] if isinstance(data_node["@type"], list) else data_node["@type"]
+            dataType = (
+                data_node["@type"][0]
+                if isinstance(data_node["@type"], list)
+                else data_node["@type"]
+            )
             self.idcache[data_node["@id"]] = dataType
 
         for k, v in data_node.items():
@@ -730,22 +871,30 @@ class JsonLdReader(Reader):
             values = [
                 {
                     "value": vi["@value"],
-                    "clss": vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal"),
+                    "clss": vi.get(
+                        "@type", "http://www.w3.org/2000/01/rdf-schema#Literal"
+                    ),
                     "language": vi.get("@language", None),
                 }
                 for vi in v
                 if "@value" in vi
-                and vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal") == "http://www.w3.org/2000/01/rdf-schema#Literal"
+                and vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal")
+                == "http://www.w3.org/2000/01/rdf-schema#Literal"
             ]
 
             # always a list
             for vi in v:
                 if id(vi) not in self.jsonld_doc_node_to_tile_lookup:
-                    self.jsonld_doc_node_to_tile_lookup[id(vi)] = {"vi": vi, "tiles": []}
+                    self.jsonld_doc_node_to_tile_lookup[id(vi)] = {
+                        "vi": vi,
+                        "tiles": [],
+                    }
                 if "@value" in vi:
                     value = vi["@value"]
                     uri = None
-                    clss = vi.get("@type", "http://www.w3.org/2000/01/rdf-schema#Literal")
+                    clss = vi.get(
+                        "@type", "http://www.w3.org/2000/01/rdf-schema#Literal"
+                    )
                     is_literal = True
                 else:
                     # We're an entity
@@ -769,14 +918,21 @@ class JsonLdReader(Reader):
                                 clss = self.get_cached_reference(uri)
                                 vi["@type"] = clss
                             except:
-                                raise ValueError(f"Multiple possible branches and no @type given: {vi}")
+                                raise ValueError(
+                                    f"Multiple possible branches and no @type given: {vi}"
+                                )
 
                     value = None
                     is_literal = False
 
-                branches = self.find_matching_branch(k, [vi], tree_node, result, None, indent=0)
+                branches = self.find_matching_branch(
+                    k, [vi], tree_node, result, None, indent=0
+                )
 
-                if k == "http://www.w3.org/2000/01/rdf-schema#label" and branches is None:
+                if (
+                    k == "http://www.w3.org/2000/01/rdf-schema#label"
+                    and branches is None
+                ):
                     continue
 
                 x = result.copy()
@@ -799,41 +955,66 @@ class JsonLdReader(Reader):
                                 if len(gs) == 1:
                                     # just select it
                                     if "ontologyProperty" in gs[0]:
-                                        node_value[0]["ontologyProperty"] = gs[0]["ontologyProperty"]
+                                        node_value[0]["ontologyProperty"] = gs[0][
+                                            "ontologyProperty"
+                                        ]
                                     if "inverseOntologyProperty" in gs[0]:
-                                        node_value[0]["inverseOntologyProperty"] = gs[0]["inverseOntologyProperty"]
+                                        node_value[0]["inverseOntologyProperty"] = gs[
+                                            0
+                                        ]["inverseOntologyProperty"]
                                 else:
                                     for g in gs:
                                         # Now test current node's class against graph's class
                                         # This isn't a guarantee, but close enough
                                         if vi["@type"][0] == g["rootclass"]:
                                             if "ontologyProperty" in g:
-                                                node_value[0]["ontologyProperty"] = g["ontologyProperty"]
+                                                node_value[0]["ontologyProperty"] = g[
+                                                    "ontologyProperty"
+                                                ]
                                             if "inverseOntologyProperty" in g:
-                                                node_value[0]["inverseOntologyProperty"] = g["inverseOntologyProperty"]
+                                                node_value[0][
+                                                    "inverseOntologyProperty"
+                                                ] = g["inverseOntologyProperty"]
                                             break
                     else:
                         # Might get checked in a cardinality n branch that shouldn't be repeated
                         node_value = None
 
-                    self.printline(f"A matching branch has been found and the value can be saved.", indent + 1)
+                    self.printline(
+                        f"A matching branch has been found and the value can be saved.",
+                        indent + 1,
+                    )
 
                     # We know now that it can go into the branch
                     # Determine if we can collapse the data into a -list or not
                     bnodeid = branch[0]["node_id"]
 
                     # This is going to be the result passed down if we recurse
-                    bnode = {"data": [], "nodegroup_id": branch[0]["nodegroup_id"], "cardinality": branch[0]["cardinality"]}
+                    bnode = {
+                        "data": [],
+                        "nodegroup_id": branch[0]["nodegroup_id"],
+                        "cardinality": branch[0]["cardinality"],
+                    }
 
-                    if branch[0]["datatype"].collects_multiple_values() and tile and str(tile.nodegroup.pk) == branch[0]["nodegroup_id"]:
+                    if (
+                        branch[0]["datatype"].collects_multiple_values()
+                        and tile
+                        and str(tile.nodegroup.pk) == branch[0]["nodegroup_id"]
+                    ):
                         # iterating through a root node *-list type
                         pass
                     elif bnodeid == branch[0]["nodegroup_id"] and not (
-                        branch[0]["datatype"].is_multilingual_rdf(values) and bnodeid in result
+                        branch[0]["datatype"].is_multilingual_rdf(values)
+                        and bnodeid in result
                     ):
                         # Used to pick the previous tile in loop which MIGHT be the parent (but might not)
-                        parenttile_id = result["tile"].tileid if "tile" in result else None
-                        if parenttile_id == None and branch[0]["parent_nodegroup"] != "None":
+                        parenttile_id = (
+                            result["tile"].tileid if "tile" in result else None
+                        )
+                        if (
+                            parenttile_id == None
+                            and branch[0]["parent_nodegroup"] != "None"
+                        ):
                             continue
                         tile = Tile(
                             tileid=uuid.uuid4(),
@@ -844,7 +1025,9 @@ class JsonLdReader(Reader):
                         )
                         self.resource.tiles.append(tile)
                         my_tiles.append(tile)
-                        self.jsonld_doc_node_to_tile_lookup[id(vi)]["tiles"].append(tile)
+                        self.jsonld_doc_node_to_tile_lookup[id(vi)]["tiles"].append(
+                            tile
+                        )
                     elif "tile" in result and result["tile"]:
                         tile = result["tile"]
 
@@ -870,11 +1053,16 @@ class JsonLdReader(Reader):
                                 bnode["tile"].data[bnodeid].extend(node_value)
                         elif branch[0]["cardinality"] != "n":
                             bnode = result[bnodeid][0]
-                            if bnodeid in bnode["tile"].data and node_value == bnode["tile"].data[bnodeid]:
+                            if (
+                                bnodeid in bnode["tile"].data
+                                and node_value == bnode["tile"].data[bnodeid]
+                            ):
                                 # No-op, attempt to readd same value
                                 pass
                             else:
-                                raise ValueError(f"Attempt to add a value to cardinality 1, non-list node {k} {clss}:\n {vi}")
+                                raise ValueError(
+                                    f"Attempt to add a value to cardinality 1, non-list node {k} {clss}:\n {vi}"
+                                )
                         else:
                             bnode["data"].append(branch[1])
                             if not self.is_semantic_node(branch[0]):
@@ -900,7 +1088,7 @@ class JsonLdReader(Reader):
                         tile_ng_hash[t.nodegroup_id].append(t)
                     except KeyError:
                         tile_ng_hash[t.nodegroup_id] = [t]
-                for (k, v) in tile_ng_hash.items():
+                for k, v in tile_ng_hash.items():
                     if len(v) > 1:
                         for func in sortfuncs:
                             v.sort(key=func)

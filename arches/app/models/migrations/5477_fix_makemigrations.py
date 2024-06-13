@@ -9,13 +9,17 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '5407_remove_tileserver_configs'),
+        ("models", "5407_remove_tileserver_configs"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='mobilesurveymodel',
-            name='datadownloadconfig',
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=arches.app.models.models.getDataDownloadConfigDefaults, null=True),
+            model_name="mobilesurveymodel",
+            name="datadownloadconfig",
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                blank=True,
+                default=arches.app.models.models.getDataDownloadConfigDefaults,
+                null=True,
+            ),
         ),
     ]

@@ -367,7 +367,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="ETLModule",
             fields=[
-                ("etlmoduleid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "etlmoduleid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("name", models.TextField()),
                 ("description", models.TextField(blank=True, null=True)),
                 ("etl_type", models.TextField()),
@@ -375,7 +380,12 @@ class Migration(migrations.Migration):
                 ("componentname", models.TextField()),
                 ("modulename", models.TextField(blank=True, null=True)),
                 ("classname", models.TextField(blank=True, null=True)),
-                ("config", django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column="config", null=True)),
+                (
+                    "config",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        blank=True, db_column="config", null=True
+                    ),
+                ),
                 ("icon", models.TextField()),
                 (
                     "slug",
@@ -412,17 +422,39 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="LoadEvent",
             fields=[
-                ("loadid", models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
+                (
+                    "loadid",
+                    models.UUIDField(
+                        default=uuid.uuid4, primary_key=True, serialize=False
+                    ),
+                ),
                 ("complete", models.BooleanField(default=False)),
                 ("successful", models.BooleanField(blank=True, null=True)),
                 ("status", models.TextField(blank=True, null=True)),
-                ("etl_module", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="models.ETLModule")),
+                (
+                    "etl_module",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="models.ETLModule",
+                    ),
+                ),
                 ("load_description", models.TextField(blank=True, null=True)),
-                ("load_details", django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True)),
+                (
+                    "load_details",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        blank=True, null=True
+                    ),
+                ),
                 ("error_message", models.TextField(blank=True, null=True)),
                 ("load_start_time", models.DateTimeField(blank=True, null=True)),
                 ("load_end_time", models.DateTimeField(blank=True, null=True)),
-                ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
                 "db_table": "load_event",
@@ -432,23 +464,50 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="LoadStaging",
             fields=[
-                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("value", django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column="value", null=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "value",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        blank=True, db_column="value", null=True
+                    ),
+                ),
                 ("legacyid", models.TextField(blank=True, null=True)),
-                ("resourceid", models.UUIDField(blank=True, null=True, serialize=False)),
+                (
+                    "resourceid",
+                    models.UUIDField(blank=True, null=True, serialize=False),
+                ),
                 ("tileid", models.UUIDField(blank=True, null=True, serialize=False)),
-                ("parenttileid", models.UUIDField(blank=True, null=True, serialize=False)),
+                (
+                    "parenttileid",
+                    models.UUIDField(blank=True, null=True, serialize=False),
+                ),
                 ("passes_validation", models.BooleanField(blank=True, null=True)),
                 ("nodegroup_depth", models.IntegerField(default=1)),
                 ("source_description", models.TextField(blank=True, null=True)),
                 ("error_message", models.TextField(blank=True, null=True)),
                 (
                     "load_event",
-                    models.ForeignKey(db_column="loadid", on_delete=django.db.models.deletion.CASCADE, to="models.LoadEvent"),
+                    models.ForeignKey(
+                        db_column="loadid",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="models.LoadEvent",
+                    ),
                 ),
                 (
                     "nodegroup",
-                    models.ForeignKey(db_column="nodegroupid", on_delete=django.db.models.deletion.CASCADE, to="models.NodeGroup"),
+                    models.ForeignKey(
+                        db_column="nodegroupid",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="models.NodeGroup",
+                    ),
                 ),
             ],
             options={
@@ -456,8 +515,16 @@ class Migration(migrations.Migration):
                 "managed": True,
             },
         ),
-        migrations.RunSQL(add_validation_reporting_functions, remove_validation_reporting_functions),
-        migrations.RunSQL(add_functions_to_get_nodegroup_tree, remove_functions_to_get_nodegroup_tree),
-        migrations.RunSQL(add_staging_to_tile_function, remove_staging_to_tile_function),
-        migrations.RunSQL(add_check_excess_tiles_trigger, remove_check_excess_tiles_trigger),
+        migrations.RunSQL(
+            add_validation_reporting_functions, remove_validation_reporting_functions
+        ),
+        migrations.RunSQL(
+            add_functions_to_get_nodegroup_tree, remove_functions_to_get_nodegroup_tree
+        ),
+        migrations.RunSQL(
+            add_staging_to_tile_function, remove_staging_to_tile_function
+        ),
+        migrations.RunSQL(
+            add_check_excess_tiles_trigger, remove_check_excess_tiles_trigger
+        ),
     ]

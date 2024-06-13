@@ -27,10 +27,18 @@ def check_if_celery_available():
                         time.sleep(0.10)
                         logger.error(_("Celery worker connection failed. Reattempting"))
                         if i == 3:
-                            logger.error(_("Failed to connect to celery due to a BrokenPipeError/ConnectionResetError"))
+                            logger.error(
+                                _(
+                                    "Failed to connect to celery due to a BrokenPipeError/ConnectionResetError"
+                                )
+                            )
                             logger.exception(e)
                 if ping_result is None:
-                    logger.error(_("A celery broker is running, but a celery worker is not available"))
+                    logger.error(
+                        _(
+                            "A celery broker is running, but a celery worker is not available"
+                        )
+                    )
                 else:
                     result = True
         except Exception as e:
