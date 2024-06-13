@@ -348,15 +348,19 @@ class ResourceTests(ArchesTestCase):
         """
         Test provisional user can delete resource instance they created
         """
-    
-        user = User.objects.create_user(username="sam", email="sam@samsclub.com", password="Test12345!")
+
+        user = User.objects.create_user(
+            username="sam", email="sam@samsclub.com", password="Test12345!"
+        )
         user.save()
         group = Group.objects.get(name="Resource Editor")
         group.user_set.add(user)
         test_resource = Resource(graph_id=self.search_model_graphid)
         test_resource.save(user=user)
 
-        other_user = User.objects.create_user(username="fred", email="fred@samsclub.com", password="Test12345!")
+        other_user = User.objects.create_user(
+            username="fred", email="fred@samsclub.com", password="Test12345!"
+        )
         other_user.save()
         group = Group.objects.get(name="Resource Editor")
         group.user_set.add(other_user)

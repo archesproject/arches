@@ -641,9 +641,18 @@ class Resource(models.ResourceInstance):
             user_is_reviewer = user_is_resource_reviewer(user)
             if user_is_reviewer is False:
                 tiles = list(models.TileModel.objects.filter(resourceinstance=self))
-                resource_is_provisional = True if sum([len(t.data) for t in tiles]) == 0 or [any(t.data.values()) for t in tiles][0] == False else False
+                resource_is_provisional = (
+                    True
+                    if sum([len(t.data) for t in tiles]) == 0
+                    or [any(t.data.values()) for t in tiles][0] == False
+                    else False
+                )
                 if resource_is_provisional is True:
-                    creator_id = int(EditLog.objects.filter(resourceinstanceid=self.pk, edittype='create').values_list('userid')[0][0])
+                    creator_id = int(
+                        EditLog.objects.filter(
+                            resourceinstanceid=self.pk, edittype="create"
+                        ).values_list("userid")[0][0]
+                    )
                     if creator_id == user.id:
                         permit_deletion = True
             else:
