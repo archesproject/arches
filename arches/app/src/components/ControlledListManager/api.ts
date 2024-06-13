@@ -5,7 +5,10 @@ import {
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
 } from "@/components/ControlledListManager/constants.ts";
-import { makeSortOrderMap } from "@/components/ControlledListManager/utils.ts";
+import {
+    makeParentMap,
+    makeSortOrderMap,
+} from "@/components/ControlledListManager/utils.ts";
 
 import type { ToastServiceMethods } from "primevue/toastservice";
 import type {
@@ -110,35 +113,6 @@ export const createItem = async (
     }
 };
 
-export const postItem = async (
-    item: ControlledListItem,
-    toast: ToastServiceMethods,
-    $gettext: GetText,
-) => {
-    let error;
-    let response;
-    try {
-        response = await fetch(arches.urls.controlled_list_item(item.id), {
-            method: "POST",
-            headers: { "X-CSRFToken": getToken() },
-            body: JSON.stringify(item),
-        });
-        if (response.ok) {
-            return true;
-        } else {
-            error = await response.json();
-            throw new Error();
-        }
-    } catch {
-        toast.add({
-            severity: ERROR,
-            life: DEFAULT_ERROR_TOAST_LIFE,
-            summary: $gettext("Move failed"),
-            detail: error?.message || response?.statusText,
-        });
-    }
-};
-
 export const patchItem = async (
     item: ControlledListItem,
     toast: ToastServiceMethods,
@@ -173,7 +147,7 @@ export const patchList = async (
     list: ControlledList,
     toast: ToastServiceMethods,
     $gettext: GetText,
-    field: "name" | "sortorder",
+    field: "name" | "sortorder" | "children",
 ) => {
     let error;
     let response;
@@ -185,6 +159,13 @@ export const patchList = async (
             break;
         case "sortorder":
             body = { sortorder_map: makeSortOrderMap(list) };
+            break;
+        case "children":
+            // Parentage is adjusted on the children themselves.
+            body = {
+                parent_map: makeParentMap(list),
+                sortorder_map: makeSortOrderMap(list),
+            };
             break;
     }
 

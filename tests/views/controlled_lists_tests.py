@@ -321,28 +321,6 @@ class ControlledListTests(ArchesTestCase):
             transform=sync_pk_for_comparison,
         )
 
-    def test_reorder_list_items_valid(self):
-        self.client.force_login(self.admin)
-        serialized_list = self.list1.serialize()
-
-        serialized_list["items"][0]["sortorder"] = 1
-        serialized_list["items"][1]["sortorder"] = 0
-        response = self.client.post(
-            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
-            serialized_list,
-            content_type="application/json",
-        )
-        self.assertEqual(response.status_code, HTTPStatus.OK, response.content)
-        self.assertEqual(
-            [
-                item.sortorder
-                for item in ControlledListItem.objects.filter(
-                    controlled_list=self.list1
-                ).order_by("uri")
-            ],
-            [1, 0, 2, 3, 4],
-        )
-
     def test_list_items_provide_new_sortorder(self):
         self.client.force_login(self.admin)
 
@@ -368,49 +346,6 @@ class ControlledListTests(ArchesTestCase):
             [4, 3, 2, 1, 0],
         )
 
-    def test_list_items_recalculate_sortorder(self):
-        self.client.force_login(self.admin)
-        serialized_list = self.list1.serialize(flat=False)
-
-        serialized_list["items"][-1]["sortorder"] = -1
-        response = self.client.post(
-            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
-            serialized_list,
-            content_type="application/json",
-        )
-        result = json.loads(response.content)
-
-        self.assertEqual(response.status_code, HTTPStatus.OK, response.content)
-        self.assertEqual(result["items"][-1]["sortorder"], 5)  # was 4, but gaps are OK
-
-    def test_list_items_mixed_parents(self):
-        self.client.force_login(self.admin)
-        serialized_list = self.list1.serialize(flat=False)
-
-        serialized_list["items"][-1]["controlled_list_id"] = str(self.list2.pk)
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
-                reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
-                serialized_list,
-                content_type="application/json",
-            )
-        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
-
-    def test_child_items_incorrect_parent(self):
-        self.client.force_login(self.admin)
-        serialized_list = self.list2.serialize(flat=False)
-
-        serialized_list["items"][0]["children"][-1]["controlled_list_id"] = str(
-            self.list1.pk
-        )
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
-                reverse("controlled_list", kwargs={"id": str(self.list2.pk)}),
-                serialized_list,
-                content_type="application/json",
-            )
-        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
-
     def test_recursive_cycles(self):
         self.client.force_login(self.admin)
         serialized_list = self.list2.serialize(flat=False)
@@ -428,15 +363,6 @@ class ControlledListTests(ArchesTestCase):
         sys.setrecursionlimit(200)
         self.addCleanup(sys.setrecursionlimit, original_limit)
 
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
-                reverse("controlled_list_item", kwargs={"id": parent_id}),
-                parent,
-                content_type="application/json",
-            )
-        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
-
-        # Also test PATCH method
         with self.assertLogs("django.request", level="WARNING"):
             response = self.client.patch(
                 reverse("controlled_list_item", kwargs={"id": parent_id}),

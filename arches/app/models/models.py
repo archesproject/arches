@@ -2257,21 +2257,27 @@ class ControlledList(models.Model):
             ]
         return data
 
-    def bulk_update_item_sortorders(self, sortorder_map):
-        """Applies new sortorders (keyed on item pk's) to those model instances."""
+    def bulk_update_item_parentage_and_order(self, parent_map, sortorder_map):
+        """Item parentage and sortorder are updated together because their
+        uniqueness is enforced together."""
+
         reordered_items = []
-        exclude_fields = set()
+        exclude_fields = {
+            name
+            for name in field_names(ControlledListItem())
+            if name not in ("sortorder", "parent_id")
+        }
         for item_id, sortorder in sortorder_map.items():
             item = ControlledListItem(pk=uuid.UUID(item_id), sortorder=sortorder)
-            # Just validate sortorder.
-            if not exclude_fields:
-                exclude_fields = {
-                    name for name in field_names(item) if name != "sortorder"
-                }
+            if item_id in parent_map:
+                item.parent_id = parent_map[item_id]
+            item.controlled_list_id = self.pk
             item.clean_fields(exclude=exclude_fields)
             reordered_items.append(item)
 
-        ControlledListItem.objects.bulk_update(reordered_items, fields=["sortorder"])
+        ControlledListItem.objects.bulk_update(
+            reordered_items, fields=["sortorder", "parent_id", "controlled_list_id"]
+        )
 
 
 class ControlledListItem(models.Model):

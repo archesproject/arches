@@ -81,8 +81,25 @@ export const listAsNode = (
     };
 };
 
+export const makeParentMap = (list: ControlledList) => {
+    const map = {};
+
+    const stripAllButParentRecursive = (
+        items: ControlledListItem[],
+        acc: { [key: string]: string },
+    ) => {
+        for (const item of items) {
+            acc[item.id] = item.parent_id;
+            stripAllButParentRecursive(item.children, acc);
+        }
+    };
+
+    stripAllButParentRecursive(list.items, map);
+    return map;
+};
+
 export const makeSortOrderMap = (list: ControlledList) => {
-    const ret = {};
+    const map = {};
 
     const stripAllButSortOrderRecursive = (
         items: ControlledListItem[],
@@ -94,8 +111,8 @@ export const makeSortOrderMap = (list: ControlledList) => {
         }
     };
 
-    stripAllButSortOrderRecursive(list.items, ret);
-    return ret;
+    stripAllButSortOrderRecursive(list.items, map);
+    return map;
 };
 
 export const reorderItems = (
@@ -140,6 +157,7 @@ export const reorderItems = (
     const itemsToRight = siblings.slice(indexInSiblings + 1);
 
     let reorderedSiblings: ControlledListItem[];
+    let patchSiblings = true;
     if (up) {
         const leftNeighbor = itemsToLeft.pop();
         if (!leftNeighbor) {
@@ -154,7 +172,14 @@ export const reorderItems = (
         ];
     } else {
         const [rightNeighbor, ...rest] = itemsToRight;
-        reorderedSiblings = [...itemsToLeft, rightNeighbor, item, ...rest];
+        if (!rightNeighbor) {
+            // Already at bottom. Might end up here from a "move" operation
+            // that added the new item to the end.
+            reorderedSiblings = [...itemsToLeft, item];
+            patchSiblings = false;
+        } else {
+            reorderedSiblings = [...itemsToLeft, rightNeighbor, item, ...rest];
+        }
     }
 
     let acc = 0;
@@ -163,7 +188,10 @@ export const reorderItems = (
         items: ControlledListItem[],
     ) => {
         // Patch in the reordered siblings.
-        if (items.some((itemCandidate) => itemCandidate.id === item.id)) {
+        if (
+            patchSiblings &&
+            items.some((itemCandidate) => itemCandidate.id === item.id)
+        ) {
             if ((parent as ControlledList).items) {
                 (parent as ControlledList).items = reorderedSiblings;
             } else {

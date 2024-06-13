@@ -28,10 +28,6 @@ from arches.app.utils.string_utils import str_to_bool
 logger = logging.getLogger(__name__)
 
 
-class MixedListsException(Exception):
-    pass
-
-
 def prefetch_terms(request):
     """Children at arbitrary depth will still be returned, but tell
     the ORM to prefetch a certain depth to mitigate N+1 queries after."""
@@ -62,79 +58,6 @@ def prefetch_terms(request):
                 ]
             )
     return terms
-
-
-def handle_items(item_dicts, max_sortorder=-1):
-    items_to_save = []
-    values_to_save = []
-    image_metadata_to_save = []
-
-    def handle_item(item_dict):
-        nonlocal items_to_save
-        nonlocal values_to_save
-        nonlocal image_metadata_to_save
-        nonlocal max_sortorder
-
-        values = item_dict.pop("values")
-        images = item_dict.pop("images")
-        # Altering hierarchy is done by altering parents.
-        children = item_dict.pop("children", None)
-        item_dict.pop("depth", None)
-
-        item_to_save = ControlledListItem(**item_dict)
-        items_to_save.append(item_to_save)
-
-        if item_to_save.sortorder < 0:
-            item_to_save.sortorder = max_sortorder + 1
-
-        if len({item.controlled_list_id for item in items_to_save}) > 1:
-            raise MixedListsException
-
-        for value in values:
-            value.pop("item_id")  # trust the item, not the label
-            value_to_save = ControlledListItemValue(
-                controlled_list_item_id=UUID(item_to_save.id),
-                **value,
-            )
-            value_to_save._state.adding = False  # allows checking uniqueness
-            value_to_save.full_clean()
-            values_to_save.append(value_to_save)
-
-        for image in images:
-            for metadata in image["metadata"]:
-                metadata.pop("controlled_list_item_image_id")
-                metadata.pop("metadata_label", None)  # computed by serialize()
-                metadata_to_save = ControlledListItemImageMetadata(
-                    controlled_list_item_image_id=UUID(image["id"]),
-                    **metadata,
-                )
-                metadata_to_save._state.adding = False  # allows checking uniqueness
-                metadata_to_save.full_clean()
-                image_metadata_to_save.append(metadata_to_save)
-
-        # Recurse
-        for child in children:
-            handle_item(child)
-
-    for item_dict in item_dicts:
-        handle_item(item_dict)
-
-    for item_to_save in items_to_save:
-        item_to_save._state.adding = False  # allows checking uniqueness
-        item_to_save.full_clean(validate_constraints=False)
-        # Sortorder uniqueness is deferred.
-        item_to_save.validate_constraints(exclude=["sortorder"])
-
-    ControlledListItem.objects.bulk_update(
-        items_to_save,
-        fields=["controlled_list_id", "guide", "uri", "sortorder", "parent"],
-    )
-    ControlledListItemValue.objects.bulk_update(
-        values_to_save, fields=["value", "valuetype", "language"]
-    )
-    ControlledListItemImageMetadata.objects.bulk_update(
-        image_metadata_to_save, fields=["value", "metadata_type", "language"]
-    )
 
 
 @method_decorator(
@@ -202,46 +125,17 @@ class ControlledListView(View):
     def post(self, request, **kwargs):
         data = JSONDeserializer().deserialize(request.body)
         name = data.get("name", None)
-
-        if not (list_id := kwargs.get("id", None)):
+        if "id" not in kwargs:
             return self.add_new_list(name)
 
-        qs = ControlledList.objects.filter(pk=list_id).annotate(
-            max_sortorder=Max("controlled_list_items__sortorder", default=-1)
-        )
-
-        try:
-            with transaction.atomic():
-                try:
-                    clist = qs.get()
-                except ControlledList.DoesNotExist:
-                    return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
-
-                clist.dynamic = data["dynamic"]
-                clist.search_only = data["search_only"]
-                clist.name = data["name"]
-                clist.full_clean()
-
-                handle_items(data["items"], max_sortorder=clist.max_sortorder)
-        except ValidationError as ve:
-            return JSONErrorResponse(
-                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
-            )
-        except MixedListsException:
-            return JSONErrorResponse(
-                message=_("Items must belong to the same list."),
-                status=HTTPStatus.BAD_REQUEST,
-            )
-
-        clist.save()
-
-        return JSONResponse(clist.serialize())
+        raise NotImplementedError
 
     def patch(self, request, **kwargs):
         list_id: UUID = kwargs.get("id")
         data = JSONDeserializer().deserialize(request.body)
         data.pop("items", None)
         sortorder_map = data.pop("sortorder_map", {})
+        parent_map = data.pop("parent_map", {})
 
         update_fields = list(data)
         if not update_fields and not sortorder_map:
@@ -249,7 +143,7 @@ class ControlledListView(View):
 
         clist = ControlledList(id=list_id, **data)
         if sortorder_map:
-            clist.bulk_update_item_sortorders(sortorder_map)
+            clist.bulk_update_item_parentage_and_order(parent_map, sortorder_map)
 
         exclude_fields = {f for f in field_names(clist) if f not in update_fields}
         try:
@@ -258,11 +152,6 @@ class ControlledListView(View):
         except ValidationError as ve:
             return JSONErrorResponse(
                 message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
-            )
-        except MixedListsException:
-            return JSONErrorResponse(
-                message=_("Items must belong to the same list."),
-                status=HTTPStatus.BAD_REQUEST,
             )
 
         clist.save(update_fields=update_fields)
@@ -337,49 +226,10 @@ class ControlledListItemView(View):
         return JSONResponse(item.serialize(), status=HTTPStatus.CREATED)
 
     def post(self, request, **kwargs):
-        if not (item_id := kwargs.get("id", None)):
+        if "id" not in kwargs:
             return self.add_new_item(request)
 
-        # Update list item
-        data = JSONDeserializer().deserialize(request.body)
-
-        try:
-            controlled_list = (
-                ControlledList.objects.filter(pk=data["controlled_list_id"])
-                .annotate(
-                    max_sortorder=Max("controlled_list_items__sortorder", default=-1)
-                )
-                .get()
-            )
-        except ControlledList.DoesNotExist:
-            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
-
-        try:
-            with transaction.atomic():
-                for item in ControlledListItem.objects.filter(
-                    pk=item_id
-                ).select_for_update():
-                    handle_items([data], max_sortorder=controlled_list.max_sortorder)
-                    break
-                else:
-                    return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
-                serialized_item = item.serialize()
-        except ValidationError as ve:
-            return JSONErrorResponse(
-                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
-            )
-        except MixedListsException:
-            return JSONErrorResponse(
-                message=_("Items must belong to the same list."),
-                status=HTTPStatus.BAD_REQUEST,
-            )
-        except RecursionError:
-            return JSONErrorResponse(
-                message=_("Recursive structure detected."),
-                status=HTTPStatus.BAD_REQUEST,
-            )
-
-        return JSONResponse(serialized_item)
+        raise NotImplementedError
 
     def patch(self, request, **kwargs):
         item_id: UUID = kwargs.get("id")
