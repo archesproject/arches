@@ -2,10 +2,9 @@ import logging
 from http import HTTPStatus
 from uuid import UUID
 
-from django.contrib.postgres.expressions import ArraySubquery
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import Max, OuterRef
+from django.db.models import Max
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
@@ -22,6 +21,7 @@ from arches.app.models.models import (
 from arches.app.models.utils import field_names
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.decorators import group_required
+from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.utils.string_utils import str_to_bool
 
@@ -144,32 +144,26 @@ class ControlledListsView(View):
     def get(self, request):
         """Returns either a flat representation (?flat=true) or a tree (default)."""
         lists = (
-            ControlledList.objects.all()
-            .annotate(node_ids=self.node_subquery())
-            .annotate(node_names=self.node_subquery("name"))
-            .annotate(nodegroup_ids=self.node_subquery("nodegroup_id"))
-            .annotate(graph_ids=self.node_subquery("graph_id"))
-            .annotate(graph_names=self.node_subquery("graph__name"))
+            ControlledList.objects.annotate_node_fields(
+                node_ids="pk",
+                node_names="name",
+                nodegroup_ids="nodegroup_id",
+                graph_ids="graph_id",
+                graph_names="graph__name",
+            )
             .order_by("name")
             .prefetch_related(*prefetch_terms(request))
         )
+
         flat = str_to_bool(request.GET.get("flat", "false"))
-        serialized_lists = [
-            obj.serialize(flat=flat, user=request.user) for obj in lists
+        permitted = [
+            ng.pk for ng in get_nodegroups_by_perm(request.user, "read_nodegroup")
+        ]
+        serialized = [
+            obj.serialize(flat=flat, permitted_nodegroups=permitted) for obj in lists
         ]
 
-        return JSONResponse({"controlled_lists": serialized_lists})
-
-    @staticmethod
-    def node_subquery(node_field: str = "pk"):
-        return ArraySubquery(
-            Node.with_controlled_list.filter(
-                controlled_list=OuterRef("id"), source_identifier=None
-            )
-            .select_related("graph" if node_field.startswith("graph__") else None)
-            .order_by("pk")
-            .values(node_field)
-        )
+        return JSONResponse({"controlled_lists": serialized})
 
 
 @method_decorator(
@@ -179,14 +173,20 @@ class ControlledListView(View):
     def get(self, request, **kwargs):
         """Returns either a flat representation (?flat=true) or a tree (default)."""
         list_id = kwargs.get("id")
-        flat = str_to_bool(request.GET.get("flat", "false"))
         try:
             lst = ControlledList.objects.prefetch_related(*prefetch_terms(request)).get(
                 pk=list_id
             )
         except ControlledList.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
-        return JSONResponse(lst.serialize(flat=flat, user=request.user))
+
+        flat = str_to_bool(request.GET.get("flat", "false"))
+        permitted = [
+            ng.pk for ng in get_nodegroups_by_perm(request.user, "read_nodegroup")
+        ]
+        serialized = lst.serialize(flat=flat, permitted_nodegroups=permitted)
+
+        return JSONResponse(serialized)
 
     def add_new_list(self, name):
         lst = ControlledList(name=name)
@@ -274,6 +274,10 @@ class ControlledListView(View):
             list_to_delete = ControlledList.objects.get(pk=kwargs.get("id"))
         except ControlledList.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
+
+        nodes_using_list = Node.objects.with_controlled_lists().filter(
+            controlled_list_id=list_to_delete.pk
+        )
         errors = [
             _(
                 "{controlled_list} could not be deleted: still in use by {graph} - {node}".format(
@@ -282,7 +286,7 @@ class ControlledListView(View):
                     node=node.name,
                 )
             )
-            for node in list_to_delete.find_nodes_using_list()
+            for node in nodes_using_list
         ]
         if errors:
             return JSONErrorResponse(

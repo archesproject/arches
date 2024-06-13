@@ -247,6 +247,13 @@ class ControlledListTests(ArchesTestCase):
 
         self.assertEqual(result["controlled_lists"][0]["nodes"], [])
 
+        response = self.client.get(
+            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
+        )
+        result = json.loads(response.content)
+
+        self.assertEqual(result["nodes"], [])
+
     def test_create_list(self):
         self.client.force_login(self.admin)
         self.client.post(

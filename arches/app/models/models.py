@@ -12,6 +12,7 @@ from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.models.querysets import ControlledListQuerySet, NodeQuerySet
 from arches.app.models.utils import add_to_update_fields, field_names
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils import import_class_from_string
@@ -788,24 +789,7 @@ class Node(models.Model):
         on_delete=models.SET_NULL,
     )
 
-    objects = models.Manager()
-
-    # custom manager provides indexed lookup on controlled lists, e.g.
-    # Node.with_controlled_list.filter(controlled_list=your_list_id_as_uuid)
-    class WithControlledListManager(models.Manager):
-        def get_queryset(self):
-            return (
-                super()
-                .get_queryset()
-                .annotate(
-                    controlled_list=Cast(
-                        KT("config__controlledList"),
-                        output_field=models.UUIDField(),
-                    )
-                )
-            )
-
-    with_controlled_list = WithControlledListManager()
+    objects = NodeQuerySet.as_manager()
 
     def get_child_nodes_and_edges(self):
         """
@@ -2203,6 +2187,8 @@ class ControlledList(models.Model):
     dynamic = models.BooleanField(default=False)
     search_only = models.BooleanField(default=False)
 
+    objects = ControlledListQuerySet.as_manager()
+
     class Meta:
         db_table = "controlled_lists"
 
@@ -2213,7 +2199,7 @@ class ControlledList(models.Model):
                 sep=" ", timespec="seconds"
             )
 
-    def serialize(self, depth_map=None, flat=False, user=None):
+    def serialize(self, depth_map=None, flat=False, permitted_nodegroups=None):
         if depth_map is None:
             depth_map = defaultdict(int)
         data = {
@@ -2227,7 +2213,7 @@ class ControlledList(models.Model):
                     for item in self.controlled_list_items.all()
                     if flat or item.parent_id is None
                 ],
-                key=lambda d: d["sortorder"],
+                key=lambda item: item["sortorder"],
             ),
         }
         if hasattr(self, "node_ids"):
@@ -2247,8 +2233,18 @@ class ControlledList(models.Model):
                     self.graph_names,
                     strict=True,
                 )
+                if permitted_nodegroups is None or nodegroup_id in permitted_nodegroups
             ]
         else:
+            nodes_using_list = Node.objects.with_controlled_lists().filter(
+                controlled_list_id=self.pk, source_identifier=None
+            )
+            filtered_nodes = [
+                node
+                for node in nodes_using_list
+                if permitted_nodegroups is None
+                or node.nodegroup_id in permitted_nodegroups
+            ]
             data["nodes"] = [
                 {
                     "id": str(node.pk),
@@ -2257,7 +2253,7 @@ class ControlledList(models.Model):
                     "graph_id": node.graph_id,
                     "graph_name": str(node.graph.name),
                 }
-                for node in self.find_nodes_using_list(user).select_related("graph")
+                for node in filtered_nodes
             ]
         return data
 
@@ -2276,21 +2272,6 @@ class ControlledList(models.Model):
             reordered_items.append(item)
 
         ControlledListItem.objects.bulk_update(reordered_items, fields=["sortorder"])
-
-    def find_nodes_using_list(self, user=None):
-        from arches.app.utils.permission_backend import get_nodegroups_by_perm
-
-        qs = Node.with_controlled_list.filter(
-            controlled_list=self.pk, source_identifier=None
-        )
-
-        if user:
-            permitted_nodegroups = [
-                ng.pk for ng in get_nodegroups_by_perm(user, "read_nodegroup")
-            ]
-            qs = qs.filter(nodegroup_id__in=permitted_nodegroups)
-
-        return qs
 
 
 class ControlledListItem(models.Model):
