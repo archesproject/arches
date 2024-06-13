@@ -43,6 +43,7 @@ class JSONLDImportTests(TransactionTestCase):
     disable triggers in the tiles table, which blows up using TestCase.
     (Cannot simply ALTER TABLE during a transaction...)
     """
+
     serialized_rollback = True
 
     @classmethod
@@ -56,11 +57,14 @@ class JSONLDImportTests(TransactionTestCase):
         skos.save_concepts_from_skos(rdf)
 
         skos = SKOSReader()
-        rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/jsonld_test_collections.xml")
+        rdf = skos.read_file(
+            "tests/fixtures/jsonld_base/rdm/jsonld_test_collections.xml"
+        )
         skos.save_concepts_from_skos(rdf)
 
         with open(
-            os.path.join("tests/fixtures/jsonld_base/models/test_1_basic_object.json"), "r"
+            os.path.join("tests/fixtures/jsonld_base/models/test_1_basic_object.json"),
+            "r",
         ) as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
@@ -155,4 +159,6 @@ class JSONLDImportTests(TransactionTestCase):
 
         importer.write(request)
 
-        self.assertEqual(EditLog.objects.filter(transactionid=start_event.pk).count(), 2)
+        self.assertEqual(
+            EditLog.objects.filter(transactionid=start_event.pk).count(), 2
+        )

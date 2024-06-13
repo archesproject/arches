@@ -11,12 +11,29 @@ from django.core.management import call_command
 from django.db import transaction
 from django.utils.translation import gettext as _
 
-from arches.app.etl_modules.save import _save_to_tiles, disable_tile_triggers, reenable_tile_triggers, _post_save_edit_log
+from arches.app.etl_modules.save import (
+    _save_to_tiles,
+    disable_tile_triggers,
+    reenable_tile_triggers,
+    _post_save_edit_log,
+)
 from arches.app.tasks import load_json_ld
-from arches.app.utils.data_management.resources.formats.rdffile import ValueErrorWithNodeInfo
-from arches.app.etl_modules.base_import_module import BaseImportModule, FileValidationError
+from arches.app.utils.data_management.resources.formats.rdffile import (
+    ValueErrorWithNodeInfo,
+)
+from arches.app.etl_modules.base_import_module import (
+    BaseImportModule,
+    FileValidationError,
+)
 from arches.app.etl_modules.decorators import load_data_async
-from arches.app.models.models import GraphModel, LoadErrors, LoadEvent, LoadStaging, Node, ResourceInstance
+from arches.app.models.models import (
+    GraphModel,
+    LoadErrors,
+    LoadEvent,
+    LoadStaging,
+    Node,
+    ResourceInstance,
+)
 from arches.app.models.system_settings import settings
 from arches.app.utils.file_validator import FileValidator
 
@@ -73,13 +90,13 @@ class JSONLDImporter(BaseImportModule):
             }
         }
         validator = FileValidator()
-        if (file_type_errors := validator.validate_file_type(content)):
+        if file_type_errors := validator.validate_file_type(content):
             return {
                 "success": False,
                 "data": FileValidationError(
                     message=", ".join(file_type_errors),
                     code=400,
-                )
+                ),
             }
 
         with zipfile.ZipFile(content, "r") as zip_ref:
@@ -92,7 +109,9 @@ class JSONLDImporter(BaseImportModule):
                 if file.is_dir():
                     continue
                 self.cumulative_files_size += file.file_size
-                result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
+                result["summary"]["files"][file.filename] = {
+                    "size": (self.filesize_format(file.file_size))
+                }
                 result["summary"]["cumulative_files_size"] = self.cumulative_files_size
                 with zip_ref.open(file) as opened_file:
                     try:
@@ -110,7 +129,9 @@ class JSONLDImporter(BaseImportModule):
 
         if not result["summary"]["files"]:
             title = _("Invalid Uploaded File")
-            message = _("This file has missing information or invalid formatting. Make sure the file is complete and in the expected format.")
+            message = _(
+                "This file has missing information or invalid formatting. Make sure the file is complete and in the expected format."
+            )
             return {"success": False, "data": {"title": title, "message": message}}
 
         return {"success": True, "data": result}
@@ -122,8 +143,7 @@ class JSONLDImporter(BaseImportModule):
             graph_id_from_slug(slug)
         except GraphModel.DoesNotExist:
             raise FileValidationError(
-                code=404,
-                message=_('The model "{0}" does not exist.').format(slug)
+                code=404, message=_('The model "{0}" does not exist.').format(slug)
             )
 
     def stage_files(self, files, summary, cursor):
@@ -175,8 +195,12 @@ class JSONLDImporter(BaseImportModule):
                     self.load_staging_instance_from_tile(tile, resource, nodegroup_info)
                 )
 
-        tile_batch_size = settings.BULK_IMPORT_BATCH_SIZE * 10  # assume 10 tiles/resource
-        LoadStaging.objects.bulk_create(load_staging_instances, batch_size=tile_batch_size)
+        tile_batch_size = (
+            settings.BULK_IMPORT_BATCH_SIZE * 10
+        )  # assume 10 tiles/resource
+        LoadStaging.objects.bulk_create(
+            load_staging_instances, batch_size=tile_batch_size
+        )
 
     def handle_early_failure(self, exception, graph_slug, block):
         """The CLI might have failed well before creating resources and tiles,
@@ -200,7 +224,9 @@ class JSONLDImporter(BaseImportModule):
             value=str(exception.value) if has_info else None,
             datatype=exception.datatype if has_info else None,
             node_id=exception.node_id if has_info else fallback_node().nodeid,
-            nodegroup_id=exception.nodegroup_id if has_info else fallback_node().nodegroup_id,
+            nodegroup_id=(
+                exception.nodegroup_id if has_info else fallback_node().nodegroup_id
+            ),
         )
         le.clean_fields()
         le.save()
@@ -228,7 +254,9 @@ class JSONLDImporter(BaseImportModule):
 
         ls = LoadStaging(
             load_event_id=self.loadid,
-            nodegroup_id=exception.nodegroup_id if has_info else fallback_node().nodegroup_id,
+            nodegroup_id=(
+                exception.nodegroup_id if has_info else fallback_node().nodegroup_id
+            ),
             value=dummy_tile_info,
             passes_validation=False,
             source_description=early_failure,
@@ -252,7 +280,9 @@ class JSONLDImporter(BaseImportModule):
                 config,
             )
             passes_validation = len(validation_errors) == 0
-            self.save_validation_errors(validation_errors, tile, source_value, datatype_instance, nodeid)
+            self.save_validation_errors(
+                validation_errors, tile, source_value, datatype_instance, nodeid
+            )
 
             tile_info[nodeid] = {
                 "value": value,
@@ -279,7 +309,9 @@ class JSONLDImporter(BaseImportModule):
         ls.clean_fields()
         return ls
 
-    def save_validation_errors(self, validation_errors, tile, source_value, datatype, nodeid):
+    def save_validation_errors(
+        self, validation_errors, tile, source_value, datatype, nodeid
+    ):
         for error in validation_errors:
             le = LoadErrors(
                 load_event_id=self.loadid,
@@ -310,7 +342,9 @@ class JSONLDImporter(BaseImportModule):
             with transaction.atomic():
                 # Prepare for possible resource overwriting
                 ResourceInstance.objects.filter(
-                    pk__in=LoadStaging.objects.filter(load_event_id=self.loadid).values("resourceid")
+                    pk__in=LoadStaging.objects.filter(load_event_id=self.loadid).values(
+                        "resourceid"
+                    )
                 ).delete()
 
                 # Now we can check tile cardinality.
@@ -327,7 +361,6 @@ class JSONLDImporter(BaseImportModule):
 
         _post_save_edit_log(cursor, userid, loadid)
 
-
     @load_data_async
     def run_load_task_async(self, request):
         details = json.loads(self.file_details)
@@ -336,6 +369,14 @@ class JSONLDImporter(BaseImportModule):
         result = {}
 
         load_task = load_json_ld.apply_async(
-            (self.userid, files, summary, result, self.temp_dir, self.loadid, self.moduleid),
+            (
+                self.userid,
+                files,
+                summary,
+                result,
+                self.temp_dir,
+                self.loadid,
+                self.moduleid,
+            ),
         )
         LoadEvent.objects.filter(loadid=self.loadid).update(taskid=load_task.task_id)

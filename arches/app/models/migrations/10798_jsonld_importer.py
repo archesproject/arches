@@ -32,19 +32,22 @@ class Migration(migrations.Migration):
                 "componentname": "jsonld-importer",
                 "modulename": "jsonld_importer.py",
                 "classname": "JSONLDImporter",
-                "config": {"bgColor": "#726a5b", "circleColor": "#9f9580", "show": True},
+                "config": {
+                    "bgColor": "#726a5b",
+                    "circleColor": "#9f9580",
+                    "show": True,
+                },
                 "reversible": False,  # does not support un-overwriting a resource
                 "slug": "jsonld-importer",
                 "description": "Import a zip archive of JSON-LD resources to Arches",
                 "helptemplate": "jsonld-importer-help",
                 "helpsortorder": max_helpsortorder + 1,
-            }
+            },
         )
 
     def remove_jsonld_module(apps, schema_editor):
         ETLModule = apps.get_model("models", "ETLModule")
         ETLModule.objects.filter(pk=JSONLD_IMPORT_MODULE_PK).delete()
-
 
     operations = [
         migrations.RunPython(add_jsonld_module, remove_jsonld_module),
@@ -52,14 +55,22 @@ class Migration(migrations.Migration):
             model_name="loaderrors",
             name="node",
             field=models.ForeignKey(
-                blank=True, db_column="nodeid", null=True, on_delete=django.db.models.deletion.CASCADE, to="models.node"
+                blank=True,
+                db_column="nodeid",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="models.node",
             ),
         ),
         migrations.AlterField(
             model_name="loaderrors",
             name="nodegroup",
             field=models.ForeignKey(
-                blank=True, db_column="nodegroupid", null=True, on_delete=django.db.models.deletion.CASCADE, to="models.nodegroup"
+                blank=True,
+                db_column="nodegroupid",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="models.nodegroup",
             ),
         ),
     ]
