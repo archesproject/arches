@@ -53,8 +53,7 @@ class ControlledListsImportTests(ArchesTestCase):
             source=input_file,
             stdout=output,
         )
-        self.assertTrue(
-            ControlledList.objects.filter(pk="e962bdaf-8243-4fbb-bd43-39bc1f54c168")
-        )
+        list_pk = "e962bdaf-8243-4fbb-bd43-39bc1f54c168"
+        self.assertTrue(ControlledList.objects.filter(pk=list_pk).exists())
 
     ### TODO Add test for creating new language if language code not in db but found in import file
