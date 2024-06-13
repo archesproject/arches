@@ -1624,12 +1624,18 @@ class UserProfile(models.Model):
 
 @receiver(post_save, sender=User)
 def save_profile(sender, instance, **kwargs):
+    if kwargs.get("raw", False):
+        return
+
     UserProfile.objects.get_or_create(user=instance)
 
 
 @receiver(post_save, sender=User)
 def create_permissions_for_new_users(sender, instance, created, **kwargs):
     from arches.app.models.resource import Resource
+
+    if kwargs.get("raw", False):
+        return
 
     if created:
         ct = ContentType.objects.get(app_label="models", model="resourceinstance")
@@ -2048,10 +2054,14 @@ class LoadErrors(models.Model):
         LoadEvent, db_column="loadid", on_delete=models.CASCADE
     )
     nodegroup = models.ForeignKey(
-        "NodeGroup", db_column="nodegroupid", null=True, on_delete=models.CASCADE
+        "NodeGroup",
+        db_column="nodegroupid",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
     )
     node = models.ForeignKey(
-        "Node", db_column="nodeid", null=True, on_delete=models.CASCADE
+        "Node", db_column="nodeid", null=True, blank=True, on_delete=models.CASCADE
     )
     type = models.TextField(blank=True, null=True)
     error = models.TextField(blank=True, null=True)

@@ -19,7 +19,6 @@ from arches.app.etl_modules.base_import_module import (
     BaseImportModule,
     FileValidationError,
 )
-from arches.app.etl_modules.base_import_module import BaseImportModule
 import arches.app.tasks as tasks
 from arches.management.commands.etl_template import create_tile_excel_workbook
 
@@ -251,6 +250,10 @@ class TileExcelImporter(BaseImportModule):
                 except (IndexError, ValidationError):
                     pass
         return graphid
+
+    def stage_files(self, files, summary, cursor):
+        for file in files:
+            self.stage_excel_file(file, summary, cursor)
 
     def stage_excel_file(self, file, summary, cursor):
         if file.endswith("xlsx"):

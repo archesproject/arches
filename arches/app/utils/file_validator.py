@@ -1,4 +1,5 @@
 import io
+import json
 import logging
 import zipfile
 from django.conf import settings
@@ -14,15 +15,19 @@ class FileValidator(object):
 
     def test_unknown_filetypes(self, file, extension=None):
         errors = []
-        if extension in settings.FILE_TYPES:
-            if extension == "xlsx":
+        match extension:
+            case "DS_Store":
+                self.logger.log(
+                    logging.WARN, "DS_Store file encountered, proceeding with caution."
+                )
+            case _ if extension not in settings.FILE_TYPES:
+                errors.append(f"File type is not permitted: {extension}")
+            case "xlsx":
                 try:
                     load_workbook(io.BytesIO(file))
                 except (InvalidFileException, zipfile.BadZipFile):
-                    error = "Invalid xlsx workbook"
-                    self.logger.log(logging.ERROR, error)
-                    errors.append(error)
-            elif extension == "csv":
+                    errors.append("Invalid xlsx workbook")
+            case "csv":
                 try:
                     datareader = csv.reader(
                         file.decode("utf-8").splitlines(), delimiter=","
@@ -34,17 +39,17 @@ class FileValidator(object):
                         elif length is None:
                             length = len(row)
                 except csv.Error:
-                    error = "Invalid csv file"
-                    self.logger.log(logging.ERROR, error)
-                    errors.append(error)
-            else:
-                error = "Cannot validate file"
-                self.logger.log(logging.ERROR, error)
-                errors.append(error)
-        else:
-            error = "File type is not permitted"
+                    errors.append("Invalid csv file")
+            case "json":
+                try:
+                    json.load(io.BytesIO(file))
+                except json.decoder.JSONDecodeError:
+                    errors.append("Invalid json file")
+            case _:
+                errors.append("Cannot validate file")
+
+        for error in errors:
             self.logger.log(logging.ERROR, error)
-            errors.append(error)
 
         return errors
 
@@ -62,13 +67,15 @@ class FileValidator(object):
                     files = zip_ref.infolist()
                     for zip_file in files:
                         if (
-                            not zip_file.filename.startswith("__MACOSX")
-                            and not zip_file.is_dir()
+                            zip_file.filename.startswith("__MACOSX")
+                            or zip_file.filename.lower().endswith("ds_store")
+                            or zip_file.is_dir()
                         ):
-                            errors = errors + self.validate_file_type(
-                                io.BytesIO(zip_ref.open(zip_file.filename).read()),
-                                extension=zip_file.filename.split(".")[-1],
-                            )
+                            continue
+                        errors = errors + self.validate_file_type(
+                            io.BytesIO(zip_ref.open(zip_file.filename).read()),
+                            extension=zip_file.filename.split(".")[-1],
+                        )
                     if len(errors) > 0:
                         error = "Unsafe zip file contents"
                         errors.append(error)

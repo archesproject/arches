@@ -7,6 +7,7 @@ import datetime
 import logging
 from io import StringIO
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from .format import Writer, Reader
 from arches.app.models import models
 from arches.app.models.resource import Resource
@@ -25,6 +26,17 @@ from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand, set_document_l
 
 # Stop code from looking up the contexts online for every operation
 docCache = {}
+
+
+class ValueErrorWithNodeInfo(ValueError):
+    def __init__(
+        self, *args, value=None, datatype=None, node_id=None, nodegroup_id=None
+    ):
+        super().__init__(*args)
+        self.value = value
+        self.datatype = datatype
+        self.node_id = node_id
+        self.nodegroup_id = nodegroup_id
 
 
 def fetch(url):
@@ -512,7 +524,7 @@ class JsonLdReader(Reader):
 
             self.resource = Resource()
             if resourceid is not None:
-                self.resource.pk = resourceid
+                self.resource.pk = uuid.UUID(resourceid)
             self.resource.graph_id = graphid
             self.resources.append(self.resource)
 
@@ -709,8 +721,16 @@ class JsonLdReader(Reader):
                             clss = self.get_cached_reference(uri)
                             vi["@type"] = clss
                         except:
-                            raise ValueError(
-                                f"Multiple possible branches and no @type given: {vi}"
+                            raise ValueErrorWithNodeInfo(
+                                f"Multiple possible branches and no @type given: {vi}",
+                                value=uri,
+                                datatype=tree_node["datatype_type"],
+                                node_id=tree_node["node_id"],
+                                nodegroup_id=(
+                                    None
+                                    if tree_node["nodegroup_id"] == "None"
+                                    else tree_node["nodegroup_id"]
+                                ),
                             )
 
                 value = None
@@ -729,12 +749,28 @@ class JsonLdReader(Reader):
                 # model has xsd:string, default is rdfs:Literal
                 key = f"{k} http://www.w3.org/2001/XMLSchema#string"
                 if not key in tree_node["children"]:
-                    raise ValueError(
-                        f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}"
+                    raise ValueErrorWithNodeInfo(
+                        f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}",
+                        value=value or uri,
+                        datatype=tree_node["datatype_type"],
+                        node_id=tree_node["node_id"],
+                        nodegroup_id=(
+                            None
+                            if tree_node["nodegroup_id"] == "None"
+                            else tree_node["nodegroup_id"]
+                        ),
                     )
             elif not key in tree_node["children"]:
-                raise ValueError(
-                    f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}"
+                raise ValueErrorWithNodeInfo(
+                    f"property/class combination does not exist in model: {k} {clss}\nWhile processing: {vi}",
+                    value=value or uri,
+                    datatype=tree_node["datatype_type"],
+                    node_id=tree_node["node_id"],
+                    nodegroup_id=(
+                        None
+                        if tree_node["nodegroup_id"] == "None"
+                        else tree_node["nodegroup_id"]
+                    ),
                 )
 
             # if we made it this far then it means that we've found at least 1 match
@@ -816,8 +852,12 @@ class JsonLdReader(Reader):
 
             if not possible:
                 # self.printline(f"Tried: {options}")
-                raise ValueError(
-                    f"Data does not match any actual node, despite prop/class combination {k} {clss}:\n{vi}"
+                raise ValueErrorWithNodeInfo(
+                    f"Data does not match any actual node, despite prop/class combination {k} {clss}:\n{vi}",
+                    value=value or uri,
+                    datatype=options[-1]["datatype"].datatype_name,
+                    node_id=options[-1]["node_id"],
+                    nodegroup_id=options[-1]["nodegroup_id"],
                 )
             elif len(possible) > 1:
                 # descend into data to check if there are further clarifying features
@@ -836,8 +876,12 @@ class JsonLdReader(Reader):
                         self.printline(f"Failed due to {e}", indent + 1)
                         pass
                 if not possible2:
-                    raise ValueError(
-                        "Considering branches, data does not match any node, despite a prop/class combination"
+                    raise ValueErrorWithNodeInfo(
+                        "Considering branches, data does not match any node, despite a prop/class combination",
+                        value=value or uri,
+                        datatype=possible[-1]["datatype"].datatype_name,
+                        node_id=possible[-1]["node_id"] if options else None,
+                        nodegroup_id=possible[-1]["nodegroup_id"] if options else None,
                     )
                 else:
                     branch = possible2
