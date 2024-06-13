@@ -70,7 +70,9 @@ class TileData(View):
                     },
                 )
 
-    def handle_save_error(self, e, tile_id="", title=_("Saving tile failed"), message=None):
+    def handle_save_error(
+        self, e, tile_id="", title=_("Saving tile failed"), message=None
+    ):
         if message is None:
             message = type(e).__name__
             if hasattr(e, "message") and e.message:
@@ -86,7 +88,9 @@ class TileData(View):
             )
         )
 
-        return JSONErrorResponse(_(title), _(str(message)), {"message": message, "title": title})
+        return JSONErrorResponse(
+            _(title), _(str(message)), {"message": message, "title": title}
+        )
 
     def post(self, request):
         original_transaction_id = request.POST.get("transaction_id", None)
@@ -97,13 +101,21 @@ class TileData(View):
             accepted_provisional = request.POST.get("accepted_provisional", None)
             resource_creation = False
             if accepted_provisional is not None:
-                accepted_provisional_edit = JSONDeserializer().deserialize(accepted_provisional)
+                accepted_provisional_edit = JSONDeserializer().deserialize(
+                    accepted_provisional
+                )
             if json is not None:
                 data = JSONDeserializer().deserialize(json)
-                data["resourceinstance_id"] = "" if "resourceinstance_id" not in data else data["resourceinstance_id"]
+                data["resourceinstance_id"] = (
+                    ""
+                    if "resourceinstance_id" not in data
+                    else data["resourceinstance_id"]
+                )
 
                 if original_transaction_id is None:
-                    data["transaction_id"] = None if "transaction_id" not in data else data["transaction_id"]
+                    data["transaction_id"] = (
+                        None if "transaction_id" not in data else data["transaction_id"]
+                    )
                     if data["transaction_id"] is not None:
                         transaction_id = data["transaction_id"]
 
@@ -117,58 +129,115 @@ class TileData(View):
                         resource = Resource(uuid.UUID(str(data["resourceinstance_id"])))
                     except ValueError:
                         resource = Resource()
-                    graphid = models.Node.objects.filter(nodegroup=data["nodegroup_id"])[0].graph_id
+                    graphid = models.Node.objects.filter(
+                        nodegroup=data["nodegroup_id"]
+                    )[0].graph_id
                     resource.graph_id = graphid
                     try:
                         resource.save(user=request.user, transaction_id=transaction_id)
                         data["resourceinstance_id"] = resource.pk
                         resource.index()
                     except PublishedModelError as e:
-                        message = _("Unable to save. Please verify the model is currently unpublished.")
-                        return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
+                        message = _(
+                            "Unable to save. Please verify the model is currently unpublished."
+                        )
+                        return JSONResponse(
+                            {
+                                "status": "false",
+                                "message": [_(e.title), _(str(message))],
+                            },
+                            status=500,
+                        )
                 tile_id = data["tileid"]
-                resource_instance = models.ResourceInstance.objects.get(pk=data["resourceinstance_id"])
+                resource_instance = models.ResourceInstance.objects.get(
+                    pk=data["resourceinstance_id"]
+                )
                 is_active = resource_instance.graph.publication is not None
                 if tile_id is not None and tile_id != "":
                     try:
                         old_tile = Tile.objects.get(pk=tile_id)
                     except ObjectDoesNotExist as e:
-                        return self.handle_save_error(e, _("This tile is no longer available"), _("It was likely deleted by another user"))
+                        return self.handle_save_error(
+                            e,
+                            _("This tile is no longer available"),
+                            _("It was likely deleted by another user"),
+                        )
 
                 tile = Tile(data)
 
-                if tile.filter_by_perm(request.user, "write_nodegroup") and is_active is True:
+                if (
+                    tile.filter_by_perm(request.user, "write_nodegroup")
+                    and is_active is True
+                ):
                     try:
                         with transaction.atomic():
                             try:
                                 if accepted_provisional is None:
                                     try:
-                                        tile.save(request=request, resource_creation=resource_creation, transaction_id=transaction_id)
+                                        tile.save(
+                                            request=request,
+                                            resource_creation=resource_creation,
+                                            transaction_id=transaction_id,
+                                        )
                                     except TileValidationError as e:
-                                        resource_tiles_exist = models.TileModel.objects.filter(resourceinstance=tile.resourceinstance).exists()
+                                        resource_tiles_exist = (
+                                            models.TileModel.objects.filter(
+                                                resourceinstance=tile.resourceinstance
+                                            ).exists()
+                                        )
                                         if not resource_tiles_exist:
-                                            Resource.objects.get(pk=tile.resourceinstance_id).delete(request.user)
-                                        title = _("Unable to save. Please verify your input is valid")
-                                        return self.handle_save_error(e, tile_id, title=title)
+                                            Resource.objects.get(
+                                                pk=tile.resourceinstance_id
+                                            ).delete(request.user)
+                                        title = _(
+                                            "Unable to save. Please verify your input is valid"
+                                        )
+                                        return self.handle_save_error(
+                                            e, tile_id, title=title
+                                        )
                                     except PublishedModelError as e:
-                                        message = _("Unable to save. Please verify the model is not currently published.")
-                                        return JSONResponse({"status": "false", "message": [_(e.title), _(str(message))]}, status=500)
+                                        message = _(
+                                            "Unable to save. Please verify the model is not currently published."
+                                        )
+                                        return JSONResponse(
+                                            {
+                                                "status": "false",
+                                                "message": [
+                                                    _(e.title),
+                                                    _(str(message)),
+                                                ],
+                                            },
+                                            status=500,
+                                        )
                                     except Exception as e:
                                         title = _("Unable to save.")
-                                        return self.handle_save_error(e, tile_id, title=title, message=str(e))
+                                        return self.handle_save_error(
+                                            e, tile_id, title=title, message=str(e)
+                                        )
                                 else:
                                     if accepted_provisional is not None:
-                                        provisional_editor = User.objects.get(pk=accepted_provisional_edit["user"])
+                                        provisional_editor = User.objects.get(
+                                            pk=accepted_provisional_edit["user"]
+                                        )
                                         prov_edit_log_details = {
                                             "user": request.user,
                                             "action": "accept edit",
                                             "edit": accepted_provisional_edit,
                                             "provisional_editor": provisional_editor,
                                         }
-                                    tile.save(request=request, resource_creation=resource_creation, provisional_edit_log_details=prov_edit_log_details)
+                                    tile.save(
+                                        request=request,
+                                        resource_creation=resource_creation,
+                                        provisional_edit_log_details=prov_edit_log_details,
+                                    )
 
-                                if tile.provisionaledits is not None and str(request.user.id) in tile.provisionaledits:
-                                    tile.data = tile.provisionaledits[str(request.user.id)]["value"]
+                                if (
+                                    tile.provisionaledits is not None
+                                    and str(request.user.id) in tile.provisionaledits
+                                ):
+                                    tile.data = tile.provisionaledits[
+                                        str(request.user.id)
+                                    ]["value"]
 
                             except Exception as e:
                                 return self.handle_save_error(e, tile_id)
@@ -181,10 +250,18 @@ class TileData(View):
 
                     return JSONResponse(tile)
                 elif is_active is False:
-                    response = {"status": "false", "message": [_("Request Failed"), _("Unable to Save. Verify model status is active")]}
+                    response = {
+                        "status": "false",
+                        "message": [
+                            _("Request Failed"),
+                            _("Unable to Save. Verify model status is active"),
+                        ],
+                    }
                     return JSONResponse(response, status=500)
                 else:
-                    return JSONErrorResponse(_("Request Failed"), _("Permission Denied"))
+                    return JSONErrorResponse(
+                        _("Request Failed"), _("Permission Denied")
+                    )
 
         if self.action == "reorder_tiles":
             json = request.body
@@ -241,12 +318,21 @@ class TileData(View):
                         content={"exception": "TileModel.ObjectDoesNotExist"},
                     )
                 user_is_reviewer = user_is_resource_reviewer(request.user)
-                if (user_is_reviewer or tile.is_provisional() is True) and is_active is True:
+                if (
+                    user_is_reviewer or tile.is_provisional() is True
+                ) and is_active is True:
                     if tile.filter_by_perm(request.user, "delete_nodegroup"):
-                        if tile.is_provisional() is True and len(list(tile.provisionaledits.keys())) == 1:
-                            provisional_editor_id = list(tile.provisionaledits.keys())[0]
+                        if (
+                            tile.is_provisional() is True
+                            and len(list(tile.provisionaledits.keys())) == 1
+                        ):
+                            provisional_editor_id = list(tile.provisionaledits.keys())[
+                                0
+                            ]
                             edit = tile.provisionaledits[provisional_editor_id]
-                            provisional_editor = User.objects.get(pk=provisional_editor_id)
+                            provisional_editor = User.objects.get(
+                                pk=provisional_editor_id
+                            )
                             reviewer = request.user
                             tile.delete(
                                 request=request,
@@ -263,13 +349,24 @@ class TileData(View):
                         update_system_settings_cache(tile)
                         return JSONResponse(tile)
                     else:
-                        return JSONErrorResponse(_("Request Failed"), _("Permission Denied"))
+                        return JSONErrorResponse(
+                            _("Request Failed"), _("Permission Denied")
+                        )
                 elif is_active is False:
-                    response = {"status": "false", "message": [_("Request Failed"), _("Unable to delete. Verify model status is active")]}
+                    response = {
+                        "status": "false",
+                        "message": [
+                            _("Request Failed"),
+                            _("Unable to delete. Verify model status is active"),
+                        ],
+                    }
                     return JSONResponse(response, status=500)
                 else:
                     return JSONErrorResponse(
-                        _("Request Failed"), _("You do not have permissions to delete a tile with authoritative data.")
+                        _("Request Failed"),
+                        _(
+                            "You do not have permissions to delete a tile with authoritative data."
+                        ),
                     )
 
         return HttpResponseNotFound()
@@ -281,14 +378,28 @@ class TileData(View):
             tiles = Tile.objects.filter(pk__in=tileids)
             files = sum(
                 [
-                    [{"name": file["name"], "outputfile": models.File.objects.get(pk=file["file_id"]).path} for file in tile.data[nodeid]]
+                    [
+                        {
+                            "name": file["name"],
+                            "outputfile": models.File.objects.get(
+                                pk=file["file_id"]
+                            ).path,
+                        }
+                        for file in tile.data[nodeid]
+                    ]
                     for tile in tiles
                 ],
                 [],
             )
 
             file_objects = sum(
-                [[models.File.objects.get(pk=file["file_id"]).path for file in tile.data[nodeid]] for tile in tiles],
+                [
+                    [
+                        models.File.objects.get(pk=file["file_id"]).path
+                        for file in tile.data[nodeid]
+                    ]
+                    for tile in tiles
+                ],
                 [],
             )
 
@@ -312,7 +423,9 @@ class TileData(View):
                 response = arches_zip.zip_response(files, "file-viewer-download.zip")
                 return response
             else:
-                return HttpResponseBadRequest(_("Too large to be zipped.  Try downloading a single file."))
+                return HttpResponseBadRequest(
+                    _("Too large to be zipped.  Try downloading a single file.")
+                )
 
         except TypeError as e:
             logger.error("Tile id array required to download files.")
@@ -327,21 +440,39 @@ class TileData(View):
                 .filter(timestamp__range=[start, end])
                 .order_by("tileinstanceid", "timestamp")
             )
-            resourceinstanceids = [e["resourceinstanceid"] for e in edits.values("resourceinstanceid")]
-            deleted_resource_edits = EditLog.objects.filter(resourceinstanceid__in=resourceinstanceids).filter(edittype="delete")
-            deleted_resource_instances = [e["resourceinstanceid"] for e in deleted_resource_edits.values("resourceinstanceid")]
+            resourceinstanceids = [
+                e["resourceinstanceid"] for e in edits.values("resourceinstanceid")
+            ]
+            deleted_resource_edits = EditLog.objects.filter(
+                resourceinstanceid__in=resourceinstanceids
+            ).filter(edittype="delete")
+            deleted_resource_instances = [
+                e["resourceinstanceid"]
+                for e in deleted_resource_edits.values("resourceinstanceid")
+            ]
             summary = {}
             for edit in edits:
                 if edit.tileinstanceid not in summary:
-                    summary[edit.tileinstanceid] = {"pending": False, "tileid": edit.tileinstanceid}
+                    summary[edit.tileinstanceid] = {
+                        "pending": False,
+                        "tileid": edit.tileinstanceid,
+                    }
                 summary[edit.tileinstanceid]["lasttimestamp"] = edit.timestamp
                 summary[edit.tileinstanceid]["lastedittype"] = edit.provisional_edittype
                 summary[edit.tileinstanceid]["reviewer"] = ""
-                summary[edit.tileinstanceid]["resourceinstanceid"] = edit.resourceinstanceid
-                summary[edit.tileinstanceid]["resourcedisplayname"] = edit.resourcedisplayname
+                summary[edit.tileinstanceid][
+                    "resourceinstanceid"
+                ] = edit.resourceinstanceid
+                summary[edit.tileinstanceid][
+                    "resourcedisplayname"
+                ] = edit.resourcedisplayname
                 summary[edit.tileinstanceid]["resourcemodelid"] = edit.resourceclassid
                 summary[edit.tileinstanceid]["nodegroupid"] = edit.nodegroupid
-                summary[edit.tileinstanceid]["resource_deleted"] = True if edit.resourceinstanceid in deleted_resource_instances else False
+                summary[edit.tileinstanceid]["resource_deleted"] = (
+                    True
+                    if edit.resourceinstanceid in deleted_resource_instances
+                    else False
+                )
                 if edit.provisional_edittype in ["accept edit", "delete edit"]:
                     summary[edit.tileinstanceid]["reviewer"] = edit.user_username
 
@@ -353,12 +484,17 @@ class TileData(View):
             )
             cards = models.CardModel.objects.all().values("name", "nodegroup_id")
             card_lookup = {str(card["nodegroup_id"]): card for card in cards}
-            resource_model_lookup = {str(graph["graphid"]): graph for graph in resource_models}
+            resource_model_lookup = {
+                str(graph["graphid"]): graph for graph in resource_models
+            }
             for k, v in summary.items():
                 if v["lastedittype"] not in ["accept edit", "delete edit"]:
                     if models.TileModel.objects.filter(pk=k).exists():
                         tile = models.TileModel.objects.get(pk=k)
-                        if tile.provisionaledits is not None and str(request.user.id) in tile.provisionaledits:
+                        if (
+                            tile.provisionaledits is not None
+                            and str(request.user.id) in tile.provisionaledits
+                        ):
                             v["pending"] = True
 
                 v["resourcemodel"] = resource_model_lookup[v["resourcemodelid"]]
@@ -369,11 +505,20 @@ class TileData(View):
                     v["card"].pop("nodegroup_id")
                 chronological_summary.append(v)
 
-            return JSONResponse(JSONSerializer().serialize(sorted(chronological_summary, key=lambda k: k["lasttimestamp"], reverse=True)))
+            return JSONResponse(
+                JSONSerializer().serialize(
+                    sorted(
+                        chronological_summary,
+                        key=lambda k: k["lasttimestamp"],
+                        reverse=True,
+                    )
+                )
+            )
 
         if self.action == "download_files":
             response = self.download_files(request)
             return response
+
 
 # Move to util function
 def get(id):

@@ -52,7 +52,12 @@ def deprecated(func):
         warnings.simplefilter("default", DeprecationWarning)  # reset filter
         logger.warning(
             "%s - DeprecationWarning: Call to deprecated function %s. %s:%s"
-            % (datetime.datetime.now(), func.__name__, func.__code__.co_filename, func.__code__.co_firstlineno + 1)
+            % (
+                datetime.datetime.now(),
+                func.__name__,
+                func.__code__.co_filename,
+                func.__code__.co_firstlineno + 1,
+            )
         )
         return func(*args, **kwargs)
 

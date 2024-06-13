@@ -4,10 +4,10 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9748_alter_graphmodel_functions_alter_icon_id'),
+        ("models", "9748_alter_graphmodel_functions_alter_icon_id"),
     ]
 
-    forward_sql =  """
+    forward_sql = """
         INSERT INTO etl_modules (
             etlmoduleid,
             name,
@@ -47,7 +47,6 @@ class Migration(migrations.Migration):
             helptemplate = 'import-branch-excel-help'
         WHERE etlmoduleid = '3b19a76a-0b09-450e-bee1-65accb096eaf';
     """
-
 
     reverse_sql = """
         DELETE FROM load_errors WHERE loadid IN (SELECT loadid FROM load_event WHERE etl_module_id = 'b96b8078-23b7-484f-b9d0-8ca304a5f7b6');

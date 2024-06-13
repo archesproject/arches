@@ -26,7 +26,10 @@ from django.utils.translation import get_language, get_language_bidi
 
 
 def livereload(request):
-    return {"livereload_port": settings.LIVERELOAD_PORT, "use_livereload": settings.USE_LIVERELOAD}
+    return {
+        "livereload_port": settings.LIVERELOAD_PORT,
+        "use_livereload": settings.USE_LIVERELOAD,
+    }
 
 
 def map_info(request):
@@ -36,10 +39,14 @@ def map_info(request):
         default_center = geo_utils.get_centroid(settings.DEFAULT_BOUNDS)
     else:
         hex_bin_bounds = (0, 0, 1, 1)
-        default_center = {"coordinates": [6.602384, 0.245926]}  # an island off the coast of Africa
+        default_center = {
+            "coordinates": [6.602384, 0.245926]
+        }  # an island off the coast of Africa
 
     try:
-        group_map_settings = GroupMapSettings.objects.get(group=request.user.groups.all()[0])
+        group_map_settings = GroupMapSettings.objects.get(
+            group=request.user.groups.all()[0]
+        )
         min_zoom = group_map_settings.min_zoom
         max_zoom = group_map_settings.max_zoom
         default_zoom = group_map_settings.default_zoom
@@ -54,14 +61,20 @@ def map_info(request):
             "zoom": default_zoom,
             "map_min_zoom": min_zoom,
             "map_max_zoom": max_zoom,
-            "map_filter_auto_zoom": "true" if settings.MAP_FILTER_AUTO_ZOOM_ENABLED else "false",
+            "map_filter_auto_zoom": (
+                "true" if settings.MAP_FILTER_AUTO_ZOOM_ENABLED else "false"
+            ),
             "mapbox_api_key": settings.MAPBOX_API_KEY,
-            "hex_bin_size": settings.HEX_BIN_SIZE if settings.HEX_BIN_SIZE is not None else 100,
+            "hex_bin_size": (
+                settings.HEX_BIN_SIZE if settings.HEX_BIN_SIZE is not None else 100
+            ),
             "mapbox_sprites": settings.MAPBOX_SPRITES,
             "mapbox_glyphs": settings.MAPBOX_GLYPHS,
             "hex_bin_bounds": json.dumps(hex_bin_bounds),
             "geocoder_default": settings.DEFAULT_GEOCODER,
-            "preferred_coordinate_systems": JSONSerializer().serialize(settings.PREFERRED_COORDINATE_SYSTEMS),
+            "preferred_coordinate_systems": JSONSerializer().serialize(
+                settings.PREFERRED_COORDINATE_SYSTEMS
+            ),
         }
     }
 
@@ -80,10 +93,18 @@ def app_settings(request=None):
             "SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT": settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT,
             "RENDERERS": settings.RENDERERS,
             "ACCESSIBILITY_MODE": settings.ACCESSIBILITY_MODE,
-            "FORCE_SCRIPT_NAME": settings.FORCE_SCRIPT_NAME if settings.FORCE_SCRIPT_NAME is not None else "",
+            "FORCE_SCRIPT_NAME": (
+                settings.FORCE_SCRIPT_NAME
+                if settings.FORCE_SCRIPT_NAME is not None
+                else ""
+            ),
             "ACTIVE_LANGUAGE": get_language(),
             "ACTIVE_LANGUAGE_DIR": "rtl" if get_language_bidi() else "ltr",
-            "LANGUAGES": JSONSerializer().serialize(languages) if len(languages) != 0 else JSONSerializer().serialize([]),
+            "LANGUAGES": (
+                JSONSerializer().serialize(languages)
+                if len(languages) != 0
+                else JSONSerializer().serialize([])
+            ),
             "RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER": settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER,
             "DEBUG": settings.DEBUG,
         }

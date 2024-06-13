@@ -18,7 +18,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="SpatialView",
             fields=[
-                ("spatialviewid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "spatialviewid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("schema", models.TextField(default="public")),
                 (
                     "slug",
@@ -35,11 +40,20 @@ class Migration(migrations.Migration):
                 ),
                 ("description", models.TextField(default="arches spatial view")),
                 ("ismixedgeometrytypes", models.BooleanField(default=False)),
-                ("attributenodes", django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column="attributenodes", null=True)),
+                (
+                    "attributenodes",
+                    django.contrib.postgres.fields.jsonb.JSONField(
+                        blank=True, db_column="attributenodes", null=True
+                    ),
+                ),
                 ("isactive", models.BooleanField(default=True)),
                 (
                     "geometrynodeid",
-                    models.ForeignKey(db_column="geometrynodeid", on_delete=django.db.models.deletion.CASCADE, to="models.Node"),
+                    models.ForeignKey(
+                        db_column="geometrynodeid",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="models.Node",
+                    ),
                 ),
             ],
             options={

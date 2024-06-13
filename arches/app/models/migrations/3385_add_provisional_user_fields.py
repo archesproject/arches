@@ -8,23 +8,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', 'deserialize_provisional_edits'),
+        ("models", "deserialize_provisional_edits"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='editlog',
-            name='provisional_edittype',
+            model_name="editlog",
+            name="provisional_edittype",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='editlog',
-            name='provisional_user_username',
+            model_name="editlog",
+            name="provisional_user_username",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='editlog',
-            name='provisional_userid',
+            model_name="editlog",
+            name="provisional_userid",
             field=models.TextField(blank=True, null=True),
         ),
     ]

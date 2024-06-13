@@ -14,7 +14,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="ManifestImage",
             fields=[
-                ("imageid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "imageid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("image", models.ImageField(upload_to="cantaloupe")),
             ],
             options={

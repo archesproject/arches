@@ -6,6 +6,7 @@ IntegrityCheckDescriptions = {
     1012: "Node Groups without matching nodes",
 }
 
+
 @unique
 class IntegrityCheck(Enum):
     NODE_HAS_ONTOLOGY_GRAPH_DOES_NOT = 1005

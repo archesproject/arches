@@ -39,7 +39,9 @@ DATABASES = {
 }
 
 ELASTICSEARCH_HTTP_PORT = get_env_variable("ESPORT")
-ELASTICSEARCH_HOSTS = [{"host": get_env_variable("ESHOST"), "port": ELASTICSEARCH_HTTP_PORT}]
+ELASTICSEARCH_HOSTS = [
+    {"host": get_env_variable("ESHOST"), "port": ELASTICSEARCH_HTTP_PORT}
+]
 
 USER_ELASTICSEARCH_PREFIX = get_optional_env_variable("ELASTICSEARCH_PREFIX")
 if USER_ELASTICSEARCH_PREFIX:

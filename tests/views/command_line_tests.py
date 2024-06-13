@@ -42,9 +42,17 @@ class CommandLineTests(ArchesTestCase):
         if not models.GraphModel.objects.filter(pk=cls.data_type_graphid).exists():
             # TODO: Fix this to run inside transaction, i.e. after super().setUpClass()
             # https://github.com/archesproject/arches/issues/10719
-            test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
+            test_pkg_path = os.path.join(
+                test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg"
+            )
             with captured_stdout():
-                management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
+                management.call_command(
+                    "packages",
+                    operation="load_package",
+                    source=test_pkg_path,
+                    yes=True,
+                    verbosity=0,
+                )
 
         path_to_cheesy_image = Path(settings.MEDIA_ROOT) / "uploadedfiles" / "test.png"
         cls.addClassCleanup(os.unlink, path_to_cheesy_image)
@@ -52,5 +60,7 @@ class CommandLineTests(ArchesTestCase):
         super().setUpClass()
 
     def test_load_package(self):
-        resources = models.ResourceInstance.objects.filter(graph_id=self.data_type_graphid)
+        resources = models.ResourceInstance.objects.filter(
+            graph_id=self.data_type_graphid
+        )
         self.assertEqual(len(list(resources)), self.expected_resource_count)
