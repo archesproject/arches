@@ -344,6 +344,35 @@ class ResourceTests(ArchesTestCase):
             },
         )
 
+    def test_provisional_user_can_delete_own_resource(self):
+        """
+        Test provisional user can delete resource instance they created
+        """
+
+        user = User.objects.create_user(
+            username="sam", email="sam@samsclub.com", password="Test12345!"
+        )
+        user.save()
+        group = Group.objects.get(name="Resource Editor")
+        group.user_set.add(user)
+        test_resource = Resource(graph_id=self.search_model_graphid)
+        test_resource.save(user=user)
+
+        other_user = User.objects.create_user(
+            username="fred", email="fred@samsclub.com", password="Test12345!"
+        )
+        other_user.save()
+        group = Group.objects.get(name="Resource Editor")
+        group.user_set.add(other_user)
+
+        with self.subTest(user="can't delete"):
+            result = test_resource.delete(user=other_user)
+            self.assertFalse(result)
+
+        with self.subTest(user="can delete"):
+            result = test_resource.delete(user=user)
+            self.assertTrue(result)
+
     def test_recalculate_descriptors_prefetch_related_objects(self):
         r1 = Resource(graph_id=self.search_model_graphid)
         r2 = Resource(graph_id=self.search_model_graphid)
