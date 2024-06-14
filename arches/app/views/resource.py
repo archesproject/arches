@@ -106,20 +106,6 @@ def get_resource_relationship_types():
     return relationship_type_values
 
 
-def get_instance_creator(resource_instance, user=None):
-    creatorid = None
-    can_edit = None
-    if models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype="create").exists():
-        creatorid = (
-            models.EditLog.objects.filter(resourceinstanceid=resource_instance.resourceinstanceid).filter(edittype="create")[0].userid
-        )
-    if creatorid is None or creatorid == "":
-        creatorid = settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
-    if user:
-        can_edit = user.id == int(creatorid) or user.is_superuser
-    return {"creatorid": creatorid, "user_can_edit_instance_permissions": can_edit}
-
-
 @method_decorator(group_required("Resource Editor"), name="dispatch")
 class ResourceEditorView(MapBaseManagerView):
     action = None
@@ -196,7 +182,7 @@ class ResourceEditorView(MapBaseManagerView):
         else:
             resource_instance = Resource.objects.get(pk=resourceid)
             graph = resource_instance.graph
-            instance_creator = get_instance_creator(resource_instance, request.user)
+            instance_creator = resource_instance.get_instance_creator(request.user)
             creator = instance_creator["creatorid"]
             user_created_instance = instance_creator["user_can_edit_instance_permissions"]
 
@@ -390,7 +376,7 @@ class ResourcePermissionDataView(View):
 
     def get(self, request):
         resourceid = request.GET.get("instanceid", None)
-        resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+        resource_instance = Resource.objects.get(pk=resourceid)
         result = self.get_instance_permissions(resource_instance)
         return JSONResponse(result)
 
@@ -407,7 +393,7 @@ class ResourcePermissionDataView(View):
             data = JSONDeserializer().deserialize(request.body)
             self.apply_permissions(data, request.user)
             if "instanceid" in data:
-                resource = models.ResourceInstance.objects.get(pk=data["instanceid"])
+                resource = Resource.objects.get(pk=data["instanceid"])
                 result = self.get_instance_permissions(resource)
         return JSONResponse(result)
 
@@ -426,7 +412,7 @@ class ResourcePermissionDataView(View):
             res += list(filter(lambda x: (x["codename"] == perm), perms))
         return res
 
-    def get_instance_permissions(self, resource_instance):
+    def get_instance_permissions(self, resource_instance: Resource):
         permission_order = ["view_resourceinstance", "change_resourceinstance", "delete_resourceinstance", "no_access_to_resourceinstance"]
         perms = json.loads(
             JSONSerializer().serialize(
@@ -458,7 +444,7 @@ class ResourcePermissionDataView(View):
         result = {"identities": identities}
         result["permissions"] = ordered_perms
         result["limitedaccess"] = (len(get_users_with_perms(resource_instance)) + len(get_groups_with_perms(resource_instance))) > 1
-        instance_creator = get_instance_creator(resource_instance)
+        instance_creator = resource_instance.get_instance_creator()
         result["creatorid"] = instance_creator["creatorid"]
         return result
 
@@ -468,7 +454,7 @@ class ResourcePermissionDataView(View):
         resource.graph_id = graphid if graphid else str(resource_instance.graph_id)
         resource.createdtime = resource_instance.createdtime
         resource.add_permission_to_all("no_access_to_resourceinstance")
-        instance_creator = get_instance_creator(resource)
+        instance_creator = resource.get_instance_creator()
         user = User.objects.get(pk=instance_creator["creatorid"])
         assign_perm("view_resourceinstance", user, resource)
         assign_perm("change_resourceinstance", user, resource)
@@ -487,14 +473,14 @@ class ResourcePermissionDataView(View):
     def apply_permissions(self, data, user, revert=False):
         with transaction.atomic():
             for instance in data["selectedInstances"]:
-                resource_instance = models.ResourceInstance.objects.get(pk=instance["resourceinstanceid"])
+                resource_instance = Resource.objects.get(pk=instance["resourceinstanceid"])
                 for identity in data["selectedIdentities"]:
                     if identity["type"] == "group":
                         identityModel = Group.objects.get(pk=identity["id"])
                     else:
                         identityModel = User.objects.get(pk=identity["id"])
 
-                    instance_creator = get_instance_creator(resource_instance, user)
+                    instance_creator = resource_instance.get_instance_creator(user)
                     creator = instance_creator["creatorid"]
                     user_can_modify_permissions = instance_creator["user_can_edit_instance_permissions"]
 

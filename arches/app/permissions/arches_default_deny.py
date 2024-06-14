@@ -15,22 +15,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import annotations
 
+from arches.app.models.resource import Resource
 from arches.app.search.components.resource_type_filter import get_permitted_graphids
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from arches.app.models.models import ResourceInstance
 
 from arches.app.permissions.arches_standard import ArchesStandardPermissionFramework, ResourceInstancePermissions
+from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Query, Terms
+
 
 class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
     def get_sets_for_user(self, user: User, perm: str) -> set[str] | None:
         # We do not do set filtering - None is allow-all for sets.
         return None if user and user.username != "anonymous" else set()
 
-
     def get_restricted_users(self, resource: ResourceInstance) -> dict[str, list[int]]:
         """Fetches _explicitly_ restricted users."""
         return super().get_restricted_users(resource)
-
 
     def check_resource_instance_permissions(self, user: User, resourceid: str, permission: str) -> ResourceInstancePermissions:
         result = super().check_resource_instance_permissions(user, resourceid, permission)
@@ -56,4 +57,63 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
                     if permission in group_permissions:
                         result["permitted"] = True
 
+        return result
+
+    def process_new_user(self, instance: User, created: bool) -> None:
+        pass
+
+    def update_mappings(self):
+        mappings = {}
+        mappings["groups_read"] = {"type": "integer"}
+        mappings["groups_edit"] = {"type": "integer"}
+        mappings["users_read"] = {"type": "integer"}
+        mappings["users_edit"] = {"type": "integer"}
+        return mappings
+
+    def get_index_values(self, resource: Resource):
+        permissions = {}
+        read_allowances = [group.id for group in self.get_groups_for_object("view_resourceinstance", resource)]
+        permissions["groups_read"] = read_allowances
+        edit_allowances = [group.id for group in self.get_groups_for_object("change_resourceinstance", resource)]
+        permissions["groups_edit"] = edit_allowances
+        users_allowances = [user.id for user in self.get_users_for_object("view_resourceinstance", resource)]
+        permissions["users_read"] = users_allowances
+        users_edit_allowances = [user.id for user in self.get_users_for_object("change_resourceinstance", resource)]
+        permissions["users_edit"] = users_edit_allowances
+        return permissions
+
+    def get_permission_inclusions(self) -> list:
+        return ["permissions.groups_read", "permissions.groups_edit", "permissions.users_read", "permissions.users_edit"]
+
+    def get_permission_search_filter(self, user: User) -> Bool:
+        has_access = Bool()
+        should_access = Bool()
+        group_read = Terms(field="permissions.groups_read", terms=[str(group.id) for group in user.groups.all()])
+        user_read = Terms(field="permissions.users_read", terms=[str(user.id)])
+
+        nested_group_term_filter = Nested(path="permissions", query=group_read)
+        nested_user_term_filter = Nested(path="permissions", query=user_read)
+        should_access.should(nested_group_term_filter)
+        should_access.should(nested_user_term_filter)
+        has_access.filter(should_access)
+        return has_access
+
+    def get_search_ui_permissions(self, user: User, search_result: dict, groups: list[str]) -> dict:
+        result = {}
+        user_can_read = (
+            len(self.get_resource_types_by_perm(user, ["models.write_nodegroup", "models.delete_nodegroup", "models.read_nodegroup"])) > 0
+        )
+        result["can_read"] = user.is_superuser or (
+            "permissions" in search_result["_source"]
+            and "groups_read" in search_result["_source"]["permissions"]
+            and (len(set(search_result["_source"]["permissions"]["groups_read"]).intersection(set(groups))) > 0)
+            and user_can_read
+        )
+
+        user_can_edit = len(self.get_editable_resource_types(user)) > 0
+        result["can_edit"] = user.is_superuser or (
+            "permissions" in search_result["_source"]
+            and "groups_read" in search_result["_source"]["permissions"]
+            and ((len(set(search_result["_source"]["permissions"]["groups_edit"]).intersection(set(groups))) > 0) and user_can_edit)
+        )
         return result

@@ -250,8 +250,8 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                             selected: ko.computed(function() {
                                 return result._source.resourceinstanceid === ko.unwrap(self.selectedResourceId);
                             }),
-                            canRead: result._source.permissions && result._source.permissions.users_without_read_perm.indexOf(this.userid) < 0 && self.userCanReadResources,
-                            canEdit: result._source.permissions && result._source.permissions.users_without_edit_perm.indexOf(this.userid) < 0 && self.userCanEditResources,
+                                canRead: result["can_read"],
+                                canEdit: result["can_edit"],
                             // can_delete: result._source.permissions.users_without_delete_perm.indexOf(this.userid) < 0,
                         });
                     }, this);

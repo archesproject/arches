@@ -38,6 +38,7 @@ from arches.app.search.mappings import TERMS_INDEX, RESOURCES_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms, Nested
 from arches.app.tasks import index_resource
 from arches.app.utils import import_class_from_string, task_management
+from arches.app.utils import permission_backend
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 from arches.app.utils.permission_backend import assign_perm, remove_perm, NotUserNorGroup
@@ -48,7 +49,6 @@ from arches.app.utils.exceptions import (
 )
 from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
-    get_restricted_users,
     get_restricted_instances,
     user_can_read_graph,
     get_nodegroups_by_perm,
@@ -247,7 +247,18 @@ class Resource(models.ResourceInstance):
         if index is True:
             self.index(context)
 
-    def load_tiles(self, user=None, perm='read_nodegroup'):
+    def get_instance_creator(self, user=None):
+        creatorid = None
+        can_edit = None
+        if models.EditLog.objects.filter(resourceinstanceid=self.resourceinstanceid).filter(edittype="create").exists():
+            creatorid = models.EditLog.objects.filter(resourceinstanceid=self.resourceinstanceid).filter(edittype="create")[0].userid
+        if creatorid is None or creatorid == "":
+            creatorid = settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
+        if user:
+            can_edit = user.id == int(creatorid) or user.is_superuser
+        return {"creatorid": creatorid, "user_can_edit_instance_permissions": can_edit}
+
+    def load_tiles(self, user=None, perm="read_nodegroup"):
         """
         Loads the resource's tiles array with all the tiles from the database as a flat list
 
@@ -412,12 +423,11 @@ class Resource(models.ResourceInstance):
 
         tiles = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
 
-        restrictions = get_restricted_users(self)
         document["tiles"] = tiles
-        document["permissions"] = {"users_without_read_perm": restrictions["cannot_read"]}
-        document["permissions"]["users_without_edit_perm"] = restrictions["cannot_write"]
-        document["permissions"]["users_without_delete_perm"] = restrictions["cannot_delete"]
-        document["permissions"]["users_with_no_access"] = restrictions["no_access"]
+        document["permissions"] = {"creator": [self.get_instance_creator()["creatorid"]]}
+
+        document["permissions"].update(permission_backend.get_index_values(self))
+
         document["strings"] = []
         document["dates"] = []
         document["domains"] = []

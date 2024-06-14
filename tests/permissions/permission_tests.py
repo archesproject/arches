@@ -91,7 +91,6 @@ class PermissionTests(ArchesTestCase):
         super().setUpClass()
         cls.add_users()
 
-
     def test_user_cannot_view_without_permission(self):
         """
         Tests if a user is allowed to view a resource with implicit permissions and explicit permissions, but
@@ -111,7 +110,7 @@ class PermissionTests(ArchesTestCase):
     def test_user_has_resource_model_permissions(self):
         """
         Tests that a user cannot access an instance if they have no access to any nodegroup.
-        
+
         """
 
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)

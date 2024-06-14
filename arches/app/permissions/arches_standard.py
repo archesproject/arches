@@ -585,6 +585,59 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                 return True
         return False
 
+    def update_mappings(self):
+        mappings = {}
+        mappings["users_without_read_perm"] = {"type": "integer"}
+        mappings["users_without_edit_perm"] = {"type": "integer"}
+        mappings["users_without_delete_perm"] = {"type": "integer"}
+        mappings["users_with_no_access"] = {"type": "integer"}
+        return mappings
+
+    def get_index_values(self, resource: Resource):
+        restrictions = self.get_restricted_users(resource)
+        permissions = {}
+        permissions["users_without_read_perm"] = restrictions["cannot_read"]
+        permissions["users_without_edit_perm"] = restrictions["cannot_write"]
+        permissions["users_without_delete_perm"] = restrictions["cannot_delete"]
+        permissions["users_with_no_access"] = restrictions["no_access"]
+        return permissions
+
+    def get_permission_inclusions(self) -> list:
+        return [
+            "permissions.users_without_read_perm",
+            "permissions.users_without_edit_perm",
+            "permissions.users_without_delete_perm",
+            "permissions.users_with_no_access",
+        ]
+
+    def get_permission_search_filter(self, user: User) -> Bool:
+        has_access = Bool()
+        terms = Terms(field="permissions.users_with_no_access", terms=[str(user.id)])
+        nested_term_filter = Nested(path="permissions", query=terms)
+        has_access.must_not(nested_term_filter)
+        return has_access
+
+    def get_search_ui_permissions(self, user: User, search_result: dict) -> dict:
+        result = {}
+        user_read_permissions = self.get_resource_types_by_perm(
+            user, ["models.write_nodegroup", "models.delete_nodegroup", "models.read_nodegroup"]
+        )
+        user_can_read = len(user_read_permissions) > 0
+        result["can_read"] = (
+            "permissions" in search_result["_source"]
+            and "users_without_read_perm" in search_result["_source"]["permissions"]
+            and (user.id in search_result["_source"]["permissions"]["users_without_read_perm"])
+        ) and user_can_read
+
+        user_can_edit = len(self.get_editable_resource_types(user)) > 0
+        result["can_edit"] = (
+            "permissions" in search_result["_source"]
+            and "users_without_edit_perm" in search_result["_source"]["permissions"]
+            and (user.id in search_result["_source"]["permissions"]["users_without_edit_perm"])
+            and user_can_edit
+        )
+        return result
+
 
 class PermissionBackend(ObjectPermissionBackend):  # type: ignore
     def has_perm(self, user_obj: User, perm: str, obj: Model | None = None) -> bool:

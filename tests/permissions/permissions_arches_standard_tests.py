@@ -14,6 +14,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+from unittest import mock
+from arches.app.search.elasticsearch_dsl_builder import Bool
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from tests.permissions.base_permissions_framework_test import ArchesPermissionFrameworkTestCase
@@ -48,13 +50,13 @@ class ArchesStandardPermissionTests(ArchesPermissionFrameworkTestCase):
         self.framework.assign_perm("view_resourceinstance", self.group, resource)
         can_access_with_view_permission = self.framework.user_can_read_resource(self.user, self.resource_instance_id)
         self.assertTrue(
-            implicit_permission is True and can_access_without_view_permission is False and can_access_with_view_permission is True
+            (implicit_permission is True and can_access_without_view_permission is False and can_access_with_view_permission is True)
         )
 
     def test_user_has_resource_model_permissions(self):
         """
         Tests that a user cannot access an instance if they have no access to any nodegroup.
-        
+
         """
 
         resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
@@ -93,3 +95,21 @@ class ArchesStandardPermissionTests(ArchesPermissionFrameworkTestCase):
         ]
 
         self.assertTrue(all(results) is True)
+
+    def test_inclusion_array(self):
+        inclusions = self.framework.get_permission_inclusions()
+        self.assertTrue(len(inclusions) == 4)
+
+    @mock.patch("django.contrib.auth.models.User")
+    def test_permission_search_filter(self, mock_User):
+        mock_User.id = 12
+        filter = self.framework.get_permission_search_filter(mock_User)
+        filter_text = str(filter.dsl)
+        assert filter_text.find("permissions.users_with_no_access") != -1
+        assert filter_text.find(str(mock_User.id)) != -1
+
+    @mock.patch("guardian.shortcuts.get_users_with_perms")
+    @mock.patch("arches.app.models.models.ResourceInstance")
+    def test_permission(self, mock_resourceinstance, mock_get_users_with_perms):
+        values = self.framework.get_index_values(mock_resourceinstance)
+        print(values)
