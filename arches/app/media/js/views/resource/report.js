@@ -10,7 +10,7 @@ require([
             BaseManagerView.prototype.initialize.call(this, options);
             
             if (location.search.indexOf('print') > 0) {
-                var self = this 
+                const self = this;
                 self.viewModel.loading(true);
                 setTimeout(
                     function() {
