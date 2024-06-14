@@ -17,14 +17,13 @@ class FileValidator(object):
         errors = []
         match extension:
             case "DS_Store":
-                if settings.FILE_TYPE_CHECKING:
-                    if settings.FILE_TYPE_CHECKING == "lenient":
-                        self.logger.log(
-                            logging.WARN,
-                            "DS_Store file encountered, proceeding with caution.",
-                        )
-                    else:
-                        errors.append(f"File type is not permitted: {extension}")
+                if settings.FILE_TYPE_CHECKING == "lenient":
+                    self.logger.log(
+                        logging.WARN,
+                        "DS_Store file encountered, proceeding with caution.",
+                    )
+                else:
+                    errors.append(f"File type is not permitted: {extension}")
             case _ if extension not in settings.FILE_TYPES:
                 errors.append(f"File type is not permitted: {extension}")
             case "xlsx":
