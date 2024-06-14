@@ -74,7 +74,6 @@ class Resource(models.ResourceInstance):
         self.serialized_graph = None
         self.node_datatypes = None
 
-
     def get_serialized_graph(self):
         if not self.serialized_graph:
             try:
@@ -103,7 +102,12 @@ class Resource(models.ResourceInstance):
         if "root" in self.get_serialized_graph():
             return self.get_serialized_graph()["root"]["ontologyclass"]
         else:
-            return SimpleNamespace(**next((x for x in self.get_serialized_graph()["nodes"] if x["istopnode"] is True), None)).ontologyclass
+            return SimpleNamespace(
+                **next(
+                    (x for x in self.get_serialized_graph()["nodes"] if x["istopnode"] is True),
+                    None,
+                )
+            ).ontologyclass
 
     def get_descriptor_language(self, context):
         """
@@ -162,7 +166,7 @@ class Resource(models.ResourceInstance):
             ).select_related("function")
 
         for lang in settings.LANGUAGES:
-            language = self.get_descriptor_language({"language":lang[0]})
+            language = self.get_descriptor_language({"language": lang[0]})
             if context:
                 context["language"] = language
             else:
@@ -172,13 +176,16 @@ class Resource(models.ResourceInstance):
                 if len(self.descriptor_function) == 1:
                     module = self.descriptor_function[0].function.get_class_module()()
                     self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
-                        self, self.descriptor_function[0].config["descriptor_types"][descriptor], context, descriptor
+                        self,
+                        self.descriptor_function[0].config["descriptor_types"][descriptor],
+                        context,
+                        descriptor,
                     )
                     if descriptor == "name" and self.descriptors[language][descriptor] is not None:
                         self.name[language] = self.descriptors[language][descriptor]
                 else:
                     self.descriptors[language][descriptor] = None
-        
+
         super(Resource, self).save()
 
     def displaydescription(self, context=None):
@@ -231,7 +238,13 @@ class Resource(models.ResourceInstance):
 
         for tile in self.tiles:
             tile.resourceinstance_id = self.resourceinstanceid
-            tile.save(request=request, index=False, resource_creation=True, transaction_id=transaction_id, context=context)
+            tile.save(
+                request=request,
+                index=False,
+                resource_creation=True,
+                transaction_id=transaction_id,
+                context=context,
+            )
         if request is None:
             if user is None:
                 user = {}
@@ -239,24 +252,17 @@ class Resource(models.ResourceInstance):
             user = request.user
 
         try:
-            for perm in ("view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"):
+            for perm in (
+                "view_resourceinstance",
+                "change_resourceinstance",
+                "delete_resourceinstance",
+            ):
                 assign_perm(perm, user, self)
         except NotUserNorGroup:
             pass
 
         if index is True:
             self.index(context)
-
-    def get_instance_creator(self, user=None):
-        creatorid = None
-        can_edit = None
-        if models.EditLog.objects.filter(resourceinstanceid=self.resourceinstanceid).filter(edittype="create").exists():
-            creatorid = models.EditLog.objects.filter(resourceinstanceid=self.resourceinstanceid).filter(edittype="create")[0].userid
-        if creatorid is None or creatorid == "":
-            creatorid = settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
-        if user:
-            can_edit = user.id == int(creatorid) or user.is_superuser
-        return {"creatorid": creatorid, "user_can_edit_instance_permissions": can_edit}
 
     def load_tiles(self, user=None, perm="read_nodegroup"):
         """
@@ -311,7 +317,9 @@ class Resource(models.ResourceInstance):
             resource.save_edit(edit_type="create", transaction_id=transaction_id)
 
         resources[0].tiles[0].save_edit(
-            note=f"Bulk created: {len(tiles)} for {len(resources)} resources.", edit_type="bulk_create", transaction_id=transaction_id
+            note=f"Bulk created: {len(tiles)} for {len(resources)} resources.",
+            edit_type="bulk_create",
+            transaction_id=transaction_id,
         )
 
         print("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
@@ -319,10 +327,18 @@ class Resource(models.ResourceInstance):
         for resource in resources:
             start = time()
             document, terms = resource.get_documents_to_index(
-                fetchTiles=False, datatype_factory=datatype_factory, node_datatypes=node_datatypes
+                fetchTiles=False,
+                datatype_factory=datatype_factory,
+                node_datatypes=node_datatypes,
             )
 
-            documents.append(se.create_bulk_item(index=RESOURCES_INDEX, id=document["resourceinstanceid"], data=document))
+            documents.append(
+                se.create_bulk_item(
+                    index=RESOURCES_INDEX,
+                    id=document["resourceinstanceid"],
+                    data=document,
+                )
+            )
 
             for term in terms:
                 term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
@@ -344,7 +360,11 @@ class Resource(models.ResourceInstance):
             node_datatypes = {
                 str(nodeid): datatype for nodeid, datatype in ((k["nodeid"], k["datatype"]) for k in self.get_serialized_graph()["nodes"])
             }
-            document, terms = self.get_documents_to_index(datatype_factory=datatype_factory, node_datatypes=node_datatypes, context=context)
+            document, terms = self.get_documents_to_index(
+                datatype_factory=datatype_factory,
+                node_datatypes=node_datatypes,
+                context=context,
+            )
             document["root_ontology_class"] = self.get_root_ontology()
             doc = JSONSerializer().serializeToPython(document)
             se.index_data(index=RESOURCES_INDEX, body=doc, id=self.pk)
@@ -356,7 +376,14 @@ class Resource(models.ResourceInstance):
 
                 for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
                     if celery_worker_running and index.get("should_update_asynchronously"):
-                        index_resource.apply_async([index["module"], index["name"], self.pk, [tile.pk for tile in document["tiles"]]])
+                        index_resource.apply_async(
+                            [
+                                index["module"],
+                                index["name"],
+                                self.pk,
+                                [tile.pk for tile in document["tiles"]],
+                            ]
+                        )
                     else:
                         es_index = import_class_from_string(index["module"])(index["name"])
                         doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
@@ -406,9 +433,17 @@ class Resource(models.ResourceInstance):
                 try:
                     display_description = JSONDeserializer().deserialize(displaydescription)
                     for key in display_description.keys():
-                        document["displaydescription"].append({"value": display_description[key]["value"], "language": key})
+                        document["displaydescription"].append(
+                            {
+                                "value": display_description[key]["value"],
+                                "language": key,
+                            }
+                        )
                 except:
-                    display_description = {"value": displaydescription, "language": lang[0]}
+                    display_description = {
+                        "value": displaydescription,
+                        "language": lang[0],
+                    }
                     document["displaydescription"].append(display_description)
 
             mappopup = self.map_popup(context)
@@ -512,9 +547,13 @@ class Resource(models.ResourceInstance):
             user_is_reviewer = user_is_resource_reviewer(user)
             if user_is_reviewer is False:
                 tiles = list(models.TileModel.objects.filter(resourceinstance=self))
-                resource_is_provisional = True if sum([len(t.data) for t in tiles]) == 0 else False
+                resource_is_provisional = (
+                    True if sum([len(t.data) for t in tiles]) == 0 or [any(t.data.values()) for t in tiles][0] == False else False
+                )
                 if resource_is_provisional is True:
-                    permit_deletion = True
+                    creator_id = int(EditLog.objects.filter(resourceinstanceid=self.pk, edittype="create").values_list("userid")[0][0])
+                    if creator_id == user.id:
+                        permit_deletion = True
             else:
                 permit_deletion = True
         else:
@@ -530,7 +569,12 @@ class Resource(models.ResourceInstance):
                 self.delete_index()
 
             try:
-                self.save_edit(edit_type="delete", user=user, note=self.displayname(), transaction_id=transaction_id)
+                self.save_edit(
+                    edit_type="delete",
+                    user=user,
+                    note=self.displayname(),
+                    transaction_id=transaction_id,
+                )
             except:
                 pass
             super(Resource, self).delete()
@@ -635,10 +679,20 @@ class Resource(models.ResourceInstance):
             )
 
         graph_lookup = {
-            str(graph.graphid): {"name": graph.name, "iconclass": graph.iconclass, "fillColor": graph.color} for graph in graphs
+            str(graph.graphid): {
+                "name": graph.name,
+                "iconclass": graph.iconclass,
+                "fillColor": graph.color,
+            }
+            for graph in graphs
         }
 
-        ret = {"resource_instance": self, "resource_relationships": [], "related_resources": [], "node_config_lookup": graph_lookup}
+        ret = {
+            "resource_instance": self,
+            "resource_relationships": [],
+            "related_resources": [],
+            "node_config_lookup": graph_lookup,
+        }
 
         if page > 0:
             number_per_page = settings.RELATED_RESOURCES_PER_PAGE
@@ -683,7 +737,7 @@ class Resource(models.ResourceInstance):
             resourceinstancefrom_graphid = relation["resourceinstancefrom_graphid"]
 
             if (
-                resourceid_to not in restricted_instances 
+                resourceid_to not in restricted_instances
                 and resourceid_from not in restricted_instances
                 and user_can_read_graph(user, resourceinstanceto_graphid)
                 and user_can_read_graph(user, resourceinstancefrom_graphid)
@@ -777,7 +831,15 @@ class Resource(models.ResourceInstance):
 
         return JSONSerializer().serializeToPython(ret)
 
-    def to_json(self, compact=True, hide_empty_nodes=False, user=None, perm=None, version=None, hide_hidden_nodes=False):
+    def to_json(
+        self,
+        compact=True,
+        hide_empty_nodes=False,
+        user=None,
+        perm=None,
+        version=None,
+        hide_hidden_nodes=False,
+    ):
         """
         Returns resource represented as disambiguated JSON graph
 
@@ -787,11 +849,21 @@ class Resource(models.ResourceInstance):
         """
         if version is None:
             return LabelBasedGraph.from_resource(
-                resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, hide_hidden_nodes=hide_hidden_nodes
+                resource=self,
+                compact=compact,
+                hide_empty_nodes=hide_empty_nodes,
+                user=user,
+                perm=perm,
+                hide_hidden_nodes=hide_hidden_nodes,
             )
         elif version == "beta":
             return LabelBasedGraphV2.from_resource(
-                resource=self, compact=compact, hide_empty_nodes=hide_empty_nodes, user=user, perm=perm, hide_hidden_nodes=hide_hidden_nodes
+                resource=self,
+                compact=compact,
+                hide_empty_nodes=hide_empty_nodes,
+                user=user,
+                perm=perm,
+                hide_hidden_nodes=hide_hidden_nodes,
             )
 
     @staticmethod
@@ -843,7 +915,12 @@ class Resource(models.ResourceInstance):
         groups = list(Group.objects.all())
         users = list(User.objects.all())
         for identity in groups + users:
-            for perm in ["no_access_to_resourceinstance", "view_resourceinstance", "change_resourceinstance", "delete_resourceinstance"]:
+            for perm in [
+                "no_access_to_resourceinstance",
+                "view_resourceinstance",
+                "change_resourceinstance",
+                "delete_resourceinstance",
+            ]:
                 remove_perm(perm, identity, self)
         self.index()
 

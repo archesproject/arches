@@ -36,7 +36,16 @@ from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, MaxAgg, Aggregation
+from arches.app.search.elasticsearch_dsl_builder import (
+    Bool,
+    Match,
+    Query,
+    Nested,
+    Term,
+    Terms,
+    MaxAgg,
+    Aggregation,
+)
 from arches.app.search.search_export import SearchResultsExporter
 from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
@@ -44,7 +53,11 @@ from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import MapBaseManagerView
 from arches.app.models.concept import get_preflabel_from_conceptid
 from arches.app.utils import permission_backend
-from arches.app.utils.permission_backend import get_nodegroups_by_perm, user_is_resource_reviewer, user_is_resource_exporter
+from arches.app.utils.permission_backend import (
+    get_nodegroups_by_perm,
+    user_is_resource_reviewer,
+    user_is_resource_exporter,
+)
 from arches.app.utils.decorators import group_required
 import arches.app.utils.zip as zip_utils
 import arches.app.utils.task_management as task_management
@@ -70,7 +83,7 @@ class SearchView(MapBaseManagerView):
         if user_is_resource_exporter(request.user):
             search_components = models.SearchComponent.objects.all()
         else:
-            search_components = models.SearchComponent.objects.all().exclude(componentname='search-export')
+            search_components = models.SearchComponent.objects.all().exclude(componentname="search-export")
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
@@ -145,7 +158,12 @@ def search_terms(request):
         boolquery.should(Match(field="value", query=searchString.lower(), type="phrase_prefix"))
         boolquery.should(Match(field="value.folded", query=searchString.lower(), type="phrase_prefix"))
         boolquery.should(
-            Match(field="value.folded", query=searchString.lower(), fuzziness="AUTO", prefix_length=settings.SEARCH_TERM_SENSITIVITY)
+            Match(
+                field="value.folded",
+                query=searchString.lower(),
+                fuzziness="AUTO",
+                prefix_length=settings.SEARCH_TERM_SENSITIVITY,
+            )
         )
 
         if user_is_reviewer is False and index == "terms":
@@ -153,7 +171,11 @@ def search_terms(request):
 
         query.add_query(boolquery)
         base_agg = Aggregation(
-            name="value_agg", type="terms", field="value.raw", size=settings.SEARCH_DROPDOWN_LENGTH, order={"max_score": "desc"}
+            name="value_agg",
+            type="terms",
+            field="value.raw",
+            size=settings.SEARCH_DROPDOWN_LENGTH,
+            order={"max_score": "desc"},
         )
         nodegroupid_agg = Aggregation(name="nodegroupid", type="terms", field="nodegroupid")
         top_concept_agg = Aggregation(name="top_concept", type="terms", field="top_concept")
@@ -173,10 +195,7 @@ def search_terms(request):
                 if len(result["top_concept"]["buckets"]) > 0:
                     for top_concept in result["top_concept"]["buckets"]:
                         top_concept_id = top_concept["key"]
-                        top_concept_label = get_preflabel_from_conceptid(
-                            top_concept["key"],
-                            lang=lang if lang != "*" else None
-                        )["value"]
+                        top_concept_label = get_preflabel_from_conceptid(top_concept["key"], lang=lang if lang != "*" else None)["value"]
                         for concept in top_concept["conceptid"]["buckets"]:
                             ret[index].append(
                                 {
@@ -445,17 +464,28 @@ def get_provisional_type(request):
 
 
 def get_permitted_nodegroups(user):
-    return get_nodegroups_by_perm(user, "models.read_nodegroup")
+    return [str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, "models.read_nodegroup")]
 
 
 def buffer(request):
     spatial_filter = JSONDeserializer().deserialize(
-        request.GET.get("filter", {"geometry": {"type": "", "coordinates": []}, "buffer": {"width": "0", "unit": "ft"}})
+        request.GET.get(
+            "filter",
+            {
+                "geometry": {"type": "", "coordinates": []},
+                "buffer": {"width": "0", "unit": "ft"},
+            },
+        )
     )
 
     if spatial_filter["geometry"]["coordinates"] != "" and spatial_filter["geometry"]["type"] != "":
         return JSONResponse(
-            _buffer(spatial_filter["geometry"], spatial_filter["buffer"]["width"], spatial_filter["buffer"]["unit"]), geom_format="json"
+            _buffer(
+                spatial_filter["geometry"],
+                spatial_filter["buffer"]["width"],
+                spatial_filter["buffer"]["unit"],
+            ),
+            geom_format="json",
         )
 
     return JSONResponse()
@@ -479,7 +509,11 @@ def _buffer(geojson, width=0, unit="ft"):
                 """SELECT ST_TRANSFORM(
                     ST_BUFFER(ST_TRANSFORM(ST_SETSRID(%s::geometry, 4326), %s), %s),
                 4326)""",
-                (geom.hex.decode("utf-8"), settings.ANALYSIS_COORDINATE_SYSTEM_SRID, width),
+                (
+                    geom.hex.decode("utf-8"),
+                    settings.ANALYSIS_COORDINATE_SYSTEM_SRID,
+                    width,
+                ),
             )
             res = cursor.fetchone()
             geom = GEOSGeometry(res[0], srid=4326)

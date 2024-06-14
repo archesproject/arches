@@ -33,6 +33,7 @@ from arches.app.utils.permission_backend import (
     user_can_read_map_layers,
 )
 
+
 class BaseManagerView(TemplateView):
 
     if is_compatible_with_arches() is False:
@@ -85,7 +86,12 @@ class BaseManagerView(TemplateView):
         context["user_can_read"] = (
             len(
                 get_resource_types_by_perm(
-                    self.request.user, ["models.write_nodegroup", "models.delete_nodegroup", "models.read_nodegroup"]
+                    self.request.user,
+                    [
+                        "models.write_nodegroup",
+                        "models.delete_nodegroup",
+                        "models.read_nodegroup",
+                    ],
                 )
             )
             > 0

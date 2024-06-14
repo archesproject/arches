@@ -9,7 +9,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4665_iiif_manifest_model'),
+        ("models", "4665_iiif_manifest_model"),
     ]
 
     operations = [
@@ -33,6 +33,6 @@ class Migration(migrations.Migration):
                     'workflow-plugin',
                     '{}'
                 );
-            """
+            """,
         )
     ]

@@ -10,9 +10,22 @@ from django.core.cache import cache
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory, get_value_from_jsonld
-from arches.app.models.concept import get_preflabel_from_valueid, get_preflabel_from_conceptid, get_valueids_from_concept_label
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Range, Term, Nested, Exists, Terms
+from arches.app.models.concept import (
+    get_preflabel_from_valueid,
+    get_preflabel_from_conceptid,
+    get_valueids_from_concept_label,
+)
+from arches.app.search.elasticsearch_dsl_builder import (
+    Bool,
+    Match,
+    Range,
+    Term,
+    Nested,
+    Exists,
+    Terms,
+)
 from arches.app.utils.date_utils import ExtendedDateFormat
+
 # for the RDF graph export helper functions
 from rdflib import Namespace, URIRef, Literal, BNode
 from rdflib import ConjunctiveGraph as Graph
@@ -25,6 +38,7 @@ archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
 
 logger = logging.getLogger(__name__)
+
 
 class BaseConceptDataType(BaseDataType):
     def __init__(self, model=None):
@@ -49,12 +63,16 @@ class BaseConceptDataType(BaseDataType):
             if nodeid in self.collection_by_node_lookup:
                 collectionid = self.collection_by_node_lookup[nodeid]
             else:
-                collectionid = models.Node.objects.get(nodeid=nodeid).config["rdmCollection"]
+                collectionid = models.Node.objects.get(nodeid=nodeid).config[
+                    "rdmCollection"
+                ]
                 self.collection_by_node_lookup[nodeid] = collectionid
         try:
             result = self.lookup_label(value, collectionid)
         except KeyError:
-            self.collection_lookup[collectionid] = Concept().get_child_collections(collectionid)
+            self.collection_lookup[collectionid] = Concept().get_child_collections(
+                collectionid
+            )
             result = self.lookup_label(value, collectionid)
         return result
 
@@ -72,7 +90,11 @@ class BaseConceptDataType(BaseDataType):
         ret = ""
         if valueid is None or valueid.strip() == "":
             pass
-        elif concept_export_value_type is None or concept_export_value_type == "" or concept_export_value_type == "label":
+        elif (
+            concept_export_value_type is None
+            or concept_export_value_type == ""
+            or concept_export_value_type == "label"
+        ):
             ret = self.get_value(valueid).value
         elif concept_export_value_type == "both":
             ret = valueid + "|" + self.get_value(valueid).value
@@ -111,7 +133,11 @@ class BaseConceptDataType(BaseDataType):
                 max_date = ExtendedDateFormat(date_range["max_year"]).upper
                 if {"gte": min_date, "lte": max_date} not in document["date_ranges"]:
                     document["date_ranges"].append(
-                        {"date_range": {"gte": min_date, "lte": max_date}, "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                        {
+                            "date_range": {"gte": min_date, "lte": max_date},
+                            "nodegroup_id": tile.nodegroup_id,
+                            "provisional": provisional,
+                        }
                     )
             document["domains"].append(
                 {
@@ -122,7 +148,13 @@ class BaseConceptDataType(BaseDataType):
                     "provisional": provisional,
                 }
             )
-            document["strings"].append({"string": value.value, "nodegroup_id": tile.nodegroup_id, "provisional": provisional})
+            document["strings"].append(
+                {
+                    "string": value.value,
+                    "nodegroup_id": tile.nodegroup_id,
+                    "provisional": provisional,
+                }
+            )
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -135,7 +167,11 @@ class BaseConceptDataType(BaseDataType):
             elif value["op"] == "in_list_not":
                 self.append_in_list_search_filters(value, node, query, match_any=None)
             elif value["val"] != "":
-                match_query = Match(field="tiles.data.%s" % (str(node.pk)), type="phrase", query=value["val"])
+                match_query = Match(
+                    field="tiles.data.%s" % (str(node.pk)),
+                    type="phrase",
+                    query=value["val"],
+                )
                 if "!" in value["op"]:
                     query.must_not(match_query)
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
@@ -163,30 +199,47 @@ class BaseConceptDataType(BaseDataType):
                         case None:
                             query.must_not(match_q)
                 query.filter(Exists(field=field_name))
-        
+
         except KeyError as e:
             pass
 
 
 class ConceptDataType(BaseConceptDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
+    def validate(
+        self,
+        value,
+        row_number=None,
+        source="",
+        node=None,
+        nodeid=None,
+        strict=False,
+        **kwargs,
+    ):
         errors = []
         # first check to see if the validator has been passed a valid UUID,
         # which should be the case at this point. return error if not.
         if value is not None:
             if type(value) == list:
-                message = _("The widget used to save this data appears to be incorrect for this datatype. Contact system admin to resolve")
+                message = _(
+                    "The widget used to save this data appears to be incorrect for this datatype. Contact system admin to resolve"
+                )
                 title = _("Invalid Concept Datatype Widget")
-                error_message = self.create_error_message(value, source, row_number, message, title)
+                error_message = self.create_error_message(
+                    value, source, row_number, message, title
+                )
                 errors.append(error_message)
                 return errors
 
             try:
                 uuid.UUID(str(value))
             except ValueError:
-                message = _("This is an invalid concept prefLabel, or an incomplete UUID")
+                message = _(
+                    "This is an invalid concept prefLabel, or an incomplete UUID"
+                )
                 title = _("Invalid Concept PrefLabel/Uuid")
-                error_message = self.create_error_message(value, source, row_number, message, title)
+                error_message = self.create_error_message(
+                    value, source, row_number, message, title
+                )
                 errors.append(error_message)
                 return errors
 
@@ -195,7 +248,9 @@ class ConceptDataType(BaseConceptDataType):
             except ObjectDoesNotExist:
                 message = _("This UUID is not an available concept value")
                 title = _("Concept Id Not Found")
-                error_message = self.create_error_message(value, source, row_number, message, title)
+                error_message = self.create_error_message(
+                    value, source, row_number, message, title
+                )
                 errors.append(error_message)
                 return errors
         return errors
@@ -212,7 +267,9 @@ class ConceptDataType(BaseConceptDataType):
                 try:
                     value = self.lookup_labelid_from_label(value, kwargs)
                 except:
-                    logger.warning(_("Unable to convert {0} to concept label".format(value)))
+                    logger.warning(
+                        _("Unable to convert {0} to concept label".format(value))
+                    )
         return value
 
     def transform_export_values(self, value, *args, **kwargs):
@@ -233,7 +290,9 @@ class ConceptDataType(BaseConceptDataType):
         data = self.get_tile_data(tile)
         if data:
             val = data[str(node.nodeid)]
-            value_data = JSONSerializer().serializeToPython(self.get_value(uuid.UUID(val)))
+            value_data = JSONSerializer().serializeToPython(
+                self.get_value(uuid.UUID(val))
+            )
             return self.compile_json(tile, node, **value_data)
 
     def get_rdf_uri(self, node, data, which="r"):
@@ -242,7 +301,10 @@ class ConceptDataType(BaseConceptDataType):
         c = ConceptValue(str(data))
         assert c.value is not None, "Null or blank concept value"
         ext_ids = [
-            ident.value for ident in models.Value.objects.all().filter(concept_id__exact=c.conceptid, valuetype__category="identifiers")
+            ident.value
+            for ident in models.Value.objects.all().filter(
+                concept_id__exact=c.conceptid, valuetype__category="identifiers"
+            )
         ]
         for p in settings.PREFERRED_CONCEPT_SCHEMES:
             for id_uri in ext_ids:
@@ -256,7 +318,9 @@ class ConceptDataType(BaseConceptDataType):
         if edge_info["r_uri"] == myuri:
             c = ConceptValue(str(edge_info["range_tile_data"]))
             g.add((edge_info["r_uri"], RDF.type, URIRef(edge.rangenode.ontologyclass)))
-            g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), edge_info["r_uri"]))
+            g.add(
+                (edge_info["d_uri"], URIRef(edge.ontologyproperty), edge_info["r_uri"])
+            )
             g.add((edge_info["r_uri"], URIRef(RDFS.label), Literal(c.value)))
         return g
 
@@ -275,19 +339,34 @@ class ConceptDataType(BaseConceptDataType):
         import re
 
         # FIXME: This should use settings for host and check for UUID
-        p = re.compile(r"(http|https)://(?P<host>[^/]*)/concepts/(?P<concept_id>[A-Fa-f0-9\-]*)/?$")
+        p = re.compile(
+            r"(http|https)://(?P<host>[^/]*)/concepts/(?P<concept_id>[A-Fa-f0-9\-]*)/?$"
+        )
         m = p.match(concept_uri)
         if m is not None:
             concept_id = m.groupdict().get("concept_id")
         else:
             # could be an external id, rather than an Arches only URI
-            hits = [ident for ident in models.Value.objects.all().filter(value__exact=str(concept_uri), valuetype__category="identifiers")]
+            hits = [
+                ident
+                for ident in models.Value.objects.all().filter(
+                    value__exact=str(concept_uri), valuetype__category="identifiers"
+                )
+            ]
             if len(hits) == 1:
                 concept_id = hits[0].concept_id
             else:
-                print("ERROR: Multiple hits for {0} external identifier in RDM:".format(concept_uri))
+                print(
+                    "ERROR: Multiple hits for {0} external identifier in RDM:".format(
+                        concept_uri
+                    )
+                )
                 for hit in hits:
-                    print("ConceptValue {0}, Concept {1} - '{2}'".format(hit.valueid, hit.concept_id, hit.value))
+                    print(
+                        "ConceptValue {0}, Concept {1} - '{2}'".format(
+                            hit.valueid, hit.concept_id, hit.value
+                        )
+                    )
                 # Just try the first one and hope
                 concept_id = hits[0].concept_id
 
@@ -299,7 +378,12 @@ class ConceptDataType(BaseConceptDataType):
                     return values[0]["id"]
                 else:
                     if concept_id:
-                        hits = [ident for ident in models.Value.objects.all().filter(value__exact=label)]
+                        hits = [
+                            ident
+                            for ident in models.Value.objects.all().filter(
+                                value__exact=label
+                            )
+                        ]
                         if hits and len(hits) == 1:
                             return str(hits[0].pk)
                         label = None
@@ -324,11 +408,22 @@ class ConceptDataType(BaseConceptDataType):
             return None
 
     def ignore_keys(self):
-        return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
+        return [
+            "http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"
+        ]
 
 
 class ConceptListDataType(BaseConceptDataType):
-    def validate(self, value, row_number=None, source="", node=None, nodeid=None, strict=False, **kwargs):
+    def validate(
+        self,
+        value,
+        row_number=None,
+        source="",
+        node=None,
+        nodeid=None,
+        strict=False,
+        **kwargs,
+    ):
         errors = []
 
         # iterate list of values and use the concept validation on each one
@@ -356,13 +451,17 @@ class ConceptListDataType(BaseConceptDataType):
                             ret.append(self.lookup_labelid_from_label(v, kwargs))
                         except:
                             ret.append(v)
-                            logger.warning(_("Unable to convert {0} to concept label".format(v)))
+                            logger.warning(
+                                _("Unable to convert {0} to concept label".format(v))
+                            )
         return ret
 
     def transform_export_values(self, value, *args, **kwargs):
         new_values = []
         for val in value:
-            new_val = self.get_concept_export_value(val, kwargs.get("concept_export_value_type", None))
+            new_val = self.get_concept_export_value(
+                val, kwargs.get("concept_export_value_type", None)
+            )
             new_values.append(new_val)
         return ",".join(new_values)
 
@@ -413,4 +512,6 @@ class ConceptListDataType(BaseConceptDataType):
         return True
 
     def ignore_keys(self):
-        return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
+        return [
+            "http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"
+        ]

@@ -47,7 +47,12 @@ class PoFileTests(TestCase):
         writer = ArchesPOWriter(m_po_file, "en", "en")
         model = MagicMock(CardXNodeXWidget)
         prop_dict = {"en": "configuration"}
-        config_dict = {"i18n_properties": ["prop", "bob", "fred"], "prop": prop_dict, "fred": prop_dict, "label": prop_dict}
+        config_dict = {
+            "i18n_properties": ["prop", "bob", "fred"],
+            "prop": prop_dict,
+            "fred": prop_dict,
+            "label": prop_dict,
+        }
         model.config.__getitem__.side_effect = config_dict.__getitem__
         model.config.prop.__getitem__.side_effect = prop_dict.__getitem__
         label_dict = {"en": "label"}
@@ -116,7 +121,9 @@ class PoFileTests(TestCase):
         self.assertEqual(m_po_file.append.call_args_list[0][0][0].msgid, "name")
         self.assertEqual(m_po_file.append.call_args_list[0][0][0].msgstr, "nombre")
         self.assertEqual(m_po_file.append.call_args_list[4][0][0].msgid, "helptext")
-        self.assertEqual(m_po_file.append.call_args_list[4][0][0].msgstr, "título de la ayuda")
+        self.assertEqual(
+            m_po_file.append.call_args_list[4][0][0].msgstr, "título de la ayuda"
+        )
 
     def test_po_write_duplicate_exception_caught(self):
         def throw_value_error(val):
@@ -140,7 +147,11 @@ class PoFileTests(TestCase):
 
         m_all_method_cardxnodexwidgets = Mock()
         m_cardxnodexwidget = MagicMock(CardXNodeXWidget)
-        i18n_json_dict = {"i18n_properties": ["test", "test2"], "test": {"en": "test"}, "test2": {"en": "test2"}}
+        i18n_json_dict = {
+            "i18n_properties": ["test", "test2"],
+            "test": {"en": "test"},
+            "test2": {"en": "test2"},
+        }
         m_i18n_json_field = MagicMock(I18n_JSON)
         m_i18n_json_field.__getitem__ = Mock()
         m_i18n_json_field.__getitem__.side_effect = i18n_json_dict.__getitem__

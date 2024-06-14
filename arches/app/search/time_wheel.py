@@ -58,7 +58,14 @@ class TimeWheel(object):
                 if permitted_nodegroups is not None:
                     date_query.filter(Terms(field="dates.nodegroup_id", terms=permitted_nodegroups))
                 date_ranges_query = Bool()
-                date_ranges_query.filter(Range(field="date_ranges.date_range", gte=gte, lte=lte, relation="intersects"))
+                date_ranges_query.filter(
+                    Range(
+                        field="date_ranges.date_range",
+                        gte=gte,
+                        lte=lte,
+                        relation="intersects",
+                    )
+                )
                 if permitted_nodegroups is not None:
                     date_ranges_query.filter(Terms(field="date_ranges.nodegroup_id", terms=permitted_nodegroups))
                 wrapper_query = Bool()
@@ -70,7 +77,11 @@ class TimeWheel(object):
                 "name": "Millennium",
                 "interval": 1000,
                 "root": True,
-                "child": {"name": "Century", "interval": 100, "child": {"name": "Decade", "interval": 10}},
+                "child": {
+                    "name": "Century",
+                    "interval": 100,
+                    "child": {"name": "Decade", "interval": 10},
+                },
             }
 
             if abs(int(min_date) - int(max_date)) > 1000:
@@ -78,7 +89,11 @@ class TimeWheel(object):
                     "name": "Millennium",
                     "interval": 1000,
                     "root": True,
-                    "child": {"name": "Half-millennium", "interval": 500, "child": {"name": "Century", "interval": 100}},
+                    "child": {
+                        "name": "Half-millennium",
+                        "interval": 500,
+                        "child": {"name": "Century", "interval": 100},
+                    },
                 }
 
             if settings.TIMEWHEEL_DATE_TIERS is not None:
@@ -129,9 +144,11 @@ class TimeWheel(object):
                 cache.set(key, root, settings.CACHE_BY_USER[user.username])
             else:
                 try:
-                    cache.set(key, root, settings.CACHE_BY_USER['default'])
+                    cache.set(key, root, settings.CACHE_BY_USER["default"])
                 except KeyError:
-                    logger.warning(_("CACHE_BY_USER setting does not have a 'default'. Adding a default can improve search page performance."))
+                    logger.warning(
+                        _("CACHE_BY_USER setting does not have a 'default'. Adding a default can improve search page performance.")
+                    )
 
             return root
 

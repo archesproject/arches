@@ -1,5 +1,6 @@
 from django.db import migrations
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -65,6 +66,10 @@ class Migration(migrations.Migration):
     """
 
     operations = [
-        migrations.RunSQL(update_check_excess_tiles_trigger, restore_check_excess_tiles_trigger),
-        migrations.RunSQL(create_index_on_load_staging_tileid, drop_index_on_load_staging_tileid),
+        migrations.RunSQL(
+            update_check_excess_tiles_trigger, restore_check_excess_tiles_trigger
+        ),
+        migrations.RunSQL(
+            create_index_on_load_staging_tileid, drop_index_on_load_staging_tileid
+        ),
     ]

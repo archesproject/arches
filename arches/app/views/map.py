@@ -15,6 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
+
 from django.db import transaction
 from django.shortcuts import render
 from django.http import Http404
@@ -29,7 +30,10 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONResponse
-from arches.app.utils.permission_backend import get_users_for_object, get_groups_for_object, get_users_with_perms, get_groups_with_perms
+from arches.app.utils.permission_backend import (
+    get_users_for_object,
+    get_groups_for_object,
+)
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, GeoBoundsAgg, Term
 from arches.app.search.mappings import RESOURCES_INDEX
@@ -90,7 +94,10 @@ class MapLayerManagerView(MapBaseManagerView):
 
         context["nav"]["title"] = _("Map Layer Manager")
         context["nav"]["icon"] = "fa-server"
-        context["nav"]["help"] = {"title": _("Map Layer Manager"), "templates": ["map-manager-help"]}
+        context["nav"]["help"] = {
+            "title": _("Map Layer Manager"),
+            "templates": ["map-manager-help"],
+        }
 
         return render(request, "views/map-layer-manager.htm", context)
 

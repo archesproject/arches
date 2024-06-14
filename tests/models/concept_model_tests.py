@@ -74,76 +74,191 @@ class ConceptModelTests(ArchesTestCase):
 
         concept = Concept()
         concept.values = [
-            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label en-US", "language": "en-US"}),
-            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label en", "language": "en"}),
-            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label es-SP", "language": "es-SP"}),
-            ConceptValue({"type": "altLabel", "category": "label", "value": "test alt label en-US", "language": "en-US"}),
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "test pref label en-US",
+                    "language": "en-US",
+                }
+            ),
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "test pref label en",
+                    "language": "en",
+                }
+            ),
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "test pref label es-SP",
+                    "language": "es-SP",
+                }
+            ),
+            ConceptValue(
+                {
+                    "type": "altLabel",
+                    "category": "label",
+                    "value": "test alt label en-US",
+                    "language": "en-US",
+                }
+            ),
         ]
 
-        self.assertEqual(concept.get_preflabel(lang="en-US").value, "test pref label en-US")
+        self.assertEqual(
+            concept.get_preflabel(lang="en-US").value, "test pref label en-US"
+        )
         self.assertEqual(concept.get_preflabel(lang="en").value, "test pref label en")
-        self.assertEqual(concept.get_preflabel().value, "test pref label %s" % (test_settings.LANGUAGE_CODE))
+        self.assertEqual(
+            concept.get_preflabel().value,
+            "test pref label %s" % (test_settings.LANGUAGE_CODE),
+        )
 
-    def test_prefer_preflabel_with_just_lang_code_match_over_exact_match_with_altlabel(self):
+    def test_prefer_preflabel_with_just_lang_code_match_over_exact_match_with_altlabel(
+        self,
+    ):
         """
-        Given a language and region, test should pick the preflabel even if that preflabel specifies a language only 
+        Given a language and region, test should pick the preflabel even if that preflabel specifies a language only
         and even if an altlabel exists with the exact match
-        
+
         """
 
         concept = Concept()
         concept.values = [
-            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label en", "language": "en"}),
-            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label es", "language": "es-SP"}),
-            ConceptValue({"type": "altLabel", "category": "label", "value": "test alt label en-US", "language": "en-US"}),
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "test pref label en",
+                    "language": "en",
+                }
+            ),
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "test pref label es",
+                    "language": "es-SP",
+                }
+            ),
+            ConceptValue(
+                {
+                    "type": "altLabel",
+                    "category": "label",
+                    "value": "test alt label en-US",
+                    "language": "en-US",
+                }
+            ),
         ]
 
-        self.assertEqual(concept.get_preflabel(lang="en-US").value, "test pref label en")
+        self.assertEqual(
+            concept.get_preflabel(lang="en-US").value, "test pref label en"
+        )
 
     def test_get_altlabel_when_no_preflabel_exists(self):
         """
         Given a language and region, test should pick the altlabel when no preflabel exists
-        
+
         """
 
         concept = Concept()
         concept.values = [
-            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label es", "language": "es-SP"}),
-            ConceptValue({"type": "altLabel", "category": "label", "value": "test alt label en-US", "language": "en-US"}),
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "test pref label es",
+                    "language": "es-SP",
+                }
+            ),
+            ConceptValue(
+                {
+                    "type": "altLabel",
+                    "category": "label",
+                    "value": "test alt label en-US",
+                    "language": "en-US",
+                }
+            ),
         ]
 
-        self.assertEqual(concept.get_preflabel(lang="en-US").value, "test alt label en-US")
+        self.assertEqual(
+            concept.get_preflabel(lang="en-US").value, "test alt label en-US"
+        )
 
-    def test_get_altlabel_when_no_preflabel_exists_and_altlabel_only_specifies_lang_code(self):
+    def test_get_altlabel_when_no_preflabel_exists_and_altlabel_only_specifies_lang_code(
+        self,
+    ):
         """
-        Given a language and region and the system only has values that specify a language code, the 
+        Given a language and region and the system only has values that specify a language code, the
         the system should pick the altlabel even if the altlabel doesn't specifiy a region
-        
+
         """
 
         concept = Concept()
         concept.values = [
-            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label es", "language": "es"}),
-            ConceptValue({"type": "altLabel", "category": "label", "value": "test alt label en", "language": "en"}),
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "test pref label es",
+                    "language": "es",
+                }
+            ),
+            ConceptValue(
+                {
+                    "type": "altLabel",
+                    "category": "label",
+                    "value": "test alt label en",
+                    "language": "en",
+                }
+            ),
         ]
 
         self.assertEqual(concept.get_preflabel(lang="en-US").value, "test alt label en")
 
-    def test_get_region_specific_preflabel_when_language_only_version_does_not_exist(self):
+    def test_get_region_specific_preflabel_when_language_only_version_does_not_exist(
+        self,
+    ):
         """
-        Given a language only and the system only has values that with regions specified, then 
-        the system should pick the first preflabel with the same language code 
-        
+        Given a language only and the system only has values that with regions specified, then
+        the system should pick the first preflabel with the same language code
+
         """
 
         concept = Concept()
         concept.values = [
-            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label en-US", "language": "en-US"}),
-            ConceptValue({"type": "prefLabel", "category": "label", "value": "test pref label es", "language": "es-SP"}),
-            ConceptValue({"type": "altLabel", "category": "label", "value": "test alt label en-US", "language": "en-US"}),
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "test pref label en-US",
+                    "language": "en-US",
+                }
+            ),
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "test pref label es",
+                    "language": "es-SP",
+                }
+            ),
+            ConceptValue(
+                {
+                    "type": "altLabel",
+                    "category": "label",
+                    "value": "test alt label en-US",
+                    "language": "en-US",
+                }
+            ),
         ]
 
-        self.assertEqual(concept.get_preflabel(lang="en").value, "test pref label en-US")
+        self.assertEqual(
+            concept.get_preflabel(lang="en").value, "test pref label en-US"
+        )
 
     def test_get_label_no_exact_match(self):
         """
@@ -154,8 +269,22 @@ class ConceptModelTests(ArchesTestCase):
         concept = Concept()
         concept.values = [
             ConceptValue({"type": "prefLabel", "value": "bier", "language": "nl"}),
-            ConceptValue({"type": "prefLabel", "category": "label", "value": "beer", "language": "es-SP"}),
-            ConceptValue({"type": "altLabel", "category": "label", "value": "test alt label en-US", "language": "en-US"}),
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "beer",
+                    "language": "es-SP",
+                }
+            ),
+            ConceptValue(
+                {
+                    "type": "altLabel",
+                    "category": "label",
+                    "value": "test alt label en-US",
+                    "language": "en-US",
+                }
+            ),
         ]
 
         pl = concept.get_preflabel("fr-BE")
