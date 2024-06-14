@@ -61,7 +61,7 @@ define([
         });
 
         this.acceptedFiles = ko.computed(function(){
-            return self.card.widgets().find(widget=>widget.node_id() === self.fileListNodeId)?.config.acceptedFiles() || 'All Formats Accepted';
+            return self.card.widgets().find(widget=>widget.node_id() === self.fileListNodeId)?.config.acceptedFiles() || arches.translations.allFormatsAccepted;
         });
 
         this.cleanUrl = function(url) {
@@ -158,7 +158,7 @@ define([
             var acceptedFileFormats;
             var loadFile;
             acceptedFileFormats = ((ko.unwrap(self.acceptedFiles)).split(',').map(item=>item.trim())).map(format => format.replace('.', ''));
-            if(ko.unwrap(self.acceptedFiles) != "All Formats Accepted" && acceptedFileFormats !== undefined && acceptedFileFormats.length > 0){
+            if(ko.unwrap(self.acceptedFiles) != arches.translations.allFormatsAccepted && acceptedFileFormats !== undefined && acceptedFileFormats.length > 0){
                 var fileType = file.name.split('.').pop().toLowerCase();
                 if(acceptedFileFormats.includes(fileType)){
                     loadFile = true;
@@ -201,8 +201,8 @@ define([
             else{
                 params.pageVm.alert(new AlertViewModel(
                     'ep-alert-red',
-                    "Incorrect File Format",
-                    "The file format is not accepted. Please upload a file in the following formats:" + ko.unwrap(self.acceptedFiles) + ".",
+                    arches.translations.incorrectFileFormat,
+                    arches.translations.fileFormatNotAccepted(ko.unwrap(self.acceptedFiles)),
                     null,
                     function(){}
                 ));
