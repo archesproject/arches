@@ -21,7 +21,7 @@ from tests.base_test import ArchesTestCase
 from arches.app.utils.date_utils import ExtendedDateFormat
 
 # these tests can be run from the command line via
-# python manage.py test tests/utils/date_utils_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.utils.date_utils_tests --settings="tests.test_settings"
 
 EDTF_DATES = (
     # ******************************* LEVEL 0 *********************************
@@ -143,18 +143,27 @@ EDTF_DATES = (
     ("15uu-12-uu", "15001201", "15991231"),
     # One of a Set
     # One of the years 1667, 1668, 1670, 1671, 1672
-    ("[1667,1668, 1670..1672]", [["16670101", "16671231"], ["16680101", "16681231"], ["16700101", "16721231"]]),
+    (
+        "[1667,1668, 1670..1672]",
+        [["16670101", "16671231"], ["16680101", "16681231"], ["16700101", "16721231"]],
+    ),
     # December 3, 1760 or some earlier date
     ("[..1760-12-03]", [["None", "17601203"]]),
     # December 1760 or some later month
     ("[1760-12..]", [["17601201", "None"]]),
     # January or February of 1760 or December 1760 or some later month
-    ("[1760-01, 1760-02, 1760-12..]", [["17600101", "17600131"], ["17600201", "17600229"], ["17601201", "None"]]),
+    (
+        "[1760-01, 1760-02, 1760-12..]",
+        [["17600101", "17600131"], ["17600201", "17600229"], ["17601201", "None"]],
+    ),
     # Either the year 1667 or the month December of 1760.
     ("[1667, 1760-12]", [["16670101", "16671231"], ["17601201", "17601231"]]),
     # Multiple Dates
     # All of the years 1667, 1668, 1670, 1671, 1672
-    ("{1667,1668, 1670..1672}", [["16670101", "16671231"], ["16680101", "16681231"], ["16700101", "16721231"]]),
+    (
+        "{1667,1668, 1670..1672}",
+        [["16670101", "16671231"], ["16680101", "16681231"], ["16700101", "16721231"]],
+    ),
     # The year 1960 and the month December of 1961.
     ("{1960, 1961-12}", [["19600101", "19601231"], ["19611201", "19611231"]]),
     # Masked Precision
@@ -223,7 +232,6 @@ class SortableDateTests(ArchesTestCase):
         else:
             o = i
 
-        print("parsing '%s'" % i)
         f = ExtendedDateFormat(i)
 
         if len(test_case) == 2:
@@ -253,20 +261,25 @@ class SortableDateTests(ArchesTestCase):
 
     def test_edtf_parsing(self):
         for test_case in EDTF_DATES:
-            self.parse(test_case)
+            with self.subTest(dates=test_case):
+                self.parse(test_case)
 
     def test_negative_date_parsing(self):
         for test_case in NEGATIVE_DATES:
-            self.parse(test_case)
+            with self.subTest(dates=test_case):
+                self.parse(test_case)
 
     def test_leap_year_parsing(self):
         for test_case in LEAP_YEARS:
-            self.parse(test_case)
+            with self.subTest(dates=test_case):
+                self.parse(test_case)
 
     def test_non_edtf_parsing(self):
         for test_case in NON_EDTF_DATES:
-            self.parse(test_case)
+            with self.subTest(dates=test_case):
+                self.parse(test_case)
 
     def test_invalid_edtf_parsing(self):
         for test_case in INVALID_EDTF_DATES:
-            self.parse(test_case)
+            with self.subTest(dates=test_case):
+                self.parse(test_case)

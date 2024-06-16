@@ -69,7 +69,9 @@ class BaseIndex(object):
         if document is not None and id is not None:
             self.se.index_data(index=self.index_name, body=document, id=id)
 
-    def index_resources(self, resources=None, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
+    def index_resources(
+        self, resources=None, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False
+    ):
         """
         Indexes a list of resources in bulk to Elastic Search
 
@@ -87,7 +89,11 @@ class BaseIndex(object):
         count_before = self.se.count(index=self.index_name, **q.dsl)
         result_summary = {"database": len(resources), "indexed": 0}
         if quiet is False:
-            bar = pyprind.ProgBar(len(resources), bar_char="█") if len(resources) > 1 else None
+            bar = (
+                pyprind.ProgBar(len(resources), bar_char="█")
+                if len(resources) > 1
+                else None
+            )
         with self.se.BulkIndexer(batch_size=batch_size, refresh=True) as indexer:
             for resource in resources:
                 if quiet is False and bar is not None:
@@ -98,8 +104,14 @@ class BaseIndex(object):
                     indexer.add(index=self.index_name, id=doc_id, data=document)
 
         self.se.refresh(index=self.index_name)
-        result_summary["indexed"] = self.se.count(index=self.index_name, **q.dsl) - count_before
-        status = "Passed" if result_summary["database"] == result_summary["indexed"] else "Failed"
+        result_summary["indexed"] = (
+            self.se.count(index=self.index_name, **q.dsl) - count_before
+        )
+        status = (
+            "Passed"
+            if result_summary["database"] == result_summary["indexed"]
+            else "Failed"
+        )
         print(f"Custom Index - {settings.ELASTICSEARCH_PREFIX}_{self.index_name}")
         print(
             f"    Status: {status}, In Database: {result_summary['database']}, Indexed: {result_summary['indexed']}, Took: {(datetime.now() - start).seconds} seconds"
@@ -141,7 +153,13 @@ class BaseIndex(object):
 
         self.se.delete_index(index=self.index_name)
 
-    def reindex(self, graphids=None, clear_index=True, batch_size=settings.BULK_IMPORT_BATCH_SIZE, quiet=False):
+    def reindex(
+        self,
+        graphids=None,
+        clear_index=True,
+        batch_size=settings.BULK_IMPORT_BATCH_SIZE,
+        quiet=False,
+    ):
         """
         Reindexes the index.  By default this does nothing, it needs to be implemented in a subclass.
         By default you can pass in a list of graph ids to trigger the reindex.  This will loop through all resource instances of each graph type.
@@ -166,9 +184,12 @@ class BaseIndex(object):
 
             for graphid in graphids:
                 resources = Resource.objects.filter(graph_id=graphid)
-                self.index_resources(resources=resources, batch_size=batch_size, quiet=quiet)
+                self.index_resources(
+                    resources=resources, batch_size=batch_size, quiet=quiet
+                )
         else:
             raise NotImplementedError
+
 
 def get_index(name):
     for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
@@ -190,7 +211,10 @@ class SearchIndexError(Exception):
 class SearchIndexNotDefinedError(Exception):
     def __init__(self, name=None):
         self.title = _("Search Index Not Defined Error:")
-        self.message = _('The index "%s" is not defined in settings.ELASTICSEARCH_CUSTOM_INDEXES' % name)
+        self.message = _(
+            'The index "%s" is not defined in settings.ELASTICSEARCH_CUSTOM_INDEXES'
+            % name
+        )
 
     def __str__(self):
         return repr(self.message)

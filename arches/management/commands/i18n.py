@@ -17,7 +17,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import logging
-from arches.app.utils.i18n import ArchesPOFileFetcher, ArchesPOLoader, ArchesPOWriter, LanguageSynchronizer
+from arches.app.utils.i18n import (
+    ArchesPOFileFetcher,
+    ArchesPOLoader,
+    ArchesPOWriter,
+    LanguageSynchronizer,
+)
 from arches.app.models.system_settings import settings
 from django.core.management.base import BaseCommand
 
@@ -40,7 +45,9 @@ class Command(BaseCommand):
             + "'loadmessages'=Reads PO file messages to the database "
             + "'synclanguages'=Synchronizes languages in settings with the user languages and publications ",
         )
-        parser.add_argument("-l", "--lang", action="store", dest="lang", default=None, help="")
+        parser.add_argument(
+            "-l", "--lang", action="store", dest="lang", default=None, help=""
+        )
 
     def handle(self, *args, **options):
         if options["operation"] == "makemessages":

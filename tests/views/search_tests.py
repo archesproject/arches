@@ -16,13 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
-
 import os
 import json
 import time
@@ -34,7 +27,9 @@ from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.utils.i18n import LanguageSynchronizer
-from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
+from arches.app.utils.data_management.resource_graphs.importer import (
+    import_graph as ResourceGraphImporter,
+)
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from guardian.shortcuts import assign_perm
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -42,7 +37,7 @@ from arches.app.search.elasticsearch_dsl_builder import Query, Term
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
 
 # these tests can be run from the command line via
-# python manage.py test tests/views/search_tests.py --pattern="*.py" --settings="tests.test_settings"
+# python manage.py test tests.views.search_tests --settings="tests.test_settings"
 
 
 class SearchTests(ArchesTestCase):
@@ -60,22 +55,30 @@ class SearchTests(ArchesTestCase):
 
         LanguageSynchronizer.synchronize_settings_with_db()
         models.ResourceInstance.objects.all().delete()
-        with open(os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "r") as f:
+        with open(
+            os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "r"
+        ) as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
         cls.search_model_graphid = "d291a445-fa5f-11e6-afa8-14109fd34195"
         cls.search_model_cultural_period_nodeid = "7a182580-fa60-11e6-96d1-14109fd34195"
         cls.search_model_creation_date_nodeid = "1c1d05f5-fa60-11e6-887f-14109fd34195"
-        cls.search_model_destruction_date_nodeid = "e771b8a1-65fe-11e7-9163-14109fd34195"
+        cls.search_model_destruction_date_nodeid = (
+            "e771b8a1-65fe-11e7-9163-14109fd34195"
+        )
         cls.search_model_name_nodeid = "2fe14de3-fa61-11e6-897b-14109fd34195"
         cls.search_model_sensitive_info_nodeid = "57446fae-65ff-11e7-b63a-14109fd34195"
         cls.search_model_geom_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
 
-        cls.user = User.objects.create_user("unpriviliged_user", "unpriviliged_user@archesproject.org", "test")
+        cls.user = User.objects.create_user(
+            "unpriviliged_user", "unpriviliged_user@archesproject.org", "test"
+        )
         cls.user.groups.add(Group.objects.get(name="Guest"))
 
-        nodegroup = models.NodeGroup.objects.get(pk=cls.search_model_destruction_date_nodeid)
+        nodegroup = models.NodeGroup.objects.get(
+            pk=cls.search_model_destruction_date_nodeid
+        )
         assign_perm("no_access_to_nodegroup", cls.user, nodegroup)
 
         # Add a concept that defines a min and max date
@@ -87,9 +90,30 @@ class SearchTests(ArchesTestCase):
             "subconcepts": [
                 {
                     "values": [
-                        {"value": "Mock concept", "language": "en-US", "category": "label", "type": "prefLabel", "id": "", "conceptid": ""},
-                        {"value": "1950", "language": "en-US", "category": "note", "type": "min_year", "id": "", "conceptid": ""},
-                        {"value": "1980", "language": "en-US", "category": "note", "type": "max_year", "id": "", "conceptid": ""},
+                        {
+                            "value": "Mock concept",
+                            "language": "en-US",
+                            "category": "label",
+                            "type": "prefLabel",
+                            "id": "",
+                            "conceptid": "",
+                        },
+                        {
+                            "value": "1950",
+                            "language": "en-US",
+                            "category": "note",
+                            "type": "min_year",
+                            "id": "",
+                            "conceptid": "",
+                        },
+                        {
+                            "value": "1980",
+                            "language": "en-US",
+                            "category": "note",
+                            "type": "max_year",
+                            "id": "",
+                            "conceptid": "",
+                        },
                     ],
                     "relationshiptype": "hasTopConcept",
                     "nodetype": "Concept",
@@ -105,7 +129,11 @@ class SearchTests(ArchesTestCase):
         post_data = JSONSerializer().serialize(concept)
         content_type = "application/x-www-form-urlencoded"
         response = cls.client.post(
-            reverse("concept", kwargs={"conceptid": "00000000-0000-0000-0000-000000000001"}), post_data, content_type
+            reverse(
+                "concept", kwargs={"conceptid": "00000000-0000-0000-0000-000000000001"}
+            ),
+            post_data,
+            content_type,
         )
         response_json = json.loads(response.content)
         valueid = response_json["subconcepts"][0]["values"][0]["id"]
@@ -113,43 +141,77 @@ class SearchTests(ArchesTestCase):
 
         # add resource instance with only a cultural period defined
         cls.cultural_period_resource = Resource(graph_id=cls.search_model_graphid)
-        tile = Tile(data={cls.search_model_cultural_period_nodeid: [valueid]}, nodegroup_id=cls.search_model_cultural_period_nodeid)
+        tile = Tile(
+            data={cls.search_model_cultural_period_nodeid: [valueid]},
+            nodegroup_id=cls.search_model_cultural_period_nodeid,
+        )
         cls.cultural_period_resource.tiles.append(tile)
         cls.cultural_period_resource.save()
 
         # add resource instance with a creation and destruction date defined
         cls.date_resource = Resource(graph_id=cls.search_model_graphid)
-        tile = Tile(data={cls.search_model_creation_date_nodeid: "1941-01-01"}, nodegroup_id=cls.search_model_creation_date_nodeid)
-        cls.date_resource.tiles.append(tile)
-        tile = Tile(data={cls.search_model_destruction_date_nodeid: "1948-01-01"}, nodegroup_id=cls.search_model_destruction_date_nodeid)
+        tile = Tile(
+            data={cls.search_model_creation_date_nodeid: "1941-01-01"},
+            nodegroup_id=cls.search_model_creation_date_nodeid,
+        )
         cls.date_resource.tiles.append(tile)
         tile = Tile(
-            data={cls.search_model_name_nodeid: {"en": {"value": "testing 123", "direction": "ltr"}}},
+            data={cls.search_model_destruction_date_nodeid: "1948-01-01"},
+            nodegroup_id=cls.search_model_destruction_date_nodeid,
+        )
+        cls.date_resource.tiles.append(tile)
+        tile = Tile(
+            data={
+                cls.search_model_name_nodeid: {
+                    "en": {"value": "testing 123", "direction": "ltr"}
+                }
+            },
             nodegroup_id=cls.search_model_name_nodeid,
         )
         cls.date_resource.tiles.append(tile)
         cls.date_resource.save()
 
         # add resource instance with a creation date and a cultural period defined
-        cls.date_and_cultural_period_resource = Resource(graph_id=cls.search_model_graphid)
-        tile = Tile(data={cls.search_model_creation_date_nodeid: "1942-01-01"}, nodegroup_id=cls.search_model_creation_date_nodeid)
+        cls.date_and_cultural_period_resource = Resource(
+            graph_id=cls.search_model_graphid
+        )
+        tile = Tile(
+            data={cls.search_model_creation_date_nodeid: "1942-01-01"},
+            nodegroup_id=cls.search_model_creation_date_nodeid,
+        )
         cls.date_and_cultural_period_resource.tiles.append(tile)
-        tile = Tile(data={cls.search_model_cultural_period_nodeid: [valueid]}, nodegroup_id=cls.search_model_cultural_period_nodeid)
+        tile = Tile(
+            data={cls.search_model_cultural_period_nodeid: [valueid]},
+            nodegroup_id=cls.search_model_cultural_period_nodeid,
+        )
         cls.date_and_cultural_period_resource.tiles.append(tile)
         cls.date_and_cultural_period_resource.save()
 
         # add resource instance with with no dates or periods defined
         cls.name_resource = Resource(graph_id=cls.search_model_graphid)
         tile = Tile(
-            data={cls.search_model_name_nodeid: {"en": {"value": "some test name", "direction": "ltr"}}},
+            data={
+                cls.search_model_name_nodeid: {
+                    "en": {"value": "some test name", "direction": "ltr"}
+                }
+            },
             nodegroup_id=cls.search_model_name_nodeid,
         )
         cls.name_resource.tiles.append(tile)
         geom = {
             "type": "FeatureCollection",
-            "features": [{"geometry": {"type": "Point", "coordinates": [0, 0]}, "type": "Feature", "properties": {}}],
+            "features": [
+                {
+                    "geometry": {"type": "Point", "coordinates": [0, 0]},
+                    "type": "Feature",
+                    "properties": {},
+                }
+            ],
         }
-        tile = Tile(data={cls.search_model_geom_nodeid: geom}, nodegroup_id=cls.search_model_geom_nodeid)
+        tile = Tile(
+            data={cls.search_model_geom_nodeid: geom},
+            nodegroup_id=cls.search_model_geom_nodeid,
+        )
         cls.name_resource.tiles.append(tile)
         cls.name_resource.save()
 
@@ -169,12 +231,21 @@ class SearchTests(ArchesTestCase):
 
         """
 
-        temporal_filter = {"fromDate": "1940-01-01", "toDate": "1960-01-01", "dateNodeId": "", "inverted": False}
+        temporal_filter = {
+            "fromDate": "1940-01-01",
+            "toDate": "1960-01-01",
+            "dateNodeId": "",
+            "inverted": False,
+        }
         response_json = get_response_json(self.client, temporal_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 3)
         self.assertCountEqual(
             extract_pks(response_json),
-            [str(self.cultural_period_resource.pk), str(self.date_resource.pk), str(self.date_and_cultural_period_resource.pk)],
+            [
+                str(self.cultural_period_resource.pk),
+                str(self.date_resource.pk),
+                str(self.date_and_cultural_period_resource.pk),
+            ],
         )
 
     def test_temporal_only_search_2(self):
@@ -183,11 +254,20 @@ class SearchTests(ArchesTestCase):
 
         """
 
-        temporal_filter = {"fromDate": "1940-01-01", "toDate": "1960-01-01", "dateNodeId": "", "inverted": True}
+        temporal_filter = {
+            "fromDate": "1940-01-01",
+            "toDate": "1960-01-01",
+            "dateNodeId": "",
+            "inverted": True,
+        }
         response_json = get_response_json(self.client, temporal_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
         self.assertCountEqual(
-            extract_pks(response_json), [str(self.cultural_period_resource.pk), str(self.date_and_cultural_period_resource.pk)]
+            extract_pks(response_json),
+            [
+                str(self.cultural_period_resource.pk),
+                str(self.date_and_cultural_period_resource.pk),
+            ],
         )
 
     def test_temporal_only_search_3(self):
@@ -204,7 +284,13 @@ class SearchTests(ArchesTestCase):
         }
         response_json = get_response_json(self.client, temporal_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
-        self.assertCountEqual(extract_pks(response_json), [str(self.date_resource.pk), str(self.date_and_cultural_period_resource.pk)])
+        self.assertCountEqual(
+            extract_pks(response_json),
+            [
+                str(self.date_resource.pk),
+                str(self.date_and_cultural_period_resource.pk),
+            ],
+        )
 
     def test_temporal_only_search_4(self):
         """
@@ -227,11 +313,20 @@ class SearchTests(ArchesTestCase):
 
         """
 
-        temporal_filter = {"fromDate": "1950-01-01", "toDate": "1960-01-01", "dateNodeId": "", "inverted": False}
+        temporal_filter = {
+            "fromDate": "1950-01-01",
+            "toDate": "1960-01-01",
+            "dateNodeId": "",
+            "inverted": False,
+        }
         response_json = get_response_json(self.client, temporal_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
         self.assertCountEqual(
-            extract_pks(response_json), [str(self.cultural_period_resource.pk), str(self.date_and_cultural_period_resource.pk)]
+            extract_pks(response_json),
+            [
+                str(self.cultural_period_resource.pk),
+                str(self.date_and_cultural_period_resource.pk),
+            ],
         )
 
     def test_temporal_only_search_6(self):
@@ -240,12 +335,21 @@ class SearchTests(ArchesTestCase):
 
         """
 
-        temporal_filter = {"fromDate": "1950-01-01", "toDate": "1960-01-01", "dateNodeId": "", "inverted": True}
+        temporal_filter = {
+            "fromDate": "1950-01-01",
+            "toDate": "1960-01-01",
+            "dateNodeId": "",
+            "inverted": True,
+        }
         response_json = get_response_json(self.client, temporal_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 3)
         self.assertCountEqual(
             extract_pks(response_json),
-            [str(self.cultural_period_resource.pk), str(self.date_resource.pk), str(self.date_and_cultural_period_resource.pk)],
+            [
+                str(self.cultural_period_resource.pk),
+                str(self.date_resource.pk),
+                str(self.date_and_cultural_period_resource.pk),
+            ],
         )
 
     def test_temporal_only_search_7(self):
@@ -254,7 +358,12 @@ class SearchTests(ArchesTestCase):
 
         """
 
-        temporal_filter = {"fromDate": "1990-01-01", "toDate": "2000-01-01", "dateNodeId": "", "inverted": False}
+        temporal_filter = {
+            "fromDate": "1990-01-01",
+            "toDate": "2000-01-01",
+            "dateNodeId": "",
+            "inverted": False,
+        }
         response_json = get_response_json(self.client, temporal_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 0)
 
@@ -264,12 +373,21 @@ class SearchTests(ArchesTestCase):
 
         """
 
-        temporal_filter = {"fromDate": "1990-01-01", "toDate": "2000-01-01", "dateNodeId": "", "inverted": True}
+        temporal_filter = {
+            "fromDate": "1990-01-01",
+            "toDate": "2000-01-01",
+            "dateNodeId": "",
+            "inverted": True,
+        }
         response_json = get_response_json(self.client, temporal_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 3)
         self.assertCountEqual(
             extract_pks(response_json),
-            [str(self.cultural_period_resource.pk), str(self.date_resource.pk), str(self.date_and_cultural_period_resource.pk)],
+            [
+                str(self.cultural_period_resource.pk),
+                str(self.date_resource.pk),
+                str(self.date_and_cultural_period_resource.pk),
+            ],
         )
 
     def test_temporal_only_search_9(self):
@@ -278,12 +396,21 @@ class SearchTests(ArchesTestCase):
 
         """
 
-        temporal_filter = {"fromDate": "1940-01-01", "toDate": "", "dateNodeId": "", "inverted": False}
+        temporal_filter = {
+            "fromDate": "1940-01-01",
+            "toDate": "",
+            "dateNodeId": "",
+            "inverted": False,
+        }
         response_json = get_response_json(self.client, temporal_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 3)
         self.assertCountEqual(
             extract_pks(response_json),
-            [str(self.cultural_period_resource.pk), str(self.date_resource.pk), str(self.date_and_cultural_period_resource.pk)],
+            [
+                str(self.cultural_period_resource.pk),
+                str(self.date_resource.pk),
+                str(self.date_and_cultural_period_resource.pk),
+            ],
         )
 
     def test_temporal_only_search_10(self):
@@ -292,7 +419,12 @@ class SearchTests(ArchesTestCase):
 
         """
 
-        temporal_filter = {"fromDate": "1940-01-01", "toDate": "", "dateNodeId": "", "inverted": True}
+        temporal_filter = {
+            "fromDate": "1940-01-01",
+            "toDate": "",
+            "dateNodeId": "",
+            "inverted": True,
+        }
         response_json = get_response_json(self.client, temporal_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 0)
 
@@ -302,10 +434,21 @@ class SearchTests(ArchesTestCase):
 
         """
 
-        temporal_filter = {"fromDate": "1950-01-01", "toDate": "", "dateNodeId": "", "inverted": True}
+        temporal_filter = {
+            "fromDate": "1950-01-01",
+            "toDate": "",
+            "dateNodeId": "",
+            "inverted": True,
+        }
         response_json = get_response_json(self.client, temporal_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
-        self.assertCountEqual(extract_pks(response_json), [str(self.date_resource.pk), str(self.date_and_cultural_period_resource.pk)])
+        self.assertCountEqual(
+            extract_pks(response_json),
+            [
+                str(self.date_resource.pk),
+                str(self.date_and_cultural_period_resource.pk),
+            ],
+        )
 
     def test_temporal_and_term_search_1(self):
         """
@@ -313,11 +456,26 @@ class SearchTests(ArchesTestCase):
 
         """
 
-        temporal_filter = {"fromDate": "1940-01-01", "toDate": "1960-01-01", "dateNodeId": "", "inverted": False}
+        temporal_filter = {
+            "fromDate": "1940-01-01",
+            "toDate": "1960-01-01",
+            "dateNodeId": "",
+            "inverted": False,
+        }
         term_filter = [
-            {"type": "string", "context": "", "context_label": "", "id": "test", "text": "test", "value": "test", "inverted": False}
+            {
+                "type": "string",
+                "context": "",
+                "context_label": "",
+                "id": "test",
+                "text": "test",
+                "value": "test",
+                "inverted": False,
+            }
         ]
-        response_json = get_response_json(self.client, temporal_filter=temporal_filter, term_filter=term_filter)
+        response_json = get_response_json(
+            self.client, temporal_filter=temporal_filter, term_filter=term_filter
+        )
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 1)
         self.assertCountEqual(extract_pks(response_json), [str(self.date_resource.pk)])
 
@@ -327,11 +485,26 @@ class SearchTests(ArchesTestCase):
 
         """
 
-        temporal_filter = {"fromDate": "1940-01-01", "toDate": "1960-01-01", "dateNodeId": "", "inverted": True}
+        temporal_filter = {
+            "fromDate": "1940-01-01",
+            "toDate": "1960-01-01",
+            "dateNodeId": "",
+            "inverted": True,
+        }
         term_filter = [
-            {"type": "string", "context": "", "context_label": "", "id": "test", "text": "test", "value": "test", "inverted": False}
+            {
+                "type": "string",
+                "context": "",
+                "context_label": "",
+                "id": "test",
+                "text": "test",
+                "value": "test",
+                "inverted": False,
+            }
         ]
-        response_json = get_response_json(self.client, temporal_filter=temporal_filter, term_filter=term_filter)
+        response_json = get_response_json(
+            self.client, temporal_filter=temporal_filter, term_filter=term_filter
+        )
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 0)
 
     def test_term_search_1(self):
@@ -341,11 +514,22 @@ class SearchTests(ArchesTestCase):
         """
 
         term_filter = [
-            {"type": "string", "context": "", "context_label": "", "id": "test", "text": "test", "value": "test", "inverted": False}
+            {
+                "type": "string",
+                "context": "",
+                "context_label": "",
+                "id": "test",
+                "text": "test",
+                "value": "test",
+                "inverted": False,
+            }
         ]
         response_json = get_response_json(self.client, term_filter=term_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
-        self.assertCountEqual(extract_pks(response_json), [str(self.date_resource.pk), str(self.name_resource.pk)])
+        self.assertCountEqual(
+            extract_pks(response_json),
+            [str(self.date_resource.pk), str(self.name_resource.pk)],
+        )
 
     def test_term_search_2(self):
         """
@@ -354,12 +538,24 @@ class SearchTests(ArchesTestCase):
         """
 
         term_filter = [
-            {"type": "string", "context": "", "context_label": "", "id": "test", "text": "test", "value": "test", "inverted": True}
+            {
+                "type": "string",
+                "context": "",
+                "context_label": "",
+                "id": "test",
+                "text": "test",
+                "value": "test",
+                "inverted": True,
+            }
         ]
         response_json = get_response_json(self.client, term_filter=term_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
         self.assertCountEqual(
-            extract_pks(response_json), [str(self.date_and_cultural_period_resource.pk), str(self.cultural_period_resource.pk)]
+            extract_pks(response_json),
+            [
+                str(self.date_and_cultural_period_resource.pk),
+                str(self.cultural_period_resource.pk),
+            ],
         )
 
     def test_term_search_3(self):
@@ -369,7 +565,15 @@ class SearchTests(ArchesTestCase):
         """
 
         term_filter = [
-            {"type": "term", "context": "", "context_label": "", "id": "test", "text": "test", "value": "test", "inverted": False}
+            {
+                "type": "term",
+                "context": "",
+                "context_label": "",
+                "id": "test",
+                "text": "test",
+                "value": "test",
+                "inverted": False,
+            }
         ]
         response_json = get_response_json(self.client, term_filter=term_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 1)
@@ -382,13 +586,25 @@ class SearchTests(ArchesTestCase):
         """
 
         term_filter = [
-            {"type": "term", "context": "", "context_label": "", "id": "test", "text": "test", "value": "test", "inverted": True}
+            {
+                "type": "term",
+                "context": "",
+                "context_label": "",
+                "id": "test",
+                "text": "test",
+                "value": "test",
+                "inverted": True,
+            }
         ]
         response_json = get_response_json(self.client, term_filter=term_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 3)
         self.assertCountEqual(
             extract_pks(response_json),
-            [str(self.date_resource.pk), str(self.date_and_cultural_period_resource.pk), str(self.cultural_period_resource.pk)],
+            [
+                str(self.date_resource.pk),
+                str(self.date_and_cultural_period_resource.pk),
+                str(self.cultural_period_resource.pk),
+            ],
         )
 
     def test_concept_search_1(self):
@@ -411,7 +627,11 @@ class SearchTests(ArchesTestCase):
         response_json = get_response_json(self.client, term_filter=term_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
         self.assertCountEqual(
-            extract_pks(response_json), [str(self.date_and_cultural_period_resource.pk), str(self.cultural_period_resource.pk)]
+            extract_pks(response_json),
+            [
+                str(self.date_and_cultural_period_resource.pk),
+                str(self.cultural_period_resource.pk),
+            ],
         )
 
     def test_concept_search_2(self):
@@ -421,11 +641,22 @@ class SearchTests(ArchesTestCase):
         """
 
         term_filter = [
-            {"type": "concept", "context": "", "context_label": "", "id": "test", "text": "test", "value": self.conceptid, "inverted": True}
+            {
+                "type": "concept",
+                "context": "",
+                "context_label": "",
+                "id": "test",
+                "text": "test",
+                "value": self.conceptid,
+                "inverted": True,
+            }
         ]
         response_json = get_response_json(self.client, term_filter=term_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
-        self.assertCountEqual(extract_pks(response_json), [str(self.name_resource.pk), str(self.date_resource.pk)])
+        self.assertCountEqual(
+            extract_pks(response_json),
+            [str(self.name_resource.pk), str(self.date_resource.pk)],
+        )
 
     def test_spatial_search_1(self):
         """
@@ -439,8 +670,14 @@ class SearchTests(ArchesTestCase):
                 {
                     "id": "ec1a2079cc12822bc71a6e6643c2f2b4",
                     "type": "Feature",
-                    "properties": {"inverted": False, "buffer": {"width": "100", "unit": "ft"}},
-                    "geometry": {"coordinates": [[[-1, -1], [-1, 1], [1, 1], [1, -1], [-1, -1]]], "type": "Polygon"},
+                    "properties": {
+                        "inverted": False,
+                        "buffer": {"width": "100", "unit": "ft"},
+                    },
+                    "geometry": {
+                        "coordinates": [[[-1, -1], [-1, 1], [1, 1], [1, -1], [-1, -1]]],
+                        "type": "Polygon",
+                    },
                 }
             ],
         }
@@ -460,8 +697,14 @@ class SearchTests(ArchesTestCase):
                 {
                     "id": "ec1a2079cc12822bc71a6e6643c2f2b4",
                     "type": "Feature",
-                    "properties": {"inverted": True, "buffer": {"width": "100", "unit": "ft"}},
-                    "geometry": {"coordinates": [[[-1, -1], [-1, 1], [1, 1], [1, -1], [-1, -1]]], "type": "Polygon"},
+                    "properties": {
+                        "inverted": True,
+                        "buffer": {"width": "100", "unit": "ft"},
+                    },
+                    "geometry": {
+                        "coordinates": [[[-1, -1], [-1, 1], [1, 1], [1, -1], [-1, -1]]],
+                        "type": "Polygon",
+                    },
                 }
             ],
         }
@@ -478,11 +721,20 @@ class SearchTests(ArchesTestCase):
 
         """
 
-        temporal_filter = {"fromDate": "1945-01-01", "toDate": "1960-01-01", "dateNodeId": "", "inverted": False}
+        temporal_filter = {
+            "fromDate": "1945-01-01",
+            "toDate": "1960-01-01",
+            "dateNodeId": "",
+            "inverted": False,
+        }
         response_json = get_response_json(self.client, temporal_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
         self.assertCountEqual(
-            extract_pks(response_json), [str(self.cultural_period_resource.pk), str(self.date_and_cultural_period_resource.pk)]
+            extract_pks(response_json),
+            [
+                str(self.cultural_period_resource.pk),
+                str(self.date_and_cultural_period_resource.pk),
+            ],
         )
 
     def test_temporal_and_permission_search_2(self):
@@ -491,17 +743,33 @@ class SearchTests(ArchesTestCase):
 
         """
 
-        temporal_filter = {"fromDate": "1940-01-01", "toDate": "1945-01-01", "dateNodeId": "", "inverted": False}
+        temporal_filter = {
+            "fromDate": "1940-01-01",
+            "toDate": "1945-01-01",
+            "dateNodeId": "",
+            "inverted": False,
+        }
         response_json = get_response_json(self.client, temporal_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
-        self.assertCountEqual(extract_pks(response_json), [str(self.date_resource.pk), str(self.date_and_cultural_period_resource.pk)])
+        self.assertCountEqual(
+            extract_pks(response_json),
+            [
+                str(self.date_resource.pk),
+                str(self.date_and_cultural_period_resource.pk),
+            ],
+        )
 
 
 def extract_pks(response_json):
-    return [result["_source"]["resourceinstanceid"] for result in response_json["results"]["hits"]["hits"]]
+    return [
+        result["_source"]["resourceinstanceid"]
+        for result in response_json["results"]["hits"]["hits"]
+    ]
 
 
-def get_response_json(client, temporal_filter=None, term_filter=None, spatial_filter=None):
+def get_response_json(
+    client, temporal_filter=None, term_filter=None, spatial_filter=None
+):
     query = {}
     if temporal_filter is not None:
         query["time-filter"] = JSONSerializer().serialize(temporal_filter)

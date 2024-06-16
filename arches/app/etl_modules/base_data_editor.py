@@ -12,7 +12,17 @@ from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import GraphModel, Node, ETLModule, LoadStaging
 from arches.app.models.system_settings import settings
-from arches.app.search.elasticsearch_dsl_builder import Bool, FiltersAgg, Match, Nested, NestedAgg, Query, Terms, Wildcard, Regex
+from arches.app.search.elasticsearch_dsl_builder import (
+    Bool,
+    FiltersAgg,
+    Match,
+    Nested,
+    NestedAgg,
+    Query,
+    Terms,
+    Wildcard,
+    Regex,
+)
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.search.search_engine_factory import SearchEngineFactory
 import arches.app.tasks as tasks
@@ -26,8 +36,10 @@ from arches.app.views.search import search_results
 
 logger = logging.getLogger(__name__)
 
+
 class MissingRequiredInputError(Exception):
     pass
+
 
 class BaseBulkEditor:
     def __init__(self, request=None, loadid=None):
@@ -107,7 +119,8 @@ class BaseBulkEditor:
         graphid = request.POST.get("graphid")
 
         with connection.cursor() as cursor:
-            cursor.execute("""
+            cursor.execute(
+                """
                 WITH RECURSIVE card_tree(nodegroupid, parentnodegroupid, name) AS (
                     SELECT ng.nodegroupid, ng.parentnodegroupid, c.name ->> %s name
                     FROM node_groups ng, cards c
@@ -133,10 +146,19 @@ class BaseBulkEditor:
         result = {"success": False}
         load_details_json = json.dumps(load_details)
         try:
-            load_description = 'Preparing the load...'
+            load_description = "Preparing the load..."
             cursor.execute(
                 """INSERT INTO load_event (loadid, etl_module_id, load_details, complete, status, load_description, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, self.moduleid, load_details_json, False, "running", load_description, datetime.now(), self.userid),
+                (
+                    self.loadid,
+                    self.moduleid,
+                    load_details_json,
+                    False,
+                    "running",
+                    load_description,
+                    datetime.now(),
+                    self.userid,
+                ),
             )
             result["success"] = True
         except Exception as e:
@@ -145,16 +167,44 @@ class BaseBulkEditor:
 
         return result
 
-    def stage_data(self, cursor, module_id, graph_id, node_id, resourceids, operation, pattern, new_text, language_code, case_insensitive):
+    def stage_data(
+        self,
+        cursor,
+        module_id,
+        graph_id,
+        node_id,
+        resourceids,
+        operation,
+        pattern,
+        new_text,
+        language_code,
+        case_insensitive,
+    ):
         result = {"success": False}
         update_limit = ETLModule.objects.get(pk=module_id).config["updateLimit"]
         try:
             cursor.execute(
                 """SELECT * FROM __arches_stage_string_data_for_bulk_edit(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, graph_id, node_id, self.moduleid, (resourceids), operation, pattern, new_text, language_code, case_insensitive, update_limit),
+                (
+                    self.loadid,
+                    graph_id,
+                    node_id,
+                    self.moduleid,
+                    (resourceids),
+                    operation,
+                    pattern,
+                    new_text,
+                    language_code,
+                    case_insensitive,
+                    update_limit,
+                ),
             )
-            count_of_tiles_staged = LoadStaging.objects.filter(load_event=self.loadid).count()
-            self.log_event_details(cursor, f"done|{count_of_tiles_staged} tiles staged...")
+            count_of_tiles_staged = LoadStaging.objects.filter(
+                load_event=self.loadid
+            ).count()
+            self.log_event_details(
+                cursor, f"done|{count_of_tiles_staged} tiles staged..."
+            )
             result["success"] = True
         except Exception as e:
             logger.error(e)
@@ -188,7 +238,7 @@ class BaseBulkEditor:
         for k, v in params.items():
             request.GET.__setitem__(k, v[0])
         response = search_results(request)
-        results = json.loads(response.content)['results']['hits']['hits']
+        results = json.loads(response.content)["results"]["hits"]["hits"]
         return [result["_source"]["resourceinstanceid"] for result in results]
 
     def validate(self, request):
@@ -207,23 +257,38 @@ class BulkStringEditor(BaseBulkEditor):
         required_inputs = {
             "graph_id": _("Resource Model"),
             "node_id": _("Node"),
-            "operation": _("Edit Operation"), 
-            "language_code": _("Language")
+            "operation": _("Edit Operation"),
+            "language_code": _("Language"),
         }
         if operation == "replace":
-            required_inputs = required_inputs | {"old_text": _("Old Text"),"new_text": _("New Text")}
+            required_inputs = required_inputs | {
+                "old_text": _("Old Text"),
+                "new_text": _("New Text"),
+            }
 
         for required_input, display_value in required_inputs.items():
             if request.POST.get(required_input, None) is None:
-                ret = _("Missing required value: {required_input}").format(required_input=display_value)
+                ret = _("Missing required value: {required_input}").format(
+                    required_input=display_value
+                )
                 raise MissingRequiredInputError(ret)
 
-    def edit_staged_data(self, cursor, graph_id, node_id, operation, language_code, pattern, new_text):
+    def edit_staged_data(
+        self, cursor, graph_id, node_id, operation, language_code, pattern, new_text
+    ):
         result = {"success": False}
         try:
             cursor.execute(
                 """SELECT * FROM __arches_edit_staged_string_data(%s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, graph_id, node_id, language_code, operation, pattern, new_text),
+                (
+                    self.loadid,
+                    graph_id,
+                    node_id,
+                    language_code,
+                    operation,
+                    pattern,
+                    new_text,
+                ),
             )
             result["success"] = True
         except Exception as e:
@@ -231,13 +296,22 @@ class BulkStringEditor(BaseBulkEditor):
             result["message"] = _("Unable to edit staged data: {}").format(str(e))
         return result
 
-    def get_preview_data(self, node_id, search_url, language_code, operation, old_text, case_insensitive, whole_word, preview_limit):
+    def get_preview_data(
+        self,
+        node_id,
+        search_url,
+        language_code,
+        operation,
+        old_text,
+        case_insensitive,
+        whole_word,
+        preview_limit,
+    ):
         request = HttpRequest()
         request.user = self.request.user
         request.method = "GET"
         request.GET["paging-filter"] = 1
         request.GET["tiles"] = True
-
 
         if search_url:
             validate = URLValidator()
@@ -279,7 +353,7 @@ class BulkStringEditor(BaseBulkEditor):
                 regexp = "([a-z].*)|([A-Z][a-zA-Z]*[A-Z].*)|((.+[ ]+)[a-z].*)|((.+[ ]+)[A-Z][a-zA-Z]*[A-Z].*)"
             elif operation.startswith("trim"):
                 regexp = "[ \t].*|.*[ \t]"
-            
+
             case_search_query = Regex(
                 field=f"tiles.data.{node_id}.{language_code}.value.keyword",
                 query=regexp,
@@ -295,7 +369,9 @@ class BulkStringEditor(BaseBulkEditor):
         inner_hits_query = {
             "inner_hits": {
                 "_source": False,
-                "docvalue_fields": [ f"tiles.data.{node_id}.{language_code}.value.keyword" ]
+                "docvalue_fields": [
+                    f"tiles.data.{node_id}.{language_code}.value.keyword"
+                ],
             }
         }
         string_search_nested.dsl["nested"].update(inner_hits_query)
@@ -319,12 +395,18 @@ class BulkStringEditor(BaseBulkEditor):
 
         results = query.search(index=RESOURCES_INDEX)
         values = []
-        for hit in results['hits']['hits']:
-            for tile in hit['inner_hits']['tiles']['hits']['hits']:
-                values.append(tile['fields'][f"tiles.data.{node_id}.{language_code}.value.keyword"][0])
+        for hit in results["hits"]["hits"]:
+            for tile in hit["inner_hits"]["tiles"]["hits"]["hits"]:
+                values.append(
+                    tile["fields"][
+                        f"tiles.data.{node_id}.{language_code}.value.keyword"
+                    ][0]
+                )
 
-        number_of_resources = results['hits']['total']['value']
-        number_of_tiles = results["aggregations"]["tile_agg"]["string_search"]["buckets"][0]["doc_count"]
+        number_of_resources = results["hits"]["total"]["value"]
+        number_of_tiles = results["aggregations"]["tile_agg"]["string_search"][
+            "buckets"
+        ][0]["doc_count"]
 
         return values[:preview_limit], number_of_tiles, number_of_resources
 
@@ -336,19 +418,21 @@ class BulkStringEditor(BaseBulkEditor):
         old_text = request.POST.get("old_text", None)
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
-        case_insensitive = request.POST.get("case_insensitive", 'false')
-        whole_word = request.POST.get("whole_word", 'false')
+        case_insensitive = request.POST.get("case_insensitive", "false")
+        whole_word = request.POST.get("whole_word", "false")
         also_trim = request.POST.get("also_trim", "false")
         search_url = request.POST.get("search_url", None)
 
-        preview_limit = ETLModule.objects.get(pk=self.moduleid).config.get("previewLimit", 5)
+        preview_limit = ETLModule.objects.get(pk=self.moduleid).config.get(
+            "previewLimit", 5
+        )
 
         try:
             self.validate_inputs(request)
         except MissingRequiredInputError as e:
             return {
                 "success": False,
-                "data": {"title": _("Missing input error"), "message": str(e)}
+                "data": {"title": _("Missing input error"), "message": str(e)},
             }
 
         if resourceids:
@@ -359,7 +443,10 @@ class BulkStringEditor(BaseBulkEditor):
             except ValidationError:
                 return {
                     "success": False,
-                    "data": {"title": _("Invalid Search Url"), "message": _("Please, enter a valid search url")}
+                    "data": {
+                        "title": _("Invalid Search Url"),
+                        "message": _("Please, enter a valid search url"),
+                    },
                 }
         if resourceids:
             resourceids = tuple(resourceids)
@@ -375,22 +462,40 @@ class BulkStringEditor(BaseBulkEditor):
             operation = operation + "_trim"
 
         try:
-            first_five_values, number_of_tiles, number_of_resources = self.get_preview_data(
-                node_id, search_url, language_code, operation, old_text, case_insensitive, whole_word, preview_limit
+            first_five_values, number_of_tiles, number_of_resources = (
+                self.get_preview_data(
+                    node_id,
+                    search_url,
+                    language_code,
+                    operation,
+                    old_text,
+                    case_insensitive,
+                    whole_word,
+                    preview_limit,
+                )
             )
         except TypeError:
             return {
                 "success": False,
-                "data": {"title": _("Invalid Search Url"), "message": _("Please, enter a valid search url")}
+                "data": {
+                    "title": _("Invalid Search Url"),
+                    "message": _("Please, enter a valid search url"),
+                },
             }
 
         return_list = []
         with connection.cursor() as cursor:
             for value in first_five_values:
                 if operation == "replace":
-                    cursor.execute("""SELECT * FROM REGEXP_REPLACE(%s, %s, %s, 'g');""", [value, pattern, new_text])
+                    cursor.execute(
+                        """SELECT * FROM REGEXP_REPLACE(%s, %s, %s, 'g');""",
+                        [value, pattern, new_text],
+                    )
                 elif operation == "replace_i":
-                    cursor.execute("""SELECT * FROM REGEXP_REPLACE(%s, %s, %s, 'ig');""", [value, pattern, new_text])
+                    cursor.execute(
+                        """SELECT * FROM REGEXP_REPLACE(%s, %s, %s, 'ig');""",
+                        [value, pattern, new_text],
+                    )
                 elif operation == "trim":
                     cursor.execute("""SELECT * FROM TRIM(%s);""", [value])
                 elif operation == "capitalize":
@@ -410,7 +515,12 @@ class BulkStringEditor(BaseBulkEditor):
 
         return {
             "success": True,
-            "data": {"value": return_list, "number_of_tiles": number_of_tiles, "number_of_resources": number_of_resources, "preview_limit": preview_limit},
+            "data": {
+                "value": return_list,
+                "number_of_tiles": number_of_tiles,
+                "number_of_resources": number_of_resources,
+                "preview_limit": preview_limit,
+            },
         }
 
     def write(self, request):
@@ -423,7 +533,7 @@ class BulkStringEditor(BaseBulkEditor):
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
         case_insensitive = request.POST.get("case_insensitive", "false")
-        whole_word = request.POST.get("whole_word", 'false')
+        whole_word = request.POST.get("whole_word", "false")
         also_trim = request.POST.get("also_trim", "false")
         search_url = request.POST.get("search_url", None)
 
@@ -432,7 +542,7 @@ class BulkStringEditor(BaseBulkEditor):
         except MissingRequiredInputError as e:
             return {
                 "success": False,
-                "data": {"title": _("Missing input error"), "message": str(e)}
+                "data": {"title": _("Missing input error"), "message": str(e)},
             }
 
         pattern = old_text
@@ -472,11 +582,24 @@ class BulkStringEditor(BaseBulkEditor):
                 resourceids = json.loads(resourceids)
             if search_url:
                 with connection.cursor() as cursor:
-                    self.log_event_details(cursor, "done|Getting resources from search url...")
+                    self.log_event_details(
+                        cursor, "done|Getting resources from search url..."
+                    )
                 resourceids = self.get_resourceids_from_search_url(search_url)
             if resourceids:
                 resourceids = tuple(resourceids)
-            response = self.run_load_task(self.userid, self.loadid, self.moduleid, graph_id, node_id, operation, language_code, pattern, new_text, resourceids)
+            response = self.run_load_task(
+                self.userid,
+                self.loadid,
+                self.moduleid,
+                graph_id,
+                node_id,
+                operation,
+                language_code,
+                pattern,
+                new_text,
+                resourceids,
+            )
 
         return response
 
@@ -489,8 +612,8 @@ class BulkStringEditor(BaseBulkEditor):
         old_text = request.POST.get("old_text", None)
         new_text = request.POST.get("new_text", None)
         resourceids = request.POST.get("resourceids", None)
-        case_insensitive = request.POST.get("case_insensitive", 'false')
-        whole_word = request.POST.get("whole_word", 'false')
+        case_insensitive = request.POST.get("case_insensitive", "false")
+        whole_word = request.POST.get("whole_word", "false")
         also_trim = request.POST.get("also_trim", "false")
         search_url = request.POST.get("search_url", None)
 
@@ -498,7 +621,9 @@ class BulkStringEditor(BaseBulkEditor):
             resourceids = json.loads(resourceids)
         if search_url:
             with connection.cursor() as cursor:
-                self.log_event_details(cursor, "done|Getting resources from search url...")
+                self.log_event_details(
+                    cursor, "done|Getting resources from search url..."
+                )
             resourceids = self.get_resourceids_from_search_url(search_url)
 
         pattern = old_text
@@ -512,7 +637,18 @@ class BulkStringEditor(BaseBulkEditor):
             operation = operation + "_trim"
 
         edit_task = tasks.edit_bulk_string_data.apply_async(
-            (self.userid, self.loadid, self.moduleid, graph_id, node_id, operation, language_code, pattern, new_text, resourceids),
+            (
+                self.userid,
+                self.loadid,
+                self.moduleid,
+                graph_id,
+                node_id,
+                operation,
+                language_code,
+                pattern,
+                new_text,
+                resourceids,
+            ),
         )
         with connection.cursor() as cursor:
             cursor.execute(
@@ -520,7 +656,19 @@ class BulkStringEditor(BaseBulkEditor):
                 (edit_task.task_id, self.loadid),
             )
 
-    def run_load_task(self, userid, loadid, module_id, graph_id, node_id, operation, language_code, pattern, new_text, resourceids):
+    def run_load_task(
+        self,
+        userid,
+        loadid,
+        module_id,
+        graph_id,
+        node_id,
+        operation,
+        language_code,
+        pattern,
+        new_text,
+        resourceids,
+    ):
         if resourceids:
             resourceids = [uuid.UUID(id) for id in resourceids]
         case_insensitive = False
@@ -529,14 +677,36 @@ class BulkStringEditor(BaseBulkEditor):
 
         with connection.cursor() as cursor:
             self.log_event_details(cursor, "done|Staging the data for edit...")
-            data_staged = self.stage_data(cursor, module_id, graph_id, node_id, resourceids, operation, pattern, new_text, language_code, case_insensitive)
+            data_staged = self.stage_data(
+                cursor,
+                module_id,
+                graph_id,
+                node_id,
+                resourceids,
+                operation,
+                pattern,
+                new_text,
+                language_code,
+                case_insensitive,
+            )
 
             if data_staged["success"]:
                 self.log_event_details(cursor, "done|Editing the data...")
-                data_updated = self.edit_staged_data(cursor, graph_id, node_id, operation, language_code, pattern, new_text)
+                data_updated = self.edit_staged_data(
+                    cursor,
+                    graph_id,
+                    node_id,
+                    operation,
+                    language_code,
+                    pattern,
+                    new_text,
+                )
             else:
                 self.log_event(cursor, "failed")
-                return {"success": False, "data": {"title": _("Error"), "message": data_staged["message"]}}
+                return {
+                    "success": False,
+                    "data": {"title": _("Error"), "message": data_staged["message"]},
+                }
 
             if data_updated["success"]:
                 self.loadid = loadid  # currently redundant, but be certain
@@ -544,4 +714,7 @@ class BulkStringEditor(BaseBulkEditor):
                 return {"success": True, "data": "done"}
             else:
                 self.log_event(cursor, "failed")
-                return {"success": False, "data": {"title": _("Error"), "message": data_updated["message"]}}
+                return {
+                    "success": False,
+                    "data": {"title": _("Error"), "message": data_updated["message"]},
+                }
