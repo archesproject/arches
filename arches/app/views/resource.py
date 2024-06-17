@@ -529,7 +529,7 @@ class ResourcePermissionDataView(View):
             len(get_users_with_perms(resource_instance))
             + len(get_groups_with_perms(resource_instance))
         ) > 1
-        instance_creator = get_instance_creator(resource_instance)
+        instance_creator = resource_instance.get_instance_creator()
         result["creatorid"] = instance_creator["creatorid"]
         return result
 
@@ -558,7 +558,7 @@ class ResourcePermissionDataView(View):
     def apply_permissions(self, data, user, revert=False):
         with transaction.atomic():
             for instance in data["selectedInstances"]:
-                resource_instance = models.ResourceInstance.objects.get(
+                resource_instance = Resource.objects.get(
                     pk=instance["resourceinstanceid"]
                 )
                 for identity in data["selectedIdentities"]:
