@@ -78,6 +78,29 @@ class Resource(models.ResourceInstance):
         self.serialized_graph = None
         self.node_datatypes = None
 
+    def get_instance_creator(self, resource_instance, user=None):
+        creatorid = None
+        can_edit = None
+        if (
+            models.EditLog.objects.filter(
+                resourceinstanceid=resource_instance.resourceinstanceid
+            )
+            .filter(edittype="create")
+            .exists()
+        ):
+            creatorid = (
+                models.EditLog.objects.filter(
+                    resourceinstanceid=resource_instance.resourceinstanceid
+                )
+                .filter(edittype="create")[0]
+                .userid
+            )
+        if creatorid is None or creatorid == "":
+            creatorid = settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
+        if user:
+            can_edit = user.id == int(creatorid) or user.is_superuser
+        return {"creatorid": creatorid, "user_can_edit_instance_permissions": can_edit}
+
     def get_serialized_graph(self):
         if not self.serialized_graph:
             try:
