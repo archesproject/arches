@@ -78,19 +78,17 @@ class Resource(models.ResourceInstance):
         self.serialized_graph = None
         self.node_datatypes = None
 
-    def get_instance_creator(self, resource_instance, user=None):
+    def get_instance_creator(self, user=None):
         creatorid = None
         can_edit = None
         if (
-            models.EditLog.objects.filter(
-                resourceinstanceid=resource_instance.resourceinstanceid
-            )
+            models.EditLog.objects.filter(resourceinstanceid=self.resourceinstanceid)
             .filter(edittype="create")
             .exists()
         ):
             creatorid = (
                 models.EditLog.objects.filter(
-                    resourceinstanceid=resource_instance.resourceinstanceid
+                    resourceinstanceid=self.resourceinstanceid
                 )
                 .filter(edittype="create")[0]
                 .userid
