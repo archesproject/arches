@@ -41,7 +41,11 @@ from arches.app.utils import import_class_from_string, task_management
 from arches.app.utils import permission_backend
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
-from arches.app.utils.permission_backend import assign_perm, remove_perm, NotUserNorGroup
+from arches.app.utils.permission_backend import (
+    assign_perm,
+    remove_perm,
+    NotUserNorGroup,
+)
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.exceptions import (
     InvalidNodeNameException,
@@ -88,7 +92,12 @@ class Resource(models.ResourceInstance):
 
     def get_node_datatypes(self):
         if not self.node_datatypes:
-            self.node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+            self.node_datatypes = {
+                str(nodeid): datatype
+                for nodeid, datatype in models.Node.objects.values_list(
+                    "nodeid", "datatype"
+                )
+            }
         return self.node_datatypes
 
     def set_node_datatypes(self, node_datatypes):
@@ -104,7 +113,11 @@ class Resource(models.ResourceInstance):
         else:
             return SimpleNamespace(
                 **next(
-                    (x for x in self.get_serialized_graph()["nodes"] if x["istopnode"] is True),
+                    (
+                        x
+                        for x in self.get_serialized_graph()["nodes"]
+                        if x["istopnode"] is True
+                    ),
                     None,
                 )
             ).ontologyclass
@@ -153,7 +166,9 @@ class Resource(models.ResourceInstance):
             except KeyError:
                 pass
 
-    def save_descriptors(self, descriptors=("name", "description", "map_popup"), context=None):
+    def save_descriptors(
+        self, descriptors=("name", "description", "map_popup"), context=None
+    ):
         """
         descriptors -- iterator with descriptors to be calculated
         context -- Dictionary with any key:value pairs needed to control the behavior of a custom descriptor function
@@ -175,13 +190,20 @@ class Resource(models.ResourceInstance):
             for descriptor in descriptors:
                 if len(self.descriptor_function) == 1:
                     module = self.descriptor_function[0].function.get_class_module()()
-                    self.descriptors[language][descriptor] = module.get_primary_descriptor_from_nodes(
-                        self,
-                        self.descriptor_function[0].config["descriptor_types"][descriptor],
-                        context,
-                        descriptor,
+                    self.descriptors[language][descriptor] = (
+                        module.get_primary_descriptor_from_nodes(
+                            self,
+                            self.descriptor_function[0].config["descriptor_types"][
+                                descriptor
+                            ],
+                            context,
+                            descriptor,
+                        )
                     )
-                    if descriptor == "name" and self.descriptors[language][descriptor] is not None:
+                    if (
+                        descriptor == "name"
+                        and self.descriptors[language][descriptor] is not None
+                    ):
                         self.name[language] = self.descriptors[language][descriptor]
                 else:
                     self.descriptors[language][descriptor] = None
@@ -273,7 +295,12 @@ class Resource(models.ResourceInstance):
         self.tiles = list(models.TileModel.objects.filter(resourceinstance=self))
         if user:
             readable_nodegroups = get_nodegroups_by_perm(user, perm, any_perm=True)
-            self.tiles = [tile for tile in self.tiles if tile.nodegroup is not None and tile.nodegroup_id in readable_nodegroups]
+            self.tiles = [
+                tile
+                for tile in self.tiles
+                if tile.nodegroup is not None
+                and tile.nodegroup_id in readable_nodegroups
+            ]
 
     # # flatten out the nested tiles into a single array
     def get_flattened_tiles(self):
@@ -296,7 +323,12 @@ class Resource(models.ResourceInstance):
         """
 
         datatype_factory = DataTypeFactory()
-        node_datatypes = {str(nodeid): datatype for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")}
+        node_datatypes = {
+            str(nodeid): datatype
+            for nodeid, datatype in models.Node.objects.values_list(
+                "nodeid", "datatype"
+            )
+        }
         tiles = []
         documents = []
         term_list = []
@@ -310,7 +342,9 @@ class Resource(models.ResourceInstance):
         Resource.objects.bulk_create(resources)
         TileModel.objects.bulk_create(tiles)
 
-        print(f"Time to bulk create tiles and resources: {datetime.timedelta(seconds=time() - start)}")
+        print(
+            f"Time to bulk create tiles and resources: {datetime.timedelta(seconds=time() - start)}"
+        )
 
         start = time()
         for resource in resources:
@@ -322,7 +356,10 @@ class Resource(models.ResourceInstance):
             transaction_id=transaction_id,
         )
 
-        print("Time to save resource edits: %s" % datetime.timedelta(seconds=time() - start))
+        print(
+            "Time to save resource edits: %s"
+            % datetime.timedelta(seconds=time() - start)
+        )
 
         for resource in resources:
             start = time()
@@ -341,7 +378,11 @@ class Resource(models.ResourceInstance):
             )
 
             for term in terms:
-                term_list.append(se.create_bulk_item(index=TERMS_INDEX, id=term["_id"], data=term["_source"]))
+                term_list.append(
+                    se.create_bulk_item(
+                        index=TERMS_INDEX, id=term["_id"], data=term["_source"]
+                    )
+                )
 
         se.bulk_index(documents)
         se.bulk_index(term_list)
@@ -358,7 +399,11 @@ class Resource(models.ResourceInstance):
             datatype_factory = DataTypeFactory()
 
             node_datatypes = {
-                str(nodeid): datatype for nodeid, datatype in ((k["nodeid"], k["datatype"]) for k in self.get_serialized_graph()["nodes"])
+                str(nodeid): datatype
+                for nodeid, datatype in (
+                    (k["nodeid"], k["datatype"])
+                    for k in self.get_serialized_graph()["nodes"]
+                )
             }
             document, terms = self.get_documents_to_index(
                 datatype_factory=datatype_factory,
@@ -375,7 +420,9 @@ class Resource(models.ResourceInstance):
                 celery_worker_running = task_management.check_if_celery_available()
 
                 for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
-                    if celery_worker_running and index.get("should_update_asynchronously"):
+                    if celery_worker_running and index.get(
+                        "should_update_asynchronously"
+                    ):
                         index_resource.apply_async(
                             [
                                 index["module"],
@@ -385,11 +432,17 @@ class Resource(models.ResourceInstance):
                             ]
                         )
                     else:
-                        es_index = import_class_from_string(index["module"])(index["name"])
-                        doc, doc_id = es_index.get_documents_to_index(self, document["tiles"])
+                        es_index = import_class_from_string(index["module"])(
+                            index["name"]
+                        )
+                        doc, doc_id = es_index.get_documents_to_index(
+                            self, document["tiles"]
+                        )
                         es_index.index_document(document=doc, id=doc_id)
 
-    def get_documents_to_index(self, fetchTiles=True, datatype_factory=None, node_datatypes=None, context=None):
+    def get_documents_to_index(
+        self, fetchTiles=True, datatype_factory=None, node_datatypes=None, context=None
+    ):
         """
         Gets all the documents nessesary to index a single resource
         returns a tuple of a document and list of terms
@@ -423,7 +476,9 @@ class Resource(models.ResourceInstance):
                 try:
                     display_name = JSONDeserializer().deserialize(displayname)
                     for key in display_name.keys():
-                        document["displayname"].append({"value": display_name[key]["value"], "language": key})
+                        document["displayname"].append(
+                            {"value": display_name[key]["value"], "language": key}
+                        )
                 except:
                     display_name = {"value": displayname, "language": lang[0]}
                     document["displayname"].append(display_name)
@@ -431,7 +486,9 @@ class Resource(models.ResourceInstance):
             displaydescription = self.displaydescription(context)
             if displaydescription is not None and displaydescription != "Undefined":
                 try:
-                    display_description = JSONDeserializer().deserialize(displaydescription)
+                    display_description = JSONDeserializer().deserialize(
+                        displaydescription
+                    )
                     for key in display_description.keys():
                         document["displaydescription"].append(
                             {
@@ -451,15 +508,23 @@ class Resource(models.ResourceInstance):
                 try:
                     map_popup = JSONDeserializer().deserialize(mappopup)
                     for key in map_popup.keys():
-                        document["map_popup"].append({"value": map_popup[key]["value"], "language": key})
+                        document["map_popup"].append(
+                            {"value": map_popup[key]["value"], "language": key}
+                        )
                 except:
                     map_popup = {"value": mappopup, "language": lang[0]}
                     document["map_popup"].append(map_popup)
 
-        tiles = list(models.TileModel.objects.filter(resourceinstance=self)) if fetchTiles else self.tiles
+        tiles = (
+            list(models.TileModel.objects.filter(resourceinstance=self))
+            if fetchTiles
+            else self.tiles
+        )
 
         document["tiles"] = tiles
-        document["permissions"] = {"creator": [self.get_instance_creator()["creatorid"]]}
+        document["permissions"] = {
+            "creator": [self.get_instance_creator()["creatorid"]]
+        }
 
         document["permissions"].update(permission_backend.get_index_values(self))
 
@@ -471,23 +536,37 @@ class Resource(models.ResourceInstance):
         document["numbers"] = []
         document["date_ranges"] = []
         document["ids"] = []
-        tiles_have_authoritative_data = any(any(val is not None for val in t.data.values()) for t in tiles)
-        document["provisional_resource"] = "true" if tiles and not tiles_have_authoritative_data else "false"
+        tiles_have_authoritative_data = any(
+            any(val is not None for val in t.data.values()) for t in tiles
+        )
+        document["provisional_resource"] = (
+            "true" if tiles and not tiles_have_authoritative_data else "false"
+        )
 
         terms = []
 
         for tile in document["tiles"]:
             for nodeid, nodevalue in tile.data.items():
-                if nodevalue != "" and nodevalue != [] and nodevalue != {} and nodevalue is not None:
+                if (
+                    nodevalue != ""
+                    and nodevalue != []
+                    and nodevalue != {}
+                    and nodevalue is not None
+                ):
                     datatype = node_datatypes[nodeid]
                     datatype_instance = datatype_factory.get_instance(datatype)
-                    datatype_instance.append_to_document(document, nodevalue, nodeid, tile)
+                    datatype_instance.append_to_document(
+                        document, nodevalue, nodeid, tile
+                    )
                     node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
 
                     for index, term in enumerate(node_terms):
                         terms.append(
                             {
-                                "_id": str(nodeid) + str(tile.tileid) + str(index) + term.lang,
+                                "_id": str(nodeid)
+                                + str(tile.tileid)
+                                + str(index)
+                                + term.lang,
                                 "_source": {
                                     "value": term.value,
                                     "nodeid": nodeid,
@@ -508,16 +587,30 @@ class Resource(models.ResourceInstance):
                     for user, edit in provisionaledits.items():
                         if edit["status"] == "review":
                             for nodeid, nodevalue in edit["value"].items():
-                                if nodevalue != "" and nodevalue != [] and nodevalue != {} and nodevalue is not None:
+                                if (
+                                    nodevalue != ""
+                                    and nodevalue != []
+                                    and nodevalue != {}
+                                    and nodevalue is not None
+                                ):
                                     datatype = node_datatypes[nodeid]
-                                    datatype_instance = datatype_factory.get_instance(datatype)
-                                    datatype_instance.append_to_document(document, nodevalue, nodeid, tile, True)
-                                    node_terms = datatype_instance.get_search_terms(nodevalue, nodeid)
+                                    datatype_instance = datatype_factory.get_instance(
+                                        datatype
+                                    )
+                                    datatype_instance.append_to_document(
+                                        document, nodevalue, nodeid, tile, True
+                                    )
+                                    node_terms = datatype_instance.get_search_terms(
+                                        nodevalue, nodeid
+                                    )
 
                                     for index, term in enumerate(node_terms):
                                         terms.append(
                                             {
-                                                "_id": str(nodeid) + str(tile.tileid) + str(index) + term.lang,
+                                                "_id": str(nodeid)
+                                                + str(tile.tileid)
+                                                + str(index)
+                                                + term.lang,
                                                 "_source": {
                                                     "value": term.value,
                                                     "nodeid": nodeid,
@@ -548,10 +641,17 @@ class Resource(models.ResourceInstance):
             if user_is_reviewer is False:
                 tiles = list(models.TileModel.objects.filter(resourceinstance=self))
                 resource_is_provisional = (
-                    True if sum([len(t.data) for t in tiles]) == 0 or [any(t.data.values()) for t in tiles][0] == False else False
+                    True
+                    if sum([len(t.data) for t in tiles]) == 0
+                    or [any(t.data.values()) for t in tiles][0] == False
+                    else False
                 )
                 if resource_is_provisional is True:
-                    creator_id = int(EditLog.objects.filter(resourceinstanceid=self.pk, edittype="create").values_list("userid")[0][0])
+                    creator_id = int(
+                        EditLog.objects.filter(
+                            resourceinstanceid=self.pk, edittype="create"
+                        ).values_list("userid")[0][0]
+                    )
                     if creator_id == user.id:
                         permit_deletion = True
             else:
@@ -561,7 +661,8 @@ class Resource(models.ResourceInstance):
 
         if permit_deletion is True:
             for related_resource in models.ResourceXResource.objects.filter(
-                Q(resourceinstanceidfrom=self.resourceinstanceid) | Q(resourceinstanceidto=self.resourceinstanceid)
+                Q(resourceinstanceidfrom=self.resourceinstanceid)
+                | Q(resourceinstanceidto=self.resourceinstanceid)
             ):
                 related_resource.delete(deletedResourceId=self.resourceinstanceid)
 
@@ -603,7 +704,9 @@ class Resource(models.ResourceInstance):
         # reindex any related resources
         query = Query(se)
         bool_query = Bool()
-        bool_query.filter(Nested(path="ids", query=Terms(field="ids.id", terms=[resourceinstanceid])))
+        bool_query.filter(
+            Nested(path="ids", query=Terms(field="ids.id", terms=[resourceinstanceid]))
+        )
         query.add_query(bool_query)
         results = query.search(index=RESOURCES_INDEX)["hits"]["hits"]
         for result in results:
@@ -641,7 +744,9 @@ class Resource(models.ResourceInstance):
             try:
                 tile.validate(raise_early=(not verbose), strict=strict)
             except TileValidationError as err:
-                errors += err.message if isinstance(err.message, list) else [err.message]
+                errors += (
+                    err.message if isinstance(err.message, list) else [err.message]
+                )
         return errors
 
     def get_related_resources(
@@ -699,21 +804,27 @@ class Resource(models.ResourceInstance):
             start = number_per_page * int(page - 1)
             limit = number_per_page * page
 
-        def get_relations(resourceinstanceid, start, limit, resourceinstance_graphid=None):
-            final_query = Q(resourceinstanceidfrom_id=resourceinstanceid) | Q(resourceinstanceidto_id=resourceinstanceid)
+        def get_relations(
+            resourceinstanceid, start, limit, resourceinstance_graphid=None
+        ):
+            final_query = Q(resourceinstanceidfrom_id=resourceinstanceid) | Q(
+                resourceinstanceidto_id=resourceinstanceid
+            )
 
             if resourceinstance_graphid:
-                to_graph_id_filter = Q(resourceinstancefrom_graphid_id=str(self.graph_id)) & Q(
-                    resourceinstanceto_graphid_id=resourceinstance_graphid
-                )
-                from_graph_id_filter = Q(resourceinstancefrom_graphid_id=resourceinstance_graphid) & Q(
-                    resourceinstanceto_graphid_id=str(self.graph_id)
-                )
+                to_graph_id_filter = Q(
+                    resourceinstancefrom_graphid_id=str(self.graph_id)
+                ) & Q(resourceinstanceto_graphid_id=resourceinstance_graphid)
+                from_graph_id_filter = Q(
+                    resourceinstancefrom_graphid_id=resourceinstance_graphid
+                ) & Q(resourceinstanceto_graphid_id=str(self.graph_id))
                 final_query = final_query & (to_graph_id_filter | from_graph_id_filter)
 
             relations = {
                 "total": models.ResourceXResource.objects.filter(final_query).count(),
-                "relations": models.ResourceXResource.objects.filter(final_query)[start:limit],
+                "relations": models.ResourceXResource.objects.filter(final_query)[
+                    start:limit
+                ],
             }
 
             return relations  # resourceinstance_graphid = "00000000-886a-374a-94a5-984f10715e3a"
@@ -728,7 +839,9 @@ class Resource(models.ResourceInstance):
         ret["total"] = {"value": resource_relations["total"]}
         instanceids = set()
 
-        restricted_instances = get_restricted_instances(user, se) if user is not None else []
+        restricted_instances = (
+            get_restricted_instances(user, se) if user is not None else []
+        )
         for relation in resource_relations["relations"]:
             relation = model_to_dict(relation)
             resourceid_to = relation["resourceinstanceidto"]
@@ -743,10 +856,14 @@ class Resource(models.ResourceInstance):
                 and user_can_read_graph(user, resourceinstancefrom_graphid)
             ):
                 try:
-                    preflabel = get_preflabel_from_valueid(relation["relationshiptype"], lang)
+                    preflabel = get_preflabel_from_valueid(
+                        relation["relationshiptype"], lang
+                    )
                     relation["relationshiptype_label"] = preflabel["value"] or ""
                 except:
-                    relation["relationshiptype_label"] = relation["relationshiptype"] or ""
+                    relation["relationshiptype_label"] = (
+                        relation["relationshiptype"] or ""
+                    )
 
                 ret["resource_relationships"].append(relation)
                 instanceids.add(str(resourceid_to))
@@ -760,7 +877,6 @@ class Resource(models.ResourceInstance):
         if len(instanceids) > 0:
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
-
                 for resource in related_resources["docs"]:
                     relations = get_relations(
                         resourceinstanceid=resource["_id"],
@@ -771,7 +887,9 @@ class Resource(models.ResourceInstance):
                         resource["_source"]["total_relations"] = relations["total"]
 
                         for descriptor_type in ("displaydescription", "displayname"):
-                            descriptor = get_localized_descriptor(resource, descriptor_type)
+                            descriptor = get_localized_descriptor(
+                                resource, descriptor_type
+                            )
                             if descriptor:
                                 resource["_source"][descriptor_type] = descriptor
                             else:
@@ -878,9 +996,13 @@ class Resource(models.ResourceInstance):
         """
 
         if version is None:
-            return LabelBasedGraph.from_resources(resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes)
+            return LabelBasedGraph.from_resources(
+                resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes
+            )
         elif version == "beta":
-            return LabelBasedGraphV2.from_resources(resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes)
+            return LabelBasedGraphV2.from_resources(
+                resources=resources, compact=compact, hide_empty_nodes=hide_empty_nodes
+            )
 
     def get_node_values(self, node_name):
         """

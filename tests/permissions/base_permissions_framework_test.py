@@ -27,7 +27,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from arches.app.models.models import GraphModel, ResourceInstance, Node
 from arches.app.models.resource import Resource
-from arches.app.permissions.arches_default_deny import ArchesDefaultDenyPermissionFramework
+from arches.app.permissions.arches_default_deny import (
+    ArchesDefaultDenyPermissionFramework,
+)
+
 
 class ArchesPermissionFrameworkTestCase(ArchesTestCase):
     def setUp(self):
@@ -48,19 +51,33 @@ class ArchesPermissionFrameworkTestCase(ArchesTestCase):
     @classmethod
     def add_users(cls):
         profiles = (
-            {"name": "ben", "email": "ben@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
+            {
+                "name": "ben",
+                "email": "ben@test.com",
+                "password": "Test12345!",
+                "groups": ["Graph Editor", "Resource Editor"],
+            },
             {
                 "name": "sam",
                 "email": "sam@test.com",
                 "password": "Test12345!",
                 "groups": ["Graph Editor", "Resource Editor", "Resource Reviewer"],
             },
-            {"name": "jim", "email": "jim@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
+            {
+                "name": "jim",
+                "email": "jim@test.com",
+                "password": "Test12345!",
+                "groups": ["Graph Editor", "Resource Editor"],
+            },
         )
 
         for profile in profiles:
             try:
-                user = User.objects.create_user(username=profile["name"], email=profile["email"], password=profile["password"])
+                user = User.objects.create_user(
+                    username=profile["name"],
+                    email=profile["email"],
+                    password=profile["password"],
+                )
                 user.save()
 
                 for group_name in profile["groups"]:
@@ -76,10 +93,17 @@ class ArchesPermissionFrameworkTestCase(ArchesTestCase):
         if not GraphModel.objects.filter(pk=cls.data_type_graphid).exists():
             # TODO: Fix this to run inside transaction, i.e. after super().setUpClass()
             # https://github.com/archesproject/arches/issues/10719
-            test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
+            test_pkg_path = os.path.join(
+                test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg"
+            )
             with captured_stdout():
-                management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
+                management.call_command(
+                    "packages",
+                    operation="load_package",
+                    source=test_pkg_path,
+                    yes=True,
+                    verbosity=0,
+                )
 
         super().setUpClass()
         cls.add_users()
-

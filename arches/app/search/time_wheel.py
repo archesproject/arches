@@ -41,22 +41,42 @@ class TimeWheel(object):
 
         if (
             results is not None
-            and results["aggregations"]["min_max_agg"]["min_dates.date"]["value"] is not None
-            and results["aggregations"]["min_max_agg"]["max_dates.date"]["value"] is not None
+            and results["aggregations"]["min_max_agg"]["min_dates.date"]["value"]
+            is not None
+            and results["aggregations"]["min_max_agg"]["max_dates.date"]["value"]
+            is not None
         ):
-            min_date = int(results["aggregations"]["min_max_agg"]["min_dates.date"]["value"]) / 10000
-            max_date = int(results["aggregations"]["min_max_agg"]["max_dates.date"]["value"]) / 10000
+            min_date = (
+                int(results["aggregations"]["min_max_agg"]["min_dates.date"]["value"])
+                / 10000
+            )
+            max_date = (
+                int(results["aggregations"]["min_max_agg"]["max_dates.date"]["value"])
+                / 10000
+            )
             # round min and max date to the nearest 1000 years
-            min_date = math.ceil(math.fabs(min_date) / 1000) * -1000 if min_date < 0 else math.floor(min_date / 1000) * 1000
-            max_date = math.floor(math.fabs(max_date) / 1000) * -1000 if max_date < 0 else math.ceil(max_date / 1000) * 1000
+            min_date = (
+                math.ceil(math.fabs(min_date) / 1000) * -1000
+                if min_date < 0
+                else math.floor(min_date / 1000) * 1000
+            )
+            max_date = (
+                math.floor(math.fabs(max_date) / 1000) * -1000
+                if max_date < 0
+                else math.ceil(max_date / 1000) * 1000
+            )
             query = Query(se, limit=0)
             range_lookup = {}
 
             def gen_range_agg(gte=None, lte=None, permitted_nodegroups=None):
                 date_query = Bool()
-                date_query.filter(Range(field="dates.date", gte=gte, lte=lte, relation="intersects"))
+                date_query.filter(
+                    Range(field="dates.date", gte=gte, lte=lte, relation="intersects")
+                )
                 if permitted_nodegroups is not None:
-                    date_query.filter(Terms(field="dates.nodegroup_id", terms=permitted_nodegroups))
+                    date_query.filter(
+                        Terms(field="dates.nodegroup_id", terms=permitted_nodegroups)
+                    )
                 date_ranges_query = Bool()
                 date_ranges_query.filter(
                     Range(
@@ -67,9 +87,15 @@ class TimeWheel(object):
                     )
                 )
                 if permitted_nodegroups is not None:
-                    date_ranges_query.filter(Terms(field="date_ranges.nodegroup_id", terms=permitted_nodegroups))
+                    date_ranges_query.filter(
+                        Terms(
+                            field="date_ranges.nodegroup_id", terms=permitted_nodegroups
+                        )
+                    )
                 wrapper_query = Bool()
-                wrapper_query.should(Nested(path="date_ranges", query=date_ranges_query))
+                wrapper_query.should(
+                    Nested(path="date_ranges", query=date_ranges_query)
+                )
                 wrapper_query.should(Nested(path="dates", query=date_query))
                 return wrapper_query
 
@@ -109,10 +135,19 @@ class TimeWheel(object):
                     min_period = period
                     max_period = period + interval
                     if "range" in date_tier:
-                        within_range = min_period >= date_tier["range"]["min"] and max_period <= date_tier["range"]["max"]
+                        within_range = (
+                            min_period >= date_tier["range"]["min"]
+                            and max_period <= date_tier["range"]["max"]
+                        )
                     if within_range is True:
-                        period_name = "{0} ({1} - {2})".format(name, min_period, max_period)
-                        nodegroups = self.get_permitted_nodegroups(user) if "root" in date_tier else None
+                        period_name = "{0} ({1} - {2})".format(
+                            name, min_period, max_period
+                        )
+                        nodegroups = (
+                            self.get_permitted_nodegroups(user)
+                            if "root" in date_tier
+                            else None
+                        )
                         period_boolquery = gen_range_agg(
                             gte=ExtendedDateFormat(min_period).lower,
                             lte=ExtendedDateFormat(max_period).lower,
@@ -124,7 +159,9 @@ class TimeWheel(object):
                             previous_period_agg.add_aggregation(period_agg)
                         range_lookup[period_name] = [min_period, max_period]
                         if "child" in date_tier:
-                            add_date_tier(date_tier["child"], min_period, max_period, period_agg)
+                            add_date_tier(
+                                date_tier["child"], min_period, max_period, period_agg
+                            )
                         if "root" in date_tier:
                             query.add_aggregation(period_agg)
 
@@ -147,7 +184,9 @@ class TimeWheel(object):
                     cache.set(key, root, settings.CACHE_BY_USER["default"])
                 except KeyError:
                     logger.warning(
-                        _("CACHE_BY_USER setting does not have a 'default'. Adding a default can improve search page performance.")
+                        _(
+                            "CACHE_BY_USER setting does not have a 'default'. Adding a default can improve search page performance."
+                        )
                     )
 
             return root
@@ -171,7 +210,9 @@ class TimeWheel(object):
                 if item.size > 0:
                     d3ItemInstance.children.append(item)
 
-        d3ItemInstance.children = sorted(d3ItemInstance.children, key=lambda item: item.start)
+        d3ItemInstance.children = sorted(
+            d3ItemInstance.children, key=lambda item: item.start
+        )
 
         return d3ItemInstance
 

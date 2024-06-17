@@ -38,7 +38,13 @@ from arches.app.models.resource import Resource
 
 from guardian.models import GroupObjectPermission, UserObjectPermission, Permission
 from guardian.exceptions import WrongAppError
-from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
+from guardian.shortcuts import (
+    assign_perm,
+    get_perms,
+    remove_perm,
+    get_group_perms,
+    get_user_perms,
+)
 
 import inspect
 from arches.app.models.models import *
@@ -47,7 +53,10 @@ from django.contrib.contenttypes.models import ContentType
 from arches.app.models.models import ResourceInstance, MapLayer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nested
 from arches.app.search.mappings import RESOURCES_INDEX
-from arches.app.utils.permission_backend import PermissionFramework, NotUserNorGroup as ArchesNotUserNorGroup
+from arches.app.utils.permission_backend import (
+    PermissionFramework,
+    NotUserNorGroup as ArchesNotUserNorGroup,
+)
 from arches.app.search.search import SearchEngine
 
 if sys.version_info >= (3, 11):
@@ -67,7 +76,12 @@ class ArchesStandardPermissionFramework(PermissionFramework):
     def get_perms_for_model(self, cls: str | Model) -> list[Permission]:
         return get_perms_for_model(cls)  # type: ignore
 
-    def assign_perm(self, perm: Permission | str, user_or_group: User | Group, obj: ResourceInstance | None = None) -> Permission:
+    def assign_perm(
+        self,
+        perm: Permission | str,
+        user_or_group: User | Group,
+        obj: ResourceInstance | None = None,
+    ) -> Permission:
         try:
             return assign_perm(perm, user_or_group, obj=obj)
         except NotUserNorGroup:
@@ -79,10 +93,14 @@ class ArchesStandardPermissionFramework(PermissionFramework):
     def remove_perm(self, perm, user_or_group=None, obj=None):
         return remove_perm(perm, user_or_group=user_or_group, obj=obj)
 
-    def get_perms(self, user_or_group: User | Group, obj: ResourceInstance) -> list[Permission]:
+    def get_perms(
+        self, user_or_group: User | Group, obj: ResourceInstance
+    ) -> list[Permission]:
         return get_perms(user_or_group, obj)  # type: ignore
 
-    def get_group_perms(self, user_or_group: User | Group, obj: ResourceInstance) -> list[Permission]:
+    def get_group_perms(
+        self, user_or_group: User | Group, obj: ResourceInstance
+    ) -> list[Permission]:
         return get_group_perms(user_or_group, obj)  # type: ignore
 
     def get_user_perms(self, user: User, obj: ResourceInstance) -> list[Permission]:
@@ -90,7 +108,11 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
     def process_new_user(self, instance: User, created: bool) -> None:
         ct = ContentType.objects.get(app_label="models", model="resourceinstance")
-        resourceInstanceIds = list(GroupObjectPermission.objects.filter(content_type=ct).values_list("object_pk", flat=True).distinct())
+        resourceInstanceIds = list(
+            GroupObjectPermission.objects.filter(content_type=ct)
+            .values_list("object_pk", flat=True)
+            .distinct()
+        )
         for resourceInstanceId in resourceInstanceIds:
             resourceInstanceId = uuid.UUID(resourceInstanceId)
         resources = ResourceInstance.objects.filter(pk__in=resourceInstanceIds)
@@ -101,7 +123,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             resource.createdtime = resource_instance.createdtime
             resource.index()  # type: ignore
 
-    def get_map_layers_by_perm(self, user: User, perms: str | Iterable[str], any_perm: bool = True) -> list[MapLayer]:
+    def get_map_layers_by_perm(
+        self, user: User, perms: str | Iterable[str], any_perm: bool = True
+    ) -> list[MapLayer]:
         """
         returns a list of node groups that a user has the given permission on
 
@@ -137,7 +161,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                     explicit_map_layer_perms = user_permissions.get_perms(map_layer)
                     if len(explicit_map_layer_perms):
                         if any_perm:
-                            if len(set(formatted_perms) & set(explicit_map_layer_perms)):
+                            if len(
+                                set(formatted_perms) & set(explicit_map_layer_perms)
+                            ):
                                 permitted_map_layers.append(map_layer)
                         else:
                             if set(formatted_perms) == set(explicit_map_layer_perms):
@@ -148,7 +174,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             return permitted_map_layers
 
     def user_can_read_map_layers(self, user):
-        map_layers_with_read_permission = self.get_map_layers_by_perm(user, ["models.read_maplayer"])
+        map_layers_with_read_permission = self.get_map_layers_by_perm(
+            user, ["models.read_maplayer"]
+        )
         map_layers_allowed = []
 
         for map_layer in map_layers_with_read_permission:
@@ -160,7 +188,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         return map_layers_allowed
 
     def user_can_write_map_layers(self, user: User) -> list[MapLayer]:
-        map_layers_with_write_permission = self.get_map_layers_by_perm(user, ["models.write_maplayer"])
+        map_layers_with_write_permission = self.get_map_layers_by_perm(
+            user, ["models.write_maplayer"]
+        )
         map_layers_allowed = []
 
         for map_layer in map_layers_with_write_permission:
@@ -171,7 +201,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         return map_layers_allowed
 
-    def get_nodegroups_by_perm(self, user: User, perms: str | Iterable[str], any_perm: bool = True) -> list[str]:
+    def get_nodegroups_by_perm(
+        self, user: User, perms: str | Iterable[str], any_perm: bool = True
+    ) -> list[str]:
         """
         returns a list of node groups that a user has the given permission on
 
@@ -181,9 +213,18 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         any_perm -- True to check ANY perm in "perms" or False to check ALL perms
 
         """
-        return list(set(str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm_for_user_or_group(user, perms, any_perm=any_perm)))
+        return list(
+            set(
+                str(nodegroup.pk)
+                for nodegroup in get_nodegroups_by_perm_for_user_or_group(
+                    user, perms, any_perm=any_perm
+                )
+            )
+        )
 
-    def check_resource_instance_permissions(self, user: User, resourceid: str, permission: str) -> ResourceInstancePermissions:
+    def check_resource_instance_permissions(
+        self, user: User, resourceid: str, permission: str
+    ) -> ResourceInstancePermissions:
         """
         Checks if a user has permission to access a resource instance
 
@@ -210,7 +251,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                 return result
             else:
                 user_permissions = self.get_user_perms(user, resource)
-                if "no_access_to_resourceinstance" in user_permissions:  # user is restricted
+                if (
+                    "no_access_to_resourceinstance" in user_permissions
+                ):  # user is restricted
                     result["permitted"] = False
                     return result
                 elif permission in user_permissions:  # user is permitted
@@ -218,19 +261,27 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                     return result
 
                 group_permissions = self.get_group_perms(user, resource)
-                if "no_access_to_resourceinstance" in group_permissions:  # group is restricted - no user override
+                if (
+                    "no_access_to_resourceinstance" in group_permissions
+                ):  # group is restricted - no user override
                     result["permitted"] = False
                     return result
-                elif permission in group_permissions:  # group is permitted - no user override
+                elif (
+                    permission in group_permissions
+                ):  # group is permitted - no user override
                     result["permitted"] = True
                     return result
 
-                if permission not in all_perms:  # neither user nor group explicitly permits or restricts.
+                if (
+                    permission not in all_perms
+                ):  # neither user nor group explicitly permits or restricts.
                     result["permitted"] = False  # restriction implied
                     return result
 
         except ObjectDoesNotExist:
-            result["permitted"] = True  # if the object does not exist, should return true - this prevents strange 403s.
+            result["permitted"] = (
+                True  # if the object does not exist, should return true - this prevents strange 403s.
+            )
             return result
 
     def get_users_with_perms(
@@ -243,7 +294,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
     ) -> list[User]:
         return get_users_with_perms(obj, attach_perms=attach_perms, with_superusers=with_superusers, with_group_users=with_group_users, only_with_perms_in=only_with_perms_in)  # type: ignore
 
-    def get_groups_with_perms(self, obj: Model, attach_perms: bool = False) -> list[Group]:
+    def get_groups_with_perms(
+        self, obj: Model, attach_perms: bool = False
+    ) -> list[Group]:
         return get_groups_with_perms(obj, attach_perms=attach_perms)  # type: ignore
 
     def get_restricted_users(self, resource: ResourceInstance) -> dict[str, list[int]]:
@@ -253,8 +306,12 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         """
 
-        user_perms = get_users_with_perms(resource, attach_perms=True, with_group_users=False)
-        user_and_group_perms = get_users_with_perms(resource, attach_perms=True, with_group_users=True)
+        user_perms = get_users_with_perms(
+            resource, attach_perms=True, with_group_users=False
+        )
+        user_and_group_perms = get_users_with_perms(
+            resource, attach_perms=True, with_group_users=True
+        )
 
         result: dict[str, list[int]] = {
             "no_access": [],
@@ -266,7 +323,10 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         for user, perms in user_and_group_perms.items():
             if user.is_superuser:
                 pass
-            elif user in user_perms and "no_access_to_resourceinstance" in user_perms[user]:
+            elif (
+                user in user_perms
+                and "no_access_to_resourceinstance" in user_perms[user]
+            ):
                 for k, v in result.items():
                     v.append(user.id)
             else:
@@ -331,20 +391,31 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                 ret.append(user)
         return ret
 
-    def get_restricted_instances(self, user: User, search_engine: SearchEngine | None = None, allresources: bool = False) -> list[str]:
+    def get_restricted_instances(
+        self,
+        user: User,
+        search_engine: SearchEngine | None = None,
+        allresources: bool = False,
+    ) -> list[str]:
         if allresources is False and user.is_superuser is True:
             return []
 
         if allresources is True:
             restricted_group_instances = {
                 perm["object_pk"]
-                for perm in GroupObjectPermission.objects.filter(permission__codename="no_access_to_resourceinstance").values("object_pk")
+                for perm in GroupObjectPermission.objects.filter(
+                    permission__codename="no_access_to_resourceinstance"
+                ).values("object_pk")
             }
             restricted_user_instances = {
                 perm["object_pk"]
-                for perm in UserObjectPermission.objects.filter(permission__codename="no_access_to_resourceinstance").values("object_pk")
+                for perm in UserObjectPermission.objects.filter(
+                    permission__codename="no_access_to_resourceinstance"
+                ).values("object_pk")
             }
-            all_restricted_instances = list(restricted_group_instances | restricted_user_instances)
+            all_restricted_instances = list(
+                restricted_group_instances | restricted_user_instances
+            )
             return all_restricted_instances
         else:
             terms = Terms(field="permissions.users_with_no_access", terms=[str(user.id)])  # type: ignore
@@ -359,7 +430,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             if total > settings.SEARCH_RESULT_LIMIT:
                 pages = total // settings.SEARCH_RESULT_LIMIT
                 for page in range(pages):
-                    results_scrolled = query.se.es.scroll(scroll_id=scroll_id, scroll="1m")
+                    results_scrolled = query.se.es.scroll(
+                        scroll_id=scroll_id, scroll="1m"
+                    )
                     results["hits"]["hits"] += results_scrolled["hits"]["hits"]
             restricted_ids = [res["_id"] for res in results["hits"]["hits"]]
             return restricted_ids
@@ -377,7 +450,11 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         ...
 
     def user_has_resource_model_permissions(
-        self, user: User, perms: str | Iterable[str], resource: ResourceInstance | None = None, graph_id: str | None = None
+        self,
+        user: User,
+        perms: str | Iterable[str],
+        resource: ResourceInstance | None = None,
+        graph_id: str | None = None,
     ) -> bool:
         """
         Checks if a user has any explicit permissions to a model's nodegroups
@@ -393,10 +470,16 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             graph_id = resource.graph_id
 
         nodegroups = self.get_nodegroups_by_perm(user, perms)
-        nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=graph_id).select_related("graph")
+        nodes = (
+            Node.objects.filter(nodegroup__in=nodegroups)
+            .filter(graph_id=graph_id)
+            .select_related("graph")
+        )
         return bool(nodes.exists())
 
-    def user_can_read_resource(self, user: User, resourceid: str | None = None) -> bool | None:
+    def user_can_read_resource(
+        self, user: User, resourceid: str | None = None
+    ) -> bool | None:
         """
         Requires that a user be able to read an instance and read a single nodegroup of a resource
 
@@ -405,23 +488,37 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             if user.is_superuser:
                 return True
             if resourceid is not None and resourceid != "":
-                result = self.check_resource_instance_permissions(user, resourceid, "view_resourceinstance")
+                result = self.check_resource_instance_permissions(
+                    user, resourceid, "view_resourceinstance"
+                )
                 if result is not None:
                     if result["permitted"] == "unknown":
-                        return self.user_has_resource_model_permissions(user, ["models.read_nodegroup"], result["resource"])
+                        return self.user_has_resource_model_permissions(
+                            user, ["models.read_nodegroup"], result["resource"]
+                        )
                     else:
                         return result["permitted"]
                 else:
                     return None
 
-            return len(self.get_resource_types_by_perm(user, ["models.read_nodegroup"])) > 0
+            return (
+                len(self.get_resource_types_by_perm(user, ["models.read_nodegroup"]))
+                > 0
+            )
         return False
 
-    def get_resource_types_by_perm(self, user: User, perms: str | Iterable[str]) -> list[str]:
+    def get_resource_types_by_perm(
+        self, user: User, perms: str | Iterable[str]
+    ) -> list[str]:
         graphs = set()
         nodegroups = self.get_nodegroups_by_perm(user, perms)
-        for node in Node.objects.filter(nodegroup__in=nodegroups).prefetch_related("graph"):
-            if node.graph.isresource and str(node.graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+        for node in Node.objects.filter(nodegroup__in=nodegroups).prefetch_related(
+            "graph"
+        ):
+            if (
+                node.graph.isresource
+                and str(node.graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+            ):
                 graphs.add(str(node.graph.pk))
         return list(graphs)
 
@@ -434,10 +531,14 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             if user.is_superuser:
                 return True
             if resourceid is not None and resourceid != "":
-                result = self.check_resource_instance_permissions(user, resourceid, "change_resourceinstance")
+                result = self.check_resource_instance_permissions(
+                    user, resourceid, "change_resourceinstance"
+                )
                 if result is not None:
                     if result["permitted"] == "unknown":
-                        return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or self.user_can_edit_model_nodegroups(
+                        return user.groups.filter(
+                            name__in=settings.RESOURCE_EDITOR_GROUPS
+                        ).exists() or self.user_can_edit_model_nodegroups(
                             user, result["resource"]
                         )
                     else:
@@ -445,10 +546,15 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                 else:
                     return None
 
-            return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or len(self.get_editable_resource_types(user)) > 0
+            return (
+                user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists()
+                or len(self.get_editable_resource_types(user)) > 0
+            )
         return False
 
-    def user_can_delete_resource(self, user: User, resourceid: str | None = None) -> bool | None:
+    def user_can_delete_resource(
+        self, user: User, resourceid: str | None = None
+    ) -> bool | None:
         """
         Requires that a user be permitted to delete an instance
 
@@ -457,17 +563,25 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             if user.is_superuser:
                 return True
             if resourceid is not None and resourceid != "":
-                result = self.check_resource_instance_permissions(user, resourceid, "delete_resourceinstance")
+                result = self.check_resource_instance_permissions(
+                    user, resourceid, "delete_resourceinstance"
+                )
                 if result is not None:
                     if result["permitted"] == "unknown":
-                        nodegroups = self.get_nodegroups_by_perm(user, "models.delete_nodegroup")
+                        nodegroups = self.get_nodegroups_by_perm(
+                            user, "models.delete_nodegroup"
+                        )
                         tiles = TileModel.objects.filter(resourceinstance_id=resourceid)
-                        protected_tiles = {str(tile.nodegroup_id) for tile in tiles} - set(nodegroups)
+                        protected_tiles = {
+                            str(tile.nodegroup_id) for tile in tiles
+                        } - set(nodegroups)
                         if len(protected_tiles) > 0:
                             return False
                         return user.groups.filter(
                             name__in=settings.RESOURCE_EDITOR_GROUPS
-                        ).exists() or self.user_can_delete_model_nodegroups(user, result["resource"])
+                        ).exists() or self.user_can_delete_model_nodegroups(
+                            user, result["resource"]
+                        )
                     else:
                         return result["permitted"]
                 else:
@@ -484,7 +598,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         """
 
         if self.user_is_resource_editor(user):
-            return self.get_resource_types_by_perm(user, ["models.write_nodegroup", "models.delete_nodegroup"])
+            return self.get_resource_types_by_perm(
+                user, ["models.write_nodegroup", "models.delete_nodegroup"]
+            )
         else:
             return []
 
@@ -501,7 +617,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         else:
             return []
 
-    def user_can_edit_model_nodegroups(self, user: User, resource: ResourceInstance) -> bool:
+    def user_can_edit_model_nodegroups(
+        self, user: User, resource: ResourceInstance
+    ) -> bool:
         """
         returns a list of graphs of which a user can edit resource instances
 
@@ -511,9 +629,15 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         """
 
-        return bool(self.user_has_resource_model_permissions(user, ["models.write_nodegroup"], resource))
+        return bool(
+            self.user_has_resource_model_permissions(
+                user, ["models.write_nodegroup"], resource
+            )
+        )
 
-    def user_can_delete_model_nodegroups(self, user: User, resource: ResourceInstance) -> bool:
+    def user_can_delete_model_nodegroups(
+        self, user: User, resource: ResourceInstance
+    ) -> bool:
         """
         returns a list of graphs of which a user can edit resource instances
 
@@ -523,7 +647,11 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         """
 
-        return bool(self.user_has_resource_model_permissions(user, ["models.delete_nodegroup"], resource))
+        return bool(
+            self.user_has_resource_model_permissions(
+                user, ["models.delete_nodegroup"], resource
+            )
+        )
 
     def user_can_read_graph(self, user: User, graph_id: str) -> bool:
         """
@@ -535,7 +663,11 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         """
 
-        return bool(self.user_has_resource_model_permissions(user, ["models.read_nodegroup"], graph_id=graph_id))
+        return bool(
+            self.user_has_resource_model_permissions(
+                user, ["models.read_nodegroup"], graph_id=graph_id
+            )
+        )
 
     def user_can_read_concepts(self, user: User) -> bool:
         """
@@ -620,20 +752,31 @@ class ArchesStandardPermissionFramework(PermissionFramework):
     def get_search_ui_permissions(self, user: User, search_result: dict) -> dict:
         result = {}
         user_read_permissions = self.get_resource_types_by_perm(
-            user, ["models.write_nodegroup", "models.delete_nodegroup", "models.read_nodegroup"]
+            user,
+            [
+                "models.write_nodegroup",
+                "models.delete_nodegroup",
+                "models.read_nodegroup",
+            ],
         )
         user_can_read = len(user_read_permissions) > 0
         result["can_read"] = (
             "permissions" in search_result["_source"]
             and "users_without_read_perm" in search_result["_source"]["permissions"]
-            and (user.id in search_result["_source"]["permissions"]["users_without_read_perm"])
+            and (
+                user.id
+                in search_result["_source"]["permissions"]["users_without_read_perm"]
+            )
         ) and user_can_read
 
         user_can_edit = len(self.get_editable_resource_types(user)) > 0
         result["can_edit"] = (
             "permissions" in search_result["_source"]
             and "users_without_edit_perm" in search_result["_source"]["permissions"]
-            and (user.id in search_result["_source"]["permissions"]["users_without_edit_perm"])
+            and (
+                user.id
+                in search_result["_source"]["permissions"]["users_without_edit_perm"]
+            )
             and user_can_edit
         )
         return result
@@ -651,9 +794,14 @@ class PermissionBackend(ObjectPermissionBackend):  # type: ignore
             if obj is None:
                 raise RuntimeError("Passed perm has app label of '%s' and obj is None")
             if app_label != obj._meta.app_label:
-                raise WrongAppError("Passed perm has app label of '%s' and " "given obj has '%s'" % (app_label, obj._meta.app_label))
+                raise WrongAppError(
+                    "Passed perm has app label of '%s' and "
+                    "given obj has '%s'" % (app_label, obj._meta.app_label)
+                )
 
-        obj_checker: ObjectPermissionChecker = CachedObjectPermissionChecker(user_obj, obj)
+        obj_checker: ObjectPermissionChecker = CachedObjectPermissionChecker(
+            user_obj, obj
+        )
         explicitly_defined_perms = obj_checker.get_perms(obj)
 
         if len(explicitly_defined_perms) > 0:
@@ -732,7 +880,10 @@ class CachedObjectPermissionChecker:
 
 
 def get_nodegroups_by_perm_for_user_or_group(
-    user_or_group: User | Group, perms: str | Iterable[str] | None = None, any_perm: bool = True, ignore_perms: bool = False
+    user_or_group: User | Group,
+    perms: str | Iterable[str] | None = None,
+    any_perm: bool = True,
+    ignore_perms: bool = False,
 ) -> dict[NodeGroup, set[Permission]]:
     formatted_perms = []
     if perms is None:

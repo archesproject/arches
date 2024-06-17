@@ -283,7 +283,9 @@ def prepare_search_index(create=False):
         },
     }
 
-    index_settings["mappings"]["properties"]["permissions"]["properties"].update(permission_backend.update_mappings())
+    index_settings["mappings"]["properties"]["permissions"]["properties"].update(
+        permission_backend.update_mappings()
+    )
 
     try:
         from arches.app.datatypes.datatypes import DataTypeFactory

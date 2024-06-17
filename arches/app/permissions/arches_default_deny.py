@@ -20,7 +20,10 @@ from arches.app.search.components.resource_type_filter import get_permitted_grap
 from django.contrib.auth.models import User, Group
 from arches.app.models.models import ResourceInstance
 
-from arches.app.permissions.arches_standard import ArchesStandardPermissionFramework, ResourceInstancePermissions
+from arches.app.permissions.arches_standard import (
+    ArchesStandardPermissionFramework,
+    ResourceInstancePermissions,
+)
 from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Query, Terms
 
 
@@ -33,8 +36,12 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
         """Fetches _explicitly_ restricted users."""
         return super().get_restricted_users(resource)
 
-    def check_resource_instance_permissions(self, user: User, resourceid: str, permission: str) -> ResourceInstancePermissions:
-        result = super().check_resource_instance_permissions(user, resourceid, permission)
+    def check_resource_instance_permissions(
+        self, user: User, resourceid: str, permission: str
+    ) -> ResourceInstancePermissions:
+        result = super().check_resource_instance_permissions(
+            user, resourceid, permission
+        )
 
         if result and result.get("permitted", None) is not None:
             # This is a safety check - we don't want an unpermissioned user
@@ -43,7 +50,6 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
             if result["permitted"] == "unknown":
                 result["permitted"] = False
             elif result["permitted"] is False:
-
                 # This covers the case where one group denies permission and another
                 # allows it. Ideally, the deny would override (as normal in Arches) but
                 # this prevents us from having a default deny rule that another group
@@ -72,23 +78,43 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
 
     def get_index_values(self, resource: Resource):
         permissions = {}
-        read_allowances = [group.id for group in self.get_groups_for_object("view_resourceinstance", resource)]
+        read_allowances = [
+            group.id
+            for group in self.get_groups_for_object("view_resourceinstance", resource)
+        ]
         permissions["groups_read"] = read_allowances
-        edit_allowances = [group.id for group in self.get_groups_for_object("change_resourceinstance", resource)]
+        edit_allowances = [
+            group.id
+            for group in self.get_groups_for_object("change_resourceinstance", resource)
+        ]
         permissions["groups_edit"] = edit_allowances
-        users_allowances = [user.id for user in self.get_users_for_object("view_resourceinstance", resource)]
+        users_allowances = [
+            user.id
+            for user in self.get_users_for_object("view_resourceinstance", resource)
+        ]
         permissions["users_read"] = users_allowances
-        users_edit_allowances = [user.id for user in self.get_users_for_object("change_resourceinstance", resource)]
+        users_edit_allowances = [
+            user.id
+            for user in self.get_users_for_object("change_resourceinstance", resource)
+        ]
         permissions["users_edit"] = users_edit_allowances
         return permissions
 
     def get_permission_inclusions(self) -> list:
-        return ["permissions.groups_read", "permissions.groups_edit", "permissions.users_read", "permissions.users_edit"]
+        return [
+            "permissions.groups_read",
+            "permissions.groups_edit",
+            "permissions.users_read",
+            "permissions.users_edit",
+        ]
 
     def get_permission_search_filter(self, user: User) -> Bool:
         has_access = Bool()
         should_access = Bool()
-        group_read = Terms(field="permissions.groups_read", terms=[str(group.id) for group in user.groups.all()])
+        group_read = Terms(
+            field="permissions.groups_read",
+            terms=[str(group.id) for group in user.groups.all()],
+        )
         user_read = Terms(field="permissions.users_read", terms=[str(user.id)])
 
         nested_group_term_filter = Nested(path="permissions", query=group_read)
@@ -98,15 +124,34 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
         has_access.filter(should_access)
         return has_access
 
-    def get_search_ui_permissions(self, user: User, search_result: dict, groups: list[str]) -> dict:
+    def get_search_ui_permissions(
+        self, user: User, search_result: dict, groups: list[str]
+    ) -> dict:
         result = {}
         user_can_read = (
-            len(self.get_resource_types_by_perm(user, ["models.write_nodegroup", "models.delete_nodegroup", "models.read_nodegroup"])) > 0
+            len(
+                self.get_resource_types_by_perm(
+                    user,
+                    [
+                        "models.write_nodegroup",
+                        "models.delete_nodegroup",
+                        "models.read_nodegroup",
+                    ],
+                )
+            )
+            > 0
         )
         result["can_read"] = user.is_superuser or (
             "permissions" in search_result["_source"]
             and "groups_read" in search_result["_source"]["permissions"]
-            and (len(set(search_result["_source"]["permissions"]["groups_read"]).intersection(set(groups))) > 0)
+            and (
+                len(
+                    set(
+                        search_result["_source"]["permissions"]["groups_read"]
+                    ).intersection(set(groups))
+                )
+                > 0
+            )
             and user_can_read
         )
 
@@ -114,6 +159,16 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
         result["can_edit"] = user.is_superuser or (
             "permissions" in search_result["_source"]
             and "groups_read" in search_result["_source"]["permissions"]
-            and ((len(set(search_result["_source"]["permissions"]["groups_edit"]).intersection(set(groups))) > 0) and user_can_edit)
+            and (
+                (
+                    len(
+                        set(
+                            search_result["_source"]["permissions"]["groups_edit"]
+                        ).intersection(set(groups))
+                    )
+                    > 0
+                )
+                and user_can_edit
+            )
         )
         return result

@@ -28,7 +28,9 @@ from arches.app.utils.permission_backend import user_can_edit_resource
 from arches.app.utils.permission_backend import user_can_delete_resource
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.permission_backend import user_created_transaction
-from arches.app.utils.permission_backend import group_required as permission_group_required
+from arches.app.utils.permission_backend import (
+    group_required as permission_group_required,
+)
 from django.contrib.auth.decorators import user_passes_test
 
 # Get an instance of a logger

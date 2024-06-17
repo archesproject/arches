@@ -35,7 +35,6 @@ from arches.app.utils.permission_backend import (
 
 
 class BaseManagerView(TemplateView):
-
     if is_compatible_with_arches() is False:
         message = _("This project is incompatible with Arches {0}.").format(__version__)
         raise CompatibilityError(message)
@@ -67,7 +66,9 @@ class BaseManagerView(TemplateView):
             ],
         )
 
-        context["notifications"] = models.UserXNotification.objects.filter(recipient=self.request.user, isread=False)
+        context["notifications"] = models.UserXNotification.objects.filter(
+            recipient=self.request.user, isread=False
+        )
         context["nav"] = {
             "icon": "fa fa-chevron-circle-right",
             "title": "",
@@ -82,7 +83,9 @@ class BaseManagerView(TemplateView):
             "print": False,
         }
         context["user_is_reviewer"] = user_is_resource_reviewer(self.request.user)
-        context["user_can_edit"] = len(get_editable_resource_types(self.request.user)) > 0
+        context["user_can_edit"] = (
+            len(get_editable_resource_types(self.request.user)) > 0
+        )
         context["user_can_read"] = (
             len(
                 get_resource_types_by_perm(
@@ -105,7 +108,9 @@ class MapBaseManagerView(BaseManagerView):
     def get_context_data(self, **kwargs):
         context = super(MapBaseManagerView, self).get_context_data(**kwargs)
         datatype_factory = DataTypeFactory()
-        geom_datatypes = [d.pk for d in models.DDataType.objects.filter(isgeometric=True)]
+        geom_datatypes = [
+            d.pk for d in models.DDataType.objects.filter(isgeometric=True)
+        ]
         geom_nodes = models.Node.objects.filter(
             graph__isresource=True,
             graph__publication__isnull=False,

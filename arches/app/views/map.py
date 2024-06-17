@@ -64,7 +64,11 @@ class MapLayerManagerView(MapBaseManagerView):
             query.add_aggregation(GeoBoundsAgg(field="points.point", name="bounds"))
             query.add_query(Term(field="graph_id", term=str(node.graph.graphid)))
             results = query.search(index=RESOURCES_INDEX)
-            bounds = results["aggregations"]["bounds"]["bounds"] if "bounds" in results["aggregations"]["bounds"] else None
+            bounds = (
+                results["aggregations"]["bounds"]["bounds"]
+                if "bounds" in results["aggregations"]["bounds"]
+                else None
+            )
             return bounds
 
         context["geom_nodes_json"] = JSONSerializer().serialize(context["geom_nodes"])
@@ -75,7 +79,9 @@ class MapLayerManagerView(MapBaseManagerView):
             datatype = datatype_factory.get_instance(node.datatype)
             map_layer = datatype.get_map_layer(node=node, preview=True)
             if map_layer is not None:
-                count = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).count()
+                count = models.TileModel.objects.filter(
+                    nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)
+                ).count()
                 if count > 0:
                     map_layer["bounds"] = get_resource_bounds(node)
                 else:
@@ -85,11 +91,29 @@ class MapLayerManagerView(MapBaseManagerView):
             if map_source is not None:
                 resource_sources.append(map_source)
             permissions[str(node.pk)] = {
-                "users": sorted([user.email or user.username for user in get_users_for_object("read_nodegroup", node.nodegroup)]),
-                "groups": sorted([group.name for group in get_groups_for_object("read_nodegroup", node.nodegroup)]),
+                "users": sorted(
+                    [
+                        user.email or user.username
+                        for user in get_users_for_object(
+                            "read_nodegroup", node.nodegroup
+                        )
+                    ]
+                ),
+                "groups": sorted(
+                    [
+                        group.name
+                        for group in get_groups_for_object(
+                            "read_nodegroup", node.nodegroup
+                        )
+                    ]
+                ),
             }
-        context["resource_map_layers_json"] = JSONSerializer().serialize(resource_layers)
-        context["resource_map_sources_json"] = JSONSerializer().serialize(resource_sources)
+        context["resource_map_layers_json"] = JSONSerializer().serialize(
+            resource_layers
+        )
+        context["resource_map_sources_json"] = JSONSerializer().serialize(
+            resource_sources
+        )
         context["node_permissions"] = JSONSerializer().serialize(permissions)
 
         context["nav"]["title"] = _("Map Layer Manager")
@@ -119,7 +143,9 @@ class MapLayerManagerView(MapBaseManagerView):
         with transaction.atomic():
             map_layer.save()
             if not map_layer.isoverlay and map_layer.addtomap:
-                models.MapLayer.objects.filter(isoverlay=False).exclude(pk=map_layer.pk).update(addtomap=False)
+                models.MapLayer.objects.filter(isoverlay=False).exclude(
+                    pk=map_layer.pk
+                ).update(addtomap=False)
         return JSONResponse({"success": True, "map_layer": map_layer})
 
     def delete(self, request, maplayerid):

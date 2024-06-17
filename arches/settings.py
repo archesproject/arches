@@ -860,6 +860,7 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
+
 PERMISSION_FRAMEWORK = "arches_standard.ArchesStandardPermissionFramework"
 
 ##########################################

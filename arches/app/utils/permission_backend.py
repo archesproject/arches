@@ -27,7 +27,9 @@ def user_created_transaction(user, transactionid):
         if user.is_superuser:
             return True
         if EditLog.objects.filter(transactionid=transactionid).exists():
-            if EditLog.objects.filter(transactionid=transactionid, userid=user.id).exists():
+            if EditLog.objects.filter(
+                transactionid=transactionid, userid=user.id
+            ).exists():
                 return True
         else:
             return True
@@ -63,7 +65,9 @@ class PermissionFramework(metaclass=ABCMeta):
     def get_restricted_users(self, resource): ...
 
     @abstractmethod
-    def get_restricted_instances(self, user, search_engine=None, allresources=False): ...
+    def get_restricted_instances(
+        self, user, search_engine=None, allresources=False
+    ): ...
 
     @abstractmethod
     def get_groups_for_object(self, perm, obj): ...
@@ -146,19 +150,27 @@ def _get_permission_framework():
     if not _PERMISSION_FRAMEWORK:
         if settings.PERMISSION_FRAMEWORK:
             if "." not in settings.PERMISSION_FRAMEWORK:
-                raise RuntimeError("Permissions frameworks must be a dot-separated module and a class")
+                raise RuntimeError(
+                    "Permissions frameworks must be a dot-separated module and a class"
+                )
             modulename, classname = settings.PERMISSION_FRAMEWORK.split(".", -1)
-            PermissionFramework = get_class_from_modulename(modulename, classname, ExtensionType.PERMISSIONS_FRAMEWORKS)
+            PermissionFramework = get_class_from_modulename(
+                modulename, classname, ExtensionType.PERMISSIONS_FRAMEWORKS
+            )
             _PERMISSION_FRAMEWORK = PermissionFramework()
         else:
-            from arches.app.permissions.arches_standard import ArchesStandardPermissionFramework
+            from arches.app.permissions.arches_standard import (
+                ArchesStandardPermissionFramework,
+            )
 
             _PERMISSION_FRAMEWORK = ArchesStandardPermissionFramework()
     return _PERMISSION_FRAMEWORK
 
 
 def get_createable_resource_models(user):
-    return GraphModel.objects.filter(pk__in=list(get_createable_resource_types(user))).all()
+    return GraphModel.objects.filter(
+        pk__in=list(get_createable_resource_types(user))
+    ).all()
 
 
 def assign_perm(perm, user_or_group, obj=None):
@@ -166,7 +178,9 @@ def assign_perm(perm, user_or_group, obj=None):
 
 
 def remove_perm(perm, user_or_group=None, obj=None):
-    return _get_permission_framework().remove_perm(perm, user_or_group=user_or_group, obj=obj)
+    return _get_permission_framework().remove_perm(
+        perm, user_or_group=user_or_group, obj=obj
+    )
 
 
 def _get_permission_backend():
@@ -178,7 +192,9 @@ def get_restricted_users(resource):
 
 
 def get_restricted_instances(user, search_engine=None, allresources=False):
-    return _get_permission_framework().get_restricted_instances(user, search_engine=search_engine, allresources=allresources)
+    return _get_permission_framework().get_restricted_instances(
+        user, search_engine=search_engine, allresources=allresources
+    )
 
 
 def get_groups_for_object(perm, obj):
@@ -190,15 +206,21 @@ def get_users_for_object(perm, obj):
 
 
 def check_resource_instance_permissions(user, resourceid, permission):
-    return _get_permission_framework().check_resource_instance_permissions(user, resourceid, permission)
+    return _get_permission_framework().check_resource_instance_permissions(
+        user, resourceid, permission
+    )
 
 
 def get_nodegroups_by_perm(user, perms, any_perm=True):
-    return _get_permission_framework().get_nodegroups_by_perm(user, perms, any_perm=any_perm)
+    return _get_permission_framework().get_nodegroups_by_perm(
+        user, perms, any_perm=any_perm
+    )
 
 
 def get_map_layers_by_perm(user, perms, any_perm=True):
-    return _get_permission_framework().get_map_layers_by_perm(user, perms, any_perm=any_perm)
+    return _get_permission_framework().get_map_layers_by_perm(
+        user, perms, any_perm=any_perm
+    )
 
 
 def user_can_read_map_layers(user):
@@ -209,7 +231,13 @@ def user_can_write_map_layers(user):
     return _get_permission_framework().user_can_write_map_layers(user)
 
 
-def get_users_with_perms(obj, attach_perms=False, with_superusers=False, with_group_users=True, only_with_perms_in=None):
+def get_users_with_perms(
+    obj,
+    attach_perms=False,
+    with_superusers=False,
+    with_group_users=True,
+    only_with_perms_in=None,
+):
     return _get_permission_framework().get_users_with_perms(
         obj,
         attach_perms=attach_perms,
@@ -220,7 +248,9 @@ def get_users_with_perms(obj, attach_perms=False, with_superusers=False, with_gr
 
 
 def get_groups_with_perms(obj, attach_perms=False):
-    return _get_permission_framework().get_groups_with_perms(obj, attach_perms=attach_perms)
+    return _get_permission_framework().get_groups_with_perms(
+        obj, attach_perms=attach_perms
+    )
 
 
 def get_user_perms(user, obj):
@@ -256,19 +286,27 @@ def update_permissions_for_group(instance):
 
 
 def user_has_resource_model_permissions(user, perms, resource):
-    return _get_permission_framework().user_has_resource_model_permissions(user, perms, resource)
+    return _get_permission_framework().user_has_resource_model_permissions(
+        user, perms, resource
+    )
 
 
 def user_can_read_resource(user, resourceid=None):
-    return _get_permission_framework().user_can_read_resource(user, resourceid=resourceid)
+    return _get_permission_framework().user_can_read_resource(
+        user, resourceid=resourceid
+    )
 
 
 def user_can_edit_resource(user, resourceid=None):
-    return _get_permission_framework().user_can_edit_resource(user, resourceid=resourceid)
+    return _get_permission_framework().user_can_edit_resource(
+        user, resourceid=resourceid
+    )
 
 
 def user_can_delete_resource(user, resourceid=None):
-    return _get_permission_framework().user_can_delete_resource(user, resourceid=resourceid)
+    return _get_permission_framework().user_can_delete_resource(
+        user, resourceid=resourceid
+    )
 
 
 def user_can_read_concepts(user):
@@ -336,4 +374,6 @@ def get_permission_inclusions():
 
 
 def get_search_ui_permissions(user, search_result, groups=None):
-    return _get_permission_framework().get_search_ui_permissions(user, search_result, groups)
+    return _get_permission_framework().get_search_ui_permissions(
+        user, search_result, groups
+    )
