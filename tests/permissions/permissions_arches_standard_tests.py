@@ -18,7 +18,9 @@ from unittest import mock
 from arches.app.search.elasticsearch_dsl_builder import Bool
 from tests import test_settings
 from tests.base_test import ArchesTestCase
-from tests.permissions.base_permissions_framework_test import ArchesPermissionFrameworkTestCase
+from tests.permissions.base_permissions_framework_test import (
+    ArchesPermissionFrameworkTestCase,
+)
 from django.core import management
 from django.urls import reverse
 from django.test.client import RequestFactory, Client
@@ -43,14 +45,26 @@ class ArchesStandardPermissionTests(ArchesPermissionFrameworkTestCase):
         not without explicit permission if a permission other than 'view_resourceinstance' is assigned.
         """
 
-        implicit_permission = self.framework.user_can_read_resource(self.user, self.resource_instance_id)
-        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
+        implicit_permission = self.framework.user_can_read_resource(
+            self.user, self.resource_instance_id
+        )
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
         self.framework.assign_perm("change_resourceinstance", self.group, resource)
-        can_access_without_view_permission = self.framework.user_can_read_resource(self.user, self.resource_instance_id)
+        can_access_without_view_permission = self.framework.user_can_read_resource(
+            self.user, self.resource_instance_id
+        )
         self.framework.assign_perm("view_resourceinstance", self.group, resource)
-        can_access_with_view_permission = self.framework.user_can_read_resource(self.user, self.resource_instance_id)
+        can_access_with_view_permission = self.framework.user_can_read_resource(
+            self.user, self.resource_instance_id
+        )
         self.assertTrue(
-            (implicit_permission is True and can_access_without_view_permission is False and can_access_with_view_permission is True)
+            (
+                implicit_permission is True
+                and can_access_without_view_permission is False
+                and can_access_with_view_permission is True
+            )
         )
 
     def test_user_has_resource_model_permissions(self):
@@ -59,12 +73,18 @@ class ArchesStandardPermissionTests(ArchesPermissionFrameworkTestCase):
 
         """
 
-        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
         nodes = Node.objects.filter(graph_id=resource.graph_id)
         for node in nodes:
             if node.nodegroup:
-                self.framework.assign_perm("no_access_to_nodegroup", self.group, node.nodegroup)
-        hasperms = self.framework.user_has_resource_model_permissions(self.user, ["models.read_nodegroup"], resource)
+                self.framework.assign_perm(
+                    "no_access_to_nodegroup", self.group, node.nodegroup
+                )
+        hasperms = self.framework.user_has_resource_model_permissions(
+            self.user, ["models.read_nodegroup"], resource
+        )
         self.assertTrue(hasperms is False)
 
     def test_get_restricted_users(self):
@@ -72,8 +92,12 @@ class ArchesStandardPermissionTests(ArchesPermissionFrameworkTestCase):
         Tests that users are properly identified as restricted.
         """
 
-        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
-        self.framework.assign_perm("no_access_to_resourceinstance", self.group, resource)
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
+        self.framework.assign_perm(
+            "no_access_to_resourceinstance", self.group, resource
+        )
         ben = self.user
         jim = User.objects.get(username="jim")
         sam = User.objects.get(username="sam")
@@ -108,7 +132,6 @@ class ArchesStandardPermissionTests(ArchesPermissionFrameworkTestCase):
         assert filter_text.find("permissions.users_with_no_access") != -1
         assert filter_text.find(str(mock_User.id)) != -1
 
-    @mock.patch("guardian.shortcuts.get_users_with_perms")
     @mock.patch("arches.app.models.models.ResourceInstance")
     def test_permission(self, mock_resourceinstance, mock_get_users_with_perms):
         values = self.framework.get_index_values(mock_resourceinstance)
