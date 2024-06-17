@@ -29,7 +29,7 @@
                 name: 'views/components/simple-switch', 
                 params: {
                     value: sortDescending, 
-                    config:{ label: {% quoted_trans "Youngest to oldest" %}, subtitle: ''}
+                    config:{ label: {% quoted_trans _("Youngest to oldest") %}, subtitle: ''}
                 }
             }"
         ></div>
@@ -56,11 +56,11 @@
             {% block listitem %}
             <div class='entry'>
                 <!--ko if: $data.resource_deleted == false -->
-                <a class="resource-edit-link" href='' data-bind="text: {% quoted_trans "Edit" %}, click: function(){$parent.editResource($data.resourceinstanceid)}"></a>
+                <a class="resource-edit-link" href='' data-bind="text: {% quoted_trans _("Edit") %}, click: function(){$parent.editResource($data.resourceinstanceid)}"></a>
                 <div class="entry-label-resource" data-bind="text: $data.resourcedisplayname"></div>
                 <!--/ko-->
                 <!--ko if: $data.resource_deleted == true -->
-                <div><span class="resource-edit-link" data-bind="text: {% quoted_trans 'Resource has been deleted' %}"></span></div>
+                <div><span class="resource-edit-link" data-bind="text: {% quoted_trans _('Resource has been deleted') %}"></span></div>
                 <!--/ko-->
             </div>
 
@@ -83,10 +83,10 @@
                 <span class="provisional-review-pending">{% trans 'pending review' %}</span>
                 <!--/ko-->
                 <!--ko if: $data.lastedittype === 'delete edit' -->
-                <div><span class="provisional-review-declined" data-bind="text: $data.reviewer + {% quoted_trans 'declined' %}"></span></div>
+                <div><span class="provisional-review-declined" data-bind="text: $data.reviewer + {% quoted_trans _('declined') %}"></span></div>
                 <!--/ko-->
                 <!--ko if: $data.lastedittype === 'accept edit' -->
-                <div><span class="provisional-review-accepted" data-bind="text: $data.reviewer + {% quoted_trans 'accepted' %}"></span></div>
+                <div><span class="provisional-review-accepted" data-bind="text: $data.reviewer + {% quoted_trans _('accepted') %}"></span></div>
                 <!--/ko-->
             </div>
 
