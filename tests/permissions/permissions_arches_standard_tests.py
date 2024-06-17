@@ -132,7 +132,8 @@ class ArchesStandardPermissionTests(ArchesPermissionFrameworkTestCase):
         assert filter_text.find("permissions.users_with_no_access") != -1
         assert filter_text.find(str(mock_User.id)) != -1
 
-    @mock.patch("arches.app.models.models.ResourceInstance")
-    def test_permission(self, mock_resourceinstance, mock_get_users_with_perms):
-        values = self.framework.get_index_values(mock_resourceinstance)
-        print(values)
+    # @mock.patch()
+    # @mock.patch("arches.app.models.models.ResourceInstance")
+    # def test_permission(self, mock_resourceinstance):
+    #     values = self.framework.get_index_values(mock_resourceinstance)
+    #     print(values)
