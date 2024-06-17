@@ -749,7 +749,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         has_access.must_not(nested_term_filter)
         return has_access
 
-    def get_search_ui_permissions(self, user: User, search_result: dict) -> dict:
+    def get_search_ui_permissions(
+        self, user: User, search_result: dict, groups
+    ) -> dict:
         result = {}
         user_read_permissions = self.get_resource_types_by_perm(
             user,

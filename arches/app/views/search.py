@@ -512,10 +512,7 @@ def get_provisional_type(request):
 
 
 def get_permitted_nodegroups(user):
-    return [
-        str(nodegroup.pk)
-        for nodegroup in get_nodegroups_by_perm(user, "models.read_nodegroup")
-    ]
+    return get_nodegroups_by_perm(user, "models.read_nodegroup")
 
 
 def buffer(request):
