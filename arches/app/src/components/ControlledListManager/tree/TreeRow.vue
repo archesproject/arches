@@ -1,21 +1,19 @@
 <script setup lang="ts">
-import arches from "arches";
-import Cookies from "js-cookie";
 import { computed, inject, ref, watch } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
+import ProgressSpinner from "primevue/progressspinner";
 import { useToast } from "primevue/usetoast";
 
 import {
     createItem,
     createList,
+    patchList,
     upsertValue,
 } from "@/components/ControlledListManager/api.ts";
 import {
-    DEFAULT_ERROR_TOAST_LIFE,
-    ERROR,
     displayedRowKey,
     selectedLanguageKey,
 } from "@/components/ControlledListManager/constants.ts";
@@ -25,6 +23,7 @@ import {
     itemAsNode,
     listAsNode,
     nodeIsList,
+    reorderItems,
 } from "@/components/ControlledListManager/utils.ts";
 import MoveRow from "@/components/ControlledListManager/tree/MoveRow.vue";
 
@@ -33,6 +32,7 @@ import type { Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
 import type {
+    ControlledList,
     ControlledListItem,
     DisplayedListItemRefAndSetter,
     MoveLabels,
@@ -53,6 +53,7 @@ const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
 });
 const movingItem = defineModel<TreeNode>("movingItem", { required: true });
 const refetcher = defineModel<number>("refetcher", { required: true });
+const rerenderTree = defineModel<number>("rerenderTree", { required: true });
 const nextNewItem = defineModel<NewControlledListItem>("nextNewItem");
 const newLabelFormValue = defineModel<string>("newLabelFormValue", {
     required: true,
@@ -71,6 +72,7 @@ const { setDisplayedRow } = inject(
     displayedRowKey,
 ) as DisplayedListItemRefAndSetter;
 
+const awaitingMove = ref(false);
 // Workaround for autofocusing the new list/label input boxes
 // https://github.com/primefaces/primevue/issues/2397
 const newListInputRef = ref();
@@ -106,58 +108,42 @@ const showMoveHereButton = (rowId: string) => {
         rowId in selectedKeys.value &&
         rowId !== movingItem.value.key &&
         rowId !== movingItem.value.data.parent_id &&
-        rowId !== movingItem.value.data.controlled_list_id
+        (movingItem.value.data.parent_id ||
+            rowId !== movingItem.value.data.controlled_list_id)
     );
 };
 
 const setParent = async (parentNode: TreeNode) => {
-    let error;
-    let response;
-
-    const setListAndSortOrderRecursive = (child: ControlledListItem) => {
-        if (!parentNode.key) {
-            return;
-        }
-        child.controlled_list_id = parentNode.key;
-        child.sortorder = -1; // tells backend to renumber
-        child.children.forEach((grandchild) =>
-            setListAndSortOrderRecursive(grandchild),
-        );
-    };
+    awaitingMove.value = true;
 
     const item = movingItem.value.data;
 
-    if (parentNode.data.name) {
-        setListAndSortOrderRecursive(item);
+    let list: ControlledList;
+    let siblings: ControlledListItem[];
+    if (nodeIsList(parentNode)) {
+        item.parent_id = null;
+        item.controlled_list_id = parentNode.key;
+        list = parentNode.data;
+        siblings = list.items;
+        siblings.push(item);
     } else {
         item.parent_id = parentNode.key;
+        list = findNodeInTree(tree.value, item.controlled_list_id).data;
+        siblings = parentNode.data.children;
+        siblings.push(item);
     }
 
-    const token = Cookies.get("csrftoken");
-    if (!token) {
-        return;
+    reorderItems(list, item, siblings, false);
+
+    const field = "children";
+    const success = await patchList(list, toast, $gettext, field);
+    if (success) {
+        // Clear custom classes added in <Tree> pass-through
+        rerenderTree.value += 1;
+        movingItem.value = {};
+        refetcher.value += 1;
     }
-    try {
-        response = await fetch(arches.urls.controlled_list_item(item.id), {
-            method: "POST",
-            headers: { "X-CSRFToken": token },
-            body: JSON.stringify(item),
-        });
-        if (response.ok) {
-            movingItem.value = {};
-            refetcher.value += 1;
-        } else {
-            error = await response.json();
-            throw new Error();
-        }
-    } catch {
-        toast.add({
-            severity: ERROR,
-            life: DEFAULT_ERROR_TOAST_LIFE,
-            summary: $gettext("Move failed"),
-            detail: error?.message || response?.statusText,
-        });
-    }
+    awaitingMove.value = false;
 };
 
 const isNewList = (node: TreeNode) => {
@@ -232,7 +218,7 @@ const acceptNewListShortcutEntry = async () => {
 <template>
     <span
         v-if="node.key"
-        style="display: inline-flex; width: 100%"
+        style="display: inline-flex; width: 100%; align-items: center"
     >
         <div v-if="isNewItem(node)">
             <InputText
@@ -262,9 +248,13 @@ const acceptNewListShortcutEntry = async () => {
             v-if="movingItem.key"
             class="actions"
         >
+            <ProgressSpinner
+                v-if="awaitingMove"
+                style="height: 2rem"
+            />
             <!-- turn off escaping: vue template sanitizes -->
             <Button
-                v-if="showMoveHereButton(node.key)"
+                v-else-if="showMoveHereButton(node.key)"
                 type="button"
                 raised
                 class="move-button"
@@ -310,9 +300,10 @@ const acceptNewListShortcutEntry = async () => {
     width: 100%;
     justify-content: space-between;
 }
+
 .p-button {
     background-color: aliceblue;
     color: black;
-    height: 2rem;
+    height: 2.5rem;
 }
 </style>

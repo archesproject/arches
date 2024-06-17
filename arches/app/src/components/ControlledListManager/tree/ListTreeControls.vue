@@ -67,7 +67,6 @@ const expandNode = (node: TreeNode) => {
         class="controls"
     >
         <PresentationControls
-            :controlled-list-items-tree
             :expand-all
             :collapse-all
         />

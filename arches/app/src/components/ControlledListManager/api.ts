@@ -5,7 +5,10 @@ import {
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
 } from "@/components/ControlledListManager/constants.ts";
-import { makeSortOrderMap } from "@/components/ControlledListManager/utils.ts";
+import {
+    makeParentMap,
+    makeSortOrderMap,
+} from "@/components/ControlledListManager/utils.ts";
 
 import type { ToastServiceMethods } from "primevue/toastservice";
 import type {
@@ -140,40 +143,11 @@ export const patchItem = async (
     }
 };
 
-export const postList = async (
-    list: ControlledList,
-    toast: ToastServiceMethods,
-    $gettext: GetText,
-) => {
-    let error;
-    let response;
-    try {
-        response = await fetch(arches.urls.controlled_list(list.id), {
-            method: "POST",
-            headers: { "X-CSRFToken": getToken() },
-            body: JSON.stringify(list),
-        });
-        if (response.ok) {
-            return await response.json();
-        } else {
-            error = await response.json();
-            throw new Error();
-        }
-    } catch {
-        toast.add({
-            severity: ERROR,
-            life: 8000,
-            summary: $gettext("Save failed"),
-            detail: error?.message || response?.statusText,
-        });
-    }
-};
-
 export const patchList = async (
     list: ControlledList,
     toast: ToastServiceMethods,
     $gettext: GetText,
-    field: "name" | "sortorder",
+    field: "name" | "sortorder" | "children",
 ) => {
     let error;
     let response;
@@ -185,6 +159,13 @@ export const patchList = async (
             break;
         case "sortorder":
             body = { sortorder_map: makeSortOrderMap(list) };
+            break;
+        case "children":
+            // Parentage is adjusted on the children themselves.
+            body = {
+                parent_map: makeParentMap(list),
+                sortorder_map: makeSortOrderMap(list),
+            };
             break;
     }
 
