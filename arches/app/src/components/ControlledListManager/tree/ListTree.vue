@@ -261,6 +261,7 @@ const filterCallbackWrapped = computed(() => {
                 v-model:selected-keys="selectedKeys"
                 v-model:moving-item="movingItem"
                 v-model:refetcher="refetcher"
+                v-model:rerenderTree="rerenderTree"
                 v-model:nextNewItem="nextNewItem"
                 v-model:newLabelFormValue="newLabelFormValue"
                 v-model:newListFormValue="newListFormValue"

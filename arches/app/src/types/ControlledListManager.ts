@@ -63,7 +63,7 @@ export interface ControlledListItem {
     values: NewOrExistingValue[];
     images: ControlledListItemImage[];
     children: ControlledListItem[];
-    parent_id: string;
+    parent_id: string | null;
     depth: number;
 }
 
@@ -76,7 +76,7 @@ export interface NewControlledListItem {
     values: NewOrExistingValue[];
     images: ControlledListItemImage[];
     children: ControlledListItem[];
-    parent_id: string;
+    parent_id: string | null;
     depth: number;
 }
 

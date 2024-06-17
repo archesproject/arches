@@ -84,13 +84,13 @@ class ControlledListTests(ArchesTestCase):
             ]
         )
 
-        parent = ControlledListItem.objects.get(
+        cls.parent = ControlledListItem.objects.get(
             controlled_list=cls.list2, uri="https://getty.edu/0"
         )
         for child in ControlledListItem.objects.filter(
             controlled_list=cls.list2
-        ).exclude(pk=parent.pk):
-            child.parent = parent
+        ).exclude(pk=cls.parent.pk):
+            child.parent = cls.parent
             child.save()
 
         # Create a prefLabel and altLabel per item. (20)
@@ -247,6 +247,13 @@ class ControlledListTests(ArchesTestCase):
 
         self.assertEqual(result["controlled_lists"][0]["nodes"], [])
 
+        response = self.client.get(
+            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
+        )
+        result = json.loads(response.content)
+
+        self.assertEqual(result["nodes"], [])
+
     def test_create_list(self):
         self.client.force_login(self.admin)
         self.client.post(
@@ -314,28 +321,6 @@ class ControlledListTests(ArchesTestCase):
             transform=sync_pk_for_comparison,
         )
 
-    def test_reorder_list_items_valid(self):
-        self.client.force_login(self.admin)
-        serialized_list = self.list1.serialize()
-
-        serialized_list["items"][0]["sortorder"] = 1
-        serialized_list["items"][1]["sortorder"] = 0
-        response = self.client.post(
-            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
-            serialized_list,
-            content_type="application/json",
-        )
-        self.assertEqual(response.status_code, HTTPStatus.OK, response.content)
-        self.assertEqual(
-            [
-                item.sortorder
-                for item in ControlledListItem.objects.filter(
-                    controlled_list=self.list1
-                ).order_by("uri")
-            ],
-            [1, 0, 2, 3, 4],
-        )
-
     def test_list_items_provide_new_sortorder(self):
         self.client.force_login(self.admin)
 
@@ -361,48 +346,31 @@ class ControlledListTests(ArchesTestCase):
             [4, 3, 2, 1, 0],
         )
 
-    def test_list_items_recalculate_sortorder(self):
+    def test_move_list_item(self):
+        """Move the top-level item in list2, which has children, into list1."""
         self.client.force_login(self.admin)
-        serialized_list = self.list1.serialize(flat=False)
 
-        serialized_list["items"][-1]["sortorder"] = -1
-        response = self.client.post(
+        body = {
+            "parent_map": {str(self.parent.pk): None},
+            "sortorder_map": {str(self.parent.pk): 5},
+        }
+
+        for i, child in enumerate(self.parent.children.all(), start=1):
+            body["sortorder_map"][str(child.pk)] = 5 + i
+
+        response = self.client.patch(
             reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
-            serialized_list,
+            body,
             content_type="application/json",
         )
-        result = json.loads(response.content)
 
-        self.assertEqual(response.status_code, HTTPStatus.OK, response.content)
-        self.assertEqual(result["items"][-1]["sortorder"], 5)  # was 4, but gaps are OK
-
-    def test_list_items_mixed_parents(self):
-        self.client.force_login(self.admin)
-        serialized_list = self.list1.serialize(flat=False)
-
-        serialized_list["items"][-1]["controlled_list_id"] = str(self.list2.pk)
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
-                reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
-                serialized_list,
-                content_type="application/json",
-            )
-        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
-
-    def test_child_items_incorrect_parent(self):
-        self.client.force_login(self.admin)
-        serialized_list = self.list2.serialize(flat=False)
-
-        serialized_list["items"][0]["children"][-1]["controlled_list_id"] = str(
-            self.list1.pk
+        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
+        self.assertQuerySetEqual(
+            self.list1.controlled_list_items.all()
+            .order_by("uri")
+            .values_list("sortorder", flat=True),
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
         )
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
-                reverse("controlled_list", kwargs={"id": str(self.list2.pk)}),
-                serialized_list,
-                content_type="application/json",
-            )
-        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
 
     def test_recursive_cycles(self):
         self.client.force_login(self.admin)
@@ -411,7 +379,7 @@ class ControlledListTests(ArchesTestCase):
         parent = serialized_list["items"][0]
         parent_id = str(parent["id"])
         child = serialized_list["items"][0]["children"][0]
-        child_id = str(parent["id"])
+        child_id = str(child["id"])
 
         parent["parent_id"] = child_id
         child["parent_id"] = parent_id
@@ -422,9 +390,9 @@ class ControlledListTests(ArchesTestCase):
         self.addCleanup(sys.setrecursionlimit, original_limit)
 
         with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
+            response = self.client.patch(
                 reverse("controlled_list_item", kwargs={"id": parent_id}),
-                parent,
+                {"parent_id": parent["parent_id"]},
                 content_type="application/json",
             )
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
@@ -439,6 +407,18 @@ class ControlledListTests(ArchesTestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
+        item.refresh_from_db()
+        self.assertIsNone(item.uri)
+
+    def test_delete_list_item(self):
+        self.client.force_login(self.admin)
+        response = self.client.delete(
+            reverse("controlled_list_item", kwargs={"id": str(self.parent.pk)})
+        )
+        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
+        self.assertQuerySetEqual(
+            ControlledListItem.objects.filter(pk=self.parent.pk), []
+        )
 
     def test_update_label_valid(self):
         self.client.force_login(self.admin)
@@ -466,6 +446,39 @@ class ControlledListTests(ArchesTestCase):
                 content_type="application/json",
             )
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
+
+    def test_delete_label_valid(self):
+        self.client.force_login(self.admin)
+        alt_label = ControlledListItemValue.values_without_images.filter(
+            valuetype_id="altLabel"
+        ).first()
+        response = self.client.delete(
+            reverse("controlled_list_item_value", kwargs={"id": str(alt_label.pk)}),
+        )
+        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
+
+    def test_delete_label_invalid(self):
+        self.client.force_login(self.admin)
+        pref_label = ControlledListItemValue.values_without_images.filter(
+            valuetype_id="prefLabel"
+        ).first()
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.delete(
+                reverse(
+                    "controlled_list_item_value", kwargs={"id": str(pref_label.pk)}
+                ),
+            )
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
+
+    def test_delete_image(self):
+        self.client.force_login(self.admin)
+        response = self.client.delete(
+            reverse("controlled_list_item_image", kwargs={"id": str(self.image.pk)}),
+        )
+        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
+        self.assertQuerySetEqual(
+            ControlledListItemImage.objects.filter(pk=self.image.pk), []
+        )
 
     def test_update_metadata_valid(self):
         self.client.force_login(self.admin)
@@ -498,3 +511,16 @@ class ControlledListTests(ArchesTestCase):
                 content_type="application/json",
             )
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
+
+    def test_delete_metadata(self):
+        self.client.force_login(self.admin)
+        metadata = self.image.controlled_list_item_image_metadata.first()
+        response = self.client.delete(
+            reverse(
+                "controlled_list_item_image_metadata", kwargs={"id": str(metadata.pk)}
+            ),
+        )
+        self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
+        self.assertQuerySetEqual(
+            ControlledListItemImageMetadata.objects.filter(pk=metadata.pk), []
+        )
