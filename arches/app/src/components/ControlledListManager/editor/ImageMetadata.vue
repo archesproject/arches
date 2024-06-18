@@ -220,6 +220,7 @@ const focusInput = () => {
                 <template #body="slotProps">
                     <span
                         class="full-width-pointer"
+                        style="white-space: pre-wrap"
                         @click.stop="
                             makeValueEditable(slotProps.data, slotProps.index)
                         "
