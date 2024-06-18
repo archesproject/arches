@@ -44,24 +44,22 @@ define([
         /**
          * This method enables custom logic for how the feature in the popup should be handled and/or mutated en route to the mapFilter.
          * @param popupFeatureObject - the javascript object of the feature and its associated contexts (e.g. mapCard).
-         * @param featureGeomIndex - int index corresponding to the feature that was clicked, used for lookup against an arry of geoms
          * @required @method mapCard.filterByFeatureGeom()
          * @required @send argument: @param feature - a geojson feature object 
          */
-        sendFeatureToMapFilter: function(popupFeatureObject, featureGeomIndex)
+        sendFeatureToMapFilter: function(popupFeatureObject)
         {
-            let feature = popupFeatureObject.geometries()[featureGeomIndex].geom.features[0];
+            let feature = popupFeatureObject.geometries()[0].geom.features[0];
             popupFeatureObject.mapCard.filterByFeatureGeom(feature);
         },
 
         /**
          * Determines whether to show the button for Filter By Feature
          * @param popupFeatureObject - the javascript object of the feature and its associated contexts (e.g. mapCard).
-         * @param featureGeomIndex - int index corresponding to the feature that was clicked, used for lookup against an arry of geoms
          * @returns {boolean} - whether to show "Filter by Feature" on map popup
          * typically dependent on at least 1 feature with a geometry and/or a featureid/resourceid combo
          */
-        showFilterByFeature: function(popupFeatureObject, featureGeomIndex) {
+        showFilterByFeature: function(popupFeatureObject) {
             return (ko.unwrap(popupFeatureObject.geometries) || []).length > 0;
         },
 
