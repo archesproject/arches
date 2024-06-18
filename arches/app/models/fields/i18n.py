@@ -33,9 +33,9 @@ class I18n_String(NothingNode):
 
                 # the following is a fix for issue #9623 - using double quotation marks in i18n input
                 # re https://github.com/archesproject/arches/issues/9623
-                # the reason we have to do this next check is that we assumed that if the 
-                # json.loads method doesn't fail we have a python dict.  That's usually 
-                # true unless you have a simple string wrapped in quotes 
+                # the reason we have to do this next check is that we assumed that if the
+                # json.loads method doesn't fail we have a python dict.  That's usually
+                # true unless you have a simple string wrapped in quotes
                 # eg: '"hello world"' rather than simply 'hello world'
                 # the quoted string loads without error but is not a dict
                 # hence the need for this check
@@ -62,7 +62,9 @@ class I18n_String(NothingNode):
         https://www.postgresql.org/docs/9.5/functions-json.html
         """
 
-        if (self.value_is_primitive or self.value is None) and not isinstance(compiler, SQLInsertCompiler):
+        if (self.value_is_primitive or self.value is None) and not isinstance(
+            compiler, SQLInsertCompiler
+        ):
             self.sql = "jsonb_set(" + self.attname + ", %s, %s)"
             params = (f"{{{self.lang}}}", json.dumps(self.value))
         else:
@@ -185,6 +187,7 @@ class I18n_TextField(JSONField):
 
     def __init__(self, *args, **kwargs):
         from arches.app.utils.betterJSONSerializer import JSONSerializer
+
         self.use_nulls = kwargs.get("null", False)
         kwargs["encoder"] = JSONSerializer
         kwargs["default"] = I18n_String(use_nulls=self.use_nulls)
@@ -241,7 +244,9 @@ class I18n_JSON(NothingNode):
         if isinstance(value, Cast):
             # Django 4.2 regression: bulk_update() sends Cast expressions
             # https://code.djangoproject.com/ticket/35167
-            values = set(case.result.value for case in value.source_expressions[0].cases)
+            values = set(
+                case.result.value for case in value.source_expressions[0].cases
+            )
             value = list(values)[0]
             if len(values) > 1:
                 # Prevent silent data loss.
@@ -280,7 +285,9 @@ class I18n_JSON(NothingNode):
         https://www.postgresql.org/docs/9.5/functions-json.html
         """
 
-        if (len(self.i18n_properties) == 0 and self.function is None) or isinstance(compiler, SQLInsertCompiler):
+        if (len(self.i18n_properties) == 0 and self.function is None) or isinstance(
+            compiler, SQLInsertCompiler
+        ):
             params = [json.dumps(self.to_localized_object())]
             sql = "%s"
         else:
@@ -291,7 +298,9 @@ class I18n_JSON(NothingNode):
             else:
                 sql = self.attname
                 for prop, value in self.raw_value.items():
-                    escaped_value = json.dumps(value).replace("%", "%%").replace("'", "''")
+                    escaped_value = (
+                        json.dumps(value).replace("%", "%%").replace("'", "''")
+                    )
                     if prop in self.i18n_properties and isinstance(value, str):
                         sql = f"""CASE WHEN jsonb_typeof({self.attname}->'{prop}') = 'object'
                         THEN jsonb_set({sql}, array['{prop}','{self.lang}'], '{escaped_value}')
@@ -337,7 +346,18 @@ class I18n_JSON(NothingNode):
     # this class can emulate the "string" type
     # see https://docs.python.org/3/reference/datamodel.html?emulating-container-types#emulating-container-types
     def __getattr__(self, name):
-        mapping_methods = ["keys", "values", "items", "get", "clear", "setdefault", "pop", "popitem", "copy", "update"]
+        mapping_methods = [
+            "keys",
+            "values",
+            "items",
+            "get",
+            "clear",
+            "setdefault",
+            "pop",
+            "popitem",
+            "copy",
+            "update",
+        ]
         if name in mapping_methods:
             return getattr(self.raw_value, name)
         raise AttributeError
@@ -354,7 +374,10 @@ class I18n_JSON(NothingNode):
         use_raw_i18n_json -- defaults to False, set to True to return the raw object saved in the db
         """
 
-        if use_raw_i18n_json or ("i18n_properties" not in self.raw_value and "i18n_config" not in self.raw_value):
+        if use_raw_i18n_json or (
+            "i18n_properties" not in self.raw_value
+            and "i18n_config" not in self.raw_value
+        ):
             return self.raw_value
         else:
             if self.function is not None:
@@ -396,6 +419,7 @@ class I18n_JSONField(JSONField):
 
     def __init__(self, *args, **kwargs):
         from arches.app.utils.betterJSONSerializer import JSONSerializer
+
         kwargs["encoder"] = JSONSerializer
         super().__init__(*args, **kwargs)
 

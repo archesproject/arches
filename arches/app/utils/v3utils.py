@@ -82,8 +82,12 @@ def get_v3_config_info(v3_data_dir, v4_graph_name=None):
     # prepend the full paths to the lookup files
     for k, conf in v3_config.items():
 
-        conf["v3_nodes_csv"] = os.path.join(v3_data_dir, "graph_data", conf["v3_nodes_csv"])
-        conf["v3_v4_node_lookup"] = os.path.join(v3_data_dir, "graph_data", conf["v3_v4_node_lookup"])
+        conf["v3_nodes_csv"] = os.path.join(
+            v3_data_dir, "graph_data", conf["v3_nodes_csv"]
+        )
+        conf["v3_v4_node_lookup"] = os.path.join(
+            v3_data_dir, "graph_data", conf["v3_v4_node_lookup"]
+        )
 
     # return the augmented v3 configs
     if v4_graph_name:

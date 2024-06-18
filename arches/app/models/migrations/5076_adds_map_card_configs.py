@@ -1,12 +1,10 @@
-
-
 from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4990_relax_tileserver_layer_constraints'),
+        ("models", "4990_relax_tileserver_layer_constraints"),
     ]
 
     operations = [

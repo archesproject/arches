@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4907_grouping_card_component'),
+        ("models", "4907_grouping_card_component"),
     ]
 
     operations = [
@@ -20,5 +20,6 @@ class Migration(migrations.Migration):
             """
             UPDATE report_templates SET defaultconfig = defaultconfig - 'activeTabIndex' WHERE templateid = '50000000-0000-0000-0000-000000000004';
             UPDATE graphs SET config = config - 'activeTabIndex' WHERE templateid = '50000000-0000-0000-0000-000000000004';
-            """
-        )]
+            """,
+        )
+    ]

@@ -31,7 +31,10 @@ class PermissionBackend(ObjectPermissionBackend):
         if "." in perm:
             app_label, perm = perm.split(".")
             if app_label != obj._meta.app_label:
-                raise WrongAppError("Passed perm has app label of '%s' and " "given obj has '%s'" % (app_label, obj._meta.app_label))
+                raise WrongAppError(
+                    "Passed perm has app label of '%s' and "
+                    "given obj has '%s'" % (app_label, obj._meta.app_label)
+                )
 
         ObjPermissionChecker = CachedObjectPermissionChecker(user_obj, obj)
         explicitly_defined_perms = ObjPermissionChecker.get_perms(obj)
@@ -53,8 +56,12 @@ def get_restricted_users(resource):
 
     """
 
-    user_perms = get_users_with_perms(resource, attach_perms=True, with_group_users=False)
-    user_and_group_perms = get_users_with_perms(resource, attach_perms=True, with_group_users=True)
+    user_perms = get_users_with_perms(
+        resource, attach_perms=True, with_group_users=False
+    )
+    user_and_group_perms = get_users_with_perms(
+        resource, attach_perms=True, with_group_users=True
+    )
 
     result = {
         "no_access": [],
@@ -89,13 +96,19 @@ def get_restricted_instances(user, search_engine=None, allresources=False):
     if allresources is True:
         restricted_group_instances = {
             perm["object_pk"]
-            for perm in GroupObjectPermission.objects.filter(permission__codename="no_access_to_resourceinstance").values("object_pk")
+            for perm in GroupObjectPermission.objects.filter(
+                permission__codename="no_access_to_resourceinstance"
+            ).values("object_pk")
         }
         restricted_user_instances = {
             perm["object_pk"]
-            for perm in UserObjectPermission.objects.filter(permission__codename="no_access_to_resourceinstance").values("object_pk")
+            for perm in UserObjectPermission.objects.filter(
+                permission__codename="no_access_to_resourceinstance"
+            ).values("object_pk")
         }
-        all_restricted_instances = list(restricted_group_instances | restricted_user_instances)
+        all_restricted_instances = list(
+            restricted_group_instances | restricted_user_instances
+        )
         return all_restricted_instances
     else:
         terms = Terms(field="permissions.users_with_no_access", terms=[str(user.id)])
@@ -253,7 +266,9 @@ def get_map_layers_by_perm(user, perms, any_perm=True):
 
 def user_can_read_map_layers(user):
 
-    map_layers_with_read_permission = get_map_layers_by_perm(user, ["models.read_maplayer"])
+    map_layers_with_read_permission = get_map_layers_by_perm(
+        user, ["models.read_maplayer"]
+    )
     map_layers_allowed = []
 
     for map_layer in map_layers_with_read_permission:
@@ -266,7 +281,9 @@ def user_can_read_map_layers(user):
 
 
 def user_can_write_map_layers(user):
-    map_layers_with_write_permission = get_map_layers_by_perm(user, ["models.write_maplayer"])
+    map_layers_with_write_permission = get_map_layers_by_perm(
+        user, ["models.write_maplayer"]
+    )
     map_layers_allowed = []
 
     for map_layer in map_layers_with_write_permission:
@@ -288,7 +305,9 @@ def get_editable_resource_types(user):
     """
 
     if user_is_resource_editor(user):
-        return get_resource_types_by_perm(user, ["models.write_nodegroup", "models.delete_nodegroup"])
+        return get_resource_types_by_perm(
+            user, ["models.write_nodegroup", "models.delete_nodegroup"]
+        )
     else:
         return []
 
@@ -321,7 +340,10 @@ def get_resource_types_by_perm(user, perms):
     graphs = set()
     nodegroups = get_nodegroups_by_perm(user, perms)
     for node in Node.objects.filter(nodegroup__in=nodegroups).prefetch_related("graph"):
-        if node.graph.isresource and str(node.graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
+        if (
+            node.graph.isresource
+            and str(node.graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+        ):
             graphs.add(node.graph)
     return list(graphs)
 
@@ -336,7 +358,9 @@ def user_can_edit_model_nodegroups(user, resource):
 
     """
 
-    return user_has_resource_model_permissions(user, ["models.write_nodegroup"], resource)
+    return user_has_resource_model_permissions(
+        user, ["models.write_nodegroup"], resource
+    )
 
 
 def user_can_delete_model_nodegroups(user, resource):
@@ -349,7 +373,9 @@ def user_can_delete_model_nodegroups(user, resource):
 
     """
 
-    return user_has_resource_model_permissions(user, ["models.delete_nodegroup"], resource)
+    return user_has_resource_model_permissions(
+        user, ["models.delete_nodegroup"], resource
+    )
 
 
 def user_can_read_graph(user, graph_id):
@@ -362,7 +388,9 @@ def user_can_read_graph(user, graph_id):
 
     """
 
-    return user_has_resource_model_permissions(user, ["models.read_nodegroup"], graph_id=graph_id)
+    return user_has_resource_model_permissions(
+        user, ["models.read_nodegroup"], graph_id=graph_id
+    )
 
 
 def user_has_resource_model_permissions(user, perms, resource=None, graph_id=None):
@@ -380,7 +408,11 @@ def user_has_resource_model_permissions(user, perms, resource=None, graph_id=Non
         graph_id = resource.graph_id
 
     nodegroups = get_nodegroups_by_perm(user, perms)
-    nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=graph_id).select_related("graph")
+    nodes = (
+        Node.objects.filter(nodegroup__in=nodegroups)
+        .filter(graph_id=graph_id)
+        .select_related("graph")
+    )
     return nodes.exists()
 
 
@@ -411,7 +443,9 @@ def check_resource_instance_permissions(user, resourceid, permission):
             return result
         else:
             user_permissions = get_user_perms(user, resource)
-            if "no_access_to_resourceinstance" in user_permissions:  # user is restricted
+            if (
+                "no_access_to_resourceinstance" in user_permissions
+            ):  # user is restricted
                 result["permitted"] = False
                 return result
             elif permission in user_permissions:  # user is permitted
@@ -419,19 +453,27 @@ def check_resource_instance_permissions(user, resourceid, permission):
                 return result
 
             group_permissions = get_group_perms(user, resource)
-            if "no_access_to_resourceinstance" in group_permissions:  # group is restricted - no user override
+            if (
+                "no_access_to_resourceinstance" in group_permissions
+            ):  # group is restricted - no user override
                 result["permitted"] = False
                 return result
-            elif permission in group_permissions:  # group is permitted - no user override
+            elif (
+                permission in group_permissions
+            ):  # group is permitted - no user override
                 result["permitted"] = True
                 return result
 
-            if permission not in all_perms:  # neither user nor group explicitly permits or restricts.
+            if (
+                permission not in all_perms
+            ):  # neither user nor group explicitly permits or restricts.
                 result["permitted"] = False  # restriction implied
                 return result
 
     except ObjectDoesNotExist:
-        result["permitted"] = True # if the object does not exist, no harm in returning true - this prevents strange 403s.
+        result["permitted"] = (
+            True  # if the object does not exist, no harm in returning true - this prevents strange 403s.
+        )
         return result
 
     return result
@@ -446,10 +488,14 @@ def user_can_read_resource(user, resourceid=None):
         if user.is_superuser:
             return True
         if resourceid not in [None, ""]:
-            result = check_resource_instance_permissions(user, resourceid, "view_resourceinstance")
+            result = check_resource_instance_permissions(
+                user, resourceid, "view_resourceinstance"
+            )
             if result is not None:
                 if result["permitted"] == "unknown":
-                    return user_has_resource_model_permissions(user, ["models.read_nodegroup"], result["resource"])
+                    return user_has_resource_model_permissions(
+                        user, ["models.read_nodegroup"], result["resource"]
+                    )
                 else:
                     return result["permitted"]
             else:
@@ -468,10 +514,14 @@ def user_can_edit_resource(user, resourceid=None):
         if user.is_superuser:
             return True
         if resourceid not in [None, ""]:
-            result = check_resource_instance_permissions(user, resourceid, "change_resourceinstance")
+            result = check_resource_instance_permissions(
+                user, resourceid, "change_resourceinstance"
+            )
             if result is not None:
                 if result["permitted"] == "unknown":
-                    return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or user_can_edit_model_nodegroups(
+                    return user.groups.filter(
+                        name__in=settings.RESOURCE_EDITOR_GROUPS
+                    ).exists() or user_can_edit_model_nodegroups(
                         user, result["resource"]
                     )
                 else:
@@ -479,7 +529,10 @@ def user_can_edit_resource(user, resourceid=None):
             else:
                 return None
 
-        return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or len(get_editable_resource_types(user)) > 0
+        return (
+            user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists()
+            or len(get_editable_resource_types(user)) > 0
+        )
     return False
 
 
@@ -492,15 +545,21 @@ def user_can_delete_resource(user, resourceid=None):
         if user.is_superuser:
             return True
         if resourceid not in [None, ""]:
-            result = check_resource_instance_permissions(user, resourceid, "delete_resourceinstance")
+            result = check_resource_instance_permissions(
+                user, resourceid, "delete_resourceinstance"
+            )
             if result is not None:
                 if result["permitted"] == "unknown":
                     nodegroups = get_nodegroups_by_perm(user, "models.delete_nodegroup")
                     tiles = TileModel.objects.filter(resourceinstance_id=resourceid)
-                    protected_tiles = {str(tile.nodegroup_id) for tile in tiles} - {str(nodegroup.nodegroupid) for nodegroup in nodegroups}
+                    protected_tiles = {str(tile.nodegroup_id) for tile in tiles} - {
+                        str(nodegroup.nodegroupid) for nodegroup in nodegroups
+                    }
                     if len(protected_tiles) > 0:
                         return False
-                    return user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists() or user_can_delete_model_nodegroups(
+                    return user.groups.filter(
+                        name__in=settings.RESOURCE_EDITOR_GROUPS
+                    ).exists() or user_can_delete_model_nodegroups(
                         user, result["resource"]
                     )
                 else:
@@ -550,7 +609,9 @@ def user_created_transaction(user, transactionid):
         if user.is_superuser:
             return True
         if EditLog.objects.filter(transactionid=transactionid).exists():
-            if EditLog.objects.filter(transactionid=transactionid, userid=user.id).exists():
+            if EditLog.objects.filter(
+                transactionid=transactionid, userid=user.id
+            ).exists():
                 return True
         else:
             return True
