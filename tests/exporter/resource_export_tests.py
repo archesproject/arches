@@ -142,4 +142,5 @@ class BusinessDataExportTests(ArchesTestCase):
             if resource_data["resourceinstance"]["graph_publication_id"]:
                 del resource_data["resourceinstance"]["graph_publication_id"]
 
+        self.maxDiff = None
         self.assertDictEqual(json_export, json_truth)
