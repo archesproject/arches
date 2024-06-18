@@ -15,15 +15,15 @@ runs:
       run: echo "No-op step"
       shell: bash
 
-    # - name: Checkout ${my_arches_application}
+    # - name: Checkout ${my_arches_application_name}
     #   uses: actions/checkout@v4
     #   with:
-    #     repository: ${my_arches_application_repository}/${my_arches_application}
+    #     repository: ${my_arches_application_repository}/${my_arches_application_name}
     #     token: ${{ fromJSON(inputs.secrets).${my_github_personal_access_token} }}
-    #     path: ${my_arches_application}
+    #     path: ${my_arches_application_name}
 
-    # - name: Install ${my_arches_application}
+    # - name: Install ${my_arches_application_name}
     #   run: |
-    #     pip install ./${my_arches_application}
-    #     echo ${my_arches_application} installed
+    #     pip install ./${my_arches_application_name}
+    #     echo ${my_arches_application_name} installed
     #   shell: bash
