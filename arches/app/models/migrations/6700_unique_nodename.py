@@ -14,7 +14,10 @@ class Migration(migrations.Migration):
         edge_model = apps.get_model("models", "Edge")
         for node in node_model.objects.filter(istopnode=False):
             parent_node = edge_model.objects.get(rangenode=node).domainnode.nodeid
-            sibling_nodes = [edge.rangenode.name for edge in edge_model.objects.filter(domainnode=parent_node)]
+            sibling_nodes = [
+                edge.rangenode.name
+                for edge in edge_model.objects.filter(domainnode=parent_node)
+            ]
             if node.name in sibling_nodes:
                 sibling_nodes.remove(node.name)
             if node.name in sibling_nodes:
@@ -50,6 +53,9 @@ class Migration(migrations.Migration):
         migrations.RunPython(forward_migrate, reverse_migrate),
         migrations.RunSQL(sql, reverse_sql),
         migrations.AddConstraint(
-            model_name="node", constraint=models.UniqueConstraint(fields=("name", "nodegroup"), name="unique_nodename_nodegroup"),
+            model_name="node",
+            constraint=models.UniqueConstraint(
+                fields=("name", "nodegroup"), name="unique_nodename_nodegroup"
+            ),
         ),
     ]

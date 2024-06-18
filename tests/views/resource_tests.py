@@ -27,7 +27,13 @@ from django.test.client import RequestFactory, Client
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_perms, get_user_perms
+from guardian.shortcuts import (
+    assign_perm,
+    get_perms,
+    remove_perm,
+    get_group_perms,
+    get_user_perms,
+)
 
 # these tests can be run from the command line via
 # python manage.py test tests.views.resource_tests --settings="tests.test_settings"
@@ -35,7 +41,12 @@ from guardian.shortcuts import assign_perm, get_perms, remove_perm, get_group_pe
 
 def add_users():
     profiles = (
-        {"name": "ben", "email": "ben@test.com", "password": "Test12345!", "groups": ["Graph Editor", "Resource Editor"]},
+        {
+            "name": "ben",
+            "email": "ben@test.com",
+            "password": "Test12345!",
+            "groups": ["Graph Editor", "Resource Editor"],
+        },
         {
             "name": "sam",
             "email": "sam@test.com",
@@ -46,7 +57,11 @@ def add_users():
     )
 
     for profile in profiles:
-        user = User.objects.create_user(username=profile["name"], email=profile["email"], password=profile["password"])
+        user = User.objects.create_user(
+            username=profile["name"],
+            email=profile["email"],
+            password=profile["password"],
+        )
 
         for group_name in profile["groups"]:
             group = Group.objects.get(name=group_name)
@@ -58,14 +73,18 @@ class CommandLineTests(ArchesTestCase):
         self.expected_resource_count = 2
         self.client = Client()
         user = User.objects.get(username="ben")
-        edit_records = EditLog.objects.filter(resourceinstanceid=self.resource_instance_id).filter(edittype="create")
+        edit_records = EditLog.objects.filter(
+            resourceinstanceid=self.resource_instance_id
+        ).filter(edittype="create")
         for edit in edit_records:
             edit.userid = user.id
             edit.save()
 
     def tearDown(self):
         ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
-        EditLog.objects.filter(resourceinstanceid=self.resource_instance_id).filter(edittype="create").delete()
+        EditLog.objects.filter(resourceinstanceid=self.resource_instance_id).filter(
+            edittype="create"
+        ).delete()
 
     @classmethod
     def setUpClass(cls):
@@ -75,9 +94,17 @@ class CommandLineTests(ArchesTestCase):
         if not GraphModel.objects.filter(pk=cls.data_type_graphid).exists():
             # TODO: Fix this to run inside transaction, i.e. after super().setUpClass()
             # https://github.com/archesproject/arches/issues/10719
-            test_pkg_path = os.path.join(test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg")
+            test_pkg_path = os.path.join(
+                test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg"
+            )
             with captured_stdout():
-                management.call_command("packages", operation="load_package", source=test_pkg_path, yes=True, verbosity=0)
+                management.call_command(
+                    "packages",
+                    operation="load_package",
+                    source=test_pkg_path,
+                    yes=True,
+                    verbosity=0,
+                )
 
         super().setUpClass()
         add_users()
@@ -94,7 +121,10 @@ class CommandLineTests(ArchesTestCase):
                 {
                     "type": "group",
                     "id": 2,
-                    "selectedPermissions": [{"codename": "change_resourceinstance"}, {"codename": "delete_resourceinstance"}],
+                    "selectedPermissions": [
+                        {"codename": "change_resourceinstance"},
+                        {"codename": "delete_resourceinstance"},
+                    ],
                 }
             ],
             "selectedInstances": [{"resourceinstanceid": self.resource_instance_id}],
@@ -105,9 +135,14 @@ class CommandLineTests(ArchesTestCase):
         content_type = "application/x-www-form-urlencoded"
         self.client.post(url, post_data, content_type)
         group = Group.objects.get(pk=payload["selectedIdentities"][0]["id"])
-        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
         assigned_perms = get_perms(group, resource)
-        self.assertTrue("change_resourceinstance" in assigned_perms and "delete_resourceinstance" in assigned_perms)
+        self.assertTrue(
+            "change_resourceinstance" in assigned_perms
+            and "delete_resourceinstance" in assigned_perms
+        )
 
     def test_resource_instance_permission_deletion(self):
         """
@@ -121,7 +156,10 @@ class CommandLineTests(ArchesTestCase):
                 {
                     "type": "group",
                     "id": 2,
-                    "selectedPermissions": [{"codename": "change_resourceinstance"}, {"codename": "delete_resourceinstance"}],
+                    "selectedPermissions": [
+                        {"codename": "change_resourceinstance"},
+                        {"codename": "delete_resourceinstance"},
+                    ],
                 }
             ],
             "selectedInstances": [{"resourceinstanceid": self.resource_instance_id}],
@@ -131,11 +169,16 @@ class CommandLineTests(ArchesTestCase):
         post_data = JSONSerializer().serialize(payload)
         content_type = "application/x-www-form-urlencoded"
         group = Group.objects.get(pk=payload["selectedIdentities"][0]["id"])
-        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
         assign_perm("delete_resourceinstance", group, resource)
         self.client.delete(url, post_data, content_type)
         assigned_perms = get_perms(group, resource)
-        self.assertTrue("change_resourceinstance" not in assigned_perms and "delete_resourceinstance" not in assigned_perms)
+        self.assertTrue(
+            "change_resourceinstance" not in assigned_perms
+            and "delete_resourceinstance" not in assigned_perms
+        )
 
     def test_user_cannot_view_without_permission(self):
         """
@@ -143,9 +186,13 @@ class CommandLineTests(ArchesTestCase):
 
         """
         self.client.login(username="ben", password="Test12345!")
-        url = reverse("resource_report", kwargs={"resourceid": self.resource_instance_id})
+        url = reverse(
+            "resource_report", kwargs={"resourceid": self.resource_instance_id}
+        )
         group = Group.objects.get(pk=2)
-        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
         assign_perm("change_resourceinstance", group, resource)
         with self.assertLogs("django.request", level="WARNING"):
             response = self.client.get(url)
@@ -157,9 +204,13 @@ class CommandLineTests(ArchesTestCase):
 
         """
         self.client.login(username="ben", password="Test12345!")
-        url = reverse("resource_editor", kwargs={"resourceid": self.resource_instance_id})
+        url = reverse(
+            "resource_editor", kwargs={"resourceid": self.resource_instance_id}
+        )
         group = Group.objects.get(pk=2)
-        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
         assign_perm("view_resourceinstance", group, resource)
         with self.assertLogs("django.request", level="WARNING"):
             response = self.client.get(url)
@@ -171,9 +222,13 @@ class CommandLineTests(ArchesTestCase):
 
         """
         self.client.login(username="ben", password="Test12345!")
-        url = reverse("resource_editor", kwargs={"resourceid": self.resource_instance_id})
+        url = reverse(
+            "resource_editor", kwargs={"resourceid": self.resource_instance_id}
+        )
         group = Group.objects.get(pk=2)
-        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
         assign_perm("change_resourceinstance", group, resource)
         with self.assertLogs("django.request", level="ERROR"):
             response = self.client.delete(url)
@@ -187,9 +242,15 @@ class CommandLineTests(ArchesTestCase):
         self.client.login(username="ben", password="Test12345!")
         group = Group.objects.get(pk=2)
         user = User.objects.get(username="ben")
-        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
-        view_url = reverse("resource_report", kwargs={"resourceid": self.resource_instance_id})
-        edit_url = reverse("resource_editor", kwargs={"resourceid": self.resource_instance_id})
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
+        view_url = reverse(
+            "resource_report", kwargs={"resourceid": self.resource_instance_id}
+        )
+        edit_url = reverse(
+            "resource_editor", kwargs={"resourceid": self.resource_instance_id}
+        )
         assign_perm("view_resourceinstance", group, resource)
         assign_perm("change_resourceinstance", group, resource)
         assign_perm("delete_resourceinstance", group, resource)
@@ -200,7 +261,11 @@ class CommandLineTests(ArchesTestCase):
             edit = self.client.get(edit_url)
         with self.assertLogs("django.request", level="ERROR"):
             delete = self.client.delete(edit_url)
-        self.assertTrue(view.status_code == 403 and edit.status_code == 403 and delete.status_code == 500)
+        self.assertTrue(
+            view.status_code == 403
+            and edit.status_code == 403
+            and delete.status_code == 500
+        )
 
     def test_user_can_view_with_permission(self):
         """
@@ -208,9 +273,13 @@ class CommandLineTests(ArchesTestCase):
 
         """
         self.client.login(username="sam", password="Test12345!")
-        url = reverse("resource_report", kwargs={"resourceid": self.resource_instance_id})
+        url = reverse(
+            "resource_report", kwargs={"resourceid": self.resource_instance_id}
+        )
         group = Group.objects.get(pk=2)
-        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
         assign_perm("view_resourceinstance", group, resource)
         response = self.client.get(url)
         self.assertTrue(response.status_code == 200)
@@ -221,9 +290,13 @@ class CommandLineTests(ArchesTestCase):
 
         """
         self.client.login(username="sam", password="Test12345!")
-        url = reverse("resource_editor", kwargs={"resourceid": self.resource_instance_id})
+        url = reverse(
+            "resource_editor", kwargs={"resourceid": self.resource_instance_id}
+        )
         group = Group.objects.get(pk=2)
-        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
         assign_perm("change_resourceinstance", group, resource)
         response = self.client.get(url)
         self.assertTrue(response.status_code == 200)
@@ -234,9 +307,13 @@ class CommandLineTests(ArchesTestCase):
 
         """
         self.client.login(username="sam", password="Test12345!")
-        url = reverse("resource_editor", kwargs={"resourceid": self.resource_instance_id})
+        url = reverse(
+            "resource_editor", kwargs={"resourceid": self.resource_instance_id}
+        )
         group = Group.objects.get(pk=2)
-        resource = ResourceInstance.objects.get(resourceinstanceid=self.resource_instance_id)
+        resource = ResourceInstance.objects.get(
+            resourceinstanceid=self.resource_instance_id
+        )
         assign_perm("delete_resourceinstance", group, resource)
         response = self.client.delete(url)
         self.assertTrue(response.status_code == 200)
@@ -248,9 +325,17 @@ class CommandLineTests(ArchesTestCase):
 
         """
         self.client.login(username="sam", password="Test12345!")
-        view_url = reverse("resource_report", kwargs={"resourceid": self.resource_instance_id})
-        edit_url = reverse("resource_editor", kwargs={"resourceid": self.resource_instance_id})
+        view_url = reverse(
+            "resource_report", kwargs={"resourceid": self.resource_instance_id}
+        )
+        edit_url = reverse(
+            "resource_editor", kwargs={"resourceid": self.resource_instance_id}
+        )
         view = self.client.get(view_url)
         edit = self.client.get(edit_url)
         delete = self.client.delete(edit_url)
-        self.assertTrue(view.status_code == 200 and edit.status_code == 200 and delete.status_code == 200)
+        self.assertTrue(
+            view.status_code == 200
+            and edit.status_code == 200
+            and delete.status_code == 200
+        )

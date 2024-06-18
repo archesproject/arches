@@ -17,7 +17,9 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name="node",
-            constraint=models.UniqueConstraint(fields=("alias", "graph"), name="unique_alias_graph"),
+            constraint=models.UniqueConstraint(
+                fields=("alias", "graph"), name="unique_alias_graph"
+            ),
         ),
         migrations.RunSQL(
             """

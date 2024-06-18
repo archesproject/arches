@@ -83,15 +83,12 @@ RUN set -ex \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
     && python3.8 get-pip.py \
     && apt-get install -y nodejs \
-    && npm install -g yarn
 
-# Install Yarn components
+# Install npm components
 COPY ./arches/install/package.json ${ARCHES_ROOT}/arches/install/package.json
-COPY ./arches/install/.yarnrc ${ARCHES_ROOT}/arches/install/.yarnrc
-COPY ./arches/install/yarn.lock ${ARCHES_ROOT}/arches/install/yarn.lock
 WORKDIR ${ARCHES_ROOT}/arches/install
 RUN mkdir -p ${ARCHES_ROOT}/node_modules
-RUN yarn install
+RUN npm install
 
 ## Install virtualenv
 WORKDIR ${WEB_ROOT}

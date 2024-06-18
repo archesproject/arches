@@ -9,13 +9,13 @@ from django.contrib.postgres.fields import JSONField
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4228_plugin_sortorder'),
+        ("models", "4228_plugin_sortorder"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='mobilesurveymodel',
-            name='onlinebasemaps',
-            field=JSONField(blank=True, db_column='onlinebasemaps', null=True),
+            model_name="mobilesurveymodel",
+            name="onlinebasemaps",
+            field=JSONField(blank=True, db_column="onlinebasemaps", null=True),
         ),
     ]

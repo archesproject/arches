@@ -39,15 +39,27 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
 
         parser.add_argument(
-            "--force", action="store_true", default=False, help='used to force a yes answer to any user input "continue? y/n" prompt'
+            "--force",
+            action="store_true",
+            default=False,
+            help='used to force a yes answer to any user input "continue? y/n" prompt',
         )
-        
-        parser.add_argument("-dev", "--dev", action="store_true", dest="dev", help="Add users for development")
+
+        parser.add_argument(
+            "-dev",
+            "--dev",
+            action="store_true",
+            dest="dev",
+            help="Add users for development",
+        )
 
     def handle(self, *args, **options):
 
         if options["force"] is False:
-            proceed = get_yn_input(msg="Are you sure you want to destroy and rebuild your database?", default="N")
+            proceed = get_yn_input(
+                msg="Are you sure you want to destroy and rebuild your database?",
+                default="N",
+            )
             if not proceed:
                 exit()
 
@@ -73,7 +85,9 @@ class Command(BaseCommand):
             username = db["USER"]
             password = db["PASSWORD"]
 
-        conn_string = "dbname={} user={} password={} host={} port={}".format(username, username, password, db["HOST"], db["PORT"])
+        conn_string = "dbname={} user={} password={} host={} port={}".format(
+            username, username, password, db["HOST"], db["PORT"]
+        )
 
         try:
             # Connect directly to the user's database. This should work in most
@@ -85,12 +99,16 @@ class Command(BaseCommand):
             # already been created.
             try:
                 # print conn_string
-                conn_string = conn_string.replace("dbname=" + username, "dbname=" + db["NAME"])
+                conn_string = conn_string.replace(
+                    "dbname=" + username, "dbname=" + db["NAME"]
+                )
                 conn = psycopg2.connect(conn_string)
             except psycopg2.OperationalError as e:
                 # If that connection fails, this is probably a non-superuser
                 # whose database has not yet been created.
-                safestr = " ".join([i for i in conn_string.split(" ") if not i.startswith("password")])
+                safestr = " ".join(
+                    [i for i in conn_string.split(" ") if not i.startswith("password")]
+                )
                 print(str(e))
                 print("Error connecting to db with these settings: " + safestr)
                 print(
@@ -101,10 +119,14 @@ class Command(BaseCommand):
                 exit()
 
         cursor = conn.cursor()
-        cursor.execute("SELECT rolcreatedb FROM pg_roles WHERE rolname = '{}'".format(username))
+        cursor.execute(
+            "SELECT rolcreatedb FROM pg_roles WHERE rolname = '{}'".format(username)
+        )
         cancreate = cursor.fetchone()[0]
 
-        cursor.execute("SELECT rolsuper FROM pg_roles WHERE rolname = '{}'".format(username))
+        cursor.execute(
+            "SELECT rolsuper FROM pg_roles WHERE rolname = '{}'".format(username)
+        )
         superuser = cursor.fetchone()[0]
 
         # autocommit false
@@ -117,7 +139,9 @@ class Command(BaseCommand):
         management.call_command("flush", "--noinput")
 
         # unapply all of the Arches migrations (the Arches "app" is labeled "models")
-        management.call_command("migrate", fake=True, app_label="models", migration_name="zero")
+        management.call_command(
+            "migrate", fake=True, app_label="models", migration_name="zero"
+        )
 
         # get the table names for all Arches models and then drop these tables
         arches_models = apps.get_app_config("models").get_models()
@@ -198,16 +222,35 @@ To create it, use:
         management.call_command("createcachetable")
 
         # import system settings graph and any saved system settings data
-        settings_graph = os.path.join(settings.ROOT_DIR, "db", "system_settings", "Arches_System_Settings_Model.json")
-        management.call_command("packages", operation="import_graphs", source=settings_graph)
+        settings_graph = os.path.join(
+            settings.ROOT_DIR,
+            "db",
+            "system_settings",
+            "Arches_System_Settings_Model.json",
+        )
+        management.call_command(
+            "packages", operation="import_graphs", source=settings_graph
+        )
 
-        settings_data = os.path.join(settings.ROOT_DIR, "db", "system_settings", "Arches_System_Settings.json")
-        management.call_command("packages", operation="import_business_data", source=settings_data, overwrite="overwrite")
+        settings_data = os.path.join(
+            settings.ROOT_DIR, "db", "system_settings", "Arches_System_Settings.json"
+        )
+        management.call_command(
+            "packages",
+            operation="import_business_data",
+            source=settings_data,
+            overwrite="overwrite",
+        )
 
         settings_data_local = settings.SYSTEM_SETTINGS_LOCAL_PATH
 
         if os.path.isfile(settings_data_local):
-            management.call_command("packages", operation="import_business_data", source=settings_data_local, overwrite="overwrite")
+            management.call_command(
+                "packages",
+                operation="import_business_data",
+                source=settings_data_local,
+                overwrite="overwrite",
+            )
 
         management.call_command("graph", operation="publish")
 

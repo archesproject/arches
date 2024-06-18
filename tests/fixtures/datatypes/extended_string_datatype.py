@@ -18,8 +18,19 @@ details = {
 
 
 class ExtendedStringDataType(StringDataType):
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
-        errors = super(ExtendedStringDataType, self).validate(value, row_number, source, node, nodeid, strict, **kwargs)
+    def validate(
+        self,
+        value,
+        row_number=None,
+        source=None,
+        node=None,
+        nodeid=None,
+        strict=False,
+        **kwargs,
+    ):
+        errors = super(ExtendedStringDataType, self).validate(
+            value, row_number, source, node, nodeid, strict, **kwargs
+        )
         return errors
 
     def clean(self, tile, nodeid):

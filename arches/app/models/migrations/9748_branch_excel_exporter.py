@@ -7,7 +7,7 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9744_add_tile_excel_importer'),
+        ("models", "9744_add_tile_excel_importer"),
     ]
 
     add_branch_excel_exporter = """
@@ -500,25 +500,37 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name='maplayer',
-            options={'default_permissions': (), 'managed': True, 'ordering': ('sortorder', 'name'), 'permissions': (('no_access_to_maplayer', 'No Access'), ('read_maplayer', 'Read'), ('write_maplayer', 'Create/Update'), ('delete_maplayer', 'Delete'))},
+            name="maplayer",
+            options={
+                "default_permissions": (),
+                "managed": True,
+                "ordering": ("sortorder", "name"),
+                "permissions": (
+                    ("no_access_to_maplayer", "No Access"),
+                    ("read_maplayer", "Read"),
+                    ("write_maplayer", "Create/Update"),
+                    ("delete_maplayer", "Delete"),
+                ),
+            },
         ),
         migrations.AddField(
-            model_name='tempfile',
-            name='created',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="tempfile",
+            name="created",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='tempfile',
-            name='source',
+            model_name="tempfile",
+            name="source",
             field=models.TextField(default=django.utils.timezone.now),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='loadstaging',
-            name='operation',
-            field=models.TextField(default='insert'),
+            model_name="loadstaging",
+            name="operation",
+            field=models.TextField(default="insert"),
         ),
         migrations.RunSQL(
             add_branch_excel_exporter,

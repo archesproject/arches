@@ -11,18 +11,29 @@ class Migration(migrations.Migration):
     def forwards_func(apps, schema_editor):
         TileModel = apps.get_model("models", "TileModel")
         try:
-            basic_search_settings_tile = TileModel.objects.get(tileid="a4e0f0e2-9840-4ba6-acae-a6c430daf917")
-            if basic_search_settings_tile.data["d0987ec0-fad8-11e6-aad3-6c4008b05c4c"] > 10000:
-                basic_search_settings_tile.data["d0987ec0-fad8-11e6-aad3-6c4008b05c4c"] = 10000
+            basic_search_settings_tile = TileModel.objects.get(
+                tileid="a4e0f0e2-9840-4ba6-acae-a6c430daf917"
+            )
+            if (
+                basic_search_settings_tile.data["d0987ec0-fad8-11e6-aad3-6c4008b05c4c"]
+                > 10000
+            ):
+                basic_search_settings_tile.data[
+                    "d0987ec0-fad8-11e6-aad3-6c4008b05c4c"
+                ] = 10000
                 basic_search_settings_tile.save()
         except TileModel.DoesNotExist as e:
             pass
 
         try:
             CardXNodeXWidget = apps.get_model("models", "CardXNodeXWidget")
-            basic_search_settings_card = CardXNodeXWidget.objects.get(pk="ec6bc4ae-2e9f-11e7-86ec-14109fd34195")
+            basic_search_settings_card = CardXNodeXWidget.objects.get(
+                pk="ec6bc4ae-2e9f-11e7-86ec-14109fd34195"
+            )
             basic_search_settings_card.label = "Max number of search results to export (see help for limitations on this value)"
-            basic_search_settings_card.config["label"] = "Max number of search results to export (see help for limitations on this value)"
+            basic_search_settings_card.config["label"] = (
+                "Max number of search results to export (see help for limitations on this value)"
+            )
             basic_search_settings_card.save()
         except CardXNodeXWidget.DoesNotExist as e:
             pass
