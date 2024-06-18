@@ -454,7 +454,7 @@ class MVT(APIBase):
                     elif search_geom_count:
                         cursor.execute(
                             """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
-                                featureid,
+                                featureid AS id,
                                 resourceinstanceid,
                                 nodeid,
                                 ST_AsMVTGeom(
@@ -471,7 +471,7 @@ class MVT(APIBase):
                 else:
                     cursor.execute(
                         """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
-                            featureid,
+                            featureid AS id,
                             resourceinstanceid,
                             nodeid,
                             ST_AsMVTGeom(
