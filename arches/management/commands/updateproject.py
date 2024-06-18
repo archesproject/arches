@@ -173,6 +173,48 @@ class Command(BaseCommand):
                 ),
             )
 
+        for action_name in ["build-test-branch", "install-arches-applications"]:
+            if not os.path.exists(
+                os.path.join(
+                    settings.APP_ROOT,
+                    "..",
+                    ".github",
+                    "actions",
+                    action_name,
+                    "action.yml",
+                )
+            ):
+                self.stdout.write(
+                    f"Copying .github/actions/{action_name}/action.yml directory to project"
+                )
+
+                os.makedirs(
+                    os.path.join(
+                        settings.APP_ROOT, "..", ".github", "actions", action_name
+                    ),
+                    exist_ok=True,
+                )
+
+                shutil.copy(
+                    os.path.join(
+                        settings.ROOT_DIR,
+                        "install",
+                        "arches-templates",
+                        ".github",
+                        "actions",
+                        action_name,
+                        "action.yml",
+                    ),
+                    os.path.join(
+                        settings.APP_ROOT,
+                        "..",
+                        ".github",
+                        "actions",
+                        action_name,
+                        "action.yml",
+                    ),
+                )
+
         if not os.path.exists(os.path.join(settings.APP_ROOT, "..", "tests")):
             self.stdout.write("Copying tests directory to project")
             test_directory_path = os.path.join(settings.APP_ROOT, "..", "tests")
