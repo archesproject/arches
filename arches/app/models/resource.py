@@ -320,7 +320,7 @@ class Resource(models.ResourceInstance):
                 tile
                 for tile in self.tiles
                 if tile.nodegroup is not None
-                and tile.nodegroup_id in readable_nodegroups
+                and str(tile.nodegroup_id) in readable_nodegroups
             ]
 
     # # flatten out the nested tiles into a single array

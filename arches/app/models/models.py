@@ -37,7 +37,6 @@ from django.utils import translation
 from django.utils.translation import gettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-from django.contrib.contenttypes.models import ContentType
 from django.core.validators import validate_slug
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
@@ -1744,6 +1743,9 @@ class UserXNotificationType(models.Model):
 
 @receiver(post_save, sender=User)
 def create_permissions_for_new_users(sender, instance, created, **kwargs):
+    if kwargs.get("raw", False):
+        return
+
     from arches.app.utils.permission_backend import process_new_user
 
     if created:
