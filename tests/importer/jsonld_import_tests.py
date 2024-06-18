@@ -88,7 +88,9 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2["graph"])
 
-        with open(os.path.join("tests/fixtures/jsonld_base/models/timezone_test.json"), "r") as f:
+        with open(
+            os.path.join("tests/fixtures/jsonld_base/models/timezone_test.json"), "r"
+        ) as f:
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2["graph"])
 
@@ -1923,8 +1925,12 @@ class JsonLDImportTests(ArchesTestCase):
         for resource in reader.resources:
             resource.save(request=None)
 
-            datetime_value = resource.tiles[1].data["ddb04a66-c163-11ea-8354-3af9d3b32b71"]
+            datetime_value = resource.tiles[1].data[
+                "ddb04a66-c163-11ea-8354-3af9d3b32b71"
+            ]
             self.assertEqual(datetime_value[-6:], "-09:00")
 
-            datetime_value = resource.tiles[2].data["ddb04a66-c163-11ea-8354-3af9d3b32b71"]
+            datetime_value = resource.tiles[2].data[
+                "ddb04a66-c163-11ea-8354-3af9d3b32b71"
+            ]
             self.assertEqual(datetime_value[-6:], "-09:00")
