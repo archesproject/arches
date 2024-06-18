@@ -18,14 +18,28 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="UserXTask",
             fields=[
-                ("id", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("taskid", models.UUIDField(blank=True, null=True, serialize=False)),
                 ("status", models.TextField(null=True, default="PENDING")),
                 ("date_start", models.DateTimeField(blank=True, null=True)),
                 ("date_done", models.DateTimeField(blank=True, null=True)),
                 ("name", models.TextField(blank=True, null=True)),
-                ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
-            options={"db_table": "user_x_tasks", "managed": True,},
+            options={
+                "db_table": "user_x_tasks",
+                "managed": True,
+            },
         ),
     ]

@@ -49,7 +49,11 @@ import django.contrib.auth.password_validation as validation
 from django_ratelimit.decorators import ratelimit
 from arches import __version__
 from arches.app.utils.response import JSONResponse, Http401Response
-from arches.app.utils.forms import ArchesUserCreationForm, ArchesPasswordResetForm, ArchesSetPasswordForm
+from arches.app.utils.forms import (
+    ArchesUserCreationForm,
+    ArchesPasswordResetForm,
+    ArchesSetPasswordForm,
+)
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.utils.arches_crypto import AESCipher
@@ -87,7 +91,12 @@ class LoginView(View):
         ratelimit(
             key="post:username",
             rate=(
-                ("{}/{}".format(int(settings.RATE_LIMIT.split("/")[0]) * 2, settings.RATE_LIMIT.split("/")[1]))
+                (
+                    "{}/{}".format(
+                        int(settings.RATE_LIMIT.split("/")[0]) * 2,
+                        settings.RATE_LIMIT.split("/")[1],
+                    )
+                )
                 if isinstance(settings.RATE_LIMIT, str)
                 else settings.RATE_LIMIT
             ),
@@ -102,7 +111,12 @@ class LoginView(View):
             return render(
                 request,
                 "login.htm",
-                {"auth_failed": True, "rate_limited": True, "next": next, "user_signup_enabled": settings.ENABLE_USER_SIGNUP},
+                {
+                    "auth_failed": True,
+                    "rate_limited": True,
+                    "next": next,
+                    "user_signup_enabled": settings.ENABLE_USER_SIGNUP,
+                },
                 status=429,
             )
 
@@ -121,18 +135,29 @@ class LoginView(View):
             return render(
                 request,
                 "login.htm",
-                {"username": username, "username_entered": True, "next": next, "user_signup_enabled": settings.ENABLE_USER_SIGNUP},
+                {
+                    "username": username,
+                    "username_entered": True,
+                    "next": next,
+                    "user_signup_enabled": settings.ENABLE_USER_SIGNUP,
+                },
             )
 
         user = authenticate(username=username, password=password)
 
         if user is not None and user.is_active:
-            if settings.FORCE_TWO_FACTOR_AUTHENTICATION or settings.ENABLE_TWO_FACTOR_AUTHENTICATION:
+            if (
+                settings.FORCE_TWO_FACTOR_AUTHENTICATION
+                or settings.ENABLE_TWO_FACTOR_AUTHENTICATION
+            ):
                 user_profile = models.UserProfile.objects.get(user=user)
-                user_has_enabled_two_factor_authentication = bool(user_profile.encrypted_mfa_hash)
+                user_has_enabled_two_factor_authentication = bool(
+                    user_profile.encrypted_mfa_hash
+                )
 
                 if (
-                    settings.FORCE_TWO_FACTOR_AUTHENTICATION or user_has_enabled_two_factor_authentication
+                    settings.FORCE_TWO_FACTOR_AUTHENTICATION
+                    or user_has_enabled_two_factor_authentication
                 ):  # user has enabled two-factor authentication
                     return render(
                         request,
@@ -157,7 +182,14 @@ class LoginView(View):
                 return redirect(next)
 
         return render(
-            request, "login.htm", {"auth_failed": True, "next": next, "user_signup_enabled": settings.ENABLE_USER_SIGNUP}, status=401
+            request,
+            "login.htm",
+            {
+                "auth_failed": True,
+                "next": next,
+                "user_signup_enabled": settings.ENABLE_USER_SIGNUP,
+            },
+            status=401,
         )
 
 
@@ -170,7 +202,13 @@ class SignupView(View):
         confirmation_message = ""
 
         if not settings.ENABLE_USER_SIGNUP:
-            raise (Exception(_("User signup has been disabled. Please contact your administrator.")))
+            raise (
+                Exception(
+                    _(
+                        "User signup has been disabled. Please contact your administrator."
+                    )
+                )
+            )
 
         return render(
             request,
@@ -185,7 +223,7 @@ class SignupView(View):
             },
         )
 
-    def post(self, request):        
+    def post(self, request):
         showform = True
         confirmation_message = ""
         postdata = request.POST.copy()
@@ -193,16 +231,26 @@ class SignupView(View):
         form = ArchesUserCreationForm(postdata, enable_captcha=settings.ENABLE_CAPTCHA)
 
         if not settings.ENABLE_USER_SIGNUP:
-            raise (Exception(_("User signup has been disabled. Please contact your administrator.")))
+            raise (
+                Exception(
+                    _(
+                        "User signup has been disabled. Please contact your administrator."
+                    )
+                )
+            )
 
         if form.is_valid():
             AES = AESCipher(settings.SECRET_KEY)
             userinfo = JSONSerializer().serialize(form.cleaned_data)
             encrypted_userinfo = AES.encrypt(userinfo)
             url_encrypted_userinfo = urlencode({"link": encrypted_userinfo})
-            confirmation_link = request.build_absolute_uri(reverse("confirm_signup") + "?" + url_encrypted_userinfo)
+            confirmation_link = request.build_absolute_uri(
+                reverse("confirm_signup") + "?" + url_encrypted_userinfo
+            )
 
-            if not settings.FORCE_USER_SIGNUP_EMAIL_AUTHENTICATION:  # bypasses email confirmation if setting is disabled
+            if (
+                not settings.FORCE_USER_SIGNUP_EMAIL_AUTHENTICATION
+            ):  # bypasses email confirmation if setting is disabled
                 return redirect(confirmation_link)
 
             admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
@@ -218,20 +266,30 @@ class SignupView(View):
                 additional_context={
                     "button_text": _("Signup for {}").format(settings.APP_NAME),
                     "link": confirmation_link,
-                    "username": form.cleaned_data['username']
-                }
+                    "username": form.cleaned_data["username"],
+                },
             )
-            
-            html_content = render_to_string("email/general_notification.htm", email_context)  # ...
-            text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
+
+            html_content = render_to_string(
+                "email/general_notification.htm", email_context
+            )  # ...
+            text_content = strip_tags(
+                html_content
+            )  # this strips the html, so people will have the text as well.
 
             # create the email, and attach the HTML version as well.
-            msg = EmailMultiAlternatives(_("Welcome to {}!").format(settings.APP_NAME), text_content, admin_email, [form.cleaned_data["email"]])
+            msg = EmailMultiAlternatives(
+                _("Welcome to {}!").format(settings.APP_NAME),
+                text_content,
+                admin_email,
+                [form.cleaned_data["email"]],
+            )
             msg.attach_alternative(html_content, "text/html")
             msg.send()
 
             confirmation_message = _(
-                "An email has been sent to <br><strong>%s</strong><br> with a link to activate your account" % form.cleaned_data["email"]
+                "An email has been sent to <br><strong>%s</strong><br> with a link to activate your account"
+                % form.cleaned_data["email"]
             )
             showform = False
 
@@ -253,16 +311,26 @@ class SignupView(View):
 class ConfirmSignupView(View):
     def get(self, request):
         if not settings.ENABLE_USER_SIGNUP:
-            raise (Exception(_("User signup has been disabled. Please contact your administrator.")))
+            raise (
+                Exception(
+                    _(
+                        "User signup has been disabled. Please contact your administrator."
+                    )
+                )
+            )
 
         link = request.GET.get("link", None)
         AES = AESCipher(settings.SECRET_KEY)
         userinfo = JSONDeserializer().deserialize(AES.decrypt(link))
         form = ArchesUserCreationForm(userinfo)
-        if datetime.fromtimestamp(userinfo["ts"]) + timedelta(days=1) >= datetime.fromtimestamp(int(time.time())):
+        if datetime.fromtimestamp(userinfo["ts"]) + timedelta(
+            days=1
+        ) >= datetime.fromtimestamp(int(time.time())):
             if form.is_valid():
                 user = form.save()
-                crowdsource_editor_group = Group.objects.get(name=settings.USER_SIGNUP_GROUP)
+                crowdsource_editor_group = Group.objects.get(
+                    name=settings.USER_SIGNUP_GROUP
+                )
                 user.groups.add(crowdsource_editor_group)
                 return redirect(reverse("auth") + "?registration_success=true")
             else:
@@ -273,24 +341,43 @@ class ConfirmSignupView(View):
                 except:
                     pass
         else:
-            form.errors["ts"] = [_("The signup link has expired, please try signing up again.  Thanks!")]
+            form.errors["ts"] = [
+                _("The signup link has expired, please try signing up again.  Thanks!")
+            ]
 
         return render(
             request,
             "signup.htm",
-            {"form": form, "showform": True, "postdata": userinfo, "validation_help": validation.password_validators_help_texts()},
+            {
+                "form": form,
+                "showform": True,
+                "postdata": userinfo,
+                "validation_help": validation.password_validators_help_texts(),
+            },
         )
 
 
 @method_decorator(login_required, name="dispatch")
 class ChangePasswordView(View):
     def get(self, request):
-        messages = {"invalid_password": None, "password_validations": None, "success": None, "other": None, "mismatched": None}
+        messages = {
+            "invalid_password": None,
+            "password_validations": None,
+            "success": None,
+            "other": None,
+            "mismatched": None,
+        }
         return JSONResponse(messages)
 
     @method_decorator(ratelimit(key="user", rate=settings.RATE_LIMIT, block=False))
     def post(self, request):
-        messages = {"invalid_password": None, "password_validations": None, "success": None, "other": None, "mismatched": None}
+        messages = {
+            "invalid_password": None,
+            "password_validations": None,
+            "success": None,
+            "other": None,
+            "mismatched": None,
+        }
 
         if getattr(request, "limited", False):
             messages["invalid_password"] = _("Too many requests")
@@ -309,10 +396,16 @@ class ChangePasswordView(View):
             except ValidationError as val_err:
                 messages["password_validations"] = val_err.messages
 
-            if messages["invalid_password"] is None and messages["password_validations"] is None and messages["mismatched"] is None:
+            if (
+                messages["invalid_password"] is None
+                and messages["password_validations"] is None
+                and messages["mismatched"] is None
+            ):
                 user.set_password(new_password)
                 user.save()
-                authenticated_user = authenticate(username=user.username, password=new_password)
+                authenticated_user = authenticate(
+                    username=user.username, password=new_password
+                )
                 login(request, authenticated_user)
                 messages["success"] = _("Password successfully updated")
 
@@ -382,7 +475,10 @@ class ServerSettingView(View):
         password = request.POST.get("password", None)
         user = authenticate(username=username, password=password)
         if user:
-            server_settings = {"version": __version__, "clientid": settings.OAUTH_CLIENT_ID}
+            server_settings = {
+                "version": __version__,
+                "clientid": settings.OAUTH_CLIENT_ID,
+            }
             response = JSONResponse(server_settings)
         else:
             response = Http401Response()
@@ -416,34 +512,55 @@ class TwoFactorAuthenticationResetView(View):
             try:
                 AES = AESCipher(settings.SECRET_KEY)
 
-                serialized_data = JSONSerializer().serialize({"ts": int(time.time()), "user": user})
+                serialized_data = JSONSerializer().serialize(
+                    {"ts": int(time.time()), "user": user}
+                )
                 encrypted_url = urlencode({"link": AES.encrypt(serialized_data)})
 
                 admin_email = settings.ADMINS[0][1] if settings.ADMINS else ""
 
                 email_context = return_message_context(
-                    greeting=_("Click on link below to update your two-factor authentication settings."),
+                    greeting=_(
+                        "Click on link below to update your two-factor authentication settings."
+                    ),
                     closing_text=_(
                         "This link expires in 15 minutes. If you did not request this change, \
                         contact your Administrator immediately."
                     ),
                     additional_context={
                         "button_text": _("Update Two-Factor Authentication Settings"),
-                        "link": request.build_absolute_uri(reverse("two-factor-authentication-settings") + "?" + encrypted_url),
-                        "username": user.username
-                    }
+                        "link": request.build_absolute_uri(
+                            reverse("two-factor-authentication-settings")
+                            + "?"
+                            + encrypted_url
+                        ),
+                        "username": user.username,
+                    },
                 )
 
-                html_content = render_to_string("email/general_notification.htm", email_context)  # ...
-                text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
+                html_content = render_to_string(
+                    "email/general_notification.htm", email_context
+                )  # ...
+                text_content = strip_tags(
+                    html_content
+                )  # this strips the html, so people will have the text as well.
 
                 # create the email, and attach the HTML version as well.
-                msg = EmailMultiAlternatives(_("Arches Two-Factor Authentication"), text_content, admin_email, [user.email])
+                msg = EmailMultiAlternatives(
+                    _("Arches Two-Factor Authentication"),
+                    text_content,
+                    admin_email,
+                    [user.email],
+                )
                 msg.attach_alternative(html_content, "text/html")
 
                 msg.send()
             except:
-                raise Exception(_("There has been error sending an email to this address. Please contact your system administrator."))
+                raise Exception(
+                    _(
+                        "There has been error sending an email to this address. Please contact your system administrator."
+                    )
+                )
 
         return render(
             request,
@@ -462,10 +579,18 @@ class TwoFactorAuthenticationLoginView(View):
         user = authenticate(username=username, password=password)
 
         next = request.POST.get("next", reverse("home"))
-        user_has_enabled_two_factor_authentication = request.POST.get("user-has-enabled-two-factor-authentication", None)
-        two_factor_authentication_string = request.POST.get("two-factor-authentication", None)
+        user_has_enabled_two_factor_authentication = request.POST.get(
+            "user-has-enabled-two-factor-authentication", None
+        )
+        two_factor_authentication_string = request.POST.get(
+            "two-factor-authentication", None
+        )
 
-        if user is not None and user.is_active and user_has_enabled_two_factor_authentication:
+        if (
+            user is not None
+            and user.is_active
+            and user_has_enabled_two_factor_authentication
+        ):
             user_profile = models.UserProfile.objects.get(user_id=user.pk)
 
             if user_profile.encrypted_mfa_hash:
@@ -506,7 +631,9 @@ class TwoFactorAuthenticationSettingsView(View):
 
         decrypted_data = JSONDeserializer().deserialize(AES.decrypt(link))
 
-        if datetime.fromtimestamp(decrypted_data["ts"]) + timedelta(minutes=15) >= datetime.fromtimestamp(
+        if datetime.fromtimestamp(decrypted_data["ts"]) + timedelta(
+            minutes=15
+        ) >= datetime.fromtimestamp(
             int(time.time())
         ):  # if before email expiry
             user_id = decrypted_data["user"]["id"]
@@ -515,7 +642,9 @@ class TwoFactorAuthenticationSettingsView(View):
             context = {
                 "ENABLE_TWO_FACTOR_AUTHENTICATION": settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
                 "FORCE_TWO_FACTOR_AUTHENTICATION": settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-                "user_has_enabled_two_factor_authentication": bool(user_profile.encrypted_mfa_hash),
+                "user_has_enabled_two_factor_authentication": bool(
+                    user_profile.encrypted_mfa_hash
+                ),
                 "user_id": user_id,
             }
 
@@ -545,7 +674,9 @@ class TwoFactorAuthenticationSettingsView(View):
                 user_profile.encrypted_mfa_hash = encrypted_mfa_hash
 
                 if generate_qr_code:
-                    uri = pyotp.totp.TOTP(mfa_hash).provisioning_uri(user.email, issuer_name=settings.APP_TITLE)
+                    uri = pyotp.totp.TOTP(mfa_hash).provisioning_uri(
+                        user.email, issuer_name=settings.APP_TITLE
+                    )
                     uri_qrcode = qrcode.make(uri)
 
                     buffer = io.BytesIO()
@@ -556,7 +687,11 @@ class TwoFactorAuthenticationSettingsView(View):
 
                     buffer.close()
                 elif generate_manual_key:
-                    new_mfa_hash_manual_entry_data = {"new_mfa_hash": mfa_hash, "name": user.email, "issuer_name": settings.APP_TITLE}
+                    new_mfa_hash_manual_entry_data = {
+                        "new_mfa_hash": mfa_hash,
+                        "name": user.email,
+                        "issuer_name": settings.APP_TITLE,
+                    }
 
             elif delete_mfa_hash and not settings.FORCE_TWO_FACTOR_AUTHENTICATION:
                 user_profile.encrypted_mfa_hash = None
@@ -570,7 +705,9 @@ class TwoFactorAuthenticationSettingsView(View):
         context = {
             "ENABLE_TWO_FACTOR_AUTHENTICATION": settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
             "FORCE_TWO_FACTOR_AUTHENTICATION": settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-            "user_has_enabled_two_factor_authentication": bool(user_profile.encrypted_mfa_hash),
+            "user_has_enabled_two_factor_authentication": bool(
+                user_profile.encrypted_mfa_hash
+            ),
             "new_mfa_hash_qr_code": new_mfa_hash_qr_code,
             "new_mfa_hash_manual_entry_data": new_mfa_hash_manual_entry_data,
             "user_id": user_id,
@@ -589,7 +726,9 @@ class Token(View):
                 "client_id": settings.OAUTH_CLIENT_ID,
                 "grant_type": "password",
             }
-            url = request.get_raw_uri().replace(request.path, "").split("?")[0] + reverse("oauth2:token")
+            url = request.get_raw_uri().replace(request.path, "").split("?")[
+                0
+            ] + reverse("oauth2:token")
             r = requests.post(url, data=data)
             return JSONResponse(r.json(), indent=4)
         return HttpResponseForbidden()
@@ -600,11 +739,15 @@ class ExternalOauth(View):
         next = request.GET.get("next", reverse("home"))
         username = request.GET.get("username", None)
 
-        token, user = ExternalOauthAuthenticationBackend.get_token_for_username(username)
+        token, user = ExternalOauthAuthenticationBackend.get_token_for_username(
+            username
+        )
         if token is not None and token.access_token_expiration > datetime.now():
             return ExternalOauth.log_user_in(request, user, next)
 
-        authorization_url, state = ExternalOauthAuthenticationBackend.get_authorization_url(request)
+        authorization_url, state = (
+            ExternalOauthAuthenticationBackend.get_authorization_url(request)
+        )
         request.session["oauth_state"] = state
         request.session["next"] = next
         request.session["user"] = username
@@ -614,13 +757,21 @@ class ExternalOauth(View):
         csrf_exempt, name="dispatch"
     )  # exempt; returned from other oauth2 authorization server, handled by 'oauth_state' in session
     def callback(request):
-        next_url = request.session["next"] if "next" in request.session else reverse("home")
-        user = authenticate(request, username=request.session["user"], sso_authentication=True)
+        next_url = (
+            request.session["next"] if "next" in request.session else reverse("home")
+        )
+        user = authenticate(
+            request, username=request.session["user"], sso_authentication=True
+        )
         return ExternalOauth.log_user_in(request, user, next_url)
 
     def log_user_in(request, user, next_url):
         if user is not None:
-            login(request, user, backend="arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend")
+            login(
+                request,
+                user,
+                backend="arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend",
+            )
             return redirect(next_url)
         else:
             return redirect("auth")

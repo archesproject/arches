@@ -10,76 +10,98 @@ from django.db import migrations, models
 from django.core import management
 from arches.app.models.system_settings import settings
 
+
 def add_permissions(apps, schema_editor, with_create_permissions=True):
     db_alias = schema_editor.connection.alias
     Group = apps.get_model("auth", "Group")
     Permission = apps.get_model("auth", "Permission")
 
-    read_nodegroup = Permission.objects.get(codename='read_nodegroup', content_type__app_label='models', content_type__model='nodegroup')
+    read_nodegroup = Permission.objects.get(
+        codename="read_nodegroup",
+        content_type__app_label="models",
+        content_type__model="nodegroup",
+    )
 
-    resource_editor_group = Group.objects.using(db_alias).get(name='Resource Editor')
+    resource_editor_group = Group.objects.using(db_alias).get(name="Resource Editor")
     resource_editor_group.permissions.add(read_nodegroup)
-    rdm_admin_group = Group.objects.using(db_alias).get(name='RDM Administrator')
+    rdm_admin_group = Group.objects.using(db_alias).get(name="RDM Administrator")
     rdm_admin_group.permissions.add(read_nodegroup)
-    app_admin_group = Group.objects.using(db_alias).get(name='Application Administrator')
+    app_admin_group = Group.objects.using(db_alias).get(
+        name="Application Administrator"
+    )
     app_admin_group.permissions.add(read_nodegroup)
-    sys_admin_group = Group.objects.using(db_alias).get(name='System Administrator')
+    sys_admin_group = Group.objects.using(db_alias).get(name="System Administrator")
     sys_admin_group.permissions.add(read_nodegroup)
-    mobile_project_admin_group = Group.objects.using(db_alias).get(name='Mobile Project Administrator')
+    mobile_project_admin_group = Group.objects.using(db_alias).get(
+        name="Mobile Project Administrator"
+    )
     mobile_project_admin_group.permissions.add(read_nodegroup)
-    crowdsource_editor_group = Group.objects.using(db_alias).get(name='Crowdsource Editor')
+    crowdsource_editor_group = Group.objects.using(db_alias).get(
+        name="Crowdsource Editor"
+    )
     crowdsource_editor_group.permissions.add(read_nodegroup)
-    guest_group = Group.objects.using(db_alias).get(name='Guest')
+    guest_group = Group.objects.using(db_alias).get(name="Guest")
     guest_group.permissions.add(read_nodegroup)
+
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '0002_40b4'),
+        ("models", "0002_40b4"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='editlog',
-            old_name='attributenodeid',
-            new_name='nodegroupid',
+            model_name="editlog",
+            old_name="attributenodeid",
+            new_name="nodegroupid",
         ),
         migrations.AlterField(
-            model_name='editlog',
-            name='newvalue',
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='newvalue', null=True),
+            model_name="editlog",
+            name="newvalue",
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                blank=True, db_column="newvalue", null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='editlog',
-            name='oldvalue',
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, db_column='oldvalue', null=True),
+            model_name="editlog",
+            name="oldvalue",
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                blank=True, db_column="oldvalue", null=True
+            ),
         ),
         migrations.CreateModel(
-            name='Geocoder',
+            name="Geocoder",
             fields=[
-                ('geocoderid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('name', models.TextField()),
-                ('component', models.TextField()),
-                ('api_key', models.TextField(blank=True, null=True)),
+                (
+                    "geocoderid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
+                ("name", models.TextField()),
+                ("component", models.TextField()),
+                ("api_key", models.TextField(blank=True, null=True)),
             ],
             options={
-                'db_table': 'geocoders',
-                'managed': True,
+                "db_table": "geocoders",
+                "managed": True,
             },
         ),
         migrations.RemoveField(
-            model_name='graphmodel',
-            name='mapfeaturecolor',
+            model_name="graphmodel",
+            name="mapfeaturecolor",
         ),
         migrations.RemoveField(
-            model_name='graphmodel',
-            name='maplinewidth',
+            model_name="graphmodel",
+            name="maplinewidth",
         ),
         migrations.RemoveField(
-            model_name='graphmodel',
-            name='mappointsize',
+            model_name="graphmodel",
+            name="mappointsize",
         ),
-        migrations.RunSQL("""
+        migrations.RunSQL(
+            """
             UPDATE d_data_types
                 SET issearchable = true,
                     configcomponent = 'views/components/datatypes/string',
@@ -123,7 +145,8 @@ class Migration(migrations.Migration):
             UPDATE d_data_types
                 SET configcomponent = 'views/components/datatypes/geojson-feature-collection'
                 WHERE datatype = 'geojson-feature-collection';
-        """, """
+        """,
+            """
             UPDATE d_data_types
                 SET issearchable = false,
                     configcomponent = NULL,
@@ -167,20 +190,26 @@ class Migration(migrations.Migration):
             UPDATE d_data_types
                 SET configcomponent = 'views/graph/datatypes/geojson-feature-collection',
                 WHERE datatype = 'geojson-feature-collection';
-        """),
-
-        migrations.RunSQL("""
+        """,
+        ),
+        migrations.RunSQL(
+            """
             INSERT INTO iiif_manifests(id, url) VALUES (public.uuid_generate_v1mc(), 'https://data.getty.edu/museum/api/iiif/249995/manifest.json');
-        """, """
+        """,
+            """
             DELETE FROM public.iiif_manifests WHERE url = 'https://data.getty.edu/museum/api/iiif/249995/manifest.json';
-        """),
-        migrations.RunSQL("""
+        """,
+        ),
+        migrations.RunSQL(
+            """
             INSERT INTO public.relations(relationid, conceptidfrom, conceptidto, relationtype) VALUES (public.uuid_generate_v1mc(), '00000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000007', 'narrower') ON CONFLICT DO NOTHING;
         """,
-        """
+            """
             DELETE FROM public.relations WHERE conceptidfrom = '00000000-0000-0000-0000-000000000004' AND conceptidto = '00000000-0000-0000-0000-000000000007' AND relationtype = 'narrower';
-        """),
-        migrations.RunSQL("""
+        """,
+        ),
+        migrations.RunSQL(
+            """
             INSERT INTO widgets(widgetid, name, component, datatype, defaultconfig)
                 VALUES ('10000000-0000-0000-0000-000000000022', 'iiif-widget', 'views/components/widgets/iiif', 'iiif-drawing', '{
                         "placeholder": "",
@@ -204,16 +233,20 @@ class Migration(migrations.Migration):
             DELETE from widgets WHERE widgetid = '10000000-0000-0000-0000-000000000022';
             UPDATE d_data_types SET (modulename, classname) = ('concept_types.py', 'ConceptDataType') WHERE datatype = 'domain-value';
             UPDATE d_data_types SET (modulename, classname) = ('concept_types.py', 'ConceptListDataType') WHERE datatype = 'domain-value-list';
-        """),
-        migrations.RunSQL("""
+        """,
+        ),
+        migrations.RunSQL(
+            """
             INSERT INTO public.geocoders(geocoderid, name, component, api_key) VALUES ('10000000-0000-0000-0000-010000000000', 'Mapbox', 'views/components/geocoders/mapbox', '');
             INSERT INTO public.geocoders(geocoderid, name, component) VALUES ('10000000-0000-0000-0000-010000000001', 'Mapzen', 'views/components/geocoders/mapzen');
         """,
-        """
+            """
             DELETE FROM public.geocoders WHERE geocoderid = '10000000-0000-0000-0000-010000000000';
             DELETE FROM public.geocoders WHERE name = 'Mapzen';
-        """),
-        migrations.RunSQL("""
+        """,
+        ),
+        migrations.RunSQL(
+            """
             UPDATE report_templates SET defaultconfig = '{
                 "basemap": "streets",
                 "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
@@ -256,7 +289,7 @@ class Migration(migrations.Migration):
                     "featurePointSize": 3
                 }' WHERE widgetid = '10000000-0000-0000-0000-000000000007';
         """,
-        """
+            """
             UPDATE report_templates SET defaultconfig = '{
                 "basemap": "streets",
                 "geometryTypes": [{"text":"Point", "id":"Point"}, {"text":"Line", "id":"Line"}, {"text":"Polygon", "id":"Polygon"}],
@@ -297,9 +330,10 @@ class Migration(migrations.Migration):
                 "featureLineWidth": null,
                 "featurePointSize": null
             }' WHERE widgetid = '10000000-0000-0000-0000-000000000007';
-        """),
-
-
+        """,
+        ),
         ## the following command has to be run after the previous RunSQL commands that update the domain datatype values
-        migrations.RunPython(add_permissions,reverse_code=lambda *args,**kwargs: True),
+        migrations.RunPython(
+            add_permissions, reverse_code=lambda *args, **kwargs: True
+        ),
     ]

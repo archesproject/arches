@@ -15,118 +15,142 @@ from arches.app.models.system_settings import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '0001_initial'),
+        ("models", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='FileValue',
+            name="FileValue",
             fields=[
-                ('valueid', models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ('value', models.FileField(upload_to='concepts')),
+                (
+                    "valueid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
+                ("value", models.FileField(upload_to="concepts")),
             ],
             options={
-                'db_table': 'values',
-                'managed': False,
+                "db_table": "values",
+                "managed": False,
             },
         ),
         migrations.CreateModel(
-            name='Resource',
-            fields=[
-            ],
+            name="Resource",
+            fields=[],
             options={
-                'proxy': True,
+                "proxy": True,
             },
-            bases=('models.resourceinstance',),
+            bases=("models.resourceinstance",),
         ),
         migrations.CreateModel(
-            name='Tile',
-            fields=[
-            ],
+            name="Tile",
+            fields=[],
             options={
-                'proxy': True,
+                "proxy": True,
             },
-            bases=('models.tilemodel',),
+            bases=("models.tilemodel",),
         ),
         migrations.CreateModel(
-            name='IIIFManifest',
+            name="IIIFManifest",
             fields=[
-                ('id', models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
-                ('url', models.TextField())
+                (
+                    "id",
+                    models.UUIDField(
+                        primary_key=True, default=uuid.uuid1, serialize=False
+                    ),
+                ),
+                ("url", models.TextField()),
             ],
             options={
-                'db_table': 'iiif_manifests',
-                'managed': True,
+                "db_table": "iiif_manifests",
+                "managed": True,
             },
         ),
         migrations.AddField(
-            model_name='maplayer',
-            name='centerx',
+            model_name="maplayer",
+            name="centerx",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='maplayer',
-            name='centery',
+            model_name="maplayer",
+            name="centery",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='maplayer',
-            name='zoom',
+            model_name="maplayer",
+            name="zoom",
             field=models.FloatField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='ddatatype',
-            name='isgeometric',
+            model_name="ddatatype",
+            name="isgeometric",
             field=models.BooleanField(),
         ),
         migrations.AlterField(
-            model_name='edge',
-            name='graph',
-            field=models.ForeignKey(blank=True, db_column='graphid', null=True, on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
+            model_name="edge",
+            name="graph",
+            field=models.ForeignKey(
+                blank=True,
+                db_column="graphid",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="models.GraphModel",
+            ),
         ),
         migrations.AlterField(
-            model_name='form',
-            name='graph',
-            field=models.ForeignKey(db_column='graphid', on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
+            model_name="form",
+            name="graph",
+            field=models.ForeignKey(
+                db_column="graphid",
+                on_delete=django.db.models.deletion.CASCADE,
+                to="models.GraphModel",
+            ),
         ),
         migrations.AlterField(
-            model_name='function',
-            name='defaultconfig',
+            model_name="function",
+            name="defaultconfig",
             field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='functionxgraph',
-            name='config',
+            model_name="functionxgraph",
+            name="config",
             field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='graphxmapping',
-            name='mapping',
+            model_name="graphxmapping",
+            name="mapping",
             field=django.contrib.postgres.fields.jsonb.JSONField(blank=True),
         ),
         migrations.AlterField(
-            model_name='node',
-            name='graph',
-            field=models.ForeignKey(blank=True, db_column='graphid', null=True, on_delete=django.db.models.deletion.CASCADE, to='models.GraphModel'),
+            model_name="node",
+            name="graph",
+            field=models.ForeignKey(
+                blank=True,
+                db_column="graphid",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="models.GraphModel",
+            ),
         ),
         migrations.AlterField(
-            model_name='tileserverlayer',
-            name='config',
+            model_name="tileserverlayer",
+            name="config",
             field=django.contrib.postgres.fields.jsonb.JSONField(),
         ),
         migrations.AlterField(
-            model_name='tileserverlayer',
-            name='name',
+            model_name="tileserverlayer",
+            name="name",
             field=models.TextField(serialize=False, unique=True),
         ),
         migrations.AddField(
-            model_name='ddatatype',
-            name='issearchable',
+            model_name="ddatatype",
+            name="issearchable",
             field=models.NullBooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='node',
-            name='issearchable',
+            model_name="node",
+            name="issearchable",
             field=models.BooleanField(default=True),
         ),
     ]
