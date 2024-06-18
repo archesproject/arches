@@ -8,7 +8,12 @@ runs:
   steps:
 
     # You must manually add any ARCHES_APPLICATIONS to this file. Below is a 
-    # template for adding an application in a private repository.
+    # template for adding an application in a private repository. Be sure to
+    # delete the `no-op step` if adding when updating this file.
+
+    - name: No-op step to maintain workflow structure
+      run: echo "No-op step"
+      shell: bash
 
     # - name: Checkout ${my_arches_application}
     #   uses: actions/checkout@v4
