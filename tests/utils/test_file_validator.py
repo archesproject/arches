@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 from django.conf import settings
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import override_settings
 
 from arches.app.utils.file_validator import FileValidator
@@ -30,7 +30,7 @@ class MockFileType:
         self.extension = extension
 
 
-class FileValidatorTests(TestCase):
+class FileValidatorTests(SimpleTestCase):
     """FILE_TYPE_CHECKING defaults to 'lenient': overridden as necessary."""
 
     validator = FileValidator()
