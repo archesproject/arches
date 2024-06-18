@@ -1,0 +1,24 @@
+name: 'Install Arches Applications'
+description: 'Manually edit this file to install all Arches Applications declared in settings.py'
+inputs: 
+  secrets:
+    description: 'Secrets from main.yml as JSON'
+runs:
+  using: 'composite'
+  steps:
+
+    # You must manually add any ARCHES_APPLICATIONS to this file. Below is a 
+    # template for adding an application in a private repository.
+
+    # - name: Checkout ${my_arches_application}
+    #   uses: actions/checkout@v4
+    #   with:
+    #     repository: ${my_arches_application_repository}/${my_arches_application}
+    #     token: ${{ fromJSON(inputs.secrets).${my_github_personal_access_token} }}
+    #     path: ${my_arches_application}
+
+    # - name: Install ${my_arches_application}
+    #   run: |
+    #     pip install ./${my_arches_application}
+    #     echo ${my_arches_application} installed
+    #   shell: bash
