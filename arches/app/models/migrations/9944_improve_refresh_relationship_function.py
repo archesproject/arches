@@ -4,10 +4,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9333_file_type_image_config'),
+        ("models", "9333_file_type_image_config"),
     ]
 
-    update_refresh_tile_resource_relationship_function = """
+    update_refresh_tile_resource_relationship_function = (
+        """
         CREATE OR REPLACE FUNCTION __arches_refresh_tile_resource_relationships(tile_id uuid)
         RETURNS boolean AS $$
         DECLARE
@@ -62,6 +63,7 @@ class Migration(migrations.Migration):
         END;
         $$ language plpgsql;
     """,
+    )
 
     revert_refresh_tile_resource_relationship_function = """
         CREATE OR REPLACE FUNCTION __arches_refresh_tile_resource_relationships(tile_id uuid)
@@ -154,6 +156,6 @@ class Migration(migrations.Migration):
         ),
         migrations.RunSQL(
             add_update_resource_x_resource_with_graphids,
-            remove_update_resource_x_resource_with_graphids
+            remove_update_resource_x_resource_with_graphids,
         ),
     ]

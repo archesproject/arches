@@ -10,13 +10,18 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '3789_card_config'),
+        ("models", "3789_card_config"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='cardmodel',
-            name='component',
-            field=models.ForeignKey(db_column='componentid', default=uuid.UUID('f05e4d3a-53c1-11e8-b0ea-784f435179ea'), on_delete=django.db.models.deletion.SET_DEFAULT, to='models.CardComponent'),
+            model_name="cardmodel",
+            name="component",
+            field=models.ForeignKey(
+                db_column="componentid",
+                default=uuid.UUID("f05e4d3a-53c1-11e8-b0ea-784f435179ea"),
+                on_delete=django.db.models.deletion.SET_DEFAULT,
+                to="models.CardComponent",
+            ),
         ),
     ]

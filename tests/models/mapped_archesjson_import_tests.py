@@ -22,8 +22,12 @@ from django.test.utils import captured_stdout
 from arches.app.models.models import TileModel, ResourceInstance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
-from arches.app.utils.data_management.resources.importer import BusinessDataImporter as ArchesFileImporter
+from arches.app.utils.data_management.resource_graphs.importer import (
+    import_graph as ResourceGraphImporter,
+)
+from arches.app.utils.data_management.resources.importer import (
+    BusinessDataImporter as ArchesFileImporter,
+)
 
 
 # these tests can be run from the command line via
@@ -39,7 +43,10 @@ class mappedArchesJSONImportTests(ArchesTestCase):
 
     def setUp(self):
         ResourceInstance.objects.all().delete()
-        with open(os.path.join("tests/fixtures/data/json/cardinality_test_data/target.json"), "r") as f:
+        with open(
+            os.path.join("tests/fixtures/data/json/cardinality_test_data/target.json"),
+            "r",
+        ) as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
@@ -47,7 +54,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/single-1.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/single-1.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -57,7 +65,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/single-n.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/single-n.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -89,7 +98,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/1_1_1_1.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/1_1_1_1.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -99,7 +109,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/1_1_n_1.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/1_1_n_1.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -109,7 +120,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/1_1_1_n.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/1_1_1_n.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -119,7 +131,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/1_1_n_n.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/1_1_n_n.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -129,7 +142,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_1_n_1.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/n_1_n_1.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -139,7 +153,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_1_n_n.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/n_1_n_n.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -149,7 +164,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/1_n_1_n.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/1_n_1_n.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -159,7 +175,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/1_n_n_n.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/1_n_n_n.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -169,7 +186,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_n_n_n.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/n_n_n_n.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -179,7 +197,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_n_1_n.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/n_n_1_n.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -189,7 +208,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_1_1_1.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/n_1_1_1.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -199,7 +219,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_1_1_n.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/n_1_1_n.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -209,7 +230,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_1_1_1.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/n_1_1_1.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -219,7 +241,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/1_n_1_1.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/1_n_1_1.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -229,7 +252,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/1_n_n_1.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/1_n_n_1.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -239,7 +263,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_n_1_1.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/n_n_1_1.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count
@@ -249,7 +274,8 @@ class mappedArchesJSONImportTests(ArchesTestCase):
         og_tile_count = TileModel.objects.count()
         with captured_stdout():
             ArchesFileImporter(
-                "tests/fixtures/data/json/cardinality_test_data/source.json", "tests/fixtures/data/json/cardinality_test_data/n_n_n_1.mapping"
+                "tests/fixtures/data/json/cardinality_test_data/source.json",
+                "tests/fixtures/data/json/cardinality_test_data/n_n_n_1.mapping",
             ).import_business_data()
         new_tile_count = TileModel.objects.count()
         tile_difference = new_tile_count - og_tile_count

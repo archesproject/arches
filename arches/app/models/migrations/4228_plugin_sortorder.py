@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4218_plugin_permissions'),
+        ("models", "4218_plugin_permissions"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='plugin',
-            name='sortorder',
+            model_name="plugin",
+            name="sortorder",
             field=models.IntegerField(blank=True, default=None, null=True),
         ),
     ]

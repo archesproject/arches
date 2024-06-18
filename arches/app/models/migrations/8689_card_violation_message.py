@@ -63,5 +63,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(update_check_excess_tiles_trigger, restore_check_excess_tiles_trigger),
+        migrations.RunSQL(
+            update_check_excess_tiles_trigger, restore_check_excess_tiles_trigger
+        ),
     ]

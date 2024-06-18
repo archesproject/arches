@@ -19,7 +19,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 from django.db import transaction, connection
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseNotAllowed, HttpResponseServerError
+from django.http import (
+    HttpResponse,
+    HttpResponseNotFound,
+    HttpResponseNotAllowed,
+    HttpResponseServerError,
+)
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.utils.module_loading import import_string
@@ -27,9 +32,23 @@ from django.utils.translation import gettext as _
 from django.utils.translation import get_language
 from arches.app.models import models
 from arches.app.models.system_settings import settings
-from arches.app.models.concept import Concept, ConceptValue, CORE_CONCEPTS, get_preflabel_from_valueid
+from arches.app.models.concept import (
+    Concept,
+    ConceptValue,
+    CORE_CONCEPTS,
+    get_preflabel_from_valueid,
+)
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Terms, GeoShape, Range, SimpleQueryString
+from arches.app.search.elasticsearch_dsl_builder import (
+    Bool,
+    Match,
+    Query,
+    Nested,
+    Terms,
+    GeoShape,
+    Range,
+    SimpleQueryString,
+)
 from arches.app.search.mappings import CONCEPTS_INDEX
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -47,11 +66,15 @@ class RDMView(BaseManagerView):
 
         concept_schemes = []
         for concept in models.Concept.objects.filter(nodetype="ConceptScheme"):
-            concept_schemes.append(Concept().get(id=concept.pk, include=["label"]).get_preflabel(lang=lang))
+            concept_schemes.append(
+                Concept().get(id=concept.pk, include=["label"]).get_preflabel(lang=lang)
+            )
 
         collections = []
         for concept in models.Concept.objects.filter(nodetype="Collection"):
-            collections.append(Concept().get(id=concept.pk, include=["label"]).get_preflabel(lang=lang))
+            collections.append(
+                Concept().get(id=concept.pk, include=["label"]).get_preflabel(lang=lang)
+            )
 
         context = self.get_context_data(
             main_script="rdm",
@@ -65,7 +88,10 @@ class RDMView(BaseManagerView):
 
         context["nav"]["icon"] = "fa fa-align-left"
         context["nav"]["title"] = _("Reference Data Manager")
-        context["nav"]["help"] = {"title": _("Using the RDM"), "templates": ["rdm-help"]}
+        context["nav"]["help"] = {
+            "title": _("Using the RDM"),
+            "templates": ["rdm-help"],
+        }
 
         return render(request, "rdm.htm", context)
 
@@ -73,7 +99,9 @@ class RDMView(BaseManagerView):
 def get_sparql_providers(endpoint=None):
     sparql_providers = {}
     for provider in settings.SPARQL_ENDPOINT_PROVIDERS:
-        provider_class = provider["SPARQL_ENDPOINT_PROVIDER"][settings.LANGUAGE_CODE]["value"]
+        provider_class = provider["SPARQL_ENDPOINT_PROVIDER"][settings.LANGUAGE_CODE][
+            "value"
+        ]
         Provider = import_string(provider_class)()
         sparql_providers[Provider.endpoint] = Provider
 
@@ -108,9 +136,15 @@ def concept(request, conceptid):
 
     if request.method == "GET":
         include_subconcepts = request.GET.get("include_subconcepts", "true") == "true"
-        include_parentconcepts = request.GET.get("include_parentconcepts", "true") == "true"
-        include_relatedconcepts = request.GET.get("include_relatedconcepts", "true") == "true"
-        emulate_elastic_search = request.GET.get("emulate_elastic_search", "false") == "true"
+        include_parentconcepts = (
+            request.GET.get("include_parentconcepts", "true") == "true"
+        )
+        include_relatedconcepts = (
+            request.GET.get("include_relatedconcepts", "true") == "true"
+        )
+        emulate_elastic_search = (
+            request.GET.get("emulate_elastic_search", "false") == "true"
+        )
         depth_limit = request.GET.get("depth_limit", None)
 
         depth_limit = 1
@@ -120,10 +154,18 @@ def concept(request, conceptid):
                 "views/rdm/concept-report.htm",
                 {
                     "lang": lang,
-                    "concept_count": models.Concept.objects.filter(nodetype="Concept").count(),
-                    "collection_count": models.Concept.objects.filter(nodetype="Collection").count(),
-                    "scheme_count": models.Concept.objects.filter(nodetype="ConceptScheme").count(),
-                    "entitytype_count": models.Concept.objects.filter(nodetype="EntityType").count(),
+                    "concept_count": models.Concept.objects.filter(
+                        nodetype="Concept"
+                    ).count(),
+                    "collection_count": models.Concept.objects.filter(
+                        nodetype="Collection"
+                    ).count(),
+                    "scheme_count": models.Concept.objects.filter(
+                        nodetype="ConceptScheme"
+                    ).count(),
+                    "entitytype_count": models.Concept.objects.filter(
+                        nodetype="EntityType"
+                    ).count(),
                     "default_report": True,
                 },
             )
@@ -155,11 +197,19 @@ def concept(request, conceptid):
                 labels.append(value)
             if value.type == "image":
                 value.full_image_url = (
-                    (settings.FORCE_SCRIPT_NAME if settings.FORCE_SCRIPT_NAME is not None else "") + settings.MEDIA_URL + value.value
+                    (
+                        settings.FORCE_SCRIPT_NAME
+                        if settings.FORCE_SCRIPT_NAME is not None
+                        else ""
+                    )
+                    + settings.MEDIA_URL
+                    + value.value
                 ).replace("//", "/")
 
         if (mode == "semantic" or mode == "") and (
-            concept_graph.nodetype == "Concept" or concept_graph.nodetype == "ConceptScheme" or concept_graph.nodetype == "EntityType"
+            concept_graph.nodetype == "Concept"
+            or concept_graph.nodetype == "ConceptScheme"
+            or concept_graph.nodetype == "EntityType"
         ):
             if concept_graph.nodetype == "ConceptScheme":
                 parent_relations = relationtypes.filter(category="Properties")
@@ -183,12 +233,21 @@ def concept(request, conceptid):
                     "sparql_providers": get_sparql_providers(),
                     "valuetype_labels": valuetypes.filter(category="label"),
                     "valuetype_notes": valuetypes.filter(category="note"),
-                    "valuetype_related_values": valuetypes.filter(category__in=["undefined", "identifiers"]),
+                    "valuetype_related_values": valuetypes.filter(
+                        category__in=["undefined", "identifiers"]
+                    ),
                     "parent_relations": parent_relations,
-                    "related_relations": relationtypes.filter(Q(category="Mapping Properties") | Q(relationtype="related")),
+                    "related_relations": relationtypes.filter(
+                        Q(category="Mapping Properties") | Q(relationtype="related")
+                    ),
                     "concept_paths": concept_graph.get_paths(lang=lang),
-                    "graph_json": JSONSerializer().serialize(concept_graph.get_node_and_links(lang=lang)),
-                    "direct_parents": [parent.get_preflabel(lang=lang) for parent in concept_graph.parentconcepts],
+                    "graph_json": JSONSerializer().serialize(
+                        concept_graph.get_node_and_links(lang=lang)
+                    ),
+                    "direct_parents": [
+                        parent.get_preflabel(lang=lang)
+                        for parent in concept_graph.parentconcepts
+                    ],
                 },
             )
         elif mode == "collections":
@@ -203,7 +262,9 @@ def concept(request, conceptid):
                     "languages": languages,
                     "valuetype_labels": valuetypes.filter(category="label"),
                     "valuetype_notes": valuetypes.filter(category="note"),
-                    "valuetype_related_values": valuetypes.filter(category__in=["undefined", "identifiers"]),
+                    "valuetype_related_values": valuetypes.filter(
+                        category__in=["undefined", "identifiers"]
+                    ),
                     "related_relations": relationtypes.filter(relationtype="member"),
                     "concept_paths": concept_graph.get_paths(lang=lang),
                 },
@@ -232,10 +293,18 @@ def concept(request, conceptid):
                 skos = SKOSReader()
                 try:
                     rdf = skos.read_file(skosfile)
-                    ret = skos.save_concepts_from_skos(rdf, overwrite_options, staging_options)
+                    ret = skos.save_concepts_from_skos(
+                        rdf, overwrite_options, staging_options
+                    )
                     return JSONResponse(ret)
                 except Exception as e:
-                    return JSONErrorResponse(_('Unable to Load SKOS File'), _('There was an issue saving the contents of the file to Arches. ') + str(e))
+                    return JSONErrorResponse(
+                        _("Unable to Load SKOS File"),
+                        _(
+                            "There was an issue saving the contents of the file to Arches. "
+                        )
+                        + str(e),
+                    )
 
         else:
             data = JSONDeserializer().deserialize(request.body)
@@ -259,19 +328,29 @@ def concept(request, conceptid):
                     else:
                         in_use = False
                         if delete_self:
-                            check_concept = Concept().get(data["id"], include_subconcepts=True)
+                            check_concept = Concept().get(
+                                data["id"], include_subconcepts=True
+                            )
                             in_use = check_concept.check_if_concept_in_use()
                         if "subconcepts" in data:
                             for subconcept in data["subconcepts"]:
                                 if in_use == False:
-                                    check_concept = Concept().get(subconcept["id"], include_subconcepts=True)
+                                    check_concept = Concept().get(
+                                        subconcept["id"], include_subconcepts=True
+                                    )
                                     in_use = check_concept.check_if_concept_in_use()
 
                         if in_use == False:
                             concept.delete_index(delete_self=delete_self)
                             concept.delete(delete_self=delete_self)
                         else:
-                            return JSONErrorResponse(_('Unable to Delete'), _('This concept or one of it\'s subconcepts is already in use by an existing resource.'), {"in_use": in_use})
+                            return JSONErrorResponse(
+                                _("Unable to Delete"),
+                                _(
+                                    "This concept or one of it's subconcepts is already in use by an existing resource."
+                                ),
+                                {"in_use": in_use},
+                            )
 
                 return JSONResponse(concept)
 
@@ -291,7 +370,9 @@ def export(request, conceptid):
     ]
 
     skos = SKOSWriter()
-    return HttpResponse(skos.write(concept_graphs, format="pretty-xml"), content_type="application/xml")
+    return HttpResponse(
+        skos.write(concept_graphs, format="pretty-xml"), content_type="application/xml"
+    )
 
 
 def export_collections(request):
@@ -310,7 +391,9 @@ def export_collections(request):
         )
 
     skos = SKOSWriter()
-    return HttpResponse(skos.write(concept_graphs, format="pretty-xml"), content_type="application/xml")
+    return HttpResponse(
+        skos.write(concept_graphs, format="pretty-xml"), content_type="application/xml"
+    )
 
 
 def get_concept_collections(request):
@@ -324,9 +407,20 @@ def make_collection(request, conceptid):
     concept = Concept().get(id=conceptid, values=[])
     try:
         collection_concept = concept.make_collection()
-        return JSONResponse({'collection': collection_concept, 'title': _('Success'), 'message': _('Collection successfully created from the selected concept')})
+        return JSONResponse(
+            {
+                "collection": collection_concept,
+                "title": _("Success"),
+                "message": _(
+                    "Collection successfully created from the selected concept"
+                ),
+            }
+        )
     except:
-        return JSONErrorResponse(_('Unable to Make Collection'), _('Unable to make a collection from the selected concept.'))
+        return JSONErrorResponse(
+            _("Unable to Make Collection"),
+            _("Unable to make a collection from the selected concept."),
+        )
 
 
 @group_required("RDM Administrator")
@@ -365,7 +459,10 @@ def confirm_delete(request, conceptid):
     lang = request.GET.get("lang", request.LANGUAGE_CODE)
     concept = Concept().get(id=conceptid)
     concepts_to_delete = [
-        concept.get_preflabel(lang=lang).value for key, concept in Concept.gather_concepts_to_delete(concept, lang=lang).items()
+        concept.get_preflabel(lang=lang).value
+        for key, concept in Concept.gather_concepts_to_delete(
+            concept, lang=lang
+        ).items()
     ]
     # return HttpResponse('<div>Showing only 50 of
     # %s concepts</div><ul><li>%s</ul>' % (len(concepts_to_delete), '<li>'.join(concepts_to_delete[:50]) + ''))
@@ -385,11 +482,22 @@ def paged_dropdown(request):
     limit = 50
     offset = (page - 1) * limit
 
-    results = Concept().get_child_collections_hierarchically(conceptid, offset=offset, limit=limit, query=query)
+    results = Concept().get_child_collections_hierarchically(
+        conceptid, offset=offset, limit=limit, query=query
+    )
     total_count = results[0][3] if len(results) > 0 else 0
     data = [dict(list(zip(["valueto", "depth", "collector"], d))) for d in results]
     data = [
-        dict(list(zip(["id", "text", "conceptid", "language", "type"], d["valueto"].values())), depth=d["depth"], collector=d["collector"])
+        dict(
+            list(
+                zip(
+                    ["id", "text", "conceptid", "language", "type"],
+                    d["valueto"].values(),
+                )
+            ),
+            depth=d["depth"],
+            collector=d["collector"],
+        )
         for d in data
     ]
 
@@ -406,13 +514,20 @@ def search(request):
     searchString = request.GET["q"]
     removechildren = request.GET.get("removechildren", None)
     query = Query(se, start=0, limit=100)
-    phrase = Match(field="value.folded", query=searchString.lower(), type="phrase_prefix")
+    phrase = Match(
+        field="value.folded", query=searchString.lower(), type="phrase_prefix"
+    )
     query.add_query(phrase)
     results = query.search(index=CONCEPTS_INDEX)
 
     ids = []
     if removechildren is not None:
-        ids = [concept[0] for concept in Concept().get_child_concepts(removechildren, columns="conceptidto::text")]
+        ids = [
+            concept[0]
+            for concept in Concept().get_child_concepts(
+                removechildren, columns="conceptidto::text"
+            )
+        ]
         ids.append(removechildren)
 
     newresults = []
@@ -479,7 +594,9 @@ def add_concepts_from_sparql_endpoint(request, conceptid):
         if json is not None:
             data = JSONDeserializer().deserialize(json)
 
-            parentconcept = Concept({"id": conceptid, "nodetype": data["model"]["nodetype"]})
+            parentconcept = Concept(
+                {"id": conceptid, "nodetype": data["model"]["nodetype"]}
+            )
 
             if parentconcept.nodetype == "Concept":
                 relationshiptype = "narrower"

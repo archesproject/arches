@@ -17,15 +17,20 @@ def log_event_details(cursor, loadid, details):
         (details, loadid),
     )
 
+
 def save_to_tiles(userid, loadid):
     with connection.cursor() as cursor:
         saved = False
         try:
-            log_event_details(cursor, loadid, "done|Disabling the triggers in the tile table...")
-            cursor.execute("""
+            log_event_details(
+                cursor, loadid, "done|Disabling the triggers in the tile table..."
+            )
+            cursor.execute(
+                """
                 ALTER TABLE TILES DISABLE TRIGGER __arches_check_excess_tiles_trigger;
                 ALTER TABLE TILES DISABLE TRIGGER __arches_trg_update_spatial_attributes;
-            """)
+            """
+            )
             log_event_details(cursor, loadid, "done|Saving the tiles...")
             cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [loadid])
             saved = cursor.fetchone()[0]
@@ -44,13 +49,14 @@ def save_to_tiles(userid, loadid):
                         AND r.resourceinstanceid = l.resourceid
                         AND g.graphid = r.graphid
                         GROUP BY g.name
-                    """, [loadid]
+                    """,
+                    [loadid],
                 )
                 resources = cursor.fetchall()
                 number_of_resources = {}
                 for resource in resources:
                     graph = json.loads(resource[0])[settings.LANGUAGE_CODE]
-                    number_of_resources.update({ graph: { "total": resource[1] } })
+                    number_of_resources.update({graph: {"total": resource[1]}})
                 cursor.execute(
                     """SELECT g.name graph, n.name, COUNT(*)
                         FROM load_staging l, nodes n, graphs g
@@ -58,14 +64,24 @@ def save_to_tiles(userid, loadid):
                         AND n.nodeid = l.nodegroupid
                         AND n.graphid = g.graphid
                         GROUP BY n.name, g.name;
-                    """, [loadid]
+                    """,
+                    [loadid],
                 )
                 tiles = cursor.fetchall()
                 for tile in tiles:
                     graph = json.loads(tile[0])[settings.LANGUAGE_CODE]
-                    number_of_resources[graph].setdefault('tiles', []).append({'tile': tile[1], 'count': tile[2] })
+                    number_of_resources[graph].setdefault("tiles", []).append(
+                        {"tile": tile[1], "count": tile[2]}
+                    )
 
-                number_of_import = json.dumps({ "number_of_import": [{ "name": k, "total": v["total"], "tiles": v["tiles"] } for k, v in number_of_resources.items()]})
+                number_of_import = json.dumps(
+                    {
+                        "number_of_import": [
+                            {"name": k, "total": v["total"], "tiles": v["tiles"]}
+                            for k, v in number_of_resources.items()
+                        ]
+                    }
+                )
                 cursor.execute(
                     """UPDATE load_event SET (status, load_end_time, load_details) = (%s, %s, load_details || %s::JSONB) WHERE loadid = %s""",
                     ("completed", datetime.now(), number_of_import, loadid),
@@ -83,16 +99,25 @@ def save_to_tiles(userid, loadid):
                 "message": _("Unable to insert record into staging table"),
             }
         finally:
-            log_event_details(cursor, loadid, "done|Reenabling the triggers in the tile table...")
-            cursor.execute("""
+            log_event_details(
+                cursor, loadid, "done|Reenabling the triggers in the tile table..."
+            )
+            cursor.execute(
+                """
                 COMMIT;
                 ALTER TABLE TILES ENABLE TRIGGER __arches_check_excess_tiles_trigger;
                 ALTER TABLE TILES ENABLE TRIGGER __arches_trg_update_spatial_attributes;
-            """)
+            """
+            )
 
         try:
             log_event_details(cursor, loadid, "done|Indexing...")
-            index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True)
+            index_resources_by_transaction(
+                loadid,
+                quiet=True,
+                use_multiprocessing=False,
+                recalculate_descriptors=True,
+            )
             user = User.objects.get(id=userid)
             user_email = getattr(user, "email", "")
             user_firstname = getattr(user, "first_name", "")
@@ -107,7 +132,15 @@ def save_to_tiles(userid, loadid):
                     WHERE e.resourceinstanceid::uuid = r.resourceinstanceid
                     AND transactionid = %s
                 """,
-                (settings.LANGUAGE_CODE, userid, user_firstname, user_lastname, user_email, user_username, loadid),
+                (
+                    settings.LANGUAGE_CODE,
+                    userid,
+                    user_firstname,
+                    user_lastname,
+                    user_email,
+                    user_username,
+                    loadid,
+                ),
             )
             log_event_details(cursor, loadid, "done")
             cursor.execute(
@@ -122,4 +155,3 @@ def save_to_tiles(userid, loadid):
                 ("unindexed", datetime.now(), loadid),
             )
             return {"success": False, "data": "saved"}
-

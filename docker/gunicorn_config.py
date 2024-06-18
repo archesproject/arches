@@ -157,7 +157,10 @@ tmp_upload_dir = get_optional_env_variable("GUNICORN_TMP_UPLOAD_DIR") or None
 errorlog = get_optional_env_variable("GUNICORN_ERRORLOG") or "-"
 loglevel = get_optional_env_variable("GUNICORN_LOGLEVEL") or "info"
 accesslog = get_optional_env_variable("GUNICORN_ACCESSLOG") or "-"
-access_log_format = get_optional_env_variable("GUNICORN_ACCESS_LOG_FORMAT") or '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
+access_log_format = (
+    get_optional_env_variable("GUNICORN_ACCESS_LOG_FORMAT")
+    or '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
+)
 
 #
 # Process naming

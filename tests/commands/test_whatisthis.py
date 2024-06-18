@@ -9,6 +9,7 @@ from django.core.management import call_command
 from arches.app.models.graph import Graph
 from tests.base_test import ArchesTestCase
 
+
 class WhatIsThisTests(ArchesTestCase):
     arbitrary_uuid = uuid.uuid4()
 

@@ -21,7 +21,9 @@ class Migration(migrations.Migration):
         language_model = apps.get_model("models", "Language")
         d_languages = dlanguage_model.objects.all()
         for lang in d_languages:
-            language_row = language_model.objects.filter(code__iexact=str.lower(lang.languageid)).first()
+            language_row = language_model.objects.filter(
+                code__iexact=str.lower(lang.languageid)
+            ).first()
             if language_row:
                 language_row.isdefault = lang.isdefault
                 language_row.save()
@@ -40,7 +42,10 @@ class Migration(migrations.Migration):
                     )
                 else:
                     language_model.objects.create(
-                        code=lang.languageid, name=lang.languagename.title(), default_direction="ltr", isdefault=lang.isdefault
+                        code=lang.languageid,
+                        name=lang.languagename.title(),
+                        default_direction="ltr",
+                        isdefault=lang.isdefault,
                     )
 
     def reverse_migration(apps, schema_editor):
@@ -49,7 +54,11 @@ class Migration(migrations.Migration):
         language_model = apps.get_model("models", "Language")
         languages = language_model.objects.all()
         for lang in languages:
-            dlanguage_model.objects.create(languageid=lang.code, languagename=lang.name.upper(), isdefault=lang.isdefault)
+            dlanguage_model.objects.create(
+                languageid=lang.code,
+                languagename=lang.name.upper(),
+                isdefault=lang.isdefault,
+            )
 
     # these blanks are necessary because the data needs to exist _before_ the FK is changed over
     def blank_reverse_migration(apps, schema_editor):
@@ -65,8 +74,20 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(primary_key=True, serialize=False)),
                 ("code", models.TextField()),
                 ("name", models.TextField()),
-                ("default_direction", models.TextField(choices=[("ltr", "Left to Right"), ("rtl", "Right to Left")], default="ltr")),
-                ("scope", models.TextField(choices=[("system", "System Scope"), ("data", "Data Scope")], default="system")),
+                (
+                    "default_direction",
+                    models.TextField(
+                        choices=[("ltr", "Left to Right"), ("rtl", "Right to Left")],
+                        default="ltr",
+                    ),
+                ),
+                (
+                    "scope",
+                    models.TextField(
+                        choices=[("system", "System Scope"), ("data", "Data Scope")],
+                        default="system",
+                    ),
+                ),
             ],
             options={
                 "db_table": "languages",
@@ -77,7 +98,12 @@ class Migration(migrations.Migration):
             sql=[
                 (
                     "insert into languages (code, name, default_direction, scope) values (%s, %s, %s, %s);",
-                    [language, language_info["name"], "rtl" if language_info["bidi"] else "ltr", "system"],
+                    [
+                        language,
+                        language_info["name"],
+                        "rtl" if language_info["bidi"] else "ltr",
+                        "system",
+                    ],
                 )
             ],
             reverse_sql=[("delete from languages")],
@@ -163,23 +189,39 @@ class Migration(migrations.Migration):
                 )
             ],
         ),
-        migrations.AddField("language", "isdefault", models.BooleanField(default=False, blank=True)),
+        migrations.AddField(
+            "language", "isdefault", models.BooleanField(default=False, blank=True)
+        ),
         migrations.AlterField("language", "code", models.TextField(unique=True)),
-        migrations.RunPython(code=forward_migration, reverse_code=blank_reverse_migration),
+        migrations.RunPython(
+            code=forward_migration, reverse_code=blank_reverse_migration
+        ),
         migrations.AlterField(
             model_name="value",
             name="language",
             field=models.ForeignKey(
-                db_column="languageid", blank=True, to_field="code", null=True, on_delete=models.CASCADE, to="models.Language"
+                db_column="languageid",
+                blank=True,
+                to_field="code",
+                null=True,
+                on_delete=models.CASCADE,
+                to="models.Language",
             ),
         ),
         migrations.AlterField(
             model_name="filevalue",
             name="language",
             field=models.ForeignKey(
-                db_column="languageid", blank=True, to_field="code", null=True, on_delete=models.CASCADE, to="models.Language"
+                db_column="languageid",
+                blank=True,
+                to_field="code",
+                null=True,
+                on_delete=models.CASCADE,
+                to="models.Language",
             ),
         ),
-        migrations.RunPython(code=blank_forward_migration, reverse_code=reverse_migration),
+        migrations.RunPython(
+            code=blank_forward_migration, reverse_code=reverse_migration
+        ),
         migrations.DeleteModel("dlanguage"),
     ]
