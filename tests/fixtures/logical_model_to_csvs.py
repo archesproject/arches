@@ -27,7 +27,16 @@ def get_type(entity_json):
     return ret
 
 
-def add_entity(nodes_writer, edges_writer, entity_json, parent_id, current_node_id, current_edge_id, resource_id, add_edge):
+def add_entity(
+    nodes_writer,
+    edges_writer,
+    entity_json,
+    parent_id,
+    current_node_id,
+    current_edge_id,
+    resource_id,
+    add_edge,
+):
     next_node_id = current_node_id + 1
     next_edge_id = current_edge_id + 1
     mergenode = resource_id
@@ -36,9 +45,20 @@ def add_entity(nodes_writer, edges_writer, entity_json, parent_id, current_node_
     relationship = "P1"
     if "relationship" in list(entity_json.keys()):
         relationship = entity_json["relationship"]
-    nodes_writer.writerow([current_node_id, name_to_id(entity_json), mergenode, get_type(entity_json)])
+    nodes_writer.writerow(
+        [current_node_id, name_to_id(entity_json), mergenode, get_type(entity_json)]
+    )
     if add_edge:
-        edges_writer.writerow([parent_id, current_node_id, "Directed", current_edge_id, relationship, "1.0"])
+        edges_writer.writerow(
+            [
+                parent_id,
+                current_node_id,
+                "Directed",
+                current_edge_id,
+                relationship,
+                "1.0",
+            ]
+        )
     if "entities" in list(entity_json.keys()):
         for child_json in entity_json["entities"]:
             if (
@@ -47,7 +67,14 @@ def add_entity(nodes_writer, edges_writer, entity_json, parent_id, current_node_
                 and len(child_json["entities"]) > 0
             ):
                 next_ids = add_entity(
-                    nodes_writer, edges_writer, child_json, current_node_id, next_node_id, next_edge_id, resource_id, True
+                    nodes_writer,
+                    edges_writer,
+                    child_json,
+                    current_node_id,
+                    next_node_id,
+                    next_edge_id,
+                    resource_id,
+                    True,
                 )
                 next_node_id = next_ids["next_node_id"] + 1
                 next_edge_id = next_ids["next_edge_id"] + 1
@@ -63,4 +90,6 @@ for resource in logical_model["resources"]:
             nodes_writer.writerow(["Id", "Label", "mergenode", "businesstable"])
             edges_writer = csv.writer(edges_file)
             edges_writer.writerow(["Source", "Target", "Type", "Id", "Label", "Weight"])
-            add_entity(nodes_writer, edges_writer, resource, 1, 1, 1, resource_id, False)
+            add_entity(
+                nodes_writer, edges_writer, resource, 1, 1, 1, resource_id, False
+            )

@@ -1,16 +1,16 @@
 *.pyc
 *.log
-{{project_name}}/logs
-{{project_name}}/export_deliverables
-{{project_name}}/cantaloupe/*
-{{project_name}}/staticfiles
-{{project_name}}/media/packages
-{{project_name}}/media/node_modules
-{{project_name}}/media/build/
-{{project_name}}/uploadedfiles/*
-{{project_name}}/settings_local.py
-{{project_name}}/webpack/webpack-stats.json
-{{project_name}}/webpack/webpack-user-config.js
+node_modules
+*.coverage
+{{ project_name }}/logs
+{{ project_name }}/export_deliverables
+{{ project_name }}/cantaloupe/*
+{{ project_name }}/staticfiles
+{{ project_name }}/media/packages
+{{ project_name }}/media/build/
+{{ project_name }}/uploadedfiles/*
+{{ project_name }}/settings_local.py
+webpack-stats.json
 .vscode/
 *.egg-info
 .DS_STORE

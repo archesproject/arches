@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4771_searchcomponent'),
+        ("models", "4771_searchcomponent"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='maplayer',
-            name='legend',
+            model_name="maplayer",
+            name="legend",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.RunSQL(

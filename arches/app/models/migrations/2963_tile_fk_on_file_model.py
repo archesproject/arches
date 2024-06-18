@@ -9,16 +9,18 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4679_resource_editor_permissions'),
+        ("models", "4679_resource_editor_permissions"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='file',
-            name='tile',
-            field=models.ForeignKey(db_column='tileid',
-                                    null=True,
-                                    on_delete=django.db.models.deletion.CASCADE,
-                                    to='models.TileModel'),
+            model_name="file",
+            name="tile",
+            field=models.ForeignKey(
+                db_column="tileid",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="models.TileModel",
+            ),
         ),
     ]

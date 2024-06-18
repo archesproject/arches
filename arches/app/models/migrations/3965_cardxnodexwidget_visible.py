@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '3808_card_component_command'),
+        ("models", "3808_card_component_command"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='cardxnodexwidget',
-            name='visible',
+            model_name="cardxnodexwidget",
+            name="visible",
             field=models.BooleanField(default=True),
         ),
     ]

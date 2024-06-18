@@ -52,14 +52,19 @@ def deprecated(func):
         warnings.simplefilter("default", DeprecationWarning)  # reset filter
         logger.warning(
             "%s - DeprecationWarning: Call to deprecated function %s. %s:%s"
-            % (datetime.datetime.now(), func.__name__, func.__code__.co_filename, func.__code__.co_firstlineno + 1)
+            % (
+                datetime.datetime.now(),
+                func.__name__,
+                func.__code__.co_filename,
+                func.__code__.co_firstlineno + 1,
+            )
         )
         return func(*args, **kwargs)
 
     return new_func
 
 
-def group_required(*group_names):
+def group_required(*group_names, raise_exception=False):
     """
     Requires user membership in at least one of the groups passed in.
 
@@ -69,6 +74,9 @@ def group_required(*group_names):
         if u.is_authenticated:
             if u.is_superuser or bool(u.groups.filter(name__in=group_names)):
                 return True
+        if raise_exception:
+            raise PermissionDenied
+        # else: user_passes_test() redirects to nowhere
         return False
 
     return user_passes_test(in_groups)

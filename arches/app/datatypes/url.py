@@ -41,7 +41,11 @@ default_url_widget = None
 try:
     default_url_widget = Widget.objects.get(name=default_widget_name)
 except Widget.DoesNotExist as e:
-    logger.warning("Setting 'url' datatype's default widget to None ({0} widget not found).".format(default_widget_name))
+    logger.warning(
+        "Setting 'url' datatype's default widget to None ({0} widget not found).".format(
+            default_widget_name
+        )
+    )
 
 details = {
     "datatype": "url",
@@ -66,13 +70,25 @@ class URLDataType(BaseDataType):
     URL Datatype to store an optionally labelled hyperlink to a (typically) external resource
     """
 
-    URL_REGEX = re.compile(r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)")
+    URL_REGEX = re.compile(
+        r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"
+    )
 
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
+    def validate(
+        self,
+        value,
+        row_number=None,
+        source=None,
+        node=None,
+        nodeid=None,
+        strict=False,
+        **kwargs,
+    ):
         errors = []
+
         if value is not None:
             try:
-                if value.get("url") is not None:
+                if value.get("url"):
                     # check URL conforms to URL structure
                     url_test = self.URL_REGEX.match(value["url"])
                     if url_test is None:
@@ -80,8 +96,20 @@ class URLDataType(BaseDataType):
             except FailRegexURLMatch:
                 message = _("This is not a valid HTTP/HTTPS URL")
                 title = _("Invalid HTTP/HTTPS URL")
-                error_message = self.create_error_message(value, source, row_number, message, title)
+                error_message = self.create_error_message(
+                    value, source, row_number, message, title
+                )
                 errors.append(error_message)
+
+            # raise error if label added without URL (#10592)
+            if value.get("url_label") and not value.get("url"):
+                message = _("URL label cannot be saved without a URL")
+                title = _("No URL added")
+                error_message = self.create_error_message(
+                    value, source, row_number, message, title
+                )
+                errors.append(error_message)
+
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
@@ -146,7 +174,10 @@ class URLDataType(BaseDataType):
         terms = []
         if nodevalue.get("url") is not None:
             if nodevalue.get("url_label") is not None:
-                if settings.WORDS_PER_SEARCH_TERM is None or (len(nodevalue["url_label"].split(" ")) < settings.WORDS_PER_SEARCH_TERM):
+                if settings.WORDS_PER_SEARCH_TERM is None or (
+                    len(nodevalue["url_label"].split(" "))
+                    < settings.WORDS_PER_SEARCH_TERM
+                ):
                     terms.append(SearchTerm(value=nodevalue["url_label"]))
             # terms.append(nodevalue['url'])       FIXME: URLs searchable?
         return terms
@@ -162,7 +193,10 @@ class URLDataType(BaseDataType):
                         type="phrase_prefix",
                     )
                 if "eq" in value["op"]:
-                    match_query = Term(field="tiles.data.%s.url.keyword" % (str(node.pk)), term=value["val"])
+                    match_query = Term(
+                        field="tiles.data.%s.url.keyword" % (str(node.pk)),
+                        term=value["val"],
+                    )
                 if "!" in value["op"]:
                     query.must_not(match_query)
                     query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
@@ -172,11 +206,14 @@ class URLDataType(BaseDataType):
             pass
 
     def get_rdf_uri(self, node, data, which="r"):
-        return URIRef(data["url"])
+        if data and "url" in data:
+            return URIRef(data["url"])
+        return None
 
     def accepts_rdf_uri(self, uri):
         return self.URL_REGEX.match(uri) and not (
-            uri.startswith("urn:uuid:") or uri.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "resources/")
+            uri.startswith("urn:uuid:")
+            or uri.startswith(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT + "resources/")
         )
 
     def is_a_literal_in_rdf(self):
@@ -185,13 +222,18 @@ class URLDataType(BaseDataType):
 
     def ignore_keys(self):
         # We process label into the datatype, so downstream processing should ignore it.
-        return ["http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"]
+        return [
+            "http://www.w3.org/2000/01/rdf-schema#label http://www.w3.org/2000/01/rdf-schema#Literal"
+        ]
 
     def to_rdf(self, edge_info, edge):
         # returns an in-memory graph object, containing the domain resource, its
         # type and the string as a string literal
         g = Graph()
-        if edge_info["range_tile_data"] is not None and edge_info["range_tile_data"].get("url") is not None:
+        if (
+            edge_info["range_tile_data"] is not None
+            and edge_info["range_tile_data"].get("url") is not None
+        ):
             g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
             g.add(
                 (
@@ -232,7 +274,9 @@ class URLDataType(BaseDataType):
             value["url"] = url_node["@id"]
             value["url_label"] = None
             if "http://www.w3.org/2000/01/rdf-schema#label" in url_node:
-                value["url_label"] = url_node["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"]
+                value["url_label"] = url_node[
+                    "http://www.w3.org/2000/01/rdf-schema#label"
+                ][0]["@value"]
         except (IndexError, AttributeError, KeyError) as e:
             print(f"Broke trying to import url datatype: {json_ld_node}")
             return None
@@ -255,3 +299,19 @@ class URLDataType(BaseDataType):
                 },
             }
         }
+
+    def pre_tile_save(self, tile, nodeid):
+        if (tile_val := tile.data[nodeid]) and "url_label" not in tile_val:
+            tile_val["url_label"] = ""
+
+    def clean(self, tile, nodeid):
+        if data := tile.data[nodeid]:
+            try:
+                if not any([val.strip() for val in data.values()]):
+                    tile.data[nodeid] = None
+            except:
+                pass  # Let self.validate handle malformed data
+
+    def pre_structure_tile_data(self, tile, nodeid, **kwargs):
+        if (tile_val := tile.data[nodeid]) and "url_label" not in tile_val:
+            tile_val["url_label"] = ""

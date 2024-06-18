@@ -4,7 +4,7 @@
 # Tested on Ubuntu 20.04
 
 # Use the yes command if you would like to install postgres/postgis,
-# node/yarn, and elasticsearch.
+# node/npm, and elasticsearch.
 # Example:
 # yes | sudo ./ubuntu_setup.sh
 
@@ -40,7 +40,7 @@ function install_postgres {
   sudo -u postgres psql -d template_postgis -c "GRANT ALL ON spatial_ref_sys TO PUBLIC;"
 }
 
-function install_yarn {
+function install_npm {
   sudo apt-get update
   sudo apt-get install -y ca-certificates curl gnupg
   sudo mkdir -p /etc/apt/keyrings
@@ -50,10 +50,6 @@ function install_yarn {
   echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list && sudo apt-get update
   sudo apt-get update
   sudo apt-get install nodejs -y
-  curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
-  echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com/debian stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-  sudo apt update
-  sudo apt install yarn
 }
 
 function install_elasticsearch {
@@ -106,13 +102,13 @@ function main {
     echo Skipping Postgres/PostGIS installation
   fi
 
-  echo -n "Would you like to install and nodejs/npm/and yarn (y/N)? "
+  echo -n "Would you like to install and nodejs/npm (y/N)? "
   read answer
   if echo "$answer" | grep -iq "^y" ;then
-    echo Yes, installing Node/Yarn
-    install_yarn
+    echo Yes, installing Node/npm
+    install_npm
   else
-    echo Skipping Node/Yarn installation
+    echo Skipping Node/npm installation
   fi
 }
 

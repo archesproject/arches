@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '3210_card_components'),
+        ("models", "3210_card_components"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='graphmodel',
-            name='jsonldcontext',
+            model_name="graphmodel",
+            name="jsonldcontext",
             field=models.TextField(blank=True, null=True),
         ),
     ]
