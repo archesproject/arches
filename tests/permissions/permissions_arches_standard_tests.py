@@ -13,23 +13,12 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
 from unittest import mock
-from arches.app.search.elasticsearch_dsl_builder import Bool
-from tests import test_settings
-from tests.base_test import ArchesTestCase
 from tests.permissions.base_permissions_framework_test import (
     ArchesPermissionFrameworkTestCase,
 )
-from django.core import management
-from django.urls import reverse
-from django.test.client import RequestFactory, Client
-from django.test.utils import captured_stdout
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.contrib.auth.models import User
-from django.contrib.auth.models import Group
-from arches.app.models.models import GraphModel, ResourceInstance, Node
-from arches.app.models.resource import Resource
+from arches.app.models.models import ResourceInstance, Node
 from arches.app.permissions.arches_standard import ArchesStandardPermissionFramework
 
 # these tests can be run from the command line via
@@ -59,13 +48,10 @@ class ArchesStandardPermissionTests(ArchesPermissionFrameworkTestCase):
         can_access_with_view_permission = self.framework.user_can_read_resource(
             self.user, self.resource_instance_id
         )
-        self.assertTrue(
-            (
-                implicit_permission is True
-                and can_access_without_view_permission is False
-                and can_access_with_view_permission is True
-            )
-        )
+
+        self.assertTrue(implicit_permission)
+        self.assertFalse(can_access_without_view_permission)
+        self.assertTrue(can_access_with_view_permission)
 
     def test_user_has_resource_model_permissions(self):
         """
@@ -85,7 +71,7 @@ class ArchesStandardPermissionTests(ArchesPermissionFrameworkTestCase):
         hasperms = self.framework.user_has_resource_model_permissions(
             self.user, ["models.read_nodegroup"], resource
         )
-        self.assertTrue(hasperms is False)
+        self.assertFalse(hasperms)
 
     def test_get_restricted_users(self):
         """
@@ -118,19 +104,21 @@ class ArchesStandardPermissionTests(ArchesPermissionFrameworkTestCase):
             admin.id not in restrictions["no_access"],
         ]
 
-        self.assertTrue(all(results) is True)
+        for result in results:
+            with self.subTest(result=result):
+                self.assertTrue(result)
 
     def test_inclusion_array(self):
         inclusions = self.framework.get_permission_inclusions()
-        self.assertTrue(len(inclusions) == 4)
+        self.assertEqual(len(inclusions), 4)
 
     @mock.patch("django.contrib.auth.models.User")
     def test_permission_search_filter(self, mock_User):
         mock_User.id = 12
         filter = self.framework.get_permission_search_filter(mock_User)
         filter_text = str(filter.dsl)
-        assert filter_text.find("permissions.users_with_no_access") != -1
-        assert filter_text.find(str(mock_User.id)) != -1
+        self.assertIn("permissions.users_with_no_access", filter_text)
+        self.assertIn(str(mock_User.id), filter_text)
 
     # @mock.patch()
     # @mock.patch("arches.app.models.models.ResourceInstance")

@@ -18,74 +18,31 @@ from tests.base_test import ArchesTestCase
 import os
 from tests import test_settings
 from tests.base_test import ArchesTestCase
+from tests.utils.permission_test_utils import add_users
 from django.core import management
-from django.urls import reverse
-from django.test.client import RequestFactory, Client
 from django.test.utils import captured_stdout
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-from arches.app.models.models import GraphModel, ResourceInstance, Node
+from arches.app.models.models import GraphModel
 from arches.app.models.resource import Resource
-from arches.app.permissions.arches_default_deny import (
-    ArchesDefaultDenyPermissionFramework,
-)
+
+
+# these tests can be run from the command line via
+# python manage.py test tests.permissions.base_permissions_framework_test --settings="tests.test_settings"
 
 
 class ArchesPermissionFrameworkTestCase(ArchesTestCase):
-    def setUp(self):
-        self.expected_resource_count = 2
-        self.client = Client()
-        self.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
-        self.resource_instance_id = "f562c2fa-48d3-4798-a723-10209806c068"
-        self.user = User.objects.get(username="ben")
-        self.group = Group.objects.get(pk=2)
-        self.framework = self.FRAMEWORK()
-        resource = Resource.objects.get(pk=self.resource_instance_id)
-        resource.graph_id = self.data_type_graphid
-        resource.remove_resource_instance_permissions()
-
-    def tearDown(self):
-        ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
-
     @classmethod
-    def add_users(cls):
-        profiles = (
-            {
-                "name": "ben",
-                "email": "ben@test.com",
-                "password": "Test12345!",
-                "groups": ["Graph Editor", "Resource Editor"],
-            },
-            {
-                "name": "sam",
-                "email": "sam@test.com",
-                "password": "Test12345!",
-                "groups": ["Graph Editor", "Resource Editor", "Resource Reviewer"],
-            },
-            {
-                "name": "jim",
-                "email": "jim@test.com",
-                "password": "Test12345!",
-                "groups": ["Graph Editor", "Resource Editor"],
-            },
-        )
-
-        for profile in profiles:
-            try:
-                user = User.objects.create_user(
-                    username=profile["name"],
-                    email=profile["email"],
-                    password=profile["password"],
-                )
-                user.save()
-
-                for group_name in profile["groups"]:
-                    group = Group.objects.get(name=group_name)
-                    group.user_set.add(user)
-
-            except Exception as e:
-                print(e)
+    def setUpTestData(cls):
+        cls.expected_resource_count = 2
+        cls.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
+        cls.resource_instance_id = "f562c2fa-48d3-4798-a723-10209806c068"
+        cls.user = User.objects.get(username="ben")
+        cls.group = Group.objects.get(pk=2)
+        cls.framework = cls.FRAMEWORK()
+        resource = Resource.objects.get(pk=cls.resource_instance_id)
+        resource.graph_id = cls.data_type_graphid
+        resource.remove_resource_instance_permissions()
 
     @classmethod
     def setUpClass(cls):
@@ -106,4 +63,4 @@ class ArchesPermissionFrameworkTestCase(ArchesTestCase):
                 )
 
         super().setUpClass()
-        cls.add_users()
+        add_users()

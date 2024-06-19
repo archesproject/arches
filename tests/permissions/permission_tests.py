@@ -139,11 +139,9 @@ class PermissionTests(ArchesTestCase):
         can_access_with_view_permission = user_can_read_resource(
             self.user, self.resource_instance_id
         )
-        self.assertTrue(
-            implicit_permission is True
-            and can_access_without_view_permission is False
-            and can_access_with_view_permission is True
-        )
+        self.assertTrue(implicit_permission)
+        self.assertFalse(can_access_without_view_permission)
+        self.assertTrue(can_access_with_view_permission)
 
     def test_user_has_resource_model_permissions(self):
         """
@@ -161,7 +159,7 @@ class PermissionTests(ArchesTestCase):
         hasperms = user_has_resource_model_permissions(
             self.user, ["models.read_nodegroup"], resource
         )
-        self.assertTrue(hasperms is False)
+        self.assertFalse(hasperms)
 
     def test_get_restricted_users(self):
         """
@@ -192,4 +190,6 @@ class PermissionTests(ArchesTestCase):
             admin.id not in restrictions["no_access"],
         ]
 
-        self.assertTrue(all(results) is True)
+        for result in results:
+            with self.subTest(result=result):
+                self.assertTrue(result)
