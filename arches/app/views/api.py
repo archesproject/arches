@@ -2095,8 +2095,8 @@ class GetNodegroupTree(APIBase):
             )
             result = cursor.fetchall()
             permitted_nodegroups = [
-                nodegroup.pk
-                for nodegroup in get_nodegroups_by_perm(
+                nodegroup_pk
+                for nodegroup_pk in get_nodegroups_by_perm(
                     request.user, "models.read_nodegroup"
                 )
             ]
