@@ -24,6 +24,9 @@ define([
                     self.resourceModels.push(res);
                     //}
                 });
+                self.resourceModels.sort(function(a,b) {
+                    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+                });  // sort resource model list alphabetically
             } else {
                 // eslint-disable-next-line no-console
                 console.log('Failed to fetch resource instance list');
