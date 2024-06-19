@@ -125,7 +125,7 @@ def _save_to_tiles(cursor, loadid):
         }
 
 
-def _post_save_edit_log(cursor, userid, loadid, multiprocessing):
+def _post_save_edit_log(cursor, userid, loadid, multiprocessing=False):
     try:
         log_event_details(cursor, loadid, "done|Indexing...")
         index_resources_by_transaction(
