@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10710_fix_whatisthis"),
+        ("models", "10798_jsonld_importer"),
     ]
 
     sql = """
