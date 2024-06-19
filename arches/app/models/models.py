@@ -24,22 +24,22 @@ from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils import import_class_from_string
-from django.contrib.gis.db import models
-from django.db.models import JSONField
-from django.core.cache import caches
-from django.core.mail import EmailMultiAlternatives
-from django.core.serializers.json import DjangoJSONEncoder
-from django.template.loader import get_template, render_to_string
-from django.core.validators import RegexValidator
-from django.db.models import Q, Max
-from django.db.models.signals import post_delete, pre_save, post_save
-from django.dispatch import receiver
-from django.utils import translation
-from django.utils.translation import gettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
-from django.core.validators import validate_slug
+from django.contrib.gis.db import models
+from django.contrib.postgres.fields import ArrayField
+from django.core.cache import caches
+from django.core.exceptions import ValidationError
+from django.core.mail import EmailMultiAlternatives
+from django.core.serializers.json import DjangoJSONEncoder
+from django.core.validators import RegexValidator, validate_slug
+from django.db.models import JSONField, Q, Max
+from django.db.models.signals import post_delete, pre_save, post_save
+from django.dispatch import receiver
+from django.template.loader import get_template, render_to_string
+from django.utils import translation
+from django.utils.translation import gettext as _
 from guardian.models import GroupObjectPermission
 from guardian.shortcuts import assign_perm
 
@@ -616,6 +616,11 @@ class GraphModel(models.Model):
         to="models.graphmodel",
     )
     has_unpublished_changes = models.BooleanField(default=False)
+    resource_instance_lifecycle_states = ArrayField(
+        models.CharField(max_length=200),
+        blank=True,
+        default=["draft", "published", "retired"],
+    )
 
     @property
     def disable_instance_creation(self):
@@ -1241,6 +1246,7 @@ class ResourceInstance(models.Model):
     descriptors = models.JSONField(blank=True, null=True)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
+    lifecycle_state = models.CharField(max_length=200, blank=True)
 
     def save(self, *args, **kwargs):
         try:
