@@ -200,7 +200,9 @@ class BaseImportModule:
             }
         return lookup
 
-    def run_load_task(self, userid, files, summary, result, temp_dir, loadid, multiprocessing=False):
+    def run_load_task(
+        self, userid, files, summary, result, temp_dir, loadid, multiprocessing=False
+    ):
         try:
             with connection.cursor() as cursor:
                 self.stage_files(files, summary, cursor)
@@ -370,23 +372,30 @@ class BaseImportModule:
     def write(self, request):
         self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         self.file_details = request.POST.get("load_details", None)
-        multiprocessing = request.POST.get('multiprocessing', False)
+        multiprocessing = request.POST.get("multiprocessing", False)
         result = {}
         if self.file_details:
             details = json.loads(self.file_details)
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
-            use_celery_file_size_threshold = self.config.get("celeryByteSizeLimit", 100000)
+            use_celery_file_size_threshold = self.config.get(
+                "celeryByteSizeLimit", 100000
+            )
 
             if summary["cumulative_excel_files_size"] > use_celery_file_size_threshold:
                 response = self.run_load_task_async(request, self.loadid)
             else:
                 response = self.run_load_task(
-                    self.userid, files, summary, result, self.temp_dir, self.loadid, multiprocessing
+                    self.userid,
+                    files,
+                    summary,
+                    result,
+                    self.temp_dir,
+                    self.loadid,
+                    multiprocessing,
                 )
 
             return response
-
 
     def cli(self, source):
         initiated = self.start(self.request)
@@ -394,31 +403,48 @@ class BaseImportModule:
         if initiated["success"]:
             read = self.read_for_cli(source)
         else:
-            return {"success": False, "data": {"title": _("Error"), "message": initiated["data"]["message"]}}
+            return {
+                "success": False,
+                "data": {"title": _("Error"), "message": initiated["data"]["message"]},
+            }
 
         if read["success"]:
-            self.request.POST.__setitem__('load_details', json.dumps({"result": read["data"]}))
-            self.request.POST.__setitem__('multiprocessing', True)
+            self.request.POST.__setitem__(
+                "load_details", json.dumps({"result": read["data"]})
+            )
+            self.request.POST.__setitem__("multiprocessing", True)
             written = self.write(self.request)
         else:
-            return {"success": False, "data": {"title": _("Error"), "message": read["data"]["message"]}}
+            return {
+                "success": False,
+                "data": {"title": _("Error"), "message": read["data"]["message"]},
+            }
 
         if written["success"]:
             return {"success": True, "data": "done"}
         else:
-            return {"success": False, "data": {"title": _("Error"), "message": written["data"]["message"]}}
+            return {
+                "success": False,
+                "data": {"title": _("Error"), "message": written["data"]["message"]},
+            }
 
     def read_for_cli(self, source):
         self.cumulative_excel_files_size = 0
         self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         try:
             self.delete_from_default_storage(self.temp_dir)
-        except (FileNotFoundError):
+        except FileNotFoundError:
             pass
-        file_name = os.path.basename(source).split('/')[-1]
+        file_name = os.path.basename(source).split("/")[-1]
         file_stat = os.stat(source)
 
-        result = {"summary": {"name": file_name, "size": self.filesize_format(file_stat.st_size), "files": {}}}
+        result = {
+            "summary": {
+                "name": file_name,
+                "size": self.filesize_format(file_stat.st_size),
+                "files": {},
+            }
+        }
         validator = FileValidator()
         if len(validator.validate_file_type(source)) > 0:
             return {
@@ -436,33 +462,57 @@ class BaseImportModule:
                         self.cumulative_excel_files_size += file.file_size
                     if not file.filename.startswith("__MACOSX"):
                         if not file.is_dir():
-                            result["summary"]["files"][file.filename] = {"size": (self.filesize_format(file.file_size))}
-                            result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
-                        default_storage.save(os.path.join(self.temp_dir, file.filename), File(zip_ref.open(file)))
+                            result["summary"]["files"][file.filename] = {
+                                "size": (self.filesize_format(file.file_size))
+                            }
+                            result["summary"][
+                                "cumulative_excel_files_size"
+                            ] = self.cumulative_excel_files_size
+                        default_storage.save(
+                            os.path.join(self.temp_dir, file.filename),
+                            File(zip_ref.open(file)),
+                        )
         elif source.split(".")[-1] == "xlsx":
             with open(source, "rb") as xlsx_file:
-                result = {"summary": {"name": file_name, "size": self.filesize_format(file_stat.st_size), "files": {}}}
+                result = {
+                    "summary": {
+                        "name": file_name,
+                        "size": self.filesize_format(file_stat.st_size),
+                        "files": {},
+                    }
+                }
                 self.cumulative_excel_files_size += file_stat.st_size
-                result["summary"]["files"][file_name] = {"size": (self.filesize_format(file_stat.st_size))}
-                result["summary"]["cumulative_excel_files_size"] = self.cumulative_excel_files_size
-                default_storage.save(os.path.join(self.temp_dir, file_name), File(xlsx_file))
+                result["summary"]["files"][file_name] = {
+                    "size": (self.filesize_format(file_stat.st_size))
+                }
+                result["summary"][
+                    "cumulative_excel_files_size"
+                ] = self.cumulative_excel_files_size
+                default_storage.save(
+                    os.path.join(self.temp_dir, file_name), File(xlsx_file)
+                )
 
         has_valid_excel_file = False
         for file in result["summary"]["files"]:
             if file.split(".")[-1] == "xlsx":
                 try:
                     uploaded_file_path = os.path.join(self.temp_dir, file)
-                    workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
+                    workbook = load_workbook(
+                        filename=default_storage.open(uploaded_file_path)
+                    )
                     self.validate_uploaded_file(workbook)
                     has_valid_excel_file = True
                 except:
                     pass
         if not has_valid_excel_file:
             title = _("Invalid Uploaded File")
-            message = _("This file has missing information or invalid formatting. Make sure the file is complete and in the expected format.")
+            message = _(
+                "This file has missing information or invalid formatting. Make sure the file is complete and in the expected format."
+            )
             return {"success": False, "data": {"title": title, "message": message}}
 
         return {"success": True, "data": result}
+
 
 class FileValidationError(Exception):
     def __init__(self, message=_("Unable to read file"), code=400):

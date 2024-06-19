@@ -86,17 +86,26 @@ class ImportSingleCsv(BaseImportModule):
         if initiated["success"]:
             read = self.read_for_cli(source)
         else:
-            return {"success": False, "data": {"title": _("Error"), "message": initiated["message"]}}
+            return {
+                "success": False,
+                "data": {"title": _("Error"), "message": initiated["message"]},
+            }
 
         if read["success"]:
             written = self.write(self.request)
         else:
-            return {"success": False, "data": {"title": _("Error"), "message": read["message"]}}
+            return {
+                "success": False,
+                "data": {"title": _("Error"), "message": read["message"]},
+            }
 
         if written["success"]:
             return {"success": True, "data": "done"}
         else:
-            return {"success": False, "data": {"title": _("Error"), "message": written["message"]}}
+            return {
+                "success": False,
+                "data": {"title": _("Error"), "message": written["message"]},
+            }
 
     def read_for_cli(self, source):
         """
@@ -107,12 +116,12 @@ class ImportSingleCsv(BaseImportModule):
         temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         try:
             self.delete_from_default_storage(temp_dir)
-        except (FileNotFoundError):
+        except FileNotFoundError:
             pass
 
         csv_file_name = None
         if source.split(".")[-1].lower() == "csv":
-            csv_file_name = os.path.basename(source).split('/')[-1]
+            csv_file_name = os.path.basename(source).split("/")[-1]
             csv_file_path = os.path.join(temp_dir, csv_file_name)
             default_storage.save(csv_file_path, File(open(source, "r")))
         elif source.split(".")[-1].lower() == "zip":
@@ -120,7 +129,10 @@ class ImportSingleCsv(BaseImportModule):
                 files = zip_ref.infolist()
                 for file in files:
                     if not file.filename.startswith("__MACOSX"):
-                        default_storage.save(os.path.join(temp_dir, file.filename), File(zip_ref.open(file)))
+                        default_storage.save(
+                            os.path.join(temp_dir, file.filename),
+                            File(zip_ref.open(file)),
+                        )
                         if file.filename.endswith(".csv"):
                             csv_file_name = file.filename
             csv_file_path = os.path.join(temp_dir, csv_file_name)
@@ -137,7 +149,10 @@ class ImportSingleCsv(BaseImportModule):
             reader = csv.reader(csvfile)
             data = {"csv": [line for line in reader], "csv_file": csv_file_name}
             with connection.cursor() as cursor:
-                cursor.execute("""SELECT load_details FROM load_event WHERE loadid = %s""", [self.loadid])
+                cursor.execute(
+                    """SELECT load_details FROM load_event WHERE loadid = %s""",
+                    [self.loadid],
+                )
                 row = cursor.fetchall()
             if len(row) > 0:
                 data["config"] = row[0][0]
@@ -352,7 +367,7 @@ class ImportSingleCsv(BaseImportModule):
         mapping_details = {
             "mapping": csv_mapping,
             "graph": graphid,
-            "file_name": csv_file_name
+            "file_name": csv_file_name,
         }
         with connection.cursor() as cursor:
             cursor.execute(

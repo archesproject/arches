@@ -33,11 +33,27 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         etl_modules = [module.componentname for module in ETLModule.objects.all()]
         parser.add_argument("module", nargs="?", choices=etl_modules)
-        parser.add_argument("-s", "--source", action="store", dest="source", default="", help="Extension file to be loaded")
-        parser.add_argument("-c", "--config", action="store", dest="config", default="", help="The configuration for the etl-module to run")
+        parser.add_argument(
+            "-s",
+            "--source",
+            action="store",
+            dest="source",
+            default="",
+            help="Extension file to be loaded",
+        )
+        parser.add_argument(
+            "-c",
+            "--config",
+            action="store",
+            dest="config",
+            default="",
+            help="The configuration for the etl-module to run",
+        )
 
     def handle(self, *args, **options):
-        self.run(module=options["module"], source=options["source"], config=options["config"])
+        self.run(
+            module=options["module"], source=options["source"], config=options["config"]
+        )
 
     def run(self, module, source, config):
         """
@@ -54,17 +70,21 @@ class Command(BaseCommand):
         try:
             etl_module = ETLModule.objects.get(componentname=module)
             config["module"] = etl_module.etlmoduleid
-            EtlModule = etl_module.get_class_module()(loadid=loadid,params=config)
+            EtlModule = etl_module.get_class_module()(loadid=loadid, params=config)
         except ETLModule.DoesNotExist:
             try:
                 moduleid = uuid.UUID(module)
                 config["module"] = moduleid
-                EtlModule = ETLModule.objects.get(pk=moduleid).get_class_module()(loadid=loadid,params=config)
+                EtlModule = ETLModule.objects.get(pk=moduleid).get_class_module()(
+                    loadid=loadid, params=config
+                )
             except ValueError:
                 etl_modules = ETLModule.objects.all()
-                print(_("You must supply the valid name or the uuid for the etl module."))
+                print(
+                    _("You must supply the valid name or the uuid for the etl module.")
+                )
                 for etl_module in etl_modules:
-                    print("\t", etl_module.componentname, "\t",etl_module.etlmoduleid)
+                    print("\t", etl_module.componentname, "\t", etl_module.etlmoduleid)
                 return
         import_function = getattr(EtlModule, "cli")
         response = import_function(source)

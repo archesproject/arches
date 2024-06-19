@@ -31,7 +31,7 @@ class BranchExcelImporter(BaseImportModule):
             request = HttpRequest()
             request.user = User.objects.get(id=self.userid)
             request.method = "POST"
-            if params is not None and params != '':
+            if params is not None and params != "":
                 for k, v in params.items():
                     request.POST.__setitem__(k, v)
         self.request = request

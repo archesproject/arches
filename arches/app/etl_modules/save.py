@@ -129,7 +129,10 @@ def _post_save_edit_log(cursor, userid, loadid, multiprocessing):
     try:
         log_event_details(cursor, loadid, "done|Indexing...")
         index_resources_by_transaction(
-            loadid, use_multiprocessing=multiprocessing, quiet=True, recalculate_descriptors=True
+            loadid,
+            use_multiprocessing=multiprocessing,
+            quiet=True,
+            recalculate_descriptors=True,
         )
         user = User.objects.get(id=userid)
         user_email = getattr(user, "email", "")
