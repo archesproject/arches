@@ -110,10 +110,19 @@ class BusinessDataExportTests(ArchesTestCase):
                 new_list = []
                 for val in obj:
                     new_list.append(deep_sort(val))
-                try:
-                    _sorted = sorted(new_list, key=itemgetter("tileid"))
-                except:
-                    _sorted = new_list
+                if all(
+                    isinstance(item, dict) and "resourceinstance" in item
+                    for item in new_list
+                ):
+                    _sorted = sorted(
+                        new_list,
+                        key=lambda item: item["resourceinstance"]["resourceinstanceid"],
+                    )
+                else:
+                    try:
+                        _sorted = sorted(new_list, key=itemgetter("tileid"))
+                    except:
+                        _sorted = new_list
 
             else:
                 _sorted = obj
