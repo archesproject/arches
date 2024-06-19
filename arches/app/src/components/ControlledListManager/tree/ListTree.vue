@@ -175,10 +175,11 @@ const filterCallbackWrapped = computed(() => {
         split: () => {
             return [
                 (node: TreeNode) => {
-                    return nodeIsList(node)
-                        ? node.data.name
-                        : bestLabel(node.data, selectedLanguage.value.code)
-                              .value;
+                    if (nodeIsList(node)) {
+                        return node.data.name;
+                    }
+                    return bestLabel(node.data, selectedLanguage.value.code)
+                        .value;
                 },
             ];
         },

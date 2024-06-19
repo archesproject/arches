@@ -129,11 +129,15 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
         tree.value,
         item.controlled_list_id,
     ).data;
-    const siblings: ControlledListItem[] = item.parent_id
-        ? findNodeInTree(tree.value, item.parent_id).children.map(
-              (child: TreeNode) => child.data,
-          )
-        : list.items;
+
+    let siblings: ControlledListItem[];
+    if (item.parent_id) {
+        siblings = findNodeInTree(tree.value, item.parent_id).children.map(
+            (child: TreeNode) => child.data,
+        );
+    } else {
+        siblings = list.items;
+    }
 
     reorderItems(list, item, siblings, up);
     const field = "sortorder";
