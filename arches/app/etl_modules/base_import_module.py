@@ -260,8 +260,8 @@ class BaseImportModule:
             [self.loadid],
         )
 
-    def save_to_tiles(self, cursor, userid, loadid):
-        return save_to_tiles(userid, loadid)
+    def save_to_tiles(self, cursor, userid, loadid, multiprocessing=False):
+        return save_to_tiles(userid, loadid, multiprocessing)
 
     ### Actions ###
 

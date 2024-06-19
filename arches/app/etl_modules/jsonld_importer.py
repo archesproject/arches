@@ -331,7 +331,7 @@ class JSONLDImporter(BaseImportModule):
         # Do this later, after any prior resources have been deleted.
         return None
 
-    def save_to_tiles(self, cursor, userid, loadid):
+    def save_to_tiles(self, cursor, userid, loadid, multiprocessing=False):
         error_saving_tiles = None
 
         # Disable the tile triggers early, because below we wrap resource
