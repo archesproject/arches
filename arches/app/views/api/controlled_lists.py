@@ -299,7 +299,9 @@ class ControlledListItemValueView(View):
         data = JSONDeserializer().deserialize(request.body)
 
         try:
-            value = ControlledListItemValue.values_without_images.get(pk=value_id)
+            value = ControlledListItemValue.objects.values_without_images().get(
+                pk=value_id
+            )
         except ControlledListItemValue.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
@@ -323,7 +325,9 @@ class ControlledListItemValueView(View):
     def delete(self, request, **kwargs):
         value_id = kwargs.get("id")
         try:
-            value = ControlledListItemValue.values_without_images.get(pk=value_id)
+            value = ControlledListItemValue.objects.values_without_images().get(
+                pk=value_id
+            )
         except:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
