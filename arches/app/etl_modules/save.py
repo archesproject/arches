@@ -54,7 +54,7 @@ def reenable_tile_triggers(cursor, loadid):
     )
 
 
-def _save_to_tiles(cursor, loadid, multiprocessing):
+def _save_to_tiles(cursor, loadid):
     try:
         log_event_details(cursor, loadid, "done|Saving the tiles...")
         cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [loadid])
