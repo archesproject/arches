@@ -488,8 +488,10 @@ ENABLE_CAPTCHA = True
 # RECAPTCHA_USE_SSL = False
 NOCAPTCHA = True
 # RECAPTCHA_PROXY = 'http://127.0.0.1:8000'
+SILENCED_SYSTEM_CHECKS = ["guardian.W001"]
+
 if DEBUG is True:
-    SILENCED_SYSTEM_CHECKS = ["captcha.recaptcha_test_key_error"]
+    SILENCED_SYSTEM_CHECKS += ["captcha.recaptcha_test_key_error"]
 
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
