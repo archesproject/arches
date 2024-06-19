@@ -382,7 +382,7 @@ class BaseImportModule:
                 "celeryByteSizeLimit", 100000
             )
 
-            if summary["cumulative_excel_files_size"] > use_celery_file_size_threshold:
+            if summary["cumulative_files_size"] > use_celery_file_size_threshold:
                 response = self.run_load_task_async(request, self.loadid)
             else:
                 response = self.run_load_task(
@@ -429,7 +429,7 @@ class BaseImportModule:
             }
 
     def read_for_cli(self, source):
-        self.cumulative_excel_files_size = 0
+        self.cumulative_files_size = 0
         self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         try:
             self.delete_from_default_storage(self.temp_dir)
@@ -459,15 +459,15 @@ class BaseImportModule:
                 files = zip_ref.infolist()
                 for file in files:
                     if file.filename.split(".")[-1] == "xlsx":
-                        self.cumulative_excel_files_size += file.file_size
+                        self.cumulative_files_size += file.file_size
                     if not file.filename.startswith("__MACOSX"):
                         if not file.is_dir():
                             result["summary"]["files"][file.filename] = {
                                 "size": (self.filesize_format(file.file_size))
                             }
                             result["summary"][
-                                "cumulative_excel_files_size"
-                            ] = self.cumulative_excel_files_size
+                                "cumulative_files_size"
+                            ] = self.cumulative_files_size
                         default_storage.save(
                             os.path.join(self.temp_dir, file.filename),
                             File(zip_ref.open(file)),
@@ -481,13 +481,11 @@ class BaseImportModule:
                         "files": {},
                     }
                 }
-                self.cumulative_excel_files_size += file_stat.st_size
+                self.cumulative_files_size += file_stat.st_size
                 result["summary"]["files"][file_name] = {
                     "size": (self.filesize_format(file_stat.st_size))
                 }
-                result["summary"][
-                    "cumulative_excel_files_size"
-                ] = self.cumulative_excel_files_size
+                result["summary"]["cumulative_files_size"] = self.cumulative_files_size
                 default_storage.save(
                     os.path.join(self.temp_dir, file_name), File(xlsx_file)
                 )
