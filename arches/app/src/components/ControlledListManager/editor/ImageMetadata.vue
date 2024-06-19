@@ -13,7 +13,11 @@ import {
     upsertMetadata,
     deleteMetadata,
 } from "@/components/ControlledListManager/api.ts";
-import { itemKey } from "@/components/ControlledListManager/constants.ts";
+import {
+    DEFAULT_ERROR_TOAST_LIFE,
+    ERROR,
+    itemKey,
+} from "@/components/ControlledListManager/constants.ts";
 import { languageNameFromCode } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
@@ -52,17 +56,25 @@ const saveMetadata = async (event: DataTableRowEditInitEvent) => {
         ...event.newData,
         id: typeof event.newData.id === "string" ? event.newData.id : null,
     };
-    const upsertedMetadata: ControlledListItemImageMetadata =
-        await upsertMetadata(normalizedNewData, toast, $gettext);
-    if (upsertedMetadata) {
+    try {
+        const upsertedMetadata: ControlledListItemImageMetadata =
+            await upsertMetadata(normalizedNewData);
         if (normalizedNewData.id) {
             updateImageMetadata(upsertedMetadata);
         } else {
             appendImageMetadata(upsertedMetadata);
             removeImageMetadata(event.newData);
         }
-    } else if (normalizedNewData.id === null) {
-        removeImageMetadata(event.newData);
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Metadata save failed"),
+            detail: error.message,
+        });
+        if (normalizedNewData.id === null) {
+            removeImageMetadata(event.newData);
+        }
     }
 };
 
@@ -75,9 +87,16 @@ const issueDeleteMetadata = async (
         removeImageMetadata(metadata);
         return;
     }
-    const deleted = await deleteMetadata(metadata, toast, $gettext);
-    if (deleted) {
+    try {
+        await deleteMetadata(metadata);
         removeImageMetadata(metadata);
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Metadata deletion failed"),
+            detail: error.message,
+        });
     }
 };
 

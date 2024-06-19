@@ -8,6 +8,8 @@ import { useToast } from "primevue/usetoast";
 
 import { patchList } from "@/components/ControlledListManager/api.ts";
 import {
+    DEFAULT_ERROR_TOAST_LIFE,
+    ERROR,
     PREF_LABEL,
     displayedRowKey,
     selectedLanguageKey,
@@ -136,21 +138,29 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
     reorderItems(list, item, siblings, up);
     const field = "sortorder";
 
-    const success = await patchList(list, toast, $gettext, field);
-    if (success) {
-        const oldListIndex = tree.value.findIndex(
-            (listNode) => listNode.data.id === list.id,
-        );
-        tree.value = [
-            ...tree.value.slice(0, oldListIndex),
-            listAsNode(list, selectedLanguage.value),
-            ...tree.value.slice(oldListIndex + 1),
-        ];
-        selectedKeys.value = {
-            ...selectedKeys.value,
-            [item.id]: true,
-        };
+    try {
+        await patchList(list, field);
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Save failed"),
+            detail: error.message,
+        });
+        return;
     }
+    const oldListIndex = tree.value.findIndex(
+        (listNode) => listNode.data.id === list.id,
+    );
+    tree.value = [
+        ...tree.value.slice(0, oldListIndex),
+        listAsNode(list, selectedLanguage.value),
+        ...tree.value.slice(oldListIndex + 1),
+    ];
+    selectedKeys.value = {
+        ...selectedKeys.value,
+        [item.id]: true,
+    };
 };
 </script>
 

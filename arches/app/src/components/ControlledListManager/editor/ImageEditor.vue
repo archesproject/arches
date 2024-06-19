@@ -9,6 +9,8 @@ import { useToast } from "primevue/usetoast";
 import { deleteImage } from "@/components/ControlledListManager/api.ts";
 import {
     DANGER,
+    DEFAULT_ERROR_TOAST_LIFE,
+    ERROR,
     METADATA_CHOICES,
     itemKey,
 } from "@/components/ControlledListManager/constants.ts";
@@ -71,9 +73,16 @@ const bestAlternativeText = computed(() => {
 });
 
 const issueDeleteImage = async () => {
-    const deleted = await deleteImage(image, toast, $gettext);
-    if (deleted) {
+    try {
+        await deleteImage(image);
         removeImage(image);
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Image deletion failed"),
+            detail: error.message,
+        });
     }
 };
 

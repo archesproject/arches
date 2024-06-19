@@ -17,6 +17,8 @@ import {
 } from "@/components/ControlledListManager/api.ts";
 import {
     ALT_LABEL,
+    DEFAULT_ERROR_TOAST_LIFE,
+    ERROR,
     NOTE,
     NOTE_CHOICES,
     PREF_LABEL,
@@ -143,20 +145,24 @@ const saveValue = async (event: DataTableRowEditInitEvent) => {
         id: typeof event.newData.id === "string" ? event.newData.id : null,
         value: event.newData.value.trim(),
     };
-    const upsertedValue: Value = await upsertValue(
-        normalizedNewData,
-        toast,
-        $gettext,
-    );
-    if (upsertedValue) {
+    try {
+        const upsertedValue: Value = await upsertValue(normalizedNewData);
         if (normalizedNewData.id) {
             updateItemValue(upsertedValue);
         } else {
             appendItemValue(upsertedValue);
             removeItemValue(event.newData);
         }
-    } else if (normalizedNewData.id === null) {
-        removeItemValue(event.newData);
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Value save failed"),
+            detail: error.message,
+        });
+        if (normalizedNewData.id === null) {
+            removeItemValue(event.newData);
+        }
     }
 };
 
@@ -165,9 +171,16 @@ const issueDeleteValue = async (value: NewValue | Value) => {
         removeItemValue(value);
         return;
     }
-    const deleted = await deleteValue(value, toast, $gettext);
-    if (deleted) {
+    try {
+        await deleteValue(value);
         removeItemValue(value);
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Value deletion failed"),
+            detail: error.message,
+        });
     }
 };
 

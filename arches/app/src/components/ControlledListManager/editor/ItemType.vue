@@ -7,7 +7,11 @@ import { useToast } from "primevue/usetoast";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
 import { patchItem } from "@/components/ControlledListManager/api.ts";
-import { itemKey } from "@/components/ControlledListManager/constants.ts";
+import {
+    DEFAULT_ERROR_TOAST_LIFE,
+    ERROR,
+    itemKey,
+} from "@/components/ControlledListManager/constants.ts";
 
 import type { Ref } from "vue";
 import type { ControlledListItem } from "@/types/ControlledListManager";
@@ -20,6 +24,19 @@ const guide = "guide";
 const guideItemSubheading = $gettext(
     "If this item should only display as an intermediate grouping in the list hierarchy, mark it as a guide item to prevent it from being chosen by a user.",
 );
+
+const issuePatchItem = async () => {
+    try {
+        await patchItem(item.value, guide);
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Save failed"),
+            detail: error.message,
+        });
+    }
+};
 </script>
 
 <template>
@@ -31,7 +48,7 @@ const guideItemSubheading = $gettext(
             <InputSwitch
                 v-model="item.guide"
                 input-id="guideSwitch"
-                @change="patchItem(item, toast, $gettext, guide)"
+                @change="issuePatchItem"
             />
         </div>
     </div>
