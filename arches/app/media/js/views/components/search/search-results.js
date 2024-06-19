@@ -226,6 +226,9 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
                             resourceinstanceid: result._source.resourceinstanceid,
                             displaydescription: result._source.displaydescription,
                             alternativelanguage: result._source.displayname_language != arches.activeLanguage,
+                            principaluser: ko.computed(function () {
+                                return result._source.permissions.principal_user && result._source.permissions.principal_user.includes(ko.unwrap(self.userid));
+                            }),
                             "map_popup": result._source.map_popup,
                             "provisional_resource": result._source.provisional_resource,
                             geometries: ko.observableArray(result._source.geometries),

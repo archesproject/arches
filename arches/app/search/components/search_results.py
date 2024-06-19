@@ -7,6 +7,7 @@ from arches.app.search.elasticsearch_dsl_builder import (
     FiltersAgg,
     GeoHashGridAgg,
     GeoBoundsAgg,
+    Nested,
 )
 from arches.app.search.components.base import BaseSearchFilter
 from arches.app.search.components.resource_type_filter import get_permitted_graphids
@@ -72,6 +73,15 @@ class SearchResultsFilter(BaseSearchFilter):
             GeoBoundsAgg(field="points.point", name="bounds")
         )
         nested_agg.add_aggregation(nested_agg_filter)
+
+        if self.user and self.user.id:
+            search_query = Bool()
+            subsearch_query = Bool()
+            # TODO: call to permissions framework with subsearch_query
+            subsearch_query.should(Nested(path="permissions", query=Terms(field="permissions.principal_user", terms=[int(self.user.id)])))
+            search_query.must(subsearch_query)
+            search_results_object["query"].add_query(search_query)
+
         search_results_object["query"].add_aggregation(nested_agg)
 
     def post_search_hook(self, search_results_object, results, permitted_nodegroups):
