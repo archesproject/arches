@@ -680,6 +680,7 @@ FILE_TYPES = [
     "gif",
     "jpg",
     "jpeg",
+    "json",
     "pdf",
     "png",
     "psd",

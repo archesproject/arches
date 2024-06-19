@@ -489,19 +489,20 @@ class Graph(models.GraphModel):
         return old, new
 
     def update_es_node_mapping(self, node, datatype_factory, se):
-        already_saved = models.Node.objects.filter(pk=node.nodeid).exists()
-        saved_node_datatype = None
-        if already_saved:
-            saved_node = models.Node.objects.get(pk=node.nodeid)
-            saved_node_datatype = saved_node.datatype
-        if saved_node_datatype != node.datatype:
-            datatype = datatype_factory.get_instance(node.datatype)
-            datatype_mapping = datatype.get_es_mapping(node.nodeid)
-            if (
-                datatype_mapping
-                and datatype_factory.datatypes[node.datatype].defaultwidget
-            ):
-                se.create_mapping("resources", body=datatype_mapping)
+        if self.isresource:
+            already_saved = models.Node.objects.filter(pk=node.nodeid).exists()
+            saved_node_datatype = None
+            if already_saved:
+                saved_node = models.Node.objects.get(pk=node.nodeid)
+                saved_node_datatype = saved_node.datatype
+            if saved_node_datatype != node.datatype:
+                datatype = datatype_factory.get_instance(node.datatype)
+                datatype_mapping = datatype.get_es_mapping(node.nodeid)
+                if (
+                    datatype_mapping
+                    and datatype_factory.datatypes[node.datatype].defaultwidget
+                ):
+                    se.create_mapping("resources", body=datatype_mapping)
 
     def save(self, validate=True, nodeid=None):
         """
