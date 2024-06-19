@@ -6,22 +6,13 @@
 {% block title %} {{ block.super }} {% trans "Search" %} {% endblock title %}
 
 {% block main_content %}
-<div>
-    <!-- ko foreach: {data: sharedStateObject.filtersList, as: 'filter'} -->
-        <!-- ko if: filter.type === 'core' && !!filter.enabled -->
-        <div data-bind="component: {
-            name: filter.componentname,
-            params: $parent.sharedStateObject
-        }"></div>
-        <!-- /ko -->
-        <!-- ko if: filter.type === 'backend' && !!filter.enabled -->
-        <div style="display:none;" data-bind="component: {
-            name: filter.componentname,
-            params: $parent.sharedStateObject
-        }"></div>
-        <!-- /ko -->
-    <!-- /ko -->
+<!-- ko if: sharedStateObject.coreFilter -->
+<div data-bind="component: {
+    name: sharedStateObject.coreFilter.componentname,
+    params: sharedStateObject
+}">
 </div>
+<!-- /ko -->
 {% endblock main_content %}
 
 {% block pre_require_js %}

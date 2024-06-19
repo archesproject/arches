@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
             '',
             'core_search.py',
             'CoreSearchFilter',
-            'backend',
+            'core',
             'views/components/search/core-search',
             'core-search',
             0,
