@@ -1,3 +1,4 @@
+from typing import List, Tuple, Any
 from arches.app.const import ExtensionType
 from arches.app.models import models
 from arches.app.models.system_settings import settings
@@ -91,11 +92,11 @@ class SearchFilterFactory(object):
         else:
             return None
 
-    def get_sorted_query_dict(self, key_value_pairs):
-        # Sort the list of (key, value) tuples according to the key's order in self.search_filters
+    def get_sorted_query_dict(self, query_dict):
+        # Sort a list of (key, value) tuples according to the key's order in self.search_filters
         return dict(
             sorted(
-                key_value_pairs,
+                list(query_dict.items()),
                 key=lambda item: (
                     list(self.search_filters.keys()).index(item[0])
                     if item[0] in self.search_filters
@@ -103,3 +104,27 @@ class SearchFilterFactory(object):
                 ),
             )
         )
+
+    def get_query_dict_with_core_component(self, query_dict):
+        # Set core=core-search on query_dict to core-search=True
+        ret = dict(query_dict)
+        core_component = ret.get("core", False)
+        if core_component:
+            ret[core_component] = True
+            del ret["core"]
+        else:
+            default_core_component = list(
+                filter(
+                    lambda x: x.config.get("default", False) and x.type == "core",
+                    list(self.search_filters.values()),
+                )
+            )[0]
+            ret[default_core_component.componentname] = True
+
+        return ret
+
+    def create_search_query_dict(self, key_value_pairs: List[Tuple[str, Any]]):
+        # handles list of key,value tuples so that dict-like data from POST and GET
+        # requests can be concatenated into single method call
+        query_dict = self.get_query_dict_with_core_component(dict(key_value_pairs))
+        return self.get_sorted_query_dict(query_dict)

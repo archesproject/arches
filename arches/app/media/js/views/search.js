@@ -47,7 +47,8 @@ define([
         this.filtersList = _.sortBy(Object.values(SearchComponents), function(filter) {
             return filter.sortorder;
         }, this);
-        this.coreFilter = this.filtersList.find(component => component.type == "core");
+        this.defaultCoreComponent = this.filtersList.find(component => component.type == "core" && component.config.default == true); // approach: let the backend decide
+        this.coreComponentName = ko.observable(false);
         this.requiredFiltersLookup = this.filtersList.reduce((lookup, item) => {
             if (item.config.requiredComponents && item.config.requiredComponents.length > 0) {
                 // Extract the names from requiredComponents and assign them to the lookup object under the component name
@@ -71,6 +72,11 @@ define([
             this.filters[component.componentname] = ko.observable(null);
         }, this);
         this.query = ko.observable(getQueryObject());
+        if (this.query().core !== undefined) {
+            this.coreComponentName(this.query().core);
+        } else {
+            this.coreComponentName(this.defaultCoreComponent.componentname);
+        }
         this.queryString = ko.computed(function() {
             return JSON.stringify(this.query());
         }, this);

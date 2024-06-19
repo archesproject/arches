@@ -17,6 +17,7 @@ details = {
     "sortorder": "0",
     "enabled": True,
     "config": {
+        "default": True,
         "requiredComponents": [
             {
                 "componentname": "advanced-search",
@@ -66,7 +67,7 @@ details = {
                 "componentname": "time-filter",
                 "searchcomponentid": "7497ed4f-2085-40da-bee5-52076a48bcb1",
             },
-        ]
+        ],
     },
 }
 
