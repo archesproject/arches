@@ -23,7 +23,6 @@ from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS
 from pyld.jsonld import compact, frame, from_rdf, to_rdf, expand, set_document_loader
 
-
 # Stop code from looking up the contexts online for every operation
 docCache = {}
 
@@ -366,6 +365,7 @@ class JsonLdReader(Reader):
         self.print_buf = []
         self.verbosity = kwargs.get("verbosity", 1)
         self.ignore_errors = kwargs.get("ignore_errors", False)
+        self.default_timezone = kwargs.get("default_timezone")
         self.logger = logging.getLogger(__name__)
         for graph in models.GraphModel.objects.filter(isresource=True):
             node = models.Node.objects.get(graph_id=graph.pk, istopnode=True)
@@ -808,6 +808,18 @@ class JsonLdReader(Reader):
                                 indent + 1,
                             )
                     else:
+                        if (
+                            o["datatype"].datatype_name == "date"
+                            and self.default_timezone
+                        ):
+                            tz_formats = ["%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"]
+                            for tz_format in tz_formats:
+                                try:
+                                    datetime.datetime.strptime(value, tz_format)
+                                    value = value + self.default_timezone
+                                    vi["@value"] = value
+                                except:
+                                    pass
                         if len(o["datatype"].validate_from_rdf(value)) == 0:
                             possible.append([o, value])
                         else:
