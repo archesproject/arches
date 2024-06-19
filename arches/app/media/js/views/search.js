@@ -48,9 +48,9 @@ define([
             return filter.sortorder;
         }, this);
         this.requiredFiltersLookup = this.filtersList.reduce((lookup, item) => {
-            if (item.config?.requiredFilters && item.config?.requiredFilters.length > 0) {
-                // Extract the names from requiredFilters and assign them to the lookup object under the component name
-                lookup[item.componentname] = item.config.requiredFilters.map(filter => filter.searchcomponentid);
+            if (item.config.requiredComponents && item.config.requiredComponents.length > 0) {
+                // Extract the names from requiredComponents and assign them to the lookup object under the component name
+                lookup[item.componentname] = item.config.requiredComponents.map(filter => filter.searchcomponentid);
             } else {
                 lookup[item.componentname] = [];
             }

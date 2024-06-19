@@ -76,11 +76,11 @@ class SearchView(MapBaseManagerView):
         )
         geocoding_providers = models.Geocoder.objects.all()
         if user_is_resource_exporter(request.user):
-            search_components = models.SearchComponent.objects.all()
+            search_components = models.SearchComponent.objects.filter(enabled=True)
         else:
-            search_components = models.SearchComponent.objects.all().exclude(
-                componentname="search-export"
-            )
+            search_components = models.SearchComponent.objects.filter(
+                enabled=True
+            ).exclude(componentname="search-export")
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
