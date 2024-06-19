@@ -128,29 +128,21 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
         self, user: User, search_result: dict, groups: list[str]
     ) -> dict:
         result = {}
-        user_can_read = (
-            len(
-                self.get_resource_types_by_perm(
-                    user,
-                    [
-                        "models.write_nodegroup",
-                        "models.delete_nodegroup",
-                        "models.read_nodegroup",
-                    ],
-                )
-            )
-            > 0
+        user_can_read = self.get_resource_types_by_perm(
+            user,
+            [
+                "models.write_nodegroup",
+                "models.delete_nodegroup",
+                "models.read_nodegroup",
+            ],
         )
         result["can_read"] = user.is_superuser or (
             "permissions" in search_result["_source"]
             and "groups_read" in search_result["_source"]["permissions"]
             and (
-                len(
-                    set(
-                        search_result["_source"]["permissions"]["groups_read"]
-                    ).intersection(set(groups))
-                )
-                > 0
+                set(
+                    search_result["_source"]["permissions"]["groups_read"]
+                ).intersection(set(groups))
             )
             and user_can_read
         )
@@ -161,12 +153,9 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
             and "groups_read" in search_result["_source"]["permissions"]
             and (
                 (
-                    len(
-                        set(
-                            search_result["_source"]["permissions"]["groups_edit"]
-                        ).intersection(set(groups))
-                    )
-                    > 0
+                    set(
+                        search_result["_source"]["permissions"]["groups_edit"]
+                    ).intersection(set(groups))
                 )
                 and user_can_edit
             )
