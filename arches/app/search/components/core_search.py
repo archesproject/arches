@@ -19,10 +19,6 @@ details = {
     "config": {
         "requiredComponents": [
             {
-                "componentname": "localize-descriptors",
-                "searchcomponentid": "ada062d9-092d-400c-bcf7-94a931d1f271",
-            },
-            {
                 "componentname": "advanced-search",
                 "searchcomponentid": "f0e56205-acb5-475b-9c98-f5e44f1dbd2c",
             },

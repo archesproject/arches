@@ -11,6 +11,7 @@ from arches.app.search.elasticsearch_dsl_builder import (
 from arches.app.search.components.base import BaseSearchFilter
 from arches.app.search.components.resource_type_filter import get_permitted_graphids
 from arches.app.utils.permission_backend import user_is_resource_reviewer
+from django.utils.translation import get_language, gettext as _
 
 details = {
     "searchcomponentid": "",
@@ -79,6 +80,9 @@ class SearchResultsFilter(BaseSearchFilter):
     ):
         user_is_reviewer = user_is_resource_reviewer(self.request.user)
 
+        descriptor_types = ("displaydescription", "displayname")
+        active_and_default_language_codes = (get_language(), settings.LANGUAGE_CODE)
+
         # only reuturn points and geometries a user is allowed to view
         geojson_nodes = get_nodegroups_by_datatype_and_perm(
             self.request, "geojson-feature-collection", "read_nodegroup"
@@ -99,6 +103,19 @@ class SearchResultsFilter(BaseSearchFilter):
                 result["_source"]["tiles"] = permitted_tiles
             except KeyError:
                 pass
+
+            for descriptor_type in descriptor_types:
+                descriptor = get_localized_descriptor(
+                    result, descriptor_type, active_and_default_language_codes
+                )
+                if descriptor:
+                    result["_source"][descriptor_type] = descriptor["value"]
+                    if descriptor_type == "displayname":
+                        result["_source"]["displayname_language"] = descriptor[
+                            "language"
+                        ]
+                else:
+                    result["_source"][descriptor_type] = _("Undefined")
 
 
 def get_nodegroups_by_datatype_and_perm(request, datatype, permission):
@@ -123,3 +140,13 @@ def select_geoms_for_results(features, geojson_nodes, user_is_reviewer):
                 res.append(feature)
 
     return res
+
+
+def get_localized_descriptor(resource, descriptor_type, language_codes):
+    descriptor = resource["_source"][descriptor_type]
+    result = descriptor[0] if len(descriptor) > 0 else None
+    for language_code in language_codes:
+        for entry in descriptor:
+            if entry["language"] == language_code and entry["value"] != "":
+                return entry
+    return result
