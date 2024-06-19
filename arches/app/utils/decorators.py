@@ -21,8 +21,6 @@ import functools
 import logging
 import datetime
 from django.core.exceptions import PermissionDenied
-from arches.app.utils.permission_backend import get_editable_resource_types
-from arches.app.utils.permission_backend import get_resource_types_by_perm
 from arches.app.utils.permission_backend import user_can_read_resource
 from arches.app.utils.permission_backend import user_can_edit_resource
 from arches.app.utils.permission_backend import user_can_delete_resource
