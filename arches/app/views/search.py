@@ -376,9 +376,7 @@ def search_results(request, returnDsl=False):
     search_filter_factory = SearchFilterFactory(request)
     search_results_object = {"query": Query(se)}
     sorted_query_obj = search_filter_factory.create_search_query_dict(
-        list(request.GET.items())
-        + list(request.POST.items())
-        + [("search-results", "")]
+        list(request.GET.items()) + list(request.POST.items())
     )
 
     try:
