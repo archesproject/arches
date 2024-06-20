@@ -1142,7 +1142,8 @@ class Card(APIBase):
                 widget
                 for widget in models.CardXNodeXWidget.objects.filter(
                     pk__in=[
-                        widget_dict["id"] for widget_dict in serialized_graph["widgets"]
+                        widget_dict["id"]
+                        for widget_dict in serialized_graph["cards_x_nodes_x_widgets"]
                     ]
                 )
             ]

@@ -327,7 +327,9 @@ class ResourceEditorView(MapBaseManagerView):
             serialized_cards = serialized_graph["cards"]
             cardwidgets = [
                 models.CardXNodeXWidget(**card_x_node_x_widget_dict)
-                for card_x_node_x_widget_dict in serialized_graph["widgets"]
+                for card_x_node_x_widget_dict in serialized_graph[
+                    "cards_x_nodes_x_widgets"
+                ]
             ]
         else:
             cards = (

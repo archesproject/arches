@@ -1633,7 +1633,7 @@ class Graph(models.GraphModel):
 
         """
         if self.serialized_graph:
-            return self.serialized_graph["widgets"]
+            return self.serialized_graph["cards_x_nodes_x_widgets"]
         else:
             widgets = []
             if self.widgets:
@@ -1715,8 +1715,11 @@ class Graph(models.GraphModel):
                 else ret.pop("cards", None)
             )
 
-            if "widgets" not in exclude:
-                ret["widgets"] = self.get_widgets(use_raw_i18n_json=use_raw_i18n_json)
+            if "cards_x_nodes_x_widgets" not in exclude:
+                ret["cards_x_nodes_x_widgets"] = self.get_widgets(
+                    use_raw_i18n_json=use_raw_i18n_json
+                )
+
             ret["nodegroups"] = (
                 self.get_nodegroups()
                 if "nodegroups" not in exclude
