@@ -616,10 +616,21 @@ class GraphModel(models.Model):
         to="models.graphmodel",
     )
     has_unpublished_changes = models.BooleanField(default=False)
-    resource_instance_lifecycle_states = ArrayField(
-        models.CharField(max_length=200),
-        blank=True,
-        default=["draft", "published", "retired"],
+    resource_instance_lifecycle_states = JSONField(
+        default={
+            "draft": {
+                "can_delete": True,
+                "initial_state": True,
+            },
+            "published": {
+                "can_delete": False,
+                "initial_state": False,
+            },
+            "retired": {
+                "can_delete": True,
+                "initial_state": False,
+            },
+        }
     )
 
     @property
@@ -1253,6 +1264,15 @@ class ResourceInstance(models.Model):
             self.graph_publication = self.graph.publication
         except ResourceInstance.graph.RelatedObjectDoesNotExist:
             pass
+
+        if not self.lifecycle_state:
+            self.lifecycle_state = next(
+                key
+                for key, value in self.graph.resource_instance_lifecycle_states.items()
+                if value["initial_state"]
+            )
+
+        add_to_update_fields(kwargs, "lifecycle_state")
         add_to_update_fields(kwargs, "graph_publication")
         super(ResourceInstance, self).save(*args, **kwargs)
 

@@ -4,13 +4,17 @@ import django.contrib.postgres.fields
 from django.db import connection, migrations, models
 
 
-def add_constraint(apps, schema_editor):
+def add_resource_instance_lifecycle_state_constraint(apps, schema_editor):
     with connection.cursor() as cursor:
         cursor.execute(
             """
             CREATE FUNCTION validate_graph_resource_instance_lifecycle_state() RETURNS trigger AS $$
             BEGIN
-                IF NOT (NEW.lifecycle_state = ANY(SELECT unnest(resource_instance_lifecycle_states) FROM graphs WHERE graphid = NEW.graphid)) THEN
+                IF NOT EXISTS (
+                    SELECT 1 
+                    FROM jsonb_each_text((SELECT resource_instance_lifecycle_states FROM graphs WHERE graphid = NEW.graphid)) AS each
+                    WHERE each.key = NEW.lifecycle_state
+                ) THEN
                     RAISE EXCEPTION 'Invalid choice for lifecycle_state';
                 END IF;
                 RETURN NEW;
@@ -25,12 +29,50 @@ def add_constraint(apps, schema_editor):
         )
 
 
-def remove_constraint(apps, schema_editor):
+def remove_resource_instance_lifecycle_state_constraint(apps, schema_editor):
     with connection.cursor() as cursor:
         cursor.execute(
             """
             DROP TRIGGER IF EXISTS resource_instance_lifecycle_state_trigger ON resource_instances;
             DROP FUNCTION IF EXISTS validate_graph_resource_instance_lifecycle_state();
+        """
+        )
+
+
+def add_initial_resource_instance_lifecycle_state_constraint(apps, schema_editor):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            CREATE FUNCTION validate_initial_resource_instance_lifecycle_state_constraint() RETURNS TRIGGER AS $$
+            DECLARE
+                resource_instance_lifecycle_initial_state_count INTEGER;
+            BEGIN
+                SELECT COUNT(*) INTO resource_instance_lifecycle_initial_state_count
+                FROM jsonb_each(NEW.resource_instance_lifecycle_states) AS each
+                WHERE each.value->>'initial_state' = 'true';
+                
+                IF resource_instance_lifecycle_initial_state_count != 1 THEN
+                    RAISE EXCEPTION 'Exactly one initial state must be true';
+                END IF;
+                
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+
+            CREATE TRIGGER check_initial_state_trigger
+            BEFORE INSERT OR UPDATE ON graphs
+            FOR EACH ROW
+            EXECUTE FUNCTION validate_initial_resource_instance_lifecycle_state_constraint();
+        """
+        )
+
+
+def remove_initial_resource_instance_lifecycle_state_constraint(apps, schema_editor):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            DROP TRIGGER IF EXISTS check_initial_state_trigger ON graphs;
+            DROP FUNCTION IF EXISTS validate_initial_resource_instance_lifecycle_state_constraint();
         """
         )
 
@@ -45,11 +87,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="graphmodel",
             name="resource_instance_lifecycle_states",
-            field=django.contrib.postgres.fields.ArrayField(
-                base_field=models.CharField(max_length=200),
-                blank=True,
-                default=["draft", "published", "retired"],
-                size=None,
+            field=models.JSONField(
+                default={
+                    "draft": {"can_delete": True, "initial_state": True},
+                    "published": {"can_delete": False, "initial_state": False},
+                    "retired": {"can_delete": True, "initial_state": False},
+                }
             ),
         ),
         migrations.AddField(
@@ -57,5 +100,12 @@ class Migration(migrations.Migration):
             name="lifecycle_state",
             field=models.CharField(blank=True, max_length=200),
         ),
-        migrations.RunPython(add_constraint, remove_constraint),
+        migrations.RunPython(
+            add_resource_instance_lifecycle_state_constraint,
+            remove_resource_instance_lifecycle_state_constraint,
+        ),
+        migrations.RunPython(
+            add_initial_resource_instance_lifecycle_state_constraint,
+            remove_initial_resource_instance_lifecycle_state_constraint,
+        ),
     ]
