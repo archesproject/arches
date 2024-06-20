@@ -359,7 +359,6 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                 else:
                     return perm in explicitly_defined_perms
             else:
-                default_perms = []
                 for permission in group.permissions.all():
                     if perm in permission.codename:
                         return True
@@ -468,6 +467,10 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         if resource:
             graph_id = resource.graph_id
+            if graph_id is None:
+                raise ValueError(
+                    "graph_id must not be None to check resource permissions"
+                )
 
         nodegroups = self.get_nodegroups_by_perm(user, perms)
         nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=graph_id)
