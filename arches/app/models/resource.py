@@ -57,9 +57,12 @@ from arches.app.utils.permission_backend import (
     user_can_read_graph,
     get_nodegroups_by_perm,
 )
+import django.dispatch
 from arches.app.datatypes.datatypes import DataTypeFactory
 
 logger = logging.getLogger(__name__)
+
+resource_indexed = django.dispatch.Signal()
 
 
 class Resource(models.ResourceInstance):
@@ -276,6 +279,16 @@ class Resource(models.ResourceInstance):
         index = kwargs.pop("index", True)
         context = kwargs.pop("context", None)
         transaction_id = kwargs.pop("transaction_id", None)
+
+        if request is None:
+            if user is None:
+                user = {}
+        else:
+            user = request.user
+
+        if not self.principaluser_id and user:
+            self.principaluser_id = user.id
+
         super(Resource, self).save(*args, **kwargs)
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
 
@@ -288,12 +301,6 @@ class Resource(models.ResourceInstance):
                 transaction_id=transaction_id,
                 context=context,
             )
-        if request is None:
-            if user is None:
-                user = {}
-        else:
-            user = request.user
-
         try:
             for perm in (
                 "view_resourceinstance",
@@ -461,6 +468,8 @@ class Resource(models.ResourceInstance):
                         )
                         es_index.index_document(document=doc, id=doc_id)
 
+            resource_indexed.send(sender=self.__class__, instance=self)
+
     def get_documents_to_index(
         self, fetchTiles=True, datatype_factory=None, node_datatypes=None, context=None
     ):
@@ -544,7 +553,8 @@ class Resource(models.ResourceInstance):
 
         document["tiles"] = tiles
         document["permissions"] = {
-            "creator": [self.get_instance_creator()["creatorid"]]
+            "creator": [self.get_instance_creator()["creatorid"]],
+            "principal_user": [int(self.principaluser_id)] if self.principaluser_id else []
         }
 
         document["permissions"].update(permission_backend.get_index_values(self))
