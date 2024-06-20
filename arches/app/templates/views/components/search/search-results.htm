@@ -25,7 +25,7 @@
             <div style="flex: 1">
                 <p 
                     class="search-listing-title" 
-                    data-bind="css: {'i18n-alt': $parent.alternativelanguage, 'principal-user': principaluser}"
+                    data-bind="css: {'i18n-alt': $parent.alternativelanguage, 'principal-user': isPrincipal}"
                 >
                     <a class="search-candidate-title" href="#" data-bind="onEnterkeyClick, onSpaceClick, click: $parent.viewReport.bind($parent),
                         attr: {'aria-label': $root.translations.viewResourceReport(displayname)},

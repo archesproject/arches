@@ -553,8 +553,9 @@ class Resource(models.ResourceInstance):
 
         document["tiles"] = tiles
         document["permissions"] = {
-            "creator": [self.get_instance_creator()["creatorid"]],
-            "principal_user": [int(self.principaluser_id)] if self.principaluser_id else []
+            "principal_user": (
+                [int(self.principaluser_id)] if self.principaluser_id else []
+            )
         }
 
         document["permissions"].update(permission_backend.get_index_values(self))

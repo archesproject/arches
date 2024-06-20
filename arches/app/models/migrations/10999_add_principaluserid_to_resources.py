@@ -8,9 +8,15 @@ from django.db.models import deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9979_update_stage_for_bulk_edit"),
+        ("models", "10798_jsonld_importer"),
     ]
 
     operations = [
-        migrations.AddField(model_name="resourceinstance", name="principaluser", field=models.ForeignKey(on_delete=deletion.SET_NULL, to=settings.AUTH_USER_MODEL, null=True)),
+        migrations.AddField(
+            model_name="resourceinstance",
+            name="principaluser",
+            field=models.ForeignKey(
+                on_delete=deletion.SET_NULL, to=settings.AUTH_USER_MODEL, null=True
+            ),
+        ),
     ]

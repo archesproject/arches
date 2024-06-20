@@ -472,7 +472,7 @@ def search_results(request, returnDsl=False):
         ret["total_results"] = dsl.count(index=RESOURCES_INDEX)
 
         ret["userid"] = request.user.id
-        ret["groups"] = [group.id for group in request.user.groups.all()]
+        ret["groups"] = groups
         return JSONResponse(ret)
 
     else:

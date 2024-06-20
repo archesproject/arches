@@ -2094,12 +2094,9 @@ class GetNodegroupTree(APIBase):
                 """SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,)
             )
             result = cursor.fetchall()
-            permitted_nodegroups = [
-                nodegroup_pk
-                for nodegroup_pk in get_nodegroups_by_perm(
-                    request.user, "models.read_nodegroup"
-                )
-            ]
+            permitted_nodegroups = get_nodegroups_by_perm(
+                request.user, "models.read_nodegroup"
+            )
             permitted_result = [
                 nodegroup
                 for nodegroup in result

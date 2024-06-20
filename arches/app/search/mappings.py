@@ -187,7 +187,6 @@ def prepare_search_index(create=False):
                 "permissions": {
                     "type": "nested",
                     "properties": {
-                        "creatorid": {"type": "integer"},
                         "principal_user": {"type": "integer"},
                     },
                 },

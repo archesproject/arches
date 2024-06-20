@@ -28,12 +28,13 @@ from arches.app.models.resource import Resource
 
 
 # these tests can be run from the command line via
-# python manage.py test tests.permissions.base_permissions_framework_test --settings="tests.test_settings"
+# python manage.py test tests.permissions --settings="tests.test_settings"
 
 
 class ArchesPermissionFrameworkTestCase(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
+        add_users()
         cls.expected_resource_count = 2
         cls.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
         cls.resource_instance_id = "f562c2fa-48d3-4798-a723-10209806c068"
@@ -53,6 +54,8 @@ class ArchesPermissionFrameworkTestCase(ArchesTestCase):
             test_pkg_path = os.path.join(
                 test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg"
             )
+            path_to_cheesy_image = test_pkg_path / "uploadedfiles" / "test.png"
+            cls.addClassCleanup(os.unlink, path_to_cheesy_image)
             with captured_stdout():
                 management.call_command(
                     "packages",
@@ -63,4 +66,3 @@ class ArchesPermissionFrameworkTestCase(ArchesTestCase):
                 )
 
         super().setUpClass()
-        add_users()

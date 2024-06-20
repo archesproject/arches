@@ -150,7 +150,7 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
         user_can_edit = len(self.get_editable_resource_types(user)) > 0
         result["can_edit"] = user.is_superuser or (
             "permissions" in search_result["_source"]
-            and "groups_read" in search_result["_source"]["permissions"]
+            and "groups_edit" in search_result["_source"]["permissions"]
             and (
                 (
                     set(
@@ -159,5 +159,8 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
                 )
                 and user_can_edit
             )
+        )
+        result["is_principal"] = (
+            user.id in search_result["_source"]["permissions"]["principal_user"]
         )
         return result

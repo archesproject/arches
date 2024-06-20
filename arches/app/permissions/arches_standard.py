@@ -131,7 +131,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         Arguments:
         user -- the user to check
-        perms -- the permssion string eg: "read_map_layer" or list of strings
+        perms -- the permission string eg: "read_map_layer" or list of strings
         any_perm -- True to check ANY perm in "perms" or False to check ALL perms
 
         """
@@ -209,7 +209,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         Arguments:
         user -- the user to check
-        perms -- the permssion string eg: "read_nodegroup" or list of strings
+        perms -- the permission string eg: "read_nodegroup" or list of strings
         any_perm -- True to check ANY perm in "perms" or False to check ALL perms
 
         """
@@ -346,7 +346,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         returns a list of group objects that have the given permission on the given object
 
         Arguments:
-        perm -- the permssion string eg: "read_nodegroup"
+        perm -- the permission string eg: "read_nodegroup"
         obj -- the model instance to check
 
         """
@@ -367,7 +367,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         ret = []
         for group in Group.objects.all():
-            if bool(has_group_perm(group, perm, obj)):  # type: ignore
+            if has_group_perm(group, perm, obj):  # type: ignore
                 ret.append(group)
         return ret
 
@@ -380,7 +380,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         Returns a list of user objects that have the given permission on the given object
 
         Arguments:
-        perm -- the permssion string eg: "read_nodegroup"
+        perm -- the permission string eg: "read_nodegroup"
         obj -- the model instance to check
 
         """
@@ -461,7 +461,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         Arguments:
         user -- the user to check
-        perms -- the permssion string eg: "read_nodegroup" or list of strings
+        perms -- the permission string eg: "read_nodegroup" or list of strings
         graph_id -- a graph id to check if a user has permissions to that graph's type specifically
 
         """
@@ -470,12 +470,8 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             graph_id = resource.graph_id
 
         nodegroups = self.get_nodegroups_by_perm(user, perms)
-        nodes = (
-            Node.objects.filter(nodegroup__in=nodegroups)
-            .filter(graph_id=graph_id)
-            .select_related("graph")
-        )
-        return bool(nodes.exists())
+        nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=graph_id)
+        return nodes.exists()
 
     def user_can_read_resource(
         self, user: User, resourceid: str | None = None
@@ -512,7 +508,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
     ) -> list[str]:
         graphs = set()
         nodegroups = self.get_nodegroups_by_perm(user, perms)
-        for node in Node.objects.filter(nodegroup__in=nodegroups).prefetch_related(
+        for node in Node.objects.filter(nodegroup__in=nodegroups).select_related(
             "graph"
         ):
             if (
@@ -629,10 +625,8 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         """
 
-        return bool(
-            self.user_has_resource_model_permissions(
-                user, ["models.write_nodegroup"], resource
-            )
+        return self.user_has_resource_model_permissions(
+            user, ["models.write_nodegroup"], resource
         )
 
     def user_can_delete_model_nodegroups(
@@ -647,10 +641,8 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         """
 
-        return bool(
-            self.user_has_resource_model_permissions(
-                user, ["models.delete_nodegroup"], resource
-            )
+        return self.user_has_resource_model_permissions(
+            user, ["models.delete_nodegroup"], resource
         )
 
     def user_can_read_graph(self, user: User, graph_id: str) -> bool:
@@ -663,10 +655,8 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         """
 
-        return bool(
-            self.user_has_resource_model_permissions(
-                user, ["models.read_nodegroup"], graph_id=graph_id
-            )
+        return self.user_has_resource_model_permissions(
+            user, ["models.read_nodegroup"], graph_id=graph_id
         )
 
     def user_can_read_concepts(self, user: User) -> bool:
@@ -676,7 +666,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         """
 
         if user.is_authenticated:
-            return bool(user.groups.filter(name="RDM Administrator").exists())
+            return user.groups.filter(name="RDM Administrator").exists()
         return False
 
     def user_is_resource_editor(self, user: User) -> bool:
@@ -684,21 +674,21 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         Single test for whether a user is in the Resource Editor group
         """
 
-        return bool(user.groups.filter(name="Resource Editor").exists())
+        return user.groups.filter(name="Resource Editor").exists()
 
     def user_is_resource_reviewer(self, user: User) -> bool:
         """
         Single test for whether a user is in the Resource Reviewer group
         """
 
-        return bool(user.groups.filter(name="Resource Reviewer").exists())
+        return user.groups.filter(name="Resource Reviewer").exists()
 
     def user_is_resource_exporter(self, user: User) -> bool:
         """
         Single test for whether a user is in the Resource Exporter group
         """
 
-        return bool(user.groups.filter(name="Resource Exporter").exists())
+        return user.groups.filter(name="Resource Exporter").exists()
 
     def user_in_group_by_name(self, user: User, names: Iterable[str]) -> bool:
         return bool(user.groups.filter(name__in=names))
@@ -781,6 +771,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             )
             and user_can_edit
         )
+        result["is_principal"] = (
+            user.id in search_result["_source"]["permissions"]["principal_user"]
+        )
         return result
 
 
@@ -794,7 +787,7 @@ class PermissionBackend(ObjectPermissionBackend):  # type: ignore
         if "." in perm:
             app_label, perm = perm.split(".")
             if obj is None:
-                raise RuntimeError("Passed perm has app label of '%s' and obj is None")
+                raise ValueError("Passed perm has app label of '%s' and obj is None")
             if app_label != obj._meta.app_label:
                 raise WrongAppError(
                     "Passed perm has app label of '%s' and "
@@ -810,10 +803,10 @@ class PermissionBackend(ObjectPermissionBackend):  # type: ignore
             if "no_access_to_nodegroup" in explicitly_defined_perms:
                 return False
             else:
-                return bool(perm in explicitly_defined_perms)
+                return perm in explicitly_defined_perms
         else:
             user_checker = CachedUserPermissionChecker(user_obj)
-            return bool(user_checker.user_has_permission(perm))
+            return user_checker.user_has_permission(perm)
 
 
 class CachedUserPermissionChecker:
@@ -830,7 +823,7 @@ class CachedUserPermissionChecker:
         else:
             user_permissions = set()
 
-            for group in user.groups.all():
+            for group in user.groups.prefetch_related("permissions").all():
                 for group_permission in group.permissions.all():
                     user_permissions.add(group_permission.codename)
 
@@ -895,7 +888,7 @@ def get_nodegroups_by_perm_for_user_or_group(
         if isinstance(perms, str):
             perms = [perms]
 
-        # in some cases, `perms` can have a `model.` prefix
+        # in some cases, `perms` can have a `models.` prefix
         for perm in perms:
             if len(perm.split(".")) > 1:
                 formatted_perms.append(perm.split(".")[1])
