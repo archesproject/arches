@@ -229,7 +229,6 @@ class BaseBulkEditor:
         request.user = self.request.user
         request.method = "GET"
         request.GET["export"] = True
-        request.GET["core-search"] = True
         validate = URLValidator()
         try:
             validate(search_url)
@@ -313,7 +312,6 @@ class BulkStringEditor(BaseBulkEditor):
         request.method = "GET"
         request.GET["paging-filter"] = 1
         request.GET["tiles"] = True
-        request.GET["core-search"] = True
 
         if search_url:
             validate = URLValidator()

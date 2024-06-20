@@ -48,7 +48,6 @@ class SearchResultsExporter(object):
         search_request.GET = search_request.GET.copy()
         search_request.GET["tiles"] = True
         search_request.GET["export"] = True
-        search_request.GET["core-search"] = True
         self.report_link = search_request.GET.get("reportlink", False)
         self.format = search_request.GET.get("format", "tilecsv")
         self.compact = search_request.GET.get("compact", True)

@@ -777,7 +777,6 @@ def get_response_json(
         query["term-filter"] = JSONSerializer().serialize(term_filter)
     if spatial_filter is not None:
         query["map-filter"] = JSONSerializer().serialize(spatial_filter)
-    query["core-search"] = "true"
     resource_reviewer_group = Group.objects.get(name="Resource Reviewer")
     test_user = User.objects.get(username="unpriviliged_user")
     test_user.groups.add(resource_reviewer_group)
