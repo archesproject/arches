@@ -622,7 +622,7 @@ class GraphModel(models.Model):
                 "can_delete": True,
                 "initial_state": True,
             },
-            "published": {
+            "active": {
                 "can_delete": False,
                 "initial_state": False,
             },

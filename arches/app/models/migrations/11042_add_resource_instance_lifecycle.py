@@ -90,7 +90,7 @@ class Migration(migrations.Migration):
             field=models.JSONField(
                 default={
                     "draft": {"can_delete": True, "initial_state": True},
-                    "published": {"can_delete": False, "initial_state": False},
+                    "active": {"can_delete": False, "initial_state": False},
                     "retired": {"can_delete": True, "initial_state": False},
                 }
             ),

@@ -1603,6 +1603,8 @@ class Graph(models.GraphModel):
             or "group_permissions" in serialized_graph
         ):
             graph_from_database_query = Graph.objects.filter(pk=self.pk)
+            graph_from_database = None
+
             if len(graph_from_database_query):
                 graph_from_database = graph_from_database_query[0]
 
@@ -1827,7 +1829,7 @@ class Graph(models.GraphModel):
             and not self.source_identifier_id
             and not force_recalculation
         ):
-            return self.serialized_graph["widgets"]
+            return self.serialized_graph["cards_x_nodes_x_widgets"]
         else:
             widgets = []
             if self.widgets:
@@ -1905,8 +1907,8 @@ class Graph(models.GraphModel):
             else:
                 ret.pop("cards", None)
 
-            if "widgets" not in exclude:
-                ret["widgets"] = self.get_widgets(
+            if "cards_x_nodes_x_widgets" not in exclude:
+                ret["cards_x_nodes_x_widgets"] = self.get_widgets(
                     use_raw_i18n_json=use_raw_i18n_json,
                     force_recalculation=force_recalculation,
                 )

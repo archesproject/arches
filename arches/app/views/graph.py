@@ -285,6 +285,7 @@ class GraphDesignerView(GraphBaseView):
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
+        # import pdb; pdb.set_trace()
 
         context = self.get_context_data(
             main_script="views/graph-designer",
@@ -314,7 +315,9 @@ class GraphDesignerView(GraphBaseView):
             card_components=card_components,
             card_components_json=JSONSerializer().serialize(card_components),
             cards=JSONSerializer().serialize(serialized_graph["cards"]),
-            cardwidgets=JSONSerializer().serialize(serialized_graph["widgets"]),
+            cardwidgets=JSONSerializer().serialize(
+                serialized_graph["cards_x_nodes_x_widgets"]
+            ),
             map_layers=models.MapLayer.objects.all(),
             map_markers=models.MapMarker.objects.all(),
             map_sources=models.MapSource.objects.all(),
