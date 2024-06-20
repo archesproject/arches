@@ -103,7 +103,10 @@ class SearchView(MapBaseManagerView):
             ]
         )
         # TODO: Apply new permission logic after #11005 is merged
-        if user_is_resource_exporter(request.user):
+        if user_is_resource_exporter(request.user) and "search-export" in [
+            s["componentname"]
+            for s in core_search_component.config["requiredComponents"]
+        ]:
             search_components.append(all_search_components_dict["search-export"])
 
         datatypes = models.DDataType.objects.all()
