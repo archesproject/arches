@@ -22,14 +22,6 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path, re_path
 from arches.app.views import concept, main, map, search, graph, api
 from arches.app.views.admin import ReIndexResources, ClearUserPermissionCache
-from arches.app.views.controlled_lists import (
-    ControlledListItemView,
-    ControlledListView,
-    ControlledListsView,
-    ControlledListItemImageView,
-    ControlledListItemImageMetadataView,
-    ControlledListItemValueView,
-)
 from arches.app.views.etl_manager import ETLManagerView
 from arches.app.views.file import FileView, TempFileView
 from arches.app.views.thumbnail import ThumbnailView
@@ -770,57 +762,7 @@ urlpatterns = [
         api.TransformEdtfForTile.as_view(),
         name="transform_edtf_for_tile",
     ),
-    path(
-        "api/controlled_lists/", ControlledListsView.as_view(), name="controlled_lists"
-    ),
-    path(
-        "api/controlled_list/", ControlledListView.as_view(), name="controlled_list_add"
-    ),
-    path(
-        "api/controlled_list/<uuid:id>/",
-        ControlledListView.as_view(),
-        name="controlled_list",
-    ),
-    path(
-        "api/controlled_list_item/",
-        ControlledListItemView.as_view(),
-        name="controlled_list_item_add",
-    ),
-    path(
-        "api/controlled_list_item/<uuid:id>/",
-        ControlledListItemView.as_view(),
-        name="controlled_list_item",
-    ),
-    path(
-        "api/controlled_list_item_value/<uuid:id>/",
-        ControlledListItemValueView.as_view(),
-        name="controlled_list_item_value",
-    ),
-    path(
-        "api/controlled_list_item_value/",
-        ControlledListItemValueView.as_view(),
-        name="controlled_list_item_value_add",
-    ),
-    path(
-        "api/controlled_list_item_image/<uuid:id>/",
-        ControlledListItemImageView.as_view(),
-        name="controlled_list_item_image",
-    ),
-    path(
-        "api/controlled_list_item_image/",
-        ControlledListItemImageView.as_view(),
-        name="controlled_list_item_image_add",
-    ),
-    path(
-        "api/controlled_list_item_image_metadata/<uuid:id>/",
-        ControlledListItemImageMetadataView.as_view(),
-        name="controlled_list_item_image_metadata",
-    ),
-    path(
-        "api/controlled_list_item_image_metadata/",
-        ControlledListItemImageMetadataView.as_view(),
-        name="controlled_list_item_image_metadata_add",
-    ),
+    path("", include("arches.controlledlists.urls")),
 ]
 
 # This must be included in core to keep webpack happy, but cannot be appended when running a project.
