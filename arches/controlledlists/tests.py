@@ -9,20 +9,22 @@ from guardian.shortcuts import assign_perm
 
 from arches.app.models.graph import Graph
 from arches.app.models.models import (
-    ControlledList,
-    ControlledListItem,
-    ControlledListItemImage,
-    ControlledListItemImageMetadata,
-    ControlledListItemValue,
     DValueType,
     Language,
     Node,
     NodeGroup,
 )
+from arches.controlledlists.models import (
+    ControlledList,
+    ControlledListItem,
+    ControlledListItemImage,
+    ControlledListItemImageMetadata,
+    ControlledListItemValue,
+)
 from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
-# python manage.py test tests.views.controlled_lists_tests --settings="tests.test_settings"
+# python manage.py test arches.controlledlists.tests --settings="tests.test_settings"
 
 
 SYNCED_PK = uuid.uuid4()

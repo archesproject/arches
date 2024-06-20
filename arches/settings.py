@@ -365,6 +365,7 @@ INSTALLED_APPS = (
     "django.contrib.gis",
     "arches",
     "arches.app.models",
+    "arches.controlledlists",
     "arches.management",
     "guardian",
     "captcha",
@@ -374,7 +375,7 @@ INSTALLED_APPS = (
     "django_celery_results",
 )
 
-ARCHES_APPLICATIONS = ()
+ARCHES_APPLICATIONS = ("arches.controlledlists",)
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -878,4 +879,5 @@ if __name__ == "__main__":
         public_server_address=PUBLIC_SERVER_ADDRESS,
         static_url=STATIC_URL,
         webpack_development_server_port=WEBPACK_DEVELOPMENT_SERVER_PORT,
+        arches_applications=ARCHES_APPLICATIONS,
     )
