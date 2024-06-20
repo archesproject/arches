@@ -75,12 +75,37 @@ class SearchView(MapBaseManagerView):
             .exclude(publication=None)
         )
         geocoding_providers = models.Geocoder.objects.all()
-        if user_is_resource_exporter(request.user):
-            search_components = models.SearchComponent.objects.filter(enabled=True)
+        all_search_components_dict = {
+            s.componentname: s for s in models.SearchComponent.objects.all()
+        }
+        core_search_component_name = request.GET.get("core", None)
+        if core_search_component_name:
+            core_search_component = all_search_components_dict[
+                core_search_component_name
+            ]
         else:
-            search_components = models.SearchComponent.objects.filter(
-                enabled=True
-            ).exclude(componentname="search-export")
+            # get default core search component
+            core_search_component = list(
+                filter(
+                    lambda x: x.config.get("default", False) and x.type == "core",
+                    list(all_search_components_dict.values()),
+                )
+            )[0]
+
+        search_components = [core_search_component]
+        search_components.extend(
+            [
+                all_search_components_dict[required_component["componentname"]]
+                for required_component in core_search_component.config[
+                    "requiredComponents"
+                ]
+                if required_component["componentname"] != "search-export"
+            ]
+        )
+        # TODO: Apply new permission logic after #11005 is merged
+        if user_is_resource_exporter(request.user):
+            search_components.append(all_search_components_dict["search-export"])
+
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
