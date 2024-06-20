@@ -7,7 +7,11 @@ import { useToast } from "primevue/usetoast";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
 import { patchItem } from "@/components/ControlledListManager/api.ts";
-import { itemKey } from "@/components/ControlledListManager/constants.ts";
+import {
+    DEFAULT_ERROR_TOAST_LIFE,
+    ERROR,
+    itemKey,
+} from "@/components/ControlledListManager/constants.ts";
 
 import type { Ref } from "vue";
 import type { ControlledListItem } from "@/types/ControlledListManager";
@@ -35,8 +39,16 @@ const save = async () => {
     editing.value = false;
     const originalValue = item.value.uri;
     item.value.uri = formValue.value;
-    const success = await patchItem(item.value, toast, $gettext, uri);
-    if (!success) {
+
+    try {
+        await patchItem(item.value, uri);
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Save failed"),
+            detail: error.message,
+        });
         item.value.uri = originalValue;
     }
 };

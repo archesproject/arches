@@ -39,3 +39,16 @@ class ControlledListQuerySet(models.QuerySet):
             qs = qs.annotate(**{annotation_name: subquery})
 
         return qs
+
+
+class ControlledListItemValueQuerySet(models.QuerySet):
+    def values_without_images(self):
+        return self.exclude(valuetype="image")
+
+    def images(self):
+        return self.filter(valuetype="image")
+
+
+class ControlledListItemImageManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(valuetype="image")

@@ -76,10 +76,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
                 },
                 file: ({ props }) => ({
                     style: {
-                        display:
-                            (props as any).badgeValue === completed
-                                ? 'none'
-                                : '',
+                        display: props.badgeValue === completed ? 'none' : '',
                     },
                 }),
             }"

@@ -142,8 +142,6 @@ class ControlledListView(View):
             return JSONResponse(status=HTTPStatus.BAD_REQUEST)
 
         clist = ControlledList(id=list_id, **data)
-        if sortorder_map:
-            clist.bulk_update_item_parentage_and_order(parent_map, sortorder_map)
 
         exclude_fields = {f for f in field_names(clist) if f not in update_fields}
         try:
@@ -155,6 +153,9 @@ class ControlledListView(View):
             )
 
         clist.save(update_fields=update_fields)
+
+        if sortorder_map:
+            clist.bulk_update_item_parentage_and_order(parent_map, sortorder_map)
 
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
@@ -298,7 +299,9 @@ class ControlledListItemValueView(View):
         data = JSONDeserializer().deserialize(request.body)
 
         try:
-            value = ControlledListItemValue.values_without_images.get(pk=value_id)
+            value = ControlledListItemValue.objects.values_without_images().get(
+                pk=value_id
+            )
         except ControlledListItemValue.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
@@ -322,7 +325,9 @@ class ControlledListItemValueView(View):
     def delete(self, request, **kwargs):
         value_id = kwargs.get("id")
         try:
-            value = ControlledListItemValue.values_without_images.get(pk=value_id)
+            value = ControlledListItemValue.objects.values_without_images().get(
+                pk=value_id
+            )
         except:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
