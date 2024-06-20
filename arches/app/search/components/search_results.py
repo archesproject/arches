@@ -78,7 +78,14 @@ class SearchResultsFilter(BaseSearchFilter):
             search_query = Bool()
             subsearch_query = Bool()
             # TODO: call to permissions framework with subsearch_query
-            subsearch_query.should(Nested(path="permissions", query=Terms(field="permissions.principal_user", terms=[int(self.user.id)])))
+            subsearch_query.should(
+                Nested(
+                    path="permissions",
+                    query=Terms(
+                        field="permissions.principal_user", terms=[int(self.user.id)]
+                    ),
+                )
+            )
             search_query.must(subsearch_query)
             search_results_object["query"].add_query(search_query)
 
