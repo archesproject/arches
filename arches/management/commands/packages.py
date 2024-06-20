@@ -1463,7 +1463,7 @@ class Command(BaseCommand):
                     models.ControlledListItem,
                     models.ControlledListItemValue,
                 ]:
-                    for instance in model.objects.filter(pk__in=created_instances):
+                    for instance in model.objects.filter(pk__in=created_instances_pks):
                         instance.full_clean()
                 self.stdout.write("Data imported successfully from {0}".format(source))
         else:
