@@ -1436,17 +1436,26 @@ class Command(BaseCommand):
         ret = skos.save_concepts_from_skos(rdf, overwrite, stage, prevent_indexing)
 
     def import_controlled_lists(self, source):
+        created_instances_pks = []
         if os.path.exists(source):
             wb = openpyxl.load_workbook(source)
             with transaction.atomic():
                 for sheet in wb.sheetnames:
                     if sheet == "ControlledList":
-                        self.import_sheet_to_model(wb[sheet], models.ControlledList)
+                        created_instances_pks.extend(
+                            self.import_sheet_to_model(wb[sheet], models.ControlledList)
+                        )
                     elif sheet == "ControlledListItem":
-                        self.import_sheet_to_model(wb[sheet], models.ControlledListItem)
+                        created_instances_pks.extend(
+                            self.import_sheet_to_model(
+                                wb[sheet], models.ControlledListItem
+                            )
+                        )
                     elif sheet == "ControlledListItemValue":
-                        self.import_sheet_to_model(
-                            wb[sheet], models.ControlledListItemValue
+                        created_instances_pks.extend(
+                            self.import_sheet_to_model(
+                                wb[sheet], models.ControlledListItemValue
+                            )
                         )
                 # validate all data
                 for model in [
@@ -1454,7 +1463,7 @@ class Command(BaseCommand):
                     models.ControlledListItem,
                     models.ControlledListItemValue,
                 ]:
-                    for instance in model.objects.all():
+                    for instance in model.objects.filter(pk__in=created_instances):
                         instance.full_clean()
                 self.stdout.write("Data imported successfully from {0}".format(source))
         else:
@@ -1479,6 +1488,7 @@ class Command(BaseCommand):
 
         # Process row data and create instances of the model
         instances = []
+        instance_pks = []
         list_items_with_parent = {}
         for row in import_table:
             instance = model()
@@ -1518,6 +1528,7 @@ class Command(BaseCommand):
             # run validation on all non-parent fields & gather for bulk create
             instance.clean_fields(exclude={"parent"})
             instances.append(instance)
+            instance_pks.append(instance.pk)
 
         model.objects.bulk_create(instances)
 
@@ -1531,6 +1542,8 @@ class Command(BaseCommand):
                     }
                 )
                 child.save()
+
+        return instance_pks
 
     def export_controlled_lists(self, data_dest):
         wb = openpyxl.Workbook()
