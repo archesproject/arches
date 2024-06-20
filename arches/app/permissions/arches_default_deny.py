@@ -151,15 +151,12 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
         result["can_edit"] = user.is_superuser or (
             "permissions" in search_result["_source"]
             and "groups_edit" in search_result["_source"]["permissions"]
-            and (
-                (
-                    set(
-                        search_result["_source"]["permissions"]["groups_edit"]
-                    ).intersection(set(groups))
-                )
-                and user_can_edit
-            )
+            and set(
+                search_result["_source"]["permissions"]["groups_edit"]
+            ).intersection(set(groups))
+            and user_can_edit
         )
+
         result["is_principal"] = (
             user.id in search_result["_source"]["permissions"]["principal_user"]
         )
