@@ -10,20 +10,22 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 
 from arches.app.models.models import (
-    ControlledList,
-    ControlledListItem,
-    ControlledListItemImage,
-    ControlledListItemImageMetadata,
-    ControlledListItemValue,
     Language,
     Node,
 )
-from arches.app.models.utils import field_names
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.utils.string_utils import str_to_bool
+from arches.controlledlists.models import (
+    ControlledList,
+    ControlledListItem,
+    ControlledListItemImage,
+    ControlledListItemImageMetadata,
+    ControlledListItemValue,
+)
+from arches.controlledlists.utils import field_names
 
 logger = logging.getLogger(__name__)
 

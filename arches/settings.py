@@ -366,6 +366,7 @@ INSTALLED_APPS = (
     "django.contrib.gis",
     "arches",
     "arches.app.models",
+    "arches.controlledlists",
     "arches.management",
     "guardian",
     "captcha",
@@ -375,7 +376,7 @@ INSTALLED_APPS = (
     "django_celery_results",
 )
 
-ARCHES_APPLICATIONS = ()
+ARCHES_APPLICATIONS = ("arches.controlledlists",)
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
