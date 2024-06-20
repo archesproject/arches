@@ -173,6 +173,10 @@ class Bool(Dsl):
             self.dsl["bool"]["filter"] + object.dsl["bool"]["filter"]
         )
 
+        this_min_should = self.dsl["bool"]["minimum_should_match"] if "minimum_should_match" in self.dsl["bool"] else None
+        other_min_should = object.dsl["bool"]["minimum_should_match"] if "minimum_should_match" in object.dsl["bool"] else None
+        if not this_min_should and other_min_should:
+            self.dsl["bool"]["minimum_should_match"] = other_min_should
         return self
 
 
