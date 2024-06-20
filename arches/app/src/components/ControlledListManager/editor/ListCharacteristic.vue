@@ -6,7 +6,11 @@ import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
 import { patchList } from "@/components/ControlledListManager/api.ts";
-import { displayedRowKey } from "@/components/ControlledListManager/constants.ts";
+import {
+    DEFAULT_ERROR_TOAST_LIFE,
+    ERROR,
+    displayedRowKey,
+} from "@/components/ControlledListManager/constants.ts";
 
 import type { DisplayedListRefAndSetter } from "@/types/ControlledListManager";
 
@@ -43,8 +47,15 @@ const save = async () => {
     editing.value = false;
     const originalValue = list.value!.name;
     list.value!.name = formValue.value.trim();
-    const success = await patchList(list.value, toast, $gettext, field);
-    if (!success) {
+    try {
+        await patchList(list.value, field);
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Save failed"),
+            detail: error.message,
+        });
         list.value!.name = originalValue;
     }
 };

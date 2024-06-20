@@ -14,6 +14,8 @@ import {
     upsertValue,
 } from "@/components/ControlledListManager/api.ts";
 import {
+    DEFAULT_ERROR_TOAST_LIFE,
+    ERROR,
     displayedRowKey,
     selectedLanguageKey,
 } from "@/components/ControlledListManager/constants.ts";
@@ -136,13 +138,21 @@ const setParent = async (parentNode: TreeNode) => {
     reorderItems(list, item, siblings, false);
 
     const field = "children";
-    const success = await patchList(list, toast, $gettext, field);
-    if (success) {
+    try {
+        await patchList(list, field);
         // Clear custom classes added in <Tree> pass-through
         rerenderTree.value += 1;
         movingItem.value = {};
         refetcher.value += 1;
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Save failed"),
+            detail: error.message,
+        });
     }
+
     awaitingMove.value = false;
 };
 
@@ -155,41 +165,56 @@ const isNewItem = (node: TreeNode) => {
 };
 
 const acceptNewItemShortcutEntry = async () => {
-    const newItem = await createItem(nextNewItem.value, toast, $gettext);
-    if (newItem) {
-        const newValue = {
-            ...nextNewItem.value!.values[0],
-            id: 0,
-            item_id: newItem.id,
-            value: newLabelFormValue.value.trim(),
-        };
-        const newLabel = await upsertValue(newValue, toast, $gettext);
-
-        if (newLabel) {
-            newItem.values = [newLabel];
-        }
-
-        const parent = findNodeInTree(
-            tree.value,
-            newItem.parent_id ?? newItem.controlled_list_id,
-        );
-        parent.children = [
-            ...parent.children.filter(
-                (child: TreeNode) => typeof child.key === "string",
-            ),
-            itemAsNode(newItem, selectedLanguage.value),
-        ];
-        if (parent.data.name) {
-            // Parent node is a list
-            parent.data.items.push(newItem);
-        } else {
-            // Parent node is an item
-            parent.data.children.push(newItem);
-        }
-
-        selectedKeys.value = { [newItem.id]: true };
-        setDisplayedRow(newItem);
+    let newItem: ControlledListItem;
+    try {
+        newItem = await createItem(nextNewItem.value);
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Item creation failed"),
+            detail: error.message,
+        });
+        return;
     }
+    const newValue = {
+        ...nextNewItem.value!.values[0],
+        id: 0,
+        item_id: newItem.id,
+        value: newLabelFormValue.value.trim(),
+    };
+    try {
+        const newLabel = await upsertValue(newValue);
+        newItem.values = [newLabel];
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Value save failed"),
+            detail: error.message,
+        });
+    }
+
+    const parent = findNodeInTree(
+        tree.value,
+        newItem.parent_id ?? newItem.controlled_list_id,
+    );
+    parent.children = [
+        ...parent.children.filter(
+            (child: TreeNode) => typeof child.key === "string",
+        ),
+        itemAsNode(newItem, selectedLanguage.value),
+    ];
+    if (parent.data.name) {
+        // Parent node is a list
+        parent.data.items.push(newItem);
+    } else {
+        // Parent node is an item
+        parent.data.children.push(newItem);
+    }
+
+    selectedKeys.value = { [newItem.id]: true };
+    setDisplayedRow(newItem);
 };
 
 const triggerAcceptNewItemShortcut = () => {
@@ -201,17 +226,22 @@ const triggerAcceptNewListShortcut = () => {
 };
 
 const acceptNewListShortcutEntry = async () => {
-    const newList = await createList(
-        newListFormValue.value.trim(),
-        toast,
-        $gettext,
-    );
-    tree.value = [
-        ...tree.value.filter((lst) => typeof lst.data.id === "string"),
-        listAsNode(newList),
-    ];
-    selectedKeys.value = { [newList.id]: true };
-    setDisplayedRow(newList);
+    try {
+        const newList = await createList(newListFormValue.value.trim());
+        tree.value = [
+            ...tree.value.filter((cList) => typeof cList.data.id === "string"),
+            listAsNode(newList),
+        ];
+        selectedKeys.value = { [newList.id]: true };
+        setDisplayedRow(newList);
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("List creation failed"),
+            detail: error.message,
+        });
+    }
 };
 </script>
 

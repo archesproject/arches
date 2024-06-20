@@ -449,7 +449,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_delete_label_valid(self):
         self.client.force_login(self.admin)
-        alt_label = ControlledListItemValue.values_without_images.filter(
+        alt_label = ControlledListItemValue.objects.filter(
             valuetype_id="altLabel"
         ).first()
         response = self.client.delete(
@@ -459,7 +459,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_delete_label_invalid(self):
         self.client.force_login(self.admin)
-        pref_label = ControlledListItemValue.values_without_images.filter(
+        pref_label = ControlledListItemValue.objects.filter(
             valuetype_id="prefLabel"
         ).first()
         with self.assertLogs("django.request", level="WARNING"):

@@ -12,30 +12,32 @@ from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
-from arches.app.models.querysets import ControlledListQuerySet, NodeQuerySet
+from arches.app.models.querysets import (
+    ControlledListQuerySet,
+    ControlledListItemImageManager,
+    ControlledListItemValueQuerySet,
+    NodeQuerySet,
+)
 from arches.app.models.utils import add_to_update_fields, field_names
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
-from django.db.models import Deferrable, JSONField
-from django.db.models.fields.json import KT
-from django.db.models.functions import Cast
 from django.core.cache import caches
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.core.serializers.json import DjangoJSONEncoder
-from django.template.loader import get_template, render_to_string
-from django.core.validators import MinValueValidator, RegexValidator
-from django.db.models import Q, Max
+from django.core.validators import MinValueValidator, RegexValidator, validate_slug
+from django.db.models import Deferrable, JSONField, Max, Q
 from django.db.models.fields.json import KT
+from django.db.models.functions import Cast
 from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
+from django.template.loader import get_template, render_to_string
 from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
-from django.core.validators import validate_slug
 from guardian.models import GroupObjectPermission
 from guardian.shortcuts import assign_perm
 
@@ -2360,16 +2362,6 @@ class ControlledListItem(models.Model):
         return data
 
 
-class ValuesWithoutImagesManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().exclude(valuetype="image")
-
-
-class ImageManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(valuetype="image")
-
-
 class ControlledListItemValue(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     controlled_list_item = models.ForeignKey(
@@ -2420,9 +2412,7 @@ class ControlledListItemValue(models.Model):
             ),
         ]
 
-    objects = models.Manager()
-    values_without_images = ValuesWithoutImagesManager()
-    images = ImageManager()
+    objects = ControlledListItemValueQuerySet.as_manager()
 
     def clean(self):
         if not self.value:
@@ -2476,7 +2466,7 @@ class ControlledListItemImage(models.Model):
     )
     value = models.FileField(upload_to="controlled_list_item_images")
 
-    objects = ImageManager()
+    objects = ControlledListItemImageManager()
 
     class Meta:
         managed = False

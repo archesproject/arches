@@ -15,9 +15,11 @@ import {
     fetchLists,
 } from "@/components/ControlledListManager/api.ts";
 import {
+    DANGER,
+    DEFAULT_ERROR_TOAST_LIFE,
+    ERROR,
     displayedRowKey,
     selectedLanguageKey,
-    DANGER,
 } from "@/components/ControlledListManager/constants.ts";
 import { listAsNode } from "@/components/ControlledListManager/utils.ts";
 
@@ -115,11 +117,32 @@ const deleteSelected = async () => {
     // Do items first so that cascade deletion doesn't cause item deletion to fail.
     let anyDeleted = false;
     if (itemIdsToDelete.length) {
-        anyDeleted = await deleteItems(itemIdsToDelete, toast, $gettext);
+        try {
+            anyDeleted = await deleteItems(itemIdsToDelete);
+        } catch (error) {
+            error.message.split("|").forEach((detail) => {
+                toast.add({
+                    severity: ERROR,
+                    life: DEFAULT_ERROR_TOAST_LIFE,
+                    summary: $gettext("Item deletion failed"),
+                    detail,
+                });
+            });
+        }
     }
     if (listIdsToDelete.length) {
-        anyDeleted =
-            (await deleteLists(listIdsToDelete, toast, $gettext)) || anyDeleted;
+        try {
+            anyDeleted = (await deleteLists(listIdsToDelete)) || anyDeleted;
+        } catch (error) {
+            error.message.split("|").forEach((detail) => {
+                toast.add({
+                    severity: ERROR,
+                    life: DEFAULT_ERROR_TOAST_LIFE,
+                    summary: $gettext("List deletion failed"),
+                    detail,
+                });
+            });
+        }
     }
     if (anyDeleted) {
         setDisplayedRow(null);
@@ -150,13 +173,22 @@ const confirmDelete = () => {
 };
 
 const fetchListsAndPopulateTree = async () => {
-    await fetchLists(toast, $gettext).then(
-        ({ controlled_lists }: { controlled_lists: ControlledList[] }) => {
-            controlledListItemsTree.value = controlled_lists.map((list) =>
-                listAsNode(list, selectedLanguage.value),
-            );
-        },
-    );
+    await fetchLists()
+        .then(
+            ({ controlled_lists }: { controlled_lists: ControlledList[] }) => {
+                controlledListItemsTree.value = controlled_lists.map((list) =>
+                    listAsNode(list, selectedLanguage.value),
+                );
+            },
+        )
+        .catch((error) => {
+            toast.add({
+                severity: ERROR,
+                life: DEFAULT_ERROR_TOAST_LIFE,
+                summary: $gettext("Unable to fetch lists"),
+                detail: error.message,
+            });
+        });
 };
 
 await fetchListsAndPopulateTree();
