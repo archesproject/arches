@@ -731,6 +731,11 @@ urlpatterns = [
         api.SpatialView.as_view(),
         name="spatialview_api",
     ),
+    re_path(
+        r"^api/spatialview$", 
+        api.SpatialView.as_view(), 
+        name="spatialview_list"
+    ),
 ]
 
 # This must be included in core to keep webpack happy, but cannot be appended when running a project.
