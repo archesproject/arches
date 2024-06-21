@@ -1245,8 +1245,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 )
 
         if value is not None:
-            if byte_count > max_bytes:
-                validate_geom_byte_size_can_be_reduced(value)
+            # if byte_count > max_bytes:
+            #     validate_geom_byte_size_can_be_reduced(value)
             for feature in value["features"]:
                 try:
                     geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
