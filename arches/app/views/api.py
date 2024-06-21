@@ -2379,7 +2379,23 @@ class SpatialView(APIBase):
                 spatialview.language = lang
             if description:
                 spatialview.description = description
-            spatialview.save()
+            
+            try:
+                spatialview.save()
+            except ValidationError as e:
+                return JSONErrorResponse(_("Validation Error"),e.message, status=400)
+
+            return_json = {
+                "spatialviewid": str(spatialview.spatialviewid),
+                "schema": spatialview.schema,
+                "slug": spatialview.slug,
+                "description": spatialview.description,
+                "geometrynodeid": str(spatialview.geometrynode.pk),
+                "ismixedgeometrytypes": spatialview.ismixedgeometrytypes,
+                "language": spatialview.language.code,
+                "attributenodes": spatialview.attributenodes,
+                "isactive": spatialview.isactive
+            }
 
             return JSONResponse(status=200)
         return JSONErrorResponse(_("No json request payload"), status=400)
