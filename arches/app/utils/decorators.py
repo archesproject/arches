@@ -75,7 +75,7 @@ def group_required(*group_names, raise_exception=False):
         passed = permission_group_required(u, *group_names)
         if passed:
             return True
-        elif not passed and raise_exception:
+        elif raise_exception:
             raise PermissionDenied
         # else: user_passes_test() redirects to nowhere
         return False
