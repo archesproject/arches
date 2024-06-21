@@ -201,7 +201,11 @@ class ResourceEditorView(MapBaseManagerView):
         else:
             resource_instance = Resource.objects.get(pk=resourceid)
             graph = resource_instance.graph
-            instance_creator = resource_instance.get_instance_creator(request.user)
+            instance_creator = (
+                resource_instance.get_instance_creator_and_edit_permissions(
+                    request.user
+                )
+            )
             creator = instance_creator["creatorid"]
             user_created_instance = instance_creator[
                 "user_can_edit_instance_permissions"
@@ -529,7 +533,7 @@ class ResourcePermissionDataView(View):
             len(get_users_with_perms(resource_instance))
             + len(get_groups_with_perms(resource_instance))
         ) > 1
-        instance_creator = resource_instance.get_instance_creator()
+        instance_creator = resource_instance.get_instance_creator_and_edit_permissions()
         result["creatorid"] = instance_creator["creatorid"]
         return result
 
@@ -539,7 +543,7 @@ class ResourcePermissionDataView(View):
         resource.graph_id = graphid if graphid else str(resource_instance.graph_id)
         resource.createdtime = resource_instance.createdtime
         resource.add_permission_to_all("no_access_to_resourceinstance")
-        instance_creator = resource.get_instance_creator()
+        instance_creator = resource.get_instance_creator_and_edit_permissions()
         user = User.objects.get(pk=instance_creator["creatorid"])
         assign_perm("view_resourceinstance", user, resource)
         assign_perm("change_resourceinstance", user, resource)
@@ -567,7 +571,11 @@ class ResourcePermissionDataView(View):
                     else:
                         identityModel = User.objects.get(pk=identity["id"])
 
-                    instance_creator = resource_instance.get_instance_creator(user)
+                    instance_creator = (
+                        resource_instance.get_instance_creator_and_edit_permissions(
+                            user
+                        )
+                    )
                     creator = instance_creator["creatorid"]
                     user_can_modify_permissions = instance_creator[
                         "user_can_edit_instance_permissions"
