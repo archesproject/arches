@@ -2180,7 +2180,7 @@ class SpatialView(APIBase):
         return uuid_pattern.match(identifier)
 
     @method_decorator(group_required("Application Administrator"))
-    def post(self, request, identifier=None):
+    def post(self, request):
         lang = None
         isactive = False
         ismixedgeometrytypes = None
@@ -2263,9 +2263,25 @@ class SpatialView(APIBase):
             spatialview.language = lang
             spatialview.attributenodes = attributenodes
             spatialview.isactive = isactive
-            spatialview.save()
+            
+            try:
+                spatialview.save()
+            except ValidationError as e:
+                return JSONErrorResponse(str(e), status=400)
 
-            return JSONResponse(status=200)
+            return_json = {
+                "spatialviewid": str(spatialview.spatialviewid),
+                "schema": spatialview.schema,
+                "slug": spatialview.slug,
+                "description": spatialview.description,
+                "geometrynodeid": str(spatialview.geometrynode.pk),
+                "ismixedgeometrytypes": spatialview.ismixedgeometrytypes,
+                "language": spatialview.language.code,
+                "attributenodes": spatialview.attributenodes,
+                "isactive": spatialview.isactive
+            }
+
+            return JSONResponse(return_json ,status=200)
         return JSONErrorResponse(_("No json request payload"), status=400)
 
     @method_decorator(group_required("Application Administrator"))
