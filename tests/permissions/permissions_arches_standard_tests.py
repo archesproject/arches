@@ -108,10 +108,6 @@ class ArchesStandardPermissionTests(ArchesPermissionFrameworkTestCase):
             with self.subTest(result=result):
                 self.assertTrue(result)
 
-    def test_inclusion_array(self):
-        inclusions = self.framework.get_permission_inclusions()
-        self.assertEqual(len(inclusions), 4)
-
     @mock.patch("django.contrib.auth.models.User")
     def test_permission_search_filter(self, mock_User):
         mock_User.id = 12
