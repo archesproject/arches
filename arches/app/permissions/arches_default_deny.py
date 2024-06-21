@@ -98,6 +98,7 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
             for user in self.get_users_for_object("change_resourceinstance", resource)
         ]
         permissions["users_edit"] = users_edit_allowances
+        permissions["principal_user"] = [resource.principaluser_id]
         return permissions
 
     def get_permission_inclusions(self) -> list:
@@ -106,6 +107,7 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
             "permissions.groups_edit",
             "permissions.users_read",
             "permissions.users_edit",
+            "permissions.principal_user",
         ]
 
     def get_permission_search_filter(self, user: User) -> Bool:
@@ -158,6 +160,9 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
         )
 
         result["is_principal"] = (
-            user.id in search_result["_source"]["permissions"]["principal_user"]
+            "permissions" in search_result["_source"]
+            and "principal_user" in search_result["_source"]["permissions"]
+            and user.id in search_result["_source"]["permissions"]["principal_user"]
         )
+
         return result

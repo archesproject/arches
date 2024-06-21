@@ -180,16 +180,28 @@ class PermissionTests(ArchesTestCase):
         restrictions = get_restricted_users(resource)
 
         results = [
-            jim.id in restrictions["cannot_read"],
-            ben.id in restrictions["cannot_write"],
-            sam.id in restrictions["cannot_delete"],
-            sam.id in restrictions["no_access"],
-            admin.id not in restrictions["cannot_read"],
-            admin.id not in restrictions["cannot_write"],
-            admin.id not in restrictions["cannot_delete"],
-            admin.id not in restrictions["no_access"],
+            ("jim", "cannot_read", jim.id in restrictions["cannot_read"]),
+            ("ben", "cannot_write", ben.id in restrictions["cannot_write"]),
+            ("sam", "cannot_delete", sam.id in restrictions["cannot_delete"]),
+            ("sam", "no_access", sam.id in restrictions["no_access"]),
+            (
+                "admin",
+                "not in cannot_read",
+                admin.id not in restrictions["cannot_read"],
+            ),
+            (
+                "admin",
+                "not in cannot_write",
+                admin.id not in restrictions["cannot_write"],
+            ),
+            (
+                "admin",
+                "not in cannot_delete",
+                admin.id not in restrictions["cannot_delete"],
+            ),
+            ("admin", "not in no_access", admin.id not in restrictions["no_access"]),
         ]
 
         for result in results:
-            with self.subTest(result=result):
+            with self.subTest(user=result[0], restriction=result[1], result=result[3]):
                 self.assertTrue(result)

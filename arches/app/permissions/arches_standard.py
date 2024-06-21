@@ -733,6 +733,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             "permissions.users_without_edit_perm",
             "permissions.users_without_delete_perm",
             "permissions.users_with_no_access",
+            "permissions.principal_user",
         ]
 
     def get_permission_search_filter(self, user: User) -> Bool:
@@ -775,7 +776,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             and user_can_edit
         )
         result["is_principal"] = (
-            user.id in search_result["_source"]["permissions"]["principal_user"]
+            "permissions" in search_result["_source"]
+            and "principal_user" in search_result["_source"]["permissions"]
+            and user.id in search_result["_source"]["permissions"]["principal_user"]
         )
         return result
 
