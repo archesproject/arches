@@ -616,21 +616,8 @@ class GraphModel(models.Model):
         to="models.graphmodel",
     )
     has_unpublished_changes = models.BooleanField(default=False)
-    resource_instance_lifecycle_states = JSONField(
-        default={
-            "draft": {
-                "can_delete": True,
-                "initial_state": True,
-            },
-            "active": {
-                "can_delete": False,
-                "initial_state": False,
-            },
-            "retired": {
-                "can_delete": True,
-                "initial_state": False,
-            },
-        }
+    resource_instance_lifecycle = models.ForeignKey(
+        null=True, on_delete=models.CASCADE, to="models.ResourceInstanceLifecycle"
     )
 
     @property
@@ -1268,7 +1255,7 @@ class ResourceInstance(models.Model):
         if not self.lifecycle_state:
             self.lifecycle_state = next(
                 key
-                for key, value in self.graph.resource_instance_lifecycle_states.items()
+                for key, value in self.graph.resource_instance_lifecycle.states.items()
                 if value["initial_state"]
             )
 
@@ -1285,6 +1272,35 @@ class ResourceInstance(models.Model):
         managed = True
         db_table = "resource_instances"
         permissions = (("no_access_to_resourceinstance", "No Access"),)
+
+
+class ResourceInstanceLifecycle(models.Model):
+    graph = models.OneToOneField(
+        "GraphModel",
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    states = models.JSONField(
+        default=lambda: {
+            "draft": {"can_delete": True, "initial_state": True},
+            "active": {"can_delete": False, "initial_state": False},
+            "retired": {"can_delete": True, "initial_state": False},
+        }
+    )
+
+    class Meta:
+        db_table = "resource_instance_lifecycles"
+        managed = True
+
+
+@receiver(post_save, sender=GraphModel)
+def create_resource_instance_lifecycle(sender, instance, created, **kwargs):
+    if created and not instance.resource_instance_lifecycle:
+        lifecycle_state = models.ResourceInstanceLifecycle.objects.create(
+            graph=instance
+        )
+        instance.resource_instance_lifecycle = lifecycle_state
+        instance.save()
 
 
 class SearchComponent(models.Model):

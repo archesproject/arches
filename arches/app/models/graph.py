@@ -23,7 +23,9 @@ import uuid
 from copy import deepcopy
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
+from django.db.models.signals import post_save
 from django.db.utils import IntegrityError
+from django.dispatch import receiver
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
 from arches.app.models.card import Card
@@ -2867,6 +2869,16 @@ class Graph(models.GraphModel):
                 published_graph.save()
 
             translation.deactivate()
+
+
+@receiver(post_save, sender=Graph)
+def create_resource_instance_lifecycle(sender, instance, created, **kwargs):
+    if created and not instance.resource_instance_lifecycle:
+        lifecycle_state = models.ResourceInstanceLifecycle.objects.create(
+            graph=instance
+        )
+        instance.resource_instance_lifecycle = lifecycle_state
+        instance.save()
 
 
 class GraphPublicationError(Exception):
