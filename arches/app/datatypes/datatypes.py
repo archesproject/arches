@@ -1329,27 +1329,28 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             return self.find_num(current_item[0])
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        max_bytes = 32766  # max bytes allowed by Lucene
-        byte_count = 0
-        byte_count += len(str(nodevalue).encode("UTF-8"))
+        max_length = 32000  # this was 32766, but do we need space for extra part of JSON?
 
-        if len(nodevalue["features"]) > 0:
-            feature_geom = GEOSGeometry(
-                JSONSerializer().serialize(nodevalue["features"][0]["geometry"])
-            )
-            current_precision = abs(self.find_num(feature_geom.coords))
+        def len_feature(feature):
+            return len(str(feature).encode("UTF-8"))
 
-        if byte_count > max_bytes and current_precision:
-            nodevalue = self.geo_utils.reduce_precision(nodevalue, current_precision)
+        features = []
+        nodevalue["properties"] = {}
+        # print("Doc length: %s" % len_feature(nodevalue))
+        if len_feature(nodevalue) < max_length:
+            features.append(nodevalue)
+        else:
+            for feature in nodevalue['features']:
+                new_feature = {"type": "FeatureCollection", "features": [feature]}
+                if len_feature(new_feature) < max_length:
+                    features.append(new_feature)
+                else:
+                    chunks = self.split_geom(feature, len_feature)
+                    features = features + chunks
 
-        document["geometries"].append(
-            {
-                "geom": nodevalue,
-                "nodegroup_id": tile.nodegroup_id,
-                "provisional": provisional,
-                "tileid": tile.pk,
-            }
-        )
+        print("Number of features: %s" % len(features))
+        for feature in features:
+            document["geometries"].append({"geom": feature, "nodegroup_id": tile.nodegroup_id, "provisional": provisional, "tileid": tile.pk})
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
             minx, miny, maxx, maxy = bounds
@@ -1362,6 +1363,24 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "provisional": provisional,
                 }
             )
+
+    def split_geom(self, geom, len_feature):
+        feat_len_bytes = len_feature(geom)
+        num_points = len(geom["geometry"]["coordinates"][0])
+        num_chunks = feat_len_bytes / 32000
+        max_points = int(num_points/num_chunks)
+        print("points/chunks = max_points: %s/%s = %s" % (num_points, num_chunks, max_points))
+
+        # print("Geometry: %s" % geom)
+        # print("Geometry: %s" % geom["geometry"])
+        with connection.cursor() as cur:
+            cur.execute('select st_asgeojson(st_subdivide(%s, %s))', [str(geom["geometry"]), max_points])
+            smaller_chunks = [{'id': geom['id'], 'type': 'Feature', 'geometry': item[0]} for item in cur.fetchall()]
+            # for chunk in smaller_chunks:
+            #     # print(chunk)
+            #     print("Type: %s" % type(chunk))
+            #     print("New feature length: %s " % len_feature(chunk))
+            return list(smaller_chunks)
 
     def get_bounds(self, tile, node):
         bounds = None
