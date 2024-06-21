@@ -2267,7 +2267,7 @@ class SpatialView(APIBase):
             try:
                 spatialview.save()
             except ValidationError as e:
-                return JSONErrorResponse(str(e), status=400)
+                return JSONErrorResponse(_("Validation Error"),e.message, status=400)
 
             return_json = {
                 "spatialviewid": str(spatialview.spatialviewid),
