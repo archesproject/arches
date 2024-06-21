@@ -2233,9 +2233,8 @@ class SpatialView(APIBase):
                     )
             if "attributenodes" in json_data:
                 attributenodes = json_data["attributenodes"]
-                attributenodes_are_valid = self.attribute_nodes_are_valid(
-                    geom_node, json_data["attributenodes"]
-                )
+                attributenodes_nodeids = [n["nodeid"] for n in attributenodes]
+                attributenodes_are_valid = self.attribute_nodes_are_valid(geom_node, attributenodes_nodeids)
                 if not attributenodes_are_valid:
                     return JSONErrorResponse(
                         _(
@@ -2324,9 +2323,8 @@ class SpatialView(APIBase):
                     )
             if "attributenodes" in json_data:
                 attributenodes = json_data["attributenodes"]
-                attributenodes_are_valid = self.attribute_nodes_are_valid(
-                    geom_node, json_data["attributenodes"]
-                )
+                attributenodes_nodeids = [n["nodeid"] for n in attributenodes]
+                attributenodes_are_valid = self.attribute_nodes_are_valid(geom_node, attributenodes_nodeids)
                 if not attributenodes_are_valid:
                     return JSONErrorResponse(
                         _(
