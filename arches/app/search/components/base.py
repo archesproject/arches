@@ -1,4 +1,4 @@
-from typing import List, Tuple, Any
+from typing import List, Tuple, Any, Dict
 from arches.app.const import ExtensionType
 from arches.app.models import models
 from arches.app.models.system_settings import settings
@@ -63,9 +63,7 @@ class SearchFilterFactory(object):
         self.request = request
         self.search_filters = {
             search_filter.componentname: search_filter
-            for search_filter in models.SearchComponent.objects.filter(
-                enabled=True
-            ).order_by("sortorder")
+            for search_filter in models.SearchComponent.objects.all()
         }
         self.search_filters_instances = {}
 
@@ -92,39 +90,42 @@ class SearchFilterFactory(object):
         else:
             return None
 
-    def get_sorted_query_dict(self, query_dict):
-        # Sort a list of (key, value) tuples according to the key's order in self.search_filters
-        return dict(
-            sorted(
-                list(query_dict.items()),
-                key=lambda item: (
-                    list(self.search_filters.keys()).index(item[0])
-                    if item[0] in self.search_filters
-                    else len(self.search_filters)
-                ),
-            )
+    def get_sorted_query_dict(self, query_dict, core_search_component):
+        component_sort_order = {
+            item["componentname"]: item["sortorder"]
+            for item in core_search_component.config["requiredComponents"]
+        }
+        # Sort the query_dict items based on the component's sortorder
+        sorted_items = sorted(
+            query_dict.items(),
+            key=lambda item: component_sort_order.get(item[0], float("inf")),
         )
 
-    def get_query_dict_with_core_component(self, query_dict):
+        return dict(sorted_items)
+
+    def get_query_dict_with_core_component(self, query_dict: Dict[str, Any]):
         # Set core=core-search on query_dict to core-search=True
         ret = dict(query_dict)
         core_component = ret.get("core", False)
         if core_component:
             ret[core_component] = True
+            core_component = self.search_filters[core_component]
             del ret["core"]
         else:
-            default_core_component = list(
+            core_component = list(
                 filter(
                     lambda x: x.config.get("default", False) and x.type == "core",
                     list(self.search_filters.values()),
                 )
             )[0]
-            ret[default_core_component.componentname] = True
+            ret[core_component.componentname] = True
 
-        return ret
+        return ret, core_component
 
     def create_search_query_dict(self, key_value_pairs: List[Tuple[str, Any]]):
         # handles list of key,value tuples so that dict-like data from POST and GET
         # requests can be concatenated into single method call
-        query_dict = self.get_query_dict_with_core_component(dict(key_value_pairs))
-        return self.get_sorted_query_dict(query_dict)
+        query_dict, core_search_component = self.get_query_dict_with_core_component(
+            dict(key_value_pairs)
+        )
+        return self.get_sorted_query_dict(query_dict, core_search_component)
