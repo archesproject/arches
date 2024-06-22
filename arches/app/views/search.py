@@ -104,15 +104,6 @@ class SearchView(MapBaseManagerView):
         ]:
             search_components.append(all_search_components_dict["search-export"])
 
-        component_sort_order = {
-            item["componentname"]: item["sortorder"]
-            for item in core_search_component.config["requiredComponents"]
-        }
-        # Sort the query_dict items based on the component's sortorder
-        search_components = sorted(
-            search_components,
-            key=lambda item: component_sort_order.get(item[0], float("inf")),
-        )
         search_components.append(core_search_component)
 
         datatypes = models.DDataType.objects.all()
