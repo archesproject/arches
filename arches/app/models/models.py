@@ -1183,8 +1183,6 @@ class SearchComponent(models.Model):
     type = models.TextField()
     componentpath = models.TextField(unique=True)
     componentname = models.TextField(unique=True)
-    sortorder = models.IntegerField(blank=True, null=True, default=None)
-    enabled = models.BooleanField(default=False)
     config = models.JSONField(default=dict)
 
     def __str__(self):
