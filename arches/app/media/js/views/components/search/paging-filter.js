@@ -5,7 +5,7 @@ define([
     'utils/aria',
     'templates/views/components/search/paging-filter.htm',
 ], function(BaseFilter, ko, koMapping, ariaUtils, pagingFilterTemplate) {
-    var componentName = 'paging-filter';
+    const componentName = 'paging-filter';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             options.name = 'Paging Filter';

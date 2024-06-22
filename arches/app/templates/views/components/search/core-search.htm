@@ -64,7 +64,7 @@
             <!-- Title Block -->
             <div class="search-toolbar">
                 <div class="search-type-btn-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}" role="tablist">
-                    <!-- ko if: filter.type === 'filter' && filter.enabled && $parent.sharedStateObject.userCanReadResources -->
+                    <!-- ko if: filter.type === 'filter' && $parent.sharedStateObject.userCanReadResources -->
                     <button class="search-type-btn relative" role="tab" data-bind="onEnterkeyClick, onSpaceClick,
                         css: {'active': $parent.selectedTab() === filter.componentname}, 
                         click: function(){
@@ -84,7 +84,7 @@
 
                 <div class="search-type-btn-popup-panel">
                     <div class="popup-panel-row" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}" role="tablist">
-                        <!-- ko if: filter.type === 'popup' && filter.enabled && $parent.sharedStateObject.userCanReadResources -->
+                        <!-- ko if: filter.type === 'popup' && $parent.sharedStateObject.userCanReadResources -->
                         <button class="saved-search-container search-type-btn-popup relative" role="tab" data-bind="onEnterkeyClick, onSpaceClick,
                             css: {'active': $parent.selectedPopup() === filter.componentname}, 
                             click: function(data, event){
@@ -118,7 +118,7 @@
                 <!-- Card Container -->
                 <div class="card-form-preview-container relative">
                     <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
-                        <!-- ko if: filter.type === 'filter' && filter.enabled -->
+                        <!-- ko if: filter.type === 'filter' -->
                         <div class="tab-pane" role="tabpanel" tabindex="-1" data-bind="css: {'active': $parent.selectedTab() === filter.componentname}, 
                             attr: {
                                 id: filter.componentname + '-tabpanel',
@@ -134,7 +134,7 @@
                     </div>
 
                     <div class="tab-content search-popup-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: selectedPopup() !== ''">
-                        <!-- ko if: filter.type === 'popup' && filter.enabled -->
+                        <!-- ko if: filter.type === 'popup' -->
                         <div class="tab-pane" role="tabpanel" tabindex="-1" data-bind="css: {'active': $parent.selectedPopup() === filter.componentname}, 
                             attr: {
                                 id: filter.componentname + '-popup-tabpanel',

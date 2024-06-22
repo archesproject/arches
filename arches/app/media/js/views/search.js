@@ -44,9 +44,7 @@ define([
 
     var CommonSearchViewModel = function() {
         this.filters = {};
-        this.filtersList = _.sortBy(Object.values(SearchComponents), function(filter) {
-            return filter.sortorder;
-        }, this);
+        this.filtersList = Object.values(SearchComponents);
         this.defaultCoreComponent = this.filtersList.find(component => component.type == "core" && component.config.default == true); // approach: let the backend decide
         this.coreComponentName = ko.observable(false);
         this.requiredFiltersLookup = this.filtersList.reduce((lookup, item) => {
