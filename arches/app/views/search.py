@@ -92,22 +92,28 @@ class SearchView(MapBaseManagerView):
                 )
             )[0]
 
-        search_components = [core_search_component]
-        search_components.extend(
-            [
-                all_search_components_dict[required_component["componentname"]]
-                for required_component in core_search_component.config[
-                    "requiredComponents"
-                ]
-                if required_component["componentname"] != "search-export"
-            ]
-        )
+        search_components = [
+            all_search_components_dict[required_component["componentname"]]
+            for required_component in core_search_component.config["requiredComponents"]
+            if required_component["componentname"] != "search-export"
+        ]
         # TODO: Apply new permission logic after #11005 is merged
         if user_is_resource_exporter(request.user) and "search-export" in [
             s["componentname"]
             for s in core_search_component.config["requiredComponents"]
         ]:
             search_components.append(all_search_components_dict["search-export"])
+
+        component_sort_order = {
+            item["componentname"]: item["sortorder"]
+            for item in core_search_component.config["requiredComponents"]
+        }
+        # Sort the query_dict items based on the component's sortorder
+        search_components = sorted(
+            search_components,
+            key=lambda item: component_sort_order.get(item[0], float("inf")),
+        )
+        search_components.append(core_search_component)
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
