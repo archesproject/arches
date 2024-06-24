@@ -1,8 +1,6 @@
 from typing import Tuple
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.signals import user_logged_out, user_logged_in
-from django.dispatch import receiver
 from django.urls import reverse
 from arches.app.models.system_settings import settings
 from arches.app.models.models import ExternalOauthToken
@@ -167,29 +165,6 @@ class ExternalOauthAuthenticationBackend(ModelBackend):
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return None
-
-    @receiver(user_logged_out)
-    def logout(sender, user, request, **kwargs):
-        try:
-            token = ExternalOauthAuthenticationBackend.get_token(user)
-            if token is not None:
-                token.delete()
-        except ExternalOauthToken.DoesNotExist:
-            pass
-
-    @receiver(user_logged_in)
-    def login(sender, user, request, **kwargs):
-        if (
-            user.backend
-            == "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend"
-        ):
-            try:
-                token = ExternalOauthAuthenticationBackend.get_token(user)
-                request.session.set_expiry(
-                    (token.access_token_expiration - datetime.now()).total_seconds()
-                )
-            except ExternalOauthToken.DoesNotExist:
-                pass
 
     def get_token(user: User) -> ExternalOauthToken or None:
         """Get the token record for a particular user"""
