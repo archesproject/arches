@@ -1158,7 +1158,9 @@ class ResourceInstance(models.Model):
     # future use of this field (e.g. locking to a group).
     # Note that this is intended to bypass normal permissions logic, so a resource type must
     # prevent a user who created the resource from editing it, by updating principaluserid logic.
-    principaluser = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    principaluser = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True
+    )
 
     def save(self, *args, **kwargs):
         try:

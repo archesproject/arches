@@ -203,5 +203,5 @@ class PermissionTests(ArchesTestCase):
         ]
 
         for result in results:
-            with self.subTest(user=result[0], restriction=result[1], result=result[3]):
-                self.assertTrue(result)
+            with self.subTest(user=result[0], restriction=result[1]):
+                self.assertTrue(result[2])

@@ -467,10 +467,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         if resource:
             graph_id = resource.graph_id
-            if graph_id is None:
-                raise ValueError(
-                    "graph_id must not be None to check resource permissions"
-                )
+
+        if graph_id is None:
+            raise ValueError("graph_id must not be None to check resource permissions")
 
         nodegroups = self.get_nodegroups_by_perm(user, perms)
         nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=graph_id)
@@ -828,8 +827,9 @@ class CachedUserPermissionChecker:
             user_permissions = current_user_cached_permissions.get("user_permissions")
         else:
             user_permissions = set()
+            user.groups.prefetch_related("permissions")
 
-            for group in user.groups.prefetch_related("permissions").all():
+            for group in user.groups.all():
                 for group_permission in group.permissions.all():
                     user_permissions.add(group_permission.codename)
 

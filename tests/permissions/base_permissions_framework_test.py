@@ -54,7 +54,9 @@ class ArchesPermissionFrameworkTestCase(ArchesTestCase):
             test_pkg_path = os.path.join(
                 test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg"
             )
-            path_to_cheesy_image = test_pkg_path / "uploadedfiles" / "test.png"
+            path_to_cheesy_image = os.path.join(
+                test_pkg_path, "uploadedfiles", "test.png"
+            )
             cls.addClassCleanup(os.unlink, path_to_cheesy_image)
             with captured_stdout():
                 management.call_command(

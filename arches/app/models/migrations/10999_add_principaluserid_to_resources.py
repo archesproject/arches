@@ -27,7 +27,10 @@ class Migration(migrations.Migration):
             model_name="resourceinstance",
             name="principaluser",
             field=models.ForeignKey(
-                on_delete=deletion.SET_NULL, to=settings.AUTH_USER_MODEL, null=True
+                on_delete=deletion.SET_NULL,
+                to=settings.AUTH_USER_MODEL,
+                blank=True,
+                null=True,
             ),
         ),
         migrations.RunPython(forward_func, reverse_func),
