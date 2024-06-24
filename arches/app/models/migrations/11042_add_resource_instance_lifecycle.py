@@ -3,8 +3,7 @@ from django.db import migrations, models
 
 def default_states():
     return {
-        "draft": {"can_delete": True, "initial_state": True},
-        "active": {"can_delete": False, "initial_state": False},
+        "active": {"can_delete": False, "initial_state": True},
         "retired": {"can_delete": True, "initial_state": False},
     }
 
