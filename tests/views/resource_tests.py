@@ -304,8 +304,6 @@ class CommandLineTests(ArchesTestCase):
         view = self.client.get(view_url)
         edit = self.client.get(edit_url)
         delete = self.client.delete(edit_url)
-        self.assertTrue(
-            view.status_code == 200
-            and edit.status_code == 200
-            and delete.status_code == 200
-        )
+        self.assertEqual(view.status_code, 200)
+        self.assertEqual(edit.status_code, 200)
+        self.assertEqual(delete.status_code, 200)

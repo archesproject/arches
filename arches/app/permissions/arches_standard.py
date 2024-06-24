@@ -203,7 +203,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
     def get_nodegroups_by_perm(
         self, user: User, perms: str | Iterable[str], any_perm: bool = True
-    ) -> list[str]:
+    ) -> list[uuid.UUID]:
         """
         returns a list of node groups that a user has the given permission on
 
@@ -215,7 +215,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         """
         return list(
             set(
-                str(nodegroup.pk)
+                nodegroup.pk
                 for nodegroup in get_nodegroups_by_perm_for_user_or_group(
                     user, perms, any_perm=any_perm
                 )
@@ -570,9 +570,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                             user, "models.delete_nodegroup"
                         )
                         tiles = TileModel.objects.filter(resourceinstance_id=resourceid)
-                        protected_tiles = {
-                            str(tile.nodegroup_id) for tile in tiles
-                        } - set(nodegroups)
+                        protected_tiles = {tile.nodegroup_id for tile in tiles} - set(
+                            nodegroups
+                        )
                         if len(protected_tiles) > 0:
                             return False
                         return user.groups.filter(
