@@ -103,16 +103,28 @@ class ArchesDefaultDenyPermissionTests(ArchesPermissionFrameworkTestCase):
         restrictions = self.framework.get_restricted_users(resource)
 
         results = [
-            jim.id in restrictions["cannot_read"],
-            ben.id in restrictions["cannot_write"],
-            sam.id in restrictions["cannot_delete"],
-            sam.id in restrictions["no_access"],
-            admin.id not in restrictions["cannot_read"],
-            admin.id not in restrictions["cannot_write"],
-            admin.id not in restrictions["cannot_delete"],
-            admin.id not in restrictions["no_access"],
+            ("jim", "cannot read", jim.id in restrictions["cannot_read"]),
+            ("ben", "cannot write", ben.id in restrictions["cannot_write"]),
+            ("sam", "cannot delete", sam.id in restrictions["cannot_delete"]),
+            ("sam", "has no access", sam.id in restrictions["no_access"]),
+            (
+                "admin",
+                "not in cannot read",
+                admin.id not in restrictions["cannot_read"],
+            ),
+            (
+                "admin",
+                "not in cannot write",
+                admin.id not in restrictions["cannot_write"],
+            ),
+            (
+                "admin",
+                "not in cannot delete",
+                admin.id not in restrictions["cannot_delete"],
+            ),
+            ("admin", "not in no access", admin.id not in restrictions["no_access"]),
         ]
 
         for result in results:
-            with self.subTest(result=result):
-                self.assertTrue(result)
+            with self.subTest(user=result[0], restriction=result[1]):
+                self.assertTrue(result[2])
