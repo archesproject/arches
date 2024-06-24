@@ -1293,14 +1293,14 @@ class ResourceInstanceLifecycle(models.Model):
         managed = True
 
 
-@receiver(post_save, sender=GraphModel)
-def create_resource_instance_lifecycle(sender, instance, created, **kwargs):
-    if created and not instance.resource_instance_lifecycle:
-        lifecycle_state = models.ResourceInstanceLifecycle.objects.create(
-            graph=instance
-        )
-        instance.resource_instance_lifecycle = lifecycle_state
-        instance.save()
+# @receiver(post_save, sender=GraphModel)
+# def create_resource_instance_lifecycle(sender, instance, created, **kwargs):
+#     if created and not instance.resource_instance_lifecycle:
+#         lifecycle_state = models.ResourceInstanceLifecycle.objects.create(
+#             graph=instance
+#         )
+#         instance.resource_instance_lifecycle = lifecycle_state
+#         instance.save()
 
 
 class SearchComponent(models.Model):

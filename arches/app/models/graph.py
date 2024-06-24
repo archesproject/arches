@@ -2317,6 +2317,7 @@ class Graph(models.GraphModel):
 
             editable_future_graph = graph_copy["copy"]
             editable_future_graph.source_identifier_id = self.graphid
+            editable_future_graph.resource_instance_lifecycle = None
             editable_future_graph.has_unpublished_changes = False
 
             editable_future_graph.root.set_relatable_resources(
@@ -2596,6 +2597,8 @@ class Graph(models.GraphModel):
                     "root",
                     "source_identifier",
                     "source_identifier_id",
+                    "resource_instance_lifecycle",
+                    "resource_instance_lifecycle_id",
                     "publication_id",
                     "_nodegroups_to_delete",
                     "_functions",
@@ -2869,16 +2872,6 @@ class Graph(models.GraphModel):
                 published_graph.save()
 
             translation.deactivate()
-
-
-@receiver(post_save, sender=Graph)
-def create_resource_instance_lifecycle(sender, instance, created, **kwargs):
-    if created and not instance.resource_instance_lifecycle:
-        lifecycle_state = models.ResourceInstanceLifecycle.objects.create(
-            graph=instance
-        )
-        instance.resource_instance_lifecycle = lifecycle_state
-        instance.save()
 
 
 class GraphPublicationError(Exception):

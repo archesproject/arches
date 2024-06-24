@@ -1,5 +1,13 @@
+from django.apps import AppConfig
 from django.conf import settings
 from django.core.checks import register, Tags, Error, Warning
+
+
+class ArchesAppConfig(AppConfig):
+    name = "arches"
+
+    def ready(self):
+        import arches.app.signals
 
 
 @register(Tags.security)
