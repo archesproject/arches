@@ -97,6 +97,7 @@ class Graph(models.GraphModel):
                         "publication",
                         "user_permissions",
                         "group_permissions",
+                        "resource_instance_lifecycle",
                     ):
                         setattr(self, key, value)
 
@@ -145,6 +146,15 @@ class Graph(models.GraphModel):
                 if "publication" in args[0] and args[0]["publication"] is not None:
                     publication_data = args[0]["publication"]
                     self.publication = models.GraphXPublishedGraph(**publication_data)
+
+                if (
+                    "resource_instance_lifecycle" in args[0]
+                    and args[0]["resource_instance_lifecycle"] is not None
+                ):
+                    resource_instance_lifecycle = args[0]["resource_instance_lifecycle"]
+                    self.resource_instance_lifecycle = models.ResourceInstanceLifecycle(
+                        **resource_instance_lifecycle
+                    )
             else:
                 if len(args) == 1 and (
                     isinstance(args[0], str) or isinstance(args[0], uuid.UUID)
@@ -635,6 +645,12 @@ class Graph(models.GraphModel):
                         language=language,
                     )
                     published_graph.save()
+
+            # edge case for instantiating a serialized_graph that has a resource_instance_lifecycle
+            if self.resource_instance_lifecycle and not len(
+                models.ResourceInstanceLifecycle.objects.filter(graph=self)
+            ):
+                self.resource_instance_lifecycle.save()
 
             for nodegroup in self._nodegroups_to_delete:
                 nodegroup.delete()
@@ -1914,6 +1930,8 @@ class Graph(models.GraphModel):
                     use_raw_i18n_json=use_raw_i18n_json,
                     force_recalculation=force_recalculation,
                 )
+            else:
+                ret.pop("cards_x_nodes_x_widgets", None)
 
             if "nodegroups" not in exclude:
                 nodegroups = self.get_nodegroups(
