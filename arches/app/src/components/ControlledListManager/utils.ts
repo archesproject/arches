@@ -12,7 +12,7 @@ import type {
 export const dataIsList = (data: Selectable) => {
     return (data as ControlledList).search_only !== undefined;
 };
-export const dataisItem = (data: Selectable) => {
+export const dataIsItem = (data: Selectable) => {
     return !dataIsList(data);
 };
 export const nodeIsList = (node: TreeNode) => {

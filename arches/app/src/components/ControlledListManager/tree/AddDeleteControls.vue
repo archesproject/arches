@@ -21,7 +21,10 @@ import {
     displayedRowKey,
     selectedLanguageKey,
 } from "@/components/ControlledListManager/constants.ts";
-import { listAsNode } from "@/components/ControlledListManager/utils.ts";
+import {
+    dataIsItem,
+    listAsNode,
+} from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
 import type { TreeSelectionKeys } from "primevue/tree/Tree";
@@ -29,11 +32,14 @@ import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/types/arches";
 import type {
     ControlledList,
+    ControlledListItem,
     DisplayedRowRefAndSetter,
     NewControlledList,
 } from "@/types/ControlledListManager";
 
-const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
+const { displayedRow, setDisplayedRow } = inject(
+    displayedRowKey,
+) as DisplayedRowRefAndSetter;
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
 const controlledListItemsTree = defineModel<TreeNode[]>({ required: true });
@@ -55,11 +61,37 @@ const { $gettext, $ngettext } = useGettext();
 const confirm = useConfirm();
 const toast = useToast();
 
+const multiSelectStateFromDisplayedRow = computed(() => {
+    if (!displayedRow.value) {
+        return {};
+    }
+    const newSelectedKeys = {
+        [displayedRow.value.id]: { checked: true, partialChecked: false },
+    };
+
+    const recurse = (items: ControlledListItem[]) => {
+        for (const child of items) {
+            newSelectedKeys[child.id] = {
+                checked: false,
+                partialChecked: true,
+            };
+            recurse(child.children);
+        }
+    };
+    if (dataIsItem(displayedRow.value)) {
+        recurse((displayedRow.value as ControlledListItem).children);
+    } else {
+        recurse((displayedRow.value as ControlledList).items);
+    }
+    return newSelectedKeys;
+});
+
 const deleteDropdownOptions = [
     {
         label: $gettext("Delete Multiple"),
         command: () => {
             isMultiSelecting.value = true;
+            selectedKeys.value = { ...multiSelectStateFromDisplayedRow.value };
         },
     },
 ];
@@ -87,6 +119,9 @@ const createList = () => {
 };
 
 const toDelete = computed(() => {
+    if (!selectedKeys.value) {
+        return [];
+    }
     if (isMultiSelecting.value) {
         return Object.entries(selectedKeys.value)
             .filter(([, v]) => v.checked)
