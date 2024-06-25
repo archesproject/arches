@@ -15,11 +15,17 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="ExternalOauthToken",
             fields=[
-                ("token_id", models.UUIDField(primary_key=True, serialize=False, unique=True)),
+                (
+                    "token_id",
+                    models.UUIDField(primary_key=True, serialize=False, unique=True),
+                ),
                 (
                     "user",
                     models.ForeignKey(
-                        db_column="userid", null=False, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+                        db_column="userid",
+                        null=False,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
                     ),
                 ),
                 ("id_token", models.TextField()),

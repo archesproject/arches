@@ -18,7 +18,9 @@ class WorkflowHistoryTests(ArchesTestCase):
         cls.client = Client()
         cls.admin = User.objects.get(username="admin")
         cls.anonymous = User.objects.get(username="anonymous")
-        cls.editor = User.objects.create_user(username="editor", email="editor@resources.com", password="Test12345!")
+        cls.editor = User.objects.create_user(
+            username="editor", email="editor@resources.com", password="Test12345!"
+        )
         group = Group.objects.get(name="Resource Editor")
         group.user_set.add(cls.editor)
         super().setUpClass()
@@ -27,7 +29,7 @@ class WorkflowHistoryTests(ArchesTestCase):
     def setUpTestData(cls):
         cls.history = WorkflowHistory.objects.create(
             workflowid=str(uuid.uuid1()),
-            workflowname='test-name',
+            workflowname="test-name",
             user=cls.admin,
             created=datetime.datetime.now(),
             completed=False,
@@ -66,7 +68,9 @@ class WorkflowHistoryTests(ArchesTestCase):
 
     def test_get_nonexistent_workflow_history(self):
         self.client.force_login(self.admin)
-        response = self.client.get(reverse("workflow_history", kwargs={"workflowid": uuid.uuid1()}))
+        response = self.client.get(
+            reverse("workflow_history", kwargs={"workflowid": uuid.uuid1()})
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b"{}")
@@ -74,13 +78,22 @@ class WorkflowHistoryTests(ArchesTestCase):
     def test_get_workflow_history(self):
         self.client.force_login(self.anonymous)
         with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.get(reverse("workflow_history", kwargs={"workflowid": str(self.history.workflowid)}))
+            response = self.client.get(
+                reverse(
+                    "workflow_history",
+                    kwargs={"workflowid": str(self.history.workflowid)},
+                )
+            )
 
         self.assertEqual(response.status_code, 403)
         self.assertIn(b"Forbidden", response.content)
 
         self.client.force_login(self.admin)
-        response = self.client.get(reverse("workflow_history", kwargs={"workflowid": str(self.history.workflowid)}))
+        response = self.client.get(
+            reverse(
+                "workflow_history", kwargs={"workflowid": str(self.history.workflowid)}
+            )
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"sample name", response.content)
@@ -89,7 +102,7 @@ class WorkflowHistoryTests(ArchesTestCase):
         """Partial updates of componentdata and stepdata are allowed."""
         post_data = {
             "workflowid": str(self.history.workflowid),  # required
-            "workflowname": 'test-name',
+            "workflowname": "test-name",
             "stepdata": {
                 # Add a second step.
                 "set-project-statement": {
@@ -129,7 +142,10 @@ class WorkflowHistoryTests(ArchesTestCase):
         self.client.force_login(self.editor)
         with self.assertLogs("django.request", level="WARNING"):
             response = self.client.post(
-                reverse("workflow_history", kwargs={"workflowid": str(self.history.workflowid)}),
+                reverse(
+                    "workflow_history",
+                    kwargs={"workflowid": str(self.history.workflowid)},
+                ),
                 post_data,
                 content_type="application/json",
             )
@@ -139,7 +155,9 @@ class WorkflowHistoryTests(ArchesTestCase):
 
         self.client.force_login(self.admin)
         response = self.client.post(
-            reverse("workflow_history", kwargs={"workflowid": str(self.history.workflowid)}),
+            reverse(
+                "workflow_history", kwargs={"workflowid": str(self.history.workflowid)}
+            ),
             post_data,
             content_type="application/json",
         )
@@ -155,8 +173,14 @@ class WorkflowHistoryTests(ArchesTestCase):
         self.client.force_login(self.admin)
 
         response = self.client.post(
-            reverse("workflow_history", kwargs={"workflowid": str(self.history.workflowid)}),
-            {"workflowid": str(self.history.workflowid), "workflowname": 'test-name', "completed": True},
+            reverse(
+                "workflow_history", kwargs={"workflowid": str(self.history.workflowid)}
+            ),
+            {
+                "workflowid": str(self.history.workflowid),
+                "workflowname": "test-name",
+                "completed": True,
+            },
             content_type="application/json",
         )
 
@@ -172,8 +196,15 @@ class WorkflowHistoryTests(ArchesTestCase):
 
         with self.assertLogs("django.request", level="WARNING"):
             response = self.client.post(
-                reverse("workflow_history", kwargs={"workflowid": str(self.history.workflowid)}),
-                {"workflowid": str(self.history.workflowid), "workflowname": "test-name", "completed": False},
+                reverse(
+                    "workflow_history",
+                    kwargs={"workflowid": str(self.history.workflowid)},
+                ),
+                {
+                    "workflowid": str(self.history.workflowid),
+                    "workflowname": "test-name",
+                    "completed": False,
+                },
                 content_type="application/json",
             )
 

@@ -26,7 +26,9 @@ def get_permitted_graphids(permitted_nodegroups):
 
 
 class ResourceTypeFilter(BaseSearchFilter):
-    def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
+    def append_dsl(
+        self, search_results_object, permitted_nodegroups, include_provisional
+    ):
         search_query = Bool()
         querystring_params = self.request.GET.get(details["componentname"], "")
         graph_ids = []
@@ -53,4 +55,6 @@ class ResourceTypeFilter(BaseSearchFilter):
         search_results_object["query"].add_query(search_query)
 
     def view_data(self):
-        return {"resources": get_resource_types_by_perm(self.request.user, "read_nodegroup")}
+        return {
+            "resources": get_resource_types_by_perm(self.request.user, "read_nodegroup")
+        }
