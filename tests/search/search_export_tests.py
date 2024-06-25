@@ -129,14 +129,6 @@ class SearchExportTests(ArchesTestCase):
     #     result, _ = exporter.export(format='tilecsv', report_link='true')
     #     self.assertIn('Link', result[0]['outputfile'].getvalue())
 
-    def is_valid_uuid(self, value, version=4):
-        """Check if value is a valid UUID."""
-        try:
-            uuid_obj = uuid.UUID(value, version=version)
-            return str(uuid_obj) == value
-        except ValueError:
-            return False
-
     def test_export_to_csv_with_system_values(self):
         """Test exporting search results to CSV with system values included"""
         request = self.factory.get(
@@ -150,11 +142,13 @@ class SearchExportTests(ArchesTestCase):
         csv_reader = csv.DictReader(io.StringIO(csv_content))
         cultural_period_column_name = self.search_model_cultural_period_nodename
         for row in csv_reader:
+            self.assertTrue(len(row) > 1, "Expected more than one column in the output")
             cultural_period_value = row[cultural_period_column_name]
             self.assertTrue(
-                self.is_valid_uuid(cultural_period_value),
+                is_valid_uuid(cultural_period_value),
                 f"Expected UUID, got {cultural_period_value}",
             )
+            break
 
     def test_export_to_csv_without_system_values(self):
         """Test exporting search results to CSV without system values"""
@@ -169,11 +163,13 @@ class SearchExportTests(ArchesTestCase):
         csv_reader = csv.DictReader(io.StringIO(csv_content))
         cultural_period_column_name = self.search_model_cultural_period_nodename
         for row in csv_reader:
+            self.assertTrue(len(row) > 1, "Expected more than one column in the output")
             cultural_period_value = row[cultural_period_column_name]
             self.assertFalse(
-                self.is_valid_uuid(cultural_period_value),
+                is_valid_uuid(cultural_period_value),
                 f"Expected non-UUID, got {cultural_period_value}",
             )
+            break
 
     def test_login_via_basic_auth_good(self):
         auth_string = "Basic " + b64encode(b"admin:admin").decode("utf-8")
@@ -208,3 +204,12 @@ class SearchExportTests(ArchesTestCase):
         response = SearchExport().get(request)
         self.assertEqual(request.user.username, "anonymous")
         self.assertEqual(response.status_code, HTTPStatus.UNAUTHORIZED)
+
+
+def is_valid_uuid(value, version=4):
+    """Check if value is a valid UUID."""
+    try:
+        uuid_obj = uuid.UUID(value, version=version)
+        return str(uuid_obj) == value
+    except ValueError:
+        return False
