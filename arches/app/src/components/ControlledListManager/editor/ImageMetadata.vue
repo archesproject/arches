@@ -293,7 +293,7 @@ const focusInput = () => {
                         tabindex="0"
                         :aria-label="$gettext('Delete')"
                         @click="issueDeleteMetadata(slotProps.data)"
-                        @key.enter="issueDeleteMetadata(slotProps.data)"
+                        @keyup.enter="issueDeleteMetadata(slotProps.data)"
                     />
                 </template>
             </Column>
