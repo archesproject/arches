@@ -30,8 +30,6 @@ class SearchExportTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         cls.factory = RequestFactory()
-        # cls.client = Client()
-        # cls.client.login(username="admin", password="admin")
 
         LanguageSynchronizer.synchronize_settings_with_db()
         with open(
@@ -43,12 +41,7 @@ class SearchExportTests(ArchesTestCase):
         cls.search_model_graphid = "d291a445-fa5f-11e6-afa8-14109fd34195"
         cls.search_model_cultural_period_nodeid = "7a182580-fa60-11e6-96d1-14109fd34195"
         cls.search_model_cultural_period_nodename = "Cultural Period Concept"
-        # cls.search_model_cultural_period_nodefieldname
-        # cls.search_model_creation_date_nodeid = "1c1d05f5-fa60-11e6-887f-14109fd34195"
-        # cls.search_model_destruction_date_nodeid = "e771b8a1-65fe-11e7-9163-14109fd34195"
         cls.search_model_name_nodeid = "2fe14de3-fa61-11e6-897b-14109fd34195"
-        # cls.search_model_sensitive_info_nodeid = "57446fae-65ff-11e7-b63a-14109fd34195"
-        # cls.search_model_geom_nodeid = "3ebc6785-fa61-11e6-8c85-14109fd34195"
 
         cls.user = User.objects.create_user(
             "unprivileged_user", "unprivileged_user@test.com", "test"
@@ -87,7 +80,6 @@ class SearchExportTests(ArchesTestCase):
         )
         cultural_period_tile.save()
         time.sleep(1)  # delay to allow for async indexing
-
         # TODO: create geospatial test data
 
     def test_search_export_no_request(self):
@@ -154,13 +146,9 @@ class SearchExportTests(ArchesTestCase):
         exporter = SearchResultsExporter(search_request=request)
         result, _ = exporter.export(format="tilecsv", report_link="false")
         self.assertIn(".csv", result[0]["name"])
-        csv_content = result[0][
-            "outputfile"
-        ].getvalue()  # Adjust based on actual output handling
+        csv_content = result[0]["outputfile"].getvalue()
         csv_reader = csv.DictReader(io.StringIO(csv_content))
-        cultural_period_column_name = (
-            self.search_model_cultural_period_nodename
-        )  # or the actual header name in your CSV
+        cultural_period_column_name = self.search_model_cultural_period_nodename
         for row in csv_reader:
             cultural_period_value = row[cultural_period_column_name]
             self.assertTrue(
@@ -203,7 +191,6 @@ class SearchExportTests(ArchesTestCase):
         request = RequestFactory().get(
             reverse("api_export_results"),
             HTTP_AUTHORIZATION=auth_string,
-            # In reality this would be added by django_ratelimit.
             QUERY_STRING="limited=True",
         )
         request.user = User.objects.get(username="anonymous")
