@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import migrations, models, transaction
 from django.db.models import deletion
 
+from arches.app.models.models import EditLog
 from arches.app.models.resource import Resource
 
 
@@ -13,11 +14,21 @@ class Migration(migrations.Migration):
         ("models", "10798_jsonld_importer"),
     ]
 
-    @transaction.atomic
     def forward_func(state, editor):
-        for resource in Resource.objects.all():
-            resource.principaluser_id = resource.get_instance_creator()
-            resource.save()
+        pass
+        # Resource.objects.update(
+        #     principaluser_id=settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
+        # )
+        # for editlog_create in EditLog.objects.filter(edittype="create"):
+        #     res = Resource.objects.get(
+        #         resourceinstanceid=editlog_create.resourceinstanceid
+        #     )
+        #     res.principaluser_id = editlog_create.userid
+        #     res.save()
+
+        # for resource in Resource.objects.all():
+        #     resource.principaluser_id = resource.get_instance_creator()
+        #     resource.save()
 
     def reverse_func(state, editor):
         pass
@@ -33,5 +44,4 @@ class Migration(migrations.Migration):
                 null=True,
             ),
         ),
-        migrations.RunPython(forward_func, reverse_func),
     ]
