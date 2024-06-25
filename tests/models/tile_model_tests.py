@@ -312,6 +312,11 @@ class TileTests(ArchesTestCase):
 
         provisionaledits = provisional_tile.provisionaledits
         self.assertEqual(tiles.count(), 2)
+        self.assertIn(
+            "72048cb3-adbc-11e6-9ccf-14109fd34195",
+            provisional_tile.data,
+            provisional_tile,
+        )
         self.assertEqual(
             provisional_tile.data["72048cb3-adbc-11e6-9ccf-14109fd34195"]["en"][
                 "value"

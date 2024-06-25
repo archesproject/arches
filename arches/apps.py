@@ -1,5 +1,19 @@
+import warnings
+
 from django.conf import settings
 from django.core.checks import register, Tags, Error, Warning
+
+### GLOBAL DEPRECATIONS ###
+FILE_TYPE_CHECKING_MSG = (
+    "Providing boolean values to FILE_TYPE_CHECKING is deprecated. "
+    "Starting with Arches 8.0, the only allowed options will be "
+    "None, 'lenient', and 'strict'."
+)
+if settings.FILE_TYPE_CHECKING in (True, False):
+    warnings.warn(FILE_TYPE_CHECKING_MSG, DeprecationWarning)
+
+
+### SYSTEM CHECKS ###
 
 
 @register(Tags.security)
