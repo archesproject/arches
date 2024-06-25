@@ -1,17 +1,11 @@
-import os, io
+import io
+import os
+
 from django.conf import settings
 from django.core import management
+from django.test.utils import captured_stdout
 
-from arches.app.models.models import (
-    ControlledList,
-    ControlledListItem,
-    ControlledListItemImage,
-    ControlledListItemImageMetadata,
-    ControlledListItemValue,
-    DValueType,
-    Language,
-)
-
+from arches.app.models.models import ControlledList
 from tests.base_test import ArchesTestCase
 
 
@@ -31,12 +25,14 @@ class ControlledListsExportTests(ArchesTestCase):
         file_path = os.path.join(settings.TEST_ROOT, "controlled_lists.xlsx")
         self.addCleanup(os.remove, file_path)
         output = io.StringIO()
-        management.call_command(
-            "packages",
-            operation="export_controlled_lists",
-            dest_dir=settings.TEST_ROOT,
-            stdout=output,
-        )
+        # packages command does not yet fully avoid print()
+        with captured_stdout():
+            management.call_command(
+                "packages",
+                operation="export_controlled_lists",
+                dest_dir=settings.TEST_ROOT,
+                stdout=output,
+            )
         self.assertTrue(os.path.exists(file_path))
 
 
@@ -47,12 +43,14 @@ class ControlledListsImportTests(ArchesTestCase):
             settings.TEST_ROOT, "fixtures/data/controlled_lists.xlsx"
         )
         output = io.StringIO()
-        management.call_command(
-            "packages",
-            operation="import_controlled_lists",
-            source=input_file,
-            stdout=output,
-        )
+        # packages command does not yet fully avoid print()
+        with captured_stdout():
+            management.call_command(
+                "packages",
+                operation="import_controlled_lists",
+                source=input_file,
+                stdout=output,
+            )
         list_pk = "e962bdaf-8243-4fbb-bd43-39bc1f54c168"
         self.assertTrue(ControlledList.objects.filter(pk=list_pk).exists())
 
