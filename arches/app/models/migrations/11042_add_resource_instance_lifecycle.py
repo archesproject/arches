@@ -1,20 +1,13 @@
 from django.db import migrations, models
 
 
-def default_states():
-    return {
-        "active": {"can_delete": False, "initial_state": True},
-        "retired": {"can_delete": True, "initial_state": False},
-    }
-
-
 def create_resource_instance_lifecycle_state(apps, schema_editor):
     GraphModel = apps.get_model("models", "GraphModel")
     ResourceInstanceLifecycle = apps.get_model("models", "ResourceInstanceLifecycle")
 
     for graph in GraphModel.objects.all():
         resource_instance_lifecycle = ResourceInstanceLifecycle.objects.create(
-            graph=graph, states=default_states()
+            graph=graph
         )
         graph.resource_instance_lifecycle = resource_instance_lifecycle
         graph.save()
@@ -53,7 +46,12 @@ class Migration(migrations.Migration):
                         to="models.GraphModel",
                     ),
                 ),
-                ("states", models.JSONField(default=default_states)),
+                (
+                    "states",
+                    models.JSONField(
+                        default="ResourceInstanceLifecycle.default_states"
+                    ),
+                ),
             ],
             options={
                 "db_table": "resource_instance_lifecycles",

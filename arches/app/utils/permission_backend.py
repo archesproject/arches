@@ -553,6 +553,18 @@ def user_can_delete_resource(user, resourceid=None):
                 user, resourceid, "delete_resourceinstance"
             )
             if result is not None:
+                resource_instance_lifecycle = ResourceInstanceLifecycle.objects.get(
+                    graph_id=result["resource"].graph_id
+                )
+                can_delete_resource_instance_in_current_lifecycle_state = (
+                    resource_instance_lifecycle.states[
+                        result["resource"].lifecycle_state
+                    ]["can_delete"]
+                )
+
+                if not can_delete_resource_instance_in_current_lifecycle_state:
+                    return False
+
                 if result["permitted"] == "unknown":
                     nodegroups = get_nodegroups_by_perm(user, "models.delete_nodegroup")
                     tiles = TileModel.objects.filter(resourceinstance_id=resourceid)

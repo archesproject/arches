@@ -30,7 +30,7 @@ define([
         if(typeof data.displayname == 'string') {
             parsedDisplayName = JSON.parse(data.displayname);
         }
-    } catch(e){
+    } catch(e){  // eslint-disable-line  @typescript-eslint/no-unused-vars
         // empty
     }
 
@@ -168,6 +168,7 @@ define([
         userIsCreator: userIsCreator,
         showGrid: ko.observable(false),
         creator: creator,
+        resourceInstanceLifecycleState: data.resource_instance_lifecycle_state,
         // appliedFunctions: appliedFunctions(),
         graph: {
             graphid: data.graphid,
@@ -317,7 +318,7 @@ define([
     });
 
     vm.showRelatedResourcesManager = function(){
-        require(['views/resource/related-resources-manager'], () => {
+        require(['views/resource/related-resources-manager'], () => {  // eslint-disable-line  @typescript-eslint/no-require-imports
             if (vm.graph.domain_connections == undefined) {
                 $.ajax({
                     url: arches.urls.relatable_resources,
@@ -348,7 +349,7 @@ define([
     };
 
     vm.showInstancePermissionsManager = function(){
-        require(['views/resource/permissions-manager'], () => {
+        require(['views/resource/permissions-manager'], () => {  // eslint-disable-line  @typescript-eslint/no-require-imports
             if (vm.userIsCreator === true || vm.userIsCreator === null) {
                 vm.selection('permissions-manager');
             }

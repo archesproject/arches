@@ -63,7 +63,8 @@ define([
 
     var TileViewModel = function(params) {
         var CardViewModel = require('viewmodels/card');
-        var self = this;
+
+        var self = this;  // eslint-disable-line @typescript-eslint/no-this-alias
         var selection = params.selection || ko.observable();
         var scrollTo = params.scrollTo || ko.observable();
         var filter = params.filter || ko.observable();
@@ -181,7 +182,6 @@ define([
                 });
             },
             save: function(onFail, onSuccess) {
-                loading(true);
                 delete self.formData.data;
                 if (params.provisionalTileViewModel && params.provisionalTileViewModel.selectedProvisionalEdit()) {
                     self.formData.append('accepted_provisional', JSON.stringify(params.provisionalTileViewModel.selectedProvisionalEdit()));
@@ -250,8 +250,6 @@ define([
                     if (typeof onFail === 'function') {
                         onFail(response);
                     }
-                }).always(function(){
-                    loading(false);
                 });
             },
             deleteTile: function(onFail, onSuccess) {

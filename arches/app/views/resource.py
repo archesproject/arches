@@ -410,6 +410,11 @@ class ResourceEditorView(MapBaseManagerView):
 
         context["graph_has_unpublished_changes"] = graph.has_unpublished_changes
 
+        if resource_instance:
+            context["resource_instance_lifecycle_state"] = (
+                resource_instance.lifecycle_state
+            )
+
         context["nav"]["title"] = ""
         context["nav"]["menu"] = nav_menu
 
