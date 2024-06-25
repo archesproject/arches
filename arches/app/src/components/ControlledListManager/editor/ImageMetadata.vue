@@ -70,7 +70,7 @@ const saveMetadata = async (event: DataTableRowEditInitEvent) => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Metadata save failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
         if (normalizedNewData.id === null) {
             removeImageMetadata(event.newData);
@@ -95,7 +95,7 @@ const issueDeleteMetadata = async (
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Metadata deletion failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
     }
 };
@@ -179,7 +179,8 @@ const focusInput = () => {
             const editorDiv = editorRef.value;
             const rowEl = editorDiv!.querySelector(inputSelector.value);
             const inputEl = rowEl!.children[1].children[0];
-            inputEl.focus({ focusVisible: true });
+            // @ts-expect-error focusVisible not yet in typeshed
+            (inputEl as HTMLInputElement).focus({ focusVisible: true });
         }
         rowIndexToFocus.value = -1;
     }, 5);

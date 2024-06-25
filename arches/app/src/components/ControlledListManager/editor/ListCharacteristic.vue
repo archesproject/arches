@@ -36,7 +36,8 @@ const vFocus = {
     // immediately hogs focus with a setTimeout of 1,
     // so we'll get in line behind it to set focus to the input.
     // This should be reported/clarified with PrimeVue with a MWE.
-    updated: (el) => {
+    updated: (el: HTMLInputElement) => {
+        // @ts-expect-error focusVisible not yet in typeshed
         setTimeout(() => el && el.focus({ focusVisible: true }), 5);
     },
 };
@@ -64,7 +65,7 @@ const save = async () => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Save failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
         list.value!.name = originalValue;
     }

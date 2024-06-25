@@ -120,28 +120,32 @@ const deleteSelected = async () => {
         try {
             anyDeleted = await deleteItems(itemIdsToDelete);
         } catch (error) {
-            error.message.split("|").forEach((detail) => {
-                toast.add({
-                    severity: ERROR,
-                    life: DEFAULT_ERROR_TOAST_LIFE,
-                    summary: $gettext("Item deletion failed"),
-                    detail,
+            if (error instanceof Error) {
+                error.message.split("|").forEach((detail: string) => {
+                    toast.add({
+                        severity: ERROR,
+                        life: DEFAULT_ERROR_TOAST_LIFE,
+                        summary: $gettext("Item deletion failed"),
+                        detail,
+                    });
                 });
-            });
+            }
         }
     }
     if (listIdsToDelete.length) {
         try {
             anyDeleted = (await deleteLists(listIdsToDelete)) || anyDeleted;
         } catch (error) {
-            error.message.split("|").forEach((detail) => {
-                toast.add({
-                    severity: ERROR,
-                    life: DEFAULT_ERROR_TOAST_LIFE,
-                    summary: $gettext("List deletion failed"),
-                    detail,
+            if (error instanceof Error) {
+                error.message.split("|").forEach((detail) => {
+                    toast.add({
+                        severity: ERROR,
+                        life: DEFAULT_ERROR_TOAST_LIFE,
+                        summary: $gettext("List deletion failed"),
+                        detail,
+                    });
                 });
-            });
+            }
         }
     }
     if (anyDeleted) {
@@ -181,7 +185,7 @@ const fetchListsAndPopulateTree = async () => {
                 );
             },
         )
-        .catch((error) => {
+        .catch((error: Error) => {
             toast.add({
                 severity: ERROR,
                 life: DEFAULT_ERROR_TOAST_LIFE,

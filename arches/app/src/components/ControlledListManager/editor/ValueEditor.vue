@@ -158,7 +158,7 @@ const saveValue = async (event: DataTableRowEditInitEvent) => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Value save failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
         if (normalizedNewData.id === null) {
             removeItemValue(event.newData);
@@ -179,7 +179,7 @@ const issueDeleteValue = async (value: NewValue | Value) => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Value deletion failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
     }
 };
@@ -238,7 +238,8 @@ const focusInput = () => {
             const editorDiv = editorRef.value;
             const rowEl = editorDiv!.querySelector(inputSelector.value);
             const inputEl = rowEl!.children[indexOfInputCol].children[0];
-            inputEl.focus({ focusVisible: true });
+            // @ts-expect-error focusVisible not yet in typeshed
+            (inputEl as HTMLInputElement).focus({ focusVisible: true });
         }
         rowIndexToFocus.value = -1;
     }, 5);

@@ -149,7 +149,7 @@ const setParent = async (parentNode: TreeNode) => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Save failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
     }
 
@@ -173,7 +173,7 @@ const acceptNewItemShortcutEntry = async () => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Item creation failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
         return;
     }
@@ -191,7 +191,7 @@ const acceptNewItemShortcutEntry = async () => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Value save failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
     }
 
@@ -239,7 +239,7 @@ const acceptNewListShortcutEntry = async () => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("List creation failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
     }
 };

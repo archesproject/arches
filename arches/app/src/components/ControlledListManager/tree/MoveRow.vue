@@ -149,7 +149,7 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Save failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
         return;
     }

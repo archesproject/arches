@@ -16,7 +16,10 @@ import {
 import ImageEditor from "@/components/ControlledListManager/editor/ImageEditor.vue";
 
 import type { Ref } from "vue";
-import type { ControlledListItem } from "@/types/ControlledListManager";
+import type {
+    ControlledListItem,
+    FileContentProps,
+} from "@/types/ControlledListManager";
 import type {
     FileUploadBeforeSendEvent,
     FileUploadErrorEvent,
@@ -74,11 +77,14 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
                         borderRadius: '4px',
                     },
                 },
-                file: ({ props }) => ({
-                    style: {
-                        display: props.badgeValue === completed ? 'none' : '',
-                    },
-                }),
+                file: ({ props }) => {
+                    const badgeVal = (props as FileContentProps).badgeValue;
+                    return {
+                        style: {
+                            display: badgeVal === completed ? 'none' : '',
+                        },
+                    };
+                },
             }"
             @before-send="addHeader($event)"
             @upload="upload($event)"
