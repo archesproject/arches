@@ -472,7 +472,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             raise ValueError("graph_id must not be None to check resource permissions")
 
         nodegroups = self.get_nodegroups_by_perm(user, perms)
-        nodes = Node.objects.filter(nodegroup__in=nodegroups).filter(graph_id=graph_id)
+        nodes = Node.objects.filter(graph_id=graph_id).filter(nodegroup__in=nodegroups)
         return nodes.exists()
 
     def user_can_read_resource(
