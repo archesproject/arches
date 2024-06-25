@@ -2179,217 +2179,177 @@ class SpatialView(APIBase):
         uuid_pattern = re.compile(settings.UUID_REGEX, re.IGNORECASE)
         return uuid_pattern.match(identifier)
 
+    def create_json_data_object_from_spatialview(self, spatialview):
+        """
+        Returns a JSON object representing the spatialview
+        """
+        return {
+            "spatialviewid": str(spatialview.spatialviewid),
+            "schema": spatialview.schema,
+            "slug": spatialview.slug,
+            "description": spatialview.description,
+            "geometrynodeid": str(spatialview.geometrynode.pk),
+            "ismixedgeometrytypes": spatialview.ismixedgeometrytypes,
+            "language": spatialview.language.code,
+            "attributenodes": spatialview.attributenodes,
+            "isactive": spatialview.isactive
+        }
+    
+    
+    
+
+    def validate_json_data_content(self, json_data, spatialviewid_identifier=None):
+        """
+        Validates the JSON data passed in the request body
+        
+        returns a JSONErrorResponse if validation fails or SpatialView if validation passes
+        """
+
+        def create_spatialview_from_json_data(self, json_data):
+            """
+            Returns a SpatialView object from the JSON data. Should only be used if the JSON data has been validated.
+            """
+
+            # if json_data has spatialviewid, try and get the spatialview object. If it doesn't exist, create a new one and use the spatialviewid
+            try:
+                spatialview = models.SpatialView.objects.get(pk=json_data["spatialviewid"])
+            except KeyError:
+                spatialview = models.SpatialView()
+            except ObjectDoesNotExist:
+                spatialview = models.SpatialView()
+                spatialview.spatialviewid = uuid.UUID(json_data["spatialviewid"])
+
+            spatialview.schema = json_data["schema"]
+            spatialview.slug = json_data["slug"]
+            spatialview.description = json_data["description"]
+            spatialview.geometrynode = models.Node.objects.get(nodeid=json_data["geometrynodeid"])
+            spatialview.ismixedgeometrytypes = json_data["ismixedgeometrytypes"]
+            spatialview.language = models.Language.objects.get(code=json_data["language"])
+            spatialview.attributenodes = json_data["attributenodes"]
+            spatialview.isactive = json_data["isactive"]
+            return spatialview
+        
+        # Check if spatialviewid_identifier matches the spatialviewid in the json_data
+        if spatialviewid_identifier:
+            if "spatialviewid" in json_data:
+                if spatialviewid_identifier != json_data["spatialviewid"]:
+                    return JSONErrorResponse(
+                        _("Incorrect Spatialview json data"),
+                        _("Spatialviewid in the URL does not match the spatialviewid in the JSON data."),
+                        status=400
+                    )
+            else:
+                return JSONErrorResponse(
+                    _("Incorrect Spatialview json data"),
+                    _("No spatialviewid provided in the JSON data."),
+                    status=400
+                )
+
+        # Check for required properties
+        required_properties = ["slug", "schema", "geometrynodeid", "language", "attributenodes", "isactive", "ismixedgeometrytypes", "description"]
+
+        for prop in required_properties:
+            if prop not in json_data:
+                return JSONErrorResponse(
+                    _("Missing spatialview JSON data"),
+                    _("No %s property provided" % prop),
+                    status=400
+                )
+        
+        # get the geometry node
+        try:
+            geom_node = models.Node.objects.get(
+                nodeid=json_data["geometrynodeid"]
+            )
+        except ObjectDoesNotExist:
+            return JSONErrorResponse(
+                _("Incorrect Spatialview json data"),
+                _("No Node exists for supplied geometrynodeid"), status=400
+            )
+        
+        # get the language
+        try:
+            lang = models.Language.objects.get(code=json_data["language"])
+        except ObjectDoesNotExist:
+            return JSONErrorResponse(
+                _("Incorrect Spatialview json data"),
+                _("No Language exists for supplied language code"), status=400
+            )
+        
+        # check if the attribute nodes are on the same graph as the geometry node
+        attributenodes = json_data["attributenodes"]
+        attributenodes_nodeids = [n["nodeid"] for n in attributenodes]
+        attributenodes_are_valid = self.attribute_nodes_are_valid(geom_node, attributenodes_nodeids)
+        if not attributenodes_are_valid:
+            return JSONErrorResponse(
+                _("Incorrect Spatialview json data"),
+                _("One or more Attribute Nodes are not on the same Graph as the Geometry Node."),
+                status=400,
+            )
+        
+        return create_spatialview_from_json_data(json_data)
+
     @method_decorator(group_required("Application Administrator"))
     def post(self, request):
-        lang = None
-        isactive = False
-        ismixedgeometrytypes = None
-        description = None
 
         try:
             json_data = json.loads(request.body.decode("utf-8"))
         except ValueError:
-            return JSONErrorResponse(_("Invalid JSON"), status=400)
+            return JSONErrorResponse(
+                _("Invalid JSON data"), 
+                _("The Spatialview API was sent invalid JSON"), 
+                status=400
+            )
 
         if json_data is not None:
-            if "slug" not in json_data:
-                return JSONErrorResponse(
-                    _("No slug or Geometry Nodeid provided"), status=400
-                )
-            if "geometrynodeid" not in json_data:
-                return JSONErrorResponse(_("No Geometry Nodeid provided"), status=400)
-            else:
-                try:
-                    geom_node = models.Node.objects.get(
-                        nodeid=json_data["geometrynodeid"]
-                    )
-                except ObjectDoesNotExist:
-                    return JSONErrorResponse(
-                        _("No Node exists for supplied geometrynodeid"), status=400
-                    )
-            if "language" in json_data:
-                try:
-                    lang = models.Language.objects.get(code=json_data["language"])
-                except ObjectDoesNotExist:
-                    return JSONErrorResponse(
-                        _("No Language exists for supplied language code"), status=400
-                    )
-            else:
-                graph_x_pubs = models.GraphXPublishedGraph.objects.filter(
-                    graph=geom_node.graph
-                )
-                pubs = models.PublishedGraph.objects.filter(
-                    publication__in=graph_x_pubs
-                )
-                pub_graph_with_default_lang = list(
-                    filter(lambda x: x.language.isdefault is True, pubs)
-                )
-                try:
-                    lang = pub_graph_with_default_lang[0].language
-                except:
-                    return JSONErrorResponse(
-                        _("No default Language available in your Arches instance."),
-                        status=400,
-                    )
-            if "attributenodes" in json_data:
-                attributenodes = json_data["attributenodes"]
-                attributenodes_nodeids = [n["nodeid"] for n in attributenodes]
-                attributenodes_are_valid = self.attribute_nodes_are_valid(geom_node, attributenodes_nodeids)
-                if not attributenodes_are_valid:
-                    return JSONErrorResponse(
-                        _(
-                            "One or more Attribute Nodes are not on the same Graph as the Geometry Node."
-                        ),
-                        status=400,
-                    )
-            else:
-                attributenodes = []
-            if "isactive" in json_data:
-                isactive = json_data["isactive"]
-            if "ismixedgeometrytypes" in json_data:
-                ismixedgeometrytypes = json_data["ismixedgeometrytypes"]
-            else:
-                ismixedgeometrytypes = False
-            if "description" in json_data:
-                description = json_data["description"]
 
-            spatialview = models.SpatialView()
-            spatialview.schema = json_data["schema"]
-            spatialview.slug = json_data["slug"]
-            if description:
-                spatialview.description = description
-            spatialview.geometrynode = geom_node
-            spatialview.ismixedgeometrytypes = ismixedgeometrytypes
-            spatialview.language = lang
-            spatialview.attributenodes = attributenodes
-            spatialview.isactive = isactive
+            validate_json_data_content_result = self.validate_json_data_content(json_data)
+            if isinstance(validate_json_data_content_result, JSONErrorResponse):
+                return validate_json_data_content_result
+            
+            spatialview = validate_json_data_content_result
             
             try:
                 spatialview.save()
             except ValidationError as e:
-                return JSONErrorResponse(_("Validation Error"),e.message, status=400)
+                return JSONErrorResponse(_("Validation Error when creating Spatialview"),e.message, status=400)
 
-            return_json = {
-                "spatialviewid": str(spatialview.spatialviewid),
-                "schema": spatialview.schema,
-                "slug": spatialview.slug,
-                "description": spatialview.description,
-                "geometrynodeid": str(spatialview.geometrynode.pk),
-                "ismixedgeometrytypes": spatialview.ismixedgeometrytypes,
-                "language": spatialview.language.code,
-                "attributenodes": spatialview.attributenodes,
-                "isactive": spatialview.isactive
-            }
-
-            return JSONResponse(return_json ,status=200)
+            return JSONResponse(self.create_json_data_object_from_spatialview(spatialview) ,status=200)
         return JSONErrorResponse(_("No json request payload"), status=400)
 
     @method_decorator(group_required("Application Administrator"))
     def put(self, request, identifier=None):
-        spatialview_id = identifier
-        lang = None
-        isactive = False
-        ismixedgeometrytypes = False
-        description = None
-
+        
         if not identifier:
-            return JSONErrorResponse(_("No spatialviewid provided"), status=400)
+            return JSONErrorResponse(
+                _("Spatialview update failed"),
+                _("PUT REST request requires a spatialviewid to be provided in the URL."), 
+                status=400
+            )
 
-        json_data = json.loads(request.body.decode("utf-8"))
+        try:
+            json_data = json.loads(request.body.decode("utf-8"))
+        except ValueError:
+            return JSONErrorResponse(
+                _("Invalid JSON data"), 
+                _("The Spatialview API was sent invalid JSON"), 
+                status=400
+            )
 
         if json_data is not None:
-            if "geometrynodeid" in json_data:
-                try:
-                    geom_node = models.Node.objects.get(
-                        nodeid=json_data["geometrynodeid"]
-                    )
-                except ObjectDoesNotExist:
-                    return JSONErrorResponse(
-                        _("No Node exists for supplied geometrynodeid"), status=400
-                    )
-            if "language" in json_data:
-                try:
-                    lang = models.Language.objects.get(code=json_data["language"])
-                except ObjectDoesNotExist:
-                    return JSONErrorResponse(
-                        _("No Language exists for supplied language code"), status=400
-                    )
-            else:
-                graph_x_pubs = models.GraphXPublishedGraph.objects.filter(
-                    graph=geom_node.graph
-                )
-                pubs = models.PublishedGraph.objects.filter(
-                    publication__in=graph_x_pubs
-                )
-                pub_graph_with_default_lang = list(
-                    filter(lambda x: x.language.isdefault is True, pubs)
-                )
-                try:
-                    lang = pub_graph_with_default_lang[0].language
-                except:
-                    return JSONErrorResponse(
-                        _("No default Language available in your Arches instance."),
-                        status=400,
-                    )
-            if "attributenodes" in json_data:
-                attributenodes = json_data["attributenodes"]
-                attributenodes_nodeids = [n["nodeid"] for n in attributenodes]
-                attributenodes_are_valid = self.attribute_nodes_are_valid(geom_node, attributenodes_nodeids)
-                if not attributenodes_are_valid:
-                    return JSONErrorResponse(
-                        _(
-                            "One or more Attribute Nodes are not on the same Graph as the Geometry Node."
-                        ),
-                        status=400,
-                    )
-            else:
-                attributenodes = None
-            if "isactive" in json_data:
-                isactive = json_data["isactive"]
-            if "ismixedgeometrytypes" in json_data:
-                ismixedgeometrytypes = json_data["ismixedgeometrytypes"]
-            if "description" in json_data:
-                description = json_data["description"]
 
-            try:
-                if spatialview_id:
-                    spatialview = models.SpatialView.objects.get(
-                        spatialviewid=spatialview_id
-                    )
-            except ObjectDoesNotExist:
-                return JSONErrorResponse(
-                    _("No SpatialView identified by UUID provided"), status=404
-                )
-
-            if attributenodes and attributenodes != spatialview.attributenodes:
-                spatialview.attributenodes = attributenodes
-            spatialview.isactive = spatialview.isactive or isactive
-            spatialview.ismixedgeometrytypes = (
-                spatialview.ismixedgeometrytypes or ismixedgeometrytypes
-            )
-            if lang and lang != spatialview.language:
-                spatialview.language = lang
-            if description:
-                spatialview.description = description
+            validate_json_data_content_result = self.validate_json_data_content(json_data, identifier)
+            if isinstance(validate_json_data_content_result, JSONErrorResponse):
+                return validate_json_data_content_result
+            
+            spatialview = validate_json_data_content_result
             
             try:
                 spatialview.save()
             except ValidationError as e:
-                return JSONErrorResponse(_("Validation Error"),e.message, status=400)
+                return JSONErrorResponse(_("Validation Error when updating Spatialview"),e.message, status=400)
 
-            return_json = {
-                "spatialviewid": str(spatialview.spatialviewid),
-                "schema": spatialview.schema,
-                "slug": spatialview.slug,
-                "description": spatialview.description,
-                "geometrynodeid": str(spatialview.geometrynode.pk),
-                "ismixedgeometrytypes": spatialview.ismixedgeometrytypes,
-                "language": spatialview.language.code,
-                "attributenodes": spatialview.attributenodes,
-                "isactive": spatialview.isactive
-            }
-
-            return JSONResponse(status=200)
+            return JSONResponse(self.create_json_data_object_from_spatialview(spatialview) ,status=200)
         return JSONErrorResponse(_("No json request payload"), status=400)
 
     @method_decorator(group_required("Application Administrator"))
