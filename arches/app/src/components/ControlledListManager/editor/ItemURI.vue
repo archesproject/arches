@@ -118,7 +118,7 @@ const cancel = () => {
                 <i
                     role="button"
                     tabindex="0"
-                    class="fa fa-times"
+                    class="fa fa-undo"
                     :aria-label="$gettext('Cancel edit')"
                     @click="cancel"
                     @keyup.enter="cancel"

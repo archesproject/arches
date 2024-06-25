@@ -368,6 +368,23 @@ const focusInput = () => {
             <Column
                 :row-editor="true"
                 style="width: 5%; min-width: 6rem; text-align: center"
+                :pt="{
+                    rowEditorInitButton: {
+                        class: 'fa fa-pencil',
+                        style: { display: 'inline-flex' },
+                    },
+                    rowEditorInitIcon: { style: { display: 'none' } },
+                    rowEditorSaveButton: {
+                        class: 'fa fa-check',
+                        style: { display: 'inline-flex' },
+                    },
+                    rowEditorSaveIcon: { style: { display: 'none' } },
+                    rowEditorCancelButton: {
+                        class: 'fa fa-undo',
+                        style: { display: 'inline-flex' },
+                    },
+                    rowEditorCancelIcon: { style: { display: 'none' } },
+                }"
             />
             <Column style="width: 5%; text-align: center">
                 <template #body="slotProps">
