@@ -2314,7 +2314,7 @@ class SpatialView(APIBase):
             except ValidationError as e:
                 return JSONErrorResponse(_("Validation Error when creating Spatialview"),e.message, status=400)
 
-            return JSONResponse(self.create_json_data_object_from_spatialview(spatialview) ,status=200)
+            return JSONResponse(self.create_json_data_object_from_spatialview(spatialview) ,status=201)
         return JSONErrorResponse(_("No json request payload"), status=400)
 
     @method_decorator(group_required("Application Administrator"))
