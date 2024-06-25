@@ -2323,7 +2323,7 @@ class SpatialView(APIBase):
         if not identifier:
             return JSONErrorResponse(
                 _("Spatialview update failed"),
-                _("PUT REST request requires a spatialviewid to be provided in the URL."), 
+                _("PUT REST request requires a spatialviewid to be provided in the URL"), 
                 status=400
             )
 
@@ -2350,18 +2350,35 @@ class SpatialView(APIBase):
                 return JSONErrorResponse(_("Validation Error when updating Spatialview"),e.message, status=400)
 
             return JSONResponse(self.create_json_data_object_from_spatialview(spatialview) ,status=200)
-        return JSONErrorResponse(_("No json request payload"), status=400)
+        return JSONErrorResponse(_("Spatialview update falied"),_("No json request payload"), status=400)
 
     @method_decorator(group_required("Application Administrator"))
     def delete(self, request, identifier=None):
-        spatial_view = None
         if identifier:
-            if self.identifier_is_uuid(identifier):
-                spatial_view = models.SpatialView.objects.get(pk=identifier)
-            else:
-                spatial_view = models.SpatialView.objects.get(slug=identifier)
-        else:
-            return JSONErrorResponse(_("No slug or spatialviewid provided"), status=400)
+            spatialview = None
+            try:
+                spatialview = models.SpatialView.objects.get(pk=identifier)
+            except ObjectDoesNotExist:
+                return JSONErrorResponse(
+                    _("Spatialview delete failed"),
+                    _("Spatialview does not exist"),
+                    status=404
+                )
+            
+            try:
+                spatialview.delete()
+            except Exception as e:
+                logger.error(e)
+                return JSONErrorResponse(
+                    _("Spatialview delete failed"),
+                    _("An error occurred when trying to delete the spatialview"), 
+                    status=500
+                )
 
-        spatial_view.delete()
+        else:
+            return JSONErrorResponse(
+                _("Spatialview delete falied"),
+                _("DELETE REST request requires a spatialviewid to be provided in the URL"), 
+                status=400
+            ) 
         return JSONResponse(status=200)
