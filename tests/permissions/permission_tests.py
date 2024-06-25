@@ -47,7 +47,6 @@ from arches.app.utils.permission_backend import get_restricted_users
 class PermissionTests(ArchesTestCase):
     def setUp(self):
         self.expected_resource_count = 2
-        self.client = Client()
         self.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
         self.resource_instance_id = "f562c2fa-48d3-4798-a723-10209806c068"
         self.user = User.objects.get(username="ben")
