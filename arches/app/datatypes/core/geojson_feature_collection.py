@@ -21,7 +21,16 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         super(GeojsonFeatureCollectionDataType, self).__init__(model=model)
         self.geo_utils = GeoUtils()
 
-    def validate(self, value, row_number=None, source=None, node=None, nodeid=None, strict=False, **kwargs):
+    def validate(
+        self,
+        value,
+        row_number=None,
+        source=None,
+        node=None,
+        nodeid=None,
+        strict=False,
+        **kwargs,
+    ):
         errors = []
         max_bytes = 32766  # max bytes allowed by Lucene
         byte_count = 0
@@ -30,9 +39,15 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         def validate_geom_byte_size_can_be_reduced(feature_collection):
             try:
                 if len(feature_collection["features"]) > 0:
-                    feature_geom = GEOSGeometry(JSONSerializer().serialize(feature_collection["features"][0]["geometry"]))
+                    feature_geom = GEOSGeometry(
+                        JSONSerializer().serialize(
+                            feature_collection["features"][0]["geometry"]
+                        )
+                    )
                     current_precision = abs(self.find_num(feature_geom.coords))
-                    feature_collection = self.geo_utils.reduce_precision(feature_collection, current_precision)
+                    feature_collection = self.geo_utils.reduce_precision(
+                        feature_collection, current_precision
+                    )
             except ValueError:
                 message = _("Geojson byte size exceeds Lucene 32766 limit.")
                 title = _("Geometry Size Exceeds Elasticsearch Limit")
@@ -40,7 +55,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     {
                         "type": "ERROR",
                         "message": "datatype: {0} {1} - {2}. {3}.".format(
-                            self.datatype_model.datatype, source, message, "This data was not imported."
+                            self.datatype_model.datatype,
+                            source,
+                            message,
+                            "This data was not imported.",
                         ),
                         "title": title,
                     }
@@ -60,7 +78,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                         {
                             "type": "ERROR",
                             "message": "datatype: {0} value: {1} {2} - {3}. {4}".format(
-                                self.datatype_model.datatype, value, source, message, "This data was not imported."
+                                self.datatype_model.datatype,
+                                value,
+                                source,
+                                message,
+                                "This data was not imported.",
                             ),
                             "title": title,
                         }
@@ -72,7 +94,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     {
                         "type": "ERROR",
                         "message": "datatype: {0} value: {1} {2} - {3}. {4}.".format(
-                            self.datatype_model.datatype, value, source, message, "This data was not imported."
+                            self.datatype_model.datatype,
+                            value,
+                            source,
+                            message,
+                            "This data was not imported.",
                         ),
                         "title": title,
                     }
@@ -91,7 +117,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 except Exception:
                     message = _("Unable to serialize some geometry features.")
                     title = _("Unable to Serialize Geometry")
-                    error_message = self.create_error_message(value, source, row_number, message, title)
+                    error_message = self.create_error_message(
+                        value, source, row_number, message, title
+                    )
                     errors.append(error_message)
         return errors
 
@@ -115,7 +143,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         if geojson["type"] == "FeatureCollection":
             for feature in geojson["features"]:
                 if feature["geometry"]["type"].find("Multi") != -1:
-                    new_collection = self.geo_utils.convert_multipart_to_singlepart(feature["geometry"])
+                    new_collection = self.geo_utils.convert_multipart_to_singlepart(
+                        feature["geometry"]
+                    )
                     for new_feature in new_collection["features"]:
                         new_feature["id"] = str(uuid.uuid4())
                     features = features + new_collection["features"]
@@ -137,13 +167,17 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 try:
                     geometry = GEOSGeometry(value, srid=4326)
                     if geometry.geom_type == "GeometryCollection":
-                        arches_geojson = self.geo_utils.convert_geos_geom_collection_to_feature_collection(geometry)
+                        arches_geojson = self.geo_utils.convert_geos_geom_collection_to_feature_collection(
+                            geometry
+                        )
                     else:
                         arches_geojson = {}
                         arches_geojson["type"] = "FeatureCollection"
                         arches_geojson["features"] = []
                         arches_json_geometry = {}
-                        arches_json_geometry["geometry"] = JSONDeserializer().deserialize(geometry.json)
+                        arches_json_geometry["geometry"] = (
+                            JSONDeserializer().deserialize(geometry.json)
+                        )
                         arches_json_geometry["type"] = "Feature"
                         arches_json_geometry["id"] = str(uuid.uuid4())
                         arches_json_geometry["properties"] = {}
@@ -178,20 +212,33 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         byte_count += len(str(nodevalue).encode("UTF-8"))
 
         if len(nodevalue["features"]) > 0:
-            feature_geom = GEOSGeometry(JSONSerializer().serialize(nodevalue["features"][0]["geometry"]))
+            feature_geom = GEOSGeometry(
+                JSONSerializer().serialize(nodevalue["features"][0]["geometry"])
+            )
             current_precision = abs(self.find_num(feature_geom.coords))
 
         if byte_count > max_bytes and current_precision:
             nodevalue = self.geo_utils.reduce_precision(nodevalue, current_precision)
 
-        document["geometries"].append({"geom": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional, "tileid": tile.pk})
+        document["geometries"].append(
+            {
+                "geom": nodevalue,
+                "nodegroup_id": tile.nodegroup_id,
+                "provisional": provisional,
+                "tileid": tile.pk,
+            }
+        )
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
             minx, miny, maxx, maxy = bounds
             centerx = maxx - (maxx - minx) / 2
             centery = maxy - (maxy - miny) / 2
             document["points"].append(
-                {"point": {"lon": centerx, "lat": centery}, "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                {
+                    "point": {"lon": centerx, "lat": centery},
+                    "nodegroup_id": tile.nodegroup_id,
+                    "provisional": provisional,
+                }
             )
 
     def get_bounds(self, tile, node):
@@ -206,7 +253,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
     def get_bounds_from_value(self, node_data):
         bounds = None
         for feature in node_data["features"]:
-            geom_collection = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
+            geom_collection = GEOSGeometry(
+                JSONSerializer().serialize(feature["geometry"])
+            )
 
             if bounds is None:
                 bounds = geom_collection.extent
@@ -230,7 +279,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             return None
         elif node.config is None:
             return None
-        tile_exists = models.TileModel.objects.filter(nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)).exists()
+        tile_exists = models.TileModel.objects.filter(
+            nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)
+        ).exists()
         if not preview and (not tile_exists or not node.config["layerActivated"]):
             return None
 
@@ -253,7 +304,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             except ValueError:
                 layer_def = "[]"
         else:
-            with open(os.path.dirname(os.path.realpath(__file__)) + "/geojson_feature_collection_layer_template.txt") as f:
+            with open(
+                os.path.dirname(os.path.realpath(__file__))
+                + "/geojson_feature_collection_layer_template.txt"
+            ) as f:
                 src = Template(f.read())
                 layer_def = src.substitute(
                     {
@@ -301,7 +355,12 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             "properties": {
                 "features": {
                     "properties": {
-                        "geometry": {"properties": {"coordinates": {"type": "float"}, "type": {"type": "keyword"}}},
+                        "geometry": {
+                            "properties": {
+                                "coordinates": {"type": "float"},
+                                "type": {"type": "keyword"},
+                            }
+                        },
                         "id": {"type": "keyword"},
                         "type": {"type": "keyword"},
                         "properties": {"type": "object"},
@@ -324,7 +383,13 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 for f in data["features"]:
                     del f["id"]
                     del f["properties"]
-            g.add((edge_info["d_uri"], URIRef(edge.ontologyproperty), Literal(JSONSerializer().serialize(data))))
+            g.add(
+                (
+                    edge_info["d_uri"],
+                    URIRef(edge.ontologyproperty),
+                    Literal(JSONSerializer().serialize(data)),
+                )
+            )
         return g
 
     def from_rdf(self, json_ld_node):
@@ -332,7 +397,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         try:
             val = json.loads(json_ld_node["@value"])
         except:
-            raise ValueError(f"Bad Data in GeoJSON, should be JSON string: {json_ld_node}")
+            raise ValueError(
+                f"Bad Data in GeoJSON, should be JSON string: {json_ld_node}"
+            )
         if "features" not in val or type(val["features"]) != list:
             raise ValueError(f"GeoJSON must have features array")
         for f in val["features"]:
