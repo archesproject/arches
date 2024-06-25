@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import migrations, models
 
 
@@ -49,7 +50,7 @@ class Migration(migrations.Migration):
                 (
                     "states",
                     models.JSONField(
-                        default="ResourceInstanceLifecycle.default_states"
+                        default=settings.RESOURCE_INSTANCE_DEFAULT_LIFECYCLE_STATES
                     ),
                 ),
             ],

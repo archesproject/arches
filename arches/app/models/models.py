@@ -1220,14 +1220,9 @@ class ResourceInstanceLifecycle(models.Model):
         on_delete=models.CASCADE,
         primary_key=True,
     )
-    states = models.JSONField(default="ResourceInstanceLifecycle.default_states")
-
-    @staticmethod
-    def default_states():
-        return {
-            "active": {"can_delete": False, "initial_state": True},
-            "retired": {"can_delete": True, "initial_state": False},
-        }
+    states = models.JSONField(
+        default=settings.RESOURCE_INSTANCE_DEFAULT_LIFECYCLE_STATES
+    )
 
     class Meta:
         db_table = "resource_instance_lifecycles"
