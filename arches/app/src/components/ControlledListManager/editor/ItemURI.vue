@@ -22,6 +22,16 @@ const editing = ref(false);
 
 const formValue = ref("");
 
+const vFocus = {
+    // The editor (pencil) button from the DataTable (elsewhere on page)
+    // immediately hogs focus with a setTimeout of 1,
+    // so we'll get in line behind it to set focus to the input.
+    // This should be reported/clarified with PrimeVue with a MWE.
+    updated: (el) => {
+        setTimeout(() => el && el.focus({ focusVisible: true }), 5);
+    },
+};
+
 const inputValue = computed({
     get() {
         return item.value.uri;
@@ -72,6 +82,7 @@ const cancel = () => {
         <div class="characteristic">
             <InputText
                 v-model="inputValue"
+                v-focus
                 type="text"
                 :disabled="!editing"
                 :aria-label="$gettext('URI')"

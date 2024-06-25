@@ -227,8 +227,10 @@ const inputSelector = computed(() => {
 });
 
 const focusInput = () => {
-    // The editor (pencil) button immediately hogs focus with a setTimeout of 1,
+    // The editor (pencil) button from the DataTable (elsewhere on page)
+    // immediately hogs focus with a setTimeout of 1,
     // so we'll get in line behind it to set focus to the input.
+    // This should be reported/clarified with PrimeVue with a MWE.
     setTimeout(() => {
         // Note editor uses the second column.
         const indexOfInputCol = valueCategory ? 1 : 0;
@@ -236,11 +238,10 @@ const focusInput = () => {
             const editorDiv = editorRef.value;
             const rowEl = editorDiv!.querySelector(inputSelector.value);
             const inputEl = rowEl!.children[indexOfInputCol].children[0];
-            // @ts-expect-error focusVisible not yet in typeshed
             inputEl.focus({ focusVisible: true });
         }
         rowIndexToFocus.value = -1;
-    }, 10);
+    }, 5);
 };
 </script>
 
