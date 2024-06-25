@@ -10,26 +10,18 @@ define([
     const componentName = 'core-search';
     const viewModel = BaseFilter.extend({ 
         initialize: function(sharedStateObject) {
-        
-            let self = this;
-
+            const self = this;
             sharedStateObject.componentName = componentName;
             BaseFilter.prototype.initialize.call(this, sharedStateObject);
-            console.log(this.requiredFiltersLoaded());
-            console.log(ko.unwrap(this.filters));
-            console.log(ko.unwrap(sharedStateObject.filters));
-
             this.query = sharedStateObject.query;
             this.queryString = sharedStateObject.queryString;
             this.updateRequest = sharedStateObject.updateRequest;
-            // this.searchResults = sharedStateObject.searchResults;
             this.userIsReviewer = sharedStateObject.userIsReviewer;
             this.total = sharedStateObject.total;
             this.userid = sharedStateObject.userid;
             this.hits = sharedStateObject.hits;
             this.alert = sharedStateObject.alert;
             this.sharedStateObject = sharedStateObject;
-            // console.log(sharedStateObject.getRequiredFilters(componentName));
             this.queryString.subscribe(function() {
                 this.doQuery();
             }, this);
@@ -80,7 +72,7 @@ define([
                         }
                     }
                 }, this);
-                this.query({"paging-filter": "1", "core-search": true, tiles: "true"});
+                this.query({"paging-filter": "1", "core":"core-search", tiles: "true"});
             };
 
             this.selectPopup = function(componentname) {
@@ -92,7 +84,6 @@ define([
             };
             if (this.requiredFiltersLoaded() === false) {
                 this.requiredFiltersLoaded.subscribe(function() {
-                    console.log("core-search: OK!");
                     this.restoreState();
                 }, this);
             } else {
