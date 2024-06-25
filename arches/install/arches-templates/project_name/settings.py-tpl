@@ -36,8 +36,23 @@ SEARCH_COMPONENT_LOCATIONS.append('{{ project_name }}.search_components')
 
 LOCALE_PATHS.insert(0, os.path.join(APP_ROOT, 'locale'))
 
-FILE_TYPE_CHECKING = False
-FILE_TYPES = ["bmp", "gif", "jpg", "jpeg", "json", "pdf", "png", "psd", "rtf", "tif", "tiff", "xlsx", "csv", "zip"]
+FILE_TYPE_CHECKING = "lenient"
+FILE_TYPES = [
+    "bmp",
+    "gif",
+    "jpg",
+    "jpeg",
+    "json",
+    "pdf",
+    "png",
+    "psd",
+    "rtf",
+    "tif",
+    "tiff",
+    "xlsx",
+    "csv",
+    "zip",
+]
 FILENAME_GENERATOR = "arches.app.utils.storage_filename_generator.generate_filename"
 UPLOADED_FILES_DIR = "uploadedfiles"
 
@@ -53,8 +68,8 @@ ROOT_URLCONF = '{{ project_name }}.urls'
 ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
 
 # If you need to connect to Elasticsearch via an API key instead of username/password, use the syntax below:
-# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": "<ENCODED_API_KEY>"}
-# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": ("<ID>", "<API_KEY>")}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "api_key": "<ENCODED_API_KEY>"}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "api_key": ("<ID>", "<API_KEY>")}
 
 # Your Elasticsearch instance needs to be configured with xpack.security.enabled=true to use API keys - update elasticsearch.yml or .env file and restart.
 
