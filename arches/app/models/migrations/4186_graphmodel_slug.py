@@ -10,13 +10,23 @@ import re
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4521_sync_revision_logs'),
+        ("models", "4521_sync_revision_logs"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='graphmodel',
-            name='slug',
-            field=models.TextField(null=True, unique=True, validators=[django.core.validators.RegexValidator(re.compile('^[-a-zA-Z0-9_]+\\Z'), "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.", 'invalid')]),
+            model_name="graphmodel",
+            name="slug",
+            field=models.TextField(
+                null=True,
+                unique=True,
+                validators=[
+                    django.core.validators.RegexValidator(
+                        re.compile("^[-a-zA-Z0-9_]+\\Z"),
+                        "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.",
+                        "invalid",
+                    )
+                ],
+            ),
         ),
     ]

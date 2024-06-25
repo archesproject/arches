@@ -42,17 +42,34 @@ class Command(BaseCommand):
 
     Example: python manage.py validate --fix-all
     """
+
     help = "Validate an Arches database against a set of data integrity checks, and opt-in to remediation."
 
     def add_arguments(self, parser):
         choices = [check.value for check in IntegrityCheck]
 
-        parser.add_argument("--fix-all", action="store_true", dest="fix_all", default=False,
-                            help="Apply all fix actions.")
-        parser.add_argument("--fix", action="extend", nargs="+", type=int, default=[], choices=choices,
-                            help="List the error codes to fix, e.g. --fix 1001 1002 ...")
-        parser.add_argument("--limit", action="store", type=int,
-                            help="Maximum number of rows to print; does not affect fix actions")
+        parser.add_argument(
+            "--fix-all",
+            action="store_true",
+            dest="fix_all",
+            default=False,
+            help="Apply all fix actions.",
+        )
+        parser.add_argument(
+            "--fix",
+            action="extend",
+            nargs="+",
+            type=int,
+            default=[],
+            choices=choices,
+            help="List the error codes to fix, e.g. --fix 1001 1002 ...",
+        )
+        parser.add_argument(
+            "--limit",
+            action="store",
+            type=int,
+            help="Maximum number of rows to print; does not affect fix actions",
+        )
 
     def handle(self, *args, **options):
         self.options = options
@@ -73,22 +90,29 @@ class Command(BaseCommand):
         if self.options["verbosity"] > 0:
             self.stdout.write()
             self.stdout.write("Arches integrity report")
-            self.stdout.write(f"Prepared by Arches {__version__} on {datetime.today().strftime('%c')}")
+            self.stdout.write(
+                f"Prepared by Arches {__version__} on {datetime.today().strftime('%c')}"
+            )
             self.stdout.write()
-            self.stdout.write("\t".join(["", "Error", "Rows", fix_heading, "Description"]))
+            self.stdout.write(
+                "\t".join(["", "Error", "Rows", fix_heading, "Description"])
+            )
             self.stdout.write()
 
         # Add checks here in numerical order
         self.check_integrity(
             check=IntegrityCheck.NODE_HAS_ONTOLOGY_GRAPH_DOES_NOT,  # 1005
-            queryset=models.Node.objects.only("ontologyclass", "graph").filter(
-                ontologyclass__isnull=False).filter(graph__ontology=None),
+            queryset=models.Node.objects.only("ontologyclass", "graph")
+            .filter(ontologyclass__isnull=False)
+            .filter(graph__ontology=None),
             fix_action=None,
         )
         self.check_integrity(
             check=IntegrityCheck.NODELESS_NODE_GROUP,  # 1012
             queryset=models.NodeGroup.objects.filter(
-                ~Exists(models.Node.objects.filter(nodegroup_id=OuterRef("nodegroupid")))
+                ~Exists(
+                    models.Node.objects.filter(nodegroup_id=OuterRef("nodegroupid"))
+                )
             ),
             fix_action=DELETE_QUERYSET,
         )
@@ -99,7 +123,11 @@ class Command(BaseCommand):
 
         if self.mode == VALIDATE:
             # Fixable?
-            fix_status = self.style.MIGRATE_HEADING("Yes") if fix_action else self.style.NOTICE("No")
+            fix_status = (
+                self.style.MIGRATE_HEADING("Yes")
+                if fix_action
+                else self.style.NOTICE("No")
+            )
             if not queryset.exists():
                 fix_status = self.style.MIGRATE_HEADING("N/A")
         else:
@@ -112,7 +140,9 @@ class Command(BaseCommand):
                 if self.options["fix_all"]:
                     fix_status = self.style.MIGRATE_HEADING("N/A")
                 else:
-                    raise CommandError(f"Requested fixing unfixable - {check.value}: {check}")
+                    raise CommandError(
+                        f"Requested fixing unfixable - {check.value}: {check}"
+                    )
             elif queryset.exists():
                 fix_status = self.style.ERROR("No")  # until actually fixed below
                 # Perform fix action
@@ -134,7 +164,12 @@ class Command(BaseCommand):
             count = len(queryset)
             result = self.style.ERROR("FAIL") if count else self.style.SUCCESS("PASS")
             # Fix status takes two "columns" so add a tab
-            self.stdout.write("\t".join(str(x) for x in (result, check.value, count, fix_status + "\t", check)))
+            self.stdout.write(
+                "\t".join(
+                    str(x)
+                    for x in (result, check.value, count, fix_status + "\t", check)
+                )
+            )
 
             if self.options["verbosity"] > 1:
                 self.stdout.write("\t" + "-" * 36)

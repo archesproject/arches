@@ -7,18 +7,18 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9973_bulk_deleting_module'),
+        ("models", "9973_bulk_deleting_module"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='workflowhistory',
-            name='workflowname',
+            model_name="workflowhistory",
+            name="workflowname",
             field=models.CharField(null=True),
         ),
         migrations.AlterField(
-            model_name='workflowhistory',
-            name='created',
+            model_name="workflowhistory",
+            name="created",
             field=models.DateTimeField(default=django.utils.timezone.now, null=False),
         ),
     ]

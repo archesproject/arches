@@ -20,12 +20,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 # From https://towardsdatascience.com/how-to-flatten-deeply-nested-json-objects-in-non-recursive-elegant-python-55f96533103d
 def flatten_dict(nested_dict, separator="_"):
     """
-        Flatten dict object with nested keys into a single level.
-        Args:
-            nested_dict: A nested dict object.
-            separator: a string used to denote hierarchical
-        Returns:
-            The flattened dict object if successful, None otherwise.
+    Flatten dict object with nested keys into a single level.
+    Args:
+        nested_dict: A nested dict object.
+        separator: a string used to denote hierarchical
+    Returns:
+        The flattened dict object if successful, None otherwise.
     """
     out = {}
 

@@ -75,7 +75,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options["graphs"]:
-            self.graphs = [Graph(graphid.strip()) for graphid in options["graphs"].split(",")]
+            self.graphs = [
+                Graph(graphid.strip()) for graphid in options["graphs"].split(",")
+            ]
         else:
             self.graphs = Graph.objects.filter(isresource=True)
 
@@ -94,7 +96,7 @@ class Command(BaseCommand):
         graphids = []
         for graph in self.graphs:
             print(graph.name)
-            
+
             if self.update:
                 if graph.publication_id:
                     graph.update_published_graphs()

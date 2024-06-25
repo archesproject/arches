@@ -46,7 +46,9 @@ class CreateFunction(Operation):
 
     """
 
-    def __init__(self, name, body, returntype, arguments=[], declarations=[], language="plpgsql"):
+    def __init__(
+        self, name, body, returntype, arguments=[], declarations=[], language="plpgsql"
+    ):
         """
         Keyword arguments:
         name -- name of the function
@@ -116,11 +118,22 @@ class CreateAutoPopulateUUIDField(Operation):
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         for column in self.columns:
-            schema_editor.execute("ALTER TABLE {0} ALTER COLUMN {1} SET DEFAULT uuid_generate_v1mc()".format(self.table, column))
+            schema_editor.execute(
+                "ALTER TABLE {0} ALTER COLUMN {1} SET DEFAULT uuid_generate_v1mc()".format(
+                    self.table, column
+                )
+            )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         for column in self.columns:
-            schema_editor.execute("ALTER TABLE {0} ALTER COLUMN {1} DROP DEFAULT".format(self.table, column))
+            schema_editor.execute(
+                "ALTER TABLE {0} ALTER COLUMN {1} DROP DEFAULT".format(
+                    self.table, column
+                )
+            )
 
     def describe(self):
-        return "Sets default value for uuid column(s) %s in %s" % self.columns, self.table
+        return (
+            "Sets default value for uuid column(s) %s in %s" % self.columns,
+            self.table,
+        )

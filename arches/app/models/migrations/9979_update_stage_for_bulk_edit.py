@@ -139,7 +139,6 @@ class Migration(migrations.Migration):
         $$;
     """
 
-
     operations = [
         migrations.RunSQL(
             update_staging_function,

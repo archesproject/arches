@@ -30,7 +30,9 @@ class LabelBasedNode(object):
 
         return is_empty
 
-    def as_json(self, compact=False, include_empty_nodes=True, include_hidden_nodes=True):
+    def as_json(
+        self, compact=False, include_empty_nodes=True, include_hidden_nodes=True
+    ):
         display_data = {}
 
         if not include_hidden_nodes:
@@ -43,7 +45,9 @@ class LabelBasedNode(object):
 
         for child_node in self.child_nodes:
             formatted_node = child_node.as_json(
-                compact=compact, include_empty_nodes=include_empty_nodes, include_hidden_nodes=include_hidden_nodes
+                compact=compact,
+                include_empty_nodes=include_empty_nodes,
+                include_hidden_nodes=include_hidden_nodes,
             )
 
             if formatted_node is not None:
@@ -55,12 +59,21 @@ class LabelBasedNode(object):
 
                     # let's handle multiple identical node names
                     if not previous_val:
-                        should_create_new_array = cardinality == "n" and self.tile_id != child_node.tile_id
-                        display_data[formatted_node_name] = [formatted_node_value] if should_create_new_array else formatted_node_value
+                        should_create_new_array = (
+                            cardinality == "n" and self.tile_id != child_node.tile_id
+                        )
+                        display_data[formatted_node_name] = (
+                            [formatted_node_value]
+                            if should_create_new_array
+                            else formatted_node_value
+                        )
                     elif isinstance(previous_val, list):
                         display_data[formatted_node_name].append(formatted_node_value)
                     else:
-                        display_data[formatted_node_name] = [previous_val, formatted_node_value]
+                        display_data[formatted_node_name] = [
+                            previous_val,
+                            formatted_node_value,
+                        ]
 
         if compact and display_data:
             if self.value is not NON_DATA_COLLECTING_NODE:
@@ -77,7 +90,9 @@ class LabelBasedNode(object):
 
 class LabelBasedGraph(object):
     @staticmethod
-    def generate_node_ids_to_tiles_reference_and_nodegroup_cardinality_reference(resource):
+    def generate_node_ids_to_tiles_reference_and_nodegroup_cardinality_reference(
+        resource,
+    ):
         """
         Builds a reference of all nodes in a in a given resource,
         paired with a list of tiles in which they exist
@@ -97,8 +112,13 @@ class LabelBasedGraph(object):
                 tile_list.append(tile)
                 node_ids_to_tiles_reference[node_id] = tile_list
 
-        nodegroup_cardinality = models.NodeGroup.objects.filter(pk__in=nodegroupids).values("nodegroupid", "cardinality")
-        nodegroup_cardinality_reference = {str(nodegroup["nodegroupid"]): nodegroup["cardinality"] for nodegroup in nodegroup_cardinality}
+        nodegroup_cardinality = models.NodeGroup.objects.filter(
+            pk__in=nodegroupids
+        ).values("nodegroupid", "cardinality")
+        nodegroup_cardinality_reference = {
+            str(nodegroup["nodegroupid"]): nodegroup["cardinality"]
+            for nodegroup in nodegroup_cardinality
+        }
 
         return node_ids_to_tiles_reference, nodegroup_cardinality_reference
 
@@ -140,7 +160,11 @@ class LabelBasedGraph(object):
             datatype_factory=datatype_factory,
         )
 
-        return graph.as_json(include_empty_nodes=bool(not hide_empty_nodes)) if as_json else graph
+        return (
+            graph.as_json(include_empty_nodes=bool(not hide_empty_nodes))
+            if as_json
+            else graph
+        )
 
     @classmethod
     def from_resource(
@@ -170,9 +194,13 @@ class LabelBasedGraph(object):
         (
             node_ids_to_tiles_reference,
             nodegroup_cardinality_reference,
-        ) = cls.generate_node_ids_to_tiles_reference_and_nodegroup_cardinality_reference(resource=resource)
+        ) = cls.generate_node_ids_to_tiles_reference_and_nodegroup_cardinality_reference(
+            resource=resource
+        )
 
-        root_label_based_node = LabelBasedNode(name=None, node_id=None, tile_id=None, value=None, cardinality=None)
+        root_label_based_node = LabelBasedNode(
+            name=None, node_id=None, tile_id=None, value=None, cardinality=None
+        )
 
         for tile in resource.tiles:
             label_based_graph = LabelBasedGraph.from_tile(
@@ -191,7 +219,9 @@ class LabelBasedGraph(object):
 
         if as_json:
             root_label_based_node_json = root_label_based_node.as_json(
-                compact=compact, include_empty_nodes=bool(not hide_empty_nodes), include_hidden_nodes=bool(not hide_hidden_nodes)
+                compact=compact,
+                include_empty_nodes=bool(not hide_empty_nodes),
+                include_hidden_nodes=bool(not hide_hidden_nodes),
             )
 
             _dummy_resource_name, resource_graph = root_label_based_node_json.popitem()
@@ -207,7 +237,9 @@ class LabelBasedGraph(object):
             return root_label_based_node
 
     @classmethod
-    def from_resources(cls, resources, compact=False, hide_empty_nodes=False, as_json=True):
+    def from_resources(
+        cls, resources, compact=False, hide_empty_nodes=False, as_json=True
+    ):
         """
         Generates a list of label-based graph from given resources
         """
@@ -253,16 +285,35 @@ class LabelBasedGraph(object):
 
     @classmethod
     def _build_graph(
-        cls, input_node, input_tile, parent_tree, node_ids_to_tiles_reference, nodegroup_cardinality_reference, node_cache, datatype_factory
+        cls,
+        input_node,
+        input_tile,
+        parent_tree,
+        node_ids_to_tiles_reference,
+        nodegroup_cardinality_reference,
+        node_cache,
+        datatype_factory,
     ):
         def is_valid_semantic_node(node, tile):
             if node.datatype == "semantic":
                 child_nodes = node.get_direct_child_nodes()
-                semantic_child_nodes = [child_node for child_node in child_nodes if child_node.datatype == "semantic"]
-                non_semantic_child_nodes = [child_node for child_node in child_nodes if child_node.datatype != "semantic"]
+                semantic_child_nodes = [
+                    child_node
+                    for child_node in child_nodes
+                    if child_node.datatype == "semantic"
+                ]
+                non_semantic_child_nodes = [
+                    child_node
+                    for child_node in child_nodes
+                    if child_node.datatype != "semantic"
+                ]
 
                 for non_semantic_child_node in non_semantic_child_nodes:
-                    if str(non_semantic_child_node.pk) in tile.data or str(non_semantic_child_node.pk) in node_ids_to_tiles_reference:
+                    if (
+                        str(non_semantic_child_node.pk) in tile.data
+                        or str(non_semantic_child_node.pk)
+                        in node_ids_to_tiles_reference
+                    ):
                         return True
 
                 has_valid_child_semantic_node = False
@@ -273,17 +324,28 @@ class LabelBasedGraph(object):
 
                 return has_valid_child_semantic_node
 
-        for associated_tile in node_ids_to_tiles_reference.get(str(input_node.pk), [input_tile]):
+        for associated_tile in node_ids_to_tiles_reference.get(
+            str(input_node.pk), [input_tile]
+        ):
             parent_tile = associated_tile.parenttile
 
             if associated_tile == input_tile or parent_tile == input_tile:
-                if is_valid_semantic_node(input_node, associated_tile) or str(input_node.pk) in associated_tile.data:
+                if (
+                    is_valid_semantic_node(input_node, associated_tile)
+                    or str(input_node.pk) in associated_tile.data
+                ):
                     label_based_node = LabelBasedNode(
                         name=input_node.name,
                         node_id=str(input_node.pk),
                         tile_id=str(associated_tile.pk),
-                        value=cls._get_display_value(tile=associated_tile, node=input_node, datatype_factory=datatype_factory),
-                        cardinality=nodegroup_cardinality_reference.get(str(associated_tile.nodegroup_id)),
+                        value=cls._get_display_value(
+                            tile=associated_tile,
+                            node=input_node,
+                            datatype_factory=datatype_factory,
+                        ),
+                        cardinality=nodegroup_cardinality_reference.get(
+                            str(associated_tile.nodegroup_id)
+                        ),
                     )
 
                     if not parent_tree:  # if top node and

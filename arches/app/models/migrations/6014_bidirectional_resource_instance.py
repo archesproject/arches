@@ -35,7 +35,11 @@ class Migration(migrations.Migration):
                 to="models.ResourceInstance",
             ),
         ),
-        migrations.AddField(model_name="resourcexresource", name="inverserelationshiptype", field=models.TextField(blank=True, null=True),),
+        migrations.AddField(
+            model_name="resourcexresource",
+            name="inverserelationshiptype",
+            field=models.TextField(blank=True, null=True),
+        ),
         migrations.AddField(
             model_name="resourcexresource",
             name="tileid",
