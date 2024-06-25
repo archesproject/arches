@@ -2286,20 +2286,14 @@ class SpatialView(APIBase):
 
     @method_decorator(group_required("Application Administrator"))
     def put(self, request, identifier=None):
-        spatialview_id = None
-        spatialview_slug = None
+        spatialview_id = identifier
         lang = None
         isactive = False
         ismixedgeometrytypes = False
         description = None
 
-        if identifier:
-            if self.identifier_is_uuid(identifier):
-                spatialview_id = identifier
-            else:
-                spatialview_slug = identifier
-        else:
-            return JSONErrorResponse(_("No slug or spatialviewid provided"), status=400)
+        if not identifier:
+            return JSONErrorResponse(_("No spatialviewid provided"), status=400)
 
         json_data = json.loads(request.body.decode("utf-8"))
 
@@ -2362,11 +2356,9 @@ class SpatialView(APIBase):
                     spatialview = models.SpatialView.objects.get(
                         spatialviewid=spatialview_id
                     )
-                else:
-                    spatialview = models.SpatialView.objects.get(slug=spatialview_slug)
             except ObjectDoesNotExist:
                 return JSONErrorResponse(
-                    _("No SpatialView identified by Slug or UUID provided"), status=404
+                    _("No SpatialView identified by UUID provided"), status=404
                 )
 
             if attributenodes and attributenodes != spatialview.attributenodes:
