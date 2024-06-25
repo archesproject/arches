@@ -827,9 +827,8 @@ class CachedUserPermissionChecker:
             user_permissions = current_user_cached_permissions.get("user_permissions")
         else:
             user_permissions = set()
-            user.groups.prefetch_related("permissions")
 
-            for group in user.groups.all():
+            for group in user.groups.prefetch_related("permissions").all():
                 for group_permission in group.permissions.all():
                     user_permissions.add(group_permission.codename)
 
