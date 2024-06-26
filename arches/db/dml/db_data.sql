@@ -20,14 +20,7 @@ SET client_min_messages = warning;
 -- Data for Name: d_languages; Type: TABLE DATA; Schema: concepts; Owner: postgres
 --
 
-INSERT INTO d_languages VALUES ('en-US', 'ENGLISH', true);
 INSERT INTO d_languages VALUES ('en', 'ENGLISH', true);
-INSERT INTO d_languages VALUES ('fr', 'FRENCH', true);
-INSERT INTO d_languages VALUES ('zh', 'CHINESE', true);
-INSERT INTO d_languages VALUES ('de', 'GERMAN', true);
-INSERT INTO d_languages VALUES ('pt', 'PORTUGUESE', true);
-INSERT INTO d_languages VALUES ('ru', 'RUSSIAN', true);
-INSERT INTO d_languages VALUES ('el', 'GREEK', true);
 
 
 --
@@ -105,11 +98,11 @@ INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000
 INSERT INTO concepts(conceptid, nodetype, legacyoid) VALUES ('00000000-0000-0000-0000-000000000007', 'Concept', 'DEFAULT RESOURCE TO RESOURCE RELATIONSHIP TYPE');
 
 
-INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES ('d8c60bf4-e786-11e6-905a-b756ec83dad5', '00000000-0000-0000-0000-000000000001', 'prefLabel', 'Arches', 'en-US');
-INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES ('c12e7e6c-e417-11e6-b14b-0738913905b4', '00000000-0000-0000-0000-000000000004', 'prefLabel', 'Resource To Resource Relationship Types', 'en-US');
-INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES ('d8c622f6-e786-11e6-905a-475a5eee86f5', '00000000-0000-0000-0000-000000000005', 'prefLabel', 'Resource To Resource Relationship Types', 'en-US');
-INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES ('fee39428-e83f-11e6-b49d-9b976819ac02', '00000000-0000-0000-0000-000000000006', 'prefLabel', 'Candidates', 'en-US');
-INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES ('ac41d9be-79db-4256-b368-2f4559cfbe55', '00000000-0000-0000-0000-000000000007', 'prefLabel', 'is related to', 'en-US');
+INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES ('d8c60bf4-e786-11e6-905a-b756ec83dad5', '00000000-0000-0000-0000-000000000001', 'prefLabel', 'Arches', 'en');
+INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES ('c12e7e6c-e417-11e6-b14b-0738913905b4', '00000000-0000-0000-0000-000000000004', 'prefLabel', 'Resource To Resource Relationship Types', 'en');
+INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES ('d8c622f6-e786-11e6-905a-475a5eee86f5', '00000000-0000-0000-0000-000000000005', 'prefLabel', 'Resource To Resource Relationship Types', 'en');
+INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES ('fee39428-e83f-11e6-b49d-9b976819ac02', '00000000-0000-0000-0000-000000000006', 'prefLabel', 'Candidates', 'en');
+INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES ('ac41d9be-79db-4256-b368-2f4559cfbe55', '00000000-0000-0000-0000-000000000007', 'prefLabel', 'is related to', 'en');
 
 
 INSERT INTO relations(relationid, conceptidfrom, conceptidto, relationtype)
