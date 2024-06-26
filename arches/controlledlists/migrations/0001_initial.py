@@ -124,7 +124,7 @@ class Migration(migrations.Migration):
         migrations.RunPython(assign_view_plugin, remove_view_plugin),
         migrations.RunSQL(add_reference_datatype, migrations.RunSQL.noop),
         migrations.CreateModel(
-            name="ControlledListItemImage",
+            name="ListItemImage",
             fields=[
                 (
                     "id",
@@ -135,15 +135,15 @@ class Migration(migrations.Migration):
                         serialize=False,
                     ),
                 ),
-                ("value", models.FileField(upload_to="controlled_list_item_images")),
+                ("value", models.FileField(upload_to="list_item_images")),
             ],
             options={
-                "db_table": "controlled_list_item_values",
+                "db_table": "controlledlists_listitemvalue",
                 "managed": False,
             },
         ),
         migrations.CreateModel(
-            name="ControlledList",
+            name="List",
             fields=[
                 (
                     "id",
@@ -158,12 +158,9 @@ class Migration(migrations.Migration):
                 ("dynamic", models.BooleanField(default=False)),
                 ("search_only", models.BooleanField(default=False)),
             ],
-            options={
-                "db_table": "controlled_lists",
-            },
         ),
         migrations.CreateModel(
-            name="ControlledListItem",
+            name="ListItem",
             fields=[
                 (
                     "id",
@@ -183,12 +180,11 @@ class Migration(migrations.Migration):
                 ),
                 ("guide", models.BooleanField(default=False)),
                 (
-                    "controlled_list",
+                    "list",
                     models.ForeignKey(
-                        db_column="listid",
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="controlled_list_items",
-                        to="controlledlists.controlledlist",
+                        related_name="list_items",
+                        to="controlledlists.list",
                     ),
                 ),
                 (
@@ -198,16 +194,13 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="children",
-                        to="controlledlists.controlledlistitem",
+                        to="controlledlists.listitem",
                     ),
                 ),
             ],
-            options={
-                "db_table": "controlled_list_items",
-            },
         ),
         migrations.CreateModel(
-            name="ControlledListItemValue",
+            name="ListItemValue",
             fields=[
                 (
                     "id",
@@ -220,15 +213,6 @@ class Migration(migrations.Migration):
                 ),
                 ("value", models.CharField(blank=True, max_length=1024)),
                 (
-                    "controlled_list_item",
-                    models.ForeignKey(
-                        db_column="itemid",
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="controlled_list_item_values",
-                        to="controlledlists.controlledlistitem",
-                    ),
-                ),
-                (
                     "language",
                     models.ForeignKey(
                         blank=True,
@@ -237,6 +221,14 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.PROTECT,
                         to="models.language",
                         to_field="code",
+                    ),
+                ),
+                (
+                    "list_item",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="list_item_values",
+                        to="controlledlists.listitem",
                     ),
                 ),
                 (
@@ -250,12 +242,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={
-                "db_table": "controlled_list_item_values",
-            },
         ),
         migrations.CreateModel(
-            name="ControlledListItemImageMetadata",
+            name="ListItemImageMetadata",
             fields=[
                 (
                     "id",
@@ -280,15 +269,6 @@ class Migration(migrations.Migration):
                 ),
                 ("value", models.CharField(max_length=2048)),
                 (
-                    "controlled_list_item_image",
-                    models.ForeignKey(
-                        db_column="labelid",
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="controlled_list_item_image_metadata",
-                        to="controlledlists.controlledlistitemimage",
-                    ),
-                ),
-                (
                     "language",
                     models.ForeignKey(
                         db_column="languageid",
@@ -297,30 +277,35 @@ class Migration(migrations.Migration):
                         to_field="code",
                     ),
                 ),
+                (
+                    "list_item_image",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="list_item_image_metadata",
+                        to="controlledlists.listitemimage",
+                    ),
+                ),
             ],
-            options={
-                "db_table": "controlled_list_item_image_metadata",
-            },
         ),
         migrations.AddConstraint(
-            model_name="controlledlistitemvalue",
+            model_name="listitemvalue",
             constraint=models.UniqueConstraint(
-                fields=("controlled_list_item", "value", "valuetype", "language"),
+                fields=("list_item", "value", "valuetype", "language"),
                 name="unique_item_value_valuetype_language",
                 violation_error_message="The same item value cannot be stored twice in the same language.",
             ),
         ),
         migrations.AddConstraint(
-            model_name="controlledlistitemvalue",
+            model_name="listitemvalue",
             constraint=models.UniqueConstraint(
                 condition=models.Q(("valuetype", "prefLabel")),
-                fields=("controlled_list_item", "language"),
+                fields=("list_item", "language"),
                 name="unique_item_preflabel_language",
                 violation_error_message="Only one preferred label per language is permitted.",
             ),
         ),
         migrations.AddConstraint(
-            model_name="controlledlistitemvalue",
+            model_name="listitemvalue",
             constraint=models.CheckConstraint(
                 check=models.Q(
                     ("language_id__isnull", False),
@@ -332,26 +317,26 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddConstraint(
-            model_name="controlledlistitemimagemetadata",
+            model_name="listitemimagemetadata",
             constraint=models.UniqueConstraint(
-                fields=("controlled_list_item_image", "metadata_type", "language"),
+                fields=("list_item_image", "metadata_type", "language"),
                 name="unique_image_metadata_valuetype_language",
                 violation_error_message="Only one metadata entry per language and metadata type is permitted.",
             ),
         ),
         migrations.AddConstraint(
-            model_name="controlledlistitem",
+            model_name="listitem",
             constraint=models.UniqueConstraint(
                 deferrable=django.db.models.constraints.Deferrable["DEFERRED"],
-                fields=("controlled_list", "sortorder"),
+                fields=("list", "sortorder"),
                 name="unique_list_sortorder",
                 violation_error_message="All items in this list must have distinct sort orders.",
             ),
         ),
         migrations.AddConstraint(
-            model_name="controlledlistitem",
+            model_name="listitem",
             constraint=models.UniqueConstraint(
-                fields=("controlled_list", "uri"),
+                fields=("list", "uri"),
                 name="unique_list_uri",
                 violation_error_message="All items in this list must have distinct URIs.",
             ),

@@ -15,11 +15,11 @@ from arches.app.models.models import (
     NodeGroup,
 )
 from arches.controlledlists.models import (
-    ControlledList,
-    ControlledListItem,
-    ControlledListItemImage,
-    ControlledListItemImageMetadata,
-    ControlledListItemValue,
+    List,
+    ListItem,
+    ListItemImage,
+    ListItemImageMetadata,
+    ListItemValue,
 )
 from tests.base_test import ArchesTestCase
 
@@ -35,7 +35,7 @@ def sync_pk_for_comparison(item):
     return item
 
 
-class ControlledListTests(ArchesTestCase):
+class ListTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -51,9 +51,9 @@ class ControlledListTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         # Create two lists.
-        cls.list1 = ControlledList.objects.create(name="list1")
+        cls.list1 = List.objects.create(name="list1")
         # Second list has children (nested items).
-        cls.list2 = ControlledList.objects.create(name="list2")
+        cls.list2 = List.objects.create(name="list2")
 
         cls.first_language = Language.objects.first()
         cls.new_language = Language.objects.create(
@@ -67,91 +67,79 @@ class ControlledListTests(ArchesTestCase):
         cls.alt_label = DValueType.objects.get(valuetype="altLabel")
 
         # Create 5 labels per list. (10)
-        ControlledListItem.objects.bulk_create(
+        ListItem.objects.bulk_create(
             [
-                ControlledListItem(
+                ListItem(
                     uri=f"https://archesproject.org/{num}",
-                    controlled_list=cls.list1,
+                    list=cls.list1,
                     sortorder=num,
                 )
                 for num in range(5)
             ]
             + [
-                ControlledListItem(
+                ListItem(
                     uri=f"https://getty.edu/{num}",
-                    controlled_list=cls.list2,
+                    list=cls.list2,
                     sortorder=num,
                 )
                 for num in range(5)
             ]
         )
 
-        cls.parent = ControlledListItem.objects.get(
-            controlled_list=cls.list2, uri="https://getty.edu/0"
-        )
-        for child in ControlledListItem.objects.filter(
-            controlled_list=cls.list2
-        ).exclude(pk=cls.parent.pk):
+        cls.parent = ListItem.objects.get(list=cls.list2, uri="https://getty.edu/0")
+        for child in ListItem.objects.filter(list=cls.list2).exclude(pk=cls.parent.pk):
             child.parent = cls.parent
             child.save()
 
         # Create a prefLabel and altLabel per item. (20)
-        ControlledListItemValue.objects.bulk_create(
+        ListItemValue.objects.bulk_create(
             [
-                ControlledListItemValue(
+                ListItemValue(
                     value=f"label{num}-pref",
                     language=cls.first_language,
                     valuetype=cls.pref_label,
-                    controlled_list_item=ControlledListItem.objects.filter(
-                        controlled_list=cls.list1
-                    )[num],
+                    list_item=ListItem.objects.filter(list=cls.list1)[num],
                 )
                 for num in range(5)
             ]
             + [
-                ControlledListItemValue(
+                ListItemValue(
                     value=f"label{num}-alt",
                     language=cls.first_language,
                     valuetype=cls.alt_label,
-                    controlled_list_item=ControlledListItem.objects.filter(
-                        controlled_list=cls.list1
-                    )[num],
+                    list_item=ListItem.objects.filter(list=cls.list1)[num],
                 )
                 for num in range(5)
             ]
             + [
-                ControlledListItemValue(
+                ListItemValue(
                     value=f"label{num}-pref",
                     language=cls.first_language,
                     valuetype=cls.pref_label,
-                    controlled_list_item=ControlledListItem.objects.filter(
-                        controlled_list=cls.list2
-                    )[num],
+                    list_item=ListItem.objects.filter(list=cls.list2)[num],
                 )
                 for num in range(5)
             ]
             + [
-                ControlledListItemValue(
+                ListItemValue(
                     value=f"label{num}-alt",
                     language=cls.first_language,
                     valuetype=cls.alt_label,
-                    controlled_list_item=ControlledListItem.objects.filter(
-                        controlled_list=cls.list2
-                    )[num],
+                    list_item=ListItem.objects.filter(list=cls.list2)[num],
                 )
                 for num in range(5)
             ]
         )
 
         # Create one image with full metadata for the first item in list 1.
-        cls.image = ControlledListItemImage.objects.create(
-            controlled_list_item=cls.list1.controlled_list_items.first(),
+        cls.image = ListItemImage.objects.create(
+            list_item=cls.list1.list_items.first(),
             value="path/to/image.png",
             valuetype_id="image",
         )
-        for metadata in ControlledListItemImageMetadata.MetadataChoices:
-            ControlledListItemImageMetadata(
-                controlled_list_item_image=cls.image,
+        for metadata in ListItemImageMetadata.MetadataChoices:
+            ListItemImageMetadata(
+                list_item_image=cls.image,
                 metadata_type=metadata,
                 value=f"{metadata} for {cls.image.value}",
                 language=cls.first_language,
@@ -192,7 +180,7 @@ class ControlledListTests(ArchesTestCase):
         cls.node_using_list2.save()
         cls.graph.publish(user=admin)
 
-    def test_get_controlled_lists(self):
+    def test_get_lists(self):
         self.client.force_login(self.anonymous)
         with self.assertLogs("django.request", level="WARNING"):
             response = self.client.get(reverse("controlled_lists"))
@@ -203,7 +191,7 @@ class ControlledListTests(ArchesTestCase):
         with self.assertNumQueries(14):
             # 1: session
             # 2: auth
-            # 3: SELECT FROM controlled_lists
+            # 3: SELECT FROM lists
             # 4: prefetch items
             # 5: prefetch item labels/images
             # 7: prefetch image metadata
@@ -240,7 +228,7 @@ class ControlledListTests(ArchesTestCase):
         self.assertEqual(len(second_list["items"]), 1)
         self.assertEqual(len(second_list["items"][0]["children"]), 4)
 
-    def test_get_controlled_list_permitted_nodegroups(self):
+    def test_get_list_permitted_nodegroups(self):
         assign_perm("no_access_to_nodegroup", self.rdm_user, self.nodegroup)
 
         self.client.force_login(self.rdm_user)
@@ -263,9 +251,9 @@ class ControlledListTests(ArchesTestCase):
             {"name": ""},
             content_type="application/json",
         )
-        self.assertEqual(ControlledList.objects.count(), 3)
+        self.assertEqual(List.objects.count(), 3)
         self.assertEqual(
-            ControlledList.objects.filter(name__startswith="Untitled List: ").count(), 1
+            List.objects.filter(name__startswith="Untitled List: ").count(), 1
         )
 
     def test_delete_list(self):
@@ -280,45 +268,42 @@ class ControlledListTests(ArchesTestCase):
         response = self.client.delete(
             reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
         )
-        self.assertEqual(ControlledList.objects.count(), 1)
-        self.assertEqual(ControlledList.objects.first().pk, self.list2.pk)
+        self.assertEqual(List.objects.count(), 1)
+        self.assertEqual(List.objects.first().pk, self.list2.pk)
 
     def test_create_list_item(self):
         self.client.force_login(self.admin)
-        existing_pks = [item.pk for item in self.list1.controlled_list_items.all()]
+        existing_pks = [item.pk for item in self.list1.list_items.all()]
 
         self.client.post(
             reverse("controlled_list_item_add"),
-            {"controlled_list_id": str(self.list1.pk), "parent_id": None},
+            {"list_id": str(self.list1.pk), "parent_id": None},
             content_type="application/json",
         )
 
         self.assertQuerySetEqual(
-            self.list1.controlled_list_items.exclude(pk__in=existing_pks),
-            [ControlledListItem(pk=SYNCED_PK, controlled_list=self.list1, sortorder=5)],
+            self.list1.list_items.exclude(pk__in=existing_pks),
+            [ListItem(pk=SYNCED_PK, list=self.list1, sortorder=5)],
             transform=sync_pk_for_comparison,
         )
 
     def test_create_list_item_nested(self):
         self.client.force_login(self.admin)
-        existing_pks = [item.pk for item in self.list1.controlled_list_items.all()]
+        existing_pks = [item.pk for item in self.list1.list_items.all()]
 
-        parent_item = self.list1.controlled_list_items.order_by("uri").first()
+        parent_item = self.list1.list_items.order_by("uri").first()
         self.client.post(
             reverse("controlled_list_item_add"),
-            {
-                "controlled_list_id": str(self.list1.pk),
-                "parent_id": str(parent_item.pk),
-            },
+            {"list_id": str(self.list1.pk), "parent_id": str(parent_item.pk)},
             content_type="application/json",
         )
 
         self.assertQuerySetEqual(
-            self.list1.controlled_list_items.exclude(pk__in=existing_pks),
+            self.list1.list_items.exclude(pk__in=existing_pks),
             [
-                ControlledListItem(
+                ListItem(
                     pk=SYNCED_PK,
-                    controlled_list=self.list1,
+                    list=self.list1,
                     sortorder=5,
                     parent_id=parent_item.pk,
                 )
@@ -335,9 +320,7 @@ class ControlledListTests(ArchesTestCase):
             {
                 "sortorder_map": {
                     str(item.pk): i
-                    for i, item in enumerate(
-                        reversed(self.list1.controlled_list_items.all())
-                    )
+                    for i, item in enumerate(reversed(self.list1.list_items.all()))
                 },
             },
             content_type="application/json",
@@ -345,7 +328,7 @@ class ControlledListTests(ArchesTestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
         self.assertQuerySetEqual(
-            self.list1.controlled_list_items.all()
+            self.list1.list_items.all()
             .order_by("uri")
             .values_list("sortorder", flat=True),
             [4, 3, 2, 1, 0],
@@ -371,7 +354,7 @@ class ControlledListTests(ArchesTestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
         self.assertQuerySetEqual(
-            self.list1.controlled_list_items.all()
+            self.list1.list_items.all()
             .order_by("uri")
             .values_list("sortorder", flat=True),
             [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
@@ -404,7 +387,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_update_uri_blank(self):
         self.client.force_login(self.admin)
-        item = self.list1.controlled_list_items.first()
+        item = self.list1.list_items.first()
 
         response = self.client.patch(
             reverse("controlled_list_item", kwargs={"id": str(item.pk)}),
@@ -421,9 +404,7 @@ class ControlledListTests(ArchesTestCase):
             reverse("controlled_list_item", kwargs={"id": str(self.parent.pk)})
         )
         self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
-        self.assertQuerySetEqual(
-            ControlledListItem.objects.filter(pk=self.parent.pk), []
-        )
+        self.assertQuerySetEqual(ListItem.objects.filter(pk=self.parent.pk), [])
 
     def test_update_label_valid(self):
         self.client.force_login(self.admin)
@@ -454,9 +435,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_delete_label_valid(self):
         self.client.force_login(self.admin)
-        alt_label = ControlledListItemValue.objects.filter(
-            valuetype_id="altLabel"
-        ).first()
+        alt_label = ListItemValue.objects.filter(valuetype_id="altLabel").first()
         response = self.client.delete(
             reverse("controlled_list_item_value", kwargs={"id": str(alt_label.pk)}),
         )
@@ -464,9 +443,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_delete_label_invalid(self):
         self.client.force_login(self.admin)
-        pref_label = ControlledListItemValue.objects.filter(
-            valuetype_id="prefLabel"
-        ).first()
+        pref_label = ListItemValue.objects.filter(valuetype_id="prefLabel").first()
         with self.assertLogs("django.request", level="WARNING"):
             response = self.client.delete(
                 reverse(
@@ -481,9 +458,7 @@ class ControlledListTests(ArchesTestCase):
             reverse("controlled_list_item_image", kwargs={"id": str(self.image.pk)}),
         )
         self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
-        self.assertQuerySetEqual(
-            ControlledListItemImage.objects.filter(pk=self.image.pk), []
-        )
+        self.assertQuerySetEqual(ListItemImage.objects.filter(pk=self.image.pk), [])
 
     def test_update_metadata_valid(self):
         self.client.force_login(self.admin)
@@ -519,7 +494,7 @@ class ControlledListTests(ArchesTestCase):
 
     def test_delete_metadata(self):
         self.client.force_login(self.admin)
-        metadata = self.image.controlled_list_item_image_metadata.first()
+        metadata = self.image.list_item_image_metadata.first()
         response = self.client.delete(
             reverse(
                 "controlled_list_item_image_metadata", kwargs={"id": str(metadata.pk)}
@@ -527,5 +502,5 @@ class ControlledListTests(ArchesTestCase):
         )
         self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
         self.assertQuerySetEqual(
-            ControlledListItemImageMetadata.objects.filter(pk=metadata.pk), []
+            ListItemImageMetadata.objects.filter(pk=metadata.pk), []
         )
