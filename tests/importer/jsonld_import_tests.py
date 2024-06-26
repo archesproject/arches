@@ -88,6 +88,12 @@ class JsonLDImportTests(ArchesTestCase):
             archesfile2 = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile2["graph"])
 
+        with open(
+            os.path.join("tests/fixtures/jsonld_base/models/timezone_test.json"), "r"
+        ) as f:
+            archesfile2 = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile2["graph"])
+
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/5098-thesaurus.xml")
         ret = skos.save_concepts_from_skos(rdf)
@@ -588,7 +594,7 @@ class JsonLDImportTests(ArchesTestCase):
                     2,
                     1
                 ]
-            } 
+            }
         """
 
         url = self._create_url(
@@ -1225,7 +1231,7 @@ class JsonLDImportTests(ArchesTestCase):
                     "http://www.w3.org/2000/01/rdf-schema#label": "History"
                 },
                 "http://www.cidoc-crm.org/cidoc-crm/P3_has_note": "visual work of madonna bla bla"
-            }     
+            }
         """
 
         url = self._create_url(
@@ -1334,7 +1340,7 @@ class JsonLDImportTests(ArchesTestCase):
                     2,
                     1
                 ]
-            }     
+            }
         """
 
         url = self._create_url(
@@ -1883,3 +1889,48 @@ class JsonLDImportTests(ArchesTestCase):
         self.assertTrue(l4 in js[l1][l2][l3])
         self.assertTrue(l5 in js[l1][l2][l3][l4])
         self.assertEqual(js[l1][l2][l3][l4][l5]["@value"], "taco")
+
+    def test_default_timezone(self):
+        data = """
+            {
+                "@id": "http://localhost:8000/resources/e6fc1069-1987-4565-9007-25708de554e8",
+                "@type": "http://www.cidoc-crm.org/cidoc-crm/E22_Man-Made_Object",
+                "http://www.cidoc-crm.org/cidoc-crm/P108i_was_produced_by": {
+                    "@id": "http://localhost:8000/tile/7c2e9e8c-3a67-4b90-87c4-84ac946947cc/node/4e1efad2-c163-11ea-8354-3af9d3b32b71",
+                    "@type": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
+                    "http://www.cidoc-crm.org/cidoc-crm/P4_has_time-span": [{
+                        "@id": "http://localhost:8000/tile/68c38757-df0a-410b-a8e0-2b8b7c5249f2/node/8a00b22a-c163-11ea-8354-3af9d3b32b71",
+                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
+                        "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
+                        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+                        "@value": "2024-05-01 15:25:13"
+                        }
+                    },{
+                        "@id": "http://localhost:8000/tile/68c38757-df0a-410b-a8e0-2b8b7c5249f2/node/8a00b22a-c163-11ea-8354-3af9d3b32b71",
+                        "@type": "http://www.cidoc-crm.org/cidoc-crm/E52_Time-Span",
+                        "http://www.cidoc-crm.org/cidoc-crm/P82a_begin_of_the_begin": {
+                        "@type": "http://www.w3.org/2001/XMLSchema#dateTime",
+                        "@value": "2024-05-01T15:25:13"
+                        }
+                    }]
+                }
+            }
+        """
+        graph_id = "0bc001c2-c163-11ea-8354-3af9d3b32b71"
+        resource_id = "e6fc1069-1987-4565-9007-25708de554e8"
+
+        data = JSONDeserializer().deserialize(data)
+        reader = JsonLdReader(default_timezone="-09:00")
+        reader.read_resource(data, resourceid=resource_id, graphid=graph_id)
+        for resource in reader.resources:
+            resource.save(request=None)
+
+            datetime_value = resource.tiles[1].data[
+                "ddb04a66-c163-11ea-8354-3af9d3b32b71"
+            ]
+            self.assertEqual(datetime_value[-6:], "-09:00")
+
+            datetime_value = resource.tiles[2].data[
+                "ddb04a66-c163-11ea-8354-3af9d3b32b71"
+            ]
+            self.assertEqual(datetime_value[-6:], "-09:00")
