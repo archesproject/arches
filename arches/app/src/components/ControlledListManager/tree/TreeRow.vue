@@ -218,11 +218,15 @@ const acceptNewItemShortcutEntry = async () => {
 };
 
 const triggerAcceptNewItemShortcut = () => {
-    newLabelInputRef.value.$el.blur();
+    if (newLabelFormValue.value.trim()) {
+        newLabelInputRef.value.$el.blur();
+    }
 };
 
 const triggerAcceptNewListShortcut = () => {
-    newListInputRef.value.$el.blur();
+    if (newListFormValue.value.trim()) {
+        newListInputRef.value.$el.blur();
+    }
 };
 
 const acceptNewListShortcutEntry = async () => {
