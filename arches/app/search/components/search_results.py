@@ -1,3 +1,4 @@
+import uuid
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import (
@@ -109,7 +110,7 @@ class SearchResultsFilter(BaseSearchFilter):
             try:
                 permitted_tiles = []
                 for tile in result["_source"]["tiles"]:
-                    if tile["nodegroup_id"] in permitted_nodegroups:
+                    if uuid.UUID(tile["nodegroup_id"]) in permitted_nodegroups:
                         permitted_tiles.append(tile)
                 result["_source"]["tiles"] = permitted_tiles
             except KeyError:
