@@ -10,23 +10,20 @@ from django.utils.translation import gettext_lazy as _
 
 from arches.app.models.models import DValueType, Language, Node
 from arches.controlledlists.querysets import (
-    ControlledListQuerySet,
-    ControlledListItemImageManager,
-    ControlledListItemValueQuerySet,
+    ListQuerySet,
+    ListItemImageManager,
+    ListItemValueQuerySet,
 )
 from arches.controlledlists.utils import field_names
 
 
-class ControlledList(models.Model):
+class List(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=127, null=False, blank=True)
     dynamic = models.BooleanField(default=False)
     search_only = models.BooleanField(default=False)
 
-    objects = ControlledListQuerySet.as_manager()
-
-    class Meta:
-        db_table = "controlled_lists"
+    objects = ListQuerySet.as_manager()
 
     def __str__(self):
         return str(self.name)
@@ -49,7 +46,7 @@ class ControlledList(models.Model):
             "items": sorted(
                 [
                     item.serialize(depth_map, flat)
-                    for item in self.controlled_list_items.all()
+                    for item in self.list_items.all()
                     if flat or item.parent_id is None
                 ],
                 key=lambda item: item["sortorder"],
@@ -103,31 +100,30 @@ class ControlledList(models.Model):
         reordered_items = []
         exclude_fields = {
             name
-            for name in field_names(ControlledListItem())
+            for name in field_names(ListItem())
             if name not in ("sortorder", "parent_id")
         }
         for item_id, sortorder in sortorder_map.items():
-            item = ControlledListItem(pk=uuid.UUID(item_id), sortorder=sortorder)
+            item = ListItem(pk=uuid.UUID(item_id), sortorder=sortorder)
             if item_id in parent_map:
                 new_parent = parent_map[item_id]
                 item.parent_id = uuid.UUID(new_parent) if new_parent else None
-            item.controlled_list_id = self.pk
+            item.list_id = self.pk
             item.clean_fields(exclude=exclude_fields)
             reordered_items.append(item)
 
-        ControlledListItem.objects.bulk_update(
-            reordered_items, fields=["sortorder", "parent_id", "controlled_list_id"]
+        ListItem.objects.bulk_update(
+            reordered_items, fields=["sortorder", "parent_id", "list_id"]
         )
 
 
-class ControlledListItem(models.Model):
+class ListItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     uri = models.URLField(max_length=2048, null=True, blank=True)
-    controlled_list = models.ForeignKey(
-        ControlledList,
-        db_column="listid",
+    list = models.ForeignKey(
+        List,
         on_delete=models.CASCADE,
-        related_name="controlled_list_items",
+        related_name="list_items",
     )
     sortorder = models.IntegerField(validators=[MinValueValidator(0)])
     parent = models.ForeignKey(
@@ -136,12 +132,11 @@ class ControlledListItem(models.Model):
     guide = models.BooleanField(default=False)
 
     class Meta:
-        db_table = "controlled_list_items"
         constraints = [
             # Sort order concerns the list as a whole, not subsets
             # of the hierarchy.
             models.UniqueConstraint(
-                fields=["controlled_list", "sortorder"],
+                fields=["list", "sortorder"],
                 name="unique_list_sortorder",
                 deferrable=Deferrable.DEFERRED,
                 violation_error_message=_(
@@ -149,7 +144,7 @@ class ControlledListItem(models.Model):
                 ),
             ),
             models.UniqueConstraint(
-                fields=["controlled_list", "uri"],
+                fields=["list", "uri"],
                 name="unique_list_uri",
                 violation_error_message=_(
                     "All items in this list must have distinct URIs."
@@ -158,7 +153,7 @@ class ControlledListItem(models.Model):
         ]
 
     def clean(self):
-        if not self.controlled_list_item_values.filter(valuetype="prefLabel").exists():
+        if not self.list_item_values.filter(valuetype="prefLabel").exists():
             raise ValidationError(_("At least one preferred label is required."))
 
     def clean_fields(self, exclude=None):
@@ -173,18 +168,16 @@ class ControlledListItem(models.Model):
             depth_map[self.id] = depth_map[self.parent_id] + 1
         data = {
             "id": str(self.id),
-            "controlled_list_id": str(self.controlled_list_id),
+            "list_id": str(self.list_id),
             "uri": self.uri,
             "sortorder": self.sortorder,
             "guide": self.guide,
             "values": [
                 value.serialize()
-                for value in self.controlled_list_item_values.all()
+                for value in self.list_item_values.all()
                 if value.valuetype_id != "image"
             ],
-            "images": [
-                image.serialize() for image in self.controlled_list_item_images.all()
-            ],
+            "images": [image.serialize() for image in self.list_item_images.all()],
             "parent_id": str(self.parent_id) if self.parent_id else None,
             "depth": depth_map[self.id],
         }
@@ -196,13 +189,12 @@ class ControlledListItem(models.Model):
         return data
 
 
-class ControlledListItemValue(models.Model):
+class ListItemValue(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    controlled_list_item = models.ForeignKey(
-        ControlledListItem,
-        db_column="itemid",
+    list_item = models.ForeignKey(
+        ListItem,
         on_delete=models.CASCADE,
-        related_name="controlled_list_item_values",
+        related_name="list_item_values",
     )
     valuetype = models.ForeignKey(
         DValueType,
@@ -220,17 +212,16 @@ class ControlledListItemValue(models.Model):
     value = models.CharField(max_length=1024, null=False, blank=True)
 
     class Meta:
-        db_table = "controlled_list_item_values"
         constraints = [
             models.UniqueConstraint(
-                fields=["controlled_list_item", "value", "valuetype", "language"],
+                fields=["list_item", "value", "valuetype", "language"],
                 name="unique_item_value_valuetype_language",
                 violation_error_message=_(
                     "The same item value cannot be stored twice in the same language."
                 ),
             ),
             models.UniqueConstraint(
-                fields=["controlled_list_item", "language"],
+                fields=["list_item", "language"],
                 condition=Q(valuetype="prefLabel"),
                 name="unique_item_preflabel_language",
                 violation_error_message=_(
@@ -246,7 +237,7 @@ class ControlledListItemValue(models.Model):
             ),
         ]
 
-    objects = ControlledListItemValueQuerySet.as_manager()
+    objects = ListItemValueQuerySet.as_manager()
 
     def clean(self):
         if not self.value:
@@ -260,18 +251,14 @@ class ControlledListItemValue(models.Model):
             "valuetype_id": self.valuetype_id,
             "language_id": self.language_id,
             "value": self.value,
-            "item_id": self.controlled_list_item_id,
+            "item_id": self.list_item_id,
         }
 
     def delete(self):
         msg = _("Deleting the item's only remaining preferred label is not permitted.")
         if (
             self.valuetype_id == "prefLabel"
-            and len(
-                self.controlled_list_item.controlled_list_item_values.filter(
-                    valuetype_id="prefLabel"
-                )
-            )
+            and len(self.list_item.list_item_values.filter(valuetype_id="prefLabel"))
             < 2
         ):
             raise ValidationError(msg)
@@ -279,13 +266,12 @@ class ControlledListItemValue(models.Model):
         return super().delete()
 
 
-class ControlledListItemImage(models.Model):
+class ListItemImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    controlled_list_item = models.ForeignKey(
-        ControlledListItem,
-        db_column="itemid",
+    list_item = models.ForeignKey(
+        ListItem,
         on_delete=models.CASCADE,
-        related_name="controlled_list_item_images",
+        related_name="list_item_images",
     )
     valuetype = models.ForeignKey(
         DValueType, on_delete=models.PROTECT, limit_choices_to={"category": "image"}
@@ -298,27 +284,26 @@ class ControlledListItemImage(models.Model):
         null=True,
         blank=True,
     )
-    value = models.FileField(upload_to="controlled_list_item_images")
+    value = models.FileField(upload_to="list_item_images")
 
-    objects = ControlledListItemImageManager()
+    objects = ListItemImageManager()
 
     class Meta:
         managed = False
-        db_table = "controlled_list_item_values"
+        db_table = "controlledlists_listitemvalue"
 
     def serialize(self):
         return {
             "id": str(self.id),
-            "item_id": self.controlled_list_item_id,
+            "item_id": self.list_item_id,
             "url": self.value.url,
             "metadata": [
-                metadata.serialize()
-                for metadata in self.controlled_list_item_image_metadata.all()
+                metadata.serialize() for metadata in self.list_item_image_metadata.all()
             ],
         }
 
 
-class ControlledListItemImageMetadata(models.Model):
+class ListItemImageMetadata(models.Model):
     class MetadataChoices(models.TextChoices):
         TITLE = "title", _("Title")
         DESCRIPTION = "desc", _("Description")
@@ -326,11 +311,10 @@ class ControlledListItemImageMetadata(models.Model):
         ALT_TEXT = "alt", _("Alternative text")
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    controlled_list_item_image = models.ForeignKey(
-        ControlledListItemImage,
-        db_column="labelid",
+    list_item_image = models.ForeignKey(
+        ListItemImage,
         on_delete=models.CASCADE,
-        related_name="controlled_list_item_image_metadata",
+        related_name="list_item_image_metadata",
     )
     language = models.ForeignKey(
         Language,
@@ -342,10 +326,9 @@ class ControlledListItemImageMetadata(models.Model):
     value = models.CharField(max_length=2048)
 
     class Meta:
-        db_table = "controlled_list_item_image_metadata"
         constraints = [
             models.UniqueConstraint(
-                fields=["controlled_list_item_image", "metadata_type", "language"],
+                fields=["list_item_image", "metadata_type", "language"],
                 name="unique_image_metadata_valuetype_language",
                 violation_error_message=_(
                     "Only one metadata entry per language and metadata type is permitted."
@@ -354,7 +337,7 @@ class ControlledListItemImageMetadata(models.Model):
         ]
 
     def serialize(self):
-        choices = ControlledListItemImageMetadata.MetadataChoices
+        choices = ListItemImageMetadata.MetadataChoices
         return {
             field: str(value)
             for (field, value) in vars(self).items()
