@@ -20,15 +20,17 @@ import warnings
 import functools
 import logging
 import datetime
+
+from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
-from arches.app.utils.permission_backend import get_editable_resource_types
-from arches.app.utils.permission_backend import get_resource_types_by_perm
+from django.shortcuts import redirect
+
 from arches.app.utils.permission_backend import user_can_read_resource
 from arches.app.utils.permission_backend import user_can_edit_resource
 from arches.app.utils.permission_backend import user_can_delete_resource
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.permission_backend import user_created_transaction
-from django.contrib.auth.decorators import user_passes_test
+
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -82,17 +84,26 @@ def group_required(*group_names, raise_exception=False):
     return user_passes_test(in_groups)
 
 
-def can_edit_resource_instance(function):
-    @functools.wraps(function)
-    def wrapper(request, *args, **kwargs):
-        resourceid = kwargs["resourceid"] if "resourceid" in kwargs else None
-        if user_can_edit_resource(request.user, resourceid=resourceid):
-            return function(request, *args, **kwargs)
-        else:
-            raise PermissionDenied
-        return function(request, *args, **kwargs)
+def can_edit_resource_instance(redirect_to_report=False):
+    def decorator(function):
+        @functools.wraps(function)
+        def _wrapped_view(request, *args, **kwargs):
+            resourceid = kwargs["resourceid"] if "resourceid" in kwargs else None
+            if user_can_edit_resource(request.user, resourceid=resourceid):
+                return function(request, *args, **kwargs)
+            else:
+                if redirect_to_report:
+                    return redirect("resource_report", resourceid=resourceid)
+                else:
+                    raise PermissionDenied
 
-    return wrapper
+        return _wrapped_view
+
+    # If the decorator is called without arguments
+    if callable(redirect_to_report):
+        return decorator(redirect_to_report)
+
+    return decorator
 
 
 def can_read_resource_instance(function):
@@ -126,7 +137,6 @@ def can_delete_resource_instance(function):
             return function(request, *args, **kwargs)
         else:
             raise PermissionDenied
-        return function(request, *args, **kwargs)
 
     return wrapper
 

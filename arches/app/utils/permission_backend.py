@@ -522,6 +522,18 @@ def user_can_edit_resource(user, resourceid=None):
                 user, resourceid, "change_resourceinstance"
             )
             if result is not None:
+                resource_instance_lifecycle = ResourceInstanceLifecycle.objects.get(
+                    graph_id=result["resource"].graph_id
+                )
+                can_edit_resource_instance_in_current_lifecycle_state = (
+                    resource_instance_lifecycle.states[
+                        result["resource"].lifecycle_state
+                    ]["can_edit"]
+                )
+
+                if not can_edit_resource_instance_in_current_lifecycle_state:
+                    return False
+
                 if result["permitted"] == "unknown":
                     return user.groups.filter(
                         name__in=settings.RESOURCE_EDITOR_GROUPS
