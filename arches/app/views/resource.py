@@ -45,7 +45,6 @@ from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.decorators import can_edit_resource_instance
-from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.i18n import LanguageSynchronizer, localize_complex_input
 from arches.app.utils.pagination import get_paginator
@@ -141,7 +140,9 @@ def get_instance_creator(resource_instance, user=None):
 class ResourceEditorView(MapBaseManagerView):
     action = None
 
-    @method_decorator(can_edit_resource_instance, name="dispatch")
+    @method_decorator(
+        can_edit_resource_instance(redirect_to_report=True), name="dispatch"
+    )
     def get(
         self,
         request,
@@ -410,10 +411,17 @@ class ResourceEditorView(MapBaseManagerView):
 
         context["graph_has_unpublished_changes"] = graph.has_unpublished_changes
 
+        resource_instance_lifecycle_state = None
         if resource_instance:
-            context["resource_instance_lifecycle_state"] = (
-                resource_instance.lifecycle_state
+            resource_instance_lifecycle = models.ResourceInstanceLifecycle.objects.get(
+                graph_id=resource_instance.graph_id
             )
+            resource_instance_lifecycle_state = resource_instance_lifecycle.states[
+                resource_instance.lifecycle_state
+            ]
+        context["resource_instance_lifecycle_state"] = json.dumps(
+            resource_instance_lifecycle_state
+        )
 
         context["nav"]["title"] = ""
         context["nav"]["menu"] = nav_menu
@@ -432,9 +440,8 @@ class ResourceEditorView(MapBaseManagerView):
                 "templates": ["resource-editor-help"],
             }
 
-        if (
-            graph.has_unpublished_changes
-            or resource_instance
+        if graph.has_unpublished_changes or (
+            resource_instance
             and resource_instance.graph_publication_id != graph.publication_id
         ):
             return redirect("resource_report", resourceid=resourceid)
@@ -1000,7 +1007,9 @@ class ResourceDescriptors(View):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
-        resource = Resource.objects.only("graph_id").get(pk=resourceid)
+        resource = Resource.objects.only("graph_id", "lifecycle_state").get(
+            pk=resourceid
+        )
         graph = Graph.objects.get(graphid=resource.graph_id)
         graph_has_different_publication = bool(
             resource.graph_publication_id != graph.publication_id
@@ -1035,6 +1044,19 @@ class ResourceReportView(MapBaseManagerView):
                 ).exists()
             ),
             graph_has_unpublished_changes=bool(graph.has_unpublished_changes),
+        )
+
+        resource_instance_lifecycle_state = None
+        if resource:
+            resource_instance_lifecycle = models.ResourceInstanceLifecycle.objects.get(
+                graph_id=resource.graph_id
+            )
+            resource_instance_lifecycle_state = resource_instance_lifecycle.states[
+                resource.lifecycle_state
+            ]
+
+        context["resource_instance_lifecycle_state_permits_editing"] = (
+            resource_instance_lifecycle_state.get("can_edit")
         )
 
         if graph.iconclass:

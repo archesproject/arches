@@ -287,6 +287,32 @@ define([
                 ));
             }
         },
+        updateResourceInstanceLifecycleStateBackward: function() {
+            $.ajax({
+                type: "POST",
+                url: arches.urls.api_resource_instance_lifecycle_state(resourceId()),
+                data: JSON.stringify({'direction': "backward"}),
+                error: function(err) {
+                    vm.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON));
+                },
+                success: function() {
+                    window.location.reload();
+                }
+            });
+        },
+        updateResourceInstanceLifecycleStateForward: function() {
+            $.ajax({
+                type: "POST",
+                url: arches.urls.api_resource_instance_lifecycle_state(resourceId()),
+                data: JSON.stringify({'direction': "forward"}),
+                error: function(err) {
+                    vm.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON));
+                },
+                success: function() {
+                    window.location.reload();
+                }
+            });
+        },
         viewEditHistory: function() {
             if (resourceId()) {
                 vm.menuActive(false);

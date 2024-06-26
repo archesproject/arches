@@ -1060,6 +1060,20 @@ class Resource(models.ResourceInstance):
             assign_perm(permission, identity, self)
         self.index()
 
+    def update_lifecycle_state(self, direction):
+        if direction == "forward":
+            if self.lifecycle_state == "active":
+                self.lifecycle_state = "retired"
+        elif direction == "backward":
+            if self.lifecycle_state == "retired":
+                self.lifecycle_state = "active"
+        else:
+            raise Exception
+
+        self.save()
+
+        return self.lifecycle_state
+
 
 def parse_node_value(value):
     if is_uuid(value):

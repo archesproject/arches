@@ -1465,6 +1465,30 @@ class OntologyProperty(APIBase):
         return JSONResponse(ret)
 
 
+class ResourceInstanceLifecycleState(APIBase):
+    def get(self, request, resourceid):
+        resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+        return JSONResponse(
+            {"resource_instance_lifecycle_state": resource_instance.lifecycle_state}
+        )
+
+    def post(self, request, resourceid):
+        data = json.loads(request.body)
+        direction = data.get("direction")
+
+        resource = Resource.objects.get(pk=resourceid)
+        original_resource_instance_lifecycle_state = resource.lifecycle_state
+
+        resource_instance_lifecycle_state = resource.update_lifecycle_state(direction)
+
+        return JSONResponse(
+            {
+                "original_resource_instance_lifecycle_state": original_resource_instance_lifecycle_state,
+                "resource_instance_lifecycle_state": resource_instance_lifecycle_state,
+            }
+        )
+
+
 class ResourceReport(APIBase):
     def get(self, request, resourceid):
         exclude = request.GET.get("exclude", [])

@@ -109,13 +109,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
         </div>
 
-        <div class="main-panel card-component-panel">
+        <div class="main-panel card-component-panel" style="height: calc(100vh - 50px);">
+            <!-- ko if: resourceInstanceLifecycleState -->
             <div 
-                data-bind="visible: resourceInstanceLifecycleState"
                 style="
                     background-color: #fff;
                     border-bottom: 1px solid #ddd; 
-                    padding: 8px; 
+                    height: 50px;
+                    padding: 0px 10px;
                     display: flex;
                 "
             >
@@ -128,13 +129,30 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                     
                     <div>
-                        <!-- ko if: resourceInstanceLifecycleState === 'active' -->
-                        <button>{% trans 'Retire' %}</button>
+                        <!-- ko if: resourceInstanceLifecycleState['previous_states'].length -->
+                        <button 
+                            class="btn btn-danger"
+                            data-bind="click: updateResourceInstanceLifecycleStateBackward"
+                        >
+                            <i class="fa fa-exclamation-circle"></i>
+                            <span style="margin: 0 4px">{% trans 'Un-retire' %}</span>
+                        </button>
+                        <!-- /ko -->
+                        <!-- ko if: resourceInstanceLifecycleState['following_states'].length -->
+                        <button 
+                            class="btn btn-danger"
+                            data-bind="click: updateResourceInstanceLifecycleStateForward"
+                        >
+                            <i class="fa fa-exclamation-circle"></i>
+                            <span style="margin: 0 4px">{% trans 'Retire' %}</span>
+                        </button>
                         <!-- /ko -->
                     </div>
                 </div>
             </div>
-            <div>
+            <!-- /ko -->
+             
+            <div style="height: inherit;">
                 <!--ko if: selection() === 'related-resources' -->
                 <div>
                      <div data-bind="component: {
@@ -341,7 +359,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         "templates": {{templates_json}},
         "graph": {{graph_json}},
         "graph_has_unpublished_changes": "{{graph_has_unpublished_changes}}",
-        "resource_instance_lifecycle_state": "{{resource_instance_lifecycle_state}}",
+        "resource_instance_lifecycle_state": {{resource_instance_lifecycle_state}},
         "issystemsettings": {{is_system_settings|yesno:"true,false"}}
     }'
 ></div>

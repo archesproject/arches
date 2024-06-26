@@ -816,8 +816,20 @@ RENDERERS = [
 
 def RESOURCE_INSTANCE_DEFAULT_LIFECYCLE_STATES():
     return {
-        "active": {"can_delete": False, "initial_state": True},
-        "retired": {"can_delete": True, "initial_state": False},
+        "active": {
+            "previous_states": [],
+            "can_delete": False,
+            "can_edit": True,
+            "initial_state": True,
+            "following_states": ["retired"],
+        },
+        "retired": {
+            "previous_states": ["active"],
+            "can_delete": False,
+            "can_edit": False,
+            "initial_state": False,
+            "following_states": [],
+        },
     }
 
 
