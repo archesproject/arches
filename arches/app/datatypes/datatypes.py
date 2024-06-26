@@ -65,7 +65,7 @@ from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
 
 # do not delete, used by module importer
-from .core.geojson_feature_collection import *
+from .core import *
 
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")

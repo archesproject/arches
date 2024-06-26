@@ -147,10 +147,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                         feature["geometry"]
                     )
                     for new_feature in new_collection["features"]:
-                        new_feature["id"] = str(uuid.uuid4())
+                        new_feature["id"] = (
+                            geojson["id"] if "id" in geojson else str(uuid.uuid4())
+                        )
                     features = features + new_collection["features"]
                 else:
-                    feature["id"] = str(uuid.uuid4())
+                    feature["id"] = (
+                        geojson["id"] if "id" in geojson else str(uuid.uuid4())
+                    )
                     features.append(feature)
             geojson["features"] = features
             return geojson
