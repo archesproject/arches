@@ -2205,7 +2205,7 @@ class SpatialView(APIBase):
         returns a JSONErrorResponse if validation fails or SpatialView if validation passes
         """
 
-        def create_spatialview_from_json_data(self, json_data):
+        def create_spatialview_from_json_data(json_data):
             """
             Returns a SpatialView object from the JSON data. Should only be used if the JSON data has been validated.
             """
