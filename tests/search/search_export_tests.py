@@ -142,7 +142,7 @@ class SearchExportTests(ArchesTestCase):
         csv_reader = csv.DictReader(io.StringIO(csv_content))
         cultural_period_column_name = self.search_model_cultural_period_nodename
         for row in csv_reader:
-            self.assertTrue(len(row) > 1, "Expected more than one column in the output")
+            self.assertTrue(len(row) > 1, f"{len(row)} column(s) in csv row: {row}")
             cultural_period_value = row[cultural_period_column_name]
             self.assertTrue(
                 is_valid_uuid(cultural_period_value),
@@ -163,7 +163,7 @@ class SearchExportTests(ArchesTestCase):
         csv_reader = csv.DictReader(io.StringIO(csv_content))
         cultural_period_column_name = self.search_model_cultural_period_nodename
         for row in csv_reader:
-            self.assertTrue(len(row) > 1, "Expected more than one column in the output")
+            self.assertTrue(len(row) > 1, f"{len(row)} columns in csv row: {row}")
             cultural_period_value = row[cultural_period_column_name]
             self.assertFalse(
                 is_valid_uuid(cultural_period_value),
