@@ -8,8 +8,11 @@ import django.db.models.fields.json
 import django.db.models.functions.comparison
 import textwrap
 import uuid
+from guardian.ctypes import get_content_type
 
 from arches.app.models.fields.i18n import I18n_String
+
+PLUGIN_ID = uuid.UUID("60aa3e80-4aea-4042-a76e-5a872b1c36a0")
 
 
 class Migration(migrations.Migration):
@@ -21,7 +24,7 @@ class Migration(migrations.Migration):
         Plugin = apps.get_model("models", "Plugin")
 
         Plugin(
-            pluginid=uuid.UUID("60aa3e80-4aea-4042-a76e-5a872b1c36a0"),
+            pluginid=PLUGIN_ID,
             name=I18n_String("Controlled List Manager"),
             icon="fa fa-list",
             component="views/components/plugins/controlled-list-manager",
@@ -34,6 +37,42 @@ class Migration(migrations.Migration):
     def remove_plugin(apps, schema_editor):
         Plugin = apps.get_model("models", "Plugin")
         Plugin.objects.filter(slug="controlled-list-manager").delete()
+
+    def assign_view_plugin(apps, schema_editor):
+        Group = apps.get_model("auth", "Group")
+        Plugin = apps.get_model("models", "Plugin")
+        Permission = apps.get_model("auth", "Permission")
+        GroupObjectPermission = apps.get_model("guardian", "GroupObjectPermission")
+
+        view_plugin = Permission.objects.get(codename="view_plugin")
+        rdm_administrators = Group.objects.get(name="RDM Administrator")
+        controlled_list_manager = Plugin.objects.get(pk=PLUGIN_ID)
+
+        # Cannot use django_guardian shortcuts or object managers
+        # https://github.com/django-guardian/django-guardian/issues/751
+        GroupObjectPermission(
+            permission=view_plugin,
+            group=rdm_administrators,
+            content_type_id=get_content_type(controlled_list_manager).pk,
+            object_pk=PLUGIN_ID,
+        ).save()
+
+    def remove_view_plugin(apps, schema_editor):
+        Group = apps.get_model("auth", "Group")
+        Plugin = apps.get_model("models", "Plugin")
+        Permission = apps.get_model("auth", "Permission")
+        GroupObjectPermission = apps.get_model("guardian", "GroupObjectPermission")
+
+        view_plugin = Permission.objects.get(codename="view_plugin")
+        rdm_administrators = Group.objects.get(name="RDM Administrator")
+        controlled_list_manager = Plugin.objects.get(pk=PLUGIN_ID)
+
+        GroupObjectPermission.objects.filter(
+            permission=view_plugin,
+            group=rdm_administrators,
+            content_type_id=get_content_type(controlled_list_manager).pk,
+            object_pk=PLUGIN_ID,
+        ).delete()
 
     add_reference_datatype = textwrap.dedent(
         """
@@ -81,6 +120,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunPython(add_plugin, remove_plugin),
+        migrations.RunPython(assign_view_plugin, remove_view_plugin),
         migrations.RunSQL(add_reference_datatype, migrations.RunSQL.noop),
         migrations.CreateModel(
             name="ControlledListItemImage",
