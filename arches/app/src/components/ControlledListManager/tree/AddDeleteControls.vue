@@ -8,7 +8,6 @@ import Button from "primevue/button";
 import ConfirmDialog from "primevue/confirmdialog";
 import SplitButton from "primevue/splitbutton";
 
-import { BUTTON_GREEN } from "@/theme.ts";
 import {
     deleteItems,
     deleteLists,
@@ -239,7 +238,6 @@ await fetchListsAndPopulateTree();
         :label="$gettext('Add New List')"
         raised
         style="font-size: inherit"
-        :pt="{ root: { style: { background: BUTTON_GREEN } } }"
         @click="createList"
     />
     <ConfirmDialog :draggable="false" />
