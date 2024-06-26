@@ -111,7 +111,7 @@ define([
 
                 if (item.uri) {
                     const text = self.getPrefLabel(item.labels) || arches.translations.searching + '...';
-                    NAME_LOOKUP[item.uri] = {"prefLabel": text, "labels": item.labels, "listid": item.controlled_list_id};
+                    NAME_LOOKUP[item.uri] = {"prefLabel": text, "labels": item.labels, "listid": item.list_id};
                     return indentation + text;
                 }
             },
