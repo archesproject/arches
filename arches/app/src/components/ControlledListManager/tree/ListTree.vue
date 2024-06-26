@@ -58,11 +58,27 @@ const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 
 const updateSelectedAndExpanded = (node: TreeNode) => {
+    let priorListId;
+    if (displayedRow.value) {
+        priorListId =
+            (displayedRow.value as ControlledListItem).list_id ??
+            displayedRow.value.id;
+    }
+
     setDisplayedRow(node.data);
     expandedKeys.value = {
         ...expandedKeys.value,
         [node.key as string]: true,
     };
+    if (nodeIsList(node)) {
+        tree.value
+            .filter((list) => list.data.id !== node.data.id)
+            .forEach((list) => collapseNodesRecursive(list));
+    } else if ((node.data as ControlledListItem).list_id !== priorListId) {
+        tree.value
+            .filter((list) => list.data.id !== node.data.list_id)
+            .forEach((list) => collapseNodesRecursive(list));
+    }
 };
 
 const expandAll = () => {

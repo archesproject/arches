@@ -44,7 +44,7 @@ const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
         metadata_type: nextMetadataType.type,
         metadata_label: nextMetadataType.label,
         language_id: arches.activeLanguage,
-        controlled_list_item_image_id: image.id,
+        list_item_image_id: image.id,
         value: "",
     };
 });

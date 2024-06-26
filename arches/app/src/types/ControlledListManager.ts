@@ -22,7 +22,7 @@ export type ValueType = string;
 
 export interface ControlledListItemImageMetadata {
     id: string;
-    controlled_list_item_image_id: string;
+    list_item_image_id: string;
     language_id: string;
     metadata_type: string;
     metadata_label: string;
@@ -31,7 +31,7 @@ export interface ControlledListItemImageMetadata {
 
 export interface NewControlledListItemImageMetadata {
     id: number;
-    controlled_list_item_image_id: string;
+    list_item_image_id: string;
     language_id: string;
     metadata_type: string;
     metadata_label: string;
@@ -56,7 +56,7 @@ export interface ControlledListItemImage {
 
 export interface ControlledListItem {
     id: string;
-    controlled_list_id: string;
+    list_id: string;
     uri: string;
     sortorder: number;
     guide: boolean;
@@ -69,7 +69,7 @@ export interface ControlledListItem {
 
 export interface NewControlledListItem {
     id: number;
-    controlled_list_id: string;
+    list_id: string;
     uri: string;
     sortorder: number;
     guide: boolean;
