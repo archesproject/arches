@@ -85,6 +85,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
                         },
                     };
                 },
+                input: { ariaLabel: $gettext('Upload an image') },
             }"
             @before-send="addHeader($event)"
             @upload="upload($event)"

@@ -222,6 +222,7 @@ const filterCallbackWrapped = computed(() => {
             },
             input: {
                 style: { height: '3.5rem', fontSize: '1.4rem' },
+                ariaLabel: $gettext('Find'),
             },
             wrapper: {
                 style: {

@@ -35,7 +35,10 @@ const letter = computed(() => {
 </script>
 
 <template>
-    <div class="circle">
+    <div
+        class="circle"
+        aria-hidden="true"
+    >
         <span class="letter">{{ letter }}</span>
     </div>
 </template>

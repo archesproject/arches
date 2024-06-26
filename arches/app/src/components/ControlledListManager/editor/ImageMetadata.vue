@@ -287,6 +287,7 @@ const focusInput = () => {
                 :row-editor="true"
                 style="width: 5%; min-width: 6rem; text-align: center"
                 :pt="{
+                    headerCell: { ariaLabel: $gettext('Row edit controls') },
                     rowEditorInitButton: {
                         class: 'fa fa-pencil',
                         style: { display: 'inline-flex' },
@@ -304,7 +305,10 @@ const focusInput = () => {
                     rowEditorCancelIcon: { style: { display: 'none' } },
                 }"
             />
-            <Column style="width: 5%; text-align: center">
+            <Column
+                style="width: 5%; text-align: center"
+                :pt="{ headerCell: { ariaLabel: $gettext('Delete controls') } }"
+            >
                 <template #body="slotProps">
                     <i
                         class="fa fa-trash"

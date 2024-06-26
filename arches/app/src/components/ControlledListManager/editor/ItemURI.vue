@@ -86,7 +86,7 @@ const cancel = () => {
                 v-focus
                 type="text"
                 :disabled="!editing"
-                :aria-label="$gettext('URI')"
+                :aria-label="$gettext('Enter a URI')"
                 :placeholder="$gettext('Enter a URI')"
                 @keyup.enter="save"
             />
