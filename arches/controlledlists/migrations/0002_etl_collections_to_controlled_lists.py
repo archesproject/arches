@@ -5,6 +5,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("controlledlists", "0001_initial"),
+        ("guardian", "0002_generic_permissions_index"),
     ]
 
     operations = [
