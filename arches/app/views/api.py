@@ -1205,7 +1205,8 @@ class Card(APIBase):
                 widget
                 for widget in models.CardXNodeXWidget.objects.filter(
                     pk__in=[
-                        widget_dict["id"] for widget_dict in serialized_graph["widgets"]
+                        widget_dict["id"]
+                        for widget_dict in serialized_graph["cards_x_nodes_x_widgets"]
                     ]
                 )
             ]
@@ -1462,6 +1463,30 @@ class OntologyProperty(APIBase):
                     ret.append(ontologyclass["ontology_property"])
 
         return JSONResponse(ret)
+
+
+class ResourceInstanceLifecycleState(APIBase):
+    def get(self, request, resourceid):
+        resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+        return JSONResponse(
+            {"resource_instance_lifecycle_state": resource_instance.lifecycle_state}
+        )
+
+    def post(self, request, resourceid):
+        data = json.loads(request.body)
+        direction = data.get("direction")
+
+        resource = Resource.objects.get(pk=resourceid)
+        original_resource_instance_lifecycle_state = resource.lifecycle_state
+
+        resource_instance_lifecycle_state = resource.update_lifecycle_state(direction)
+
+        return JSONResponse(
+            {
+                "original_resource_instance_lifecycle_state": original_resource_instance_lifecycle_state,
+                "resource_instance_lifecycle_state": resource_instance_lifecycle_state,
+            }
+        )
 
 
 class ResourceReport(APIBase):

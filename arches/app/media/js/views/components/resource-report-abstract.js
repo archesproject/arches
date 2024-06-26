@@ -11,8 +11,8 @@ define([
     'viewmodels/card',
 ], function($, _, ko, arches, reportLookup, ReportModel, GraphModel, AlertViewmodel, resourceReportAbstractTemplate) {
     var ResourceReportAbstract = function(params) {
-        var self = this;
-        var CardViewModel = require('viewmodels/card');
+        var self = this;  // eslint-disable-line @typescript-eslint/no-this-alias
+        var CardViewModel = require('viewmodels/card');  // eslint-disable-line  @typescript-eslint/no-require-imports
          
         this.loading = ko.observable(true);
 
@@ -29,6 +29,8 @@ define([
             params.graph_has_different_publication_and_user_has_insufficient_permissions === "True" ? true : false
         );
 
+        this.resoureceInstanceLifecycleStatePermitsEditing = params.resource_instance_lifecycle_state_permits_editing === "True" ? true : false;
+
         this.template = ko.observable();
         this.report = ko.observable();
 
@@ -36,24 +38,33 @@ define([
             var url;
             params.cache = params.cache === undefined ? true : params.cache;
 
-            if (params.view && self.graphHasDifferentPublication()) {
-                if (self.graphHasDifferentPublicationAndUserHasInsufficientPermissions()) {
+            if (params.view) {
+                if (!self.resoureceInstanceLifecycleStatePermitsEditing) {
                     params.view.alert(new AlertViewmodel(
-                        'ep-alert-red',
-                        arches.translations.resourceGraphHasDifferentPublicationUserIsNotPermissioned.title,
-                        arches.translations.resourceGraphHasDifferentPublicationUserIsNotPermissioned.text,
-                        null,
-                        function() {}
+                        'ep-alert-blue',
+                        'foo',
+                        'bar',
                     ));
                 }
-                else {
-                    params.view.alert(new AlertViewmodel(
-                        'ep-alert-red',
-                        arches.translations.resourceGraphHasDifferentPublication.title,
-                        arches.translations.resourceGraphHasDifferentPublication.text,
-                        null,
-                        function() {}
-                    ));
+                else if (self.graphHasDifferentPublication()) {
+                    if (self.graphHasDifferentPublicationAndUserHasInsufficientPermissions()) {
+                        params.view.alert(new AlertViewmodel(
+                            'ep-alert-red',
+                            arches.translations.resourceGraphHasDifferentPublicationUserIsNotPermissioned.title,
+                            arches.translations.resourceGraphHasDifferentPublicationUserIsNotPermissioned.text,
+                            null,
+                            function() {}
+                        ));
+                    }
+                    else {
+                        params.view.alert(new AlertViewmodel(
+                            'ep-alert-red',
+                            arches.translations.resourceGraphHasDifferentPublication.title,
+                            arches.translations.resourceGraphHasDifferentPublication.text,
+                            null,
+                            function() {}
+                        ));
+                    }
                 }
             }
 
@@ -121,7 +132,7 @@ define([
             const displayName = (() => {
                 try{
                     return JSON.parse(responseJson.displayname)?.[arches.activeLanguage]?.value;
-                } catch (e){
+                } catch (e){  // eslint-disable-line  @typescript-eslint/no-unused-vars
                     return responseJson.displayname;
                 }
             })();

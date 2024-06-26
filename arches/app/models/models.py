@@ -9,7 +9,6 @@
 # into your database.
 
 
-import os
 import sys
 import json
 import uuid
@@ -24,24 +23,15 @@ from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils import import_class_from_string
-from django.contrib.gis.db import models
-from django.db.models import JSONField
-from django.core.cache import caches
-from django.core.mail import EmailMultiAlternatives
-from django.core.serializers.json import DjangoJSONEncoder
-from django.template.loader import get_template, render_to_string
-from django.core.validators import RegexValidator
-from django.db.models import Q, Max
-from django.db.models.signals import post_delete, pre_save, post_save
-from django.dispatch import receiver
-from django.utils import translation
-from django.utils.translation import gettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-from django.contrib.contenttypes.models import ContentType
-from django.core.validators import validate_slug
-from guardian.models import GroupObjectPermission
-from guardian.shortcuts import assign_perm
+from django.contrib.gis.db import models
+from django.core.serializers.json import DjangoJSONEncoder
+from django.core.validators import RegexValidator, validate_slug
+from django.db.models import JSONField, Q, Max
+from django.utils import translation
+from django.utils.translation import gettext as _
+
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -477,48 +467,6 @@ class TempFile(models.Model):
         db_table = "files_temporary"
 
 
-# These two event listeners auto-delete files from filesystem when they are unneeded:
-# from http://stackoverflow.com/questions/16041232/django-delete-filefield
-@receiver(post_delete, sender=File)
-def delete_file_on_delete(sender, instance, **kwargs):
-    """Deletes file from filesystem
-    when corresponding `File` object is deleted.
-    """
-
-    if instance.path:
-        try:
-            if os.path.isfile(instance.path.path):
-                os.remove(instance.path.path)
-        # except block added to deal with S3 file deletion
-        # see comments on 2nd answer below
-        # http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
-        except Exception as e:
-            storage, name = instance.path.storage, instance.path.name
-            storage.delete(name)
-
-
-@receiver(pre_save, sender=File)
-def delete_file_on_change(sender, instance, **kwargs):
-    """Deletes file from filesystem
-    when corresponding `File` object is changed.
-    """
-    if not instance.pk:
-        return False
-
-    try:
-        old_file = File.objects.get(pk=instance.pk).path
-    except File.DoesNotExist:
-        return False
-
-    new_file = instance.path
-    if not old_file == new_file:
-        try:
-            if os.path.isfile(old_file.path):
-                os.remove(old_file.path)
-        except Exception:
-            return False
-
-
 class Function(models.Model):
     functionid = models.UUIDField(primary_key=True)
     name = models.TextField(blank=True, null=True)
@@ -616,6 +564,9 @@ class GraphModel(models.Model):
         to="models.graphmodel",
     )
     has_unpublished_changes = models.BooleanField(default=False)
+    resource_instance_lifecycle = models.ForeignKey(
+        null=True, on_delete=models.CASCADE, to="models.ResourceInstanceLifecycle"
+    )
 
     @property
     def disable_instance_creation(self):
@@ -908,14 +859,6 @@ class Node(models.Model):
                 fields=["alias", "graph"], name="unique_alias_graph"
             ),
         ]
-
-
-@receiver(post_save, sender=Node)
-def clear_user_permission_cache(sender, instance, **kwargs):
-    user_permission_cache = caches["user_permission"]
-
-    if user_permission_cache:
-        user_permission_cache.clear()
 
 
 class Ontology(models.Model):
@@ -1241,12 +1184,22 @@ class ResourceInstance(models.Model):
     descriptors = models.JSONField(blank=True, null=True)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
+    lifecycle_state = models.CharField(max_length=200, blank=True)
 
     def save(self, *args, **kwargs):
         try:
             self.graph_publication = self.graph.publication
         except ResourceInstance.graph.RelatedObjectDoesNotExist:
             pass
+
+        if not self.lifecycle_state:
+            self.lifecycle_state = next(
+                key
+                for key, value in self.graph.resource_instance_lifecycle.states.items()
+                if value["initial_state"]
+            )
+
+        add_to_update_fields(kwargs, "lifecycle_state")
         add_to_update_fields(kwargs, "graph_publication")
         super(ResourceInstance, self).save(*args, **kwargs)
 
@@ -1259,6 +1212,21 @@ class ResourceInstance(models.Model):
         managed = True
         db_table = "resource_instances"
         permissions = (("no_access_to_resourceinstance", "No Access"),)
+
+
+class ResourceInstanceLifecycle(models.Model):
+    graph = models.OneToOneField(
+        "GraphModel",
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    states = models.JSONField(
+        default=settings.RESOURCE_INSTANCE_DEFAULT_LIFECYCLE_STATES
+    )
+
+    class Meta:
+        db_table = "resource_instance_lifecycles"
+        managed = True
 
 
 class SearchComponent(models.Model):
@@ -1503,47 +1471,6 @@ class FileValue(models.Model):
         return ""
 
 
-# These two event listeners auto-delete files from filesystem when they are unneeded:
-# from http://stackoverflow.com/questions/16041232/django-delete-filefield
-@receiver(post_delete, sender=FileValue)
-def auto_delete_file_on_delete(sender, instance, **kwargs):
-    """Deletes file from filesystem
-    when corresponding `FileValue` object is deleted.
-    """
-    if instance.value.path:
-        try:
-            if os.path.isfile(instance.value.path):
-                os.remove(instance.value.path)
-        # except block added to deal with S3 file deletion
-        # see comments on 2nd answer below
-        # http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
-        except Exception as e:
-            storage, name = instance.value.storage, instance.value.name
-            storage.delete(name)
-
-
-@receiver(pre_save, sender=FileValue)
-def auto_delete_file_on_change(sender, instance, **kwargs):
-    """Deletes file from filesystem
-    when corresponding `FileValue` object is changed.
-    """
-    if not instance.pk:
-        return False
-
-    try:
-        old_file = FileValue.objects.get(pk=instance.pk).value
-    except FileValue.DoesNotExist:
-        return False
-
-    new_file = instance.value
-    if not old_file == new_file:
-        try:
-            if os.path.isfile(old_file.value):
-                os.remove(old_file.value)
-        except Exception:
-            return False
-
-
 class Widget(models.Model):
     widgetid = models.UUIDField(primary_key=True)
     name = models.TextField(unique=True)
@@ -1716,33 +1643,6 @@ class UserProfile(models.Model):
         db_table = "user_profile"
 
 
-@receiver(post_save, sender=User)
-def save_profile(sender, instance, **kwargs):
-    UserProfile.objects.get_or_create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def create_permissions_for_new_users(sender, instance, created, **kwargs):
-    from arches.app.models.resource import Resource
-
-    if created:
-        ct = ContentType.objects.get(app_label="models", model="resourceinstance")
-        resourceInstanceIds = list(
-            GroupObjectPermission.objects.filter(content_type=ct)
-            .values_list("object_pk", flat=True)
-            .distinct()
-        )
-        for resourceInstanceId in resourceInstanceIds:
-            resourceInstanceId = uuid.UUID(resourceInstanceId)
-        resources = ResourceInstance.objects.filter(pk__in=resourceInstanceIds)
-        assign_perm("no_access_to_resourceinstance", instance, resources)
-        for resource_instance in resources:
-            resource = Resource(resource_instance.resourceinstanceid)
-            resource.graph_id = resource_instance.graph_id
-            resource.createdtime = resource_instance.createdtime
-            resource.index()
-
-
 class UserXTask(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False)
     taskid = models.UUIDField(serialize=False, blank=True, null=True)
@@ -1855,53 +1755,6 @@ class UserXNotificationType(models.Model):
     class Meta:
         managed = True
         db_table = "user_x_notification_types"
-
-
-@receiver(post_save, sender=UserXNotification)
-def send_email_on_save(sender, instance, **kwargs):
-    """Checks if a notification type needs to send an email, does so if email server exists"""
-
-    if instance.notif.notiftype is not None and instance.isread is False:
-        if UserXNotificationType.objects.filter(
-            user=instance.recipient,
-            notiftype=instance.notif.notiftype,
-            emailnotify=False,
-        ).exists():
-            return False
-
-        try:
-            context = instance.notif.context.copy()
-            text_content = render_to_string(
-                instance.notif.notiftype.emailtemplate, context
-            )
-            html_template = get_template(instance.notif.notiftype.emailtemplate)
-            html_content = html_template.render(context)
-            if context["email"] == instance.recipient.email:
-                email_to = instance.recipient.email
-            else:
-                email_to = context["email"]
-
-            if type(email_to) is not list:
-                email_to = [email_to]
-
-            subject, from_email, to = (
-                instance.notif.notiftype.name,
-                settings.DEFAULT_FROM_EMAIL,
-                email_to,
-            )
-            msg = EmailMultiAlternatives(subject, text_content, from_email, to)
-            msg.attach_alternative(html_content, "text/html")
-            msg.send()
-            if instance.notif.notiftype.webnotify is not True:
-                instance.isread = True
-                instance.save()
-        except Exception as e:
-            logger.warning(e)
-            logger.warning(
-                "Error occurred sending email.  See previous stack trace and check email configuration in settings.py."
-            )
-
-    return False
 
 
 def getDataDownloadConfigDefaults():

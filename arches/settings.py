@@ -813,6 +813,26 @@ RENDERERS = [
     },
 ]
 
+
+def RESOURCE_INSTANCE_DEFAULT_LIFECYCLE_STATES():
+    return {
+        "active": {
+            "previous_states": [],
+            "can_delete": False,
+            "can_edit": True,
+            "initial_state": True,
+            "following_states": ["retired"],
+        },
+        "retired": {
+            "previous_states": ["active"],
+            "can_delete": False,
+            "can_edit": False,
+            "initial_state": False,
+            "following_states": [],
+        },
+    }
+
+
 # --- JSON LD sortorder generating functions --- #
 #
 # The functions in the array below will be called in the order given with the json-ld of the node
