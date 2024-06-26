@@ -75,7 +75,7 @@ const updateSelectedAndExpanded = (node: TreeNode) => {
     let priorListId;
     if (displayedRow.value) {
         priorListId =
-            (displayedRow.value as ControlledListItem).controlled_list_id ??
+            (displayedRow.value as ControlledListItem).list_id ??
             displayedRow.value.id;
     }
 
@@ -88,11 +88,9 @@ const updateSelectedAndExpanded = (node: TreeNode) => {
         tree.value
             .filter((list) => list.data.id !== node.data.id)
             .forEach((list) => collapseNodesRecursive(list));
-    } else if (
-        (node.data as ControlledListItem).controlled_list_id !== priorListId
-    ) {
+    } else if ((node.data as ControlledListItem).list_id !== priorListId) {
         tree.value
-            .filter((list) => list.data.id !== node.data.controlled_list_id)
+            .filter((list) => list.data.id !== node.data.list_id)
             .forEach((list) => collapseNodesRecursive(list));
     }
 };

@@ -103,8 +103,7 @@ const issueDeleteMetadata = async (
 const appendImageMetadata = (newMetadata: ControlledListItemImageMetadata) => {
     const imageFromItem = item.value!.images.find(
         (imageCandidateFromItem) =>
-            imageCandidateFromItem.id ===
-            newMetadata.controlled_list_item_image_id,
+            imageCandidateFromItem.id === newMetadata.list_item_image_id,
     );
     if (imageFromItem) {
         imageFromItem.metadata.push(newMetadata);
@@ -116,8 +115,7 @@ const removeImageMetadata = (
 ) => {
     const imageFromItem = item.value!.images.find(
         (imageCandidateFromItem) =>
-            imageCandidateFromItem.id ===
-            removedMetadata.controlled_list_item_image_id,
+            imageCandidateFromItem.id === removedMetadata.list_item_image_id,
     );
     if (imageFromItem) {
         const toDelete = imageFromItem.metadata.findIndex(
@@ -135,8 +133,7 @@ const updateImageMetadata = (
 ) => {
     const imageFromItem = item.value!.images.find(
         (imageCandidateFromItem) =>
-            imageCandidateFromItem.id ===
-            updatedMetadata.controlled_list_item_image_id,
+            imageCandidateFromItem.id === updatedMetadata.list_item_image_id,
     );
     if (imageFromItem) {
         const toUpdate = imageFromItem.metadata.find(

@@ -65,7 +65,7 @@ const newLabelCounter = ref(1);
 const isFirstItem = (item: ControlledListItem) => {
     const siblings: TreeNode[] = item.parent_id
         ? findNodeInTree(tree.value, item.parent_id).data.children
-        : findNodeInTree(tree.value, item.controlled_list_id).data.items;
+        : findNodeInTree(tree.value, item.list_id).data.items;
     if (!siblings) {
         throw new Error();
     }
@@ -75,7 +75,7 @@ const isFirstItem = (item: ControlledListItem) => {
 const isLastItem = (item: ControlledListItem) => {
     const siblings: TreeNode[] = item.parent_id
         ? findNodeInTree(tree.value, item.parent_id).data.children
-        : findNodeInTree(tree.value, item.controlled_list_id).data.items;
+        : findNodeInTree(tree.value, item.list_id).data.items;
     if (!siblings) {
         throw new Error();
     }
@@ -93,7 +93,7 @@ const addItem = (parent: TreeNode) => {
     const newItem: NewControlledListItem = {
         parent_id: nodeIsItem(parent) ? parent.data.id : null,
         id: newLabelCounter.value,
-        controlled_list_id: parent.data.controlled_list_id ?? parent.data.id,
+        list_id: parent.data.list_id ?? parent.data.id,
         uri: "",
         sortorder: 0,
         guide: false,
@@ -126,10 +126,7 @@ const addItem = (parent: TreeNode) => {
 };
 
 const reorder = async (item: ControlledListItem, up: boolean) => {
-    const list: ControlledList = findNodeInTree(
-        tree.value,
-        item.controlled_list_id,
-    ).data;
+    const list: ControlledList = findNodeInTree(tree.value, item.list_id).data;
 
     let siblings: ControlledListItem[];
     if (item.parent_id) {

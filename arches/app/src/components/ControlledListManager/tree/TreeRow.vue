@@ -111,7 +111,7 @@ const showMoveHereButton = (rowId: string) => {
         rowId !== movingItem.value.key &&
         rowId !== movingItem.value.data.parent_id &&
         (movingItem.value.data.parent_id ||
-            rowId !== movingItem.value.data.controlled_list_id)
+            rowId !== movingItem.value.data.list_id)
     );
 };
 
@@ -124,13 +124,13 @@ const setParent = async (parentNode: TreeNode) => {
     let siblings: ControlledListItem[];
     if (nodeIsList(parentNode)) {
         item.parent_id = null;
-        item.controlled_list_id = parentNode.key;
+        item.list_id = parentNode.key;
         list = parentNode.data;
         siblings = list.items;
         siblings.push(item);
     } else {
         item.parent_id = parentNode.key;
-        list = findNodeInTree(tree.value, item.controlled_list_id).data;
+        list = findNodeInTree(tree.value, item.list_id).data;
         siblings = parentNode.data.children;
         siblings.push(item);
     }
@@ -197,7 +197,7 @@ const acceptNewItemShortcutEntry = async () => {
 
     const parent = findNodeInTree(
         tree.value,
-        newItem.parent_id ?? newItem.controlled_list_id,
+        newItem.parent_id ?? newItem.list_id,
     );
     parent.children = [
         ...parent.children.filter(
