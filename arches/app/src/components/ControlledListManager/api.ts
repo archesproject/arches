@@ -32,8 +32,8 @@ export const fetchLists = async () => {
             return parsed;
         }
         throw new Error(parsed.message);
-    } catch {
-        throw new Error(response.statusText);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
     }
 };
 
@@ -49,8 +49,8 @@ export const createList = async (name: string) => {
             return parsed;
         }
         throw new Error(parsed.message);
-    } catch {
-        throw new Error(response.statusText);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
     }
 };
 
@@ -66,8 +66,8 @@ export const createItem = async (item: ControlledListItem) => {
             return parsed;
         }
         throw new Error(parsed.message);
-    } catch {
-        throw new Error(response.statusText);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
     }
 };
 
@@ -86,8 +86,8 @@ export const patchItem = async (
     try {
         const error = await response.json();
         throw new Error(error.message);
-    } catch {
-        throw new Error(response.statusText);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
     }
 };
 
@@ -123,8 +123,8 @@ export const patchList = async (
     try {
         const error = await response.json();
         throw new Error(error.message);
-    } catch {
-        throw new Error(response.statusText);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
     }
 };
 
@@ -191,8 +191,8 @@ export const upsertValue = async (value: NewOrExistingValue) => {
             return parsed;
         }
         throw new Error(parsed.message);
-    } catch {
-        throw new Error(response.statusText);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
     }
 };
 
@@ -210,8 +210,8 @@ export const deleteValue = async (value: Value) => {
     try {
         const error = await response.json();
         throw new Error(error.message);
-    } catch {
-        throw new Error(response.statusText);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
     }
 };
 
@@ -232,8 +232,8 @@ export const upsertMetadata = async (
             return parsed;
         }
         throw new Error(parsed.message);
-    } catch {
-        throw new Error(response.statusText);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
     }
 };
 
@@ -253,8 +253,8 @@ export const deleteMetadata = async (
     try {
         const error = await response.json();
         throw new Error(error.message);
-    } catch {
-        throw new Error(response.statusText);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
     }
 };
 
@@ -272,7 +272,7 @@ export const deleteImage = async (image: ControlledListItemImage) => {
     try {
         const error = await response.json();
         throw new Error(error.message);
-    } catch {
-        throw new Error(response.statusText);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
     }
 };
