@@ -79,7 +79,7 @@ class SearchExportTests(ArchesTestCase):
             resourceinstance_id=cls.test_resourceinstanceid,
         )
         cultural_period_tile.save()
-        time.sleep(2)  # delay to allow for async indexing
+        time.sleep(5)  # delay to allow for async indexing
         # TODO: create geospatial test data
 
     def test_cultural_period_node_exportable(self):
