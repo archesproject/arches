@@ -287,7 +287,7 @@ class ControlledListTests(ArchesTestCase):
 
         self.client.post(
             reverse("controlled_list_item_add"),
-            {"parent_id": str(self.list1.pk)},
+            {"controlled_list_id": str(self.list1.pk), "parent_id": None},
             content_type="application/json",
         )
 
@@ -304,7 +304,10 @@ class ControlledListTests(ArchesTestCase):
         parent_item = self.list1.controlled_list_items.order_by("uri").first()
         self.client.post(
             reverse("controlled_list_item_add"),
-            {"parent_id": str(parent_item.pk)},
+            {
+                "controlled_list_id": str(self.list1.pk),
+                "parent_id": str(parent_item.pk),
+            },
             content_type="application/json",
         )
 

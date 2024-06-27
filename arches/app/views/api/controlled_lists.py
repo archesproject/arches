@@ -199,17 +199,7 @@ class ControlledListItemView(View):
 
         # Insert
         parent_id = data["parent_id"]
-
-        # The front end shows lists and items in the same tree, and when
-        # sending the parent id to the endpoint, it doesn't really know
-        # if the parent is a list or an item. The backend does care whether
-        # the parent is a list or an item, so we figure it out here.
-        try:
-            controlled_list_id = ControlledListItem.objects.get(
-                pk=parent_id
-            ).controlled_list_id
-        except ControlledListItem.DoesNotExist:
-            controlled_list_id = parent_id
+        controlled_list_id = data["controlled_list_id"]
 
         try:
             with transaction.atomic():
@@ -225,7 +215,7 @@ class ControlledListItemView(View):
                 item = ControlledListItem.objects.create(
                     controlled_list=controlled_list,
                     sortorder=controlled_list.max_sortorder + 1,
-                    parent_id=None if controlled_list_id == parent_id else parent_id,
+                    parent_id=parent_id,
                 )
         except ControlledList.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)

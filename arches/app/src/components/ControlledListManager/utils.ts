@@ -15,6 +15,9 @@ export const dataIsList = (data: Selectable) => {
 export const dataIsItem = (data: Selectable) => {
     return !dataIsList(data);
 };
+export const nodeIsItem = (node: TreeNode) => {
+    return !nodeIsList(node);
+};
 export const nodeIsList = (node: TreeNode) => {
     return dataIsList(node.data);
 };

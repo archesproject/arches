@@ -18,6 +18,7 @@ import {
     findNodeInTree,
     itemAsNode,
     listAsNode,
+    nodeIsItem,
     nodeIsList,
     reorderItems,
 } from "@/components/ControlledListManager/utils.ts";
@@ -90,9 +91,9 @@ const setMovingItem = (node: TreeNode) => {
 
 const addItem = (parent: TreeNode) => {
     const newItem: NewControlledListItem = {
-        parent_id: parent.key!,
+        parent_id: nodeIsItem(parent) ? parent.data.id : null,
         id: newLabelCounter.value,
-        controlled_list_id: parent.controlled_list_id ?? parent.id,
+        controlled_list_id: parent.data.controlled_list_id ?? parent.data.id,
         uri: "",
         sortorder: 0,
         guide: false,
