@@ -644,9 +644,9 @@ urlpatterns = [
         name="concepts",
     ),
     re_path(
-        r"^plugins/(?P<pluginid>%s)$" % uuid_regex, PluginView.as_view(), name="plugins"
+        r"^plugins/(?P<pluginid>%s)" % uuid_regex, PluginView.as_view(), name="plugins"
     ),
-    re_path(r"^plugins/(?P<slug>[-\w]+)$", PluginView.as_view(), name="plugins"),
+    re_path(r"^plugins/(?P<slug>[-\w]+)", PluginView.as_view(), name="plugins"),
     re_path(
         r"^workflow_history/(?P<workflowid>%s|())$" % uuid_regex,
         WorkflowHistoryView.as_view(),

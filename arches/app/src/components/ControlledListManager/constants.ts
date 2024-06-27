@@ -18,6 +18,12 @@ export const ERROR = "error";
 export const DANGER = "danger";
 export const DEFAULT_ERROR_TOAST_LIFE = 8000;
 
+export const routes = {
+    splash: "splash",
+    list: "list",
+    item: "item",
+};
+
 // Django model choices
 export const METADATA_CHOICES = {
     title: "title",

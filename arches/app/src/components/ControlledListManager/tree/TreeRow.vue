@@ -130,7 +130,7 @@ const setParent = async (parentNode: TreeNode) => {
         siblings.push(item);
     } else {
         item.parent_id = parentNode.key;
-        list = findNodeInTree(tree.value, item.controlled_list_id).data;
+        list = findNodeInTree(tree.value, item.controlled_list_id).found.data;
         siblings = parentNode.data.children;
         siblings.push(item);
     }
@@ -198,7 +198,7 @@ const acceptNewItemShortcutEntry = async () => {
     const parent = findNodeInTree(
         tree.value,
         newItem.parent_id ?? newItem.controlled_list_id,
-    );
+    ).found;
     parent.children = [
         ...parent.children.filter(
             (child: TreeNode) => typeof child.key === "string",

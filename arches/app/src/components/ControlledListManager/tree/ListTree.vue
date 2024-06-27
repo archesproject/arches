@@ -72,6 +72,10 @@ const collapseNodesRecursive = (node: TreeNode) => {
 };
 
 const updateSelectedAndExpanded = (node: TreeNode) => {
+    if (isMultiSelecting.value || movingItem.value.key) {
+        return;
+    }
+
     let priorListId;
     if (displayedRow.value) {
         priorListId =
@@ -190,7 +194,7 @@ const filterCallbackWrapped = computed(() => {
 <template>
     <ListTreeControls
         :key="refetcher"
-        v-model="tree"
+        v-model:tree="tree"
         v-model:rerender-tree="rerenderTree"
         v-model:expanded-keys="expandedKeys"
         v-model:selected-keys="selectedKeys"
