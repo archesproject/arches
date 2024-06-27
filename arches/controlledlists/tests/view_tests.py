@@ -24,7 +24,7 @@ from arches.controlledlists.models import (
 )
 
 # these tests can be run from the command line via
-# python manage.py test arches.controlledlists.tests --settings="tests.test_settings"
+# python manage.py test arches.controlledlists.tests.view_tests --settings="tests.test_settings"
 
 SYNCED_PK = uuid.uuid4()
 

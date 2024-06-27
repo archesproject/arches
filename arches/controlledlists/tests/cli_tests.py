@@ -3,26 +3,31 @@ import os
 
 from django.conf import settings
 from django.core import management
+from django.test import TestCase
 from django.test.utils import captured_stdout
 
-from arches.app.models.models import ControlledList
-from tests.base_test import ArchesTestCase
+from arches.controlledlists.models import List
+
+# Change TEST_ROOT context for just Controlled Lists
+from arches.settings import ROOT_DIR
+
+TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "controlledlists/tests"))
 
 
 # these tests can be run from the command line via
-# python manage.py test tests.commands.controlled_lists_cli_tests --settings="tests.test_settings"
+# python manage.py test arches.controlledlists.tests.cli_tests --settings="tests.test_settings"
 
 
-class ControlledListsExportTests(ArchesTestCase):
+class ListExportPacakgeTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        from tests.views.controlled_lists_tests import ControlledListTests
+        from arches.controlledlists.tests.view_tests import ListTests
 
-        return ControlledListTests.setUpTestData()
+        return ListTests.setUpTestData()
 
     def test_export_controlled_list(self):
-        file_path = os.path.join(settings.TEST_ROOT, "controlled_lists.xlsx")
+        file_path = os.path.join(TEST_ROOT, "controlled_lists.xlsx")
         self.addCleanup(os.remove, file_path)
         output = io.StringIO()
         # packages command does not yet fully avoid print()
@@ -30,18 +35,16 @@ class ControlledListsExportTests(ArchesTestCase):
             management.call_command(
                 "packages",
                 operation="export_controlled_lists",
-                dest_dir=settings.TEST_ROOT,
+                dest_dir=TEST_ROOT,
                 stdout=output,
             )
         self.assertTrue(os.path.exists(file_path))
 
 
-class ControlledListsImportTests(ArchesTestCase):
+class ListImportPacakgeTests(TestCase):
 
     def test_import_controlled_list(self):
-        input_file = os.path.join(
-            settings.TEST_ROOT, "fixtures/data/controlled_lists.xlsx"
-        )
+        input_file = os.path.join(TEST_ROOT, "data/controlled_lists.xlsx")
         output = io.StringIO()
         # packages command does not yet fully avoid print()
         with captured_stdout():
@@ -52,6 +55,6 @@ class ControlledListsImportTests(ArchesTestCase):
                 stdout=output,
             )
         list_pk = "e962bdaf-8243-4fbb-bd43-39bc1f54c168"
-        self.assertTrue(ControlledList.objects.filter(pk=list_pk).exists())
+        self.assertTrue(List.objects.filter(pk=list_pk).exists())
 
     ### TODO Add test for creating new language if language code not in db but found in import file
