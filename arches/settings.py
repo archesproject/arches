@@ -872,4 +872,5 @@ if __name__ == "__main__":
         public_server_address=PUBLIC_SERVER_ADDRESS,
         static_url=STATIC_URL,
         webpack_development_server_port=WEBPACK_DEVELOPMENT_SERVER_PORT,
+        arches_applications=ARCHES_APPLICATIONS,
     )
