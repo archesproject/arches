@@ -8,7 +8,7 @@
   <skos:Concept rdf:about="http://www.archesproject.org/3bcf52dc-f8c8-4cb3-9240-44abb7d11c94">
     <skos:inScheme>
       <skos:ConceptScheme rdf:about="http://www.archesproject.org/00000000-0000-0000-0000-000000000001">
-        <dcterms:title xml:lang="en-US">{"id": "d8c60bf4-e786-11e6-905a-b756ec83dad5", "value": "Arches"}</dcterms:title>
+        <dcterms:title xml:lang="en">{"id": "d8c60bf4-e786-11e6-905a-b756ec83dad5", "value": "Arches"}</dcterms:title>
         <skos:hasTopConcept rdf:resource="http://www.archesproject.org/00000000-0000-0000-0000-000000000004"/>
         <skos:hasTopConcept rdf:resource="http://www.archesproject.org/f4e53194-33b8-4833-b397-a31d7dcbfbbe"/>
         <skos:hasTopConcept rdf:resource="http://www.archesproject.org/121b23b4-9e6b-458e-90b1-40f2f9ba80b7"/>

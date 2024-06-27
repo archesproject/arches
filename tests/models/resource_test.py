@@ -103,7 +103,7 @@ class ResourceTests(ArchesTestCase):
                     "values": [
                         {
                             "value": "Mock concept",
-                            "language": "en-US",
+                            "language": "en",
                             "category": "label",
                             "type": "prefLabel",
                             "id": "",
@@ -111,7 +111,7 @@ class ResourceTests(ArchesTestCase):
                         },
                         {
                             "value": "1950",
-                            "language": "en-US",
+                            "language": "en",
                             "category": "note",
                             "type": "min_year",
                             "id": "",
@@ -119,7 +119,7 @@ class ResourceTests(ArchesTestCase):
                         },
                         {
                             "value": "1980",
-                            "language": "en-US",
+                            "language": "en",
                             "category": "note",
                             "type": "max_year",
                             "id": "",
