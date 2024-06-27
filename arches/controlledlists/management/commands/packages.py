@@ -115,10 +115,7 @@ class Command(PackagesCommand):
                     setattr(instance, field_name, value)
 
             # run validation on all non-parent fields & gather for bulk create
-            try:
-                instance.clean_fields(exclude={"parent"})
-            except:
-                breakpoint()
+            instance.clean_fields(exclude={"parent"})
             instances.append(instance)
             instance_pks.append(instance.pk)
 
