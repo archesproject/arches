@@ -21,4 +21,4 @@ class ExtensionType(Enum):
     ETL_MODULES = "etl_modules"
     FUNCTIONS = "functions"
     SEARCH_COMPONENTS = "search_components"
-    PERMISSIONS_FRAMEWORKS = "permissions"
+    PERMISSIONS_FRAMEWORKS = "permissions_frameworks"

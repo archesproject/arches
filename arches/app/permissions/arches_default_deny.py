@@ -76,21 +76,21 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
 
     def get_index_values(self, resource: Resource):
         permissions = {}
-        read_allowances = [
+        group_read_allowances = [
             group.id
             for group in self.get_groups_for_object("view_resourceinstance", resource)
         ]
-        permissions["groups_read"] = read_allowances
-        edit_allowances = [
+        permissions["groups_read"] = group_read_allowances
+        group_edit_allowances = [
             group.id
             for group in self.get_groups_for_object("change_resourceinstance", resource)
         ]
-        permissions["groups_edit"] = edit_allowances
-        users_allowances = [
+        permissions["groups_edit"] = group_edit_allowances
+        users_read_allowances = [
             user.id
             for user in self.get_users_for_object("view_resourceinstance", resource)
         ]
-        permissions["users_read"] = users_allowances
+        permissions["users_read"] = users_read_allowances
         users_edit_allowances = [
             user.id
             for user in self.get_users_for_object("change_resourceinstance", resource)

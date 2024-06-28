@@ -62,8 +62,6 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 
 logger = logging.getLogger(__name__)
 
-resource_indexed = django.dispatch.Signal()
-
 
 class Resource(models.ResourceInstance):
     class Meta:
@@ -470,6 +468,7 @@ class Resource(models.ResourceInstance):
                         )
                         es_index.index_document(document=doc, id=doc_id)
 
+            resource_indexed = django.dispatch.Signal()
             resource_indexed.send(sender=self.__class__, instance=self)
 
     def get_documents_to_index(
