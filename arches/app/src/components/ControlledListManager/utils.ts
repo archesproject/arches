@@ -211,3 +211,19 @@ export const reorderItems = (
 
     recalculateSortOrderRecursive(list, list.items);
 };
+
+export const vFocus = {
+    /*
+    The editor (pencil) button from the DataTable hogs focus with a
+    setTimeout of 1, so we'll queue behind it to set focus to the input.
+    This should be reported/clarified with PrimeVue with a MWE.
+    */
+    mounted: (el: HTMLInputElement) => {
+        // @ts-expect-error focusVisible not yet in typeshed
+        setTimeout(() => el && el.focus({ focusVisible: true }), 5);
+    },
+    updated: (el: HTMLInputElement) => {
+        // @ts-expect-error focusVisible not yet in typeshed
+        setTimeout(() => el && el.focus({ focusVisible: true }), 5);
+    },
+};
