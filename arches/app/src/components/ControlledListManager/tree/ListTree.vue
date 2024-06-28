@@ -38,7 +38,7 @@ const moveLabels = Object.freeze({
 const tree: Ref<TreeNode[]> = ref([]);
 const selectedKeys: Ref<TreeSelectionKeys> = ref({});
 const expandedKeys: Ref<TreeExpandedKeys> = ref({});
-const movingItem: Ref<TreeNode> = ref({});
+const movingItem: Ref<TreeNode | undefined> = ref();
 const isMultiSelecting = ref(false);
 const refetcher = ref(0);
 const filterValue = ref("");
@@ -204,7 +204,7 @@ const filterCallbackWrapped = computed(() => {
             },
             container: { style: { fontSize: '1.4rem' } },
             content: ({ instance }) => {
-                if (instance.$el && instance.node.key === movingItem.key) {
+                if (instance.$el && instance.node.key === movingItem?.key) {
                     instance.$el.classList.add('is-adjusting-parent');
                 }
                 return { style: { height: '4rem' } };

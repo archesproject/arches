@@ -170,7 +170,7 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
 
 <template>
     <Button
-        v-if="selectedKeys && node.key! in selectedKeys"
+        v-if="selectedKeys && node.key in selectedKeys"
         v-tooltip="moveLabels.addChild"
         type="button"
         raised
@@ -184,7 +184,7 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
         class="move-buttons"
     >
         <Button
-            v-if="selectedKeys && node.key! in selectedKeys"
+            v-if="selectedKeys && node.key in selectedKeys"
             v-tooltip="moveLabels.moveUp"
             type="button"
             raised
@@ -195,7 +195,7 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
             @click="reorder(node.data, true)"
         />
         <Button
-            v-if="selectedKeys && node.key! in selectedKeys"
+            v-if="selectedKeys && node.key in selectedKeys"
             v-tooltip="moveLabels.moveDown"
             type="button"
             raised
@@ -206,7 +206,7 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
             @click="reorder(node.data, false)"
         />
         <Button
-            v-if="!node.data.name && selectedKeys && node.key! in selectedKeys"
+            v-if="!node.data.name && selectedKeys && node.key in selectedKeys"
             v-tooltip="moveLabels.changeParent"
             type="button"
             raised
