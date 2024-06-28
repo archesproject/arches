@@ -21,7 +21,6 @@ import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/types/arches";
 import type {
-    ControlledListItem,
     DisplayedRowRefAndSetter,
     NewControlledList,
     NewControlledListItem,
@@ -55,46 +54,14 @@ const rerenderTree = ref(0);
 const nextFilterChangeNeedsExpandAll = ref(false);
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
-const { displayedRow, setDisplayedRow } = inject(
-    displayedRowKey,
-) as DisplayedRowRefAndSetter;
-
-const collapseNodesRecursive = (node: TreeNode) => {
-    if (node.children && node.children.length) {
-        expandedKeys.value = {
-            ...expandedKeys.value,
-            [node.key as string]: false,
-        };
-        for (const child of node.children) {
-            collapseNodesRecursive(child);
-        }
-    }
-};
+const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 
 const updateSelectedAndExpanded = (node: TreeNode) => {
-    let priorListId;
-    if (displayedRow.value) {
-        priorListId =
-            (displayedRow.value as ControlledListItem).controlled_list_id ??
-            displayedRow.value.id;
-    }
-
     setDisplayedRow(node.data);
     expandedKeys.value = {
         ...expandedKeys.value,
         [node.key as string]: true,
     };
-    if (nodeIsList(node)) {
-        tree.value
-            .filter((list) => list.data.id !== node.data.id)
-            .forEach((list) => collapseNodesRecursive(list));
-    } else if (
-        (node.data as ControlledListItem).controlled_list_id !== priorListId
-    ) {
-        tree.value
-            .filter((list) => list.data.id !== node.data.controlled_list_id)
-            .forEach((list) => collapseNodesRecursive(list));
-    }
 };
 
 const expandAll = () => {
