@@ -654,7 +654,7 @@ class Resource(models.ResourceInstance):
                     try:
                         creator_id = int(creator_id)
                     except ValueError:
-                        creator_id = ""
+                        pass
                     if creator_id == user.id:
                         permit_deletion = True
             else:
