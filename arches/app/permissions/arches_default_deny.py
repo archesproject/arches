@@ -14,17 +14,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from __future__ import annotations
-
 from arches.app.models.resource import Resource
-from arches.app.search.components.resource_type_filter import get_permitted_graphids
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from arches.app.models.models import ResourceInstance
 
 from arches.app.permissions.arches_standard import (
     ArchesStandardPermissionFramework,
     ResourceInstancePermissions,
 )
-from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Query, Terms
+from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Terms
 
 
 class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):

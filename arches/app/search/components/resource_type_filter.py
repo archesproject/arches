@@ -2,7 +2,7 @@ from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Terms
 from arches.app.search.components.base import BaseSearchFilter
-from arches.app.models.models import Node
+from arches.app.models.models import GraphModel, Node
 from arches.app.utils.permission_backend import get_resource_types_by_perm
 
 details = {
@@ -58,7 +58,7 @@ class ResourceTypeFilter(BaseSearchFilter):
     def view_data(self):
         return {
             "resources": list(
-                Graph.objects.filter(
+                GraphModel.objects.filter(
                     graphid__in=get_resource_types_by_perm(
                         self.request.user, "read_nodegroup"
                     )

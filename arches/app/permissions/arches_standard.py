@@ -23,6 +23,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User, Group
 from django.contrib.gis.db.models import Model
 from django.core.cache import caches
+from django.db.models import Count
 from guardian.backends import check_support, ObjectPermissionBackend
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import (
@@ -68,6 +69,8 @@ if sys.version_info >= (3, 11):
 
 else:
     ResourceInstancePermissions = dict
+
+from datetime import datetime
 
 
 class ArchesStandardPermissionFramework(PermissionFramework):
@@ -508,17 +511,21 @@ class ArchesStandardPermissionFramework(PermissionFramework):
     def get_resource_types_by_perm(
         self, user: User, perms: str | Iterable[str]
     ) -> list[str]:
-        graphs = set()
+        graphs = list()
+
         nodegroups = self.get_nodegroups_by_perm(user, perms)
-        for node in Node.objects.filter(nodegroup__in=nodegroups).select_related(
-            "graph"
-        ):
-            if (
-                node.graph.isresource
-                and str(node.graph_id) != settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
-            ):
-                graphs.add(str(node.graph.pk))
-        return list(graphs)
+        graphs = (
+            Node.objects.values("graph_id")
+            .annotate(graph_count=Count("graph_id"))
+            .filter(
+                Q(nodegroup__in=nodegroups)
+                & ~Q(graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+                & Q(graph__isresource=True)
+            )
+            .values_list("graph_id")
+        )
+
+        return list(str(graph[0]) for graph in graphs)
 
     def user_can_edit_resource(self, user: User, resourceid: str | None = None) -> bool:
         """
