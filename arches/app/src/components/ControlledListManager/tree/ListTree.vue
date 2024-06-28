@@ -52,6 +52,7 @@ const newListFormValue = ref("");
 const nextNewList = ref<NewControlledList>();
 const rerenderTree = ref(0);
 const nextFilterChangeNeedsExpandAll = ref(false);
+const expandedKeysSnapshotBeforeSearch = ref<TreeExpandedKeys>({});
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
@@ -85,6 +86,8 @@ const expandNode = (node: TreeNode, newExpandedKeys: TreeExpandedKeys) => {
 const expandPathsToFilterResults = (newFilterValue: string) => {
     // https://github.com/primefaces/primevue/issues/3996
     if (filterValue.value && !newFilterValue) {
+        expandedKeys.value = { ...expandedKeysSnapshotBeforeSearch.value };
+        expandedKeysSnapshotBeforeSearch.value = {};
         // Rerender to avoid error emitted in PrimeVue tree re: aria-selected.
         rerenderTree.value += 1;
     }
@@ -95,6 +98,7 @@ const expandPathsToFilterResults = (newFilterValue: string) => {
         (nextFilterChangeNeedsExpandAll.value &&
             filterValue.value !== newFilterValue)
     ) {
+        expandedKeysSnapshotBeforeSearch.value = { ...expandedKeys.value };
         expandAll();
     }
     nextFilterChangeNeedsExpandAll.value = false;
