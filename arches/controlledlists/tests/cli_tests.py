@@ -18,7 +18,7 @@ TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "controlledlists/tests"))
 # python manage.py test arches.controlledlists.tests.cli_tests --settings="tests.test_settings"
 
 
-class ListExportPacakgeTests(TestCase):
+class ListExportPackageTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
@@ -41,7 +41,7 @@ class ListExportPacakgeTests(TestCase):
         self.assertTrue(os.path.exists(file_path))
 
 
-class ListImportPacakgeTests(TestCase):
+class ListImportPackageTests(TestCase):
 
     def test_import_controlled_list(self):
         input_file = os.path.join(TEST_ROOT, "data/controlled_lists.xlsx")
