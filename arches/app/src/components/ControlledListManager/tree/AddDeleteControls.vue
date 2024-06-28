@@ -41,7 +41,7 @@ const { displayedRow, setDisplayedRow } = inject(
 ) as DisplayedRowRefAndSetter;
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
-const controlledListItemsTree = defineModel<TreeNode[]>({ required: true });
+const tree = defineModel<TreeNode[]>({ required: true });
 const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
     required: true,
 });
@@ -109,9 +109,7 @@ const createList = () => {
     newListFormValue.value = "";
     newListCounter.value += 1;
 
-    controlledListItemsTree.value.push(
-        listAsNode(newList, selectedLanguage.value),
-    );
+    tree.value.push(listAsNode(newList, selectedLanguage.value));
 
     selectedKeys.value = { [newList.id]: true };
     setDisplayedRow(newList);
@@ -135,9 +133,7 @@ const deleteSelected = async () => {
     if (!selectedKeys.value) {
         return;
     }
-    const allListIds = controlledListItemsTree.value.map(
-        (node) => node.data.id,
-    );
+    const allListIds = tree.value.map((node) => node.data.id);
 
     const listIdsToDelete = toDelete.value.filter((id) =>
         allListIds.includes(id),
@@ -211,12 +207,24 @@ const confirmDelete = () => {
 };
 
 const fetchListsAndPopulateTree = async () => {
+    /*
+    Currently, rather than inspecting the results of the batched
+    delete requests, we just refetch everything. This requires being
+    a little clever about resorting the ordered response from the API
+    to preserve the existing sort (and avoid confusion).
+    */
+    const priorSortedListIds = tree.value.map((node) => node.key);
+
     await fetchLists()
         .then(
             ({ controlled_lists }: { controlled_lists: ControlledList[] }) => {
-                controlledListItemsTree.value = controlled_lists.map((list) =>
-                    listAsNode(list, selectedLanguage.value),
-                );
+                tree.value = controlled_lists
+                    .map((list) => listAsNode(list, selectedLanguage.value))
+                    .sort(
+                        (a, b) =>
+                            priorSortedListIds.indexOf(a.key) -
+                            priorSortedListIds.indexOf(b.key),
+                    );
             },
         )
         .catch((error: Error) => {

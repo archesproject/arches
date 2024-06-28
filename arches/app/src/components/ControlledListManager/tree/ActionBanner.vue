@@ -15,7 +15,7 @@ import type { Language } from "@/types/arches";
 const isMultiSelecting = defineModel<boolean>("isMultiSelecting", {
     required: true,
 });
-const movingItem = defineModel<TreeNode>("movingItem", { required: true });
+const movingItem = defineModel<TreeNode>("movingItem");
 const rerenderTree = defineModel<number>("rerenderTree", { required: true });
 const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
     required: true,
@@ -28,7 +28,7 @@ const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 const { $gettext } = useGettext();
 
 const abandonMove = () => {
-    movingItem.value = {};
+    movingItem.value = undefined;
     // Clear custom classes added in <Tree> pass-through
     rerenderTree.value += 1;
 };
@@ -36,7 +36,7 @@ const abandonMove = () => {
 
 <template>
     <div
-        v-if="movingItem.key"
+        v-if="movingItem"
         class="action-banner"
     >
         <!-- turn off escaping: vue template sanitizes -->

@@ -15,7 +15,7 @@ const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", {
 const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
     required: true,
 });
-const movingItem = defineModel<TreeNode>("movingItem", { required: true });
+const movingItem = defineModel<TreeNode>("movingItem");
 const isMultiSelecting = defineModel<boolean>("isMultiSelecting", {
     required: true,
 });
@@ -56,7 +56,7 @@ const expandNode = (node: TreeNode) => {
         />
     </div>
     <ActionBanner
-        v-if="movingItem.key || isMultiSelecting"
+        v-if="movingItem || isMultiSelecting"
         v-model:is-multi-selecting="isMultiSelecting"
         v-model:moving-item="movingItem"
         v-model:rerender-tree="rerenderTree"

@@ -68,6 +68,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
             :file-limit="10"
             :preview-width="250"
             :with-credentials="true"
+            :show-cancel-button="false"
             :show-upload-button="false"
             name="item_image"
             :pt="{
