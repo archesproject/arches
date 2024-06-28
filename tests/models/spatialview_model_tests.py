@@ -337,11 +337,6 @@ class SpatialViewTriggerTests(TransactionTestCase):
             rows = cursor.fetchall()
             self.assertTrue(len(rows) == 1)
             row = rows[0]
-            
-            print(10*"-")
-            print(row)
-            print(10*"-")
-
             self.assertTrue(row[5] == "ABC123") # gridref
             self.assertTrue(row[6] == "Bat Willow") # name
             self.assertTrue(row[7] == "2024-05-10") # date
