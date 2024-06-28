@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import arches from "arches";
 import { inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
@@ -101,7 +100,7 @@ const addItem = (parent: TreeNode) => {
             {
                 id: 0,
                 valuetype_id: PREF_LABEL,
-                language_id: arches.activeLanguage,
+                language_id: selectedLanguage.value.code,
                 value: "",
                 item_id: newLabelCounter.value,
             },
