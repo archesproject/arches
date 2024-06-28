@@ -64,11 +64,13 @@ runs:
           npm run build_test
       shell: bash
 
-    - name: Check formatting
+    - name: Check frontend formatting with prettier
       run: |
         npm run prettier:check
+
+    - name: Check backend formatting with black
+      run: |
         black . --check --exclude=node_modules
-      shell: bash
 
     - name: Run frontend tests
       run: |
