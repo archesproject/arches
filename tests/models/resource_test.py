@@ -374,6 +374,8 @@ class ResourceTests(ArchesTestCase):
             self.assertTrue(result)
 
         with self.subTest(user="can't delete"):
+            test_resource = Resource(graph_id=self.search_model_graphid)
+            test_resource.save(user=user)
             edit_log_entry = models.EditLog.objects.get(
                 resourceinstanceid=test_resource.pk, edittype="create"
             )
