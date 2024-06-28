@@ -2091,11 +2091,15 @@ class SpatialView(models.Model):
         ],
         unique=True,
     )
-    description = models.TextField(default="arches spatial view")  # provide a description of the spatial view
+    description = models.TextField(
+        default="arches spatial view"
+    )  # provide a description of the spatial view
     geometrynode = models.ForeignKey(
-		Node, on_delete=models.CASCADE, db_column="geometrynodeid", 
-		limit_choices_to={'datatype': 'geojson-feature-collection'}
-	)
+        Node,
+        on_delete=models.CASCADE,
+        db_column="geometrynodeid",
+        limit_choices_to={"datatype": "geojson-feature-collection"},
+    )
     ismixedgeometrytypes = models.BooleanField(default=False)
     language = models.ForeignKey(
         Language, db_column="languageid", to_field="code", on_delete=models.CASCADE
@@ -2118,34 +2122,49 @@ class SpatialView(models.Model):
         """
         if self.geometrynode:
             if self.geometrynode.datatype != "geojson-feature-collection":
-                raise ValidationError("Geometry node must be of type geojson-feature-collection")
+                raise ValidationError(
+                    "Geometry node must be of type geojson-feature-collection"
+                )
             else:
                 graph = self.geometrynode.graph
                 if not self.attributenodes or len(self.attributenodes) == 0:
-                    raise ValidationError("Attribute nodes must have at least one entry")
+                    raise ValidationError(
+                        "Attribute nodes must have at least one entry"
+                    )
                 else:
                     for node in self.attributenodes:
-                        if not Node.objects.filter(pk=node["nodeid"], graph=graph).exists():
-                            raise ValidationError(f"Attribute nodes must belong to the same graph as the geometry node (error nodeid:{str(node.id)})")
-                
+                        if not Node.objects.filter(
+                            pk=node["nodeid"], graph=graph
+                        ).exists():
+                            raise ValidationError(
+                                f"Attribute nodes must belong to the same graph as the geometry node (error nodeid:{str(node.id)})"
+                            )
+
                 # language must be be a valid language code beloging to the current publication
-                published_graphs = PublishedGraph.objects.filter(publication=graph.publication)
-                if self.language not in [published_graph.language for published_graph in published_graphs]:
-                    raise ValidationError("Language must belong to a published graph for the graph of the geometry node")
-                
+                published_graphs = PublishedGraph.objects.filter(
+                    publication=graph.publication
+                )
+                if self.language not in [
+                    published_graph.language for published_graph in published_graphs
+                ]:
+                    raise ValidationError(
+                        "Language must belong to a published graph for the graph of the geometry node"
+                    )
+
                 # validate the slug
                 if not re.match(r"^[a-zA-Z_]([a-zA-Z0-9_]+)$", self.slug):
-                    raise ValidationError("Slug must contain only letters, numbers and hyphens, but not begin with a number.")
-                
+                    raise ValidationError(
+                        "Slug must contain only letters, numbers and hyphens, but not begin with a number."
+                    )
+
                 # validate the schema is a valid schema in the database
                 with connection.cursor() as cursor:
-                    cursor.execute(f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{self.schema}'")
+                    cursor.execute(
+                        f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{self.schema}'"
+                    )
                     if cursor.rowcount == 0:
                         raise ValidationError("Schema does not exist in the database")
         else:
             raise ValidationError("Geometry node must be set")
-        
+
         super(SpatialView, self).save(*args, **kwargs)
-
-
-

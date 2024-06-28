@@ -7,24 +7,35 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '10798_jsonld_importer'),
+        ("models", "10798_jsonld_importer"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='spatialview',
-            old_name='geometrynodeid',
-            new_name='geometrynode',
+            model_name="spatialview",
+            old_name="geometrynodeid",
+            new_name="geometrynode",
         ),
         migrations.AlterField(
-            model_name='spatialview',
-            name='geometrynode',
-            field=models.ForeignKey(db_column='geometrynodeid', limit_choices_to={'datatype': 'geojson-feature-collection'}, on_delete=django.db.models.deletion.CASCADE, to='models.node'),
+            model_name="spatialview",
+            name="geometrynode",
+            field=models.ForeignKey(
+                db_column="geometrynodeid",
+                limit_choices_to={"datatype": "geojson-feature-collection"},
+                on_delete=django.db.models.deletion.CASCADE,
+                to="models.node",
+            ),
         ),
         migrations.AddField(
-            model_name='spatialview',
-            name='language',
-            field=models.ForeignKey(db_column='languageid', default='en', on_delete=django.db.models.deletion.CASCADE, to='models.language', to_field='code'),
+            model_name="spatialview",
+            name="language",
+            field=models.ForeignKey(
+                db_column="languageid",
+                default="en",
+                on_delete=django.db.models.deletion.CASCADE,
+                to="models.language",
+                to_field="code",
+            ),
             preserve_default=False,
         ),
     ]
