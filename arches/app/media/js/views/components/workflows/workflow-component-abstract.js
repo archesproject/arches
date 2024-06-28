@@ -533,7 +533,16 @@ define([
             /* force the value of current tile data observables */ 
             Object.keys(tile.data).forEach(function(key) {
                 if (ko.isObservable(tile.data[key])) {
-                    tile.data[key](data.data[key]());
+                    if (ko.isObservable(data.data[key])) {
+                        tile.data[key](data.data[key]());
+                    }
+                    else{
+                        var dataNotObservable = ko.observable(ko.mapping.toJS(data.data[key]));
+                        tile.data[key](dataNotObservable());
+                    }
+
+
+
                 }
             });
         };
