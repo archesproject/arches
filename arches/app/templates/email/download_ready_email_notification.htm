@@ -19,18 +19,13 @@
                 </a>
             </div>
             <!-- /ko -->
-    
-            {% if link != "" %}
+        {% endif %}
+
+        {% if link != "" %}
             <a class="btn" href="{{email_link}}"><button
                     class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'><span>{{button_text}}</span></button></a>    
-            {% endif %}
         {% endif %}
-        {% if not files %}
-            {% if link != "" %}
-                <a class="btn" href="{{email_link}}"><button
-                        class='btn btn-notifs-download btn-labeled btn-sm fa fa-download'><span>{{button_text}}</span></button></a>    
-            {% endif %}
-        {% endif %}
+
         <p>{{closing}}</p>
 
         {% include 'custom_email_footer.htm' %}
