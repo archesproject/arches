@@ -40,6 +40,8 @@ class SpatialViewTests(ArchesTestCase):
     def setUpClass(self):
         super().setUpClass()
 
+        LanguageSynchronizer.synchronize_settings_with_db()
+
         spatialviews_other_test_model_path = os.path.join(
             test_settings.TEST_ROOT, "fixtures", "resource_graphs", "SpatialViews_Other_Model.json"
         )
@@ -64,7 +66,8 @@ class SpatialViewTests(ArchesTestCase):
         with connection.cursor() as cursor:
             cursor.execute("INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (%s, '00000000-0000-0000-0000-000000000007', 'prefLabel', '(en) is related to', 'en');", [self.extra_concept_value_id])
         self.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
-    
+
+        
     @classmethod
     def tearDownClass(self):
         # delete extra concept value
@@ -92,7 +95,8 @@ class SpatialViewTests(ArchesTestCase):
         return view_count
     
     def get_language_instance(self, language):
-        return models.Language.objects.get(code=language)
+        l, created = models.Language.objects.get_or_create(code=language)
+        return l
 
     def generate_valid_spatiatview(self):
         spatialview = SpatialView()
@@ -333,10 +337,15 @@ class SpatialViewTriggerTests(TransactionTestCase):
             rows = cursor.fetchall()
             self.assertTrue(len(rows) == 1)
             row = rows[0]
+            
+            print(10*"-")
+            print(row)
+            print(10*"-")
+
             self.assertTrue(row[5] == "ABC123") # gridref
             self.assertTrue(row[6] == "Bat Willow") # name
             self.assertTrue(row[7] == "2024-05-10") # date
-            self.assertTrue(row[8] == "(en) is related to") # concept_list
+            self.assertTrue(row[8] == "is related to") # concept_list
             self.assertTrue(row[9] == "true") # bool (disabled as boolean node)
             self.assertTrue(row[10] == "non-local") # non_local_string
             self.assertTrue(row[11] == "2010") # edtf_date
@@ -344,7 +353,7 @@ class SpatialViewTriggerTests(TransactionTestCase):
             self.assertTrue(row[13] == "https://www.cnbc.com")  # url
             self.assertTrue(row[14] == "1") # domain
             self.assertTrue(row[15] == "Arches Project, elastic.png") # file
-            self.assertTrue(row[16] == "(en) is related to") # concept
+            self.assertTrue(row[16] == "is related to") # concept
             self.assertTrue(row[17] == "george, john, ringo, Paul") # domain_list
             self.assertTrue(row[18] == "Bat Willow") # other_spatialviews
             self.assertTrue(row[19] == "Other Model 2") # other_models_list
