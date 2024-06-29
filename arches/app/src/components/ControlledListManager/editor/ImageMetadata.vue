@@ -70,7 +70,7 @@ const saveMetadata = async (event: DataTableRowEditInitEvent) => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Metadata save failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
         if (normalizedNewData.id === null) {
             removeImageMetadata(event.newData);
@@ -95,7 +95,7 @@ const issueDeleteMetadata = async (
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Metadata deletion failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
     }
 };
@@ -170,18 +170,20 @@ const inputSelector = computed(() => {
 });
 
 const focusInput = () => {
-    // The editor (pencil) button immediately hogs focus with a setTimeout of 1,
+    // The editor (pencil) button from the DataTable (elsewhere on page)
+    // immediately hogs focus with a setTimeout of 1,
     // so we'll get in line behind it to set focus to the input.
+    // This should be reported/clarified with PrimeVue with a MWE.
     setTimeout(() => {
         if (rowIndexToFocus.value !== -1) {
             const editorDiv = editorRef.value;
             const rowEl = editorDiv!.querySelector(inputSelector.value);
             const inputEl = rowEl!.children[1].children[0];
             // @ts-expect-error focusVisible not yet in typeshed
-            inputEl.focus({ focusVisible: true });
+            (inputEl as HTMLInputElement).focus({ focusVisible: true });
         }
         rowIndexToFocus.value = -1;
-    }, 2);
+    }, 5);
 };
 </script>
 
@@ -284,8 +286,29 @@ const focusInput = () => {
             <Column
                 :row-editor="true"
                 style="width: 5%; min-width: 6rem; text-align: center"
+                :pt="{
+                    headerCell: { ariaLabel: $gettext('Row edit controls') },
+                    rowEditorInitButton: {
+                        class: 'fa fa-pencil',
+                        style: { display: 'inline-flex' },
+                    },
+                    rowEditorInitIcon: { style: { display: 'none' } },
+                    rowEditorSaveButton: {
+                        class: 'fa fa-check',
+                        style: { display: 'inline-flex' },
+                    },
+                    rowEditorSaveIcon: { style: { display: 'none' } },
+                    rowEditorCancelButton: {
+                        class: 'fa fa-undo',
+                        style: { display: 'inline-flex' },
+                    },
+                    rowEditorCancelIcon: { style: { display: 'none' } },
+                }"
             />
-            <Column style="width: 5%; text-align: center">
+            <Column
+                style="width: 5%; text-align: center"
+                :pt="{ headerCell: { ariaLabel: $gettext('Delete controls') } }"
+            >
                 <template #body="slotProps">
                     <i
                         class="fa fa-trash"
@@ -293,7 +316,7 @@ const focusInput = () => {
                         tabindex="0"
                         :aria-label="$gettext('Delete')"
                         @click="issueDeleteMetadata(slotProps.data)"
-                        @key.enter="issueDeleteMetadata(slotProps.data)"
+                        @keyup.enter="issueDeleteMetadata(slotProps.data)"
                     />
                 </template>
             </Column>

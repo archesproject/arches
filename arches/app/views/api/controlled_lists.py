@@ -111,7 +111,15 @@ class ControlledListView(View):
 
         return JSONResponse(serialized)
 
-    def add_new_list(self, name):
+    def post(self, request, **kwargs):
+        data = JSONDeserializer().deserialize(request.body)
+
+        # Update
+        if "id" in kwargs:
+            raise NotImplementedError
+
+        # Insert
+        name = data.get("name", None)
         lst = ControlledList(name=name)
         try:
             lst.full_clean()  # applies default name
@@ -121,14 +129,6 @@ class ControlledListView(View):
             )
         lst.save()
         return JSONResponse(lst.serialize(), status=HTTPStatus.CREATED)
-
-    def post(self, request, **kwargs):
-        data = JSONDeserializer().deserialize(request.body)
-        name = data.get("name", None)
-        if "id" not in kwargs:
-            return self.add_new_list(name)
-
-        raise NotImplementedError
 
     def patch(self, request, **kwargs):
         list_id: UUID = kwargs.get("id")
@@ -190,20 +190,16 @@ class ControlledListView(View):
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ControlledListItemView(View):
-    def add_new_item(self, request):
+    def post(self, request, **kwargs):
         data = JSONDeserializer().deserialize(request.body)
-        parent_id = data["parent_id"]
 
-        # The front end shows lists and items in the same tree, and when
-        # sending the parent id to the endpoint, it doesn't really know
-        # if the parent is a list or an item. The backend does care whether
-        # the parent is a list or an item, so we figure it out here.
-        try:
-            controlled_list_id = ControlledListItem.objects.get(
-                pk=parent_id
-            ).controlled_list_id
-        except ControlledListItem.DoesNotExist:
-            controlled_list_id = parent_id
+        # Update
+        if "id" in kwargs:
+            raise NotImplementedError
+
+        # Insert
+        parent_id = data["parent_id"]
+        controlled_list_id = data["controlled_list_id"]
 
         try:
             with transaction.atomic():
@@ -219,18 +215,12 @@ class ControlledListItemView(View):
                 item = ControlledListItem.objects.create(
                     controlled_list=controlled_list,
                     sortorder=controlled_list.max_sortorder + 1,
-                    parent_id=None if controlled_list_id == parent_id else parent_id,
+                    parent_id=parent_id,
                 )
         except ControlledList.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
         return JSONResponse(item.serialize(), status=HTTPStatus.CREATED)
-
-    def post(self, request, **kwargs):
-        if "id" not in kwargs:
-            return self.add_new_item(request)
-
-        raise NotImplementedError
 
     def patch(self, request, **kwargs):
         item_id: UUID = kwargs.get("id")
@@ -273,31 +263,28 @@ class ControlledListItemView(View):
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ControlledListItemValueView(View):
-    def add_new_value(self, request):
-        data = JSONDeserializer().deserialize(request.body)
-
-        value = ControlledListItemValue(
-            controlled_list_item_id=UUID(data["item_id"]),
-            valuetype_id=data["valuetype_id"],
-            language_id=data["language_id"],
-            value=data["value"],
-        )
-        try:
-            value.full_clean()
-        except ValidationError as ve:
-            return JSONErrorResponse(
-                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
-            )
-        value.save()
-
-        return JSONResponse(value.serialize(), status=HTTPStatus.CREATED)
-
     def post(self, request, **kwargs):
-        if not (value_id := kwargs.get("id", None)):
-            return self.add_new_value(request)
-
         data = JSONDeserializer().deserialize(request.body)
 
+        # Insert
+        if not (value_id := kwargs.get("id", None)):
+            value = ControlledListItemValue(
+                controlled_list_item_id=UUID(data["item_id"]),
+                valuetype_id=data["valuetype_id"],
+                language_id=data["language_id"],
+                value=data["value"],
+            )
+            try:
+                value.full_clean()
+            except ValidationError as ve:
+                return JSONErrorResponse(
+                    message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+                )
+            value.save()
+
+            return JSONResponse(value.serialize(), status=HTTPStatus.CREATED)
+
+        # Update
         try:
             value = ControlledListItemValue.objects.values_without_images().get(
                 pk=value_id
@@ -344,25 +331,25 @@ class ControlledListItemValueView(View):
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ControlledListItemImageView(View):
-    def add_new_image(self, request):
-        uploaded_file = request.FILES["item_image"]
-        img = ControlledListItemImage(
-            controlled_list_item_id=UUID(request.POST["item_id"]),
-            valuetype_id="image",
-            value=uploaded_file,
-        )
-        try:
-            img.full_clean()
-        except ValidationError as ve:
-            return JSONErrorResponse(
-                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
-            )
-        img.save()
-        return JSONResponse(img.serialize(), status=HTTPStatus.CREATED)
-
     def post(self, request, **kwargs):
+        # Insert
         if not (image_id := kwargs.get("id", None)):
-            return self.add_new_image(request)
+            uploaded_file = request.FILES["item_image"]
+            img = ControlledListItemImage(
+                controlled_list_item_id=UUID(request.POST["item_id"]),
+                valuetype_id="image",
+                value=uploaded_file,
+            )
+            try:
+                img.full_clean()
+            except ValidationError as ve:
+                return JSONErrorResponse(
+                    message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+                )
+            img.save()
+            return JSONResponse(img.serialize(), status=HTTPStatus.CREATED)
+
+        # Update
         raise NotImplementedError
 
     def delete(self, request, **kwargs):
@@ -377,26 +364,23 @@ class ControlledListItemImageView(View):
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ControlledListItemImageMetadataView(View):
-    def add_new_metadata(self, request):
-        data = JSONDeserializer().deserialize(request.body)
-        data.pop("metadata_label", None)
-        metadata = ControlledListItemImageMetadata(**data)
-        try:
-            metadata.full_clean()
-        except ValidationError as ve:
-            return JSONErrorResponse(
-                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
-            )
-        metadata.save()
-
-        return JSONResponse(metadata.serialize(), status=HTTPStatus.CREATED)
-
     def post(self, request, **kwargs):
-        if not (metadata_id := kwargs.get("id", None)):
-            return self.add_new_metadata(request)
-
         data = JSONDeserializer().deserialize(request.body)
 
+        # Insert
+        if not (metadata_id := kwargs.get("id", None)):
+            data.pop("metadata_label", None)
+            metadata = ControlledListItemImageMetadata(**data)
+            try:
+                metadata.full_clean()
+            except ValidationError as ve:
+                return JSONErrorResponse(
+                    message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+                )
+            metadata.save()
+            return JSONResponse(metadata.serialize(), status=HTTPStatus.CREATED)
+
+        # Update
         try:
             metadata = ControlledListItemImageMetadata.objects.get(pk=metadata_id)
         except ControlledListItemImageMetadata.DoesNotExist:

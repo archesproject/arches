@@ -11,6 +11,7 @@ import {
     ERROR,
     displayedRowKey,
 } from "@/components/ControlledListManager/constants.ts";
+import { vFocus } from "@/components/ControlledListManager/utils.ts";
 
 import type { DisplayedListRefAndSetter } from "@/types/ControlledListManager";
 
@@ -54,7 +55,7 @@ const save = async () => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Save failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
         list.value!.name = originalValue;
     }
@@ -79,6 +80,7 @@ const cancel = () => {
         <InputText
             v-else
             v-model="inputValue"
+            v-focus
             type="text"
             :disabled="disabled"
             @keyup.enter="save"
@@ -111,7 +113,7 @@ const cancel = () => {
             <i
                 role="button"
                 tabindex="0"
-                class="fa fa-times"
+                class="fa fa-undo"
                 :aria-label="$gettext('Cancel edit')"
                 @click="cancel"
                 @keyup.enter="cancel"

@@ -81,7 +81,7 @@ const issueDeleteImage = async () => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Image deletion failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
     }
 };

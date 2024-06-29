@@ -8,7 +8,6 @@ import Button from "primevue/button";
 import ConfirmDialog from "primevue/confirmdialog";
 import SplitButton from "primevue/splitbutton";
 
-import { BUTTON_GREEN } from "@/theme.ts";
 import {
     deleteItems,
     deleteLists,
@@ -21,7 +20,10 @@ import {
     displayedRowKey,
     selectedLanguageKey,
 } from "@/components/ControlledListManager/constants.ts";
-import { listAsNode } from "@/components/ControlledListManager/utils.ts";
+import {
+    dataIsItem,
+    listAsNode,
+} from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
 import type { TreeSelectionKeys } from "primevue/tree/Tree";
@@ -29,14 +31,17 @@ import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/types/arches";
 import type {
     ControlledList,
+    ControlledListItem,
     DisplayedRowRefAndSetter,
     NewControlledList,
 } from "@/types/ControlledListManager";
 
-const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
+const { displayedRow, setDisplayedRow } = inject(
+    displayedRowKey,
+) as DisplayedRowRefAndSetter;
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
-const controlledListItemsTree = defineModel<TreeNode[]>({ required: true });
+const tree = defineModel<TreeNode[]>({ required: true });
 const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
     required: true,
 });
@@ -55,11 +60,37 @@ const { $gettext, $ngettext } = useGettext();
 const confirm = useConfirm();
 const toast = useToast();
 
+const multiSelectStateFromDisplayedRow = computed(() => {
+    if (!displayedRow.value) {
+        return {};
+    }
+    const newSelectedKeys = {
+        [displayedRow.value.id]: { checked: true, partialChecked: false },
+    };
+
+    const recurse = (items: ControlledListItem[]) => {
+        for (const child of items) {
+            newSelectedKeys[child.id] = {
+                checked: false,
+                partialChecked: true,
+            };
+            recurse(child.children);
+        }
+    };
+    if (dataIsItem(displayedRow.value)) {
+        recurse((displayedRow.value as ControlledListItem).children);
+    } else {
+        recurse((displayedRow.value as ControlledList).items);
+    }
+    return newSelectedKeys;
+});
+
 const deleteDropdownOptions = [
     {
         label: $gettext("Delete Multiple"),
         command: () => {
             isMultiSelecting.value = true;
+            selectedKeys.value = { ...multiSelectStateFromDisplayedRow.value };
         },
     },
 ];
@@ -78,15 +109,16 @@ const createList = () => {
     newListFormValue.value = "";
     newListCounter.value += 1;
 
-    controlledListItemsTree.value.push(
-        listAsNode(newList, selectedLanguage.value),
-    );
+    tree.value.push(listAsNode(newList, selectedLanguage.value));
 
     selectedKeys.value = { [newList.id]: true };
     setDisplayedRow(newList);
 };
 
 const toDelete = computed(() => {
+    if (!selectedKeys.value) {
+        return [];
+    }
     if (isMultiSelecting.value) {
         return Object.entries(selectedKeys.value)
             .filter(([, v]) => v.checked)
@@ -101,9 +133,7 @@ const deleteSelected = async () => {
     if (!selectedKeys.value) {
         return;
     }
-    const allListIds = controlledListItemsTree.value.map(
-        (node) => node.data.id,
-    );
+    const allListIds = tree.value.map((node) => node.data.id);
 
     const listIdsToDelete = toDelete.value.filter((id) =>
         allListIds.includes(id),
@@ -120,28 +150,32 @@ const deleteSelected = async () => {
         try {
             anyDeleted = await deleteItems(itemIdsToDelete);
         } catch (error) {
-            error.message.split("|").forEach((detail) => {
-                toast.add({
-                    severity: ERROR,
-                    life: DEFAULT_ERROR_TOAST_LIFE,
-                    summary: $gettext("Item deletion failed"),
-                    detail,
+            if (error instanceof Error) {
+                error.message.split("|").forEach((detail: string) => {
+                    toast.add({
+                        severity: ERROR,
+                        life: DEFAULT_ERROR_TOAST_LIFE,
+                        summary: $gettext("Item deletion failed"),
+                        detail,
+                    });
                 });
-            });
+            }
         }
     }
     if (listIdsToDelete.length) {
         try {
             anyDeleted = (await deleteLists(listIdsToDelete)) || anyDeleted;
         } catch (error) {
-            error.message.split("|").forEach((detail) => {
-                toast.add({
-                    severity: ERROR,
-                    life: DEFAULT_ERROR_TOAST_LIFE,
-                    summary: $gettext("List deletion failed"),
-                    detail,
+            if (error instanceof Error) {
+                error.message.split("|").forEach((detail) => {
+                    toast.add({
+                        severity: ERROR,
+                        life: DEFAULT_ERROR_TOAST_LIFE,
+                        summary: $gettext("List deletion failed"),
+                        detail,
+                    });
                 });
-            });
+            }
         }
     }
     if (anyDeleted) {
@@ -173,15 +207,27 @@ const confirmDelete = () => {
 };
 
 const fetchListsAndPopulateTree = async () => {
+    /*
+    Currently, rather than inspecting the results of the batched
+    delete requests, we just refetch everything. This requires being
+    a little clever about resorting the ordered response from the API
+    to preserve the existing sort (and avoid confusion).
+    */
+    const priorSortedListIds = tree.value.map((node) => node.key);
+
     await fetchLists()
         .then(
             ({ controlled_lists }: { controlled_lists: ControlledList[] }) => {
-                controlledListItemsTree.value = controlled_lists.map((list) =>
-                    listAsNode(list, selectedLanguage.value),
-                );
+                tree.value = controlled_lists
+                    .map((list) => listAsNode(list, selectedLanguage.value))
+                    .sort(
+                        (a, b) =>
+                            priorSortedListIds.indexOf(a.key) -
+                            priorSortedListIds.indexOf(b.key),
+                    );
             },
         )
-        .catch((error) => {
+        .catch((error: Error) => {
             toast.add({
                 severity: ERROR,
                 life: DEFAULT_ERROR_TOAST_LIFE,
@@ -200,7 +246,6 @@ await fetchListsAndPopulateTree();
         :label="$gettext('Add New List')"
         raised
         style="font-size: inherit"
-        :pt="{ root: { style: { background: BUTTON_GREEN } } }"
         @click="createList"
     />
     <ConfirmDialog :draggable="false" />

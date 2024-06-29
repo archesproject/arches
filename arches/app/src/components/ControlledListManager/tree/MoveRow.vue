@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import arches from "arches";
 import { inject, ref } from "vue";
 import { useGettext } from "vue3-gettext";
 
@@ -18,6 +17,7 @@ import {
     findNodeInTree,
     itemAsNode,
     listAsNode,
+    nodeIsItem,
     nodeIsList,
     reorderItems,
 } from "@/components/ControlledListManager/utils.ts";
@@ -90,9 +90,9 @@ const setMovingItem = (node: TreeNode) => {
 
 const addItem = (parent: TreeNode) => {
     const newItem: NewControlledListItem = {
-        parent_id: parent.key!,
+        parent_id: nodeIsItem(parent) ? parent.data.id : null,
         id: newLabelCounter.value,
-        controlled_list_id: parent.controlled_list_id ?? parent.id,
+        controlled_list_id: parent.data.controlled_list_id ?? parent.data.id,
         uri: "",
         sortorder: 0,
         guide: false,
@@ -100,7 +100,7 @@ const addItem = (parent: TreeNode) => {
             {
                 id: 0,
                 valuetype_id: PREF_LABEL,
-                language_id: arches.activeLanguage,
+                language_id: selectedLanguage.value.code,
                 value: "",
                 item_id: newLabelCounter.value,
             },
@@ -149,7 +149,7 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Save failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
         return;
     }
@@ -170,7 +170,7 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
 
 <template>
     <Button
-        v-if="selectedKeys && node.key! in selectedKeys"
+        v-if="selectedKeys && node.key in selectedKeys"
         v-tooltip="moveLabels.addChild"
         type="button"
         raised
@@ -184,7 +184,7 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
         class="move-buttons"
     >
         <Button
-            v-if="selectedKeys && node.key! in selectedKeys"
+            v-if="selectedKeys && node.key in selectedKeys"
             v-tooltip="moveLabels.moveUp"
             type="button"
             raised
@@ -195,7 +195,7 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
             @click="reorder(node.data, true)"
         />
         <Button
-            v-if="selectedKeys && node.key! in selectedKeys"
+            v-if="selectedKeys && node.key in selectedKeys"
             v-tooltip="moveLabels.moveDown"
             type="button"
             raised
@@ -206,7 +206,7 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
             @click="reorder(node.data, false)"
         />
         <Button
-            v-if="!node.data.name && selectedKeys && node.key! in selectedKeys"
+            v-if="!node.data.name && selectedKeys && node.key in selectedKeys"
             v-tooltip="moveLabels.changeParent"
             type="button"
             raised

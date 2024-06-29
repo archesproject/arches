@@ -21,7 +21,6 @@ import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/types/arches";
 import type {
-    ControlledListItem,
     DisplayedRowRefAndSetter,
     NewControlledList,
     NewControlledListItem,
@@ -39,7 +38,7 @@ const moveLabels = Object.freeze({
 const tree: Ref<TreeNode[]> = ref([]);
 const selectedKeys: Ref<TreeSelectionKeys> = ref({});
 const expandedKeys: Ref<TreeExpandedKeys> = ref({});
-const movingItem: Ref<TreeNode> = ref({});
+const movingItem: Ref<TreeNode | undefined> = ref();
 const isMultiSelecting = ref(false);
 const refetcher = ref(0);
 const filterValue = ref("");
@@ -53,48 +52,17 @@ const newListFormValue = ref("");
 const nextNewList = ref<NewControlledList>();
 const rerenderTree = ref(0);
 const nextFilterChangeNeedsExpandAll = ref(false);
+const expandedKeysSnapshotBeforeSearch = ref<TreeExpandedKeys>({});
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
-const { displayedRow, setDisplayedRow } = inject(
-    displayedRowKey,
-) as DisplayedRowRefAndSetter;
-
-const collapseNodesRecursive = (node: TreeNode) => {
-    if (node.children && node.children.length) {
-        expandedKeys.value = {
-            ...expandedKeys.value,
-            [node.key as string]: false,
-        };
-        for (const child of node.children) {
-            collapseNodesRecursive(child);
-        }
-    }
-};
+const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
 
 const updateSelectedAndExpanded = (node: TreeNode) => {
-    let priorListId;
-    if (displayedRow.value) {
-        priorListId =
-            (displayedRow.value as ControlledListItem).controlled_list_id ??
-            displayedRow.value.id;
-    }
-
     setDisplayedRow(node.data);
     expandedKeys.value = {
         ...expandedKeys.value,
         [node.key as string]: true,
     };
-    if (nodeIsList(node)) {
-        tree.value
-            .filter((list) => list.data.id !== node.data.id)
-            .forEach((list) => collapseNodesRecursive(list));
-    } else if (
-        (node.data as ControlledListItem).controlled_list_id !== priorListId
-    ) {
-        tree.value
-            .filter((list) => list.data.id !== node.data.controlled_list_id)
-            .forEach((list) => collapseNodesRecursive(list));
-    }
 };
 
 const expandAll = () => {
@@ -118,6 +86,8 @@ const expandNode = (node: TreeNode, newExpandedKeys: TreeExpandedKeys) => {
 const expandPathsToFilterResults = (newFilterValue: string) => {
     // https://github.com/primefaces/primevue/issues/3996
     if (filterValue.value && !newFilterValue) {
+        expandedKeys.value = { ...expandedKeysSnapshotBeforeSearch.value };
+        expandedKeysSnapshotBeforeSearch.value = {};
         // Rerender to avoid error emitted in PrimeVue tree re: aria-selected.
         rerenderTree.value += 1;
     }
@@ -128,6 +98,7 @@ const expandPathsToFilterResults = (newFilterValue: string) => {
         (nextFilterChangeNeedsExpandAll.value &&
             filterValue.value !== newFilterValue)
     ) {
+        expandedKeysSnapshotBeforeSearch.value = { ...expandedKeys.value };
         expandAll();
     }
     nextFilterChangeNeedsExpandAll.value = false;
@@ -222,6 +193,7 @@ const filterCallbackWrapped = computed(() => {
             },
             input: {
                 style: { height: '3.5rem', fontSize: '1.4rem' },
+                ariaLabel: $gettext('Find'),
             },
             wrapper: {
                 style: {
@@ -232,7 +204,7 @@ const filterCallbackWrapped = computed(() => {
             },
             container: { style: { fontSize: '1.4rem' } },
             content: ({ instance }) => {
-                if (instance.$el && instance.node.key === movingItem.key) {
+                if (instance.$el && instance.node.key === movingItem?.key) {
                     instance.$el.classList.add('is-adjusting-parent');
                 }
                 return { style: { height: '4rem' } };

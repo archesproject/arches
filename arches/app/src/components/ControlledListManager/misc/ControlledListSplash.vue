@@ -70,7 +70,7 @@ i {
 
 .controlled-list-splash-description {
     font-size: 1.5rem;
-    color: #999;
+    color: #666;
     font-weight: 500;
 }
 </style>

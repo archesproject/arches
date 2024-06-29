@@ -12,6 +12,7 @@ import {
     ERROR,
     itemKey,
 } from "@/components/ControlledListManager/constants.ts";
+import { vFocus } from "@/components/ControlledListManager/utils.ts";
 
 import type { Ref } from "vue";
 import type { ControlledListItem } from "@/types/ControlledListManager";
@@ -47,7 +48,7 @@ const save = async () => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Save failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
         item.value.uri = originalValue;
     }
@@ -72,9 +73,10 @@ const cancel = () => {
         <div class="characteristic">
             <InputText
                 v-model="inputValue"
+                v-focus
                 type="text"
                 :disabled="!editing"
-                :aria-label="$gettext('URI')"
+                :aria-label="$gettext('Enter a URI')"
                 :placeholder="$gettext('Enter a URI')"
                 @keyup.enter="save"
             />
@@ -106,7 +108,7 @@ const cancel = () => {
                 <i
                     role="button"
                     tabindex="0"
-                    class="fa fa-times"
+                    class="fa fa-undo"
                     :aria-label="$gettext('Cancel edit')"
                     @click="cancel"
                     @keyup.enter="cancel"

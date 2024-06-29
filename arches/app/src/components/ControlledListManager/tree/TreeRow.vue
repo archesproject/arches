@@ -53,7 +53,7 @@ const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", {
 const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
     required: true,
 });
-const movingItem = defineModel<TreeNode>("movingItem", { required: true });
+const movingItem = defineModel<TreeNode>("movingItem");
 const refetcher = defineModel<number>("refetcher", { required: true });
 const rerenderTree = defineModel<number>("rerenderTree", { required: true });
 const nextNewItem = defineModel<NewControlledListItem>("nextNewItem");
@@ -106,7 +106,7 @@ const rowLabel = computed(() => {
 
 const showMoveHereButton = (rowId: string) => {
     return (
-        movingItem.value.key &&
+        movingItem.value &&
         rowId in selectedKeys.value &&
         rowId !== movingItem.value.key &&
         rowId !== movingItem.value.data.parent_id &&
@@ -118,6 +118,9 @@ const showMoveHereButton = (rowId: string) => {
 const setParent = async (parentNode: TreeNode) => {
     awaitingMove.value = true;
 
+    if (!movingItem.value) {
+        throw new Error();
+    }
     const item = movingItem.value.data;
 
     let list: ControlledList;
@@ -142,14 +145,14 @@ const setParent = async (parentNode: TreeNode) => {
         await patchList(list, field);
         // Clear custom classes added in <Tree> pass-through
         rerenderTree.value += 1;
-        movingItem.value = {};
+        movingItem.value = undefined;
         refetcher.value += 1;
     } catch (error) {
         toast.add({
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Save failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
     }
 
@@ -173,7 +176,7 @@ const acceptNewItemShortcutEntry = async () => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Item creation failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
         return;
     }
@@ -191,7 +194,7 @@ const acceptNewItemShortcutEntry = async () => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("Value save failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
     }
 
@@ -218,11 +221,15 @@ const acceptNewItemShortcutEntry = async () => {
 };
 
 const triggerAcceptNewItemShortcut = () => {
-    newLabelInputRef.value.$el.blur();
+    if (newLabelFormValue.value.trim()) {
+        newLabelInputRef.value.$el.blur();
+    }
 };
 
 const triggerAcceptNewListShortcut = () => {
-    newListInputRef.value.$el.blur();
+    if (newListFormValue.value.trim()) {
+        newListInputRef.value.$el.blur();
+    }
 };
 
 const acceptNewListShortcutEntry = async () => {
@@ -239,7 +246,7 @@ const acceptNewListShortcutEntry = async () => {
             severity: ERROR,
             life: DEFAULT_ERROR_TOAST_LIFE,
             summary: $gettext("List creation failed"),
-            detail: error.message,
+            detail: error instanceof Error ? error.message : undefined,
         });
     }
 };
@@ -275,7 +282,7 @@ const acceptNewListShortcutEntry = async () => {
         />
         <!-- eslint-enable vue/no-v-html -->
         <div
-            v-if="movingItem.key"
+            v-if="movingItem"
             class="actions"
         >
             <ProgressSpinner

@@ -88,7 +88,7 @@ const buttonLabel = computed(() => {
 });
 
 const addValue = () => {
-    const staticNewValue = { ...newValue.value };
+    const staticNewValue = newValue.value;
     item.value.values.push(staticNewValue);
     makeValueEditable(staticNewValue, -1);
 };

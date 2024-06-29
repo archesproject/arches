@@ -16,7 +16,10 @@ import {
 import ImageEditor from "@/components/ControlledListManager/editor/ImageEditor.vue";
 
 import type { Ref } from "vue";
-import type { ControlledListItem } from "@/types/ControlledListManager";
+import type {
+    ControlledListItem,
+    FileContentProps,
+} from "@/types/ControlledListManager";
 import type {
     FileUploadBeforeSendEvent,
     FileUploadErrorEvent,
@@ -65,6 +68,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
             :file-limit="10"
             :preview-width="250"
             :with-credentials="true"
+            :show-cancel-button="false"
             :show-upload-button="false"
             name="item_image"
             :pt="{
@@ -74,11 +78,15 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
                         borderRadius: '4px',
                     },
                 },
-                file: ({ props }) => ({
-                    style: {
-                        display: props.badgeValue === completed ? 'none' : '',
-                    },
-                }),
+                file: ({ props }) => {
+                    const badgeVal = (props as FileContentProps).badgeValue;
+                    return {
+                        style: {
+                            display: badgeVal === completed ? 'none' : '',
+                        },
+                    };
+                },
+                input: { ariaLabel: $gettext('Upload an image') },
             }"
             @before-send="addHeader($event)"
             @upload="upload($event)"
