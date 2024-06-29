@@ -511,21 +511,18 @@ class ArchesStandardPermissionFramework(PermissionFramework):
     def get_resource_types_by_perm(
         self, user: User, perms: str | Iterable[str]
     ) -> list[str]:
-        graphs = list()
-
         nodegroups = self.get_nodegroups_by_perm(user, perms)
         graphs = (
             Node.objects.values("graph_id")
-            .annotate(graph_count=Count("graph_id"))
             .filter(
                 Q(nodegroup__in=nodegroups)
                 & ~Q(graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
                 & Q(graph__isresource=True)
             )
-            .values_list("graph_id")
+            .values_list("graph_id", flat=True)
         )
 
-        return list(str(graph[0]) for graph in graphs)
+        return list(str(graph) for graph in graphs)
 
     def user_can_edit_resource(self, user: User, resourceid: str | None = None) -> bool:
         """

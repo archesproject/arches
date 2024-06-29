@@ -1162,6 +1162,29 @@ class ResourceInstance(models.Model):
         User, on_delete=models.SET_NULL, blank=True, null=True
     )
 
+    def get_instance_creator_and_edit_permissions(self, user=None):
+        creatorid = None
+        can_edit = None
+
+        creatorid = self.get_instance_creator()
+
+        if user:
+            can_edit = user.id == int(creatorid) or user.is_superuser
+        return {"creatorid": creatorid, "user_can_edit_instance_permissions": can_edit}
+
+    def get_instance_creator(self):
+        create_record = EditLog.objects.filter(
+            resourceinstanceid=self.resourceinstanceid, edittype="create"
+        ).first()
+
+        if create_record:
+            creatorid = create_record.userid
+
+        if creatorid is None or creatorid == "":
+            creatorid = settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
+
+        return creatorid
+
     def save(self, *args, **kwargs):
         try:
             self.graph_publication = self.graph.publication

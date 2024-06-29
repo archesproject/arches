@@ -447,7 +447,7 @@ class ResourcePermissionDataView(View):
 
     def get(self, request):
         resourceid = request.GET.get("instanceid", None)
-        resource_instance = Resource.objects.get(pk=resourceid)
+        resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
         result = self.get_instance_permissions(resource_instance)
         return JSONResponse(result)
 
@@ -464,7 +464,7 @@ class ResourcePermissionDataView(View):
             data = JSONDeserializer().deserialize(request.body)
             self.apply_permissions(data, request.user)
             if "instanceid" in data:
-                resource = Resource.objects.get(pk=data["instanceid"])
+                resource = models.ResourceInstance.objects.get(pk=data["instanceid"])
                 result = self.get_instance_permissions(resource)
         return JSONResponse(result)
 
@@ -562,7 +562,7 @@ class ResourcePermissionDataView(View):
     def apply_permissions(self, data, user, revert=False):
         with transaction.atomic():
             for instance in data["selectedInstances"]:
-                resource_instance = Resource.objects.get(
+                resource_instance = models.ResourceInstance.objects.get(
                     pk=instance["resourceinstanceid"]
                 )
                 for identity in data["selectedIdentities"]:
