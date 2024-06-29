@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 
 class Command(BaseCommand):
     """
-    Commands for running Arches ETL processes
+    Commands for running controlled list operations
 
     """
 
@@ -76,7 +76,7 @@ class Command(BaseCommand):
         Uses a postgres function to migrate collections to controlled lists
 
         Example usage:
-            python manage.py etl_processes
+            python manage.py controlled_lists
                 -o migrate_collections_to_controlled_lists
                 -co 'Johns list' 'Getty AAT'
                 -ho 'http://localhost:8000/plugins/controlled-list-manager/item/'
