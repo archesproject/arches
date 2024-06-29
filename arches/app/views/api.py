@@ -29,6 +29,7 @@ from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.urls import reverse
 from django.utils.translation import get_language, gettext as _
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -2117,3 +2118,338 @@ class GetNodegroupTree(APIBase):
             ]
 
         return JSONResponse({"path": permitted_result})
+
+
+class SpatialView(APIBase):
+    """ """
+
+    def get(self, request, identifier=None):
+        """
+        Returns a permitted spatial view given an id or slug
+        otherwise returns a list of permitted spatial views
+        """
+        spatialview_id = None
+        spatialview_slug = None
+        spatialview = None
+
+        if identifier:
+            if self.identifier_is_uuid(identifier):
+                spatialview_id = identifier
+            else:
+                spatialview_slug = identifier
+        # permission check
+        permitted_nodegroupids = [
+            nodegroup.pk
+            for nodegroup in get_nodegroups_by_perm(
+                request.user, "models.read_nodegroup"
+            )
+        ]
+        spatialviews_dict = {
+            str(sv.geometrynode.pk): sv for sv in models.SpatialView.objects.all()
+        }
+        spatialview_nodes = [sv.geometrynode for sv in list(spatialviews_dict.values())]
+
+        permitted_spatialview_nodes = list(
+            filter(
+                lambda x: x.nodegroup_id in permitted_nodegroupids, spatialview_nodes
+            )
+        )
+        permitted_spatialviews = [
+            spatialviews_dict[str(sv_node.pk)]
+            for sv_node in permitted_spatialview_nodes
+        ]
+
+        if identifier:
+            if spatialview_id:
+                spatialview = list(
+                    filter(
+                        lambda x: str(x.pk) == spatialview_id, permitted_spatialviews
+                    )
+                )
+                spatial_view_exists = (
+                    len(
+                        list(
+                            filter(
+                                lambda x: str(x.pk) == spatialview_id,
+                                list(spatialviews_dict.values()),
+                            )
+                        )
+                    )
+                    > 0
+                )
+            else:
+                spatialview = list(
+                    filter(lambda x: x.slug == spatialview_slug, permitted_spatialviews)
+                )
+                spatial_view_exists = (
+                    len(
+                        list(
+                            filter(
+                                lambda x: x.slug == spatialview_slug,
+                                list(spatialviews_dict.values()),
+                            )
+                        )
+                    )
+                    > 0
+                )
+
+            if not len(spatialview):
+                if spatial_view_exists:
+                    return JSONErrorResponse(
+                        _("Request Failed"), _("Permission Denied"), status=403
+                    )
+                else:
+                    return JSONErrorResponse(
+                        _("No Spatial View Exists with this id or slug"), status=404
+                    )
+            else:
+                spatialview = spatialview[0]
+                response_data = {
+                    "spatialviewid": str(spatialview.spatialviewid),
+                    "schema": spatialview.schema,
+                    "slug": spatialview.slug,
+                    "description": spatialview.description,
+                    "geometrynodeid": str(spatialview.geometrynode.pk),
+                    "ismixedgeometrytypes": spatialview.ismixedgeometrytypes,
+                    "language": spatialview.language.code,
+                    "attributenodes": spatialview.attributenodes,
+                    "isactive": spatialview.isactive,
+                }
+                return JSONResponse(response_data)
+
+        else:
+            response_data = [
+                {
+                    "spatialviewid": str(spatialview.spatialviewid),
+                    "schema": spatialview.schema,
+                    "slug": spatialview.slug,
+                    "description": spatialview.description,
+                    "geometrynodeid": str(spatialview.geometrynode.pk),
+                    "ismixedgeometrytypes": spatialview.ismixedgeometrytypes,
+                    "language": spatialview.language.code,
+                    "attributenodes": spatialview.attributenodes,
+                    "isactive": spatialview.isactive,
+                }
+                for spatialview in permitted_spatialviews
+            ]
+            return JSONResponse(response_data)
+
+    def attribute_nodes_are_valid(self, geom_node=models.Node, attribute_nodeids=[]):
+        attribute_node_graphs = [
+            n.graph_id for n in models.Node.objects.filter(nodeid__in=attribute_nodeids)
+        ]
+        # if any of the graphs in attribute_node_graphs != geom_node.graph return False
+        are_valid = not any(
+            graph_id != geom_node.graph_id for graph_id in attribute_node_graphs
+        )
+
+        return are_valid
+
+    def identifier_is_uuid(self, identifier):
+        uuid_pattern = re.compile(settings.UUID_REGEX, re.IGNORECASE)
+        return uuid_pattern.match(identifier)
+
+    @method_decorator(group_required("Application Administrator"))
+    def post(self, request, identifier=None):
+        lang = None
+        isactive = False
+        ismixedgeometrytypes = None
+        description = None
+
+        try:
+            json_data = json.loads(request.body.decode("utf-8"))
+        except ValueError:
+            return JSONErrorResponse(_("Invalid JSON"), status=400)
+
+        if json_data is not None:
+            if "slug" not in json_data:
+                return JSONErrorResponse(
+                    _("No slug or Geometry Nodeid provided"), status=400
+                )
+            if "geometrynodeid" not in json_data:
+                return JSONErrorResponse(_("No Geometry Nodeid provided"), status=400)
+            else:
+                try:
+                    geom_node = models.Node.objects.get(
+                        nodeid=json_data["geometrynodeid"]
+                    )
+                except ObjectDoesNotExist:
+                    return JSONErrorResponse(
+                        _("No Node exists for supplied geometrynodeid"), status=400
+                    )
+            if "language" in json_data:
+                try:
+                    lang = models.Language.objects.get(code=json_data["language"])
+                except ObjectDoesNotExist:
+                    return JSONErrorResponse(
+                        _("No Language exists for supplied language code"), status=400
+                    )
+            else:
+                graph_x_pubs = models.GraphXPublishedGraph.objects.filter(
+                    graph=geom_node.graph
+                )
+                pubs = models.PublishedGraph.objects.filter(
+                    publication__in=graph_x_pubs
+                )
+                pub_graph_with_default_lang = list(
+                    filter(lambda x: x.language.isdefault is True, pubs)
+                )
+                try:
+                    lang = pub_graph_with_default_lang[0].language
+                except:
+                    return JSONErrorResponse(
+                        _("No default Language available in your Arches instance."),
+                        status=400,
+                    )
+            if "attributenodes" in json_data:
+                attributenodes = json_data["attributenodes"]
+                attributenodes_are_valid = self.attribute_nodes_are_valid(
+                    geom_node, json_data["attributenodes"]
+                )
+                if not attributenodes_are_valid:
+                    return JSONErrorResponse(
+                        _(
+                            "One or more Attribute Nodes are not on the same Graph as the Geometry Node."
+                        ),
+                        status=400,
+                    )
+            else:
+                attributenodes = []
+            if "isactive" in json_data:
+                isactive = json_data["isactive"]
+            if "ismixedgeometrytypes" in json_data:
+                ismixedgeometrytypes = json_data["ismixedgeometrytypes"]
+            else:
+                ismixedgeometrytypes = False
+            if "description" in json_data:
+                description = json_data["description"]
+
+            spatialview = models.SpatialView()
+            spatialview.schema = json_data["schema"]
+            spatialview.slug = json_data["slug"]
+            if description:
+                spatialview.description = description
+            spatialview.geometrynode = geom_node
+            spatialview.ismixedgeometrytypes = ismixedgeometrytypes
+            spatialview.language = lang
+            spatialview.attributenodes = attributenodes
+            spatialview.isactive = isactive
+            spatialview.save()
+
+            return JSONResponse(status=200)
+        return JSONErrorResponse(_("No json request payload"), status=400)
+
+    @method_decorator(group_required("Application Administrator"))
+    def put(self, request, identifier=None):
+        spatialview_id = None
+        spatialview_slug = None
+        lang = None
+        isactive = False
+        ismixedgeometrytypes = False
+        description = None
+
+        if identifier:
+            if self.identifier_is_uuid(identifier):
+                spatialview_id = identifier
+            else:
+                spatialview_slug = identifier
+        else:
+            return JSONErrorResponse(_("No slug or spatialviewid provided"), status=400)
+
+        json_data = json.loads(request.body.decode("utf-8"))
+
+        if json_data is not None:
+            if "geometrynodeid" in json_data:
+                try:
+                    geom_node = models.Node.objects.get(
+                        nodeid=json_data["geometrynodeid"]
+                    )
+                except ObjectDoesNotExist:
+                    return JSONErrorResponse(
+                        _("No Node exists for supplied geometrynodeid"), status=400
+                    )
+            if "language" in json_data:
+                try:
+                    lang = models.Language.objects.get(code=json_data["language"])
+                except ObjectDoesNotExist:
+                    return JSONErrorResponse(
+                        _("No Language exists for supplied language code"), status=400
+                    )
+            else:
+                graph_x_pubs = models.GraphXPublishedGraph.objects.filter(
+                    graph=geom_node.graph
+                )
+                pubs = models.PublishedGraph.objects.filter(
+                    publication__in=graph_x_pubs
+                )
+                pub_graph_with_default_lang = list(
+                    filter(lambda x: x.language.isdefault is True, pubs)
+                )
+                try:
+                    lang = pub_graph_with_default_lang[0].language
+                except:
+                    return JSONErrorResponse(
+                        _("No default Language available in your Arches instance."),
+                        status=400,
+                    )
+            if "attributenodes" in json_data:
+                attributenodes = json_data["attributenodes"]
+                attributenodes_are_valid = self.attribute_nodes_are_valid(
+                    geom_node, json_data["attributenodes"]
+                )
+                if not attributenodes_are_valid:
+                    return JSONErrorResponse(
+                        _(
+                            "One or more Attribute Nodes are not on the same Graph as the Geometry Node."
+                        ),
+                        status=400,
+                    )
+            else:
+                attributenodes = None
+            if "isactive" in json_data:
+                isactive = json_data["isactive"]
+            if "ismixedgeometrytypes" in json_data:
+                ismixedgeometrytypes = json_data["ismixedgeometrytypes"]
+            if "description" in json_data:
+                description = json_data["description"]
+
+            try:
+                if spatialview_id:
+                    spatialview = models.SpatialView.objects.get(
+                        spatialviewid=spatialview_id
+                    )
+                else:
+                    spatialview = models.SpatialView.objects.get(slug=spatialview_slug)
+            except ObjectDoesNotExist:
+                return JSONErrorResponse(
+                    _("No SpatialView identified by Slug or UUID provided"), status=404
+                )
+
+            if attributenodes and attributenodes != spatialview.attributenodes:
+                spatialview.attributenodes = attributenodes
+            spatialview.isactive = spatialview.isactive or isactive
+            spatialview.ismixedgeometrytypes = (
+                spatialview.ismixedgeometrytypes or ismixedgeometrytypes
+            )
+            if lang and lang != spatialview.language:
+                spatialview.language = lang
+            if description:
+                spatialview.description = description
+            spatialview.save()
+
+            return JSONResponse(status=200)
+        return JSONErrorResponse(_("No json request payload"), status=400)
+
+    @method_decorator(group_required("Application Administrator"))
+    def delete(self, request, identifier=None):
+        spatial_view = None
+        if identifier:
+            if self.identifier_is_uuid(identifier):
+                spatial_view = models.SpatialView.objects.get(pk=identifier)
+            else:
+                spatial_view = models.SpatialView.objects.get(slug=identifier)
+        else:
+            return JSONErrorResponse(_("No slug or spatialviewid provided"), status=400)
+
+        spatial_view.delete()
+        return JSONResponse(status=200)
