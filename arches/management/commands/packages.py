@@ -745,21 +745,22 @@ class Command(BaseCommand):
             config_paths = glob.glob(os.path.join(package_dir, "package_config.json"))
             if len(config_paths) > 0:
                 try:
-                    configs = json.load(open(config_paths[0]))
-                    for relationship in configs["permitted_resource_relationships"]:
-                        (obj, created) = (
-                            models.Resource2ResourceConstraint.objects.update_or_create(
-                                resourceclassfrom_id=uuid.UUID(
-                                    relationship["resourceclassfrom_id"]
-                                ),
-                                resourceclassto_id=uuid.UUID(
-                                    relationship["resourceclassto_id"]
-                                ),
-                                resource2resourceid=uuid.UUID(
-                                    relationship["resource2resourceid"]
-                                ),
+                    with open(config_paths[0]) as f:
+                        configs = json.load(f)
+                        for relationship in configs["permitted_resource_relationships"]:
+                            (obj, created) = (
+                                models.Resource2ResourceConstraint.objects.update_or_create(
+                                    resourceclassfrom_id=uuid.UUID(
+                                        relationship["resourceclassfrom_id"]
+                                    ),
+                                    resourceclassto_id=uuid.UUID(
+                                        relationship["resourceclassto_id"]
+                                    ),
+                                    resource2resourceid=uuid.UUID(
+                                        relationship["resource2resourceid"]
+                                    ),
+                                )
                             )
-                        )
                 except json.decoder.JSONDecodeError as e:
                     logger.warning(
                         "Invalid syntax in package_config.json. Please inspect and then re-run command."
@@ -918,7 +919,8 @@ class Command(BaseCommand):
             config_paths = glob.glob(os.path.join(package_dir, "package_config.json"))
             configs = {}
             if len(config_paths) > 0:
-                configs = json.load(open(config_paths[0]))
+                with open(config_paths[0]) as f:
+                    configs = json.load()
 
             business_data = []
             if dev and os.path.isdir(
@@ -1594,8 +1596,9 @@ class Command(BaseCommand):
 
         for path in data_source:
             if os.path.isfile(os.path.join(path)):
-                relations = csv.DictReader(open(path, "r"))
-                RelationImporter().import_relations(relations)
+                with open(path, "r") as f:
+                    relations = csv.DictReader(f)
+                    RelationImporter().import_relations(relations)
             else:
                 utils.print_message(
                     "No file found at indicated location: {0}".format(path)

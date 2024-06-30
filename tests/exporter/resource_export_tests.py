@@ -84,15 +84,16 @@ class BusinessDataExportTests(ArchesTestCase):
             csv.DictReader(export[0]["outputfile"].getvalue().split("\r\n"))
         )[0]
         csvinputfile = "tests/fixtures/data/csv/resource_export_test.csv"
-        csv_input = list(
-            csv.DictReader(
-                open(csvinputfile, "r", encoding="utf-8"),
-                restkey="ADDITIONAL",
-                restval="MISSING",
-            )
-        )[0]
+        with open(csvinputfile, "r", encoding="utf-8") as f:
+            csv_input = list(
+                csv.DictReader(
+                    f,
+                    restkey="ADDITIONAL",
+                    restval="MISSING",
+                )
+            )[0]
 
-        self.assertDictEqual(dict(csv_input), dict(csv_output))
+            self.assertDictEqual(dict(csv_input), dict(csv_output))
 
     def test_json_export(self):
         def deep_sort(obj):
@@ -138,13 +139,14 @@ class BusinessDataExportTests(ArchesTestCase):
         )
 
         json_export = deep_sort(json.loads(export[0]["outputfile"].getvalue()))
-        json_truth = deep_sort(
-            json.load(
-                open(
+        with open(
                     "tests/fixtures/data/json/resource_export_business_data_truth.json"
+                ) as f:
+            json_truth = deep_sort(
+                json.load(
+                    f
                 )
             )
-        )
 
         # removes generated graph_publication_id
         for resource_data in json_export["business_data"]["resources"]:

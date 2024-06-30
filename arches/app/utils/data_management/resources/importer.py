@@ -104,12 +104,14 @@ class BusinessDataImporter(object):
         for path in relations_file:
             if os.path.exists(path):
                 if isfile(join(path)):
-                    self.relations = csv.DictReader(open(relations_file[0], "r"))
+                    with open(relations_file[0], "r") as f:
+                        self.relations = csv.DictReader(f)
 
         for path in mapping_file:
             if os.path.exists(path):
                 if isfile(join(path)):
-                    self.mapping = json.load(open(path, "r"))
+                    with open(path, "r") as f:
+                        self.mapping = json.load(f)
                 else:
                     self.mapping = None
 
@@ -127,7 +129,8 @@ class BusinessDataImporter(object):
                             if "business_data" in list(archesfile.keys()):
                                 self.business_data = archesfile["business_data"]
                     elif self.file_format == "csv":
-                        data = csv.DictReader(open(file[0], encoding="utf-8"))
+                        with open(file[0], encoding="utf-8") as f:
+                            data = csv.DictReader(f)
                         self.business_data = list(data)
                     elif self.file_format == "zip":
                         shp_zipfile = os.path.basename(path)
