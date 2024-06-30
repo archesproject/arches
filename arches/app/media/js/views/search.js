@@ -138,7 +138,22 @@ define([
         },
 
         doQuery: function() {
-            var queryString = JSON.parse(this.queryString());
+            var queryObj = JSON.parse(this.queryString());
+
+            let sortOrderDict = {}, sortedQueryObj = {};
+            for (let filter of Object.values(SearchComponents)) {
+                sortOrderDict[filter.componentname] = filter.sortorder;
+            }
+            const sortedKeys = Object.keys(queryObj).sort((a, b) => {
+                // Utilizing sortOrderDict for sorting. If a key is not found in sortOrderDict, assign a default sort order
+                const orderA = sortOrderDict[a] || Infinity; // Using Infinity to place unknown items at the end
+                const orderB = sortOrderDict[b] || Infinity;
+                return orderA - orderB;
+            });
+            sortedKeys.forEach(key => {
+                sortedQueryObj[key] = queryObj[key];
+            });
+            queryObj = JSON.parse(JSON.stringify(sortedQueryObj));
 
             if (this.updateRequest) {
                 this.updateRequest.abort();
@@ -147,7 +162,7 @@ define([
             this.updateRequest = $.ajax({
                 type: "GET",
                 url: arches.urls.search_results,
-                data: queryString,
+                data: queryObj,
                 context: this,
                 success: function(response) {
                     _.each(this.viewModel.sharedStateObject.searchResults, function(value, key, results) {
@@ -175,7 +190,7 @@ define([
                 },
                 complete: function(request, status) {
                     this.updateRequest = undefined;
-                    window.history.pushState({}, '', '?' + $.param(queryString).split('+').join('%20'));
+                    window.history.pushState({}, '', '?' + $.param(queryObj).split('+').join('%20'));
                 }
             });
         }
