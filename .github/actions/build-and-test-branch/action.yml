@@ -71,6 +71,7 @@ runs:
     - name: Check backend formatting with black
       run: |
         black . --check --exclude=node_modules
+      shell: bash
 
     - name: Run frontend tests
       run: |
@@ -78,12 +79,10 @@ runs:
         mv coverage/frontend/coverage.xml ${{ inputs.branch-type }}_branch_frontend_coverage.xml
       shell: bash
 
-
     - name: Check for missing migrations
       run: |
         python manage.py makemigrations --check
       shell: bash
-
 
     - name: Ensure previous Python coverage data is erased
       run: |
