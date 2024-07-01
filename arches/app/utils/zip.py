@@ -16,11 +16,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
+import tarfile
 import zipfile
-import datetime
 from io import BytesIO
-from arches.app.models import models
+
 from django.http import HttpResponse
 
 
@@ -54,3 +53,15 @@ def zip_response(files_for_export, zip_file_name=None, filekey="outputfile"):
     response["Content-Type"] = "application/zip"
     response.write(zip_stream)
     return response
+
+
+def unzip_file(file_name, unzip_location):
+    try:
+        # first assume you have a .tar.gz file
+        tar = tarfile.open(file_name, "r:gz")
+        tar.extractall(path=unzip_location)
+        tar.close()
+    except:
+        # next assume you have a .zip file
+        with zipfile.ZipFile(file_name, "r") as myzip:
+            myzip.extractall(unzip_location)

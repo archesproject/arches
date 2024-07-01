@@ -19,7 +19,6 @@ source /home/ubuntu/ENV/bin/activate
 
 cd /home/ubuntu/arches
 pip install -e . --no-binary :all:
-pip install -r arches/install/requirements.txt
 
 # cd /home/ubuntu
 # arches-project create arches_dev

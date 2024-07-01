@@ -1,3 +1,99 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+dynamic = ["version"]
+name = "arches"
+readme = "README.md"
+authors = [
+    {name = "Farallon Geographics, Inc", email = "dev@fargeo.com"}
+]
+license = {text = "GNU AGPL3"}
+requires-python = ">=3.10"
+description = "Arches is an open-source, web-based, geospatial information system for cultural heritage inventory and management."
+keywords = ["django", "arches", "cultural heritage"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Information Technology",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+]
+dependencies = [
+    "Django>=4.2.13,<5.0.0",
+    "psycopg2==2.9.9",
+    "urllib3<2",
+    "elasticsearch>=8.3.1,<9.0.0",
+    "rdflib==4.2.2",
+    "django-guardian==2.4.0",
+    "python-memcached==1.59",
+    "celery==5.3.6",
+    "django-celery-results==2.5.1",
+    "SPARQLWrapper==1.8.5",
+    "django-recaptcha==3.0.0",
+    "edtf==4.0.1",
+    "django-revproxy==0.12.0",
+    "django-cors-headers==4.2.0",
+    "django-oauth-toolkit==1.7.0",
+    "polib==1.1.1",
+    "PyLD[requests]==1.0.5",
+    "pyprind==2.11.3",
+    "pycryptodome<4.0.0,>=3.3.1",
+    "pyotp>=2.6.0",
+    "qrcode>=7.3.1",
+    "pyshp==2.1.2",
+    "requests[security]>=2.31.0",
+    "python-slugify==7.0.0",
+    "pillow>=7.0.0",
+    "arcgis2geojson==2.0.0",
+    "openpyxl==3.1.2",
+    "django-webpack-loader==2.0.1",
+    "filetype==1.2.0",
+    "defusedxml==0.7.1",
+    "requests-oauthlib==1.3.1",
+    "pyjwt>=2.0.0,<3",
+    "pyjwt[crypto]",
+    "semantic-version==2.10.0",
+    "tzdata==2023.3",
+    "pytz==2023.3",
+    "django-ratelimit==4.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "livereload",
+    "sst",
+    "coverage",
+    "django-silk==5.1.0",
+    "pre-commit",
+    "black==24.4.2",
+]
+
+[project.scripts]
+arches-admin = "arches.install.arches_admin:main"
+arches-project = "arches.install.arches_project:main"
+
+[project.urls]
+Homepage = "https://archesproject.org/"
+Documentation = "https://arches.readthedocs.io"
+Repository = "https://github.com/archesproject/arches.git"
+Issues = "https://github.com/archesproject/arches/issues"
+
+[tool.setuptools.dynamic]
+version = {attr = "arches.__version__"}
+
+[tool.setuptools.packages.find]
+exclude = ["*.tests", "*.tests.*", "tests.*", "tests"]
+namespaces = false
+
 [tool.black]
 target-version = ['py310']
 include = '\.pyi?$'

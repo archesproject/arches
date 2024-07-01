@@ -1,6 +1,7 @@
 recursive-include arches *
 include README.md
 exclude Dockerfile
+exclude manage.py
 exclude arches/logs/*.txt
 exclude arches/settings_local.py
 exclude .*
@@ -8,15 +9,18 @@ exclude *.yml
 recursive-exclude .eggs *
 recursive-exclude .github *
 recursive-exclude .idea *
+recursive-exclude contributing *
+recursive-exclude cypress *
 recursive-exclude docker *
+recursive-exclude node_modules *
+recursive-exclude releases *
 recursive-exclude tests *
 recursive-exclude docs *
 recursive-exclude virtualenv *
-recursive-exclude arches/elasticsearch *
+recursive-exclude webpack *
 recursive-exclude arches/uploadedfiles *
-recursive-exclude arches/tileserver *
-recursive-exclude arches/app/media/packages *
-recursive-exclude arches/app/media/js/docs *
+recursive-exclude arches/staticfiles *
+recursive-exclude arches/app/media/build *
 global-exclude *.log
 global-exclude *.pyc
 global-exclude *.zip
