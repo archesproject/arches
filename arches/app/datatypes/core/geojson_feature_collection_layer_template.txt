@@ -1,0 +1,351 @@
+[
+    {
+        "id": "resources-fill-${nodeid}",
+        "type": "fill",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all", ["==", "$$type", "Polygon"],["==", "total", 1]],
+        "paint": {
+            "fill-color": "${fillColor}"
+        }
+    },
+    {
+        "id": "resources-fill-${nodeid}-click",
+        "type": "fill",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all", ["==", "$$type", "Polygon"],["==", "total", 1],["==", "resourceinstanceid", ""]],
+        "paint": {
+            "fill-color": "${fillColor}"
+        }
+    },
+    {
+        "id": "resources-fill-${nodeid}-hover",
+        "type": "fill",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all", ["==", "$$type", "Polygon"],["==", "total", 1],["==", "resourceinstanceid", ""]],
+        "paint": {
+            "fill-color": "${fillColor}"
+        }
+    },
+    {
+        "id": "resources-poly-outline-${nodeid}",
+        "type": "line",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all",["==", "$$type", "Polygon"],["==", "total", 1]],
+        "paint": {
+            "line-width": ["case",
+                ["boolean", ["feature-state", "hover"], false],
+                ${expanded_outlineWeight},
+                ${outlineWeight}
+            ],
+            "line-color": "${outlineColor}"
+        }
+    },
+    {
+        "id": "resources-poly-outline-${nodeid}-hover",
+        "type": "line",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all",["==", "$$type", "Polygon"],["==", "total", 1],["==", "resourceinstanceid", ""]],
+        "paint": {
+            "line-width": ${expanded_outlineWeight},
+            "line-color": "${outlineColor}"
+        }
+    },
+    {
+        "id": "resources-poly-outline-${nodeid}-click",
+        "type": "line",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all",["==", "$$type", "Polygon"],["==", "total", 1],["==", "resourceinstanceid", ""]],
+        "paint": {
+            "line-width": ${expanded_outlineWeight},
+            "line-color": "${outlineColor}"
+        }
+    },
+    {
+        "id": "resources-line-halo-${nodeid}",
+        "type": "line",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all", ["==", "$$type", "LineString"],["==", "total", 1]],
+        "paint": {
+            "line-width": ["case",
+                ["boolean", ["feature-state", "hover"], false],
+                ${expanded_haloWeight},
+                ${haloWeight}
+            ],
+            "line-color": "${lineHaloColor}"
+        }
+    },
+    {
+        "id": "resources-line-${nodeid}",
+        "type": "line",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all",["==", "$$type", "LineString"],["==", "total", 1]],
+        "paint": {
+            "line-width": ["case",
+                ["boolean", ["feature-state", "hover"], false],
+                ${expanded_weight},
+                ${weight}
+            ],
+            "line-color": "${lineColor}"
+        }
+    },
+    {
+        "id": "resources-line-halo-${nodeid}-hover",
+        "type": "line",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all",["==", "$$type", "LineString"],["==", "total", 1],["==", "resourceinstanceid", ""]],
+        "paint": {
+            "line-width": ${expanded_haloWeight},
+            "line-color": "${lineHaloColor}"
+        }
+    },
+    {
+        "id": "resources-line-${nodeid}-hover",
+        "type": "line",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all",["==", "$$type", "LineString"],["==", "total", 1],["==", "resourceinstanceid", ""]],
+        "paint": {
+            "line-width": ${expanded_weight},
+            "line-color": "${lineColor}"
+        }
+    },
+    {
+        "id": "resources-line-halo-${nodeid}-click",
+        "type": "line",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all", ["==", "$$type", "LineString"],["==", "total", 1],["==", "resourceinstanceid", ""]],
+        "paint": {
+            "line-width": ${expanded_haloWeight},
+            "line-color": "${lineHaloColor}"
+        }
+    },
+    {
+        "id": "resources-line-${nodeid}-click",
+        "type": "line",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all", ["==", "$$type", "LineString"],["==", "total", 1],["==", "resourceinstanceid", ""]],
+        "paint": {
+            "line-width": ${expanded_weight},
+            "line-color": "${lineColor}"
+        }
+    },
+
+    {
+        "id": "resources-point-halo-${nodeid}-hover",
+        "type": "circle",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all", ["==", "$$type", "Point"],["==", "total", 1],["==", "resourceinstanceid", ""]],
+        "paint": {
+            "circle-radius": ${expanded_haloRadius},
+            "circle-color": "${pointHaloColor}"
+        }
+    },
+    {
+        "id": "resources-point-${nodeid}-hover",
+        "type": "circle",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all", ["==", "$$type", "Point"],["==", "total", 1],["==", "resourceinstanceid", ""]],
+        "paint": {
+            "circle-radius": ${expanded_radius},
+            "circle-color": "${pointColor}"
+        }
+    },
+
+    {
+        "id": "resources-point-halo-${nodeid}",
+        "type": "circle",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all", ["==", "$$type", "Point"],["==", "total", 1]],
+        "paint": {
+            "circle-radius": ["case",
+                ["boolean", ["feature-state", "hover"], false],
+                ${expanded_haloRadius},
+                ${haloRadius}
+            ],
+            "circle-color": "${pointHaloColor}"
+        }
+    },
+    {
+        "id": "resources-point-${nodeid}",
+        "type": "circle",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all", ["==", "$$type", "Point"],["==", "total", 1]],
+        "paint": {
+            "circle-radius": ["case",
+                ["boolean", ["feature-state", "hover"], false],
+                ${expanded_radius},
+                ${radius}
+            ],
+            "circle-color": "${pointColor}"
+        }
+    },
+
+    {
+        "id": "resources-point-halo-${nodeid}-click",
+        "type": "circle",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all", ["==", "$$type", "Point"],["==", "total", 1],["==", "resourceinstanceid", ""]],
+        "paint": {
+            "circle-radius": ${expanded_haloRadius},
+            "circle-color": "${pointHaloColor}"
+        }
+    },
+    {
+        "id": "resources-point-${nodeid}-click",
+        "type": "circle",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all", ["==", "$$type", "Point"],["==", "total", 1],["==", "resourceinstanceid", ""]],
+        "paint": {
+            "circle-radius": ${expanded_radius},
+            "circle-color": "${pointColor}"
+        }
+    },
+    {
+        "id": "resources-cluster-point-halo-${nodeid}",
+        "type": "circle",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all", ["==", "$$type", "Point"],[">", "total", 1]],
+        "paint": {
+            "circle-radius": {
+                "property": "total",
+                "stops": [
+                    [0,   22],
+                    [50, 24],
+                    [100, 26],
+                    [200, 28],
+                    [400, 30],
+                    [800, 32],
+                    [1200, 34],
+                    [1600, 36],
+                    [2000, 38],
+                    [2500, 40],
+                    [3000, 42],
+                    [4000, 44],
+                    [5000, 46]
+                ]
+            },
+            "circle-color": "${pointHaloColor}"
+        }
+    },
+    {
+        "id": "resources-cluster-point-${nodeid}",
+        "type": "circle",
+        "source": "${source_name}",
+        "source-layer": "${nodeid}",
+        "layout": {
+            "visibility": "visible"
+        },
+        "filter": ["all", ["==", "$$type", "Point"],[">", "total", 1]],
+        "paint": {
+                "circle-radius": {
+                    "property": "total",
+                    "type": "exponential",
+                    "stops": [
+                        [0,   12],
+                        [50, 14],
+                        [100, 16],
+                        [200, 18],
+                        [400, 20],
+                        [800, 22],
+                        [1200, 24],
+                        [1600, 26],
+                        [2000, 28],
+                        [2500, 30],
+                        [3000, 32],
+                        [4000, 34],
+                        [5000, 36]
+                    ]
+                },
+            "circle-color": "${pointColor}"
+        }
+    },
+    {
+            "id": "resources-cluster-count-${nodeid}",
+            "type": "symbol",
+            "source": "${source_name}",
+            "source-layer": "${nodeid}",
+            "layout": {
+                "text-field": "{total}",
+                "text-size": 10
+            },
+            "paint": {
+            "text-color": "#fff"
+        },
+            "filter": ["all", [">", "total", 1]]
+    }
+]
