@@ -71,8 +71,9 @@ class CsvWriter(Writer):
         Reads the export configuration file or object and adds an array for records to store property data
         """
         if configs:
-            resource_export_configs = json.load(open(configs, "r"))
-            configs = [resource_export_configs]
+            with open(configs, "r") as f:
+                resource_export_configs = json.load(f)
+                configs = [resource_export_configs]
         else:
             configs = []
             for val in GraphXMapping.objects.values("mapping"):
