@@ -67,6 +67,7 @@ class ArchesFileWriter(Writer):
             resource["resourceinstance"] = ResourceInstance.objects.get(
                 resourceinstanceid=resourceinstanceid
             )
+
             graph = resource["resourceinstance"].graph
 
             if graph.publication_id and not graph_id_to_publication_id.get(graph.pk):
@@ -548,10 +549,16 @@ class ArchesFileReader(Reader):
                                 if blank_tile is not None:
                                     populate_tile(mapped_tiles, blank_tile)
 
+                    principaluser_id = (
+                        resource["princpaluser_id"]
+                        if "principaluser_id" in resource
+                        else None
+                    )
                     newresourceinstance = Resource(
                         resourceinstanceid=resourceinstanceid,
                         graph_id=target_resource_model,
                         legacyid=None,
+                        principaluser_id=principaluser_id,
                         createdtime=datetime.datetime.now(),
                     )
                     newresourceinstance.tiles = populated_tiles

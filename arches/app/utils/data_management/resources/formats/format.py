@@ -307,10 +307,7 @@ class Writer(object):
         user = kwargs.get("user", None)
         permitted_nodegroups = []
         if user:
-            permitted_nodegroups = [
-                str(nodegroup.pk)
-                for nodegroup in get_nodegroups_by_perm(user, "models.read_nodegroup")
-            ]
+            permitted_nodegroups = get_nodegroups_by_perm(user, "models.read_nodegroup")
 
         if (graph_id is None or graph_id is False) and resourceinstanceids is None:
             raise MissingGraphException(

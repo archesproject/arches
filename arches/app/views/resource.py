@@ -65,7 +65,7 @@ from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
 from elasticsearch import Elasticsearch
-from guardian.shortcuts import (
+from arches.app.utils.permission_backend import (
     assign_perm,
     get_perms,
     remove_perm,
@@ -111,30 +111,6 @@ def get_resource_relationship_types():
         "default": str(default_relationshiptype_valueid),
     }
     return relationship_type_values
-
-
-def get_instance_creator(resource_instance, user=None):
-    creatorid = None
-    can_edit = None
-    if (
-        models.EditLog.objects.filter(
-            resourceinstanceid=resource_instance.resourceinstanceid
-        )
-        .filter(edittype="create")
-        .exists()
-    ):
-        creatorid = (
-            models.EditLog.objects.filter(
-                resourceinstanceid=resource_instance.resourceinstanceid
-            )
-            .filter(edittype="create")[0]
-            .userid
-        )
-    if creatorid is None or creatorid == "":
-        creatorid = settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
-    if user:
-        can_edit = user.id == int(creatorid) or user.is_superuser
-    return {"creatorid": creatorid, "user_can_edit_instance_permissions": can_edit}
 
 
 @method_decorator(group_required("Resource Editor"), name="dispatch")
@@ -225,7 +201,11 @@ class ResourceEditorView(MapBaseManagerView):
         else:
             resource_instance = Resource.objects.get(pk=resourceid)
             graph = resource_instance.graph
-            instance_creator = get_instance_creator(resource_instance, request.user)
+            instance_creator = (
+                resource_instance.get_instance_creator_and_edit_permissions(
+                    request.user
+                )
+            )
             creator = instance_creator["creatorid"]
             user_created_instance = instance_creator[
                 "user_can_edit_instance_permissions"
@@ -553,7 +533,7 @@ class ResourcePermissionDataView(View):
             len(get_users_with_perms(resource_instance))
             + len(get_groups_with_perms(resource_instance))
         ) > 1
-        instance_creator = get_instance_creator(resource_instance)
+        instance_creator = resource_instance.get_instance_creator_and_edit_permissions()
         result["creatorid"] = instance_creator["creatorid"]
         return result
 
@@ -563,7 +543,7 @@ class ResourcePermissionDataView(View):
         resource.graph_id = graphid if graphid else str(resource_instance.graph_id)
         resource.createdtime = resource_instance.createdtime
         resource.add_permission_to_all("no_access_to_resourceinstance")
-        instance_creator = get_instance_creator(resource)
+        instance_creator = resource.get_instance_creator_and_edit_permissions()
         user = User.objects.get(pk=instance_creator["creatorid"])
         assign_perm("view_resourceinstance", user, resource)
         assign_perm("change_resourceinstance", user, resource)
@@ -591,7 +571,11 @@ class ResourcePermissionDataView(View):
                     else:
                         identityModel = User.objects.get(pk=identity["id"])
 
-                    instance_creator = get_instance_creator(resource_instance, user)
+                    instance_creator = (
+                        resource_instance.get_instance_creator_and_edit_permissions(
+                            user
+                        )
+                    )
                     creator = instance_creator["creatorid"]
                     user_can_modify_permissions = instance_creator[
                         "user_can_edit_instance_permissions"

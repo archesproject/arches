@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.utils import permission_backend
 from django.db.utils import ProgrammingError
 
 
@@ -186,10 +187,7 @@ def prepare_search_index(create=False):
                 "permissions": {
                     "type": "nested",
                     "properties": {
-                        "users_without_read_perm": {"type": "integer"},
-                        "users_without_edit_perm": {"type": "integer"},
-                        "users_without_delete_perm": {"type": "integer"},
-                        "users_with_no_access": {"type": "integer"},
+                        "principal_user": {"type": "integer"},
                     },
                 },
                 "strings": {
@@ -284,6 +282,11 @@ def prepare_search_index(create=False):
             },
         },
     }
+
+    index_settings["mappings"]["properties"]["permissions"]["properties"].update(
+        permission_backend.update_mappings()
+    )
+
     try:
         from arches.app.datatypes.datatypes import DataTypeFactory
 

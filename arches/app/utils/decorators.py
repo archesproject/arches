@@ -21,13 +21,14 @@ import functools
 import logging
 import datetime
 from django.core.exceptions import PermissionDenied
-from arches.app.utils.permission_backend import get_editable_resource_types
-from arches.app.utils.permission_backend import get_resource_types_by_perm
 from arches.app.utils.permission_backend import user_can_read_resource
 from arches.app.utils.permission_backend import user_can_edit_resource
 from arches.app.utils.permission_backend import user_can_delete_resource
 from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.permission_backend import user_created_transaction
+from arches.app.utils.permission_backend import (
+    group_required as permission_group_required,
+)
 from django.contrib.auth.decorators import user_passes_test
 
 # Get an instance of a logger
@@ -71,10 +72,10 @@ def group_required(*group_names, raise_exception=False):
     """
 
     def in_groups(u):
-        if u.is_authenticated:
-            if u.is_superuser or bool(u.groups.filter(name__in=group_names)):
-                return True
-        if raise_exception:
+        passed = permission_group_required(u, *group_names)
+        if passed:
+            return True
+        elif raise_exception:
             raise PermissionDenied
         # else: user_passes_test() redirects to nowhere
         return False

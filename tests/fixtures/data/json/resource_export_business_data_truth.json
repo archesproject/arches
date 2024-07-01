@@ -3,6 +3,7 @@
     "resources": [
       {
         "resourceinstance": {
+          "principaluser_id": null,
           "descriptors": {
             "ar": {
               "description": "Undefined",
@@ -184,6 +185,7 @@
       },
       {
         "resourceinstance": {
+          "principaluser_id": null,
           "descriptors": {
             "ar": {
               "description": "Undefined",

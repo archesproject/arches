@@ -204,7 +204,6 @@ class BusinessDataImporter(object):
     ):
         start = time()
         cursor = connection.cursor()
-
         try:
             if file_format is None:
                 file_format = self.file_format

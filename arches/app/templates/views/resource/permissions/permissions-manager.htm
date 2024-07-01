@@ -52,11 +52,16 @@
             </div>
             <div class="permission-list">
             <div class="applied-permissions">
+            <div style="padding: 5px 0px">
+                <input data-bind="checked: showPeople" type="checkbox" /> 
+                <span data-bind="text: $root.translations.showPersonGroup"></span>
+            </div>
+            <div></div>
             <!--ko if: filteredPermissions()  -->
             <div class="permission-list-table">
                 <div class="permissions-list-header">
                     <div class="identities-column">
-                        <span data-bind="text: $root.translations.personGroup"></span>
+                        <span data-bind="visible: showPeople"><span data-bind="text: $root.translations.person"></span> / </span><span data-bind="text: $root.translations.group"></span>
                     </div>
                     <div class="permissions-column">
                         <span data-bind="text: $root.translations.permissions"></span>
@@ -64,7 +69,7 @@
                 </div>
                 <div class="permissions-list-table-body">
                      <!--ko foreach: filteredPermissions() -->
-                        <!--ko if: $data.creatorOrSuperUser -->
+                        <!--ko if: $data.creatorOrSuperUser && $parent.showPeople() -->
                         <div class="permissions-table-row">
                             <div style="display: inline-flex">
                                 <div class="identities-column"><i style="color: #579ddb; padding: 0 5px" class="fa" data-bind="class: function(){return $data['type']==='user' ? 'fa-user' : 'fa-users'}()"></i><span data-bind="text: $data['name']"></span></div>
@@ -74,7 +79,7 @@
                          <!--/ko-->
                      <!--/ko-->
                     <!--ko foreach: filteredPermissions() -->
-                    <!--ko ifnot: $data.creatorOrSuperUser -->
+                    <!--ko if: !$data.creatorOrSuperUser && (($data.type=="user" && $parent.showPeople()) || ($data.type != "user")) -->
                     <div class="permissions-table-row" data-bind = "css: {selected: $data.selected()}">
                         <div data-bind="click: function(){$data.selected(!$data.selected())}" style="display: inline-flex">
                             <div class="identities-column"><i style="color: #579ddb; padding: 0 5px" class="fa" data-bind="class: function(){return $data['type']==='user' ? 'fa-user' : 'fa-users'}()"></i><span data-bind="text: $data['name']"></span></div>
@@ -87,7 +92,7 @@
                             <div class="permissions-column">
                                 <div class="permissions-options">
                                     <!--ko foreach: $data.availablePermissions -->
-                                    <div style="margin-right: 15px">
+                                    <div>
                                     <label class="form-checkbox form-normal form-primary permission-option active" data-bind="css: {
                                             'active': $data.selected
                                         }, click: $data.selected.bind($data, !$data.selected())">
