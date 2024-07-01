@@ -130,7 +130,7 @@ INSTALLED_APPS = (
     "oauth2_provider",
     "django_celery_results",
     # "silk",
-    "{{ project_name }}",  # must be last
+    "{{ project_name }}",
 )
 
 MIDDLEWARE = [

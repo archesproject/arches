@@ -9,7 +9,7 @@ urlpatterns = [
 
 # Only handle i18n routing in active project. This will still handle the routes provided by Arches core and Arches applications,
 # but handling i18n routes in multiple places causes application errors.
-if settings.APP_NAME == settings.INSTALLED_APPS[-1]:
+if settings.ROOT_URLCONF == __main__:
     if settings.SHOW_LANGUAGE_SWITCH is True:
         urlpatterns = i18n_patterns(*urlpatterns)
 
