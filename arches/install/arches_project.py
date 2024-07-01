@@ -3,19 +3,15 @@
 import arches
 import argparse
 import codecs
-import django
-import errno
 import os
 import sys
 import subprocess
-import shutil
-from importlib import import_module
+
 from django.utils.crypto import get_random_string
-from django.core.management.utils import handle_extensions
 from django.core.management.templates import TemplateCommand
-from django.core.management.base import BaseCommand, CommandError
-from arches.setup import get_complete_version
-from arches.management.commands import utils
+from django.core.management.base import CommandError
+
+from arches.version import get_complete_version
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")

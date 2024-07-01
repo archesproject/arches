@@ -42,9 +42,7 @@ jobs:
       - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
-          pip install .
-          pip install -r ${{ github.event.repository.name }}/install/requirements.txt
-          pip install -r ${{ github.event.repository.name }}/install/requirements_dev.txt
+          pip install '.[dev]'
           echo Python packages installed
 
       - uses: ankane/setup-elasticsearch@v1
@@ -144,9 +142,7 @@ jobs:
       - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
-          pip install .
-          pip install -r ${{ github.event.repository.name }}/install/requirements.txt
-          pip install -r ${{ github.event.repository.name }}/install/requirements_dev.txt
+          pip install '.[dev]'
           echo Python packages installed
 
       - uses: ankane/setup-elasticsearch@v1

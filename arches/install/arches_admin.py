@@ -7,12 +7,12 @@ import os
 import sys
 import subprocess
 
-from importlib import import_module
 from django.core.management.templates import TemplateCommand
 from django.core.management.base import CommandError
 from django.utils.crypto import get_random_string
+
 from arches import __version__
-from arches.setup import get_complete_version
+from arches.version import get_complete_version
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
