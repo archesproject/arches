@@ -1,4 +1,5 @@
 import { beforeAll, vi } from 'vitest';
+import '@/declarations.d.ts';
 
 
 beforeAll(() => {
