@@ -131,7 +131,7 @@ class BusinessDataImporter(object):
                     elif self.file_format == "csv":
                         with open(file[0], encoding="utf-8") as f:
                             data = csv.DictReader(f)
-                        self.business_data = list(data)
+                            self.business_data = list(data)
                     elif self.file_format == "zip":
                         shp_zipfile = os.path.basename(path)
                         shp_zipfile_name = os.path.splitext(shp_zipfile)[0]

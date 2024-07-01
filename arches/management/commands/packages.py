@@ -920,7 +920,7 @@ class Command(BaseCommand):
             configs = {}
             if len(config_paths) > 0:
                 with open(config_paths[0]) as f:
-                    configs = json.load()
+                    configs = json.load(f)
 
             business_data = []
             if dev and os.path.isdir(

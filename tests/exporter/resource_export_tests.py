@@ -93,7 +93,7 @@ class BusinessDataExportTests(ArchesTestCase):
                 )
             )[0]
 
-            self.assertDictEqual(dict(csv_input), dict(csv_output))
+        self.assertDictEqual(dict(csv_input), dict(csv_output))
 
     def test_json_export(self):
         def deep_sort(obj):
