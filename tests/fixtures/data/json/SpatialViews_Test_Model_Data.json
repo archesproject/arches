@@ -1,0 +1,520 @@
+{
+    "business_data": {
+        "resources": [
+            {
+                "resourceinstance": {
+                    "descriptors": {
+                        "en": {
+                            "description": "<Info>, Oxford Area 1, /files/f10cddfd-1392-491e-bed3-ac88b39233fc | /files/e64c83de-a951-421c-93c6-21d9e740b53e, john,Paul, bob, Test non String, , is related to, {\"url\": \"https://www.bbc.co.uk\", \"url_label\": \"Test\"}, 1, 2024-05, is related to, 2024-05-28",
+                            "map_popup": "<Info>, Oxford Area 1, /files/f10cddfd-1392-491e-bed3-ac88b39233fc | /files/e64c83de-a951-421c-93c6-21d9e740b53e, john,Paul, bob, Test non String, , is related to, {\"url\": \"https://www.bbc.co.uk\", \"url_label\": \"Test\"}, 1, 2024-05, is related to, 2024-05-28",
+                            "name": "Oxford Area 1"
+                        }
+                    },
+                    "graph_id": "5db49c51-2c70-47b3-b7be-66afced863c8",
+                    "graph_publication_id": "5f0ca2bc-1cfa-11ef-9e4b-0242ac130005",
+                    "legacyid": null,
+                    "name": "Oxford Area 1",
+                    "resourceinstanceid": "0b89fcd3-8e6b-4ad8-8311-28324c39c622",
+                    "publication_id": "5f0ca2bc-1cfa-11ef-9e4b-0242ac130005"
+                },
+                "tiles": [
+                    {
+                        "data": {
+                            "348eb80a-1cf9-11ef-ab82-0242ac130005": [
+                                {
+                                    "inverseOntologyProperty": "ac41d9be-79db-4256-b368-2f4559cfbe55",
+                                    "ontologyProperty": "ac41d9be-79db-4256-b368-2f4559cfbe55",
+                                    "resourceId": "0b89fcd3-8e6b-4ad8-8311-28324c39c622",
+                                    "resourceXresourceId": "128a6c7f-0e9f-436e-97e1-cef2e4302717"
+                                }
+                            ],
+                            "54fc2d0c-1cf9-11ef-ab82-0242ac130005": [
+                                {
+                                    "inverseOntologyProperty": "ac41d9be-79db-4256-b368-2f4559cfbe55",
+                                    "ontologyProperty": "ac41d9be-79db-4256-b368-2f4559cfbe55",
+                                    "resourceId": "baf236a3-63f4-4fcb-8612-a002f316446c",
+                                    "resourceXresourceId": "f2bd7848-f37c-40da-93fb-775d358cda11"
+                                },
+                                {
+                                    "inverseOntologyProperty": "ac41d9be-79db-4256-b368-2f4559cfbe55",
+                                    "ontologyProperty": "ac41d9be-79db-4256-b368-2f4559cfbe55",
+                                    "resourceId": "91a55b62-df8b-449a-8345-c1d7b7d8e608",
+                                    "resourceXresourceId": "4a7ad5be-eea0-480d-b2af-87cc24780a2e"
+                                }
+                            ]
+                        },
+                        "nodegroup_id": "2925560e-1cf9-11ef-971a-0242ac130005",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "0b89fcd3-8e6b-4ad8-8311-28324c39c622",
+                        "sortorder": 0,
+                        "tileid": "2913a864-0759-44cc-83d9-50d15c7a549c"
+                    },
+                    {
+                        "data": {
+                            "95b2c8de-1cf8-11ef-971a-0242ac130005": {
+                                "features": [
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                [
+                                                    -1.2394485810973208,
+                                                    51.75275143846133
+                                                ],
+                                                [
+                                                    -1.2391524294303906,
+                                                    51.752977080403014
+                                                ],
+                                                [
+                                                    -1.2389758774756388,
+                                                    51.752699728690914
+                                                ]
+                                            ],
+                                            "type": "LineString"
+                                        },
+                                        "id": "9b54cf804bf665df90dd250a16670561",
+                                        "properties": {
+                                            "nodeId": "95b2c8de-1cf8-11ef-971a-0242ac130005"
+                                        },
+                                        "type": "Feature"
+                                    }
+                                ],
+                                "type": "FeatureCollection"
+                            },
+                            "a379b7ac-1cf8-11ef-ab82-0242ac130005": {
+                                "en": {
+                                    "direction": "ltr",
+                                    "value": "Test"
+                                }
+                            }
+                        },
+                        "nodegroup_id": "7584e966-1cf8-11ef-971a-0242ac130005",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "0b89fcd3-8e6b-4ad8-8311-28324c39c622",
+                        "sortorder": 0,
+                        "tileid": "acb3d799-6e05-46cb-92c8-d76a9fcabe74"
+                    },
+                    {
+                        "data": {
+                            "0e65f1d4-1cf9-11ef-971a-0242ac130005": "ac41d9be-79db-4256-b368-2f4559cfbe55",
+                            "0e8d1560-1cfa-11ef-a1fe-0242ac130005": [
+                                "6dcc25dc-959d-4835-b617-19484d9e2636",
+                                "dada494c-80bd-4bea-8bb6-223bb55fe022"
+                            ],
+                            "298ef7ac-1cfa-11ef-a1fe-0242ac130005": [
+                                {
+                                    "accepted": true,
+                                    "altText": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": "Test Alt"
+                                        }
+                                    },
+                                    "attribution": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": "Arches Project Team"
+                                        }
+                                    },
+                                    "content": "blob:http://localhost:8002/43ddbe41-6419-4fcc-8920-2fe10e1dd521",
+                                    "description": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": "This is the Arches Logo"
+                                        }
+                                    },
+                                    "file_id": "f10cddfd-1392-491e-bed3-ac88b39233fc",
+                                    "index": 0,
+                                    "lastModified": 1709897713896,
+                                    "name": "Arches_icon_strip-1.svg",
+                                    "path": "uploadedfiles/Arches_icon_strip-1.svg",
+                                    "size": 5835,
+                                    "status": "uploaded",
+                                    "title": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": "Arches Project"
+                                        }
+                                    },
+                                    "type": "image/svg+xml",
+                                    "url": "/files/f10cddfd-1392-491e-bed3-ac88b39233fc"
+                                },
+                                {
+                                    "accepted": true,
+                                    "altText": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": ""
+                                        }
+                                    },
+                                    "attribution": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": ""
+                                        }
+                                    },
+                                    "content": "blob:http://localhost:8002/384240d9-9c79-459b-9cb0-55107a00760e",
+                                    "description": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": ""
+                                        }
+                                    },
+                                    "file_id": "e64c83de-a951-421c-93c6-21d9e740b53e",
+                                    "height": 225,
+                                    "index": 0,
+                                    "lastModified": 1704883367866,
+                                    "name": "elastic.png",
+                                    "path": "uploadedfiles/elastic.png",
+                                    "size": 2349,
+                                    "status": "uploaded",
+                                    "title": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": ""
+                                        }
+                                    },
+                                    "type": "image/png",
+                                    "url": "/files/e64c83de-a951-421c-93c6-21d9e740b53e",
+                                    "width": 225
+                                }
+                            ],
+                            "bee90060-1cf8-11ef-971a-0242ac130005": {
+                                "de": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "el": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "en": {
+                                    "direction": "ltr",
+                                    "value": "Oxford Area 1"
+                                },
+                                "en-US": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "fr": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "pt": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "ru": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "zh": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                }
+                            },
+                            "ccfe0a6a-1cf8-11ef-971a-0242ac130005": "2024-05-28",
+                            "d1a59230-1cf9-11ef-a1fe-0242ac130005": [
+                                "ac41d9be-79db-4256-b368-2f4559cfbe55"
+                            ],
+                            "d2a55a44-1cf9-11ef-a1fe-0242ac130005": null,
+                            "d2f5d474-1cf9-11ef-a1fe-0242ac130005": "Test non String",
+                            "e514005a-1cf8-11ef-971a-0242ac130005": "2024-05",
+                            "e674837a-1cf8-11ef-971a-0242ac130005": 1,
+                            "e70850dc-1cf8-11ef-971a-0242ac130005": {
+                                "url": "https://www.bbc.co.uk",
+                                "url_label": "Test"
+                            },
+                            "fe3a586c-1cf9-11ef-a1fe-0242ac130005": "4355afc7-1f38-4174-b6dd-640ac00520e6"
+                        },
+                        "nodegroup_id": "b4b1bbaa-1cf8-11ef-ab82-0242ac130005",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "0b89fcd3-8e6b-4ad8-8311-28324c39c622",
+                        "sortorder": 0,
+                        "tileid": "9c040a86-3f25-4a6d-8e69-f388faaeed03"
+                    }
+                ]
+            },
+            {
+                "resourceinstance": {
+                    "descriptors": {
+                        "en": {
+                            "description": "<Info>, Bat Willow, , george,john,ringo,Paul, 1, non-local, , is related to, {\"url\": \"https://www.cnbc.com\", \"url_label\": \"\"}, 11111, 2010, is related to, 2024-05-10",
+                            "map_popup": "<Info>, Bat Willow, , george,john,ringo,Paul, 1, non-local, , is related to, {\"url\": \"https://www.cnbc.com\", \"url_label\": \"\"}, 11111, 2010, is related to, 2024-05-10",
+                            "name": "Bat Willow"
+                        }
+                    },
+                    "graph_id": "5db49c51-2c70-47b3-b7be-66afced863c8",
+                    "graph_publication_id": "5f0ca2bc-1cfa-11ef-9e4b-0242ac130005",
+                    "legacyid": null,
+                    "name": "Bat Willow",
+                    "resourceinstanceid": "eb65e0f7-1374-41d5-a8f5-8013aad69b5f",
+                    "publication_id": "5f0ca2bc-1cfa-11ef-9e4b-0242ac130005"
+                },
+                "tiles": [
+                    {
+                        "data": {
+                            "95b2c8de-1cf8-11ef-971a-0242ac130005": {
+                                "features": [
+                                    {
+                                        "geometry": {
+                                            "coordinates": [
+                                                [
+                                                    [
+                                                        -1.240303247043812,
+                                                        51.75355109635589
+                                                    ],
+                                                    [
+                                                        -1.2398619436022216,
+                                                        51.754178610215035
+                                                    ],
+                                                    [
+                                                        -1.2388133017605583,
+                                                        51.754043370896426
+                                                    ],
+                                                    [
+                                                        -1.2386691135073136,
+                                                        51.7537512525858
+                                                    ],
+                                                    [
+                                                        -1.238856995170238,
+                                                        51.753407740673254
+                                                    ],
+                                                    [
+                                                        -1.2393245146584206,
+                                                        51.75336987305877
+                                                    ],
+                                                    [
+                                                        -1.240303247043812,
+                                                        51.75355109635589
+                                                    ]
+                                                ]
+                                            ],
+                                            "type": "Polygon"
+                                        },
+                                        "id": "f3873676e5fc094480d7e8b28bd5f0b9",
+                                        "properties": {
+                                            "nodeId": "95b2c8de-1cf8-11ef-971a-0242ac130005"
+                                        },
+                                        "type": "Feature"
+                                    }
+                                ],
+                                "type": "FeatureCollection"
+                            },
+                            "a379b7ac-1cf8-11ef-ab82-0242ac130005": {
+                                "de": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "el": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "en": {
+                                    "direction": "ltr",
+                                    "value": "ABC123"
+                                },
+                                "en-US": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "fr": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "pt": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "ru": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "zh": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                }
+                            }
+                        },
+                        "nodegroup_id": "7584e966-1cf8-11ef-971a-0242ac130005",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "eb65e0f7-1374-41d5-a8f5-8013aad69b5f",
+                        "sortorder": 0,
+                        "tileid": "15178db7-d1b0-4b4c-ba40-bb888c036156"
+                    },
+                    {
+                        "data": {
+                            "0e65f1d4-1cf9-11ef-971a-0242ac130005": "ac41d9be-79db-4256-b368-2f4559cfbe55",
+                            "0e8d1560-1cfa-11ef-a1fe-0242ac130005": [
+                                "0ec3b60a-a4ae-4397-aabc-5766423155cd",
+                                "6dcc25dc-959d-4835-b617-19484d9e2636",
+                                "a7f04a34-da45-4113-9619-169f8671af28",
+                                "dada494c-80bd-4bea-8bb6-223bb55fe022"
+                            ],
+                            "298ef7ac-1cfa-11ef-a1fe-0242ac130005": [
+                                {
+                                    "accepted": true,
+                                    "altText": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": "Test Alt"
+                                        }
+                                    },
+                                    "attribution": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": "Arches Project Team"
+                                        }
+                                    },
+                                    "content": "blob:http://localhost:8002/43ddbe41-6419-4fcc-8920-2fe10e1dd521",
+                                    "description": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": "This is the Arches Logo"
+                                        }
+                                    },
+                                    "file_id": "f10cddfd-1392-491e-bed3-ac88b39233fc",
+                                    "index": 0,
+                                    "lastModified": 1709897713896,
+                                    "name": "Arches_icon_strip-1.svg",
+                                    "path": "uploadedfiles/Arches_icon_strip-1.svg",
+                                    "size": 5835,
+                                    "status": "uploaded",
+                                    "title": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": "Arches Project"
+                                        }
+                                    },
+                                    "type": "image/svg+xml",
+                                    "url": "/files/f10cddfd-1392-491e-bed3-ac88b39233fc"
+                                },
+                                {
+                                    "accepted": true,
+                                    "altText": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": ""
+                                        }
+                                    },
+                                    "attribution": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": ""
+                                        }
+                                    },
+                                    "content": "blob:http://localhost:8002/384240d9-9c79-459b-9cb0-55107a00760e",
+                                    "description": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": ""
+                                        }
+                                    },
+                                    "file_id": "e64c83de-a951-421c-93c6-21d9e740b53e",
+                                    "height": 225,
+                                    "index": 0,
+                                    "lastModified": 1704883367866,
+                                    "name": "elastic.png",
+                                    "path": "uploadedfiles/elastic.png",
+                                    "size": 2349,
+                                    "status": "uploaded",
+                                    "title": {
+                                        "en": {
+                                            "direction": "ltr",
+                                            "value": ""
+                                        }
+                                    },
+                                    "type": "image/png",
+                                    "url": "/files/e64c83de-a951-421c-93c6-21d9e740b53e",
+                                    "width": 225
+                                }
+                            ],
+                            "bee90060-1cf8-11ef-971a-0242ac130005": {
+                                "de": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "el": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "en": {
+                                    "direction": "ltr",
+                                    "value": "Bat Willow"
+                                },
+                                "en-US": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "fr": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "pt": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "ru": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "zh": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                }
+                            },
+                            "ccfe0a6a-1cf8-11ef-971a-0242ac130005": "2024-05-10",
+                            "d1a59230-1cf9-11ef-a1fe-0242ac130005": [
+                                "ac41d9be-79db-4256-b368-2f4559cfbe55"
+                            ],
+                            "d2a55a44-1cf9-11ef-a1fe-0242ac130005": true,
+                            "d2f5d474-1cf9-11ef-a1fe-0242ac130005": "non-local",
+                            "e514005a-1cf8-11ef-971a-0242ac130005": "2010",
+                            "e674837a-1cf8-11ef-971a-0242ac130005": 11111,
+                            "e70850dc-1cf8-11ef-971a-0242ac130005": {
+                                "url": "https://www.cnbc.com",
+                                "url_label": ""
+                            },
+                            "fe3a586c-1cf9-11ef-a1fe-0242ac130005": "0a331bdf-4ed5-4062-a181-309d5a760f74"
+                        },
+                        "nodegroup_id": "b4b1bbaa-1cf8-11ef-ab82-0242ac130005",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "eb65e0f7-1374-41d5-a8f5-8013aad69b5f",
+                        "sortorder": 0,
+                        "tileid": "4f9c3e62-0e12-4d48-b6b1-303029c7c0b6"
+                    },
+                    {
+                        "data": {
+                            "348eb80a-1cf9-11ef-ab82-0242ac130005": [
+                                {
+                                    "inverseOntologyProperty": "ac41d9be-79db-4256-b368-2f4559cfbe55",
+                                    "ontologyProperty": "ac41d9be-79db-4256-b368-2f4559cfbe55",
+                                    "resourceId": "eb65e0f7-1374-41d5-a8f5-8013aad69b5f",
+                                    "resourceXresourceId": "198e334c-4775-4ed6-8399-9b946a17f024"
+                                }
+                            ],
+                            "54fc2d0c-1cf9-11ef-ab82-0242ac130005": [
+                                {
+                                    "inverseOntologyProperty": "ac41d9be-79db-4256-b368-2f4559cfbe55",
+                                    "ontologyProperty": "ac41d9be-79db-4256-b368-2f4559cfbe55",
+                                    "resourceId": "baf236a3-63f4-4fcb-8612-a002f316446c",
+                                    "resourceXresourceId": "d6f9e11e-24e8-42f3-92a9-2e4c0524b3b9"
+                                }
+                            ]
+                        },
+                        "nodegroup_id": "2925560e-1cf9-11ef-971a-0242ac130005",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "eb65e0f7-1374-41d5-a8f5-8013aad69b5f",
+                        "sortorder": 0,
+                        "tileid": "383cac00-0ade-4db7-94b6-7ad1d6c715e6"
+                    }
+                ]
+            }
+        ]
+    }
+}
