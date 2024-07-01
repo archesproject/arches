@@ -16,7 +16,7 @@ from django.db import connection
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
-from arches.app.models.models import Node
+from arches.app.models.models import ETLModule, Node
 from arches.app.models.system_settings import settings
 from arches.app.utils.decorators import user_created_transaction_match
 from arches.app.utils.file_validator import FileValidator
@@ -38,6 +38,9 @@ class BaseImportModule:
         self.loadid = loadid
         self.legacyid_lookup = {}
         self.datatype_factory = DataTypeFactory()
+        self.config = (
+            ETLModule.objects.get(pk=self.moduleid).config if self.moduleid else {}
+        )
 
         if self.request:
             self.userid = request.user.id
@@ -197,15 +200,16 @@ class BaseImportModule:
             }
         return lookup
 
-    def run_load_task(self, userid, files, summary, result, temp_dir, loadid):
-        self.loadid = loadid  # currently redundant, but be certain
+    def run_load_task(
+        self, userid, files, summary, result, temp_dir, loadid, multiprocessing=False
+    ):
         try:
             with connection.cursor() as cursor:
                 self.stage_files(files, summary, cursor)
                 self.check_tile_cardinality(cursor)
                 result["validation"] = self.validate(loadid)
                 if len(result["validation"]["data"]) == 0:
-                    self.save_to_tiles(cursor, userid, loadid)
+                    self.save_to_tiles(cursor, userid, loadid, multiprocessing)
                     cursor.execute(
                         """CALL __arches_update_resource_x_resource_with_graphids();"""
                     )
@@ -256,8 +260,8 @@ class BaseImportModule:
             [self.loadid],
         )
 
-    def save_to_tiles(self, cursor, userid, loadid):
-        return save_to_tiles(userid, loadid)
+    def save_to_tiles(self, cursor, userid, loadid, multiprocessing=False):
+        return save_to_tiles(userid, loadid, multiprocessing)
 
     ### Actions ###
 
@@ -345,7 +349,6 @@ class BaseImportModule:
         return {"success": True, "data": result}
 
     def start(self, request):
-        self.loadid = request.POST.get("load_id")
         self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         result = {"started": False, "message": ""}
         with connection.cursor() as cursor:
@@ -367,26 +370,146 @@ class BaseImportModule:
         return {"success": result["started"], "data": result}
 
     def write(self, request):
-        self.loadid = request.POST.get("load_id")
         self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         self.file_details = request.POST.get("load_details", None)
+        multiprocessing = request.POST.get("multiprocessing", False)
         result = {}
         if self.file_details:
             details = json.loads(self.file_details)
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
-            use_celery_file_size_threshold_in_MB = 0.1
-            if (
-                summary["cumulative_files_size"] / 1000000
-                > use_celery_file_size_threshold_in_MB
-            ):
+            use_celery_file_size_threshold = self.config.get(
+                "celeryByteSizeLimit", 100000
+            )
+
+            if summary["cumulative_files_size"] > use_celery_file_size_threshold:
                 response = self.run_load_task_async(request, self.loadid)
             else:
                 response = self.run_load_task(
-                    self.userid, files, summary, result, self.temp_dir, self.loadid
+                    self.userid,
+                    files,
+                    summary,
+                    result,
+                    self.temp_dir,
+                    self.loadid,
+                    multiprocessing,
                 )
 
             return response
+
+    def cli(self, source):
+        initiated = self.start(self.request)
+
+        if initiated["success"]:
+            read = self.read_for_cli(source)
+        else:
+            return {
+                "success": False,
+                "data": {"title": _("Error"), "message": initiated["data"]["message"]},
+            }
+
+        if read["success"]:
+            self.request.POST.__setitem__(
+                "load_details", json.dumps({"result": read["data"]})
+            )
+            self.request.POST.__setitem__("multiprocessing", True)
+            written = self.write(self.request)
+        else:
+            return {
+                "success": False,
+                "data": {"title": _("Error"), "message": read["data"]["message"]},
+            }
+
+        if written["success"]:
+            return {"success": True, "data": "done"}
+        else:
+            return {
+                "success": False,
+                "data": {"title": _("Error"), "message": written["data"]["message"]},
+            }
+
+    def read_for_cli(self, source):
+        self.cumulative_files_size = 0
+        self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
+        try:
+            self.delete_from_default_storage(self.temp_dir)
+        except FileNotFoundError:
+            pass
+        file_name = os.path.basename(source).split("/")[-1]
+        file_stat = os.stat(source)
+
+        result = {
+            "summary": {
+                "name": file_name,
+                "size": self.filesize_format(file_stat.st_size),
+                "files": {},
+            }
+        }
+        validator = FileValidator()
+        if len(validator.validate_file_type(source)) > 0:
+            return {
+                "status": 400,
+                "success": False,
+                "title": _("Invalid excel file/zip specified"),
+                "message": _("Upload a valid excel file"),
+            }
+
+        if source.split(".")[-1].lower() == "zip":
+            with zipfile.ZipFile(source, "r") as zip_ref:
+                files = zip_ref.infolist()
+                for file in files:
+                    if file.filename.split(".")[-1] == "xlsx":
+                        self.cumulative_files_size += file.file_size
+                    if not file.filename.startswith("__MACOSX"):
+                        if not file.is_dir():
+                            result["summary"]["files"][file.filename] = {
+                                "size": (self.filesize_format(file.file_size))
+                            }
+                            result["summary"][
+                                "cumulative_files_size"
+                            ] = self.cumulative_files_size
+                        default_storage.save(
+                            os.path.join(self.temp_dir, file.filename),
+                            File(zip_ref.open(file)),
+                        )
+        elif source.split(".")[-1] == "xlsx":
+            with open(source, "rb") as xlsx_file:
+                result = {
+                    "summary": {
+                        "name": file_name,
+                        "size": self.filesize_format(file_stat.st_size),
+                        "files": {},
+                    }
+                }
+                self.cumulative_files_size += file_stat.st_size
+                result["summary"]["files"][file_name] = {
+                    "size": (self.filesize_format(file_stat.st_size))
+                }
+                result["summary"]["cumulative_files_size"] = self.cumulative_files_size
+                default_storage.save(
+                    os.path.join(self.temp_dir, file_name), File(xlsx_file)
+                )
+
+        has_valid_excel_file = False
+        for file in result["summary"]["files"]:
+            if file.split(".")[-1] == "xlsx":
+                try:
+                    uploaded_file_path = os.path.join(self.temp_dir, file)
+                    workbook = load_workbook(
+                        filename=default_storage.open(uploaded_file_path)
+                    )
+                    self.validate_uploaded_file(workbook)
+                    has_valid_excel_file = True
+                except:
+                    pass
+        if not has_valid_excel_file:
+            title = _("Invalid Uploaded File")
+            message = _(
+                "This file has missing information or invalid formatting. Make sure the file is complete and in the expected format."
+            )
+            return {"success": False, "data": {"title": title, "message": message}}
+
+        return {"success": True, "data": result}
 
 
 class FileValidationError(Exception):
