@@ -537,12 +537,8 @@ define([
                         tile.data[key](data.data[key]());
                     }
                     else{
-                        var dataNotObservable = ko.observable(ko.mapping.toJS(data.data[key]));
-                        tile.data[key](dataNotObservable());
+                        tile.data[key](ko.mapping.toJS(data.data[key]));
                     }
-
-
-
                 }
             });
         };
