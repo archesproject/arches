@@ -140,13 +140,9 @@ class BusinessDataExportTests(ArchesTestCase):
 
         json_export = deep_sort(json.loads(export[0]["outputfile"].getvalue()))
         with open(
-                    "tests/fixtures/data/json/resource_export_business_data_truth.json"
-                ) as f:
-            json_truth = deep_sort(
-                json.load(
-                    f
-                )
-            )
+            "tests/fixtures/data/json/resource_export_business_data_truth.json"
+        ) as f:
+            json_truth = deep_sort(json.load(f))
 
         # removes generated graph_publication_id
         for resource_data in json_export["business_data"]["resources"]:
