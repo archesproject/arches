@@ -16,9 +16,8 @@ details = {
 
 
 class ProvisionalFilter(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def append_dsl(self, search_query_object, **kwargs):
+        include_provisional = kwargs.get("include_provisional")
         search_query = Bool()
 
         if include_provisional is not True:
@@ -35,4 +34,4 @@ class ProvisionalFilter(BaseSearchFilter):
                 )
 
             search_query.must(provisional_resource_filter)
-            search_results_object["query"].add_query(search_query)
+            search_query_object["query"].add_query(search_query)

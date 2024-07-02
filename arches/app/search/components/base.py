@@ -41,9 +41,7 @@ class BaseSearchFilter:
     def __init__(self, request=None):
         self.request = request
 
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def append_dsl(self, search_query_object, **kwargs):
         """
         used to append ES query dsl to the search request
 
@@ -59,15 +57,13 @@ class BaseSearchFilter:
 
         pass
 
-    def execute_query(self, search_results_object, response_object):
+    def execute_query(self, search_query_object, response_object):
         """
         code responsible for execution of the search query logic and mutation of the response object
         """
         pass
 
-    def post_search_hook(
-        self, search_results_object, response_object, permitted_nodegroups
-    ):
+    def post_search_hook(self, search_query_object, response_object, **kwargs):
         """
         code to run after the search results have been retrieved
 

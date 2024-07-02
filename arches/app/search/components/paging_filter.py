@@ -17,9 +17,7 @@ details = {
 
 
 class PagingFilter(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def append_dsl(self, search_query_object, **kwargs):
         export = self.request.GET.get("export", None)
         mobile_download = self.request.GET.get("mobiledownload", None)
         page = (
@@ -35,12 +33,10 @@ class PagingFilter(BaseSearchFilter):
         else:
             limit = settings.SEARCH_ITEMS_PER_PAGE
         limit = int(self.request.GET.get("limit", limit))
-        search_results_object["query"].start = limit * int(page - 1)
-        search_results_object["query"].limit = limit
+        search_query_object["query"].start = limit * int(page - 1)
+        search_query_object["query"].limit = limit
 
-    def post_search_hook(
-        self, search_results_object, response_object, permitted_nodegroups
-    ):
+    def post_search_hook(self, search_query_object, response_object, **kwargs):
         total = (
             response_object["results"]["hits"]["total"]["value"]
             if response_object["results"]["hits"]["total"]["value"]
@@ -75,6 +71,6 @@ class PagingFilter(BaseSearchFilter):
         ret["end_index"] = page.end_index()
         ret["pages"] = pages
 
-        if details["componentname"] not in search_results_object:
-            search_results_object[details["componentname"]] = {}
-        search_results_object[details["componentname"]]["paginator"] = ret
+        if details["componentname"] not in search_query_object:
+            search_query_object[details["componentname"]] = {}
+        search_query_object[details["componentname"]]["paginator"] = ret

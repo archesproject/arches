@@ -28,15 +28,15 @@ details = {
 
 
 class SearchResultsFilter(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def append_dsl(self, search_query_object, **kwargs):
+        permitted_nodegroups = kwargs.get("permitted_nodegroups")
+        include_provisional = kwargs.get("include_provisional")
         nested_agg = NestedAgg(path="points", name="geo_aggs")
         nested_agg_filter = FiltersAgg(name="inner")
         geo_agg_filter = Bool()
 
         try:
-            search_results_object["query"].dsl["query"]["bool"]["filter"][0]["terms"][
+            search_query_object["query"].dsl["query"]["bool"]["filter"][0]["terms"][
                 "graph_id"
             ]  # check if resource_type filter is already applied
         except (KeyError, IndexError):
@@ -44,7 +44,7 @@ class SearchResultsFilter(BaseSearchFilter):
             permitted_graphids = get_permitted_graphids(permitted_nodegroups)
             terms = Terms(field="graph_id", terms=list(permitted_graphids))
             resource_model_filter.filter(terms)
-            search_results_object["query"].add_query(resource_model_filter)
+            search_query_object["query"].add_query(resource_model_filter)
 
         if include_provisional is True:
             geo_agg_filter.filter(
@@ -73,11 +73,10 @@ class SearchResultsFilter(BaseSearchFilter):
             GeoBoundsAgg(field="points.point", name="bounds")
         )
         nested_agg.add_aggregation(nested_agg_filter)
-        search_results_object["query"].add_aggregation(nested_agg)
+        search_query_object["query"].add_aggregation(nested_agg)
 
-    def post_search_hook(
-        self, search_results_object, response_object, permitted_nodegroups
-    ):
+    def post_search_hook(self, search_query_object, response_object, **kwargs):
+        permitted_nodegroups = kwargs.get("permitted_nodegroups")
         user_is_reviewer = user_is_resource_reviewer(self.request.user)
 
         descriptor_types = ("displaydescription", "displayname")

@@ -24,9 +24,9 @@ details = {
 
 
 class MapFilter(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def append_dsl(self, search_query_object, **kwargs):
+        permitted_nodegroups = kwargs.get("permitted_nodegroups")
+        include_provisional = kwargs.get("include_provisional")
         search_query = Bool()
         querysting_params = self.request.GET.get(details["componentname"], "")
         spatial_filter = JSONDeserializer().deserialize(querysting_params)
@@ -74,13 +74,13 @@ class MapFilter(BaseSearchFilter):
 
                 search_query.filter(Nested(path="geometries", query=spatial_query))
 
-        search_results_object["query"].add_query(search_query)
+        search_query_object["query"].add_query(search_query)
 
-        if details["componentname"] not in search_results_object:
-            search_results_object[details["componentname"]] = {}
+        if details["componentname"] not in search_query_object:
+            search_query_object[details["componentname"]] = {}
 
         try:
-            search_results_object[details["componentname"]][
+            search_query_object[details["componentname"]][
                 "search_buffer"
             ] = feature_geom
         except NameError:

@@ -29,9 +29,9 @@ details = {
 
 
 class TermFilter(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def append_dsl(self, search_query_object, **kwargs):
+        permitted_nodegroups = kwargs.get("permitted_nodegroups")
+        include_provisional = kwargs.get("include_provisional")
         search_query = Bool()
         querysting_params = self.request.GET.get(details["componentname"], "")
         language = self.request.GET.get("language", "*")
@@ -118,7 +118,7 @@ class TermFilter(BaseSearchFilter):
                 else:
                     search_query.must(nested_string_filter)
                     # need to set min_score because the query returns results with score 0 and those have to be removed, which I don't think it should be doing
-                    search_results_object["query"].min_score("0.01")
+                    search_query_object["query"].min_score("0.01")
             elif term["type"] == "concept":
                 concept_ids = _get_child_concepts(term["value"])
                 conceptid_filter = Bool()
@@ -144,7 +144,7 @@ class TermFilter(BaseSearchFilter):
                 else:
                     search_query.filter(nested_conceptid_filter)
 
-        search_results_object["query"].add_query(search_query)
+        search_query_object["query"].add_query(search_query)
 
 
 def _get_child_concepts(conceptid):

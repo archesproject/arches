@@ -106,22 +106,20 @@ logger = logging.getLogger(__name__)
 
 class ArchesCoreSearch(CoreSearchComponent):
 
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
-        search_results_object["query"].include("graph_id")
-        search_results_object["query"].include("root_ontology_class")
-        search_results_object["query"].include("resourceinstanceid")
-        search_results_object["query"].include("points")
-        search_results_object["query"].include("permissions.users_without_read_perm")
-        search_results_object["query"].include("permissions.users_without_edit_perm")
-        search_results_object["query"].include("permissions.users_without_delete_perm")
-        search_results_object["query"].include("permissions.users_with_no_access")
-        search_results_object["query"].include("geometries")
-        search_results_object["query"].include("displayname")
-        search_results_object["query"].include("displaydescription")
-        search_results_object["query"].include("map_popup")
-        search_results_object["query"].include("provisional_resource")
+    def append_dsl(self, search_query_object, **kwargs):
+        search_query_object["query"].include("graph_id")
+        search_query_object["query"].include("root_ontology_class")
+        search_query_object["query"].include("resourceinstanceid")
+        search_query_object["query"].include("points")
+        search_query_object["query"].include("permissions.users_without_read_perm")
+        search_query_object["query"].include("permissions.users_without_edit_perm")
+        search_query_object["query"].include("permissions.users_without_delete_perm")
+        search_query_object["query"].include("permissions.users_with_no_access")
+        search_query_object["query"].include("geometries")
+        search_query_object["query"].include("displayname")
+        search_query_object["query"].include("displaydescription")
+        search_query_object["query"].include("map_popup")
+        search_query_object["query"].include("provisional_resource")
         load_tiles = self.request.GET.get("tiles", False)
         if load_tiles:
             try:
@@ -129,14 +127,14 @@ class ArchesCoreSearch(CoreSearchComponent):
             except TypeError:
                 pass
         if load_tiles:
-            search_results_object["query"].include("tiles")
+            search_query_object["query"].include("tiles")
 
-    def execute_query(self, search_results_object, response_object):
+    def execute_query(self, search_query_object, response_object):
         for_export = self.request.GET.get("export", None)
         pages = self.request.GET.get("pages", None)
         total = int(self.request.GET.get("total", "0"))
         resourceinstanceid = self.request.GET.get("id", None)
-        dsl = search_results_object["query"]
+        dsl = search_query_object["query"]
         if for_export or pages:
             results = dsl.search(index=RESOURCES_INDEX, scroll="1m")
             scroll_id = results["_scroll_id"]
@@ -159,10 +157,9 @@ class ArchesCoreSearch(CoreSearchComponent):
                     results = {"hits": {"hits": [results]}}
         response_object["results"] = results
 
-    def post_search_hook(
-        self, search_results_object, response_object, permitted_nodegroups
-    ):
-        dsl = search_results_object["query"]
+    def post_search_hook(self, search_query_object, response_object, **kwargs):
+
+        dsl = search_query_object["query"]
         response_object["reviewer"] = user_is_resource_reviewer(self.request.user)
         response_object["timestamp"] = datetime.now()
         response_object["total_results"] = dsl.count(index=RESOURCES_INDEX)
@@ -201,7 +198,9 @@ class ArchesCoreSearch(CoreSearchComponent):
                 search_filter = search_filter_factory.get_filter(filter_type)
                 if search_filter:
                     search_filter.append_dsl(
-                        search_query_object, permitted_nodegroups, include_provisional
+                        search_query_object,
+                        permitted_nodegroups=permitted_nodegroups,
+                        include_provisional=include_provisional,
                     )
             append_instance_permission_filter_dsl(self.request, search_query_object)
         except Exception as err:
