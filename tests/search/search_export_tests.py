@@ -7,6 +7,7 @@ from base64 import b64encode
 from http import HTTPStatus
 from arches.app.models import models
 from arches.app.models.tile import Tile
+from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.search_export import SearchResultsExporter
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import (
@@ -79,7 +80,8 @@ class SearchExportTests(ArchesTestCase):
             resourceinstance_id=cls.test_resourceinstanceid,
         )
         cultural_period_tile.save()
-        time.sleep(5)  # delay to allow for async indexing
+        se = SearchEngineFactory().create()
+        sync_es(se, index="test_resources")
         # TODO: create geospatial test data
 
     def test_cultural_period_node_exportable(self):
@@ -217,3 +219,7 @@ def is_valid_uuid(value, version=4):
         return str(uuid_obj) == value
     except ValueError:
         return False
+
+
+def sync_es(search_engine, index="test"):
+    search_engine.es.indices.refresh(index=index)
