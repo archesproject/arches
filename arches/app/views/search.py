@@ -26,11 +26,13 @@ from django.db import connection
 from django.shortcuts import render
 from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
+from arches.app.const import ExtensionType
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
@@ -92,19 +94,13 @@ class SearchView(MapBaseManagerView):
                 )
             )[0]
 
-        search_components = [
-            all_search_components_dict[required_component["componentname"]]
-            for required_component in core_search_component.config["requiredComponents"]
-            if required_component["componentname"] != "search-export"
-        ]
-        # TODO: Apply new permission logic after #11005 is merged
-        if user_is_resource_exporter(request.user) and "search-export" in [
-            s["componentname"]
-            for s in core_search_component.config["requiredComponents"]
-        ]:
-            search_components.append(all_search_components_dict["search-export"])
-
-        search_components.append(core_search_component)
+        core_search_class_method = get_class_from_modulename(
+            core_search_component.modulename,
+            core_search_component.classname,
+            ExtensionType.SEARCH_COMPONENTS,
+        )
+        core_search_instance = core_search_class_method(core_search_component)
+        search_components = core_search_instance.get_search_components()
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()

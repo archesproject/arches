@@ -1,71 +1,90 @@
 from arches.app.models.system_settings import settings
-from arches.app.search.components.base import BaseSearchFilter
+from arches.app.search.components.base import CoreSearchComponent
 from arches.app.search.mappings import RESOURCES_INDEX
-from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.utils.permission_backend import (
+    user_is_resource_reviewer,
+    user_is_resource_exporter,
+)
 from datetime import datetime
 import json
 
+
 details = {
     "searchcomponentid": "69695d63-6f03-4536-8da9-841b07116381",
-    "name": "Core Search",
+    "name": "Arches Core Search",
     "icon": "",
-    "modulename": "core_search.py",
-    "classname": "CoreSearchFilter",
+    "modulename": "arches_core_search.py",
+    "classname": "ArchesCoreSearch",
     "type": "core",
-    "componentpath": "views/components/search/core-search",
-    "componentname": "core-search",
-    "sortorder": "0",
-    "enabled": True,
+    "componentpath": "views/components/search/arches-core-search",
+    "componentname": "arches-core-search",
     "config": {
         "default": True,
         "requiredComponents": [
             {
-                "componentname": "advanced-search",
-                "searchcomponentid": "f0e56205-acb5-475b-9c98-f5e44f1dbd2c",
-            },
-            {
                 "componentname": "map-filter",
                 "searchcomponentid": "09d97fc6-8c83-4319-9cef-3aaa08c3fbec",
+                "sortorder": 1,
             },
             {
-                "componentname": "paging-filter",
-                "searchcomponentid": "7aff5819-651c-4390-9b9a-a61221ba52c6",
-            },
-            {
-                "componentname": "provisional-filter",
-                "searchcomponentid": "073406ed-93e5-4b5b-9418-b61c26b3640f",
+                "componentname": "advanced-search",
+                "searchcomponentid": "f0e56205-acb5-475b-9c98-f5e44f1dbd2c",
+                "sortorder": 2,
             },
             {
                 "componentname": "related-resources-filter",
                 "searchcomponentid": "59f28272-d1f1-4805-af51-227771739aed",
+                "sortorder": 3,
+            },
+            {
+                "componentname": "provisional-filter",
+                "searchcomponentid": "073406ed-93e5-4b5b-9418-b61c26b3640f",
+                "sortorder": 4,
             },
             {
                 "componentname": "resource-type-filter",
                 "searchcomponentid": "f1c46b7d-0132-421b-b1f3-95d67f9b3980",
+                "sortorder": 5,
             },
             {
                 "componentname": "saved-searches",
                 "searchcomponentid": "6dc29637-43a1-4fba-adae-8d9956dcd3b9",
+                "sortorder": 6,
             },
             {
                 "componentname": "search-export",
                 "searchcomponentid": "9c6a5a9c-a7ec-48d2-8a25-501b55b8eff6",
+                "sortorder": 7,
             },
             {
                 "componentname": "search-result-details",
                 "searchcomponentid": "f5986dae-8b01-11ea-b65a-77903936669c",
+                "sortorder": 8,
             },
             {
                 "componentname": "sort-results",
                 "searchcomponentid": "6a2fe122-de54-4e44-8e93-b6a0cda7955c",
+                "sortorder": 9,
             },
             {
                 "componentname": "term-filter",
                 "searchcomponentid": "1f42f501-ed70-48c5-bae1-6ff7d0d187da",
+                "sortorder": 10,
             },
             {
                 "componentname": "time-filter",
                 "searchcomponentid": "7497ed4f-2085-40da-bee5-52076a48bcb1",
+                "sortorder": 11,
+            },
+            {
+                "componentname": "paging-filter",
+                "searchcomponentid": "7aff5819-651c-4390-9b9a-a61221ba52c6",
+                "sortorder": 12,
+            },
+            {
+                "componentname": "search-results",
+                "searchcomponentid": "00673743-8c1c-4cc0-bd85-c073a52e03ec",
+                "sortorder": 13,
             },
         ],
     },
@@ -76,7 +95,7 @@ SEARCH_RESULT_PAGES = (
 )
 
 
-class CoreSearchFilter(BaseSearchFilter):
+class ArchesCoreSearch(CoreSearchComponent):
 
     def append_dsl(
         self, search_results_object, permitted_nodegroups, include_provisional
@@ -139,3 +158,23 @@ class CoreSearchFilter(BaseSearchFilter):
         response_object["timestamp"] = datetime.now()
         response_object["total_results"] = dsl.count(index=RESOURCES_INDEX)
         response_object["userid"] = self.request.user.id
+
+    def get_search_components(self):
+        search_components = [
+            required_component
+            for required_component in self._required_search_components
+            if required_component.componentname != "search-export"
+        ]
+        # TODO: Apply new permission logic after #11005 is merged
+        if user_is_resource_exporter(self.request.user):
+            search_components.extend(
+                [
+                    required_component
+                    for required_component in self._required_search_components
+                    if required_component.componentname == "search-export"
+                ]
+            )
+
+        search_components.append(self.core_component)
+
+        return search_components

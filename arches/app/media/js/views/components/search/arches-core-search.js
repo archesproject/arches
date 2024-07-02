@@ -5,9 +5,9 @@ define([
     'arches',
     'viewmodels/alert',
     'views/components/search/base-filter',
-    'templates/views/components/search/core-search.htm',
-], function($, _, ko, arches, AlertViewModel, BaseFilter, coreSearchTemplate) {
-    const componentName = 'core-search';
+    'templates/views/components/search/arches-core-search.htm',
+], function($, _, ko, arches, AlertViewModel, BaseFilter, archesCoreSearchTemplate) {
+    const componentName = 'arches-core-search';
     const viewModel = BaseFilter.extend({ 
         initialize: function(sharedStateObject) {
             const self = this;
@@ -72,7 +72,7 @@ define([
                         }
                     }
                 }, this);
-                this.query({"paging-filter": "1", "core":"core-search", tiles: "true"});
+                this.query({"paging-filter": "1", "core":"arches-core-search", tiles: "true"});
             };
 
             this.selectPopup = function(componentname) {
@@ -154,6 +154,6 @@ define([
 
     return ko.components.register(componentName, {
         viewModel: viewModel,
-        template: coreSearchTemplate,
+        template: archesCoreSearchTemplate,
     });
 });

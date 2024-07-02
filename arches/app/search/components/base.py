@@ -14,8 +14,26 @@ details = {}
 #     "type": "filter",  # 'filter' if you want the component to show up dynamically
 #     "componentpath": "views/components/search/...",  # path to ko component
 #     "componentname": "advanced-search",  # lowercase unique name
-#     "sortorder": "0",  # order in which to display dynamically added filters to the UI
-#     "enabled": True  # True to enable in the system
+#     "config": {
+#         "default": True, # set for CoreSearch components; only 1 can be the default
+#         "requiredComponents": [ # other components on which this one depends
+#             {
+#                 "componentname": "paging-filter",
+#                 "searchcomponentid": "7aff5819-651c-4390-9b9a-a61221ba52c6",
+#                 "sortorder": 1,
+#             },
+#             {
+#                 "componentname": "provisional-filter",
+#                 "searchcomponentid": "073406ed-93e5-4b5b-9418-b61c26b3640f",
+#                 "sortorder": 2,
+#             },
+#             {
+#                 "componentname": "search-results",
+#                 "searchcomponentid": "00673743-8c1c-4cc0-bd85-c073a52e03ec",
+#                 "sortorder": 3,
+#             }
+#         ]
+#     }
 # }
 
 
@@ -56,6 +74,36 @@ class BaseSearchFilter:
         """
 
         pass
+
+
+class CoreSearchComponent(BaseSearchFilter):
+    """
+    Special type of component that specifies which other components to be used,
+    how to execute a search in the search_results method
+    """
+
+    def __init__(self, request=None, componentname=None):
+        super(BaseSearchFilter, self).__init__(request=request)
+        self.core_component = models.SearchComponent.objects.get(
+            componentname=componentname
+        )
+        self._required_search_components = list(
+            models.SearchComponent.objects.filter(
+                searchcomponentid__in=[
+                    required_component["searchcomponentid"]
+                    for required_component in self.core_component.config[
+                        "requiredComponents"
+                    ]
+                ]
+            )
+        )
+
+    @property
+    def required_search_components(self):
+        return self._required_search_components
+
+    def get_search_components(self):
+        return self._required_search_components + [self.core_component]
 
 
 class SearchFilterFactory(object):
