@@ -648,11 +648,13 @@ class Resource(models.ResourceInstance):
                     else False
                 )
                 if resource_is_provisional is True:
-                    creator_id = int(
-                        EditLog.objects.filter(
-                            resourceinstanceid=self.pk, edittype="create"
-                        ).values_list("userid")[0][0]
-                    )
+                    creator_id = EditLog.objects.filter(
+                        resourceinstanceid=self.pk, edittype="create"
+                    ).values_list("userid")[0][0]
+                    try:
+                        creator_id = int(creator_id)
+                    except ValueError:
+                        pass
                     if creator_id == user.id:
                         permit_deletion = True
             else:

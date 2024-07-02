@@ -18,7 +18,7 @@
                 {% trans "Card Type" %}
             </div>
             <div>
-                <select class="resources" data-bind="value: model.component_id, options: $parent.cardComponents, optionsText: 'name', optionsValue: 'componentid', optionsCaption: {% quoted_trans "Choose a card component..." %}, chosen: {disable_search_threshold: 10, width: '100%'}"></select>
+                <select class="resources" data-bind="value: model.component_id, options: $parent.cardComponents, optionsText: 'name', optionsValue: 'componentid', optionsCaption: {% quoted_trans _("Choose a card component...") %}, chosen: {disable_search_threshold: 10, width: '100%'}"></select>
             </div>
         </div>
 
@@ -72,14 +72,14 @@
 
             <div class="form-divider">
                 <!-- Card Visibility -->
-                <div class="pad-top" data-bind="component: { name: 'views/components/simple-switch', params: {value: model.visible, config:{label: {% quoted_trans "Make Card Visible" %}, subtitle: {% quoted_trans "Show this card by default" %}}}}"></div>
+                <div class="pad-top" data-bind="component: { name: 'views/components/simple-switch', params: {value: model.visible, config:{label: {% quoted_trans _("Make Card Visible") %}, subtitle: {% quoted_trans _("Show this card by default") %}}}}"></div>
 
                 <!-- Multiple values tools -->
                 <div class="cardinality-form" data-bind="visible: model.cardinality() === 'n'" style="display: none;">
                 </div>
 
                 <!-- Enable help -->
-                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.helpenabled, config:{label: {% quoted_trans "Enable Card-level help" %}, subtitle: {% quoted_trans "Provide specific user guidance for this card" %}}}}"></div>
+                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: model.helpenabled, config:{label: {% quoted_trans _("Enable Card-level help") %}, subtitle: {% quoted_trans _("Provide specific user guidance for this card") %}}}}"></div>
 
                 <!-- Tertiary Panel For Card Help Text-->
                 <div class="" style="display: none;" data-bind="visible: model.helpenabled">
@@ -121,7 +121,7 @@
                         <div class="dropdown">
                             <select class="" style="display:inline-block;"
                             data-bind="select2Query: {
-                                select2Config: getSelect2ConstraintConfig({% quoted_trans "Select Nodes" %})
+                                select2Config: getSelect2ConstraintConfig({% quoted_trans _("Select Nodes") %})
                             }"></select>
                         </div>
                         <div data-bind="component: { name: 'views/components/simple-switch', params: {value: constraintvm.constraint.uniquetoallinstances, config:{label: 'Unique to all resource instances?'}}}"></div>

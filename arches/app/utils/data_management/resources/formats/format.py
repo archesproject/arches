@@ -258,6 +258,7 @@ class Reader(object):
                     )
                 except TypeError as e:
                     f.write(timestamp + " " + e + str(error))
+            f.close()
 
 
 class Writer(object):

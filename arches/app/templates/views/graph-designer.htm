@@ -111,7 +111,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <script type="text/html" id="selectGraphTemplate">
                     <option disabled selected value>{% trans "Find a Resource Model/Branch..." %}</option>
                     <!-- ko foreach: groups -->
-                        <optgroup data-bind="attr: { 'label': (name==='Resource Models')?{% quoted_trans "Resource Models" %}:{% quoted_trans "Branches" %}}, foreach: items">
+                        <optgroup data-bind="attr: { 'label': (name==='Resource Models')?{% quoted_trans _("Resource Models") %}:{% quoted_trans _("Branches") %}}, foreach: items">
                             <option data-bind="value: graphid, text: name"></option>
                         </optgroup>
                     <!-- /ko -->

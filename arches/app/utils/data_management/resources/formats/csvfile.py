@@ -31,6 +31,7 @@ from arches.app.utils.data_management.resource_graphs import exporter as GraphEx
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.utils.i18n import capitalize_region
 import arches.app.utils.task_management as task_management
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
@@ -70,8 +71,9 @@ class CsvWriter(Writer):
         Reads the export configuration file or object and adds an array for records to store property data
         """
         if configs:
-            resource_export_configs = json.load(open(configs, "r"))
-            configs = [resource_export_configs]
+            with open(configs, "r") as f:
+                resource_export_configs = json.load(f)
+                configs = [resource_export_configs]
         else:
             configs = []
             for val in GraphXMapping.objects.values("mapping"):
@@ -566,7 +568,7 @@ class CsvReader(Reader):
             column_regex = re.compile(r"^.+ \(([A-Za-z-]+)\)$")
             match = column_regex.match(column)
             if match is not None:
-                new_language_candidate = match.groups()[0]
+                new_language_candidate = capitalize_region(match.groups()[0])
                 language_exists = Language.objects.filter(
                     code=new_language_candidate
                 ).exists()

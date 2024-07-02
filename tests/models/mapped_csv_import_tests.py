@@ -20,7 +20,7 @@ import os
 from operator import itemgetter
 from tests.base_test import ArchesTestCase
 from django.test.utils import captured_stdout
-from arches.app.models.models import TileModel, ResourceInstance
+from arches.app.models.models import Language, TileModel, ResourceInstance
 from arches.app.models.concept import Concept
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.skos import SKOSReader
@@ -75,6 +75,13 @@ class mappedCSVFileImportTests(ArchesTestCase):
         ).scan_for_new_languages()
         self.assertNotEqual(new_languages, None)
         self.assertEqual(len(new_languages), 2)
+
+    def test_language_differs_only_in_case(self):
+        Language.objects.get_or_create(code="en-US")  # see header in test file
+        new_languages = BusinessDataImporter(
+            "tests/fixtures/data/csv/mixed_case_language_codes.csv"
+        ).scan_for_new_languages()
+        self.assertEqual(new_languages, ["en-ZA"])
 
     def test_single_1(self):
         og_tile_count = TileModel.objects.count()

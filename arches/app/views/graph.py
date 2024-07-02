@@ -460,7 +460,8 @@ class GraphDataView(View):
                     old_node_data = graph.nodes.get(uuid.UUID(data["nodeid"]))
 
                     if (
-                        old_node_data.datatype != "semantic"
+                        graph.isresource
+                        and old_node_data.datatype != "semantic"
                         and old_node_data.datatype != data["datatype"]
                     ):
                         return JSONErrorResponse(
