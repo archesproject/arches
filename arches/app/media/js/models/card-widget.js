@@ -30,11 +30,9 @@ define([
 
             // Workaround to issue with widgets not being loaded in workflow (https://community.archesproject.org/t/issue-with-workflows-in-7-5/2270)
             // This is a temporary fix until we can figure out why widgets are not being loaded.
-            if (!document.widgets) {
-                document.widgets = require('widgets');
+            if (!widgets) {
+                widgets = require('widgets');
             }
-
-            const widgets = document.widgets;
             //-----------------------------------------------
             
             var self = this;
