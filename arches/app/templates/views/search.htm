@@ -8,7 +8,7 @@
 {% block main_content %}
 <!-- ko if: sharedStateObject.coreComponentName -->
 <div data-bind="component: {
-    name: sharedStateObject.coreComponentName,
+    name: sharedStateObject.coreComponentName(),
     params: sharedStateObject
 }">
 </div>
