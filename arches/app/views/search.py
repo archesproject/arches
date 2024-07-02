@@ -77,29 +77,8 @@ class SearchView(MapBaseManagerView):
             .exclude(publication=None)
         )
         geocoding_providers = models.Geocoder.objects.all()
-        all_search_components_dict = {
-            s.componentname: s for s in models.SearchComponent.objects.all()
-        }
-        core_search_component_name = request.GET.get("core", None)
-        if core_search_component_name:
-            core_search_component = all_search_components_dict[
-                core_search_component_name
-            ]
-        else:
-            # get default core search component
-            core_search_component = list(
-                filter(
-                    lambda x: x.config.get("default", False) and x.type == "core",
-                    list(all_search_components_dict.values()),
-                )
-            )[0]
-
-        core_search_class_method = get_class_from_modulename(
-            core_search_component.modulename,
-            core_search_component.classname,
-            ExtensionType.SEARCH_COMPONENTS,
-        )
-        core_search_instance = core_search_class_method(core_search_component)
+        search_component_factory = SearchFilterFactory(request)
+        core_search_instance = search_component_factory.get_core_component_instance()
         search_components = core_search_instance.get_search_components()
 
         datatypes = models.DDataType.objects.all()
@@ -364,50 +343,24 @@ def get_dsl_from_search_string(request):
 
 def search_results(request, returnDsl=False):
     se = SearchEngineFactory().create()
-    permitted_nodegroups = get_permitted_nodegroups(request.user)
-    include_provisional = get_provisional_type(request)
     search_filter_factory = SearchFilterFactory(request)
-    search_results_object = {"query": Query(se)}
-    sorted_query_obj = search_filter_factory.create_search_query_dict(
-        list(request.GET.items()) + list(request.POST.items())
+    core_search_instance = search_filter_factory.get_core_component_instance()
+
+    search_query_object = {"query": Query(se)}
+    results_object = {"results": None}
+
+    dsl_only = core_search_instance.handle_search_results_query(
+        search_query_object, results_object, search_filter_factory, returnDsl
     )
-
-    try:
-        for filter_type, querystring in list(sorted_query_obj.items()):
-            search_filter = search_filter_factory.get_filter(filter_type)
-            if search_filter:
-                search_filter.append_dsl(
-                    search_results_object, permitted_nodegroups, include_provisional
-                )
-        append_instance_permission_filter_dsl(request, search_results_object)
-    except Exception as err:
-        logger.exception(err)
-        return JSONErrorResponse(message=str(err))
-
     if returnDsl:
-        return search_results_object.pop("query", None)
+        return dsl_only
 
-    ret = {"results": None}
-
-    for filter_type, querystring in list(sorted_query_obj.items()):
-        search_filter = search_filter_factory.get_filter(filter_type)
-        if search_filter:
-            search_filter.execute_query(search_results_object, ret)
-
-    if ret["results"] is not None:
-
-        # allow filters to modify the results
-        for filter_type, querystring in list(sorted_query_obj.items()):
-            search_filter = search_filter_factory.get_filter(filter_type)
-            if search_filter:
-                search_filter.post_search_hook(
-                    search_results_object, ret, permitted_nodegroups
-                )
-
-        search_results_object.pop("query")
-        if isinstance(ret, dict):
-            for key, value in list(search_results_object.items()):
-                ret[key] = value
+    if results_object["results"] is not None:
+        search_query_object.pop("query")
+        # ensure that if a search filter modified the query in some way
+        # that the modification is set on the results_object
+        for key, value in list(search_query_object.items()):
+            results_object[key] = value
 
         return JSONResponse(content=ret)
 

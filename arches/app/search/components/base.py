@@ -105,6 +105,17 @@ class CoreSearchComponent(BaseSearchFilter):
     def get_search_components(self):
         return self._required_search_components + [self.core_component]
 
+    def handle_search_results_query(
+        self, search_query_object, results_object, search_filter_factory, returnDsl
+    ):
+        """
+        Called in-place to modify both search_query_object and results_object
+        See arches.app.search.components.arches_core_search for example implementation
+        """
+
+        if returnDsl:
+            return search_query_object.pop("query", None)
+
 
 class SearchFilterFactory(object):
     def __init__(self, request=None):
@@ -137,6 +148,29 @@ class SearchFilterFactory(object):
             return filter_instance
         else:
             return None
+
+    def get_core_component_name(self):
+        if self.request.method == "POST":
+            core_search_component_name = self.request.POST.get("core", None)
+        else:
+            core_search_component_name = self.request.GET.get("core", None)
+
+        if not core_search_component_name:
+            # get default core search component
+            core_search_component = list(
+                filter(
+                    lambda x: x.config.get("default", False) and x.type == "core",
+                    list(self.search_filters.values()),
+                )
+            )[0]
+            core_search_component_name = core_search_component.componentname
+
+        return core_search_component_name
+
+    def get_core_component_instance(self):
+        core_search_component_name = self.get_core_component_name()
+        core_search_component_instance = self.get_filter(core_search_component_name)
+        return core_search_component_instance
 
     def get_sorted_query_dict(self, query_dict, core_search_component):
         component_sort_order = {

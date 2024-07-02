@@ -1,12 +1,19 @@
 from arches.app.models.system_settings import settings
 from arches.app.search.components.base import CoreSearchComponent
 from arches.app.search.mappings import RESOURCES_INDEX
+from arches.app.views.search import (
+    append_instance_permission_filter_dsl,
+    get_permitted_nodegroups,
+    get_provisional_type,
+)
 from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
     user_is_resource_exporter,
 )
+from arches.app.utils.response import JSONErrorResponse
 from datetime import datetime
 import json
+import logging
 
 
 details = {
@@ -94,6 +101,8 @@ SEARCH_RESULT_PAGES = (
     int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT) - 1
 )
 
+logger = logging.getLogger(__name__)
+
 
 class ArchesCoreSearch(CoreSearchComponent):
 
@@ -178,3 +187,40 @@ class ArchesCoreSearch(CoreSearchComponent):
         search_components.append(self.core_component)
 
         return search_components
+
+    def handle_search_results_query(
+        self, search_query_object, results_object, search_filter_factory, returnDsl
+    ):
+        sorted_query_obj = search_filter_factory.create_search_query_dict(
+            list(self.request.GET.items()) + list(self.request.POST.items())
+        )
+        permitted_nodegroups = get_permitted_nodegroups(self.request.user)
+        include_provisional = get_provisional_type(self.request)
+        try:
+            for filter_type, querystring in list(sorted_query_obj.items()):
+                search_filter = search_filter_factory.get_filter(filter_type)
+                if search_filter:
+                    search_filter.append_dsl(
+                        search_query_object, permitted_nodegroups, include_provisional
+                    )
+            append_instance_permission_filter_dsl(self.request, search_query_object)
+        except Exception as err:
+            logger.exception(err)
+            return JSONErrorResponse(message=str(err))
+
+        if returnDsl:
+            return search_query_object.pop("query", None)
+
+        for filter_type, querystring in list(sorted_query_obj.items()):
+            search_filter = search_filter_factory.get_filter(filter_type)
+            if search_filter:
+                search_filter.execute_query(search_query_object, results_object)
+
+        if results_object["results"] is not None:
+            # allow filters to modify the results
+            for filter_type, querystring in list(sorted_query_obj.items()):
+                search_filter = search_filter_factory.get_filter(filter_type)
+                if search_filter:
+                    search_filter.post_search_hook(
+                        search_query_object, results_object, permitted_nodegroups
+                    )
