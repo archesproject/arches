@@ -1178,9 +1178,12 @@ class ResourceInstance(models.Model):
         ).first()
 
         if create_record:
-            creatorid = create_record.userid
+            try:
+                creatorid = int(create_record.userid)
+            except ValueError:
+                pass
 
-        if creatorid is None or creatorid == "":
+        if creatorid is None:
             creatorid = settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
 
         return creatorid
