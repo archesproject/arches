@@ -1245,8 +1245,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 )
 
         if value is not None:
-            # if byte_count > max_bytes:
-            #     validate_geom_byte_size_can_be_reduced(value)
             for feature in value["features"]:
                 try:
                     geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
@@ -1336,7 +1334,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
         features = []
         nodevalue["properties"] = {}
-        # print("Doc length: %s" % len_feature(nodevalue))
         if len_feature(nodevalue) < max_length:
             features.append(nodevalue)
         else:
@@ -1348,7 +1345,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     chunks = self.split_geom(feature, len_feature)
                     features = features + chunks
 
-        print("Number of features: %s" % len(features))
         for feature in features:
             document["geometries"].append({"geom": feature, "nodegroup_id": tile.nodegroup_id, "provisional": provisional, "tileid": tile.pk})
         bounds = self.get_bounds_from_value(nodevalue)
@@ -1371,18 +1367,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         num_points = len(coordinates)
         num_chunks = feat_len_bytes / 32000
         max_points = int(num_points/num_chunks)
-        print("points/chunks = max_points: %s/%s = %s" % (num_points, num_chunks, max_points))
 
-        # print("Geometry: %s" % geom)
-        # print("Geometry: %s" % geom["geometry"])
         with connection.cursor() as cur:
             cur.execute('select st_asgeojson(st_subdivide(%s, %s))', [str(feature["geometry"]), max_points])
             smaller_chunks = [{'id': feature['id'], 'type': 'Feature', 'geometry': json.loads(item[0])} for item in cur.fetchall()]
             feature_collections = [{"type": "FeatureCollection", "features": [geometry]} for geometry in smaller_chunks]
-            # for chunk in smaller_chunks:
-            #     # print(chunk)
-            #     print("Type: %s" % type(chunk))
-            #     print("New feature length: %s " % len_feature(chunk))
             return feature_collections
 
     def get_bounds(self, tile, node):
