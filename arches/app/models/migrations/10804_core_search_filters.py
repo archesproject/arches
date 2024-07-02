@@ -62,4 +62,9 @@ class Migration(migrations.Migration):
             model_name="searchcomponent",
             name="sortorder",
         ),
+        migrations.AlterField(
+            model_name="searchcomponent",
+            name="componentpath",
+            field=models.TextField(),
+        ),
     ]
