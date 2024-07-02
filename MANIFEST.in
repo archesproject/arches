@@ -1,6 +1,7 @@
 recursive-include arches *
 include README.md
 exclude Dockerfile
+exclude arches/controlledlists/tests.py
 exclude arches/logs/*.txt
 exclude arches/settings_local.py
 exclude .*

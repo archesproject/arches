@@ -81,7 +81,7 @@ jobs:
 
       - name: Run Python unit tests
         run: |
-          python -W default::DeprecationWarning -m coverage run manage.py test tests --settings="tests.test_settings"
+          python -W default::DeprecationWarning -m coverage run manage.py test tests arches.controlledlists.tests --settings="tests.test_settings"
 
       - name: Generate Python report coverage
         run: |

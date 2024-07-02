@@ -12,7 +12,3 @@ def add_to_update_fields(kwargs, field_name):
             new = set(update_fields)
             new.add(field_name)
             kwargs["update_fields"] = new
-
-
-def field_names(instance):
-    return {f.name for f in instance.__class__._meta.fields}

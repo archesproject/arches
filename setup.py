@@ -60,5 +60,4 @@ setup(
     packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
     include_package_data=True,
     zip_safe=False,
-    test_suite="tests.run_tests.run_all",
 )
