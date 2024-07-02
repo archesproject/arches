@@ -155,8 +155,6 @@ input {
 
 .characteristic input[disabled] {
     text-align: left;
-    opacity: 1;
-    border: 0;
 }
 
 .edit-controls {
