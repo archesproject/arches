@@ -1176,6 +1176,7 @@ class ResourceInstance(models.Model):
         create_record = EditLog.objects.filter(
             resourceinstanceid=self.resourceinstanceid, edittype="create"
         ).first()
+        creatorid = None
 
         if create_record:
             try:
