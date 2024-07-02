@@ -325,7 +325,7 @@ def export_results(request):
         )
 
 
-def append_instance_permission_filter_dsl(request, search_results_object):
+def append_instance_permission_filter_dsl(request, search_query_object):
     if request.user.is_superuser is False:
         has_access = Bool()
         terms = Terms(
@@ -333,7 +333,7 @@ def append_instance_permission_filter_dsl(request, search_results_object):
         )
         nested_term_filter = Nested(path="permissions", query=terms)
         has_access.must_not(nested_term_filter)
-        search_results_object["query"].add_query(has_access)
+        search_query_object["query"].add_query(has_access)
 
 
 def get_dsl_from_search_string(request):
