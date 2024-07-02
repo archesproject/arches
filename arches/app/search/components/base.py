@@ -198,8 +198,6 @@ class SearchFilterFactory(object):
         ret = dict(query_dict)
         core_component_name = self.get_core_component_name()
         ret[core_component_name] = True
-        if "core" in ret:
-            del ret["core"]
 
         return ret, self.search_filters[core_component_name]
 

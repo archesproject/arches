@@ -35,12 +35,6 @@ define([
             this.queryString.subscribe(function() {
                 this.doQuery();
             }, this);
-            
-            var firstEnabledFilter = _.find(this.sharedStateObject.filtersList, function(filter) {
-                return filter.type === 'filter';
-            }, this);
-
-            this.sharedStateObject.isResourceRelatable = this.isResourceRelatable;
         },
 
         doQuery: function() {
