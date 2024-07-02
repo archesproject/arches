@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from arches.setup import get_version
+from arches.version import get_version
 
 try:
     # This will make sure the app is always imported when
