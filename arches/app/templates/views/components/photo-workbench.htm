@@ -110,17 +110,17 @@
                        </button>
                        <br>
                        <div style="padding: 10px">
-                            <p>
-                                <span data-bind="text: $root.translations.addingPhotosOptional"></span>
-                            </p>
-                            <p>
-                                <span data-bind="text: $root.translations.maxPhotoSizeWarning(maxFilesize())"></span>
-                            </p>
-                        </div>
+                        <p>
+                            <span data-bind="text: $root.translations.addingPhotosOptional"></span>
+                        </p>
+                        <p>
+                            <span data-bind="text: $root.translations.maxPhotoSizeWarning(maxFilesize())"></span>
+                        </p>
+                    </div>
 
                    </div>
                    <div class="file-upload-footer">
-                        <span data-bind="text: $root.translations.validImageFormats"></span>
+                        <span data-bind="text: $root.translations.validImageFormats(acceptedFiles())"></span>
                    </div>
                </div>
 
@@ -162,14 +162,14 @@
                             <span data-bind="text: $root.translations.addingPhotosOptional"></span>
                         </p>
                         <p>
-                            <span data-bind="text: $root.translations.maxPhotoSizeWarning"></span>
+                            <span data-bind="text: $root.translations.maxPhotoSizeWarning(maxFilesize())"></span>
                         </p>
                     </div>
 
-               </div>
-               <div class="file-upload-footer">
-                    <span data-bind="text: $root.translations.acceptedImageFormats"></span>
-               </div>
+            </div>
+            <div class="file-upload-footer">
+                    <span data-bind="text: $root.translations.acceptedImageFormats(acceptedFiles())"></span>
+            </div>
            </div>
 
         </div>

@@ -1327,7 +1327,9 @@ class TileModel(models.Model):  # Tile
 
     def save(self, *args, **kwargs):
         if self.sortorder is None or self.is_fully_provisional():
-            for node in Node.objects.filter(nodegroup_id=self.nodegroup_id):
+            for node in Node.objects.filter(nodegroup_id=self.nodegroup_id).exclude(
+                datatype="semantic"
+            ):
                 if not str(node.pk) in self.data:
                     self.data[str(node.pk)] = None
 
