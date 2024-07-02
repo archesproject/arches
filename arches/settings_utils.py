@@ -43,7 +43,9 @@ def list_arches_app_paths():
 def build_staticfiles_dirs(root_dir, app_root=None, additional_directories=None):
     """
     Builds the STATICFILES_DIRS tuple with respect to ordering projects,
-    packages, additional directories.
+    packages, additional directories, before considering Arches
+    applications. (Those are handled by inject_arches_applications_directories(),
+    called by an arches application's ready() method.)
 
     Arguments
 
@@ -79,7 +81,9 @@ def build_templates_config(
     context_processors=None,
 ):
     """
-    Builds a template config dictionary
+    Builds a preliminary template config dictionary, before considering Arches
+    applications. (Those are handled by inject_arches_applications_directories(),
+    called by an arches application's ready() method.)
 
     Arguments
 
@@ -134,19 +138,24 @@ def inject_arches_applications_directories():
 
     arches_app_paths = list_arches_app_paths()
 
-    arches_app_template_dirs = [
-        os.path.join(arches_app_path, "templates")
-        for arches_app_path in arches_app_paths
-    ]
+    arches_app_template_dirs = []
+    for arches_app_path in arches_app_paths:
+        template_path = os.path.join(arches_app_path, "templates")
+        if template_path not in settings.TEMPLATES[0]["DIRS"]:
+            arches_app_template_dirs.append(template_path)
+
     settings.TEMPLATES[0]["DIRS"] = (
         *settings.TEMPLATES[0]["DIRS"][:-1],
         *arches_app_template_dirs,
         settings.TEMPLATES[0]["DIRS"][-1],
     )
 
-    arches_app_media_dirs = [
-        os.path.join(arches_app_path, "media") for arches_app_path in arches_app_paths
-    ]
+    arches_app_media_dirs = []
+    for arches_app_path in arches_app_paths:
+        media_dir = os.path.join(arches_app_path, "media")
+        if media_dir not in settings.STATICFILES_DIRS:
+            arches_app_media_dirs.append(media_dir)
+
     settings.STATICFILES_DIRS = (
         *settings.STATICFILES_DIRS[:-3],
         *arches_app_media_dirs,
