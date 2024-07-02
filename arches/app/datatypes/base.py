@@ -517,3 +517,11 @@ class BaseDataType(object):
         Adds properties to a tile necessary for some clients, but not essential to the tile
         """
         pass
+
+    def validate_node(self, node):
+        """
+        Confirms a node is properly configured to collect data.
+        If improperly configured, this method should raise
+        a GraphValidationError
+        """
+        pass
