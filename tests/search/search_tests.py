@@ -58,7 +58,7 @@ class SearchTests(ArchesTestCase):
             y = {"id": i + 100, "type": "altLabel", "value": "test alt label"}
             se.index_data(index="test", body=y, idfield="id", refresh=True)
 
-        time.sleep(3)
+        sync_es(se)
 
         query = Query(se, start=0, limit=100)
         match = Match(field="type", query="altLabel")
@@ -108,3 +108,7 @@ class SearchTests(ArchesTestCase):
 
         count_after = se.count(index="bulk")
         self.assertEqual(count_after, 1001)
+
+
+def sync_es(search_engine, index="test"):
+    search_engine.es.indices.refresh(index=index)
