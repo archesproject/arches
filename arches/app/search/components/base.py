@@ -61,7 +61,7 @@ class BaseSearchFilter:
 
     def execute_query(self, search_results_object, response_object):
         """
-        code responsible for execution of the search query and initial mutation of response object
+        code responsible for execution of the search query logic and mutation of the response object
         """
         pass
 
@@ -83,7 +83,7 @@ class CoreSearchComponent(BaseSearchFilter):
     """
 
     def __init__(self, request=None, componentname=None):
-        super(BaseSearchFilter, self).__init__(request=request)
+        super().__init__(request=request)
         self.core_component = models.SearchComponent.objects.get(
             componentname=componentname
         )
