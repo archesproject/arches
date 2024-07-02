@@ -144,10 +144,5 @@ class BusinessDataExportTests(ArchesTestCase):
         ) as f:
             json_truth = deep_sort(json.load(f))
 
-        # removes generated graph_publication_id
-        for resource_data in json_export["business_data"]["resources"]:
-            if resource_data["resourceinstance"]["graph_publication_id"]:
-                del resource_data["resourceinstance"]["graph_publication_id"]
-
         self.maxDiff = None
         self.assertDictEqual(json_export, json_truth)
