@@ -17,7 +17,6 @@ define([
             var self = this;
             options.name = 'Search Result Details';
             options.componentName = componentName;
-            // this.requiredFilters = ['search-results'];
             BaseFilter.prototype.initialize.call(this, options);
 
             this.options = options;

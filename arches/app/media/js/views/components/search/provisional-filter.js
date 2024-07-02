@@ -10,7 +10,6 @@ define([
             options.name = 'Provisional Filter';
             options.componentName = componentName;
             this.translations = arches.translations;
-            // this.requiredFilters = ['term-filter'];
             BaseFilter.prototype.initialize.call(this, options);
             this.filter = ko.observableArray();
             this.provisionalOptions = [{'name': 'Authoritative'},{'name': 'Provisional'}];

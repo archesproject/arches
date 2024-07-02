@@ -27,7 +27,6 @@ function($, _, BaseFilter, bootstrap, arches, select2, ko, koMapping, GraphModel
             initialize: function(options) {
                 options.name = 'Search Results';
                 options.componentName = componentName;
-                // this.requiredFilters = ['map-filter'];
                 BaseFilter.prototype.initialize.call(this, options);
                 this.results = ko.observableArray();
                 this.showRelationships = ko.observable();

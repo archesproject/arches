@@ -9,7 +9,6 @@ define([
         initialize: async function(options) {
             options.name = 'Resource Type Filter';
             options.componentName = componentName;
-            // this.requiredFilters = ['term-filter'];
             BaseFilter.prototype.initialize.call(this, options);
             this.resourceModels = ko.observableArray();
             this.filter = ko.observableArray();
