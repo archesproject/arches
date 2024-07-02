@@ -1364,9 +1364,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 }
             )
 
-    def split_geom(self, geom, len_feature):
-        feat_len_bytes = len_feature(geom)
-        num_points = len(geom["geometry"]["coordinates"][0])
+    def split_geom(self, feature, len_feature):
+        feat_len_bytes = len_feature(feature)
+        geom = feature["geometry"]
+        coordinates = geom["coordinates"] if geom["type"] == "LineString" else geom["coordinates"][0]
+        num_points = len(coordinates)
         num_chunks = feat_len_bytes / 32000
         max_points = int(num_points/num_chunks)
         print("points/chunks = max_points: %s/%s = %s" % (num_points, num_chunks, max_points))
@@ -1374,13 +1376,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         # print("Geometry: %s" % geom)
         # print("Geometry: %s" % geom["geometry"])
         with connection.cursor() as cur:
-            cur.execute('select st_asgeojson(st_subdivide(%s, %s))', [str(geom["geometry"]), max_points])
-            smaller_chunks = [{'id': geom['id'], 'type': 'Feature', 'geometry': item[0]} for item in cur.fetchall()]
+            cur.execute('select st_asgeojson(st_subdivide(%s, %s))', [str(feature["geometry"]), max_points])
+            smaller_chunks = [{'id': feature['id'], 'type': 'Feature', 'geometry': json.loads(item[0])} for item in cur.fetchall()]
+            feature_collections = [{"type": "FeatureCollection", "features": [geometry]} for geometry in smaller_chunks]
             # for chunk in smaller_chunks:
             #     # print(chunk)
             #     print("Type: %s" % type(chunk))
             #     print("New feature length: %s " % len_feature(chunk))
-            return list(smaller_chunks)
+            return feature_collections
 
     def get_bounds(self, tile, node):
         bounds = None
