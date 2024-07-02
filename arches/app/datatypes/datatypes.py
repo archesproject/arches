@@ -1337,7 +1337,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         if len_feature(nodevalue) < max_length:
             features.append(nodevalue)
         else:
-            for feature in nodevalue['features']:
+            for feature in nodevalue["features"]:
                 new_feature = {"type": "FeatureCollection", "features": [feature]}
                 if len_feature(new_feature) < max_length:
                     features.append(new_feature)
@@ -1361,18 +1361,29 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             )
 
     def split_geom(self, feature, len_feature):
-        feat_len_bytes = len_feature(feature)
-        geom = feature["geometry"]
-        coordinates = geom["coordinates"] if geom["type"] == "LineString" else geom["coordinates"][0]
-        num_points = len(coordinates)
-        num_chunks = feat_len_bytes / 32000
-        max_points = int(num_points/num_chunks)
+       feat_len_bytes = len_feature(feature)
+       geom = feature["geometry"]
+       coordinates = (
+           geom["coordinates"] if geom["type"] == "LineString" else geom["coordinates"][0]
+       )
+       num_points = len(coordinates)
+       num_chunks = feat_len_bytes / 32000
+       max_points = int(num_points / num_chunks)
 
-        with connection.cursor() as cur:
-            cur.execute('select st_asgeojson(st_subdivide(%s, %s))', [str(feature["geometry"]), max_points])
-            smaller_chunks = [{'id': feature['id'], 'type': 'Feature', 'geometry': json.loads(item[0])} for item in cur.fetchall()]
-            feature_collections = [{"type": "FeatureCollection", "features": [geometry]} for geometry in smaller_chunks]
-            return feature_collections
+       with connection.cursor() as cur:
+           cur.execute(
+               "select st_asgeojson(st_subdivide(%s, %s))",
+               [str(feature["geometry"]), max_points],
+           )
+           smaller_chunks = [
+               {"id": feature["id"], "type": "Feature", "geometry": json.loads(item[0])}
+               for item in cur.fetchall()
+           ]
+           feature_collections = [
+               {"type": "FeatureCollection", "features": [geometry]}
+               for geometry in smaller_chunks
+           ]
+           return feature_collections
 
     def get_bounds(self, tile, node):
         bounds = None
