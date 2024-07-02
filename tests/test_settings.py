@@ -29,8 +29,6 @@ PACKAGE_NAME = "arches"
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 APP_ROOT = ""
 
-ARCHES_APPLICATIONS = ()
-
 MIN_ARCHES_VERSION = arches.__version__
 MAX_ARCHES_VERSION = arches.__version__
 

@@ -2,6 +2,7 @@ import importlib
 
 from arches.app.const import ExtensionType
 from arches.app.models.system_settings import settings
+from arches.settings_utils import list_arches_app_names
 
 
 def get_module(path, modulename=""):
@@ -15,7 +16,7 @@ def get_directories(extension_type: ExtensionType):
         core_root_dir = core_root_dir.replace("search_components", "search.components")
 
     core_and_arches_app_dirs = [core_root_dir]
-    for arches_app in settings.ARCHES_APPLICATIONS:
+    for arches_app in list_arches_app_names():
         core_and_arches_app_dirs.append(f"{arches_app}.{extension_type.value}")
         core_and_arches_app_dirs.append(
             f"{arches_app}.pkg.extensions.{extension_type.value}"

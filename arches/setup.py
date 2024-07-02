@@ -7,7 +7,6 @@ import zipfile
 import datetime
 import platform
 import tarfile
-from arches import settings
 
 here = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(here)

@@ -1,7 +1,20 @@
 import warnings
 
+from django.apps import AppConfig
 from django.conf import settings
 from django.core.checks import register, Tags, Error, Warning
+
+from arches.settings_utils import inject_arches_applications_directories
+
+
+class ArchesAppConfig(AppConfig):
+    name = "arches"
+    verbose_name = "Arches"
+    is_arches_application = False
+
+    def ready(self):
+        inject_arches_applications_directories()
+
 
 ### GLOBAL DEPRECATIONS ###
 FILE_TYPE_CHECKING_MSG = (
@@ -14,8 +27,6 @@ if settings.FILE_TYPE_CHECKING in (True, False):
 
 
 ### SYSTEM CHECKS ###
-
-
 @register(Tags.security)
 def check_cache_backend_for_production(app_configs, **kwargs):
     errors = []
