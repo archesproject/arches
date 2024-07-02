@@ -150,7 +150,9 @@ class SearchFilterFactory(object):
             return None
 
     def get_core_component_name(self):
-        if self.request.method == "POST":
+        if not self.request:
+            core_search_component_name = None
+        elif self.request.method == "POST":
             core_search_component_name = self.request.POST.get("core", None)
         else:
             core_search_component_name = self.request.GET.get("core", None)
@@ -174,10 +176,10 @@ class SearchFilterFactory(object):
 
     def get_sorted_query_dict(self, query_dict, core_search_component):
         component_sort_order = {
-            item["componentname"]: item["sortorder"]
+            item["componentname"]: int(item["sortorder"])
             for item in core_search_component.config["requiredComponents"]
         }
-        # Sort the query_dict items based on the component's sortorder
+        # Sort the query_dict items based on the requiredComponent's sortorder
         sorted_items = sorted(
             query_dict.items(),
             key=lambda item: component_sort_order.get(item[0], float("inf")),
@@ -186,23 +188,15 @@ class SearchFilterFactory(object):
         return dict(sorted_items)
 
     def get_query_dict_with_core_component(self, query_dict: Dict[str, Any]):
-        # Set core=core-search on query_dict to core-search=True
+        """
+        Set core=arches-core-search on query_dict to arches-core-search=True
+        """
         ret = dict(query_dict)
-        core_component = ret.get("core", False)
-        if core_component:
-            ret[core_component] = True
-            core_component = self.search_filters[core_component]
-            del ret["core"]
-        else:
-            core_component = list(
-                filter(
-                    lambda x: x.config.get("default", False) and x.type == "core",
-                    list(self.search_filters.values()),
-                )
-            )[0]
-            ret[core_component.componentname] = True
+        core_component_name = self.get_core_component_name()
+        ret[core_component_name] = True
+        del ret["core"]
 
-        return ret, core_component
+        return ret, self.search_filters[core_component_name]
 
     def create_search_query_dict(self, key_value_pairs: List[Tuple[str, Any]]):
         # handles list of key,value tuples so that dict-like data from POST and GET
