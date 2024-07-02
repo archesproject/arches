@@ -5,7 +5,7 @@ from arches.settings_utils import inject_arches_applications_directories
 
 class {{ project_name_title_case }}Config(AppConfig):
     name = "{{ project_name }}"
-    verbose_name = {{ project_name_title_case }}
+    verbose_name = "{{ project_name_title_case }}"
     is_arches_application = True
 
     def ready(self):
