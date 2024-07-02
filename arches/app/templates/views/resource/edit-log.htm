@@ -42,7 +42,7 @@
 <div data-bind="foreach: edits">
     <div class="timeline-entry">
         <div class="timeline-stat eh-timeline-stat">
-            <div class="timeline-icon" data-bind="css: edit_type_icon.color"><i class="fa fa-plus fa-lg" data-bind="css: edit_type_icon.icon"></i></div>
+            <div class="timeline-icon" data-bind="css: edit_type_icon.color"><i data-bind="css: edit_type_icon.icon"></i></div>
             <div class="timeline-time eh-timeline-time"><span data-bind="text: time"></span> <br> <span data-bind="text: day"></span> </div>
         </div>
         <div class="timeline-label eh-timeline-label">
@@ -53,131 +53,141 @@
                 </div>
             <!--/ko-->
             <!--ko if: edittype == 'tile create'-->
-            <!--ko if: cardContainerName -->
-            <h4 class="mar-no pad-btm"><span data-bind="text: cardContainerName + ': ' + card.name + ' '"></span>{% trans 'Created' %}</h4>
-            <!--/ko-->
-            <!--ko ifnot: cardContainerName -->
-            <h4 class="mar-no pad-btm"><span data-bind="text: card.name + ' '"></span>{% trans 'Created' %}</h4>
-            <!--/ko-->
+                <!--ko if: cardContainerName -->
+                <h4 class="mar-no pad-btm"><span data-bind="text: cardContainerName + ': ' + card.name + ' '"></span>{% trans 'Created' %}</h4>
+                <!--/ko-->
+                <!--ko ifnot: cardContainerName -->
+                <h4 class="mar-no pad-btm"><span data-bind="text: card.name + ' '"></span>{% trans 'Created' %}</h4>
+                <!--/ko-->
 
-            <div class="eh-node-group">
+                <div class="eh-node-group">
 
-                <!--ko if: full_new_value.length > 0 -->
-                <div class="eh-edit-title">{% trans 'Tile Data' %}</div>
-                <div class="tile-data-container">
+                    <!--ko if: full_new_value.length > 0 -->
+                    <div class="eh-edit-title">{% trans 'Tile Data' %}</div>
+                    <div class="tile-data-container">
+                        <ul class="tile-data-list">
+                            <div data-bind="foreach: full_new_value">
+                            <li class="tile-data-item">
+                                <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                            </li>
+                            </div>
+                        </ul>
+                    </div>
+                    <!-- /ko -->
+                    <!--ko if: full_new_provisional_value.length > 0 -->
+                    <div class="eh-edit-title">{% trans 'Provisional Tile Data' %}</div>
+                    <div>
                     <ul class="tile-data-list">
-                        <div data-bind="foreach: full_new_value">
-                        <li class="tile-data-item">
-                            <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
-                        </li>
+                        <div data-bind="foreach: full_new_provisional_value">
+                            <li class="tile-data-item">
+                                <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                            </li>
                         </div>
                     </ul>
-                </div>
-                <!-- /ko -->
-                <!--ko if: full_new_provisional_value.length > 0 -->
-                <div class="eh-edit-title">{% trans 'Provisional Tile Data' %}</div>
-                <div>
-                <ul class="tile-data-list">
-                    <div data-bind="foreach: full_new_provisional_value">
-                        <li class="tile-data-item">
-                            <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
-                        </li>
                     </div>
-                </ul>
+                    <!-- /ko -->
                 </div>
-                <!-- /ko -->
-            </div>
             <!--/ko-->
             <!--ko if: edittype == 'tile edit'-->
-            <!--ko if: cardContainerName -->
-            <h4 class="mar-no pad-btm"><span data-bind="text: cardContainerName + ': ' + card.name + ' '"></span>{% trans 'Edit' %}</h4>
-            <!--/ko-->
-            <!--ko ifnot: cardContainerName -->
-            <h4 class="mar-no pad-btm"><span data-bind="text: card.name + ' '"></span>{% trans 'Edit' %}</h4>
-            <!--/ko-->
+                <!--ko if: cardContainerName -->
+                <h4 class="mar-no pad-btm"><span data-bind="text: cardContainerName + ': ' + card.name + ' '"></span>{% trans 'Edit' %}</h4>
+                <!--/ko-->
+                <!--ko ifnot: cardContainerName -->
+                <h4 class="mar-no pad-btm"><span data-bind="text: card.name + ' '"></span>{% trans 'Edit' %}</h4>
+                <!--/ko-->
 
-            <div class="eh-node-group">
+                <div class="eh-node-group">
 
-                <!--ko if: full_new_value.length > 0 -->
-                <div class="eh-edit-title">{% trans 'New Tile Data' %}</div>
-                <div class="tile-data-container">
-                    <ul class="tile-data-list">
-                        <div data-bind="foreach: full_new_value">
-                        <li class="tile-data-item">
-                            <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
-                        </li>
-                        </div>
-                    </ul>
-                </div>
-                <!-- /ko -->
-                <!--ko if: full_new_provisional_value.length > 0 -->
-                <div class="eh-edit-title">{% trans 'Provisional Tile Data' %}</div>
-                <div>
-                <ul class="tile-data-list">
-                    <div data-bind="foreach: full_new_provisional_value">
-                        <li class="tile-data-item">
-                            <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
-                        </li>
+                    <!--ko if: full_new_value.length > 0 -->
+                    <div class="eh-edit-title">{% trans 'New Tile Data' %}</div>
+                    <div class="tile-data-container">
+                        <ul class="tile-data-list">
+                            <div data-bind="foreach: full_new_value">
+                            <li class="tile-data-item">
+                                <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                            </li>
+                            </div>
+                        </ul>
                     </div>
-                </ul>
-                </div>
-                <!-- /ko -->
-            </div>
-
-
-            <div class="eh-node-group">
-
-                <!--ko if: full_old_value.length > 0 -->
-                <hr>
-                <div class="eh-edit-title">{% trans 'Previous Tile Data' %}</div>
-                <div class="tile-data-container">
+                    <!-- /ko -->
+                    <!--ko if: full_new_provisional_value.length > 0 -->
+                    <div class="eh-edit-title">{% trans 'Provisional Tile Data' %}</div>
+                    <div>
                     <ul class="tile-data-list">
-                        <div data-bind="foreach: full_old_value">
-                        <li class="tile-data-item">
-                            <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
-                        </li>
+                        <div data-bind="foreach: full_new_provisional_value">
+                            <li class="tile-data-item">
+                                <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                            </li>
                         </div>
                     </ul>
+                    </div>
+                    <!-- /ko -->
                 </div>
-                <!--/ko-->
 
-                <!--ko if: full_old_provisional_value.length > 0 -->
-                <hr>
-                <div class="eh-edit-title">{% trans 'Previous Provisional Tile Data' %}</div>
-                <div class="tile-data-container">
-                    <ul class="tile-data-list">
-                        <div data-bind="foreach: full_old_provisional_value">
-                        <li class="tile-data-item">
-                            <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
-                        </li>
-                        </div>
-                    </ul>
+                <div class="eh-node-group">
+
+                    <!--ko if: full_old_value.length > 0 -->
+                    <hr>
+                    <div class="eh-edit-title">{% trans 'Previous Tile Data' %}</div>
+                    <div class="tile-data-container">
+                        <ul class="tile-data-list">
+                            <div data-bind="foreach: full_old_value">
+                            <li class="tile-data-item">
+                                <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                            </li>
+                            </div>
+                        </ul>
+                    </div>
+                    <!--/ko-->
+
+                    <!--ko if: full_old_provisional_value.length > 0 -->
+                    <hr>
+                    <div class="eh-edit-title">{% trans 'Previous Provisional Tile Data' %}</div>
+                    <div class="tile-data-container">
+                        <ul class="tile-data-list">
+                            <div data-bind="foreach: full_old_provisional_value">
+                            <li class="tile-data-item">
+                                <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                            </li>
+                            </div>
+                        </ul>
+                    </div>
+                    <!--/ko-->
+
                 </div>
-                <!--/ko-->
-
-            </div>
             <!--/ko-->
             <!--ko if: edittype == 'tile delete'-->
-            <!--ko if: cardContainerName -->
-            <h4 class="mar-no pad-btm"><span data-bind="text: cardContainerName + ': ' + card.name + ' '"></span>{% trans 'Deleted' %}</h4>
-            <!--/ko-->
-            <!--ko ifnot: cardContainerName -->
-            <h4 class="mar-no pad-btm"><span data-bind="text: card.name + ' '"></span>{% trans 'Deleted' %}</h4>
+                <!--ko if: cardContainerName -->
+                <h4 class="mar-no pad-btm"><span data-bind="text: cardContainerName + ': ' + card.name + ' '"></span>{% trans 'Deleted' %}</h4>
+                <!--/ko-->
+                <!--ko ifnot: cardContainerName -->
+                <h4 class="mar-no pad-btm"><span data-bind="text: card.name + ' '"></span>{% trans 'Deleted' %}</h4>
 
-            <!--/ko-->
-            <div class="eh-node-group">
-                <div class="eh-edit-title">{% trans 'Tile Data' %}</div>
+                <!--/ko-->
+                <div class="eh-node-group">
+                    <div class="eh-edit-title">{% trans 'Tile Data' %}</div>
 
-                <div class="tile-data-container">
-                    <ul class="tile-data-list">
-                        <div data-bind="foreach: full_old_value">
-                        <li class="tile-data-item">
-                            <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
-                        </li>
-                        </div>
-                    </ul>
+                    <div class="tile-data-container">
+                        <ul class="tile-data-list">
+                            <div data-bind="foreach: full_old_value">
+                            <li class="tile-data-item">
+                                <span class="tile-node-name" data-bind="text: node.name"></span><span class="tile-node-value" data-bind="text: ' ' + new_value"></span>
+                            </li>
+                            </div>
+                        </ul>
+                    </div>
                 </div>
-            </div>
+            <!--/ko-->
+            <!--ko if: edittype == 'update_lifecycle_state' -->
+                <h4 class="mar-no pad-btm">{% trans 'Resource Lifecycle State Updated' %}</h4>
+                <div class="eh-node-group">
+                    <p>                        
+                        <span>{% trans 'Previous Value: ' %}</span><span class="text-bold" data-bind="text: oldvalue"></span></p>
+                    </p>
+                    <p>                        
+                        <span>{% trans 'Updated Value: ' %}</span><span class="text-bold" data-bind="text: newvalue"></span></p>
+                    </p>
+                </div>
             <!--/ko-->
 
             <div class="eh-footer">

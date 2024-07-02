@@ -216,7 +216,15 @@ class Resource(models.ResourceInstance):
     def displayname(self, context=None):
         return self.get_descriptor("name", context)
 
-    def save_edit(self, user={}, note="", edit_type="", transaction_id=None):
+    def save_edit(
+        self,
+        user={},
+        note="",
+        edit_type="",
+        oldvalue=None,
+        newvalue=None,
+        transaction_id=None,
+    ):
         timestamp = datetime.datetime.now()
         edit = EditLog()
         edit.resourceclassid = self.graph_id
@@ -225,8 +233,11 @@ class Resource(models.ResourceInstance):
         edit.user_email = getattr(user, "email", "")
         edit.user_firstname = getattr(user, "first_name", "")
         edit.user_lastname = getattr(user, "last_name", "")
+        edit.user_username = getattr(user, "username", "")
         edit.note = note
         edit.timestamp = timestamp
+        edit.oldvalue = oldvalue
+        edit.newvalue = newvalue
         if transaction_id is not None:
             edit.transactionid = transaction_id
         edit.edittype = edit_type
@@ -246,12 +257,29 @@ class Resource(models.ResourceInstance):
         if not self.get_serialized_graph():
             pass
 
-        request = kwargs.pop("request", None)
-        user = kwargs.pop("user", None)
-        index = kwargs.pop("index", True)
         context = kwargs.pop("context", None)
+        index = kwargs.pop("index", True)
+        request = kwargs.pop("request", None)
         transaction_id = kwargs.pop("transaction_id", None)
+        should_update_lifecycle_state = kwargs.pop(
+            "should_update_lifecycle_state", False
+        )
+        current_lifecycle_state = kwargs.pop("current_lifecycle_state", None)
+        user = kwargs.pop("user", None)
+
         super(Resource, self).save(*args, **kwargs)
+
+        if should_update_lifecycle_state:
+            self.save_edit(
+                user=user,
+                edit_type="update_lifecycle_state",
+                oldvalue=current_lifecycle_state,
+                newvalue=self.lifecycle_state,
+                transaction_id=transaction_id,
+            )
+
+            return
+
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
 
         for tile in self.tiles:
@@ -1060,7 +1088,9 @@ class Resource(models.ResourceInstance):
             assign_perm(permission, identity, self)
         self.index()
 
-    def update_lifecycle_state(self, direction):
+    def update_lifecycle_state(self, user, direction):
+        current_lifecycle_state = self.lifecycle_state
+
         if direction == "forward":
             if self.lifecycle_state == "active":
                 self.lifecycle_state = "retired"
@@ -1070,7 +1100,12 @@ class Resource(models.ResourceInstance):
         else:
             raise Exception
 
-        self.save()
+        if current_lifecycle_state != self.lifecycle_state:
+            self.save(
+                user=user,
+                current_lifecycle_state=current_lifecycle_state,
+                should_update_lifecycle_state=True,
+            )
 
         return self.lifecycle_state
 

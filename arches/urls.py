@@ -591,7 +591,12 @@ urlpatterns = [
     ),
     re_path(r"^api/node_value/$", api.NodeValue.as_view(), name="api_node_value"),
     re_path(
-        r"^api/resource_instance_lifecycle/(?P<resourceid>%s|())$" % (uuid_regex),
+        r"^api/resource_instance_lifecycle/$",
+        api.ResourceInstanceLifecycle.as_view(),
+        name="api_resource_instance_lifecycle",
+    ),
+    re_path(
+        r"^api/resource_instance_lifecycle_state/(?P<resourceid>%s|())$" % (uuid_regex),
         api.ResourceInstanceLifecycleState.as_view(),
         name="api_resource_instance_lifecycle_state",
     ),

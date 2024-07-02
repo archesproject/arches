@@ -1,0 +1,28 @@
+{% load i18n %}
+
+<div class="resource-selector-button">
+    <div class="btn-group btn-group-xs">
+        <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false" aria-controls="resource-type-filter-contents">
+            <span data-bind="text: 'FOO'"></span>
+            <i class="dropdown-caret fa fa-caret-down"></i>
+        </button>
+        <ul id="resource-type-filter-contents" class="dropdown-menu dropdown-menu-right">
+            <li><a href="#" data-bind="onEnterkeyClick, click: selectFoo.bind($data, null)">
+                <span data-bind="text: $root.translations.allResources"></span>
+            </a></li>
+            <!-- ko foreach: lifecycleStates -->
+            <li>
+                <a 
+                    href="#" 
+                    data-bind="
+                        text: $data.length > 55 ? $data.substring(55, length) + '...' : $data,
+                        onEnterkeyClick, 
+                        click: $parent.selectFoo.bind($parent)
+                    "
+                >
+                </a>
+            </li>
+            <!-- /ko -->
+        </ul>
+    </div>
+</div>
