@@ -17,8 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from django.conf import LazySettings
-from django.db import ProgrammingError, OperationalError
-from django.utils.functional import empty
+from django.core.exceptions import ImproperlyConfigured
+
 from arches.app.models import models
 
 
@@ -42,7 +42,6 @@ class SystemSettings(LazySettings):
 
     def __init__(self, *args, **kwargs):
         super(SystemSettings, self).__init__(*args, **kwargs)
-        # print self
 
     def __str__(self):
         ret = []
@@ -65,6 +64,8 @@ class SystemSettings(LazySettings):
 
         try:
             return super(SystemSettings, self).__getattr__(name)
+        except ImproperlyConfigured:
+            raise
         except:
             self.update_from_db()
             return super(SystemSettings, self).__getattr__(
@@ -79,6 +80,8 @@ class SystemSettings(LazySettings):
         try:
             super(SystemSettings, self).__getattr__(name)
             return True
+        except ImproperlyConfigured:
+            raise
         except:
             return False
 
