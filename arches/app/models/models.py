@@ -1169,10 +1169,10 @@ class ResourceInstance(models.Model):
         creatorid = self.get_instance_creator()
 
         if user:
-            can_edit = user.id == int(creatorid) or user.is_superuser
+            can_edit = user.id == creatorid or user.is_superuser
         return {"creatorid": creatorid, "user_can_edit_instance_permissions": can_edit}
 
-    def get_instance_creator(self):
+    def get_instance_creator(self) -> int:
         create_record = EditLog.objects.filter(
             resourceinstanceid=self.resourceinstanceid, edittype="create"
         ).first()
