@@ -1001,9 +1001,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 }
             )
 
-    def split_geom(self, geom, len_feature):
-        feat_len_bytes = len_feature(geom)
-        num_points = len(geom["geometry"]["coordinates"][0])
+        coordinates = geom["coordinates"] if geom["type"] == "LineString" else geom["coordinates"][0]
         num_chunks = feat_len_bytes / 32000
         max_points = int(num_points/num_chunks)
         print("points/chunks = max_points: %s/%s = %s" % (num_points, num_chunks, max_points))
