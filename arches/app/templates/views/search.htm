@@ -16,6 +16,10 @@
 
                 <!-- Inline Filters (for QA and Resource Type) -->
                 <div class="search-inline-filters">
+                    <div class="results-related-resources-filter" data-bind="component: {
+                        name: 'results-related-resources-filter',
+                        params: sharedStateObject
+                    }"></div>
                     <!--ko if: sharedStateObject.userIsReviewer-->
                         <div class="qa-filter" data-bind="component: {
                             name: 'provisional-filter',
