@@ -1,3 +1,5 @@
+# pragma: no cover
+
 import arches
 import os
 import shutil
