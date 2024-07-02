@@ -147,6 +147,25 @@ class GeoJsonDataTypeTest(ArchesTestCase):
         with self.subTest(input=map_source):
             self.assertTrue("minzoom" in map_source and "maxzoom" in map_source)
 
+    def test_split_geom(self):
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+
+        resource_path = os.path.join(
+            "tests", "fixtures", "data", "json", "large_geojson_geometry.json"
+        )
+
+        def len_feature(feature_object):
+            return len(str(feature_object).encode("UTF-8"))
+
+        with open(resource_path) as geojson_file:
+            for feature in JSONDeserializer().deserialize(geojson_file)["features"]:
+                assert(len_feature(feature) > 3200)
+                for new_feature_set in geom_datatype.split_geom(feature, len_feature=len_feature):
+                    assert(len_feature(new_feature_set) < 32000)
+                    for new_feature in new_feature_set["features"]:
+                        assert(new_feature["id"] is not None)
+                        assert(new_feature["type"] == "Feature")
+
 
 class BaseDataTypeTests(ArchesTestCase):
     def test_get_tile_data_only_none(self):
