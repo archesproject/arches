@@ -31,7 +31,7 @@ APP_NAME = '{{ project_name }}'
 APP_ROOT = os.path.dirname(__file__)
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 
-ROOT_URLCONF = '{{ project_name }}.{{ project_name }}.urls'
+ROOT_URLCONF = '{{ project_name }}.urls'
 
 ARCHES_APPLICATIONS = ()
 
@@ -48,6 +48,7 @@ RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, "fixtures", "resource_graphs
 
 ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, "fixtures", "ontologies", "test_ontology")
 ONTOLOGY_PATH = os.path.join(TEST_ROOT, "fixtures", "ontologies", "cidoc_crm")
+MEDIA_ROOT = os.path.join(TEST_ROOT, "fixtures", "data")
 
 BUSINESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".

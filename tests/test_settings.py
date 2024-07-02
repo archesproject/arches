@@ -44,6 +44,7 @@ RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, "fixtures", "resource_graphs
 
 ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, "fixtures", "ontologies", "test_ontology")
 ONTOLOGY_PATH = os.path.join(TEST_ROOT, "fixtures", "ontologies", "cidoc_crm")
+MEDIA_ROOT = os.path.join(TEST_ROOT, "fixtures", "data")
 
 BUSINESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -69,6 +70,8 @@ TEST_RUNNER = "tests.base_test.ArchesTestRunner"
 SILENCED_SYSTEM_CHECKS.append(
     "arches.W001"
 )  # Cache backend does not support rate-limiting
+
+FILE_TYPE_CHECKING = "lenient"
 
 # could add Chrome, PhantomJS etc... here
 LOCAL_BROWSERS = []  # ['Firefox']

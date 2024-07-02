@@ -31,7 +31,6 @@ from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.db import connection
 from django.http import HttpRequest
-from django.test import override_settings
 from django.test import TransactionTestCase
 
 # these tests can be run from the command line via
@@ -39,10 +38,9 @@ from django.test import TransactionTestCase
 
 
 class SingleCSVTests(TransactionTestCase):
+    serialized_rollback = True
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUp(self):
         LanguageSynchronizer.synchronize_settings_with_db()
         with open(
             os.path.join("tests/fixtures/single_csv_bulk_manager_test_model.json"), "r"
@@ -53,9 +51,6 @@ class SingleCSVTests(TransactionTestCase):
         admin = User.objects.get(username="admin")
         graph.publish(user=admin)
 
-    @override_settings(
-        MEDIA_ROOT=os.path.join(settings.ROOT_DIR, "..", "tests/fixtures/data")
-    )
     def test_write(self):
         request = HttpRequest()
         request.method = "POST"
