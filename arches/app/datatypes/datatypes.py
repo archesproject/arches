@@ -1327,7 +1327,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             return self.find_num(current_item[0])
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        max_length = 32000  # this was 32766, but do we need space for extra part of JSON?
+        max_length = (
+            32000  # this was 32766, but do we need space for extra part of JSON?
+        )
 
         def len_feature(feature):
             return len(str(feature).encode("UTF-8"))
@@ -1346,7 +1348,14 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     features = features + chunks
 
         for feature in features:
-            document["geometries"].append({"geom": feature, "nodegroup_id": tile.nodegroup_id, "provisional": provisional, "tileid": tile.pk})
+            document["geometries"].append(
+                {
+                    "geom": feature,
+                    "nodegroup_id": tile.nodegroup_id,
+                    "provisional": provisional,
+                    "tileid": tile.pk,
+                }
+            )
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
             minx, miny, maxx, maxy = bounds
@@ -1361,29 +1370,35 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             )
 
     def split_geom(self, feature, len_feature):
-       feat_len_bytes = len_feature(feature)
-       geom = feature["geometry"]
-       coordinates = (
-           geom["coordinates"] if geom["type"] == "LineString" else geom["coordinates"][0]
-       )
-       num_points = len(coordinates)
-       num_chunks = feat_len_bytes / 32000
-       max_points = int(num_points / num_chunks)
+        feat_len_bytes = len_feature(feature)
+        geom = feature["geometry"]
+        coordinates = (
+            geom["coordinates"]
+            if geom["type"] == "LineString"
+            else geom["coordinates"][0]
+        )
+        num_points = len(coordinates)
+        num_chunks = feat_len_bytes / 32000
+        max_points = int(num_points / num_chunks)
 
-       with connection.cursor() as cur:
-           cur.execute(
-               "select st_asgeojson(st_subdivide(%s, %s))",
-               [str(feature["geometry"]), max_points],
-           )
-           smaller_chunks = [
-               {"id": feature["id"], "type": "Feature", "geometry": json.loads(item[0])}
-               for item in cur.fetchall()
-           ]
-           feature_collections = [
-               {"type": "FeatureCollection", "features": [geometry]}
-               for geometry in smaller_chunks
-           ]
-           return feature_collections
+        with connection.cursor() as cur:
+            cur.execute(
+                "select st_asgeojson(st_subdivide(%s, %s))",
+                [str(feature["geometry"]), max_points],
+            )
+            smaller_chunks = [
+                {
+                    "id": feature["id"],
+                    "type": "Feature",
+                    "geometry": json.loads(item[0]),
+                }
+                for item in cur.fetchall()
+            ]
+            feature_collections = [
+                {"type": "FeatureCollection", "features": [geometry]}
+                for geometry in smaller_chunks
+            ]
+            return feature_collections
 
     def get_bounds(self, tile, node):
         bounds = None
