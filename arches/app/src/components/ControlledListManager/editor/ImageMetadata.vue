@@ -183,7 +183,7 @@ const focusInput = () => {
             (inputEl as HTMLInputElement).focus({ focusVisible: true });
         }
         rowIndexToFocus.value = -1;
-    }, 5);
+    }, 25);
 };
 </script>
 
