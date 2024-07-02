@@ -362,7 +362,7 @@ def search_results(request, returnDsl=False):
         for key, value in list(search_query_object.items()):
             results_object[key] = value
 
-        return JSONResponse(content=ret)
+        return JSONResponse(content=results_object)
 
     else:
         ret = {"message": _("There was an error retrieving the search results")}
