@@ -4,27 +4,17 @@ define([
     'knockout',
     'arches',
     'viewmodels/alert',
-    'views/components/search/base-filter',
+    'views/components/search/core-search-component',
     'templates/views/components/search/arches-core-search.htm',
-], function($, _, ko, arches, AlertViewModel, BaseFilter, archesCoreSearchTemplate) {
+], function($, _, ko, arches, AlertViewModel, CoreSearchComponent, archesCoreSearchTemplate) {
     const componentName = 'arches-core-search';
-    const viewModel = BaseFilter.extend({ 
+    const viewModel = CoreSearchComponent.extend({ 
         initialize: function(sharedStateObject) {
             const self = this;
             sharedStateObject.componentName = componentName;
-            BaseFilter.prototype.initialize.call(this, sharedStateObject);
-            this.query = sharedStateObject.query;
-            this.queryString = sharedStateObject.queryString;
-            this.updateRequest = sharedStateObject.updateRequest;
-            this.userIsReviewer = sharedStateObject.userIsReviewer;
-            this.total = sharedStateObject.total;
-            this.userid = sharedStateObject.userid;
-            this.hits = sharedStateObject.hits;
-            this.alert = sharedStateObject.alert;
-            this.sharedStateObject = sharedStateObject;
-            this.queryString.subscribe(function() {
-                this.doQuery();
-            }, this);
+            CoreSearchComponent.prototype.initialize.call(this, sharedStateObject);
+            this.defaultQuery = {"paging-filter": "1", "core":"arches-core-search", tiles: "true"};
+            
             this.selectedPopup = ko.observable('');
             this.sharedStateObject.selectedPopup = this.selectedPopup;
             var firstEnabledFilter = _.find(this.sharedStateObject.filtersList, function(filter) {
@@ -64,17 +54,6 @@ define([
             };
             this.sharedStateObject.toggleRelationshipCandidacy = this.toggleRelationshipCandidacy;
 
-            this.clearQuery = function(){
-                Object.values(this.sharedStateObject.filters).forEach(function(value){
-                    if (value()){
-                        if (value().clear){
-                            value().clear();
-                        }
-                    }
-                }, this);
-                this.query({"paging-filter": "1", "core":"arches-core-search", tiles: "true"});
-            };
-
             this.selectPopup = function(componentname) {
                 if(this.selectedPopup() !== '' && componentname === this.selectedPopup()) {
                     this.selectedPopup('');
@@ -82,13 +61,6 @@ define([
                     this.selectedPopup(componentname);
                 }
             };
-            if (this.requiredFiltersLoaded() === false) {
-                this.requiredFiltersLoaded.subscribe(function() {
-                    this.restoreState();
-                }, this);
-            } else {
-                this.restoreState();
-            }
         },
 
         doQuery: function() {
@@ -135,21 +107,6 @@ define([
             });
         },
 
-        updateQuery: function() {
-            let queryObj = this.query();
-            queryObj[componentName] = true;
-            this.query(queryObj);
-        },
-
-        restoreState: function(){
-            if (!this.query()[componentName]) {
-                this.updateQuery();
-            } else {
-                this.sharedStateObject.loading(false);
-            }
-        },
-
-        clear: function(){ return; }
     });
 
     return ko.components.register(componentName, {
