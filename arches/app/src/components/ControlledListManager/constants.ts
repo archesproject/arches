@@ -16,6 +16,7 @@ export const NOTE = "note";
 export const URI = "URI";
 export const ERROR = "error";
 export const DANGER = "danger";
+export const SUCCESS = "success";
 export const DEFAULT_ERROR_TOAST_LIFE = 8000;
 
 // Django model choices

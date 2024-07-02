@@ -78,6 +78,9 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
                         borderRadius: '4px',
                     },
                 },
+                chooseButton: {
+                    style: { backgroundColor: 'aliceblue', color: 'black' },
+                },
                 file: ({ props }) => {
                     const badgeVal = (props as FileContentProps).badgeValue;
                     return {

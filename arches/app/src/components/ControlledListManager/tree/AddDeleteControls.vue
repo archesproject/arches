@@ -17,6 +17,7 @@ import {
     DANGER,
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
+    SUCCESS,
     displayedRowKey,
     selectedLanguageKey,
 } from "@/components/ControlledListManager/constants.ts";
@@ -243,6 +244,7 @@ await fetchListsAndPopulateTree();
 <template>
     <Button
         class="list-button"
+        :severity="SUCCESS"
         :label="$gettext('Add New List')"
         raised
         style="font-size: inherit"
