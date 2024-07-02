@@ -17,24 +17,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from base64 import b64decode
-from datetime import datetime
 import logging
 import os
-import json
 from django.contrib.auth import authenticate
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
 from django.db import connection
-from django.http import HttpResponseNotFound
 from django.shortcuts import render
-from django.utils.translation import get_language, gettext as _
+from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
+from arches.app.const import ExtensionType
 from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
-from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
@@ -49,7 +47,6 @@ from arches.app.search.elasticsearch_dsl_builder import (
 from arches.app.search.search_export import SearchResultsExporter
 from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
-from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import MapBaseManagerView
 from arches.app.models.concept import get_preflabel_from_conceptid
 from arches.app.utils.permission_backend import (
@@ -64,7 +61,6 @@ from arches.app.utils.data_management.resources.formats.htmlfile import HtmlWrit
 import arches.app.tasks as tasks
 from io import StringIO
 from tempfile import NamedTemporaryFile
-from openpyxl import Workbook
 from arches.app.models.system_settings import settings
 
 logger = logging.getLogger(__name__)
@@ -81,12 +77,10 @@ class SearchView(MapBaseManagerView):
             .exclude(publication=None)
         )
         geocoding_providers = models.Geocoder.objects.all()
-        if user_is_resource_exporter(request.user):
-            search_components = models.SearchComponent.objects.all()
-        else:
-            search_components = models.SearchComponent.objects.all().exclude(
-                componentname="search-export"
-            )
+        search_component_factory = SearchFilterFactory(request)
+        core_search_instance = search_component_factory.get_core_component_instance()
+        search_components = core_search_instance.get_search_components()
+
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
         templates = models.ReportTemplate.objects.all()
@@ -348,127 +342,27 @@ def get_dsl_from_search_string(request):
 
 
 def search_results(request, returnDsl=False):
-    for_export = request.GET.get("export")
-    pages = request.GET.get("pages", None)
-    total = int(request.GET.get("total", "0"))
-    resourceinstanceid = request.GET.get("id", None)
-    load_tiles = request.GET.get("tiles", False)
-    if load_tiles:
-        try:
-            load_tiles = json.loads(load_tiles)
-        except TypeError:
-            pass
     se = SearchEngineFactory().create()
-    permitted_nodegroups = get_permitted_nodegroups(request.user)
-    include_provisional = get_provisional_type(request)
     search_filter_factory = SearchFilterFactory(request)
-    search_results_object = {"query": Query(se)}
+    core_search_instance = search_filter_factory.get_core_component_instance()
 
-    try:
-        for filter_type, querystring in (
-            list(request.GET.items())
-            + list(request.POST.items())
-            + [("search-results", "")]
-        ):
-            search_filter = search_filter_factory.get_filter(filter_type)
-            if search_filter:
-                search_filter.append_dsl(
-                    search_results_object, permitted_nodegroups, include_provisional
-                )
-        append_instance_permission_filter_dsl(request, search_results_object)
-    except Exception as err:
-        logger.exception(err)
-        return JSONErrorResponse(message=str(err))
+    search_query_object = {"query": Query(se)}
+    results_object = {"results": None}
 
-    dsl = search_results_object.pop("query", None)
+    dsl_only = core_search_instance.handle_search_results_query(
+        search_query_object, results_object, search_filter_factory, returnDsl
+    )
     if returnDsl:
-        return dsl
-    dsl.include("graph_id")
-    dsl.include("root_ontology_class")
-    dsl.include("resourceinstanceid")
-    dsl.include("points")
-    dsl.include("permissions.users_without_read_perm")
-    dsl.include("permissions.users_without_edit_perm")
-    dsl.include("permissions.users_without_delete_perm")
-    dsl.include("permissions.users_with_no_access")
-    dsl.include("geometries")
-    dsl.include("displayname")
-    dsl.include("displaydescription")
-    dsl.include("map_popup")
-    dsl.include("provisional_resource")
-    if load_tiles:
-        dsl.include("tiles")
-    if for_export or pages:
-        results = dsl.search(index=RESOURCES_INDEX, scroll="1m")
-        scroll_id = results["_scroll_id"]
-        if not pages:
-            if total <= settings.SEARCH_EXPORT_LIMIT:
-                pages = (total // settings.SEARCH_RESULT_LIMIT) + 1
-            if total > settings.SEARCH_EXPORT_LIMIT:
-                pages = (
-                    int(settings.SEARCH_EXPORT_LIMIT // settings.SEARCH_RESULT_LIMIT)
-                    - 1
-                )
-        for page in range(int(pages)):
-            results_scrolled = dsl.se.es.scroll(scroll_id=scroll_id, scroll="1m")
-            results["hits"]["hits"] += results_scrolled["hits"]["hits"]
-    else:
-        results = dsl.search(index=RESOURCES_INDEX, id=resourceinstanceid)
+        return dsl_only
 
-    ret = {}
-    if results is not None:
-        if "hits" not in results:
-            if "docs" in results:
-                results = {"hits": {"hits": results["docs"]}}
-            else:
-                results = {"hits": {"hits": [results]}}
+    if results_object["results"] is not None:
+        search_query_object.pop("query")
+        # ensure that if a search filter modified the query in some way
+        # that the modification is set on the results_object
+        for key, value in list(search_query_object.items()):
+            results_object[key] = value
 
-        # allow filters to modify the results
-        for filter_type, querystring in list(request.GET.items()) + [
-            ("search-results", "")
-        ]:
-            search_filter = search_filter_factory.get_filter(filter_type)
-            if search_filter:
-                search_filter.post_search_hook(
-                    search_results_object, results, permitted_nodegroups
-                )
-
-        def get_localized_descriptor(resource, descriptor_type, language_codes):
-            descriptor = resource["_source"][descriptor_type]
-            result = descriptor[0] if len(descriptor) > 0 else None
-            for language_code in language_codes:
-                for entry in descriptor:
-                    if entry["language"] == language_code and entry["value"] != "":
-                        return entry
-            return result
-
-        descriptor_types = ("displaydescription", "displayname")
-        active_and_default_language_codes = (get_language(), settings.LANGUAGE_CODE)
-
-        for resource in results["hits"]["hits"]:
-            for descriptor_type in descriptor_types:
-                descriptor = get_localized_descriptor(
-                    resource, descriptor_type, active_and_default_language_codes
-                )
-                if descriptor:
-                    resource["_source"][descriptor_type] = descriptor["value"]
-                    if descriptor_type == "displayname":
-                        resource["_source"]["displayname_language"] = descriptor[
-                            "language"
-                        ]
-                else:
-                    resource["_source"][descriptor_type] = _("Undefined")
-
-        ret["results"] = results
-
-        for key, value in list(search_results_object.items()):
-            ret[key] = value
-
-        ret["reviewer"] = user_is_resource_reviewer(request.user)
-        ret["timestamp"] = datetime.now()
-        ret["total_results"] = dsl.count(index=RESOURCES_INDEX)
-        ret["userid"] = request.user.id
-        return JSONResponse(ret)
+        return JSONResponse(content=results_object)
 
     else:
         ret = {"message": _("There was an error retrieving the search results")}

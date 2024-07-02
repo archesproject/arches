@@ -1181,10 +1181,9 @@ class SearchComponent(models.Model):
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
     type = models.TextField()
-    componentpath = models.TextField(unique=True)
+    componentpath = models.TextField()
     componentname = models.TextField(unique=True)
-    sortorder = models.IntegerField(blank=True, null=True, default=None)
-    enabled = models.BooleanField(default=False)
+    config = models.JSONField(default=dict)
 
     def __str__(self):
         return self.name

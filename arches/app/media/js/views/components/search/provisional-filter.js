@@ -8,8 +8,8 @@ define([
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             options.name = 'Provisional Filter';
-            this.translations = arches. translations;
-            this.requiredFilters = ['term-filter'];
+            options.componentName = componentName;
+            this.translations = arches.translations;
             BaseFilter.prototype.initialize.call(this, options);
             this.filter = ko.observableArray();
             this.provisionalOptions = [{'name': 'Authoritative'},{'name': 'Provisional'}];
