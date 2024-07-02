@@ -274,6 +274,22 @@ define([
                 }
             }, this);
 
+            this.filterByFeatureGeom = function(feature) {
+                if (feature.geometry.type == 'Point' && this.buffer() == 0) { this.buffer(25); }
+                let currentSearchGeoms = self.searchGeometries();
+                this.draw.set({
+                    "type": "FeatureCollection",
+                    "features": [feature]
+                });
+                if (currentSearchGeoms != null) {
+                    currentSearchGeoms.push(feature);
+                } else {
+                    currentSearchGeoms = [feature];
+                }
+                self.searchGeometries(currentSearchGeoms);
+                self.updateFilter();
+            };
+
             var updateSearchResultPointLayer = function() {
                 var pointSource = self.map().getSource('search-results-points');
                 var agg = ko.unwrap(self.searchAggregations);

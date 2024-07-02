@@ -1,4 +1,5 @@
-define(['arches',
+define([
+    'arches',
     'knockout',
     'templates/views/components/map-popup.htm'
 ], function(arches, ko, popupTemplate) {
@@ -38,6 +39,28 @@ define(['arches',
         processData: function(features)
         {
             return features;
+        },
+
+        /**
+         * This method enables custom logic for how the feature in the popup should be handled and/or mutated en route to the mapFilter.
+         * @param popupFeatureObject - the javascript object of the feature and its associated contexts (e.g. mapCard).
+         * @required @method mapCard.filterByFeatureGeom()
+         * @required @send argument: @param feature - a geojson feature object 
+         */
+        sendFeatureToMapFilter: function(popupFeatureObject)
+        {
+            let feature = popupFeatureObject.geometries()[0].geom.features[0];
+            popupFeatureObject.mapCard.filterByFeatureGeom(feature);
+        },
+
+        /**
+         * Determines whether to show the button for Filter By Feature
+         * @param popupFeatureObject - the javascript object of the feature and its associated contexts (e.g. mapCard).
+         * @returns {boolean} - whether to show "Filter by Feature" on map popup
+         * typically dependent on at least 1 feature with a geometry and/or a featureid/resourceid combo
+         */
+        showFilterByFeature: function(popupFeatureObject) {
+            return (ko.unwrap(popupFeatureObject.geometries) || []).length > 0;
         },
 
     };
