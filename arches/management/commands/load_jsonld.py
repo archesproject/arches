@@ -297,7 +297,9 @@ class Command(BaseCommand):
             if not graphid:
                 # Check slug
                 try:
-                    graphid = archesmodels.GraphModel.objects.get(slug=m).pk
+                    graphid = archesmodels.GraphModel.objects.get(
+                        slug=m, source_identifier=None
+                    ).pk
                 except:
                     self.stderr.write(
                         f"Couldn't find a model definition for {m}; skipping"
