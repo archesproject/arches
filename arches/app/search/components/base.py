@@ -126,7 +126,7 @@ class SearchFilterFactory(object):
         }
         self.search_filters_instances = {}
 
-    def get_filter(self, componentname):
+    def get_filter(self, componentname, core=False):
         if componentname in self.search_filters:
             search_filter = self.search_filters[componentname]
             try:
@@ -140,7 +140,9 @@ class SearchFilterFactory(object):
                     search_filter.classname,
                     ExtensionType.SEARCH_COMPONENTS,
                 )
-                if class_method:
+                if class_method and core:
+                    filter_instance = class_method(self.request, componentname)
+                elif class_method:
                     filter_instance = class_method(self.request)
                 self.search_filters_instances[search_filter.componentname] = (
                     filter_instance
@@ -171,7 +173,9 @@ class SearchFilterFactory(object):
 
     def get_core_component_instance(self):
         core_search_component_name = self.get_core_component_name()
-        core_search_component_instance = self.get_filter(core_search_component_name)
+        core_search_component_instance = self.get_filter(
+            core_search_component_name, core=True
+        )
         return core_search_component_instance
 
     def get_sorted_query_dict(self, query_dict, core_search_component):
