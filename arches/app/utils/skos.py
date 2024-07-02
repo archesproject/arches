@@ -32,6 +32,7 @@ from arches.app.models import models
 from arches.app.models.concept import Concept
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.i18n import capitalize_region
 
 # define the ARCHES namespace
 ARCHES = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
@@ -459,14 +460,14 @@ class SKOSReader(object):
     def language_exists(self, rdf_tag, allowed_languages):
         if (
             hasattr(rdf_tag, "language")
-            and rdf_tag.language not in allowed_languages
             and rdf_tag.language is not None
             and rdf_tag.language.strip() != ""
+            and capitalize_region(rdf_tag.language) not in allowed_languages
         ):
             language_info = translation.get_language_info(rdf_tag.language)
 
             newlang = models.Language()
-            newlang.code = rdf_tag.language
+            newlang.code = capitalize_region(rdf_tag.language)
 
             if language_info:
                 newlang.name = language_info["name"]

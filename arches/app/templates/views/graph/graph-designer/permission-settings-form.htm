@@ -42,7 +42,7 @@
                     <script type="text/html" id="selectAccountTemplate">
                         <option disabled selected value>{% trans "Select a Group/Account..." %}</option>
                         <!-- ko foreach: groups -->
-                            <optgroup data-bind="attr: { 'label': (name==='Groups')?{% quoted_trans "Groups" %}:{% quoted_trans "Accounts" %} }, foreach: items">
+                            <optgroup data-bind="attr: { 'label': (name==='Groups')?{% quoted_trans _("Groups") %}:{% quoted_trans _("Accounts") %} }, foreach: items">
                                 <option data-bind="value: combinedId, text: name"></option>
                             </optgroup>
                         <!-- /ko -->

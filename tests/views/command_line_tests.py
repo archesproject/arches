@@ -17,8 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+from pathlib import Path
+
 from tests import test_settings
 from django.test.utils import captured_stdout
+from django.conf import settings
 from django.core import management
 from arches.app.models import models
 from tests.base_test import ArchesTestCase
@@ -50,6 +53,9 @@ class CommandLineTests(ArchesTestCase):
                     yes=True,
                     verbosity=0,
                 )
+
+        path_to_cheesy_image = Path(settings.MEDIA_ROOT) / "uploadedfiles" / "test.png"
+        cls.addClassCleanup(os.unlink, path_to_cheesy_image)
 
         super().setUpClass()
 

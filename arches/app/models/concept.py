@@ -29,7 +29,7 @@ from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.elasticsearch_dsl_builder import Term, Query, Bool, Match, Terms
 from arches.app.search.mappings import CONCEPTS_INDEX
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.i18n import rank_label
+from arches.app.utils.i18n import capitalize_region, rank_label
 from django.utils.translation import get_language, gettext as _
 from django.db import IntegrityError
 from psycopg2.extensions import AsIs
@@ -1590,12 +1590,7 @@ class ConceptValue(object):
 
             if self.language != "":
                 # need to normalize language ids to the form xx-XX
-                lang_parts = self.language.lower().replace("_", "-").split("-")
-                try:
-                    lang_parts[1] = lang_parts[1].upper()
-                except:
-                    pass
-                self.language = "-".join(lang_parts)
+                self.language = capitalize_region(self.language)
                 value.language_id = (
                     self.language
                 )  # models.DLanguage.objects.get(pk=self.language)

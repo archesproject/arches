@@ -132,13 +132,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         userIsCreator: userIsCreator,
                         alert: alert,
                         permissionLabelLookup: {
-                            'view_resourceinstance':{% quoted_trans 'Read' %},
-                            'change_resourceinstance':{% quoted_trans 'Update' %},
-                            'no_access_to_resourceinstance':{% quoted_trans 'No Access' %},
-                            'delete_resourceinstance':{% quoted_trans 'Delete' %},
+                            'view_resourceinstance':{% quoted_trans _('Read') %},
+                            'change_resourceinstance':{% quoted_trans _('Update') %},
+                            'no_access_to_resourceinstance':{% quoted_trans _('No Access') %},
+                            'delete_resourceinstance':{% quoted_trans _('Delete') %},
                         },
-                        alertTitle: {% quoted_trans 'You are about assign normal user access to this instance' %},
-                        alertMessage: {% quoted_trans 'Would you like to proceed?' %}},
+                        alertTitle: {% quoted_trans _('You are about assign normal user access to this instance') %},
+                        alertMessage: {% quoted_trans _('Would you like to proceed?') %}},
                 }"></div>
             </div>
             <!--/ko -->
