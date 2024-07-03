@@ -1172,9 +1172,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         **kwargs,
     ):
         errors = []
-        max_bytes = 32766  # max bytes allowed by Lucene
-        byte_count = 0
-        byte_count += len(str(value).encode("UTF-8"))
 
         def validate_geom_bbox(geom):
             try:
