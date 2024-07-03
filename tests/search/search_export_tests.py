@@ -87,7 +87,6 @@ class SearchExportTests(ArchesTestCase):
         )
         cultural_period_tile.save(index=False)
         cultural_period_tile.index()
-        se = SearchEngineFactory().create()
         sync_es(se)
         # TODO: create geospatial test data
 
