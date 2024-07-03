@@ -208,11 +208,9 @@ const acceptNewItemShortcutEntry = async () => {
         ),
         itemAsNode(newItem, selectedLanguage.value),
     ];
-    if (parent.data.name) {
-        // Parent node is a list
+    if (nodeIsList(parent)) {
         parent.data.items.push(newItem);
     } else {
-        // Parent node is an item
         parent.data.children.push(newItem);
     }
 
