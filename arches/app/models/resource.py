@@ -450,6 +450,7 @@ class Resource(models.ResourceInstance):
             )
             document["root_ontology_class"] = self.get_root_ontology()
             doc = JSONSerializer().serializeToPython(document)
+
             se.index_data(index=RESOURCES_INDEX, body=doc, id=self.pk)
             for term in terms:
                 se.index_data("terms", body=term["_source"], id=term["_id"])
@@ -501,6 +502,7 @@ class Resource(models.ResourceInstance):
         document["displayname"] = None
         document["root_ontology_class"] = self.get_root_ontology()
         document["legacyid"] = self.legacyid
+        document["lifecycle_state"] = self.lifecycle_state
 
         document["displayname"] = []
         document["displaydescription"] = []

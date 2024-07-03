@@ -18,11 +18,11 @@ details = {
 }
 
 
-def get_permitted_graphids(permitted_nodegroups):
-    permitted_graphids = set()
-    for node in Node.objects.filter(nodegroup__in=permitted_nodegroups):
-        permitted_graphids.add(str(node.graph_id))
-    return permitted_graphids
+# def get_permitted_graphids(permitted_nodegroups):
+#     permitted_graphids = set()
+#     for node in Node.objects.filter(nodegroup__in=permitted_nodegroups):
+#         permitted_graphids.add(str(node.graph_id))
+#     return permitted_graphids
 
 
 class LifecycleStateFilter(BaseSearchFilter):
@@ -31,24 +31,14 @@ class LifecycleStateFilter(BaseSearchFilter):
     ):
         search_query = Bool()
         querystring_params = self.request.GET.get(details["componentname"], "")
-        graph_ids = []
-        permitted_graphids = get_permitted_graphids(permitted_nodegroups)
 
         for resourceTypeFilter in JSONDeserializer().deserialize(querystring_params):
-            graphid = str(resourceTypeFilter["graphid"])
-            if resourceTypeFilter["inverted"] is True:
-                try:
-                    permitted_graphids.remove(graphid)
-                except KeyError:
-                    pass
-            else:
-                if graphid in permitted_graphids:
-                    graph_ids.append(graphid)
+            pass
 
         if resourceTypeFilter["inverted"] is True:
-            terms = Terms(field="graph_id", terms=list(permitted_graphids))
+            terms = Terms(field="lifecycle_state", terms=["retired"])
         else:
-            terms = Terms(field="graph_id", terms=graph_ids)
+            terms = Terms(field="lifecycle_state", terms=["active"])
 
         search_query.filter(terms)
 

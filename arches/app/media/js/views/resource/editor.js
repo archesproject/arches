@@ -133,6 +133,7 @@ define([
         topCard.topCards = topCards;
     });
 
+    console.log(data.resource_instance_lifecycle_state);
     var vm = {
         loading: loading,
         scrollTo: scrollTo,
