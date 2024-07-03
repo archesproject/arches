@@ -1298,25 +1298,25 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         else:
             return self.find_num(current_item[0])
 
+    def _feature_length_in_bytes(self, feature):
+        return len(str(feature).encode("UTF-8"))
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         max_length = (
             32000  # this was 32766, but do we need space for extra part of JSON?
         )
 
-        def len_feature(feature):
-            return len(str(feature).encode("UTF-8"))
-
         features = []
         nodevalue["properties"] = {}
-        if len_feature(nodevalue) < max_length:
+        if self._feature_length_in_bytes(nodevalue) < max_length:
             features.append(nodevalue)
         else:
             for feature in nodevalue["features"]:
                 new_feature = {"type": "FeatureCollection", "features": [feature]}
-                if len_feature(new_feature) < max_length:
+                if self._feature_length_in_bytes(new_feature) < max_length:
                     features.append(new_feature)
                 else:
-                    chunks = self.split_geom(feature, len_feature)
+                    chunks = self.split_geom(feature, max_length)
                     features = features + chunks
 
         for feature in features:
@@ -1341,8 +1341,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 }
             )
 
-    def split_geom(self, feature, len_feature):
-        feat_len_bytes = len_feature(feature)
+    def split_geom(self, feature, max_feature_in_bytes=32766):
         geom = feature["geometry"]
         coordinates = (
             geom["coordinates"]
@@ -1350,7 +1349,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             else geom["coordinates"][0]
         )
         num_points = len(coordinates)
-        num_chunks = feat_len_bytes / 32000
+        num_chunks = self._feature_length_in_bytes(feature) / max_feature_in_bytes
         max_points = int(num_points / num_chunks)
 
         with connection.cursor() as cur:
