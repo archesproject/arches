@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, ref } from "vue";
+import { inject, ref, watch } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
@@ -60,6 +60,13 @@ const newLabelFormValue = defineModel<string>("newLabelFormValue", {
     required: true,
 });
 const newLabelCounter = ref(1);
+const shouldRefocusUpArrow = ref(false);
+const shouldRefocusDownArrow = ref(false);
+
+watch(displayedRow, () => {
+    shouldRefocusUpArrow.value = false;
+    shouldRefocusDownArrow.value = false;
+});
 
 const isFirstItem = (item: ControlledListItem) => {
     const siblings: TreeNode[] = item.parent_id
@@ -165,6 +172,31 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
         ...selectedKeys.value,
         [item.id]: true,
     };
+
+    if (up) {
+        shouldRefocusUpArrow.value = true;
+        shouldRefocusDownArrow.value = false;
+    } else {
+        shouldRefocusUpArrow.value = false;
+        shouldRefocusDownArrow.value = true;
+    }
+};
+
+const vRefocusUpArrow = {
+    mounted: (el: HTMLButtonElement) => {
+        if (shouldRefocusUpArrow.value && el) {
+            // @ts-expect-error focusVisible not yet in typeshed
+            el.focus({ focusVisible: true });
+        }
+    },
+};
+const vRefocusDownArrow = {
+    mounted: (el: HTMLButtonElement) => {
+        if (shouldRefocusDownArrow.value && el) {
+            // @ts-expect-error focusVisible not yet in typeshed
+            el.focus({ focusVisible: true });
+        }
+    },
 };
 </script>
 
@@ -185,6 +217,7 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
     >
         <Button
             v-if="selectedKeys && node.key in selectedKeys"
+            v-refocus-up-arrow
             v-tooltip="moveLabels.moveUp"
             type="button"
             raised
@@ -196,6 +229,7 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
         />
         <Button
             v-if="selectedKeys && node.key in selectedKeys"
+            v-refocus-down-arrow
             v-tooltip="moveLabels.moveDown"
             type="button"
             raised
