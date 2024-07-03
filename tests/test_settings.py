@@ -22,7 +22,7 @@ import os
 
 try:
     from django.utils.translation import gettext_lazy as _
-except ImportError:  # unable to import prior to installing requirements.txt in setup.py
+except ImportError:  # unable to import prior to installing requirements
     pass
 
 PACKAGE_NAME = "arches"
@@ -70,6 +70,8 @@ TEST_RUNNER = "tests.base_test.ArchesTestRunner"
 SILENCED_SYSTEM_CHECKS.append(
     "arches.W001"
 )  # Cache backend does not support rate-limiting
+
+FILE_TYPE_CHECKING = "lenient"
 
 # could add Chrome, PhantomJS etc... here
 LOCAL_BROWSERS = []  # ['Firefox']

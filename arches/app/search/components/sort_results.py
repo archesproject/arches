@@ -20,7 +20,7 @@ class SortResults(BaseSearchFilter):
     def append_dsl(self, search_query_object, **kwargs):
         sort_param = self.request.GET.get(details["componentname"], None)
 
-        if sort_param is not None and sort_param is not "":
+        if sort_param is not None and sort_param != "":
             search_query_object["query"].sort(
                 field="displayname.value",
                 dsl={

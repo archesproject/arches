@@ -103,7 +103,7 @@ class ResourceTests(ArchesTestCase):
                     "values": [
                         {
                             "value": "Mock concept",
-                            "language": "en-US",
+                            "language": "en",
                             "category": "label",
                             "type": "prefLabel",
                             "id": "",
@@ -111,7 +111,7 @@ class ResourceTests(ArchesTestCase):
                         },
                         {
                             "value": "1950",
-                            "language": "en-US",
+                            "language": "en",
                             "category": "note",
                             "type": "min_year",
                             "id": "",
@@ -119,7 +119,7 @@ class ResourceTests(ArchesTestCase):
                         },
                         {
                             "value": "1980",
-                            "language": "en-US",
+                            "language": "en",
                             "category": "note",
                             "type": "max_year",
                             "id": "",
@@ -372,6 +372,17 @@ class ResourceTests(ArchesTestCase):
         with self.subTest(user="can delete"):
             result = test_resource.delete(user=user)
             self.assertTrue(result)
+
+        with self.subTest(user="can't delete"):
+            test_resource = Resource(graph_id=self.search_model_graphid)
+            test_resource.save(user=user)
+            edit_log_entry = models.EditLog.objects.get(
+                resourceinstanceid=test_resource.pk, edittype="create"
+            )
+            edit_log_entry.userid = ""
+            edit_log_entry.save()
+            result = test_resource.delete(user=user)
+            self.assertFalse(result)
 
     def test_recalculate_descriptors_prefetch_related_objects(self):
         r1 = Resource(graph_id=self.search_model_graphid)

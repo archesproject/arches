@@ -20,13 +20,23 @@ classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Information Technology",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
 ]
 requires-python = ">=3.10"
 dependencies = [
     "arches>={{ arches_semantic_version }},<{{ arches_next_minor_version }}",
 ]
 version = "0.0.1"
+
+[project.optional-dependencies]
+dev = [
+    "livereload",
+    "sst",
+    "coverage",
+    "django-silk==5.1.0",
+    "pre-commit",
+    "black==24.4.2",
+]
 
 [tool.setuptools]
 packages = ["{{ project_name }}"]
