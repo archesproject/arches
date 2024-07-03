@@ -1382,10 +1382,15 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         max_points = int(num_points / num_chunks)
 
         with connection.cursor() as cur:
-            cur.execute(
-                "select st_asgeojson(st_subdivide(%s, %s))",
-                [JSONSerializer().serialize(feature["geometry"]), max_points],
-            )
+            try:
+                cur.execute(
+                    "select st_asgeojson(st_subdivide(ST_GeomFromGeoJSON(%s::jsonb), %s))",
+                    [JSONSerializer().serialize(feature["geometry"]), max_points],
+                )
+            except Exception as e:
+                print("Failed with geometry: %s" % feature["geometry"])
+                raise e
+
             smaller_chunks = [
                 {
                     "id": feature["id"],
