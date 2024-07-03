@@ -8,11 +8,6 @@ import django
 from django.apps import apps
 from django.conf import global_settings, settings
 from django.contrib.staticfiles.finders import AppDirectoriesFinder
-from django.template.backends.django import DjangoTemplates
-
-
-class ArchesTemplates(DjangoTemplates):
-    app_dirname = os.path.join("app", "templates")
 
 
 class ArchesApplicationsStaticFilesFinder(AppDirectoriesFinder):
@@ -121,7 +116,7 @@ def build_templates_config(
 
     return [
         {
-            "BACKEND": "arches.settings_utils.ArchesTemplates",
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
             "DIRS": directories,
             "APP_DIRS": True,
             "OPTIONS": {
