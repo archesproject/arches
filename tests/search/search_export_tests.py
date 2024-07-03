@@ -199,6 +199,7 @@ class SearchExportTests(ArchesTestCase):
         request = RequestFactory().get(
             reverse("api_export_results"),
             HTTP_AUTHORIZATION=auth_string,
+            # In reality this would be added by django_ratelimit.
             QUERY_STRING="limited=True",
         )
         request.user = User.objects.get(username="anonymous")
