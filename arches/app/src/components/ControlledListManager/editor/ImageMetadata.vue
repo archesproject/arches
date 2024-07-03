@@ -3,6 +3,7 @@ import arches from "arches";
 import { computed, ref, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
+import Button from "primevue/button";
 import Column from "primevue/column";
 import Dropdown from "primevue/dropdown";
 import DataTable from "primevue/datatable";
@@ -10,23 +11,27 @@ import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
 import {
-    upsertMetadata,
+    deleteImage,
     deleteMetadata,
+    upsertMetadata,
 } from "@/components/ControlledListManager/api.ts";
 import {
+    DANGER,
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
+    METADATA_CHOICES,
     itemKey,
 } from "@/components/ControlledListManager/constants.ts";
 import { languageNameFromCode } from "@/components/ControlledListManager/utils.ts";
+import AddMetadata from "@/components/ControlledListManager/editor/AddMetadata.vue";
 
 import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
 import type {
     ControlledListItem,
+    ControlledListItemImage,
     ControlledListItemImageMetadata,
     LabeledChoice,
-    NewControlledListItemImageMetadata,
     NewOrExistingControlledListItemImageMetadata,
 } from "@/types/ControlledListManager";
 
@@ -38,20 +43,36 @@ const metadataValueHeader = $gettext("Value");
 const languageHeader = $gettext("Language");
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
-const { labeledChoices, metadata } = defineProps<{
-    labeledChoices: LabeledChoice[];
-    metadata: ControlledListItemImageMetadata[];
-}>();
-const editingRows: Ref<ControlledListItemImageMetadata[]> = ref([]);
-const rowIndexToFocus: Ref<number> = ref(-1);
+const { image } = defineProps<{ image: ControlledListItemImage }>();
+const editingRows = ref<NewOrExistingControlledListItemImageMetadata[]>([]);
+const rowIndexToFocus = ref(-1);
 const editorRef: Ref<HTMLDivElement | null> = ref(null);
+
+const labeledChoices: LabeledChoice[] = [
+    {
+        type: METADATA_CHOICES.title,
+        label: $gettext("Title"),
+    },
+    {
+        type: METADATA_CHOICES.alternativeText,
+        label: $gettext("Alternative text"),
+    },
+    {
+        type: METADATA_CHOICES.description,
+        label: $gettext("Description"),
+    },
+    {
+        type: METADATA_CHOICES.attribution,
+        label: $gettext("Attribution"),
+    },
+];
 
 const metadataLabel = (metadataType: string) => {
     return labeledChoices.find((choice) => choice.type === metadataType)!.label;
 };
 
 const saveMetadata = async (event: DataTableRowEditInitEvent) => {
-    // normalize new metadata numbers (starting at 1000) to null
+    // normalize new metadata numbers to null
     const normalizedNewData: ControlledListItemImageMetadata = {
         ...event.newData,
         id: typeof event.newData.id === "string" ? event.newData.id : null,
@@ -79,9 +100,7 @@ const saveMetadata = async (event: DataTableRowEditInitEvent) => {
 };
 
 const issueDeleteMetadata = async (
-    metadata:
-        | NewControlledListItemImageMetadata
-        | ControlledListItemImageMetadata,
+    metadata: NewOrExistingControlledListItemImageMetadata,
 ) => {
     if (typeof metadata.id === "number") {
         removeImageMetadata(metadata);
@@ -151,18 +170,44 @@ const updateImageMetadata = (
     }
 };
 
-const setRowFocus = (event: DataTableRowEditInitEvent) => {
-    rowIndexToFocus.value = event.index;
+const issueDeleteImage = async () => {
+    try {
+        await deleteImage(image);
+        removeImage(image);
+    } catch (error) {
+        toast.add({
+            severity: ERROR,
+            life: DEFAULT_ERROR_TOAST_LIFE,
+            summary: $gettext("Image deletion failed"),
+            detail: error instanceof Error ? error.message : undefined,
+        });
+    }
 };
 
-const makeValueEditable = (
-    clickedValue: ControlledListItemImageMetadata,
+const removeImage = (removedImage: ControlledListItemImage) => {
+    const toDelete = item.value!.images.findIndex(
+        (imageFromItem) => imageFromItem.id === removedImage.id,
+    );
+    item.value!.images.splice(toDelete, 1);
+};
+
+const makeMetadataEditable = (
+    clickedMetadata: NewOrExistingControlledListItemImageMetadata,
     index: number,
 ) => {
-    if (!editingRows.value.includes(clickedValue)) {
-        editingRows.value = [...editingRows.value, clickedValue];
+    if (!editingRows.value.includes(clickedMetadata)) {
+        editingRows.value = [...editingRows.value, clickedMetadata];
     }
-    rowIndexToFocus.value = index;
+    if (index === -1) {
+        // Coming from <AddMetadata>
+        rowIndexToFocus.value = Math.max(image.metadata.length - 1, 0);
+    } else {
+        rowIndexToFocus.value = index;
+    }
+};
+
+const setRowFocus = (event: DataTableRowEditInitEvent) => {
+    rowIndexToFocus.value = event.index;
 };
 
 const inputSelector = computed(() => {
@@ -190,9 +235,9 @@ const focusInput = () => {
 <template>
     <div ref="editorRef">
         <DataTable
-            v-if="metadata.length"
+            v-if="image.metadata.length"
             v-model:editingRows="editingRows"
-            :value="metadata"
+            :value="image.metadata"
             data-key="id"
             edit-mode="row"
             striped-rows
@@ -235,7 +280,12 @@ const focusInput = () => {
                 <template #editor="{ data, field }">
                     <InputText
                         v-model="data[field]"
-                        :pt="{ hooks: { onUpdated: focusInput } }"
+                        :pt="{
+                            hooks: {
+                                onMounted: focusInput,
+                                onUpdated: focusInput,
+                            },
+                        }"
                     />
                 </template>
                 <template #body="slotProps">
@@ -243,7 +293,10 @@ const focusInput = () => {
                         class="full-width-pointer"
                         style="white-space: pre-wrap"
                         @click.stop="
-                            makeValueEditable(slotProps.data, slotProps.index)
+                            makeMetadataEditable(
+                                slotProps.data,
+                                slotProps.index,
+                            )
                         "
                     >
                         {{ slotProps.data.value }}
@@ -322,6 +375,20 @@ const focusInput = () => {
             </Column>
         </DataTable>
     </div>
+    <div style="display: flex; gap: 1rem">
+        <AddMetadata
+            :image
+            :labeled-choices
+            :make-metadata-editable
+        />
+        <Button
+            raised
+            :severity="DANGER"
+            icon="fa fa-trash"
+            :label="$gettext('Delete image')"
+            @click="issueDeleteImage"
+        />
+    </div>
 </template>
 
 <style scoped>
@@ -341,5 +408,17 @@ const focusInput = () => {
 
 :deep(td > input) {
     width: 95%;
+}
+
+.p-button {
+    height: 3rem;
+    margin-top: 1rem;
+}
+
+:deep(.p-button-icon),
+:deep(.p-button-label) {
+    color: white;
+    font-size: small;
+    font-weight: 600;
 }
 </style>

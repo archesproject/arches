@@ -16,9 +16,13 @@ import type {
     NewControlledListItemImageMetadata,
 } from "@/types/ControlledListManager";
 
-const { labeledChoices, image } = defineProps<{
+const { labeledChoices, image, makeMetadataEditable } = defineProps<{
     labeledChoices: LabeledChoice[];
     image: ControlledListItemImage;
+    makeMetadataEditable: (
+        clickedMetadata: NewControlledListItemImageMetadata,
+        index: number,
+    ) => void;
 }>();
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
@@ -50,9 +54,11 @@ const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
 });
 
 const addMetadata = () => {
+    const staticNewMetadata = newMetadata.value;
     item.value.images
         .find((imageFromItem) => imageFromItem.id === image.id)!
-        .metadata.push(newMetadata.value);
+        .metadata.push(staticNewMetadata);
+    makeMetadataEditable(staticNewMetadata, -1);
 };
 </script>
 
