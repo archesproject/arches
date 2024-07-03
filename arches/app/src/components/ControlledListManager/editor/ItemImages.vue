@@ -16,10 +16,7 @@ import {
 import ImageEditor from "@/components/ControlledListManager/editor/ImageEditor.vue";
 
 import type { Ref } from "vue";
-import type {
-    ControlledListItem,
-    FileContentProps,
-} from "@/types/ControlledListManager";
+import type { ControlledListItem } from "@/types/ControlledListManager";
 import type {
     FileUploadBeforeSendEvent,
     FileUploadErrorEvent,
@@ -27,7 +24,6 @@ import type {
 } from "primevue/fileupload";
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
-const completed = "Completed";
 
 const { $gettext } = useGettext();
 const toast = useToast();
@@ -81,12 +77,10 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
                 chooseButton: {
                     style: { backgroundColor: 'aliceblue', color: 'black' },
                 },
-                file: ({ props }) => {
-                    const badgeVal = (props as FileContentProps).badgeValue;
+                content: ({ props, state }) => {
+                    const done = state.uploadedFileCount > state.files.length;
                     return {
-                        style: {
-                            display: badgeVal === completed ? 'none' : '',
-                        },
+                        style: { display: done ? 'none' : '' },
                     };
                 },
                 input: { ariaLabel: $gettext('Upload an image') },
