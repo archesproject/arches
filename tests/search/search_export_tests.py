@@ -7,6 +7,8 @@ from base64 import b64encode
 from http import HTTPStatus
 from arches.app.models import models
 from arches.app.models.tile import Tile
+from arches.app.search.elasticsearch_dsl_builder import Query
+from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.search_export import SearchResultsExporter
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
@@ -30,6 +32,10 @@ from tests.base_test import ArchesTestCase
 class SearchExportTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
+        se = SearchEngineFactory().create()
+        q = Query(se=se)
+        for indexname in [TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX]:
+            q.delete(index=indexname, refresh=True)
         cls.factory = RequestFactory()
 
         LanguageSynchronizer.synchronize_settings_with_db()
@@ -79,9 +85,10 @@ class SearchExportTests(ArchesTestCase):
             nodegroup_id=cls.search_model_cultural_period_nodeid,
             resourceinstance_id=cls.test_resourceinstanceid,
         )
-        cultural_period_tile.save()
+        cultural_period_tile.save(index=False)
+        cultural_period_tile.index()
         se = SearchEngineFactory().create()
-        sync_es(se, index="test_resources")
+        sync_es(se)
         # TODO: create geospatial test data
 
     def test_cultural_period_node_exportable(self):
@@ -221,5 +228,5 @@ def is_valid_uuid(value, version=4):
         return False
 
 
-def sync_es(search_engine, index="test"):
+def sync_es(search_engine, index="test_resources"):
     search_engine.es.indices.refresh(index=index)
