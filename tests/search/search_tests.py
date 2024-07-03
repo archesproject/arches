@@ -110,5 +110,5 @@ class SearchTests(ArchesTestCase):
         self.assertEqual(count_after, 1001)
 
 
-def sync_es(search_engine, index="test"):
+def sync_es(search_engine, index="test_resources"):
     search_engine.es.indices.refresh(index=index)
