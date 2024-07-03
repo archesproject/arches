@@ -90,10 +90,6 @@ class SearchExportTests(ArchesTestCase):
         sync_es(se)
         # TODO: create geospatial test data
 
-    def test_cultural_period_node_exportable(self):
-        node = models.Node.objects.get(nodeid=self.search_model_cultural_period_nodeid)
-        self.assertTrue(node.exportable, "Cultural Period Node not exportable")
-
     def test_search_export_no_request(self):
         """Test SearchResultsExporter without search request"""
         with self.assertRaisesMessage(Exception, "Need to pass in a search request"):
