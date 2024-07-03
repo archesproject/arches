@@ -23,6 +23,7 @@ define([
             this.alertTitle = params.alertTitle;
             this.alertMessage = params.alertMessage;
             this.permissionLabelLookup = params.permissionLabelLookup;
+            this.showPeople = ko.observable(false);
 
             this.getInstancePermissions = function(){
                 $.ajax({

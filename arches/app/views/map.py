@@ -21,7 +21,6 @@ from django.shortcuts import render
 from django.http import Http404
 from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
-from guardian.shortcuts import get_users_with_perms, get_groups_with_perms
 from revproxy.views import ProxyView
 from arches.app.models import models
 from arches.app.models.system_settings import settings

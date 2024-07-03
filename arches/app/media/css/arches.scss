@@ -2983,10 +2983,6 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     border-bottom: 1px solid #D3E5F4
 }
 
-.permissions-table-row:nth-child(odd) {
-    background: #F5FAFE;
-}
-
 .permissions-table-row.selected {
     background-color: #F1F1FF;
 }
@@ -12870,4 +12866,36 @@ table.csv-mapping-table td {
 
 .notif-table th{
     text-align: start;
+}
+
+
+.permissions-options {
+    display: flex;
+    flex-direction: row;
+
+    div {
+        flex: 1;
+        align-items: center;
+        display: flex;
+    }
+
+    .form-checkbox.form-normal:before,.form-radio.form-normal:before {
+        content: '';
+        display: block;
+        width: 16px;
+        height: 16px;
+        background-color: transparent;
+        border: 1px solid #c3cedb;
+        border-radius: 0;
+        left: 0;
+        margin: 0 3px;
+    }
+
+    .form-checkbox>input[type="checkbox"], .form-radio>input[type="radio"]{
+        display: none;
+    }
+
+    label.form-checkbox.form-normal span{
+        width: auto;
+    }
 }
