@@ -31,6 +31,12 @@ from tests.base_test import ArchesTestCase
 
 class SearchExportTests(ArchesTestCase):
     @classmethod
+    def setUp(cls):
+        super().setUp(cls)
+        se = SearchEngineFactory().create()
+        sync_es(se)
+
+    @classmethod
     def setUpTestData(cls):
         se = SearchEngineFactory().create()
         q = Query(se=se)
@@ -87,7 +93,6 @@ class SearchExportTests(ArchesTestCase):
         )
         cultural_period_tile.save(index=False)
         cultural_period_tile.index()
-        sync_es(se)
         # TODO: create geospatial test data
 
     def test_search_export_no_request(self):
