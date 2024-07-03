@@ -23,49 +23,19 @@ from django.core import management
 from django.test.utils import captured_stdout
 from django.urls import reverse
 from arches.app.models.models import GraphModel, ResourceInstance, EditLog
-from django.test.client import RequestFactory, Client
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from django.test.client import Client
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from guardian.shortcuts import (
     assign_perm,
     get_perms,
-    remove_perm,
-    get_group_perms,
-    get_user_perms,
 )
+
+from tests.utils.permission_test_utils import add_users
 
 # these tests can be run from the command line via
 # python manage.py test tests.views.resource_tests --settings="tests.test_settings"
-
-
-def add_users():
-    profiles = (
-        {
-            "name": "ben",
-            "email": "ben@test.com",
-            "password": "Test12345!",
-            "groups": ["Graph Editor", "Resource Editor"],
-        },
-        {
-            "name": "sam",
-            "email": "sam@test.com",
-            "password": "Test12345!",
-            "groups": ["Graph Editor", "Resource Editor", "Resource Reviewer"],
-        },
-        # {'name': 'jim', 'email': 'jim@test.com', 'password': 'Test12345!', 'groups': ['Graph Editor', 'Resource Editor']},
-    )
-
-    for profile in profiles:
-        user = User.objects.create_user(
-            username=profile["name"],
-            email=profile["email"],
-            password=profile["password"],
-        )
-
-        for group_name in profile["groups"]:
-            group = Group.objects.get(name=group_name)
-            group.user_set.add(user)
 
 
 class CommandLineTests(ArchesTestCase):
@@ -334,8 +304,6 @@ class CommandLineTests(ArchesTestCase):
         view = self.client.get(view_url)
         edit = self.client.get(edit_url)
         delete = self.client.delete(edit_url)
-        self.assertTrue(
-            view.status_code == 200
-            and edit.status_code == 200
-            and delete.status_code == 200
-        )
+        self.assertEqual(view.status_code, 200)
+        self.assertEqual(edit.status_code, 200)
+        self.assertEqual(delete.status_code, 200)
