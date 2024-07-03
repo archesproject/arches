@@ -33,6 +33,7 @@ import type {
     ControlledListItem,
     Value,
     ValueCategory,
+    NewOrExistingValue,
     NewValue,
     ValueType,
 } from "@/types/ControlledListManager";
@@ -41,8 +42,8 @@ const { valueType, valueCategory } = defineProps<{
     valueType?: ValueType;
     valueCategory?: ValueCategory;
 }>();
-const editingRows: Ref<Value[]> = ref([]);
-const rowIndexToFocus: Ref<number> = ref(-1);
+const editingRows: Ref<NewOrExistingValue[]> = ref([]);
+const rowIndexToFocus = ref(-1);
 const editorRef: Ref<HTMLDivElement | null> = ref(null);
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
@@ -139,7 +140,7 @@ const values = computed(() => {
 });
 
 const saveValue = async (event: DataTableRowEditInitEvent) => {
-    // normalize new value numbers (starting at 1000) to null
+    // normalize new value numbers to null
     const normalizedNewData: Value = {
         ...event.newData,
         id: typeof event.newData.id === "string" ? event.newData.id : null,
@@ -210,7 +211,7 @@ const setRowFocus = (event: DataTableRowEditInitEvent) => {
     rowIndexToFocus.value = event.index;
 };
 
-const makeValueEditable = (clickedValue: Value, index: number) => {
+const makeValueEditable = (clickedValue: NewOrExistingValue, index: number) => {
     if (!editingRows.value.includes(clickedValue)) {
         editingRows.value = [...editingRows.value, clickedValue];
     }
@@ -405,7 +406,7 @@ const focusInput = () => {
         </DataTable>
         <AddValue
             :value-type
-            :make-value-editable
+            :make-new-value-editable="makeValueEditable"
         />
     </div>
 </template>
