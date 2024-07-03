@@ -1384,7 +1384,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         with connection.cursor() as cur:
             cur.execute(
                 "select st_asgeojson(st_subdivide(%s, %s))",
-                [str(feature["geometry"]), max_points],
+                [JSONSerializer().serialize(feature["geometry"]), max_points],
             )
             smaller_chunks = [
                 {
