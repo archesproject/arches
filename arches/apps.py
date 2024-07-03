@@ -4,16 +4,11 @@ from django.apps import AppConfig
 from django.conf import settings
 from django.core.checks import register, Tags, Error, Warning
 
-from arches.settings_utils import inject_arches_applications_directories
-
 
 class ArchesAppConfig(AppConfig):
     name = "arches"
     verbose_name = "Arches"
     is_arches_application = False
-
-    def ready(self):
-        inject_arches_applications_directories()
 
 
 ### GLOBAL DEPRECATIONS ###

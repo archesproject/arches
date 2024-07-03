@@ -7,6 +7,28 @@ from contextlib import contextmanager
 import django
 from django.apps import apps
 from django.conf import global_settings, settings
+from django.contrib.staticfiles.finders import AppDirectoriesFinder
+from django.template.backends.django import DjangoTemplates
+
+
+class ArchesTemplates(DjangoTemplates):
+    app_dirname = os.path.join("app", "templates")
+
+
+class ArchesApplicationsStaticFilesFinder(AppDirectoriesFinder):
+    source_dir = "media"
+
+
+class CoreArchesStaticFilesFinderOne(AppDirectoriesFinder):
+    source_dir = os.path.join("app", "media", "build")
+
+
+class CoreArchesStaticFilesFinderTwo(AppDirectoriesFinder):
+    source_dir = os.path.join("app", "media")
+
+
+class CoreArchesStaticFilesFinderThree(AppDirectoriesFinder):
+    source_dir = os.path.join("..", "node_modules")
 
 
 @contextmanager
@@ -40,12 +62,11 @@ def list_arches_app_paths():
     ]
 
 
-def build_staticfiles_dirs(root_dir, app_root=None, additional_directories=None):
+def build_staticfiles_dirs(*, app_root=None, additional_directories=None):
     """
-    Builds the STATICFILES_DIRS tuple with respect to ordering projects,
-    packages, additional directories, before considering Arches
-    applications. (Those are handled by inject_arches_applications_directories(),
-    called by an arches application's ready() method.)
+    Builds a STATICFILES_DIRS tuple for this project (additional_directories,
+    then app_root) that Django will proritize before falling back to
+    INSTALLED_APPS (Arches applications and Arches core.)
 
     Arguments
 
@@ -66,24 +87,20 @@ def build_staticfiles_dirs(root_dir, app_root=None, additional_directories=None)
             ("node_modules", os.path.join(app_root, "..", "node_modules"))
         )
 
-    directories.append(os.path.join(root_dir, "app", "media", "build"))
-    directories.append(os.path.join(root_dir, "app", "media"))
-    directories.append(("node_modules", os.path.join(root_dir, "..", "node_modules")))
-
     return tuple(directories)
 
 
 def build_templates_config(
-    root_dir,
+    *,
     debug,
     app_root=None,
     additional_directories=None,
     context_processors=None,
 ):
     """
-    Builds a preliminary template config dictionary, before considering Arches
-    applications. (Those are handled by inject_arches_applications_directories(),
-    called by an arches application's ready() method.)
+    Builds a preliminary template config dictionary for this project
+    (additional_directories, then app_root) that Django will proritize
+    before falling back to INSTALLED_APPS (Arches applications and Arches core.)
 
     Arguments
 
@@ -102,11 +119,9 @@ def build_templates_config(
     if app_root:
         directories.append(os.path.join(app_root, "templates"))
 
-    directories.append(os.path.join(root_dir, "app", "templates"))
-
     return [
         {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "BACKEND": "arches.settings_utils.ArchesTemplates",
             "DIRS": directories,
             "APP_DIRS": True,
             "OPTIONS": {
@@ -131,36 +146,6 @@ def build_templates_config(
             },
         },
     ]
-
-
-def inject_arches_applications_directories():
-    from django.conf import settings
-
-    arches_app_paths = list_arches_app_paths()
-
-    arches_app_template_dirs = []
-    for arches_app_path in arches_app_paths:
-        template_path = os.path.join(arches_app_path, "templates")
-        if template_path not in settings.TEMPLATES[0]["DIRS"]:
-            arches_app_template_dirs.append(template_path)
-
-    settings.TEMPLATES[0]["DIRS"] = (
-        *settings.TEMPLATES[0]["DIRS"][:-1],
-        *arches_app_template_dirs,
-        settings.TEMPLATES[0]["DIRS"][-1],
-    )
-
-    arches_app_media_dirs = []
-    for arches_app_path in arches_app_paths:
-        media_dir = os.path.join(arches_app_path, "media")
-        if media_dir not in settings.STATICFILES_DIRS:
-            arches_app_media_dirs.append(media_dir)
-
-    settings.STATICFILES_DIRS = (
-        *settings.STATICFILES_DIRS[:-3],
-        *arches_app_media_dirs,
-        *settings.STATICFILES_DIRS[-3:],
-    )
 
 
 def transmit_webpack_django_config(**kwargs):

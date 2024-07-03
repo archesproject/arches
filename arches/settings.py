@@ -314,14 +314,18 @@ FORCE_SCRIPT_NAME = None
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
 ADMIN_MEDIA_PREFIX = "/media/admin/"
 
-STATICFILES_DIRS = build_staticfiles_dirs(root_dir=ROOT_DIR)
-TEMPLATES = build_templates_config(root_dir=ROOT_DIR, debug=DEBUG)
+STATICFILES_DIRS = build_staticfiles_dirs()
+TEMPLATES = build_templates_config(debug=DEBUG)
 
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "arches.settings_utils.ArchesApplicationsStaticFilesFinder",
+    "arches.settings_utils.CoreArchesStaticFilesFinderOne",
+    "arches.settings_utils.CoreArchesStaticFilesFinderTwo",
+    "arches.settings_utils.CoreArchesStaticFilesFinderThree",
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -357,6 +361,7 @@ INSTALLED_APPS = (
     "django.contrib.staticfiles",
     "django.contrib.gis",
     "arches",
+    "arches.app",
     "arches.app.models",
     "arches.management",
     "guardian",
