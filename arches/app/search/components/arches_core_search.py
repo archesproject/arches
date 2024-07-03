@@ -221,5 +221,7 @@ class ArchesCoreSearch(CoreSearchComponent):
                 search_filter = search_filter_factory.get_filter(filter_type)
                 if search_filter:
                     search_filter.post_search_hook(
-                        search_query_object, results_object, permitted_nodegroups
+                        search_query_object,
+                        results_object,
+                        permitted_nodegroups=permitted_nodegroups,
                     )
