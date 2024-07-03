@@ -159,12 +159,14 @@ class GeoJsonDataTypeTest(ArchesTestCase):
 
         with open(resource_path) as geojson_file:
             for feature in JSONDeserializer().deserialize(geojson_file)["features"]:
-                assert(len_feature(feature) > 3200)
-                for new_feature_set in geom_datatype.split_geom(feature, len_feature=len_feature):
-                    assert(len_feature(new_feature_set) < 32000)
+                assert len_feature(feature) > 3200
+                for new_feature_set in geom_datatype.split_geom(
+                    feature, len_feature=len_feature
+                ):
+                    assert len_feature(new_feature_set) < 32000
                     for new_feature in new_feature_set["features"]:
-                        assert(new_feature["id"] is not None)
-                        assert(new_feature["type"] == "Feature")
+                        assert new_feature["id"] is not None
+                        assert new_feature["type"] == "Feature"
 
 
 class BaseDataTypeTests(ArchesTestCase):
