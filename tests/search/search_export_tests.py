@@ -30,9 +30,8 @@ from tests.base_test import ArchesTestCase
 
 
 class SearchExportTests(ArchesTestCase):
-    @classmethod
-    def setUp(cls):
-        super().setUp(cls)
+    def setUp(self):
+        super().setUp()
         se = SearchEngineFactory().create()
         sync_es(se)
 
