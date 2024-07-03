@@ -2,12 +2,12 @@
 
 <div class="resource-selector-button">
     <div class="btn-group btn-group-xs">
-        <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false" aria-controls="resource-type-filter-contents">
-            <span data-bind="text: 'FOO'"></span>
+        <button class="btn btn-primary btn-active-primary dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false" aria-controls="lifecycle-state-filter-contents">
+            <span data-bind="text: $root.translations.lifecycleState"></span>
             <i class="dropdown-caret fa fa-caret-down"></i>
         </button>
-        <ul id="resource-type-filter-contents" class="dropdown-menu dropdown-menu-right">
-            <li><a href="#" data-bind="onEnterkeyClick, click: selectFoo.bind($data, null)">
+        <ul id="lifecycle-state-filter-contents" class="dropdown-menu dropdown-menu-right">
+            <li><a href="#" data-bind="onEnterkeyClick, click: selectLifecycleState.bind($data, null)">
                 <span data-bind="text: $root.translations.allResources"></span>
             </a></li>
             <!-- ko foreach: lifecycleStates -->
@@ -15,9 +15,9 @@
                 <a 
                     href="#" 
                     data-bind="
-                        text: $data.length > 55 ? $data.substring(55, length) + '...' : $data,
+                        text: $data.name.length > 55 ? $data.name.substring(55, length) + '...' : $data.name,
                         onEnterkeyClick, 
-                        click: $parent.selectFoo.bind($parent)
+                        click: $parent.selectLifecycleState.bind($parent, $data)
                     "
                 >
                 </a>

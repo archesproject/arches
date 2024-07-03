@@ -1,7 +1,7 @@
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Terms
 from arches.app.search.components.base import BaseSearchFilter
-from arches.app.models.models import Node
+from arches.app.models.models import ResourceInstanceLifecycle
 from arches.app.utils.permission_backend import get_resource_types_by_perm
 
 details = {
@@ -18,11 +18,12 @@ details = {
 }
 
 
-# def get_permitted_graphids(permitted_nodegroups):
-#     permitted_graphids = set()
-#     for node in Node.objects.filter(nodegroup__in=permitted_nodegroups):
-#         permitted_graphids.add(str(node.graph_id))
-#     return permitted_graphids
+def get_resource_instance_lifecycle_states():
+    all_keys = set()
+    for instance in ResourceInstanceLifecycle.objects.all():
+        all_keys.update(instance.states.keys())
+
+    return all_keys
 
 
 class LifecycleStateFilter(BaseSearchFilter):
@@ -30,21 +31,33 @@ class LifecycleStateFilter(BaseSearchFilter):
         self, search_results_object, permitted_nodegroups, include_provisional
     ):
         search_query = Bool()
+        lifecycle_state_filter = Bool()
+
         querystring_params = self.request.GET.get(details["componentname"], "")
+        lifecycle_state_filter_term = JSONDeserializer().deserialize(
+            querystring_params
+        )[0]
 
-        for resourceTypeFilter in JSONDeserializer().deserialize(querystring_params):
-            pass
+        if lifecycle_state_filter_term["inverted"] is True:
+            resource_instance_lifecycle_states = (
+                get_resource_instance_lifecycle_states()
+            )
+            resource_instance_lifecycle_states.remove(
+                lifecycle_state_filter_term["name"]
+            )
 
-        if resourceTypeFilter["inverted"] is True:
-            terms = Terms(field="lifecycle_state", terms=["retired"])
+            lifecycle_state_filter.filter(
+                Terms(
+                    field="lifecycle_state",
+                    terms=list(resource_instance_lifecycle_states),
+                )
+            )
         else:
-            terms = Terms(field="lifecycle_state", terms=["active"])
+            lifecycle_state_filter.filter(
+                Terms(
+                    field="lifecycle_state", terms=[lifecycle_state_filter_term["name"]]
+                )
+            )
 
-        search_query.filter(terms)
-
+        search_query.must(lifecycle_state_filter)
         search_results_object["query"].add_query(search_query)
-
-    def view_data(self):
-        return {
-            "resources": get_resource_types_by_perm(self.request.user, "read_nodegroup")
-        }

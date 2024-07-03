@@ -9,22 +9,21 @@ define([
         initialize: async function(options) {
             options.name = 'Lifecycle State Filter';
 
-
             this.requiredFilters = ['term-filter'];
             BaseFilter.prototype.initialize.call(this, options);
+
             this.lifecycleStates = ko.observableArray();
             this.filter = ko.observableArray();
+
             const self = this;  // eslint-disable-line @typescript-eslint/no-this-alias
 
-            const response = await fetch(arches.urls.api_resource_instance_lifecycle );
-
+            const response = await fetch(arches.urls.api_resource_instance_lifecycle);
             if (response.ok) {
                 const data = await response.json();
                 data.forEach(function(lifecycleState) {
                     self.lifecycleStates.push(lifecycleState);
                 });
             } else {
-                 
                 console.log('Failed to fetch resource instance list');
             }
 
@@ -38,8 +37,9 @@ define([
             this.filters[componentName](this);
 
             if (this.requiredFiltersLoaded() === false) {
-                this.requiredFiltersLoaded.subscribe(function() {
+                this.requireFiltersLoadedSubscription = this.requiredFiltersLoaded.subscribe(function() {
                     this.restoreState();
+                    self.requireFiltersLoadedSubscription.dispose();
                 }, this);
             } else {
                 this.restoreState();
@@ -59,13 +59,13 @@ define([
         restoreState: function() {
             var query = this.query();
             if (componentName in query) {
-                var resourceTypeQuery = JSON.parse(query[componentName]);
-                if (resourceTypeQuery.length > 0) {
-                    resourceTypeQuery.forEach(function(type){
+                var lifecycleStateQuery = JSON.parse(query[componentName]);
+                if (lifecycleStateQuery.length > 0) {
+                    lifecycleStateQuery.forEach(function(type){
                         type.inverted = ko.observable(!!type.inverted);
                         this.getFilter('term-filter').addTag(type.name, this.name, type.inverted);
                     }, this);
-                    this.filter(resourceTypeQuery);
+                    this.filter(lifecycleStateQuery);
                 }
             }
         },
@@ -74,16 +74,17 @@ define([
             this.filter.removeAll();
         },
 
-        selectFoo: function(item){
-            this.filter().forEach(function(item){
-                this.getFilter('term-filter').removeTag(item.name);
+        selectLifecycleState: function(item){
+            this.filter().forEach(function(filterItem){
+                this.getFilter('term-filter').removeTag(filterItem.name);
             }, this);
-            if(item){
-                console.log("!!", item);
+
+            if (item) {
                 var inverted = ko.observable(false);
-                this.getFilter('term-filter').addTag(item, this.name, inverted);
-                this.filter([{name: item, inverted: inverted}]);
-            }else{
+                this.getFilter('term-filter').addTag(item.name, this.name, inverted);
+                this.filter([{name: item.name, inverted: inverted}]);
+            }
+            else{
                 this.clear();
             }
         }

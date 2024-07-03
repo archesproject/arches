@@ -385,6 +385,7 @@ def search_results(request, returnDsl=False):
     if returnDsl:
         return dsl
     dsl.include("graph_id")
+    dsl.include("lifecycle_state")
     dsl.include("root_ontology_class")
     dsl.include("resourceinstanceid")
     dsl.include("points")
