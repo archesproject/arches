@@ -323,9 +323,9 @@ STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
     "arches.settings_utils.ArchesApplicationsStaticFilesFinder",
-    "arches.settings_utils.CoreArchesStaticFilesFinderOne",
-    "arches.settings_utils.CoreArchesStaticFilesFinderTwo",
-    "arches.settings_utils.CoreArchesStaticFilesFinderThree",
+    "arches.settings_utils.CoreArchesStaticFilesFinderBuildDirectory",
+    "arches.settings_utils.CoreArchesStaticFilesFinderMediaRoot",
+    "arches.settings_utils.CoreArchesStaticFilesFinderNodeModules",
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -361,7 +361,6 @@ INSTALLED_APPS = (
     "django.contrib.staticfiles",
     "django.contrib.gis",
     "arches",
-    "arches.app",
     "arches.app.models",
     "arches.management",
     "guardian",
@@ -371,6 +370,10 @@ INSTALLED_APPS = (
     "oauth2_provider",
     "django_celery_results",
 )
+
+# Placing this last ensures any templates provided by Arches Applications
+# take precedence over core arches templates in arches/app/templates.
+INSTALLED_APPS += ("arches.app",)
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",

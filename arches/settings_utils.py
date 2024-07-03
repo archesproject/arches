@@ -14,15 +14,15 @@ class ArchesApplicationsStaticFilesFinder(AppDirectoriesFinder):
     source_dir = "media"
 
 
-class CoreArchesStaticFilesFinderOne(AppDirectoriesFinder):
+class CoreArchesStaticFilesFinderBuildDirectory(AppDirectoriesFinder):
     source_dir = os.path.join("app", "media", "build")
 
 
-class CoreArchesStaticFilesFinderTwo(AppDirectoriesFinder):
+class CoreArchesStaticFilesFinderMediaRoot(AppDirectoriesFinder):
     source_dir = os.path.join("app", "media")
 
 
-class CoreArchesStaticFilesFinderThree(AppDirectoriesFinder):
+class CoreArchesStaticFilesFinderNodeModules(AppDirectoriesFinder):
     source_dir = os.path.join("..", "node_modules")
 
 
@@ -61,11 +61,10 @@ def build_staticfiles_dirs(*, app_root=None, additional_directories=None):
     """
     Builds a STATICFILES_DIRS tuple for this project (additional_directories,
     then app_root) that Django will proritize before falling back to
-    INSTALLED_APPS (Arches applications and Arches core.)
+    INSTALLED_APPS (Arches applications and Arches core).
 
     Arguments
 
-    root_dir -- string, os-safe absolute path to arches-core root directory
     app_root -- string, os-safe absolute path to application directory
     additional_directories -- list of os-safe absolute paths
     """
@@ -95,11 +94,10 @@ def build_templates_config(
     """
     Builds a preliminary template config dictionary for this project
     (additional_directories, then app_root) that Django will proritize
-    before falling back to INSTALLED_APPS (Arches applications and Arches core.)
+    before falling back to INSTALLED_APPS (Arches applications and Arches core).
 
     Arguments
 
-    root_dir -- string, os-safe absolute path to arches-core root directory
     debug -- boolean representing the DEBUG value derived from settings
     app_root -- string, os-safe absolute path to application directory
     additional_directories -- list of os-safe absolute paths
