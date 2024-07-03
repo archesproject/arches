@@ -1556,16 +1556,10 @@ class ResourceReport(APIBase):
             resp["tiles"] = permitted_tiles
 
         if "cards" not in exclude:
-            nodegroups = [
-                models.NodeGroup(**serialized_nodegroup)
-                for serialized_nodegroup in published_graph.serialized_graph[
-                    "nodegroups"
-                ]
-            ]
             readable_nodegroup_ids = [
                 nodegroup.pk
                 for nodegroup in get_nodegroups_by_perm(
-                    request.user, perm, any_perm=True, nodegroups=nodegroups
+                    request.user, perm, any_perm=True
                 )
             ]
             writable_nodegroup_ids = [
@@ -1574,7 +1568,6 @@ class ResourceReport(APIBase):
                     request.user,
                     "write_nodegroup",
                     any_perm=True,
-                    nodegroups=nodegroups,
                 )
             ]
 
@@ -1582,8 +1575,8 @@ class ResourceReport(APIBase):
                 [
                     card
                     for card in graph.cards.values()
-                    if str(card.nodegroup_id) in readable_nodegroup_ids
-                    and str(card.nodegroup_id) in writable_nodegroup_ids
+                    if card.nodegroup_id in readable_nodegroup_ids
+                    and card.nodegroup_id in writable_nodegroup_ids
                 ],
                 key=lambda card: card.sortorder,
             )
