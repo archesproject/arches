@@ -167,7 +167,7 @@ class GeoJsonDataTypeTest(ArchesTestCase):
             nodevalue = JSONDeserializer().deserialize(geojson_file)
             geom_datatype.append_to_document(document, nodevalue, nodeid, tile)
             for geometry in document["geometries"]:
-                assert(GeoJsonDataTypeTest.len_feature(geometry) < 32000)
+                assert GeoJsonDataTypeTest.len_feature(geometry) < 32000
 
     def test_get_bounds(self):
         geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
@@ -183,10 +183,10 @@ class GeoJsonDataTypeTest(ArchesTestCase):
             bounds = geom_datatype.get_bounds(tile, node)
             # Obtained from postgis - st_extent()
             # BOX(-122 36.9999999999834,-120.98300000004122 39.50000000006639)
-            assert(bounds[0] == -122.0)
-            assert(bounds[1] == 36.9999999999834)
-            assert(bounds[2] == -120.98300000004122)
-            assert(bounds[3] == 39.50000000006639)
+            assert bounds[0] == -122.0
+            assert bounds[1] == 36.9999999999834
+            assert bounds[2] == -120.98300000004122
+            assert bounds[3] == 39.50000000006639
 
     def test_split_geom(self):
         geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
