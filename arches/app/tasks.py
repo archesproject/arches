@@ -18,6 +18,27 @@ from tempfile import NamedTemporaryFile
 
 
 @shared_task
+def add(userid, load_id, module_id, graph_id, node_id, operation, language_old, old_text, new_text, resourceids, language_new, oldid, newid):
+    from arches.app.etl_modules import bulk_edit_concept
+
+    logger = logging.getLogger(__name__)
+    try:
+        BulkStringEditor = bulk_edit_concept.BulkConceptEditor(loadid=load_id)
+        BulkStringEditor.run_load_task(userid, load_id, module_id, graph_id, node_id, operation, language_old, old_text, new_text, resourceids,language_new, oldid, newid)
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        load_event.status = "failed"
+        load_event.save()
+        status = _("Failed")
+    finally:
+        msg = _("Bulk Data Edit: {} [{}]").format(operation, status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
+
+@shared_task
 def delete_file():
     from arches.app.models.system_settings import settings
 
