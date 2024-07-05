@@ -38,8 +38,9 @@ details = {}
 
 
 class BaseSearchFilter:
-    def __init__(self, request=None):
+    def __init__(self, request=None, user=None):
         self.request = request
+        self.user = user
 
     def append_dsl(self, search_query_object, **kwargs):
         """
@@ -78,8 +79,8 @@ class CoreSearchComponent(BaseSearchFilter):
     how to execute a search in the search_results method
     """
 
-    def __init__(self, request=None, componentname=None):
-        super().__init__(request=request)
+    def __init__(self, request=None, user=None, componentname=None):
+        super().__init__(request=request, user=user)
         self.core_component = models.SearchComponent.objects.get(
             componentname=componentname
         )
@@ -135,8 +136,9 @@ class CoreSearchComponent(BaseSearchFilter):
 
 
 class SearchFilterFactory(object):
-    def __init__(self, request=None):
+    def __init__(self, request=None, user=None):
         self.request = request
+        self.user = user
         self.search_filters = {
             search_filter.componentname: search_filter
             for search_filter in models.SearchComponent.objects.all()
@@ -158,9 +160,11 @@ class SearchFilterFactory(object):
                     ExtensionType.SEARCH_COMPONENTS,
                 )
                 if class_method and core:
-                    filter_instance = class_method(self.request, componentname)
+                    filter_instance = class_method(
+                        self.request, self.user, componentname
+                    )
                 elif class_method:
-                    filter_instance = class_method(self.request)
+                    filter_instance = class_method(self.request, self.user)
                 self.search_filters_instances[search_filter.componentname] = (
                     filter_instance
                 )

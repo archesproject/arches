@@ -11,6 +11,7 @@ from arches.app.utils.permission_backend import (
     user_is_resource_exporter,
 )
 from arches.app.utils.response import JSONErrorResponse
+from arches.app.utils.string_utils import str_to_bool
 from datetime import datetime
 import json
 import logging
@@ -111,21 +112,14 @@ class ArchesCoreSearch(CoreSearchComponent):
         search_query_object["query"].include("root_ontology_class")
         search_query_object["query"].include("resourceinstanceid")
         search_query_object["query"].include("points")
-        search_query_object["query"].include("permissions.users_without_read_perm")
-        search_query_object["query"].include("permissions.users_without_edit_perm")
-        search_query_object["query"].include("permissions.users_without_delete_perm")
-        search_query_object["query"].include("permissions.users_with_no_access")
         search_query_object["query"].include("geometries")
         search_query_object["query"].include("displayname")
         search_query_object["query"].include("displaydescription")
         search_query_object["query"].include("map_popup")
         search_query_object["query"].include("provisional_resource")
         load_tiles = self.request.GET.get("tiles", False)
-        if load_tiles:
-            try:
-                load_tiles = json.loads(load_tiles)
-            except TypeError:
-                pass
+        if not isinstance(load_tiles, bool):
+            load_tiles = str_to_bool(load_tiles)
         if load_tiles:
             search_query_object["query"].include("tiles")
 

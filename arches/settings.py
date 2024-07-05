@@ -350,8 +350,7 @@ AUTHENTICATION_BACKENDS = (
     "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
     "oauth2_provider.backends.OAuth2Backend",
     "django.contrib.auth.backends.ModelBackend",  # this is default
-    "arches.app.utils.permission_backend.PermissionBackend",
-    "guardian.backends.ObjectPermissionBackend",
+    "arches.app.permissions.arches_standard.PermissionBackend",
     "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend",
 )
 
@@ -489,8 +488,10 @@ ENABLE_CAPTCHA = True
 # RECAPTCHA_USE_SSL = False
 NOCAPTCHA = True
 # RECAPTCHA_PROXY = 'http://127.0.0.1:8000'
+SILENCED_SYSTEM_CHECKS = ["guardian.W001"]
+
 if DEBUG is True:
-    SILENCED_SYSTEM_CHECKS = ["captcha.recaptcha_test_key_error"]
+    SILENCED_SYSTEM_CHECKS += ["captcha.recaptcha_test_key_error"]
 
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
@@ -660,6 +661,9 @@ BUSINESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+PERMISSION_LOCATIONS = [
+    "arches.app.permissions",
+]
 DATATYPE_LOCATIONS = [
     "arches.app.datatypes",
 ]
@@ -858,6 +862,8 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
+
+PERMISSION_FRAMEWORK = "arches_standard.ArchesStandardPermissionFramework"
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###

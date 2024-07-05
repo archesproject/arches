@@ -47,6 +47,7 @@ from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.views.base import MapBaseManagerView
 from arches.app.models.concept import get_preflabel_from_conceptid
+from arches.app.utils import permission_backend
 from arches.app.utils.permission_backend import (
     get_nodegroups_by_perm,
     user_is_resource_reviewer,
@@ -245,7 +246,6 @@ def get_resource_model_label(result):
 
 @group_required("Resource Exporter")
 def export_results(request):
-
     total = int(request.GET.get("total", 0))
     format = request.GET.get("format", "tilecsv")
     report_link = request.GET.get("reportlink", False)
@@ -324,13 +324,14 @@ def export_results(request):
 
 def append_instance_permission_filter_dsl(request, search_query_object):
     if request.user.is_superuser is False:
-        has_access = Bool()
-        terms = Terms(
-            field="permissions.users_with_no_access", terms=[str(request.user.id)]
-        )
-        nested_term_filter = Nested(path="permissions", query=terms)
-        has_access.must_not(nested_term_filter)
-        search_query_object["query"].add_query(has_access)
+        query: Query = search_query_object.get("query", None)
+        if query:
+            inclusions = permission_backend.get_permission_inclusions()
+            for inclusion in inclusions:
+                query.include(inclusion)
+            query.add_query(
+                permission_backend.get_permission_search_filter(request.user)
+            )
 
 
 def get_dsl_from_search_string(request):
@@ -398,10 +399,7 @@ def get_provisional_type(request):
 
 
 def get_permitted_nodegroups(user):
-    return [
-        str(nodegroup.pk)
-        for nodegroup in get_nodegroups_by_perm(user, "models.read_nodegroup")
-    ]
+    return get_nodegroups_by_perm(user, "models.read_nodegroup")
 
 
 def buffer(request):
