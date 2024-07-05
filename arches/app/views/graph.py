@@ -48,7 +48,7 @@ from arches.app.utils.data_management.resource_graphs.exporter import (
 from arches.app.utils.data_management.resource_graphs import importer as GraphImporter
 from arches.app.utils.system_metadata import system_metadata
 from arches.app.views.base import BaseManagerView
-from guardian.shortcuts import (
+from arches.app.utils.permission_backend import (
     assign_perm,
     get_perms,
     remove_perm,
@@ -234,9 +234,8 @@ class GraphDesignerView(GraphBaseView):
         return ontology_namespaces
 
     def get(self, request, graphid):
-
         if graphid == settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID:
-            if not request.user.groups.filter(name="System Administrator").exists():
+            if not group_required("System Administrator", raise_exception=True):
                 raise PermissionDenied
 
         self.graph = Graph.objects.get(graphid=graphid)
@@ -364,7 +363,6 @@ class GraphDesignerView(GraphBaseView):
 
 
 class GraphDataView(View):
-
     action = "update_node"
 
     def get(self, request, graphid, nodeid=None):
@@ -743,15 +741,16 @@ class FunctionManagerView(GraphBaseView):
         self.graph = Graph.objects.get(graphid=graphid)
         with transaction.atomic():
             for item in data:
-                functionXgraph, created = (
-                    models.FunctionXGraph.objects.update_or_create(
-                        pk=item["id"],
-                        defaults={
-                            "function_id": item["function_id"],
-                            "graph_id": graphid,
-                            "config": item["config"],
-                        },
-                    )
+                (
+                    functionXgraph,
+                    created,
+                ) = models.FunctionXGraph.objects.update_or_create(
+                    pk=item["id"],
+                    defaults={
+                        "function_id": item["function_id"],
+                        "graph_id": graphid,
+                        "config": item["config"],
+                    },
                 )
                 item["id"] = functionXgraph.pk
 
