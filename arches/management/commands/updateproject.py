@@ -233,24 +233,6 @@ class Command(BaseCommand):
                         )
 
         if not os.path.isfile(
-            os.path.join(settings.APP_ROOT, "install", "requirements_dev.txt")
-        ):
-            self.stdout.write(
-                "Copying requirements_dev.txt to project install directory"
-            )
-            shutil.copy2(
-                os.path.join(
-                    settings.ROOT_DIR,
-                    "install",
-                    "arches-templates",
-                    "project_name",
-                    "install",
-                    "requirements_dev.txt",
-                ),
-                os.path.join(settings.APP_ROOT, "install"),
-            )
-
-        if not os.path.isfile(
             os.path.join(settings.APP_ROOT, "src", "declarations.d.ts")
         ):
             self.stdout.write("Creating /src/declarations.d.ts")

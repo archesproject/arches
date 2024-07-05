@@ -33,7 +33,7 @@ from arches.app.models.models import (
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.i18n import capitalize_region
-from arches.setup import unzip_file
+from arches.app.utils.zip import unzip_file
 from .formats.csvfile import CsvReader
 from .formats.archesfile import ArchesFileReader
 import ctypes
@@ -204,7 +204,6 @@ class BusinessDataImporter(object):
     ):
         start = time()
         cursor = connection.cursor()
-
         try:
             if file_format is None:
                 file_format = self.file_format
