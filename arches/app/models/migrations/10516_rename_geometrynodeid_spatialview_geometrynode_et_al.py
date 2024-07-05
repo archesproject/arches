@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10798_jsonld_importer"),
+        ("models", "10999_update_principaluser"),
     ]
 
     operations = [
