@@ -2128,12 +2128,10 @@ class SpatialView(APIBase):
             else:
                 return JSONErrorResponse(_("Invalid spatialview id"), status=400)
 
-        permitted_nodegroupids = [
-            nodegroup.pk
-            for nodegroup in get_nodegroups_by_perm(
+        permitted_nodegroupids = get_nodegroups_by_perm(
                 request.user, "models.read_nodegroup"
-            )
-        ]
+        )
+        
         permitted_spatialviews = models.SpatialView.objects.filter(
             geometrynode__nodegroup_id__in=permitted_nodegroupids
         )
