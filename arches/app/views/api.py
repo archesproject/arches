@@ -2129,9 +2129,9 @@ class SpatialView(APIBase):
                 return JSONErrorResponse(_("Invalid spatialview id"), status=400)
 
         permitted_nodegroupids = get_nodegroups_by_perm(
-                request.user, "models.read_nodegroup"
+            request.user, "models.read_nodegroup"
         )
-        
+
         permitted_spatialviews = models.SpatialView.objects.filter(
             geometrynode__nodegroup_id__in=permitted_nodegroupids
         )
@@ -2192,9 +2192,7 @@ class SpatialView(APIBase):
 
         # if json_data has spatialviewid, try and get the spatialview object. If it doesn't exist, create a new one and use the spatialviewid
         try:
-            spatialview = models.SpatialView.objects.get(
-                pk=json_data["spatialviewid"]
-            )
+            spatialview = models.SpatialView.objects.get(pk=json_data["spatialviewid"])
         except KeyError:
             spatialview = models.SpatialView()
         except ObjectDoesNotExist:
@@ -2208,13 +2206,11 @@ class SpatialView(APIBase):
             nodeid=json_data["geometrynodeid"]
         )
         spatialview.ismixedgeometrytypes = json_data["ismixedgeometrytypes"]
-        spatialview.language = models.Language.objects.get(
-            code=json_data["language"]
-        )
+        spatialview.language = models.Language.objects.get(code=json_data["language"])
         spatialview.attributenodes = json_data["attributenodes"]
         spatialview.isactive = json_data["isactive"]
         return spatialview
-    
+
     def validate_json_data_content(self, json_data, spatialviewid_identifier=None):
         """
         Validates the JSON data passed in the request body
