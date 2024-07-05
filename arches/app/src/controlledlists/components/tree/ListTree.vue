@@ -7,24 +7,21 @@ import Tree from "primevue/tree";
 import {
     displayedRowKey,
     selectedLanguageKey,
-} from "@/components/ControlledListManager/constants.ts";
-import {
-    bestLabel,
-    nodeIsList,
-} from "@/components/ControlledListManager/utils.ts";
-import LetterCircle from "@/components/ControlledListManager/misc/LetterCircle.vue";
-import ListTreeControls from "@/components/ControlledListManager/tree/ListTreeControls.vue";
-import TreeRow from "@/components/ControlledListManager/tree/TreeRow.vue";
+} from "@/controlledlists/constants.ts";
+import { bestLabel, nodeIsList } from "@/controlledlists/utils.ts";
+import LetterCircle from "@/controlledlists/components/misc/LetterCircle.vue";
+import ListTreeControls from "@/controlledlists/components/tree/ListTreeControls.vue";
+import TreeRow from "@/controlledlists/components/tree/TreeRow.vue";
 
 import type { ComponentPublicInstance, Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
-import type { Language } from "@/types/arches";
+import type { Language } from "@/arches/types";
 import type {
     DisplayedRowRefAndSetter,
     NewControlledList,
     NewControlledListItem,
-} from "@/types/ControlledListManager";
+} from "@/controlledlists/types";
 
 const { $gettext } = useGettext();
 

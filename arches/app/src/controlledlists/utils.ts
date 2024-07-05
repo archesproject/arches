@@ -1,12 +1,12 @@
 import arches from "arches";
 
 import type { TreeNode } from "primevue/treenode";
-import type { Language } from "@/types/arches";
+import type { Language } from "@/arches/types";
 import type {
     ControlledList,
     ControlledListItem,
     Selectable,
-} from "@/types/ControlledListManager";
+} from "@/controlledlists/types";
 
 // Duck-typing helpers
 export const dataIsList = (data: Selectable) => {

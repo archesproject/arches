@@ -6,10 +6,10 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 import Dropdown from "primevue/dropdown";
 
-import { selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
+import { selectedLanguageKey } from "@/controlledlists/constants.ts";
 
 import type { Ref } from "vue";
-import type { Language } from "@/types/arches";
+import type { Language } from "@/arches/types";
 
 const { $gettext } = useGettext();
 

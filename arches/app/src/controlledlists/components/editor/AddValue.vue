@@ -11,16 +11,16 @@ import {
     ALT_LABEL,
     NOTE_CHOICES,
     PREF_LABEL,
-} from "@/components/ControlledListManager/constants.ts";
+} from "@/controlledlists/constants.ts";
 
 import type { Ref } from "vue";
-import type { Language } from "@/types/arches";
+import type { Language } from "@/arches/types";
 import type {
     ControlledListItem,
     Value,
     NewValue,
     ValueType,
-} from "@/types/ControlledListManager";
+} from "@/controlledlists/types";
 
 const { valueType, makeNewValueEditable } = defineProps<{
     valueType?: ValueType;

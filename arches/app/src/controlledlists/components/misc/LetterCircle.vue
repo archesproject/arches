@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import { dataIsList } from "@/components/ControlledListManager/utils.ts";
+import { dataIsList } from "@/controlledlists/utils.ts";
 
-import type {
-    ControlledListItem,
-    Selectable,
-} from "@/types/ControlledListManager";
+import type { ControlledListItem, Selectable } from "@/controlledlists/types";
 
 const props = defineProps<{ labelled: Selectable }>();
 

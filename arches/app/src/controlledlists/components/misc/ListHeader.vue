@@ -6,18 +6,15 @@ import { ARCHES_CHROME_BLUE } from "@/theme.ts";
 import {
     displayedRowKey,
     selectedLanguageKey,
-} from "@/components/ControlledListManager/constants.ts";
-import {
-    bestLabel,
-    dataIsList,
-} from "@/components/ControlledListManager/utils.ts";
+} from "@/controlledlists/constants.ts";
+import { bestLabel, dataIsList } from "@/controlledlists/utils.ts";
 
 import type { Ref } from "vue";
-import type { Language } from "@/types/arches";
+import type { Language } from "@/arches/types";
 import type {
     ControlledList,
     DisplayedRowRefAndSetter,
-} from "@/types/ControlledListManager";
+} from "@/controlledlists/types";
 
 const { $gettext } = useGettext();
 

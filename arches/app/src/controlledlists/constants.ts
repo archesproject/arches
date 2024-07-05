@@ -2,8 +2,8 @@ import type { InjectionKey } from "vue";
 import type {
     ControlledList,
     ControlledListItem,
-} from "@/types/ControlledListManager";
-import type { Language } from "@/types/arches";
+} from "@/controlledlists/types";
+import type { Language } from "@/arches/types";
 
 export const displayedRowKey = Symbol() as InjectionKey<ControlledList | null>;
 export const itemKey = Symbol() as InjectionKey<ControlledListItem | null>;

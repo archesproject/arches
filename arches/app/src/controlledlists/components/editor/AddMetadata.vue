@@ -6,7 +6,7 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
-import { itemKey } from "@/components/ControlledListManager/constants.ts";
+import { itemKey } from "@/controlledlists/constants.ts";
 
 import type { Ref } from "vue";
 import type {
@@ -14,7 +14,7 @@ import type {
     ControlledListItemImage,
     LabeledChoice,
     NewControlledListItemImageMetadata,
-} from "@/types/ControlledListManager";
+} from "@/controlledlists/types";
 
 const { labeledChoices, image, makeMetadataEditable } = defineProps<{
     labeledChoices: LabeledChoice[];

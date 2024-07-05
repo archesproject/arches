@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { inject, provide } from "vue";
 
-import ItemHeader from "@/components/ControlledListManager/editor/ItemHeader.vue";
-import ItemImages from "@/components/ControlledListManager/editor/ItemImages.vue";
-import ItemType from "@/components/ControlledListManager/editor/ItemType.vue";
-import ItemURI from "@/components/ControlledListManager/editor/ItemURI.vue";
-import ValueEditor from "@/components/ControlledListManager/editor/ValueEditor.vue";
+import ItemHeader from "@/controlledlists/components/editor/ItemHeader.vue";
+import ItemImages from "@/controlledlists/components/editor/ItemImages.vue";
+import ItemType from "@/controlledlists/components/editor/ItemType.vue";
+import ItemURI from "@/controlledlists/components/editor/ItemURI.vue";
+import ValueEditor from "@/controlledlists/components/editor/ValueEditor.vue";
 
 import {
     displayedRowKey,
@@ -13,9 +13,9 @@ import {
     ALT_LABEL,
     NOTE,
     PREF_LABEL,
-} from "@/components/ControlledListManager/constants.ts";
+} from "@/controlledlists/constants.ts";
 
-import type { DisplayedListItemRefAndSetter } from "@/types/ControlledListManager";
+import type { DisplayedListItemRefAndSetter } from "@/controlledlists/types";
 
 const { displayedRow: item } = inject(
     displayedRowKey,

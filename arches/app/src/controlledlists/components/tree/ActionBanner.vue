@@ -4,13 +4,13 @@ import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 
-import { selectedLanguageKey } from "@/components/ControlledListManager/constants.ts";
-import { bestLabel } from "@/components/ControlledListManager/utils.ts";
+import { selectedLanguageKey } from "@/controlledlists/constants.ts";
+import { bestLabel } from "@/controlledlists/utils.ts";
 
 import type { Ref } from "vue";
 import type { TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
-import type { Language } from "@/types/arches";
+import type { Language } from "@/arches/types";
 
 const isMultiSelecting = defineModel<boolean>("isMultiSelecting", {
     required: true,

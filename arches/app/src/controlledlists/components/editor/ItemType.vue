@@ -6,15 +6,15 @@ import InputSwitch from "primevue/inputswitch";
 import { useToast } from "primevue/usetoast";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
-import { patchItem } from "@/components/ControlledListManager/api.ts";
+import { patchItem } from "@/controlledlists/api.ts";
 import {
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
     itemKey,
-} from "@/components/ControlledListManager/constants.ts";
+} from "@/controlledlists/constants.ts";
 
 import type { Ref } from "vue";
-import type { ControlledListItem } from "@/types/ControlledListManager";
+import type { ControlledListItem } from "@/controlledlists/types";
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
 const toast = useToast();

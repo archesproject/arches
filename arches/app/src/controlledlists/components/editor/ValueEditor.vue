@@ -11,10 +11,7 @@ import Textarea from "primevue/textarea";
 import { useToast } from "primevue/usetoast";
 
 import { ARCHES_CHROME_BLUE } from "@/theme.ts";
-import {
-    deleteValue,
-    upsertValue,
-} from "@/components/ControlledListManager/api.ts";
+import { deleteValue, upsertValue } from "@/controlledlists/api.ts";
 import {
     ALT_LABEL,
     DEFAULT_ERROR_TOAST_LIFE,
@@ -23,9 +20,9 @@ import {
     NOTE_CHOICES,
     PREF_LABEL,
     itemKey,
-} from "@/components/ControlledListManager/constants.ts";
-import { languageNameFromCode } from "@/components/ControlledListManager/utils.ts";
-import AddValue from "@/components/ControlledListManager/editor/AddValue.vue";
+} from "@/controlledlists/constants.ts";
+import { languageNameFromCode } from "@/controlledlists/utils.ts";
+import AddValue from "@/controlledlists/components/editor/AddValue.vue";
 
 import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
@@ -36,7 +33,7 @@ import type {
     NewOrExistingValue,
     NewValue,
     ValueType,
-} from "@/types/ControlledListManager";
+} from "@/controlledlists/types";
 
 const { valueType, valueCategory } = defineProps<{
     valueType?: ValueType;

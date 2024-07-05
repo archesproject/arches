@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import ActionBanner from "@/components/ControlledListManager/tree/ActionBanner.vue";
-import AddDeleteControls from "@/components/ControlledListManager/tree/AddDeleteControls.vue";
-import PresentationControls from "@/components/ControlledListManager/tree/PresentationControls.vue";
+import ActionBanner from "@/controlledlists/components/tree/ActionBanner.vue";
+import AddDeleteControls from "@/controlledlists/components/tree/AddDeleteControls.vue";
+import PresentationControls from "@/controlledlists/components/tree/PresentationControls.vue";
 
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
-import type { NewControlledList } from "@/types/ControlledListManager";
+import type { NewControlledList } from "@/controlledlists/types";
 
 const controlledListItemsTree = defineModel<TreeNode[]>({ required: true });
 const rerenderTree = defineModel<number>("rerenderTree", { required: true });
