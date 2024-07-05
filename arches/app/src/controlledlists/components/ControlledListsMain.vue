@@ -19,8 +19,8 @@ import ListHeader from "@/controlledlists/components/misc/ListHeader.vue";
 import ListTree from "@/controlledlists/components/tree/ListTree.vue";
 
 import type { Ref } from "vue";
+import type { Language } from "@/types";
 import type { Selectable } from "@/controlledlists/types";
-import type { Language } from "@/arches/types";
 
 const splash = "splash";
 

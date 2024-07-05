@@ -29,10 +29,10 @@ import {
 } from "@/controlledlists/utils.ts";
 import MoveRow from "@/controlledlists/components/tree/MoveRow.vue";
 
-import type { Language } from "@/arches/types";
 import type { Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
+import type { Language } from "@/types";
 import type {
     ControlledList,
     ControlledListItem,

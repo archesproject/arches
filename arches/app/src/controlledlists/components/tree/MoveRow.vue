@@ -25,6 +25,7 @@ import {
 import type { Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
+import type { Language } from "@/types";
 import type {
     ControlledList,
     ControlledListItem,
@@ -32,7 +33,6 @@ import type {
     MoveLabels,
     NewControlledListItem,
 } from "@/controlledlists/types";
-import type { Language } from "@/arches/types";
 
 const toast = useToast();
 const { $gettext } = useGettext();

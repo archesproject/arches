@@ -1,7 +1,7 @@
 import arches from "arches";
 
 import type { TreeNode } from "primevue/treenode";
-import type { Language } from "@/arches/types";
+import type { Language } from "@/types";
 import type {
     ControlledList,
     ControlledListItem,
