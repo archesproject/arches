@@ -194,7 +194,7 @@ class SpatialViewTests(ArchesTestCase):
 
     def test_create_spatialview_discreet_geometry(self):
         spatialview = self.generate_valid_spatiatview()
-
+        spatialview.clean()
         spatialview.save()
 
         fetched_spatialview = SpatialView.objects.get(pk=spatialview.spatialviewid)
@@ -206,6 +206,7 @@ class SpatialViewTests(ArchesTestCase):
 
         spatialview = self.generate_valid_spatiatview()
         spatialview.ismixedgeometrytypes = True
+        spatialview.clean()
         spatialview.save()
 
         fetched_spatialview = SpatialView.objects.get(pk=spatialview.spatialviewid)
@@ -224,6 +225,7 @@ class SpatialViewTests(ArchesTestCase):
         node_type = spatialview.geometrynode.datatype
 
         with self.assertRaises(Exception):
+            spatialview.clean()
             spatialview.save()
 
         with self.assertRaises(SpatialView.DoesNotExist):
@@ -236,6 +238,7 @@ class SpatialViewTests(ArchesTestCase):
         )
 
         with self.assertRaises(Exception):
+            spatialview.clean()
             spatialview.save()
 
         with self.assertRaises(SpatialView.DoesNotExist):
@@ -246,6 +249,7 @@ class SpatialViewTests(ArchesTestCase):
         spatialview.language = self.get_language_instance("fr")
 
         with self.assertRaises(Exception):
+            spatialview.clean()
             spatialview.save()
 
         with self.assertRaises(SpatialView.DoesNotExist):
@@ -256,6 +260,7 @@ class SpatialViewTests(ArchesTestCase):
         spatialview.schema = "invalid"
 
         with self.assertRaises(Exception):
+            spatialview.clean()
             spatialview.save()
 
         with self.assertRaises(SpatialView.DoesNotExist):
@@ -266,6 +271,7 @@ class SpatialViewTests(ArchesTestCase):
         spatialview.slug = "1_invalid"
 
         with self.assertRaises(Exception):
+            spatialview.clean()
             spatialview.save()
 
         with self.assertRaises(SpatialView.DoesNotExist):
@@ -275,6 +281,7 @@ class SpatialViewTests(ArchesTestCase):
 
         # first create a valid spatial view that isactive=True
         spatialview = self.generate_valid_spatiatview()
+        spatialview.clean()
         spatialview.save()
 
         self.assertTrue(
@@ -283,6 +290,7 @@ class SpatialViewTests(ArchesTestCase):
 
         # now set isactive=False
         spatialview.isactive = False
+        spatialview.clean()
         spatialview.save()
 
         self.assertTrue(
@@ -361,6 +369,7 @@ class SpatialViewTriggerTests(TransactionTestCase):
         # create a spatialview with objects to test triggers
         self.spatialview_slug = "spatialviews_test"
         self.test_spatial_view = self.generate_valid_spatiatview()
+        self.test_spatial_view.clean()
         self.test_spatial_view.save()
         self.spatialview_id = self.test_spatial_view.spatialviewid
 
