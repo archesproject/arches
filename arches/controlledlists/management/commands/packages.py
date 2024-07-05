@@ -1,6 +1,8 @@
 import os
 import logging
 import openpyxl
+import sys
+
 from arches.management.commands.packages import Command as PackagesCommand
 from arches.app.models.system_settings import settings
 from arches.app.models import models
