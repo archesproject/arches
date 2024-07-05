@@ -1,7 +1,6 @@
 import io
 import os
 
-from django.conf import settings
 from django.core import management
 from django.test import TestCase
 from django.test.utils import captured_stdout
@@ -22,7 +21,7 @@ class ListExportPackageTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        from arches.controlledlists.tests.view_tests import ListTests
+        from arches.controlledlists.tests.test_views import ListTests
 
         return ListTests.setUpTestData()
 
