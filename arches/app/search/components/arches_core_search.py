@@ -180,7 +180,7 @@ class ArchesCoreSearch(CoreSearchComponent):
         return search_components
 
     def handle_search_results_query(
-        self, search_query_object, results_object, search_filter_factory, returnDsl
+        self, search_query_object, response_object, search_filter_factory, returnDsl
     ):
         sorted_query_obj = search_filter_factory.create_search_query_dict(
             list(self.request.GET.items()) + list(self.request.POST.items())
@@ -207,15 +207,15 @@ class ArchesCoreSearch(CoreSearchComponent):
         for filter_type, querystring in list(sorted_query_obj.items()):
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
-                search_filter.execute_query(search_query_object, results_object)
+                search_filter.execute_query(search_query_object, response_object)
 
-        if results_object["results"] is not None:
+        if response_object["results"] is not None:
             # allow filters to modify the results
             for filter_type, querystring in list(sorted_query_obj.items()):
                 search_filter = search_filter_factory.get_filter(filter_type)
                 if search_filter:
                     search_filter.post_search_hook(
                         search_query_object,
-                        results_object,
+                        response_object,
                         permitted_nodegroups=permitted_nodegroups,
                     )

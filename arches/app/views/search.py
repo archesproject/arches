@@ -345,22 +345,22 @@ def search_results(request, returnDsl=False):
     core_search_instance = search_filter_factory.get_core_component_instance()
 
     search_query_object = {"query": Query(se)}
-    results_object = {"results": None}
+    response_object = {"results": None}
 
     dsl_only = core_search_instance.handle_search_results_query(
-        search_query_object, results_object, search_filter_factory, returnDsl
+        search_query_object, response_object, search_filter_factory, returnDsl
     )
     if returnDsl:
         return dsl_only
 
-    if results_object["results"] is not None:
+    if response_object["results"] is not None:
         search_query_object.pop("query")
         # ensure that if a search filter modified the query in some way
-        # that the modification is set on the results_object
+        # that the modification is set on the response_object
         for key, value in list(search_query_object.items()):
-            results_object[key] = value
+            response_object[key] = value
 
-        return JSONResponse(content=results_object)
+        return JSONResponse(content=response_object)
 
     else:
         ret = {"message": _("There was an error retrieving the search results")}

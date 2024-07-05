@@ -103,10 +103,10 @@ class CoreSearchComponent(BaseSearchFilter):
         return self._required_search_components + [self.core_component]
 
     def handle_search_results_query(
-        self, search_query_object, results_object, search_filter_factory, returnDsl
+        self, search_query_object, response_object, search_filter_factory, returnDsl
     ):
         """
-        Called in-place to modify both search_query_object and results_object
+        Called in-place to modify both search_query_object and response_object
         See arches.app.search.components.arches_core_search for example implementation
         """
 
@@ -125,14 +125,14 @@ class CoreSearchComponent(BaseSearchFilter):
         for filter_type, querystring in list(sorted_query_obj.items()):
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
-                search_filter.execute_query(search_query_object, results_object)
+                search_filter.execute_query(search_query_object, response_object)
 
-        if results_object["results"] is not None:
+        if response_object["results"] is not None:
             # allow filters to modify the results
             for filter_type, querystring in list(sorted_query_obj.items()):
                 search_filter = search_filter_factory.get_filter(filter_type)
                 if search_filter:
-                    search_filter.post_search_hook(search_query_object, results_object)
+                    search_filter.post_search_hook(search_query_object, response_object)
 
 
 class SearchFilterFactory(object):
