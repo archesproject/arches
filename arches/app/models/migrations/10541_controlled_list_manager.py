@@ -248,7 +248,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="controlledlistitemvalue",
-            name="controlled_list_item",
+            name="list_item",
             field=models.ForeignKey(
                 db_column="itemid",
                 on_delete=django.db.models.deletion.CASCADE,
@@ -321,7 +321,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="controlledlistitemvalue",
             constraint=models.UniqueConstraint(
-                fields=("controlled_list_item", "value", "valuetype", "language"),
+                fields=("list_item", "value", "valuetype", "language"),
                 name="unique_item_value_valuetype_language",
                 violation_error_message="The same item value cannot be stored twice in the same language.",
             ),
@@ -330,7 +330,7 @@ class Migration(migrations.Migration):
             model_name="controlledlistitemvalue",
             constraint=models.UniqueConstraint(
                 condition=models.Q(("valuetype", "prefLabel")),
-                fields=("controlled_list_item", "language"),
+                fields=("list_item", "language"),
                 name="unique_item_preflabel_language",
                 violation_error_message="Only one preferred label per language is permitted.",
             ),

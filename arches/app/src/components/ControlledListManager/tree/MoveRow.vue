@@ -109,7 +109,7 @@ const addItem = (parent: TreeNode) => {
                 valuetype_id: PREF_LABEL,
                 language_id: selectedLanguage.value.code,
                 value: "",
-                item_id: newLabelCounter.value,
+                list_item_id: newLabelCounter.value,
             },
         ],
         images: [],

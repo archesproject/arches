@@ -15,7 +15,6 @@ from arches.app.models.models import (
     ControlledListItemImage,
     ControlledListItemImageMetadata,
     ControlledListItemValue,
-    Language,
     Node,
 )
 from arches.app.models.utils import field_names
@@ -112,15 +111,13 @@ class ControlledListView(View):
         return JSONResponse(serialized)
 
     def post(self, request, **kwargs):
-        data = JSONDeserializer().deserialize(request.body)
-
-        # Update
+        # Update (not implemented)
         if "id" in kwargs:
-            raise NotImplementedError
+            raise JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
 
         # Insert
-        name = data.get("name", None)
-        lst = ControlledList(name=name)
+        data = JSONDeserializer().deserialize(request.body)
+        lst = ControlledList(name=data.get("name", None))
         try:
             lst.full_clean()  # applies default name
         except ValidationError as ve:
@@ -191,15 +188,17 @@ class ControlledListView(View):
 )
 class ControlledListItemView(View):
     def post(self, request, **kwargs):
-        data = JSONDeserializer().deserialize(request.body)
-
-        # Update
+        # Update (not implemented)
         if "id" in kwargs:
-            raise NotImplementedError
+            raise JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
 
         # Insert
-        parent_id = data["parent_id"]
-        controlled_list_id = data["controlled_list_id"]
+        data = JSONDeserializer().deserialize(request.body)
+        try:
+            parent_id = data["parent_id"]
+            controlled_list_id = data["controlled_list_id"]
+        except KeyError:
+            return JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
 
         try:
             with transaction.atomic():
@@ -268,12 +267,7 @@ class ControlledListItemValueView(View):
 
         # Insert
         if not (value_id := kwargs.get("id", None)):
-            value = ControlledListItemValue(
-                controlled_list_item_id=UUID(data["item_id"]),
-                valuetype_id=data["valuetype_id"],
-                language_id=data["language_id"],
-                value=data["value"],
-            )
+            value = ControlledListItemValue(**data)
             try:
                 value.full_clean()
             except ValidationError as ve:
@@ -292,19 +286,17 @@ class ControlledListItemValueView(View):
         except ControlledListItemValue.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
-        value.value = data["value"]
-        value.valuetype_id = data["valuetype_id"]
         try:
-            value.language = Language.objects.get(code=data["language_id"])
-        except Language.DoesNotExist:
-            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
-
-        try:
+            value.value = data["value"]
+            value.valuetype_id = data["valuetype_id"]
+            value.language_id = data["language_id"]
             value.full_clean()
         except ValidationError as ve:
             return JSONErrorResponse(
                 message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
             )
+        except KeyError:
+            return JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
         value.save()
 
         return JSONResponse(value.serialize())
@@ -332,25 +324,25 @@ class ControlledListItemValueView(View):
 )
 class ControlledListItemImageView(View):
     def post(self, request, **kwargs):
-        # Insert
-        if not (image_id := kwargs.get("id", None)):
-            uploaded_file = request.FILES["item_image"]
-            img = ControlledListItemImage(
-                controlled_list_item_id=UUID(request.POST["item_id"]),
-                valuetype_id="image",
-                value=uploaded_file,
-            )
-            try:
-                img.full_clean()
-            except ValidationError as ve:
-                return JSONErrorResponse(
-                    message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
-                )
-            img.save()
-            return JSONResponse(img.serialize(), status=HTTPStatus.CREATED)
+        # Update (not yet implemented)
+        if "id" in kwargs:
+            raise JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
 
-        # Update
-        raise NotImplementedError
+        # Insert
+        uploaded_file = request.FILES["item_image"]
+        img = ControlledListItemImage(
+            list_item_id=UUID(request.POST["list_item_id"]),
+            valuetype_id="image",
+            value=uploaded_file,
+        )
+        try:
+            img.full_clean()
+        except ValidationError as ve:
+            return JSONErrorResponse(
+                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+            )
+        img.save()
+        return JSONResponse(img.serialize(), status=HTTPStatus.CREATED)
 
     def delete(self, request, **kwargs):
         image_id = kwargs.get("id")
@@ -386,19 +378,17 @@ class ControlledListItemImageMetadataView(View):
         except ControlledListItemImageMetadata.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
-        metadata.value = data["value"]
         try:
-            metadata.language = Language.objects.get(code=data["language_id"])
-        except Language.DoesNotExist:
-            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
-        metadata.metadata_type = data["metadata_type"]
-
-        try:
+            metadata.value = data["value"]
+            metadata.language_id = data["language_id"]
+            metadata.metadata_type = data["metadata_type"]
             metadata.full_clean()
         except ValidationError as ve:
             return JSONErrorResponse(
                 message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
             )
+        except KeyError:
+            return JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
         metadata.save()
 
         return JSONResponse(metadata.serialize())

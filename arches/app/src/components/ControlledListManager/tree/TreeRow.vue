@@ -170,7 +170,7 @@ const isNewItem = (node: TreeNode) => {
 const acceptNewItemShortcutEntry = async () => {
     let newItem: ControlledListItem;
     try {
-        newItem = await createItem(nextNewItem.value);
+        newItem = await createItem({ ...nextNewItem.value, id: null });
     } catch (error) {
         toast.add({
             severity: ERROR,
@@ -182,8 +182,8 @@ const acceptNewItemShortcutEntry = async () => {
     }
     const newValue = {
         ...nextNewItem.value!.values[0],
-        id: 0,
-        item_id: newItem.id,
+        id: null,
+        list_item_id: newItem.id,
         value: newLabelFormValue.value.trim(),
     };
     let newLabel;

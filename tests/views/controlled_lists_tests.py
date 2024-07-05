@@ -94,15 +94,15 @@ class ControlledListTests(ArchesTestCase):
             child.save()
 
         # Create a prefLabel and altLabel per item. (20)
+        list1_items = cls.list1.controlled_list_items.all()
+        list2_items = cls.list2.controlled_list_items.all()
         ControlledListItemValue.objects.bulk_create(
             [
                 ControlledListItemValue(
                     value=f"label{num}-pref",
                     language=cls.first_language,
                     valuetype=cls.pref_label,
-                    controlled_list_item=ControlledListItem.objects.filter(
-                        controlled_list=cls.list1
-                    )[num],
+                    list_item=list1_items[num],
                 )
                 for num in range(5)
             ]
@@ -111,9 +111,7 @@ class ControlledListTests(ArchesTestCase):
                     value=f"label{num}-alt",
                     language=cls.first_language,
                     valuetype=cls.alt_label,
-                    controlled_list_item=ControlledListItem.objects.filter(
-                        controlled_list=cls.list1
-                    )[num],
+                    list_item=list1_items[num],
                 )
                 for num in range(5)
             ]
@@ -122,9 +120,7 @@ class ControlledListTests(ArchesTestCase):
                     value=f"label{num}-pref",
                     language=cls.first_language,
                     valuetype=cls.pref_label,
-                    controlled_list_item=ControlledListItem.objects.filter(
-                        controlled_list=cls.list2
-                    )[num],
+                    list_item=list2_items[num],
                 )
                 for num in range(5)
             ]
@@ -133,9 +129,7 @@ class ControlledListTests(ArchesTestCase):
                     value=f"label{num}-alt",
                     language=cls.first_language,
                     valuetype=cls.alt_label,
-                    controlled_list_item=ControlledListItem.objects.filter(
-                        controlled_list=cls.list2
-                    )[num],
+                    list_item=list2_items[num],
                 )
                 for num in range(5)
             ]
@@ -143,7 +137,7 @@ class ControlledListTests(ArchesTestCase):
 
         # Create one image with full metadata for the first item in list 1.
         cls.image = ControlledListItemImage.objects.create(
-            controlled_list_item=cls.list1.controlled_list_items.first(),
+            list_item=cls.list1.controlled_list_items.first(),
             value="path/to/image.png",
             valuetype_id="image",
         )

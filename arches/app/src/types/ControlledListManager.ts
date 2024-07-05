@@ -5,7 +5,7 @@ export interface Value {
     valuetype_id: string;
     language_id: string;
     value: string;
-    item_id: string;
+    list_item_id: string;
 }
 
 export interface NewValue {
@@ -13,7 +13,7 @@ export interface NewValue {
     valuetype_id: string;
     language_id: string;
     value: string;
-    item_id: string | number;
+    list_item_id: string | number;
 }
 
 export type NewOrExistingValue = Value | NewValue;
@@ -49,7 +49,7 @@ export interface LabeledChoice {
 
 export interface ControlledListItemImage {
     id: string;
-    item_id: string;
+    list_item_id: string;
     url: string;
     metadata: NewOrExistingControlledListItemImageMetadata[];
 }

@@ -2360,7 +2360,7 @@ class ControlledListItem(models.Model):
 
 class ControlledListItemValue(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    controlled_list_item = models.ForeignKey(
+    list_item = models.ForeignKey(
         ControlledListItem,
         db_column="itemid",
         on_delete=models.CASCADE,
@@ -2385,14 +2385,14 @@ class ControlledListItemValue(models.Model):
         db_table = "controlled_list_item_values"
         constraints = [
             models.UniqueConstraint(
-                fields=["controlled_list_item", "value", "valuetype", "language"],
+                fields=["list_item", "value", "valuetype", "language"],
                 name="unique_item_value_valuetype_language",
                 violation_error_message=_(
                     "The same item value cannot be stored twice in the same language."
                 ),
             ),
             models.UniqueConstraint(
-                fields=["controlled_list_item", "language"],
+                fields=["list_item", "language"],
                 condition=Q(valuetype="prefLabel"),
                 name="unique_item_preflabel_language",
                 violation_error_message=_(
@@ -2422,7 +2422,7 @@ class ControlledListItemValue(models.Model):
             "valuetype_id": self.valuetype_id,
             "language_id": self.language_id,
             "value": self.value,
-            "item_id": self.controlled_list_item_id,
+            "list_item_id": self.list_item_id,
         }
 
     def delete(self):
@@ -2430,7 +2430,7 @@ class ControlledListItemValue(models.Model):
         if (
             self.valuetype_id == "prefLabel"
             and len(
-                self.controlled_list_item.controlled_list_item_values.filter(
+                self.list_item.controlled_list_item_values.filter(
                     valuetype_id="prefLabel"
                 )
             )
@@ -2443,7 +2443,7 @@ class ControlledListItemValue(models.Model):
 
 class ControlledListItemImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    controlled_list_item = models.ForeignKey(
+    list_item = models.ForeignKey(
         ControlledListItem,
         db_column="itemid",
         on_delete=models.CASCADE,
@@ -2460,7 +2460,7 @@ class ControlledListItemImage(models.Model):
         null=True,
         blank=True,
     )
-    value = models.FileField(upload_to="controlled_list_item_images")
+    value = models.FileField(upload_to="list_item_images")
 
     objects = ControlledListItemImageManager()
 
@@ -2471,7 +2471,7 @@ class ControlledListItemImage(models.Model):
     def serialize(self):
         return {
             "id": str(self.id),
-            "item_id": self.controlled_list_item_id,
+            "list_item_id": self.list_item_id,
             "url": self.value.url,
             "metadata": [
                 metadata.serialize()

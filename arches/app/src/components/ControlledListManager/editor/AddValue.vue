@@ -72,7 +72,7 @@ const newValue: Ref<NewValue> = computed(() => {
         valuetype_id: nextValueType ?? NOTE_CHOICES.scope,
         language_id: nextLanguageCode,
         value: "",
-        item_id: item.value.id,
+        list_item_id: item.value.id,
     };
 });
 
