@@ -2,7 +2,6 @@ from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Terms
 from arches.app.search.components.base import BaseSearchFilter
 from arches.app.models.models import ResourceInstanceLifecycle
-from arches.app.utils.permission_backend import get_resource_types_by_perm
 
 details = {
     "searchcomponentid": "",
