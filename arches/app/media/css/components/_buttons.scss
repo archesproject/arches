@@ -4,6 +4,10 @@
 			.btn {
 				padding: 2px 10px;
 			}
+			.dropdown-menu {
+				max-height: 60vh;
+				overflow-y: auto;
+			}
 		}
 	}
 }
@@ -13,6 +17,10 @@
 		div {
 			.btn {
 				padding: 2px 10px;
+			}
+			.dropdown-menu {
+				max-height: 60vh;
+				overflow-y: auto;
 			}
 		}
 	}
