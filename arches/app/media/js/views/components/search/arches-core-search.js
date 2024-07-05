@@ -4,15 +4,15 @@ define([
     'knockout',
     'arches',
     'viewmodels/alert',
-    'views/components/search/core-search-component',
+    'views/components/search/base-core-search',
     'templates/views/components/search/arches-core-search.htm',
-], function($, _, ko, arches, AlertViewModel, CoreSearchComponent, archesCoreSearchTemplate) {
+], function($, _, ko, arches, AlertViewModel, BaseCoreSearchComponent, archesCoreSearchTemplate) {
     const componentName = 'arches-core-search';
-    const viewModel = CoreSearchComponent.extend({ 
+    const viewModel = BaseCoreSearchComponent.extend({ 
         initialize: function(sharedStateObject) {
             const self = this;
             sharedStateObject.componentName = componentName;
-            CoreSearchComponent.prototype.initialize.call(this, sharedStateObject);
+            BaseCoreSearchComponent.prototype.initialize.call(this, sharedStateObject);
             this.defaultQuery = {"paging-filter": "1", "core":"arches-core-search", tiles: "true"};
             
             this.selectedPopup = ko.observable('');

@@ -6,7 +6,7 @@ define([
 ], function($, Backbone, ko, _) {
     return Backbone.View.extend({
         constructor: function() {
-            this.name = 'Core Search Component';
+            this.name = 'Base Core Search';
             this.filter = {};
             this.requiredFilters = [];
             Backbone.View.apply(this, arguments);

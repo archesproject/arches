@@ -1,5 +1,5 @@
 from arches.app.models.system_settings import settings
-from arches.app.search.components.base import CoreSearchComponent
+from arches.app.search.components.base import BaseCoreSearch
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.search import (
     append_instance_permission_filter_dsl,
@@ -105,7 +105,7 @@ SEARCH_RESULT_PAGES = (
 logger = logging.getLogger(__name__)
 
 
-class ArchesCoreSearch(CoreSearchComponent):
+class ArchesCoreSearch(BaseCoreSearch):
 
     def append_dsl(self, search_query_object, **kwargs):
         search_query_object["query"].include("graph_id")

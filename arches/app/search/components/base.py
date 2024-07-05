@@ -73,7 +73,7 @@ class BaseSearchFilter:
         pass
 
 
-class CoreSearchComponent(BaseSearchFilter):
+class BaseCoreSearch(BaseSearchFilter):
     """
     Special type of component that specifies which other components to be used,
     how to execute a search in the search_results method
