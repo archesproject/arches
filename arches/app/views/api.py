@@ -2187,43 +2187,42 @@ class SpatialView(APIBase):
             "isactive": spatialview.isactive,
         }
 
+    def create_spatialview_from_json_data(self, json_data):
+        """
+        Returns a SpatialView object from the JSON data. Should only be used if the JSON data has been validated.
+        """
+
+        # if json_data has spatialviewid, try and get the spatialview object. If it doesn't exist, create a new one and use the spatialviewid
+        try:
+            spatialview = models.SpatialView.objects.get(
+                pk=json_data["spatialviewid"]
+            )
+        except KeyError:
+            spatialview = models.SpatialView()
+        except ObjectDoesNotExist:
+            spatialview = models.SpatialView()
+            spatialview.spatialviewid = uuid.UUID(json_data["spatialviewid"])
+
+        spatialview.schema = json_data["schema"]
+        spatialview.slug = json_data["slug"]
+        spatialview.description = json_data["description"]
+        spatialview.geometrynode = models.Node.objects.get(
+            nodeid=json_data["geometrynodeid"]
+        )
+        spatialview.ismixedgeometrytypes = json_data["ismixedgeometrytypes"]
+        spatialview.language = models.Language.objects.get(
+            code=json_data["language"]
+        )
+        spatialview.attributenodes = json_data["attributenodes"]
+        spatialview.isactive = json_data["isactive"]
+        return spatialview
+    
     def validate_json_data_content(self, json_data, spatialviewid_identifier=None):
         """
         Validates the JSON data passed in the request body
 
         returns a JSONErrorResponse if validation fails or SpatialView if validation passes
         """
-
-        def create_spatialview_from_json_data(json_data):
-            """
-            Returns a SpatialView object from the JSON data. Should only be used if the JSON data has been validated.
-            """
-
-            # if json_data has spatialviewid, try and get the spatialview object. If it doesn't exist, create a new one and use the spatialviewid
-            try:
-                spatialview = models.SpatialView.objects.get(
-                    pk=json_data["spatialviewid"]
-                )
-            except KeyError:
-                spatialview = models.SpatialView()
-            except ObjectDoesNotExist:
-                spatialview = models.SpatialView()
-                spatialview.spatialviewid = uuid.UUID(json_data["spatialviewid"])
-
-            spatialview.schema = json_data["schema"]
-            spatialview.slug = json_data["slug"]
-            spatialview.description = json_data["description"]
-            spatialview.geometrynode = models.Node.objects.get(
-                nodeid=json_data["geometrynodeid"]
-            )
-            spatialview.ismixedgeometrytypes = json_data["ismixedgeometrytypes"]
-            spatialview.language = models.Language.objects.get(
-                code=json_data["language"]
-            )
-            spatialview.attributenodes = json_data["attributenodes"]
-            spatialview.isactive = json_data["isactive"]
-            return spatialview
-
         # Check if spatialviewid_identifier matches the spatialviewid in the json_data
         if spatialviewid_identifier:
             if "spatialviewid" in json_data:
@@ -2297,7 +2296,7 @@ class SpatialView(APIBase):
                 status=400,
             )
 
-        return create_spatialview_from_json_data(json_data)
+        return self.create_spatialview_from_json_data(json_data)
 
     @method_decorator(group_required("Application Administrator"))
     def post(self, request):
