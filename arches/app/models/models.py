@@ -2162,10 +2162,11 @@ class SpatialView(models.Model):
         managed = True
         db_table = "spatial_views"
 
-    def save(self, *args, **kwargs):
+    def clean(self):
         """
         Validate the spatial view before saving it to the database as the database triggers have proved hard to test.
         """
+        super().clean()
         if self.geometrynode:
             if self.geometrynode.datatype != "geojson-feature-collection":
                 raise ValidationError(
@@ -2212,5 +2213,3 @@ class SpatialView(models.Model):
                         raise ValidationError("Schema does not exist in the database")
         else:
             raise ValidationError("Geometry node must be set")
-
-        super(SpatialView, self).save(*args, **kwargs)
