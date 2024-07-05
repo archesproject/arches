@@ -137,13 +137,13 @@ class ControlledListView(View):
         sortorder_map = data.pop("sortorder_map", {})
         parent_map = data.pop("parent_map", {})
 
-        update_fields = list(data)
+        update_fields = set(data)
         if not update_fields and not sortorder_map:
             return JSONResponse(status=HTTPStatus.BAD_REQUEST)
 
         clist = ControlledList(id=list_id, **data)
 
-        exclude_fields = {f for f in field_names(clist) if f not in update_fields}
+        exclude_fields = field_names(clist) - update_fields
         try:
             clist._state.adding = False
             clist.full_clean(exclude=exclude_fields)
@@ -227,10 +227,10 @@ class ControlledListItemView(View):
         data = JSONDeserializer().deserialize(request.body)
         item = ControlledListItem(id=item_id, **data)
 
-        update_fields = list(data)
+        update_fields = set(data)
         if not update_fields:
             return JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
-        exclude_fields = {f for f in field_names(item) if f not in update_fields}
+        exclude_fields = field_names(item) - update_fields
         try:
             item._state.adding = False
             item.full_clean(exclude=exclude_fields)

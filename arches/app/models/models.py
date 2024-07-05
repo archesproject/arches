@@ -2267,11 +2267,7 @@ class ControlledList(models.Model):
         uniqueness is enforced together."""
 
         reordered_items = []
-        exclude_fields = {
-            name
-            for name in field_names(ControlledListItem())
-            if name not in ("sortorder", "parent_id")
-        }
+        exclude_fields = field_names(ControlledListItem()) - {"sortorder", "parent_id"}
         for item_id, sortorder in sortorder_map.items():
             item = ControlledListItem(pk=uuid.UUID(item_id), sortorder=sortorder)
             if item_id in parent_map:
