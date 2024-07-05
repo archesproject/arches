@@ -40,12 +40,12 @@
                 <!-- ko if: hasExportHtmlTemplates() -->
                 <label role="radio" tabindex="0" class="form-radio form-normal form-text" 
                     data-bind="
-                        css: { 'active': format() === 'html', 'disabled': (celeryRunning() !== 'True' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}}) }, 
-                        click: function () { if((celeryRunning() === 'True' || total() <= {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}})) {format('html')} },
+                        css: { 'active': format() === 'html', 'disabled': (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}}) }, 
+                        click: function () { if((total() <= {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}})) {format('html')} },
                         onSpaceClick, 
                         attr: {
                             'aria-checked': format() === 'html', 
-                            'aria-disabled': (celeryRunning() !== 'True' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}}), 
+                            'aria-disabled': (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}}), 
                             'aria-describedby': 'format-instruction-text'
                         },
                     ">
@@ -170,7 +170,7 @@
         </div>
 
         <!-- Options if Celery is running -->
-        <!-- ko if: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() === "True") || (format() === "html" && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() === "True")) && ("{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "False" || "{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "True" && "{{user.username}}" !== "anonymous")-->
+        <!-- ko if: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}) || (format() === "html" && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}})) && ("{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "False" || "{{app_settings.RESTRICT_CELERY_EXPORT_FOR_ANONYMOUS_USER}}" === "True" && "{{user.username}}" !== "anonymous")-->
         <div>
             <div class="instruction">
                 <div class="search-export-instruction-h2 h2">
@@ -216,25 +216,16 @@
         <!-- /ko -->
     </div>
 
-    <!-- Celery Warning -->
-    <!-- ko let: {show_celery_warning: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}) && (celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True'))} -->
-    <div 
-        id="export-warning"
-        data-bind="
-            visible: show_celery_warning,
-            text: $root.translations.celeryNotRunningWarning( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}, {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} ),
-        "
-    ></div>
-
     <!-- Download -->
+    <!-- ko let: {show_celery_warning: ((total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}) || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}}))} -->
     <div class="search-export download">
         <button class="btn btn-lg btn-primary btn-active-primary"
             type="button"
             data-bind="
-                css: {disabled: (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() !== 'True') || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} && celeryRunning() !== 'True') },
+                css: {disabled: (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}) || (format() === 'html' && total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}}) },
                 click: function(){if (format() === 'html') { executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD_HTML_FORMAT}} ) } else { executeExport( {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} ) }},
                 attr: {
-                    'aria-disabled': (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}} && celeryRunning() !== 'True'),
+                    'aria-disabled': (total() === 0) || (total() > {{app_settings.SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD}}),
                     'aria-describedby': show_celery_warning ? 'export-warning':'',
                     'aria-busy': downloadPending(),
                 },
