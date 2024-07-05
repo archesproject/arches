@@ -102,10 +102,10 @@ class Query(Dsl):
             return self.se.search(index=index, scroll=self.scroll, **self.dsl)
 
     def count(self, index="", **kwargs):
-        # print("should: %s" % self.dsl["query"]["bool"]["should"])
-        # print("should empty? %s" % len(self.dsl["query"]["bool"]["should"]))
-        # print("dsl.count: (%s) %s" % (type(self.dsl["query"]["bool"]), self.dsl))
-        if not "minimum_should_match" in self.dsl["query"]["bool"] and len(self.dsl["query"]["bool"]["should"]) > 0:
+        if (
+            not "minimum_should_match" in self.dsl["query"]["bool"]
+            and len(self.dsl["query"]["bool"]["should"]) > 0
+        ):
             self.dsl["query"]["bool"]["minimum_should_match"] = 1
         return self.se.count(index=index, **self.dsl)
 
@@ -173,8 +173,16 @@ class Bool(Dsl):
             self.dsl["bool"]["filter"] + object.dsl["bool"]["filter"]
         )
 
-        this_min_should = self.dsl["bool"]["minimum_should_match"] if "minimum_should_match" in self.dsl["bool"] else None
-        other_min_should = object.dsl["bool"]["minimum_should_match"] if "minimum_should_match" in object.dsl["bool"] else None
+        this_min_should = (
+            self.dsl["bool"]["minimum_should_match"]
+            if "minimum_should_match" in self.dsl["bool"]
+            else None
+        )
+        other_min_should = (
+            object.dsl["bool"]["minimum_should_match"]
+            if "minimum_should_match" in object.dsl["bool"]
+            else None
+        )
         if not this_min_should and other_min_should:
             self.dsl["bool"]["minimum_should_match"] = other_min_should
         return self

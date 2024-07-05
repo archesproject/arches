@@ -10,7 +10,8 @@ class CustomResourceSearchValue:
     @staticmethod
     def add_search_terms(resourceinstance, document, terms):
         document[CustomResourceSearchValue.custom_search_path].append(
-            {"custom_value": "business-specific search value"})
+            {"custom_value": "business-specific search value"}
+        )
 
     @staticmethod
     def add_search_filter(search_query, term):
@@ -22,9 +23,20 @@ class CustomResourceSearchValue:
 
         document_key = CustomResourceSearchValue.custom_search_path
         custom_filter = Bool()
-        custom_filter.should(Match(field="%s.custom_value" % document_key, query=term["value"], type="phrase_prefix"))
         custom_filter.should(
-            Match(field="%s.custom_value.folded" % document_key, query=term["value"], type="phrase_prefix"))
+            Match(
+                field="%s.custom_value" % document_key,
+                query=term["value"],
+                type="phrase_prefix",
+            )
+        )
+        custom_filter.should(
+            Match(
+                field="%s.custom_value.folded" % document_key,
+                query=term["value"],
+                type="phrase_prefix",
+            )
+        )
         nested_custom_filter = Nested(path=document_key, query=custom_filter)
         # return nested_custom_filter
         if term["inverted"]:
@@ -34,13 +46,15 @@ class CustomResourceSearchValue:
 
     @staticmethod
     def get_custom_search_config():
-        return {"type": "nested",
-                "properties": {
-                    "custom_value": {"type": "text",
-                                     "fields": {
-                                         "raw": {"type": "keyword", "ignore_above": 256},
-                                         "folded": {"type": "text", "analyzer": "folding"}
-                                     },
-                                     }
+        return {
+            "type": "nested",
+            "properties": {
+                "custom_value": {
+                    "type": "text",
+                    "fields": {
+                        "raw": {"type": "keyword", "ignore_above": 256},
+                        "folded": {"type": "text", "analyzer": "folding"},
+                    },
                 }
-                }
+            },
+        }
