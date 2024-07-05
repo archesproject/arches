@@ -146,14 +146,9 @@ const saveValue = async (event: DataTableRowEditInitEvent) => {
         id: typeof event.newData.id === "string" ? event.newData.id : null,
         value: event.newData.value.trim(),
     };
+    let upsertedValue: Value;
     try {
-        const upsertedValue: Value = await upsertValue(normalizedNewData);
-        if (normalizedNewData.id) {
-            updateItemValue(upsertedValue);
-        } else {
-            appendItemValue(upsertedValue);
-            removeItemValue(event.newData);
-        }
+        upsertedValue = await upsertValue(normalizedNewData);
     } catch (error) {
         toast.add({
             severity: ERROR,
@@ -164,6 +159,13 @@ const saveValue = async (event: DataTableRowEditInitEvent) => {
         if (normalizedNewData.id === null) {
             removeItemValue(event.newData);
         }
+        return;
+    }
+    if (normalizedNewData.id) {
+        updateItemValue(upsertedValue);
+    } else {
+        appendItemValue(upsertedValue);
+        removeItemValue(event.newData);
     }
 };
 
@@ -174,7 +176,6 @@ const issueDeleteValue = async (value: NewValue | Value) => {
     }
     try {
         await deleteValue(value);
-        removeItemValue(value);
     } catch (error) {
         toast.add({
             severity: ERROR,
@@ -182,7 +183,9 @@ const issueDeleteValue = async (value: NewValue | Value) => {
             summary: $gettext("Value deletion failed"),
             detail: error instanceof Error ? error.message : undefined,
         });
+        return;
     }
+    removeItemValue(value);
 };
 
 const appendItemValue = (newValue: Value) => {

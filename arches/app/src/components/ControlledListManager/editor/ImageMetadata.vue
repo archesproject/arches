@@ -77,15 +77,9 @@ const saveMetadata = async (event: DataTableRowEditInitEvent) => {
         ...event.newData,
         id: typeof event.newData.id === "string" ? event.newData.id : null,
     };
+    let upsertedMetadata: ControlledListItemImageMetadata;
     try {
-        const upsertedMetadata: ControlledListItemImageMetadata =
-            await upsertMetadata(normalizedNewData);
-        if (normalizedNewData.id) {
-            updateImageMetadata(upsertedMetadata);
-        } else {
-            appendImageMetadata(upsertedMetadata);
-            removeImageMetadata(event.newData);
-        }
+        upsertedMetadata = await upsertMetadata(normalizedNewData);
     } catch (error) {
         toast.add({
             severity: ERROR,
@@ -96,6 +90,13 @@ const saveMetadata = async (event: DataTableRowEditInitEvent) => {
         if (normalizedNewData.id === null) {
             removeImageMetadata(event.newData);
         }
+        return;
+    }
+    if (normalizedNewData.id) {
+        updateImageMetadata(upsertedMetadata);
+    } else {
+        appendImageMetadata(upsertedMetadata);
+        removeImageMetadata(event.newData);
     }
 };
 
@@ -108,7 +109,6 @@ const issueDeleteMetadata = async (
     }
     try {
         await deleteMetadata(metadata);
-        removeImageMetadata(metadata);
     } catch (error) {
         toast.add({
             severity: ERROR,
@@ -116,7 +116,9 @@ const issueDeleteMetadata = async (
             summary: $gettext("Metadata deletion failed"),
             detail: error instanceof Error ? error.message : undefined,
         });
+        return;
     }
+    removeImageMetadata(metadata);
 };
 
 const appendImageMetadata = (newMetadata: ControlledListItemImageMetadata) => {
@@ -173,7 +175,6 @@ const updateImageMetadata = (
 const issueDeleteImage = async () => {
     try {
         await deleteImage(image);
-        removeImage(image);
     } catch (error) {
         toast.add({
             severity: ERROR,
@@ -181,7 +182,9 @@ const issueDeleteImage = async () => {
             summary: $gettext("Image deletion failed"),
             detail: error instanceof Error ? error.message : undefined,
         });
+        return;
     }
+    removeImage(image);
 };
 
 const removeImage = (removedImage: ControlledListItemImage) => {

@@ -39,6 +39,7 @@ const addHeader = (event: FileUploadBeforeSendEvent) => {
 const upload = (event: FileUploadUploadEvent) => {
     if (event.xhr.status !== 201) {
         showError(event);
+        return;
     }
     const newImage = JSON.parse(event.xhr.responseText);
     item.value!.images.push(newImage);

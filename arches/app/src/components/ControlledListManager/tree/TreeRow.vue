@@ -143,10 +143,6 @@ const setParent = async (parentNode: TreeNode) => {
     const field = "children";
     try {
         await patchList(list, field);
-        // Clear custom classes added in <Tree> pass-through
-        rerenderTree.value += 1;
-        movingItem.value = undefined;
-        refetcher.value += 1;
     } catch (error) {
         toast.add({
             severity: ERROR,
@@ -154,9 +150,13 @@ const setParent = async (parentNode: TreeNode) => {
             summary: $gettext("Save failed"),
             detail: error instanceof Error ? error.message : undefined,
         });
+        return;
     }
-
     awaitingMove.value = false;
+    // Clear custom classes added in <Tree> pass-through
+    rerenderTree.value += 1;
+    movingItem.value = undefined;
+    refetcher.value += 1;
 };
 
 const isNewList = (node: TreeNode) => {
@@ -186,9 +186,9 @@ const acceptNewItemShortcutEntry = async () => {
         item_id: newItem.id,
         value: newLabelFormValue.value.trim(),
     };
+    let newLabel;
     try {
-        const newLabel = await upsertValue(newValue);
-        newItem.values = [newLabel];
+        newLabel = await upsertValue(newValue);
     } catch (error) {
         toast.add({
             severity: ERROR,
@@ -196,6 +196,10 @@ const acceptNewItemShortcutEntry = async () => {
             summary: $gettext("Value save failed"),
             detail: error instanceof Error ? error.message : undefined,
         });
+        return;
+    }
+    if (newLabel) {
+        newItem.values = [newLabel];
     }
 
     const parent = findNodeInTree(
@@ -231,14 +235,9 @@ const triggerAcceptNewListShortcut = () => {
 };
 
 const acceptNewListShortcutEntry = async () => {
+    let newList;
     try {
-        const newList = await createList(newListFormValue.value.trim());
-        tree.value = [
-            ...tree.value.filter((cList) => typeof cList.data.id === "string"),
-            listAsNode(newList),
-        ];
-        selectedKeys.value = { [newList.id]: true };
-        setDisplayedRow(newList);
+        newList = await createList(newListFormValue.value.trim());
     } catch (error) {
         toast.add({
             severity: ERROR,
@@ -246,7 +245,14 @@ const acceptNewListShortcutEntry = async () => {
             summary: $gettext("List creation failed"),
             detail: error instanceof Error ? error.message : undefined,
         });
+        return;
     }
+    tree.value = [
+        ...tree.value.filter((cList) => typeof cList.data.id === "string"),
+        listAsNode(newList),
+    ];
+    selectedKeys.value = { [newList.id]: true };
+    setDisplayedRow(newList);
 };
 </script>
 
