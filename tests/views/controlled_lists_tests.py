@@ -423,7 +423,7 @@ class ControlledListTests(ArchesTestCase):
         label = serialized_list["items"][0]["values"][0]
         label["language_id"] = self.new_language.code
 
-        response = self.client.post(
+        response = self.client.put(
             reverse("controlled_list_item_value", kwargs={"id": label["id"]}),
             label,
             content_type="application/json",
@@ -437,7 +437,7 @@ class ControlledListTests(ArchesTestCase):
         label["value"] = "A" * 2049
 
         with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
+            response = self.client.put(
                 reverse("controlled_list_item_value", kwargs={"id": label["id"]}),
                 label,
                 content_type="application/json",
@@ -483,7 +483,7 @@ class ControlledListTests(ArchesTestCase):
         metadatum = serialized_image["metadata"][0]
         metadatum["language_id"] = self.new_language.code
 
-        response = self.client.post(
+        response = self.client.put(
             reverse(
                 "controlled_list_item_image_metadata", kwargs={"id": metadatum["id"]}
             ),
@@ -499,7 +499,7 @@ class ControlledListTests(ArchesTestCase):
         metadatum["value"] = "A" * 2049
 
         with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.post(
+            response = self.client.put(
                 reverse(
                     "controlled_list_item_image_metadata",
                     kwargs={"id": metadatum["id"]},

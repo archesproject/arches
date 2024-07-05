@@ -110,12 +110,7 @@ class ControlledListView(View):
 
         return JSONResponse(serialized)
 
-    def post(self, request, **kwargs):
-        # Update (not implemented)
-        if "id" in kwargs:
-            raise JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
-
-        # Insert
+    def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
         lst = ControlledList(name=data.get("name", None))
         try:
@@ -187,12 +182,7 @@ class ControlledListView(View):
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ControlledListItemView(View):
-    def post(self, request, **kwargs):
-        # Update (not implemented)
-        if "id" in kwargs:
-            raise JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
-
-        # Insert
+    def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
         try:
             parent_id = data["parent_id"]
@@ -262,27 +252,23 @@ class ControlledListItemView(View):
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ControlledListItemValueView(View):
-    def post(self, request, **kwargs):
+    def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
-
-        # Insert
-        if not (value_id := kwargs.get("id", None)):
-            value = ControlledListItemValue(**data)
-            try:
-                value.full_clean()
-            except ValidationError as ve:
-                return JSONErrorResponse(
-                    message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
-                )
-            value.save()
-
-            return JSONResponse(value.serialize(), status=HTTPStatus.CREATED)
-
-        # Update
+        value = ControlledListItemValue(**data)
         try:
-            value = ControlledListItemValue.objects.values_without_images().get(
-                pk=value_id
+            value.full_clean()
+        except ValidationError as ve:
+            return JSONErrorResponse(
+                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
             )
+        value.save()
+
+        return JSONResponse(value.serialize(), status=HTTPStatus.CREATED)
+
+    def put(self, request, id):
+        data = JSONDeserializer().deserialize(request.body)
+        try:
+            value = ControlledListItemValue.objects.values_without_images().get(pk=id)
         except ControlledListItemValue.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
@@ -324,11 +310,6 @@ class ControlledListItemValueView(View):
 )
 class ControlledListItemImageView(View):
     def post(self, request, **kwargs):
-        # Update (not yet implemented)
-        if "id" in kwargs:
-            raise JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
-
-        # Insert
         uploaded_file = request.FILES["item_image"]
         img = ControlledListItemImage(
             list_item_id=UUID(request.POST["list_item_id"]),
@@ -356,25 +337,25 @@ class ControlledListItemImageView(View):
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ControlledListItemImageMetadataView(View):
-    def post(self, request, **kwargs):
+    def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
 
-        # Insert
-        if not (metadata_id := kwargs.get("id", None)):
-            data.pop("metadata_label", None)
-            metadata = ControlledListItemImageMetadata(**data)
-            try:
-                metadata.full_clean()
-            except ValidationError as ve:
-                return JSONErrorResponse(
-                    message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
-                )
-            metadata.save()
-            return JSONResponse(metadata.serialize(), status=HTTPStatus.CREATED)
-
-        # Update
+        data.pop("metadata_label", None)
+        metadata = ControlledListItemImageMetadata(**data)
         try:
-            metadata = ControlledListItemImageMetadata.objects.get(pk=metadata_id)
+            metadata.full_clean()
+        except ValidationError as ve:
+            return JSONErrorResponse(
+                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+            )
+        metadata.save()
+        return JSONResponse(metadata.serialize(), status=HTTPStatus.CREATED)
+
+    def put(self, request, id):
+        data = JSONDeserializer().deserialize(request.body)
+
+        try:
+            metadata = ControlledListItemImageMetadata.objects.get(pk=id)
         except ControlledListItemImageMetadata.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 

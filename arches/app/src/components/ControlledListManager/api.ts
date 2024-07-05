@@ -180,8 +180,9 @@ export const upsertValue = async (value: NewOrExistingValue) => {
     const url = value.id
         ? arches.urls.controlled_list_item_value(value.id)
         : arches.urls.controlled_list_item_value_add;
+    const method = value.id ? "PUT" : "POST";
     const response = await fetch(url, {
-        method: "POST",
+        method,
         headers: { "X-CSRFToken": getToken() },
         body: JSON.stringify(value),
     });
@@ -221,8 +222,9 @@ export const upsertMetadata = async (
     const url = metadata.id
         ? arches.urls.controlled_list_item_image_metadata(metadata.id)
         : arches.urls.controlled_list_item_image_metadata_add;
+    const method = metadata.id ? "PUT" : "POST";
     const response = await fetch(url, {
-        method: "POST",
+        method,
         headers: { "X-CSRFToken": getToken() },
         body: JSON.stringify(metadata),
     });
