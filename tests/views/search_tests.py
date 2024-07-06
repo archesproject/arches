@@ -759,6 +759,24 @@ class SearchTests(ArchesTestCase):
             ],
         )
 
+    def test_search_without_core(self):
+        """
+        Execute a search without setting a core-search component on the query
+
+        """
+
+        response_json = get_response_json(self.client)
+        self.assertTrue(response_json["results"]["hits"]["total"]["value"] > 0)
+
+    def test_search_with_bad_core(self):
+        """
+        Execute a search with a core-search component name that does not exist
+
+        """
+        query = {"core": "unavailable-core"}
+        response_json = get_response_json(self.client, query=query)
+        self.assertFalse(response_json["success"])
+
 
 def extract_pks(response_json):
     return [
