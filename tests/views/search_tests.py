@@ -768,9 +768,8 @@ def extract_pks(response_json):
 
 
 def get_response_json(
-    client, temporal_filter=None, term_filter=None, spatial_filter=None
+    client, temporal_filter=None, term_filter=None, spatial_filter=None, query={}
 ):
-    query = {}
     if temporal_filter is not None:
         query["time-filter"] = JSONSerializer().serialize(temporal_filter)
     if term_filter is not None:
