@@ -343,6 +343,15 @@ def search_results(request, returnDsl=False):
     se = SearchEngineFactory().create()
     search_filter_factory = SearchFilterFactory(request)
     core_search_instance = search_filter_factory.get_core_component_instance()
+    if not core_search_instance:
+        unavailable_core_name = search_filter_factory.get_core_component_name()
+        ret = {
+            "success": False,
+            "message": _("No core-search component named {0}").format(
+                unavailable_core_name
+            ),
+        }
+        return JSONResponse(ret, status=406)
 
     search_query_object = {"query": Query(se)}
     response_object = {"results": None}
@@ -363,7 +372,10 @@ def search_results(request, returnDsl=False):
         return JSONResponse(content=response_object)
 
     else:
-        ret = {"message": _("There was an error retrieving the search results")}
+        ret = {
+            "success": False,
+            "message": _("There was an error retrieving the search results"),
+        }
         return JSONResponse(ret, status=500)
 
 
