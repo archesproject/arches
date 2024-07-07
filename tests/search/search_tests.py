@@ -20,6 +20,7 @@ import time
 from django.test.utils import captured_stdout
 
 from tests.base_test import ArchesTestCase
+from tests.utils.search_test_utils import sync_es
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
@@ -108,7 +109,3 @@ class SearchTests(ArchesTestCase):
 
         count_after = se.count(index="bulk")
         self.assertEqual(count_after, 1001)
-
-
-def sync_es(search_engine, index="test_resources"):
-    search_engine.es.indices.refresh(index=index)

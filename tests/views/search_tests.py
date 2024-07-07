@@ -20,6 +20,7 @@ import os
 import json
 import time
 from tests.base_test import ArchesTestCase
+from tests.utils.search_test_utils import sync_es
 from django.urls import reverse
 from django.contrib.auth.models import User, Group
 from django.test.client import Client
@@ -215,8 +216,7 @@ class SearchTests(ArchesTestCase):
         cls.name_resource.tiles.append(tile)
         cls.name_resource.save()
 
-        # add delay to allow for indexes to be updated
-        time.sleep(1)
+        sync_es(se)
 
     @classmethod
     def tearDownClass(cls):
