@@ -93,7 +93,7 @@ class SearchTests(ArchesTestCase):
                     "values": [
                         {
                             "value": "Mock concept",
-                            "language": "en-US",
+                            "language": "en",
                             "category": "label",
                             "type": "prefLabel",
                             "id": "",
@@ -101,7 +101,7 @@ class SearchTests(ArchesTestCase):
                         },
                         {
                             "value": "1950",
-                            "language": "en-US",
+                            "language": "en",
                             "category": "note",
                             "type": "min_year",
                             "id": "",
@@ -109,7 +109,7 @@ class SearchTests(ArchesTestCase):
                         },
                         {
                             "value": "1980",
-                            "language": "en-US",
+                            "language": "en",
                             "category": "note",
                             "type": "max_year",
                             "id": "",
@@ -786,8 +786,10 @@ def extract_pks(response_json):
 
 
 def get_response_json(
-    client, temporal_filter=None, term_filter=None, spatial_filter=None, query={}
+    client, temporal_filter=None, term_filter=None, spatial_filter=None, query=None
 ):
+    # declared here due to mutability issues
+    query = query if query else {}
     if temporal_filter is not None:
         query["time-filter"] = JSONSerializer().serialize(temporal_filter)
     if term_filter is not None:
