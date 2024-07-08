@@ -8,7 +8,11 @@ import Button from "primevue/button";
 import ConfirmDialog from "primevue/confirmdialog";
 import SplitButton from "primevue/splitbutton";
 
-import { deleteItems, deleteLists, fetchLists } from "@/controlledlists/api.ts";
+import {
+    deleteItems,
+    deleteLists,
+    fetchLists,
+} from "@/controlled-lists/api.ts";
 import {
     DANGER,
     DEFAULT_ERROR_TOAST_LIFE,
@@ -16,8 +20,8 @@ import {
     SUCCESS,
     displayedRowKey,
     selectedLanguageKey,
-} from "@/controlledlists/constants.ts";
-import { dataIsItem, listAsNode } from "@/controlledlists/utils.ts";
+} from "@/controlled-lists/constants.ts";
+import { dataIsItem, listAsNode } from "@/controlled-lists/utils.ts";
 
 import type { Ref } from "vue";
 import type { TreeSelectionKeys } from "primevue/tree/Tree";
@@ -28,7 +32,7 @@ import type {
     ControlledListItem,
     DisplayedRowRefAndSetter,
     NewControlledList,
-} from "@/controlledlists/types";
+} from "@/controlled-lists/types";
 
 const { displayedRow, setDisplayedRow } = inject(
     displayedRowKey,

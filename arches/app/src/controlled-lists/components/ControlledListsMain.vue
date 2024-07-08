@@ -10,17 +10,17 @@ import { LIGHT_GRAY } from "@/arches/theme.ts";
 import {
     displayedRowKey,
     selectedLanguageKey,
-} from "@/controlledlists/constants.ts";
-import { dataIsList } from "@/controlledlists/utils.ts";
-import ControlledListSplash from "@/controlledlists/components/misc/ControlledListSplash.vue";
-import ItemEditor from "@/controlledlists/components/editor/ItemEditor.vue";
-import ListCharacteristics from "@/controlledlists/components/editor/ListCharacteristics.vue";
-import ListHeader from "@/controlledlists/components/misc/ListHeader.vue";
-import ListTree from "@/controlledlists/components/tree/ListTree.vue";
+} from "@/controlled-lists/constants.ts";
+import { dataIsList } from "@/controlled-lists/utils.ts";
+import ControlledListSplash from "@/controlled-lists/components/misc/ControlledListSplash.vue";
+import ItemEditor from "@/controlled-lists/components/editor/ItemEditor.vue";
+import ListCharacteristics from "@/controlled-lists/components/editor/ListCharacteristics.vue";
+import ListHeader from "@/controlled-lists/components/misc/ListHeader.vue";
+import ListTree from "@/controlled-lists/components/tree/ListTree.vue";
 
 import type { Ref } from "vue";
 import type { Language } from "@/arches/types";
-import type { Selectable } from "@/controlledlists/types";
+import type { Selectable } from "@/controlled-lists/types";
 
 const splash = "splash";
 

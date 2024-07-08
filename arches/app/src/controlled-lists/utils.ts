@@ -6,7 +6,7 @@ import type {
     ControlledList,
     ControlledListItem,
     Selectable,
-} from "@/controlledlists/types";
+} from "@/controlled-lists/types";
 
 // Duck-typing helpers
 export const dataIsList = (data: Selectable) => {

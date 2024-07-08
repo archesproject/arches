@@ -5,14 +5,14 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 import { useToast } from "primevue/usetoast";
 
-import { patchList } from "@/controlledlists/api.ts";
+import { patchList } from "@/controlled-lists/api.ts";
 import {
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
     PREF_LABEL,
     displayedRowKey,
     selectedLanguageKey,
-} from "@/controlledlists/constants.ts";
+} from "@/controlled-lists/constants.ts";
 import {
     findNodeInTree,
     itemAsNode,
@@ -20,7 +20,7 @@ import {
     nodeIsItem,
     nodeIsList,
     reorderItems,
-} from "@/controlledlists/utils.ts";
+} from "@/controlled-lists/utils.ts";
 
 import type { Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
@@ -32,7 +32,7 @@ import type {
     DisplayedListItemRefAndSetter,
     MoveLabels,
     NewControlledListItem,
-} from "@/controlledlists/types";
+} from "@/controlled-lists/types";
 
 const toast = useToast();
 const { $gettext } = useGettext();

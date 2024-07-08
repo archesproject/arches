@@ -12,13 +12,13 @@ import {
     createList,
     patchList,
     upsertValue,
-} from "@/controlledlists/api.ts";
+} from "@/controlled-lists/api.ts";
 import {
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
     displayedRowKey,
     selectedLanguageKey,
-} from "@/controlledlists/constants.ts";
+} from "@/controlled-lists/constants.ts";
 import {
     bestLabel,
     findNodeInTree,
@@ -26,8 +26,8 @@ import {
     listAsNode,
     nodeIsList,
     reorderItems,
-} from "@/controlledlists/utils.ts";
-import MoveRow from "@/controlledlists/components/tree/MoveRow.vue";
+} from "@/controlled-lists/utils.ts";
+import MoveRow from "@/controlled-lists/components/tree/MoveRow.vue";
 
 import type { Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
@@ -39,7 +39,7 @@ import type {
     DisplayedListItemRefAndSetter,
     MoveLabels,
     NewControlledListItem,
-} from "@/controlledlists/types";
+} from "@/controlled-lists/types";
 
 const toast = useToast();
 const { $gettext } = useGettext();

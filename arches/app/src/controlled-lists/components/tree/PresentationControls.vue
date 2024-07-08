@@ -6,7 +6,7 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 import Dropdown from "primevue/dropdown";
 
-import { selectedLanguageKey } from "@/controlledlists/constants.ts";
+import { selectedLanguageKey } from "@/controlled-lists/constants.ts";
 
 import type { Ref } from "vue";
 import type { Language } from "@/arches/types";

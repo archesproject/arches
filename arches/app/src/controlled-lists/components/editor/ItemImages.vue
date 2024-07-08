@@ -12,11 +12,11 @@ import {
     itemKey,
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
-} from "@/controlledlists/constants.ts";
-import ImageEditor from "@/controlledlists/components/editor/ImageEditor.vue";
+} from "@/controlled-lists/constants.ts";
+import ImageEditor from "@/controlled-lists/components/editor/ImageEditor.vue";
 
 import type { Ref } from "vue";
-import type { ControlledListItem } from "@/controlledlists/types";
+import type { ControlledListItem } from "@/controlled-lists/types";
 import type {
     FileUploadBeforeSendEvent,
     FileUploadErrorEvent,

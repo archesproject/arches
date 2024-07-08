@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Toast from "primevue/toast";
 
-import ControlledListsMain from "@/controlledlists/components/ControlledListsMain.vue";
+import ControlledListsMain from "@/controlled-lists/components/ControlledListsMain.vue";
 </script>
 
 <template>

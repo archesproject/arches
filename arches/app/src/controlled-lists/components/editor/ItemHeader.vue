@@ -2,13 +2,13 @@
 import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import { itemKey, selectedLanguageKey } from "@/controlledlists/constants.ts";
-import { bestLabel } from "@/controlledlists/utils.ts";
-import LetterCircle from "@/controlledlists/components/misc/LetterCircle.vue";
+import { itemKey, selectedLanguageKey } from "@/controlled-lists/constants.ts";
+import { bestLabel } from "@/controlled-lists/utils.ts";
+import LetterCircle from "@/controlled-lists/components/misc/LetterCircle.vue";
 
 import type { Ref } from "vue";
 import type { Language } from "@/arches/types";
-import type { ControlledListItem } from "@/controlledlists/types";
+import type { ControlledListItem } from "@/controlled-lists/types";
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 const item = inject(itemKey) as Ref<ControlledListItem>;
