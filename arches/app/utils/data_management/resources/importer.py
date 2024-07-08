@@ -24,10 +24,16 @@ django.setup()
 from django.db import connection, connections
 from django.contrib.gis.gdal import DataSource
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import DDataType, Language, ResourceXResource, ResourceInstance
+from arches.app.models.models import (
+    DDataType,
+    Language,
+    ResourceXResource,
+    ResourceInstance,
+)
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.setup import unzip_file
+from arches.app.utils.i18n import capitalize_region
+from arches.app.utils.zip import unzip_file
 from .formats.csvfile import CsvReader
 from .formats.archesfile import ArchesFileReader
 import ctypes
@@ -40,7 +46,9 @@ def import_one_resource(line, prevent_indexing=False):
     connections.close_all()
     reader = ArchesFileReader()
     archesresource = JSONDeserializer().deserialize(line)
-    reader.import_business_data({"resources": [archesresource]}, prevent_indexing=prevent_indexing)
+    reader.import_business_data(
+        {"resources": [archesresource]}, prevent_indexing=prevent_indexing
+    )
 
 
 class BusinessDataImporter(object):
@@ -96,12 +104,14 @@ class BusinessDataImporter(object):
         for path in relations_file:
             if os.path.exists(path):
                 if isfile(join(path)):
-                    self.relations = csv.DictReader(open(relations_file[0], "r"))
+                    with open(relations_file[0], "r") as f:
+                        self.relations = csv.DictReader(f)
 
         for path in mapping_file:
             if os.path.exists(path):
                 if isfile(join(path)):
-                    self.mapping = json.load(open(path, "r"))
+                    with open(path, "r") as f:
+                        self.mapping = json.load(f)
                 else:
                     self.mapping = None
 
@@ -119,12 +129,15 @@ class BusinessDataImporter(object):
                             if "business_data" in list(archesfile.keys()):
                                 self.business_data = archesfile["business_data"]
                     elif self.file_format == "csv":
-                        data = csv.DictReader(open(file[0], encoding="utf-8"))
-                        self.business_data = list(data)
+                        with open(file[0], encoding="utf-8") as f:
+                            data = csv.DictReader(f)
+                            self.business_data = list(data)
                     elif self.file_format == "zip":
                         shp_zipfile = os.path.basename(path)
                         shp_zipfile_name = os.path.splitext(shp_zipfile)[0]
-                        unzip_dir = os.path.join(os.path.dirname(path), shp_zipfile_name)
+                        unzip_dir = os.path.join(
+                            os.path.dirname(path), shp_zipfile_name
+                        )
                         unzip_file(path, unzip_dir)
                         shp = [i for i in os.listdir(unzip_dir) if i.endswith(".shp")]
                         if len(shp) == 0:
@@ -134,7 +147,9 @@ class BusinessDataImporter(object):
                             exit()
                         elif len(shp) > 1:
                             print("*" * 80)
-                            print("ERROR: There are multiple shapefiles in this zipfile. Please load each individually:")
+                            print(
+                                "ERROR: There are multiple shapefiles in this zipfile. Please load each individually:"
+                            )
                             for s in shp:
                                 print(
                                     "\npython manage.py packages -o import_business_data -s {0} -c {1} -ow [append or overwrite]".format(
@@ -162,7 +177,7 @@ class BusinessDataImporter(object):
         if file_reader is not None and data is not None:
             language_list = file_reader.scan_for_new_languages(business_data=data)
             if language_list is not None:
-                return list(set(language_list))
+                return list(set(capitalize_region(code) for code in language_list))
 
         return []
 
@@ -189,7 +204,6 @@ class BusinessDataImporter(object):
     ):
         start = time()
         cursor = connection.cursor()
-
         try:
             if file_format is None:
                 file_format = self.file_format
@@ -202,7 +216,11 @@ class BusinessDataImporter(object):
 
             if file_format == "json":
                 reader.import_business_data(
-                    business_data, mapping=mapping, overwrite=overwrite, prevent_indexing=prevent_indexing, transaction_id=transaction_id
+                    business_data,
+                    mapping=mapping,
+                    overwrite=overwrite,
+                    prevent_indexing=prevent_indexing,
+                    transaction_id=transaction_id,
                 )
             elif file_format == "jsonl":
                 with open(self.file[0], "r") as openf:
@@ -241,17 +259,25 @@ class BusinessDataImporter(object):
                     print("*" * 80)
 
             elapsed = time() - start
-            print("Time to import_business_data = {0}".format(datetime.timedelta(seconds=elapsed)))
+            print(
+                "Time to import_business_data = {0}".format(
+                    datetime.timedelta(seconds=elapsed)
+                )
+            )
 
             if reader is not None:
                 reader.report_errors()
 
         finally:
             # cleans up the ResourceXResource table, adding any graph_id values that were unavailable during package/csv load
-            for res_x_res in ResourceXResource.objects.filter(resourceinstanceto_graphid__isnull=True):
+            for res_x_res in ResourceXResource.objects.filter(
+                resourceinstanceto_graphid__isnull=True
+            ):
                 # wrapping in a try allows for graceful handling of corrupted data
                 try:
-                    res_x_res.resourceinstanceto_graphid = res_x_res.resourceinstanceidto.graph
+                    res_x_res.resourceinstanceto_graphid = (
+                        res_x_res.resourceinstanceidto.graph
+                    )
                 except:
                     pass
 
@@ -266,7 +292,6 @@ class BusinessDataImporter(object):
                 except BrokenPipeError as e:
                     logger = logging.getLogger(__name__)
                     logger.info("Celery not working: tasks unavailable during import.")
-
 
     def shape_to_csv(self, shp_path):
         csv_records = []

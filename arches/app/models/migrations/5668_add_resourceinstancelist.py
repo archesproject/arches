@@ -9,7 +9,7 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '3693_ontology_in_pkgs'),
+        ("models", "3693_ontology_in_pkgs"),
     ]
 
     operations = [
@@ -23,6 +23,6 @@ class Migration(migrations.Migration):
             UPDATE public.d_data_types
             SET classname='ResourceInstanceDataType'
             WHERE datatype='resource-instance-list';
-            """
+            """,
         )
     ]

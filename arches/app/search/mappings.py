@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.utils import permission_backend
 from django.db.utils import ProgrammingError
 
 
@@ -27,7 +28,11 @@ RESOURCES_INDEX = "resources"
 RESOURCE_RELATIONS_INDEX = "resource_relations"
 
 
-ANALYZER = {"analyzer": {"folding": {"tokenizer": "whitespace", "filter": ["lowercase", "asciifolding"]}}}
+ANALYZER = {
+    "analyzer": {
+        "folding": {"tokenizer": "whitespace", "filter": ["lowercase", "asciifolding"]}
+    }
+}
 
 
 def prepare_terms_index(create=False):
@@ -49,7 +54,10 @@ def prepare_terms_index(create=False):
                 "value": {
                     "analyzer": "whitespace",
                     "type": "text",
-                    "fields": {"raw": {"type": "keyword"}, "folded": {"analyzer": "folding", "type": "text"}},
+                    "fields": {
+                        "raw": {"type": "keyword"},
+                        "folded": {"analyzer": "folding", "type": "text"},
+                    },
                 },
             }
         },
@@ -82,7 +90,10 @@ def prepare_concepts_index(create=False):
                 "value": {
                     "analyzer": "whitespace",
                     "type": "text",
-                    "fields": {"raw": {"type": "keyword"}, "folded": {"analyzer": "folding", "type": "text"}},
+                    "fields": {
+                        "raw": {"type": "keyword"},
+                        "folded": {"analyzer": "folding", "type": "text"},
+                    },
                 },
             }
         },
@@ -122,18 +133,44 @@ def prepare_search_index(create=False):
                 {
                     "language_values": {
                         "path_match": "tiles.data.*.*.value",
-                        "mapping": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+                        "mapping": {
+                            "type": "text",
+                            "fields": {
+                                "keyword": {"ignore_above": 256, "type": "keyword"}
+                            },
+                        },
                     }
                 }
             ],
             "properties": {
                 "graph_id": {"type": "keyword"},
-                "legacyid": {"type": "text", "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}}},
+                "legacyid": {
+                    "type": "text",
+                    "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}},
+                },
                 "resourceinstanceid": {"type": "keyword"},
                 "root_ontology_class": {"type": "keyword"},
-                "displayname": {"type": "nested", "properties": {"value": {"type": "keyword"}, "language": {"type": "keyword"}}},
-                "displaydescription": {"type": "nested", "properties": {"value": {"type": "keyword"}, "language": {"type": "keyword"}}},
-                "map_popup": {"type": "nested", "properties": {"value": {"type": "keyword"}, "language": {"type": "keyword"}}},
+                "displayname": {
+                    "type": "nested",
+                    "properties": {
+                        "value": {"type": "keyword"},
+                        "language": {"type": "keyword"},
+                    },
+                },
+                "displaydescription": {
+                    "type": "nested",
+                    "properties": {
+                        "value": {"type": "keyword"},
+                        "language": {"type": "keyword"},
+                    },
+                },
+                "map_popup": {
+                    "type": "nested",
+                    "properties": {
+                        "value": {"type": "keyword"},
+                        "language": {"type": "keyword"},
+                    },
+                },
                 "provisional_resource": {"type": "keyword"},
                 "tiles": {
                     "type": "nested",
@@ -150,10 +187,7 @@ def prepare_search_index(create=False):
                 "permissions": {
                     "type": "nested",
                     "properties": {
-                        "users_without_read_perm": {"type": "integer"},
-                        "users_without_edit_perm": {"type": "integer"},
-                        "users_without_delete_perm": {"type": "integer"},
-                        "users_with_no_access": {"type": "integer"},
+                        "principal_user": {"type": "integer"},
                     },
                 },
                 "strings": {
@@ -161,7 +195,10 @@ def prepare_search_index(create=False):
                     "properties": {
                         "string": {
                             "type": "text",
-                            "fields": {"raw": {"type": "keyword", "ignore_above": 256}, "folded": {"type": "text", "analyzer": "folding"}},
+                            "fields": {
+                                "raw": {"type": "keyword", "ignore_above": 256},
+                                "folded": {"type": "text", "analyzer": "folding"},
+                            },
                         },
                         "nodegroup_id": {"type": "keyword"},
                         "language": {"type": "text"},
@@ -170,12 +207,19 @@ def prepare_search_index(create=False):
                 },
                 "ids": {
                     "type": "nested",
-                    "properties": {"id": {"type": "keyword"}, "nodegroup_id": {"type": "keyword"}, "provisional": {"type": "boolean"}},
+                    "properties": {
+                        "id": {"type": "keyword"},
+                        "nodegroup_id": {"type": "keyword"},
+                        "provisional": {"type": "boolean"},
+                    },
                 },
                 "domains": {
                     "type": "nested",
                     "properties": {
-                        "value": {"type": "text", "fields": {"raw": {"type": "keyword"}}},
+                        "value": {
+                            "type": "text",
+                            "fields": {"raw": {"type": "keyword"}},
+                        },
                         "conceptid": {"type": "keyword"},
                         "valueid": {"type": "keyword"},
                         "nodegroup_id": {"type": "keyword"},
@@ -238,18 +282,30 @@ def prepare_search_index(create=False):
             },
         },
     }
+
+    index_settings["mappings"]["properties"]["permissions"]["properties"].update(
+        permission_backend.update_mappings()
+    )
+
     try:
         from arches.app.datatypes.datatypes import DataTypeFactory
 
         datatype_factory = DataTypeFactory()
-        data = index_settings["mappings"]["properties"]["tiles"]["properties"]["data"]["properties"]
+        data = index_settings["mappings"]["properties"]["tiles"]["properties"]["data"][
+            "properties"
+        ]
         for node in models.Node.objects.all():
             datatype = datatype_factory.get_instance(node.datatype)
             datatype_mapping = datatype.default_es_mapping()
-            if datatype_mapping and datatype_factory.datatypes[node.datatype].defaultwidget:
+            if (
+                datatype_mapping
+                and datatype_factory.datatypes[node.datatype].defaultwidget
+            ):
                 data[str(node.nodeid)] = datatype_mapping
     except ProgrammingError:
-        print("Skipping datatype mappings because the datatypes table is not yet available")
+        print(
+            "Skipping datatype mappings because the datatypes table is not yet available"
+        )
 
     if create:
         se = SearchEngineFactory().create()

@@ -41,7 +41,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name="resourceinstance", options={"managed": True, "permissions": (("no_access_to_resourceinstance", "No Access"),)},
+            name="resourceinstance",
+            options={
+                "managed": True,
+                "permissions": (("no_access_to_resourceinstance", "No Access"),),
+            },
         ),
         migrations.RunPython(forwards_func, reverse_func),
     ]

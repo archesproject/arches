@@ -14,10 +14,6 @@ FROM base as wheelbuilder
 
 WORKDIR ${WHEELS}
 
-# Install pip requirements files
-COPY ./arches/install/requirements.txt ${WHEELS}/requirements.txt
-COPY ./arches/install/requirements_dev.txt ${WHEELS}/requirements_dev.txt
-
 # Install packages required to build the python libs, then remove them
 RUN set -ex \
     && BUILD_DEPS=" \
@@ -42,9 +38,7 @@ RUN set -ex \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
     && python3.8 get-pip.py
 
-RUN pip3 wheel --no-cache-dir -b /tmp -r ${WHEELS}/requirements.txt  \
-    && pip3 wheel --no-cache-dir -b /tmp -r ${WHEELS}/requirements_dev.txt  \
-    && pip3 wheel --no-cache-dir -b /tmp gunicorn \
+RUN pip3 wheel --no-cache-dir -b /tmp gunicorn \
     && pip3 wheel --no-cache-dir -b /tmp django-auth-ldap
 
 # Add Docker-related files
@@ -83,15 +77,12 @@ RUN set -ex \
     && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
     && python3.8 get-pip.py \
     && apt-get install -y nodejs \
-    && npm install -g yarn
 
-# Install Yarn components
+# Install npm components
 COPY ./arches/install/package.json ${ARCHES_ROOT}/arches/install/package.json
-COPY ./arches/install/.yarnrc ${ARCHES_ROOT}/arches/install/.yarnrc
-COPY ./arches/install/yarn.lock ${ARCHES_ROOT}/arches/install/yarn.lock
 WORKDIR ${ARCHES_ROOT}/arches/install
 RUN mkdir -p ${ARCHES_ROOT}/node_modules
-RUN yarn install
+RUN npm install
 
 ## Install virtualenv
 WORKDIR ${WEB_ROOT}
@@ -103,10 +94,6 @@ RUN python3.8 -m venv ENV \
     && pip install requests \
     && pip install -f ${WHEELS} django-auth-ldap \
     && pip install -f ${WHEELS} gunicorn \
-    && pip install -r ${WHEELS}/requirements.txt \
-                   -f ${WHEELS} \
-    && pip install -r ${WHEELS}/requirements_dev.txt \
-                   -f ${WHEELS} \
     && rm -rf ${WHEELS} \
     && rm -rf /root/.cache/pip/*
 
@@ -118,7 +105,7 @@ COPY . ${ARCHES_ROOT}
 WORKDIR ${ARCHES_ROOT}
 
 RUN . ../ENV/bin/activate \
-    && pip install -e . --no-binary :all:
+    && pip install -e '.[dev]' --no-binary :all:
 
 # Set default workdir
 WORKDIR ${ARCHES_ROOT}

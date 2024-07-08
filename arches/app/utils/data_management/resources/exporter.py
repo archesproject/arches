@@ -15,6 +15,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
+
 import os
 import zipfile
 import datetime
@@ -27,9 +28,13 @@ from django.http import HttpResponse
 class ResourceExporter(object):
     def __init__(self, format=None, **kwargs):
         kwargs["format"] = format
-        self.writer = import_class_from_string(settings.RESOURCE_FORMATTERS[format])(**kwargs)
+        self.writer = import_class_from_string(settings.RESOURCE_FORMATTERS[format])(
+            **kwargs
+        )
 
-    def export(self, graph_id=None, resourceinstanceids=None, languages: str = None, user=None):
+    def export(
+        self, graph_id=None, resourceinstanceids=None, languages: str = None, user=None
+    ):
         resources = self.writer.write_resources(
             graph_id=graph_id,
             resourceinstanceids=resourceinstanceids,
