@@ -21,6 +21,7 @@ import json
 import time
 from tests.base_test import ArchesTestCase
 from tests.utils.search_test_utils import sync_es
+from django.http import HttpRequest
 from django.urls import reverse
 from django.contrib.auth.models import User, Group
 from django.test.client import Client
@@ -33,6 +34,7 @@ from arches.app.utils.data_management.resource_graphs.importer import (
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from guardian.shortcuts import assign_perm
+from arches.app.search.components.base import SearchFilterFactory
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Term
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
@@ -776,6 +778,18 @@ class SearchTests(ArchesTestCase):
         query = {"core": "unavailable-core"}
         response_json = get_response_json(self.client, query=query)
         self.assertFalse(response_json["success"])
+
+    def test_searchview_core_component_from_admin(self):
+        request = HttpRequest()
+        request.method = "GET"
+        request.user = User.objects.get(username="admin")
+        search_component_factory = SearchFilterFactory(request)
+        core_search_instance = search_component_factory.get_core_component_instance()
+        self.assertTrue(core_search_instance is not None)
+
+        search_components = core_search_instance.get_search_components()
+        # 13 req'd components + core-search component
+        self.assertEqual(len(search_components), 14)
 
 
 def extract_pks(response_json):
