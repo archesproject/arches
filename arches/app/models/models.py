@@ -2174,7 +2174,7 @@ class SpatialView(models.Model):
                     f"Attribute nodes must belong to the same graph as the geometry node (error nodeid:{str(node.id)})"
                 )
 
-        # language must be be a valid language code beloging to the current publication
+        # language must be be a valid language code belonging to the current publication
         published_graphs = PublishedGraph.objects.filter(
             publication=graph.publication
         )
