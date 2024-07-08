@@ -26,6 +26,7 @@ from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
 from django.db.models import JSONField
 from django.core.cache import caches
+from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template, render_to_string
@@ -1243,6 +1244,18 @@ class SearchComponent(models.Model):
         )
 
         return JSONSerializer().serialize(self)
+
+
+@receiver(pre_save, sender=SearchComponent)
+def ensure_single_default_core(sender, instance, **kwargs):
+    if instance.config.get("default", False) and instance.type == "core":
+        existing_default = SearchComponent.objects.filter(
+            config__default=True, type="core"
+        ).exclude(id=instance.id)
+        if existing_default.exists():
+            raise ValidationError(
+                "Only one core search component can be default at a time."
+            )
 
 
 class SearchExportHistory(models.Model):
