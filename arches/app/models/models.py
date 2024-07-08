@@ -565,7 +565,9 @@ class GraphModel(models.Model):
     )
     has_unpublished_changes = models.BooleanField(default=False)
     resource_instance_lifecycle = models.ForeignKey(
-        null=True, on_delete=models.CASCADE, to="models.ResourceInstanceLifecycle"
+        on_delete=models.PROTECT,
+        to="models.ResourceInstanceLifecycle",
+        related_name="graphs",
     )
 
     @property
@@ -1184,7 +1186,11 @@ class ResourceInstance(models.Model):
     descriptors = models.JSONField(blank=True, null=True)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
-    lifecycle_state = models.CharField(max_length=200, blank=True)
+    resource_instance_lifecycle_state = models.ForeignKey(
+        on_delete=models.PROTECT,
+        to="models.ResourceInstanceLifecycleState",
+        related_name="resource_instances",
+    )
 
     def save(self, *args, **kwargs):
         try:
@@ -1192,14 +1198,14 @@ class ResourceInstance(models.Model):
         except ResourceInstance.graph.RelatedObjectDoesNotExist:
             pass
 
-        if not self.lifecycle_state:
-            self.lifecycle_state = next(
-                key
-                for key, value in self.graph.resource_instance_lifecycle.states.items()
-                if value["initial_state"]
-            )
+        # if not self.lifecycle_state:
+        #     self.lifecycle_state = next(
+        #         key
+        #         for key, value in self.graph.resource_instance_lifecycle.states.items()
+        #         if value["initial_state"]
+        #     )
 
-        add_to_update_fields(kwargs, "lifecycle_state")
+        # add_to_update_fields(kwargs, "lifecycle_state")
         add_to_update_fields(kwargs, "graph_publication")
         super(ResourceInstance, self).save(*args, **kwargs)
 
@@ -1215,17 +1221,65 @@ class ResourceInstance(models.Model):
 
 
 class ResourceInstanceLifecycle(models.Model):
-    graph = models.OneToOneField(
-        "GraphModel",
-        on_delete=models.CASCADE,
-        primary_key=True,
-    )
-    states = models.JSONField(
-        default=settings.RESOURCE_INSTANCE_DEFAULT_LIFECYCLE_STATES
-    )
+    id = models.UUIDField(primary_key=True, serialize=False)
+    name = models.TextField()
 
     class Meta:
         db_table = "resource_instance_lifecycles"
+        managed = True
+
+
+class ResourceInstanceLifecycleState(models.Model):
+    id = models.UUIDField(primary_key=True, serialize=False)
+    name = models.TextField()
+    is_initial_state = models.BooleanField(default=False)
+    can_delete_resource_instances = models.BooleanField(default=False)
+    can_edit_resource_instances = models.BooleanField(default=False)
+    resource_instance_lifecycle = models.ForeignKey(
+        on_delete=models.CASCADE,
+        to="models.ResourceInstanceLifecycle",
+        related_name="resource_instance_lifecycle_states",
+    )
+    previous_resource_instance_lifecycle_states = models.ManyToManyField(
+        "self",
+        through="ResourceInstanceLifecycleStateXResourceInstanceLifecycleState",
+        through_fields=(
+            "resource_instance_lifecycle_state_to",
+            "resource_instance_lifecycle_state_from",
+        ),
+        symmetrical=False,
+        related_name="next_lifecycle_states",
+    )
+    next_resource_instance_lifecycle_states = models.ManyToManyField(
+        "self",
+        through="ResourceInstanceLifecycleStateXResourceInstanceLifecycleState",
+        through_fields=(
+            "resource_instance_lifecycle_state_from",
+            "resource_instance_lifecycle_state_to",
+        ),
+        symmetrical=False,
+        related_name="previous_lifecycle_states",
+    )
+
+    class Meta:
+        db_table = "resource_instance_lifecycle_states"
+        managed = True
+
+
+class ResourceInstanceLifecycleStateXResourceInstanceLifecycleState(models.Model):
+    resource_instance_lifecycle_state_from = models.ForeignKey(
+        ResourceInstanceLifecycleState,
+        related_name="previous_resource_instance_lifecycle_state",
+        on_delete=models.CASCADE,
+    )
+    resource_instance_lifecycle_state_to = models.ForeignKey(
+        ResourceInstanceLifecycleState,
+        related_name="next_resource_instance_lifecycle_state",
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        db_table = "resource_instance_lifecycle_states_xref"
         managed = True
 
 
