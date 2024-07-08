@@ -46,7 +46,6 @@ def build_staticfiles_dirs(
 
     directories.append(os.path.join(root_dir, "app", "media", "build"))
     directories.append(os.path.join(root_dir, "app", "media"))
-    directories.append(("node_modules", os.path.join(root_dir, "..", "node_modules")))
 
     return tuple(directories)
 
