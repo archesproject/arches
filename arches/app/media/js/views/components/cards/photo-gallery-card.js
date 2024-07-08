@@ -9,11 +9,12 @@ define([
     'views/components/workbench',
     'viewmodels/photo-gallery',
     'templates/views/components/cards/photo-gallery-card.htm',
+    'viewmodels/alert',
     'bindings/slide',
     'bindings/fadeVisible',
     'bindings/dropzone',
     'bindings/gallery',
-], function(ko, koMapping, _, arches, Dropzone, uuid, CardComponentViewModel, WorkbenchComponentViewModel, PhotoGallery, photoGalleryCardTemplate) {
+], function(ko, koMapping, _, arches, Dropzone, uuid, CardComponentViewModel, WorkbenchComponentViewModel, PhotoGallery, photoGalleryCardTemplate, AlertViewModel) {
     const viewModel = function(params) {
 
         params.configKeys = ['acceptedFiles', 'maxFilesize'];
@@ -57,6 +58,10 @@ define([
                 }
             });
             return mfs;
+        });
+
+        this.acceptedFiles = ko.computed(function(){
+            return self.card.widgets().find(widget=>widget.node_id() === self.fileListNodeId)?.config.acceptedFiles() || arches.translations.allFormatsAccepted;
         });
 
         this.cleanUrl = function(url) {
@@ -150,31 +155,58 @@ define([
         }
 
         this.addTile = function(file){
-            var newtile;
-            newtile = self.card.getNewTile();
-            var tilevalue = {
-                name: file.name,
-                accepted: true,
-                height: file.height,
-                lastModified: file.lastModified,
-                size: file.size,
-                status: file.status,
-                type: file.type,
-                width: file.width,
-                url: null,
-                file_id: null,
-                index: 0,
-                content: window.URL.createObjectURL(file),
-                error: file.error
-            };
-            newtile.data[self.fileListNodeId]([tilevalue]);
-            newtile.formData.append('file-list_' + self.fileListNodeId, file, file.name);
-            newtile.resourceinstance_id = self.card.resourceinstanceid;
-            if (self.card.tiles().length === 0) {
-                sleep(50);
+            var acceptedFileFormats;
+            var loadFile;
+            acceptedFileFormats = ((ko.unwrap(self.acceptedFiles)).split(',').map(item=>item.trim())).map(format => format.replace('.', ''));
+            if(ko.unwrap(self.acceptedFiles) != arches.translations.allFormatsAccepted && acceptedFileFormats !== undefined && acceptedFileFormats.length > 0){
+                var fileType = file.name.split('.').pop().toLowerCase();
+                if(acceptedFileFormats.includes(fileType)){
+                    loadFile = true;
+                }
+                else{
+                    loadFile = false;
+                }
             }
-            newtile.save();
-            self.card.newTile = undefined;
+            else{
+                loadFile = true;
+            }
+
+            if (loadFile === true) {
+                var newtile;
+                newtile = self.card.getNewTile();
+                var tilevalue = {
+                    name: file.name,
+                    accepted: true,
+                    height: file.height,
+                    lastModified: file.lastModified,
+                    size: file.size,
+                    status: file.status,
+                    type: file.type,
+                    width: file.width,
+                    url: null,
+                    file_id: null,
+                    index: 0,
+                    content: window.URL.createObjectURL(file),
+                    error: file.error
+                };
+                newtile.data[self.fileListNodeId]([tilevalue]);
+                newtile.formData.append('file-list_' + self.fileListNodeId, file, file.name);
+                newtile.resourceinstance_id = self.card.resourceinstanceid;
+                if (self.card.tiles().length === 0) {
+                    sleep(50);
+                }
+                newtile.save();
+                self.card.newTile = undefined;
+            }
+            else{
+                params.pageVm.alert(new AlertViewModel(
+                    'ep-alert-red',
+                    arches.translations.incorrectFileFormat,
+                    arches.translations.fileFormatNotAccepted(ko.unwrap(self.acceptedFiles)),
+                    null,
+                    function(){}
+                ));
+            }
         };
 
         this.dropzoneOptions = {

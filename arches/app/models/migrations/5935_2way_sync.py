@@ -10,11 +10,35 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameField(model_name="mobilesynclog", old_name="user", new_name="userid",),
-        migrations.RemoveField(model_name="mobilesynclog", name="resourcescreated",),
-        migrations.RemoveField(model_name="mobilesynclog", name="tilescreated",),
-        migrations.RemoveField(model_name="mobilesynclog", name="tilesdeleted",),
-        migrations.RemoveField(model_name="mobilesynclog", name="tilesupdated",),
-        migrations.RenameField(model_name="mobilesynclog", old_name="note", new_name="message",),
-        migrations.AddField(model_name="mobilesynclog", name="status", field=models.TextField(blank=True, null=True),),
+        migrations.RenameField(
+            model_name="mobilesynclog",
+            old_name="user",
+            new_name="userid",
+        ),
+        migrations.RemoveField(
+            model_name="mobilesynclog",
+            name="resourcescreated",
+        ),
+        migrations.RemoveField(
+            model_name="mobilesynclog",
+            name="tilescreated",
+        ),
+        migrations.RemoveField(
+            model_name="mobilesynclog",
+            name="tilesdeleted",
+        ),
+        migrations.RemoveField(
+            model_name="mobilesynclog",
+            name="tilesupdated",
+        ),
+        migrations.RenameField(
+            model_name="mobilesynclog",
+            old_name="note",
+            new_name="message",
+        ),
+        migrations.AddField(
+            model_name="mobilesynclog",
+            name="status",
+            field=models.TextField(blank=True, null=True),
+        ),
     ]

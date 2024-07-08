@@ -1,6 +1,8 @@
 from django.views.generic import View
 from django.http import HttpResponse, HttpResponseNotFound
-from arches.app.utils.search_thumbnail_fetcher_factory import SearchThumbnailFetcherFactory
+from arches.app.utils.search_thumbnail_fetcher_factory import (
+    SearchThumbnailFetcherFactory,
+)
 
 
 class ThumbnailView(View):

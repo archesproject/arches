@@ -8,7 +8,6 @@ sudo rm -r /home/ubuntu/ENV
 # sudo apt-get install -y git
 # sudo apt-get install -y python-pip
 # sudo -H pip install virtualenv==13.1.2
-# sudo npm install -g yarn
 
 cd /home/ubuntu/arches
 git pull
@@ -20,12 +19,11 @@ source /home/ubuntu/ENV/bin/activate
 
 cd /home/ubuntu/arches
 pip install -e . --no-binary :all:
-pip install -r arches/install/requirements.txt
 
 # cd /home/ubuntu
 # arches-project create arches_dev
 # cd /home/ubuntu/arches_dev/arches_dev
-# yarn install
+# npm install
 # cp /home/ubuntu/settings_local.py /home/ubuntu/arches_dev/arches_dev
 
 sudo chown ubuntu:ubuntu /home/ubuntu/arches/arches/arches.log

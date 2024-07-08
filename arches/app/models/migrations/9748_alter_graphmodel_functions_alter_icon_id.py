@@ -6,18 +6,20 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '9747_alter_maplayer_options'),
+        ("models", "9747_alter_maplayer_options"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='graphmodel',
-            name='functions',
-            field=models.ManyToManyField(through='models.FunctionXGraph', to='models.function'),
+            model_name="graphmodel",
+            name="functions",
+            field=models.ManyToManyField(
+                through="models.FunctionXGraph", to="models.function"
+            ),
         ),
         migrations.AlterField(
-            model_name='icon',
-            name='id',
+            model_name="icon",
+            name="id",
             field=models.AutoField(primary_key=True, serialize=False),
         ),
     ]

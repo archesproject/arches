@@ -20,19 +20,25 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="cardxnodexwidget",
             name="config",
-            field=arches.app.models.fields.i18n.I18n_JSONField(blank=True, db_column="config", null=True),
+            field=arches.app.models.fields.i18n.I18n_JSONField(
+                blank=True, db_column="config", null=True
+            ),
         ),
         # last modified to change to i18n json field in model - no migration ever generated.
         migrations.AlterField(
             model_name="ddatatype",
             name="defaultconfig",
-            field=arches.app.models.fields.i18n.I18n_JSONField(blank=True, db_column="defaultconfig", null=True),
+            field=arches.app.models.fields.i18n.I18n_JSONField(
+                blank=True, db_column="defaultconfig", null=True
+            ),
         ),
         # last modified to change to i18n json field in model - no migration ever generated.
         migrations.AlterField(
             model_name="node",
             name="config",
-            field=arches.app.models.fields.i18n.I18n_JSONField(blank=True, db_column="config", null=True),
+            field=arches.app.models.fields.i18n.I18n_JSONField(
+                blank=True, db_column="config", null=True
+            ),
         ),
         # following two fields are specified in their respective migrations as legacy contrib jsonb type.
         # jsonb is automatic for models.JSONField and these are basically noops.

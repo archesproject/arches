@@ -80,7 +80,9 @@ class JSONSerializer(object):
         options.pop("fields", None)
         options.pop("exclude", None)
         options.pop("force_recalculation", False)
-        result = json.dumps(obj, cls=DjangoJSONEncoder, sort_keys=sort_keys, **options.copy())
+        result = json.dumps(
+            obj, cls=DjangoJSONEncoder, sort_keys=sort_keys, **options.copy()
+        )
 
         return result.encode("utf-8") if self.utf_encode else result
 
@@ -95,11 +97,19 @@ class JSONSerializer(object):
         # print inspect.isroutine(object)
         # print inspect.isabstract(object)
         # print type(object) == 'staticmethod'
-        if inspect.isroutine(object) or inspect.isbuiltin(object) or inspect.isclass(object):
+        if (
+            inspect.isroutine(object)
+            or inspect.isbuiltin(object)
+            or inspect.isclass(object)
+        ):
             raise UnableToSerializeMethodTypesError(type(object))
         elif isinstance(object, dict):
             return self.handle_dictionary(object)
-        elif isinstance(object, list) or isinstance(object, tuple) or isinstance(object, set):
+        elif (
+            isinstance(object, list)
+            or isinstance(object, tuple)
+            or isinstance(object, set)
+        ):
             return self.handle_list(object)
         elif isinstance(object, Model):
             if hasattr(object, "serialize"):
@@ -109,7 +119,9 @@ class JSONSerializer(object):
                 if self.force_recalculation:
                     signature = inspect.signature(serialize_function)
 
-                    if "force_recalculation" in [parameter.name for parameter in signature.parameters.values()]:
+                    if "force_recalculation" in [
+                        parameter.name for parameter in signature.parameters.values()
+                    ]:
                         kwargs["force_recalculation"] = True
                         # return self.handle_object(serialize_function(**kwargs), **kwargs)
 
@@ -200,13 +212,17 @@ class JSONSerializer(object):
         fields = kwargs.get("fields", None)
         exclude = kwargs.get("exclude", None)
         # print '='*40
-        properties = [k for k, v in instance.__class__.__dict__.items() if type(v) is property]
+        properties = [
+            k for k, v in instance.__class__.__dict__.items() if type(v) is property
+        ]
         for property_name in properties:
             if fields and property_name not in fields:
                 continue
             if exclude and property_name in exclude:
                 continue
-            data[property_name] = self.handle_object(getattr(instance, property_name), **kwargs)
+            data[property_name] = self.handle_object(
+                getattr(instance, property_name), **kwargs
+            )
         for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
             if not getattr(f, "editable", False):
                 continue
@@ -231,7 +247,9 @@ class JSONSerializer(object):
                     qs = f.value_from_object(instance)
                     data[f.name] = [item.pk for item in qs]
             else:
-                data[f.name] = self.handle_object(f.value_from_object(instance), **kwargs)
+                data[f.name] = self.handle_object(
+                    f.value_from_object(instance), **kwargs
+                )
         return data
 
 

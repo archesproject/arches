@@ -8,7 +8,11 @@ import django.contrib.gis.db.models.fields
 from django.core import management
 from django.contrib.postgres.fields import JSONField
 from django.db import migrations, models
-from arches.db.migration_operations.extras import CreateExtension, CreateAutoPopulateUUIDField, CreateFunction
+from arches.db.migration_operations.extras import (
+    CreateExtension,
+    CreateAutoPopulateUUIDField,
+    CreateFunction,
+)
 from arches.app.models.system_settings import settings
 
 
@@ -43,13 +47,19 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
     Permission = apps.get_model("auth", "Permission")
     try:
         read_nodegroup = Permission.objects.using(db_alias).get(
-            codename="read_nodegroup", content_type__app_label="models", content_type__model="nodegroup"
+            codename="read_nodegroup",
+            content_type__app_label="models",
+            content_type__model="nodegroup",
         )
         write_nodegroup = Permission.objects.using(db_alias).get(
-            codename="write_nodegroup", content_type__app_label="models", content_type__model="nodegroup"
+            codename="write_nodegroup",
+            content_type__app_label="models",
+            content_type__model="nodegroup",
         )
         delete_nodegroup = Permission.objects.using(db_alias).get(
-            codename="delete_nodegroup", content_type__app_label="models", content_type__model="nodegroup"
+            codename="delete_nodegroup",
+            content_type__app_label="models",
+            content_type__model="nodegroup",
         )
     except Permission.DoesNotExist:
         if with_create_permissions:
@@ -66,14 +76,22 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
             raise
 
     graph_editor_group = Group.objects.using(db_alias).create(name="Graph Editor")
-    graph_editor_group.permissions.add(read_nodegroup, write_nodegroup, delete_nodegroup)
+    graph_editor_group.permissions.add(
+        read_nodegroup, write_nodegroup, delete_nodegroup
+    )
 
     resource_editor_group = Group.objects.using(db_alias).create(name="Resource Editor")
     rdm_admin_group = Group.objects.using(db_alias).create(name="RDM Administrator")
-    app_admin_group = Group.objects.using(db_alias).create(name="Application Administrator")
+    app_admin_group = Group.objects.using(db_alias).create(
+        name="Application Administrator"
+    )
     sys_admin_group = Group.objects.using(db_alias).create(name="System Administrator")
-    mobile_project_admin_group = Group.objects.using(db_alias).create(name="Mobile Project Administrator")
-    crowdsource_editor_group = Group.objects.using(db_alias).create(name="Crowdsource Editor")
+    mobile_project_admin_group = Group.objects.using(db_alias).create(
+        name="Mobile Project Administrator"
+    )
+    crowdsource_editor_group = Group.objects.using(db_alias).create(
+        name="Crowdsource Editor"
+    )
     guest_group = Group.objects.using(db_alias).create(name="Guest")
 
     anonymous_user = User.objects.using(db_alias).get(username="anonymous")
@@ -128,7 +146,9 @@ class Migration(migrations.Migration):
         CreateFunction(
             name="get_conceptid",
             arguments=["p_label text"],
-            declarations=["v_return text;",],
+            declarations=[
+                "v_return text;",
+            ],
             language="plpgsql",
             body="""
                v_return =
@@ -144,7 +164,13 @@ class Migration(migrations.Migration):
         ),
         CreateFunction(
             name="insert_concept",
-            arguments=["p_label text", "p_note text", "p_languageid text", "p_legacyid text", "p_nodetype text"],
+            arguments=[
+                "p_label text",
+                "p_note text",
+                "p_languageid text",
+                "p_legacyid text",
+                "p_nodetype text",
+            ],
             declarations=[
                 "v_conceptid uuid = public.uuid_generate_v1mc();",
                 "v_valueid uuid = public.uuid_generate_v1mc();",
@@ -171,7 +197,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="GraphModel",
             fields=[
-                ("graphid", models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                (
+                    "graphid",
+                    models.UUIDField(
+                        default=uuid.uuid1, serialize=False, primary_key=True
+                    ),
+                ),
                 ("name", models.TextField(null=True, blank=True)),
                 ("description", models.TextField(null=True, blank=True)),
                 ("deploymentfile", models.TextField(null=True, blank=True)),
@@ -186,13 +217,28 @@ class Migration(migrations.Migration):
                 ("mappointsize", models.IntegerField(blank=True, null=True)),
                 ("subtitle", models.TextField(null=True, blank=True)),
             ],
-            options={"db_table": "graphs", "managed": True,},
+            options={
+                "db_table": "graphs",
+                "managed": True,
+            },
         ),
-        migrations.CreateModel(name="Graph", fields=[], options={"proxy": True,}, bases=("models.GraphModel",),),
+        migrations.CreateModel(
+            name="Graph",
+            fields=[],
+            options={
+                "proxy": True,
+            },
+            bases=("models.GraphModel",),
+        ),
         migrations.CreateModel(
             name="CardModel",
             fields=[
-                ("cardid", models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                (
+                    "cardid",
+                    models.UUIDField(
+                        default=uuid.uuid1, serialize=False, primary_key=True
+                    ),
+                ),
                 ("name", models.TextField(null=True, blank=True)),
                 ("description", models.TextField(null=True, blank=True)),
                 ("instructions", models.TextField(null=True, blank=True)),
@@ -203,27 +249,60 @@ class Migration(migrations.Migration):
                 ("visible", models.BooleanField(default=True)),
                 ("sortorder", models.IntegerField(blank=True, null=True, default=None)),
             ],
-            options={"db_table": "cards", "managed": True,},
+            options={
+                "db_table": "cards",
+                "managed": True,
+            },
         ),
-        migrations.CreateModel(name="Card", fields=[], options={"proxy": True,}, bases=("models.CardModel",),),
+        migrations.CreateModel(
+            name="Card",
+            fields=[],
+            options={
+                "proxy": True,
+            },
+            bases=("models.CardModel",),
+        ),
         migrations.CreateModel(
             name="CardXNodeXWidget",
             fields=[
-                ("card", models.ForeignKey(to="models.CardModel", db_column="cardid", on_delete=models.CASCADE)),
-                ("id", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "card",
+                    models.ForeignKey(
+                        to="models.CardModel",
+                        db_column="cardid",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("config", JSONField(blank=True, db_column="config", null=True)),
                 ("label", models.TextField(blank=True, null=True)),
                 ("sortorder", models.IntegerField(blank=True, null=True, default=None)),
             ],
-            options={"db_table": "cards_x_nodes_x_widgets", "managed": True,},
+            options={
+                "db_table": "cards_x_nodes_x_widgets",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="Concept",
             fields=[
-                ("conceptid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "conceptid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("legacyoid", models.TextField(unique=True)),
             ],
-            options={"db_table": "concepts", "managed": True,},
+            options={
+                "db_table": "concepts",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="DDataType",
@@ -233,11 +312,17 @@ class Migration(migrations.Migration):
                 ("modulename", models.TextField(blank=True, null=True)),
                 ("classname", models.TextField(blank=True, null=True)),
                 ("configcomponent", models.TextField(blank=True, null=True)),
-                ("defaultconfig", JSONField(blank=True, db_column="defaultconfig", null=True)),
+                (
+                    "defaultconfig",
+                    JSONField(blank=True, db_column="defaultconfig", null=True),
+                ),
                 ("configname", models.TextField(blank=True, null=True)),
                 ("isgeometric", models.BooleanField(default=False)),
             ],
-            options={"db_table": "d_data_types", "managed": True,},
+            options={
+                "db_table": "d_data_types",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="DLanguage",
@@ -246,12 +331,21 @@ class Migration(migrations.Migration):
                 ("languagename", models.TextField()),
                 ("isdefault", models.BooleanField()),
             ],
-            options={"db_table": "d_languages", "managed": True,},
+            options={
+                "db_table": "d_languages",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="DNodeType",
-            fields=[("nodetype", models.TextField(primary_key=True, serialize=False)), ("namespace", models.TextField()),],
-            options={"db_table": "d_node_types", "managed": True,},
+            fields=[
+                ("nodetype", models.TextField(primary_key=True, serialize=False)),
+                ("namespace", models.TextField()),
+            ],
+            options={
+                "db_table": "d_node_types",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="DRelationType",
@@ -260,7 +354,10 @@ class Migration(migrations.Migration):
                 ("category", models.TextField()),
                 ("namespace", models.TextField()),
             ],
-            options={"db_table": "d_relation_types", "managed": True,},
+            options={
+                "db_table": "d_relation_types",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="DValueType",
@@ -271,26 +368,48 @@ class Migration(migrations.Migration):
                 ("namespace", models.TextField()),
                 ("datatype", models.TextField(blank=True, null=True)),
             ],
-            options={"db_table": "d_value_types", "managed": True,},
+            options={
+                "db_table": "d_value_types",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="Edge",
             fields=[
-                ("edgeid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "edgeid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("name", models.TextField(blank=True, null=True)),
                 ("description", models.TextField(blank=True, null=True)),
                 ("ontologyproperty", models.TextField(blank=True, null=True)),
                 (
                     "graph",
-                    models.ForeignKey(blank=False, db_column="graphid", null=False, to="models.GraphModel", on_delete=models.CASCADE),
+                    models.ForeignKey(
+                        blank=False,
+                        db_column="graphid",
+                        null=False,
+                        to="models.GraphModel",
+                        on_delete=models.CASCADE,
+                    ),
                 ),
             ],
-            options={"db_table": "edges", "managed": True,},
+            options={
+                "db_table": "edges",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="EditLog",
             fields=[
-                ("editlogid", models.UUIDField(default=uuid.uuid1, serialize=False, primary_key=True)),
+                (
+                    "editlogid",
+                    models.UUIDField(
+                        default=uuid.uuid1, serialize=False, primary_key=True
+                    ),
+                ),
                 ("resourceclassid", models.TextField(null=True, blank=True)),
                 ("resourceinstanceid", models.TextField(null=True, blank=True)),
                 ("attributenodeid", models.TextField(null=True, blank=True)),
@@ -305,61 +424,133 @@ class Migration(migrations.Migration):
                 ("user_email", models.TextField(null=True, blank=True)),
                 ("note", models.TextField(null=True, blank=True)),
             ],
-            options={"db_table": "edit_log", "managed": True,},
+            options={
+                "db_table": "edit_log",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="File",
             fields=[
-                ("fileid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "fileid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("path", models.FileField(upload_to="uploadedfiles")),
             ],
-            options={"db_table": "files", "managed": True,},
+            options={
+                "db_table": "files",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="Form",
             fields=[
-                ("formid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "formid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("title", models.TextField(blank=True, null=True)),
                 ("subtitle", models.TextField(blank=True, null=True)),
                 ("iconclass", models.TextField(blank=True, null=True)),
                 ("visible", models.BooleanField(default=True)),
                 ("sortorder", models.IntegerField(blank=True, null=True, default=None)),
             ],
-            options={"db_table": "forms", "managed": True,},
+            options={
+                "db_table": "forms",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="FormXCard",
             fields=[
-                ("id", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
-                ("card", models.ForeignKey(to="models.CardModel", db_column="cardid", on_delete=models.CASCADE)),
-                ("form", models.ForeignKey(to="models.Form", db_column="formid", on_delete=models.CASCADE)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
+                (
+                    "card",
+                    models.ForeignKey(
+                        to="models.CardModel",
+                        db_column="cardid",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
+                (
+                    "form",
+                    models.ForeignKey(
+                        to="models.Form", db_column="formid", on_delete=models.CASCADE
+                    ),
+                ),
                 ("sortorder", models.IntegerField(blank=True, null=True, default=None)),
             ],
-            options={"db_table": "forms_x_cards", "managed": True,},
+            options={
+                "db_table": "forms_x_cards",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="Function",
             fields=[
-                ("functionid", models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
+                (
+                    "functionid",
+                    models.UUIDField(
+                        primary_key=True, default=uuid.uuid1, serialize=False
+                    ),
+                ),
                 ("functiontype", models.TextField(blank=True, null=True)),
                 ("name", models.TextField(blank=True, null=True)),
                 ("description", models.TextField(blank=True, null=True)),
-                ("defaultconfig", JSONField(blank=True, null=True, db_column="defaultconfig")),
+                (
+                    "defaultconfig",
+                    JSONField(blank=True, null=True, db_column="defaultconfig"),
+                ),
                 ("modulename", models.TextField(blank=True, null=True)),
                 ("classname", models.TextField(blank=True, null=True)),
                 ("component", models.TextField(blank=True, null=True)),
             ],
-            options={"db_table": "functions", "managed": True,},
+            options={
+                "db_table": "functions",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="FunctionXGraph",
             fields=[
-                ("id", models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
-                ("function", models.ForeignKey(to="models.Function", db_column="functionid", on_delete=models.CASCADE)),
-                ("graph", models.ForeignKey(to="models.GraphModel", db_column="graphid", on_delete=models.CASCADE)),
+                (
+                    "id",
+                    models.UUIDField(
+                        primary_key=True, default=uuid.uuid1, serialize=False
+                    ),
+                ),
+                (
+                    "function",
+                    models.ForeignKey(
+                        to="models.Function",
+                        db_column="functionid",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
+                (
+                    "graph",
+                    models.ForeignKey(
+                        to="models.GraphModel",
+                        db_column="graphid",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
                 ("config", JSONField(blank=True, null=True, db_column="config")),
             ],
-            options={"db_table": "functions_x_graphs", "managed": True,},
+            options={
+                "db_table": "functions_x_graphs",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="Icon",
@@ -368,12 +559,20 @@ class Migration(migrations.Migration):
                 ("name", models.TextField(blank=True, null=True)),
                 ("cssclass", models.TextField(blank=True, null=True)),
             ],
-            options={"db_table": "icons", "managed": True,},
+            options={
+                "db_table": "icons",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="Node",
             fields=[
-                ("nodeid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "nodeid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("name", models.TextField()),
                 ("description", models.TextField(blank=True, null=True)),
                 ("istopnode", models.BooleanField()),
@@ -381,22 +580,40 @@ class Migration(migrations.Migration):
                 ("datatype", models.TextField()),
                 (
                     "graph",
-                    models.ForeignKey(blank=False, db_column="graphid", null=False, to="models.GraphModel", on_delete=models.CASCADE),
+                    models.ForeignKey(
+                        blank=False,
+                        db_column="graphid",
+                        null=False,
+                        to="models.GraphModel",
+                        on_delete=models.CASCADE,
+                    ),
                 ),
                 ("config", JSONField(blank=True, db_column="config", null=True)),
             ],
-            options={"db_table": "nodes", "managed": True,},
+            options={
+                "db_table": "nodes",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="NodeGroup",
             fields=[
-                ("nodegroupid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "nodegroupid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("legacygroupid", models.TextField(blank=True, null=True)),
                 ("cardinality", models.TextField(blank=True, default="1")),
                 (
                     "parentnodegroup",
                     models.ForeignKey(
-                        blank=True, db_column="parentnodegroupid", null=True, to="models.NodeGroup", on_delete=models.CASCADE
+                        blank=True,
+                        db_column="parentnodegroupid",
+                        null=True,
+                        to="models.NodeGroup",
+                        on_delete=models.CASCADE,
                     ),
                 ),
             ],
@@ -431,72 +648,146 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"db_table": "ontologies", "managed": True,},
+            options={
+                "db_table": "ontologies",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="OntologyClass",
             fields=[
-                ("ontologyclassid", models.UUIDField(default=uuid.uuid1, primary_key=True)),
+                (
+                    "ontologyclassid",
+                    models.UUIDField(default=uuid.uuid1, primary_key=True),
+                ),
                 ("source", models.TextField()),
                 ("target", JSONField(null=True)),
                 (
                     "ontology",
                     models.ForeignKey(
-                        to="models.Ontology", db_column="ontologyid", related_name="ontologyclasses", on_delete=models.CASCADE
+                        to="models.Ontology",
+                        db_column="ontologyid",
+                        related_name="ontologyclasses",
+                        on_delete=models.CASCADE,
                     ),
                 ),
             ],
-            options={"db_table": "ontologyclasses", "managed": True,},
+            options={
+                "db_table": "ontologyclasses",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="Relation",
             fields=[
-                ("relationid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "relationid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 (
                     "conceptfrom",
                     models.ForeignKey(
-                        db_column="conceptidfrom", related_name="relation_concepts_from", to="models.Concept", on_delete=models.CASCADE
+                        db_column="conceptidfrom",
+                        related_name="relation_concepts_from",
+                        to="models.Concept",
+                        on_delete=models.CASCADE,
                     ),
                 ),
                 (
                     "conceptto",
                     models.ForeignKey(
-                        db_column="conceptidto", related_name="relation_concepts_to", to="models.Concept", on_delete=models.CASCADE
+                        db_column="conceptidto",
+                        related_name="relation_concepts_to",
+                        to="models.Concept",
+                        on_delete=models.CASCADE,
                     ),
                 ),
-                ("relationtype", models.ForeignKey(db_column="relationtype", to="models.DRelationType", on_delete=models.CASCADE)),
+                (
+                    "relationtype",
+                    models.ForeignKey(
+                        db_column="relationtype",
+                        to="models.DRelationType",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
             ],
-            options={"db_table": "relations", "managed": True,},
+            options={
+                "db_table": "relations",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="ReportTemplate",
             fields=[
-                ("templateid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "templateid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("name", models.TextField(null=True, blank=True)),
                 ("description", models.TextField(null=True, blank=True)),
                 ("component", models.TextField()),
                 ("componentname", models.TextField()),
-                ("defaultconfig", JSONField(blank=True, db_column="defaultconfig", null=True)),
+                (
+                    "defaultconfig",
+                    JSONField(blank=True, db_column="defaultconfig", null=True),
+                ),
             ],
-            options={"db_table": "report_templates", "managed": True,},
+            options={
+                "db_table": "report_templates",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="Report",
             fields=[
-                ("reportid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "reportid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("name", models.TextField(null=True, blank=True)),
-                ("template", models.ForeignKey(db_column="templateid", to="models.ReportTemplate", on_delete=models.CASCADE)),
-                ("graph", models.ForeignKey(db_column="graphid", to="models.GraphModel", on_delete=models.CASCADE)),
+                (
+                    "template",
+                    models.ForeignKey(
+                        db_column="templateid",
+                        to="models.ReportTemplate",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
+                (
+                    "graph",
+                    models.ForeignKey(
+                        db_column="graphid",
+                        to="models.GraphModel",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
                 ("config", JSONField(blank=True, db_column="config", null=True)),
-                ("formsconfig", JSONField(blank=True, db_column="formsconfig", null=True)),
+                (
+                    "formsconfig",
+                    JSONField(blank=True, db_column="formsconfig", null=True),
+                ),
                 ("active", models.BooleanField(default=False)),
             ],
-            options={"db_table": "reports", "managed": True,},
+            options={
+                "db_table": "reports",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="Resource2ResourceConstraint",
             fields=[
-                ("resource2resourceid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "resource2resourceid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 (
                     "resourceclassfrom",
                     models.ForeignKey(
@@ -520,93 +811,205 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"db_table": "resource_2_resource_constraints", "managed": True,},
+            options={
+                "db_table": "resource_2_resource_constraints",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="ResourceInstance",
             fields=[
-                ("resourceinstanceid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "resourceinstanceid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("legacyid", models.TextField(blank=True, unique=True, null=True)),
-                ("graph", models.ForeignKey(db_column="graphid", to="models.GraphModel", on_delete=models.CASCADE)),
+                (
+                    "graph",
+                    models.ForeignKey(
+                        db_column="graphid",
+                        to="models.GraphModel",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
                 ("createdtime", models.DateTimeField(auto_now_add=True)),
             ],
-            options={"db_table": "resource_instances", "managed": True,},
+            options={
+                "db_table": "resource_instances",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="ResourceXResource",
             fields=[
-                ("resourcexid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "resourcexid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("notes", models.TextField(blank=True, null=True)),
                 ("datestarted", models.DateField(blank=True, null=True)),
                 ("dateended", models.DateField(blank=True, null=True)),
             ],
-            options={"db_table": "resource_x_resource", "managed": True,},
+            options={
+                "db_table": "resource_x_resource",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="TileModel",
             fields=[
-                ("tileid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "tileid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("data", JSONField(blank=True, db_column="tiledata", null=True)),
-                ("nodegroup", models.ForeignKey(db_column="nodegroupid", to="models.NodeGroup", on_delete=models.CASCADE)),
+                (
+                    "nodegroup",
+                    models.ForeignKey(
+                        db_column="nodegroupid",
+                        to="models.NodeGroup",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
                 (
                     "parenttile",
-                    models.ForeignKey(blank=True, db_column="parenttileid", null=True, to="models.TileModel", on_delete=models.CASCADE),
+                    models.ForeignKey(
+                        blank=True,
+                        db_column="parenttileid",
+                        null=True,
+                        to="models.TileModel",
+                        on_delete=models.CASCADE,
+                    ),
                 ),
                 (
                     "resourceinstance",
-                    models.ForeignKey(db_column="resourceinstanceid", to="models.ResourceInstance", on_delete=models.CASCADE),
+                    models.ForeignKey(
+                        db_column="resourceinstanceid",
+                        to="models.ResourceInstance",
+                        on_delete=models.CASCADE,
+                    ),
                 ),
                 ("sortorder", models.IntegerField(blank=True, null=True, default=0)),
             ],
-            options={"db_table": "tiles", "managed": True,},
+            options={
+                "db_table": "tiles",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="Value",
             fields=[
-                ("valueid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "valueid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("value", models.TextField()),
-                ("concept", models.ForeignKey(db_column="conceptid", to="models.Concept", on_delete=models.CASCADE)),
+                (
+                    "concept",
+                    models.ForeignKey(
+                        db_column="conceptid",
+                        to="models.Concept",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
                 (
                     "language",
-                    models.ForeignKey(blank=True, db_column="languageid", null=True, to="models.DLanguage", on_delete=models.CASCADE),
+                    models.ForeignKey(
+                        blank=True,
+                        db_column="languageid",
+                        null=True,
+                        to="models.DLanguage",
+                        on_delete=models.CASCADE,
+                    ),
                 ),
-                ("valuetype", models.ForeignKey(db_column="valuetype", to="models.DValueType", on_delete=models.CASCADE)),
+                (
+                    "valuetype",
+                    models.ForeignKey(
+                        db_column="valuetype",
+                        to="models.DValueType",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
             ],
-            options={"db_table": "values", "managed": True,},
+            options={
+                "db_table": "values",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="Widget",
             fields=[
-                ("widgetid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "widgetid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("name", models.TextField()),
                 ("component", models.TextField()),
-                ("defaultconfig", JSONField(blank=True, db_column="defaultconfig", null=True)),
+                (
+                    "defaultconfig",
+                    JSONField(blank=True, db_column="defaultconfig", null=True),
+                ),
                 ("helptext", models.TextField(blank=True, null=True)),
                 ("datatype", models.TextField()),
             ],
-            options={"db_table": "widgets", "managed": True,},
+            options={
+                "db_table": "widgets",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="MapLayer",
             fields=[
-                ("maplayerid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "maplayerid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("name", models.TextField(unique=True)),
-                ("layerdefinitions", JSONField(blank=True, db_column="layerdefinitions", null=True)),
+                (
+                    "layerdefinitions",
+                    JSONField(blank=True, db_column="layerdefinitions", null=True),
+                ),
                 ("isoverlay", models.BooleanField(default=False)),
                 ("icon", models.TextField(default=None)),
                 ("activated", models.BooleanField(default=True)),
                 ("addtomap", models.BooleanField(default=False)),
             ],
-            options={"db_table": "map_layers", "managed": True,},
+            options={
+                "db_table": "map_layers",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="MapSource",
             fields=[
-                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("name", models.TextField(unique=True)),
                 ("source", JSONField(blank=True, db_column="source", null=True)),
             ],
-            options={"db_table": "map_sources", "managed": True,},
+            options={
+                "db_table": "map_sources",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="TileserverLayer",
@@ -614,29 +1017,70 @@ class Migration(migrations.Migration):
                 ("name", models.TextField(unique=True)),
                 ("path", models.TextField()),
                 ("config", JSONField(db_column="config")),
-                ("map_layer", models.ForeignKey(db_column="map_layerid", to="models.MapLayer", on_delete=models.CASCADE)),
-                ("map_source", models.ForeignKey(db_column="map_sourceid", to="models.MapSource", on_delete=models.CASCADE)),
+                (
+                    "map_layer",
+                    models.ForeignKey(
+                        db_column="map_layerid",
+                        to="models.MapLayer",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
+                (
+                    "map_source",
+                    models.ForeignKey(
+                        db_column="map_sourceid",
+                        to="models.MapSource",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
             ],
-            options={"db_table": "tileserver_layers", "managed": True,},
+            options={
+                "db_table": "tileserver_layers",
+                "managed": True,
+            },
         ),
         migrations.CreateModel(
             name="GraphXMapping",
             fields=[
-                ("id", models.UUIDField(primary_key=True, default=uuid.uuid1, serialize=False)),
-                ("graph", models.ForeignKey(to="models.GraphModel", db_column="graphid", on_delete=models.CASCADE)),
+                (
+                    "id",
+                    models.UUIDField(
+                        primary_key=True, default=uuid.uuid1, serialize=False
+                    ),
+                ),
+                (
+                    "graph",
+                    models.ForeignKey(
+                        to="models.GraphModel",
+                        db_column="graphid",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
                 ("mapping", JSONField(blank=True, db_column="mapping")),
             ],
-            options={"db_table": "graphs_x_mapping_file", "managed": True,},
+            options={
+                "db_table": "graphs_x_mapping_file",
+                "managed": True,
+            },
         ),
         migrations.AddField(
             model_name="ddatatype",
             name="defaultwidget",
-            field=models.ForeignKey(db_column="defaultwidget", to="models.Widget", null=True, on_delete=models.SET_NULL),
+            field=models.ForeignKey(
+                db_column="defaultwidget",
+                to="models.Widget",
+                null=True,
+                on_delete=models.SET_NULL,
+            ),
         ),
         migrations.AddField(
             model_name="resourcexresource",
             name="relationshiptype",
-            field=models.ForeignKey(db_column="relationshiptype", to="models.Value", on_delete=models.CASCADE),
+            field=models.ForeignKey(
+                db_column="relationshiptype",
+                to="models.Value",
+                on_delete=models.CASCADE,
+            ),
         ),
         migrations.AddField(
             model_name="resourcexresource",
@@ -665,65 +1109,120 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="node",
             name="nodegroup",
-            field=models.ForeignKey(blank=True, db_column="nodegroupid", null=True, to="models.NodeGroup", on_delete=models.CASCADE),
+            field=models.ForeignKey(
+                blank=True,
+                db_column="nodegroupid",
+                null=True,
+                to="models.NodeGroup",
+                on_delete=models.CASCADE,
+            ),
         ),
         migrations.AddField(
             model_name="edge",
             name="domainnode",
-            field=models.ForeignKey(db_column="domainnodeid", related_name="edge_domains", to="models.Node", on_delete=models.CASCADE),
+            field=models.ForeignKey(
+                db_column="domainnodeid",
+                related_name="edge_domains",
+                to="models.Node",
+                on_delete=models.CASCADE,
+            ),
         ),
         migrations.AddField(
             model_name="edge",
             name="rangenode",
-            field=models.ForeignKey(db_column="rangenodeid", related_name="edge_ranges", to="models.Node", on_delete=models.CASCADE),
+            field=models.ForeignKey(
+                db_column="rangenodeid",
+                related_name="edge_ranges",
+                to="models.Node",
+                on_delete=models.CASCADE,
+            ),
         ),
         migrations.AddField(
             model_name="concept",
             name="nodetype",
-            field=models.ForeignKey(db_column="nodetype", to="models.DNodeType", on_delete=models.CASCADE),
+            field=models.ForeignKey(
+                db_column="nodetype", to="models.DNodeType", on_delete=models.CASCADE
+            ),
         ),
         migrations.AddField(
             model_name="cardxnodexwidget",
             name="node",
-            field=models.ForeignKey(db_column="nodeid", to="models.Node", on_delete=models.CASCADE),
+            field=models.ForeignKey(
+                db_column="nodeid", to="models.Node", on_delete=models.CASCADE
+            ),
         ),
         migrations.AddField(
             model_name="cardxnodexwidget",
             name="widget",
-            field=models.ForeignKey(db_column="widgetid", to="models.Widget", on_delete=models.CASCADE),
+            field=models.ForeignKey(
+                db_column="widgetid", to="models.Widget", on_delete=models.CASCADE
+            ),
         ),
         migrations.AddField(
             model_name="cardmodel",
             name="nodegroup",
-            field=models.ForeignKey(db_column="nodegroupid", to="models.NodeGroup", on_delete=models.CASCADE),
+            field=models.ForeignKey(
+                db_column="nodegroupid", to="models.NodeGroup", on_delete=models.CASCADE
+            ),
         ),
         migrations.AddField(
             model_name="cardmodel",
             name="graph",
-            field=models.ForeignKey(db_column="graphid", to="models.GraphModel", on_delete=models.CASCADE),
+            field=models.ForeignKey(
+                db_column="graphid", to="models.GraphModel", on_delete=models.CASCADE
+            ),
         ),
         migrations.AddField(
             model_name="form",
             name="graph",
             field=models.ForeignKey(
-                to="models.GraphModel", db_column="graphid", related_name="forms", null=False, blank=False, on_delete=models.CASCADE
+                to="models.GraphModel",
+                db_column="graphid",
+                related_name="forms",
+                null=False,
+                blank=False,
+                on_delete=models.CASCADE,
             ),
         ),
         migrations.AddField(
-            model_name="graphmodel", name="functions", field=models.ManyToManyField(to="models.Function", through="FunctionXGraph"),
+            model_name="graphmodel",
+            name="functions",
+            field=models.ManyToManyField(
+                to="models.Function", through="FunctionXGraph"
+            ),
         ),
         migrations.AddField(
             model_name="graphmodel",
             name="ontology",
             field=models.ForeignKey(
-                to="models.Ontology", db_column="ontologyid", related_name="graphs", null=True, blank=True, on_delete=models.SET_NULL
+                to="models.Ontology",
+                db_column="ontologyid",
+                related_name="graphs",
+                null=True,
+                blank=True,
+                on_delete=models.SET_NULL,
             ),
         ),
-        migrations.AlterUniqueTogether(name="edge", unique_together={("rangenode", "domainnode")},),
-        migrations.AlterUniqueTogether(name="cardxnodexwidget", unique_together={("node", "card", "widget")},),
-        migrations.AlterUniqueTogether(name="ontologyclass", unique_together={("source", "ontology")},),
-        migrations.AlterUniqueTogether(name="relation", unique_together={("conceptfrom", "conceptto", "relationtype")},),
-        migrations.AlterUniqueTogether(name="functionxgraph", unique_together={("function", "graph")},),
+        migrations.AlterUniqueTogether(
+            name="edge",
+            unique_together={("rangenode", "domainnode")},
+        ),
+        migrations.AlterUniqueTogether(
+            name="cardxnodexwidget",
+            unique_together={("node", "card", "widget")},
+        ),
+        migrations.AlterUniqueTogether(
+            name="ontologyclass",
+            unique_together={("source", "ontology")},
+        ),
+        migrations.AlterUniqueTogether(
+            name="relation",
+            unique_together={("conceptfrom", "conceptto", "relationtype")},
+        ),
+        migrations.AlterUniqueTogether(
+            name="functionxgraph",
+            unique_together={("function", "graph")},
+        ),
         CreateAutoPopulateUUIDField("graphs", ["graphid"]),
         CreateAutoPopulateUUIDField("cards", ["cardid"]),
         CreateAutoPopulateUUIDField("concepts", ["conceptid"]),
@@ -733,7 +1232,9 @@ class Migration(migrations.Migration):
         CreateAutoPopulateUUIDField("node_groups", ["nodegroupid"]),
         CreateAutoPopulateUUIDField("nodes", ["nodeid"]),
         CreateAutoPopulateUUIDField("relations", ["relationid"]),
-        CreateAutoPopulateUUIDField("resource_2_resource_constraints", ["resource2resourceid"]),
+        CreateAutoPopulateUUIDField(
+            "resource_2_resource_constraints", ["resource2resourceid"]
+        ),
         CreateAutoPopulateUUIDField("resource_instances", ["resourceinstanceid"]),
         CreateAutoPopulateUUIDField("tiles", ["tileid"]),
         CreateAutoPopulateUUIDField("values", ["valueid"]),
@@ -744,7 +1245,14 @@ class Migration(migrations.Migration):
                 REFERENCES public.d_data_types (datatype) MATCH SIMPLE
                 """
         ),
-        migrations.RunSQL(get_sql_string_from_file(os.path.join(settings.ROOT_DIR, "db", "dml", "db_data.sql")), ""),
+        migrations.RunSQL(
+            get_sql_string_from_file(
+                os.path.join(settings.ROOT_DIR, "db", "dml", "db_data.sql")
+            ),
+            "",
+        ),
         migrations.RunPython(forwards_func, reverse_func),
-        migrations.RunPython(make_permissions, reverse_code=lambda *args, **kwargs: True),
+        migrations.RunPython(
+            make_permissions, reverse_code=lambda *args, **kwargs: True
+        ),
     ]

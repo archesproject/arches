@@ -33,11 +33,32 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("operation", nargs="?")
 
-        parser.add_argument("-d", "--dest", action="store", dest="dest", default="", help="The destination directory of the output")
+        parser.add_argument(
+            "-d",
+            "--dest",
+            action="store",
+            dest="dest",
+            default="",
+            help="The destination directory of the output",
+        )
 
-        parser.add_argument("-t", "--table", action="store", dest="table", default="", help="The table to be exported")
+        parser.add_argument(
+            "-t",
+            "--table",
+            action="store",
+            dest="table",
+            default="",
+            help="The table to be exported",
+        )
 
-        parser.add_argument("-n", "--name", action="store", dest="name", default="", help="The name of destination file")
+        parser.add_argument(
+            "-n",
+            "--name",
+            action="store",
+            dest="name",
+            default="",
+            help="The name of destination file",
+        )
 
     def handle(self, *args, **options):
         if options["operation"] == "shp":
@@ -58,16 +79,32 @@ class Command(BaseCommand):
                 if len(row) > 0:
                     os.mkdir(dest)
                     for geom_type, st_type in geometry_types.items():
-                        cursor.execute("SELECT count(*) FROM {0} WHERE geom_type IN ({1})".format(table, ",".join(st_type)))
+                        cursor.execute(
+                            "SELECT count(*) FROM {0} WHERE geom_type IN ({1})".format(
+                                table, ",".join(st_type)
+                            )
+                        )
                         if cursor.fetchone()[0] > 0:
-                            cmd = "pgsql2shp -f {0}/{1} -P {2} -u {3} -g geom {4}".format(
-                                dest, geom_type, db["PASSWORD"], db["USER"], db["NAME"]
+                            cmd = (
+                                "pgsql2shp -f {0}/{1} -P {2} -u {3} -g geom {4}".format(
+                                    dest,
+                                    geom_type,
+                                    db["PASSWORD"],
+                                    db["USER"],
+                                    db["NAME"],
+                                )
                             )
                             cmd_process = cmd.split()
-                            sql = "select * from {0} where geom_type in ({1});".format(table, ",".join(st_type))
+                            sql = "select * from {0} where geom_type in ({1});".format(
+                                table, ",".join(st_type)
+                            )
                             cmd_process.append(sql)
                             subprocess.call(cmd_process)
                 else:
                     print("No records in table for export")
         else:
-            print("Cannot export data. Destination directory, {0} already exists".format(dest))
+            print(
+                "Cannot export data. Destination directory, {0} already exists".format(
+                    dest
+                )
+            )
