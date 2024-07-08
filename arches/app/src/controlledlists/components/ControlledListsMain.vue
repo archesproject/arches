@@ -6,7 +6,7 @@ import ProgressSpinner from "primevue/progressspinner";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 
-import { LIGHT_GRAY } from "@/theme.ts";
+import { LIGHT_GRAY } from "@/arches/theme.ts";
 import {
     displayedRowKey,
     selectedLanguageKey,
@@ -19,7 +19,7 @@ import ListHeader from "@/controlledlists/components/misc/ListHeader.vue";
 import ListTree from "@/controlledlists/components/tree/ListTree.vue";
 
 import type { Ref } from "vue";
-import type { Language } from "@/types";
+import type { Language } from "@/arches/types";
 import type { Selectable } from "@/controlledlists/types";
 
 const splash = "splash";

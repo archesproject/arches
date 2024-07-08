@@ -16,7 +16,7 @@ import TreeRow from "@/controlledlists/components/tree/TreeRow.vue";
 import type { ComponentPublicInstance, Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
-import type { Language } from "@/types";
+import type { Language } from "@/arches/types";
 import type {
     DisplayedRowRefAndSetter,
     NewControlledList,

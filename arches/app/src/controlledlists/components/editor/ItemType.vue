@@ -5,7 +5,7 @@ import { useGettext } from "vue3-gettext";
 import InputSwitch from "primevue/inputswitch";
 import { useToast } from "primevue/usetoast";
 
-import { ARCHES_CHROME_BLUE } from "@/theme.ts";
+import { ARCHES_CHROME_BLUE } from "@/arches/theme.ts";
 import { patchItem } from "@/controlledlists/api.ts";
 import {
     DEFAULT_ERROR_TOAST_LIFE,

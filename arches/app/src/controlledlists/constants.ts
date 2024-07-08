@@ -1,5 +1,5 @@
 import type { InjectionKey } from "vue";
-import type { Language } from "@/types";
+import type { Language } from "@/arches/types";
 import type {
     ControlledList,
     ControlledListItem,
