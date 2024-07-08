@@ -2176,8 +2176,8 @@ class SpatialView(models.Model):
 
         # language must be be a valid language code belonging to the current publication
         published_graphs = graph.publication.publishedgraph_set.all()
-        if self.language not in [
-            published_graph.language for published_graph in published_graphs
+        if self.language_id not in [
+            published_graph.language_id for published_graph in published_graphs
         ]:
             raise ValidationError(
                 "Language must belong to a published graph for the graph of the geometry node"
