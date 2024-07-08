@@ -791,6 +791,18 @@ class SearchTests(ArchesTestCase):
         # 13 req'd components + core-search component
         self.assertEqual(len(search_components), 14)
 
+    def test_searchview_core_component_from_anonymous(self):
+        request = HttpRequest()
+        request.method = "GET"
+        request.user = User.objects.get(username="anonymous")
+        search_component_factory = SearchFilterFactory(request)
+        core_search_instance = search_component_factory.get_core_component_instance()
+        self.assertTrue(core_search_instance is not None)
+
+        search_components = core_search_instance.get_search_components()
+        # 13 req'd components + core-search component
+        self.assertEqual(len(search_components), 14)
+
 
 def extract_pks(response_json):
     return [
