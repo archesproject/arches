@@ -2315,7 +2315,7 @@ class SpatialView(APIBase):
             spatialview = validate_json_data_content_result
 
             try:
-                spatialview.clean()
+                spatialview.full_clean()
                 spatialview.save()
             except ValidationError as e:
                 return JSONErrorResponse(
@@ -2361,7 +2361,7 @@ class SpatialView(APIBase):
             spatialview = validate_json_data_content_result
 
             try:
-                spatialview.clean()
+                spatialview.full_clean()
                 spatialview.save()
             except ValidationError as e:
                 return JSONErrorResponse(

@@ -90,6 +90,7 @@ class SpatialViewApiTest(TransactionTestCase):
         # create a spatialview with objects to test triggers
         self.spatialview_slug = "spatialviews_test"
         self.test_spatial_view = self.generate_valid_spatiatview()
+        self.test_spatial_view.full_clean()
         self.test_spatial_view.save()
         self.spatialview_id = self.test_spatial_view.spatialviewid
 
