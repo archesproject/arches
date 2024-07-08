@@ -11,9 +11,8 @@ from arches.app.utils.permission_backend import (
     user_is_resource_exporter,
 )
 from arches.app.utils.response import JSONErrorResponse
-from arches.app.utils.string_utils import str_to_bool
+from arches.app.utils.string_utils import get_str_kwarg_as_bool
 from datetime import datetime
-import json
 import logging
 
 
@@ -117,14 +116,12 @@ class ArchesCoreSearch(BaseCoreSearch):
         search_query_object["query"].include("displaydescription")
         search_query_object["query"].include("map_popup")
         search_query_object["query"].include("provisional_resource")
-        load_tiles = self.request.GET.get("tiles", False)
-        if not isinstance(load_tiles, bool):
-            load_tiles = str_to_bool(load_tiles)
+        load_tiles = get_str_kwarg_as_bool("tiles", self.request.GET)
         if load_tiles:
             search_query_object["query"].include("tiles")
 
     def execute_query(self, search_query_object, response_object):
-        for_export = self.request.GET.get("export", None)
+        for_export = get_str_kwarg_as_bool("export", self.request.GET)
         pages = self.request.GET.get("pages", None)
         total = int(self.request.GET.get("total", "0"))
         resourceinstanceid = self.request.GET.get("id", None)
