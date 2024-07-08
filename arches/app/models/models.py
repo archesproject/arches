@@ -2150,7 +2150,7 @@ class SpatialView(models.Model):
     language = models.ForeignKey(
         Language, db_column="languageid", to_field="code", on_delete=models.CASCADE
     )
-    attributenodes = JSONField(blank=True, null=True, db_column="attributenodes")
+    attributenodes = JSONField(blank=False, null=False, db_column="attributenodes")
     isactive = models.BooleanField(
         default=True
     )  # the view is not created in the DB until set to active.
@@ -2174,18 +2174,11 @@ class SpatialView(models.Model):
                 )
             else:
                 graph = self.geometrynode.graph
-                if not self.attributenodes or len(self.attributenodes) == 0:
-                    raise ValidationError(
-                        "Attribute nodes must have at least one entry"
-                    )
-                else:
-                    for node in self.attributenodes:
-                        if not Node.objects.filter(
-                            pk=node["nodeid"], graph=graph
-                        ).exists():
-                            raise ValidationError(
-                                f"Attribute nodes must belong to the same graph as the geometry node (error nodeid:{str(node.id)})"
-                            )
+                for node in self.attributenodes:
+                    if not Node.objects.filter(pk=node["nodeid"], graph=graph).exists():
+                        raise ValidationError(
+                            f"Attribute nodes must belong to the same graph as the geometry node (error nodeid:{str(node.id)})"
+                        )
 
                 # language must be be a valid language code beloging to the current publication
                 published_graphs = PublishedGraph.objects.filter(
