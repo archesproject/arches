@@ -2183,12 +2183,6 @@ class SpatialView(models.Model):
                 "Language must belong to a published graph for the graph of the geometry node"
             )
 
-        # validate the slug
-        if not re.match(r"^[a-zA-Z_]([a-zA-Z0-9_]+)$", self.slug):
-            raise ValidationError(
-                "Slug must contain only letters, numbers and hyphens, but not begin with a number."
-            )
-
         # validate the schema is a valid schema in the database
         with connection.cursor() as cursor:
             cursor.execute(
