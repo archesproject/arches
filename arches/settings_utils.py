@@ -44,7 +44,6 @@ def build_staticfiles_dirs(
             )[0]
             directories.append(os.path.join(application_origin, "media"))
 
-    directories.append(os.path.join(root_dir, "app", "media", "build"))
     directories.append(os.path.join(root_dir, "app", "media"))
 
     return tuple(directories)
