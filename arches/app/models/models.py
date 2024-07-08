@@ -2148,7 +2148,7 @@ class SpatialView(models.Model):
     )
     ismixedgeometrytypes = models.BooleanField(default=False)
     language = models.ForeignKey(
-        Language, db_column="languageid", to_field="code", on_delete=models.CASCADE
+        Language, db_column="languageid", to_field="code", on_delete=models.PROTECT
     )
     attributenodes = JSONField(blank=False, null=False, db_column="attributenodes")
     isactive = models.BooleanField(
