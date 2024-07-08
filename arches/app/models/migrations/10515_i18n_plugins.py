@@ -39,14 +39,20 @@ class Migration(migrations.Migration):
             model_name="plugin",
             name="config",
             field=arches.app.models.fields.i18n.I18n_JSONField(
-                blank=True, db_column="config", encoder=arches.app.utils.betterJSONSerializer.JSONSerializer, null=True
+                blank=True,
+                db_column="config",
+                encoder=arches.app.utils.betterJSONSerializer.JSONSerializer,
+                null=True,
             ),
         ),
         migrations.AlterField(
             model_name="plugin",
             name="name",
             field=arches.app.models.fields.i18n.I18n_TextField(
-                blank=True, default="", encoder=arches.app.utils.betterJSONSerializer.JSONSerializer, null=True
+                blank=True,
+                default="",
+                encoder=arches.app.utils.betterJSONSerializer.JSONSerializer,
+                null=True,
             ),
         ),
     ]

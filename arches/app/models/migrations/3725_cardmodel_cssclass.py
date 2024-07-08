@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '3724_report_manager_2'),
+        ("models", "3724_report_manager_2"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='cardmodel',
-            name='cssclass',
+            model_name="cardmodel",
+            name="cssclass",
             field=models.TextField(blank=True, null=True),
         ),
     ]

@@ -18,11 +18,18 @@ def forwards_func(apps, schema_editor):
     # if we directly import it, it'll be the wrong version
 
     # index base Arches concept
-    arches_concept = Concept().get(id="00000000-0000-0000-0000-000000000001", include=["label"])
+    arches_concept = Concept().get(
+        id="00000000-0000-0000-0000-000000000001", include=["label"]
+    )
     arches_concept.index()
 
     DValueType = apps.get_model("models", "DValueType")
-    DValueType.objects.create(valuetype="identifier", category="identifiers", namespace="dcterms", datatype="text")
+    DValueType.objects.create(
+        valuetype="identifier",
+        category="identifiers",
+        namespace="dcterms",
+        datatype="text",
+    )
 
 
 def reverse_func(apps, schema_editor):
@@ -41,7 +48,9 @@ def reverse_func(apps, schema_editor):
     # remove index for base Arches concept
     se = SearchEngineFactory().create()
     query = Query(se, start=0, limit=10000)
-    query.add_query(Term(field="conceptid", term="00000000-0000-0000-0000-000000000001"))
+    query.add_query(
+        Term(field="conceptid", term="00000000-0000-0000-0000-000000000001")
+    )
     query.delete(index=CONCEPTS_INDEX)
 
     try:

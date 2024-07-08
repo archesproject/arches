@@ -51,10 +51,19 @@ class Command(BaseCommand):
             default="",
             help="Destination (directory and filename) where template should be saved. e.g. ~/Documents/mytemplate.xlsx",
         )
-        parser.add_argument("-g", "--graph", action="store", dest="graph", default="", help="Graphid for your template")
+        parser.add_argument(
+            "-g",
+            "--graph",
+            action="store",
+            dest="graph",
+            default="",
+            help="Graphid for your template",
+        )
 
     def handle(self, *args, **options):
-        self.create_template(template=options["template"], dest=options["dest"], graphid=options["graph"])
+        self.create_template(
+            template=options["template"], dest=options["dest"], graphid=options["graph"]
+        )
 
     def create_branchcsv_template(self, dest, graphid):
         wb = create_workbook(graphid)
@@ -94,9 +103,20 @@ def style_header(length, width, sheet):
 
 def create_workbook(graphid, tiledata=None) -> Workbook:
     wb = Workbook()
-    columns = ("root_nodegroupid", "nodegroupid", "parent_nodegroupid", "alias", "name", "depth", "path", "cardinality")
+    columns = (
+        "root_nodegroupid",
+        "nodegroupid",
+        "parent_nodegroupid",
+        "alias",
+        "name",
+        "depth",
+        "path",
+        "cardinality",
+    )
     with connection.cursor() as cursor:
-        cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
+        cursor.execute(
+            """SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,)
+        )
         rows = cursor.fetchall()
         first_sheet = True
         metadata = {"nodes": [], "graphid": graphid}
@@ -104,7 +124,11 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
         for row in rows:
             details = dict(zip(columns, row))
             tab = "    " * details["depth"]
-            nodes = Node.objects.filter(nodegroup_id=details["nodegroupid"]).exclude(datatype="semantic").values("datatype", "alias")
+            nodes = (
+                Node.objects.filter(nodegroup_id=details["nodegroupid"])
+                .exclude(datatype="semantic")
+                .values("datatype", "alias")
+            )
             metadata["nodes"] += nodes
             if details["depth"] == 0:
                 column_length = 0
@@ -127,7 +151,9 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
                 row_number += 1
                 sheet[f"A{row_number}"] = "--"
                 sheet[f"B{row_number}"] = "--"
-                sheet[f"C{row_number}"] = f'{tab}{details["alias"]}  ({details["cardinality"]})'
+                sheet[f"C{row_number}"] = (
+                    f'{tab}{details["alias"]}  ({details["cardinality"]})'
+                )
                 for i, node in enumerate(nodes):
                     sheet.cell(column=i + 4, row=row_number, value=f"{node['alias']}")
             column_length = len(nodes) if len(nodes) > column_length else column_length
@@ -142,18 +168,29 @@ def create_workbook(graphid, tiledata=None) -> Workbook:
                     sheet[f"A{row_number}"] = str(tile["resourceinstanceid"])
                     sheet[f"B{row_number}"] = str(tile["tileid"])
                     sheet[f"C{row_number}"] = f'{tab}{tile["alias"]}'
-                    nodes = Node.objects.filter(nodegroup_id=tile["nodegroupid"]).exclude(datatype="semantic").values("alias")
+                    nodes = (
+                        Node.objects.filter(nodegroup_id=tile["nodegroupid"])
+                        .exclude(datatype="semantic")
+                        .values("alias")
+                    )
                     for i, node in enumerate(nodes):
-                        if tile[node['alias']] is not None:
-                            sheet.cell(column=i + 4, row=row_number, value=f"{tile[node['alias']]}")
+                        if tile[node["alias"]] is not None:
+                            sheet.cell(
+                                column=i + 4,
+                                row=row_number,
+                                value=f"{tile[node['alias']]}",
+                            )
 
         write_metadata(wb, metadata)
         return wb
 
+
 def create_tile_excel_workbook(graphid, tiledata=None):
     wb = Workbook()
     with connection.cursor() as cursor:
-        cursor.execute("""SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,))
+        cursor.execute(
+            """SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,)
+        )
         rows = dictfetchall(cursor)
         first_sheet = True
         for row in rows:
@@ -167,12 +204,16 @@ def create_tile_excel_workbook(graphid, tiledata=None):
             sheet[f"A1"] = "tileid"
             sheet[f"B1"] = "parenttile_id"
             sheet[f"C1"] = "resourceinstance_id"
-            nodes = Node.objects.filter(nodegroup_id=row["nodegroupid"]).exclude(datatype="semantic").values("datatype", "alias")
+            nodes = (
+                Node.objects.filter(nodegroup_id=row["nodegroupid"])
+                .exclude(datatype="semantic")
+                .values("datatype", "alias")
+            )
             for i, node in enumerate(nodes):
                 sheet.cell(column=i + 4, row=1, value=node["alias"])
-                sheet.cell(column=i+5, row=1, value="sortorder")
-                sheet.cell(column=i+6, row=1, value="provisionaledits")
-                sheet.cell(column=i+7, row=1, value="nodegroup_id")
+                sheet.cell(column=i + 5, row=1, value="sortorder")
+                sheet.cell(column=i + 6, row=1, value="provisionaledits")
+                sheet.cell(column=i + 7, row=1, value="nodegroup_id")
 
         if tiledata is not None:
             for card_name, tiles in tiledata.items():
@@ -182,12 +223,26 @@ def create_tile_excel_workbook(graphid, tiledata=None):
                     sheet[f"A{row_number}"] = str(tile["tileid"])
                     sheet[f"B{row_number}"] = str(tile["parenttileid"])
                     sheet[f"C{row_number}"] = str(tile["resourceinstanceid"])
-                    nodes = Node.objects.filter(nodegroup_id=tile["nodegroupid"]).exclude(datatype="semantic").values("alias")
+                    nodes = (
+                        Node.objects.filter(nodegroup_id=tile["nodegroupid"])
+                        .exclude(datatype="semantic")
+                        .values("alias")
+                    )
                     for i, node in enumerate(nodes):
-                        if tile[node['alias']] is not None:
-                            sheet.cell(column=i + 4, row=row_number, value=f"{tile[node['alias']]}")
-                        sheet.cell(column=i+5, row=row_number, value=tile["sortorder"])
-                        sheet.cell(column=i+6, row=row_number, value=tile["provisionaledits"])
-                        sheet.cell(column=i+7, row=row_number, value=str(tile["nodegroupid"]))
+                        if tile[node["alias"]] is not None:
+                            sheet.cell(
+                                column=i + 4,
+                                row=row_number,
+                                value=f"{tile[node['alias']]}",
+                            )
+                        sheet.cell(
+                            column=i + 5, row=row_number, value=tile["sortorder"]
+                        )
+                        sheet.cell(
+                            column=i + 6, row=row_number, value=tile["provisionaledits"]
+                        )
+                        sheet.cell(
+                            column=i + 7, row=row_number, value=str(tile["nodegroupid"])
+                        )
 
     return wb

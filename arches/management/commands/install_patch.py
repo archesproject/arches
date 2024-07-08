@@ -30,7 +30,14 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument("-s", "--source", action="store", dest="source", default="", help="A self executing python file.")
+        parser.add_argument(
+            "-s",
+            "--source",
+            action="store",
+            dest="source",
+            default="",
+            help="A self executing python file.",
+        )
 
     def handle(self, *args, **options):
         self.run_patch_file(options["source"])

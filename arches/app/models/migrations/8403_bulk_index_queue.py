@@ -13,7 +13,10 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="BulkIndexQueue",
             fields=[
-                ("resourceinstanceid", models.UUIDField(primary_key=True, serialize=False, unique=True)),
+                (
+                    "resourceinstanceid",
+                    models.UUIDField(primary_key=True, serialize=False, unique=True),
+                ),
                 ("createddate", models.DateTimeField(auto_now_add=True)),
             ],
             options={

@@ -81,7 +81,9 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="editlog",
             name="newprovisionalvalue",
-            field=models.JSONField(blank=True, db_column="newprovisionalvalue", null=True),
+            field=models.JSONField(
+                blank=True, db_column="newprovisionalvalue", null=True
+            ),
         ),
         migrations.AlterField(
             model_name="editlog",
@@ -91,7 +93,9 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="editlog",
             name="oldprovisionalvalue",
-            field=models.JSONField(blank=True, db_column="oldprovisionalvalue", null=True),
+            field=models.JSONField(
+                blank=True, db_column="oldprovisionalvalue", null=True
+            ),
         ),
         migrations.AlterField(
             model_name="editlog",
@@ -186,7 +190,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="mobilesurveymodel",
             name="datadownloadconfig",
-            field=models.JSONField(blank=True, default=arches.app.models.models.getDataDownloadConfigDefaults, null=True),
+            field=models.JSONField(
+                blank=True,
+                default=arches.app.models.models.getDataDownloadConfigDefaults,
+                null=True,
+            ),
         ),
         migrations.AlterField(
             model_name="mobilesurveymodel",
@@ -411,17 +419,23 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="geojsongeometry",
             name="id",
-            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+            field=models.BigAutoField(
+                auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+            ),
         ),
         migrations.AlterField(
             model_name="groupmapsettings",
             name="id",
-            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+            field=models.BigAutoField(
+                auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+            ),
         ),
         migrations.AlterField(
             model_name="iiifmanifest",
             name="id",
-            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+            field=models.BigAutoField(
+                auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+            ),
         ),
         migrations.AlterField(
             model_name="loadevent",
@@ -431,7 +445,9 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="loadstaging",
             name="id",
-            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+            field=models.BigAutoField(
+                auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+            ),
         ),
         migrations.AlterField(
             model_name="loadstaging",
@@ -441,12 +457,16 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="mapmarker",
             name="id",
-            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+            field=models.BigAutoField(
+                auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+            ),
         ),
         migrations.AlterField(
             model_name="mapsource",
             name="id",
-            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+            field=models.BigAutoField(
+                auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+            ),
         ),
         migrations.AlterField(
             model_name="spatialview",
@@ -456,6 +476,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="userprofile",
             name="id",
-            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID"),
+            field=models.BigAutoField(
+                auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+            ),
         ),
     ]

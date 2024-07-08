@@ -6,6 +6,7 @@ IntegrityCheckDescriptions = {
     1012: "Node Groups without matching nodes",
 }
 
+
 @unique
 class IntegrityCheck(Enum):
     NODE_HAS_ONTOLOGY_GRAPH_DOES_NOT = 1005
@@ -20,3 +21,4 @@ class ExtensionType(Enum):
     ETL_MODULES = "etl_modules"
     FUNCTIONS = "functions"
     SEARCH_COMPONENTS = "search_components"
+    PERMISSIONS_FRAMEWORKS = "permissions"

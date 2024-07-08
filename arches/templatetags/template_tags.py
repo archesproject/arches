@@ -12,7 +12,9 @@ register = template.Library()
 @register.filter(name="has_group")
 def has_group(user, group_names):
     if user.is_authenticated:
-        if user.is_superuser or bool(user.groups.filter(name__in=group_names.split(","))):
+        if user.is_superuser or bool(
+            user.groups.filter(name__in=group_names.split(","))
+        ):
             return True
     return False
 
@@ -24,7 +26,19 @@ def can_edit_resource_instance(user):
 
 @register.filter(name="can_read_resource_instance")
 def can_read_resource_instance(user):
-    return len(get_resource_types_by_perm(user, ["models.write_nodegroup", "models.delete_nodegroup", "models.read_nodegroup"])) > 0
+    return (
+        len(
+            get_resource_types_by_perm(
+                user,
+                [
+                    "models.write_nodegroup",
+                    "models.delete_nodegroup",
+                    "models.read_nodegroup",
+                ],
+            )
+        )
+        > 0
+    )
 
 
 @register.filter(name="can_create_resource_instance")
@@ -34,7 +48,14 @@ def can_create_resource_instance(user):
 
 @register.filter(name="can_create_graph")
 def can_create_graph(user):
-    return len(get_resource_types_by_perm(user, ["models.write_nodegroup", "models.delete_nodegroup"])) > 0
+    return (
+        len(
+            get_resource_types_by_perm(
+                user, ["models.write_nodegroup", "models.delete_nodegroup"]
+            )
+        )
+        > 0
+    )
 
 
 @register.filter(name="has_key")
@@ -95,7 +116,12 @@ def quoted_trans_tag(parser, token):
     which is often found in other languages
     """
     transnode = do_translate(parser, token)
-    return QuotedTranslateNode(transnode.filter_expression, transnode.noop, transnode.asvar, transnode.message_context)
+    return QuotedTranslateNode(
+        transnode.filter_expression,
+        transnode.noop,
+        transnode.asvar,
+        transnode.message_context,
+    )
 
 
 class JsTranslatedNode(TranslateNode):
@@ -113,4 +139,9 @@ def jsescaped_trans(parser, token):
     which is often found in other languages
     """
     transnode = do_translate(parser, token)
-    return JsTranslatedNode(transnode.filter_expression, transnode.noop, transnode.asvar, transnode.message_context)
+    return JsTranslatedNode(
+        transnode.filter_expression,
+        transnode.noop,
+        transnode.asvar,
+        transnode.message_context,
+    )
