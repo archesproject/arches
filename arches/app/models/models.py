@@ -2167,39 +2167,34 @@ class SpatialView(models.Model):
         Validate the spatial view before saving it to the database as the database triggers have proved hard to test.
         """
         super().clean()
-        if self.geometrynode.datatype != "geojson-feature-collection":
+        graph = self.geometrynode.graph
+        for node in self.attributenodes:
+            if not Node.objects.filter(pk=node["nodeid"], graph=graph).exists():
+                raise ValidationError(
+                    f"Attribute nodes must belong to the same graph as the geometry node (error nodeid:{str(node.id)})"
+                )
+
+        # language must be be a valid language code beloging to the current publication
+        published_graphs = PublishedGraph.objects.filter(
+            publication=graph.publication
+        )
+        if self.language not in [
+            published_graph.language for published_graph in published_graphs
+        ]:
             raise ValidationError(
-                "Geometry node must be of type geojson-feature-collection"
+                "Language must belong to a published graph for the graph of the geometry node"
             )
-        else:
-            graph = self.geometrynode.graph
-            for node in self.attributenodes:
-                if not Node.objects.filter(pk=node["nodeid"], graph=graph).exists():
-                    raise ValidationError(
-                        f"Attribute nodes must belong to the same graph as the geometry node (error nodeid:{str(node.id)})"
-                    )
 
-            # language must be be a valid language code beloging to the current publication
-            published_graphs = PublishedGraph.objects.filter(
-                publication=graph.publication
+        # validate the slug
+        if not re.match(r"^[a-zA-Z_]([a-zA-Z0-9_]+)$", self.slug):
+            raise ValidationError(
+                "Slug must contain only letters, numbers and hyphens, but not begin with a number."
             )
-            if self.language not in [
-                published_graph.language for published_graph in published_graphs
-            ]:
-                raise ValidationError(
-                    "Language must belong to a published graph for the graph of the geometry node"
-                )
 
-            # validate the slug
-            if not re.match(r"^[a-zA-Z_]([a-zA-Z0-9_]+)$", self.slug):
-                raise ValidationError(
-                    "Slug must contain only letters, numbers and hyphens, but not begin with a number."
-                )
-
-            # validate the schema is a valid schema in the database
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{self.schema}'"
-                )
-                if cursor.rowcount == 0:
+        # validate the schema is a valid schema in the database
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{self.schema}'"
+            )
+            if cursor.rowcount == 0:
                     raise ValidationError("Schema does not exist in the database")
