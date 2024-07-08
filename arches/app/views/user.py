@@ -59,22 +59,26 @@ class UserManagerView(BaseManagerView):
     def get_user_details(self, user):
         identities = []
         for group in Group.objects.all():
-            users = group.user_set.all()
-            if len(users) > 0:
-                groupUsers = [
-                    {
-                        "id": user.id,
-                        "first_name": user.first_name,
-                        "last_name": user.last_name,
-                        "email": user.email,
-                        "last_login": self.get_last_login(user.last_login),
-                        "username": user.username,
-                        "groups": [gp.id for gp in user.groups.all()],
-                    }
-                    for user in users
-                ]
+            groupUsers = [
+                {
+                    "id": user.id,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "email": user.email,
+                    "last_login": self.get_last_login(user.last_login),
+                    "username": user.username,
+                    "groups": [gp.id for gp in user.groups.all()],
+                }
+                for user in group.user_set.all()
+            ]
             identities.append(
-                {"name": group.name, "type": "group", "id": group.pk, "users": groupUsers, "default_permissions": group.permissions.all()}
+                {
+                    "name": group.name,
+                    "type": "group",
+                    "id": group.pk,
+                    "users": groupUsers,
+                    "default_permissions": group.permissions.all(),
+                }
             )
         for user in User.objects.filter():
             groups = []
@@ -103,7 +107,10 @@ class UserManagerView(BaseManagerView):
 
     def get(self, request):
 
-        if self.request.user.is_authenticated and self.request.user.username != "anonymous":
+        if (
+            self.request.user.is_authenticated
+            and self.request.user.username != "anonymous"
+        ):
             context = self.get_context_data(
                 main_script="views/user-profile-manager",
             )
@@ -123,7 +130,9 @@ class UserManagerView(BaseManagerView):
                 {
                     "ENABLE_TWO_FACTOR_AUTHENTICATION": settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
                     "FORCE_TWO_FACTOR_AUTHENTICATION": settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-                    "user_has_enabled_two_factor_authentication": bool(user_profile.encrypted_mfa_hash),
+                    "user_has_enabled_two_factor_authentication": bool(
+                        user_profile.encrypted_mfa_hash
+                    ),
                 }
             )
 
@@ -132,12 +141,17 @@ class UserManagerView(BaseManagerView):
     def post(self, request):
         if self.action == "get_user_names":
             data = {}
-            if self.request.user.is_authenticated and user_is_resource_reviewer(request.user):
+            if self.request.user.is_authenticated and user_is_resource_reviewer(
+                request.user
+            ):
                 userids = json.loads(request.POST.get("userids", "[]"))
                 data = {u.id: u.username for u in User.objects.filter(id__in=userids)}
                 return JSONResponse(data)
 
-        if self.request.user.is_authenticated and self.request.user.username != "anonymous":
+        if (
+            self.request.user.is_authenticated
+            and self.request.user.username != "anonymous"
+        ):
             context = self.get_context_data(
                 main_script="views/user-profile-manager",
             )
@@ -169,20 +183,33 @@ class UserManagerView(BaseManagerView):
                         email_username = user.first_name
 
                     if admin_info and not str.isspace(admin_info):
-                        message = _("Your {} profile was just changed. If this was unexpected, please contact your administrator at {}").format(settings.APP_NAME, admin_info)
+                        message = _(
+                            "Your {} profile was just changed. If this was unexpected, please contact your administrator at {}"
+                        ).format(settings.APP_NAME, admin_info)
                     else:
-                        message = _("Your {} profile was just changed. If this was unexpected, please contact your administrator.").format(settings.APP_NAME)
+                        message = _(
+                            "Your {} profile was just changed. If this was unexpected, please contact your administrator."
+                        ).format(settings.APP_NAME)
 
                     email_context = return_message_context(
                         greeting=message,
-                        additional_context={"username":email_username}
+                        additional_context={"username": email_username},
                     )
 
-                    html_content = render_to_string("email/general_notification.htm", email_context)  # ...
-                    text_content = strip_tags(html_content)  # this strips the html, so people will have the text as well.
+                    html_content = render_to_string(
+                        "email/general_notification.htm", email_context
+                    )  # ...
+                    text_content = strip_tags(
+                        html_content
+                    )  # this strips the html, so people will have the text as well.
 
                     # create the email, and attach the HTML version as well.
-                    msg = EmailMultiAlternatives(_("Your {} Profile Has Changed!").format(settings.APP_NAME), text_content, admin_info, [form.cleaned_data["email"]])
+                    msg = EmailMultiAlternatives(
+                        _("Your {} Profile Has Changed!").format(settings.APP_NAME),
+                        text_content,
+                        admin_info,
+                        [form.cleaned_data["email"]],
+                    )
                     msg.attach_alternative(html_content, "text/html")
                     msg.send()
                 except:
@@ -199,7 +226,9 @@ class UserManagerView(BaseManagerView):
                 {
                     "ENABLE_TWO_FACTOR_AUTHENTICATION": settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
                     "FORCE_TWO_FACTOR_AUTHENTICATION": settings.FORCE_TWO_FACTOR_AUTHENTICATION,
-                    "user_has_enabled_two_factor_authentication": bool(user_profile.encrypted_mfa_hash),
+                    "user_has_enabled_two_factor_authentication": bool(
+                        user_profile.encrypted_mfa_hash
+                    ),
                 }
             )
 

@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '10196_alter_workflowhistory_workflowname'),
+        ("models", "10196_alter_workflowhistory_workflowname"),
     ]
 
     set_reversibility = """
@@ -21,8 +21,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='etlmodule',
-            name='reversible',
+            model_name="etlmodule",
+            name="reversible",
             field=models.BooleanField(default=True),
         ),
         migrations.RunSQL(

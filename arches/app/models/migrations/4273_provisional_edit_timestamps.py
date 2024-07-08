@@ -11,37 +11,41 @@ import pytz
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4264_online_msm_basemap'),
+        ("models", "4264_online_msm_basemap"),
     ]
 
     def forwards_func(apps, schema_editor):
         local = pytz.timezone(settings.TIME_ZONE)
         utc = pytz.utc
-        local_date_format = '%Y-%m-%d %H:%M:%S.%f'
-        utc_date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
+        local_date_format = "%Y-%m-%d %H:%M:%S.%f"
+        utc_date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
         TileModel = apps.get_model("models", "TileModel")
-        tiles_w_provisional_edits = TileModel.objects.filter(provisionaledits__isnull=False)
+        tiles_w_provisional_edits = TileModel.objects.filter(
+            provisionaledits__isnull=False
+        )
         for tile in tiles_w_provisional_edits:
             for k, v in iter(list(tile.provisionaledits.items())):
-                naive_timestamp = datetime.strptime(v['timestamp'], local_date_format)
+                naive_timestamp = datetime.strptime(v["timestamp"], local_date_format)
                 local_datetime = local.localize(naive_timestamp)
                 utc_datetime = local_datetime.astimezone(utc)
-                v['timestamp'] = utc_datetime.strftime(utc_date_format)
+                v["timestamp"] = utc_datetime.strftime(utc_date_format)
             tile.save()
 
     def reverse_func(apps, schema_editor):
         local = pytz.timezone(settings.TIME_ZONE)
         utc = pytz.utc
-        local_date_format = '%Y-%m-%d %H:%M:%S.%f'
-        utc_date_format = '%Y-%m-%dT%H:%M:%S.%fZ'
+        local_date_format = "%Y-%m-%d %H:%M:%S.%f"
+        utc_date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
         TileModel = apps.get_model("models", "TileModel")
-        tiles_w_provisional_edits = TileModel.objects.filter(provisionaledits__isnull=False)
+        tiles_w_provisional_edits = TileModel.objects.filter(
+            provisionaledits__isnull=False
+        )
         for tile in tiles_w_provisional_edits:
             for k, v in iter(list(tile.provisionaledits.items())):
-                naive_timestamp = datetime.strptime(v['timestamp'], utc_date_format)
+                naive_timestamp = datetime.strptime(v["timestamp"], utc_date_format)
                 utc_datetime = utc.localize(naive_timestamp)
                 local_datetime = utc_datetime.astimezone(local)
-                v['timestamp'] = local_datetime.strftime(local_date_format)
+                v["timestamp"] = local_datetime.strftime(local_date_format)
             tile.save()
 
     operations = [

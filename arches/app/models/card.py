@@ -49,14 +49,20 @@ class Card(models.CardModel):
             nodeids = constraint.get("nodes", [])
             if nodeids:
                 try:
-                    constraint_model = models.ConstraintModel.objects.get(pk=constraintid)
+                    constraint_model = models.ConstraintModel.objects.get(
+                        pk=constraintid
+                    )
                     constraint_model.uniquetoallinstances = unique_to_all
-                    current_nodeids = {str(i.nodeid) for i in constraint_model.nodes.all()}
+                    current_nodeids = {
+                        str(i.nodeid) for i in constraint_model.nodes.all()
+                    }
                     future_nodeids = set(nodeids)
                     nodes_to_remove = current_nodeids - future_nodeids
                     nodes_to_add = future_nodeids - current_nodeids
                     add_nodeconstraints(nodes_to_add, constraint_model)
-                    models.ConstraintXNode.objects.filter(Q(constraint=constraint_model) & Q(node__in=nodes_to_remove)).delete()
+                    models.ConstraintXNode.objects.filter(
+                        Q(constraint=constraint_model) & Q(node__in=nodes_to_remove)
+                    ).delete()
                     constraint_model.save()
                 except ObjectDoesNotExist:
                     constraint_model = models.ConstraintModel()
@@ -129,7 +135,14 @@ class Card(models.CardModel):
         if args:
             if isinstance(args[0], dict):
                 for key, value in args[0].items():
-                    if key not in ("cards", "widgets", "nodes", "is_editable", "nodegroup", "constraints"):
+                    if key not in (
+                        "cards",
+                        "widgets",
+                        "nodes",
+                        "is_editable",
+                        "nodegroup",
+                        "constraints",
+                    ):
                         setattr(self, key, value)
 
                 if "cards" in args[0]:
@@ -145,9 +158,17 @@ class Card(models.CardModel):
                         node_id = widget.get("node_id", None)
                         card_id = widget.get("card_id", None)
                         widget_id = widget.get("widget_id", None)
-                        if cardxnodexwidgetid is None and (node_id is not None and card_id is not None and widget_id is not None):
-                            widget_model, _ = models.CardXNodeXWidget.objects.get_or_create(
-                                node_id=node_id, card_id=card_id, widget_id=widget_id
+                        if cardxnodexwidgetid is None and (
+                            node_id is not None
+                            and card_id is not None
+                            and widget_id is not None
+                        ):
+                            widget_model, _ = (
+                                models.CardXNodeXWidget.objects.get_or_create(
+                                    node_id=node_id,
+                                    card_id=card_id,
+                                    widget_id=widget_id,
+                                )
                             )
                         else:
                             widget_model = models.CardXNodeXWidget()
@@ -170,15 +191,23 @@ class Card(models.CardModel):
                         if nodeid is not None:
                             node_model = models.Node.objects.get(nodeid=nodeid)
                             node_model.config = node.get("config", None)
-                            node_model.isrequired = node.get("isrequired", node_model.isrequired)
+                            node_model.isrequired = node.get(
+                                "isrequired", node_model.isrequired
+                            )
                             self.nodes.append(node_model)
 
             else:
                 self.widgets = list(self.cardxnodexwidget_set.all())
 
-                sub_groups = models.NodeGroup.objects.filter(parentnodegroup=self.nodegroup)
+                sub_groups = models.NodeGroup.objects.filter(
+                    parentnodegroup=self.nodegroup
+                )
                 for sub_group in sub_groups:
-                    self.cards.extend(Card.objects.select_related("nodegroup").filter(nodegroup=sub_group))
+                    self.cards.extend(
+                        Card.objects.select_related("nodegroup").filter(
+                            nodegroup=sub_group
+                        )
+                    )
 
                 self.cardinality = self.nodegroup.cardinality
 
@@ -248,15 +277,41 @@ class Card(models.CardModel):
         exclude = [] if exclude is None else exclude
         ret = JSONSerializer().handle_model(self, fields=fields, exclude=exclude)
 
-        ret["cardinality"] = self.cardinality if "cardinality" not in exclude else ret.pop("cardinality", None)
+        ret["cardinality"] = (
+            self.cardinality
+            if "cardinality" not in exclude
+            else ret.pop("cardinality", None)
+        )
         ret["cards"] = self.cards if "cards" not in exclude else ret.pop("cards", None)
-        ret["nodes"] = list(self.nodegroup.node_set.all()) if "nodes" not in exclude else ret.pop("nodes", None)
-        ret["visible"] = self.visible if "visible" not in exclude else ret.pop("visible", None)
-        ret["active"] = self.active if "active" not in exclude else ret.pop("active", None)
-        ret["is_editable"] = self.is_editable() if "is_editable" not in exclude else ret.pop("is_editable", None)
-        ret["ontologyproperty"] = self.ontologyproperty if "ontologyproperty" not in exclude else ret.pop("ontologyproperty", None)
-        ret["disabled"] = self.disabled if "disabled" not in exclude else ret.pop("disabled", None)
-        ret["constraints"] = self.constraints if "constraints" not in exclude else ret.pop("constraints", None)
+        ret["nodes"] = (
+            list(self.nodegroup.node_set.all())
+            if "nodes" not in exclude
+            else ret.pop("nodes", None)
+        )
+        ret["visible"] = (
+            self.visible if "visible" not in exclude else ret.pop("visible", None)
+        )
+        ret["active"] = (
+            self.active if "active" not in exclude else ret.pop("active", None)
+        )
+        ret["is_editable"] = (
+            self.is_editable()
+            if "is_editable" not in exclude
+            else ret.pop("is_editable", None)
+        )
+        ret["ontologyproperty"] = (
+            self.ontologyproperty
+            if "ontologyproperty" not in exclude
+            else ret.pop("ontologyproperty", None)
+        )
+        ret["disabled"] = (
+            self.disabled if "disabled" not in exclude else ret.pop("disabled", None)
+        )
+        ret["constraints"] = (
+            self.constraints
+            if "constraints" not in exclude
+            else ret.pop("constraints", None)
+        )
         if self.graph and self.graph.ontology and self.graph.isresource:
             edge = self.get_edge_to_parent()
             ret["ontologyproperty"] = edge.ontologyproperty
@@ -273,13 +328,17 @@ class Card(models.CardModel):
                     if node.nodeid == widget.node_id:
                         found = True
                 if not found:
-                    widget = [widget for widget in widgets if widget.pk == node.datatype][0].defaultwidget
+                    widget = [
+                        widget for widget in widgets if widget.pk == node.datatype
+                    ][0].defaultwidget
                     if widget:
                         widget_model = models.CardXNodeXWidget()
                         widget_model.node_id = node.nodeid
                         widget_model.card_id = self.cardid
                         widget_model.widget_id = widget.pk
-                        widget_model.config = JSONSerializer().serialize(widget.defaultconfig)
+                        widget_model.config = JSONSerializer().serialize(
+                            widget.defaultconfig
+                        )
                         widget_model.label = node.name
                         ret["widgets"].append(widget_model)
         else:

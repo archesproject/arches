@@ -24,7 +24,9 @@ from arches.app.models.graph import Graph
 from arches.app.models.models import DDataType, Ontology
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
+from arches.app.utils.data_management.resource_graphs.importer import (
+    import_graph as ResourceGraphImporter,
+)
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from tests import test_settings
 from arches.app.utils.context_processors import app_settings
@@ -53,8 +55,11 @@ CREATE_TOKEN_SQL = """
             token, expires, scope, application_id, user_id, created, updated)
             VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018');
     """
-DELETE_TOKEN_SQL = "DELETE FROM public.oauth2_provider_accesstoken WHERE application_id = 44;"
+DELETE_TOKEN_SQL = (
+    "DELETE FROM public.oauth2_provider_accesstoken WHERE application_id = 44;"
+)
 SYSTEM_SETINGS_GRAPH_ID = "ff623370-fa12-11e6-b98b-6c4008b05c4c"
+
 
 class ArchesTestRunner(DiscoverRunner):
     def __init__(self, *args, **kwargs) -> None:
@@ -82,24 +87,34 @@ class ArchesTestRunner(DiscoverRunner):
 
         super().teardown_databases(old_config, **kwargs)
 
+
 class ArchesTestCase(TestCase):
     def __init__(self, *args, **kwargs):
         super(ArchesTestCase, self).__init__(*args, **kwargs)
         if settings.DEFAULT_BOUNDS is None:
             management.call_command("migrate")
             if not Graph.objects.filter(pk=SYSTEM_SETINGS_GRAPH_ID).exists():
-                with open(os.path.join("tests/fixtures/system_settings/Arches_System_Settings_Model.json"), "r") as f:
+                with open(
+                    os.path.join(
+                        "tests/fixtures/system_settings/Arches_System_Settings_Model.json"
+                    ),
+                    "r",
+                ) as f:
                     archesfile = JSONDeserializer().deserialize(f)
                 ResourceGraphImporter(archesfile["graph"], True)
                 management.call_command("graph", ["publish"])
-                BusinessDataImporter("tests/fixtures/system_settings/Arches_System_Settings_Local.json").import_business_data()
+                BusinessDataImporter(
+                    "tests/fixtures/system_settings/Arches_System_Settings_Local.json"
+                ).import_business_data()
             settings.update_from_db()
 
     @classmethod
     def loadOntology(cls):
         ontologies_count = Ontology.objects.exclude(ontologyid__isnull=True).count()
         if ontologies_count == 0:
-            management.call_command("load_ontology", source=test_settings.ONTOLOGY_PATH, verbosity=0)
+            management.call_command(
+                "load_ontology", source=test_settings.ONTOLOGY_PATH, verbosity=0
+            )
 
     @classmethod
     def ensure_resource_test_model_loaded(cls):
@@ -112,11 +127,18 @@ class ArchesTestCase(TestCase):
         )
 
         if not DDataType.objects.filter(datatype="extended-string-datatype").exists():
-            management.call_command("datatype", "register", source=custom_string_datatype_filename, verbosity=0)
+            management.call_command(
+                "datatype",
+                "register",
+                source=custom_string_datatype_filename,
+                verbosity=0,
+            )
         if not Graph.objects.filter(pk=resource_test_model_graph_id).exists():
             for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
                 with captured_stdout():
-                    management.call_command("packages", operation="import_graphs", source=path, verbosity=0)
+                    management.call_command(
+                        "packages", operation="import_graphs", source=path, verbosity=0
+                    )
 
     @classmethod
     def setUpClass(cls):

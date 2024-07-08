@@ -13,11 +13,22 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="IIIFManifest",
             fields=[
-                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
                 ("label", models.TextField()),
                 ("url", models.TextField()),
                 ("description", models.TextField(blank=True, null=True)),
             ],
-            options={"db_table": "iiif_manifests", "managed": True,},
+            options={
+                "db_table": "iiif_manifests",
+                "managed": True,
+            },
         ),
     ]

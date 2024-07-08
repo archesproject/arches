@@ -1,7 +1,7 @@
 import { defineAsyncComponent } from 'vue';
 import createVueApplication from 'utils/create-vue-application';
 
-const pluginData = require('views/plugin-data');
+import pluginData from 'views/plugin-data';
 
 // workaround for webpack failures surrounding dynamic imports
 const vuePluginPath = pluginData['component'].replace('src/', '').replace('.vue', '');
