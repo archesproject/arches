@@ -35,6 +35,7 @@ def build_staticfiles_dirs(root_dir, app_root=None, arches_applications=None, ad
             application_origin = os.path.split(sys.modules[arches_application].__spec__.origin)[0]
             directories.append(os.path.join(application_origin, 'media'))
 
+    directories.append(os.path.join(root_dir, "app", "media", "build"))
     directories.append(os.path.join(root_dir, "app", "media"))
 
     return tuple(directories)
