@@ -774,12 +774,17 @@ urlpatterns = [
         "api/controlled_lists/", ControlledListsView.as_view(), name="controlled_lists"
     ),
     path(
+        "api/controlled_list/<uuid:list_id>/",
+        ControlledListView.as_view(),
+        name="controlled_list",
+    ),
+    path(
         "api/controlled_list/", ControlledListView.as_view(), name="controlled_list_add"
     ),
     path(
-        "api/controlled_list/<uuid:id>/",
-        ControlledListView.as_view(),
-        name="controlled_list",
+        "api/controlled_list_item/<uuid:item_id>/",
+        ControlledListItemView.as_view(),
+        name="controlled_list_item",
     ),
     path(
         "api/controlled_list_item/",
@@ -787,12 +792,7 @@ urlpatterns = [
         name="controlled_list_item_add",
     ),
     path(
-        "api/controlled_list_item/<uuid:id>/",
-        ControlledListItemView.as_view(),
-        name="controlled_list_item",
-    ),
-    path(
-        "api/controlled_list_item_value/<uuid:id>/",
+        "api/controlled_list_item_value/<uuid:value_id>/",
         ControlledListItemValueView.as_view(),
         name="controlled_list_item_value",
     ),
@@ -802,7 +802,7 @@ urlpatterns = [
         name="controlled_list_item_value_add",
     ),
     path(
-        "api/controlled_list_item_image/<uuid:id>/",
+        "api/controlled_list_item_image/<uuid:image_id>/",
         ControlledListItemImageView.as_view(),
         name="controlled_list_item_image",
     ),
@@ -812,7 +812,7 @@ urlpatterns = [
         name="controlled_list_item_image_add",
     ),
     path(
-        "api/controlled_list_item_image_metadata/<uuid:id>/",
+        "api/controlled_list_item_image_metadata/<uuid:metadata_id>/",
         ControlledListItemImageMetadataView.as_view(),
         name="controlled_list_item_image_metadata",
     ),

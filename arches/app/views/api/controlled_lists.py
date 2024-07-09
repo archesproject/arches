@@ -92,9 +92,8 @@ class ControlledListsView(View):
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ControlledListView(View):
-    def get(self, request, **kwargs):
+    def get(self, request, list_id):
         """Returns either a flat representation (?flat=true) or a tree (default)."""
-        list_id = kwargs.get("id")
         try:
             lst = ControlledList.objects.prefetch_related(
                 *_prefetch_terms(request)
@@ -122,8 +121,7 @@ class ControlledListView(View):
         lst.save()
         return JSONResponse(lst.serialize(), status=HTTPStatus.CREATED)
 
-    def patch(self, request, **kwargs):
-        list_id: UUID = kwargs.get("id")
+    def patch(self, request, list_id):
         data = JSONDeserializer().deserialize(request.body)
         data.pop("items", None)
         sortorder_map = data.pop("sortorder_map", {})
@@ -151,9 +149,9 @@ class ControlledListView(View):
 
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
-    def delete(self, request, **kwargs):
+    def delete(self, request, list_id):
         try:
-            list_to_delete = ControlledList.objects.get(pk=kwargs.get("id"))
+            list_to_delete = ControlledList.objects.get(pk=list_id)
         except ControlledList.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
@@ -211,8 +209,7 @@ class ControlledListItemView(View):
 
         return JSONResponse(item.serialize(), status=HTTPStatus.CREATED)
 
-    def patch(self, request, **kwargs):
-        item_id: UUID = kwargs.get("id")
+    def patch(self, request, item_id):
         data = JSONDeserializer().deserialize(request.body)
         item = ControlledListItem(id=item_id, **data)
 
@@ -240,8 +237,7 @@ class ControlledListItemView(View):
 
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
-    def delete(self, request, **kwargs):
-        item_id: UUID = kwargs.get("id")
+    def delete(self, request, item_id):
         objs_deleted, unused = ControlledListItem.objects.filter(pk=item_id).delete()
         if not objs_deleted:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
@@ -265,10 +261,12 @@ class ControlledListItemValueView(View):
 
         return JSONResponse(value.serialize(), status=HTTPStatus.CREATED)
 
-    def put(self, request, id):
+    def put(self, request, value_id):
         data = JSONDeserializer().deserialize(request.body)
         try:
-            value = ControlledListItemValue.objects.values_without_images().get(pk=id)
+            value = ControlledListItemValue.objects.values_without_images().get(
+                pk=value_id
+            )
         except ControlledListItemValue.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
@@ -287,13 +285,12 @@ class ControlledListItemValueView(View):
 
         return JSONResponse(value.serialize())
 
-    def delete(self, request, **kwargs):
-        value_id = kwargs.get("id")
+    def delete(self, request, value_id):
         try:
             value = ControlledListItemValue.objects.values_without_images().get(
                 pk=value_id
             )
-        except:
+        except ControlledListItemValue.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
         try:
@@ -309,7 +306,7 @@ class ControlledListItemValueView(View):
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
 class ControlledListItemImageView(View):
-    def post(self, request, **kwargs):
+    def post(self, request):
         uploaded_file = request.FILES["item_image"]
         img = ControlledListItemImage(
             list_item_id=UUID(request.POST["list_item_id"]),
@@ -325,8 +322,7 @@ class ControlledListItemImageView(View):
         img.save()
         return JSONResponse(img.serialize(), status=HTTPStatus.CREATED)
 
-    def delete(self, request, **kwargs):
-        image_id = kwargs.get("id")
+    def delete(self, request, image_id):
         count, unused = ControlledListItemImage.objects.filter(pk=image_id).delete()
         if not count:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
@@ -339,7 +335,6 @@ class ControlledListItemImageView(View):
 class ControlledListItemImageMetadataView(View):
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
-
         data.pop("metadata_label", None)
         metadata = ControlledListItemImageMetadata(**data)
         try:
@@ -351,11 +346,10 @@ class ControlledListItemImageMetadataView(View):
         metadata.save()
         return JSONResponse(metadata.serialize(), status=HTTPStatus.CREATED)
 
-    def put(self, request, id):
+    def put(self, request, metadata_id):
         data = JSONDeserializer().deserialize(request.body)
-
         try:
-            metadata = ControlledListItemImageMetadata.objects.get(pk=id)
+            metadata = ControlledListItemImageMetadata.objects.get(pk=metadata_id)
         except ControlledListItemImageMetadata.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
@@ -374,8 +368,7 @@ class ControlledListItemImageMetadataView(View):
 
         return JSONResponse(metadata.serialize())
 
-    def delete(self, request, **kwargs):
-        metadata_id = kwargs.get("id")
+    def delete(self, request, metadata_id):
         count, unused = ControlledListItemImageMetadata.objects.filter(
             pk=metadata_id
         ).delete()

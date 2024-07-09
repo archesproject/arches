@@ -242,7 +242,7 @@ class ControlledListTests(ArchesTestCase):
         self.assertEqual(result["controlled_lists"][0]["nodes"], [])
 
         response = self.client.get(
-            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
+            reverse("controlled_list", kwargs={"list_id": str(self.list1.pk)}),
         )
         result = json.loads(response.content)
 
@@ -264,13 +264,13 @@ class ControlledListTests(ArchesTestCase):
         self.client.force_login(self.admin)
         with self.assertLogs("django.request", level="WARNING"):
             response = self.client.delete(
-                reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
+                reverse("controlled_list", kwargs={"list_id": str(self.list1.pk)}),
             )
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
         del self.node_using_list1.config["controlledList"]
         self.node_using_list1.save()
         response = self.client.delete(
-            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
+            reverse("controlled_list", kwargs={"list_id": str(self.list1.pk)}),
         )
         self.assertEqual(ControlledList.objects.count(), 1)
         self.assertEqual(ControlledList.objects.first().pk, self.list2.pk)
@@ -322,7 +322,7 @@ class ControlledListTests(ArchesTestCase):
         self.client.force_login(self.admin)
 
         response = self.client.patch(
-            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
+            reverse("controlled_list", kwargs={"list_id": str(self.list1.pk)}),
             # Reverse the sortorder
             {
                 "sortorder_map": {
@@ -356,7 +356,7 @@ class ControlledListTests(ArchesTestCase):
             body["sortorder_map"][str(child.pk)] = 5 + i
 
         response = self.client.patch(
-            reverse("controlled_list", kwargs={"id": str(self.list1.pk)}),
+            reverse("controlled_list", kwargs={"list_id": str(self.list1.pk)}),
             body,
             content_type="application/json",
         )
@@ -388,7 +388,7 @@ class ControlledListTests(ArchesTestCase):
 
         with self.assertLogs("django.request", level="WARNING"):
             response = self.client.patch(
-                reverse("controlled_list_item", kwargs={"id": parent_id}),
+                reverse("controlled_list_item", kwargs={"item_id": parent_id}),
                 {"parent_id": parent["parent_id"]},
                 content_type="application/json",
             )
@@ -399,7 +399,7 @@ class ControlledListTests(ArchesTestCase):
         item = self.list1.controlled_list_items.first()
 
         response = self.client.patch(
-            reverse("controlled_list_item", kwargs={"id": str(item.pk)}),
+            reverse("controlled_list_item", kwargs={"item_id": str(item.pk)}),
             {"uri": ""},
             content_type="application/json",
         )
@@ -410,7 +410,7 @@ class ControlledListTests(ArchesTestCase):
     def test_delete_list_item(self):
         self.client.force_login(self.admin)
         response = self.client.delete(
-            reverse("controlled_list_item", kwargs={"id": str(self.parent.pk)})
+            reverse("controlled_list_item", kwargs={"item_id": str(self.parent.pk)})
         )
         self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
         self.assertQuerySetEqual(
@@ -424,7 +424,7 @@ class ControlledListTests(ArchesTestCase):
         label["language_id"] = self.new_language.code
 
         response = self.client.put(
-            reverse("controlled_list_item_value", kwargs={"id": label["id"]}),
+            reverse("controlled_list_item_value", kwargs={"value_id": label["id"]}),
             label,
             content_type="application/json",
         )
@@ -438,7 +438,7 @@ class ControlledListTests(ArchesTestCase):
 
         with self.assertLogs("django.request", level="WARNING"):
             response = self.client.put(
-                reverse("controlled_list_item_value", kwargs={"id": label["id"]}),
+                reverse("controlled_list_item_value", kwargs={"value_id": label["id"]}),
                 label,
                 content_type="application/json",
             )
@@ -450,7 +450,9 @@ class ControlledListTests(ArchesTestCase):
             valuetype_id="altLabel"
         ).first()
         response = self.client.delete(
-            reverse("controlled_list_item_value", kwargs={"id": str(alt_label.pk)}),
+            reverse(
+                "controlled_list_item_value", kwargs={"value_id": str(alt_label.pk)}
+            ),
         )
         self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
 
@@ -462,7 +464,8 @@ class ControlledListTests(ArchesTestCase):
         with self.assertLogs("django.request", level="WARNING"):
             response = self.client.delete(
                 reverse(
-                    "controlled_list_item_value", kwargs={"id": str(pref_label.pk)}
+                    "controlled_list_item_value",
+                    kwargs={"value_id": str(pref_label.pk)},
                 ),
             )
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST, response.content)
@@ -470,7 +473,9 @@ class ControlledListTests(ArchesTestCase):
     def test_delete_image(self):
         self.client.force_login(self.admin)
         response = self.client.delete(
-            reverse("controlled_list_item_image", kwargs={"id": str(self.image.pk)}),
+            reverse(
+                "controlled_list_item_image", kwargs={"image_id": str(self.image.pk)}
+            ),
         )
         self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
         self.assertQuerySetEqual(
@@ -485,7 +490,8 @@ class ControlledListTests(ArchesTestCase):
 
         response = self.client.put(
             reverse(
-                "controlled_list_item_image_metadata", kwargs={"id": metadatum["id"]}
+                "controlled_list_item_image_metadata",
+                kwargs={"metadata_id": metadatum["id"]},
             ),
             metadatum,
             content_type="application/json",
@@ -502,7 +508,7 @@ class ControlledListTests(ArchesTestCase):
             response = self.client.put(
                 reverse(
                     "controlled_list_item_image_metadata",
-                    kwargs={"id": metadatum["id"]},
+                    kwargs={"metadata_id": metadatum["id"]},
                 ),
                 metadatum,
                 content_type="application/json",
@@ -514,7 +520,8 @@ class ControlledListTests(ArchesTestCase):
         metadata = self.image.controlled_list_item_image_metadata.first()
         response = self.client.delete(
             reverse(
-                "controlled_list_item_image_metadata", kwargs={"id": str(metadata.pk)}
+                "controlled_list_item_image_metadata",
+                kwargs={"metadata_id": str(metadata.pk)},
             ),
         )
         self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT, response.content)
