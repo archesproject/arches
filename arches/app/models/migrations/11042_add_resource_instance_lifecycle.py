@@ -121,7 +121,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name="ResourceInstanceLifecycleStateXResourceInstanceLifecycleState",
+            name="ResourceInstanceLifecycleStateFromXRef",
             fields=[
                 (
                     "id",
@@ -136,21 +136,55 @@ class Migration(migrations.Migration):
                     "resource_instance_lifecycle_state_from",
                     models.ForeignKey(
                         on_delete=models.deletion.CASCADE,
-                        related_name="previous_resource_instance_lifecycle_state",
-                        to="models.ResourceInstanceLifecycleState",
+                        related_name="from_xref_next_lifecycle_states",
+                        to="models.resourceinstancelifecyclestate",
                     ),
                 ),
                 (
                     "resource_instance_lifecycle_state_to",
                     models.ForeignKey(
                         on_delete=models.deletion.CASCADE,
-                        related_name="next_resource_instance_lifecycle_state",
-                        to="models.ResourceInstanceLifecycleState",
+                        related_name="from_xref_previous_lifecycle_states",
+                        to="models.resourceinstancelifecyclestate",
                     ),
                 ),
             ],
             options={
-                "db_table": "resource_instance_lifecycle_states_xref",
+                "db_table": "resource_instance_lifecycle_states_from_xref",
+                "managed": True,
+            },
+        ),
+        migrations.CreateModel(
+            name="ResourceInstanceLifecycleStateToXRef",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "resource_instance_lifecycle_state_from",
+                    models.ForeignKey(
+                        on_delete=models.deletion.CASCADE,
+                        related_name="to_xref_next_lifecycle_states",
+                        to="models.resourceinstancelifecyclestate",
+                    ),
+                ),
+                (
+                    "resource_instance_lifecycle_state_to",
+                    models.ForeignKey(
+                        on_delete=models.deletion.CASCADE,
+                        related_name="to_xref_previous_lifecycle_states",
+                        to="models.resourceinstancelifecyclestate",
+                    ),
+                ),
+            ],
+            options={
+                "db_table": "resource_instance_lifecycle_states_to_xref",
                 "managed": True,
             },
         ),
@@ -159,12 +193,9 @@ class Migration(migrations.Migration):
             name="previous_resource_instance_lifecycle_states",
             field=models.ManyToManyField(
                 related_name="next_lifecycle_states",
-                through="models.ResourceInstanceLifecycleStateXResourceInstanceLifecycleState",
-                through_fields=(
-                    "resource_instance_lifecycle_state_to",
-                    "resource_instance_lifecycle_state_from",
-                ),
-                to="models.ResourceInstanceLifecycleState",
+                through="models.ResourceInstanceLifecycleStateFromXRef",
+                symmetrical=False,
+                to="models.resourceinstancelifecyclestate",
             ),
         ),
         migrations.AddField(
@@ -172,12 +203,17 @@ class Migration(migrations.Migration):
             name="next_resource_instance_lifecycle_states",
             field=models.ManyToManyField(
                 related_name="previous_lifecycle_states",
-                through="models.ResourceInstanceLifecycleStateXResourceInstanceLifecycleState",
-                through_fields=(
-                    "resource_instance_lifecycle_state_from",
-                    "resource_instance_lifecycle_state_to",
-                ),
-                to="models.ResourceInstanceLifecycleState",
+                through="models.ResourceInstanceLifecycleStateToXRef",
+                symmetrical=False,
+                to="models.resourceinstancelifecyclestate",
+            ),
+        ),
+        migrations.AddConstraint(
+            model_name="resourceinstancelifecyclestate",
+            constraint=models.UniqueConstraint(
+                condition=models.Q(("is_initial_state", True)),
+                fields=("resource_instance_lifecycle",),
+                name="unique_initial_state_per_lifecycle",
             ),
         ),
         migrations.RunPython(
@@ -192,15 +228,18 @@ class Migration(migrations.Migration):
             model_name="graphmodel",
             name="resource_instance_lifecycle",
             field=models.ForeignKey(
-                on_delete=models.PROTECT,
+                default=uuid.UUID("7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"),
+                null=True,
+                on_delete=models.deletion.PROTECT,
                 related_name="graphs",
-                to="models.ResourceInstanceLifecycle",
+                to="models.resourceinstancelifecycle",
             ),
         ),
         migrations.AddField(
             model_name="resourceinstance",
             name="resource_instance_lifecycle_state",
             field=models.ForeignKey(
+                null=True,
                 default=uuid.UUID("f75bb034-36e3-4ab4-8167-f520cf0b4c58"),
                 on_delete=models.deletion.PROTECT,
                 related_name="resource_instances",

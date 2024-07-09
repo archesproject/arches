@@ -411,14 +411,16 @@ class ResourceEditorView(MapBaseManagerView):
 
         context["graph_has_unpublished_changes"] = graph.has_unpublished_changes
 
+        # import pdb; pdb.set_trace()
+
         resource_instance_lifecycle_state = None
-        if resource_instance:
-            resource_instance_lifecycle = models.ResourceInstanceLifecycle.objects.get(
-                graph_id=resource_instance.graph_id
-            )
-            resource_instance_lifecycle_state = resource_instance_lifecycle.states[
-                resource_instance.lifecycle_state
-            ]
+        # if resource_instance:
+        #     resource_instance_lifecycle = models.ResourceInstanceLifecycle.objects.get(
+        #         graph_id=resource_instance.graph_id
+        #     )
+        #     resource_instance_lifecycle_state = resource_instance_lifecycle.states[
+        #         resource_instance.lifecycle_state
+        #     ]
         context["resource_instance_lifecycle_state"] = json.dumps(
             resource_instance_lifecycle_state
         )

@@ -151,9 +151,8 @@ class Graph(models.GraphModel):
                     "resource_instance_lifecycle" in args[0]
                     and args[0]["resource_instance_lifecycle"] is not None
                 ):
-                    resource_instance_lifecycle = args[0]["resource_instance_lifecycle"]
-                    self.resource_instance_lifecycle = models.ResourceInstanceLifecycle(
-                        **resource_instance_lifecycle
+                    self.add_resource_instance_lifecycle(
+                        args[0]["resource_instance_lifecycle"]
                     )
             else:
                 if len(args) == 1 and (
@@ -500,6 +499,44 @@ class Graph(models.GraphModel):
 
         return function
 
+    def add_resource_instance_lifecycle(self, resource_instance_lifecycle):
+        self.resource_instance_lifecycle = models.ResourceInstanceLifecycle(
+            id=resource_instance_lifecycle["id"],
+            name=resource_instance_lifecycle["name"],
+        )
+
+        resource_instance_lifecycle_states = []
+        for resource_instance_lifecycle_state_json in resource_instance_lifecycle[
+            "resource_instance_lifecycle_states"
+        ]:
+            next_resource_instance_lifecycle_states = (
+                resource_instance_lifecycle_state_json.pop(
+                    "next_resource_instance_lifecycle_states"
+                )
+            )
+            previous_resource_instance_lifecycle_states = (
+                resource_instance_lifecycle_state_json.pop(
+                    "previous_resource_instance_lifecycle_states"
+                )
+            )
+
+            resource_instance_lifecycle_state = models.ResourceInstanceLifecycleState(
+                **resource_instance_lifecycle_state_json
+            )
+
+            resource_instance_lifecycle_state.next_resource_instance_lifecycle_states.set(
+                next_resource_instance_lifecycle_states
+            )
+            resource_instance_lifecycle_state.previous_resource_instance_lifecycle_states.set(
+                previous_resource_instance_lifecycle_states
+            )
+
+            resource_instance_lifecycle_states.append(resource_instance_lifecycle_state)
+
+        self.resource_instance_lifecycle.resource_instance_lifecycle_states.set(
+            resource_instance_lifecycle_states, bulk=False
+        )
+
     def _compare(self, obj1, obj2, additional_excepted_keys=[]):
         excluded_keys = ["_state"] + additional_excepted_keys
         d1, d2 = obj1.__dict__, obj2.__dict__
@@ -646,10 +683,19 @@ class Graph(models.GraphModel):
                     )
                     published_graph.save()
 
-            # edge case for instantiating a serialized_graph that has a resource_instance_lifecycle
+            # edge case for instantiating a serialized_graph that has a resource_instance_lifecycle not already in the system
             if self.resource_instance_lifecycle and not len(
-                models.ResourceInstanceLifecycle.objects.filter(graph=self)
+                models.ResourceInstanceLifecycle.objects.filter(
+                    pk=self.resource_instance_lifecycle.pk
+                )
             ):
+                for (
+                    resource_instance_lifecycle_state
+                ) in (
+                    self.resource_instance_lifecycle.resource_instance_lifecycle_states.all()
+                ):
+                    resource_instance_lifecycle_state.save()
+
                 self.resource_instance_lifecycle.save()
 
             for nodegroup in self._nodegroups_to_delete:
