@@ -398,13 +398,14 @@ class SearchResultsExporter(object):
                             properties[header] = None
                 for key, value in instance.items():
                     if key == geometry_field:
-                        geometry = GEOSGeometry(value, srid=4326)
-                        for geom in geometry:
-                            feature = {}
-                            feature["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
-                            feature["type"] = "Feature"
-                            feature["properties"] = properties
-                            features.append(feature)
+                        if isinstance(value, GeometryCollection):
+                            geometry = GEOSGeometry(value, srid=4326)
+                            for geom in geometry:
+                                feature = {}
+                                feature["geometry"] = JSONDeserializer().deserialize(GEOSGeometry(geom, srid=4326).json)
+                                feature["type"] = "Feature"
+                                feature["properties"] = properties
+                                features.append(feature)
 
         feature_collection = {"type": "FeatureCollection", "features": features}
         return feature_collection
