@@ -78,9 +78,7 @@ class ControlledListsView(View):
         )
 
         flat = str_to_bool(request.GET.get("flat", "false"))
-        permitted = [
-            ng.pk for ng in get_nodegroups_by_perm(request.user, "read_nodegroup")
-        ]
+        permitted = get_nodegroups_by_perm(request.user, "read_nodegroup")
         serialized = [
             obj.serialize(flat=flat, permitted_nodegroups=permitted) for obj in lists
         ]
@@ -102,9 +100,7 @@ class ControlledListView(View):
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
         flat = str_to_bool(request.GET.get("flat", "false"))
-        permitted = [
-            ng.pk for ng in get_nodegroups_by_perm(request.user, "read_nodegroup")
-        ]
+        permitted = get_nodegroups_by_perm(request.user, "read_nodegroup")
         serialized = lst.serialize(flat=flat, permitted_nodegroups=permitted)
 
         return JSONResponse(serialized)
