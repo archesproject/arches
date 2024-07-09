@@ -67,6 +67,10 @@ jobs:
         run: |
           black . --check --exclude=node_modules
 
+      - name: Check line endings
+        run: |
+          ! git ls-files --eol | grep 'w/crlf\|w/mixed'
+
       - name: Run frontend tests
         run: |
           npm run vitest
