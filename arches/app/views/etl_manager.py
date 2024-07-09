@@ -45,9 +45,15 @@ class ETLManagerView(View):
                 FROM load_errors e
                 JOIN nodes n ON e.nodegroupid = n.nodeid
                 WHERE loadid = %s AND e.type = 'tile'
-                GROUP BY n.name, e.error, e.datatype, e.type, e.nodegroupid);
+                GROUP BY n.name, e.error, e.datatype, e.type, e.nodegroupid)
+                -- Add any errors that are neither node nor tile, e.g. early json-ld failures
+                UNION
+                (SELECT e.source, e.error, e.datatype, count(e.source), e.type, e.nodeid
+                FROM load_errors e
+                WHERE loadid = %s AND e.type NOT IN ('node', 'tile')
+                GROUP BY e.source, e.error, e.datatype, e.type, e.nodeid);
             """,
-                [loadid, loadid],
+                [loadid, loadid, loadid],
             )
             rows = self.dictfetchall(cursor)
         return {"success": True, "data": rows}
@@ -196,7 +202,9 @@ class ETLManagerView(View):
         """
         action = request.POST.get("action")
         moduleid = request.POST.get("module")
-        import_module = ETLModule.objects.get(pk=moduleid).get_class_module()(request)
+        import_module = ETLModule.objects.get(pk=moduleid).get_class_module()(
+            request=request
+        )
         import_function = getattr(import_module, action)
         response = import_function(request)
         if response["success"] and "raw" not in response:
