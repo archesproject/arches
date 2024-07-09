@@ -1,8 +1,13 @@
+# Normalize line endings
+3fe93f1e11e517e06884c7a10591fa99074cb0fe
 # Reformat python code with black (2024)
 6d519d00e752448362b880b73c3641a562ee9ee3
 eea27d316c5ff975556e15ccd4c11d7c393dd95c
 8de09526329685ee4d80c816c3475a66b19d46e9
 e3d8197d5a7d1f03ed125fe2f47d4fbef0913404
+eff6710e8b44faef5a628b0ea1373cd99cb47e9e
+# Reformatting of 7.6 features under dev (2024)
+9740c846eda0cc067f49d7abffdcb1a93fe3e0a9
 # Reformatting of 8.0 features under dev (2024)
 0a4e7a54dc9795756208a5356bd92a3a11d467f2
 1d7d411aba53e32f6be2e998c8b9b22bba72e56f

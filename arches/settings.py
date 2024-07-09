@@ -33,7 +33,7 @@ except ModuleNotFoundError:
 try:
     from django.utils.translation import gettext_lazy as _
     from corsheaders.defaults import default_headers
-except ImportError:  # unable to import prior to installing requirements.txt in setup.py
+except ImportError:  # unable to import prior to installing requirements
     pass
 
 #########################################
@@ -82,8 +82,8 @@ ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30}
 # ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
 
 # If you need to connect to Elasticsearch via an API key instead of username/password, use the syntax below:
-# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": "<ENCODED_API_KEY>"}
-# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": ("<ID>", "<API_KEY>")}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "api_key": "<ENCODED_API_KEY>"}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "api_key": ("<ID>", "<API_KEY>")}
 
 # Your Elasticsearch instance needs to be configured with xpack.security.enabled=true to use API keys - update elasticsearch.yml or .env file and restart.
 
@@ -350,8 +350,7 @@ AUTHENTICATION_BACKENDS = (
     "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
     "oauth2_provider.backends.OAuth2Backend",
     "django.contrib.auth.backends.ModelBackend",  # this is default
-    "arches.app.utils.permission_backend.PermissionBackend",
-    "guardian.backends.ObjectPermissionBackend",
+    "arches.app.permissions.arches_standard.PermissionBackend",
     "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend",
 )
 
@@ -489,8 +488,10 @@ ENABLE_CAPTCHA = True
 # RECAPTCHA_USE_SSL = False
 NOCAPTCHA = True
 # RECAPTCHA_PROXY = 'http://127.0.0.1:8000'
+SILENCED_SYSTEM_CHECKS = ["guardian.W001"]
+
 if DEBUG is True:
-    SILENCED_SYSTEM_CHECKS = ["captcha.recaptcha_test_key_error"]
+    SILENCED_SYSTEM_CHECKS += ["captcha.recaptcha_test_key_error"]
 
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
@@ -660,6 +661,9 @@ BUSINESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+PERMISSION_LOCATIONS = [
+    "arches.app.permissions",
+]
 DATATYPE_LOCATIONS = [
     "arches.app.datatypes",
 ]
@@ -674,12 +678,13 @@ ETL_MODULE_LOCATIONS = [
     "arches.app.etl_modules",
 ]
 
-FILE_TYPE_CHECKING = False
+FILE_TYPE_CHECKING = "lenient"
 FILE_TYPES = [
     "bmp",
     "gif",
     "jpg",
     "jpeg",
+    "json",
     "pdf",
     "png",
     "psd",
@@ -850,6 +855,8 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
+
+PERMISSION_FRAMEWORK = "arches_standard.ArchesStandardPermissionFramework"
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###

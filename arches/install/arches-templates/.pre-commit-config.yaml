@@ -19,6 +19,7 @@ repos:
         name: eslint
         entry: npm run eslint:fix
         language: system
+        files: {{ project_name }}/src
       - id: typescript
         name: typescript
         entry: npm run ts:check

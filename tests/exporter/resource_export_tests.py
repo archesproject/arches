@@ -84,13 +84,14 @@ class BusinessDataExportTests(ArchesTestCase):
             csv.DictReader(export[0]["outputfile"].getvalue().split("\r\n"))
         )[0]
         csvinputfile = "tests/fixtures/data/csv/resource_export_test.csv"
-        csv_input = list(
-            csv.DictReader(
-                open(csvinputfile, "r", encoding="utf-8"),
-                restkey="ADDITIONAL",
-                restval="MISSING",
-            )
-        )[0]
+        with open(csvinputfile, "r", encoding="utf-8") as f:
+            csv_input = list(
+                csv.DictReader(
+                    f,
+                    restkey="ADDITIONAL",
+                    restval="MISSING",
+                )
+            )[0]
 
         self.assertDictEqual(dict(csv_input), dict(csv_output))
 
@@ -110,10 +111,19 @@ class BusinessDataExportTests(ArchesTestCase):
                 new_list = []
                 for val in obj:
                     new_list.append(deep_sort(val))
-                try:
-                    _sorted = sorted(new_list, key=itemgetter("tileid"))
-                except:
-                    _sorted = new_list
+                if all(
+                    isinstance(item, dict) and "resourceinstance" in item
+                    for item in new_list
+                ):
+                    _sorted = sorted(
+                        new_list,
+                        key=lambda item: item["resourceinstance"]["resourceinstanceid"],
+                    )
+                else:
+                    try:
+                        _sorted = sorted(new_list, key=itemgetter("tileid"))
+                    except:
+                        _sorted = new_list
 
             else:
                 _sorted = obj
@@ -129,12 +139,10 @@ class BusinessDataExportTests(ArchesTestCase):
         )
 
         json_export = deep_sort(json.loads(export[0]["outputfile"].getvalue()))
-        json_truth = deep_sort(
-            json.load(
-                open(
-                    "tests/fixtures/data/json/resource_export_business_data_truth.json"
-                )
-            )
-        )
+        with open(
+            "tests/fixtures/data/json/resource_export_business_data_truth.json"
+        ) as f:
+            json_truth = deep_sort(json.load(f))
 
+        self.maxDiff = None
         self.assertDictEqual(json_export, json_truth)

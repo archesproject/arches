@@ -1,0 +1,254 @@
+{% extends "views/components/etl_modules/base-import.htm" %}
+{% load i18n %}
+
+{% block task_details %}
+<!-- ko ifnot: loading() -->
+    <div class="branch-csv-etl">
+        <!-- ko ifnot: response() -->
+        <div class="file-select loader-select">
+            <div data-bind="visible: downloadMode()">
+                <div class="manifest-manager-main-menu-circle loader-button" aria-hidden="true">
+                    <span>
+                        <i style="color: #000" class="fa fa-file-text-o r-select-icon"></i>
+                    </span>
+                </div>
+                <h3>
+                    <span data-bind="text: $root.translations.jsonldCap"></span>
+                </h3>
+                <h4>
+                    <span data-bind="text: $root.translations.selectAResourceModel"></span>
+                </h4>
+                <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
+                    <div style="margin-top: 15px;">
+                        <button class="btn btn-primary btn-labeled btn-lg fa fa-cloud-upload" data-bind="click: toggleDownloadMode">
+                            <span data-bind="text: $root.translations.uploadZipFile"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div data-bind="dropzone: dropzoneOptions, visible: !downloadMode()">
+                <div class="manifest-manager-main-menu-circle loader-button" aria-hidden="true">
+                    <span>
+                        <i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i>
+                    </span>
+                </div>
+                <h3>
+                    <span data-bind="text: $root.translations.jsonldCap"></span>
+                </h3>
+                <h2>
+                    <span data-bind="text: $root.translations.uploadZipFile"></span>
+                </h2>
+                <h4>
+                    <span data-bind="text: $root.translations.dragAndDropFilesOnPanel"></span>
+                </h4>
+                <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
+                    <div style="display:flex; flex-direction: column;">
+                        <div>
+                            <div class="dropzone-photo-upload" style="display:flex; margin-top: 0px;">
+                                <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-file fileinput-button dz-clickable" data-bind="css: uniqueidClass" role="button">
+                                    <span data-bind="text: $root.translations.selectFile"></span>
+                                </div>
+                                <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-danger btn-labeled btn-lg fa fa-times-circle" data-bind="click: function() { $parent.cancel() }" role="button">
+                                    <span data-bind="text: $root.translations.cancelFileImport"></span>
+                                </div>
+                                <div style="min-height: 100%;">
+                                    <div id="hidden-dz-previews" style="display:none"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h5>
+                        <span data-bind="text: $root.translations.etlFileUploadMessage"></span>
+                    </h5>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- ko if: response() -->
+        <div class="branch-xl-metadata-container">
+            <div style="display: grid; row-gap: 2px; height:fit-content; padding:15px 20px;">
+                <h3 class="branch-xl-title">
+                    <span data-bind="text: $root.translations.format + ': ' + $root.translations.jsonldCap"></span>
+                </h3>
+                <div class="etl-module-component" style="margin-top: 0px;">
+                    <h4 class="branch-xl-title">
+                        <span data-bind="text: $root.translations.fileUploadSummary"></span>
+                    </h4>
+                    <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
+                        <div class="etl-loading-metadata-key">
+                            <span data-bind="text: $root.translations.file + ':'"></span>
+                        </div>
+                        <div class="etl-loading-metadata-value" data-bind="text: response().result.summary.name"></div>
+                        <div class="etl-loading-metadata-key">
+                            <span data-bind="text: $root.translations.size + ':'"></span>
+                        </div>
+                        <div class="etl-loading-metadata-value" data-bind="text: response().result.summary.size"></div>
+                    </div>
+                </div>
+
+                <div class="branch-xl-file-contents-container">
+                    <h4 class="branch-xl-title">
+                        <span data-bind="text: $root.translations.fileContents"></span>
+                    </h4>
+                    <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
+                    <!--ko foreach: {data: Object.keys(response().result.summary.files), as: 'file'}-->
+                        <div class="etl-loading-metadata-value" data-bind="text: file"></div>
+                        <!-- ko foreach: {data: $parent.response().result.summary.files[file], as: 'details'} -->
+                        <div class="etl-loading-metadata-key" data-bind="text: details.size"></div>
+                        <!-- /ko -->
+                    <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div  class="tabbed-workflow-footer, etl-module-footer">
+            <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" style="margin-right: 8px;" data-bind="click: function(){ start(); }">
+                <span data-bind="text: $root.translations.submit"></span>
+            </button>
+            <button class="btn btn-shim btn-labeled btn-lg fa fa-times btn-danger" data-bind="click: function(){ response(null); }">
+                <span data-bind="text: $root.translations.cancel"></span>
+            </button>
+        </div>
+        <!-- /ko -->
+    </div>
+<!--/ko-->
+{% endblock task_details %}
+
+{% block etl_status %}
+<div class="branch-csv-etl" style="display: grid; row-gap: 2px; height:fit-content; margin-top: -5px;">
+    <h4 class="summary-title">
+        <span data-bind="text: $root.translations.importJSONLDSummary"></span>
+    </h4>
+    <!-- ko if: ko.unwrap(loadDetails) -->
+    <div class="branch-csv-etl-load-summmary">
+        <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
+            <div class="summary-header">
+                <span data-bind="text: $root.translations.jsonldArchive"></span>
+            </div>
+            <div class="summary-header">
+                <span data-bind="text: $root.translations.size"></span>
+            </div>
+
+            <!--ko foreach: {data: Object.keys(loadDetails.files).filter(n => n.endsWith('.xlsx')), as: 'file'}-->
+            <div class="etl-loading-metadata-value" data-bind="text: file"></div>
+                <!-- ko foreach: {data: $parent.loadDetails.files[file], as: 'details'} -->
+                <div class="etl-loading-metadata-key" data-bind="text: details.size"></div>
+                <div class="summary-header" style="margin-top: 10px;">
+                    <span data-bind="text: $root.translations.worksheets"></span>
+                </div>
+                <div class="summary-header" style="margin-top: 10px;">
+                    <span data-bind="text: $root.translations.tiles"></span>
+                </div>
+                <!--ko foreach: $data.worksheets-->
+                <div class="etl-loading-metadata-value" style="font-size: 14px; line-height: 1.25;" data-bind="text: $data.name"></div>
+                <div class="etl-loading-metadata-key" style="font-size: 14px; line-height: 1.25;" data-bind="text: $data.rows"></div>
+                <!-- /ko -->
+                <!-- /ko -->
+
+            <!-- /ko -->
+
+            <div class="branch-csv-etl-load-files" style="margin-top: 25px; display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
+                <div class="etl-loading-metadata-value" data-bind="text: loadDetails.name"></div>
+                <div class="etl-loading-metadata-key" data-bind="text: loadDetails.size"></div>
+                <!--ko foreach: {data: Object.keys(loadDetails.files).filter(n => !n.endsWith('.xlsx')), as: 'file'}-->
+                    <div class="etl-loading-metadata-value" data-bind="text: file"></div>
+                    <!-- ko foreach: {data: $parent.loadDetails.files[file], as: 'details'} -->
+                    <div class="etl-loading-metadata-key" data-bind="text: details.size"></div>
+                    <!-- /ko -->
+                <!-- /ko -->
+            </div>
+
+        </div>
+    </div>
+    <!--/ko-->
+</div>
+{% endblock etl_status %}
+
+{% block etl_error_report %}
+<!-- ko if: validated -->
+<div class="etl-error-report">
+    <h4 class="summary-header">
+        <span data-bind="text: $root.translations.validationErrors"></span>
+    </h4>
+    <table class="table table-striped" style="margin-top: 5px; border: 1px solid rgba(0,0,0,0.14)" width="100%">
+        <thead>
+            <tr>
+                <th>{% trans "File Name" %}</th>
+                <th>{% trans "Error" %}</th>
+                <th>{% trans "Node Alias" %}</th>
+                <th>{% trans "Datatype" %}</th>
+                <th>{% trans "Count" %}</th>
+                <th>{% trans "Details" %}</th>
+            </tr>
+        </thead>
+        <!-- ko if: validationErrors().length -->
+        <tbody>
+            <!-- ko foreach: validationErrors -->
+            <tr>
+                <td data-bind="text: $data.source"></td>
+                <td data-bind="text: $data.error"></td>
+                <td data-bind="text: $data.nodeAlias"></td>
+                <td data-bind="text: $data.datatype"></td>
+                <td data-bind="text: $data.count"></td>
+                <td class='etl-status-link'
+                    data-bind="
+                        if: ['node', 'JSON-LD block'].includes($data.type),
+                        click: function(){
+                            $data.showDetails(!$data.showDetails());
+                            $parent.getNodeError($parent.selectedLoadEvent().loadid, $data);
+                        }">
+                    <span data-bind="text: $data.showDetails() ? $root.translations.hide : $root.translations.show"></span>
+                </td>
+            </tr>
+            <!-- ko if: $data.showDetails -->
+            <tr>
+                <td style="text-align: right; vertical-align: top" data-bind="click: function(){ $data.showDetails(false); }">
+                    <i class="fa fa-2xl fa-folder-open"></i>
+                </td>
+                <td colspan="5">
+                    <!-- ko if: $data.count > 5 -->
+                    <span data-bind="text: $root.translations.firstFiveShown"></span>
+                    <!-- /ko -->
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>{% trans "Description" %}</th>
+                                <th>{% trans "Value" %}</th>
+                                <th>{% trans "Source" %}</th>
+                            </tr>    
+                        </thead>
+                        <tbody>
+                            <!-- ko foreach: { data: $data.details, as: "details" } -->
+                            <tr>
+                                <td data-bind="text: details.message"></td>
+                                <td style="min-width:80px" data-bind="text: details.value"></td>
+                                <td data-bind="text: details.source"></td>
+                            </tr>
+                            <!-- /ko -->
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <!-- /ko -->    
+            <!-- /ko -->
+            <tr>
+                <td colspan="6" class='etl-status-link' data-bind="click: function(){ getErrorReport(selectedLoadEvent().loadid); }">{% trans "Full Error Report" %}</td>
+            </tr>
+        </tbody>
+        <!-- /ko -->
+        <!-- ko ifnot: validationErrors().length || selectedLoadEvent().error_message -->
+        <tbody>
+            <tr>
+                <span ></span>
+                <td colspan="5">
+                    <span data-bind="text: $root.translations.noErrorFound"></span>
+                </td>
+            </tr>
+        </tbody>
+        <!-- /ko -->            
+    </table>
+</div>
+<!-- /ko -->
+{% endblock etl_error_report %}

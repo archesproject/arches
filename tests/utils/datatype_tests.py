@@ -147,6 +147,77 @@ class GeoJsonDataTypeTest(ArchesTestCase):
         with self.subTest(input=map_source):
             self.assertTrue("minzoom" in map_source and "maxzoom" in map_source)
 
+    @staticmethod
+    def len_feature(feature_object):
+        return len(str(feature_object).encode("UTF-8"))
+
+    def test_append_to_document(self):
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+        document = {"geometries": [], "points": []}
+        nodeid = "99999999-0000-0000-0000-000000000003"
+        tile = Tile()
+        tile.nodegroup_id = "99999998-0000-0000-0000-000000000001"
+        tile.pk = "99999998-0000-0000-0000-000000000002"
+
+        resource_path = os.path.join(
+            "tests", "fixtures", "data", "json", "large_geojson_geometry.json"
+        )
+
+        with open(resource_path) as geojson_file:
+            nodevalue = JSONDeserializer().deserialize(geojson_file)
+            geom_datatype.append_to_document(document, nodevalue, nodeid, tile)
+            for geometry in document["geometries"]:
+                assert GeoJsonDataTypeTest.len_feature(geometry) < 32000
+
+    def test__feature_length_in_bytes(self):
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+        resource_path = os.path.join(
+            "tests", "fixtures", "data", "json", "large_geojson_geometry.json"
+        )
+        with open(resource_path) as geojson_file:
+            large_geometry = JSONDeserializer().deserialize(geojson_file)
+            # Ensure we're using the original test geometry
+            assert geom_datatype._feature_length_in_bytes(large_geometry) == 1539884
+            # Ensure the test feature length function matches the datatype length function
+            assert geom_datatype._feature_length_in_bytes(
+                large_geometry
+            ) == GeoJsonDataTypeTest.len_feature(large_geometry)
+
+    def test_get_bounds(self):
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+        node = models.Node()
+        node.pk = "99999999-0000-0000-0000-000000000001"
+        tile = Tile()
+        resource_path = os.path.join(
+            "tests", "fixtures", "data", "json", "large_geojson_geometry.json"
+        )
+
+        with open(resource_path) as geojson_file:
+            tile.data = {node.pk: JSONDeserializer().deserialize(geojson_file)}
+            bounds = geom_datatype.get_bounds(tile, node)
+            # Obtained from postgis - st_extent()
+            # BOX(-122 36.9999999999834,-120.98300000004122 39.50000000006639)
+            assert bounds[0] == -122.0
+            assert bounds[1] == 36.9999999999834
+            assert bounds[2] == -120.98300000004122
+            assert bounds[3] == 39.50000000006639
+
+    def test_split_geom(self):
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+
+        resource_path = os.path.join(
+            "tests", "fixtures", "data", "json", "large_geojson_geometry.json"
+        )
+
+        with open(resource_path) as geojson_file:
+            for feature in JSONDeserializer().deserialize(geojson_file)["features"]:
+                assert GeoJsonDataTypeTest.len_feature(feature) > 32000
+                for new_feature_set in geom_datatype.split_geom(feature):
+                    assert GeoJsonDataTypeTest.len_feature(new_feature_set) < 32000
+                    for new_feature in new_feature_set["features"]:
+                        assert new_feature["id"] is not None
+                        assert new_feature["type"] == "Feature"
+
 
 class BaseDataTypeTests(ArchesTestCase):
     def test_get_tile_data_only_none(self):
