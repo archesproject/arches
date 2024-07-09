@@ -1,5 +1,4 @@
 from django.test import SimpleTestCase
-from django.utils.translation import activate
 
 from arches.app.models.fields.i18n import I18n_JSON, I18n_String
 from arches.app.utils.betterJSONSerializer import JSONSerializer
