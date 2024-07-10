@@ -27,6 +27,7 @@ from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinValueValidator, RegexValidator, validate_slug
+from django.db import transaction
 from django.db.models import Deferrable, JSONField, Max, Q
 from django.db.models.fields.json import KT
 from django.db.models.functions import Cast
@@ -2375,14 +2376,31 @@ class ControlledListItem(models.Model):
             ),
         ]
 
-    def clean(self):
-        if not self.controlled_list_item_values.filter(valuetype="prefLabel").exists():
-            raise ValidationError(_("At least one preferred label is required."))
-
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)
-        if (not exclude or "uri" not in exclude) and not self.uri:
-            self.uri = None
+        if "id" not in exclude:
+            id_field = [f for f in self._meta.fields if f.name == "id"][0]
+            self.id = id_field.get_default()
+
+    def clean(self):
+        if not self.uri:
+            self.uri = self.generate_uri()
+
+    def generate_uri(self):
+        """Similar logic exists in `etl_collections_to_controlled_lists` migration."""
+        if not self.id:
+            raise RuntimeError("URI generation attempted without a primary key.")
+
+        parts = [settings.PUBLIC_SERVER_ADDRESS.rstrip("/")]
+        if settings.FORCE_SCRIPT_NAME:
+            parts.append(settings.FORCE_SCRIPT_NAME)
+        parts += ["plugins", "controlled-list-manager", "item", str(self.id)]
+
+        return "/".join(parts)
+
+    def ensure_pref_label(self):
+        if not self.controlled_list_item_values.filter(valuetype="prefLabel").exists():
+            raise ValidationError(_("At least one preferred label is required."))
 
     def serialize(self, depth_map=None, flat=False):
         if depth_map is None:
@@ -2482,19 +2500,10 @@ class ControlledListItemValue(models.Model):
         }
 
     def delete(self):
-        msg = _("Deleting the item's only remaining preferred label is not permitted.")
-        if (
-            self.valuetype_id == "prefLabel"
-            and len(
-                self.list_item.controlled_list_item_values.filter(
-                    valuetype_id="prefLabel"
-                )
-            )
-            < 2
-        ):
-            raise ValidationError(msg)
-
-        return super().delete()
+        with transaction.atomic():
+            ret = super().delete()
+            self.list_item.ensure_pref_label()
+        return ret
 
 
 class ControlledListItemImage(models.Model):
