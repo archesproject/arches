@@ -133,7 +133,7 @@ define([
         topCard.topCards = topCards;
     });
 
-    console.log(data.resource_instance_lifecycle_state);
+    console.log(data);
     var vm = {
         loading: loading,
         scrollTo: scrollTo,
@@ -288,24 +288,11 @@ define([
                 ));
             }
         },
-        updateResourceInstanceLifecycleStateBackward: function() {
+        updateResourceInstanceLifecycleState: function(data) {
             $.ajax({
                 type: "POST",
                 url: arches.urls.api_resource_instance_lifecycle_state(resourceId()),
-                data: JSON.stringify({'direction': "backward"}),
-                error: function(err) {
-                    vm.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON));
-                },
-                success: function() {
-                    window.location.reload();
-                }
-            });
-        },
-        updateResourceInstanceLifecycleStateForward: function() {
-            $.ajax({
-                type: "POST",
-                url: arches.urls.api_resource_instance_lifecycle_state(resourceId()),
-                data: JSON.stringify({'direction': "forward"}),
+                data: JSON.stringify(data['id']),
                 error: function(err) {
                     vm.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON));
                 },

@@ -1485,24 +1485,34 @@ class ResourceInstanceLifecycleState(APIBase):
     def get(self, request, resourceid):
         resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
         return JSONResponse(
-            {"resource_instance_lifecycle_state": resource_instance.lifecycle_state}
+            {
+                "resource_instance_lifecycle_state": resource_instance.resource_instance_lifecycle_state
+            }
         )
 
     def post(self, request, resourceid):
         data = json.loads(request.body)
-        direction = data.get("direction")
 
         resource = Resource.objects.get(pk=resourceid)
-        original_resource_instance_lifecycle_state = resource.lifecycle_state
+        resource_instance_lifecycle_state = (
+            models.ResourceInstanceLifecycleState.objects.get(pk=data)
+        )
 
-        resource_instance_lifecycle_state = resource.update_lifecycle_state(
-            user=request.user, direction=direction
+        original_resource_instance_lifecycle_state = (
+            resource.resource_instance_lifecycle_state
+        )
+
+        current_resource_instance_lifecycle_state = (
+            resource.update_resource_instance_lifecycle_state(
+                user=request.user,
+                resource_instance_lifecycle_state=resource_instance_lifecycle_state,
+            )
         )
 
         return JSONResponse(
             {
                 "original_resource_instance_lifecycle_state": original_resource_instance_lifecycle_state,
-                "resource_instance_lifecycle_state": resource_instance_lifecycle_state,
+                "current_resource_instance_lifecycle_state": current_resource_instance_lifecycle_state,
             }
         )
 

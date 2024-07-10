@@ -1,6 +1,9 @@
 import uuid
 from django.db import migrations, models
 
+import arches.app.models.fields.i18n
+import arches.app.utils.betterJSONSerializer
+
 
 def create_default_resource_instance_lifecycle(apps, schema_editor):
     ResourceInstanceLifecycle = apps.get_model("models", "ResourceInstanceLifecycle")
@@ -24,7 +27,8 @@ def create_default_resource_instance_lifecycle_states(apps, schema_editor):
     )
     draft_state = ResourceInstanceLifecycleState.objects.create(
         id=uuid.UUID("9375c9a7-dad2-4f14-a5c1-d7e329fdde4f"),
-        name="draft",
+        name="Draft",
+        action_label="Revert to Draft",
         resource_instance_lifecycle_id=uuid.UUID(
             "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
         ),
@@ -34,7 +38,8 @@ def create_default_resource_instance_lifecycle_states(apps, schema_editor):
     )
     active_state = ResourceInstanceLifecycleState.objects.create(
         id=uuid.UUID("f75bb034-36e3-4ab4-8167-f520cf0b4c58"),
-        name="active",
+        name="Active",
+        action_label="Make Active",
         resource_instance_lifecycle_id=uuid.UUID(
             "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
         ),
@@ -44,7 +49,8 @@ def create_default_resource_instance_lifecycle_states(apps, schema_editor):
     )
     retired_state = ResourceInstanceLifecycleState.objects.create(
         id=uuid.UUID("d95d9c0e-0e2c-4450-93a3-d788b91abcc8"),
-        name="retired",
+        name="Retired",
+        action_label="Retire",
         resource_instance_lifecycle_id=uuid.UUID(
             "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
         ),
@@ -102,7 +108,20 @@ class Migration(migrations.Migration):
             name="ResourceInstanceLifecycleState",
             fields=[
                 ("id", models.UUIDField(primary_key=True, serialize=False)),
-                ("name", models.TextField()),
+                (
+                    "name",
+                    arches.app.models.fields.i18n.I18n_TextField(
+                        default="",
+                        encoder=arches.app.utils.betterJSONSerializer.JSONSerializer,
+                    ),
+                ),
+                (
+                    "action_label",
+                    arches.app.models.fields.i18n.I18n_TextField(
+                        default="",
+                        encoder=arches.app.utils.betterJSONSerializer.JSONSerializer,
+                    ),
+                ),
                 ("is_initial_state", models.BooleanField(default=False)),
                 ("can_edit_resource_instances", models.BooleanField(default=False)),
                 ("can_delete_resource_instances", models.BooleanField(default=False)),

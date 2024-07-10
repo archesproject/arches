@@ -19,7 +19,7 @@ require([  // eslint-disable-line @typescript-eslint/no-require-imports
                 'tile create': {icon: 'fa fa-plus fa-lg', color: 'bg-dark'},
                 'tile delete': {icon: 'fa fa-minus fa-lg', color: 'bg-danger'},
                 'delete edit': {icon: 'fa fa-minus fa-lg', color: 'bg-danger'},
-                'update_lifecycle_state': {icon: 'fa fa-exclamation fa-lg', color: 'bg-warning'},
+                'update_resource_instance_lifecycle_state': {icon: 'fa fa-exclamation fa-lg', color: 'bg-warning'},
             };
 
             var handleChildCards = function(card) {

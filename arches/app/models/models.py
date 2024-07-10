@@ -1242,8 +1242,6 @@ class ResourceInstanceLifecycle(models.Model):
             self, fields=fields, exclude=exclude, **kwargs
         )
 
-        # import pdb; pdb.set_trace()
-
         ret["resource_instance_lifecycle_states"] = [
             JSONSerializer().handle_model(resource_instance_lifecycle_state)
             for resource_instance_lifecycle_state in self.resource_instance_lifecycle_states.all()
@@ -1258,7 +1256,8 @@ class ResourceInstanceLifecycle(models.Model):
 
 class ResourceInstanceLifecycleState(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False)
-    name = models.TextField()
+    name = I18n_TextField()
+    action_label = I18n_TextField()
     is_initial_state = models.BooleanField(default=False)
     can_delete_resource_instances = models.BooleanField(default=False)
     can_edit_resource_instances = models.BooleanField(default=False)
@@ -1279,6 +1278,23 @@ class ResourceInstanceLifecycleState(models.Model):
         symmetrical=False,
         related_name="previous_lifecycle_states",
     )
+
+    def serialize(self, fields=None, exclude=None, **kwargs):
+        ret = JSONSerializer().handle_model(
+            self, fields=fields, exclude=exclude, **kwargs
+        )
+
+        # for serialization we shouldn't need to recurse, 1 level down is enough
+        ret["next_resource_instance_lifecycle_states"] = [
+            JSONSerializer().handle_model(resource_instance_lifecycle_state)
+            for resource_instance_lifecycle_state in self.next_resource_instance_lifecycle_states.all()
+        ]
+        ret["previous_resource_instance_lifecycle_states"] = [
+            JSONSerializer().handle_model(resource_instance_lifecycle_state)
+            for resource_instance_lifecycle_state in self.previous_resource_instance_lifecycle_states.all()
+        ]
+
+        return ret
 
     class Meta:
         db_table = "resource_instance_lifecycle_states"

@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "11042_add_resource_instance_lifecycle_triggers"),
+        ("models", "11042_add_resource_instance_lifecycle"),
     ]
 
     operations = [

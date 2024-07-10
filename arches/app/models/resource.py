@@ -261,20 +261,22 @@ class Resource(models.ResourceInstance):
         index = kwargs.pop("index", True)
         request = kwargs.pop("request", None)
         transaction_id = kwargs.pop("transaction_id", None)
-        should_update_lifecycle_state = kwargs.pop(
-            "should_update_lifecycle_state", False
+        should_update_resource_instance_lifecycle_state = kwargs.pop(
+            "should_update_resource_instance_lifecycle_state", False
         )
-        current_lifecycle_state = kwargs.pop("current_lifecycle_state", None)
+        current_resource_instance_lifecycle_state = kwargs.pop(
+            "current_resource_instance_lifecycle_state", None
+        )
         user = kwargs.pop("user", None)
 
         super(Resource, self).save(*args, **kwargs)
 
-        if should_update_lifecycle_state:
+        if should_update_resource_instance_lifecycle_state:
             self.save_edit(
                 user=user,
-                edit_type="update_lifecycle_state",
-                oldvalue=current_lifecycle_state,
-                newvalue=self.lifecycle_state,
+                edit_type="update_resource_instance_lifecycle_state",
+                oldvalue=f"{current_resource_instance_lifecycle_state.name} ({current_resource_instance_lifecycle_state.id})",
+                newvalue=f"{self.resource_instance_lifecycle_state.name} ({self.resource_instance_lifecycle_state.id})",
                 transaction_id=transaction_id,
             )
 
@@ -502,7 +504,9 @@ class Resource(models.ResourceInstance):
         document["displayname"] = None
         document["root_ontology_class"] = self.get_root_ontology()
         document["legacyid"] = self.legacyid
-        document["lifecycle_state"] = self.lifecycle_state
+        document["resource_instance_lifecycle_state"] = (
+            self.resource_instance_lifecycle_state
+        )
 
         document["displayname"] = []
         document["displaydescription"] = []
@@ -1090,26 +1094,35 @@ class Resource(models.ResourceInstance):
             assign_perm(permission, identity, self)
         self.index()
 
-    def update_lifecycle_state(self, user, direction):
-        current_lifecycle_state = self.lifecycle_state
-
-        if direction == "forward":
-            if self.lifecycle_state == "active":
-                self.lifecycle_state = "retired"
-        elif direction == "backward":
-            if self.lifecycle_state == "retired":
-                self.lifecycle_state = "active"
-        else:
-            raise Exception
-
-        if current_lifecycle_state != self.lifecycle_state:
-            self.save(
-                user=user,
-                current_lifecycle_state=current_lifecycle_state,
-                should_update_lifecycle_state=True,
+    def update_resource_instance_lifecycle_state(
+        self, user, resource_instance_lifecycle_state
+    ):
+        if (
+            self.graph.resource_instance_lifecycle.pk
+            != resource_instance_lifecycle_state.resource_instance_lifecycle.pk
+        ):
+            raise ValueError(
+                _(
+                    "The given ResourceInstanceLifecycleState is not part of the model's ResourceInstanceLifecycle."
+                )
             )
 
-        return self.lifecycle_state
+        if (
+            self.resource_instance_lifecycle_state.pk
+            != resource_instance_lifecycle_state.pk
+        ):
+            current_resource_instance_lifecycle_state = (
+                self.resource_instance_lifecycle_state
+            )
+            self.resource_instance_lifecycle_state = resource_instance_lifecycle_state
+
+            self.save(
+                user=user,
+                current_resource_instance_lifecycle_state=current_resource_instance_lifecycle_state,
+                should_update_resource_instance_lifecycle_state=True,
+            )
+
+        return self.resource_instance_lifecycle_state
 
 
 def parse_node_value(value):

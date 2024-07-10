@@ -125,26 +125,32 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <span>
                             {% trans 'Resource Instance Lifecycle State:' %}
                         </span>
-                        <span data-bind="text: resourceInstanceLifecycleState" style="margin: 0 10px;"></span>
+                        <span data-bind="text: resourceInstanceLifecycleState['name']" style="margin: 0 10px;"></span>
                     </div>
                     
                     <div>
-                        <!-- ko if: resourceInstanceLifecycleState['previous_states'].length -->
+                        <!-- ko foreach: resourceInstanceLifecycleState['previous_resource_instance_lifecycle_states'] -->
                         <button 
-                            class="btn btn-danger"
-                            data-bind="click: updateResourceInstanceLifecycleStateBackward"
+                            class="btn btn-info"
+                            data-bind="click: function() { $parent.updateResourceInstanceLifecycleState($data) }"
                         >
-                            <i class="fa fa-exclamation-circle"></i>
-                            <span style="margin: 0 4px">{% trans 'Un-retire' %}</span>
+                            <i class="fa fa-arrow-left"></i>
+                            <span 
+                                style="margin: 0 4px"
+                                data-bind="text: $data['action_label']"
+                            ></span>
                         </button>
                         <!-- /ko -->
-                        <!-- ko if: resourceInstanceLifecycleState['following_states'].length -->
+                        <!-- ko foreach: resourceInstanceLifecycleState['next_resource_instance_lifecycle_states'] -->
                         <button 
-                            class="btn btn-danger"
-                            data-bind="click: updateResourceInstanceLifecycleStateForward"
+                            class="btn btn-info"
+                            data-bind="click: function() { $parent.updateResourceInstanceLifecycleState($data) }"
                         >
-                            <i class="fa fa-exclamation-circle"></i>
-                            <span style="margin: 0 4px">{% trans 'Retire' %}</span>
+                            <i class="fa fa-arrow-right"></i>
+                            <span 
+                                style="margin: 0 4px"
+                                data-bind="text: $data['action_label']"
+                            ></span>
                         </button>
                         <!-- /ko -->
                     </div>
