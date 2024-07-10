@@ -6,8 +6,11 @@ define([], function() {
             try {  // first try to load project path
                 require(`${APP_ROOT_DIRECTORY}/media/js/${componentPath}`);
             }
-            catch(e) {  // if project path fails, load application paths
+            catch(e) {  // if project path fails, look in applications
                 try {
+                    if (ARCHES_APPLICATIONS.length === 0) {  // ensures fallthrough to Arches-core
+                        throw new Error();
+                    }
                     for (const archesApp of ARCHES_APPLICATIONS) {
                         try {
                             require(`${SITE_PACKAGES_DIRECTORY}/${archesApp}/media/js/${componentPath}`);
