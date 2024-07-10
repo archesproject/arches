@@ -362,13 +362,7 @@ def search_results(request, returnDsl=False):
     if returnDsl:
         return dsl_only
 
-    if response_object["results"] is not None:
-        search_query_object.pop("query")
-        # ensure that if a search filter modified the query in some way
-        # that the modification is set on the response_object
-        for key, value in list(search_query_object.items()):
-            response_object[key] = value
-
+    if response_object:
         return JSONResponse(content=response_object)
 
     else:

@@ -148,6 +148,13 @@ class BaseCoreSearch(BaseSearchFilter):
                 if search_filter:
                     search_filter.post_search_hook(search_query_object, response_object)
 
+            search_query_object.pop("query")
+            # ensure that if a search filter modified the query in some way
+            # that the modification is set on the response_object
+            for key, value in list(search_query_object.items()):
+                if key not in response_object:
+                    response_object[key] = value
+
 
 class SearchFilterFactory(object):
     def __init__(self, request=None, user=None):
