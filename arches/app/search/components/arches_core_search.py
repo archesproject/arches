@@ -170,17 +170,16 @@ class ArchesCoreSearch(BaseCoreSearch):
 
     def get_searchview_components(self):
         search_components = [
-            required_component
-            for required_component in self._required_search_components
-            if required_component.componentname != "search-export"
+            available_component
+            for available_component in self._available_search_components
+            if available_component.componentname != "search-export"
         ]
-        # TODO: Apply new permission logic after #11005 is merged
         if user_is_resource_exporter(self.request.user):
             search_components.extend(
                 [
-                    required_component
-                    for required_component in self._required_search_components
-                    if required_component.componentname == "search-export"
+                    available_component
+                    for available_component in self._available_search_components
+                    if available_component.componentname == "search-export"
                 ]
             )
 
