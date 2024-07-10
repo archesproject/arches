@@ -1467,28 +1467,14 @@ class OntologyProperty(APIBase):
 
 class ResourceInstanceLifecycle(APIBase):
     def get(self, request):
-        all_keys = []
-        seen_keys = set()
-
-        for (
-            resource_instance_lifecycle
-        ) in models.ResourceInstanceLifecycle.objects.all():
-            for key in resource_instance_lifecycle.states.keys():
-                if key not in seen_keys:
-                    seen_keys.add(key)
-                    all_keys.append({"name": key})
-
-        return JSONResponse(all_keys)
+        return JSONResponse(models.ResourceInstanceLifecycleState.objects.all())
 
 
 class ResourceInstanceLifecycleState(APIBase):
     def get(self, request, resourceid):
-        resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
-        return JSONResponse(
-            {
-                "resource_instance_lifecycle_state": resource_instance.resource_instance_lifecycle_state
-            }
-        )
+        if resourceid:
+            resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+            return JSONResponse(resource_instance.resource_instance_lifecycle_state)
 
     def post(self, request, resourceid):
         data = json.loads(request.body)

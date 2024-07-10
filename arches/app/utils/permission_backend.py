@@ -515,23 +515,18 @@ def user_can_edit_resource(user, resourceid=None):
 
     """
     if user.is_authenticated:
-        if user.is_superuser:
-            return True
+        # if user.is_superuser:
+        #     return True
         if resourceid not in [None, ""]:
             result = check_resource_instance_permissions(
                 user, resourceid, "change_resourceinstance"
             )
             if result is not None:
-                resource_instance_lifecycle = ResourceInstanceLifecycle.objects.get(
-                    graph_id=result["resource"].graph_id
-                )
-                can_edit_resource_instance_in_current_lifecycle_state = (
-                    resource_instance_lifecycle.states[
-                        result["resource"].lifecycle_state
-                    ]["can_edit"]
-                )
+                resource_instance_lifecycle_state = result[
+                    "resource"
+                ].resource_instance_lifecycle_state
 
-                if not can_edit_resource_instance_in_current_lifecycle_state:
+                if not resource_instance_lifecycle_state.can_edit_resource_instances:
                     return False
 
                 if result["permitted"] == "unknown":
@@ -558,23 +553,18 @@ def user_can_delete_resource(user, resourceid=None):
 
     """
     if user.is_authenticated:
-        if user.is_superuser:
-            return True
+        # if user.is_superuser:
+        #     return True
         if resourceid not in [None, ""]:
             result = check_resource_instance_permissions(
                 user, resourceid, "delete_resourceinstance"
             )
             if result is not None:
-                resource_instance_lifecycle = ResourceInstanceLifecycle.objects.get(
-                    graph_id=result["resource"].graph_id
-                )
-                can_delete_resource_instance_in_current_lifecycle_state = (
-                    resource_instance_lifecycle.states[
-                        result["resource"].lifecycle_state
-                    ]["can_delete"]
-                )
+                resource_instance_lifecycle_state = result[
+                    "resource"
+                ].resource_instance_lifecycle_state
 
-                if not can_delete_resource_instance_in_current_lifecycle_state:
+                if not resource_instance_lifecycle_state.can_delete_resource_instances:
                     return False
 
                 if result["permitted"] == "unknown":

@@ -1,7 +1,7 @@
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Terms
 from arches.app.search.components.base import BaseSearchFilter
-from arches.app.models.models import ResourceInstanceLifecycle
+from arches.app.models.models import ResourceInstanceLifecycleState
 
 details = {
     "searchcomponentid": "",
@@ -17,46 +17,41 @@ details = {
 }
 
 
-def get_resource_instance_lifecycle_states():
-    all_keys = set()
-    for instance in ResourceInstanceLifecycle.objects.all():
-        all_keys.update(instance.states.keys())
-
-    return all_keys
-
-
 class LifecycleStateFilter(BaseSearchFilter):
     def append_dsl(
         self, search_results_object, permitted_nodegroups, include_provisional
     ):
         search_query = Bool()
-        lifecycle_state_filter = Bool()
+        resource_instance_lifecycle_state_filter = Bool()
 
         querystring_params = self.request.GET.get(details["componentname"], "")
-        lifecycle_state_filter_term = JSONDeserializer().deserialize(
+        resource_instance_lifecycle_state_filter_term = JSONDeserializer().deserialize(
             querystring_params
         )[0]
 
-        if lifecycle_state_filter_term["inverted"] is True:
-            resource_instance_lifecycle_states = (
-                get_resource_instance_lifecycle_states()
-            )
-            resource_instance_lifecycle_states.remove(
-                lifecycle_state_filter_term["name"]
+        if resource_instance_lifecycle_state_filter_term["inverted"] is True:
+            resource_instance_lifecycle_state_ids = (
+                ResourceInstanceLifecycleState.objects.exclude(
+                    pk=resource_instance_lifecycle_state_filter_term["id"]
+                ).values_list("pk", flat=True)
             )
 
-            lifecycle_state_filter.filter(
+            resource_instance_lifecycle_state_filter.filter(
                 Terms(
-                    field="lifecycle_state",
-                    terms=list(resource_instance_lifecycle_states),
+                    field="resource_instance_lifecycle_state_id",
+                    terms=[
+                        str(resource_instance_lifecycle_state_id)
+                        for resource_instance_lifecycle_state_id in resource_instance_lifecycle_state_ids
+                    ],
                 )
             )
         else:
-            lifecycle_state_filter.filter(
+            resource_instance_lifecycle_state_filter.filter(
                 Terms(
-                    field="lifecycle_state", terms=[lifecycle_state_filter_term["name"]]
+                    field="resource_instance_lifecycle_state_id",
+                    terms=[resource_instance_lifecycle_state_filter_term["id"]],
                 )
             )
 
-        search_query.must(lifecycle_state_filter)
+        search_query.must(resource_instance_lifecycle_state_filter)
         search_results_object["query"].add_query(search_query)

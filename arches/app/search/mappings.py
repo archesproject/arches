@@ -143,6 +143,7 @@ def prepare_search_index(create=False):
             ],
             "properties": {
                 "graph_id": {"type": "keyword"},
+                "resource_instance_lifecycle_state_id": {"type": "keyword"},
                 "legacyid": {
                     "type": "text",
                     "fields": {"keyword": {"ignore_above": 256, "type": "keyword"}},

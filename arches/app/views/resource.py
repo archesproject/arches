@@ -1001,9 +1001,9 @@ class ResourceDescriptors(View):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
-        resource = Resource.objects.only("graph_id", "lifecycle_state").get(
-            pk=resourceid
-        )
+        resource = Resource.objects.only(
+            "graph_id", "resource_instance_lifecycle_state"
+        ).get(pk=resourceid)
         graph = Graph.objects.get(graphid=resource.graph_id)
         graph_has_different_publication = bool(
             resource.graph_publication_id != graph.publication_id
@@ -1040,17 +1040,8 @@ class ResourceReportView(MapBaseManagerView):
             graph_has_unpublished_changes=bool(graph.has_unpublished_changes),
         )
 
-        resource_instance_lifecycle_state = None
-        if resource:
-            resource_instance_lifecycle = models.ResourceInstanceLifecycle.objects.get(
-                graph_id=resource.graph_id
-            )
-            resource_instance_lifecycle_state = resource_instance_lifecycle.states[
-                resource.lifecycle_state
-            ]
-
         context["resource_instance_lifecycle_state_permits_editing"] = (
-            resource_instance_lifecycle_state.get("can_edit")
+            resource.resource_instance_lifecycle_state.can_edit_resource_instances
         )
 
         if graph.iconclass:

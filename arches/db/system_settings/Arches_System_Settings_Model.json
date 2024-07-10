@@ -2296,6 +2296,7 @@
                 "name": "active_only",
                 "resource_instance_lifecycle_states": [
                     {
+                        "action_label": "",
                         "can_delete_resource_instances": true,
                         "can_edit_resource_instances": true,
                         "id": "4e2a6b8e-2489-4377-9c9f-29cfbd3e76c8",

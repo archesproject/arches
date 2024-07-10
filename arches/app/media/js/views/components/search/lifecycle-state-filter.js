@@ -82,7 +82,7 @@ define([
             if (item) {
                 var inverted = ko.observable(false);
                 this.getFilter('term-filter').addTag(item.name, this.name, inverted);
-                this.filter([{name: item.name, inverted: inverted}]);
+                this.filter([{id: item.id, name: item.name, inverted: inverted}]);
             }
             else{
                 this.clear();

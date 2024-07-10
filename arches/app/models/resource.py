@@ -279,7 +279,7 @@ class Resource(models.ResourceInstance):
                 newvalue=f"{self.resource_instance_lifecycle_state.name} ({self.resource_instance_lifecycle_state.id})",
                 transaction_id=transaction_id,
             )
-
+            self.index(context)
             return
 
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
@@ -504,8 +504,8 @@ class Resource(models.ResourceInstance):
         document["displayname"] = None
         document["root_ontology_class"] = self.get_root_ontology()
         document["legacyid"] = self.legacyid
-        document["resource_instance_lifecycle_state"] = (
-            self.resource_instance_lifecycle_state
+        document["resource_instance_lifecycle_state_id"] = str(
+            self.resource_instance_lifecycle_state.pk
         )
 
         document["displayname"] = []

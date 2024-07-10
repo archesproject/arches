@@ -109,21 +109,6 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
             return False
 
 
-# @receiver(post_save, sender=models.GraphModel)
-# @receiver(post_save, sender=Graph)
-# def create_resource_instance_lifecycle(sender, instance, created, **kwargs):
-#     if (
-#         created
-#         and not instance.source_identifier_id
-#         and not instance.resource_instance_lifecycle
-#     ):
-#         lifecycle_state = models.ResourceInstanceLifecycle.objects.create(
-#             graph=instance
-#         )
-#         instance.resource_instance_lifecycle = lifecycle_state
-#         instance.save()
-
-
 @receiver(post_save, sender=models.Node)
 def clear_user_permission_cache(sender, instance, **kwargs):
     user_permission_cache = caches["user_permission"]
