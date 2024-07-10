@@ -120,7 +120,7 @@ class ArchesCoreSearch(BaseCoreSearch):
         if load_tiles:
             search_query_object["query"].include("tiles")
 
-    def execute_query(self, search_query_object, response_object):
+    def execute_query(self, search_query_object, response_object, **kwargs):
         for_export = get_str_kwarg_as_bool("export", self.request.GET)
         pages = self.request.GET.get("pages", None)
         total = int(self.request.GET.get("total", "0"))

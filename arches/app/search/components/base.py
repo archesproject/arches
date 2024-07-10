@@ -58,7 +58,7 @@ class BaseSearchFilter:
 
         pass
 
-    def execute_query(self, search_query_object, response_object):
+    def execute_query(self, search_query_object, response_object, **kwargs):
         """
         code responsible for execution of the search query logic and mutation of the response object
         """
