@@ -94,13 +94,27 @@ class BaseCoreSearch(BaseSearchFilter):
                 ]
             )
         )
+        self._available_search_components = list(
+            models.SearchComponent.objects.filter(
+                searchcomponentid__in=[
+                    required_component["searchcomponentid"]
+                    for required_component in self.core_component.config[
+                        "availableComponents"
+                    ]
+                ]
+            )
+        )
 
     @property
     def required_search_components(self):
         return self._required_search_components
 
-    def get_search_components(self):
-        return self._required_search_components + [self.core_component]
+    @property
+    def available_search_components(self):
+        return self._available_search_components
+
+    def get_searchview_components(self):
+        return self._available_search_components + [self.core_component]
 
     def handle_search_results_query(
         self, search_query_object, response_object, search_filter_factory, returnDsl
@@ -219,6 +233,12 @@ class SearchFilterFactory(object):
         ret = dict(query_dict)
         core_component_name = self.get_core_component_name()
         ret[core_component_name] = True
+        # check that all core-search component requiredComponents are present
+        for required_component in self.search_filters[core_component_name].config[
+            "requiredComponents"
+        ]:
+            if required_component["componentname"] not in ret:
+                ret[required_component["componentname"]] = {}
 
         return ret, self.search_filters[core_component_name]
 

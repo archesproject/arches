@@ -77,7 +77,7 @@ class SearchView(MapBaseManagerView):
         geocoding_providers = models.Geocoder.objects.all()
         search_component_factory = SearchFilterFactory(request)
         core_search_instance = search_component_factory.get_core_component_instance()
-        search_components = core_search_instance.get_search_components()
+        search_components = core_search_instance.get_searchview_components()
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()

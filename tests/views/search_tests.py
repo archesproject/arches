@@ -787,7 +787,7 @@ class SearchTests(ArchesTestCase):
         core_search_instance = search_component_factory.get_core_component_instance()
         self.assertTrue(core_search_instance is not None)
 
-        search_components = core_search_instance.get_search_components()
+        search_components = core_search_instance.get_searchview_components()
         # 13 req'd components + core-search component
         self.assertEqual(len(search_components), 14)
 
@@ -799,7 +799,7 @@ class SearchTests(ArchesTestCase):
         core_search_instance = search_component_factory.get_core_component_instance()
         self.assertTrue(core_search_instance is not None)
 
-        search_components = core_search_instance.get_search_components()
+        search_components = core_search_instance.get_searchview_components()
         # 13 req'd components + core-search component
         self.assertEqual(len(search_components), 14)
 

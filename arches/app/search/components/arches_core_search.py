@@ -29,6 +29,18 @@ details = {
         "default": True,
         "requiredComponents": [
             {
+                "componentname": "paging-filter",
+                "searchcomponentid": "7aff5819-651c-4390-9b9a-a61221ba52c6",
+                "sortorder": 1,
+            },
+            {
+                "componentname": "search-results",
+                "searchcomponentid": "00673743-8c1c-4cc0-bd85-c073a52e03ec",
+                "sortorder": 2,
+            },
+        ],
+        "availableComponents": [
+            {
                 "componentname": "map-filter",
                 "searchcomponentid": "09d97fc6-8c83-4319-9cef-3aaa08c3fbec",
                 "sortorder": 1,
@@ -156,7 +168,7 @@ class ArchesCoreSearch(BaseCoreSearch):
         response_object["total_results"] = dsl.count(index=RESOURCES_INDEX)
         response_object["userid"] = self.request.user.id
 
-    def get_search_components(self):
+    def get_searchview_components(self):
         search_components = [
             required_component
             for required_component in self._required_search_components
