@@ -84,6 +84,7 @@
         "underscore": "^1.13.6",
         "uuidjs": "^3.3.0",
         "vue": "^3.4.21",
+        "vue-router": "^4.4.0",
         "vue3-gettext": "^3.0.0-beta.4",
         "webpack-bundle-tracker": "^3.1.0"
     },
