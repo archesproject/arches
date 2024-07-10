@@ -2341,7 +2341,7 @@ class ControlledList(models.Model):
 
 class ControlledListItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    uri = models.URLField(max_length=2048, null=True, blank=True)
+    uri = models.URLField(max_length=2048, null=False, blank=True)
     controlled_list = models.ForeignKey(
         ControlledList,
         db_column="listid",
