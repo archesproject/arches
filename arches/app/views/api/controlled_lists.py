@@ -23,6 +23,7 @@ from arches.app.utils.decorators import group_required
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.utils.string_utils import str_to_bool
+from arches.app.views.api import APIBase
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +63,7 @@ def _prefetch_terms(request):
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
-class ControlledListsView(View):
+class ControlledListsView(APIBase):
     def get(self, request):
         """Returns either a flat representation (?flat=true) or a tree (default)."""
         lists = (
