@@ -16,8 +16,7 @@ details = {
     "type": "popup",
     "componentpath": "views/components/search/time-filter",
     "componentname": "time-filter",
-    "sortorder": "1",
-    "enabled": True,
+    "config": {},
 }
 
 

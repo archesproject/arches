@@ -11,8 +11,7 @@ details = {
     "type": "popup",
     "componentpath": "views/components/search/saved-searches",
     "componentname": "saved-searches",
-    "sortorder": "2",
-    "enabled": True,
+    "config": {},
 }
 
 

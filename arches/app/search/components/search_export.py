@@ -11,8 +11,7 @@ details = {
     "type": "popup",
     "componentpath": "views/components/search/search-export",
     "componentname": "search-export",
-    "sortorder": "3",
-    "enabled": True,
+    "config": {},
 }
 
 

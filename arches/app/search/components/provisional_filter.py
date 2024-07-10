@@ -10,8 +10,7 @@ details = {
     "type": "",
     "componentpath": "views/components/search/provisional-filter",
     "componentname": "provisional-filter",
-    "sortorder": "0",
-    "enabled": True,
+    "config": {},
 }
 
 

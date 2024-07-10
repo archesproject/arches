@@ -11,8 +11,7 @@ details = {
     "type": "",
     "componentpath": "views/components/search/sort-results",
     "componentname": "sort-results",
-    "sortorder": "0",
-    "enabled": True,
+    "config": {},
 }
 
 

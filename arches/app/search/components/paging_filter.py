@@ -11,8 +11,7 @@ details = {
     "type": "paging",
     "componentpath": "views/components/search/paging-filter",
     "componentname": "paging-filter",
-    "sortorder": "0",
-    "enabled": True,
+    "config": {},
 }
 
 

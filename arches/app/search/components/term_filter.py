@@ -23,8 +23,7 @@ details = {
     "type": "text-input",
     "componentpath": "views/components/search/term-filter",
     "componentname": "term-filter",
-    "sortorder": "0",
-    "enabled": True,
+    "config": {},
 }
 
 

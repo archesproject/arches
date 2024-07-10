@@ -14,8 +14,7 @@ details = {
     "type": "resource-type-filter",
     "componentpath": "views/components/search/resource-type-filter",
     "componentname": "resource-type-filter",
-    "sortorder": "0",
-    "enabled": True,
+    "config": {},
 }
 
 
