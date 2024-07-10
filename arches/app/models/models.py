@@ -2378,7 +2378,7 @@ class ControlledListItem(models.Model):
 
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)
-        if "id" not in exclude:
+        if not self.id and "id" not in exclude:
             id_field = [f for f in self._meta.fields if f.name == "id"][0]
             self.id = id_field.get_default()
 
