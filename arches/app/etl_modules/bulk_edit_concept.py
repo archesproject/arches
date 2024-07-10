@@ -12,7 +12,7 @@ details = {
     "icon": "fa fa-edit",
     "slug": "bulk_edit_concept",
     "helpsortorder": 9,
-    "helptemplate": "bulk_edit_concept-help"
+    "helptemplate": "bulk_edit_concept-help",
 }
 
 from datetime import datetime
@@ -44,82 +44,115 @@ import arches.app.tasks as tasks
 
 logger = logging.getLogger(__name__)
 
+
 def log_event_details(cursor, loadid, details):
     cursor.execute(
         """UPDATE load_event SET load_description = concat(load_description, %s) WHERE loadid = %s""",
         (details, loadid),
     )
 
-def perth_items(items):
-        id_name_pairs = []
-        if len(items)%2 == 0:
-            id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
-        else:
-            count = 0
-            help_var = ""
-            extra = ""
 
-            for i in range(len(items)):
-                
-                if count == 0:
-                    extra = ""  # Reset extra for each iteration
-                    count += 1
-                    help_var = items[i]
-                else:
-                    if i + 1 <= len(items):
-                        try:
-                            uuid.UUID(items[i + 1])
-                            count = 0
-                            extra = extra + items[i]
-                            id_name_pairs.append([help_var, extra])
-                        except:
-                            extra = items[i]+","
-        return id_name_pairs           
+def perth_items(items):
+    id_name_pairs = []
+    if len(items) % 2 == 0:
+        id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
+    else:
+        count = 0
+        help_var = ""
+        extra = ""
+
+        for i in range(len(items)):
+
+            if count == 0:
+                extra = ""  # Reset extra for each iteration
+                count += 1
+                help_var = items[i]
+            else:
+                if i + 1 <= len(items):
+                    try:
+                        uuid.UUID(items[i + 1])
+                        count = 0
+                        extra = extra + items[i]
+                        id_name_pairs.append([help_var, extra])
+                    except:
+                        extra = items[i] + ","
+    return id_name_pairs
+
 
 class BulkConceptEditor(BaseBulkEditor):
     def editor_log(self, cursor, tile, node_id, resourceid, old_value):
         id = uuid.uuid4()
         cursor.execute(
-                """INSERT INTO edit_log (editlogid, resourceinstanceid, nodegroupid, tileinstanceid, oldvalue, edittype, transactionid) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                (id, resourceid, node_id, tile, old_value, "tile edit", str(self.loadid)),
-            )
+            """INSERT INTO edit_log (editlogid, resourceinstanceid, nodegroupid, tileinstanceid, oldvalue, edittype, transactionid) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+            (id, resourceid, node_id, tile, old_value, "tile edit", str(self.loadid)),
+        )
 
-    def save_tiles(self, cursor, loadid, userid, tileids, newids, tiledatas, nodeids, newresources, oldid):
+    def save_tiles(
+        self,
+        cursor,
+        loadid,
+        userid,
+        tileids,
+        newids,
+        tiledatas,
+        nodeids,
+        newresources,
+        oldid,
+    ):
         log_event_details(cursor, loadid, "done|Saving the tiles...")
         log_event_details(cursor, loadid, "done|Getting the statistics...")
-        
-        cursor.execute("""SELECT g.name graph, COUNT(DISTINCT l.resourceid)
+
+        cursor.execute(
+            """SELECT g.name graph, COUNT(DISTINCT l.resourceid)
                         FROM load_staging l, resource_instances r, graphs g
                         WHERE l.loadid = %s
                         AND r.resourceinstanceid = l.resourceid
                         AND g.graphid = r.graphid
-                        GROUP BY g.name""", [loadid])
+                        GROUP BY g.name""",
+            [loadid],
+        )
         resources = cursor.fetchall()
         number_of_resources = {}
-        
+
         for resource in resources:
             graph = json.loads(resource[0])[settings.LANGUAGE_CODE]
-            number_of_resources.update({ graph: { "total": resource[1] } })
-        
-        cursor.execute("""SELECT g.name graph, n.name, COUNT(*)
+            number_of_resources.update({graph: {"total": resource[1]}})
+
+        cursor.execute(
+            """SELECT g.name graph, n.name, COUNT(*)
                         FROM load_staging l, nodes n, graphs g
                         WHERE l.loadid = %s
                         AND n.nodeid = l.nodegroupid
                         AND n.graphid = g.graphid
-                        GROUP BY n.name, g.name;""", [loadid])
+                        GROUP BY n.name, g.name;""",
+            [loadid],
+        )
         tiles = cursor.fetchall()
-        
+
         for tile in tiles:
             graph = json.loads(tile[0])[settings.LANGUAGE_CODE]
-            number_of_resources[graph].setdefault('tiles', []).append({'tile': tile[1], 'count': tile[2] })
-        
-        number_of_import = json.dumps({ "number_of_import": [{ "name": k, "total": v["total"], "tiles": v["tiles"] } for k, v in number_of_resources.items()]})
-        
-        cursor.execute("""UPDATE load_event SET (status, load_end_time, load_details) = (%s, %s, load_details || %s::JSONB) WHERE loadid = %s""",
-                ("completed", datetime.now(), number_of_import, loadid),)
-        
+            number_of_resources[graph].setdefault("tiles", []).append(
+                {"tile": tile[1], "count": tile[2]}
+            )
+
+        number_of_import = json.dumps(
+            {
+                "number_of_import": [
+                    {"name": k, "total": v["total"], "tiles": v["tiles"]}
+                    for k, v in number_of_resources.items()
+                ]
+            }
+        )
+
+        cursor.execute(
+            """UPDATE load_event SET (status, load_end_time, load_details) = (%s, %s, load_details || %s::JSONB) WHERE loadid = %s""",
+            ("completed", datetime.now(), number_of_import, loadid),
+        )
+
         log_event_details(cursor, loadid, "done|Indexing...")
-        index_resources_by_transaction(loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True)
+        index_resources_by_transaction(
+            loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True
+        )
         user = User.objects.get(id=userid)
         user_email = getattr(user, "email", "")
         user_firstname = getattr(user, "first_name", "")
@@ -130,29 +163,37 @@ class BulkConceptEditor(BaseBulkEditor):
         match_tileid = []
         match_resourceid = []
         for tileid, tiledata, newresource in zip(tileids, tiledatas, newresources):
-            
-            if str(oldid) in tiledata.get(str(nodeids),[]):  
+
+            if str(oldid) in tiledata.get(str(nodeids), []):
                 if isinstance(tiledata[str(nodeids)], list):
-                    tiledata[str(nodeids)][tiledata[str(nodeids)].index(str(oldid))] = str(newids)
+                    tiledata[str(nodeids)][tiledata[str(nodeids)].index(str(oldid))] = (
+                        str(newids)
+                    )
                 else:
                     tiledata[str(nodeids)] = str(newids)
                 new_tiledata.append(tiledata)
                 match_tileid.append(tileid)
                 match_resourceid.append(newresource)
-        
-        update_data = [(json.dumps(data_json), str(resource_id), str(tile_id)) for data_json, resource_id, tile_id in zip(new_tiledata, match_resourceid, match_tileid)]
+
+        update_data = [
+            (json.dumps(data_json), str(resource_id), str(tile_id))
+            for data_json, resource_id, tile_id in zip(
+                new_tiledata, match_resourceid, match_tileid
+            )
+        ]
         update_query = "UPDATE tiles SET tiledata = %s WHERE resourceinstanceid = %s AND tileid = %s;"
         try:
-            
+
             cursor.executemany(update_query, update_data)
-                
-            
+
         except Exception as e:
-            cursor.execute("""UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                                ('failed', datetime.now(), self.loadid))
-            
+            cursor.execute(
+                """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                ("failed", datetime.now(), self.loadid),
+            )
+
             print("Error:", e)
-            return  None
+            return None
 
         for tiledata in new_tiledata:
             json_data = json.dumps(tiledata)
@@ -164,7 +205,17 @@ class BulkConceptEditor(BaseBulkEditor):
                 WHERE e.resourceinstanceid::uuid = r.resourceinstanceid
                 AND transactionid = %s
                 """,
-                (settings.LANGUAGE_CODE, userid, user_firstname, user_lastname, user_email, user_username, json_data, datetime.now(), loadid),
+                (
+                    settings.LANGUAGE_CODE,
+                    userid,
+                    user_firstname,
+                    user_lastname,
+                    user_email,
+                    user_username,
+                    json_data,
+                    datetime.now(),
+                    loadid,
+                ),
             )
 
         log_event_details(cursor, loadid, "done")
@@ -173,28 +224,27 @@ class BulkConceptEditor(BaseBulkEditor):
             """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
             ("indexed", datetime.now(), True, True, loadid),
         )
-        
+
     def return_value(self, cursor, resource_ids, node_id, old_id, new_id):
         select_query = "SELECT tileid, tiledata  FROM tiles WHERE resourceinstanceid = %s AND Not tiledata -> %s @> %s;"
-        
+
         tiles_data = []
         tile_ids = []
         resources = []
         for resource_id in resource_ids:
-           
+
             newid_json = f'["{str(new_id)}"]'
             cursor.execute(select_query, [resource_id, str(node_id), newid_json])
             rows = cursor.fetchall()
-            
-            
+
             for row in rows:
                 tile_id = str(row[0])
                 data = json.loads(row[1])
-                if data and tile_id not in tile_ids :
+                if data and tile_id not in tile_ids:
                     key = str(node_id)
                 else:
                     continue
-                if key in data and isinstance(data[key], list) :
+                if key in data and isinstance(data[key], list):
                     for see_data in data[key]:
                         if len(see_data) == 36 and str(see_data) == str(old_id):
                             tiles_data.append(data)
@@ -206,19 +256,32 @@ class BulkConceptEditor(BaseBulkEditor):
                     resources.append(str(resource_id))
 
         return tile_ids, tiles_data, resources
-        
-    def edit_staged_data(self, cursor, graphid, nodeid, operation, languageold, resource_ids, language_new, oldid, newid, tiles, tile_datas):
-        
+
+    def edit_staged_data(
+        self,
+        cursor,
+        graphid,
+        nodeid,
+        operation,
+        languageold,
+        resource_ids,
+        language_new,
+        oldid,
+        newid,
+        tiles,
+        tile_datas,
+    ):
+
         for resourceid, tile, tiledata in zip(resource_ids, tiles, tile_datas):
             result = {"success": False}
-            value = {   
-            "graph": str(graphid),
-            "node": str(nodeid),
-            "new": str(newid),
-            "old": tiledata,
-            "languageold": languageold,
-            "languagenew": language_new,
-        }
+            value = {
+                "graph": str(graphid),
+                "node": str(nodeid),
+                "new": str(newid),
+                "old": tiledata,
+                "languageold": languageold,
+                "languagenew": language_new,
+            }
             operation = "update"
             sql_query = "SELECT nodegroupid FROM public.nodes WHERE nodeid = %s"
             cursor.execute(sql_query, [str(nodeid)])
@@ -233,23 +296,25 @@ class BulkConceptEditor(BaseBulkEditor):
                         json.dumps(value),
                         str(self.loadid),
                         0,
-                        'bulk_edit',
+                        "bulk_edit",
                         True,
                         operation,
                     ),
                 )
-                
+
                 result["success"] = True
             except Exception as e:
                 logger.error(e)
                 result["message"] = _("Unable to edit staged data: {}").format(str(e))
                 return result  # Exit early if an exception occurs
         for resourceid, tile, tile_data in zip(resource_ids, tiles, tile_datas):
-            self.editor_log(cursor, str(tile), str(nodeid), str(resourceid), json.dumps(tile_data))
+            self.editor_log(
+                cursor, str(tile), str(nodeid), str(resourceid), json.dumps(tile_data)
+            )
         return result
-    
+
     def all_node_by_conept(self, request):
-         
+
         with connection.cursor() as cursor:
             select_nodes = "SELECT name, config, nodeid FROM nodes Where (datatype = 'concept-list' or datatype = 'concept') ORDER BY name ASC ;"
             # cursor.execute(select_nodes,[select_value[0]])
@@ -258,20 +323,19 @@ class BulkConceptEditor(BaseBulkEditor):
             all_node = []
             for node in nodes:
                 name = json.loads(node[1])
-                if name['rdmCollection']:
-                    all_node.append([node[0], name['rdmCollection'], node[2]])
-        return {
-            "success": True,
-            'data': all_node
-        }
+                if name["rdmCollection"]:
+                    all_node.append([node[0], name["rdmCollection"], node[2]])
+        return {"success": True, "data": all_node}
 
     def get_graphs_node(self, request):
-        saveid = request.POST.get('saveid', None)
-        items = saveid.split(',')
+        saveid = request.POST.get("saveid", None)
+        items = saveid.split(",")
         id_name_pairs = []
-        select_node = request.POST.get('selectedgrapgh', None)
+        select_node = request.POST.get("selectedgrapgh", None)
         id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
-        select_value = next((pair for pair in id_name_pairs if pair[1] == select_node), None)
+        select_value = next(
+            (pair for pair in id_name_pairs if pair[1] == select_node), None
+        )
         with connection.cursor() as cursor:
             select_nodes = """SELECT c.name as card_name, n.config, n.nodeid, w.label as widget_label
                             FROM cards c, nodes n, cards_x_nodes_x_widgets w
@@ -280,27 +344,32 @@ class BulkConceptEditor(BaseBulkEditor):
                             AND (n.datatype = 'concept-list' or n.datatype = 'concept')
                             AND n.graphid = %s
                             ORDER BY c.name;"""
-            cursor.execute(select_nodes,[select_value[0]])
+            cursor.execute(select_nodes, [select_value[0]])
             nodes = cursor.fetchall()
             all_node = []
             for node in nodes:
                 name = json.loads(node[1])
                 name_node = json.loads(node[0])
                 name_label = json.loads(node[-1])
-                if name['rdmCollection']:
-                    
-                    all_node.append([name_node['en']+'-'+ name_label['en'], name['rdmCollection'], node[2]])
-        return {
-            "success": True,
-            'data': all_node
-        }
+                if name["rdmCollection"]:
+
+                    all_node.append(
+                        [
+                            name_node["en"] + "-" + name_label["en"],
+                            name["rdmCollection"],
+                            node[2],
+                        ]
+                    )
+        return {"success": True, "data": all_node}
 
     def all_graph(self, request):
-        graph_model_strings = [str(obj) for obj in BaseBulkEditor().get_graphs({})['data']]
+        graph_model_strings = [
+            str(obj) for obj in BaseBulkEditor().get_graphs({})["data"]
+        ]
         graphs = [obj for obj in graph_model_strings]
         list_graphs = []
         for graph in graphs:
-          
+
             name = {"en": graph}  # Assuming `value` is already a string
             with connection.cursor() as cursor:
                 select_graphs = "SELECT graphid, name FROM graphs WHERE name = %s AND isresource = 'True' ORDER BY name ASC ;"
@@ -308,19 +377,23 @@ class BulkConceptEditor(BaseBulkEditor):
                 graphs = cursor.fetchall()
                 name = json.loads(graphs[0][1])
                 id = str(graphs[0][0])
-                list_graphs.append([id, name['en']])
+                list_graphs.append([id, name["en"]])
         return {
             "success": True,
             "data": list_graphs,
         }
-    
+
     def list_concepts(self, request):
-        selected_node = request.POST.get('selectednode', None)
-        save_node = request.POST.get('savenode', None)
-        items = save_node.split(',')
+        selected_node = request.POST.get("selectednode", None)
+        save_node = request.POST.get("savenode", None)
+        items = save_node.split(",")
         id_name_pairs = []
-        id_name_pairs = [[items[i], items[i + 1], items[i + 2]] for i in range(0, len(items), 3)]
-        concept = next((pair for pair in id_name_pairs if pair[0] == selected_node), None)
+        id_name_pairs = [
+            [items[i], items[i + 1], items[i + 2]] for i in range(0, len(items), 3)
+        ]
+        concept = next(
+            (pair for pair in id_name_pairs if pair[0] == selected_node), None
+        )
         with connection.cursor() as cursor:
             select_nodes = """SELECT relations.conceptidto, values_table.value
                                 FROM relations
@@ -330,7 +403,7 @@ class BulkConceptEditor(BaseBulkEditor):
                                 ) AS values_table ON relations.conceptidto = values_table.conceptid
                                 WHERE relations.conceptidfrom = %s;
                                 """
-            cursor.execute(select_nodes,[concept[1]])
+            cursor.execute(select_nodes, [concept[1]])
             conceptall = cursor.fetchall()
             concept_list = []
             for con in conceptall:
@@ -355,22 +428,22 @@ class BulkConceptEditor(BaseBulkEditor):
         for k, v in params.items():
             request.GET.__setitem__(k, v[0])
         response = search_results(request)
-        results = json.loads(response.content)['results']['hits']['hits']
+        results = json.loads(response.content)["results"]["hits"]["hits"]
         return [result["_source"]["resourceinstanceid"] for result in results]
-    
+
     def replaceConcept(self, request):
-        old = request.POST.get('Selectold', None)
-        new = request.POST.get('Selectnew', None)
-        all_child_concept = request.POST.get('allchildconcept', None)
-        language_old = request.POST.get('vaoldlanguage', None)
-        language_new = request.POST.get('vanewlanguage', None)
-        nodeid = request.POST.get('nodeid', None)
-        
+        old = request.POST.get("Selectold", None)
+        new = request.POST.get("Selectnew", None)
+        all_child_concept = request.POST.get("allchildconcept", None)
+        language_old = request.POST.get("vaoldlanguage", None)
+        language_new = request.POST.get("vanewlanguage", None)
+        nodeid = request.POST.get("nodeid", None)
+
         search_url = request.POST.get("search_url", None)
         resourceids = None
-        items = all_child_concept.split(',')
+        items = all_child_concept.split(",")
         id_name_pairs = []
-        if len(items)%2 == 0:
+        if len(items) % 2 == 0:
             id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
         else:
             id_name_pairs = perth_items(items)
@@ -382,9 +455,12 @@ class BulkConceptEditor(BaseBulkEditor):
             except ValidationError:
                 return {
                     "success": False,
-                    "data": {"title": _("Invalid Search Url"), "message": _("Please, enter a valid search url")}
+                    "data": {
+                        "title": _("Invalid Search Url"),
+                        "message": _("Please, enter a valid search url"),
+                    },
                 }
-           
+
         with connection.cursor() as cursor:
             select_query = "SELECT valueid FROM values Where conceptid = %s and languageid = %s and value= %s;"
             cursor.execute(select_query, [oldid[0], language_old, old])
@@ -394,75 +470,94 @@ class BulkConceptEditor(BaseBulkEditor):
             cursor.execute(select_query, [newid[0], language_new, new])
             valueid = cursor.fetchall()
             newid = valueid[0][0]
-            
+
             if resourceids:
                 resources_id = tuple(resourceids)
                 oldid_json = f'["{str(oldid)}"]'
                 newid_json = f'["{str(newid)}"]'
                 select_resource = "SELECT resourceinstanceid, tiledata, tileid FROM tiles WHERE tiledata -> %s @>%s AND resourceinstanceid in %s AND Not tiledata -> %s @> %s;"
-                cursor.execute(select_resource, [str(nodeid),oldid_json, resources_id, str(nodeid), newid_json])
+                cursor.execute(
+                    select_resource,
+                    [str(nodeid), oldid_json, resources_id, str(nodeid), newid_json],
+                )
                 rows = cursor.fetchall()
-                if len(rows)==0:
+                if len(rows) == 0:
                     select_resource = "SELECT resourceinstanceid, tiledata, tileid FROM tiles WHERE tiledata ->> %s = %s;"
-                    
+
                     cursor.execute(select_resource, [str(nodeid), str(oldid)])
                     rows = cursor.fetchall()
             else:
                 oldid_json = f'["{str(oldid)}"]'
                 newid_json = f'["{str(newid)}"]'
                 select_resource = "SELECT resourceinstanceid, tiledata, tileid FROM tiles WHERE tiledata -> %s @>%s AND Not tiledata -> %s @> %s;"
-                cursor.execute(select_resource, [str(nodeid), oldid_json, str(nodeid), newid_json])
+                cursor.execute(
+                    select_resource, [str(nodeid), oldid_json, str(nodeid), newid_json]
+                )
                 rows = cursor.fetchall()
-                if len(rows)==0:
+                if len(rows) == 0:
                     select_resource = "SELECT resourceinstanceid, tiledata, tileid FROM tiles WHERE tiledata ->> %s = %s;"
-                    
+
                     cursor.execute(select_resource, [str(nodeid), str(oldid)])
                     rows = cursor.fetchall()
-               
+
             information = []
             for row in rows:
-                    data = json.loads(row[1])
-                    if data:
-                        key = str(nodeid)
-                    else:
-                        break
-                    
-                    if key in data and isinstance(data[key], list) :
+                data = json.loads(row[1])
+                if data:
+                    key = str(nodeid)
+                else:
+                    break
 
-                        for item in data[key]:
-                            if len(item) == 36 and str(item) == str(oldid):
-                                select_name = "SELECT name FROM resource_instances WHERE resourceinstanceid = %s;"
-                                cursor.execute(select_name, [row[0]])
-                                name = cursor.fetchone()
-                                if name:
-                                    fulname = json.loads(name[0])
-                                    information.append([str(row[0]), str(fulname.get('en', '')), f"{old}({language_old})", f"{new}({language_new})"])  
-                    elif key in data:
-                          item = data[key]
-                          if len(item) == 36 and str(item) == str(oldid):
-                                select_name = "SELECT name FROM resource_instances WHERE resourceinstanceid = %s;"
-                                cursor.execute(select_name, [row[0]])
-                                name = cursor.fetchone()
-                                if name:
-                                    fulname = json.loads(name[0])
-                                    information.append([str(row[0]), str(fulname.get('en', '')), f"{old}({language_old})", f"{new}({language_new})"])
+                if key in data and isinstance(data[key], list):
+
+                    for item in data[key]:
+                        if len(item) == 36 and str(item) == str(oldid):
+                            select_name = "SELECT name FROM resource_instances WHERE resourceinstanceid = %s;"
+                            cursor.execute(select_name, [row[0]])
+                            name = cursor.fetchone()
+                            if name:
+                                fulname = json.loads(name[0])
+                                information.append(
+                                    [
+                                        str(row[0]),
+                                        str(fulname.get("en", "")),
+                                        f"{old}({language_old})",
+                                        f"{new}({language_new})",
+                                    ]
+                                )
+                elif key in data:
+                    item = data[key]
+                    if len(item) == 36 and str(item) == str(oldid):
+                        select_name = "SELECT name FROM resource_instances WHERE resourceinstanceid = %s;"
+                        cursor.execute(select_name, [row[0]])
+                        name = cursor.fetchone()
+                        if name:
+                            fulname = json.loads(name[0])
+                            information.append(
+                                [
+                                    str(row[0]),
+                                    str(fulname.get("en", "")),
+                                    f"{old}({language_old})",
+                                    f"{new}({language_new})",
+                                ]
+                            )
 
         return {
             "success": True,
             "data": information,
         }
-    
+
     def select_language(self, request):
-        type_lang = request.POST.get('type_lang', None)
-        if type_lang == 'language_old':
-            languege = request.POST.get('Selectold', None)
-        elif  type_lang == 'language_new':
-            languege = request.POST.get('Selectnew', None)
-    
-        all_child_concept = request.POST.get('allchildconcept', None)
-        items = all_child_concept.split(',')
+        type_lang = request.POST.get("type_lang", None)
+        if type_lang == "language_old":
+            languege = request.POST.get("Selectold", None)
+        elif type_lang == "language_new":
+            languege = request.POST.get("Selectnew", None)
+
+        all_child_concept = request.POST.get("allchildconcept", None)
+        items = all_child_concept.split(",")
         id_name_pairs = []
-        if len(items)%2 == 0:
+        if len(items) % 2 == 0:
             id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
         else:
             id_name_pairs = perth_items(items)
@@ -478,16 +573,16 @@ class BulkConceptEditor(BaseBulkEditor):
             "success": True,
             "data": langs,
         }
-    
+
     def write(self, request):
-        selected_grapgh = request.POST.get('selectedgrapgh', None)
-        select_node = request.POST.get('selectednode', None)
-        new = request.POST.get('Selectnew', None)
-        old = request.POST.get('Selectold', None)
-        language_old = request.POST.get('vaoldlanguage', None)
-        language_new = request.POST.get('vanewlanguage', None)
-        table = request.POST.get('table', None)
-        load_details = {   
+        selected_grapgh = request.POST.get("selectedgrapgh", None)
+        select_node = request.POST.get("selectednode", None)
+        new = request.POST.get("Selectnew", None)
+        old = request.POST.get("Selectold", None)
+        language_old = request.POST.get("vaoldlanguage", None)
+        language_new = request.POST.get("vanewlanguage", None)
+        table = request.POST.get("table", None)
+        load_details = {
             "graph": selected_grapgh,
             "node": select_node,
             "new": new,
@@ -496,7 +591,7 @@ class BulkConceptEditor(BaseBulkEditor):
             "languagenew": language_new,
         }
         resourcesid = []
-        for resource in table.split(','):
+        for resource in table.split(","):
             try:
                 uuid.UUID(resource)
                 resourcesid.append(resource)
@@ -511,33 +606,35 @@ class BulkConceptEditor(BaseBulkEditor):
         use_celery_bulk_edit = True
         if use_celery_bulk_edit:
             response = self.run_load_task_async(request, self.loadid)
-        return response        
-        
+        return response
+
     @load_data_async
     def run_load_task_async(self, request):
-        selected_grapgh = request.POST.get('selectedgrapgh', None)
-        new = request.POST.get('Selectnew', None)
-        old = request.POST.get('Selectold', None)
-        language_old = request.POST.get('vaoldlanguage', None)
-        language_new = request.POST.get('vanewlanguage', None)
-        table = request.POST.get('table', None)
-        nodeid = request.POST.get('nodeid', None)
-        all_child_concept = request.POST.get('allchildconcept', None)
-        saveid = request.POST.get('saveid', None)
-        items = all_child_concept.split(',')
+        selected_grapgh = request.POST.get("selectedgrapgh", None)
+        new = request.POST.get("Selectnew", None)
+        old = request.POST.get("Selectold", None)
+        language_old = request.POST.get("vaoldlanguage", None)
+        language_new = request.POST.get("vanewlanguage", None)
+        table = request.POST.get("table", None)
+        nodeid = request.POST.get("nodeid", None)
+        all_child_concept = request.POST.get("allchildconcept", None)
+        saveid = request.POST.get("saveid", None)
+        items = all_child_concept.split(",")
         id_name_pairs = []
-        if len(items)%2 == 0:
+        if len(items) % 2 == 0:
             id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
         else:
             id_name_pairs = perth_items(items)
         oldid = next((pair for pair in id_name_pairs if pair[1] == old), None)
         newid = next((pair for pair in id_name_pairs if pair[1] == new), None)
-        items = saveid.split(',')
+        items = saveid.split(",")
         id_name_pairs = []
         id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
-        graphid = next((pair for pair in id_name_pairs if pair[1] == selected_grapgh), None)
+        graphid = next(
+            (pair for pair in id_name_pairs if pair[1] == selected_grapgh), None
+        )
         resourcesid = []
-        for resource in table.split(','):
+        for resource in table.split(","):
             try:
                 uuid.UUID(resource)
                 resourcesid.append(resource)
@@ -547,9 +644,23 @@ class BulkConceptEditor(BaseBulkEditor):
             resourceids_json_string = json.dumps(resourcesid)
             resourceids = json.loads(resourceids_json_string)
         pattern = old
-        operation = 'replace'
+        operation = "replace"
         edit_task = tasks.add.apply_async(
-            (self.userid, self.loadid, self.moduleid, graphid, nodeid, operation, language_old, pattern, new, resourceids, language_new, oldid, newid),
+            (
+                self.userid,
+                self.loadid,
+                self.moduleid,
+                graphid,
+                nodeid,
+                operation,
+                language_old,
+                pattern,
+                new,
+                resourceids,
+                language_new,
+                oldid,
+                newid,
+            ),
         )
         with connection.cursor() as cursor:
             cursor.execute(
@@ -557,7 +668,22 @@ class BulkConceptEditor(BaseBulkEditor):
                 (edit_task.task_id, self.loadid),
             )
 
-    def run_load_task(self, userid, loadid, module_id, graphid, nodeid, operation, languageold, pattern, new_text, resourceids, language_new, oldid, newid):
+    def run_load_task(
+        self,
+        userid,
+        loadid,
+        module_id,
+        graphid,
+        nodeid,
+        operation,
+        languageold,
+        pattern,
+        new_text,
+        resourceids,
+        language_new,
+        oldid,
+        newid,
+    ):
 
         with connection.cursor() as cursor:
             self.log_event_details(cursor, "done|Staging the data for edit...")
@@ -572,13 +698,38 @@ class BulkConceptEditor(BaseBulkEditor):
             self.log_event_details(cursor, "done|Editing the data...")
             tile = self.return_value(cursor, resourceids, nodeid, oldid, newid)
             self.log_event_details(cursor, "done|returm data...")
-            data_updated = self.edit_staged_data(cursor, graphid[0], nodeid, operation, languageold, tile[2],language_new, oldid, newid, tile[0], tile[1])
+            data_updated = self.edit_staged_data(
+                cursor,
+                graphid[0],
+                nodeid,
+                operation,
+                languageold,
+                tile[2],
+                language_new,
+                oldid,
+                newid,
+                tile[0],
+                tile[1],
+            )
             if data_updated["success"]:
                 self.loadid = loadid  # currently redundant, but be certain
                 # for resource in resourceids:
                 tile = self.return_value(cursor, resourceids, nodeid, oldid, newid)
-                self.save_tiles(cursor, loadid, userid, tile[0], newid, tile[1], nodeid, tile[2], oldid)
+                self.save_tiles(
+                    cursor,
+                    loadid,
+                    userid,
+                    tile[0],
+                    newid,
+                    tile[1],
+                    nodeid,
+                    tile[2],
+                    oldid,
+                )
                 return {"success": True, "data": "done"}
             else:
                 self.log_event(cursor, "failed")
-                return {"success": False, "data": {"title": _("Error"), "message": data_updated["message"]}}
+                return {
+                    "success": False,
+                    "data": {"title": _("Error"), "message": data_updated["message"]},
+                }
