@@ -1,5 +1,5 @@
 name: 'Install Arches Applications'
-description: 'Manually edit this file to install all Arches Applications declared in settings.py, but not declared in `requirements.txt`'
+description: 'Manually edit this file to install all Arches Applications declared in settings.py, but not declared in `pyproject.toml`'
 inputs: 
   secrets:
     description: 'Secrets from main.yml as JSON'
@@ -7,7 +7,7 @@ runs:
   using: 'composite'
   steps:
 
-    # Manually add any ARCHES_APPLICATIONS to this file if not already declared in `requirements.txt`. 
+    # Manually add any ARCHES_APPLICATIONS to this file if not already declared in `pyproject.toml`. 
     # Below is a template for adding an application in a private repository. 
     # Be sure to delete the `no-op step` if adding when updating this file.
 
