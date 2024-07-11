@@ -74,7 +74,7 @@
         "moment": "^2.29.4",
         "nouislider": "11.0.3",
         "numeral": "^2.0.6",
-        "primevue": "4.0.0-rc.2",
+        "primevue": "^3.53.0",
         "proj4": "^2.3.15",
         "regenerator-runtime": "^0.14.1",
         "requirejs": "~2.3.2",

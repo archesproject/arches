@@ -7,25 +7,12 @@ import StyleClass from 'primevue/styleclass';
 import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
 
-import Aura from '@primevue/themes/aura';
-
 import { createApp } from 'vue';
 import { createGettext } from "vue3-gettext";
 
 import arches from 'arches';
 
-const DEFAULT_THEME = {
-    theme: {
-        preset: Aura,
-        options: {
-            prefix: 'p',
-            darkModeSelector: 'system',
-            cssLayer: false
-        }
-    }
-};
-
-export default async function createVueApplication(vueComponent, themeConfiguration) {
+export default async function createVueApplication(vueComponent) {
     /**
      * This wrapper allows us to maintain a level of control inside arches-core
      * over Vue apps. For instance this allows us to abstract i18n setup/config
@@ -53,7 +40,7 @@ export default async function createVueApplication(vueComponent, themeConfigurat
 
         const app = createApp(vueComponent);
 
-        app.use(PrimeVue, themeConfiguration || DEFAULT_THEME);
+        app.use(PrimeVue);
         app.use(gettext);
         app.use(ConfirmationService);
         app.use(DialogService);
