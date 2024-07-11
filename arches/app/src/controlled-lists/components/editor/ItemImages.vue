@@ -79,7 +79,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
                     style: { backgroundColor: 'aliceblue', color: 'black' },
                 },
                 content: ({ props, state }) => {
-                    const done = state.uploadedFileCount > state.files.length;
+                    const done = [0, 100].includes(state.progress);
                     return {
                         style: { display: done ? 'none' : '' },
                     };
