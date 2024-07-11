@@ -17,23 +17,23 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
-import sys
-import inspect
+from unittest import mock
 
-path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+from django.core.exceptions import ImproperlyConfigured
+from django.test import SimpleTestCase
 
-if path not in sys.path:
-    sys.path.append(path)
+from arches.app.models.system_settings import SystemSettings
 
-# reverting back to the old style of setting the DJANGO_SETTINGS_MODULE env variable
-# refer to the following blog post under the heading "Leaking of process environment variables."
-# http://blog.dscpl.com.au/2012/10/requests-running-in-wrong-django.html
-os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
+# these tests can be run from the command line via
+# python manage.py test tests.models.system_settings_tests --settings="tests.test_settings"
 
-from django.core.wsgi import get_wsgi_application
 
-application = get_wsgi_application()
-
-from arches.app.models.system_settings import settings
-
-settings.update_from_db()
+class SystemSettingsTests(SimpleTestCase):
+    @mock.patch.dict(os.environ, {"DJANGO_SETTINGS_MODULE": ""})
+    def test_improper_access(self):
+        """Accessing settings during the Django startup phase fails loudly."""
+        settings_obj = SystemSettings()
+        with self.assertRaises(ImproperlyConfigured):
+            settings_obj.ARBITRARY_KEY
+        with self.assertRaises(ImproperlyConfigured):
+            settings_obj.setting_exists("ARBITRARY_KEY")
