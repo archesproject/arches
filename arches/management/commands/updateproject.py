@@ -20,8 +20,8 @@ class Command(BaseCommand):
         answer = input(
             "This will replace the following files in your project:\n"
             ".babelrc, eslintrc.js, .eslintignore, .browserslistrc, .stylelintrc.json,\n"
-            ".yarnrc, .gitignore, nodemon.json, .prettierrc, .pre-commit-config.yaml,\n"
-            "tsconfig.json, and the entire webpack directory.\n\n"
+            ".yarnrc, .gitattributes, .gitignore, nodemon.json, .prettierrc,\n"
+            ".pre-commit-config.yaml, tsconfig.json, and the entire webpack directory.\n\n"
             "Continue? "
         )
 
@@ -124,6 +124,7 @@ class Command(BaseCommand):
             "nodemon.json",
             "tsconfig.json",
             ".coveragerc",
+            ".gitattributes",
             ".gitignore",
             ".babelrc",
             ".browserslistrc",

@@ -9658,9 +9658,9 @@ ul.pagination {
 
 .search-listing-footer {
     display: flex;
-    height: fit-content;
+    min-height: 40px;
     font-size: 1.1rem;
-    padding: 10px 10px 10px 10px;
+    padding: 10px;
     background: #f5f5f5;
     border-top: 1px solid #ddd;
     flex-flow: row wrap;

@@ -72,6 +72,11 @@ runs:
         black . --check --exclude=node_modules
       shell: bash
 
+    - name: Check line endings
+      run: |
+        ! git ls-files --eol | grep 'w/crlf\|w/mixed'
+      shell: bash
+
     - name: Run frontend tests
       run: |
         npm run vitest
