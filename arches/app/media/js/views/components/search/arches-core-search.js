@@ -66,8 +66,6 @@ define([
         doQuery: function() {
             let queryObj = JSON.parse(this.queryString());
             queryObj[componentName] = true;
-            if (!queryObj["search-results"])
-                queryObj["search-results"] = "";
             if (self.updateRequest) { self.updateRequest.abort(); }
             self.updateRequest = $.ajax({
                 type: "GET",
