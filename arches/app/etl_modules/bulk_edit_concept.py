@@ -21,26 +21,20 @@ import logging
 import uuid
 from urllib.parse import urlsplit, parse_qs
 from django.db import connection
-import requests
 from django.http import HttpRequest
-import json
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.contrib.auth.models import User
-from django.utils.decorators import method_decorator
-from django.utils.translation import gettext as _
+from django.utils.translation import get_language, gettext as _
 from arches.app.etl_modules.base_data_editor import BaseBulkEditor
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.models.system_settings import settings
-from arches.app.models.models import GraphModel, Node
+from arches.app.models.models import Value, Language
+from arches.app.models.concept import Concept
 from arches.app.utils.db_utils import dictfetchall
-from arches.app.utils.transaction import reverse_edit_log_entries
-from arches.app.utils.decorators import user_created_transaction_match
 from arches.app.utils.index_database import index_resources_by_transaction
-from arches.app.utils.transaction import reverse_edit_log_entries
 from arches.app.views.search import search_results
-import arches.app.utils.task_management as task_management
-import arches.app.tasks as tasks
+from arches.app.tasks import edit_bulk_concept_data
 
 logger = logging.getLogger(__name__)
 
@@ -328,90 +322,43 @@ class BulkConceptEditor(BaseBulkEditor):
         return {"success": True, "data": all_node}
 
     def get_graphs_node(self, request):
-        saveid = request.POST.get("saveid", None)
-        items = saveid.split(",")
-        id_name_pairs = []
-        select_node = request.POST.get("selectedgrapgh", None)
-        id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
-        select_value = next(
-            (pair for pair in id_name_pairs if pair[1] == select_node), None
-        )
+        graphid = request.POST.get("selectedgrapgh", None)
         with connection.cursor() as cursor:
-            select_nodes = """SELECT c.name as card_name, n.config, n.nodeid, w.label as widget_label
-                            FROM cards c, nodes n, cards_x_nodes_x_widgets w
-                            WHERE n.nodeid = w.nodeid
-                            AND w.cardid = c.cardid
-                            AND (n.datatype = 'concept-list' or n.datatype = 'concept')
-                            AND n.graphid = %s
-                            ORDER BY c.name;"""
-            cursor.execute(select_nodes, [select_value[0]])
-            nodes = cursor.fetchall()
-            all_node = []
-            for node in nodes:
-                name = json.loads(node[1])
-                name_node = json.loads(node[0])
-                name_label = json.loads(node[-1])
-                if name["rdmCollection"]:
-
-                    all_node.append(
-                        [
-                            name_node["en"] + "-" + name_label["en"],
-                            name["rdmCollection"],
-                            node[2],
-                        ]
-                    )
-        return {"success": True, "data": all_node}
-
-    def all_graph(self, request):
-        graph_model_strings = [
-            str(obj) for obj in BaseBulkEditor().get_graphs({})["data"]
-        ]
-        graphs = [obj for obj in graph_model_strings]
-        list_graphs = []
-        for graph in graphs:
-
-            name = {"en": graph}  # Assuming `value` is already a string
-            with connection.cursor() as cursor:
-                select_graphs = "SELECT graphid, name FROM graphs WHERE name = %s AND isresource = 'True' ORDER BY name ASC ;"
-                cursor.execute(select_graphs, (json.dumps(name),))
-                graphs = cursor.fetchall()
-                name = json.loads(graphs[0][1])
-                id = str(graphs[0][0])
-                list_graphs.append([id, name["en"]])
-        return {
-            "success": True,
-            "data": list_graphs,
-        }
+            select_nodes = """
+                SELECT c.name as card_name, n.config, n.nodeid, w.label as widget_label
+                FROM cards c, nodes n, cards_x_nodes_x_widgets w
+                WHERE n.nodeid = w.nodeid
+                AND w.cardid = c.cardid
+                AND (n.datatype = 'concept-list' or n.datatype = 'concept')
+                AND n.graphid = %s
+                ORDER BY c.name;
+            """
+            cursor.execute(select_nodes, [graphid])
+            nodes = dictfetchall(cursor)
+            return {"success": True, "data": nodes}
 
     def list_concepts(self, request):
-        selected_node = request.POST.get("selectednode", None)
-        save_node = request.POST.get("savenode", None)
-        items = save_node.split(",")
-        id_name_pairs = []
-        id_name_pairs = [
-            [items[i], items[i + 1], items[i + 2]] for i in range(0, len(items), 3)
-        ]
-        concept = next(
-            (pair for pair in id_name_pairs if pair[0] == selected_node), None
-        )
+        selected_node_info = request.POST.get("selectednode", None)
+        if not selected_node_info:
+            return {}
+
+        selected_rdmCollection = json.loads(selected_node_info)["rdmCollection"]
         with connection.cursor() as cursor:
-            select_nodes = """SELECT relations.conceptidto, values_table.value
-                                FROM relations
-                                INNER JOIN (
-                                    SELECT conceptid, value
-                                    FROM public."values" Where (languageid = 'en' or languageid = 'en-US') and valuetype = 'prefLabel'
-                                ) AS values_table ON relations.conceptidto = values_table.conceptid
-                                WHERE relations.conceptidfrom = %s;
-                                """
-            cursor.execute(select_nodes, [concept[1]])
-            conceptall = cursor.fetchall()
-            concept_list = []
-            for con in conceptall:
-                concept_list.append([str(con[0]), con[1]])
-            concept_list.append([concept[2]])
+            select_nodes = """
+                SELECT relations.conceptidto as conceptid, values_table.value as label, values_table.valueid as valueid
+                FROM relations
+                INNER JOIN (
+                    SELECT conceptid, value, valueid
+                    FROM public."values" 
+                    WHERE valuetype = 'prefLabel'
+                ) AS values_table ON relations.conceptidto = values_table.conceptid
+                WHERE relations.conceptidfrom = %s;
+            """
+            cursor.execute(select_nodes, [selected_rdmCollection])
+            conceptall = dictfetchall(cursor)
         return {
             "success": True,
-            "data": concept_list,
+            "data": conceptall,
         }
 
     def get_resourceids_from_search_url(self, search_url):
@@ -432,23 +379,28 @@ class BulkConceptEditor(BaseBulkEditor):
         return [result["_source"]["resourceinstanceid"] for result in results]
 
     def replaceConcept(self, request):
-        old = request.POST.get("Selectold", None)
-        new = request.POST.get("Selectnew", None)
-        all_child_concept = request.POST.get("allchildconcept", None)
+        old = request.POST.get("conceptOld", None)
+        new = request.POST.get("conceptNew", None)
+        # all_child_concept = request.POST.get("allchildconcept", None)
         language_old = request.POST.get("vaoldlanguage", None)
         language_new = request.POST.get("vanewlanguage", None)
-        nodeid = request.POST.get("nodeid", None)
+        # nodeid = request.POST.get("nodeid", None)
+        selected_node_info = request.POST.get("selectednode", None)
+        if not selected_node_info:
+            return {}
+        # selected_node = json.loads(selected_node_info)["nodeid"]
+        nodeid = json.loads(selected_node_info)["nodeid"]
 
         search_url = request.POST.get("search_url", None)
         resourceids = None
-        items = all_child_concept.split(",")
-        id_name_pairs = []
-        if len(items) % 2 == 0:
-            id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
-        else:
-            id_name_pairs = perth_items(items)
-        oldid = next((pair for pair in id_name_pairs if pair[1] == old), None)
-        newid = next((pair for pair in id_name_pairs if pair[1] == new), None)
+        # items = all_child_concept.split(",")
+        # id_name_pairs = []
+        # if len(items) % 2 == 0:
+        #     id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
+        # else:
+        #     id_name_pairs = perth_items(items)
+        # oldid = next((pair for pair in id_name_pairs if pair[1] == old), None)
+        # newid = next((pair for pair in id_name_pairs if pair[1] == new), None)
         if search_url:
             try:
                 resourceids = self.get_resourceids_from_search_url(search_url)
@@ -462,14 +414,17 @@ class BulkConceptEditor(BaseBulkEditor):
                 }
 
         with connection.cursor() as cursor:
-            select_query = "SELECT valueid FROM values Where conceptid = %s and languageid = %s and value= %s;"
-            cursor.execute(select_query, [oldid[0], language_old, old])
-            valueid = cursor.fetchall()
-            oldid = valueid[0][0]
-            select_query = "SELECT valueid FROM values Where conceptid = %s and languageid = %s and value= %s;"
-            cursor.execute(select_query, [newid[0], language_new, new])
-            valueid = cursor.fetchall()
-            newid = valueid[0][0]
+            # select_query = "SELECT valueid FROM values Where conceptid = %s and languageid = %s and value= %s;"
+            # cursor.execute(select_query, [oldid[0], language_old, old])
+            # valueid = cursor.fetchall()
+            # oldid = valueid[0][0]
+            # select_query = "SELECT valueid FROM values Where conceptid = %s and languageid = %s and value= %s;"
+            # cursor.execute(select_query, [newid[0], language_new, new])
+            # valueid = cursor.fetchall()
+            # newid = valueid[0][0]
+
+            oldid = old
+            newid = new
 
             if resourceids:
                 resources_id = tuple(resourceids)
@@ -548,37 +503,55 @@ class BulkConceptEditor(BaseBulkEditor):
         }
 
     def select_language(self, request):
-        type_lang = request.POST.get("type_lang", None)
-        if type_lang == "language_old":
-            languege = request.POST.get("Selectold", None)
-        elif type_lang == "language_new":
-            languege = request.POST.get("Selectnew", None)
+        # import ipdb; ipdb.sset_trace()
 
-        all_child_concept = request.POST.get("allchildconcept", None)
-        items = all_child_concept.split(",")
-        id_name_pairs = []
-        if len(items) % 2 == 0:
-            id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
-        else:
-            id_name_pairs = perth_items(items)
-        languegeid = next((pair for pair in id_name_pairs if pair[1] == languege), None)
-        with connection.cursor() as cursor:
-            select_query = "SELECT languageid FROM values Where conceptid = %s  and valuetype = 'prefLabel';"
-            cursor.execute(select_query, [languegeid[0]])
-            langueges = cursor.fetchall()
-            langs = []
-            for lang in langueges:
-                langs.append(lang[0])
+        selected_conceptid = request.POST.get("selected_conceptid", None)
+        langs = Value.objects.values_list("language_id", flat=True).filter(
+            valueid=selected_conceptid
+        )
         return {
             "success": True,
             "data": langs,
         }
 
+    def get_default_language(self, request):
+        return {"userLang": get_language()}
+
+    def get_collection_languages(self, request):
+        from arches.app.utils.i18n import rank_label
+
+        collection_languages = []
+        rdm_collection = request.POST.get("rdmCollection", None)
+        language_codes = list(
+            map(
+                (lambda x: x[0]),
+                Concept().get_child_collections(rdm_collection, columns="languageto"),
+            )
+        )
+        for lang in Language.objects.filter(code__in=language_codes).values(
+            "code", "name"
+        ):
+            collection_languages.append(
+                {
+                    "id": lang["code"],
+                    "text": f"{lang['name']} ({lang['code']})",
+                    "rank": rank_label(source_lang=lang["code"]),
+                }
+            )
+
+        collection_languages.sort(key=lambda lang: lang["rank"], reverse=True)
+        collection_languages[0]["selected"] = True
+
+        return {
+            "success": True,
+            "data": collection_languages,
+        }
+
     def write(self, request):
         selected_grapgh = request.POST.get("selectedgrapgh", None)
         select_node = request.POST.get("selectednode", None)
-        new = request.POST.get("Selectnew", None)
-        old = request.POST.get("Selectold", None)
+        new = request.POST.get("conceptNew", None)
+        old = request.POST.get("conceptOld", None)
         language_old = request.POST.get("vaoldlanguage", None)
         language_new = request.POST.get("vanewlanguage", None)
         table = request.POST.get("table", None)
@@ -610,15 +583,15 @@ class BulkConceptEditor(BaseBulkEditor):
 
     @load_data_async
     def run_load_task_async(self, request):
-        selected_grapgh = request.POST.get("selectedgrapgh", None)
-        new = request.POST.get("Selectnew", None)
-        old = request.POST.get("Selectold", None)
+        graphid = request.POST.get("selectedgrapgh", None)
+        new = request.POST.get("conceptNew", None)
+        old = request.POST.get("conceptOld", None)
         language_old = request.POST.get("vaoldlanguage", None)
         language_new = request.POST.get("vanewlanguage", None)
         table = request.POST.get("table", None)
         nodeid = request.POST.get("nodeid", None)
         all_child_concept = request.POST.get("allchildconcept", None)
-        saveid = request.POST.get("saveid", None)
+        # saveid = request.POST.get("saveid", None)
         items = all_child_concept.split(",")
         id_name_pairs = []
         if len(items) % 2 == 0:
@@ -627,7 +600,7 @@ class BulkConceptEditor(BaseBulkEditor):
             id_name_pairs = perth_items(items)
         oldid = next((pair for pair in id_name_pairs if pair[1] == old), None)
         newid = next((pair for pair in id_name_pairs if pair[1] == new), None)
-        items = saveid.split(",")
+        # items = saveid.split(",")
         id_name_pairs = []
         id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
         graphid = next(
@@ -645,7 +618,7 @@ class BulkConceptEditor(BaseBulkEditor):
             resourceids = json.loads(resourceids_json_string)
         pattern = old
         operation = "replace"
-        edit_task = tasks.add.apply_async(
+        edit_task = edit_bulk_concept_data.apply_async(
             (
                 self.userid,
                 self.loadid,
