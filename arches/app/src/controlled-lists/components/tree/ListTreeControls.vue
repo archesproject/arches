@@ -65,7 +65,10 @@ watch(
                 );
                 if (list) {
                     setDisplayedRow(list.data);
-                    expandedKeys.value = { [list.data.id]: true };
+                    expandedKeys.value = {
+                        ...expandedKeys.value,
+                        [list.data.id]: true,
+                    };
                     selectedKeys.value = { [list.data.id]: true };
                 } else {
                     setDisplayedRow(null);
@@ -85,12 +88,15 @@ watch(
                     const itemsToExpandIds = path.map(
                         (itemInPath: TreeNode) => itemInPath.key,
                     );
-                    expandedKeys.value = Object.fromEntries(
-                        [
-                            found.data.controlled_list_id,
-                            ...itemsToExpandIds,
-                        ].map((x) => [x, true]),
-                    );
+                    expandedKeys.value = {
+                        ...expandedKeys.value,
+                        ...Object.fromEntries(
+                            [
+                                found.data.controlled_list_id,
+                                ...itemsToExpandIds,
+                            ].map((x) => [x, true]),
+                        ),
+                    };
                     selectedKeys.value = { [found.data.id]: true };
                 }
                 break;
