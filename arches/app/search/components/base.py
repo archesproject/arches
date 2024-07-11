@@ -120,7 +120,7 @@ class BaseCoreSearch(BaseSearchFilter):
         self, search_query_object, response_object, search_filter_factory, returnDsl
     ):
         """
-        Called in-place to modify both search_query_object and response_object
+        returns response_object, search_query_object
         See arches.app.search.components.arches_core_search for example implementation
         """
 
@@ -134,7 +134,8 @@ class BaseCoreSearch(BaseSearchFilter):
                 search_filter.append_dsl(search_query_object)
 
         if returnDsl:
-            return search_query_object.pop("query", None)
+            dsl = search_query_object.pop("query", None)
+            return dsl, search_query_object
 
         for filter_type, querystring in list(sorted_query_obj.items()):
             search_filter = search_filter_factory.get_filter(filter_type)
@@ -154,6 +155,8 @@ class BaseCoreSearch(BaseSearchFilter):
             for key, value in list(search_query_object.items()):
                 if key not in response_object:
                     response_object[key] = value
+
+        return response_object, search_query_object
 
 
 class SearchFilterFactory(object):

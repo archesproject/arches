@@ -356,11 +356,11 @@ def search_results(request, returnDsl=False):
     search_query_object = {"query": Query(se)}
     response_object = {"results": None}
 
-    dsl_only = core_search_instance.handle_search_results_query(
-        search_query_object, response_object, search_filter_factory, returnDsl
+    response_object, search_query_object = (
+        core_search_instance.handle_search_results_query(
+            search_query_object, response_object, search_filter_factory, returnDsl
+        )
     )
-    if returnDsl:
-        return dsl_only
 
     if response_object:
         return JSONResponse(content=response_object)

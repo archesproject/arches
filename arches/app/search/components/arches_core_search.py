@@ -210,7 +210,8 @@ class ArchesCoreSearch(BaseCoreSearch):
             return JSONErrorResponse(message=str(err))
 
         if returnDsl:
-            return search_query_object.pop("query", None)
+            dsl = search_query_object.pop("query", None)
+            return dsl, search_query_object
 
         for filter_type, querystring in list(sorted_query_obj.items()):
             search_filter = search_filter_factory.get_filter(filter_type)
@@ -234,3 +235,5 @@ class ArchesCoreSearch(BaseCoreSearch):
             for key, value in list(search_query_object.items()):
                 if key not in response_object:
                     response_object[key] = value
+
+        return response_object, search_query_object
