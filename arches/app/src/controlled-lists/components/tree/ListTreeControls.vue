@@ -53,6 +53,8 @@ watch(
         switch (newRoute.name) {
             case routes.splash:
                 setDisplayedRow(null);
+                expandedKeys.value = {};
+                selectedKeys.value = {};
                 break;
             case routes.list: {
                 if (!controlledListItemsTree.value.length) {
