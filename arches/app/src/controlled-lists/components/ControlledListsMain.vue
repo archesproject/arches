@@ -29,14 +29,19 @@ import type { Language } from "@/arches/types";
 const router = useRouter();
 
 const displayedRow: Ref<Selectable | null> = ref(null);
-function setDisplayedRow(val: Selectable | null) {
-    displayedRow.value = val;
-    if (val === null) {
+function setDisplayedRow(row: Selectable | null) {
+    displayedRow.value = row;
+    if (row === null) {
         router.push({ name: routes.splash });
-    } else if ((val as ControlledListItem).controlled_list_id) {
-        router.push({ name: routes.item, params: { id: val.id } });
+        return;
+    }
+    if (typeof row.id === "number") {
+        return;
+    }
+    if ((row as ControlledListItem).controlled_list_id) {
+        router.push({ name: routes.item, params: { id: row.id } });
     } else {
-        router.push({ name: routes.list, params: { id: val.id } });
+        router.push({ name: routes.list, params: { id: row.id } });
     }
 }
 provide(displayedRowKey, { displayedRow, setDisplayedRow });
