@@ -70,6 +70,6 @@ class PagingFilter(BaseSearchFilter):
         ret["end_index"] = page.end_index()
         ret["pages"] = pages
 
-        if details["componentname"] not in response_object:
-            response_object[details["componentname"]] = {}
-        response_object[details["componentname"]]["paginator"] = ret
+        if details["componentname"] not in search_query_object:
+            search_query_object[details["componentname"]] = {}
+        search_query_object[details["componentname"]]["paginator"] = ret
