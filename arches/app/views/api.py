@@ -112,6 +112,13 @@ class APIBase(View):
         return super(APIBase, self).dispatch(request, *args, **kwargs)
 
 
+class API404(View):
+    def dispatch(self, request, *args, **kwargs):
+        return JSONErrorResponse(
+            _("Request failed"), _("Route not found"), status=HTTPStatus.NOT_FOUND
+        )
+
+
 class GetFrontendI18NData(APIBase):
     def get(self, request):
         user_language = get_language()
