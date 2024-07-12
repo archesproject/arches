@@ -174,7 +174,7 @@ class Command(BaseCommand):
                 ),
             )
 
-        for action_name in ["build-test-branch", "install-arches-applications"]:
+        for action_name in ["build-and-test-branch", "install-arches-applications"]:
             if not os.path.exists(
                 os.path.join(
                     settings.APP_ROOT,
