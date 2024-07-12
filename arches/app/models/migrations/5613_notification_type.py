@@ -18,7 +18,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="NotificationType",
             fields=[
-                ("typeid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "typeid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("name", models.TextField(blank=True, null=True)),
                 ("emailtemplate", models.TextField(blank=True, null=True)),
                 ("emailnotify", models.BooleanField(default=False)),
@@ -29,28 +34,70 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="UserXNotificationType",
             fields=[
-                ("id", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("emailnotify", models.BooleanField(default=False)),
                 ("webnotify", models.BooleanField(default=False)),
-                ("notiftype", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="models.NotificationType")),
-                ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "notiftype",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="models.NotificationType",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={"db_table": "user_x_notification_types", "managed": True},
         ),
         migrations.AddField(
             model_name="notification",
             name="notiftype",
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to="models.NotificationType"),
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="models.NotificationType",
+            ),
         ),
-        migrations.RenameField(model_name="userxtask", old_name="date_done", new_name="datedone"),
-        migrations.RenameField(model_name="userxtask", old_name="date_start", new_name="datestart"),
+        migrations.RenameField(
+            model_name="userxtask", old_name="date_done", new_name="datedone"
+        ),
+        migrations.RenameField(
+            model_name="userxtask", old_name="date_start", new_name="datestart"
+        ),
         migrations.CreateModel(
             name="UserXNotification",
             fields=[
-                ("id", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("isread", models.BooleanField(default=False)),
-                ("notif", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="models.Notification")),
-                ("recipient", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "notif",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="models.Notification",
+                    ),
+                ),
+                (
+                    "recipient",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={"db_table": "user_x_notifications", "managed": True},
         ),

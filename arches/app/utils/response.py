@@ -49,7 +49,9 @@ class JSONResponse(HttpResponse):
 
 
 class JSONErrorResponse(JSONResponse):
-    def __init__(self, title=None, message=None, content=None, status=500, *args, **kwargs):
+    def __init__(
+        self, title=None, message=None, content=None, status=500, *args, **kwargs
+    ):
         if not content:
             content = {}
         try:
@@ -60,7 +62,9 @@ class JSONErrorResponse(JSONResponse):
         except AttributeError as e:
             logger.exception(_("Could not return JSON Response"))
 
-        super(JSONErrorResponse, self).__init__(content=content, status=status, *args, **kwargs)
+        super(JSONErrorResponse, self).__init__(
+            content=content, status=status, *args, **kwargs
+        )
 
 
 class Http401Response(HttpResponse):

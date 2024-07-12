@@ -26,9 +26,19 @@ def get_reference_data_for_export(conceptids=None):
     reference_data_dict = {}
     reference_data = []
     if conceptids is None or conceptids[0] == "all" or conceptids == [""]:
-        reference_data.append(Concept().get("00000000-0000-0000-0000-000000000001", include_subconcepts=True, semantic=True))
+        reference_data.append(
+            Concept().get(
+                "00000000-0000-0000-0000-000000000001",
+                include_subconcepts=True,
+                semantic=True,
+            )
+        )
     else:
         for conceptid in conceptids:
-            reference_data.append(Concept().get(uuid.UUID(str(conceptid)), include_subconcepts=True, semantic=True))
+            reference_data.append(
+                Concept().get(
+                    uuid.UUID(str(conceptid)), include_subconcepts=True, semantic=True
+                )
+            )
     reference_data_dict["reference_data"] = reference_data
     return reference_data_dict

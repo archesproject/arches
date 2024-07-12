@@ -33,7 +33,7 @@ except ModuleNotFoundError:
 try:
     from django.utils.translation import gettext_lazy as _
     from corsheaders.defaults import default_headers
-except ImportError:  # unable to import prior to installing requirements.txt in setup.py
+except ImportError:  # unable to import prior to installing requirements
     pass
 
 #########################################
@@ -65,11 +65,15 @@ PG_SUPERUSER_PW = ""
 # from http://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
 ANONYMOUS_USER_NAME = None
 
-ELASTICSEARCH_HTTP_PORT = 9200  # this should be in increments of 200, eg: 9400, 9600, 9800
+ELASTICSEARCH_HTTP_PORT = (
+    9200  # this should be in increments of 200, eg: 9400, 9600, 9800
+)
 SEARCH_BACKEND = "arches.app.search.search.SearchEngine"
 SEARCH_THUMBNAILS = False
 # see http://elasticsearch-py.readthedocs.org/en/master/api.html#elasticsearch.Elasticsearch
-ELASTICSEARCH_HOSTS = [{"scheme": "https", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
+ELASTICSEARCH_HOSTS = [
+    {"scheme": "https", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}
+]
 
 # Comment out this line for a development setup after running the ubuntu_setup.sh script
 ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30}
@@ -78,8 +82,8 @@ ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30}
 # ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
 
 # If you need to connect to Elasticsearch via an API key instead of username/password, use the syntax below:
-# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": "<ENCODED_API_KEY>"}
-# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": ("<ID>", "<API_KEY>")}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "api_key": "<ENCODED_API_KEY>"}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "api_key": ("<ID>", "<API_KEY>")}
 
 # Your Elasticsearch instance needs to be configured with xpack.security.enabled=true to use API keys - update elasticsearch.yml or .env file and restart.
 
@@ -105,9 +109,13 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 #     'should_update_asynchronously': False
 # }]
 
-THUMBNAIL_GENERATOR = None #"arches.app.utils.thumbnail_generator.ThumbnailGenerator"
-GENERATE_THUMBNAILS_ON_DEMAND = False # True to generate a thumnail on request if it doens't exist
-MIN_FILE_SIZE_T0_GENERATE_THUMBNAIL = 150000 # yet to be implemented, in bytes eg: 150000 = 150kb
+THUMBNAIL_GENERATOR = None  # "arches.app.utils.thumbnail_generator.ThumbnailGenerator"
+GENERATE_THUMBNAILS_ON_DEMAND = (
+    False  # True to generate a thumnail on request if it doens't exist
+)
+MIN_FILE_SIZE_T0_GENERATE_THUMBNAIL = (
+    150000  # yet to be implemented, in bytes eg: 150000 = 150kb
+)
 
 # This should point to the url where you host your site
 # Make sure to use a trailing slash
@@ -118,11 +126,13 @@ KIBANA_CONFIG_BASEPATH = "kibana"  # must match Kibana config.yml setting (serve
 # also make sure to set server.rewriteBasePath: true
 USE_SEMANTIC_RESOURCE_RELATIONSHIPS = True
 ROOT_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-APP_ROOT = os.path.join(ROOT_DIR, 'app')
+APP_ROOT = os.path.join(ROOT_DIR, "app")
 PACKAGE_ROOT = ROOT_DIR
 PACKAGE_NAME = PACKAGE_ROOT.split(os.sep)[-1]
 RESOURCE_IMPORT_LOG = "arches/logs/resource_import.log"
-FILE_VIEWER_DOWNLOAD_LIMIT = 1073741824  # limit of file viewer download source files in bytes
+FILE_VIEWER_DOWNLOAD_LIMIT = (
+    1073741824  # limit of file viewer download source files in bytes
+)
 RESOURCE_FORMATTERS = {
     "csv": "arches.app.utils.data_management.resources.formats.csvfile.CsvWriter",
     "json": "arches.app.utils.data_management.resources.formats.archesfile.ArchesFileWriter",
@@ -159,7 +169,10 @@ ONTOLOGY_DIR = os.path.join(ROOT_DIR, "ontologies")
 # Used in the JSON-LD export for determining which external concept scheme URI
 # to use in preference for the URI of a concept. If there is no match, the default
 # Arches host URI will be used (eg http://localhost/concepts/123f323f-...)
-PREFERRED_CONCEPT_SCHEMES = ["http://vocab.getty.edu/aat/", "http://www.cidoc-crm.org/cidoc-crm/"]
+PREFERRED_CONCEPT_SCHEMES = [
+    "http://vocab.getty.edu/aat/",
+    "http://www.cidoc-crm.org/cidoc-crm/",
+]
 JSONLD_CONTEXT_CACHE_TIMEOUT = 43800  # in minutes (43800 minutes ~= 1 month)
 
 # This is the namespace to use for export of data (for RDF/XML for example)
@@ -174,7 +187,12 @@ EXPORT_DATA_FIELDS_IN_CARD_ORDER = False
 RDM_JSONLD_CONTEXT = {"arches": ARCHES_NAMESPACE_FOR_DATA_EXPORT}
 
 PREFERRED_COORDINATE_SYSTEMS = (
-    {"name": "Geographic", "srid": "4326", "proj4": "+proj=longlat +datum=WGS84 +no_defs", "default": True},  # Required
+    {
+        "name": "Geographic",
+        "srid": "4326",
+        "proj4": "+proj=longlat +datum=WGS84 +no_defs",
+        "default": True,
+    },  # Required
 )
 
 ANALYSIS_COORDINATE_SYSTEM_SRID = 3857  # Coord sys units must be meters
@@ -332,8 +350,7 @@ AUTHENTICATION_BACKENDS = (
     "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
     "oauth2_provider.backends.OAuth2Backend",
     "django.contrib.auth.backends.ModelBackend",  # this is default
-    "arches.app.utils.permission_backend.PermissionBackend",
-    "guardian.backends.ObjectPermissionBackend",
+    "arches.app.permissions.arches_standard.PermissionBackend",
     "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend",
 )
 
@@ -410,9 +427,19 @@ LOGGING = {
             "filename": os.path.join(ROOT_DIR, "arches.log"),
             "formatter": "console",
         },
-        "console": {"level": "WARNING", "class": "logging.StreamHandler", "formatter": "console"},
+        "console": {
+            "level": "WARNING",
+            "class": "logging.StreamHandler",
+            "formatter": "console",
+        },
     },
-    "loggers": {"arches": {"handlers": ["file", "console"], "level": "WARNING", "propagate": True}},
+    "loggers": {
+        "arches": {
+            "handlers": ["file", "console"],
+            "level": "WARNING",
+            "propagate": True,
+        }
+    },
 }
 
 LOGIN_URL = "auth"
@@ -425,17 +452,27 @@ PROFILE_LOG_BASE = os.path.join(ROOT_DIR, "logs")
 
 BULK_IMPORT_BATCH_SIZE = 2000
 
-SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(ROOT_DIR, "db", "system_settings", "Arches_System_Settings_Local.json")
+SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(
+    ROOT_DIR, "db", "system_settings", "Arches_System_Settings_Local.json"
+)
 SYSTEM_SETTINGS_RESOURCE_ID = "a106c400-260c-11e7-a604-14109fd34195"
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "arches.app.utils.password_validation.NumericPasswordValidator"},  # Passwords cannot be entirely numeric
+    {
+        "NAME": "arches.app.utils.password_validation.NumericPasswordValidator"
+    },  # Passwords cannot be entirely numeric
     {
         "NAME": "arches.app.utils.password_validation.SpecialCharacterValidator",  # Passwords must contain special characters
-        "OPTIONS": {"special_characters": ("!", "@", "#", ")", "(", "*", "&", "^", "%", "$")},
+        "OPTIONS": {
+            "special_characters": ("!", "@", "#", ")", "(", "*", "&", "^", "%", "$")
+        },
     },
-    {"NAME": "arches.app.utils.password_validation.HasNumericCharacterValidator"},  # Passwords must contain 1 or more numbers
-    {"NAME": "arches.app.utils.password_validation.HasUpperAndLowerCaseValidator"},  # Passwords must contain upper and lower characters
+    {
+        "NAME": "arches.app.utils.password_validation.HasNumericCharacterValidator"
+    },  # Passwords must contain 1 or more numbers
+    {
+        "NAME": "arches.app.utils.password_validation.HasUpperAndLowerCaseValidator"
+    },  # Passwords must contain upper and lower characters
     {
         "NAME": "arches.app.utils.password_validation.MinLengthValidator",  # Passwords must meet minimum length requirement
         "OPTIONS": {"min_length": 9},
@@ -451,8 +488,10 @@ ENABLE_CAPTCHA = True
 # RECAPTCHA_USE_SSL = False
 NOCAPTCHA = True
 # RECAPTCHA_PROXY = 'http://127.0.0.1:8000'
+SILENCED_SYSTEM_CHECKS = ["guardian.W001"]
+
 if DEBUG is True:
-    SILENCED_SYSTEM_CHECKS = ["captcha.recaptcha_test_key_error"]
+    SILENCED_SYSTEM_CHECKS += ["captcha.recaptcha_test_key_error"]
 
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
@@ -472,7 +511,10 @@ EXTERNAL_OAUTH_CONFIGURATION = {
 }
 
 CACHES = {
-    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache", "LOCATION": "unique-snowflake"},
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "unique-snowflake",
+    },
     "user_permission": {
         "BACKEND": "django.core.cache.backends.db.DatabaseCache",
         "LOCATION": "user_permission_cache",
@@ -500,20 +542,35 @@ DEFAULT_RESOURCE_IMPORT_USER = {"username": "admin", "userid": 1}
 TIMEWHEEL_DATE_TIERS = None
 
 # Identify the usernames and duration (seconds) for which you want to cache the timewheel
-CACHE_BY_USER = {
-    "default": 3600 * 24, #24hrs
-    "anonymous": 3600 * 24 #24hrs
-}
+CACHE_BY_USER = {"default": 3600 * 24, "anonymous": 3600 * 24}  # 24hrs  # 24hrs
 
 BYPASS_UNIQUE_CONSTRAINT_TILE_VALIDATION = False
 BYPASS_REQUIRED_VALUE_TILE_VALIDATION = False
 
-DATE_IMPORT_EXPORT_FORMAT = "%Y-%m-%d"  # Custom date format for dates imported from and exported to csv
+DATE_IMPORT_EXPORT_FORMAT = (
+    "%Y-%m-%d"  # Custom date format for dates imported from and exported to csv
+)
 
 DATE_FORMATS = {
     # Keep index values the same for formats in the python and javascript arrays.
-    "Python": ["%Y-%m-%dT%H:%M:%S.%f%z", "%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%d %H:%M:%S%z", "%Y-%m-%d", "%Y-%m", "%Y", "-%Y"],
-    "JavaScript": ["YYYY-MM-DDTHH:mm:ss.sssZ", "YYYY-MM-DDTHH:mm:ssZ", "YYYY-MM-DD HH:mm:ssZ", "YYYY-MM-DD", "YYYY-MM", "YYYY", "-YYYY"],
+    "Python": [
+        "%Y-%m-%dT%H:%M:%S.%f%z",
+        "%Y-%m-%dT%H:%M:%S%z",
+        "%Y-%m-%d %H:%M:%S%z",
+        "%Y-%m-%d",
+        "%Y-%m",
+        "%Y",
+        "-%Y",
+    ],
+    "JavaScript": [
+        "YYYY-MM-DDTHH:mm:ss.sssZ",
+        "YYYY-MM-DDTHH:mm:ssZ",
+        "YYYY-MM-DD HH:mm:ssZ",
+        "YYYY-MM-DD",
+        "YYYY-MM",
+        "YYYY",
+        "-YYYY",
+    ],
     "Elasticsearch": [
         "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ",
         "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
@@ -529,7 +586,9 @@ DATE_FORMATS = {
 
 API_MAX_PAGE_SIZE = 500
 
-UUID_REGEX = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+UUID_REGEX = (
+    "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+)
 
 OAUTH2_PROVIDER = {"ACCESS_TOKEN_EXPIRE_SECONDS": 604800}  # one week
 
@@ -558,7 +617,9 @@ SEARCH_DROPDOWN_LENGTH = 100
 # see "prefix_length" at https://www.elastic.co/guide/en/elasticsearch/reference/6.7/query-dsl-fuzzy-query.html#_parameters_7
 SEARCH_TERM_SENSITIVITY = 3
 
-WORDS_PER_SEARCH_TERM = 10  # set to None for unlimited number of words allowed for search terms
+WORDS_PER_SEARCH_TERM = (
+    10  # set to None for unlimited number of words allowed for search terms
+)
 SEARCH_RESULT_LIMIT = 10000  # should be less than or equal to elasticsearch configuration, index.max_result_window (default = 10,000)
 
 ETL_USERNAME = "ETL"  # override this setting in your packages settings.py file
@@ -567,7 +628,11 @@ GOOGLE_ANALYTICS_TRACKING_ID = None
 
 DEFAULT_GEOCODER = "10000000-0000-0000-0000-010000000000"
 
-SPARQL_ENDPOINT_PROVIDERS = ({"SPARQL_ENDPOINT_PROVIDER": "arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider"},)
+SPARQL_ENDPOINT_PROVIDERS = (
+    {
+        "SPARQL_ENDPOINT_PROVIDER": "arches.app.utils.data_management.sparql_providers.aat_provider.AAT_Provider"
+    },
+)
 
 APP_NAME = "Arches"
 APP_VERSION = None
@@ -596,6 +661,9 @@ BUSINESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+PERMISSION_LOCATIONS = [
+    "arches.app.permissions",
+]
 DATATYPE_LOCATIONS = [
     "arches.app.datatypes",
 ]
@@ -610,8 +678,23 @@ ETL_MODULE_LOCATIONS = [
     "arches.app.etl_modules",
 ]
 
-FILE_TYPE_CHECKING = False
-FILE_TYPES = ["bmp", "gif", "jpg", "jpeg", "pdf", "png", "psd", "rtf", "tif", "tiff", "xlsx", "csv", "zip"]
+FILE_TYPE_CHECKING = "lenient"
+FILE_TYPES = [
+    "bmp",
+    "gif",
+    "jpg",
+    "jpeg",
+    "json",
+    "pdf",
+    "png",
+    "psd",
+    "rtf",
+    "tif",
+    "tiff",
+    "xlsx",
+    "csv",
+    "zip",
+]
 FILENAME_GENERATOR = "arches.app.utils.storage_filename_generator.generate_filename"
 UPLOADED_FILES_DIR = "uploadedfiles"
 
@@ -647,7 +730,12 @@ DEFAULT_BOUNDS = {
     "type": "FeatureCollection",
     "features": [
         {
-            "geometry": {"type": "Polygon", "coordinates": [[[-122, -52], [128, -52], [128, 69], [-122, 69], [-122, -52]]]},
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [[-122, -52], [128, -52], [128, 69], [-122, 69], [-122, -52]]
+                ],
+            },
             "type": "Feature",
             "properties": {},
         }
@@ -668,14 +756,23 @@ TILESERVER_URL = None
 
 CELERY_BROKER_URL = ""  # RabbitMQ --> "amqp://guest:guest@localhost",  Redis --> "redis://localhost:6379/0"
 CELERY_ACCEPT_CONTENT = ["json"]
-CELERY_RESULT_BACKEND = "django-db"  # Use 'django-cache' if you want to use your cache as your backend
+CELERY_RESULT_BACKEND = (
+    "django-db"  # Use 'django-cache' if you want to use your cache as your backend
+)
 CELERY_TASK_SERIALIZER = "json"
 CELERY_SEARCH_EXPORT_EXPIRES = 24 * 3600  # seconds
 CELERY_SEARCH_EXPORT_CHECK = 3600  # seconds
 
 CELERY_BEAT_SCHEDULE = {
-    "delete-expired-search-export": {"task": "arches.app.tasks.delete_file", "schedule": CELERY_SEARCH_EXPORT_CHECK},
-    "notification": {"task": "arches.app.tasks.message", "schedule": CELERY_SEARCH_EXPORT_CHECK, "args": ("Celery Beat is Running",)},
+    "delete-expired-search-export": {
+        "task": "arches.app.tasks.delete_file",
+        "schedule": CELERY_SEARCH_EXPORT_CHECK,
+    },
+    "notification": {
+        "task": "arches.app.tasks.message",
+        "schedule": CELERY_SEARCH_EXPORT_CHECK,
+        "args": ("Celery Beat is Running",),
+    },
 }
 
 # Set to True if you want to send celery tasks to the broker without being able to detect celery.
@@ -698,7 +795,9 @@ ACCESSIBILITY_MODE = False
 with suppress(NameError):  # need to suppress i18n NameError for test runner
     EXTRA_EMAIL_CONTEXT = {
         "salutation": _("Hi"),
-        "expiration":(datetime.now() + timedelta(seconds=CELERY_SEARCH_EXPORT_EXPIRES)).strftime("%A, %d %B %Y")
+        "expiration": (
+            datetime.now() + timedelta(seconds=CELERY_SEARCH_EXPORT_EXPIRES)
+        ).strftime("%A, %d %B %Y"),
     }
 
 RENDERERS = [
@@ -763,6 +862,8 @@ JSON_LD_SORT_FUNCTIONS = [lambda x: x.get("@id", "~")]
 def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
+
+PERMISSION_FRAMEWORK = "arches_standard.ArchesStandardPermissionFramework"
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###

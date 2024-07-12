@@ -17,7 +17,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, PasswordResetForm, SetPasswordForm, UserChangeForm
+from django.contrib.auth.forms import (
+    UserCreationForm,
+    PasswordResetForm,
+    SetPasswordForm,
+    UserChangeForm,
+)
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.forms.widgets import PasswordInput, TextInput
@@ -106,11 +111,27 @@ class ArchesUserProfileForm(UserChangeForm):
 
 
 class ArchesPasswordResetForm(PasswordResetForm):
-    email = forms.CharField(widget=forms.EmailInput(attrs={"class": "form-control input-lg floating-label-input", "required": "required"}))
+    email = forms.CharField(
+        widget=forms.EmailInput(
+            attrs={
+                "class": "form-control input-lg floating-label-input",
+                "required": "required",
+            }
+        )
+    )
 
 
 class ArchesSetPasswordForm(SetPasswordForm):
-    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={"placeholder": _("New password"), "class": "form-control input-lg"}))
+    new_password1 = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={"placeholder": _("New password"), "class": "form-control input-lg"}
+        )
+    )
     new_password2 = forms.CharField(
-        widget=forms.PasswordInput(attrs={"placeholder": _("Re-enter new password"), "class": "form-control input-lg"})
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": _("Re-enter new password"),
+                "class": "form-control input-lg",
+            }
+        )
     )

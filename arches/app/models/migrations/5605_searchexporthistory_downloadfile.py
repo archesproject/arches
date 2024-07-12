@@ -13,6 +13,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="searchexporthistory",
             name="downloadfile",
-            field=models.FileField(blank=True, null=True, upload_to="export_deliverables"),
+            field=models.FileField(
+                blank=True, null=True, upload_to="export_deliverables"
+            ),
         ),
     ]

@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '10150_add_default_value_file_list'),
+        ("models", "10150_add_default_value_file_list"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='workflowhistory',
-            name='workflowname',
+            model_name="workflowhistory",
+            name="workflowname",
             field=models.CharField(max_length=255, null=True),
         ),
     ]

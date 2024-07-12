@@ -4,7 +4,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '4921_file_data_type'),
+        ("models", "4921_file_data_type"),
     ]
 
     operations = [
@@ -33,6 +33,6 @@ class Migration(migrations.Migration):
             end;
             $func$;""",
             reverse_sql="drop function if exists TileBBox(z int, x int, y int, srid int) restrict;",
-            elidable=False
+            elidable=False,
         ),
     ]

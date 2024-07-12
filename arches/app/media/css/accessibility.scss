@@ -99,7 +99,7 @@ a, button {
 .sidenav-sm {
 	.sidenav-menu {
 		.active-sub {
-			a {
+			a:not(.collapse .link-submenu-item .link-submenu) {
 				background-color: $leftnav-active;
                 &:after {
 					display: inline-block;

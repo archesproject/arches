@@ -236,8 +236,9 @@ define([
                         return _.contains(cardNodeIds, nodeIds[0]);
                     }, this);
                     if (card) {
-                        _.each(card.nodes, function(node) {
+                        card.nodes.forEach(node => {
                             facet[node.nodeid] = ko.observable(facet[node.nodeid]);
+                            node.label = this.widgetLookup[node.nodeid]?.label;  
                         });
                         facet.op = ko.observable(facet.op);
                         this.filter.facets.push({
