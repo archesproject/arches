@@ -1,3 +1,5 @@
+# pragma: no cover
+
 import arches
 import os
 import shutil
@@ -148,14 +150,71 @@ class Command(BaseCommand):
                 os.path.join(settings.APP_ROOT, ".."),
             )
 
-        if not os.path.exists(os.path.join(settings.APP_ROOT, "..", ".github")):
-            self.stdout.write("Copying .github directory to project")
-            shutil.copytree(
-                os.path.join(
-                    settings.ROOT_DIR, "install", "arches-templates", ".github"
-                ),
-                os.path.join(settings.APP_ROOT, "..", ".github"),
+        if not os.path.exists(
+            os.path.join(settings.APP_ROOT, "..", ".github", "workflows", "main.yml")
+        ):
+            self.stdout.write("Copying .github/workflows/main.yml directory to project")
+
+            os.makedirs(
+                os.path.join(settings.APP_ROOT, "..", ".github", "workflows"),
+                exist_ok=True,
             )
+
+            shutil.copy(
+                os.path.join(
+                    settings.ROOT_DIR,
+                    "install",
+                    "arches-templates",
+                    ".github",
+                    "workflows",
+                    "main.yml",
+                ),
+                os.path.join(
+                    settings.APP_ROOT, "..", ".github", "workflows", "main.yml"
+                ),
+            )
+
+        for action_name in ["build-test-branch", "install-arches-applications"]:
+            if not os.path.exists(
+                os.path.join(
+                    settings.APP_ROOT,
+                    "..",
+                    ".github",
+                    "actions",
+                    action_name,
+                    "action.yml",
+                )
+            ):
+                self.stdout.write(
+                    f"Copying .github/actions/{action_name}/action.yml directory to project"
+                )
+
+                os.makedirs(
+                    os.path.join(
+                        settings.APP_ROOT, "..", ".github", "actions", action_name
+                    ),
+                    exist_ok=True,
+                )
+
+                shutil.copy(
+                    os.path.join(
+                        settings.ROOT_DIR,
+                        "install",
+                        "arches-templates",
+                        ".github",
+                        "actions",
+                        action_name,
+                        "action.yml",
+                    ),
+                    os.path.join(
+                        settings.APP_ROOT,
+                        "..",
+                        ".github",
+                        "actions",
+                        action_name,
+                        "action.yml",
+                    ),
+                )
 
         if not os.path.exists(os.path.join(settings.APP_ROOT, "..", "tests")):
             self.stdout.write("Copying tests directory to project")
@@ -233,11 +292,12 @@ class Command(BaseCommand):
             "gettext.config.js",
             ".coveragerc",
             ".gitignore",
+            ".github/workflows/main.yml",
+            ".pre-commit-config.yaml",
             "tsconfig.json",
             "tests/test_settings.py",
             "tests/search_indexes/sample_index_tests.py",
             "pyproject.toml",
-            ".pre-commit-config.yaml",
         ]:  # relative to app root directory
             try:
                 file = open(os.path.join(path_to_project, relative_file_path), "r")
