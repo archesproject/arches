@@ -8,6 +8,7 @@ import ActionBanner from "@/controlled-lists/components/tree/ActionBanner.vue";
 import AddDeleteControls from "@/controlled-lists/components/tree/AddDeleteControls.vue";
 import PresentationControls from "@/controlled-lists/components/tree/PresentationControls.vue";
 
+import type { RouteLocationNormalizedLoadedGeneric } from "vue-router";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
 import type {
@@ -39,70 +40,71 @@ const { setDisplayedRow } = inject(
 
 const route = useRoute();
 
-// React to route changes.
-// Add list tree as dependency so it runs on initial fetch.
 watch(
     [
         () => {
             return { ...route };
         },
-        controlledListItemsTree,
     ],
     ([newRoute]) => {
-        switch (newRoute.name) {
-            case routes.splash:
-                setDisplayedRow(null);
-                expandedKeys.value = {};
-                selectedKeys.value = {};
-                break;
-            case routes.list: {
-                if (!controlledListItemsTree.value.length) {
-                    return;
-                }
-                const list = controlledListItemsTree.value.find(
-                    (node) => node.data.id === newRoute.params.id,
-                );
-                if (list) {
-                    setDisplayedRow(list.data);
-                    expandedKeys.value = {
-                        ...expandedKeys.value,
-                        [list.data.id]: true,
-                    };
-                    selectedKeys.value = { [list.data.id]: true };
-                } else {
-                    setDisplayedRow(null);
-                }
-                break;
-            }
-            case routes.item: {
-                if (!controlledListItemsTree.value.length) {
-                    return;
-                }
-                const { found, path } = findNodeInTree(
-                    controlledListItemsTree.value,
-                    newRoute.params.id,
-                );
-                if (found) {
-                    setDisplayedRow(found.data);
-                    const itemsToExpandIds = path.map(
-                        (itemInPath: TreeNode) => itemInPath.key,
-                    );
-                    expandedKeys.value = {
-                        ...expandedKeys.value,
-                        ...Object.fromEntries(
-                            [
-                                found.data.controlled_list_id,
-                                ...itemsToExpandIds,
-                            ].map((x) => [x, true]),
-                        ),
-                    };
-                    selectedKeys.value = { [found.data.id]: true };
-                }
-                break;
-            }
-        }
+        navigate(newRoute);
     },
 );
+
+const navigate = (newRoute: RouteLocationNormalizedLoadedGeneric) => {
+    switch (newRoute.name) {
+        case routes.splash:
+            setDisplayedRow(null);
+            expandedKeys.value = {};
+            selectedKeys.value = {};
+            break;
+        case routes.list: {
+            if (!controlledListItemsTree.value.length) {
+                return;
+            }
+            const list = controlledListItemsTree.value.find(
+                (node) => node.data.id === newRoute.params.id,
+            );
+            if (list) {
+                setDisplayedRow(list.data);
+                expandedKeys.value = {
+                    ...expandedKeys.value,
+                    [list.data.id]: true,
+                };
+                selectedKeys.value = { [list.data.id]: true };
+            } else {
+                setDisplayedRow(null);
+            }
+            break;
+        }
+        case routes.item: {
+            if (!controlledListItemsTree.value.length) {
+                return;
+            }
+            const { found, path } = findNodeInTree(
+                controlledListItemsTree.value,
+                newRoute.params.id,
+            );
+            if (found) {
+                setDisplayedRow(found.data);
+                const itemsToExpandIds = path.map(
+                    (itemInPath: TreeNode) => itemInPath.key,
+                );
+                expandedKeys.value = {
+                    ...expandedKeys.value,
+                    ...Object.fromEntries(
+                        [
+                            found.data.controlled_list_id,
+                            ...itemsToExpandIds,
+                        ].map((x) => [x, true]),
+                    ),
+                };
+                selectedKeys.value = { [found.data.id]: true };
+            }
+            break;
+        }
+    }
+};
 
 const expandAll = () => {
     for (const node of controlledListItemsTree.value) {
@@ -123,6 +125,15 @@ const expandNode = (node: TreeNode) => {
         }
     }
 };
+
+// Navigate on initial load of the tree.
+watch(
+    controlledListItemsTree,
+    () => {
+        navigate(route);
+    },
+    { once: true },
+);
 </script>
 
 <template>
