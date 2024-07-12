@@ -5,6 +5,8 @@ define([
     'arches',
     'viewmodels/alert-json',
     'templates/views/components/etl_modules/bulk_edit_concept.htm',
+    'views/components/widgets/concept-select',
+    'select-woo'
 ], function(ko, $, uuid, arches, JsonErrorAlertViewModel, baseStringEditorTemplate) {
     const ViewModel = function(params) {
         const self = this;
@@ -26,12 +28,15 @@ define([
         this.selectednode = ko.observable();
         this.dropdowngraph = ko.observableArray();
         this.selectedgrapgh = ko.observable();
-        this.Selectold = ko.observable();
-        this.Selectnew = ko.observable();
+        this.conceptOld = ko.observable();
+        this.conceptNew = ko.observable();
         this.vaoldlanguage = ko.observable();
         this.vanewlanguage = ko.observable();
-        this.dropdownoldlang = ko.observableArray();
-        this.dropdownnewlang = ko.observableArray();
+        this.conceptOldLang = ko.observable();
+        this.conceptNewLang = ko.observableArray();
+        this.rdmCollection = null;
+        this.rdmCollectionLanguages = ko.observableArray();
+        this.defaultLanguage = ko.observable();
         this.dropdownConceptReplace = ko.observableArray();
         this.tableVisible = ko.observable(false);
         this.showPreviewTalbe = ko.observable(true);
@@ -50,8 +55,8 @@ define([
             if (self.selectedgrapgh()) { self.formData.append('selectedgrapgh', self.selectedgrapgh()); }
             if (self.saveid()) { self.formData.append('saveid', self.saveid()); }
             if (self.savenode()) { self.formData.append('savenode', self.savenode()); }
-            if (self.Selectold()) { self.formData.append('Selectold', self.Selectold()); }
-            if (self.Selectnew()) { self.formData.append('Selectnew', self.Selectnew()); }
+            if (self.conceptOld()) { self.formData.append('conceptOld', self.conceptOld()); }
+            if (self.conceptNew()) { self.formData.append('conceptNew', self.conceptNew()); }
             if (self.allchildconcept()) { self.formData.append('allchildconcept', self.allchildconcept()); }
             if (self.vaoldlanguage()) { self.formData.append('vaoldlanguage', self.vaoldlanguage()); }
             if (self.vanewlanguage()) { self.formData.append('vanewlanguage', self.vanewlanguage()); }
@@ -59,13 +64,14 @@ define([
             if (self.allinformationTable()) { self.formData.append('table', self.allinformationTable()); }
             if (self.nodeid) { self.formData.append('nodeid', self.nodeid); }
             if (self.searchUrl()) { self.formData.append('search_url', self.searchUrl()); }
+            if (self.rdmCollection) { self.formData.append('rdmCollection', self.rdmCollection); }
         };
         self.deleteAllFormData = () => {
             self.formData.delete('selectedgrapgh');
             self.formData.delete('saveid');
             self.formData.delete('savenode');
-            self.formData.delete('Selectold');
-            self.formData.delete('Selectnew');
+            self.formData.delete('conceptOld');
+            self.formData.delete('conceptNew');
             self.formData.delete('allchildconcept');
             self.formData.delete('vaoldlanguage');
             self.formData.delete('vanewlanguage');
@@ -73,6 +79,7 @@ define([
             self.formData.delete('table');
             self.formData.delete('nodeid');
             self.formData.delete('search_url');
+            self.formData.delete('rdmCollection');
         };
         //lenght table
         self.listLength = ko.computed(function() {
@@ -118,7 +125,7 @@ define([
         //call python code to display the change
         this.ReplaceConcept = function() {
             self.addAllFormData();
-            self.allinformationTable.removeAll()
+            self.allinformationTable.removeAll();
             self.tableVisible(true);
             self.showPreview(true);
             self.submit('replaceConcept').then(data => {
@@ -142,29 +149,57 @@ define([
             });
         };
 
-        //select concept and create dropdwon with olad and new
-        this.selectconcept = function() {
+        this.selectednode.subscribe((node) => {
+            self.rdmCollection = node.rdmCollection;
             self.addAllFormData();
-            self.dropdownConcept.removeAll()
-            self.dropdownConceptReplace.removeAll()
+            self.dropdownConcept.removeAll();
+            self.dropdownConceptReplace.removeAll();
             self.allchildconcept.removeAll();
-            self.dropdownnewlang.removeAll();
-            self.dropdownoldlang.removeAll();
+            self.conceptNewLang.removeAll();
             self.tableVisible(false);
-            
-            self.submit('list_concepts').then(data => {
-                
+
+            self.submit('get_collection_languages').then(data => {
+                self.rdmCollectionLanguages(data.result);
+                if(data.result.length > 0) {
+                    self.conceptOldLang(data.result[0].id);
+                    self.conceptNewLang(data.result[0].id);
+                }
+            }).fail(function(err) {
+                self.alert(
+                    new JsonErrorAlertViewModel(
+                        'ep-alert-red',
+                        err.responseJSON["data"],
+                        null,
+                        function(){}
+                    )
+                );
+            }).always(function() {
+                //self.previewing(false);
+            });
+        });
+
+
+        // this.conceptOld.subscribe(function(conceptid){
+        //     self.formData = new window.FormData();
+        //     self.formData.append('selected_conceptid', conceptid);
+        //     this.language(this.conceptOldLang);
+        // }, this);
+
+        // this.conceptNew.subscribe(function(conceptid){
+        //     self.formData = new window.FormData();
+        //     self.formData.append('selected_conceptid', conceptid);
+        //     this.language(this.conceptNewLang);
+        // }, this);
+
+        //select old language
+        this.language = function(dd) {
+            self.addAllFormData();
+            self.tableVisible(false);
+            dd.removeAll();
+            self.submit('select_language').then(data => {
                 for (var i = 0; i < data.result.length; i++){
-                    if(i < data.result.length -1){
-                        
-                        self.dropdownConcept.push(data.result[i][1]);
-                        self.allchildconcept.push(data.result[i]);
-                        self.dropdownConceptReplace.push(data.result[i][1]);
-                    }else{
-                        this.nodeid = data.result[i][0];
-                    }
-                } 
-                
+                    dd.push(data.result[i]);
+                }   
             }).fail(function(err) {
                 self.alert(
                     new JsonErrorAlertViewModel(
@@ -177,55 +212,6 @@ define([
             }).always(function() {
                 self.previewing(false);
             });
-        };
-
-        //select old language
-        this.language = function(type) {
-            self.addAllFormData();
-            self.tableVisible(false);
-            if (type === 'Old') {
-                self.dropdownoldlang.removeAll();
-                self.submit('select_language', 'language_old').then(data => {
-                
-                    for (var i = 0; i < data.result.length; i++){
-                        self.dropdownoldlang.push(data.result[i]);
-                    }   
-                    
-                }).fail(function(err) {
-                    self.alert(
-                        new JsonErrorAlertViewModel(
-                            'ep-alert-red',
-                            err.responseJSON["data"],
-                            null,
-                            function(){}
-                        )
-                    );
-                }).always(function() {
-                    self.previewing(false);
-                });
-            }
-            else if (type === 'New') {
-                self.dropdownnewlang.removeAll();
-                self.submit('select_language', "language_new").then(data => {
-                    for (var i = 0; i < data.result.length; i++){
-    
-                        self.dropdownnewlang.push(data.result[i]);
-                    }   
-                    
-                }).fail(function(err) {
-                    self.alert(
-                        new JsonErrorAlertViewModel(
-                            'ep-alert-red',
-                            err.responseJSON["data"],
-                            null,
-                            function(){}
-                        )
-                    );
-                }).always(function() {
-                    self.previewing(false);
-                });
-            }
-
         };
 
         //select nodes and take the specific value
@@ -233,19 +219,25 @@ define([
             self.addAllFormData();
             self.dropdownnodes.removeAll();
             self.savenode.removeAll();
-            self.dropdownoldlang.removeAll();
-            self.dropdownnewlang.removeAll();
+            //self.conceptOldLang.removeAll();
+            self.conceptNewLang.removeAll();
             self.dropdownConcept.removeAll();
             self.dropdownConceptReplace.removeAll();
             self.allchildconcept.removeAll();
             self.tableVisible(false);
             self.showPreview(false);
             self.submit('get_graphs_node').then(data => {
-                for (var i = 0; i < data.result.length; i++){
+                const nodes = data.result.map(node => (
+                    {   node: node.nodeid,
+                        label: `${JSON.parse(node.card_name)[arches.activeLanguage]} - ${JSON.parse(node.widget_label)[arches.activeLanguage]}`,
+                        rdmCollection: JSON.parse(node.config).rdmCollection
+                    }));
+                self.dropdownnodes(nodes);
+                // for (var i = 0; i < data.result.length; i++){
                     
-                    self.dropdownnodes.push(data.result[i][0]);
-                    self.savenode.push(data.result[i]);
-                }   
+                //     self.dropdownnodes.push(data.result[i][0]);
+                //     self.savenode.push(data.result[i]);
+                // }   
                 
             }).fail(function(err) {
                 self.alert(
@@ -262,29 +254,24 @@ define([
         };
 
 
-
         //take the graphs 
         this.allgraph = function() {
             self.addAllFormData();
             self.dropdowngraph.removeAll();
-            self.dropdownoldlang.removeAll();
-            self.dropdownnewlang.removeAll();
+            self.conceptNewLang.removeAll();
             self.saveid.removeAll();
             self.dropdownnodes.removeAll();
             self.savenode.removeAll();
-            self.dropdownConcept.removeAll()
-            self.dropdownConceptReplace.removeAll()
+            self.dropdownConcept.removeAll();
+            self.dropdownConceptReplace.removeAll();
             self.allchildconcept.removeAll();
             self.tableVisible(false);
             self.showPreview(false);
 
-            self.submit('all_graph').then(data => {
-                for (var i = 0; i < data.result.length; i++){
-                    self.dropdowngraph.push(data.result[i][1]);
-                    self.saveid.push(data.result[i]);
-
-                }   
-
+            self.submit('get_graphs').then(data => {
+                data.result.forEach(graph => {
+                    self.dropdowngraph.push({"graphName": graph.name, "graphid": graph.graphid});
+                });
             }).fail(function(err) {
                 self.alert(
                     new JsonErrorAlertViewModel(
@@ -301,7 +288,7 @@ define([
         
         this.write = function() {
             self.showPreview(false);
-            self.showPreviewTalbe(false)
+            self.showPreviewTalbe(false);
             self.addAllFormData();
             params.activeTab("import");
             self.submit('write').then(data => {
@@ -321,9 +308,6 @@ define([
             self.formData.append('action', action);
             self.formData.append('load_id', self.loadId);
             self.formData.append('module', self.moduleId);
-            if (data){
-                self.formData.append("type_lang", data)
-            }
             return $.ajax({
                 type: "POST",
                 url: arches.urls.etl_manager,
@@ -344,6 +328,6 @@ define([
     });
 
     // Apply bindings after registering the component
-    ko.applyBindings(new ViewModel()); // This makes Knockout get to work
+    //ko.applyBindings(new ViewModel()); // This makes Knockout get to work
     return ViewModel;
 });

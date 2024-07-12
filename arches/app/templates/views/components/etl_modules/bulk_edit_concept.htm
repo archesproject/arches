@@ -18,41 +18,86 @@
             ></textarea>
         </div>
 
-        <h3>
-            <label style="font-weight: normal; font-size: 1.5rem; color: #565656;" >Select a resource model</label>
-        </h3>
-        <div>
-            <select data-bind="options: dropdowngraph, value: selectedgrapgh, valueAllowUnset: true, chosen: {width: '400px'}, event:{change: allnodes}"></select>
-                
+        <div class="etl-module-component-block">
+            <h3>
+                <label style="font-weight: normal; font-size: 1.5rem; color: #565656;" >Select a resource model</label>
+            </h3>
+            <div>
+                <select data-bind="options: dropdowngraph, optionsText: 'graphName', optionsValue: 'graphid', value: selectedgrapgh, valueAllowUnset: true, chosen: {width: '400px'}, event:{change: allnodes}"></select>
+            </div>
         </div>
 
-        <div data-bind="visible: selectedgrapgh()">
+        <div class="etl-module-component-block" data-bind="visible: selectedgrapgh()">
             <h3>
                 <label style="font-weight: normal; font-size: 1.5rem; color: #565656;">Select a node </label>
             </h3>
-            <select data-bind="options: dropdownnodes, value: selectednode, valueAllowUnset: true, chosen: {width: '400px'}, event:{change: selectconcept}"></select>
+            <select data-bind="options: dropdownnodes, optionsText: 'label', value: selectednode, valueAllowUnset: true, chosen: {width: '400px'}"></select>
         </div>
 
-        <div data-bind="visible: selectednode()">
-            <h3>
-                <label style="font-weight: normal; font-size: 1.5rem; color: #565656;">Select a concept to replace </label>
-            </h3>
-            <div style="display: inline-block; margin-right: 5px; vertical-align: middle; ">
-                <label style='display: flex; flex-direction: column;'>From <select data-bind="options: dropdownConcept, value: Selectold, valueAllowUnset: true, chosen: {width: '400px'}, event:{change: function() { language('Old') }}"></select> </label>
-                
+        <div data-bind="if: selectednode" style="font-size: 1.5rem; margin-bottom: 30px;">
+            <div display="flex" style="border:solid 1px lightgrey; border-radius: 5px; margin: 10px 0px;">
+                <div style="background-color: #ebebeb;padding: 5px;">
+                    <label style="font-weight: normal; color: #565656;">Select a concept to replace</label>
+                </div>
+                <div style="display: flex; flex-direction: row;">
+                    <div style="padding: 0px 20px;">
+                        <label style='display: flex; flex-direction: column; margin: 12px 0px 10px 0px;'>Language</label>
+                        <select class="resources" data-bind="
+                            attr: {'data-label': 'Language'},
+                            select2Query: {
+                                select2Config:{
+                                    value: conceptOldLang,
+                                    data: rdmCollectionLanguages
+                            }}">
+                        </select>
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <label style="font-weight: normal; color: #565656; margin: 10px 0px 0px 0px;">Concept</label>
+                        <div data-bind="component: {
+                            name: 'concept-select-widget',
+                            params: {
+                                node: {'config': {'rdmCollection': selectednode().rdmCollection }},
+                                value: conceptOld,
+                                allowClear: false,
+                                placeholder: 'Select a replacement concept',
+                                lang: conceptOldLang
+                            }, 
+                        }
+                        "></div>
+                    </div>
+                </div>
             </div>
-            <div style="display: inline-block; margin-right: 5px; vertical-align: middle;">
-                <label style='display: flex; flex-direction: column;'>Language <select data-bind="options: dropdownoldlang, value: vaoldlanguage, valueAllowUnset: true, chosen: {width: '100px'}"></select></label>
-                
-            </div>
-            <i class="fa fa-arrow-right" style="margin: 0px 5px; vertical-align: middle;margin-top: 10px;"></i>
-            <div style="display: inline-block; margin-right: 5px; vertical-align: middle;">
-                <label style='display: flex; flex-direction: column;'>To <select data-bind="options: dropdownConceptReplace, value: Selectnew, valueAllowUnset: true, chosen: {width: '400px'}, , event:{change: function() { language('New') }}"></select>
-                </label>
-            </div>
-                <div style="display: inline-block; margin-right: 5px; vertical-align: middle;">
-                <label style='display: flex; flex-direction: column;'>Language <select data-bind="options: dropdownnewlang, value: vanewlanguage, valueAllowUnset: true, chosen: {width: '100px'}"></select>
-                </label>
+            <div display="flex" style="border:solid 1px lightgrey; border-radius: 5px;">
+                <div style="background-color: #ebebeb;padding: 5px;">
+                    <label style="font-weight: normal; color: #565656;">Select a replacement concept</label>
+                </div>
+                <div style="display: flex; flex-direction: row;">
+                    <div style="padding: 0px 20px;">
+                        <label style='display: flex; flex-direction: column; margin: 12px 0px 10px 0px;'>Language</label>
+                        <select class="resources" data-bind="
+                            attr: {'data-label': 'Language'},
+                            select2Query: {
+                                select2Config:{
+                                    value: conceptNewLang,
+                                    data: rdmCollectionLanguages
+                            }}">
+                        </select>
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <label style="font-weight: normal; color: #565656; margin: 10px 0px 0px 0px;">Concept</label>
+                        <div data-bind="component: {
+                            name: 'concept-select-widget',
+                            params: {
+                                node: {'config': {'rdmCollection': selectednode().rdmCollection }},
+                                value: conceptNew,
+                                allowClear: false,
+                                placeholder: 'Select a replacement concept',
+                                lang: conceptNewLang
+                            }, 
+                        }
+                        "></div>
+                    </div>
+                </div>
             </div>
         </div>
         
