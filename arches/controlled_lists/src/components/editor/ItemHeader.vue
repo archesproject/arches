@@ -7,7 +7,7 @@ import { bestLabel } from "@/controlled-lists/utils.ts";
 import LetterCircle from "@/controlled-lists/components/misc/LetterCircle.vue";
 
 import type { Ref } from "vue";
-import type { Language } from "@/arches/types";
+import type { Language } from "@/app/arches/types";
 import type { ControlledListItem } from "@/controlled-lists/types";
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;

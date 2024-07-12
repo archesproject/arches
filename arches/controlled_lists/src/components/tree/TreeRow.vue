@@ -32,7 +32,7 @@ import MoveRow from "@/controlled-lists/components/tree/MoveRow.vue";
 import type { Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
-import type { Language } from "@/arches/types";
+import type { Language } from "@/app/arches/types";
 import type {
     ControlledList,
     ControlledListItem,

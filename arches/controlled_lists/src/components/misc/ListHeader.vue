@@ -2,7 +2,7 @@
 import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import { ARCHES_CHROME_BLUE } from "@/arches/theme.ts";
+import { ARCHES_CHROME_BLUE } from "@/app/arches/theme.ts";
 import {
     displayedRowKey,
     selectedLanguageKey,
@@ -10,7 +10,7 @@ import {
 import { bestLabel, dataIsList } from "@/controlled-lists/utils.ts";
 
 import type { Ref } from "vue";
-import type { Language } from "@/arches/types";
+import type { Language } from "@/app/arches/types";
 import type {
     ControlledList,
     DisplayedRowRefAndSetter,

@@ -26,7 +26,7 @@ import { dataIsItem, listAsNode } from "@/controlled-lists/utils.ts";
 import type { Ref } from "vue";
 import type { TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
-import type { Language } from "@/arches/types";
+import type { Language } from "@/app/arches/types";
 import type {
     ControlledList,
     ControlledListItem,

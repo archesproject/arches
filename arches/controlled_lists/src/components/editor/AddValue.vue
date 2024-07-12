@@ -5,7 +5,7 @@ import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 
-import { ARCHES_CHROME_BLUE } from "@/arches/theme.ts";
+import { ARCHES_CHROME_BLUE } from "@/app/arches/theme.ts";
 import {
     itemKey,
     ALT_LABEL,
@@ -14,7 +14,7 @@ import {
 } from "@/controlled-lists/constants.ts";
 
 import type { Ref } from "vue";
-import type { Language } from "@/arches/types";
+import type { Language } from "@/app/arches/types";
 import type {
     ControlledListItem,
     Value,

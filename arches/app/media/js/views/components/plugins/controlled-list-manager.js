@@ -1,5 +1,5 @@
 import ko from 'knockout';
-import ControlledListManager from '@/arches/plugins/ControlledListManager.vue';
+import ControlledListManager from '@/app/arches/plugins/ControlledListManager.vue';
 import createVueApp from 'utils/create-vue-application';
 import ControlledListManagerTemplate from 'templates/views/components/plugins/controlled-list-manager.htm';
 
