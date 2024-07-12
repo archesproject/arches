@@ -9,12 +9,12 @@ from django.db.models import Deferrable, Q
 from django.utils.translation import gettext_lazy as _
 
 from arches.app.models.models import DValueType, Language, Node
-from arches.controlledlists.querysets import (
+from arches.controlled_lists.querysets import (
     ListQuerySet,
     ListItemImageManager,
     ListItemValueQuerySet,
 )
-from arches.controlledlists.utils import field_names
+from arches.controlled_lists.utils import field_names
 
 
 class List(models.Model):
@@ -286,7 +286,7 @@ class ListItemImage(models.Model):
 
     class Meta:
         managed = False
-        db_table = "controlledlists_listitemvalue"
+        db_table = "controlled_lists_listitemvalue"
 
     def serialize(self):
         return {

@@ -762,7 +762,7 @@ urlpatterns = [
         api.TransformEdtfForTile.as_view(),
         name="transform_edtf_for_tile",
     ),
-    path("", include("arches.controlledlists.urls")),
+    path("", include("arches.controlled_lists.urls")),
 ]
 
 # This must be included in core to keep webpack happy, but cannot be appended when running a project.

@@ -15,7 +15,7 @@ from arches.app.models.models import (
     Node,
     NodeGroup,
 )
-from arches.controlledlists.models import (
+from arches.controlled_lists.models import (
     List,
     ListItem,
     ListItemImage,
@@ -24,7 +24,7 @@ from arches.controlledlists.models import (
 )
 
 # these tests can be run from the command line via
-# python manage.py test arches.controlledlists.tests.view_tests --settings="tests.test_settings"
+# python manage.py test arches.controlled_lists.tests.view_tests --settings="tests.test_settings"
 
 SYNCED_PK = uuid.uuid4()
 

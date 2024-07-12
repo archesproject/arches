@@ -16,14 +16,14 @@ from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches.app.utils.response import JSONErrorResponse, JSONResponse
 from arches.app.utils.string_utils import str_to_bool
 from arches.app.views.api import APIBase
-from arches.controlledlists.models import (
+from arches.controlled_lists.models import (
     List,
     ListItem,
     ListItemImage,
     ListItemImageMetadata,
     ListItemValue,
 )
-from arches.controlledlists.utils import field_names
+from arches.controlled_lists.utils import field_names
 
 logger = logging.getLogger(__name__)
 

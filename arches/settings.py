@@ -363,7 +363,7 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.gis",
-    "arches.controlledlists",
+    "arches.controlled_lists",
     "arches",
     "arches.app.models",
     "arches.management",
@@ -375,7 +375,7 @@ INSTALLED_APPS = (
     "django_celery_results",
 )
 
-ARCHES_APPLICATIONS = ("arches.controlledlists",)
+ARCHES_APPLICATIONS = ("arches.controlled_lists",)
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",

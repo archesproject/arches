@@ -5,23 +5,23 @@ from django.core import management
 from django.test import TestCase
 from django.test.utils import captured_stdout
 
-from arches.controlledlists.models import List
+from arches.controlled_lists.models import List
 
 # Change TEST_ROOT context for just Controlled Lists
 from arches.settings import ROOT_DIR
 
-TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "controlledlists/tests"))
+TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "controlled_lists/tests"))
 
 
 # these tests can be run from the command line via
-# python manage.py test arches.controlledlists.tests.cli_tests --settings="tests.test_settings"
+# python manage.py test arches.controlled_lists.tests.cli_tests --settings="tests.test_settings"
 
 
 class ListExportPackageTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        from arches.controlledlists.tests.test_views import ListTests
+        from arches.controlled_lists.tests.test_views import ListTests
 
         return ListTests.setUpTestData()
 

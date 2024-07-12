@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("controlledlists", "0001_initial"),
+        ("controlled_lists", "0001_initial"),
         ("guardian", "0002_generic_permissions_index"),
     ]
 
@@ -77,30 +77,30 @@ class Migration(migrations.Migration):
 
                 -- If overwrite flag is provided, completely recreate the list/items/values
                 if overwrite then
-                    delete from controlledlists_listitemvalue
+                    delete from controlled_lists_listitemvalue
                     where list_item_id in (
                         select id
-                        from controlledlists_listitem
+                        from controlled_lists_listitem
                         where list_id in (
                             select id
-                            from controlledlists_list
+                            from controlled_lists_list
                             where name = any(collection_names)
                         )
                     );
 
-                    delete from controlledlists_listitem
+                    delete from controlled_lists_listitem
                     where list_id in (
                         select id
-                        from controlledlists_list
+                        from controlled_lists_list
                         where name = any(collection_names)
                     );
 
-                    delete from controlledlists_list
+                    delete from controlled_lists_list
                     where name = any(collection_names);
                 end if;
 
                 -- Migrate Collection -> Controlled List
-                insert into controlledlists_list (
+                insert into controlled_lists_list (
                     id,
                     name,
                     dynamic,
@@ -178,9 +178,9 @@ class Migration(migrations.Migration):
                         depth
                     from ranked_prefLabels rpl
                     where language_rank = 1 and
-                        root_list in (select id from controlledlists_list where name = ANY(collection_names))
+                        root_list in (select id from controlled_lists_list where name = ANY(collection_names))
                 )
-                insert into controlledlists_listitem(
+                insert into controlled_lists_listitem(
                     id,
                     uri,
                     sortorder,
@@ -198,7 +198,7 @@ class Migration(migrations.Migration):
 
 
                 -- Migrate concept values -> controlled list item values
-                insert into controlledlists_listitemvalue (
+                insert into controlled_lists_listitemvalue (
                     id,
                     value,
                     list_item_id,
@@ -215,8 +215,8 @@ class Migration(migrations.Migration):
                 where relationtype = 'member' and
                     (valuetype = 'prefLabel' or valuetype = 'altLabel') and
                     r.conceptidto in (
-                        select id from controlledlists_listitem where list_id in (
-                            select id from controlledlists_list where name = ANY(collection_names)
+                        select id from controlled_lists_listitem where list_id in (
+                            select id from controlled_lists_list where name = ANY(collection_names)
                         )
                     );
 
