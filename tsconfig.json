@@ -14,12 +14,10 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "baseUrl": "./arches/app/src/",
+    "baseUrl": "./arches",
     "paths": {
-      "@/*": [
-        "*.ts",
-        "*.vue"
-      ]
+      "@/app/*": ["app/src/*.ts", "app/src/*.vue"],
+      "@/controlled-lists/*": ["controlled_lists/src/*.ts", "controlled_lists/src/*.vue"]
     }
   },
   "include": [

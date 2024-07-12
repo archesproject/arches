@@ -295,7 +295,16 @@ module.exports = () => {
                         ...imageFilepathLookup,
                         ...nodeModulesAliases,
                         ...parsedPackageJSONFilepaths,
-                        '@': [Path.resolve(__dirname, APP_ROOT, 'src'), ...archesApplicationsVuePaths, Path.resolve(__dirname, ROOT_DIR, 'app', 'src')],
+                        '@/app': [
+                            Path.resolve(__dirname, APP_ROOT, 'src'),
+                            ...archesApplicationsVuePaths,
+                            Path.resolve(__dirname, ROOT_DIR, 'app', 'src'),
+                        ],
+                        '@/controlled-lists': [
+                            Path.resolve(__dirname, APP_ROOT, '..', 'controlled_lists', 'src'),
+                            ...archesApplicationsVuePaths,
+                            Path.resolve(__dirname, ROOT_DIR, 'controlled_lists', 'src'),
+                        ],
                         'node_modules': Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH)
                     },
                 },
@@ -352,6 +361,7 @@ module.exports = () => {
                                 /node_modules/,
                                 Path.resolve(__dirname, APP_ROOT, 'src'),
                                 Path.resolve(__dirname, ROOT_DIR, 'app', 'src'),
+                                // controlled_lists currently does not define its own dependencies
                                 ...archesApplicationsVuePaths,
                             ],
                             use: [
@@ -373,6 +383,7 @@ module.exports = () => {
                                                 Path.resolve(__dirname, APP_ROOT, 'media', 'css'),
                                                 ...archesApplicationsCSSFilepaths,
                                                 Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'css'),
+                                                // controlled_lists currently does not define its own static files
                                             ],
                                         },
                                     },

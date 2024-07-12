@@ -14,12 +14,10 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "baseUrl": "{{ project_name }}/src/",
+    "baseUrl": "{{ project_name }}",
     "paths": {
-      "@/*": [
-        "*.ts",
-        "*.vue"
-      ]
+      "@/app/*": ["app/src/*.ts", "app/src/*.vue"],
+      "@/controlled-lists/*": ["controlled_lists/src/*.ts", "controlled_lists/src/*.vue"]
     }
   },
   "include": [
