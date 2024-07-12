@@ -1,5 +1,3 @@
-# pragma: no cover
-
 import arches
 import os
 import shutil
@@ -11,7 +9,7 @@ from django.db import connection
 from arches.app.models.system_settings import settings
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # pragma: no cover
     """
     Command for migrating projects between versions
 
