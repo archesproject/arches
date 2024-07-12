@@ -23,7 +23,7 @@ import ListHeader from "@/controlled-lists/components/misc/ListHeader.vue";
 import ListTree from "@/controlled-lists/components/tree/ListTree.vue";
 
 import type { Ref } from "vue";
-import type { ControlledListItem, Selectable } from "@/controlled-lists/types";
+import type { Selectable } from "@/controlled-lists/types";
 import type { Language } from "@/arches/types";
 
 const router = useRouter();
@@ -38,10 +38,10 @@ function setDisplayedRow(row: Selectable | null) {
     if (typeof row.id === "number") {
         return;
     }
-    if ((row as ControlledListItem).controlled_list_id) {
-        router.push({ name: routes.item, params: { id: row.id } });
-    } else {
+    if (dataIsList(row)) {
         router.push({ name: routes.list, params: { id: row.id } });
+    } else {
+        router.push({ name: routes.item, params: { id: row.id } });
     }
 }
 provide(displayedRowKey, { displayedRow, setDisplayedRow });
