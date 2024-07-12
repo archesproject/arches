@@ -220,6 +220,7 @@ const acceptNewItemShortcutEntry = async () => {
 
     selectedKeys.value = { [newItem.id]: true };
     setDisplayedRow(newItem);
+    newLabelFormValue.value = "";
 };
 
 const triggerAcceptNewItemShortcut = () => {
@@ -253,6 +254,7 @@ const acceptNewListShortcutEntry = async () => {
     ];
     selectedKeys.value = { [newList.id]: true };
     setDisplayedRow(newList);
+    newListFormValue.value = "";
 };
 </script>
 

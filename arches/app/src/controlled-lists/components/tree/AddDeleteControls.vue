@@ -46,9 +46,8 @@ const isMultiSelecting = defineModel<boolean>("isMultiSelecting", {
     required: true,
 });
 const nextNewList = defineModel<NewControlledList>("nextNewList");
-const newListFormValue = defineModel<string>("newListFormValue", {
-    required: true,
-});
+
+const { newListName } = defineProps<{ newListName: string }>();
 
 // For new list entry (input textbox)
 const newListCounter = ref(1);
@@ -95,7 +94,7 @@ const deleteDropdownOptions = [
 const createList = () => {
     const newList: NewControlledList = {
         id: newListCounter.value,
-        name: newListFormValue.value,
+        name: newListName,
         dynamic: false,
         search_only: false,
         items: [],
@@ -103,7 +102,6 @@ const createList = () => {
     };
 
     nextNewList.value = newList;
-    newListFormValue.value = "";
     newListCounter.value += 1;
 
     tree.value.push(listAsNode(newList, selectedLanguage.value));

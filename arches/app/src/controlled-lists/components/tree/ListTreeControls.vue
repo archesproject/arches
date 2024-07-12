@@ -30,9 +30,8 @@ const isMultiSelecting = defineModel<boolean>("isMultiSelecting", {
     required: true,
 });
 const nextNewList = defineModel<NewControlledList>("nextNewList");
-const newListFormValue = defineModel<string>("newListFormValue", {
-    required: true,
-});
+
+const { newListName } = defineProps<{ newListName: string }>();
 
 const { setDisplayedRow } = inject(
     displayedRowKey,
@@ -133,7 +132,7 @@ const expandNode = (node: TreeNode) => {
             v-model:is-multi-selecting="isMultiSelecting"
             v-model:selected-keys="selectedKeys"
             v-model:next-new-list="nextNewList"
-            v-model:new-list-form-value="newListFormValue"
+            :new-list-name
         />
     </div>
     <ActionBanner

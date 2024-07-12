@@ -169,7 +169,7 @@ const filterCallbackWrapped = computed(() => {
         v-model:moving-item="movingItem"
         v-model:is-multi-selecting="isMultiSelecting"
         v-model:nextNewList="nextNewList"
-        v-model:newListFormValue="newListFormValue"
+        :new-list-name="newListFormValue"
     />
     <Tree
         v-if="tree"

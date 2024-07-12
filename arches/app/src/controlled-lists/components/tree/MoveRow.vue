@@ -56,9 +56,6 @@ const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
 });
 const movingItem = defineModel<TreeNode>("movingItem");
 const nextNewItem = defineModel<NewControlledListItem>("nextNewItem");
-const newLabelFormValue = defineModel<string>("newLabelFormValue", {
-    required: true,
-});
 const newLabelCounter = ref(1);
 const shouldRefocusUpArrow = ref(false);
 const shouldRefocusDownArrow = ref(false);
@@ -118,7 +115,6 @@ const addItem = (parent: TreeNode) => {
     };
 
     nextNewItem.value = newItem;
-    newLabelFormValue.value = "";
     newLabelCounter.value += 1;
 
     parent.children!.push(itemAsNode(newItem, selectedLanguage.value));
