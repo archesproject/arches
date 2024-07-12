@@ -23,18 +23,18 @@
                 <label style="font-weight: normal; font-size: 1.5rem; color: #565656;" >Select a resource model</label>
             </h3>
             <div>
-                <select data-bind="options: dropdowngraph, optionsText: 'graphName', optionsValue: 'graphid', value: selectedgrapgh, valueAllowUnset: true, chosen: {width: '400px'}, event:{change: allnodes}"></select>
+                <select data-bind="options: dropdowngraph, optionsText: 'graphName', optionsValue: 'graphid', value: selectedGraph, valueAllowUnset: true, chosen: {width: '400px'}"></select>
             </div>
         </div>
 
-        <div class="etl-module-component-block" data-bind="visible: selectedgrapgh()">
+        <div class="etl-module-component-block" data-bind="visible: selectedGraph()">
             <h3>
                 <label style="font-weight: normal; font-size: 1.5rem; color: #565656;">Select a node </label>
             </h3>
             <select data-bind="options: dropdownnodes, optionsText: 'label', value: selectednode, valueAllowUnset: true, chosen: {width: '400px'}"></select>
         </div>
 
-        <div data-bind="if: selectednode" style="font-size: 1.5rem; margin-bottom: 30px;">
+        <div data-bind="if: selectednode" style="font-size: 1.5rem; margin: 30px 0px;">
             <div display="flex" style="border:solid 1px lightgrey; border-radius: 5px; margin: 10px 0px;">
                 <div style="background-color: #ebebeb;padding: 5px;">
                     <label style="font-weight: normal; color: #565656;">Select a concept to replace</label>
@@ -101,7 +101,11 @@
             </div>
         </div>
         
-        <button data-bind="click: ReplaceConcept" class="btn btn-success" style="margin-top:5px;">Preview</button>
+        <!-- <button data-bind="click: getPreviewData" class="btn btn-success" style="margin-top:5px;">Preview</button> -->
+        <button data-bind="click: getPreviewData, css: {disabled: !ready()}" class="btn btn-success">
+            <span data-bind="text: $root.translations.preview"></span>
+            <i class="fa fa-spin fa-spinner" data-bind="visible: previewing()"></i>
+        </button>
 
         <div data-bind="visible: tableVisible">
             <div>

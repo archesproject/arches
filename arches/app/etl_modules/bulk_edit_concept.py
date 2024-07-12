@@ -322,7 +322,7 @@ class BulkConceptEditor(BaseBulkEditor):
         return {"success": True, "data": all_node}
 
     def get_graphs_node(self, request):
-        graphid = request.POST.get("selectedgrapgh", None)
+        graphid = request.POST.get("selectedGraph", None)
         with connection.cursor() as cursor:
             select_nodes = """
                 SELECT c.name as card_name, n.config, n.nodeid, w.label as widget_label
@@ -378,18 +378,18 @@ class BulkConceptEditor(BaseBulkEditor):
         results = json.loads(response.content)["results"]["hits"]["hits"]
         return [result["_source"]["resourceinstanceid"] for result in results]
 
-    def replaceConcept(self, request):
+    def get_preview_data(self, request):
         old = request.POST.get("conceptOld", None)
         new = request.POST.get("conceptNew", None)
         # all_child_concept = request.POST.get("allchildconcept", None)
-        language_old = request.POST.get("vaoldlanguage", None)
-        language_new = request.POST.get("vanewlanguage", None)
+        language_old = request.POST.get("conceptOldLang", None)
+        language_new = request.POST.get("conceptNewLang", None)
         # nodeid = request.POST.get("nodeid", None)
         selected_node_info = request.POST.get("selectednode", None)
         if not selected_node_info:
             return {}
         # selected_node = json.loads(selected_node_info)["nodeid"]
-        nodeid = json.loads(selected_node_info)["nodeid"]
+        nodeid = json.loads(selected_node_info)["node"]
 
         search_url = request.POST.get("search_url", None)
         resourceids = None
@@ -548,16 +548,16 @@ class BulkConceptEditor(BaseBulkEditor):
         }
 
     def write(self, request):
-        selected_grapgh = request.POST.get("selectedgrapgh", None)
-        select_node = request.POST.get("selectednode", None)
+        selected_grapgh = request.POST.get("selectedGraph", None)
+        selected_node_info = request.POST.get("selectednode", None)
         new = request.POST.get("conceptNew", None)
         old = request.POST.get("conceptOld", None)
-        language_old = request.POST.get("vaoldlanguage", None)
-        language_new = request.POST.get("vanewlanguage", None)
+        language_old = request.POST.get("conceptOldLang", None)
+        language_new = request.POST.get("conceptNewLang", None)
         table = request.POST.get("table", None)
         load_details = {
             "graph": selected_grapgh,
-            "node": select_node,
+            "node": json.loads(selected_node_info)["node"],
             "new": new,
             "old": old,
             "languageold": language_old,
@@ -583,11 +583,11 @@ class BulkConceptEditor(BaseBulkEditor):
 
     @load_data_async
     def run_load_task_async(self, request):
-        graphid = request.POST.get("selectedgrapgh", None)
+        graphid = request.POST.get("selectedGraph", None)
         new = request.POST.get("conceptNew", None)
         old = request.POST.get("conceptOld", None)
-        language_old = request.POST.get("vaoldlanguage", None)
-        language_new = request.POST.get("vanewlanguage", None)
+        language_old = request.POST.get("conceptOldLang", None)
+        language_new = request.POST.get("conceptNewLang", None)
         table = request.POST.get("table", None)
         nodeid = request.POST.get("nodeid", None)
         all_child_concept = request.POST.get("allchildconcept", None)

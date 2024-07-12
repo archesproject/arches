@@ -20,24 +20,21 @@ define([
         this.saveid = ko.observableArray();
         this.savenode = ko.observableArray();
         this.searchUrl = ko.observable();
-        this.nodeid = ko.observable();
-        this.dropdownConcept = ko.observableArray();
+        // this.dropdownConcept = ko.observableArray();
         this.allchildconcept = ko.observableArray();
         this.dropdownnodes = ko.observableArray();
         this.allinformationTable = ko.observableArray();
         this.selectednode = ko.observable();
         this.dropdowngraph = ko.observableArray();
-        this.selectedgrapgh = ko.observable();
+        this.selectedGraph = ko.observable();
         this.conceptOld = ko.observable();
         this.conceptNew = ko.observable();
-        this.vaoldlanguage = ko.observable();
-        this.vanewlanguage = ko.observable();
         this.conceptOldLang = ko.observable();
-        this.conceptNewLang = ko.observableArray();
+        this.conceptNewLang = ko.observable();
         this.rdmCollection = null;
         this.rdmCollectionLanguages = ko.observableArray();
         this.defaultLanguage = ko.observable();
-        this.dropdownConceptReplace = ko.observableArray();
+        // this.dropdownConceptReplace = ko.observableArray();
         this.tableVisible = ko.observable(false);
         this.showPreviewTalbe = ko.observable(true);
         this.showPreview = ko.observable(false);
@@ -52,32 +49,30 @@ define([
 
         
         this.addAllFormData = () => {
-            if (self.selectedgrapgh()) { self.formData.append('selectedgrapgh', self.selectedgrapgh()); }
+            if (self.selectedGraph()) { self.formData.append('selectedGraph', self.selectedGraph()); }
             if (self.saveid()) { self.formData.append('saveid', self.saveid()); }
             if (self.savenode()) { self.formData.append('savenode', self.savenode()); }
             if (self.conceptOld()) { self.formData.append('conceptOld', self.conceptOld()); }
             if (self.conceptNew()) { self.formData.append('conceptNew', self.conceptNew()); }
             if (self.allchildconcept()) { self.formData.append('allchildconcept', self.allchildconcept()); }
-            if (self.vaoldlanguage()) { self.formData.append('vaoldlanguage', self.vaoldlanguage()); }
-            if (self.vanewlanguage()) { self.formData.append('vanewlanguage', self.vanewlanguage()); }
-            if (self.selectednode()) { self.formData.append('selectednode', self.selectednode()); }
+            if (self.conceptOldLang()) { self.formData.append('conceptOldLang', self.conceptOldLang()); }
+            if (self.conceptNewLang()) { self.formData.append('conceptNewLang', self.conceptNewLang()); }
+            if (self.selectednode()) { self.formData.append('selectednode', JSON.stringify(self.selectednode())); }
             if (self.allinformationTable()) { self.formData.append('table', self.allinformationTable()); }
-            if (self.nodeid) { self.formData.append('nodeid', self.nodeid); }
             if (self.searchUrl()) { self.formData.append('search_url', self.searchUrl()); }
             if (self.rdmCollection) { self.formData.append('rdmCollection', self.rdmCollection); }
         };
         self.deleteAllFormData = () => {
-            self.formData.delete('selectedgrapgh');
+            self.formData.delete('selectedGraph');
             self.formData.delete('saveid');
             self.formData.delete('savenode');
             self.formData.delete('conceptOld');
             self.formData.delete('conceptNew');
             self.formData.delete('allchildconcept');
-            self.formData.delete('vaoldlanguage');
-            self.formData.delete('vanewlanguage');
+            self.formData.delete('conceptOldLang');
+            self.formData.delete('conceptNewLang');
             self.formData.delete('selectednode');
             self.formData.delete('table');
-            self.formData.delete('nodeid');
             self.formData.delete('search_url');
             self.formData.delete('rdmCollection');
         };
@@ -123,12 +118,12 @@ define([
         };
 
         //call python code to display the change
-        this.ReplaceConcept = function() {
+        this.getPreviewData = function() {
             self.addAllFormData();
             self.allinformationTable.removeAll();
             self.tableVisible(true);
             self.showPreview(true);
-            self.submit('replaceConcept').then(data => {
+            self.submit('get_preview_data').then(data => {
                 
                 for (var i = 0; i < data.result.length; i++){
                     self.allinformationTable.push(data.result[i]);
@@ -149,13 +144,24 @@ define([
             });
         };
 
+        this.ready = ko.computed(() => {
+            const ready = !!self.selectedGraph() &&
+                !!self.selectednode() &&
+                !self.previewing() &&
+                self.conceptNew() !== self.conceptOld() &&
+                !!self.conceptNew() &&
+                !!self.conceptOld();
+            return ready;
+        });
+
         this.selectednode.subscribe((node) => {
             self.rdmCollection = node.rdmCollection;
             self.addAllFormData();
-            self.dropdownConcept.removeAll();
-            self.dropdownConceptReplace.removeAll();
+            self.conceptNew("");
+            self.conceptOld("");
+            // self.dropdownConcept.removeAll();
+            // self.dropdownConceptReplace.removeAll();
             self.allchildconcept.removeAll();
-            self.conceptNewLang.removeAll();
             self.tableVisible(false);
 
             self.submit('get_collection_languages').then(data => {
@@ -178,51 +184,36 @@ define([
             });
         });
 
-
-        // this.conceptOld.subscribe(function(conceptid){
-        //     self.formData = new window.FormData();
-        //     self.formData.append('selected_conceptid', conceptid);
-        //     this.language(this.conceptOldLang);
-        // }, this);
-
-        // this.conceptNew.subscribe(function(conceptid){
-        //     self.formData = new window.FormData();
-        //     self.formData.append('selected_conceptid', conceptid);
-        //     this.language(this.conceptNewLang);
-        // }, this);
-
         //select old language
-        this.language = function(dd) {
-            self.addAllFormData();
-            self.tableVisible(false);
-            dd.removeAll();
-            self.submit('select_language').then(data => {
-                for (var i = 0; i < data.result.length; i++){
-                    dd.push(data.result[i]);
-                }   
-            }).fail(function(err) {
-                self.alert(
-                    new JsonErrorAlertViewModel(
-                        'ep-alert-red',
-                        err.responseJSON["data"],
-                        null,
-                        function(){}
-                    )
-                );
-            }).always(function() {
-                self.previewing(false);
-            });
-        };
+        // this.language = function(dd) {
+        //     self.addAllFormData();
+        //     self.tableVisible(false);
+        //     dd.removeAll();
+        //     self.submit('select_language').then(data => {
+        //         for (var i = 0; i < data.result.length; i++){
+        //             dd.push(data.result[i]);
+        //         }   
+        //     }).fail(function(err) {
+        //         self.alert(
+        //             new JsonErrorAlertViewModel(
+        //                 'ep-alert-red',
+        //                 err.responseJSON["data"],
+        //                 null,
+        //                 function(){}
+        //             )
+        //         );
+        //     }).always(function() {
+        //         self.previewing(false);
+        //     });
+        // };
 
         //select nodes and take the specific value
-        this.allnodes = function() {
+        this.selectedGraph.subscribe((graphid) => {
             self.addAllFormData();
             self.dropdownnodes.removeAll();
             self.savenode.removeAll();
-            //self.conceptOldLang.removeAll();
-            self.conceptNewLang.removeAll();
-            self.dropdownConcept.removeAll();
-            self.dropdownConceptReplace.removeAll();
+            self.conceptNew("");
+            self.conceptOld("");
             self.allchildconcept.removeAll();
             self.tableVisible(false);
             self.showPreview(false);
@@ -251,19 +242,18 @@ define([
             }).always(function() {
                 self.previewing(false);
             });
-        };
 
+        });
 
         //take the graphs 
         this.allgraph = function() {
             self.addAllFormData();
             self.dropdowngraph.removeAll();
-            self.conceptNewLang.removeAll();
             self.saveid.removeAll();
             self.dropdownnodes.removeAll();
             self.savenode.removeAll();
-            self.dropdownConcept.removeAll();
-            self.dropdownConceptReplace.removeAll();
+            // self.dropdownConcept.removeAll();
+            // self.dropdownConceptReplace.removeAll();
             self.allchildconcept.removeAll();
             self.tableVisible(false);
             self.showPreview(false);
