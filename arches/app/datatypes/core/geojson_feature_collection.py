@@ -32,37 +32,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         **kwargs,
     ):
         errors = []
-        max_bytes = 32766  # max bytes allowed by Lucene
-        byte_count = 0
-        byte_count += len(str(value).encode("UTF-8"))
-
-        def validate_geom_byte_size_can_be_reduced(feature_collection):
-            try:
-                if len(feature_collection["features"]) > 0:
-                    feature_geom = GEOSGeometry(
-                        JSONSerializer().serialize(
-                            feature_collection["features"][0]["geometry"]
-                        )
-                    )
-                    current_precision = abs(self.find_num(feature_geom.coords))
-                    feature_collection = self.geo_utils.reduce_precision(
-                        feature_collection, current_precision
-                    )
-            except ValueError:
-                message = _("Geojson byte size exceeds Lucene 32766 limit.")
-                title = _("Geometry Size Exceeds Elasticsearch Limit")
-                errors.append(
-                    {
-                        "type": "ERROR",
-                        "message": "datatype: {0} {1} - {2}. {3}.".format(
-                            self.datatype_model.datatype,
-                            source,
-                            message,
-                            "This data was not imported.",
-                        ),
-                        "title": title,
-                    }
-                )
 
         def validate_geom_bbox(geom):
             try:
@@ -105,8 +74,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 )
 
         if value is not None:
-            if byte_count > max_bytes:
-                validate_geom_byte_size_can_be_reduced(value)
             for feature in value["features"]:
                 try:
                     geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
