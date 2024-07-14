@@ -56,6 +56,7 @@ from arches.app.utils.permission_backend import (
     get_restricted_instances,
     user_can_read_graph,
     get_nodegroups_by_perm,
+    get_default_permissions,
 )
 import django.dispatch
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -279,6 +280,7 @@ class Resource(models.ResourceInstance):
                 context=context,
             )
         try:
+            # get_default_permissions()
             for perm in (
                 "view_resourceinstance",
                 "change_resourceinstance",
