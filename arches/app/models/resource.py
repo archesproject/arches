@@ -38,10 +38,14 @@ from arches.app.search.mappings import TERMS_INDEX, RESOURCES_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms, Nested
 from arches.app.tasks import index_resource
 from arches.app.utils import import_class_from_string, task_management
+from arches.app.utils import permission_backend
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
-from guardian.shortcuts import assign_perm, remove_perm
-from guardian.exceptions import NotUserNorGroup
+from arches.app.utils.permission_backend import (
+    assign_perm,
+    remove_perm,
+    NotUserNorGroup,
+)
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.exceptions import (
     InvalidNodeNameException,
@@ -49,11 +53,11 @@ from arches.app.utils.exceptions import (
 )
 from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
-    get_restricted_users,
     get_restricted_instances,
     user_can_read_graph,
     get_nodegroups_by_perm,
 )
+import django.dispatch
 from arches.app.datatypes.datatypes import DataTypeFactory
 
 logger = logging.getLogger(__name__)
@@ -252,6 +256,16 @@ class Resource(models.ResourceInstance):
         index = kwargs.pop("index", True)
         context = kwargs.pop("context", None)
         transaction_id = kwargs.pop("transaction_id", None)
+
+        if request is None:
+            if user is None:
+                user = {}
+        else:
+            user = request.user
+
+        if not self.principaluser_id and user:
+            self.principaluser_id = user.id
+
         super(Resource, self).save(*args, **kwargs)
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
 
@@ -264,12 +278,6 @@ class Resource(models.ResourceInstance):
                 transaction_id=transaction_id,
                 context=context,
             )
-        if request is None:
-            if user is None:
-                user = {}
-        else:
-            user = request.user
-
         try:
             for perm in (
                 "view_resourceinstance",
@@ -295,7 +303,8 @@ class Resource(models.ResourceInstance):
             self.tiles = [
                 tile
                 for tile in self.tiles
-                if tile.nodegroup is not None and tile.nodegroup in readable_nodegroups
+                if tile.nodegroup is not None
+                and tile.nodegroup_id in readable_nodegroups
             ]
 
     # # flatten out the nested tiles into a single array
@@ -436,6 +445,9 @@ class Resource(models.ResourceInstance):
                         )
                         es_index.index_document(document=doc, id=doc_id)
 
+            resource_indexed = django.dispatch.Signal()
+            resource_indexed.send(sender=self.__class__, instance=self)
+
     def get_documents_to_index(
         self, fetchTiles=True, datatype_factory=None, node_datatypes=None, context=None
     ):
@@ -517,18 +529,15 @@ class Resource(models.ResourceInstance):
             else self.tiles
         )
 
-        restrictions = get_restricted_users(self)
         document["tiles"] = tiles
         document["permissions"] = {
-            "users_without_read_perm": restrictions["cannot_read"]
+            "principal_user": (
+                [int(self.principaluser_id)] if self.principaluser_id else []
+            )
         }
-        document["permissions"]["users_without_edit_perm"] = restrictions[
-            "cannot_write"
-        ]
-        document["permissions"]["users_without_delete_perm"] = restrictions[
-            "cannot_delete"
-        ]
-        document["permissions"]["users_with_no_access"] = restrictions["no_access"]
+
+        document["permissions"].update(permission_backend.get_index_values(self))
+
         document["strings"] = []
         document["dates"] = []
         document["domains"] = []
@@ -648,11 +657,13 @@ class Resource(models.ResourceInstance):
                     else False
                 )
                 if resource_is_provisional is True:
-                    creator_id = int(
-                        EditLog.objects.filter(
-                            resourceinstanceid=self.pk, edittype="create"
-                        ).values_list("userid")[0][0]
-                    )
+                    creator_id = EditLog.objects.filter(
+                        resourceinstanceid=self.pk, edittype="create"
+                    ).values_list("userid")[0][0]
+                    try:
+                        creator_id = int(creator_id)
+                    except ValueError:
+                        pass
                     if creator_id == user.id:
                         permit_deletion = True
             else:
@@ -878,7 +889,6 @@ class Resource(models.ResourceInstance):
         if len(instanceids) > 0:
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
-
                 for resource in related_resources["docs"]:
                     relations = get_relations(
                         resourceinstanceid=resource["_id"],
