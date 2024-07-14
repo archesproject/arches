@@ -26,6 +26,11 @@ from django.core.cache import caches
 from django.db.models import Count
 from guardian.backends import check_support, ObjectPermissionBackend
 from guardian.core import ObjectPermissionChecker
+from guardian.exceptions import NotUserNorGroup
+from arches.app.models.resource import Resource
+
+from guardian.models import GroupObjectPermission, UserObjectPermission, Permission
+from guardian.exceptions import WrongAppError
 from guardian.shortcuts import (
     get_perms,
     get_group_perms,
@@ -33,18 +38,8 @@ from guardian.shortcuts import (
     get_users_with_perms,
     get_groups_with_perms,
     get_perms_for_model,
-)
-from guardian.exceptions import NotUserNorGroup
-from arches.app.models.resource import Resource
-
-from guardian.models import GroupObjectPermission, UserObjectPermission, Permission
-from guardian.exceptions import WrongAppError
-from guardian.shortcuts import (
     assign_perm,
-    get_perms,
     remove_perm,
-    get_group_perms,
-    get_user_perms,
 )
 
 import inspect
@@ -52,6 +47,7 @@ from arches.app.models.models import *
 from arches.app.models.system_settings import settings
 from django.contrib.contenttypes.models import ContentType
 from arches.app.models.models import ResourceInstance, MapLayer
+
 from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nested
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.utils.permission_backend import (
@@ -77,7 +73,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
     def setup(self): ...
 
     def get_perms_for_model(self, cls: str | Model) -> list[Permission]:
-        return get_perms_for_model(cls)  # type: ignore
+        return self.get_default_permissions(cls) + get_perms_for_model(cls)  # type: ignore
 
     def assign_perm(
         self,
@@ -99,15 +95,15 @@ class ArchesStandardPermissionFramework(PermissionFramework):
     def get_perms(
         self, user_or_group: User | Group, obj: ResourceInstance
     ) -> list[Permission]:
-        return get_perms(user_or_group, obj)  # type: ignore
+        return self.get_default_permissions(user_or_group, obj) + get_perms(user_or_group, obj)  # type: ignore
 
     def get_group_perms(
         self, user_or_group: User | Group, obj: ResourceInstance
     ) -> list[Permission]:
-        return get_group_perms(user_or_group, obj)  # type: ignore
+        return self.get_default_permissions(user_or_group, obj) + get_group_perms(user_or_group, obj)  # type: ignore
 
     def get_user_perms(self, user: User, obj: ResourceInstance) -> list[Permission]:
-        return get_user_perms(user, obj)  # type: ignore
+        return self.get_default_permissions(user_or_group, obj) + get_user_perms(user, obj)  # type: ignore
 
     def process_new_user(self, instance: User, created: bool) -> None:
         ct = ContentType.objects.get(app_label="models", model="resourceinstance")
@@ -788,6 +784,32 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             and user.id in search_result["_source"]["permissions"]["principal_user"]
         )
         return result
+
+    def get_default_permissions(
+        self,
+        user_or_group: User | Group = None,
+        resource_instance: ResourceInstance = None,
+        cls: str | Model = None,
+    ) -> list[Permission]:
+        """
+        Gets default permissions (if any) for a resource instance.
+        """
+        return []
+        # default_permissions = settings.PERMISSION_DEFAULTS
+        # if not default_permissions: return []
+
+        # permissions = set()
+        # for graph in default_permissions.keys():
+        #     for entity in default_permissions[graph].keys():
+        #         Permissions
+
+        # permissions = Permission.objects.filter(codename__in=[])
+        # if user_or_group.isinstance(Group):
+        # elif user_or_group.isinstance(User):
+        # elif cls.isinstance(Model):
+        # elif cls.isinstance(str):
+
+        print(resource_instance.graph_id)
 
 
 class PermissionBackend(ObjectPermissionBackend):  # type: ignore

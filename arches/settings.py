@@ -876,6 +876,11 @@ def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
 
 PERMISSION_FRAMEWORK = "arches_standard.ArchesStandardPermissionFramework"
 
+PERMISSION_DEFAULTS = {}
+# PERMISSION_DEFAULTS = {
+#     "graphid": [{"id": "1", "type": "user", "permissions": ["no_access_to_resourceinstance"]}]
+# }
+
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################

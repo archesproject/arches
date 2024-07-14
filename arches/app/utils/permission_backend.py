@@ -141,6 +141,9 @@ class PermissionFramework(metaclass=ABCMeta):
     @abstractmethod
     def get_search_ui_permissions(self, user, search_result, groups=None): ...
 
+    @abstractmethod
+    def get_default_permissions(self, resource): ...
+
 
 _PERMISSION_FRAMEWORK = None
 
@@ -377,3 +380,7 @@ def get_search_ui_permissions(user, search_result, groups=None):
     return _get_permission_framework().get_search_ui_permissions(
         user, search_result, groups
     )
+
+
+def get_default_permissions(resource):
+    return _get_permission_framework().get_default_permissions(resource)
