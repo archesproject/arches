@@ -12,7 +12,7 @@ from arches.settings_utils import generate_frontend_configuration
 
 try:
     import tomllib  # Python 3.11+
-except ImportError:
+except ImportError:  # pragma: no cover
     # Python 3.10 depends on tomli instead
     import tomli as tomllib
 
@@ -93,13 +93,13 @@ def check_arches_compatibility(app_configs, **kwargs):
         except PackageNotFoundError:
             # Not installed by pip: read pyproject.toml directly
             toml_path = Path(config.path).parent / "pyproject.toml"
-            if not toml_path.exists():
+            if not toml_path.exists():  # pragma: no cover
                 raise ValueError
             with open(toml_path, "rb") as f:
                 data = tomllib.load(f)
                 try:
                     project_requirements = data["project"]["dependencies"]
-                except KeyError:
+                except KeyError:  # pragma: no cover
                     raise ValueError from None
         try:
             for requirement in project_requirements:
