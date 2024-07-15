@@ -21,14 +21,7 @@ import os
 from datetime import datetime, timedelta
 from contextlib import suppress
 
-
-try:
-    from settings_utils import *
-except ModuleNotFoundError:
-    try:
-        from .settings_utils import *
-    except ModuleNotFoundError:
-        pass
+from arches.settings_utils import *
 
 try:
     from django.utils.translation import gettext_lazy as _
@@ -321,14 +314,18 @@ FORCE_SCRIPT_NAME = None
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
 ADMIN_MEDIA_PREFIX = "/media/admin/"
 
-STATICFILES_DIRS = build_staticfiles_dirs(root_dir=ROOT_DIR)
-TEMPLATES = build_templates_config(root_dir=ROOT_DIR, debug=DEBUG)
+STATICFILES_DIRS = build_staticfiles_dirs()
+TEMPLATES = build_templates_config(debug=DEBUG)
 
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "arches.settings_utils.ArchesApplicationsStaticFilesFinder",
+    "arches.settings_utils.CoreArchesStaticFilesFinderBuildDirectory",
+    "arches.settings_utils.CoreArchesStaticFilesFinderMediaRoot",
+    "arches.settings_utils.CoreArchesStaticFilesFinderNodeModules",
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -374,7 +371,9 @@ INSTALLED_APPS = (
     "django_celery_results",
 )
 
-ARCHES_APPLICATIONS = ()
+# Placing this last ensures any templates provided by Arches Applications
+# take precedence over core arches templates in arches/app/templates.
+INSTALLED_APPS += ("arches.app",)
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -879,10 +878,4 @@ except ImportError:
 
 # returns an output that can be read by NODEJS
 if __name__ == "__main__":
-    transmit_webpack_django_config(
-        root_dir=ROOT_DIR,
-        app_root=APP_ROOT,
-        public_server_address=PUBLIC_SERVER_ADDRESS,
-        static_url=STATIC_URL,
-        webpack_development_server_port=WEBPACK_DEVELOPMENT_SERVER_PORT,
-    )
+    transmit_webpack_django_config(**locals())
