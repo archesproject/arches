@@ -1,8 +1,14 @@
+import tomllib
 import warnings
+from importlib.metadata import PackageNotFoundError, requires
+from pathlib import Path
 
-from django.apps import AppConfig
+from django.apps import AppConfig, apps
 from django.conf import settings
 from django.core.checks import register, Tags, Error, Warning
+from semantic_version import SimpleSpec, Version
+
+from arches import __version__
 
 from arches.settings_utils import generate_frontend_configuration
 
@@ -61,4 +67,63 @@ def check_cache_backend(app_configs, **kwargs):
                 id="arches.W001",
             )
         )
+    return errors
+
+
+@register(Tags.compatibility)
+def check_arches_compatibility(app_configs, **kwargs):
+    try:
+        arches_version = Version(__version__)
+    except ValueError:
+        arches_version = Version.coerce(__version__)
+
+    if app_configs is None:
+        app_configs = apps.get_app_configs()
+
+    errors = []
+    for config in app_configs:
+        if not getattr(config, "is_arches_application", False):
+            continue
+        try:
+            project_requirements = requires(config.name)
+        except PackageNotFoundError:
+            # Not installed by pip: read pyproject.toml directly
+            toml_path = Path(config.path).parent / "pyproject.toml"
+            if not toml_path.exists():
+                raise ValueError
+            with open(toml_path, "rb") as f:
+                data = tomllib.load(f)
+                try:
+                    project_requirements = data["project"]["dependencies"]
+                except KeyError:
+                    raise ValueError from None
+        try:
+            for requirement in project_requirements:
+                if requirement.lower().startswith("arches"):
+                    parsed_arches_requirement = SimpleSpec(
+                        requirement.lower().replace("arches", "").lstrip()
+                    )
+                    break
+            else:
+                raise ValueError
+        except ValueError:
+            errors.append(
+                Error(
+                    f"Invalid or missing arches requirement",
+                    obj=config.name,
+                    hint=project_requirements,
+                    id="arches.E002",
+                )
+            )
+            continue
+        if arches_version not in parsed_arches_requirement:
+            errors.append(
+                Error(
+                    f"Incompatible arches requirement for Arches version: {arches_version}",
+                    obj=config.name,
+                    hint=requirement,
+                    id="arches.E003",
+                )
+            )
+
     return errors
