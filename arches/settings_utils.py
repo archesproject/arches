@@ -69,19 +69,23 @@ def build_staticfiles_dirs(*, app_root=None, additional_directories=None):
     additional_directories -- list of os-safe absolute paths
     """
     directories = []
+    try:
+        if additional_directories:
+            for additional_directory in additional_directories:
+                directories.append(additional_directory)
 
-    if additional_directories:
-        for additional_directory in additional_directories:
-            directories.append(additional_directory)
+        if app_root:
+            directories.append(os.path.join(app_root, "media", "build"))
+            directories.append(os.path.join(app_root, "media"))
+            directories.append(
+                ("node_modules", os.path.join(app_root, "..", "node_modules"))
+            )
 
-    if app_root:
-        directories.append(os.path.join(app_root, "media", "build"))
-        directories.append(os.path.join(app_root, "media"))
-        directories.append(
-            ("node_modules", os.path.join(app_root, "..", "node_modules"))
-        )
-
-    return tuple(directories)
+        return tuple(directories)
+    except Exception as e:
+        # Ensures error message is shown if error encountered in webpack build
+        sys.stdout.write(e)
+        raise e
 
 
 def build_templates_config(
@@ -104,76 +108,87 @@ def build_templates_config(
     context_processors -- list of strings representing desired context processors
     """
     directories = []
+    try:
+        if additional_directories:
+            for additional_directory in additional_directories:
+                directories.append(additional_directory)
 
-    if additional_directories:
-        for additional_directory in additional_directories:
-            directories.append(additional_directory)
+        if app_root:
+            directories.append(os.path.join(app_root, "templates"))
 
-    if app_root:
-        directories.append(os.path.join(app_root, "templates"))
-
-    return [
-        {
-            "BACKEND": "django.template.backends.django.DjangoTemplates",
-            "DIRS": directories,
-            "APP_DIRS": True,
-            "OPTIONS": {
-                "context_processors": (
-                    context_processors
-                    if context_processors
-                    else [
-                        "django.contrib.auth.context_processors.auth",
-                        "django.template.context_processors.debug",
-                        "django.template.context_processors.i18n",
-                        "django.template.context_processors.media",
-                        "django.template.context_processors.static",
-                        "django.template.context_processors.tz",
-                        "django.template.context_processors.request",
-                        "django.contrib.messages.context_processors.messages",
-                        "arches.app.utils.context_processors.livereload",
-                        "arches.app.utils.context_processors.map_info",
-                        "arches.app.utils.context_processors.app_settings",
-                    ]
-                ),
-                "debug": debug,
+        return [
+            {
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "DIRS": directories,
+                "APP_DIRS": True,
+                "OPTIONS": {
+                    "context_processors": (
+                        context_processors
+                        if context_processors
+                        else [
+                            "django.contrib.auth.context_processors.auth",
+                            "django.template.context_processors.debug",
+                            "django.template.context_processors.i18n",
+                            "django.template.context_processors.media",
+                            "django.template.context_processors.static",
+                            "django.template.context_processors.tz",
+                            "django.template.context_processors.request",
+                            "django.contrib.messages.context_processors.messages",
+                            "arches.app.utils.context_processors.livereload",
+                            "arches.app.utils.context_processors.map_info",
+                            "arches.app.utils.context_processors.app_settings",
+                        ]
+                    ),
+                    "debug": debug,
+                },
             },
-        },
-    ]
+        ]
+    except Exception as e:
+        # Ensures error message is shown if error encountered in webpack build
+        sys.stdout.write(e)
+        raise e
 
 
 def transmit_webpack_django_config(**kwargs):
-    is_arches_core = kwargs["APP_NAME"] == "Arches"
-    transmitted_project_settings = {k: v for k, v in kwargs.items() if k.isupper()}
-    settings.configure(default_settings=global_settings, **transmitted_project_settings)
-
-    # Without this `import celery` might resolve to arches.celery or project.celery
-    if is_arches_core:
-        with _move_to_end_of_sys_path(os.path.realpath(kwargs["ROOT_DIR"])):
-            django.setup()
-    else:
-        with _move_to_end_of_sys_path(
-            os.path.realpath(kwargs["APP_ROOT"]), add_cwd=True
-        ):
-            django.setup()
-
-    arches_app_names = list_arches_app_names()
-    arches_app_paths = list_arches_app_paths()
-    path_lookup = dict(zip(arches_app_names, arches_app_paths, strict=True))
-
-    sys.stdout.write(
-        json.dumps(
-            {
-                "APP_ROOT": os.path.realpath(kwargs["APP_ROOT"]),
-                "ARCHES_APPLICATIONS": arches_app_names,
-                "ARCHES_APPLICATIONS_PATHS": path_lookup,
-                "SITE_PACKAGES_DIRECTORY": site.getsitepackages()[0],
-                "PUBLIC_SERVER_ADDRESS": kwargs["PUBLIC_SERVER_ADDRESS"],
-                "ROOT_DIR": os.path.realpath(kwargs["ROOT_DIR"]),
-                "STATIC_URL": kwargs["STATIC_URL"],
-                "WEBPACK_DEVELOPMENT_SERVER_PORT": kwargs[
-                    "WEBPACK_DEVELOPMENT_SERVER_PORT"
-                ],
-            }
+    try:
+        is_arches_core = kwargs["APP_NAME"] == "Arches"
+        transmitted_project_settings = {k: v for k, v in kwargs.items() if k.isupper()}
+        settings.configure(
+            default_settings=global_settings, **transmitted_project_settings
         )
-    )
-    sys.stdout.flush()
+
+        # Without this `import celery` might resolve to arches.celery or project.celery
+        if is_arches_core:
+            with _move_to_end_of_sys_path(os.path.realpath(kwargs["ROOT_DIR"])):
+                django.setup()
+        else:
+            with _move_to_end_of_sys_path(
+                os.path.realpath(kwargs["APP_ROOT"]), add_cwd=True
+            ):
+                django.setup()
+
+        arches_app_names = list_arches_app_names()
+        arches_app_paths = list_arches_app_paths()
+        path_lookup = dict(zip(arches_app_names, arches_app_paths, strict=True))
+
+        sys.stdout.write(
+            json.dumps(
+                {
+                    "APP_ROOT": os.path.realpath(kwargs["APP_ROOT"]),
+                    "ARCHES_APPLICATIONS": arches_app_names,
+                    "ARCHES_APPLICATIONS_PATHS": path_lookup,
+                    "SITE_PACKAGES_DIRECTORY": site.getsitepackages()[0],
+                    "PUBLIC_SERVER_ADDRESS": kwargs["PUBLIC_SERVER_ADDRESS"],
+                    "ROOT_DIR": os.path.realpath(kwargs["ROOT_DIR"]),
+                    "STATIC_URL": kwargs["STATIC_URL"],
+                    "WEBPACK_DEVELOPMENT_SERVER_PORT": kwargs[
+                        "WEBPACK_DEVELOPMENT_SERVER_PORT"
+                    ],
+                }
+            )
+        )
+        sys.stdout.flush()
+    except Exception as e:
+        # Ensures error message is shown if error encountered in webpack build
+        sys.stdout.write(e)
+        raise e
