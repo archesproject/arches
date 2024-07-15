@@ -76,6 +76,15 @@ def check_cache_backend(app_configs, **kwargs):
 
 @register(Tags.compatibility)
 def check_arches_compatibility(app_configs, **kwargs):
+    def read_project_requirements_from_toml_file(config: AppConfig):
+        with open(Path(config.path).parent / "pyproject.toml", "rb") as f:
+            data = tomllib.load(f)
+        try:
+            project_requirements = data["project"]["dependencies"]
+        except KeyError:  # pragma: no cover
+            raise ValueError from None
+        return project_requirements
+
     try:
         arches_version = Version(__version__)
     except ValueError:
@@ -88,20 +97,13 @@ def check_arches_compatibility(app_configs, **kwargs):
     for config in app_configs:
         if not getattr(config, "is_arches_application", False):
             continue
+        project_requirements = ["No project requirements found."]
         try:
-            project_requirements = requires(config.name)
-        except PackageNotFoundError:
-            # Not installed by pip: read pyproject.toml directly
-            toml_path = Path(config.path).parent / "pyproject.toml"
-            if not toml_path.exists():  # pragma: no cover
-                raise ValueError
-            with open(toml_path, "rb") as f:
-                data = tomllib.load(f)
-                try:
-                    project_requirements = data["project"]["dependencies"]
-                except KeyError:  # pragma: no cover
-                    raise ValueError from None
-        try:
+            try:
+                project_requirements = requires(config.name)
+            except PackageNotFoundError:
+                # Not installed by pip: read pyproject.toml directly
+                project_requirements = read_project_requirements_from_toml_file(config)
             for requirement in project_requirements:
                 if requirement.lower().startswith("arches"):
                     parsed_arches_requirement = SimpleSpec(
