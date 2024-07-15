@@ -1,0 +1,29 @@
+<div class="card-component" style="width: 100%">
+  <div class="row widget-wrapper">
+    <h4>Workflow Builder</h4>
+  </div>
+  <div class="row widget-wrapper">
+    <div style="margin-bottom: 8px">Pick a resource to start as the base of the workflow:</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <!-- ko foreach: { data: resources(), as: 'resource', noChildContext: true } -->
+      <div
+        data-bind="text: resource.name, click: () => {
+          openWorkflowBuilderWithGraph(resource.graphid);
+        }"
+        style="background: #ededed; padding: 8px; font-size: 14px; cursor: pointer"
+      ></div>
+      <!-- /ko -->
+    </div>
+    <div style="margin-bottom: 8px; margin-top: 8px">Edit an existing workflow:</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <!-- ko foreach: { data: workflows(), as: 'workflow', noChildContext: true } -->
+      <div
+        data-bind="text: workflow.name, click: () => {
+          openWorkflowBuilderWithWorkflow(workflow.pluginid);
+        }"
+        style="background: #ededed; padding: 8px; font-size: 14px; cursor: pointer"
+      ></div>
+      <!-- /ko -->
+    </div>
+  </div>
+</div>

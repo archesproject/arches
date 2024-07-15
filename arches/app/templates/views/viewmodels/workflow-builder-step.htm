@@ -1,0 +1,101 @@
+<div>
+  <!-- ko with: step -->
+  <div class="card-component">
+    <div style="display: flex; justify-content: space-between; align-items: center">
+      <h4 class="card-title">Step Config</h4>
+      <button class="btn btn-danger" data-bind="click: () => removeStep()">
+        <span>Remove Step</span>
+      </button>
+    </div>
+    <div>
+      <text-widget
+        params="
+          config: {
+            label: 'Step Title',
+            placeholder: 'Please provide a step title',
+          },
+          value: {
+            en: {
+              value: title,
+              direction: ko.observable('ltr')
+            }
+          },
+          loading: false,
+          pageVm: $root
+        "
+      ></text-widget>
+      <generate-slug
+        params="
+          rawText: title,
+          slug: stepName,
+          radioLabel: 'Auto generate step slug based on the name?',
+          textLabel: 'Unique Step Slug',
+          suffix: 'step'
+        "
+      ></generate-slug>
+      <radio-boolean-widget
+        params="
+          node: {
+            config: {
+              trueLabel: 'Yes',
+              falseLabel: 'No',
+            },
+          },
+          config: {
+            label: 'Required step?',
+          },
+          value: required,
+          loading: false,
+          pageVm: $root
+        "
+      ></radio-boolean-widget>
+      <text-widget
+        params="
+          config: {
+            label: 'Information Box Heading',
+            placeholder: 'Enter text',
+          },
+          value: {
+            en: {
+              value: informationBoxHeading,
+              direction: ko.observable('ltr')
+            }
+          },
+          loading: false,
+          pageVm: $root
+        "
+      ></text-widget>
+      <text-widget
+        params="
+          config: {
+            label: 'Information Box Text',
+            placeholder: 'Enter text',
+          },
+          value: {
+            en: {
+              value: informationBoxText,
+              direction: ko.observable('ltr')
+            }
+          },
+          loading: false,
+          pageVm: $root
+        "
+      ></text-widget>
+    </div>
+  </div>
+  <div>
+    <!-- ko foreach: {data: cards(), as: 'card', noChildContext: true} -->
+    <workflow-builder-card params="card: card"></workflow-builder-card>
+    <!-- /ko -->
+    <div
+      class="card-component"
+      style="padding: 15px 25px 15px 25px !important; background: #eceef0"
+      data-bind="click: () => addCard()"
+    >
+      <div style="display: flex; justify-content: center; align-items: center">
+        <div><i class="fa fa-plus"></i></div>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+</div>

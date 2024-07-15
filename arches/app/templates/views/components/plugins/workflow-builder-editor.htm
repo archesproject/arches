@@ -1,0 +1,110 @@
+{% load i18n %}
+<div class="workflow-plugin">
+  <div class="tabbed-workflow">
+    <div class="tabbed-workflow-title-bar">
+      <div style="display: flex; flex-direction: row">
+        <div class="workflow-name" data-bind="text: workflowName() + ' Workflow'"></div>
+      </div>
+
+      <div style="display: inline-flex">
+        <button
+          data-bind="click: () => registerWorkflow(), disable: workflowId() && !isDeleted()"
+          class="btn btn-success"
+        >
+          <span>{% trans "Publish" %}</span>
+        </button>
+        <button
+          data-bind="click: () => exportWorkflow(), disable: !workflowId() || isDeleted()"
+          class="btn btn-primary"
+        >
+          <span>{% trans "Export" %}</span>
+        </button>
+        <button
+          data-bind="click: () => updateWorkflow(), disable: !workflowId() || isDeleted()"
+          class="btn btn-primary"
+        >
+          <span>{% trans "Update" %}</span>
+        </button>
+        <button
+          data-bind="click: () => deleteWorkflow(), disable: !workflowId() || isDeleted()"
+          class="btn btn-danger"
+        >
+          <i class="ion-android-cancel"></i>
+          <span>{% trans "Delete" %}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="workflow-nav-tab-container">
+      <div class="workflow-tab-controls right" data-bind="click: function(){ updatePan('left') }">
+        <i class="fa fa-angle-left"></i>
+      </div>
+      <div class="workflow-nav-tabs">
+        <ul class="nav nav-tabs workflow-nav-tab-list">
+          <li class="workflow-nav-tab-list-item" data-bind="click: () => setConfigActive(true)">
+            <div class="workflow-nav-tab">
+              <div
+                style="
+                  display: flex;
+                  flex-direction: row;
+                  justify-content: center;
+                  align-items: center;
+                "
+              >
+                <span style="font-size: 14px; font-weight: bold">Workflow Config</span>
+              </div>
+            </div>
+          </li>
+          <!--ko foreach: {data: workflowSteps(), as: 'workflowStep', noChildContext: true} -->
+          <li class="workflow-nav-tab-list-item" data-bind="click: () => switchStep($index())">
+            <div class="workflow-nav-tab">
+              <div
+                style="
+                  display: flex;
+                  flex-direction: row;
+                  justify-content: center;
+                  align-items: center;
+                "
+              >
+                <span style="font-size: 14px" data-bind="text: workflowStep.title"></span>
+              </div>
+            </div>
+          </li>
+          <!-- /ko -->
+          <li class="workflow-nav-tab-list-item" data-bind="click: () => addStep()">
+            <div class="workflow-nav-tab">
+              <div
+                style="
+                  display: flex;
+                  flex-direction: row;
+                  justify-content: center;
+                  align-items: center;
+                "
+              >
+                <span style="margin-right: 4px">
+                  <i class="fa fa-plus"></i>
+                </span>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="workflow-tab-controls left" data-bind="click: function(){ updatePan('right') }">
+        <i class="fa fa-angle-right"></i>
+      </div>
+    </div>
+
+    <div class="tabbed-workflow-step-container">
+      <!-- ko if: configActive() -->
+      <workflow-builder-config params="builderConfig: builderConfig"></workflow-builder-config>
+      <!-- /ko -->
+      <!-- ko ifnot: configActive() -->
+      <workflow-builder-step params="step: activeStep()"></workflow-builder-step>
+      <!-- /ko -->
+    </div>
+
+    <div class="tabbed-workflow-footer">
+      <div class="tabbed-workflow-footer-button-container">footer</div>
+    </div>
+  </div>
+</div>

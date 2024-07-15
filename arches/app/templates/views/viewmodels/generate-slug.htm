@@ -1,0 +1,33 @@
+<radio-boolean-widget
+  params="
+    node: {
+        config: {
+            trueLabel: 'Yes',
+            falseLabel: 'No',
+        },
+    },
+    config: {
+        label: radioLabel,
+    },
+    value: autoGenerate,
+    loading: false,
+    pageVm: $root
+    "
+></radio-boolean-widget>
+<text-widget
+  params="
+    config: {
+        label: textLabel,
+        placeholder: 'Please provide a unique slug',
+    },
+    value: {
+        en: {
+            value: slug,
+            direction: ko.observable('ltr')
+        }
+    },
+    disabled: autoGenerate,
+    loading: false,
+    pageVm: $root
+    "
+></text-widget>

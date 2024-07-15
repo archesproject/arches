@@ -1,0 +1,160 @@
+<!-- ko with: builderConfig -->
+<div class="card-component" style="display: flex; flex-direction: column">
+  <h4 class="card-title">Workflow Config</h4>
+  <text-widget
+    params="
+      config: {
+        label: 'Workflow Name',
+        placeholder: 'Please provide a name for the workflow',
+      },
+      value: {
+        en: {
+          value: workflowName,
+          direction: ko.observable('ltr')
+        }
+      },
+      loading: false,
+      pageVm: $root
+    "
+  ></text-widget>
+  <generate-slug
+    params="
+      rawText: workflowName,
+      slug: workflowSlug,
+      radioLabel: 'Auto generate workflow slug based on the workflow name?',
+      textLabel: 'Workflow Slug',
+      suffix: 'workflow'
+    "
+  ></generate-slug>
+  <radio-boolean-widget
+    params="
+      node: {
+        config: {
+          trueLabel: 'Yes',
+          falseLabel: 'No',
+        },
+      },
+      config: {
+        label: 'Show workflow in sidebar?',
+      },
+      value: showOnSidebar,
+      loading: false,
+      pageVm: $root
+    "
+  ></radio-boolean-widget>
+</div>
+<div class="card-component" style="display: flex; flex-direction: column">
+  <h4 class="card-title">Init Workflow Config</h4>
+  <radio-boolean-widget
+    params="
+      node: {
+        config: {
+          trueLabel: 'Yes',
+          falseLabel: 'No',
+        },
+      },
+      config: {
+        label: 'Show on workflows page?',
+      },
+      value: showOnInitWorkflow,
+      loading: false,
+      pageVm: $root
+    "
+  ></radio-boolean-widget>
+  <text-widget
+    params="
+      config: {
+        label: 'Workflow Name',
+        placeholder: 'Please provide a workflow name',
+      },
+      value: {
+        en: {
+          value: initWorkflowName,
+          direction: ko.observable('ltr')
+        }
+      },
+      loading: false,
+      pageVm: $root
+    "
+  ></text-widget>
+  <text-widget
+    params="
+      config: {
+        label: 'Description',
+        placeholder: 'Please provide a description',
+      },
+      value: {
+        en: {
+          value: initDescription,
+          direction: ko.observable('ltr')
+        }
+      },
+      loading: false,
+      pageVm: $root
+    "
+  ></text-widget>
+  <div class="row widget-wrapper">
+    <div class="form-group" style="display: flex; gap: 32px">
+      <div>
+        <div class="relative">
+          <label class="col-xs-12 control-label widget-input-label" style="height: 22px">
+            Background Colour
+          </label>
+        </div>
+
+        <div class="colorpicker-component input-group" id="cp1">
+          <input
+            placeholder="Background Color"
+            class="form-control input-md widget-input"
+            data-bind="colorPicker: {color: initBackgroundColour,  container: '#cp1'}"
+            style="height: 40px"
+          />
+          <div class="input-group-addon" style="width: min-content">
+            <i
+              class="ion-stop resource-color-swatch"
+              data-bind="style: {color: initBackgroundColour}"
+            ></i>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="relative">
+          <label class="col-xs-12 control-label widget-input-label" style="height: 22px">
+            Circle Colour
+          </label>
+        </div>
+
+        <div class="colorpicker-component input-group" id="cp2">
+          <input
+            placeholder="Circle Color"
+            class="form-control input-md widget-input"
+            data-bind="colorPicker: {color: initCircleColour,  container: '#cp2'}"
+            style="height: 40px"
+          />
+          <div class="input-group-addon" style="width: min-content">
+            <i
+              class="ion-stop resource-color-swatch"
+              data-bind="style: {color: initCircleColour}"
+            ></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row widget-wrapper">
+    <div class="form-group">
+      <div
+        data-bind="component: {
+            name: 'views/components/icon-selector',
+            params: {
+                selectedIconObservable: initIcon,
+                iconFilter: iconFilter,
+                iconList: iconList,
+                label: 'Selected icon: '
+            }
+        }"
+      ></div>
+    </div>
+  </div>
+</div>
+<!-- /ko -->

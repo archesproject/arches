@@ -80,6 +80,7 @@ from arches.app.views.auth import (
     TwoFactorAuthenticationResetView,
     ExternalOauth,
 )
+from arches.app.views.workflow_builder import WorkflowBuilder, WorkflowBuilderGraphComponents, WorkflowBuilderCardOverride, WorkflowBuilderWorkflowPlugins, WorkflowBuilderPluginExport, WorkflowBuilderUpdateInitWorkflow
 from arches.app.models.system_settings import settings
 from django.urls import path
 
@@ -725,6 +726,22 @@ urlpatterns = [
         r"^transform-edtf-for-tile",
         api.TransformEdtfForTile.as_view(),
         name="transform_edtf_for_tile",
+    ),
+    #
+    # Workflow builder
+    #
+    re_path(r'^workflow-builder/resources', WorkflowBuilder.as_view(), name='wb_resources'),
+    re_path(r'^workflow-builder/graph-components', WorkflowBuilderGraphComponents.as_view(), name='wb_graph_components'),
+    re_path(r"^cards/(?P<resourceid>%s|())/override$" % uuid_regex, WorkflowBuilderCardOverride.as_view(), name="api_card_override"),
+    re_path(r"^workflow-builder/register", WorkflowBuilderWorkflowPlugins.as_view(), name="wb_register"),
+    re_path(r"^workflow-builder/plugins", WorkflowBuilderWorkflowPlugins.as_view(), name="wb_plugins"),
+    re_path(r"^workflow-builder/export", WorkflowBuilderPluginExport.as_view(), name="wb_export_plugin"),
+    re_path(r"^workflow-builder/update", WorkflowBuilderWorkflowPlugins.as_view(), name="wb_update"),
+    re_path(r"^workflow-builder/delete", WorkflowBuilderWorkflowPlugins.as_view(), name="wb_delete"),
+    re_path(
+        r"^workflow-builder/init-workflow",
+        WorkflowBuilderUpdateInitWorkflow.as_view(),
+        name="wb_update_init_workflow",
     ),
 ]
 

@@ -1,0 +1,114 @@
+<div>
+  <!-- ko with: card -->
+  <div>
+    <div class="card-component">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <h4 class="card-title" data-bind="text: title"></h4>
+        <div style="display: flex; gap: 4px">
+          <button
+            class="btn btn-primary fa fa-arrow-up"
+            data-bind="click: () => shiftCard('up')"
+          ></button>
+          <button
+            class="btn btn-primary fa fa-arrow-down"
+            data-bind="click: () => shiftCard('down')"
+          ></button>
+          <button class="btn btn-danger" data-bind="click: () => removeCard()">
+            <span>Remove</span>
+          </button>
+        </div>
+      </div>
+      <domain-select-widget
+        params="
+          node: {
+            config: {
+              options: nodegroupOptions,
+              multiple: false
+            },
+            configKeys: configKeys
+          },
+          config: {
+            label: 'Selected Nodegroup',
+          },
+          value: selectedNodegroup,
+          loading: false,
+          pageVm: $root
+        "
+      ></domain-select-widget>
+      <domain-select-widget
+        params="
+          node: {
+            config: {
+              options: workflowResourceIdPathOptions,
+              multiple: false
+            },
+            configKeys: configKeys
+          },
+          config: {
+            label: 'Selected resource ID path',
+          },
+          value: selectedResourceIdPath,
+          loading: false,
+          pageVm: $root
+        "
+      ></domain-select-widget> 
+      <div class="row widget-wrapper">
+        <div class="form-group">
+          <label
+            class="control-label widget-input-label"
+            data-bind="text: 'Unique card identifier'"
+          ></label>
+          <div class="col-xs-12">
+            <input
+              type="text"
+              data-bind="textInput: cardId, attr: {placeholder: 'Please provide a name for the workflow', disabled: true}"
+              class="form-control input-lg widget-input"
+            />
+          </div>
+        </div>
+      </div>
+      <domain-radio-widget
+        params="
+          node: {
+            config: {
+              options: tileManagedOptions,
+            },
+            configKeys: configKeys
+          },
+          config: {
+            label: 'Tiles Managed',
+          },
+          value: selectedTileManaged,
+          loading: false,
+          pageVm: $root
+        "
+      ></domain-radio-widget>
+      <domain-checkbox-widget
+        params="
+          node: {
+            config: {
+              options: hiddenNodeOptions,
+            },
+            configKeys: configKeys
+          },
+          config: {
+            label: 'Hidden Nodes: This will only show nodes that are visible from the Arches Designer',
+            options: hiddenNodeOptions,
+          },
+          value: selectedHiddenNodes,
+          loading: false,
+          pageVm: $root
+        "
+      ></domain-checkbox-widget>
+      <!-- ko if: !cardHasLoaded() -->
+      <div style="text-align: center">
+        <span style="padding: 4px 8px; background: #eeeeee; border-radius: 4px">Loading...</span>
+      </div>
+      <!-- /ko -->
+      <workflow-component-abstract
+        params="visible: cardHasLoaded, component: workflowComponentAbstract()"
+      ></workflow-component-abstract>
+    </div>
+  </div>
+  <!-- /ko -->
+</div>
