@@ -376,8 +376,6 @@ INSTALLED_APPS = (
 # take precedence over core arches templates in arches/app/templates.
 INSTALLED_APPS += ("arches.app",)
 
-INSTALLED_APPS += ARCHES_APPLICATIONS
-
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
