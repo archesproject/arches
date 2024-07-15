@@ -157,7 +157,6 @@ ARCHES_APPLICATIONS = ()
 INSTALLED_APPS += ARCHES_APPLICATIONS
 
 MIDDLEWARE = [
-    "django_hosts.middleware.HostsRequestMiddleware",  # this _must_ be first MIDDLEWARE entry
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -174,7 +173,14 @@ MIDDLEWARE = [
     # "silk.middleware.SilkyMiddleware",
 ]
 
-MIDDLEWARE.append('django_hosts.middleware.HostsResponseMiddleware')  # this _must_ be last MIDDLEWARE entry
+MIDDLEWARE.insert(  # this must resolve to first MIDDLEWARE entry
+    0, 
+    "django_hosts.middleware.HostsRequestMiddleware"
+)
+
+MIDDLEWARE.append(  # this must resolve last MIDDLEWARE entry
+    "django_hosts.middleware.HostsResponseMiddleware"
+)  
 
 STATICFILES_DIRS = build_staticfiles_dirs(
     root_dir=ROOT_DIR,

@@ -380,7 +380,6 @@ ARCHES_APPLICATIONS = ()
 INSTALLED_APPS += ARCHES_APPLICATIONS
 
 MIDDLEWARE = [
-    "django_hosts.middleware.HostsRequestMiddleware",  # this _must_ be first MIDDLEWARE entry
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -396,9 +395,13 @@ MIDDLEWARE = [
     "arches.app.utils.middleware.SetAnonymousUser",
 ]
 
-MIDDLEWARE.append(
+MIDDLEWARE.insert(  # this must resolve to first MIDDLEWARE entry
+    0, "django_hosts.middleware.HostsRequestMiddleware"
+)
+
+MIDDLEWARE.append(  # this must resolve last MIDDLEWARE entry
     "django_hosts.middleware.HostsResponseMiddleware"
-)  # this _must_ be last MIDDLEWARE entry
+)
 
 WEBPACK_LOADER = {
     "DEFAULT": {
