@@ -25,24 +25,24 @@ from arches.app.models.system_settings import settings
 def system_metadata():
     os_type = platform.system()
     os_release = platform.release()
-    cursor = connection.cursor()
     sql = "SELECT version()"
 
     try:
-        cursor.execute(sql)
-        db = cursor.fetchall()[0][0]
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
+            db = cursor.fetchall()[0][0]
     except:
         db = "No DB version found."
 
     try:
-        full_tag = subprocess.Popen(
+        with subprocess.Popen(
             "git log --pretty=format:'%h %ai' --abbrev-commit --date=short -1",
             cwd=settings.PACKAGE_ROOT,
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-        )
-        tag = full_tag.stdout.readline().strip()
+        ) as full_tag:
+            tag = full_tag.stdout.readline().strip()
     except:
         tag = "git not found."
 

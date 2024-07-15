@@ -1,5 +1,5 @@
 // import declarations from other projects or Arches core
-import('../../node_modules/arches/arches/app/src/declarations.d.ts');
+import("../../node_modules/arches/arches/app/src/declarations.d.ts");
 
 declare module 'arches';
 declare module 'arches/*';
@@ -9,6 +9,5 @@ declare module 'arches/**';
 // Module homepage on npmjs.com uses logos "TS" or "DT" to indicate if typed
 
 // declare filetypes used in `./src/` folder
-declare module '*.ts';
-declare module '*.vue';
-
+declare module "*.ts";
+declare module "*.vue";

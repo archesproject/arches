@@ -39,30 +39,22 @@ class Command(BaseCommand):
             help="Operation Type; build=Alias for `npm run build_test`",
         )
 
-        parser.add_argument("-r", "--reinstall_node_modules", action="store_true", dest="reinstall_node_modules", help="Reinstall node_modules")
-
+        parser.add_argument(
+            "-r",
+            "--reinstall_node_modules",
+            action="store_true",
+            dest="reinstall_node_modules",
+            help="Reinstall node_modules",
+        )
 
     def handle(self, *args, **options):
-
 
         print("operation: " + options["operation"])
         if options["operation"] == "build":
             if settings.STATIC_ROOT != "":
                 if options["reinstall_node_modules"] == True:
-                    subprocess.call(
-                        'rm -rf ./node_modules', 
-                        shell=True
-                    )
-                    subprocess.call(
-                        'rm package-lock.json', 
-                        shell=True
-                    )
-                    subprocess.call(
-                        "npm install", 
-                        shell=True
-                    )
+                    subprocess.call("rm -rf ./node_modules", shell=True)
+                    subprocess.call("rm package-lock.json", shell=True)
+                    subprocess.call("npm install", shell=True)
 
-                subprocess.call(
-                    "npm run build_test", 
-                    shell=True
-                )
+                subprocess.call("npm run build_test", shell=True)

@@ -42,9 +42,11 @@ class PluginView(MapBaseManagerView):
 
         if request.GET.get("json"):
             return JSONResponse(plugin)
-        
+
         resource_graphs = (
-            models.GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            models.GraphModel.objects.exclude(
+                pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+            )
             .exclude(isresource=False)
             .exclude(publication=None)
         )
@@ -66,11 +68,15 @@ class PluginView(MapBaseManagerView):
             widgets_json=JSONSerializer().serialize(widgets),
             card_components=card_components,
             card_components_json=JSONSerializer().serialize(card_components),
-            datatypes_json=JSONSerializer().serialize(datatypes, exclude=["iconclass", "modulename", "classname"]),
+            datatypes_json=JSONSerializer().serialize(
+                datatypes, exclude=["iconclass", "modulename", "classname"]
+            ),
             map_markers=map_markers,
             geocoding_providers=geocoding_providers,
             report_templates=templates,
-            templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=["name", "description"]),
+            templates_json=JSONSerializer().serialize(
+                templates, sort_keys=False, exclude=["name", "description"]
+            ),
         )
 
         context["nav"]["title"] = ""
@@ -84,8 +90,14 @@ class PluginView(MapBaseManagerView):
                 if etl_module.helptemplate:
                     template_paths.append(etl_module.helptemplate)
             if len(template_paths) > 0:
-                context["nav"]["help"] = {"title": _("Plugin Help"), "templates": template_paths}
+                context["nav"]["help"] = {
+                    "title": _("Plugin Help"),
+                    "templates": template_paths,
+                }
         elif plugin.helptemplate:
-            context["nav"]["help"] = {"title": _("Help"), "templates": [plugin.helptemplate]}
+            context["nav"]["help"] = {
+                "title": _("Help"),
+                "templates": [plugin.helptemplate],
+            }
 
         return render(request, "views/plugin.htm", context)

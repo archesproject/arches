@@ -34,10 +34,22 @@ class Command(BaseCommand):
         parser.add_argument("operation", nargs="?")
 
         parser.add_argument(
-            "-s", "--source", action="store", dest="source", default="", help="Search Component json file or string to be loaded"
+            "-s",
+            "--source",
+            action="store",
+            dest="source",
+            default="",
+            help="Search Component json file or string to be loaded",
         )
 
-        parser.add_argument("-n", "--name", action="store", dest="name", default="", help="The js component name of the search component")
+        parser.add_argument(
+            "-n",
+            "--name",
+            action="store",
+            dest="name",
+            default="",
+            help="The js component name of the search component",
+        )
 
     def handle(self, *args, **options):
         if options["operation"] == "register":
@@ -67,7 +79,10 @@ class Command(BaseCommand):
                 uuid.UUID(details["searchcomponentid"])
             except:
                 details["searchcomponentid"] = str(uuid.uuid4())
-            print("Registering the search component, %s, with componentid: %s" % (details["name"], details["searchcomponentid"]))
+            print(
+                "Registering the search component, %s, with componentid: %s"
+                % (details["name"], details["searchcomponentid"])
+            )
 
             instance = models.SearchComponent(
                 searchcomponentid=details["searchcomponentid"],

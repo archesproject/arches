@@ -16,7 +16,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="SearchComponent",
             fields=[
-                ("searchcomponentid", models.UUIDField(default=uuid.uuid1, primary_key=True, serialize=False)),
+                (
+                    "searchcomponentid",
+                    models.UUIDField(
+                        default=uuid.uuid1, primary_key=True, serialize=False
+                    ),
+                ),
                 ("name", models.TextField()),
                 ("icon", models.TextField(default=None)),
                 ("modulename", models.TextField(blank=True, null=True)),
