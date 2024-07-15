@@ -87,7 +87,7 @@ def build_staticfiles_dirs(*, app_root=None, additional_directories=None):
         return tuple(directories)
     except Exception as e:
         # Ensures error message is shown if error encountered in webpack build
-        sys.stdout.write(e)
+        sys.stdout.write(str(e))
         raise e
 
 
@@ -148,7 +148,7 @@ def build_templates_config(
         ]
     except Exception as e:
         # Ensures error message is shown if error encountered in webpack build
-        sys.stdout.write(e)
+        sys.stdout.write(str(e))
         raise e
 
 
@@ -193,5 +193,5 @@ def transmit_webpack_django_config(**kwargs):
         sys.stdout.flush()
     except Exception as e:
         # Ensures error message is shown if error encountered in webpack build
-        sys.stdout.write(e)
+        sys.stdout.write(str(e))
         raise e
