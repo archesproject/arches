@@ -64,6 +64,7 @@ dependencies = [
     "requests[security]>=2.31.0",
     "semantic-version==2.10.0",
     "SPARQLWrapper==1.8.5",
+    "tomli==2.0.1;python_version<'3.11'",
     "tzdata==2023.3",
     "urllib3<2",
 ]
