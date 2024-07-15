@@ -120,7 +120,7 @@ class GetFrontendI18NData(APIBase):
         language_file_path = []
 
         language_file_path.append(
-            os.path.join(settings.APP_ROOT, "locale", user_language + ".json")
+            os.path.join(settings.ROOT_DIR, "locale", user_language + ".json")
         )
 
         for arches_app_path in list_arches_app_paths():
@@ -129,7 +129,7 @@ class GetFrontendI18NData(APIBase):
             )
 
         language_file_path.append(
-            os.path.join(settings.ROOT_DIR, "locale", user_language + ".json")
+            os.path.join(settings.APP_ROOT, "locale", user_language + ".json")
         )
 
         localized_strings = {}
