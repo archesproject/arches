@@ -649,8 +649,6 @@ SPARQL_ENDPOINT_PROVIDERS = (
 
 APP_NAME = "Arches"
 APP_VERSION = None
-MIN_ARCHES_VERSION = None
-MAX_ARCHES_VERSION = None
 
 APP_TITLE = "Arches | Heritage Data Management"
 COPYRIGHT_TEXT = "All Rights Reserved."
