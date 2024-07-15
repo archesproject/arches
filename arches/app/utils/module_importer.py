@@ -28,6 +28,9 @@ def get_directories(extension_type: ExtensionType):
     if extension_type is ExtensionType.SEARCH_COMPONENTS:
         core_root_dir = core_root_dir.replace("search_components", "search.components")
 
+    if core_root_dir in filtered_settings_dirs:
+        filtered_settings_dirs.remove(core_root_dir)
+
     return arches_app_dirs + filtered_settings_dirs + [core_root_dir]
 
 

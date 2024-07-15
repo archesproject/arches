@@ -34,12 +34,12 @@ class ModuleImporterTests(TestCase):
         self.assertEqual(
             function_dirs,
             [
-                "arches.app.functions",
                 "arches_for_music.functions",
                 "arches_for_music.pkg.extensions.functions",
                 "arches_for_dance.functions",
                 "arches_for_dance.pkg.extensions.functions",
                 "hiphop.functions",
+                "arches.app.functions",
             ],
         )
 
@@ -58,12 +58,12 @@ class ModuleImporterTests(TestCase):
         self.assertEqual(
             search_dirs,
             [
-                "arches.app.search.components",
                 "arches_for_music.search_components",
                 "arches_for_music.pkg.extensions.search_components",
                 "arches_for_dance.search_components",
                 "arches_for_dance.pkg.extensions.search_components",
                 "hiphop.search_components",
+                "arches.app.search.components",
             ],
         )
 
@@ -80,11 +80,11 @@ class ModuleImporterTests(TestCase):
         self.assertEqual(
             etl_modules,
             [
-                "arches.app.etl_modules",
                 "arches_for_music.etl_modules",
                 "arches_for_music.pkg.extensions.etl_modules",
                 "arches_for_dance.etl_modules",
                 "arches_for_dance.pkg.extensions.etl_modules",
+                "arches.app.etl_modules",
             ],
         )
 
@@ -98,10 +98,10 @@ class ModuleImporterTests(TestCase):
         self.assertEqual(
             datatypes,
             [
-                "arches.app.datatypes",
                 "arches_for_music.datatypes",
                 "arches_for_music.pkg.extensions.datatypes",
                 "arches_for_dance.datatypes",
                 "arches_for_dance.pkg.extensions.datatypes",
+                "arches.app.datatypes",
             ],
         )
