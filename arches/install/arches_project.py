@@ -51,6 +51,7 @@ class ArchesCommand(TemplateCommand):
         options["arches_next_minor_version"] = ".".join(
             [str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"]
         )
+        options["project_name_title_case"] = project_name.title()
 
         super(ArchesCommand, self).handle("project", project_name, target, **options)
 
@@ -60,6 +61,7 @@ class ArchesCommand(TemplateCommand):
         )
 
         for relative_file_path in [
+            os.path.join(project_name, "apps.py"),
             ".coveragerc",
             "pyproject.toml",
             ".pre-commit-config.yaml",
@@ -70,7 +72,8 @@ class ArchesCommand(TemplateCommand):
             file.close()
 
             updated_file_data = (
-                file_data.replace("{{ project_name }}", project_name)
+                file_data.replace("{{ project_name_title_case }}", project_name.title())
+                .replace("{{ project_name }}", project_name)
                 .replace(
                     "{{ arches_semantic_version }}", options["arches_semantic_version"]
                 )
