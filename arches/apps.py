@@ -1,4 +1,3 @@
-import tomllib
 import warnings
 from importlib.metadata import PackageNotFoundError, requires
 from pathlib import Path
@@ -9,8 +8,13 @@ from django.core.checks import register, Tags, Error, Warning
 from semantic_version import SimpleSpec, Version
 
 from arches import __version__
-
 from arches.settings_utils import generate_frontend_configuration
+
+try:
+    import tomllib  # Python 3.11+
+except ImportError:
+    # Python 3.10 depends on tomli instead
+    import tomli as tomllib
 
 
 class ArchesAppConfig(AppConfig):
