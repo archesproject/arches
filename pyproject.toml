@@ -51,6 +51,7 @@ dependencies = [
     "pycryptodome<4.0.0,>=3.3.1",
     "pyjwt>=2.0.0,<3",
     "pyjwt[crypto]",
+    "PyLD[requests]==1.0.5",
     "pyotp>=2.6.0",
     "pyprind==2.11.3",
     "pyshp==2.1.2",
