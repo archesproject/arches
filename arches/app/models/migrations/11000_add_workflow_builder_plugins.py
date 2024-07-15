@@ -52,7 +52,7 @@ remove_wb_editor_plugin = """
 
 
 class Migration(migrations.Migration):
-    dependencies = [("migrations", "10515_i18n_plugins")]
+    dependencies = [("migrations", "10999_update_principaluser")]
 
     operations = [
         migrations.RunSQL(
