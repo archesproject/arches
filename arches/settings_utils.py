@@ -23,7 +23,7 @@ class CoreArchesStaticFilesFinderMediaRoot(AppDirectoriesFinder):
 
 
 class CoreArchesStaticFilesFinderNodeModules(AppDirectoriesFinder):
-    source_dir = os.path.join("..", "node_modules")
+    source_dir = os.path.normpath(os.path.join("..", "node_modules"))
 
 
 @contextmanager
@@ -78,7 +78,10 @@ def build_staticfiles_dirs(*, app_root=None, additional_directories=None):
             directories.append(os.path.join(app_root, "media", "build"))
             directories.append(os.path.join(app_root, "media"))
             directories.append(
-                ("node_modules", os.path.join(app_root, "..", "node_modules"))
+                (
+                    "node_modules",
+                    os.path.normpath(os.path.join(app_root, "..", "node_modules")),
+                )
             )
 
         return tuple(directories)
