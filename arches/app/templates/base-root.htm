@@ -24,9 +24,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
 <!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->
 
+{% block head %}
 <head>
     <title>
-        {% block title %} {{ plugin.name }} {% endblock title %}
+        {% block title %}{% endblock title %}
     </title>
 
         <!-- Meta -->
@@ -46,14 +47,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             <link rel="stylesheet" href="{% webpack_static 'node_modules/font-awesome/css/font-awesome.min.css' %}" />
         {% endblock css %}
 </head>
+{% endblock head %}
 
+{% block body_content %}
 <body>
-    {% block main_content %}
-    {% endblock main_content %}
+    {% block body %}
+    {% endblock body %}
 </body>
+{% endblock body_content %}
 
 {% block javascript %}
     <script src="{% webpack_static 'node_modules/requirejs/require.js' %}"></script>
+
+    {% block pre_require_js %}
+    {% endblock pre_require_js %}
 
     {% block arches_modules %}
         {% include "arches_urls.htm" %}
