@@ -465,7 +465,7 @@ class MVT(APIBase):
                                 ) AS geom,
                                 1 AS total
                             FROM geojson_geometries
-                            WHERE nodeid = %s and resourceinstanceid not in %s and st_intersects(geom, TileBBox(%s, %s, %s, 3857))) AS tile;""",
+                            WHERE nodeid = %s and resourceinstanceid not in %s and (geom && ST_TileEnvelope(%s, %s, %s))) AS tile;""",
                             [nodeid, zoom, x, y, nodeid, resource_ids, zoom, x, y],
                         )
                     else:
@@ -482,7 +482,7 @@ class MVT(APIBase):
                             ) AS geom,
                             1 AS total
                         FROM geojson_geometries
-                        WHERE nodeid = %s and resourceinstanceid not in %s and st_intersects(geom, TileBBox(%s, %s, %s, 3857))) AS tile;""",
+                        WHERE nodeid = %s and resourceinstanceid not in %s and (geom && ST_TileEnvelope(%s, %s, %s))) AS tile;""",
                         [nodeid, zoom, x, y, nodeid, resource_ids, zoom, x, y],
                     )
                 tile = bytes(cursor.fetchone()[0]) if tile is None else tile
