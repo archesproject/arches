@@ -52,6 +52,9 @@ BUSINESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+# Class for custom ES document generator and search functionality
+CUSTOM_SEARCH_CLASS = 'tests.views.search_tests.CustomResourceSearchValue'
+
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.dummy.DummyCache",
