@@ -31,19 +31,19 @@
             <h3>
                 <label style="font-weight: normal; font-size: 1.5rem; color: #565656;">Select a node </label>
             </h3>
-            <select data-bind="options: dropdownnodes, optionsText: 'label', value: selectednode, valueAllowUnset: true, chosen: {width: '400px'}"></select>
+            <select data-bind="options: dropdownnodes, optionsText: 'label', value: selectedNode, valueAllowUnset: true, chosen: {width: '400px'}"></select>
         </div>
 
-        <div data-bind="if: selectednode" style="font-size: 1.5rem; margin: 30px 0px;">
+        <div data-bind="if: selectedNode" style="font-size: 1.5rem; margin: 30px 0px;">
             <div display="flex" style="border:solid 1px lightgrey; border-radius: 5px; margin: 10px 0px;">
                 <div style="background-color: #ebebeb;padding: 5px;">
                     <label style="font-weight: normal; color: #565656;">Select a concept to replace</label>
                 </div>
                 <div style="display: flex; flex-direction: row;">
                     <div style="padding: 0px 20px;">
-                        <label style='display: flex; flex-direction: column; margin: 12px 0px 10px 0px;'>Language</label>
-                        <select class="resources" data-bind="
-                            attr: {'data-label': 'Language'},
+                        <label data-bind="text: $root.translations.language" style='display: flex; flex-direction: column; margin: 12px 0px 10px 0px;'></label>
+                        <select class="resources3" data-bind="
+                            attr: {'data-label': $root.translations.language},
                             select2Query: {
                                 select2Config:{
                                     value: conceptOldLang,
@@ -56,7 +56,7 @@
                         <div data-bind="component: {
                             name: 'concept-select-widget',
                             params: {
-                                node: {'config': {'rdmCollection': selectednode().rdmCollection }},
+                                node: {'config': {'rdmCollection': selectedNode().rdmCollection }},
                                 value: conceptOld,
                                 allowClear: false,
                                 placeholder: 'Select a replacement concept',
@@ -73,9 +73,9 @@
                 </div>
                 <div style="display: flex; flex-direction: row;">
                     <div style="padding: 0px 20px;">
-                        <label style='display: flex; flex-direction: column; margin: 12px 0px 10px 0px;'>Language</label>
+                        <label data-bind="text: $root.translations.language" style='display: flex; flex-direction: column; margin: 12px 0px 10px 0px;'></label>
                         <select class="resources" data-bind="
-                            attr: {'data-label': 'Language'},
+                            attr: {'data-label': $root.translations.language},
                             select2Query: {
                                 select2Config:{
                                     value: conceptNewLang,
@@ -88,7 +88,7 @@
                         <div data-bind="component: {
                             name: 'concept-select-widget',
                             params: {
-                                node: {'config': {'rdmCollection': selectednode().rdmCollection }},
+                                node: {'config': {'rdmCollection': selectedNode().rdmCollection }},
                                 value: conceptNew,
                                 allowClear: false,
                                 placeholder: 'Select a replacement concept',
@@ -101,54 +101,63 @@
             </div>
         </div>
         
-        <!-- <button data-bind="click: getPreviewData" class="btn btn-success" style="margin-top:5px;">Preview</button> -->
-        <button data-bind="click: getPreviewData, css: {disabled: !ready()}" class="btn btn-success">
+        <button data-bind="click: getPreviewData, attr: {disabled: !ready()}" class="btn btn-success">
             <span data-bind="text: $root.translations.preview"></span>
             <i class="fa fa-spin fa-spinner" data-bind="visible: previewing()"></i>
         </button>
 
-        <div data-bind="visible: tableVisible">
-            <div>
-                <p style="margin-top: 10px; color: rgb(17, 15, 15); display: inline-block; font-size: 15px;">
-                    Affected resources:<span data-bind="text: listLength() === 0 ? 0 : (currentPageIndex() * 5 + 1)"></span> 
-                    <!-- ko if: listLength() !== 0 -->
-                        to <span data-bind="text: Math.min((currentPageIndex() + 1) * 5, listLength())"></span> 
-                        out of <span data-bind="text: listLength()"></span>
-                    <!-- /ko -->
-                </p>
-                <button data-bind="click: previousPage, enable: currentPageIndex() > 0" class="btn btn-success" style="display: inline-block;  margin-right: 10px;">Previous</button>
-                <button data-bind="click: nextPage, enable: currentPageIndex() < maxPageIndex()" class="btn btn-success" style="display: inline-block;">Next</button>
+        <!-- ko if: showPreview-->
+        <section  class="etl-preview">
+            <!-- ko if: listLength() === 0 -->
+            <h3 style="margin-top: 0px;">
+                <span style="margin: 2px;" class="fa fa-info-circle"></span><span data-bind="text: $root.translations.noDataToPreview"></span>
+            </h3>
+            <!-- /ko -->
+            <!-- ko if: listLength() > 0 -->
+            <div data-bind="visible: ready">
+                <div>
+                    <p style="margin-top: 10px; color: rgb(17, 15, 15); display: inline-block; font-size: 15px;">
+                        Affected resources:<span data-bind="text: listLength() === 0 ? 0 : (currentPageIndex() * 5 + 1)"></span> 
+                        <!-- ko if: listLength() !== 0 -->
+                            to <span data-bind="text: Math.min((currentPageIndex() + 1) * 5, listLength())"></span> 
+                            out of <span data-bind="text: listLength()"></span>
+                        <!-- /ko -->
+                    </p>
+                    <button data-bind="click: previousPage, enable: currentPageIndex() > 0" class="btn btn-success" style="display: inline-block;  margin-right: 10px;">Previous</button>
+                    <button data-bind="click: nextPage, enable: currentPageIndex() < maxPageIndex()" class="btn btn-success" style="display: inline-block;">Next</button>
+                </div>
+                <table class="table table-striped csv-mapping-table">
+                    <thead>
+                        <tr>
+                            <th>Resource ID</th>
+                            <th>Name</th>
+                            <th>Old</th>
+                            <th>New</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: paginatedRows">
+                        <tr>
+                            <td><a data-bind="attr: { href: $parent.constructReportUrl($data)}, text: $data[0]" target="_blank" style="color: rgb(145, 71, 235);"></a></td>
+                            <td data-bind="text: $data[1]"></td>
+                            <td data-bind="text: $data[2]"></td>
+                            <td data-bind="text: $data[3]"></td>
+                            <td><button data-bind="click: $parent.deleteRow" style="background-color: #ff6347; color: white; border: none; padding: 7px 14px; border-radius: 4px; cursor: pointer;">Remove</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
             </div>
-            <table class="table table-striped csv-mapping-table">
-                <thead>
-                    <tr>
-                        <th>Resource ID</th>
-                        <th>Name</th>
-                        <th>Old</th>
-                        <th>New</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody data-bind="foreach: paginatedRows">
-                    <tr>
-                        <td><a data-bind="attr: { href: $parent.constructReportUrl($data)}, text: $data[0]" target="_blank" style="color: rgb(145, 71, 235);"></a></td>
-                        <td data-bind="text: $data[1]"></td>
-                        <td data-bind="text: $data[2]"></td>
-                        <td data-bind="text: $data[3]"></td>
-                        <td><button data-bind="click: $parent.deleteRow" style="background-color: #ff6347; color: white; border: none; padding: 7px 14px; border-radius: 4px; cursor: pointer;">Remove</button></td>
-                    </tr>
-                </tbody>
-            </table>
-            
-        </div>
+            <!-- /ko -->
+        </section>
+        <!-- /ko -->
     </div>
-    <!-- ko if: listLength() !== 0 -->
-    <div class="tabbed-workflow-footer, etl-module-footer"  data-bind="visible: showPreviewTalbe" >
-        <button style="margin-right: 8px;"  data-bind="click: write, visible: showPreview " class="btn btn-success">
+
+    <div class="tabbed-workflow-footer, etl-module-footer">
+        <button style="margin-right: 8px;" data-bind="click: write, attr: {disabled: !allowEditOperation()}" class="btn btn-success">
             <span data-bind="text: $root.translations.start"></span>
         </button>
     </div>
-    <!-- /ko -->
 
 </div>
 {% endblock task_details %}

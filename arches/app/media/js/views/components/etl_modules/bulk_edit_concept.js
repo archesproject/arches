@@ -20,11 +20,9 @@ define([
         this.saveid = ko.observableArray();
         this.savenode = ko.observableArray();
         this.searchUrl = ko.observable();
-        // this.dropdownConcept = ko.observableArray();
-        this.allchildconcept = ko.observableArray();
         this.dropdownnodes = ko.observableArray();
         this.allinformationTable = ko.observableArray();
-        this.selectednode = ko.observable();
+        this.selectedNode = ko.observable();
         this.dropdowngraph = ko.observableArray();
         this.selectedGraph = ko.observable();
         this.conceptOld = ko.observable();
@@ -34,8 +32,6 @@ define([
         this.rdmCollection = null;
         this.rdmCollectionLanguages = ko.observableArray();
         this.defaultLanguage = ko.observable();
-        // this.dropdownConceptReplace = ko.observableArray();
-        this.tableVisible = ko.observable(false);
         this.showPreviewTalbe = ko.observable(true);
         this.showPreview = ko.observable(false);
         this.reportUrl = ko.observable(window.location.href.split('/').slice(0, 3).join('/')+'/report/');
@@ -54,10 +50,9 @@ define([
             if (self.savenode()) { self.formData.append('savenode', self.savenode()); }
             if (self.conceptOld()) { self.formData.append('conceptOld', self.conceptOld()); }
             if (self.conceptNew()) { self.formData.append('conceptNew', self.conceptNew()); }
-            if (self.allchildconcept()) { self.formData.append('allchildconcept', self.allchildconcept()); }
             if (self.conceptOldLang()) { self.formData.append('conceptOldLang', self.conceptOldLang()); }
             if (self.conceptNewLang()) { self.formData.append('conceptNewLang', self.conceptNewLang()); }
-            if (self.selectednode()) { self.formData.append('selectednode', JSON.stringify(self.selectednode())); }
+            if (self.selectedNode()) { self.formData.append('selectedNode', JSON.stringify(self.selectedNode())); }
             if (self.allinformationTable()) { self.formData.append('table', self.allinformationTable()); }
             if (self.searchUrl()) { self.formData.append('search_url', self.searchUrl()); }
             if (self.rdmCollection) { self.formData.append('rdmCollection', self.rdmCollection); }
@@ -68,10 +63,9 @@ define([
             self.formData.delete('savenode');
             self.formData.delete('conceptOld');
             self.formData.delete('conceptNew');
-            self.formData.delete('allchildconcept');
             self.formData.delete('conceptOldLang');
             self.formData.delete('conceptNewLang');
-            self.formData.delete('selectednode');
+            self.formData.delete('selectedNode');
             self.formData.delete('table');
             self.formData.delete('search_url');
             self.formData.delete('rdmCollection');
@@ -117,11 +111,42 @@ define([
             self.allinformationTable.remove(data);
         };
 
+        this.ready = ko.computed(() => {
+            const ready = !!self.selectedGraph() &&
+                !!self.selectedNode() &&
+                !self.previewing() &&
+                self.conceptNew() !== self.conceptOld() &&
+                !!self.conceptNew() &&
+                !!self.conceptOld();
+            return ready;
+        });
+
+        this.clearResults = ko.computed(() => {
+            // if any of these values change then clear the preview results
+            self.showPreview(false);
+            //self.allinformationTable.removeAll();
+            // we don't actually care about the results of the following
+            let clearResults = '';
+            [self.selectedGraph(),
+                self.selectedNode(),
+                self.conceptOldLang(),
+                self.conceptNewLang(),
+                self.conceptOld(),
+                self.conceptNew()
+            ].forEach(function(item){
+                clearResults += item?.toString();
+            });
+            return clearResults;
+        });
+
+        this.allowEditOperation = ko.computed(() => {
+            return self.ready() && self.listLength() > 0 && self.showPreview();
+        });
+
         //call python code to display the change
         this.getPreviewData = function() {
             self.addAllFormData();
             self.allinformationTable.removeAll();
-            self.tableVisible(true);
             self.showPreview(true);
             self.submit('get_preview_data').then(data => {
                 
@@ -144,79 +169,46 @@ define([
             });
         };
 
-        this.ready = ko.computed(() => {
-            const ready = !!self.selectedGraph() &&
-                !!self.selectednode() &&
-                !self.previewing() &&
-                self.conceptNew() !== self.conceptOld() &&
-                !!self.conceptNew() &&
-                !!self.conceptOld();
-            return ready;
+        this.selectedNode.subscribe((node) => {
+            self.conceptNew(undefined);
+            self.conceptOld(undefined);
+            self.rdmCollectionLanguages.removeAll();
+            
+            if(!!node){
+                self.rdmCollection = node.rdmCollection;
+                self.addAllFormData();
+    
+                self.submit('get_collection_languages').then(data => {
+                    self.rdmCollectionLanguages(data.result);
+                    if(data.result.length > 0) {
+                        window.setTimeout(() =>{
+                            self.conceptOldLang(data.result[0].id);
+                            self.conceptNewLang(data.result[0].id);
+                        }, 500);
+                    }
+                }).fail(function(err) {
+                    self.alert(
+                        new JsonErrorAlertViewModel(
+                            'ep-alert-red',
+                            err.responseJSON["data"],
+                            null,
+                            function(){}
+                        )
+                    );
+                }).always(function() {
+                    //self.previewing(false);
+                });
+            }
         });
-
-        this.selectednode.subscribe((node) => {
-            self.rdmCollection = node.rdmCollection;
-            self.addAllFormData();
-            self.conceptNew("");
-            self.conceptOld("");
-            // self.dropdownConcept.removeAll();
-            // self.dropdownConceptReplace.removeAll();
-            self.allchildconcept.removeAll();
-            self.tableVisible(false);
-
-            self.submit('get_collection_languages').then(data => {
-                self.rdmCollectionLanguages(data.result);
-                if(data.result.length > 0) {
-                    self.conceptOldLang(data.result[0].id);
-                    self.conceptNewLang(data.result[0].id);
-                }
-            }).fail(function(err) {
-                self.alert(
-                    new JsonErrorAlertViewModel(
-                        'ep-alert-red',
-                        err.responseJSON["data"],
-                        null,
-                        function(){}
-                    )
-                );
-            }).always(function() {
-                //self.previewing(false);
-            });
-        });
-
-        //select old language
-        // this.language = function(dd) {
-        //     self.addAllFormData();
-        //     self.tableVisible(false);
-        //     dd.removeAll();
-        //     self.submit('select_language').then(data => {
-        //         for (var i = 0; i < data.result.length; i++){
-        //             dd.push(data.result[i]);
-        //         }   
-        //     }).fail(function(err) {
-        //         self.alert(
-        //             new JsonErrorAlertViewModel(
-        //                 'ep-alert-red',
-        //                 err.responseJSON["data"],
-        //                 null,
-        //                 function(){}
-        //             )
-        //         );
-        //     }).always(function() {
-        //         self.previewing(false);
-        //     });
-        // };
 
         //select nodes and take the specific value
         this.selectedGraph.subscribe((graphid) => {
             self.addAllFormData();
             self.dropdownnodes.removeAll();
             self.savenode.removeAll();
-            self.conceptNew("");
-            self.conceptOld("");
-            self.allchildconcept.removeAll();
-            self.tableVisible(false);
-            self.showPreview(false);
+            self.conceptNew(undefined);
+            self.conceptOld(undefined);
+            self.selectedNode(undefined);
             self.submit('get_graphs_node').then(data => {
                 const nodes = data.result.map(node => (
                     {   node: node.nodeid,
@@ -224,11 +216,6 @@ define([
                         rdmCollection: JSON.parse(node.config).rdmCollection
                     }));
                 self.dropdownnodes(nodes);
-                // for (var i = 0; i < data.result.length; i++){
-                    
-                //     self.dropdownnodes.push(data.result[i][0]);
-                //     self.savenode.push(data.result[i]);
-                // }   
                 
             }).fail(function(err) {
                 self.alert(
@@ -252,10 +239,6 @@ define([
             self.saveid.removeAll();
             self.dropdownnodes.removeAll();
             self.savenode.removeAll();
-            // self.dropdownConcept.removeAll();
-            // self.dropdownConceptReplace.removeAll();
-            self.allchildconcept.removeAll();
-            self.tableVisible(false);
             self.showPreview(false);
 
             self.submit('get_graphs').then(data => {
@@ -277,6 +260,10 @@ define([
         };
         
         this.write = function() {
+            if (!self.allowEditOperation()) {
+                return;
+            }
+
             self.showPreview(false);
             self.showPreviewTalbe(false);
             self.addAllFormData();
