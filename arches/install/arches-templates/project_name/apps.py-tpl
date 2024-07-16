@@ -1,0 +1,7 @@
+from django.apps import AppConfig
+
+
+class {{ project_name_title_case }}Config(AppConfig):
+    name = "{{ project_name }}"
+    verbose_name = "{{ project_name_title_case }}"
+    is_arches_application = True

@@ -104,6 +104,15 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            "-tz",
+            "--default-timezone",
+            default="",
+            action="store",
+            dest="default_timezone",
+            help="Sets the default timezone for data that does not contain a timezone.",
+        )
+
+        parser.add_argument(
             "--max",
             default=-1,
             type=int,
@@ -192,6 +201,10 @@ class Command(BaseCommand):
             self.stdout.write(f"Not loading records > {options['toobig']}kb")
         if options["quiet"]:
             self.stdout.write("Only announcing timing data")
+        if options["default_timezone"]:
+            self.stdout.write(
+                f"Setting default timezone to: {options['default_timezone']}"
+            )
         if options["verbosity"] > 1:
             self.stdout.write(
                 "Logging detailed error information: set log level to DEBUG to view messages"
@@ -233,7 +246,9 @@ class Command(BaseCommand):
 
     def load_resources(self, options):
         self.reader = JsonLdReader(
-            verbosity=options["verbosity"], ignore_errors=options["ignore_errors"]
+            verbosity=options["verbosity"],
+            ignore_errors=options["ignore_errors"],
+            default_timezone=options["default_timezone"],
         )
         self.jss = JSONSerializer()
         source = options["source"]

@@ -99,6 +99,27 @@ class JSONLDImporter(BaseImportModule):
                 ),
             }
 
+        try:
+            self.read_zip_file(content, result)
+        except zipfile.BadZipFile as e:
+            return {
+                "success": False,
+                "data": FileValidationError(
+                    message=e.args[0],
+                    code=400,
+                ),
+            }
+
+        if not result["summary"]["files"]:
+            title = _("Invalid Uploaded File")
+            message = _(
+                "This file has missing information or invalid formatting. Make sure the file is complete and in the expected format."
+            )
+            return {"success": False, "data": {"title": title, "message": message}}
+
+        return {"success": True, "data": result}
+
+    def read_zip_file(self, content, result):
         with zipfile.ZipFile(content, "r") as zip_ref:
             files = zip_ref.infolist()
             for file in files:
@@ -126,15 +147,6 @@ class JSONLDImporter(BaseImportModule):
                         destination = destination / part
 
                     default_storage.save(destination, f)
-
-        if not result["summary"]["files"]:
-            title = _("Invalid Uploaded File")
-            message = _(
-                "This file has missing information or invalid formatting. Make sure the file is complete and in the expected format."
-            )
-            return {"success": False, "data": {"title": title, "message": message}}
-
-        return {"success": True, "data": result}
 
     def validate_uploaded_file(self, file):
         path = Path(file.name)

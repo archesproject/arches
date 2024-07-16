@@ -69,6 +69,7 @@ from arches.app.utils.permission_backend import user_is_resource_editor
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.settings_utils import list_arches_app_paths
 
 logger = logging.getLogger(__name__)
 
@@ -119,19 +120,16 @@ class GetFrontendI18NData(APIBase):
         language_file_path = []
 
         language_file_path.append(
-            os.path.join(settings.APP_ROOT, "locale", user_language + ".json")
+            os.path.join(settings.ROOT_DIR, "locale", user_language + ".json")
         )
 
-        for arches_application_name in settings.ARCHES_APPLICATIONS:
-            application_path = os.path.split(
-                sys.modules[arches_application_name].__spec__.origin
-            )[0]
+        for arches_app_path in list_arches_app_paths():
             language_file_path.append(
-                os.path.join(application_path, "locale", user_language + ".json")
+                os.path.join(arches_app_path, "locale", user_language + ".json")
             )
 
         language_file_path.append(
-            os.path.join(settings.ROOT_DIR, "locale", user_language + ".json")
+            os.path.join(settings.APP_ROOT, "locale", user_language + ".json")
         )
 
         localized_strings = {}
@@ -310,7 +308,11 @@ class GeoJSON(APIBase):
                             if include_geojson_link:
                                 feature["properties"]["geojson"] = (
                                     "%s?tileid=%s&nodeid=%s"
-                                    % (reverse("geojson"), tile.pk, node.pk)
+                                    % (
+                                        reverse("geojson"),
+                                        tile.pk,
+                                        node.pk,
+                                    )
                                 )
                             feature["id"] = i
                             if precision is not None:
@@ -560,7 +562,6 @@ class Graphs(APIBase):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Resources(APIBase):
-
     # context = [{
     #     "@context": {
     #         "id": "@id",
@@ -1309,12 +1310,9 @@ class IIIFAnnotations(APIBase):
         canvas = request.GET.get("canvas", None)
         resourceid = request.GET.get("resourceid", None)
         nodeid = request.GET.get("nodeid", None)
-        permitted_nodegroups = [
-            nodegroup
-            for nodegroup in get_nodegroups_by_perm(
-                request.user, "models.read_nodegroup"
-            )
-        ]
+        permitted_nodegroups = get_nodegroups_by_perm(
+            request.user, "models.read_nodegroup"
+        )
         annotations = models.VwAnnotation.objects.filter(
             nodegroup__in=permitted_nodegroups
         )
@@ -1351,12 +1349,9 @@ class IIIFAnnotations(APIBase):
 
 class IIIFAnnotationNodes(APIBase):
     def get(self, request, indent=None):
-        permitted_nodegroups = [
-            nodegroup
-            for nodegroup in get_nodegroups_by_perm(
-                request.user, "models.read_nodegroup"
-            )
-        ]
+        permitted_nodegroups = get_nodegroups_by_perm(
+            request.user, "models.read_nodegroup"
+        )
         annotation_nodes = models.Node.objects.filter(
             nodegroup__in=permitted_nodegroups, datatype="annotation"
         )
@@ -1708,12 +1703,9 @@ class Tile(APIBase):
             return JSONResponse(str(e), status=404)
 
         # filter tiles from attribute query based on user permissions
-        permitted_nodegroups = [
-            str(nodegroup.pk)
-            for nodegroup in get_nodegroups_by_perm(
-                request.user, "models.read_nodegroup"
-            )
-        ]
+        permitted_nodegroups = get_nodegroups_by_perm(
+            request.user, "models.read_nodegroup"
+        )
         if str(tile.nodegroup_id) in permitted_nodegroups:
             return JSONResponse(tile, status=200)
         else:
@@ -1747,9 +1739,7 @@ class NodeGroup(APIBase):
 
         try:
             nodegroup = models.NodeGroup.objects.get(pk=params["nodegroupid"])
-            permitted_nodegroups = [
-                nodegroup.pk for nodegroup in get_nodegroups_by_perm(user, perms)
-            ]
+            permitted_nodegroups = get_nodegroups_by_perm(user, perms)
         except Exception as e:
             return JSONResponse(str(e), status=404)
 
@@ -1799,9 +1789,7 @@ class Node(APIBase):
         # try to get nodes by attribute filter and then get nodes by passed in user perms
         try:
             nodes = models.Node.objects.filter(**dict(params)).values()
-            permitted_nodegroups = [
-                str(nodegroup.pk) for nodegroup in get_nodegroups_by_perm(user, perms)
-            ]
+            permitted_nodegroups = get_nodegroups_by_perm(user, perms)
         except Exception as e:
             return JSONResponse(str(e), status=404)
 
@@ -2104,12 +2092,9 @@ class GetNodegroupTree(APIBase):
                 """SELECT * FROM __get_nodegroup_tree_by_graph(%s)""", (graphid,)
             )
             result = cursor.fetchall()
-            permitted_nodegroups = [
-                nodegroup.pk
-                for nodegroup in get_nodegroups_by_perm(
-                    request.user, "models.read_nodegroup"
-                )
-            ]
+            permitted_nodegroups = get_nodegroups_by_perm(
+                request.user, "models.read_nodegroup"
+            )
             permitted_result = [
                 nodegroup
                 for nodegroup in result
