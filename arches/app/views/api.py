@@ -455,10 +455,9 @@ class MVT(APIBase):
                         cursor.execute(
                             """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
                                 id,
-                                featureid AS tile_featureid,
                                 resourceinstanceid,
                                 nodeid,
-                                featureid::text AS tile_featureid,
+                                featureid::text AS featureid,
                                 ST_AsMVTGeom(
                                     geom,
                                     TileBBox(%s, %s, %s, 3857)
