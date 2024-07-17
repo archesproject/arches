@@ -31,16 +31,13 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template, render_to_string
 from django.core.validators import RegexValidator
 from django.db.models import Q, Max
-from django.db.models.signals import post_delete, pre_save, post_save
+from django.db.models.signals import post_delete, pre_save, post_save, m2m_changed
 from django.dispatch import receiver
 from django.utils import translation
 from django.utils.translation import gettext as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-from django.contrib.contenttypes.models import ContentType
 from django.core.validators import validate_slug
-from guardian.models import GroupObjectPermission
-from guardian.shortcuts import assign_perm
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -1154,6 +1151,43 @@ class ResourceInstance(models.Model):
     descriptors = models.JSONField(blank=True, null=True)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
+    # This could be used as a lock, but primarily addresses the issue that a creating user
+    # may not yet match the criteria to edit a ResourceInstance (via Set/LogicalSet) simply
+    # because the details may not yet be complete. Only one user can create, as it is an
+    # action, not a state, so we do not need an array here. That may be desirable depending on
+    # future use of this field (e.g. locking to a group).
+    # Note that this is intended to bypass normal permissions logic, so a resource type must
+    # prevent a user who created the resource from editing it, by updating principaluserid logic.
+    principaluser = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True
+    )
+
+    def get_instance_creator_and_edit_permissions(self, user=None):
+        creatorid = None
+        can_edit = None
+
+        creatorid = self.get_instance_creator()
+
+        if user:
+            can_edit = user.id == creatorid or user.is_superuser
+        return {"creatorid": creatorid, "user_can_edit_instance_permissions": can_edit}
+
+    def get_instance_creator(self) -> int:
+        create_record = EditLog.objects.filter(
+            resourceinstanceid=self.resourceinstanceid, edittype="create"
+        ).first()
+        creatorid = None
+
+        if create_record:
+            try:
+                creatorid = int(create_record.userid)
+            except ValueError:
+                pass
+
+        if creatorid is None:
+            creatorid = settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
+
+        return creatorid
 
     def save(self, *args, **kwargs):
         try:
@@ -1327,7 +1361,9 @@ class TileModel(models.Model):  # Tile
 
     def save(self, *args, **kwargs):
         if self.sortorder is None or self.is_fully_provisional():
-            for node in Node.objects.filter(nodegroup_id=self.nodegroup_id):
+            for node in Node.objects.filter(nodegroup_id=self.nodegroup_id).exclude(
+                datatype="semantic"
+            ):
                 if not str(node.pk) in self.data:
                     self.data[str(node.pk)] = None
 
@@ -1589,8 +1625,8 @@ class UserProfile(models.Model):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
         return set(
-            str(nodegroup.pk)
-            for nodegroup in get_nodegroups_by_perm(
+            str(nodegroup_pk)
+            for nodegroup_pk in get_nodegroups_by_perm(
                 self.user, ["models.read_nodegroup"], any_perm=True
             )
         )
@@ -1600,8 +1636,8 @@ class UserProfile(models.Model):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
         return set(
-            str(nodegroup.pk)
-            for nodegroup in get_nodegroups_by_perm(
+            str(nodegroup_pk)
+            for nodegroup_pk in get_nodegroups_by_perm(
                 self.user, ["models.write_nodegroup"], any_perm=True
             )
         )
@@ -1611,8 +1647,8 @@ class UserProfile(models.Model):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
         return set(
-            str(nodegroup.pk)
-            for nodegroup in get_nodegroups_by_perm(
+            str(nodegroup_pk)
+            for nodegroup_pk in get_nodegroups_by_perm(
                 self.user, ["models.delete_nodegroup"], any_perm=True
             )
         )
@@ -1628,31 +1664,6 @@ def save_profile(sender, instance, **kwargs):
         return
 
     UserProfile.objects.get_or_create(user=instance)
-
-
-@receiver(post_save, sender=User)
-def create_permissions_for_new_users(sender, instance, created, **kwargs):
-    from arches.app.models.resource import Resource
-
-    if kwargs.get("raw", False):
-        return
-
-    if created:
-        ct = ContentType.objects.get(app_label="models", model="resourceinstance")
-        resourceInstanceIds = list(
-            GroupObjectPermission.objects.filter(content_type=ct)
-            .values_list("object_pk", flat=True)
-            .distinct()
-        )
-        for resourceInstanceId in resourceInstanceIds:
-            resourceInstanceId = uuid.UUID(resourceInstanceId)
-        resources = ResourceInstance.objects.filter(pk__in=resourceInstanceIds)
-        assign_perm("no_access_to_resourceinstance", instance, resources)
-        for resource_instance in resources:
-            resource = Resource(resource_instance.resourceinstanceid)
-            resource.graph_id = resource_instance.graph_id
-            resource.createdtime = resource_instance.createdtime
-            resource.index()
 
 
 class UserXTask(models.Model):
@@ -1767,6 +1778,41 @@ class UserXNotificationType(models.Model):
     class Meta:
         managed = True
         db_table = "user_x_notification_types"
+
+
+@receiver(post_save, sender=User)
+def create_permissions_for_new_users(sender, instance, created, **kwargs):
+    if kwargs.get("raw", False):
+        return
+
+    from arches.app.utils.permission_backend import process_new_user
+
+    if created:
+        process_new_user(instance, created)
+
+
+@receiver(m2m_changed, sender=User.groups.through)
+def update_groups_for_user(sender, instance, action, **kwargs):
+    from arches.app.utils.permission_backend import update_groups_for_user
+
+    if action in ("post_add", "post_remove"):
+        update_groups_for_user(instance)
+
+
+@receiver(m2m_changed, sender=User.user_permissions.through)
+def update_permissions_for_user(sender, instance, action, **kwargs):
+    from arches.app.utils.permission_backend import update_permissions_for_user
+
+    if action in ("post_add", "post_remove"):
+        update_permissions_for_user(instance)
+
+
+@receiver(m2m_changed, sender=Group.permissions.through)
+def update_permissions_for_group(sender, instance, action, **kwargs):
+    from arches.app.utils.permission_backend import update_permissions_for_group
+
+    if action in ("post_add", "post_remove"):
+        update_permissions_for_group(instance)
 
 
 @receiver(post_save, sender=UserXNotification)

@@ -228,10 +228,7 @@ class TimeWheel(object):
         return results
 
     def get_permitted_nodegroups(self, user):
-        return [
-            str(nodegroup.pk)
-            for nodegroup in get_nodegroups_by_perm(user, "models.read_nodegroup")
-        ]
+        return get_nodegroups_by_perm(user, "models.read_nodegroup")
 
 
 class d3Item(object):

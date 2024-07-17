@@ -14,7 +14,7 @@ jobs:
         image: postgis/postgis:13-3.0
         env:
           POSTGRES_PASSWORD: postgis
-          POSTGRES_DB: ${{ github.event.repository.name }}
+          POSTGRES_DB: {{ project_name }}
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -33,75 +33,12 @@ jobs:
           python-version: ${{ matrix.python-version }}
           check-latest: true
 
-      - name: Install Java, GDAL, and other system dependencies
-        run: |
-          sudo apt update
-          sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk libgdal-dev libxslt-dev
-          echo Postgres and ES dependencies installed
-
-      - name: Install Python packages
-        run: |
-          python -m pip install --upgrade pip
-          pip install .
-          pip install -r ${{ github.event.repository.name }}/install/requirements.txt
-          pip install -r ${{ github.event.repository.name }}/install/requirements_dev.txt
-          echo Python packages installed
-
-      - uses: ankane/setup-elasticsearch@v1
+      - name: Build and test branch
+        uses: ./.github/actions/build-and-test-branch
         with:
-          elasticsearch-version: 8
-
-      - name: Webpack frontend files
-        run: |
-          echo "Checking for package.json..."
-          if [ -f package.json ]; then
-            echo "package.json found, building static bundle."
-            npm install && npm run build_test
-          else
-            echo "package.json not found, skipping npm commands."
-          fi
-
-      - name: Check formatting
-        run: |
-          npm run prettier:check
-          black . --check --exclude=node_modules
-
-      - name: Run frontend tests
-        run: |
-          npm run vitest
-          mv coverage/frontend/coverage.xml feature_branch_frontend_coverage.xml
-
-      - name: Check for missing migrations
-        run: |
-          python manage.py makemigrations --check
-
-      - name: Ensure previous Python coverage data is erased
-        run: |
-          coverage erase
-
-      - name: Run Python unit tests
-        run: |
-          python -W default::DeprecationWarning -m coverage run manage.py test tests --settings="tests.test_settings"
-
-      - name: Generate Python report coverage
-        run: |
-          coverage report
-          coverage json
-          mv coverage/python/coverage.json feature_branch_python_coverage.json
-
-      - name: Upload frontend coverage report as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: feature-branch-frontend-coverage-report
-          path: feature_branch_frontend_coverage.xml
-          overwrite: true
-
-      - name: Upload Python coverage report as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: feature-branch-python-coverage-report
-          path: feature_branch_python_coverage.json
-          overwrite: true
+          secrets: ${{ toJSON(secrets) }}
+          project-name: '{{ project_name }}'
+          branch-type: 'feature'
 
   build_target_branch:
     runs-on: ubuntu-latest
@@ -111,7 +48,7 @@ jobs:
         image: postgis/postgis:13-3.0
         env:
           POSTGRES_PASSWORD: postgis
-          POSTGRES_DB: ${{ github.event.repository.name }}
+          POSTGRES_DB: {{ project_name }}
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -123,8 +60,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.base.ref }}
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -132,80 +67,12 @@ jobs:
           python-version: ${{ matrix.python-version }}
           check-latest: true
 
-      - name: Install Java, GDAL, and other system dependencies
-        run: |
-          sudo apt update
-          sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk libgdal-dev libxslt-dev
-          echo Postgres and ES dependencies installed
-
-      - name: Install Python packages
-        run: |
-          python -m pip install --upgrade pip
-          pip install .
-          pip install -r ${{ github.event.repository.name }}/install/requirements.txt
-          pip install -r ${{ github.event.repository.name }}/install/requirements_dev.txt
-          echo Python packages installed
-
-      - uses: ankane/setup-elasticsearch@v1
+      - name: Build and test branch
+        uses: ./.github/actions/build-and-test-branch
         with:
-          elasticsearch-version: 8
-
-      - name: Webpack frontend files
-        run: |
-          echo "Checking for package.json..."
-          if [ -f package.json ]; then
-            echo "package.json found, building static bundle."
-            npm install && npm run build_test
-          else
-            echo "package.json not found, skipping npm commands."
-          fi
-
-      - name: Run frontend tests
-        run: |
-          if [ -f vitest.config.json ]; then
-            npm run vitest
-            mv coverage/frontend/coverage.xml target_branch_frontend_coverage.xml
-          else
-            echo "Unable to find vitest config. Skipping frontend tests."
-          fi
-
-      - name: Check for missing migrations
-        run: |
-          python manage.py makemigrations --check
-
-      - name: Ensure previous Python coverage data is erased
-        run: |
-          coverage erase
-
-      - name: Run Python unit tests
-        run: |
-          python -W default::DeprecationWarning -m coverage run manage.py test tests --settings="tests.test_settings"
-
-      - name: Generate Python report coverage
-        run: |
-          coverage report
-          coverage json
-
-          # handles older target branch
-          if [ -f coverage/python/coverage.json ]; then
-            mv coverage/python/coverage.json target_branch_python_coverage.json
-          else
-            mv coverage.json target_branch_python_coverage.json
-          fi
-
-      - name: Upload frontend coverage report as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: target-branch-frontend-coverage-report
-          path: target_branch_frontend_coverage.xml
-          overwrite: true
-
-      - name: Upload Python coverage report as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: target-branch-python-coverage-report
-          path: target_branch_python_coverage.json
-          overwrite: true
+          secrets: ${{ toJSON(secrets) }}
+          project-name: '{{ project_name }}'
+          branch-type: 'target'
 
   check_frontend_coverage:
     runs-on: ubuntu-latest

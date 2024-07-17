@@ -20,7 +20,7 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
-from guardian.shortcuts import assign_perm
+from arches.app.utils.permission_backend import assign_perm
 from arches.app.models import models
 
 

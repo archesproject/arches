@@ -22,7 +22,7 @@ import os
 
 try:
     from django.utils.translation import gettext_lazy as _
-except ImportError:  # unable to import prior to installing requirements.txt in setup.py
+except ImportError:  # unable to import prior to installing requirements
     pass
 
 PACKAGE_NAME = "{{ project_name }}"
@@ -31,9 +31,7 @@ APP_NAME = '{{ project_name }}'
 APP_ROOT = os.path.dirname(__file__)
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 
-ROOT_URLCONF = '{{ project_name }}.{{ project_name }}.urls'
-
-ARCHES_APPLICATIONS = ()
+ROOT_URLCONF = '{{ project_name }}.urls'
 
 MIN_ARCHES_VERSION = arches.__version__
 MAX_ARCHES_VERSION = arches.__version__

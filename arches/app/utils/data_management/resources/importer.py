@@ -32,7 +32,8 @@ from arches.app.models.models import (
 )
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.setup import unzip_file
+from arches.app.utils.i18n import capitalize_region
+from arches.app.utils.zip import unzip_file
 from .formats.csvfile import CsvReader
 from .formats.archesfile import ArchesFileReader
 import ctypes
@@ -103,12 +104,14 @@ class BusinessDataImporter(object):
         for path in relations_file:
             if os.path.exists(path):
                 if isfile(join(path)):
-                    self.relations = csv.DictReader(open(relations_file[0], "r"))
+                    with open(relations_file[0], "r") as f:
+                        self.relations = csv.DictReader(f)
 
         for path in mapping_file:
             if os.path.exists(path):
                 if isfile(join(path)):
-                    self.mapping = json.load(open(path, "r"))
+                    with open(path, "r") as f:
+                        self.mapping = json.load(f)
                 else:
                     self.mapping = None
 
@@ -126,8 +129,9 @@ class BusinessDataImporter(object):
                             if "business_data" in list(archesfile.keys()):
                                 self.business_data = archesfile["business_data"]
                     elif self.file_format == "csv":
-                        data = csv.DictReader(open(file[0], encoding="utf-8"))
-                        self.business_data = list(data)
+                        with open(file[0], encoding="utf-8") as f:
+                            data = csv.DictReader(f)
+                            self.business_data = list(data)
                     elif self.file_format == "zip":
                         shp_zipfile = os.path.basename(path)
                         shp_zipfile_name = os.path.splitext(shp_zipfile)[0]
@@ -173,7 +177,7 @@ class BusinessDataImporter(object):
         if file_reader is not None and data is not None:
             language_list = file_reader.scan_for_new_languages(business_data=data)
             if language_list is not None:
-                return list(set(language_list))
+                return list(set(capitalize_region(code) for code in language_list))
 
         return []
 
@@ -200,7 +204,6 @@ class BusinessDataImporter(object):
     ):
         start = time()
         cursor = connection.cursor()
-
         try:
             if file_format is None:
                 file_format = self.file_format

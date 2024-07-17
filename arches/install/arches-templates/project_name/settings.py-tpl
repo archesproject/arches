@@ -36,8 +36,23 @@ SEARCH_COMPONENT_LOCATIONS.append('{{ project_name }}.search_components')
 
 LOCALE_PATHS.insert(0, os.path.join(APP_ROOT, 'locale'))
 
-FILE_TYPE_CHECKING = False
-FILE_TYPES = ["bmp", "gif", "jpg", "jpeg", "json", "pdf", "png", "psd", "rtf", "tif", "tiff", "xlsx", "csv", "zip"]
+FILE_TYPE_CHECKING = "lenient"
+FILE_TYPES = [
+    "bmp",
+    "gif",
+    "jpg",
+    "jpeg",
+    "json",
+    "pdf",
+    "png",
+    "psd",
+    "rtf",
+    "tif",
+    "tiff",
+    "xlsx",
+    "csv",
+    "zip",
+]
 FILENAME_GENERATOR = "arches.app.utils.storage_filename_generator.generate_filename"
 UPLOADED_FILES_DIR = "uploadedfiles"
 
@@ -53,8 +68,8 @@ ROOT_URLCONF = '{{ project_name }}.urls'
 ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
 
 # If you need to connect to Elasticsearch via an API key instead of username/password, use the syntax below:
-# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": "<ENCODED_API_KEY>"}
-# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": ("<ID>", "<API_KEY>")}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "api_key": "<ENCODED_API_KEY>"}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "api_key": ("<ID>", "<API_KEY>")}
 
 # Your Elasticsearch instance needs to be configured with xpack.security.enabled=true to use API keys - update elasticsearch.yml or .env file and restart.
 
@@ -130,10 +145,12 @@ INSTALLED_APPS = (
     "oauth2_provider",
     "django_celery_results",
     # "silk",
-    "{{ project_name }}",
+    "{{ project_name }}",  # Ensure the project is listed before any other arches applications 
 )
 
-ARCHES_APPLICATIONS = ()
+# Placing this last ensures any templates provided by Arches Applications
+# take precedence over core arches templates in arches/app/templates.
+INSTALLED_APPS += ("arches.app",)
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -152,17 +169,11 @@ MIDDLEWARE = [
     # "silk.middleware.SilkyMiddleware",
 ]
 
-STATICFILES_DIRS = build_staticfiles_dirs(
-    root_dir=ROOT_DIR,
-    app_root=APP_ROOT,
-    arches_applications=ARCHES_APPLICATIONS,
-)
+STATICFILES_DIRS = build_staticfiles_dirs(app_root=APP_ROOT)
 
 TEMPLATES = build_templates_config(
-    root_dir=ROOT_DIR,
     debug=DEBUG,
     app_root=APP_ROOT,
-    arches_applications=ARCHES_APPLICATIONS,
 )
 
 ALLOWED_HOSTS = []
@@ -279,9 +290,6 @@ ENABLE_CAPTCHA = False
 # RECAPTCHA_USE_SSL = False
 NOCAPTCHA = True
 # RECAPTCHA_PROXY = 'http://127.0.0.1:8000'
-if DEBUG is True:
-    SILENCED_SYSTEM_CHECKS = ["captcha.recaptcha_test_key_error"]
-
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
 # EMAIL_USE_TLS = True
@@ -411,12 +419,4 @@ except ImportError as e:
 
 # returns an output that can be read by NODEJS
 if __name__ == "__main__":
-    transmit_webpack_django_config(
-        root_dir=ROOT_DIR,
-        app_root=APP_ROOT,
-        arches_applications=ARCHES_APPLICATIONS,
-        public_server_address=PUBLIC_SERVER_ADDRESS,
-        static_url=STATIC_URL,
-        webpack_development_server_port=WEBPACK_DEVELOPMENT_SERVER_PORT,
-    )
-
+    transmit_webpack_django_config(**locals())
