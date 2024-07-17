@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
                 ) AS geom,
                 (json_array_elements(
                     t.tiledata::json->n.nodeid::text->'features'
-                )::json->>'id')::uuid AS featureid
+                )->>'id')::uuid AS featureid
             FROM tiles t
                 LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
             WHERE n.datatype = 'geojson-feature-collection'::text;
@@ -85,7 +85,7 @@ class Migration(migrations.Migration):
                 ) AS geom,
                 (json_array_elements(
                     t.tiledata::json->n.nodeid::text->'features'
-                )::json->>'id')::uuid AS featureid
+                )->>'id')::uuid AS featureid
             FROM tiles t
                 LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
             WHERE n.datatype = 'geojson-feature-collection'::text AND t.tileid = refreshtileid
