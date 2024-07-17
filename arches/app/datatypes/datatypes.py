@@ -1172,37 +1172,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         **kwargs,
     ):
         errors = []
-        max_bytes = 32766  # max bytes allowed by Lucene
-        byte_count = 0
-        byte_count += len(str(value).encode("UTF-8"))
-
-        def validate_geom_byte_size_can_be_reduced(feature_collection):
-            try:
-                if len(feature_collection["features"]) > 0:
-                    feature_geom = GEOSGeometry(
-                        JSONSerializer().serialize(
-                            feature_collection["features"][0]["geometry"]
-                        )
-                    )
-                    current_precision = abs(self.find_num(feature_geom.coords))
-                    feature_collection = self.geo_utils.reduce_precision(
-                        feature_collection, current_precision
-                    )
-            except ValueError:
-                message = _("Geojson byte size exceeds Lucene 32766 limit.")
-                title = _("Geometry Size Exceeds Elasticsearch Limit")
-                errors.append(
-                    {
-                        "type": "ERROR",
-                        "message": "datatype: {0} {1} - {2}. {3}.".format(
-                            self.datatype_model.datatype,
-                            source,
-                            message,
-                            "This data was not imported.",
-                        ),
-                        "title": title,
-                    }
-                )
 
         def validate_geom_bbox(geom):
             try:
@@ -1245,8 +1214,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 )
 
         if value is not None:
-            if byte_count > max_bytes:
-                validate_geom_byte_size_can_be_reduced(value)
             for feature in value["features"]:
                 try:
                     geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
@@ -1328,28 +1295,36 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         else:
             return self.find_num(current_item[0])
 
+    def _feature_length_in_bytes(self, feature):
+        return len(str(feature).encode("UTF-8"))
+
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        max_bytes = 32766  # max bytes allowed by Lucene
-        byte_count = 0
-        byte_count += len(str(nodevalue).encode("UTF-8"))
-
-        if len(nodevalue["features"]) > 0:
-            feature_geom = GEOSGeometry(
-                JSONSerializer().serialize(nodevalue["features"][0]["geometry"])
-            )
-            current_precision = abs(self.find_num(feature_geom.coords))
-
-        if byte_count > max_bytes and current_precision:
-            nodevalue = self.geo_utils.reduce_precision(nodevalue, current_precision)
-
-        document["geometries"].append(
-            {
-                "geom": nodevalue,
-                "nodegroup_id": tile.nodegroup_id,
-                "provisional": provisional,
-                "tileid": tile.pk,
-            }
+        max_length = (
+            32000  # this was 32766, but do we need space for extra part of JSON?
         )
+
+        features = []
+        nodevalue["properties"] = {}
+        if self._feature_length_in_bytes(nodevalue) < max_length:
+            features.append(nodevalue)
+        else:
+            for feature in nodevalue["features"]:
+                new_feature = {"type": "FeatureCollection", "features": [feature]}
+                if self._feature_length_in_bytes(new_feature) < max_length:
+                    features.append(new_feature)
+                else:
+                    chunks = self.split_geom(feature, max_length)
+                    features = features + chunks
+
+        for feature in features:
+            document["geometries"].append(
+                {
+                    "geom": feature,
+                    "nodegroup_id": tile.nodegroup_id,
+                    "provisional": provisional,
+                    "tileid": tile.pk,
+                }
+            )
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
             minx, miny, maxx, maxy = bounds
@@ -1362,6 +1337,36 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "provisional": provisional,
                 }
             )
+
+    def split_geom(self, feature, max_feature_in_bytes=32766):
+        geom = feature["geometry"]
+        coordinates = (
+            geom["coordinates"]
+            if geom["type"] == "LineString"
+            else geom["coordinates"][0]
+        )
+        num_points = len(coordinates)
+        num_chunks = self._feature_length_in_bytes(feature) / max_feature_in_bytes
+        max_points = int(num_points / num_chunks)
+
+        with connection.cursor() as cur:
+            cur.execute(
+                "select st_asgeojson(st_subdivide(ST_GeomFromGeoJSON(%s::jsonb), %s))",
+                [JSONSerializer().serialize(feature["geometry"]), max_points],
+            )
+            smaller_chunks = [
+                {
+                    "id": feature["id"],
+                    "type": "Feature",
+                    "geometry": json.loads(item[0]),
+                }
+                for item in cur.fetchall()
+            ]
+            feature_collections = [
+                {"type": "FeatureCollection", "features": [geometry]}
+                for geometry in smaller_chunks
+            ]
+            return feature_collections
 
     def get_bounds(self, tile, node):
         bounds = None
@@ -2418,7 +2423,7 @@ class BaseDomainDataType(BaseDataType):
                 return get_localized_value(option["text"], return_lang=return_lang)
         raise Exception(
             _(
-                "No domain option found for option id {0}, in node conifg: {1}".format(
+                "No domain option found for option id {0}, in node config: {1}".format(
                     option_id, node.config["options"]
                 )
             )
@@ -3267,3 +3272,123 @@ def get_value_from_jsonld(json_ld_node):
             return
     except IndexError as e:
         return
+
+
+class ReferenceDataType(BaseDataType):
+    def validate(
+        self,
+        value,
+        row_number=None,
+        source="",
+        node=None,
+        nodeid=None,
+        strict=False,
+        **kwargs,
+    ):
+        errors = []
+        title = _("Invalid Reference Datatype Value")
+        if value is None:
+            return errors
+
+        if type(value) == list and len(value):
+            for reference in value:
+                if "uri" in reference and len(reference["uri"]):
+                    pass
+                else:
+                    errors.append(
+                        {
+                            "type": "ERROR",
+                            "message": _(
+                                "Reference objects require a 'uri' property and corresponding value"
+                            ),
+                            "title": title,
+                        }
+                    )
+                if "labels" in reference:
+                    pref_label_languages = []
+                    for label in reference["labels"]:
+                        if not all(
+                            key in label
+                            for key in ("id", "value", "language_id", "valuetype_id")
+                        ):
+                            errors.append(
+                                {
+                                    "type": "ERROR",
+                                    "message": _(
+                                        "Reference labels require properties: id(uuid), value(string), language_id(e.g. 'en'), and valuetype_id(e.g. 'prefLabel')"
+                                    ),
+                                    "title": title,
+                                }
+                            )
+                        if label["valuetype_id"] == "prefLabel":
+                            pref_label_languages.append(label["language_id"])
+
+                    if len(set(pref_label_languages)) < len(pref_label_languages):
+                        errors.append(
+                            {
+                                "type": "ERROR",
+                                "message": _(
+                                    "A reference can have only one prefLabel per language"
+                                ),
+                                "title": title,
+                            }
+                        )
+        else:
+            errors.append(
+                {
+                    "type": "ERROR",
+                    "message": _("Reference value must be a list of reference objects"),
+                    "title": title,
+                }
+            )
+        return errors
+
+    def transform_value_for_tile(self, value, **kwargs):
+        return value
+
+    def clean(self, tile, nodeid):
+        super().clean(tile, nodeid)
+        if tile.data[nodeid] == []:
+            tile.data[nodeid] = None
+
+    def transform_export_values(self, value, *args, **kwargs):
+        return ",".join(value)
+
+    def get_display_value(self, tile, node, **kwargs):
+        labels = []
+        requested_language = kwargs.pop("language", None)
+        current_language = requested_language or get_language()
+        for item in self.get_tile_data(tile)[str(node.nodeid)]:
+            for label in item["labels"]:
+                if (
+                    label["language_id"] == current_language
+                    and label["valuetype_id"] == "prefLabel"
+                ):
+                    labels.append(label.get("value", ""))
+        return ", ".join(labels)
+
+    def collects_multiple_values(self):
+        return True
+
+    def default_es_mapping(self):
+        return {
+            "properties": {
+                "uri": {"type": "keyword"},
+                "id": {"type": "keyword"},
+                "labels": {
+                    "properties": {},
+                },
+            }
+        }
+
+    def validate_node(self, node):
+        from arches.app.models.graph import (
+            GraphValidationError,
+        )  # prevent circular import
+
+        try:
+            uuid.UUID(node.config["controlledList"])
+        except (TypeError, KeyError):
+            raise GraphValidationError(
+                _("A reference datatype node requires a controlled list")
+            )

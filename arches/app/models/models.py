@@ -1,38 +1,37 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
-#
-# Also note: You'll have to insert the output of 'django-admin sqlcustom [app_label]'
-# into your database.
-
-
+import os
 import sys
 import json
 import uuid
 import datetime
 import logging
 import traceback
+from collections import defaultdict
 import django.utils.timezone
 
 from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.models.querysets import (
+    ControlledListQuerySet,
+    ControlledListItemImageManager,
+    ControlledListItemValueQuerySet,
+    NodeQuerySet,
+)
+from arches.app.models.utils import add_to_update_fields, field_names
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils import import_class_from_string
-from django.contrib.auth.models import User
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.contrib.gis.db import models
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
-from django.core.validators import RegexValidator, validate_slug
+from django.core.validators import MinValueValidator, RegexValidator, validate_slug
 from django.db.models import JSONField, Q, Max
 from django.db.models.constraints import UniqueConstraint
+from django.db.models.fields.json import KT
+from django.db.models.functions import Cast
 from django.utils import translation
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, gettext_lazy as _
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -40,22 +39,6 @@ from django.conf import settings
 
 
 logger = logging.getLogger(__name__)
-
-
-def add_to_update_fields(kwargs, field_name):
-    """
-    Update the `update_field` arg inside `kwargs` (if present) in-place
-    with `field_name`.
-    """
-    if (update_fields := kwargs.get("update_fields")) is not None:
-        # Django sends a set from update_or_create()
-        if isinstance(update_fields, set):
-            update_fields.add(field_name)
-        # Arches sends a list from tile POST view
-        else:
-            new = set(update_fields)
-            new.add(field_name)
-            kwargs["update_fields"] = new
 
 
 class BulkIndexQueue(models.Model):
@@ -765,6 +748,8 @@ class Node(models.Model):
         on_delete=models.SET_NULL,
     )
 
+    objects = NodeQuerySet.as_manager()
+
     def get_child_nodes_and_edges(self):
         """
         gather up the child nodes and edges of this node
@@ -863,6 +848,12 @@ class Node(models.Model):
             models.UniqueConstraint(
                 fields=["alias", "graph"], name="unique_alias_graph"
             ),
+        ]
+        indexes = [
+            models.Index(
+                Cast(KT("config__controlledList"), output_field=models.UUIDField()),
+                name="lists_reffed_by_node_idx",
+            )
         ]
 
 
@@ -1204,6 +1195,44 @@ class ResourceInstance(models.Model):
         except (ObjectDoesNotExist, AttributeError):
             return None
 
+    # This could be used as a lock, but primarily addresses the issue that a creating user
+    # may not yet match the criteria to edit a ResourceInstance (via Set/LogicalSet) simply
+    # because the details may not yet be complete. Only one user can create, as it is an
+    # action, not a state, so we do not need an array here. That may be desirable depending on
+    # future use of this field (e.g. locking to a group).
+    # Note that this is intended to bypass normal permissions logic, so a resource type must
+    # prevent a user who created the resource from editing it, by updating principaluserid logic.
+    principaluser = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True
+    )
+
+    def get_instance_creator_and_edit_permissions(self, user=None):
+        creatorid = None
+        can_edit = None
+
+        creatorid = self.get_instance_creator()
+
+        if user:
+            can_edit = user.id == creatorid or user.is_superuser
+        return {"creatorid": creatorid, "user_can_edit_instance_permissions": can_edit}
+
+    def get_instance_creator(self) -> int:
+        create_record = EditLog.objects.filter(
+            resourceinstanceid=self.resourceinstanceid, edittype="create"
+        ).first()
+        creatorid = None
+
+        if create_record:
+            try:
+                creatorid = int(create_record.userid)
+            except ValueError:
+                pass
+
+        if creatorid is None:
+            creatorid = settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
+
+        return creatorid
+
     def save(self, *args, **kwargs):
         try:
             self.graph_publication = self.graph.publication
@@ -1497,7 +1526,9 @@ class TileModel(models.Model):  # Tile
 
     def save(self, *args, **kwargs):
         if self.sortorder is None or self.is_fully_provisional():
-            for node in Node.objects.filter(nodegroup_id=self.nodegroup_id):
+            for node in Node.objects.filter(nodegroup_id=self.nodegroup_id).exclude(
+                datatype="semantic"
+            ):
                 if not str(node.pk) in self.data:
                     self.data[str(node.pk)] = None
 
@@ -1723,8 +1754,8 @@ class UserProfile(models.Model):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
         return set(
-            str(nodegroup.pk)
-            for nodegroup in get_nodegroups_by_perm(
+            str(nodegroup_pk)
+            for nodegroup_pk in get_nodegroups_by_perm(
                 self.user, ["models.read_nodegroup"], any_perm=True
             )
         )
@@ -1734,8 +1765,8 @@ class UserProfile(models.Model):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
         return set(
-            str(nodegroup.pk)
-            for nodegroup in get_nodegroups_by_perm(
+            str(nodegroup_pk)
+            for nodegroup_pk in get_nodegroups_by_perm(
                 self.user, ["models.write_nodegroup"], any_perm=True
             )
         )
@@ -1745,8 +1776,8 @@ class UserProfile(models.Model):
         from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
         return set(
-            str(nodegroup.pk)
-            for nodegroup in get_nodegroups_by_perm(
+            str(nodegroup_pk)
+            for nodegroup_pk in get_nodegroups_by_perm(
                 self.user, ["models.delete_nodegroup"], any_perm=True
             )
         )
@@ -2108,10 +2139,14 @@ class LoadErrors(models.Model):
         LoadEvent, db_column="loadid", on_delete=models.CASCADE
     )
     nodegroup = models.ForeignKey(
-        "NodeGroup", db_column="nodegroupid", null=True, on_delete=models.CASCADE
+        "NodeGroup",
+        db_column="nodegroupid",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
     )
     node = models.ForeignKey(
-        "Node", db_column="nodeid", null=True, on_delete=models.CASCADE
+        "Node", db_column="nodeid", null=True, blank=True, on_delete=models.CASCADE
     )
     type = models.TextField(blank=True, null=True)
     error = models.TextField(blank=True, null=True)
@@ -2156,3 +2191,348 @@ class SpatialView(models.Model):
     class Meta:
         managed = True
         db_table = "spatial_views"
+
+
+### Controlled List Manager
+class ControlledList(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=127, null=False, blank=True)
+    dynamic = models.BooleanField(default=False)
+    search_only = models.BooleanField(default=False)
+
+    objects = ControlledListQuerySet.as_manager()
+
+    class Meta:
+        db_table = "controlled_lists"
+
+    def __str__(self):
+        return str(self.name)
+
+    def clean_fields(self, exclude=None):
+        super().clean_fields(exclude=exclude)
+        if (not exclude or "name" not in exclude) and not self.name:
+            self.name = _("Untitled List: ") + datetime.datetime.now().isoformat(
+                sep=" ", timespec="seconds"
+            )
+
+    def serialize(self, depth_map=None, flat=False, permitted_nodegroups=None):
+        if depth_map is None:
+            depth_map = defaultdict(int)
+        data = {
+            "id": str(self.id),
+            "name": self.name,
+            "dynamic": self.dynamic,
+            "search_only": self.search_only,
+            "items": sorted(
+                [
+                    item.serialize(depth_map, flat)
+                    for item in self.controlled_list_items.all()
+                    if flat or item.parent_id is None
+                ],
+                key=lambda item: item["sortorder"],
+            ),
+        }
+        if hasattr(self, "node_ids"):
+            data["nodes"] = [
+                {
+                    "id": node_id,
+                    "name": node_name,
+                    "nodegroup_id": nodegroup_id,
+                    "graph_id": graph_id,
+                    "graph_name": graph_name,
+                }
+                for node_id, node_name, nodegroup_id, graph_id, graph_name in zip(
+                    self.node_ids,
+                    self.node_names,
+                    self.nodegroup_ids,
+                    self.graph_ids,
+                    self.graph_names,
+                    strict=True,
+                )
+                if permitted_nodegroups is None or nodegroup_id in permitted_nodegroups
+            ]
+        else:
+            nodes_using_list = Node.objects.with_controlled_lists().filter(
+                controlled_list_id=self.pk, source_identifier=None
+            )
+            filtered_nodes = [
+                node
+                for node in nodes_using_list
+                if permitted_nodegroups is None
+                or node.nodegroup_id in permitted_nodegroups
+            ]
+            data["nodes"] = [
+                {
+                    "id": str(node.pk),
+                    "name": node.name,
+                    "nodegroup_id": node.nodegroup_id,
+                    "graph_id": node.graph_id,
+                    "graph_name": str(node.graph.name),
+                }
+                for node in filtered_nodes
+            ]
+        return data
+
+    def bulk_update_item_parentage_and_order(self, parent_map, sortorder_map):
+        """Item parentage and sortorder are updated together because their
+        uniqueness is enforced together."""
+
+        reordered_items = []
+        exclude_fields = field_names(ControlledListItem()) - {"sortorder", "parent_id"}
+        for item_id, sortorder in sortorder_map.items():
+            item = ControlledListItem(pk=uuid.UUID(item_id), sortorder=sortorder)
+            if item_id in parent_map:
+                new_parent = parent_map[item_id]
+                item.parent_id = uuid.UUID(new_parent) if new_parent else None
+            item.controlled_list_id = self.pk
+            item.clean_fields(exclude=exclude_fields)
+            reordered_items.append(item)
+
+        ControlledListItem.objects.bulk_update(
+            reordered_items, fields=["sortorder", "parent_id", "controlled_list_id"]
+        )
+
+
+class ControlledListItem(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    uri = models.URLField(max_length=2048, null=True, blank=True)
+    controlled_list = models.ForeignKey(
+        ControlledList,
+        db_column="listid",
+        on_delete=models.CASCADE,
+        related_name="controlled_list_items",
+    )
+    sortorder = models.IntegerField(validators=[MinValueValidator(0)])
+    parent = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.CASCADE, related_name="children"
+    )
+    guide = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "controlled_list_items"
+        constraints = [
+            # Sort order concerns the list as a whole, not subsets
+            # of the hierarchy.
+            models.UniqueConstraint(
+                fields=["controlled_list", "sortorder"],
+                name="unique_list_sortorder",
+                deferrable=Deferrable.DEFERRED,
+                violation_error_message=_(
+                    "All items in this list must have distinct sort orders."
+                ),
+            ),
+            models.UniqueConstraint(
+                fields=["controlled_list", "uri"],
+                name="unique_list_uri",
+                violation_error_message=_(
+                    "All items in this list must have distinct URIs."
+                ),
+            ),
+        ]
+
+    def clean(self):
+        if not self.controlled_list_item_values.filter(valuetype="prefLabel").exists():
+            raise ValidationError(_("At least one preferred label is required."))
+
+    def clean_fields(self, exclude=None):
+        super().clean_fields(exclude=exclude)
+        if (not exclude or "uri" not in exclude) and not self.uri:
+            self.uri = None
+
+    def serialize(self, depth_map=None, flat=False):
+        if depth_map is None:
+            depth_map = defaultdict(int)
+        if self.parent_id:
+            depth_map[self.id] = depth_map[self.parent_id] + 1
+        data = {
+            "id": str(self.id),
+            "controlled_list_id": str(self.controlled_list_id),
+            "uri": self.uri,
+            "sortorder": self.sortorder,
+            "guide": self.guide,
+            "values": [
+                value.serialize()
+                for value in self.controlled_list_item_values.all()
+                if value.valuetype_id != "image"
+            ],
+            "images": [
+                image.serialize() for image in self.controlled_list_item_images.all()
+            ],
+            "parent_id": str(self.parent_id) if self.parent_id else None,
+            "depth": depth_map[self.id],
+        }
+        if not flat:
+            data["children"] = sorted(
+                [child.serialize(depth_map, flat) for child in self.children.all()],
+                key=lambda d: d["sortorder"],
+            )
+        return data
+
+
+class ControlledListItemValue(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    list_item = models.ForeignKey(
+        ControlledListItem,
+        db_column="itemid",
+        on_delete=models.CASCADE,
+        related_name="controlled_list_item_values",
+    )
+    valuetype = models.ForeignKey(
+        DValueType,
+        on_delete=models.PROTECT,
+        limit_choices_to=Q(category__in=("label", "image", "note")),
+    )
+    language = models.ForeignKey(
+        Language,
+        db_column="languageid",
+        to_field="code",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
+    value = models.CharField(max_length=1024, null=False, blank=True)
+
+    class Meta:
+        db_table = "controlled_list_item_values"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["list_item", "value", "valuetype", "language"],
+                name="unique_item_value_valuetype_language",
+                violation_error_message=_(
+                    "The same item value cannot be stored twice in the same language."
+                ),
+            ),
+            models.UniqueConstraint(
+                fields=["list_item", "language"],
+                condition=Q(valuetype="prefLabel"),
+                name="unique_item_preflabel_language",
+                violation_error_message=_(
+                    "Only one preferred label per language is permitted."
+                ),
+            ),
+            models.CheckConstraint(
+                check=Q(language_id__isnull=False) | Q(valuetype="image"),
+                name="only_images_nullable_language",
+                violation_error_message=_(
+                    "Item values must be associated with a language."
+                ),
+            ),
+        ]
+
+    objects = ControlledListItemValueQuerySet.as_manager()
+
+    def clean(self):
+        if not self.value:
+            self.value = _("New Item: ") + datetime.datetime.now().isoformat(
+                sep=" ", timespec="seconds"
+            )
+
+    def serialize(self):
+        return {
+            "id": str(self.id),
+            "valuetype_id": self.valuetype_id,
+            "language_id": self.language_id,
+            "value": self.value,
+            "list_item_id": self.list_item_id,
+        }
+
+    def delete(self):
+        msg = _("Deleting the item's only remaining preferred label is not permitted.")
+        if (
+            self.valuetype_id == "prefLabel"
+            and len(
+                self.list_item.controlled_list_item_values.filter(
+                    valuetype_id="prefLabel"
+                )
+            )
+            < 2
+        ):
+            raise ValidationError(msg)
+
+        return super().delete()
+
+
+class ControlledListItemImage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    list_item = models.ForeignKey(
+        ControlledListItem,
+        db_column="itemid",
+        on_delete=models.CASCADE,
+        related_name="controlled_list_item_images",
+    )
+    valuetype = models.ForeignKey(
+        DValueType, on_delete=models.PROTECT, limit_choices_to={"category": "image"}
+    )
+    language = models.ForeignKey(
+        Language,
+        db_column="languageid",
+        to_field="code",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
+    value = models.FileField(upload_to="list_item_images")
+
+    objects = ControlledListItemImageManager()
+
+    class Meta:
+        managed = False
+        db_table = "controlled_list_item_values"
+
+    def serialize(self):
+        return {
+            "id": str(self.id),
+            "list_item_id": self.list_item_id,
+            "url": self.value.url,
+            "metadata": [
+                metadata.serialize()
+                for metadata in self.controlled_list_item_image_metadata.all()
+            ],
+        }
+
+
+class ControlledListItemImageMetadata(models.Model):
+    class MetadataChoices(models.TextChoices):
+        TITLE = "title", _("Title")
+        DESCRIPTION = "desc", _("Description")
+        ATTRIBUTION = "attr", _("Attribution")
+        ALT_TEXT = "alt", _("Alternative text")
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    controlled_list_item_image = models.ForeignKey(
+        ControlledListItemImage,
+        db_column="labelid",
+        on_delete=models.CASCADE,
+        related_name="controlled_list_item_image_metadata",
+    )
+    language = models.ForeignKey(
+        Language,
+        db_column="languageid",
+        to_field="code",
+        on_delete=models.PROTECT,
+    )
+    metadata_type = models.CharField(max_length=5, choices=MetadataChoices.choices)
+    value = models.CharField(max_length=2048)
+
+    class Meta:
+        db_table = "controlled_list_item_image_metadata"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["controlled_list_item_image", "metadata_type", "language"],
+                name="unique_image_metadata_valuetype_language",
+                violation_error_message=_(
+                    "Only one metadata entry per language and metadata type is permitted."
+                ),
+            ),
+        ]
+
+    def serialize(self):
+        choices = ControlledListItemImageMetadata.MetadataChoices
+        return {
+            field: str(value)
+            for (field, value) in vars(self).items()
+            if not field.startswith("_")
+        } | {
+            # Get localized label for metadata type
+            "metadata_label": str(choices(self.metadata_type).label)
+        }

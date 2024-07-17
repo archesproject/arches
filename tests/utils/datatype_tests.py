@@ -147,6 +147,77 @@ class GeoJsonDataTypeTest(ArchesTestCase):
         with self.subTest(input=map_source):
             self.assertTrue("minzoom" in map_source and "maxzoom" in map_source)
 
+    @staticmethod
+    def len_feature(feature_object):
+        return len(str(feature_object).encode("UTF-8"))
+
+    def test_append_to_document(self):
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+        document = {"geometries": [], "points": []}
+        nodeid = "99999999-0000-0000-0000-000000000003"
+        tile = Tile()
+        tile.nodegroup_id = "99999998-0000-0000-0000-000000000001"
+        tile.pk = "99999998-0000-0000-0000-000000000002"
+
+        resource_path = os.path.join(
+            "tests", "fixtures", "data", "json", "large_geojson_geometry.json"
+        )
+
+        with open(resource_path) as geojson_file:
+            nodevalue = JSONDeserializer().deserialize(geojson_file)
+            geom_datatype.append_to_document(document, nodevalue, nodeid, tile)
+            for geometry in document["geometries"]:
+                assert GeoJsonDataTypeTest.len_feature(geometry) < 32000
+
+    def test__feature_length_in_bytes(self):
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+        resource_path = os.path.join(
+            "tests", "fixtures", "data", "json", "large_geojson_geometry.json"
+        )
+        with open(resource_path) as geojson_file:
+            large_geometry = JSONDeserializer().deserialize(geojson_file)
+            # Ensure we're using the original test geometry
+            assert geom_datatype._feature_length_in_bytes(large_geometry) == 1539884
+            # Ensure the test feature length function matches the datatype length function
+            assert geom_datatype._feature_length_in_bytes(
+                large_geometry
+            ) == GeoJsonDataTypeTest.len_feature(large_geometry)
+
+    def test_get_bounds(self):
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+        node = models.Node()
+        node.pk = "99999999-0000-0000-0000-000000000001"
+        tile = Tile()
+        resource_path = os.path.join(
+            "tests", "fixtures", "data", "json", "large_geojson_geometry.json"
+        )
+
+        with open(resource_path) as geojson_file:
+            tile.data = {node.pk: JSONDeserializer().deserialize(geojson_file)}
+            bounds = geom_datatype.get_bounds(tile, node)
+            # Obtained from postgis - st_extent()
+            # BOX(-122 36.9999999999834,-120.98300000004122 39.50000000006639)
+            assert bounds[0] == -122.0
+            assert bounds[1] == 36.9999999999834
+            assert bounds[2] == -120.98300000004122
+            assert bounds[3] == 39.50000000006639
+
+    def test_split_geom(self):
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+
+        resource_path = os.path.join(
+            "tests", "fixtures", "data", "json", "large_geojson_geometry.json"
+        )
+
+        with open(resource_path) as geojson_file:
+            for feature in JSONDeserializer().deserialize(geojson_file)["features"]:
+                assert GeoJsonDataTypeTest.len_feature(feature) > 32000
+                for new_feature_set in geom_datatype.split_geom(feature):
+                    assert GeoJsonDataTypeTest.len_feature(new_feature_set) < 32000
+                    for new_feature in new_feature_set["features"]:
+                        assert new_feature["id"] is not None
+                        assert new_feature["type"] == "Feature"
+
 
 class BaseDataTypeTests(ArchesTestCase):
     def test_get_tile_data_only_none(self):
@@ -335,3 +406,85 @@ class URLDataTypeTests(ArchesTestCase):
         self.assertIsNotNone(tile1.data[nodeid])
         self.assertTrue("url_label" in tile1.data[nodeid])
         self.assertFalse(tile1.data[nodeid]["url_label"])
+
+
+class ReferenceDataTypeTests(ArchesTestCase):
+    def test_validate(self):
+        reference = DataTypeFactory().get_instance("reference")
+
+        for value in [
+            "",
+            [],
+            [{}],  # reference has no 'uri'
+            [{"uri": ""}],  # reference uri is empty
+        ]:
+            with self.subTest(reference_value=value):
+                errors = reference.validate(value)
+                self.assertTrue(len(errors) > 0)
+
+        data = {
+            "uri": "https://www.domain.com/label",
+            "labels": [
+                {
+                    "id": "23b4efbd-2e46-4b3f-8d75-2f3b2bb96af2",
+                    "value": "label",
+                    "language_id": "en",
+                    "valuetype_id": "prefLabel",
+                },
+                {
+                    "id": "e8676242-f0c7-4e3d-b031-fded4960cd86",
+                    "language_id": "de",
+                    "valuetype_id": "prefLabel",
+                },
+            ],
+        }
+
+        errors = reference.validate(value=[data])  # label missing value property
+        self.assertIsNotNone(errors)
+
+        data["labels"][1]["value"] = "a label"
+        data["labels"][1]["language_id"] = "en"
+
+        errors = reference.validate(value=[data])  # too many prefLabels per language
+        self.assertIsNotNone(errors)
+
+        data["labels"][1]["value"] = "ein label"
+        data["labels"][1]["language_id"] = "de"
+
+        errors = reference.validate(value=[data])  # data should be valid
+        self.assertTrue(len(errors) == 0)
+
+    def test_tile_clean(self):
+        reference = DataTypeFactory().get_instance("reference")
+        nodeid = "72048cb3-adbc-11e6-9ccf-14109fd34195"
+        resourceinstanceid = "40000000-0000-0000-0000-000000000000"
+        data = [
+            {
+                "uri": "https://www.domain.com/label",
+                "labels": [
+                    {
+                        "id": "23b4efbd-2e46-4b3f-8d75-2f3b2bb96af2",
+                        "value": "label",
+                        "language_id": "en",
+                        "valuetype_id": "prefLabel",
+                    },
+                ],
+                "listid": "fd9508dc-2aab-4c46-85ae-dccce1200035",
+            }
+        ]
+
+        tile_info = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid,
+            "tileid": "",
+            "data": {nodeid: {"en": data}},
+        }
+
+        tile1 = Tile(tile_info)
+        reference.clean(tile1, nodeid)
+        self.assertIsNotNone(tile1.data[nodeid])
+
+        tile1.data[nodeid] = []
+        reference.clean(tile1, nodeid)
+        self.assertIsNone(tile1.data[nodeid])

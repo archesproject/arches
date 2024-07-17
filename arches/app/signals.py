@@ -5,21 +5,22 @@ import uuid
 from datetime import datetime
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.contrib.auth.signals import user_logged_out, user_logged_in
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import caches
 from django.core.mail import EmailMultiAlternatives
-from django.db.models.signals import pre_save, post_save, post_delete
+from django.db.models.signals import pre_save, post_save, post_delete, m2m_changed
 from django.dispatch import receiver
 from django.template.loader import get_template, render_to_string
 from guardian.models import GroupObjectPermission
 from guardian.shortcuts import assign_perm
 
 from arches.app.models import models
-from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.utils.external_oauth_backend import ExternalOauthAuthenticationBackend
+from arches.app.utils.permission_backend import process_new_user
+
 
 logger = logging.getLogger(__name__)
 
@@ -212,3 +213,91 @@ def login(sender, user, request, **kwargs):
             )
         except models.ExternalOauthToken.DoesNotExist:
             pass
+
+
+@receiver(post_save, sender=User)
+def save_profile(sender, instance, **kwargs):
+    if kwargs.get("raw", False):
+        return
+
+    models.UserProfile.objects.get_or_create(user=instance)
+
+
+@receiver(post_save, sender=User)
+def create_permissions_for_new_users(sender, instance, created, **kwargs):
+    if kwargs.get("raw", False):
+        return
+
+    if created:
+        process_new_user(instance, created)
+
+
+@receiver(m2m_changed, sender=User.groups.through)
+def update_groups_for_user(sender, instance, action, **kwargs):
+    from arches.app.utils.permission_backend import update_groups_for_user
+
+    if action in ("post_add", "post_remove"):
+        update_groups_for_user(instance)
+
+
+@receiver(m2m_changed, sender=User.user_permissions.through)
+def update_permissions_for_user(sender, instance, action, **kwargs):
+    from arches.app.utils.permission_backend import update_permissions_for_user
+
+    if action in ("post_add", "post_remove"):
+        update_permissions_for_user(instance)
+
+
+@receiver(m2m_changed, sender=Group.permissions.through)
+def update_permissions_for_group(sender, instance, action, **kwargs):
+    from arches.app.utils.permission_backend import update_permissions_for_group
+
+    if action in ("post_add", "post_remove"):
+        update_permissions_for_group(instance)
+
+
+@receiver(post_save, sender=models.UserXNotification)
+def send_email_on_save(sender, instance, **kwargs):
+    """Checks if a notification type needs to send an email, does so if email server exists"""
+
+    if instance.notif.notiftype is not None and instance.isread is False:
+        if models.UserXNotificationType.objects.filter(
+            user=instance.recipient,
+            notiftype=instance.notif.notiftype,
+            emailnotify=False,
+        ).exists():
+            return False
+
+        try:
+            context = instance.notif.context.copy()
+            text_content = render_to_string(
+                instance.notif.notiftype.emailtemplate, context
+            )
+            html_template = get_template(instance.notif.notiftype.emailtemplate)
+            html_content = html_template.render(context)
+            if context["email"] == instance.recipient.email:
+                email_to = instance.recipient.email
+            else:
+                email_to = context["email"]
+
+            if type(email_to) is not list:
+                email_to = [email_to]
+
+            subject, from_email, to = (
+                instance.notif.notiftype.name,
+                settings.DEFAULT_FROM_EMAIL,
+                email_to,
+            )
+            msg = EmailMultiAlternatives(subject, text_content, from_email, to)
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            if instance.notif.notiftype.webnotify is not True:
+                instance.isread = True
+                instance.save()
+        except Exception as e:
+            logger.warning(e)
+            logger.warning(
+                "Error occurred sending email.  See previous stack trace and check email configuration in settings.py."
+            )
+
+    return False

@@ -42,9 +42,7 @@ jobs:
       - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
-          pip install .
-          pip install -r ${{ github.event.repository.name }}/install/requirements.txt
-          pip install -r ${{ github.event.repository.name }}/install/requirements_dev.txt
+          pip install '.[dev]'
           echo Python packages installed
 
       - uses: ankane/setup-elasticsearch@v1
@@ -61,10 +59,17 @@ jobs:
             echo "package.json not found, skipping npm commands."
           fi
 
-      - name: Check formatting
+      - name: Check frontend formatting with prettier
         run: |
           npm run prettier:check
+
+      - name: Check backend formatting with black
+        run: |
           black . --check --exclude=node_modules
+
+      - name: Check line endings
+        run: |
+          ! git ls-files --eol | grep 'w/crlf\|w/mixed'
 
       - name: Run frontend tests
         run: |
@@ -141,9 +146,7 @@ jobs:
       - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
-          pip install .
-          pip install -r ${{ github.event.repository.name }}/install/requirements.txt
-          pip install -r ${{ github.event.repository.name }}/install/requirements_dev.txt
+          pip install '.[dev]'
           echo Python packages installed
 
       - uses: ankane/setup-elasticsearch@v1
