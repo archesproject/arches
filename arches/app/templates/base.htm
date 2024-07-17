@@ -63,6 +63,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 </head>
 
+{% if app_settings.GOOGLE_ANALYTICS_TRACKING_ID != None %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{app_settings.GOOGLE_ANALYTICS_TRACKING_ID}}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{app_settings.GOOGLE_ANALYTICS_TRACKING_ID}}');
+    </script>
+{% endif %}
+
 <body dir="{{ app_settings.ACTIVE_LANGUAGE_DIR }}" {% block body_attributes %}class="scroll-y-auto"{% endblock %}>
     {% block loading_mask %}
 
@@ -89,18 +99,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     
     {% if main_script %}
         <script src="{% webpack_static '' %}build/js/{{main_script}}.js"></script>
-    {% endif %}
-
-    {% if app_settings.GOOGLE_ANALYTICS_TRACKING_ID != None %}
-
-        <script async src="https://www.googletagmanager.com/gtag/js?id={{app_settings.GOOGLE_ANALYTICS_TRACKING_ID}}"></script>
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', '{{app_settings.GOOGLE_ANALYTICS_TRACKING_ID}}');
-        </script>
-
     {% endif %}
 
 {% endblock javascript %}

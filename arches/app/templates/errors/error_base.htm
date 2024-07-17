@@ -53,6 +53,16 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 </head>
 
+{% if app_settings.GOOGLE_ANALYTICS_TRACKING_ID != None %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{app_settings.GOOGLE_ANALYTICS_TRACKING_ID}}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{app_settings.GOOGLE_ANALYTICS_TRACKING_ID}}');
+    </script>
+{% endif %}
+
 <body {% block body_attributes %}class="scroll-y-hidden"{% endblock %}>
     {% block body %}
 
@@ -60,19 +70,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 </body>
 
 {% block javascript %}
-
-    {% if app_settings.GOOGLE_ANALYTICS_TRACKING_ID != None %}
-
-        <script async src="https://www.googletagmanager.com/gtag/js?id={{app_settings.GOOGLE_ANALYTICS_TRACKING_ID}}"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '{{app_settings.GOOGLE_ANALYTICS_TRACKING_ID}}');
-        </script>
-
-    {% endif %}
-
 {% endblock javascript %}
 
 </html>
