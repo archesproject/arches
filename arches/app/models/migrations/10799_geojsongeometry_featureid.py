@@ -46,7 +46,8 @@ class Migration(migrations.Migration):
                 )->>'id')::uuid AS featureid
             FROM tiles t
                 LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
-            WHERE n.datatype = 'geojson-feature-collection'::text;
+            GROUP BY t.tileid, t.resourceinstanceid, n.nodeid
+            HAVING n.datatype = 'geojson-feature-collection'::text;
 
             RETURN TRUE;
         END;
@@ -88,8 +89,9 @@ class Migration(migrations.Migration):
                 )->>'id')::uuid AS featureid
             FROM tiles t
                 LEFT JOIN nodes n ON t.nodegroupid = n.nodegroupid
-            WHERE n.datatype = 'geojson-feature-collection'::text
-            AND t.tileid = refreshtileid;
+            GROUP BY t.tileid, t.resourceinstanceid, n.nodeid
+            HAVING n.datatype = 'geojson-feature-collection'::text
+                AND t.tileid = refreshtileid;
 
             RETURN TRUE;
         END;
