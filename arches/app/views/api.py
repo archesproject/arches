@@ -475,7 +475,7 @@ class MVT(APIBase):
                             id,
                             resourceinstanceid,
                             nodeid,
-                            featureid::text AS tile_featureid,
+                            featureid::text AS featureid,
                             ST_AsMVTGeom(
                                 geom,
                                 TileBBox(%s, %s, %s, 3857)
