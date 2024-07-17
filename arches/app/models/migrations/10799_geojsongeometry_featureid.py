@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10999_add_principaluserid_to_resources"),
+        ("models", "10999_update_principaluser"),
     ]
 
     forward = """
