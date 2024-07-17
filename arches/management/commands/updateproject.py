@@ -330,7 +330,8 @@ class Command(BaseCommand):  # pragma: no cover
 
                 updated_file_data = (
                     file_data.replace(
-                        "{{ project_name_title_case }}", settings.APP_NAME.title()
+                        "{{ project_name_title_case }}",
+                        settings.APP_NAME.title().replace("_", ""),
                     )
                     .replace("{{ project_name }}", settings.APP_NAME)
                     .replace("{{ arches_semantic_version }}", arches_semantic_version)
