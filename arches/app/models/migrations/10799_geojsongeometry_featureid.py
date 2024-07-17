@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10798_jsonld_importer"),
+        ("models", "10999_add_principaluserid_to_resources"),
     ]
 
     forward = """
