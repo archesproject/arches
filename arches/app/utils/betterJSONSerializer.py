@@ -53,7 +53,11 @@ class JSONSerializer(object):
         self.utf_encode = False
 
     def encode(self, obj):
-        return self.serializeToPython(obj, **self._options)
+        if isinstance(obj, (I18n_JSON, I18n_String)):
+            # Ensure raw JSON strings are re-encoded ("'" -> "\"")
+            # and non-active language values are preserved.
+            return DjangoJSONEncoder().encode(obj.raw_value)
+        return self.serialize(obj, **self._options)
 
     def serializeToPython(self, obj, **options):
         # allow users to override any kwargs passed into the __init__ method
@@ -71,7 +75,7 @@ class JSONSerializer(object):
 
     def serialize(self, obj, **options):
         obj = self.serializeToPython(obj, **options)
-        # prevent raw strings from begin re-encoded
+        # prevent raw strings from being re-encoded
         # this is especially important when doing bulk operations in elasticsearch
         if isinstance(obj, str):
             return obj

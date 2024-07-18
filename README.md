@@ -12,7 +12,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 7.5.2 release notes](https://github.com/archesproject/arches/blob/stable/7.5.2/releases/7.5.2.md)
+[Version 7.5.4 release notes](https://github.com/archesproject/arches/blob/stable/7.5.4/releases/7.5.4.md)
 
 #### Quick Install
 
@@ -49,7 +49,7 @@ If you run into problems, please review our full [installation documentation](ht
 
 #### Release Cycle
 
-Our general release cycle will typically be a functional release (either major if there are backward incompatible changes or minor, if there are not) every 6 months. Each functional release will typically be followed by one or more patch releases. See [semver.org](https://semver.org/) for version numbering.
+Our general release cycle will typically be a functional release (either major if there are backward incompatible changes or minor, if there are not) every 9 months. Each functional release will typically be followed by one or more patch releases. See [semver.org](https://semver.org/) for version numbering.
 
 -   Functional releases will usually introduce new functionality to the application, but could also include styling updates, enhancements to the UX, bug fixes, and performance improvements.
 -   Patch releases are really only concerned with fixing any bugs related to the previous release or any other issues not yet addressed
