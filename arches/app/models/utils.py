@@ -15,4 +15,4 @@ def add_to_update_fields(kwargs, field_name):
 
 
 def field_names(instance):
-    return {f.name for f in instance.__class__._meta.fields}
+    return {f.name for f in instance._meta.fields}
