@@ -2423,7 +2423,7 @@ class BaseDomainDataType(BaseDataType):
                 return get_localized_value(option["text"], return_lang=return_lang)
         raise Exception(
             _(
-                "No domain option found for option id {0}, in node conifg: {1}".format(
+                "No domain option found for option id {0}, in node config: {1}".format(
                     option_id, node.config["options"]
                 )
             )
