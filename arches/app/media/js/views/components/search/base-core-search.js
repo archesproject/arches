@@ -4,7 +4,8 @@ define([
     'knockout',
     'underscore',
     'arches',
-], function($, Backbone, ko, _, arches) {
+    'viewmodels/alert',
+], function($, Backbone, ko, _, arches, AlertViewModel) {
     return Backbone.View.extend({
         constructor: function() {
             this.name = 'Base Core Search';
