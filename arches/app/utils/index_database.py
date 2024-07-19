@@ -305,7 +305,7 @@ def index_resources_by_type(
     Indexes all resources of a given type(s)
 
     Arguments:
-    resource_types -- array of graph ids that represent resource types
+    resource_types -- array of graph ids or graph slugs that represent resource types
 
     Keyword Arguments:
     clear_index -- set to True to remove all the resources of the types passed in from the index before the reindexing operation
@@ -328,15 +328,17 @@ def index_resources_by_type(
     for resource_type in resource_types:
         start = datetime.now()
         try:
-            uuid.UUID(str(resource_type))
-            graph = models.GraphModel.objects.get(graphid=str(resource_type))
+            graph = models.GraphModel.objects.get(
+                graphid=str(uuid.UUID(str(resource_type)))
+            )
+            if graph is None:
+                raise ValueError(f"Graph ID does not exist: {resource_type}")
         except ValueError:
             try:
                 graph = models.GraphModel.objects.get(slug=str(resource_type))
             except:
                 logger.warning(
-                    "Unable to resolve resource type %s. Please confirm it is a valid graph ID or slug."
-                    % resource_type
+                    f"Unable to resolve resource type {resource_type}. Please confirm it is a valid graph ID or slug."
                 )
                 continue
 
@@ -344,12 +346,8 @@ def index_resources_by_type(
 
         if clear_index:
             tq = Query(se=se)
-            cards = models.CardModel.objects.filter(
-                graph_id=str(graph.graphid)
-            ).select_related("nodegroup")
-            for nodegroup in [card.nodegroup for card in cards]:
-                term = Term(field="nodegroupid", term=str(nodegroup.nodegroupid))
-                tq.add_query(term)
+            for card in graph.cardmodel_set.all():
+                tq.add_query(Term(field="nodegroupid", term=str(card.nodegroup_id)))
             tq.delete(index=TERMS_INDEX, refresh=True)
 
             rq = Query(se=se)
@@ -360,9 +358,9 @@ def index_resources_by_type(
         if use_multiprocessing:
             resources = [
                 str(rid)
-                for rid in Resource.objects.filter(
-                    graph_id=str(graph.graphid)
-                ).values_list("resourceinstanceid", flat=True)
+                for rid in Resource.objects.filter(graph_id=graph.graphid).values_list(
+                    "resourceinstanceid", flat=True
+                )
             ]
             index_resources_using_multiprocessing(
                 resourceids=resources,
