@@ -328,7 +328,7 @@ def index_resources_by_type(
     for resource_type in resource_types:
         start = datetime.now()
         try:
-            uuid.UUID(resource_type)
+            uuid.UUID(str(resource_type))
             graph = models.GraphModel.objects.get(graphid=str(resource_type))
         except ValueError:
             try:
