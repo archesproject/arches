@@ -89,7 +89,7 @@ def remove_default_resource_instance_lifecycle_states(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10883_etl_collections_to_controlled_lists"),
+        ("models", "9525_add_published_graph_edits"),
     ]
 
     operations = [
