@@ -137,3 +137,17 @@ def check_arches_compatibility(app_configs, **kwargs):
             )
 
     return errors
+
+
+@register(Tags.compatibility)
+def warn_old_compatibility_settings(app_configs, **kwargs):
+    if getattr(settings, "MIN_ARCHES_VERSION", None) or getattr(
+        settings, "MAX_ARCHES_VERSION", None
+    ):
+        return [
+            Warning(
+                msg=f"MIN_ARCHES_VERSION and MAX_ARCHES_VERSION have no effect.",
+                hint="Migrate your version range to pyproject.toml.",
+                id="arches.W002",
+            )
+        ]
