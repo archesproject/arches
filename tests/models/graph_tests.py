@@ -1383,6 +1383,8 @@ class GraphTests(ArchesTestCase):
                 "functions",
                 "root",
                 "widgets",
+                "resource_instance_lifecycle",
+                "resource_instance_lifecycle_id",
                 "source_identifier",
                 "source_identifier_id",
                 "publication_id",
