@@ -26,7 +26,7 @@ from django.contrib.gis.db import models
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinValueValidator, RegexValidator, validate_slug
-from django.db.models import JSONField, Q, Max
+from django.db.models import Deferrable, JSONField, Q, Max
 from django.db.models.constraints import UniqueConstraint
 from django.db.models.fields.json import KT
 from django.db.models.functions import Cast
