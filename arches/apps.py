@@ -1,10 +1,12 @@
+import re
 import warnings
 from importlib.metadata import PackageNotFoundError, requires
 from pathlib import Path
 
 from django.apps import AppConfig, apps
 from django.conf import settings
-from django.core.checks import register, Tags, Error, Warning
+from django.core.checks import register, CheckMessage, Error, Tags, Warning
+from django.core.checks.messages import ERROR, WARNING
 from semantic_version import SimpleSpec, Version
 
 from arches import __version__
@@ -105,10 +107,11 @@ def check_arches_compatibility(app_configs, **kwargs):
                 # Not installed by pip: read pyproject.toml directly
                 project_requirements = read_project_requirements_from_toml_file(config)
             for requirement in project_requirements:
-                if requirement.lower().startswith("arches"):
-                    parsed_arches_requirement = SimpleSpec(
-                        requirement.lower().replace("arches", "").lstrip()
-                    )
+                if requirement.lower().split()[0] == "arches":
+                    to_parse = requirement.lower().replace("arches", "").lstrip()
+                    # Some arches tags didn't use hyphens, so provide them.
+                    to_parse = re.sub(r"0(a|b|rc)", r"0-\1", to_parse)
+                    parsed_arches_requirement = SimpleSpec(to_parse)
                     break
             else:
                 raise ValueError
@@ -124,8 +127,9 @@ def check_arches_compatibility(app_configs, **kwargs):
             continue
         if arches_version not in parsed_arches_requirement:
             errors.append(
-                Error(
-                    f"Incompatible arches requirement for Arches version: {arches_version}",
+                CheckMessage(
+                    level=WARNING if settings.DEBUG else ERROR,
+                    msg=f"Incompatible arches requirement for Arches version: {arches_version}",
                     obj=config.name,
                     hint=requirement,
                     id="arches.E003",
