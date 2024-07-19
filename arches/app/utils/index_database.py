@@ -334,7 +334,10 @@ def index_resources_by_type(
             try:
                 graph = models.GraphModel.objects.get(slug=str(resource_type))
             except:
-                logger.warning("Unable to resolve resource type %s. Please confirm it is a valid graph ID or slug."% resource_type)
+                logger.warning(
+                    "Unable to resolve resource type %s. Please confirm it is a valid graph ID or slug."
+                    % resource_type
+                )
                 continue
 
         logger.info("Indexing resource type '{0}'".format(graph.name))
