@@ -1,6 +1,6 @@
 define([
     'jquery',
-    'backbone',
+    'underscore',
     'knockout',
     'underscore',
     'arches',
