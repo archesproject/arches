@@ -18,18 +18,14 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import logging
-import pyprind
 import uuid
 from copy import deepcopy
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
-from django.db.models.signals import post_save
 from django.db.utils import IntegrityError
-from django.dispatch import receiver
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
 from arches.app.models.card import Card
-from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.bulk_data_deletion import BulkDataDeletion
