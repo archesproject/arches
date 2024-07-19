@@ -4,6 +4,16 @@ from django.apps import AppConfig
 from django.conf import settings
 from django.core.checks import register, Tags, Error, Warning
 
+
+class ArchesAppConfig(AppConfig):
+    name = "arches"
+    verbose_name = "Arches"
+    is_arches_application = False
+
+    def ready(self):
+        import arches.app.signals
+
+
 ### GLOBAL DEPRECATIONS ###
 FILE_TYPE_CHECKING_MSG = (
     "Providing boolean values to FILE_TYPE_CHECKING is deprecated. "
@@ -15,15 +25,6 @@ if settings.FILE_TYPE_CHECKING in (True, False):
 
 
 ### SYSTEM CHECKS ###
-
-
-class ArchesAppConfig(AppConfig):
-    name = "arches"
-
-    def ready(self):
-        import arches.app.signals
-
-
 @register(Tags.security)
 def check_cache_backend_for_production(app_configs, **kwargs):
     errors = []

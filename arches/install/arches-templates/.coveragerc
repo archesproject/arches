@@ -9,6 +9,7 @@ omit =
     */urls.py
     */wsgi.py
     */celery.py
+    */__init__.py
 
 data_file = coverage/python/.coverage
 

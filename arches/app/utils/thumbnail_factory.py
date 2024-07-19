@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import logging
 import importlib
 
-from arches.app.models.system_settings import settings
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
