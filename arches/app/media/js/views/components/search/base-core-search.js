@@ -1,10 +1,10 @@
 define([
     'jquery',
-    'backbone',
+    'underscore',
     'knockout',
-    'underscore'
-], function($, Backbone, ko, _) {
-    return Backbone.View.extend({
+    'arches',
+    'backbone',
+], function($, _, ko, arches, Backbone) {
         constructor: function() {
             this.name = 'Base Core Search';
             this.filter = {};
