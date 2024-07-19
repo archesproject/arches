@@ -380,7 +380,7 @@ def index_resources_by_type(
                 resources=resources,
                 batch_size=batch_size,
                 quiet=quiet,
-                title=graph.graphid,
+                title=graph.name,
                 recalculate_descriptors=recalculate_descriptors,
             )
 
