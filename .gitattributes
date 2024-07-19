@@ -1,0 +1,11 @@
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text=auto
+
+# Known binary formats
+*.png binary
+*.jpg binary
+*.ico binary
+*.gif binary
+*.ttf binary
+*.woff binary
+*.woff2 binary

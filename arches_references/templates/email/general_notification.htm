@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <style>
+            .btn {
+                text-decoration: none;
+                border-width: 1px;
+                color: #fff;
+                background-color: #337ab7;
+                border-color: #2e6da4;
+                font-size: 14px;
+                font-weight: 400;
+                display: inline-block;
+                padding: 6px 12px;
+                margin-bottom: 0;
+                font-size: 14px;
+                font-weight: 400;
+                line-height: 1.42857143;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: middle;
+                -ms-touch-action: manipulation;
+                touch-action: manipulation;
+                cursor: pointer;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                background-image: none;
+                border: 1px solid transparent;
+                border-radius: 4px;
+            }
+        </style>
+        {% include 'custom_email_css.htm' %}
+    </head>
+
+    <body>
+
+        {% include 'custom_email_header.htm' %}
+
+        {% if username != "" %}
+            <p>{{salutation}} {{username}},</p>
+        {% endif %}
+        <p>
+            {{greeting}}
+        </p>
+        {% if link != "" %}
+            <p><a href="{{link}}">{{button_text}}</a></p>
+        {% endif %}
+
+        {% include 'custom_email_footer.htm' %}
+
+    </body>
+    
+</html>

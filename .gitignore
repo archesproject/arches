@@ -1,0 +1,17 @@
+*.pyc
+*.log
+node_modules
+*.coverage
+arches_references/logs
+arches_references/export_deliverables
+arches_references/cantaloupe/*
+arches_references/staticfiles
+arches_references/media/packages
+arches_references/media/build/
+arches_references/uploadedfiles/*
+arches_references/settings_local.py
+webpack-stats.json
+.vscode/
+*.egg-info
+.DS_STORE
+CACHE

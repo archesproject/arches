@@ -1,0 +1,29 @@
+name: 'Install Arches Applications'
+description: 'Manually edit this file to install all Arches Applications declared in settings.py, but not declared in `pyproject.toml`'
+inputs: 
+  secrets:
+    description: 'Secrets from main.yml as JSON'
+runs:
+  using: 'composite'
+  steps:
+
+    # Manually add any ARCHES_APPLICATIONS to this file if not already declared in `pyproject.toml`. 
+    # Below is a template for adding an application in a private repository. 
+    # Be sure to delete the `no-op step` if adding when updating this file.
+
+    - name: No-op step to maintain workflow structure
+      run: echo "No-op step"
+      shell: bash
+
+    # - name: Checkout ${my_arches_application_name}
+    #   uses: actions/checkout@v4
+    #   with:
+    #     repository: ${my_arches_application_repository}/${my_arches_application_name}
+    #     token: ${{ fromJSON(inputs.secrets).${my_github_personal_access_token} }}
+    #     path: ${my_arches_application_name}
+
+    # - name: Install ${my_arches_application_name}
+    #   run: |
+    #     pip install ./${my_arches_application_name}
+    #     echo ${my_arches_application_name} installed
+    #   shell: bash

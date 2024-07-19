@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arches_references"
+readme = "README.md"
+authors = []
+license = {text = "GNU AGPL3"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "arches>=7.6.0,<7.7.0",
+]
+version = "0.0.1"
+
+[project.optional-dependencies]
+dev = [
+    "livereload",
+    "sst",
+    "coverage",
+    "django-silk==5.1.0",
+    "pre-commit",
+    "black==24.4.2",
+]
+
+[tool.setuptools]
+packages = ["arches_references"]
