@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.test import TestCase, override_settings
 
 from arches.app.const import ExtensionType
@@ -8,10 +10,17 @@ from tests.base_test import sync_overridden_test_settings_to_arches
 # python manage.py test tests.utils.test_module_importer --settings="tests.test_settings"
 
 
+def patched_arches_applications():
+    return ["arches_for_music", "arches_for_dance"]
+
+
+@mock.patch(
+    "arches.app.utils.module_importer.list_arches_app_names",
+    patched_arches_applications,
+)
 class ModuleImporterTests(TestCase):
     @override_settings(
         APP_NAME="hiphop",
-        ARCHES_APPLICATIONS=["arches_for_music", "arches_for_dance"],
         FUNCTION_LOCATIONS=[
             "arches.app.functions",
             # Include an example where one of the installed apps is explicitly given
@@ -25,18 +34,17 @@ class ModuleImporterTests(TestCase):
         self.assertEqual(
             function_dirs,
             [
-                "arches.app.functions",
                 "arches_for_music.functions",
                 "arches_for_music.pkg.extensions.functions",
                 "arches_for_dance.functions",
                 "arches_for_dance.pkg.extensions.functions",
                 "hiphop.functions",
+                "arches.app.functions",
             ],
         )
 
     @override_settings(
         APP_NAME="hiphop",
-        ARCHES_APPLICATIONS=["arches_for_music", "arches_for_dance"],
         SEARCH_COMPONENT_LOCATIONS=[
             # Same, but poorly ordered.
             "hiphop.search_components",
@@ -50,18 +58,17 @@ class ModuleImporterTests(TestCase):
         self.assertEqual(
             search_dirs,
             [
-                "arches.app.search.components",
                 "arches_for_music.search_components",
                 "arches_for_music.pkg.extensions.search_components",
                 "arches_for_dance.search_components",
                 "arches_for_dance.pkg.extensions.search_components",
                 "hiphop.search_components",
+                "arches.app.search.components",
             ],
         )
 
     @override_settings(
         APP_NAME="hiphop",
-        ARCHES_APPLICATIONS=["arches_for_music", "arches_for_dance"],
         ETL_MODULE_LOCATIONS=[
             # App not given.
             "arches.app.etl_modules",
@@ -73,17 +80,16 @@ class ModuleImporterTests(TestCase):
         self.assertEqual(
             etl_modules,
             [
-                "arches.app.etl_modules",
                 "arches_for_music.etl_modules",
                 "arches_for_music.pkg.extensions.etl_modules",
                 "arches_for_dance.etl_modules",
                 "arches_for_dance.pkg.extensions.etl_modules",
+                "arches.app.etl_modules",
             ],
         )
 
     @override_settings(
         APP_NAME="hiphop",
-        ARCHES_APPLICATIONS=["arches_for_music", "arches_for_dance"],
         DATATYPE_LOCATIONS=[],  # Nothing given.
     )
     def test_arches_application_extension_core_arches_implicit(self):
@@ -92,10 +98,10 @@ class ModuleImporterTests(TestCase):
         self.assertEqual(
             datatypes,
             [
-                "arches.app.datatypes",
                 "arches_for_music.datatypes",
                 "arches_for_music.pkg.extensions.datatypes",
                 "arches_for_dance.datatypes",
                 "arches_for_dance.pkg.extensions.datatypes",
+                "arches.app.datatypes",
             ],
         )
