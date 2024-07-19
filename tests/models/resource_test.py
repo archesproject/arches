@@ -70,6 +70,7 @@ class ResourceTests(ArchesTestCase):
         resource_graph_importer(archesfile["graph"])
 
         cls.search_model_graphid = uuid.UUID("c9b37a14-17b3-11eb-a708-acde48001122")
+        cls.search_model_slug = "resource_test_model"
         cls.search_model_cultural_period_nodeid = "c9b3882e-17b3-11eb-a708-acde48001122"
         cls.search_model_creation_date_nodeid = "c9b38568-17b3-11eb-a708-acde48001122"
         cls.search_model_destruction_date_nodeid = (
@@ -286,6 +287,10 @@ class ResourceTests(ArchesTestCase):
         time.sleep(1)
         result = index_resources_by_type(
             [self.search_model_graphid], clear_index=True, batch_size=4000
+        )
+
+        result = index_resources_by_type(
+            [self.search_model_slug], clear_index=True, batch_size=4000
         )
 
         self.assertEqual(result, "Passed")
