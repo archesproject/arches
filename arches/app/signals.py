@@ -118,11 +118,6 @@ def clear_user_permission_cache(sender, instance, **kwargs):
         user_permission_cache.clear()
 
 
-@receiver(post_save, sender=User)
-def save_profile(sender, instance, **kwargs):
-    models.UserProfile.objects.get_or_create(user=instance)
-
-
 @receiver(post_save, sender=models.UserXNotification)
 def send_email_on_save(sender, instance, **kwargs):
     """Checks if a notification type needs to send an email, does so if email server exists"""
