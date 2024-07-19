@@ -100,22 +100,31 @@ def check_arches_compatibility(app_configs, **kwargs):
         if not getattr(config, "is_arches_application", False):
             continue
         project_requirements = ["No project requirements found."]
+
         try:
-            try:
-                project_requirements = requires(config.name)
-            except PackageNotFoundError:
-                # Not installed by pip: read pyproject.toml directly
-                project_requirements = read_project_requirements_from_toml_file(config)
-            for requirement in project_requirements:
-                if requirement.lower().split()[0] == "arches":
-                    to_parse = requirement.lower().replace("arches", "").lstrip()
-                    # Some arches tags didn't use hyphens, so provide them.
-                    to_parse = re.sub(r"0(a|b|rc)", r"0-\1", to_parse)
-                    parsed_arches_requirement = SimpleSpec(to_parse)
-                    break
+            project_requirements = requires(config.name)
+        except PackageNotFoundError:
+            # Not installed by pip: read pyproject.toml directly
+            project_requirements = read_project_requirements_from_toml_file(config)
+
+        for requirement in project_requirements:
+            to_parse = requirement.lower()
+            # Normalize "arches" [requires() output] to "arches " [raw toml file]
+            # So we can split on a consistent separator (space)
+            to_parse = to_parse.replace("arches", "arches ")
+            if to_parse.split()[0] == "arches":
+                to_parse = requirement.lower().replace("arches", "").lstrip()
             else:
-                raise ValueError
-        except ValueError:
+                continue
+            # Some arches tags didn't use hyphens, so provide them.
+            to_parse = re.sub(r"0(a|b|rc)", r"0-\1", to_parse)
+            try:
+                parsed_arches_requirement = SimpleSpec(to_parse)
+            except ValueError:
+                # might have been arches-for-x==3 -> for-x==3, not valid; keep searching.
+                continue
+            break
+        else:
             errors.append(
                 Error(
                     f"Invalid or missing arches requirement",
@@ -125,6 +134,7 @@ def check_arches_compatibility(app_configs, **kwargs):
                 )
             )
             continue
+
         if arches_version not in parsed_arches_requirement:
             errors.append(
                 CheckMessage(
@@ -141,13 +151,16 @@ def check_arches_compatibility(app_configs, **kwargs):
 
 @register(Tags.compatibility)
 def warn_old_compatibility_settings(app_configs, **kwargs):
+    errors = []
+
     if getattr(settings, "MIN_ARCHES_VERSION", None) or getattr(
         settings, "MAX_ARCHES_VERSION", None
     ):
-        return [
+        errors.append(
             Warning(
                 msg=f"MIN_ARCHES_VERSION and MAX_ARCHES_VERSION have no effect.",
                 hint="Migrate your version range to pyproject.toml.",
                 id="arches.W002",
             )
-        ]
+        )
+    return errors

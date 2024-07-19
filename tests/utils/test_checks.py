@@ -4,7 +4,7 @@ from unittest import mock
 from django.apps import apps
 from django.core.management import call_command
 from django.core.management.base import SystemCheckError
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, override_settings
 
 
 # these tests can be run from the command line via
@@ -16,6 +16,7 @@ def raise_package_not_found_error(name):
 
 
 class SystemCheckTests(SimpleTestCase):
+    @override_settings(DEBUG=False)
     def test_compatibility(self):
         """Patch core arches to be an "arches application" so we can check
         its range of compatible arches version, which it won't have.
