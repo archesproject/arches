@@ -123,26 +123,6 @@ def save_profile(sender, instance, **kwargs):
     models.UserProfile.objects.get_or_create(user=instance)
 
 
-@receiver(post_save, sender=User)
-def create_permissions_for_new_users(sender, instance, created, **kwargs):
-    if created:
-        ct = ContentType.objects.get(app_label="models", model="resourceinstance")
-        resourceInstanceIds = list(
-            GroupObjectPermission.objects.filter(content_type=ct)
-            .values_list("object_pk", flat=True)
-            .distinct()
-        )
-        for resourceInstanceId in resourceInstanceIds:
-            resourceInstanceId = uuid.UUID(resourceInstanceId)
-        resources = models.ResourceInstance.objects.filter(pk__in=resourceInstanceIds)
-        assign_perm("no_access_to_resourceinstance", instance, resources)
-        for resource_instance in resources:
-            resource = Resource(resource_instance.resourceinstanceid)
-            resource.graph_id = resource_instance.graph_id
-            resource.createdtime = resource_instance.createdtime
-            resource.index()
-
-
 @receiver(post_save, sender=models.UserXNotification)
 def send_email_on_save(sender, instance, **kwargs):
     """Checks if a notification type needs to send an email, does so if email server exists"""
