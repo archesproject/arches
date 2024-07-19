@@ -40,8 +40,9 @@ class SystemCheckTests(SimpleTestCase):
                 call_command("check")
 
         # Mock an incompatible version requirement.
-        with mock.patch("arches.apps.requires", lambda app_name: ["arches==0.0.1"]):
-            with self.assertRaisesMessage(
-                SystemCheckError, "Incompatible arches requirement"
-            ):
+        with mock.patch(
+            "arches.apps.requires",
+            lambda app_name: ["arches-for-x==0.0.1", "arches==1.0.1"],
+        ):
+            with self.assertRaisesMessage(SystemCheckError, "arches==1.0.1"):
                 call_command("check")
