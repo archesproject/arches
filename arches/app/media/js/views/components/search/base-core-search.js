@@ -2,8 +2,9 @@ define([
     'jquery',
     'backbone',
     'knockout',
-    'underscore'
-], function($, Backbone, ko, _) {
+    'underscore',
+    'arches',
+], function($, Backbone, ko, _, arches) {
     return Backbone.View.extend({
         constructor: function() {
             this.name = 'Base Core Search';
@@ -38,7 +39,7 @@ define([
         },
 
         doQuery: function() {
-            let queryObj = JSON.parse(this.queryString());
+            const queryObj = JSON.parse(this.queryString());
             if (self.updateRequest) { self.updateRequest.abort(); }
             self.updateRequest = $.ajax({
                 type: "GET",
