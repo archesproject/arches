@@ -3,10 +3,7 @@
 define([], function() {
     return function loadComponentDependencies(componentPaths){
         for (const componentPath of componentPaths) {
-            try {  // first try to load project path
-                require(`${APP_ROOT_DIRECTORY}/media/js/${componentPath}`);
-            }
-            catch(e) {  // if project path fails, load application paths
+            try {
                 for (const archesApp of ARCHES_APPLICATIONS) {
                     try {
                         require(`${SITE_PACKAGES_DIRECTORY}/${archesApp}/media/js/${componentPath}`);
@@ -27,13 +24,14 @@ define([], function() {
                                     require(`${LINKED_APPLICATION_PATH_2}/media/js/${componentPath}`);
                                     break;
                                 }
-                                catch {  // finally, look in Arches core for component
-                                    require(`${ARCHES_CORE_DIRECTORY}/app/media/js/${componentPath}`);
-                                }
+                                catch { throw new Error(); } // if all attempts fail within the loop, throw error for outer try/catch
                             }
                         }
                     }
                 }
+            }
+            catch(e) {  // finally, look in Arches core for component
+                require(`${ARCHES_CORE_DIRECTORY}/app/media/js/${componentPath}`);
             }
         }
     };
