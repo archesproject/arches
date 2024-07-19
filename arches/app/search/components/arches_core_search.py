@@ -1,5 +1,5 @@
 from arches.app.models.system_settings import settings
-from arches.app.search.components.base import BaseCoreSearch
+from arches.app.search.components.base_core_search import BaseCoreSearch
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.search import (
     append_instance_permission_filter_dsl,

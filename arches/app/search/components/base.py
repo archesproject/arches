@@ -15,18 +15,7 @@ details = {}
 #     "componentpath": "views/components/search/...",  # path to ko component
 #     "componentname": "advanced-search",  # lowercase unique name
 #     "config": {
-#         "default": True, # set for CoreSearch components; only 1 can be the default
 #         "requiredComponents": [ # other components on which this one depends
-#             {
-#                 "componentname": "paging-filter",
-#                 "searchcomponentid": "7aff5819-651c-4390-9b9a-a61221ba52c6",
-#                 "sortorder": 1,
-#             },
-#             {
-#                 "componentname": "provisional-filter",
-#                 "searchcomponentid": "073406ed-93e5-4b5b-9418-b61c26b3640f",
-#                 "sortorder": 2,
-#             },
 #             {
 #                 "componentname": "search-results",
 #                 "searchcomponentid": "00673743-8c1c-4cc0-bd85-c073a52e03ec",
@@ -71,92 +60,6 @@ class BaseSearchFilter:
         """
 
         pass
-
-
-class BaseCoreSearch(BaseSearchFilter):
-    """
-    Special type of component that specifies which other components to be used,
-    how to execute a search in the search_results method
-    """
-
-    def __init__(self, request=None, user=None, componentname=None):
-        super().__init__(request=request, user=user)
-        self.core_component = models.SearchComponent.objects.get(
-            componentname=componentname
-        )
-        self._required_search_components = list(
-            models.SearchComponent.objects.filter(
-                searchcomponentid__in=[
-                    required_component["searchcomponentid"]
-                    for required_component in self.core_component.config[
-                        "requiredComponents"
-                    ]
-                ]
-            )
-        )
-        self._available_search_components = list(
-            models.SearchComponent.objects.filter(
-                searchcomponentid__in=[
-                    required_component["searchcomponentid"]
-                    for required_component in self.core_component.config[
-                        "availableComponents"
-                    ]
-                ]
-            )
-        )
-
-    @property
-    def required_search_components(self):
-        return self._required_search_components
-
-    @property
-    def available_search_components(self):
-        return self._available_search_components
-
-    def get_searchview_components(self):
-        return self._available_search_components + [self.core_component]
-
-    def handle_search_results_query(
-        self, search_query_object, response_object, search_filter_factory, returnDsl
-    ):
-        """
-        returns response_object, search_query_object
-        See arches.app.search.components.arches_core_search for example implementation
-        """
-
-        sorted_query_obj = search_filter_factory.create_search_query_dict(
-            list(self.request.GET.items()) + list(self.request.POST.items())
-        )
-
-        for filter_type, querystring in list(sorted_query_obj.items()):
-            search_filter = search_filter_factory.get_filter(filter_type)
-            if search_filter:
-                search_filter.append_dsl(search_query_object)
-
-        if returnDsl:
-            dsl = search_query_object.pop("query", None)
-            return dsl, search_query_object
-
-        for filter_type, querystring in list(sorted_query_obj.items()):
-            search_filter = search_filter_factory.get_filter(filter_type)
-            if search_filter:
-                search_filter.execute_query(search_query_object, response_object)
-
-        if response_object["results"] is not None:
-            # allow filters to modify the results
-            for filter_type, querystring in list(sorted_query_obj.items()):
-                search_filter = search_filter_factory.get_filter(filter_type)
-                if search_filter:
-                    search_filter.post_search_hook(search_query_object, response_object)
-
-            search_query_object.pop("query")
-            # ensure that if a search filter modified the query in some way
-            # that the modification is set on the response_object
-            for key, value in list(search_query_object.items()):
-                if key not in response_object:
-                    response_object[key] = value
-
-        return response_object, search_query_object
 
 
 class SearchFilterFactory(object):
