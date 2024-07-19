@@ -258,7 +258,6 @@
         no-related-resources-shown='{% trans "No related resources shown." as noRelatedResourcesShown %} "{{ noRelatedResourcesShown|escapejs }}"'
         report-date='{% trans "Report Date:" as reportDate %} "{{ reportDate|escapejs }}"'
         placeholder='{% trans "Placeholder" as placeholder %} "{{ placeholder|escapejs }}"'
-        required='{% trans "required" as required %} "{{ required|escapejs }}"'
         x-coordinate-place-holder='{% trans "X Coordinate Placeholder" as xCoordinatePlaceHolder %} "{{ xCoordinatePlaceHolder|escapejs }}"'
         y-coordinate-place-holder='{% trans "Y Coordinate Placeholder" as yCoordinatePlaceHolder %} "{{ yCoordinatePlaceHolder|escapejs }}"'
         display-as-greyscale='{% trans "Display as Greyscale" as displayAsGreyscale %} "{{ displayAsGreyscale|escapejs }}"'
@@ -321,11 +320,6 @@
         select-an-option='{% trans "Select an Option" as selectAnOption %} "{{ selectAnOption|escapejs }}"'
         concept-collection='{% trans "Concept Collection" as conceptCollection %} "{{ conceptCollection|escapejs }}"'
         select-a-concept-collection='{% trans "Select a concept collection" as selectAConceptCollection %} "{{ selectAConceptCollection|escapejs }}"'
-        controlled-list='{% trans "Controlled List" as controlledList %} "{{ controlledList|escapejs }}"'
-        unlabeled-item='{% trans "Unlabeled Item" as unlabeledItem %} "{{ unlabeledItem|escapejs }}"'
-        select-a-controlled-list='{% trans "Select a controlled list" as selectAControlledList %} "{{ selectAControlledList|escapejs }}"'
-        multiple-values='{% trans "Multiple Values" as multipleValues %} "{{ multipleValues|escapejs }}"'
-        allow-selection-of-multiple-items='{% trans "Allow selection of multiple items" as allowSelectionOfMultipleItems %} "{{ allowSelectionOfMultipleItems|escapejs }}"'
         search-url='{% trans "Search Url" as SearchUrl %} "{{ SearchUrl|escapejs }}"'
         use-search-url='{% trans "Use search url" as useSearchUrl %} "{{ useSearchUrl|escapejs }}"'
         use-search-url-optional='{% trans "Use search url (optional)" as useSearchUrlOptional %} "{{ useSearchUrlOptional|escapejs }}"'
@@ -1145,17 +1139,6 @@
         get_dsl="{% url 'get_dsl' %}"
         transform_edtf_for_tile="{% url 'transform_edtf_for_tile' %}"
         api_get_nodegroup_tree="{% url 'api_get_nodegroup_tree' %}"
-        controlled_lists="{% url 'controlled_lists' %}"
-        controlled_list='(listid) => {return "{% url "controlled_list" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", listid)}'
-        controlled_list_add="{% url 'controlled_list_add' %}"
-        controlled_list_item='(itemid) => {return "{% url "controlled_list_item" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", itemid)}'
-        controlled_list_item_add="{% url 'controlled_list_item_add' %}"
-        controlled_list_item_value='(valueid) => {return "{% url "controlled_list_item_value" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", valueid)}'
-        controlled_list_item_value_add="{% url 'controlled_list_item_value_add' %}"
-        controlled_list_item_image='(imageid) => { return "{% url "controlled_list_item_image" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", imageid)}'
-        controlled_list_item_image_add="{% url 'controlled_list_item_image_add' %}"
-        controlled_list_item_image_metadata='(metadataid) => { return "{% url "controlled_list_item_image_metadata" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", metadataid)}'
-        controlled_list_item_image_metadata_add="{% url 'controlled_list_item_image_metadata_add' %}"
     ></div>
     {% endblock arches_urls %}
     {% block arches_data %}
