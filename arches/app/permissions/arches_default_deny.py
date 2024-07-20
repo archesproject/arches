@@ -74,6 +74,13 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
         mappings["users_edit"] = {"type": "integer"}
         return mappings
 
+    def has_group_perm(self, group, perm, obj):
+        explicitly_defined_perms = self.get_perms(group, obj)
+        if len(explicitly_defined_perms) > 0:
+            return perm in explicitly_defined_perms
+        else:  # for default deny, explicit permissions are required.  Model level permissions are bypassed.
+            return False
+
     def get_index_values(self, resource: Resource):
         permissions = {}
         group_read_allowances = [

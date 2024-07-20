@@ -340,6 +340,19 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         return result
 
+    def has_group_perm(self, group, perm, obj):
+        explicitly_defined_perms = self.get_perms(group, obj)
+        if len(explicitly_defined_perms) > 0:
+            if "no_access_to_nodegroup" in explicitly_defined_perms:
+                return False
+            else:
+                return perm in explicitly_defined_perms
+        else:
+            for permission in group.permissions.all():
+                if perm in permission.codename:
+                    return True
+            return False
+
     def get_groups_for_object(self, perm: str, obj: Model) -> list[Group]:
         """
         returns a list of group objects that have the given permission on the given object
@@ -350,22 +363,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         """
 
-        def has_group_perm(group, perm, obj):
-            explicitly_defined_perms = self.get_perms(group, obj)
-            if len(explicitly_defined_perms) > 0:
-                if "no_access_to_nodegroup" in explicitly_defined_perms:
-                    return False
-                else:
-                    return perm in explicitly_defined_perms
-            else:
-                for permission in group.permissions.all():
-                    if perm in permission.codename:
-                        return True
-                return False
-
         ret = []
         for group in Group.objects.all():
-            if has_group_perm(group, perm, obj):  # type: ignore
+            if self.has_group_perm(group, perm, obj):  # type: ignore
                 ret.append(group)
         return ret
 
