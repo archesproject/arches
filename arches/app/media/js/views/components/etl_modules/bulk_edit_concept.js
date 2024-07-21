@@ -37,6 +37,7 @@ define([
         this.reportUrl = ko.observable(window.location.href.split('/').slice(0, 3).join('/')+'/report/');
         //paging
         this.currentPageIndex = ko.observable(0);
+        this.tilesToRemove = ko.observableArray();
         //loading status
         this.formatTime = params.formatTime;
         this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
@@ -56,6 +57,8 @@ define([
             if (self.allinformationTable()) { self.formData.append('table', self.allinformationTable()); }
             if (self.searchUrl()) { self.formData.append('search_url', self.searchUrl()); }
             if (self.rdmCollection) { self.formData.append('rdmCollection', self.rdmCollection); }
+            self.formData.append('currentPageIndex', self.currentPageIndex());
+            self.formData.append('tilesToRemove', self.tilesToRemove);
         };
         self.deleteAllFormData = () => {
             self.formData.delete('selectedGraph');
@@ -69,11 +72,11 @@ define([
             self.formData.delete('table');
             self.formData.delete('search_url');
             self.formData.delete('rdmCollection');
+            self.formData.delete('currentPageIndex');
         };
         //lenght table
-        self.listLength = ko.computed(function() {
-            return self.allinformationTable().length;
-        });
+        self.listLength = ko.observable();
+
         //paging
         // Function to navigate to the previous page
         self.previousPage = function() {
@@ -87,28 +90,21 @@ define([
                 self.currentPageIndex(self.currentPageIndex() + 1);
             }
         };
+
+        self.currentPageIndex.subscribe((pageIndex) => {
+            self.getPreviewData();
+        });
         // Computed observable to calculate the maximum page index
         self.maxPageIndex = ko.computed(function() {
             return Math.ceil(self.listLength() / 5) - 1;
         });
 
         // Computed observable to paginate rows
-        self.paginatedRows = ko.computed(function() {
-            var startIndex = self.currentPageIndex() * 5;
-            var endIndex = startIndex + 5;
-            return self.allinformationTable().slice(startIndex, endIndex);
-        });
+        self.paginatedRows = ko.observableArray();
 
         //make url
         self.constructReportUrl = function(dataItem) {
-            return self.reportUrl() + dataItem[0];
-        };
-
-        //delete Row in table
-        this.deleteRow = function(data) {
-            self.addAllFormData();
-            // Remove the row from the allinformationTable array
-            self.allinformationTable.remove(data);
+            return self.reportUrl() + dataItem.resourceid;
         };
 
         this.ready = ko.computed(() => {
@@ -143,16 +139,26 @@ define([
             return self.ready() && self.listLength() > 0 && self.showPreview();
         });
 
+        this.inTileList = (tileToFind) => {
+            const tile = self.tilesToRemove().find((tileid) => {
+                return tileid === tileToFind.tileid;
+            });
+            return !!tile;
+        };
+
+        //delete Row in table
+        this.addToList = function(tileid) {
+            self.tilesToRemove.push(tileid);
+        };
+
         //call python code to display the change
         this.getPreviewData = function() {
             self.addAllFormData();
             self.allinformationTable.removeAll();
             self.showPreview(true);
-            self.submit('get_preview_data').then(data => {
-                
-                for (var i = 0; i < data.result.length; i++){
-                    self.allinformationTable.push(data.result[i]);
-                }
+            self.submit('preview').then(data => {
+                self.listLength(data.result.number_of_tiles);
+                self.paginatedRows(data.result.values);
                 
             }).fail(function(err) {
                 self.alert(

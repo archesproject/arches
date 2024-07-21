@@ -138,10 +138,11 @@
                     </thead>
                     <tbody data-bind="foreach: paginatedRows">
                         <tr>
-                            <td><a data-bind="attr: { href: $parent.constructReportUrl($data)}, text: $data[0]" target="_blank" style="color: rgb(145, 71, 235);"></a></td>
-                            <td data-bind="text: $data[1]"></td>
-                            <td data-bind="text: $data[2]"></td>
-                            <td data-bind="text: $data[3]"></td>
+                            <td><a data-bind="attr: { href: $parent.constructReportUrl($data)}, text: $data.resourceid" target="_blank" style="color: rgb(145, 71, 235);"></a></td>
+                            <td data-bind="text: $data.displayname"></td>
+                            <td data-bind="text: $data.original_preflabels"></td>
+                            <td data-bind="text: $data.new_preflabels"></td>
+                            <td><input type="checkbox" data-bind="click: $parent.addToList($data.tileid), value: !$parent.inTileList"></td>
                             <td><button data-bind="click: $parent.deleteRow" style="background-color: #ff6347; color: white; border: none; padding: 7px 14px; border-radius: 4px; cursor: pointer;">Remove</button></td>
                         </tr>
                     </tbody>
