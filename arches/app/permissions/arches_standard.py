@@ -598,9 +598,13 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         user -- the user to check
 
         """
-        return self.get_resource_types_by_perm(
-            user, ["models.write_nodegroup", "models.delete_nodegroup"]
-        )
+
+        if self.user_is_resource_editor(user):
+            return self.get_resource_types_by_perm(
+                user, ["models.write_nodegroup", "models.delete_nodegroup"]
+            )
+        else:
+            return []
 
     def get_createable_resource_types(self, user: User) -> list[str]:
         """
@@ -610,7 +614,10 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         user -- the user to check
 
         """
-        return self.get_resource_types_by_perm(user, "models.write_nodegroup")
+        if self.user_is_resource_editor(user):
+            return self.get_resource_types_by_perm(user, "models.write_nodegroup")
+        else:
+            return []
 
     def user_can_edit_model_nodegroups(
         self, user: User, resource: ResourceInstance
