@@ -19,7 +19,6 @@ import sys
 import uuid
 from typing import Iterable
 
-
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User, Group
 from django.contrib.gis.db.models import Model

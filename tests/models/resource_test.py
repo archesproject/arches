@@ -196,6 +196,16 @@ class ResourceTests(ArchesTestCase):
         )
         cls.test_resource.tiles.append(tile)
 
+        cls.lifecycle = models.ResourceInstanceLifecycle.objects.create(
+            id=uuid.uuid4(), name="Test Lifecycle"
+        )
+        cls.state1 = models.ResourceInstanceLifecycleState.objects.create(
+            id=uuid.uuid4(), name="State 1", resource_instance_lifecycle=cls.lifecycle
+        )
+        cls.state2 = models.ResourceInstanceLifecycleState.objects.create(
+            id=uuid.uuid4(), name="State 2", resource_instance_lifecycle=cls.lifecycle
+        )
+
         cls.test_resource.save()
 
         # add delay to allow for indexes to be updated
@@ -210,6 +220,52 @@ class ResourceTests(ArchesTestCase):
         models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
         cls.user.delete()
         super().tearDownClass()
+
+    def test_update_resource_instance_lifecycle_state_success(self):
+        self.test_resource.graph.resource_instance_lifecycle = self.lifecycle
+        self.test_resource.graph.save()
+
+        updated_state = self.test_resource.update_resource_instance_lifecycle_state(
+            self.user, self.state2
+        )
+
+        self.assertEqual(updated_state.pk, self.state2.pk)
+        self.assertEqual(
+            self.test_resource.resource_instance_lifecycle_state.pk, self.state2.pk
+        )
+
+    def test_update_resource_instance_lifecycle_state_invalid_lifecycle(self):
+        different_lifecycle = models.ResourceInstanceLifecycle.objects.create(
+            id=uuid.uuid4(), name="Different Lifecycle"
+        )
+        different_state = models.ResourceInstanceLifecycleState.objects.create(
+            id=uuid.uuid4(),
+            name="Different State",
+            resource_instance_lifecycle=different_lifecycle,
+        )
+
+        with self.assertRaises(ValueError) as context:
+            self.test_resource.update_resource_instance_lifecycle_state(
+                self.user, different_state
+            )
+
+        self.assertEqual(
+            str(context.exception),
+            "The given ResourceInstanceLifecycleState is not part of the model's ResourceInstanceLifecycle.",
+        )
+
+    def test_update_resource_instance_lifecycle_state_no_change(self):
+        self.test_resource.graph.resource_instance_lifecycle = self.lifecycle
+        self.test_resource.graph.save()
+
+        same_state = self.test_resource.update_resource_instance_lifecycle_state(
+            self.user, self.state1
+        )
+
+        self.assertEqual(same_state.pk, self.state1.pk)
+        self.assertEqual(
+            self.test_resource.resource_instance_lifecycle_state.pk, self.state1.pk
+        )
 
     def test_get_node_value_string(self):
         """

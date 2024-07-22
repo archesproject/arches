@@ -285,7 +285,6 @@ class GraphDesignerView(GraphBaseView):
         branch_graphs = Graph.objects.exclude(pk=graphid).exclude(isresource=True)
         if self.graph.ontology is not None:
             branch_graphs = branch_graphs.filter(ontology=self.graph.ontology)
-        # import pdb; pdb.set_trace()
 
         context = self.get_context_data(
             main_script="views/graph-designer",
