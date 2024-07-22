@@ -465,8 +465,8 @@ class MVT(APIBase):
                                 ) AS geom,
                                 1 AS total
                             FROM geojson_geometries
-                            WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
-                            [nodeid, zoom, x, y, nodeid, resource_ids],
+                            WHERE nodeid = %s and resourceinstanceid not in %s and (geom && ST_TileEnvelope(%s, %s, %s))) AS tile;""",
+                            [nodeid, zoom, x, y, nodeid, resource_ids, zoom, x, y],
                         )
                     else:
                         tile = ""
@@ -482,8 +482,8 @@ class MVT(APIBase):
                             ) AS geom,
                             1 AS total
                         FROM geojson_geometries
-                        WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
-                        [nodeid, zoom, x, y, nodeid, resource_ids],
+                        WHERE nodeid = %s and resourceinstanceid not in %s and (geom && ST_TileEnvelope(%s, %s, %s))) AS tile;""",
+                        [nodeid, zoom, x, y, nodeid, resource_ids, zoom, x, y],
                     )
                 tile = bytes(cursor.fetchone()[0]) if tile is None else tile
                 cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
