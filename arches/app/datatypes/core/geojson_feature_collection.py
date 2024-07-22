@@ -109,7 +109,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         features = []
         if geojson["type"] == "FeatureCollection":
             for feature in geojson["features"]:
-                if feature["geometry"]["type"].find("Multi") != -1:
+                if "Multi" in feature["geometry"]["type"]:
                     new_collection = self.geo_utils.convert_multipart_to_singlepart(
                         feature["geometry"]
                     )
@@ -131,7 +131,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
     def transform_value_for_tile(self, value, **kwargs):
         if "format" in kwargs and kwargs["format"] == "esrijson":
-            arches_geojson = self.geo_utils.arcgisjson_to_geojson(value)
+            arches_geojson = self.check_geojson_value(
+                json.dumps(self.geo_utils.arcgisjson_to_geojson(value))
+            )
         else:
             try:
                 arches_geojson = self.check_geojson_value(value)
