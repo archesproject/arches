@@ -1,1 +1,2 @@
 graft *
+exclude arches_references/tests/tests.py
