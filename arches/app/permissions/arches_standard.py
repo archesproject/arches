@@ -598,13 +598,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         user -- the user to check
 
         """
-
-        if self.user_is_resource_editor(user):
-            return self.get_resource_types_by_perm(
-                user, ["models.write_nodegroup", "models.delete_nodegroup"]
-            )
-        else:
-            return []
+        return self.get_resource_types_by_perm(
+            user, ["models.write_nodegroup", "models.delete_nodegroup"]
+        )
 
     def get_createable_resource_types(self, user: User) -> list[str]:
         """
@@ -614,10 +610,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         user -- the user to check
 
         """
-        if self.user_is_resource_editor(user):
-            return self.get_resource_types_by_perm(user, "models.write_nodegroup")
-        else:
-            return []
+        return self.get_resource_types_by_perm(user, "models.write_nodegroup")
 
     def user_can_edit_model_nodegroups(
         self, user: User, resource: ResourceInstance
@@ -764,7 +757,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             and "users_without_read_perm" in search_result["_source"]["permissions"]
             and (
                 user.id
-                not in search_result["_source"]["permissions"]["users_without_read_perm"]
+                not in search_result["_source"]["permissions"][
+                    "users_without_read_perm"
+                ]
             )
         ) and user_can_read
 
@@ -774,7 +769,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             and "users_without_edit_perm" in search_result["_source"]["permissions"]
             and (
                 user.id
-                not in search_result["_source"]["permissions"]["users_without_edit_perm"]
+                not in search_result["_source"]["permissions"][
+                    "users_without_edit_perm"
+                ]
             )
             and user_can_edit
         )
