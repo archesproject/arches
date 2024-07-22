@@ -1594,14 +1594,14 @@ class ResourceReport(APIBase):
 
         if "cards" not in exclude:
             readable_nodegroup_ids = [
-                nodegroup.pk
-                for nodegroup in get_nodegroups_by_perm(
+                nodegroup_id
+                for nodegroup_id in get_nodegroups_by_perm(
                     request.user, perm, any_perm=True
                 )
             ]
             writable_nodegroup_ids = [
-                nodegroup.pk
-                for nodegroup in get_nodegroups_by_perm(
+                nodegroup_id
+                for nodegroup_id in get_nodegroups_by_perm(
                     request.user,
                     "write_nodegroup",
                     any_perm=True,
