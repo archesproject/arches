@@ -141,16 +141,6 @@ class PermissionFramework(metaclass=ABCMeta):
     @abstractmethod
     def get_search_ui_permissions(self, user, search_result, groups=None): ...
 
-    @abstractmethod
-    def resource_instance_lifecycle_state_allows_editing(
-        self, user, resourceid=None, resource=None
-    ): ...
-
-    @abstractmethod
-    def resource_instance_lifecycle_state_allows_deletion(
-        self, user, resourceid=None, resource=None
-    ): ...
-
 
 _PERMISSION_FRAMEWORK = None
 
@@ -386,22 +376,4 @@ def get_permission_inclusions():
 def get_search_ui_permissions(user, search_result, groups=None):
     return _get_permission_framework().get_search_ui_permissions(
         user, search_result, groups
-    )
-
-
-def resource_instance_lifecycle_state_allows_editing(
-    user, resourceid=None, resource=None
-):
-    return _get_permission_framework().resource_instance_lifecycle_state_allows_editing(
-        user, resourceid=resourceid, resource=resource
-    )
-
-
-def resource_instance_lifecycle_state_allows_deletion(
-    user, resourceid=None, resource=None
-):
-    return (
-        _get_permission_framework().resource_instance_lifecycle_state_allows_deletion(
-            user, resourceid=resourceid, resource=resource
-        )
     )

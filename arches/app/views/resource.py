@@ -49,6 +49,7 @@ from arches.app.utils.pagination import get_paginator
 from arches.app.utils.permission_backend import (
     user_is_resource_editor,
     user_is_resource_reviewer,
+    user_can_edit_resource,
     user_can_delete_resource,
 )
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -1016,6 +1017,10 @@ class ResourceReportView(MapBaseManagerView):
                 ).exists()
             ),
             graph_has_unpublished_changes=bool(graph.has_unpublished_changes),
+        )
+
+        context["user_can_edit_resource"] = user_can_edit_resource(
+            request.user, resourceid=resourceid
         )
 
         context["resource_instance_lifecycle_state_permits_editing"] = (

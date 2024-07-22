@@ -539,6 +539,11 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                     user, resourceid, "change_resourceinstance"
                 )
                 if result is not None:
+                    if not result[
+                        "resource"
+                    ].resource_instance_lifecycle_state.can_edit_resource_instances:
+                        return False
+
                     if result["permitted"] == "unknown":
                         return user.groups.filter(
                             name__in=settings.RESOURCE_EDITOR_GROUPS
@@ -571,6 +576,11 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                     user, resourceid, "delete_resourceinstance"
                 )
                 if result is not None:
+                    if not result[
+                        "resource"
+                    ].resource_instance_lifecycle_state.can_delete_resource_instances:
+                        return False
+
                     if result["permitted"] == "unknown":
                         nodegroups = self.get_nodegroups_by_perm(
                             user, "models.delete_nodegroup"
@@ -591,46 +601,6 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                 else:
                     return None
         return False
-
-    def resource_instance_lifecycle_state_allows_editing(
-        self,
-        user: User,
-        resourceid: str | None = None,
-        resource: ResourceInstance | None = None,
-    ) -> bool:
-        if not resourceid and not resource:
-            raise ValueError(_("Either 'resourceid' or 'resource' must be provided."))
-
-        if user.is_authenticated:
-            if user.is_superuser:
-                return True
-
-        if not resource:
-            resource = ResourceInstance.objects.get(pk=resourceid)
-
-        return bool(
-            resource.resource_instance_lifecycle_state.can_edit_resource_instances
-        )
-
-    def resource_instance_lifecycle_state_allows_deletion(
-        self,
-        user: User,
-        resourceid: str | None = None,
-        resource: ResourceInstance | None = None,
-    ) -> bool:
-        if not resourceid and not resource:
-            raise ValueError(_("Either 'resourceid' or 'resource' must be provided."))
-
-        if user.is_authenticated:
-            if user.is_superuser:
-                return True
-
-        if not resource:
-            resource = ResourceInstance.objects.get(pk=resourceid)
-
-        return bool(
-            resource.resource_instance_lifecycle_state.can_delete_resource_instances
-        )
 
     def get_editable_resource_types(self, user: User) -> list[str]:
         """
