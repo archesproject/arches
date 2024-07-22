@@ -23,7 +23,8 @@ import datetime
 
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import redirect
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 from arches.app.utils.permission_backend import user_can_read_resource
 from arches.app.utils.permission_backend import user_can_edit_resource
@@ -96,7 +97,8 @@ def can_edit_resource_instance(redirect_to_report=False):
                 return function(request, *args, **kwargs)
             else:
                 if redirect_to_report:
-                    return redirect("resource_report", resourceid=resourceid)
+                    url = reverse("resource_report", kwargs={"resourceid": resourceid})
+                    return HttpResponseRedirect(f"{url}?redirected=true")
                 else:
                     raise PermissionDenied
 

@@ -29,7 +29,11 @@ define([
             params.graph_has_different_publication_and_user_has_insufficient_permissions === "True" ? true : false
         );
 
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        this.userHasBeenRedirected = urlSearchParams.get('redirected');
+
         this.resoureceInstanceLifecycleStatePermitsEditing = params.resource_instance_lifecycle_state_permits_editing === "True" ? true : false;
+        this.userCanEditResource = params.user_can_edit_resource === "True" ? true : false;
 
         this.template = ko.observable();
         this.report = ko.observable();
@@ -39,11 +43,22 @@ define([
             params.cache = params.cache === undefined ? true : params.cache;
 
             if (params.view) {
-                if (!self.resoureceInstanceLifecycleStatePermitsEditing) {
+                if (self.userHasBeenRedirected && !self.resoureceInstanceLifecycleStatePermitsEditing) {
                     params.view.alert(new AlertViewmodel(
                         'ep-alert-blue',
-                        'foo',
-                        'bar',
+                        arches.translations.resourceReportRedirectFromResourceEditorLifecycleState.title,
+                        arches.translations.resourceReportRedirectFromResourceEditorLifecycleState.text,
+                        null,
+                        function() {}
+                    ));
+                }
+                else if (self.userHasBeenRedirected && !self.userCanEditResource) {
+                    params.view.alert(new AlertViewmodel(
+                        'ep-alert-red',
+                        arches.translations.resourceReportRedirectFromResourceEditorNotPermissioned.title,
+                        arches.translations.resourceReportRedirectFromResourceEditorNotPermissioned.text,
+                        null,
+                        function() {}
                     ));
                 }
                 else if (self.graphHasDifferentPublication()) {
