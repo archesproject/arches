@@ -4,6 +4,7 @@ import sys
 from http import HTTPStatus
 
 from django.contrib.auth.models import Group, User
+from django.test import TestCase
 from django.urls import reverse
 from guardian.shortcuts import assign_perm
 
@@ -21,7 +22,6 @@ from arches_references.models import (
     ListItemImageMetadata,
     ListItemValue,
 )
-from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
 # python manage.py test arches_references.tests.tests --settings="tests.test_settings"
@@ -35,7 +35,7 @@ def sync_pk_for_comparison(item):
     return item
 
 
-class ListTests(ArchesTestCase):
+class ListTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
