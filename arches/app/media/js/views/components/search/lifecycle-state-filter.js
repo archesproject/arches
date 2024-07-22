@@ -17,7 +17,7 @@ define([
 
             const self = this;  // eslint-disable-line @typescript-eslint/no-this-alias
 
-            const response = await fetch(arches.urls.api_resource_instance_lifecycle);
+            const response = await fetch(arches.urls.api_resource_instance_lifecycle_states);
             if (response.ok) {
                 const data = await response.json();
                 data.forEach(function(lifecycleState) {
