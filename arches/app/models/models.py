@@ -1394,11 +1394,6 @@ class SearchComponent(models.Model):
         )
 
     def toJSON(self):
-        from arches.app.utils.betterJSONSerializer import (
-            JSONSerializer,
-            JSONDeserializer,
-        )
-
         return JSONSerializer().serialize(self)
 
 
