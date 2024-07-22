@@ -24,7 +24,6 @@ from django.contrib.auth.models import User, Group
 from django.contrib.gis.db.models import Model
 from django.core.cache import caches
 from django.db.models import Count
-from django.utils.translation import gettext_lazy as _
 from guardian.backends import check_support, ObjectPermissionBackend
 from guardian.core import ObjectPermissionChecker
 from guardian.shortcuts import (
