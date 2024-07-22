@@ -34,7 +34,7 @@ def create_default_resource_instance_lifecycle_states(apps, schema_editor):
         ),
         is_initial_state=True,
         can_delete_resource_instances=True,
-        can_edit_resource_instances=False,
+        can_edit_resource_instances=True,
     )
     active_state = ResourceInstanceLifecycleState.objects.create(
         id=uuid.UUID("f75bb034-36e3-4ab4-8167-f520cf0b4c58"),
@@ -45,7 +45,7 @@ def create_default_resource_instance_lifecycle_states(apps, schema_editor):
         ),
         is_initial_state=False,
         can_delete_resource_instances=False,
-        can_edit_resource_instances=False,
+        can_edit_resource_instances=True,
     )
     retired_state = ResourceInstanceLifecycleState.objects.create(
         id=uuid.UUID("d95d9c0e-0e2c-4450-93a3-d788b91abcc8"),

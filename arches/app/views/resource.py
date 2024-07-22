@@ -20,15 +20,13 @@ import json
 import uuid
 
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import User, Group
 from django.db import transaction
 from django.forms.models import model_to_dict
 from django.http import HttpResponseNotFound
-from django.http import HttpResponse
 from django.http import Http404
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import redirect, render
-from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
@@ -52,18 +50,14 @@ from arches.app.utils.permission_backend import (
     user_is_resource_editor,
     user_is_resource_reviewer,
     user_can_delete_resource,
-    user_can_edit_resource,
-    user_can_read_resource,
 )
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.string_utils import str_to_bool
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
-from elasticsearch import Elasticsearch
 from arches.app.utils.permission_backend import (
     assign_perm,
     get_perms,
