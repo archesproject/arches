@@ -2,7 +2,7 @@ from django.contrib.postgres.expressions import ArraySubquery
 from django.db import models
 
 
-class ControlledListQuerySet(models.QuerySet):
+class ListQuerySet(models.QuerySet):
     def annotate_node_fields(self, **kwargs):
         from arches.app.models.models import Node
 
@@ -23,7 +23,7 @@ class ControlledListQuerySet(models.QuerySet):
         return qs
 
 
-class ControlledListItemValueQuerySet(models.QuerySet):
+class ListItemValueQuerySet(models.QuerySet):
     def values_without_images(self):
         return self.exclude(valuetype="image")
 
@@ -31,6 +31,6 @@ class ControlledListItemValueQuerySet(models.QuerySet):
         return self.filter(valuetype="image")
 
 
-class ControlledListItemImageManager(models.Manager):
+class ListItemImageManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(valuetype="image")
