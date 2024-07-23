@@ -3,7 +3,7 @@ import type { Language } from "@/arches/types";
 import type {
     ControlledList,
     ControlledListItem,
-} from "@/controlled-lists/types";
+} from "@/arches-references/types";
 
 export const displayedRowKey = Symbol() as InjectionKey<ControlledList | null>;
 export const itemKey = Symbol() as InjectionKey<ControlledListItem | null>;

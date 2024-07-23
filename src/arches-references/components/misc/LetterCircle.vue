@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import { dataIsList } from "@/controlled-lists/utils.ts";
+import { dataIsList } from "@/arches-references/utils.ts";
 
-import type { ControlledListItem, Selectable } from "@/controlled-lists/types";
+import type { ControlledListItem, Selectable } from "@/arches-references/types";
 
 const props = defineProps<{ labelled: Selectable }>();
 

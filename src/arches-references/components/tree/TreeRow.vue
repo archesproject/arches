@@ -12,13 +12,13 @@ import {
     createList,
     patchList,
     upsertValue,
-} from "@/controlled-lists/api.ts";
+} from "@/arches-references/api.ts";
 import {
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
     displayedRowKey,
     selectedLanguageKey,
-} from "@/controlled-lists/constants.ts";
+} from "@/arches-references/constants.ts";
 import {
     bestLabel,
     findNodeInTree,
@@ -26,8 +26,8 @@ import {
     listAsNode,
     nodeIsList,
     reorderItems,
-} from "@/controlled-lists/utils.ts";
-import MoveRow from "@/controlled-lists/components/tree/MoveRow.vue";
+} from "@/arches-references/utils.ts";
+import MoveRow from "@/arches-references/components/tree/MoveRow.vue";
 
 import type { Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
@@ -39,7 +39,7 @@ import type {
     DisplayedListItemRefAndSetter,
     MoveLabels,
     NewControlledListItem,
-} from "@/controlled-lists/types";
+} from "@/arches-references/types";
 
 const toast = useToast();
 const { $gettext } = useGettext();

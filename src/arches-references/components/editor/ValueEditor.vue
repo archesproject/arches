@@ -11,7 +11,7 @@ import Textarea from "primevue/textarea";
 import { useToast } from "primevue/usetoast";
 
 import { ARCHES_CHROME_BLUE } from "@/arches/theme.ts";
-import { deleteValue, upsertValue } from "@/controlled-lists/api.ts";
+import { deleteValue, upsertValue } from "@/arches-references/api.ts";
 import {
     ALT_LABEL,
     DEFAULT_ERROR_TOAST_LIFE,
@@ -20,9 +20,9 @@ import {
     NOTE_CHOICES,
     PREF_LABEL,
     itemKey,
-} from "@/controlled-lists/constants.ts";
-import { languageNameFromCode } from "@/controlled-lists/utils.ts";
-import AddValue from "@/controlled-lists/components/editor/AddValue.vue";
+} from "@/arches-references/constants.ts";
+import { languageNameFromCode } from "@/arches-references/utils.ts";
+import AddValue from "@/arches-references/components/editor/AddValue.vue";
 
 import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
@@ -33,7 +33,7 @@ import type {
     NewOrExistingValue,
     NewValue,
     ValueType,
-} from "@/controlled-lists/types";
+} from "@/arches-references/types";
 
 const { valueType, valueCategory } = defineProps<{
     valueType?: ValueType;

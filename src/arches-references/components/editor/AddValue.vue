@@ -11,7 +11,7 @@ import {
     ALT_LABEL,
     NOTE_CHOICES,
     PREF_LABEL,
-} from "@/controlled-lists/constants.ts";
+} from "@/arches-references/constants.ts";
 
 import type { Ref } from "vue";
 import type { Language } from "@/arches/types";
@@ -20,7 +20,7 @@ import type {
     Value,
     NewValue,
     ValueType,
-} from "@/controlled-lists/types";
+} from "@/arches-references/types";
 
 const { valueType, makeNewValueEditable } = defineProps<{
     valueType?: ValueType;

@@ -2,7 +2,7 @@
 import arches from "arches";
 import { useGettext } from "vue3-gettext";
 
-import type { ReferencingNode } from "@/controlled-lists/types";
+import type { ReferencingNode } from "@/arches-references/types";
 
 const props = defineProps<{ node: ReferencingNode }>();
 

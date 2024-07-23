@@ -7,11 +7,11 @@ import Tree from "primevue/tree";
 import {
     displayedRowKey,
     selectedLanguageKey,
-} from "@/controlled-lists/constants.ts";
-import { bestLabel, nodeIsList } from "@/controlled-lists/utils.ts";
-import LetterCircle from "@/controlled-lists/components/misc/LetterCircle.vue";
-import ListTreeControls from "@/controlled-lists/components/tree/ListTreeControls.vue";
-import TreeRow from "@/controlled-lists/components/tree/TreeRow.vue";
+} from "@/arches-references/constants.ts";
+import { bestLabel, nodeIsList } from "@/arches-references/utils.ts";
+import LetterCircle from "@/arches-references/components/misc/LetterCircle.vue";
+import ListTreeControls from "@/arches-references/components/tree/ListTreeControls.vue";
+import TreeRow from "@/arches-references/components/tree/TreeRow.vue";
 
 import type { ComponentPublicInstance, Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
@@ -21,7 +21,7 @@ import type {
     DisplayedRowRefAndSetter,
     NewControlledList,
     NewControlledListItem,
-} from "@/controlled-lists/types";
+} from "@/arches-references/types";
 
 const { $gettext } = useGettext();
 

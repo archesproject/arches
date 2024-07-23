@@ -1,7 +1,7 @@
 import arches from "arches";
 import Cookies from "js-cookie";
 
-import { makeParentMap, makeSortOrderMap } from "@/controlled-lists/utils.ts";
+import { makeParentMap, makeSortOrderMap } from "@/arches-references/utils.ts";
 
 import type {
     ControlledList,
@@ -11,7 +11,7 @@ import type {
     Value,
     NewControlledListItemImageMetadata,
     NewOrExistingValue,
-} from "@/controlled-lists/types";
+} from "@/arches-references/types";
 
 function getToken() {
     const token = Cookies.get("csrftoken");

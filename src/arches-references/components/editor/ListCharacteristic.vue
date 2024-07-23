@@ -5,15 +5,15 @@ import { useGettext } from "vue3-gettext";
 import InputText from "primevue/inputtext";
 import { useToast } from "primevue/usetoast";
 
-import { patchList } from "@/controlled-lists/api.ts";
+import { patchList } from "@/arches-references/api.ts";
 import {
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
     displayedRowKey,
-} from "@/controlled-lists/constants.ts";
-import { vFocus } from "@/controlled-lists/utils.ts";
+} from "@/arches-references/constants.ts";
+import { vFocus } from "@/arches-references/utils.ts";
 
-import type { DisplayedListRefAndSetter } from "@/controlled-lists/types";
+import type { DisplayedListRefAndSetter } from "@/arches-references/types";
 
 const props = defineProps<{
     editable: boolean;

@@ -12,7 +12,7 @@ import {
     deleteItems,
     deleteLists,
     fetchLists,
-} from "@/controlled-lists/api.ts";
+} from "@/arches-references/api.ts";
 import {
     DANGER,
     DEFAULT_ERROR_TOAST_LIFE,
@@ -20,8 +20,8 @@ import {
     SUCCESS,
     displayedRowKey,
     selectedLanguageKey,
-} from "@/controlled-lists/constants.ts";
-import { dataIsItem, listAsNode } from "@/controlled-lists/utils.ts";
+} from "@/arches-references/constants.ts";
+import { dataIsItem, listAsNode } from "@/arches-references/utils.ts";
 
 import type { Ref } from "vue";
 import type { TreeSelectionKeys } from "primevue/tree/Tree";
@@ -32,7 +32,7 @@ import type {
     ControlledListItem,
     DisplayedRowRefAndSetter,
     NewControlledList,
-} from "@/controlled-lists/types";
+} from "@/arches-references/types";
 
 const { displayedRow, setDisplayedRow } = inject(
     displayedRowKey,

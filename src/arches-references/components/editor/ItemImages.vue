@@ -12,11 +12,11 @@ import {
     itemKey,
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
-} from "@/controlled-lists/constants.ts";
-import ImageEditor from "@/controlled-lists/components/editor/ImageEditor.vue";
+} from "@/arches-references/constants.ts";
+import ImageEditor from "@/arches-references/components/editor/ImageEditor.vue";
 
 import type { Ref } from "vue";
-import type { ControlledListItem } from "@/controlled-lists/types";
+import type { ControlledListItem } from "@/arches-references/types";
 import type {
     FileUploadBeforeSendEvent,
     FileUploadErrorEvent,

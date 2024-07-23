@@ -2,12 +2,12 @@
 import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import { displayedRowKey } from "@/controlled-lists/constants.ts";
-import LetterCircle from "@/controlled-lists/components/misc/LetterCircle.vue";
-import ListCharacteristic from "@/controlled-lists/components/editor/ListCharacteristic.vue";
-import ReferenceNodeLink from "@/controlled-lists/components/editor/ReferenceNodeLink.vue";
+import { displayedRowKey } from "@/arches-references/constants.ts";
+import LetterCircle from "@/arches-references/components/misc/LetterCircle.vue";
+import ListCharacteristic from "@/arches-references/components/editor/ListCharacteristic.vue";
+import ReferenceNodeLink from "@/arches-references/components/editor/ReferenceNodeLink.vue";
 
-import type { DisplayedListRefAndSetter } from "@/controlled-lists/types";
+import type { DisplayedListRefAndSetter } from "@/arches-references/types";
 
 const { displayedRow: list } = inject(
     displayedRowKey,

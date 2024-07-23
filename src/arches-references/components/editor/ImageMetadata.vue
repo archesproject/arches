@@ -14,16 +14,16 @@ import {
     deleteImage,
     deleteMetadata,
     upsertMetadata,
-} from "@/controlled-lists/api.ts";
+} from "@/arches-references/api.ts";
 import {
     DANGER,
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
     METADATA_CHOICES,
     itemKey,
-} from "@/controlled-lists/constants.ts";
-import { languageNameFromCode } from "@/controlled-lists/utils.ts";
-import AddMetadata from "@/controlled-lists/components/editor/AddMetadata.vue";
+} from "@/arches-references/constants.ts";
+import { languageNameFromCode } from "@/arches-references/utils.ts";
+import AddMetadata from "@/arches-references/components/editor/AddMetadata.vue";
 
 import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
@@ -33,7 +33,7 @@ import type {
     ControlledListItemImageMetadata,
     LabeledChoice,
     NewOrExistingControlledListItemImageMetadata,
-} from "@/controlled-lists/types";
+} from "@/arches-references/types";
 
 const toast = useToast();
 const { $gettext } = useGettext();

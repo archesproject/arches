@@ -4,8 +4,8 @@ import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 
-import { selectedLanguageKey } from "@/controlled-lists/constants.ts";
-import { bestLabel } from "@/controlled-lists/utils.ts";
+import { selectedLanguageKey } from "@/arches-references/constants.ts";
+import { bestLabel } from "@/arches-references/utils.ts";
 
 import type { Ref } from "vue";
 import type { TreeSelectionKeys } from "primevue/tree/Tree";

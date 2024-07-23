@@ -6,7 +6,7 @@ import type {
     ControlledList,
     ControlledListItem,
     Selectable,
-} from "@/controlled-lists/types";
+} from "@/arches-references/types";
 
 // Duck-typing helpers
 export const dataIsList = (data: Selectable) => {

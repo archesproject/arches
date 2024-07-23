@@ -2,15 +2,15 @@
 import arches from "arches";
 import { computed, inject } from "vue";
 
-import { itemKey, METADATA_CHOICES } from "@/controlled-lists/constants.ts";
-import { bestLabel } from "@/controlled-lists/utils.ts";
-import ImageMetadata from "@/controlled-lists/components/editor/ImageMetadata.vue";
+import { itemKey, METADATA_CHOICES } from "@/arches-references/constants.ts";
+import { bestLabel } from "@/arches-references/utils.ts";
+import ImageMetadata from "@/arches-references/components/editor/ImageMetadata.vue";
 
 import type { Ref } from "vue";
 import type {
     ControlledListItem,
     ControlledListItemImage,
-} from "@/controlled-lists/types";
+} from "@/arches-references/types";
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
 const { image } = defineProps<{ image: ControlledListItemImage }>();
