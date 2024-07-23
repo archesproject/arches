@@ -6,7 +6,7 @@ import ProgressSpinner from "primevue/progressspinner";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 
-import { LIGHT_GRAY } from "@/arches/theme.ts";
+import { LIGHT_GRAY } from "@/arches-references/theme";
 import {
     displayedRowKey,
     selectedLanguageKey,

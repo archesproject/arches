@@ -2,7 +2,7 @@
 import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import { ARCHES_CHROME_BLUE } from "@/arches/theme.ts";
+import { ARCHES_CHROME_BLUE } from "@/arches-references/theme";
 import {
     displayedRowKey,
     selectedLanguageKey,
