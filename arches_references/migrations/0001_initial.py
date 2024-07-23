@@ -140,7 +140,7 @@ class Migration(migrations.Migration):
                 ("value", models.FileField(upload_to="list_item_images")),
             ],
             options={
-                "db_table": "controlledlists_listitemvalue",
+                "db_table": "arches_references_listitemvalue",
                 "managed": False,
             },
         ),
@@ -186,7 +186,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="list_items",
-                        to="controlledlists.list",
+                        to="arches_references.list",
                     ),
                 ),
                 (
@@ -196,7 +196,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="children",
-                        to="controlledlists.listitem",
+                        to="arches_references.listitem",
                     ),
                 ),
             ],
@@ -230,7 +230,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="list_item_values",
-                        to="controlledlists.listitem",
+                        to="arches_references.listitem",
                     ),
                 ),
                 (
@@ -284,7 +284,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="list_item_image_metadata",
-                        to="controlledlists.listitemimage",
+                        to="arches_references.listitemimage",
                     ),
                 ),
             ],
