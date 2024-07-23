@@ -1232,14 +1232,14 @@ class SearchComponent(models.Model):
 
 
 @receiver(pre_save, sender=SearchComponent)
-def ensure_single_default_core(sender, instance, **kwargs):
-    if instance.config.get("default", False) and instance.type == "core":
+def ensure_single_default_search_logic(sender, instance, **kwargs):
+    if instance.config.get("default", False) and instance.type == "search-logic":
         existing_default = SearchComponent.objects.filter(
-            config__default=True, type="core"
+            config__default=True, type="search-logic"
         ).exclude(searchcomponentid=instance.searchcomponentid)
         if existing_default.exists():
             raise ValidationError(
-                "Only one core search component can be default at a time."
+                "Only one search logic component can be default at a time."
             )
 
 

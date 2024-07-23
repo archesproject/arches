@@ -761,46 +761,46 @@ class SearchTests(ArchesTestCase):
             ],
         )
 
-    def test_search_without_core(self):
+    def test_search_without_search_logic(self):
         """
-        Execute a search without setting a core-search component on the query
+        Execute a search without setting a search-logic component on the query
 
         """
 
         response_json = get_response_json(self.client)
         self.assertTrue(response_json["results"]["hits"]["total"]["value"] > 0)
 
-    def test_search_with_bad_core(self):
+    def test_search_with_bad_search_logic(self):
         """
-        Execute a search with a core-search component name that does not exist
+        Execute a search with a search-logic component name that does not exist
 
         """
-        query = {"core": "unavailable-core"}
+        query = {"search-logic": "unavailable-search-logic"}
         response_json = get_response_json(self.client, query=query)
         self.assertFalse(response_json["success"])
 
-    def test_searchview_core_component_from_admin(self):
+    def test_searchview_search_logic_component_from_admin(self):
         request = HttpRequest()
         request.method = "GET"
         request.user = User.objects.get(username="admin")
         search_component_factory = SearchFilterFactory(request)
-        core_search_instance = search_component_factory.get_core_component_instance()
-        self.assertTrue(core_search_instance is not None)
+        search_logic_instance = search_component_factory.get_search_logic_instance()
+        self.assertTrue(search_logic_instance is not None)
 
-        search_components = core_search_instance.get_searchview_components()
-        # 13 req'd components + core-search component
+        search_components = search_logic_instance.get_searchview_components()
+        # 13 available components + search-logic component
         self.assertEqual(len(search_components), 14)
 
-    def test_searchview_core_component_from_anonymous(self):
+    def test_searchview_search_logic_component_from_anonymous(self):
         request = HttpRequest()
         request.method = "GET"
         request.user = User.objects.get(username="anonymous")
         search_component_factory = SearchFilterFactory(request)
-        core_search_instance = search_component_factory.get_core_component_instance()
-        self.assertTrue(core_search_instance is not None)
+        search_logic_instance = search_component_factory.get_search_logic_instance()
+        self.assertTrue(search_logic_instance is not None)
 
-        search_components = core_search_instance.get_searchview_components()
-        # 13 req'd components + core-search component
+        search_components = search_logic_instance.get_searchview_components()
+        # 13 available components + search-logic component
         self.assertEqual(len(search_components), 14)
 
 

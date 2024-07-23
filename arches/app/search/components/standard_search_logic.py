@@ -1,5 +1,5 @@
 from arches.app.models.system_settings import settings
-from arches.app.search.components.base_core_search import BaseCoreSearch
+from arches.app.search.components.base_search_logic import BaseSearchLogic
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.search import (
     append_instance_permission_filter_dsl,
@@ -18,13 +18,13 @@ import logging
 
 details = {
     "searchcomponentid": "69695d63-6f03-4536-8da9-841b07116381",
-    "name": "Arches Core Search",
+    "name": "Standard Search Logic",
     "icon": "",
-    "modulename": "arches_core_search.py",
-    "classname": "ArchesCoreSearch",
-    "type": "core",
-    "componentpath": "views/components/search/arches-core-search",
-    "componentname": "arches-core-search",
+    "modulename": "standard_search_logic.py",
+    "classname": "StandardSearchLogic",
+    "type": "search-logic",
+    "componentpath": "views/components/search/standard-search-logic",
+    "componentname": "standard-search-logic",
     "config": {
         "default": True,
         "requiredComponents": [
@@ -116,7 +116,7 @@ SEARCH_RESULT_PAGES = (
 logger = logging.getLogger(__name__)
 
 
-class ArchesCoreSearch(BaseCoreSearch):
+class StandardSearchLogic(BaseSearchLogic):
 
     def append_dsl(self, search_query_object, **kwargs):
         search_query_object["query"].include("graph_id")
@@ -184,7 +184,7 @@ class ArchesCoreSearch(BaseCoreSearch):
                 ]
             )
 
-        search_components.append(self.core_component)
+        search_components.append(self.search_logic_component)
 
         return search_components
 

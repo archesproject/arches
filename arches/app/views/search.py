@@ -76,8 +76,8 @@ class SearchView(MapBaseManagerView):
         )
         geocoding_providers = models.Geocoder.objects.all()
         search_component_factory = SearchFilterFactory(request)
-        core_search_instance = search_component_factory.get_core_component_instance()
-        search_components = core_search_instance.get_searchview_components()
+        search_logic_instance = search_component_factory.get_search_logic_instance()
+        search_components = search_logic_instance.get_searchview_components()
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
@@ -342,9 +342,9 @@ def get_dsl_from_search_string(request):
 def search_results(request, returnDsl=False):
     se = SearchEngineFactory().create()
     search_filter_factory = SearchFilterFactory(request)
-    core_search_instance = search_filter_factory.get_core_component_instance()
-    if not core_search_instance:
-        unavailable_core_name = search_filter_factory.get_core_component_name()
+    search_logic_instance = search_filter_factory.get_search_logic_instance()
+    if not search_logic_instance:
+        unavailable_core_name = search_filter_factory.get_search_logic_component_name()
         ret = {
             "success": False,
             "message": _("No core-search component named {0}").format(
@@ -357,7 +357,7 @@ def search_results(request, returnDsl=False):
     response_object = {"results": None}
 
     response_object, search_query_object = (
-        core_search_instance.handle_search_results_query(
+        search_logic_instance.handle_search_results_query(
             search_query_object, response_object, search_filter_factory, returnDsl
         )
     )

@@ -8,7 +8,7 @@ define([
 ], function($, _, ko, BackBone, arches, AlertViewModel) {
     return Backbone.View.extend({
         constructor: function() {
-            this.name = 'Base Core Search';
+            this.name = 'Base Search Logic';
             this.filter = {};
             this.requiredFilters = [];
             Backbone.View.apply(this, arguments);

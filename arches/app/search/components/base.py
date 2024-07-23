@@ -72,7 +72,7 @@ class SearchFilterFactory(object):
         }
         self.search_filters_instances = {}
 
-    def get_filter(self, componentname, core=False):
+    def get_filter(self, componentname, search_logic=False):
         if componentname in self.search_filters:
             search_filter = self.search_filters[componentname]
             try:
@@ -86,7 +86,7 @@ class SearchFilterFactory(object):
                     search_filter.classname,
                     ExtensionType.SEARCH_COMPONENTS,
                 )
-                if class_method and core:
+                if class_method and search_logic:
                     filter_instance = class_method(
                         self.request, self.user, componentname
                     )
@@ -99,37 +99,38 @@ class SearchFilterFactory(object):
         else:
             return None
 
-    def get_core_component_name(self):
+    def get_search_logic_component_name(self):
         if not self.request:
-            core_search_component_name = None
+            search_logic_component_name = None
         elif self.request.method == "POST":
-            core_search_component_name = self.request.POST.get("core", None)
+            search_logic_component_name = self.request.POST.get("search-logic", None)
         else:
-            core_search_component_name = self.request.GET.get("core", None)
+            search_logic_component_name = self.request.GET.get("search-logic", None)
 
-        if not core_search_component_name:
-            # get default core search component
-            core_search_component = list(
+        if not search_logic_component_name:
+            # get default search_logic component
+            search_logic_component = list(
                 filter(
-                    lambda x: x.config.get("default", False) and x.type == "core",
+                    lambda x: x.config.get("default", False)
+                    and x.type == "search-logic",
                     list(self.search_filters.values()),
                 )
             )[0]
-            core_search_component_name = core_search_component.componentname
+            search_logic_component_name = search_logic_component.componentname
 
-        return core_search_component_name
+        return search_logic_component_name
 
-    def get_core_component_instance(self):
-        core_search_component_name = self.get_core_component_name()
-        core_search_component_instance = self.get_filter(
-            core_search_component_name, core=True
+    def get_search_logic_instance(self):
+        search_logic_component_name = self.get_search_logic_component_name()
+        search_logic_instance = self.get_filter(
+            search_logic_component_name, search_logic=True
         )
-        return core_search_component_instance
+        return search_logic_instance
 
-    def get_sorted_query_dict(self, query_dict, core_search_component):
+    def get_sorted_query_dict(self, query_dict, search_logic_component):
         component_sort_order = {
             item["componentname"]: int(item["sortorder"])
-            for item in core_search_component.config["requiredComponents"]
+            for item in search_logic_component.config["requiredComponents"]
         }
         # Sort the query_dict items based on the requiredComponent's sortorder
         sorted_items = sorted(
@@ -139,26 +140,26 @@ class SearchFilterFactory(object):
 
         return dict(sorted_items)
 
-    def get_query_dict_with_core_component(self, query_dict: Dict[str, Any]):
+    def get_query_dict_with_search_logic_component(self, query_dict: Dict[str, Any]):
         """
-        Set core=arches-core-search on query_dict to arches-core-search=True
+        Set search-logic=arches-search-logic on query_dict to arches-search-logic=True
         """
         ret = dict(query_dict)
-        core_component_name = self.get_core_component_name()
-        ret[core_component_name] = True
+        search_logic_component_name = self.get_search_logic_component_name()
+        ret[search_logic_component_name] = True
         # check that all core-search component requiredComponents are present
-        for required_component in self.search_filters[core_component_name].config[
-            "requiredComponents"
-        ]:
+        for required_component in self.search_filters[
+            search_logic_component_name
+        ].config["requiredComponents"]:
             if required_component["componentname"] not in ret:
                 ret[required_component["componentname"]] = {}
 
-        return ret, self.search_filters[core_component_name]
+        return ret, self.search_filters[search_logic_component_name]
 
     def create_search_query_dict(self, key_value_pairs: List[Tuple[str, Any]]):
         # handles list of key,value tuples so that dict-like data from POST and GET
         # requests can be concatenated into single method call
-        query_dict, core_search_component = self.get_query_dict_with_core_component(
-            dict(key_value_pairs)
+        query_dict, search_logic_component = (
+            self.get_query_dict_with_search_logic_component(dict(key_value_pairs))
         )
-        return self.get_sorted_query_dict(query_dict, core_search_component)
+        return self.get_sorted_query_dict(query_dict, search_logic_component)
