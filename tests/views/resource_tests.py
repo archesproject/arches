@@ -184,7 +184,9 @@ class CommandLineTests(ArchesTestCase):
         assign_perm("view_resourceinstance", group, resource)
         response = self.client.get(url)
 
-        self.assertRedirects(response, "/report/" + self.resource_instance_id)
+        self.assertRedirects(
+            response, "/report/" + self.resource_instance_id + "?redirected=true"
+        )
 
     def test_user_cannot_delete_without_permission(self):
         """
