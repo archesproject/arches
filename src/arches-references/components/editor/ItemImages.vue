@@ -7,7 +7,7 @@ import { useGettext } from "vue3-gettext";
 import FileUpload from "primevue/fileupload";
 import { useToast } from "primevue/usetoast";
 
-import { ARCHES_CHROME_BLUE } from "@/arches-references/theme";
+import { ARCHES_CHROME_BLUE } from "@/arches-references/theme.ts";
 import {
     itemKey,
     DEFAULT_ERROR_TOAST_LIFE,

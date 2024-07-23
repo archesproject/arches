@@ -10,7 +10,7 @@ import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import { useToast } from "primevue/usetoast";
 
-import { ARCHES_CHROME_BLUE } from "@/arches-references/theme";
+import { ARCHES_CHROME_BLUE } from "@/arches-references/theme.ts";
 import { deleteValue, upsertValue } from "@/arches-references/api.ts";
 import {
     ALT_LABEL,

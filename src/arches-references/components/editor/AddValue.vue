@@ -5,7 +5,7 @@ import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 
-import { ARCHES_CHROME_BLUE } from "@/arches-references/theme";
+import { ARCHES_CHROME_BLUE } from "@/arches-references/theme.ts";
 import {
     itemKey,
     ALT_LABEL,
