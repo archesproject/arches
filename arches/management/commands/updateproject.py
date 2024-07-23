@@ -1,5 +1,9 @@
 from django.core.management.base import BaseCommand
 
+from arches.app.search.mappings import (
+    prepare_search_index,
+)
+
 
 class Command(BaseCommand):  # pragma: no cover
     """
@@ -16,4 +20,4 @@ class Command(BaseCommand):  # pragma: no cover
             self.stdout.write("Operation aborted.")
 
     def update_to_v8(self):
-        pass
+        prepare_search_index()
