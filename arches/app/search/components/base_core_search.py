@@ -68,6 +68,10 @@ class BaseCoreSearch(BaseSearchFilter):
         self.core_component = models.SearchComponent.objects.get(
             componentname=componentname
         )
+        required_component_sort_order = {
+            item["componentname"]: int(item["sortorder"])
+            for item in self.core_component.config["requiredComponents"]
+        }
         self._required_search_components = list(
             models.SearchComponent.objects.filter(
                 searchcomponentid__in=[
@@ -78,6 +82,16 @@ class BaseCoreSearch(BaseSearchFilter):
                 ]
             )
         )
+        self._required_search_components = sorted(
+            self._required_search_components,
+            key=lambda item: required_component_sort_order.get(
+                item.componentname, float("inf")
+            ),
+        )
+        available_component_sort_order = {
+            item["componentname"]: int(item["sortorder"])
+            for item in self.core_component.config["availableComponents"]
+        }
         self._available_search_components = list(
             models.SearchComponent.objects.filter(
                 searchcomponentid__in=[
@@ -87,6 +101,12 @@ class BaseCoreSearch(BaseSearchFilter):
                     ]
                 ]
             )
+        )
+        self._available_search_components = sorted(
+            self._available_search_components,
+            key=lambda item: available_component_sort_order.get(
+                item.componentname, float("inf")
+            ),
         )
 
     @property
