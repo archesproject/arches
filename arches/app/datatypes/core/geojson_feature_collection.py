@@ -239,9 +239,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 "select st_asgeojson(st_subdivide(ST_GeomFromGeoJSON(%s::jsonb), %s))",
                 [JSONSerializer().serialize(feature["geometry"]), max_points],
             )
+
+            id = feature["id"] if "id" in feature else ""
             smaller_chunks = [
                 {
-                    "id": feature["id"],
+                    "id": id,
                     "type": "Feature",
                     "geometry": json.loads(item[0]),
                 }
