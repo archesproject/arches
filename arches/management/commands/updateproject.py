@@ -244,13 +244,11 @@ class Command(BaseCommand):  # pragma: no cover
                     "project_name",
                     "hosts.py-tpl",
                 ),
-                os.path.join(settings.APP_ROOT),
+                settings.APP_ROOT,
             )
             os.rename(
-                os.path.join(os.path.join(settings.APP_ROOT), "hosts.py-tpl"),
-                os.path.join(
-                    os.path.join(settings.APP_ROOT), "hosts.py-tpl"[:-7] + ".py"
-                ),
+                os.path.join(settings.APP_ROOT, "hosts.py-tpl"),
+                os.path.join(settings.APP_ROOT, "hosts.py-tpl"[:-7] + ".py"),
             )
 
         if os.path.isfile(os.path.join(settings.APP_ROOT, "apps.py")):
@@ -329,7 +327,6 @@ class Command(BaseCommand):  # pragma: no cover
             [str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"]
         )
 
-        path_to_project = os.path.join(settings.APP_ROOT)
         for relative_file_path in [
             os.path.join("..", "gettext.config.js"),
             os.path.join("..", ".coveragerc"),
@@ -343,7 +340,7 @@ class Command(BaseCommand):  # pragma: no cover
             "hosts.py",
         ]:  # relative to app root directory
             try:
-                file = open(os.path.join(path_to_project, relative_file_path), "r")
+                file = open(os.path.join(settings.APP_ROOT, relative_file_path), "r")
                 file_data = file.read()
                 file.close()
 
@@ -359,7 +356,7 @@ class Command(BaseCommand):  # pragma: no cover
                     )
                 )
 
-                file = open(os.path.join(path_to_project, relative_file_path), "w")
+                file = open(os.path.join(settings.APP_ROOT, relative_file_path), "w")
                 file.write(updated_file_data)
                 file.close()
             except FileNotFoundError:
