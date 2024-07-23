@@ -128,6 +128,7 @@ class ArchesCoreSearch(BaseCoreSearch):
         search_query_object["query"].include("displaydescription")
         search_query_object["query"].include("map_popup")
         search_query_object["query"].include("provisional_resource")
+        search_query_object["query"].include("permissions")
         load_tiles = get_str_kwarg_as_bool("tiles", self.request.GET)
         if load_tiles:
             search_query_object["query"].include("tiles")
