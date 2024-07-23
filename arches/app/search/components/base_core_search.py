@@ -95,8 +95,8 @@ class BaseCoreSearch(BaseSearchFilter):
         self._available_search_components = list(
             models.SearchComponent.objects.filter(
                 searchcomponentid__in=[
-                    required_component["searchcomponentid"]
-                    for required_component in self.core_component.config[
+                    available_component["searchcomponentid"]
+                    for available_component in self.core_component.config[
                         "availableComponents"
                     ]
                 ]
