@@ -24,7 +24,7 @@ from arches_references.models import (
 )
 
 # these tests can be run from the command line via
-# python manage.py test arches_references.tests.tests --settings="tests.test_settings"
+# python manage.py test arches_references.tests.view_tests --settings="tests.test_settings"
 
 
 SYNCED_PK = uuid.uuid4()
