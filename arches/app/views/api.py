@@ -459,6 +459,7 @@ class MVT(APIBase):
                                 id,
                                 resourceinstanceid,
                                 nodeid,
+                                featureid::text AS featureid,
                                 ST_AsMVTGeom(
                                     geom,
                                     TileBBox(%s, %s, %s, 3857)
@@ -476,6 +477,7 @@ class MVT(APIBase):
                             id,
                             resourceinstanceid,
                             nodeid,
+                            featureid::text AS featureid,
                             ST_AsMVTGeom(
                                 geom,
                                 TileBBox(%s, %s, %s, 3857)
@@ -1706,7 +1708,7 @@ class Tile(APIBase):
         permitted_nodegroups = get_nodegroups_by_perm(
             request.user, "models.read_nodegroup"
         )
-        if str(tile.nodegroup_id) in permitted_nodegroups:
+        if tile.nodegroup_id in permitted_nodegroups:
             return JSONResponse(tile, status=200)
         else:
             return JSONResponse(_("Tile not found."), status=404)
@@ -1801,7 +1803,7 @@ class Node(APIBase):
 
         # filter nodes from attribute query based on user permissions
         permitted_nodes = [
-            node for node in nodes if str(node["nodegroup_id"]) in permitted_nodegroups
+            node for node in nodes if node["nodegroup_id"] in permitted_nodegroups
         ]
         for node in permitted_nodes:
             try:
