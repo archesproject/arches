@@ -14,11 +14,14 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "baseUrl": "{{ project_name }}/src/",
     "paths": {
+      "@/arches/*": [
+        "./node_modules/arches/arches/app/src/arches/*.ts",
+        "./node_modules/arches/arches/app/src/arches/*.vue"
+      ],
       "@/*": [
-        "*.ts",
-        "*.vue"
+        "./{{ project_name }}/src/*.ts",
+        "./{{ project_name }}/src/*.vue"
       ]
     }
   },
