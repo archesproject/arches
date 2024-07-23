@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("contenttypes", "0002_remove_content_type_name"),
-        # ("arches_references", "9526_node_lists_reffed_by_node_idx"),
+        ("models", "10999_update_principaluser"),
         ("guardian", "0002_generic_permissions_index"),
     ]
 
