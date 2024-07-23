@@ -7,6 +7,7 @@ import uuid
 import sys
 import urllib.request, urllib.parse, urllib.error
 import os
+import warnings
 import logging
 from arches.management.commands import utils
 from arches.app.utils.i18n import LanguageSynchronizer
