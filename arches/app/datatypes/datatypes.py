@@ -1354,9 +1354,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 "select st_asgeojson(st_subdivide(ST_GeomFromGeoJSON(%s::jsonb), %s))",
                 [JSONSerializer().serialize(feature["geometry"]), max_points],
             )
+            id = feature["id"] if "id" in feature else ""
             smaller_chunks = [
                 {
-                    "id": feature["id"],
+                    "id": id,
                     "type": "Feature",
                     "geometry": json.loads(item[0]),
                 }
@@ -2423,7 +2424,7 @@ class BaseDomainDataType(BaseDataType):
                 return get_localized_value(option["text"], return_lang=return_lang)
         raise Exception(
             _(
-                "No domain option found for option id {0}, in node conifg: {1}".format(
+                "No domain option found for option id {0}, in node config: {1}".format(
                     option_id, node.config["options"]
                 )
             )

@@ -1968,8 +1968,12 @@ class Graph(models.GraphModel):
             return fieldname
 
         fieldnames = {}
-        for node_id, node in self.nodes.items():
+        datatype_factory = DataTypeFactory()
+
+        for node in self.nodes.values():
             self._validate_node_name(node)
+            datatype = datatype_factory.get_instance(node.datatype)
+            datatype.validate_node(node)
             if node.exportable is True:
                 if node.fieldname is not None:
                     validated_fieldname = validate_fieldname(node.fieldname, fieldnames)
