@@ -38,7 +38,6 @@ import arches.app.utils.data_management.resource_graphs.exporter as graph_export
 import arches.app.utils.task_management as task_management
 from django.db.utils import IntegrityError
 from django.db import transaction, connection
-from django.utils.module_loading import import_string
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand, CommandError
 from django.core import management
@@ -81,7 +80,6 @@ class Command(BaseCommand):
             dest="operation",
             choices=[
                 "setup",
-                "install",
                 "setup_indexes",
                 "load_concept_scheme",
                 "export_business_data",
@@ -103,8 +101,7 @@ class Command(BaseCommand):
             ],
             help="Operation Type; "
             + "'setup'=Sets up the database schema and code"
-            + "'setup_indexes'=Creates the indexes in Elastic Search needed by the system"
-            + "'install'=Runs the setup file defined in your package root",
+            + "'setup_indexes'=Creates the indexes in Elastic Search needed by the system",
         )
 
         group = parser.add_mutually_exclusive_group()
@@ -333,9 +330,6 @@ class Command(BaseCommand):
 
         if options["operation"] == "setup":
             self.setup(package_name, es_install_location=options["dest_dir"])
-
-        if options["operation"] == "install":
-            self.install(package_name)
 
         if options["operation"] == "setup_indexes":
             self.setup_indexes()
@@ -1318,15 +1312,6 @@ class Command(BaseCommand):
         """
 
         self.setup_db(package_name)
-
-    def install(self, package_name):
-        """
-        Runs the setup.py file found in the package root
-
-        """
-
-        install = import_string("%s.setup.install" % package_name)
-        install()
 
     def setup_db(self, package_name):
         """
