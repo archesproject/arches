@@ -72,9 +72,17 @@ class List(models.Model):
                 if permitted_nodegroups is None or nodegroup_id in permitted_nodegroups
             ]
         else:
-            nodes_using_list = Node.objects.with_controlled_lists().filter(
-                controlled_list_id=self.pk, source_identifier=None
+            # TODO: when dropping support for 7.x replace with simplified:
+            # nodes_using_list = NodeProxy.objects.with_controlled_lists().filter(
+            #     controlled_list_id=self.pk, source_identifier=None
+            # )
+            reffed_by_list = Q(controlled_list_id=self.pk)
+            if hasattr(NodeProxy, "source_identifier"):
+                reffed_by_list &= Q(source_identifier=None)
+            nodes_using_list = NodeProxy.objects.with_controlled_lists().filter(
+                reffed_by_list
             )
+
             filtered_nodes = [
                 node
                 for node in nodes_using_list
@@ -286,7 +294,7 @@ class ListItemImage(models.Model):
 
     class Meta:
         managed = False
-        db_table = "controlledlists_listitemvalue"
+        db_table = "arches_references_listitemvalue"
 
     def serialize(self):
         return {
