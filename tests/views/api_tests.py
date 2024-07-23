@@ -16,18 +16,24 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import json
 import os
+import uuid
+
 from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.urls import reverse
+from django.contrib.auth.models import User
 from django.core import management
 from django.test.client import RequestFactory, Client
 from django.test.utils import captured_stdout
+from unittest.mock import patch, MagicMock
 
 from arches.app.views.api import APIBase
 from arches.app.models import models
 from arches.app.models.graph import Graph
+from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
@@ -500,3 +506,90 @@ class APITests(ArchesTestCase):
             )
 
         self.assertEqual(response.status_code, 400)
+
+
+class ResourceInstanceLifecycleStatesTest(ArchesTestCase):
+    @patch("arches.app.models.models.ResourceInstanceLifecycleState.objects.all")
+    def test_get_all_lifecycle_states(self, mock_all):
+        lifecycle_state1 = models.ResourceInstanceLifecycleState(
+            id=uuid.uuid4(), name="State 1"
+        )
+        lifecycle_state2 = models.ResourceInstanceLifecycleState(
+            id=uuid.uuid4(), name="State 2"
+        )
+        mock_all.return_value = [lifecycle_state1, lifecycle_state2]
+
+        response = self.client.get(reverse("api_resource_instance_lifecycle_states"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 2)
+        self.assertEqual(response.json()[0]["name"], "State 1")
+        self.assertEqual(response.json()[1]["name"], "State 2")
+
+
+class ResourceInstanceLifecycleStateTest(ArchesTestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.lifecycle_state_id = uuid.uuid4()
+        self.new_lifecycle_state_id = uuid.uuid4()
+        self.resource_instance_id = uuid.uuid4()
+        self.resource_id = uuid.uuid4()
+
+    @patch("arches.app.models.models.ResourceInstance.objects.get")
+    def test_get_lifecycle_state(self, mock_get):
+        lifecycle_state = models.ResourceInstanceLifecycleState(
+            id=self.lifecycle_state_id, name="State 1"
+        )
+        mock_resource_instance = MagicMock(
+            resource_instance_lifecycle_state=lifecycle_state
+        )
+        mock_get.return_value = mock_resource_instance
+
+        response = self.client.get(
+            reverse(
+                "api_resource_instance_lifecycle_state",
+                args=[self.resource_instance_id],
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["name"], "State 1")
+
+    @patch("arches.app.models.resource.Resource.objects.get")
+    @patch("arches.app.models.models.ResourceInstanceLifecycleState.objects.get")
+    @patch(
+        "arches.app.models.resource.Resource.update_resource_instance_lifecycle_state"
+    )
+    def test_post_lifecycle_state(
+        self, mock_update, mock_get_lifecycle_state, mock_get_resource
+    ):
+        self.client.login(username="testuser", password="testpass")
+
+        original_lifecycle_state = models.ResourceInstanceLifecycleState(
+            id=self.lifecycle_state_id, name="State 1"
+        )
+        new_lifecycle_state = models.ResourceInstanceLifecycleState(
+            id=self.new_lifecycle_state_id, name="State 2"
+        )
+
+        # Configure the mock to return actual instances
+        mock_get_resource.return_value = Resource(
+            pk=self.resource_id,
+            resource_instance_lifecycle_state=original_lifecycle_state,
+        )
+        mock_get_lifecycle_state.return_value = new_lifecycle_state
+        mock_update.return_value = new_lifecycle_state
+
+        response = self.client.post(
+            reverse("api_resource_instance_lifecycle_state", args=[self.resource_id]),
+            data=json.dumps(str(self.new_lifecycle_state_id)),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json()["original_resource_instance_lifecycle_state"]["name"],
+            "State 1",
+        )
+        self.assertEqual(
+            response.json()["current_resource_instance_lifecycle_state"]["name"],
+            "State 2",
+        )
