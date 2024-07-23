@@ -121,7 +121,7 @@ class ArchesProjectCommand(TemplateCommand):
         options["arches_next_minor_version"] = ".".join(
             [str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"]
         )
-        options["project_name_title_case"] = project_name.title()
+        options["project_name_title_case"] = project_name.title().replace("_", "")
 
         super(ArchesProjectCommand, self).handle(
             "project", project_name, target, **options
@@ -144,7 +144,10 @@ class ArchesProjectCommand(TemplateCommand):
             file.close()
 
             updated_file_data = (
-                file_data.replace("{{ project_name_title_case }}", project_name.title())
+                file_data.replace(
+                    "{{ project_name_title_case }}",
+                    options["project_name_title_case"],
+                )
                 .replace("{{ project_name }}", project_name)
                 .replace(
                     "{{ arches_semantic_version }}", options["arches_semantic_version"]
