@@ -21,6 +21,15 @@ class Command(PackagesCommand):
             ["import_controlled_lists", "export_controlled_lists"]
         )
 
+        parser.add_argument(
+            "-fn",
+            "--file_name",
+            type=str,
+            dest="file_name",
+            default="export_controlled_lists.xlsx",
+            help="The name of the file to export to. Default is export_controlled_lists.xlsx",
+        )
+
     def handle(self, *args, **options):
         super().handle(self, *args, **options)
 
@@ -28,7 +37,7 @@ class Command(PackagesCommand):
             self.import_controlled_lists(options["source"])
 
         if options["operation"] == "export_controlled_lists":
-            self.export_controlled_lists(options["dest_dir"])
+            self.export_controlled_lists(options["dest_dir"], options["file_name"])
 
     def import_controlled_lists(self, source):
         created_instances_pks = []
@@ -134,7 +143,7 @@ class Command(PackagesCommand):
 
         return instance_pks
 
-    def export_controlled_lists(self, data_dest):
+    def export_controlled_lists(self, data_dest, file_name):
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "ControlledList"
@@ -145,7 +154,7 @@ class Command(PackagesCommand):
         # if data_dest == ".":
         #     data_dest = os.path.dirname(settings.SYSTEM_SETTINGS_LOCAL_PATH)
         if data_dest != "" and data_dest != ".":
-            wb.save(os.path.join(data_dest, "controlled_lists.xlsx"))
+            wb.save(os.path.join(data_dest, file_name))
             self.stdout.write("Data exported successfully to controlled_lists.xlsx")
         else:
             self.stdout.write(
