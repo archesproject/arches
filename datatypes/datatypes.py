@@ -2,7 +2,7 @@ import uuid
 
 from django.utils.translation import get_language, gettext as _
 
-from arches.app.datatypes import BaseDataType
+from arches.app.datatypes.base import BaseDataType
 from arches.app.models.graph import GraphValidationError
 
 
