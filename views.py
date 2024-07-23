@@ -9,7 +9,6 @@ from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 
-from arches.app.models.models import Node
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
@@ -22,6 +21,7 @@ from arches_references.models import (
     ListItemImage,
     ListItemImageMetadata,
     ListItemValue,
+    NodeProxy,
 )
 from arches_references.utils import field_names
 
@@ -152,7 +152,7 @@ class ListView(View):
         except List.DoesNotExist:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
 
-        nodes_using_list = Node.objects.with_controlled_lists().filter(
+        nodes_using_list = NodeProxy.objects.with_controlled_lists().filter(
             controlled_list_id=list_to_delete.pk
         )
         errors = [

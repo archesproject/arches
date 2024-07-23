@@ -13,6 +13,7 @@ from arches_references.querysets import (
     ListQuerySet,
     ListItemImageManager,
     ListItemValueQuerySet,
+    NodeQuerySet,
 )
 from arches_references.utils import field_names
 
@@ -350,3 +351,11 @@ class ListItemImageMetadata(models.Model):
             # Get localized label for metadata type
             "metadata_label": str(choices(self.metadata_type).label)
         }
+
+
+# Proxy models for tables managed by core arches
+class NodeProxy(Node):
+    objects = NodeQuerySet.as_manager()
+
+    class Meta:
+        proxy = True
