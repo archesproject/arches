@@ -949,9 +949,9 @@
         hide-facet-path='{% trans "Hide facet path" as hideFacetPath %} "{{ hideFacetPath|escapejs }}"'
     ></div>
     {% endblock arches_translations %}
-    {% block arches_urls %}
-            {% include 'arches_urls.htm' %}
-    {% endblock arches_urls %}
+
+    {% include 'arches_urls.htm' %}
+
     {% block arches_data %}
     <div
         class='arches-data'
