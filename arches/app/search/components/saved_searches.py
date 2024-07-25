@@ -18,6 +18,6 @@ details = {
 class SavedSearches(BaseSearchFilter):
     def view_data(self):
         ret = {}
-        ret["saved_searches"] = settings.SAVED_SEARCHES
+        ret[self.componentname] = settings.SAVED_SEARCHES
 
         return ret
