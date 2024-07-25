@@ -31,51 +31,33 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':{{ livereload_port }}/livereload.js?snipver=1"></' + 'script>')</script>
 {% endif %}
 
-{% block head %}
-{{ block.super }}
-<head>
-    <title>{% block title %}{{ app_settings.APP_NAME }} - {% endblock title %}</title>
+{% block title %}{{ app_settings.APP_NAME }} - {% endblock title %}
 
-    {% block css %}
-        {% render_bundle 'css/arches' 'css' %}
-        {% render_bundle 'css/core' 'css' %}
+{% block css %}
+    {% render_bundle 'css/arches' 'css' %}
+    {% render_bundle 'css/core' 'css' %}
 
-        {% if app_settings.ACTIVE_LANGUAGE_DIR == "rtl" %}
-            {% render_bundle 'css/rtl' 'css' %}
-        {% endif %}
-            
-        {% if app_settings.ACCESSIBILITY_MODE %}
-            {% render_bundle 'css/accessibility' 'css' %}
-        {% endif %}
+    {% if app_settings.ACTIVE_LANGUAGE_DIR == "rtl" %}
+        {% render_bundle 'css/rtl' 'css' %}
+    {% endif %}
         
-        {% render_bundle 'css/package' 'css' %}
-        {% render_bundle 'css/project' 'css' %}
-    {% endblock css %}
+    {% if app_settings.ACCESSIBILITY_MODE %}
+        {% render_bundle 'css/accessibility' 'css' %}
+    {% endif %}
+    
+    {% render_bundle 'css/package' 'css' %}
+    {% render_bundle 'css/project' 'css' %}
+{% endblock css %}
 
-</head>
-{% endblock head %}
+{% block loading_mask %}
+<div class="loading-mask" data-bind="visible: typeof(loading()) === 'boolean' && loading()"></div>
 
-{% block body_content %}
-{{ block.super }}
-<body dir="{{ app_settings.ACTIVE_LANGUAGE_DIR }}" {% block body_attributes %}class="scroll-y-auto"{% endblock %}>
-    {% block loading_mask %}
-    <div class="loading-mask" data-bind="visible: typeof(loading()) === 'boolean' && loading()"></div>
+<div class="loading-mask" style="display: none;" data-bind="visible: typeof(loading()==='string') && loading().length > 0">
+    <div class="loading-mask-string" data-bind="text: loading"></div>
+</div>
+{% endblock loading_mask %}
 
-    <div class="loading-mask" style="display: none;" data-bind="visible: typeof(loading()==='string') && loading().length > 0">
-        <div class="loading-mask-string" data-bind="text: loading"></div>
-    </div>
-    {% endblock loading_mask %}
-
-    {% block body %}
-    {% endblock body %}
-</body>
-{% endblock body_content %}
-
-{% block javascript %}
-    {{ block.super }}
-
-    {% block arches_modules %}
-        {% include 'javascript.htm' %}
-    {% endblock arches_modules %}
-{% endblock javascript %}
+{% block arches_modules %}
+    {% include 'javascript.htm' %}
+{% endblock arches_modules %}
 </html>
