@@ -64,7 +64,7 @@ class BaseSearchLogic(BaseSearchFilter):
     """
 
     def __init__(self, request=None, user=None, componentname=None):
-        super().__init__(request=request, user=user)
+        super().__init__(request=request, user=user, componentname=componentname)
         self.search_logic_component = models.SearchComponent.objects.get(
             componentname=componentname
         )

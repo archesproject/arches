@@ -21,8 +21,8 @@ class PagingFilter(BaseSearchFilter):
         mobile_download = self.request.GET.get("mobiledownload", None)
         page = (
             1
-            if self.request.GET.get(details["componentname"]) == ""
-            else int(self.request.GET.get(details["componentname"], 1))
+            if self.request.GET.get(self.componentname) == ""
+            else int(self.request.GET.get(self.componentname, 1))
         )
 
         if export is not None:
@@ -44,8 +44,8 @@ class PagingFilter(BaseSearchFilter):
         )
         page = (
             1
-            if self.request.GET.get(details["componentname"]) == ""
-            else int(self.request.GET.get(details["componentname"], 1))
+            if self.request.GET.get(self.componentname) == ""
+            else int(self.request.GET.get(self.componentname, 1))
         )
 
         paginator, pages = get_paginator(
@@ -70,6 +70,6 @@ class PagingFilter(BaseSearchFilter):
         ret["end_index"] = page.end_index()
         ret["pages"] = pages
 
-        if details["componentname"] not in response_object:
-            response_object[details["componentname"]] = {}
-        response_object[details["componentname"]]["paginator"] = ret
+        if self.componentname not in response_object:
+            response_object[self.componentname] = {}
+        response_object[self.componentname]["paginator"] = ret

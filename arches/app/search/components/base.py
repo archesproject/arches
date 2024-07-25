@@ -27,9 +27,10 @@ details = {}
 
 
 class BaseSearchFilter:
-    def __init__(self, request=None, user=None):
+    def __init__(self, request=None, user=None, componentname=None):
         self.request = request
         self.user = user
+        self.componentname = componentname
 
     def append_dsl(self, search_query_object, **kwargs):
         """
@@ -72,7 +73,7 @@ class SearchFilterFactory(object):
         }
         self.search_filters_instances = {}
 
-    def get_filter(self, componentname, search_logic=False):
+    def get_filter(self, componentname):
         if componentname in self.search_filters:
             search_filter = self.search_filters[componentname]
             try:
@@ -86,12 +87,10 @@ class SearchFilterFactory(object):
                     search_filter.classname,
                     ExtensionType.SEARCH_COMPONENTS,
                 )
-                if class_method and search_logic:
+                if class_method:
                     filter_instance = class_method(
                         self.request, self.user, componentname
                     )
-                elif class_method:
-                    filter_instance = class_method(self.request, self.user)
                 self.search_filters_instances[search_filter.componentname] = (
                     filter_instance
                 )
@@ -122,10 +121,7 @@ class SearchFilterFactory(object):
 
     def get_search_logic_instance(self):
         search_logic_component_name = self.get_search_logic_component_name()
-        search_logic_instance = self.get_filter(
-            search_logic_component_name, search_logic=True
-        )
-        return search_logic_instance
+        return self.get_filter(search_logic_component_name)
 
     def get_sorted_query_dict(self, query_dict, search_logic_component):
         component_sort_order = {

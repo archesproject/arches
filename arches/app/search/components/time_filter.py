@@ -25,7 +25,7 @@ class TimeFilter(BaseSearchFilter):
         permitted_nodegroups = kwargs.get("permitted_nodegroups")
         include_provisional = kwargs.get("include_provisional")
         search_query = Bool()
-        querysting_params = self.request.GET.get(details["componentname"], "")
+        querysting_params = self.request.GET.get(self.componentname, "")
         temporal_filter = JSONDeserializer().deserialize(querysting_params)
         if "fromDate" in temporal_filter and "toDate" in temporal_filter:
             # now = str(datetime.utcnow())
