@@ -18,7 +18,7 @@ define([
             url: arches.urls.api_search_component_data + componentName,
             context: this
         }).done(function(response) {
-            response.saved_searches.forEach(function(search) {
+            response[componentName].forEach(function(search) {
                 let searchImageUrl = arches.urls.url_subpath + ((search.IMAGE && search.IMAGE.length > 0) ? search.IMAGE[0].url : '');
                 searchImageUrl = searchImageUrl.replace('//', '/');
                 self.items.push({
