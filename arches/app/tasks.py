@@ -545,7 +545,7 @@ def edit_bulk_concept_data(
         load_event.save()
         status = _("Failed")
     finally:
-        msg = _("Bulk Data Edit: {} [{}]").format(operation, status)
+        msg = _("Bulk Concept Editor: [{}]").format(status)
         user = User.objects.get(id=userid)
         notify_completion(msg, user)
 

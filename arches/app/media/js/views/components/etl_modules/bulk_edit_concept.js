@@ -9,6 +9,7 @@ define([
     'select-woo'
 ], function(ko, $, uuid, arches, JsonErrorAlertViewModel, baseStringEditorTemplate) {
     const ViewModel = function(params) {
+        console.log(params);
         const self = this;
         this.editHistoryUrl = `${arches.urls.edit_history}?transactionid=${ko.unwrap(params.selectedLoadEvent)?.loadid}`;
         this.load_details = params.load_details ?? {};
@@ -43,7 +44,7 @@ define([
         this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
         this.statusDetails = this.selectedLoadEvent()?.load_description?.split("|");
         this.timeDifference = params.timeDifference;
-
+        this.alert = params.alert || ko.observable();
         
         this.addAllFormData = () => {
             if (self.selectedGraph()) { self.formData.append('selectedGraph', self.selectedGraph()); }

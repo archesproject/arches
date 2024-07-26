@@ -97,11 +97,20 @@ def perth_items(items):
 
 
 class BulkConceptEditor(BaseBulkEditor):
-    def editor_log(self, cursor, tile, node_id, resourceid, old_value):
+    def editor_log(self, cursor, tile, node_id, resourceid, old_value, new_value):
         id = uuid.uuid4()
         cursor.execute(
-            """INSERT INTO edit_log (editlogid, resourceinstanceid, nodegroupid, tileinstanceid, oldvalue, edittype, transactionid) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-            (id, resourceid, node_id, tile, old_value, "tile edit", str(self.loadid)),
+            """INSERT INTO edit_log (editlogid, resourceinstanceid, nodegroupid, tileinstanceid, oldvalue, newvalue, edittype, transactionid) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+            (
+                id,
+                resourceid,
+                node_id,
+                tile,
+                old_value,
+                new_value,
+                "tile edit",
+                str(self.loadid),
+            ),
         )
 
     def validate_inputs(self, request):
@@ -277,12 +286,12 @@ class BulkConceptEditor(BaseBulkEditor):
 
         return tile_ids, tiles_data, resources
 
-    def edit_staged_data(
+    def stage_data(
         self,
         cursor,
         graphid,
         nodeid,
-        languageold,
+        language_old,
         resource_ids,
         language_new,
         oldid,
@@ -298,7 +307,7 @@ class BulkConceptEditor(BaseBulkEditor):
                 "node": str(nodeid),
                 "new": str(newid),
                 "old": tiledata,
-                "languageold": languageold,
+                "languageold": language_old,
                 "languagenew": language_new,
             }
             operation = "update"
@@ -846,11 +855,12 @@ class BulkConceptEditor(BaseBulkEditor):
             "languageold": language_old,
             "languagenew": language_new,
         }
-        resourcesid = []
+        resourceids = []
+        ### get all the resourceids and (-) removed resourceids
         for resource in table.split(","):
             try:
                 uuid.UUID(resource)
-                resourcesid.append(resource)
+                resourceids.append(resource)
             except ValueError:
                 pass
 
@@ -902,17 +912,17 @@ class BulkConceptEditor(BaseBulkEditor):
         id_name_pairs = []
         id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
         graphid = next(
-            (pair for pair in id_name_pairs if pair[1] == selected_grapgh), None
+            (pair for pair in id_name_pairs if pair[1] == selected_graph), None
         )
-        resourcesid = []
+        resourceids = []
         for resource in table.split(","):
             try:
                 uuid.UUID(resource)
-                resourcesid.append(resource)
+                resourceids.append(resource)
             except ValueError:
                 pass
-        if resourcesid:
-            resourceids_json_string = json.dumps(resourcesid)
+        if resourceids:
+            resourceids_json_string = json.dumps(resourceids)
             resourceids = json.loads(resourceids_json_string)
         pattern = old
         edit_task = edit_bulk_concept_data.apply_async(
@@ -944,7 +954,7 @@ class BulkConceptEditor(BaseBulkEditor):
         module_id,
         graphid,
         nodeid,
-        languageold,
+        language_old,
         resourceids,
         language_new,
         oldid,
@@ -954,7 +964,7 @@ class BulkConceptEditor(BaseBulkEditor):
         with connection.cursor() as cursor:
             self.log_event_details(cursor, "done|Staging the data for edit...")
             # select_query = "SELECT valueid FROM values Where conceptid = %s and languageid = %s and valuetype = 'prefLabel';"
-            # cursor.execute(select_query, [oldid[0], languageold])
+            # cursor.execute(select_query, [oldid[0], language_old])
             # valueid = cursor.fetchall()
             # oldid = valueid[0][0]
             # select_query = "SELECT valueid FROM values Where conceptid = %s and languageid = %s and valuetype = 'prefLabel';"
@@ -964,11 +974,11 @@ class BulkConceptEditor(BaseBulkEditor):
             self.log_event_details(cursor, "done|Editing the data...")
             tile = self.return_value(cursor, resourceids, nodeid, oldid, newid)
             self.log_event_details(cursor, "done|returm data...")
-            data_updated = self.edit_staged_data(
+            data_updated = self.stage_data(
                 cursor,
                 graphid[0],
                 nodeid,
-                languageold,
+                language_old,
                 tile[2],
                 language_new,
                 oldid,
