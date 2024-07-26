@@ -134,6 +134,7 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.gis",
+    "django_hosts",
     "arches_references",
     "arches",
     "arches.app.models",
@@ -151,6 +152,9 @@ INSTALLED_APPS = (
 # take precedence over core arches templates in arches/app/templates.
 INSTALLED_APPS += ("arches.app",)
 
+ROOT_HOSTCONF = "arches_references.hosts"
+DEFAULT_HOST = "arches_references"
+
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -167,6 +171,15 @@ MIDDLEWARE = [
     "arches.app.utils.middleware.SetAnonymousUser",
     # "silk.middleware.SilkyMiddleware",
 ]
+
+MIDDLEWARE.insert(  # this must resolve to first MIDDLEWARE entry
+    0, 
+    "django_hosts.middleware.HostsRequestMiddleware"
+)
+
+MIDDLEWARE.append(  # this must resolve last MIDDLEWARE entry
+    "django_hosts.middleware.HostsResponseMiddleware"
+)
 
 STATICFILES_DIRS = build_staticfiles_dirs(app_root=APP_ROOT)
 

@@ -13,7 +13,6 @@ from arches_references.views import (
 )
 
 urlpatterns = [
-    path("", include("arches.urls")),
     path("api/controlled_lists/", ListsView.as_view(), name="controlled_lists"),
     path(
         "api/controlled_list/<uuid:list_id>/",
@@ -61,7 +60,13 @@ urlpatterns = [
         ListItemImageMetadataView.as_view(),
         name="controlled_list_item_image_metadata_add",
     ),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] 
+
+# Ensure Arches core urls are superseded by project-level urls
+urlpatterns.append(path('', include('arches.urls')))
+
+# Adds URL pattern to serve media files during development
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Only handle i18n routing in active project. This will still handle the routes provided by Arches core and Arches applications,
 # but handling i18n routes in multiple places causes application errors.
