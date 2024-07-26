@@ -32,7 +32,10 @@ define([
             // Split each array item into [key, value]
             // ignore empty string if search is empty
             .map(function(item) {
-                if (item) return item.split('=');
+                if (item) {
+                    var cleanItem = item.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+                    return cleanItem.split('=');
+                } 
             })
             // Remove undefined in the case the search is empty
             .compact()
