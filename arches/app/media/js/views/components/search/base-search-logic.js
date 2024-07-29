@@ -35,7 +35,13 @@ define([
             this.alert = sharedStateObject.alert;
             this.sharedStateObject = sharedStateObject;
             this.queryString.subscribe(function() {
-                this.doQuery();
+                if (this.requiredFiltersLoaded()) {
+                    this.doQuery();
+                } else {
+                    this.requiredFiltersLoaded.subscribe(function() {
+                        this.doQuery();
+                    }, this);
+                }
             }, this);
         },
 
