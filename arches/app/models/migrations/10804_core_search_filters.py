@@ -42,6 +42,7 @@ class Migration(migrations.Migration):
     """
     reverse_sql = """
         delete from search_component where searchcomponentid = '69695d63-6f03-4536-8da9-841b07116381';
+        UPDATE search_component SET config = '{}';
     """
 
     operations = [
@@ -61,10 +62,5 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name="searchcomponent",
             name="sortorder",
-        ),
-        migrations.AlterField(
-            model_name="searchcomponent",
-            name="componentpath",
-            field=models.TextField(),
         ),
     ]
