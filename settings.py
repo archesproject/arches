@@ -173,8 +173,7 @@ MIDDLEWARE = [
 ]
 
 MIDDLEWARE.insert(  # this must resolve to first MIDDLEWARE entry
-    0, 
-    "django_hosts.middleware.HostsRequestMiddleware"
+    0, "django_hosts.middleware.HostsRequestMiddleware"
 )
 
 MIDDLEWARE.append(  # this must resolve last MIDDLEWARE entry

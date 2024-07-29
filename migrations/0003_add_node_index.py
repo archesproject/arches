@@ -7,8 +7,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '10999_update_principaluser'),
-        ('arches_references', '0002_etl_collections_to_controlled_lists'),
+        ("models", "10999_update_principaluser"),
+        ("arches_references", "0002_etl_collections_to_controlled_lists"),
     ]
 
     create_index = textwrap.dedent(
@@ -22,18 +22,14 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='NodeProxy',
-            fields=[
-            ],
+            name="NodeProxy",
+            fields=[],
             options={
-                'proxy': True,
-                'indexes': [],
-                'constraints': [],
+                "proxy": True,
+                "indexes": [],
+                "constraints": [],
             },
-            bases=('models.node',),
+            bases=("models.node",),
         ),
-        migrations.RunSQL(
-            create_index,
-            remove_index
-        ),
+        migrations.RunSQL(create_index, remove_index),
     ]
