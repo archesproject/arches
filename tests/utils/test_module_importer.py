@@ -3,7 +3,7 @@ from unittest import mock
 from django.test import TestCase, override_settings
 
 from arches.app.const import ExtensionType
-from arches.app.utils.module_importer import get_directories
+from arches.app.utils.module_importer import get_directories, get_class_from_modulename
 from tests.base_test import sync_overridden_test_settings_to_arches
 
 # these tests can be run from the command line via
@@ -105,3 +105,18 @@ class ModuleImporterTests(TestCase):
                 "arches.app.datatypes",
             ],
         )
+
+    @override_settings(
+        APP_NAME="hiphop",
+        DATATYPE_LOCATIONS=["hiphop.datatypes"],
+    )
+    def test_arches_application_datatypes_get_class_from_modulename(self):
+        with sync_overridden_test_settings_to_arches():
+            from arches.app.models.models import DDataType
+            DDataTypes = DDataType.objects.all()
+            for d_datatype in DDataTypes:
+                get_class_from_modulename(
+                    d_datatype.modulename, d_datatype.classname, ExtensionType.DATATYPES
+                )
+            breakpoint()
+
