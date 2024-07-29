@@ -48,8 +48,9 @@ define([
         this.defaultSearchLogicComponent = this.filtersList.find(component => component.type == "search-logic" && component.config.default == true); // approach: let the backend decide
         this.searchLogicComponentName = ko.observable(false);
         this.requiredFiltersLookup = this.filtersList.reduce((lookup, item) => {
-            if (item.config.requiredComponents && item.config.requiredComponents.length > 0) {
-                // Extract the names from requiredComponents and assign them to the lookup object under the component name
+            if (item.config.availableComponents && item.config.availableComponents.length > 0) {
+                lookup[item.componentname] = item.config.availableComponents.map(filter => filter.searchcomponentid);
+            } else if (item.config.requiredComponents && item.config.requiredComponents.length > 0) {
                 lookup[item.componentname] = item.config.requiredComponents.map(filter => filter.searchcomponentid);
             } else {
                 lookup[item.componentname] = [];
