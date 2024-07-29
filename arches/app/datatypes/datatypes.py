@@ -844,25 +844,25 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
         def validate_geom(geom, coordinate_count=0):
             try:
-                coordinate_count += geom.num_coords
+                # coordinate_count += geom.num_coords
                 bbox = Polygon(settings.DATA_VALIDATION_BBOX)
-                if coordinate_count > coord_limit:
-                    message = _(
-                        "Geometry has too many coordinates for Elasticsearch ({0}), \
-                        Please limit to less then {1} coordinates of 5 digits of precision or less.".format(
-                            coordinate_count, coord_limit
-                        )
-                    )
-                    title = _("Geometry Too Many Coordinates for ES")
-                    errors.append(
-                        {
-                            "type": "ERROR",
-                            "message": "datatype: {0} value: {1} {2} - {3}. {4}".format(
-                                self.datatype_model.datatype, value, source, message, "This data was not imported."
-                            ),
-                            "title": title,
-                        }
-                    )
+                # if coordinate_count > coord_limit:
+                #     message = _(
+                #         "Geometry has too many coordinates for Elasticsearch ({0}), \
+                #         Please limit to less then {1} coordinates of 5 digits of precision or less.".format(
+                #             coordinate_count, coord_limit
+                #         )
+                #     )
+                #     title = _("Geometry Too Many Coordinates for ES")
+                #     errors.append(
+                #         {
+                #             "type": "ERROR",
+                #             "message": "datatype: {0} value: {1} {2} - {3}. {4}".format(
+                #                 self.datatype_model.datatype, value, source, message, "This data was not imported."
+                #             ),
+                #             "title": title,
+                #         }
+                #     )
 
                 if bbox.contains(geom) == False:
                     message = _(
@@ -966,15 +966,61 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return updated_data
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        document["geometries"].append({"geom": nodevalue, "nodegroup_id": tile.nodegroup_id, "provisional": provisional, "tileid": tile.pk})
+        max_length = 32000  # this was 32766, but do we need space for extra part of JSON?
+
+        def len_feature(feature):
+            return len(str(feature).encode("UTF-8"))
+
+        features = []
+        nodevalue["properties"] = {}
+        # print("Doc length: %s" % len_feature(nodevalue))
+        if len_feature(nodevalue) < max_length:
+            features.append(nodevalue)
+        else:
+            for feature in nodevalue['features']:
+                new_feature = {"type": "FeatureCollection", "features": [feature]}
+                if len_feature(new_feature) < max_length:
+                    features.append(new_feature)
+                else:
+                    chunks = self.split_geom(feature, len_feature)
+                    features = features + chunks
+
+        print("Number of features: %s" % len(features))
+        for feature in features:
+            document["geometries"].append({"geom": feature, "nodegroup_id": tile.nodegroup_id, "provisional": provisional, "tileid": tile.pk})
         bounds = self.get_bounds_from_value(nodevalue)
         if bounds is not None:
             minx, miny, maxx, maxy = bounds
             centerx = maxx - (maxx - minx) / 2
             centery = maxy - (maxy - miny) / 2
             document["points"].append(
-                {"point": {"lon": centerx, "lat": centery}, "nodegroup_id": tile.nodegroup_id, "provisional": provisional}
+                {
+                    "point": {"lon": centerx, "lat": centery},
+                    "nodegroup_id": tile.nodegroup_id,
+                    "provisional": provisional,
+                }
             )
+
+    def split_geom(self, feature, len_feature):
+        feat_len_bytes = len_feature(feature)
+        geom = feature["geometry"]
+        coordinates = geom["coordinates"] if geom["type"] == "LineString" else geom["coordinates"][0]
+        num_points = len(coordinates)
+        num_chunks = feat_len_bytes / 32000
+        max_points = int(num_points/num_chunks)
+        print("points/chunks = max_points: %s/%s = %s" % (num_points, num_chunks, max_points))
+
+        # print("Geometry: %s" % geom)
+        # print("Geometry: %s" % geom["geometry"])
+        with connection.cursor() as cur:
+            cur.execute('select st_asgeojson(st_subdivide(%s, %s))', [str(feature["geometry"]), max_points])
+            smaller_chunks = [{'id': feature['id'], 'type': 'Feature', 'geometry': json.loads(item[0])} for item in cur.fetchall()]
+            feature_collections = [{"type": "FeatureCollection", "features": [geometry]} for geometry in smaller_chunks]
+            # for chunk in smaller_chunks:
+            #     # print(chunk)
+            #     print("Type: %s" % type(chunk))
+            #     print("New feature length: %s " % len_feature(chunk))
+            return feature_collections
 
     def get_bounds(self, tile, node):
         bounds = None
