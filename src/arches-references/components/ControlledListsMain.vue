@@ -19,7 +19,7 @@ import ListHeader from "@/arches-references/components/misc/ListHeader.vue";
 import ListTree from "@/arches-references/components/tree/ListTree.vue";
 
 import type { Ref } from "vue";
-import type { Language } from "@/arches/types";
+import type { Language } from "arches/arches/app/src/arches/types";
 import type { Selectable } from "@/arches-references/types";
 
 const splash = "splash";

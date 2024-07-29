@@ -10,7 +10,7 @@ import {
 import { bestLabel, dataIsList } from "@/arches-references/utils.ts";
 
 import type { Ref } from "vue";
-import type { Language } from "@/arches/types";
+import type { Language } from "arches/arches/app/src/arches/types";
 import type {
     ControlledList,
     DisplayedRowRefAndSetter,

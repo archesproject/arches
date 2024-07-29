@@ -9,7 +9,7 @@ import Dropdown from "primevue/dropdown";
 import { selectedLanguageKey } from "@/arches-references/constants.ts";
 
 import type { Ref } from "vue";
-import type { Language } from "@/arches/types";
+import type { Language } from "arches/arches/app/src/arches/types";
 
 const { $gettext } = useGettext();
 
