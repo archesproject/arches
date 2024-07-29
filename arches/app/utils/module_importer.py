@@ -45,15 +45,14 @@ def get_class_from_modulename(modulename, classname, extension_type: ExtensionTy
         except ImportError as e:
             import_error = e
             continue
-        try: 
+        try:
             func = getattr(module, classname)
             import_success = True
         except AttributeError as e:
             import_error = e
         if import_success:
             break
-    if import_success == False:
-        print("Failed to import " + mod_path)
-        print(import_error)
+    if not import_success:
+        raise import_error
 
     return func
