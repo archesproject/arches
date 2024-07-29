@@ -4,7 +4,7 @@ define([
     'views/components/search/base-filter',
     'templates/views/components/search/provisional-filter.htm',
 ], function(ko, arches, BaseFilter, provisionalFilterTemplate) {
-    var componentName = 'provisional-filter';
+    const componentName = 'provisional-filter';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             options.name = 'Provisional Filter';
