@@ -38,8 +38,9 @@ define([
                 if (this.requiredFiltersLoaded()) {
                     this.doQuery();
                 } else {
-                    this.requiredFiltersLoaded.subscribe(function() {
-                        this.doQuery();
+                    this.requiredFiltersLoaded.subscribe(function(loaded) {
+                        if (loaded)
+                            this.doQuery();
                     }, this);
                 }
             }, this);
