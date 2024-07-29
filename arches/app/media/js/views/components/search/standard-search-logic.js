@@ -22,17 +22,6 @@ define([
             }, this);
             this.selectedTab = ko.observable(firstEnabledFilter.componentname);
             this.sharedStateObject.selectedTab = this.selectedTab;
-
-            this.filterApplied = ko.pureComputed(function(){
-                var filterNames = Object.keys(sharedStateObject.filters);
-                return filterNames.some(function(filterName){
-                    if (ko.unwrap(sharedStateObject.filters[filterName]) && filterName !== 'paging-filter') {
-                        return !!ko.unwrap(sharedStateObject.filters[filterName]).query()[filterName];
-                    } else {
-                        return false;
-                    }
-                });
-            }, this);
             this.resultsExpanded = ko.observable(true);
             this.isResourceRelatable = function(graphId) {
                 var relatable = false;
@@ -61,6 +50,7 @@ define([
                     this.selectedPopup(componentname);
                 }
             };
+            this.filters[componentName](this);
         },
 
     });

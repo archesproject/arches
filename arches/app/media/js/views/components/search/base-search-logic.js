@@ -19,8 +19,10 @@ define([
             $.extend(this, sharedStateObject);
             this.requiredFilters = this.getRequiredFilters(this.componentName);
             this.requiredFiltersLoaded = ko.computed(function() {
-                var self = this;
-                var res = this.requiredFilters.every(function(f){return self.getFilter(f) !== null;});
+                let res = true;
+                Object.entries(this.filters).forEach(function([componentName, filter]) {
+                    res = res && ko.unwrap(filter) !== null;
+                });
                 return res;
             }, this);
 
@@ -38,9 +40,8 @@ define([
                 if (this.requiredFiltersLoaded()) {
                     this.doQuery();
                 } else {
-                    this.requiredFiltersLoaded.subscribe(function(loaded) {
-                        if (loaded)
-                            this.doQuery();
+                    this.requiredFiltersLoaded.subscribe(function() {
+                        this.doQuery();
                     }, this);
                 }
             }, this);

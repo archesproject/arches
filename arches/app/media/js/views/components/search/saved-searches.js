@@ -5,9 +5,10 @@ define([
     'templates/views/components/search/saved-searches.htm',
     'bindings/smartresize',
 ], function($, ko, arches, savedSearchesTemplate) {
-    var componentName = 'saved-searches';
+    const componentName = 'saved-searches';
     const viewModel = function(params) {
         var self = this;
+        self.filters = params.filters;
 
          
         self.urls = arches.urls;
@@ -28,6 +29,7 @@ define([
                     searchUrl: search.SEARCH_URL[arches.activeLanguage].value
                 });
             });
+            self.filters[componentName](self);
         });
 
         self.options = {
