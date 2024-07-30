@@ -54,9 +54,7 @@ runs:
       with:
         repository: ${{ github.repository }}
         ref: ${{ github.event.pull_request.base.ref }}
-        clean: true
-        fetch-depth: 1
-        path: .
+        # path: .
 
     - name: Clean install dependencies
       run: |
