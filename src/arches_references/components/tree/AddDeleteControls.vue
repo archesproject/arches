@@ -255,7 +255,29 @@ await fetchListsAndPopulateTree();
         raised
         @click="createList"
     />
-    <ConfirmDialog :draggable="false" />
+    <ConfirmDialog
+        :draggable="false"
+        :pt="{
+            root: {
+                style: {
+                    fontSize: 'small',
+                },
+            },
+            header: {
+                style: {
+                    background: 'var(--p-sky-950)',
+                    color: 'white',
+                    borderRadius: '1rem',
+                    marginBottom: '1rem',
+                },
+            },
+            title: {
+                style: {
+                    fontWeight: 800,
+                },
+            },
+        }"
+    />
     <SplitButton
         class="list-button"
         :label="$gettext('Delete')"
@@ -264,7 +286,11 @@ await fetchListsAndPopulateTree();
         :disabled="!toDelete.length"
         :severity="DANGER"
         :model="deleteSelectOptions"
-        :pt="{ pcButton: { style: { fontSize: 'inherit' } } }"
+        :pt="{
+            pcButton: {
+                root: { style: { width: '100%', fontSize: 'inherit' } },
+            },
+        }"
         @click="confirmDelete"
     />
 </template>
@@ -277,36 +303,5 @@ await fetchListsAndPopulateTree();
     justify-content: center;
     text-wrap: nowrap;
     font-size: inherit;
-}
-</style>
-
-<style>
-.p-dialog {
-    font-size: small;
-}
-
-.p-splitbutton-button {
-    /* These overrides seem to reveal a bug in primevue? */
-    width: 100%;
-    font-size: inherit !important;
-}
-
-.p-dialog-header {
-    background: var(--p-sky-950);
-    color: white;
-    border-radius: 1rem;
-    margin-bottom: 1rem;
-}
-
-.p-dialog-title {
-    font-weight: 800;
-}
-
-.p-confirm-dialog-accept {
-    font-weight: 600;
-}
-
-.p-button {
-    font-size: small;
 }
 </style>

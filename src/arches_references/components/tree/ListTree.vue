@@ -194,13 +194,15 @@ const ptNodeContent = ({ instance }: TreePassThroughMethodOptions) => {
             root: {
                 style: {
                     flexGrow: 1,
-                    border: 0,
                     overflowY: 'hidden',
                     paddingBottom: '5rem',
                 },
             },
             pcFilter: {
-                ariaLabel: $gettext('Find'),
+                root: {
+                    ariaLabel: $gettext('Find'),
+                    style: { width: '100%', fontSize: 'small' },
+                },
             },
             filterIcon: { style: { display: 'flex' } },
             wrapper: {
