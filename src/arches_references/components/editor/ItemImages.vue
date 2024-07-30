@@ -9,9 +9,12 @@ import { useToast } from "primevue/usetoast";
 
 import {
     itemKey,
+    CONTRAST,
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
+    PRIMARY,
 } from "@/arches_references/constants.ts";
+import { shouldUseContrast } from "@/arches_references/utils.ts";
 import ImageEditor from "@/arches_references/components/editor/ImageEditor.vue";
 
 import type { Ref } from "vue";
@@ -75,6 +78,9 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
             :with-credentials="true"
             :show-cancel-button="false"
             :show-upload-button="false"
+            :choose-button-props="{
+                severity: shouldUseContrast() ? CONTRAST : PRIMARY,
+            }"
             choose-icon="fa fa-plus-circle"
             :choose-label="$gettext('Upload an image')"
             name="item_image"

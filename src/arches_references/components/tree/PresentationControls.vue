@@ -6,7 +6,12 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 import Select from "primevue/select";
 
-import { SECONDARY, selectedLanguageKey } from "@/arches_references/constants.ts";
+import {
+    CONTRAST,
+    SECONDARY,
+    selectedLanguageKey,
+} from "@/arches_references/constants.ts";
+import { shouldUseContrast } from "@/arches_references/utils.ts";
 
 import type { Ref } from "vue";
 import type { Language } from "@/arches/types";
@@ -24,7 +29,7 @@ const { expandAll, collapseAll } = defineProps<{
 <template>
     <div style="text-align: center; display: flex; width: 100%">
         <Button
-            :severity="SECONDARY"
+            :severity="shouldUseContrast() ? CONTRAST : SECONDARY"
             class="secondary-button"
             type="button"
             icon="fa fa-plus"
@@ -32,7 +37,7 @@ const { expandAll, collapseAll } = defineProps<{
             @click="expandAll"
         />
         <Button
-            :severity="SECONDARY"
+            :severity="shouldUseContrast() ? CONTRAST : SECONDARY"
             class="secondary-button"
             type="button"
             icon="fa fa-minus"

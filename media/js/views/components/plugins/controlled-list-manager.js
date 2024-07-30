@@ -10,7 +10,7 @@ import ControlledListManagerTemplate from 'templates/views/components/plugins/co
 const ControlledListsPreset = definePreset(Aura, {
     primitive: {
         sky: {
-            950: '#2d3c4b',
+            950: '#2d3c4b',  // matches arches sidebar
         },
     },
     components: {

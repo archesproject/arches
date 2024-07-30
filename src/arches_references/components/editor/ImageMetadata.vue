@@ -16,13 +16,18 @@ import {
     upsertMetadata,
 } from "@/arches_references/api.ts";
 import {
+    CONTRAST,
     DANGER,
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
     METADATA_CHOICES,
     itemKey,
 } from "@/arches_references/constants.ts";
-import { dataIsNew, languageNameFromCode } from "@/arches_references/utils.ts";
+import {
+    dataIsNew,
+    languageNameFromCode,
+    shouldUseContrast,
+} from "@/arches_references/utils.ts";
 import AddMetadata from "@/arches_references/components/editor/AddMetadata.vue";
 
 import type { Ref } from "vue";
@@ -374,7 +379,7 @@ const focusInput = () => {
         />
         <Button
             raised
-            :severity="DANGER"
+            :severity="shouldUseContrast() ? CONTRAST : DANGER"
             icon="fa fa-trash"
             :label="$gettext('Delete image')"
             @click="issueDeleteImage"

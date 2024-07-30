@@ -247,3 +247,9 @@ export const vFocus = {
         setTimeout(() => el && el.focus({ focusVisible: true }), 5);
     },
 };
+
+export const shouldUseContrast = () => {
+    return Array.from(document.getElementsByTagName("link")).some((el) =>
+        el.href.endsWith("accessibility.css"),
+    );
+};

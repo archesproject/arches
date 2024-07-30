@@ -4,8 +4,12 @@ import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 
-import { selectedLanguageKey, SECONDARY } from "@/arches_references/constants.ts";
-import { bestLabel } from "@/arches_references/utils.ts";
+import {
+    selectedLanguageKey,
+    CONTRAST,
+    SECONDARY,
+} from "@/arches_references/constants.ts";
+import { bestLabel, shouldUseContrast } from "@/arches_references/utils.ts";
 
 import type { Ref } from "vue";
 import type { TreeSelectionKeys } from "primevue/tree";
@@ -54,7 +58,7 @@ const abandonMove = () => {
             ref="abandonMoveRef"
             type="button"
             class="banner-button"
-            :severity="SECONDARY"
+            :severity="shouldUseContrast() ? CONTRAST : SECONDARY"
             :label="$gettext('Abandon')"
             @click="abandonMove"
         />
@@ -67,7 +71,7 @@ const abandonMove = () => {
         <Button
             type="button"
             class="banner-button"
-            :severity="SECONDARY"
+            :severity="shouldUseContrast() ? CONTRAST : SECONDARY"
             :label="$gettext('Abandon')"
             @click="
                 isMultiSelecting = false;
