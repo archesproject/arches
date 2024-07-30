@@ -98,7 +98,7 @@ define([
             }
         };
 
-        sharedStateObject.filters[componentName](this);
+        sharedStateObject.searchComponentVms[componentName](this);
     };
 
     return ko.components.register(componentName, {
