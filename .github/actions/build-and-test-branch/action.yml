@@ -54,7 +54,11 @@ runs:
       with:
         repository: ${{ github.repository }}
         ref: ${{ github.event.pull_request.base.ref }}
-        # path: .
+        path: .
+    
+    - name: Verify current branch
+        run: echo "Checked out branch: $(git rev-parse --abbrev-ref HEAD)"
+        shell: bash
 
     - name: Clean install dependencies
       run: |
