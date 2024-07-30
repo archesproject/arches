@@ -85,6 +85,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
                         style: { display: done ? 'none' : '' },
                     };
                 },
+                pcChooseButton: { root: { style: { fontSize: 'smaller' } } },
             }"
             @before-send="addHeader($event)"
             @upload="upload($event)"
@@ -126,11 +127,6 @@ p {
     display: flex;
     flex-direction: column;
     gap: 3rem;
-}
-
-:deep(.p-button-icon),
-:deep(.p-button-label) {
-    font-size: small;
 }
 
 :deep(input[type="file"]) {

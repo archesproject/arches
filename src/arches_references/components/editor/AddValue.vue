@@ -108,6 +108,6 @@ const addValue = () => {
     display: flex;
     height: 3rem;
     margin-top: 1rem;
-    font-size: small;
+    font-size: smaller;
 }
 </style>

@@ -406,6 +406,6 @@ const focusInput = () => {
 .p-button {
     height: 3rem;
     margin-top: 1rem;
-    font-size: small;
+    font-size: smaller;
 }
 </style>
