@@ -1,6 +1,10 @@
 ---
 repos:
 
+  - repo: meta
+    hooks:
+      - id: check-hooks-apply
+
   - repo: https://github.com/psf/black
     rev: 24.4.2
     hooks:
@@ -24,7 +28,7 @@ repos:
         name: typescript
         entry: npm run ts:check
         language: system
-        types: [
+        types_or: [
           "ts",
           "vue",
         ]
