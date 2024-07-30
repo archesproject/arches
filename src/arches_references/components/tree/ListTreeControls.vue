@@ -76,7 +76,7 @@ const expandNode = (node: TreeNode) => {
 <style scoped>
 .controls {
     display: flex;
-    background: var(--p-sky-50);
+    background: var(--p-primary-50);
     gap: 0.5rem;
     padding: 0.5rem;
     justify-content: space-between;

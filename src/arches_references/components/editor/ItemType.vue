@@ -75,7 +75,7 @@ label {
 }
 
 h4 {
-    color: var(--p-sky-950);
+    color: var(--p-primary-950);
     margin-top: 0;
     font-size: 1.33rem;
 }
