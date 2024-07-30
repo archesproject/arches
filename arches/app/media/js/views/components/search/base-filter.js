@@ -17,8 +17,10 @@ define([
             $.extend(this, options);
             this.requiredFilters = this.getRequiredFilters(this.componentName);
             this.requiredFiltersLoaded = ko.computed(function() {
-                var self = this;
-                var res = this.requiredFilters.every(function(f){return self.getFilter(f) !== null;});
+                let res = true;
+                Object.entries(this.filters).forEach(function([componentName, filter]) {
+                    res = res && filter !== null;
+                });
                 return res;
             }, this);
         },

@@ -21,7 +21,7 @@ define([
             this.requiredFiltersLoaded = ko.computed(function() {
                 let res = true;
                 Object.entries(this.filters).forEach(function([componentName, filter]) {
-                    res = res && ko.unwrap(filter) !== null;
+                    res = res && filter !== null;
                 });
                 return res;
             }, this);
