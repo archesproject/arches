@@ -33,6 +33,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
           check-latest: true
 
+      - name: Checkout into target branch
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.event.pull_request.base.ref }}
+          path: .
+
       - name: Build and test branch
         uses: ./.github/actions/build-and-test-branch
         with:
@@ -40,219 +47,226 @@ jobs:
           project-name: 'arches'
           branch-type: 'target'
 
-  # build_feature_branch:
-  #   runs-on: ubuntu-latest
+  build_feature_branch:
+    runs-on: ubuntu-latest
 
-  #   services:
-  #     postgres:
-  #       image: postgis/postgis:13-3.0
-  #       env:
-  #         POSTGRES_PASSWORD: postgis
-  #         POSTGRES_DB: arches
-  #       ports:
-  #         - 5432:5432
-  #       options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    services:
+      postgres:
+        image: postgis/postgis:13-3.0
+        env:
+          POSTGRES_PASSWORD: postgis
+          POSTGRES_DB: arches
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       python-version: ["3.10", "3.11", "3.12"]
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
 
-  #   steps:
-  #     - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Set up Python ${{ matrix.python-version }}
-  #       uses: actions/setup-python@v5
-  #       with:
-  #         python-version: ${{ matrix.python-version }}
-  #         check-latest: true
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          check-latest: true
 
-  #     - name: Build and test branch
-  #       uses: ./.github/actions/build-and-test-branch
-  #       with:
-  #         secrets: ${{ toJSON(secrets) }}
-  #         project-name: 'arches'
-  #         branch-type: 'feature'
+      - name: Checkout into feature branch
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ github.ref }}
+          path: .
 
-  # check_frontend_coverage:
-  #   runs-on: ubuntu-latest
-  #   needs: [build_feature_branch, build_target_branch]
-  #   steps:
-  #     - uses: actions/checkout@v4
+      - name: Build and test branch
+        uses: ./.github/actions/build-and-test-branch
+        with:
+          secrets: ${{ toJSON(secrets) }}
+          project-name: 'arches'
+          branch-type: 'feature'
 
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v5
-  #       with:
-  #         python-version: '3.x' # Use the latest available version
-  #         check-latest: true
+  check_frontend_coverage:
+    runs-on: ubuntu-latest
+    needs: [build_feature_branch, build_target_branch]
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Download feature branch frontend coverage report artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: feature-branch-frontend-coverage-report
-  #         path: .
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x' # Use the latest available version
+          check-latest: true
 
-  #     - name: Extract feature branch frontend coverage data
-  #       shell: pwsh
-  #       run: |
-  #         [xml]$xml = Get-Content feature_branch_frontend_coverage.xml
-  #         $metrics = $xml.coverage.project.metrics
+      - name: Download feature branch frontend coverage report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: feature-branch-frontend-coverage-report
+          path: .
 
-  #         $statements = [double]$metrics.statements
-  #         $coveredstatements = [double]$metrics.coveredstatements
-  #         $conditionals = [double]$metrics.conditionals
-  #         $coveredconditionals = [double]$metrics.coveredconditionals
-  #         $methods = [double]$metrics.methods
-  #         $coveredmethods = [double]$metrics.coveredmethods
-  #         $elements = [double]$metrics.elements
-  #         $coveredelements = [double]$metrics.coveredelements
+      - name: Extract feature branch frontend coverage data
+        shell: pwsh
+        run: |
+          [xml]$xml = Get-Content feature_branch_frontend_coverage.xml
+          $metrics = $xml.coverage.project.metrics
 
-  #         $statement_coverage = 0.0
-  #         $conditional_coverage = 0.0
-  #         $method_coverage = 0.0
-  #         $element_coverage = 0.0
+          $statements = [double]$metrics.statements
+          $coveredstatements = [double]$metrics.coveredstatements
+          $conditionals = [double]$metrics.conditionals
+          $coveredconditionals = [double]$metrics.coveredconditionals
+          $methods = [double]$metrics.methods
+          $coveredmethods = [double]$metrics.coveredmethods
+          $elements = [double]$metrics.elements
+          $coveredelements = [double]$metrics.coveredelements
 
-  #         if ($statements -gt 0) {
-  #             $statement_coverage = ($coveredstatements / $statements) * 100
-  #         }
-  #         if ($conditionals -gt 0) {
-  #             $conditional_coverage = ($coveredconditionals / $conditionals) * 100
-  #         }
-  #         if ($methods -gt 0) {
-  #             $method_coverage = ($coveredmethods / $methods) * 100
-  #         }
-  #         if ($elements -gt 0) {
-  #             $element_coverage = ($coveredelements / $elements) * 100
-  #         }
+          $statement_coverage = 0.0
+          $conditional_coverage = 0.0
+          $method_coverage = 0.0
+          $element_coverage = 0.0
 
-  #         $nonZeroCount = 0
-  #         $totalCoverage = 0.0
+          if ($statements -gt 0) {
+              $statement_coverage = ($coveredstatements / $statements) * 100
+          }
+          if ($conditionals -gt 0) {
+              $conditional_coverage = ($coveredconditionals / $conditionals) * 100
+          }
+          if ($methods -gt 0) {
+              $method_coverage = ($coveredmethods / $methods) * 100
+          }
+          if ($elements -gt 0) {
+              $element_coverage = ($coveredelements / $elements) * 100
+          }
 
-  #         if ($statements -gt 0) { $nonZeroCount++; $totalCoverage += $statement_coverage }
-  #         if ($conditionals -gt 0) { $nonZeroCount++; $totalCoverage += $conditional_coverage }
-  #         if ($methods -gt 0) { $nonZeroCount++; $totalCoverage += $method_coverage }
-  #         if ($elements -gt 0) { $nonZeroCount++; $totalCoverage += $element_coverage }
+          $nonZeroCount = 0
+          $totalCoverage = 0.0
 
-  #         $feature_branch_frontend_coverage = 0.0
-  #         if ($nonZeroCount -gt 0) {
-  #             $feature_branch_frontend_coverage = $totalCoverage / $nonZeroCount
-  #         }
+          if ($statements -gt 0) { $nonZeroCount++; $totalCoverage += $statement_coverage }
+          if ($conditionals -gt 0) { $nonZeroCount++; $totalCoverage += $conditional_coverage }
+          if ($methods -gt 0) { $nonZeroCount++; $totalCoverage += $method_coverage }
+          if ($elements -gt 0) { $nonZeroCount++; $totalCoverage += $element_coverage }
 
-  #         Write-Output "feature_branch_frontend_coverage=$feature_branch_frontend_coverage" | Out-File -Append $env:GITHUB_ENV
+          $feature_branch_frontend_coverage = 0.0
+          if ($nonZeroCount -gt 0) {
+              $feature_branch_frontend_coverage = $totalCoverage / $nonZeroCount
+          }
 
-  #     - name: Download target branch frontend coverage report artifact
-  #       continue-on-error: true
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: target-branch-frontend-coverage-report
-  #         path: .
+          Write-Output "feature_branch_frontend_coverage=$feature_branch_frontend_coverage" | Out-File -Append $env:GITHUB_ENV
 
-  #     - name: Check if target branch frontend coverage report artifact exists
-  #       run: |
-  #         if [ -f target_branch_frontend_coverage.xml ]; then
-  #           echo "target_branch_frontend_coverage_artifact_exists=true" >> $GITHUB_ENV
-  #         else
-  #           echo "Target branch coverage not found. Defaulting to 0% coverage."
-  #           echo "target_branch_frontend_coverage_artifact_exists=false" >> $GITHUB_ENV
-  #         fi
+      - name: Download target branch frontend coverage report artifact
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: target-branch-frontend-coverage-report
+          path: .
 
-  #     - name: Extract target branch frontend coverage data
-  #       if: ${{ env.target_branch_frontend_coverage_artifact_exists == 'true' }}
-  #       shell: pwsh
-  #       run: |
-  #         [xml]$xml = Get-Content target_branch_frontend_coverage.xml
-  #         $metrics = $xml.coverage.project.metrics
+      - name: Check if target branch frontend coverage report artifact exists
+        run: |
+          if [ -f target_branch_frontend_coverage.xml ]; then
+            echo "target_branch_frontend_coverage_artifact_exists=true" >> $GITHUB_ENV
+          else
+            echo "Target branch coverage not found. Defaulting to 0% coverage."
+            echo "target_branch_frontend_coverage_artifact_exists=false" >> $GITHUB_ENV
+          fi
 
-  #         $statements = [double]$metrics.statements
-  #         $coveredstatements = [double]$metrics.coveredstatements
-  #         $conditionals = [double]$metrics.conditionals
-  #         $coveredconditionals = [double]$metrics.coveredconditionals
-  #         $methods = [double]$metrics.methods
-  #         $coveredmethods = [double]$metrics.coveredmethods
-  #         $elements = [double]$metrics.elements
-  #         $coveredelements = [double]$metrics.coveredelements
+      - name: Extract target branch frontend coverage data
+        if: ${{ env.target_branch_frontend_coverage_artifact_exists == 'true' }}
+        shell: pwsh
+        run: |
+          [xml]$xml = Get-Content target_branch_frontend_coverage.xml
+          $metrics = $xml.coverage.project.metrics
 
-  #         $statement_coverage = 0.0
-  #         $conditional_coverage = 0.0
-  #         $method_coverage = 0.0
-  #         $element_coverage = 0.0
+          $statements = [double]$metrics.statements
+          $coveredstatements = [double]$metrics.coveredstatements
+          $conditionals = [double]$metrics.conditionals
+          $coveredconditionals = [double]$metrics.coveredconditionals
+          $methods = [double]$metrics.methods
+          $coveredmethods = [double]$metrics.coveredmethods
+          $elements = [double]$metrics.elements
+          $coveredelements = [double]$metrics.coveredelements
 
-  #         if ($statements -gt 0) {
-  #             $statement_coverage = ($coveredstatements / $statements) * 100
-  #         }
-  #         if ($conditionals -gt 0) {
-  #             $conditional_coverage = ($coveredconditionals / $conditionals) * 100
-  #         }
-  #         if ($methods -gt 0) {
-  #             $method_coverage = ($coveredmethods / $methods) * 100
-  #         }
-  #         if ($elements -gt 0) {
-  #             $element_coverage = ($coveredelements / $elements) * 100
-  #         }
+          $statement_coverage = 0.0
+          $conditional_coverage = 0.0
+          $method_coverage = 0.0
+          $element_coverage = 0.0
 
-  #         $nonZeroCount = 0
-  #         $totalCoverage = 0.0
+          if ($statements -gt 0) {
+              $statement_coverage = ($coveredstatements / $statements) * 100
+          }
+          if ($conditionals -gt 0) {
+              $conditional_coverage = ($coveredconditionals / $conditionals) * 100
+          }
+          if ($methods -gt 0) {
+              $method_coverage = ($coveredmethods / $methods) * 100
+          }
+          if ($elements -gt 0) {
+              $element_coverage = ($coveredelements / $elements) * 100
+          }
 
-  #         if ($statements -gt 0) { $nonZeroCount++; $totalCoverage += $statement_coverage }
-  #         if ($conditionals -gt 0) { $nonZeroCount++; $totalCoverage += $conditional_coverage }
-  #         if ($methods -gt 0) { $nonZeroCount++; $totalCoverage += $method_coverage }
-  #         if ($elements -gt 0) { $nonZeroCount++; $totalCoverage += $element_coverage }
+          $nonZeroCount = 0
+          $totalCoverage = 0.0
 
-  #         $target_branch_frontend_coverage = 0.0
-  #         if ($nonZeroCount -gt 0) {
-  #             $target_branch_frontend_coverage = $totalCoverage / $nonZeroCount
-  #         }
+          if ($statements -gt 0) { $nonZeroCount++; $totalCoverage += $statement_coverage }
+          if ($conditionals -gt 0) { $nonZeroCount++; $totalCoverage += $conditional_coverage }
+          if ($methods -gt 0) { $nonZeroCount++; $totalCoverage += $method_coverage }
+          if ($elements -gt 0) { $nonZeroCount++; $totalCoverage += $element_coverage }
 
-  #         Write-Output "target_branch_frontend_coverage=$target_branch_frontend_coverage" | Out-File -Append $env:GITHUB_ENV
+          $target_branch_frontend_coverage = 0.0
+          if ($nonZeroCount -gt 0) {
+              $target_branch_frontend_coverage = $totalCoverage / $nonZeroCount
+          }
 
-  #     - name: Compare frontend feature coverage with target coverage
-  #       if: github.event_name == 'pull_request'
-  #       run: |
-  #         feature_branch_frontend_coverage=${feature_branch_frontend_coverage}
-  #         target_branch_frontend_coverage=${target_branch_frontend_coverage:-0.0}
+          Write-Output "target_branch_frontend_coverage=$target_branch_frontend_coverage" | Out-File -Append $env:GITHUB_ENV
 
-  #         # Compare feature coverage with target coverage using floating-point comparison
-  #         if awk -v feature="$feature_branch_frontend_coverage" -v target="$target_branch_frontend_coverage" 'BEGIN { exit (feature < target) ? 0 : 1 }'; then
-  #           echo "Coverage decreased from $target_branch_frontend_coverage% to $feature_branch_frontend_coverage%. Please add or update tests to increase coverage."
-  #           exit 1
-  #         else
-  #           echo "Feature branch coverage ($feature_branch_frontend_coverage%) >= Target branch coverage ($target_branch_frontend_coverage%)."
-  #         fi
+      - name: Compare frontend feature coverage with target coverage
+        if: github.event_name == 'pull_request'
+        run: |
+          feature_branch_frontend_coverage=${feature_branch_frontend_coverage}
+          target_branch_frontend_coverage=${target_branch_frontend_coverage:-0.0}
 
-  # check_python_coverage:
-  #   runs-on: ubuntu-latest
-  #   needs: [build_feature_branch, build_target_branch]
-  #   steps:
-  #     - uses: actions/checkout@v4
+          # Compare feature coverage with target coverage using floating-point comparison
+          if awk -v feature="$feature_branch_frontend_coverage" -v target="$target_branch_frontend_coverage" 'BEGIN { exit (feature < target) ? 0 : 1 }'; then
+            echo "Coverage decreased from $target_branch_frontend_coverage% to $feature_branch_frontend_coverage%. Please add or update tests to increase coverage."
+            exit 1
+          else
+            echo "Feature branch coverage ($feature_branch_frontend_coverage%) >= Target branch coverage ($target_branch_frontend_coverage%)."
+          fi
 
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v5
-  #       with:
-  #         python-version: '3.x' # Use the latest available version
-  #         check-latest: true
+  check_python_coverage:
+    runs-on: ubuntu-latest
+    needs: [build_feature_branch, build_target_branch]
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Download feature branch Python coverage report artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: feature-branch-python-coverage-report
-  #         path: .
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x' # Use the latest available version
+          check-latest: true
 
-  #     - name: Download target branch Python coverage report artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: target-branch-python-coverage-report
-  #         path: .
+      - name: Download feature branch Python coverage report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: feature-branch-python-coverage-report
+          path: .
 
-  #     - name: Compare Python feature coverage with target coverage
-  #       if: github.event_name == 'pull_request'
-  #       run: |
-  #         feature_branch_python_coverage=$(cat feature_branch_python_coverage.json | grep -o '"totals": {[^}]*' | grep -o '"percent_covered": [0-9.]*' | awk -F ': ' '{print $2}')
-  #         target_branch_python_coverage=$(cat target_branch_python_coverage.json | grep -o '"totals": {[^}]*' | grep -o '"percent_covered": [0-9.]*' | awk -F ': ' '{print $2}')
+      - name: Download target branch Python coverage report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: target-branch-python-coverage-report
+          path: .
 
-  #         # Compare feature coverage with target coverage using floating-point comparison
-  #         if awk -v feature="$feature_branch_python_coverage" -v target="$target_branch_python_coverage" 'BEGIN { exit (feature < target) ? 0 : 1 }'; then
-  #           echo "Coverage decreased from $target_branch_python_coverage% to $feature_branch_python_coverage%. Please add or update tests to increase coverage."
-  #           exit 1
-  #         else
-  #           echo "Feature branch coverage ($feature_branch_python_coverage%) >= Target branch coverage ($target_branch_python_coverage%)."
-  #         fi
+      - name: Compare Python feature coverage with target coverage
+        if: github.event_name == 'pull_request'
+        run: |
+          feature_branch_python_coverage=$(cat feature_branch_python_coverage.json | grep -o '"totals": {[^}]*' | grep -o '"percent_covered": [0-9.]*' | awk -F ': ' '{print $2}')
+          target_branch_python_coverage=$(cat target_branch_python_coverage.json | grep -o '"totals": {[^}]*' | grep -o '"percent_covered": [0-9.]*' | awk -F ': ' '{print $2}')
+
+          # Compare feature coverage with target coverage using floating-point comparison
+          if awk -v feature="$feature_branch_python_coverage" -v target="$target_branch_python_coverage" 'BEGIN { exit (feature < target) ? 0 : 1 }'; then
+            echo "Coverage decreased from $target_branch_python_coverage% to $feature_branch_python_coverage%. Please add or update tests to increase coverage."
+            exit 1
+          else
+            echo "Feature branch coverage ($feature_branch_python_coverage%) >= Target branch coverage ($target_branch_python_coverage%)."
+          fi

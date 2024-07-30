@@ -24,26 +24,6 @@ runs:
       with:
         elasticsearch-version: 8
 
-    # - name: Checkout into feature branch
-    #   if: inputs.branch-type == 'feature'
-    #   uses: actions/checkout@v4
-    #   with:
-    #     repository: ${{ github.repository }}
-    #     ref: ${{ github.ref }}
-    #     path: .
-
-    - name: Remove GitHub workspace
-      run: rm -rf ${{ github.workspace }}/*
-      shell: bash
-
-    - name: Checkout into target branch
-      if: inputs.branch-type == 'target'
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ github.repository }}
-        ref: ${{ github.event.pull_request.base.ref }}
-        path: .
-
     - name: Install Python packages
       run: |
         python -m pip install --upgrade pip
