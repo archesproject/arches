@@ -76,15 +76,10 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
             :with-credentials="true"
             :show-cancel-button="false"
             :show-upload-button="false"
+            choose-icon="fa fa-plus-circle"
             :choose-label="$gettext('Upload an image')"
             name="item_image"
             :pt="{
-                header: {
-                    style: {
-                        border: '1px solid lightgray',
-                        borderRadius: '4px',
-                    },
-                },
                 content: ({ props, state }: FileUploadInternals) => {
                     const done = [0, 100].includes(state.progress);
                     return {
@@ -117,11 +112,6 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
     width: 100%;
 }
 
-.images {
-    margin-top: 1.5rem;
-    gap: 1.5rem;
-}
-
 h4 {
     color: v-bind(ARCHES_CHROME_BLUE);
     margin-top: 0;
@@ -133,9 +123,15 @@ p {
 }
 
 .images {
+    margin-top: 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 3rem;
+}
+
+:deep(.p-button-icon),
+:deep(.p-button-label) {
+    font-size: small;
 }
 
 :deep(input[type="file"]) {

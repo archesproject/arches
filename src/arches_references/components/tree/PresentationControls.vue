@@ -45,7 +45,7 @@ const { expandAll, collapseAll } = defineProps<{
                 style="
                     align-self: center;
                     margin-right: 0.25rem;
-                    font-size: 1rem;
+                    font-size: smaller;
                 "
             >
                 {{ $gettext("Show labels in:") }}
@@ -59,16 +59,9 @@ const { expandAll, collapseAll } = defineProps<{
                 "
                 :placeholder="$gettext('Language')"
                 :pt="{
-                    root: { class: 'p-button secondary-button' },
-                    input: {
-                        style: {
-                            fontFamily: 'inherit',
-                            fontSize: 'small',
-                            textAlign: 'center',
-                            alignContent: 'center',
-                        },
-                    },
-                    itemLabel: { style: { fontSize: 'small' } },
+                    root: { class: 'secondary-button' },
+                    label: { style: { alignSelf: 'center' } },
+                    optionLabel: { style: { fontSize: 'small' } },
                 }"
             />
         </div>

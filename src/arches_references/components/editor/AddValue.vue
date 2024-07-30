@@ -5,7 +5,6 @@ import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 
-import { ARCHES_CHROME_BLUE } from "@/arches_references/theme.ts";
 import {
     itemKey,
     ALT_LABEL,
@@ -114,13 +113,10 @@ const addValue = () => {
 .add-value {
     display: flex;
     height: 3rem;
-    color: v-bind(ARCHES_CHROME_BLUE);
-    background-color: #f3fbfd;
     margin-top: 1rem;
 }
-.add-value > i,
-.add-value > span {
-    align-self: center;
+.add-value > i {
+    font-size: small;
 }
 .add-value-text {
     margin: 1rem;

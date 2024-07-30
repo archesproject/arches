@@ -259,13 +259,7 @@ const focusInput = () => {
                         option-value="type"
                         :pt="{
                             root: { style: { width: '90%' } },
-                            input: {
-                                style: {
-                                    fontFamily: 'inherit',
-                                    fontSize: 'small',
-                                },
-                            },
-                            panel: { style: { fontSize: 'small' } },
+                            optionLabel: { style: { fontSize: 'small' } },
                         }"
                     />
                 </template>
@@ -307,12 +301,7 @@ const focusInput = () => {
             <Column
                 field="language_id"
                 :header="languageHeader"
-                style="
-                    width: 10%;
-                    min-width: 8rem;
-                    height: 5rem;
-                    padding-left: 1rem;
-                "
+                style="width: 10%; min-width: 8rem; height: 5rem"
             >
                 <template #editor="{ data, field }">
                     <Select
@@ -322,15 +311,7 @@ const focusInput = () => {
                             (lang: Language) => `${lang.name} (${lang.code})`
                         "
                         option-value="code"
-                        :pt="{
-                            input: {
-                                style: {
-                                    fontFamily: 'inherit',
-                                    fontSize: 'small',
-                                },
-                            },
-                            panel: { style: { fontSize: 'small' } },
-                        }"
+                        :pt="{ optionLabel: { style: { fontSize: 'small' } } }"
                     />
                 </template>
                 <template #body="slotProps">
@@ -417,7 +398,9 @@ const focusInput = () => {
 }
 
 :deep(td > input) {
-    width: 95%;
+    width: 100%;
+    height: 3rem;
+    font-size: inherit;
 }
 
 .p-button {
@@ -427,7 +410,6 @@ const focusInput = () => {
 
 :deep(.p-button-icon),
 :deep(.p-button-label) {
-    color: white;
     font-size: small;
     font-weight: 600;
 }

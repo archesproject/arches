@@ -268,8 +268,6 @@ const vRefocusDownArrow = {
 
 <style scoped>
 .p-button {
-    background-color: aliceblue;
-    color: black;
     height: 2rem;
 }
 

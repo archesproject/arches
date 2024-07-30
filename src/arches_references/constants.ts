@@ -22,6 +22,7 @@ export const ERROR = "error";
 export const DANGER = "danger";
 export const SECONDARY = "secondary";
 export const SUCCESS = "success";
+export const WARN = "warn";
 export const DEFAULT_ERROR_TOAST_LIFE = 8000;
 
 // Django model choices

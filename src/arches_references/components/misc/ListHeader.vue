@@ -49,10 +49,7 @@ const heading = computed(() => {
 </script>
 
 <template>
-    <div
-        class="header"
-        :style="{ background: ARCHES_CHROME_BLUE }"
-    >
+    <div class="header">
         <i
             class="fa fa-inverse fa-list"
             aria-hidden="true"
@@ -65,6 +62,7 @@ const heading = computed(() => {
 .header {
     display: flex;
     align-items: center;
+    background: v-bind(ARCHES_CHROME_BLUE);
 }
 
 i {

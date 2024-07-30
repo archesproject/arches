@@ -124,6 +124,7 @@ const cancel = () => {
     flex-direction: column;
     width: 100%;
 }
+
 h4 {
     color: v-bind(ARCHES_CHROME_BLUE);
     margin-top: 0;
