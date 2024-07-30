@@ -106,9 +106,9 @@ const expandPathsToFilterResults = (newFilterValue: string) => {
 
 const getInputElement = () => {
     if (treeDOMRef.value !== null) {
-        return treeDOMRef.value.$el.ownerDocument.getElementsByClassName(
-            "p-tree-filter-input",
-        )[0] as HTMLInputElement;
+        return treeDOMRef.value.$el.ownerDocument.querySelector(
+            'input[data-pc-name="pcfilter"]',
+        ) as HTMLInputElement;
     }
 };
 
