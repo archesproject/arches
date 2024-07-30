@@ -178,7 +178,7 @@ def generate_frontend_configuration():
             base_path = app_root_path
 
         with open(
-            os.path.join(base_path, "..", ".frontend-configuration-settings.json"), "w"
+            os.path.join(base_path, "..", ".webpack-configuration-settings.json"), "w"
         ) as file:
             json.dump(frontend_configuration_settings_data, file, indent=4)
 
