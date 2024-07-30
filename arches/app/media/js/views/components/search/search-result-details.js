@@ -28,7 +28,7 @@ define([
             var setSearchResults = function(){
                 options.searchResultsVm = self.getFilterByType('search-results');
                 options.searchResultsVm.details = self;
-                options.filters[componentName](self);           
+                options.searchComponentVms[componentName](self);           
             };
 
             if (this.requiredFiltersLoaded() === false) {

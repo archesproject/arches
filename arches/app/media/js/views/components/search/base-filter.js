@@ -18,7 +18,7 @@ define([
             this.requiredFilters = this.getRequiredFilters(this.componentName);
             this.requiredFiltersLoaded = ko.computed(function() {
                 let res = true;
-                Object.entries(this.filters).forEach(function([componentName, filter]) {
+                Object.entries(this.searchComponentVms).forEach(function([componentName, filter]) {
                     res = res && filter !== null;
                 });
                 return res;
@@ -27,7 +27,7 @@ define([
     
 
         getFilter: function(filterName) {
-            return ko.unwrap(this.filters[filterName]);
+            return ko.unwrap(this.searchComponentVms[filterName]);
         }
     });
 });

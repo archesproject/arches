@@ -113,7 +113,7 @@ define([
             this.filterChanged.subscribe(function() {
                 this.updateQuery();
             }, this);
-            this.filters[componentName](this);
+            this.searchComponentVms[componentName](this);
         },
 
         updateQuery: function() {

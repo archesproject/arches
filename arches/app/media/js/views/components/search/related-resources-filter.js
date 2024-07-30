@@ -22,9 +22,9 @@ define([
             // because we need to pass the entire rsearch results filter into the
             // related resources filter
             var setSearchResults = function(){
-                options.searchResultsVm = self.getFilter('search-results');
+                options.searchResultsVm = self.getFilterByType('search-results');
                 options.searchResultsVm.relatedResourcesManager = self;
-                options.filters[componentName](self);
+                options.searchComponentVms[componentName](self);
                 self.ready(true);
             };
 

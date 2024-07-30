@@ -20,7 +20,7 @@ define([
             this.requiredFilters = this.getRequiredFilters(this.componentName);
             this.requiredFiltersLoaded = ko.computed(function() {
                 let res = true;
-                Object.entries(this.filters).forEach(function([componentName, filter]) {
+                Object.entries(this.searchComponentVms).forEach(function([componentName, filter]) {
                     res = res && filter !== null;
                 });
                 return res;
@@ -99,11 +99,11 @@ define([
         },
 
         getFilter: function(filterName) {
-            return ko.unwrap(this.filters[filterName]);
+            return ko.unwrap(this.searchComponentVms[filterName]);
         },
 
         clearQuery: function(){
-            Object.values(this.filters).forEach(function(value){
+            Object.values(this.searchComponentVms).forEach(function(value){
                 if (value()){
                     if (value().clear){
                         value().clear();

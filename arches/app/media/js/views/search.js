@@ -43,7 +43,7 @@ define([
     };
 
     var CommonSearchViewModel = function() {
-        this.filters = {};
+        this.searchComponentVms = {};
         this.filtersList = Object.values(SearchComponents);
         this.defaultSearchLogicComponent = this.filtersList.find(component => component.type == "search-logic" && component.config.default == true); // approach: let the backend decide
         this.searchLogicComponentName = ko.observable(false);
@@ -71,10 +71,10 @@ define([
             const filter = this.filtersList.find(component => component.type == type);
             if (!filter)
                 return null;
-            return ko.unwrap(this.filters[filter.componentname]);
+            return ko.unwrap(this.searchComponentVms[filter.componentname]);
         };
         Object.values(SearchComponents).forEach(function(component) {
-            this.filters[component.componentname] = ko.observable(null);
+            this.searchComponentVms[component.componentname] = ko.observable(null);
         }, this);
         this.query = ko.observable(getQueryObject());
         if (this.query()["search-logic"] !== undefined) {

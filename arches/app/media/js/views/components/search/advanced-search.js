@@ -179,7 +179,7 @@ define([
                 options.loading(false);
             });
 
-            this.filters[componentName](this);
+            this.searchComponentVms[componentName](this);
         },
 
         updateQuery: function() {

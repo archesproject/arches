@@ -42,7 +42,7 @@ define([
                             return tag.value.type === currentTag.type;
                         }, this);
                         if(!found){
-                            _.each(this.filters, function(filter){
+                            _.each(this.searchComponentVms, function(filter){
                                 if(!!filter() && filter().name === tag.value.type){
                                     filter().clear();
                                 }
@@ -52,7 +52,7 @@ define([
                 }, this);
             }, this, "arrayChange");
 
-            this.filters[componentName](this);
+            this.searchComponentVms[componentName](this);
             this.restoreState();
         },
 

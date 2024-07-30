@@ -53,7 +53,7 @@ define([
                     this.updateResults();
                 }, this);
 
-                this.filters[componentName](this);
+                this.searchComponentVms[componentName](this);
                 this.restoreState();
                 if (this.requiredFiltersLoaded() === false) {
                     this.requiredFiltersLoaded.subscribe(function () {
