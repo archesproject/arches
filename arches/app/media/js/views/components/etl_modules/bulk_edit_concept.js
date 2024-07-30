@@ -11,6 +11,7 @@ define([
     const ViewModel = function(params) {
         console.log(params);
         const self = this;
+        this.state = params.state;
         this.editHistoryUrl = `${arches.urls.edit_history}?transactionid=${ko.unwrap(params.selectedLoadEvent)?.loadid}`;
         this.load_details = params.load_details ?? {};
         this.loadId = params.loadId || uuid.generate();
