@@ -72,6 +72,5 @@ const { expandAll, collapseAll } = defineProps<{
 .secondary-button {
     height: 3rem;
     margin: 0.5rem;
-    font-weight: 600;
 }
 </style>

@@ -21,6 +21,13 @@ const ControlledListsPreset = definePreset(Aura, {
                 },
             },
         },
+        datatable: {
+            column: {
+                title: {
+                    fontWeight: 600,
+                },
+            },
+        },
         splitter: {
             handle: {
                 background: "{surface.500}",

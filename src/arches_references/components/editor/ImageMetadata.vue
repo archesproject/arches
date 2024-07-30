@@ -389,14 +389,6 @@ const focusInput = () => {
     width: 100%;
 }
 
-:deep(th) {
-    font-weight: 600;
-}
-
-:deep(td:first-child) {
-    padding-left: 0.75rem;
-}
-
 :deep(td > input) {
     width: 100%;
     height: 3rem;

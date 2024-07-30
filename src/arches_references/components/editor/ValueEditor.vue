@@ -427,15 +427,6 @@ p {
     width: 100%;
 }
 
-:deep(th) {
-    font-weight: 600;
-    height: 3rem;
-}
-
-:deep(td) {
-    padding: 0.75rem;
-}
-
 :deep(td > input) {
     height: 3rem;
     font-size: inherit;

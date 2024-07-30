@@ -38,7 +38,7 @@ const { $gettext } = useGettext();
     align-items: center;
     font-size: small;
     text-align: center;
-    border-radius: 2px;
+    border-radius: var(--p-content-border-radius);
     height: 3rem;
     background: var(--p-gray-200);
     text-wrap: nowrap;
