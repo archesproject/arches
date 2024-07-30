@@ -490,7 +490,7 @@ class BulkConceptEditor(BaseBulkEditor):
                         jsonb_set(
                             tiledata,
                             %(node_id_path)s,
-                            replace(tiledata ->> %(node_id)s, %(old_id)s, %(new_id)s)::jsonb,
+                            replace((tiledata -> %(node_id)s)::text, %(old_id)s, %(new_id)s)::jsonb,
                             false
                         ),
                         tileid, nodegroupid, parenttileid, resourceinstanceid, %(load_id)s, 0, 'bulk_edit', 'update', true
