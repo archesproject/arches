@@ -374,7 +374,10 @@ INSTALLED_APPS = (
 
 # Placing this last ensures any templates provided by Arches Applications
 # take precedence over core arches templates in arches/app/templates.
-INSTALLED_APPS += ("arches.app",)
+INSTALLED_APPS += (
+    "arches.app",
+    "bar",
+)
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",

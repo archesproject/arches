@@ -39,7 +39,7 @@ function generateConfig(): Promise<UserConfigExport> {
             test: {
                 alias: alias,
                 coverage: {
-                    include: [path.join(path.basename(__dirname), 'src', '/')],
+                    include: [path.join(path.basename(__dirname), 'app', 'src', '/')],
                     exclude: exclude,
                     reporter: [
                         ['clover', { 'file': 'coverage.xml' }],
