@@ -9,6 +9,7 @@ from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 
+from arches.app.models.utils import field_names
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
@@ -23,7 +24,6 @@ from arches_references.models import (
     ListItemValue,
     NodeProxy,
 )
-from arches_references.utils import field_names
 
 logger = logging.getLogger(__name__)
 
@@ -186,19 +186,26 @@ class ListItemView(View):
             return JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
 
         try:
-            with transaction.atomic():
-                controlled_list = (
-                    List.objects.filter(pk=list_id)
-                    .annotate(max_sortorder=Max("list_items__sortorder", default=-1))
-                    .get()
-                )
-                item = ListItem.objects.create(
-                    list=controlled_list,
-                    sortorder=controlled_list.max_sortorder + 1,
-                    parent_id=parent_id,
-                )
+            controlled_list = (
+                List.objects.filter(pk=list_id)
+                .annotate(max_sortorder=Max("list_items__sortorder", default=-1))
+                .get()
+            )
         except List.DoesNotExist:
-            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
+            return JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
+
+        try:
+            item = ListItem(
+                list=controlled_list,
+                sortorder=controlled_list.max_sortorder + 1,
+                parent_id=parent_id,
+            )
+            item.full_clean()
+            item.save()
+        except ValidationError as ve:
+            return JSONErrorResponse(
+                message="\n".join(ve.messages), status=HTTPStatus.BAD_REQUEST
+            )
 
         return JSONResponse(item.serialize(), status=HTTPStatus.CREATED)
 
