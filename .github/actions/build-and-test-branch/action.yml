@@ -44,12 +44,17 @@ runs:
     #     ref: ${{ github.ref }}
     #     path: .
 
+    - name: Remove GitHub workspace
+      run: rm -rf ${{ github.workspace }}/*
+
     - name: Checkout into target branch
       if: inputs.branch-type == 'target'
       uses: actions/checkout@v4
       with:
         repository: ${{ github.repository }}
         ref: ${{ github.event.pull_request.base.ref }}
+        clean: true
+        fetch-depth: 1
         path: .
 
     - name: Clean install dependencies
