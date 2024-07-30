@@ -412,8 +412,8 @@ class BulkConceptEditor(BaseBulkEditor):
     @load_data_async
     def run_load_task_async(self, request):
         graphid = request.POST.get("selectedGraph", None)
-        new = request.POST.get("conceptNew", None)
-        old = request.POST.get("conceptOld", None)
+        newid = request.POST.get("conceptNew", None)
+        oldid = request.POST.get("conceptOld", None)
         language_old = request.POST.get("conceptOldLang", None)
         language_new = request.POST.get("conceptNewLang", None)
         # table = request.POST.get("table", None)
@@ -446,7 +446,7 @@ class BulkConceptEditor(BaseBulkEditor):
         #     resourceids_json_string = json.dumps(resourceids)
         #     resourceids = json.loads(resourceids_json_string)
         # pattern = old
-
+        resource_ids = []
         edit_task = edit_bulk_concept_data.apply_async(
             (
                 self.userid,
@@ -454,10 +454,8 @@ class BulkConceptEditor(BaseBulkEditor):
                 self.moduleid,
                 graphid,
                 nodeid,
+                resource_ids,
                 language_old,
-                pattern,
-                new,
-                resourceids,
                 language_new,
                 oldid,
                 newid,
@@ -484,25 +482,31 @@ class BulkConceptEditor(BaseBulkEditor):
         update_limit = ETLModule.objects.get(pk=module_id).config.get(
             "updateLimit", 5000
         )
-        nodeid_path = [nodeid]
+
         try:
             sql = """
                 INSERT INTO load_staging (value, tileid, nodegroupid, parenttileid, resourceid, loadid, nodegroup_depth, source_description, operation, passes_validation)
                     (SELECT 
                         jsonb_set(
                             tiledata,
-                            %s,
-                            replace(tiledata ->> %s,%s,%s)::jsonb,
+                            %(node_id_path)s,
+                            replace(tiledata ->> %(node_id)s, %(old_id)s, %(new_id)s)::jsonb,
                             false
                         ),
-                        tileid, nodegroupid, parenttileid, resourceinstanceid, %s, 0, 'bulk_edit', 'update', true
+                        tileid, nodegroupid, parenttileid, resourceinstanceid, %(load_id)s, 0, 'bulk_edit', 'update', true
                     FROM tiles t
-                    WHERE nodegroupid in (select nodegroupid from nodes where nodeid = %s)
-                    AND tiledata -> %s ? %s);
+                    WHERE nodegroupid in (select nodegroupid from nodes where nodeid = %(node_id)s)
+                    AND tiledata -> %(node_id)s ? %(old_id)s);
             """
             cursor.execute(
                 sql,
-                [nodeid_path, nodeid, oldid, newid, self.loadid, nodeid, nodeid, oldid],
+                {
+                    "node_id_path": [nodeid],
+                    "node_id": nodeid,
+                    "old_id": oldid,
+                    "new_id": newid,
+                    "load_id": self.loadid,
+                },
             )
             result["success"] = True
 
