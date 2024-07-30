@@ -6,7 +6,6 @@ import ProgressSpinner from "primevue/progressspinner";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 
-import { LIGHT_GRAY } from "@/arches_references/theme.ts";
 import {
     displayedRowKey,
     selectedLanguageKey,
@@ -52,21 +51,11 @@ const panel = computed(() => {
 <template>
     <div class="list-editor-container">
         <ListHeader />
-        <Splitter
-            :pt="{
-                root: { style: { height: '100%' } },
-                gutter: { style: { background: LIGHT_GRAY } },
-                gutterHandler: { style: { background: LIGHT_GRAY } },
-            }"
-        >
+        <Splitter style="height: 100%">
             <SplitterPanel
                 :size="34"
                 :min-size="25"
-                :pt="{
-                    root: {
-                        style: { display: 'flex', flexDirection: 'column' },
-                    },
-                }"
+                style="display: flex; flex-direction: column"
             >
                 <Suspense>
                     <ListTree />

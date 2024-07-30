@@ -97,16 +97,10 @@ const addValue = () => {
     <Button
         class="add-value"
         raised
+        icon="fa fa-plus-circle"
+        :label="buttonLabel"
         @click="addValue"
-    >
-        <i
-            class="fa fa-plus-circle"
-            aria-hidden="true"
-        />
-        <span class="add-value-text">
-            {{ buttonLabel }}
-        </span>
-    </Button>
+    />
 </template>
 
 <style scoped>
@@ -114,13 +108,6 @@ const addValue = () => {
     display: flex;
     height: 3rem;
     margin-top: 1rem;
-}
-.add-value > i {
     font-size: small;
-}
-.add-value-text {
-    margin: 1rem;
-    font-size: small;
-    font-weight: 600;
 }
 </style>

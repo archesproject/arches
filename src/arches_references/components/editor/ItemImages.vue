@@ -7,7 +7,6 @@ import { useGettext } from "vue3-gettext";
 import FileUpload from "primevue/fileupload";
 import { useToast } from "primevue/usetoast";
 
-import { ARCHES_CHROME_BLUE } from "@/arches_references/theme.ts";
 import {
     itemKey,
     DEFAULT_ERROR_TOAST_LIFE,
@@ -113,7 +112,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
 }
 
 h4 {
-    color: v-bind(ARCHES_CHROME_BLUE);
+    color: var(--p-sky-950);
     margin-top: 0;
     font-size: 1.33rem;
 }

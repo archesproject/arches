@@ -10,7 +10,6 @@ import Select from "primevue/select";
 import Textarea from "primevue/textarea";
 import { useToast } from "primevue/usetoast";
 
-import { ARCHES_CHROME_BLUE } from "@/arches_references/theme.ts";
 import { deleteValue, upsertValue } from "@/arches_references/api.ts";
 import {
     ALT_LABEL,
@@ -411,7 +410,7 @@ const focusInput = () => {
 }
 
 h4 {
-    color: v-bind(ARCHES_CHROME_BLUE);
+    color: var(--p-sky-950);
     margin-top: 0;
     font-size: 1.33rem;
 }

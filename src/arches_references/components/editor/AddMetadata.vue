@@ -66,16 +66,10 @@ const addMetadata = () => {
     <Button
         class="add-metadata"
         raised
+        icon="fa fa-plus-circle"
+        :label="$gettext('Add metadata')"
         @click="addMetadata"
-    >
-        <i
-            class="fa fa-plus-circle"
-            aria-hidden="true"
-        />
-        <span class="add-metadata-text">
-            {{ $gettext("Add metadata") }}
-        </span>
-    </Button>
+    />
 </template>
 
 <style scoped>
@@ -83,13 +77,5 @@ const addMetadata = () => {
     display: flex;
     height: 3rem;
     margin-top: 1rem;
-}
-.add-metadata > i {
-    font-size: small;
-}
-.add-metadata-text {
-    margin: 1rem;
-    font-size: small;
-    font-weight: 600;
 }
 </style>
