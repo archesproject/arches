@@ -332,7 +332,7 @@ const focusInput = () => {
             <Column
                 field="language_id"
                 :header="languageHeader"
-                style="width: 10%; min-width: 8rem; height: 5rem"
+                style="width: 12%; height: 5rem"
             >
                 <template #editor="{ data, field }">
                     <Select
@@ -381,7 +381,7 @@ const focusInput = () => {
                 </template>
             </Column>
             <Column
-                style="width: 5%; text-align: center"
+                style="width: 3%; text-align: center"
                 :pt="{ headerCell: { ariaLabel: $gettext('Delete controls') } }"
             >
                 <template #body="slotProps">
