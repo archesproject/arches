@@ -194,12 +194,12 @@ define([
                 });
                 queryObj[componentName] = JSON.stringify(advanced);
 
-                if (this.getFilter('term-filter').hasTag(this.tagId) === false) {
-                    this.getFilter('term-filter').addTag(this.tagId, this.name, ko.observable(false));
+                if (this.getFilterByType('term-filter').hasTag(this.tagId) === false) {
+                    this.getFilterByType('term-filter').addTag(this.tagId, this.name, ko.observable(false));
                 }
             } else {
                 delete queryObj[componentName];
-                this.getFilter('term-filter').removeTag(this.tagId);
+                this.getFilterByType('term-filter').removeTag(this.tagId);
             }
             this.query(queryObj);
         },
@@ -223,7 +223,7 @@ define([
                 var facets = JSON.parse(query[componentName]);
 
                 if (facets.length > 0) {
-                    this.getFilter('term-filter').addTag("Advanced Search", this.name, ko.observable(false));    
+                    this.getFilterByType('term-filter').addTag("Advanced Search", this.name, ko.observable(false));    
                 }
                 _.each(facets, function(facet) {
                     var nodeIds = _.filter(Object.keys(facet), function(key) {

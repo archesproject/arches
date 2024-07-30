@@ -45,6 +45,16 @@ define([
                     }, this);
                 }
             }, this);
+            // init query
+            if (self.updateRequest === undefined) {
+                if (this.requiredFiltersLoaded()) {
+                    this.doQuery();
+                } else {
+                    this.requiredFiltersLoaded.subscribe(function() {
+                        this.doQuery();
+                    }, this);
+                }
+            }
         },
 
         doQuery: function() {

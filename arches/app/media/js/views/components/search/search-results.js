@@ -57,10 +57,10 @@ define([
                 this.restoreState();
                 if (this.requiredFiltersLoaded() === false) {
                     this.requiredFiltersLoaded.subscribe(function () {
-                        this.mapFilter = this.getFilter("map-filter");
+                        this.mapFilter = this.getFilterByType("map-filter");
                     }, this);
                 } else {
-                    this.mapFilter = this.getFilter("map-filter");
+                    this.mapFilter = this.getFilterByType("map-filter");
                 }
                 this.selectedTab.subscribe(function (tab) {
                     var self = this;

@@ -65,7 +65,7 @@ define([
                 if (resourceTypeQuery.length > 0) {
                     resourceTypeQuery.forEach(function(type){
                         type.inverted = ko.observable(!!type.inverted);
-                        this.getFilter('term-filter').addTag(type.name, this.name, type.inverted);
+                        this.getFilterByType('term-filter').addTag(type.name, this.name, type.inverted);
                     }, this);
                     this.filter(resourceTypeQuery);
                 }
@@ -78,11 +78,11 @@ define([
 
         selectModelType: function(item){
             this.filter().forEach(function(item){
-                this.getFilter('term-filter').removeTag(item.name);
+                this.getFilterByType('term-filter').removeTag(item.name);
             }, this);
             if(!!item){
                 var inverted = ko.observable(false);
-                this.getFilter('term-filter').addTag(item.name, this.name, inverted);
+                this.getFilterByType('term-filter').addTag(item.name, this.name, inverted);
                 this.filter([{graphid:item.graphid, name: item.name, inverted: inverted}]);
             }else{
                 this.clear();

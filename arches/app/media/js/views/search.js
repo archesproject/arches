@@ -67,6 +67,12 @@ define([
         
             return requiredComponentNames;
         };
+        this.getFilterByType = function(type) {
+            const filter = this.filtersList.find(component => component.type == type);
+            if (!filter)
+                return null;
+            return ko.unwrap(this.filters[filter.componentname]);
+        };
         Object.values(SearchComponents).forEach(function(component) {
             this.filters[component.componentname] = ko.observable(null);
         }, this);
