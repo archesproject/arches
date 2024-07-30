@@ -46,6 +46,7 @@ runs:
 
     - name: Remove GitHub workspace
       run: rm -rf ${{ github.workspace }}/*
+      shell: bash
 
     - name: Checkout into target branch
       if: inputs.branch-type == 'target'
