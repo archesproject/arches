@@ -5,8 +5,8 @@ import { useGettext } from "vue3-gettext";
 
 import Column from "primevue/column";
 import DataTable from "primevue/datatable";
-import Dropdown from "primevue/dropdown";
 import InputText from "primevue/inputtext";
+import Select from "primevue/select";
 import Textarea from "primevue/textarea";
 import { useToast } from "primevue/usetoast";
 
@@ -265,7 +265,7 @@ const focusInput = () => {
             @row-edit-init="setRowFocus"
             @row-edit-save="saveValue"
         >
-            <!-- Note type dropdown (if this is a note editor) -->
+            <!-- Note type select (if this is a note editor) -->
             <Column
                 v-if="valueCategory"
                 field="valuetype_id"
@@ -273,7 +273,7 @@ const focusInput = () => {
                 style="width: 20%"
             >
                 <template #editor="{ data, field }">
-                    <Dropdown
+                    <Select
                         v-model="data[field]"
                         :options="labeledNoteChoices"
                         option-label="label"
@@ -343,7 +343,7 @@ const focusInput = () => {
                 style="width: 10%; min-width: 8rem; height: 5rem"
             >
                 <template #editor="{ data, field }">
-                    <Dropdown
+                    <Select
                         v-model="data[field]"
                         :options="arches.languages"
                         :option-label="

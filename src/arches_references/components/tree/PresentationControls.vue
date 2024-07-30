@@ -4,7 +4,7 @@ import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
-import Dropdown from "primevue/dropdown";
+import Select from "primevue/select";
 
 import { selectedLanguageKey } from "@/arches_references/constants.ts";
 
@@ -44,7 +44,7 @@ const { expandAll, collapseAll } = defineProps<{
             >
                 {{ $gettext("Show labels in:") }}
             </span>
-            <Dropdown
+            <Select
                 v-model="selectedLanguage"
                 aria-labelledby="languageSelectLabel"
                 :options="arches.languages"

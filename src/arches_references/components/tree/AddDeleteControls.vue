@@ -86,7 +86,7 @@ const multiSelectStateFromDisplayedRow = computed(() => {
     return newSelectedKeys;
 });
 
-const deleteDropdownOptions = [
+const deleteSelectOptions = [
     {
         label: $gettext("Delete Multiple"),
         command: () => {
@@ -259,7 +259,7 @@ await fetchListsAndPopulateTree();
         style="font-size: inherit"
         :disabled="!toDelete.length"
         :severity="DANGER"
-        :model="deleteDropdownOptions"
+        :model="deleteSelectOptions"
         @click="confirmDelete"
     />
 </template>

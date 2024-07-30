@@ -5,9 +5,9 @@ import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 import Column from "primevue/column";
-import Dropdown from "primevue/dropdown";
 import DataTable from "primevue/datatable";
 import InputText from "primevue/inputtext";
+import Select from "primevue/select";
 import { useToast } from "primevue/usetoast";
 
 import {
@@ -252,7 +252,7 @@ const focusInput = () => {
                 style="width: 20%"
             >
                 <template #editor="{ data, field }">
-                    <Dropdown
+                    <Select
                         v-model="data[field]"
                         :options="labeledChoices"
                         option-label="label"
@@ -315,7 +315,7 @@ const focusInput = () => {
                 "
             >
                 <template #editor="{ data, field }">
-                    <Dropdown
+                    <Select
                         v-model="data[field]"
                         :options="arches.languages"
                         :option-label="
