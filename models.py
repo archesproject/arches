@@ -2,20 +2,21 @@ import datetime
 import uuid
 from collections import defaultdict
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Deferrable, Q
 from django.utils.translation import gettext_lazy as _
 
 from arches.app.models.models import DValueType, Language, Node
+from arches.app.models.utils import field_names
 from arches_references.querysets import (
     ListQuerySet,
     ListItemImageManager,
     ListItemValueQuerySet,
     NodeQuerySet,
 )
-from arches_references.utils import field_names
 
 
 class List(models.Model):
@@ -124,7 +125,7 @@ class List(models.Model):
 
 class ListItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    uri = models.URLField(max_length=2048, null=True, blank=True)
+    uri = models.URLField(max_length=2048, null=False, blank=True)
     list = models.ForeignKey(
         List,
         on_delete=models.CASCADE,
@@ -157,14 +158,31 @@ class ListItem(models.Model):
             ),
         ]
 
-    def clean(self):
-        if not self.list_item_values.filter(valuetype="prefLabel").exists():
-            raise ValidationError(_("At least one preferred label is required."))
-
     def clean_fields(self, exclude=None):
         super().clean_fields(exclude=exclude)
-        if (not exclude or "uri" not in exclude) and not self.uri:
-            self.uri = None
+        if not self.id and "id" not in exclude:
+            id_field = [f for f in self._meta.fields if f.name == "id"][0]
+            self.id = id_field.get_default()
+
+    def clean(self):
+        if not self.uri:
+            self.uri = self.generate_uri()
+
+    def generate_uri(self):
+        """Similar logic exists in `etl_collections_to_controlled_lists` migration."""
+        if not self.id:
+            raise RuntimeError("URI generation attempted without a primary key.")
+
+        parts = [settings.PUBLIC_SERVER_ADDRESS.rstrip("/")]
+        if settings.FORCE_SCRIPT_NAME:
+            parts.append(settings.FORCE_SCRIPT_NAME)
+        parts += ["plugins", "controlled-list-manager", "item", str(self.id)]
+
+        return "/".join(parts)
+
+    def ensure_pref_label(self):
+        if not self.list_item_values.filter(valuetype="prefLabel").exists():
+            raise ValidationError(_("At least one preferred label is required."))
 
     def serialize(self, depth_map=None, flat=False):
         if depth_map is None:
@@ -260,15 +278,10 @@ class ListItemValue(models.Model):
         }
 
     def delete(self):
-        msg = _("Deleting the item's only remaining preferred label is not permitted.")
-        if (
-            self.valuetype_id == "prefLabel"
-            and len(self.list_item.list_item_values.filter(valuetype_id="prefLabel"))
-            < 2
-        ):
-            raise ValidationError(msg)
-
-        return super().delete()
+        with transaction.atomic():
+            ret = super().delete()
+            self.list_item.ensure_pref_label()
+        return ret
 
 
 class ListItemImage(models.Model):
