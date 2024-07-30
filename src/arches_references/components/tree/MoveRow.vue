@@ -224,6 +224,7 @@ const vRefocusDownArrow = {
         class="add-child-button"
         icon="fa fa-plus"
         :aria-label="moveLabels.addChild"
+        :pt="{ icon: { style: { alignSelf: 'baseline' } } }"
         @click.stop="addItem(node)"
     />
     <span
@@ -240,6 +241,7 @@ const vRefocusDownArrow = {
             icon="fa fa-caret-up"
             :aria-label="moveLabels.moveUp"
             :disabled="isFirstItem(node.data)"
+            :pt="{ icon: { style: { alignSelf: 'baseline' } } }"
             @click="reorder(node.data, true)"
         />
         <Button
@@ -252,6 +254,7 @@ const vRefocusDownArrow = {
             icon="fa fa-caret-down"
             :aria-label="moveLabels.moveDown"
             :disabled="isLastItem(node.data)"
+            :pt="{ icon: { style: { alignSelf: 'baseline' } } }"
             @click="reorder(node.data, false)"
         />
         <Button
@@ -261,6 +264,7 @@ const vRefocusDownArrow = {
             raised
             icon="fa fa-arrows-alt"
             :aria-label="moveLabels.changeParent"
+            :pt="{ icon: { style: { alignSelf: 'baseline' } } }"
             @click="setMovingItem(node)"
         />
     </span>
