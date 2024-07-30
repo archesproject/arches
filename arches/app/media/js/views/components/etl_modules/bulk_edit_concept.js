@@ -18,11 +18,8 @@ define([
         this.moduleId = params.etlmoduleid;
         this.previewing = ko.observable();
         this.formData = new window.FormData();
-        this.saveid = ko.observableArray();
-        this.savenode = ko.observableArray();
         this.searchUrl = ko.observable();
         this.dropdownnodes = ko.observableArray();
-        this.allinformationTable = ko.observableArray();
         this.selectedNode = ko.observable();
         this.dropdowngraph = ko.observableArray();
         this.selectedGraph = ko.observable();
@@ -32,10 +29,7 @@ define([
         this.conceptNewLang = ko.observable();
         this.rdmCollection = null;
         this.rdmCollectionLanguages = ko.observableArray();
-        this.defaultLanguage = ko.observable();
-        this.showPreviewTalbe = ko.observable(true);
         this.showPreview = ko.observable(false);
-        this.reportUrl = ko.observable(window.location.href.split('/').slice(0, 3).join('/')+'/report/');
         //paging
         this.currentPageIndex = ko.observable(0);
         this.tilesToRemove = ko.observableArray();
@@ -47,35 +41,20 @@ define([
         this.alert = params.alert || ko.observable();
         
         this.addAllFormData = () => {
+            self.formData = new window.FormData();
+            self.formData.append('load_id', self.loadId);
+            self.formData.append('module', self.moduleId);
             if (self.selectedGraph()) { self.formData.append('selectedGraph', self.selectedGraph()); }
-            if (self.saveid()) { self.formData.append('saveid', self.saveid()); }
-            if (self.savenode()) { self.formData.append('savenode', self.savenode()); }
             if (self.conceptOld()) { self.formData.append('conceptOld', self.conceptOld()); }
             if (self.conceptNew()) { self.formData.append('conceptNew', self.conceptNew()); }
-            if (self.conceptOldLang()) { self.formData.append('conceptOldLang', self.conceptOldLang()); }
-            if (self.conceptNewLang()) { self.formData.append('conceptNewLang', self.conceptNewLang()); }
             if (self.selectedNode()) { self.formData.append('selectedNode', JSON.stringify(self.selectedNode())); }
-            if (self.allinformationTable()) { self.formData.append('table', self.allinformationTable()); }
             if (self.searchUrl()) { self.formData.append('search_url', self.searchUrl()); }
             if (self.rdmCollection) { self.formData.append('rdmCollection', self.rdmCollection); }
             self.formData.append('currentPageIndex', self.currentPageIndex());
-            self.formData.append('tilesToRemove', self.tilesToRemove);
+            self.formData.append('tilesToRemove', self.tilesToRemove());
         };
-        self.deleteAllFormData = () => {
-            self.formData.delete('selectedGraph');
-            self.formData.delete('saveid');
-            self.formData.delete('savenode');
-            self.formData.delete('conceptOld');
-            self.formData.delete('conceptNew');
-            self.formData.delete('conceptOldLang');
-            self.formData.delete('conceptNewLang');
-            self.formData.delete('selectedNode');
-            self.formData.delete('table');
-            self.formData.delete('search_url');
-            self.formData.delete('rdmCollection');
-            self.formData.delete('currentPageIndex');
-        };
-        //lenght table
+
+        //length table
         self.listLength = ko.observable();
 
         //paging
@@ -105,7 +84,7 @@ define([
 
         //make url
         self.constructReportUrl = function(dataItem) {
-            return self.reportUrl() + dataItem.resourceid;
+            return arches.urls.reports + dataItem.resourceid;
         };
 
         this.ready = ko.computed(() => {
@@ -121,10 +100,11 @@ define([
         this.clearResults = ko.computed(() => {
             // if any of these values change then clear the preview results
             self.showPreview(false);
-            //self.allinformationTable.removeAll();
+            self.tilesToRemove.removeAll();
             // we don't actually care about the results of the following
             let clearResults = '';
-            [self.selectedGraph(),
+            [
+                self.selectedGraph(),
                 self.selectedNode(),
                 self.conceptOldLang(),
                 self.conceptNewLang(),
@@ -149,13 +129,12 @@ define([
 
         //delete Row in table
         this.addToList = function(tileid) {
-            self.tilesToRemove.push(tileid);
+            const list = new Set([...self.tilesToRemove(), tileid]);
+            self.tilesToRemove(list);
         };
 
         //call python code to display the change
         this.getPreviewData = function() {
-            self.addAllFormData();
-            self.allinformationTable.removeAll();
             self.showPreview(true);
             self.submit('preview').then(data => {
                 self.listLength(data.result.number_of_tiles);
@@ -172,7 +151,6 @@ define([
                 );
             }).always(function() {
                 self.previewing(false);
-                self.deleteAllFormData();
             });
         };
 
@@ -183,7 +161,6 @@ define([
             
             if(!!node){
                 self.rdmCollection = node.rdmCollection;
-                self.addAllFormData();
     
                 self.submit('get_collection_languages').then(data => {
                     self.rdmCollectionLanguages(data.result);
@@ -210,9 +187,7 @@ define([
 
         //select nodes and take the specific value
         this.selectedGraph.subscribe((graphid) => {
-            self.addAllFormData();
             self.dropdownnodes.removeAll();
-            self.savenode.removeAll();
             self.conceptNew(undefined);
             self.conceptOld(undefined);
             self.selectedNode(undefined);
@@ -241,11 +216,8 @@ define([
 
         //take the graphs 
         this.allgraph = function() {
-            self.addAllFormData();
             self.dropdowngraph.removeAll();
-            self.saveid.removeAll();
             self.dropdownnodes.removeAll();
-            self.savenode.removeAll();
             self.showPreview(false);
 
             self.submit('get_graphs').then(data => {
@@ -270,10 +242,7 @@ define([
             if (!self.allowEditOperation()) {
                 return;
             }
-
             self.showPreview(false);
-            self.showPreviewTalbe(false);
-            self.addAllFormData();
             params.activeTab("import");
             self.submit('write').then(data => {
             }).fail( function(err) {
@@ -289,9 +258,8 @@ define([
         };
 
         this.submit = function(action, data) {
+            self.addAllFormData();
             self.formData.append('action', action);
-            self.formData.append('load_id', self.loadId);
-            self.formData.append('module', self.moduleId);
             return $.ajax({
                 type: "POST",
                 url: arches.urls.etl_manager,
