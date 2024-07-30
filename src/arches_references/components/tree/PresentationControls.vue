@@ -6,7 +6,7 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 import Select from "primevue/select";
 
-import { selectedLanguageKey } from "@/arches_references/constants.ts";
+import { SECONDARY, selectedLanguageKey } from "@/arches_references/constants.ts";
 
 import type { Ref } from "vue";
 import type { Language } from "@/arches/types";
@@ -24,6 +24,7 @@ const { expandAll, collapseAll } = defineProps<{
 <template>
     <div style="text-align: center; display: flex; width: 100%">
         <Button
+            :severity="SECONDARY"
             class="secondary-button"
             type="button"
             icon="fa fa-plus"
@@ -31,6 +32,7 @@ const { expandAll, collapseAll } = defineProps<{
             @click="expandAll"
         />
         <Button
+            :severity="SECONDARY"
             class="secondary-button"
             type="button"
             icon="fa fa-minus"
@@ -40,7 +42,11 @@ const { expandAll, collapseAll } = defineProps<{
         <div style="display: flex; flex-grow: 1; justify-content: flex-end">
             <span
                 id="languageSelectLabel"
-                style="align-self: center; margin-right: 0.25rem"
+                style="
+                    align-self: center;
+                    margin-right: 0.25rem;
+                    font-size: 1rem;
+                "
             >
                 {{ $gettext("Show labels in:") }}
             </span>
@@ -71,12 +77,8 @@ const { expandAll, collapseAll } = defineProps<{
 
 <style scoped>
 .secondary-button {
-    border: 0;
-    background: #f4f4f4;
     height: 3rem;
     margin: 0.5rem;
-    justify-content: center;
     font-weight: 600;
-    text-wrap: nowrap;
 }
 </style>

@@ -199,10 +199,10 @@ const ptNodeContent = ({ instance }: TreePassThroughMethodOptions) => {
                     paddingBottom: '5rem',
                 },
             },
-            input: {
-                style: { height: '3.5rem', fontSize: '1.4rem' },
+            pcFilter: {
                 ariaLabel: $gettext('Find'),
             },
+            filterIcon: { style: { display: 'flex' } },
             wrapper: {
                 style: {
                     overflowY: 'auto',
@@ -212,7 +212,7 @@ const ptNodeContent = ({ instance }: TreePassThroughMethodOptions) => {
             },
             container: { style: { fontSize: '1.4rem' } },
             nodeContent: ptNodeContent,
-            label: {
+            nodeLabel: {
                 style: {
                     textWrap: 'nowrap',
                     marginLeft: '0.5rem',
@@ -253,5 +253,10 @@ const ptNodeContent = ({ instance }: TreePassThroughMethodOptions) => {
 <style scoped>
 :deep(.is-adjusting-parent) {
     border: dashed;
+}
+
+:deep(.p-tree-filter-input) {
+    height: 3.5rem;
+    font-size: 1.4rem;
 }
 </style>

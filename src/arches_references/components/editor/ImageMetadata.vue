@@ -344,23 +344,30 @@ const focusInput = () => {
                 style="width: 5%; min-width: 6rem; text-align: center"
                 :pt="{
                     headerCell: { ariaLabel: $gettext('Row edit controls') },
-                    rowEditorInitButton: {
-                        class: 'fa fa-pencil',
-                        style: { display: 'inline-flex' },
-                    },
-                    rowEditorInitIcon: { style: { display: 'none' } },
-                    rowEditorSaveButton: {
-                        class: 'fa fa-check',
-                        style: { display: 'inline-flex' },
-                    },
-                    rowEditorSaveIcon: { style: { display: 'none' } },
-                    rowEditorCancelButton: {
-                        class: 'fa fa-undo',
-                        style: { display: 'inline-flex' },
-                    },
-                    rowEditorCancelIcon: { style: { display: 'none' } },
                 }"
-            />
+            >
+                <template #roweditoriniticon>
+                    <i
+                        class="fa fa-pencil"
+                        aria-hidden="true"
+                        style="font-size: small"
+                    ></i>
+                </template>
+                <template #roweditorsaveicon>
+                    <i
+                        class="fa fa-check"
+                        aria-hidden="true"
+                        style="font-size: small"
+                    ></i>
+                </template>
+                <template #roweditorcancelicon>
+                    <i
+                        class="fa fa-undo"
+                        aria-hidden="true"
+                        style="font-size: small"
+                    ></i>
+                </template>
+            </Column>
             <Column
                 style="width: 5%; text-align: center"
                 :pt="{ headerCell: { ariaLabel: $gettext('Delete controls') } }"

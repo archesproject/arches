@@ -17,7 +17,7 @@ import {
     DANGER,
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
-    SUCCESS,
+    SECONDARY,
     displayedRowKey,
     selectedLanguageKey,
 } from "@/arches_references/constants.ts";
@@ -197,9 +197,16 @@ const confirmDelete = () => {
         ),
         header: $gettext("Confirm deletion"),
         icon: "fa fa-exclamation-triangle",
-        rejectLabel: $gettext("Cancel"),
-        rejectClass: "p-button-secondary p-button-outlined",
-        acceptLabel: $gettext("Delete"),
+        acceptProps: {
+            label: $gettext("Delete"),
+            severity: DANGER,
+            outlined: true,
+        },
+        rejectProps: {
+            label: $gettext("Cancel"),
+            severity: SECONDARY,
+            outlined: true,
+        },
         accept: async () => {
             await deleteSelected().then(fetchListsAndPopulateTree);
         },
@@ -244,7 +251,6 @@ await fetchListsAndPopulateTree();
 <template>
     <Button
         class="list-button"
-        :severity="SUCCESS"
         :label="$gettext('Add New List')"
         raised
         style="font-size: inherit"
@@ -256,34 +262,29 @@ await fetchListsAndPopulateTree();
         :label="$gettext('Delete')"
         :menu-button-props="{ 'aria-label': $gettext('Delete multiple') }"
         raised
-        style="font-size: inherit"
         :disabled="!toDelete.length"
         :severity="DANGER"
         :model="deleteSelectOptions"
+        :pt="{ pcButton: { class: 'listButton' } }"
         @click="confirmDelete"
     />
 </template>
 
 <style scoped>
-.list-button,
-.p-splitbutton {
+.list-button {
     height: 4rem;
     margin: 0.5rem;
     flex: 0.5;
     justify-content: center;
-    font-weight: 600;
-    color: white;
     text-wrap: nowrap;
 }
 </style>
 
 <style>
-.p-tieredmenu.p-tieredmenu-overlay {
+.p-splitbutton-button {
+    width: 100%;
+    font-weight: 600;
     font-size: inherit;
-}
-
-.p-tieredmenu-root-list {
-    margin: 0; /* override arches css */
 }
 
 .p-confirm-dialog {
@@ -293,19 +294,15 @@ await fetchListsAndPopulateTree();
 .p-dialog-header {
     background: #2d3c4b;
     color: white;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
 }
 
 .p-dialog-title {
     font-weight: 800;
 }
 
-.p-dialog-content {
-    padding-top: 1.25rem;
-}
-
 .p-confirm-dialog-accept {
-    background: #ed7979;
-    color: white;
     font-weight: 600;
 }
 </style>

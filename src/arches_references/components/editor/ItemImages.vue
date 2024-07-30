@@ -76,16 +76,14 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
             :with-credentials="true"
             :show-cancel-button="false"
             :show-upload-button="false"
+            :choose-label="$gettext('Upload an image')"
             name="item_image"
             :pt="{
-                buttonbar: {
+                header: {
                     style: {
                         border: '1px solid lightgray',
                         borderRadius: '4px',
                     },
-                },
-                chooseButton: {
-                    style: { backgroundColor: 'aliceblue', color: 'black' },
                 },
                 content: ({ props, state }: FileUploadInternals) => {
                     const done = [0, 100].includes(state.progress);
@@ -93,7 +91,6 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
                         style: { display: done ? 'none' : '' },
                     };
                 },
-                input: { ariaLabel: $gettext('Upload an image') },
             }"
             @before-send="addHeader($event)"
             @upload="upload($event)"

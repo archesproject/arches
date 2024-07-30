@@ -301,7 +301,6 @@ const acceptNewListShortcutEntry = async () => {
                 v-else-if="showMoveHereButton(node.key)"
                 type="button"
                 raised
-                class="move-button"
                 :label="
                     $gettext(
                         'Move %{item} here',
@@ -314,6 +313,7 @@ const acceptNewListShortcutEntry = async () => {
                         true,
                     )
                 "
+                :style="{ height: '2.5rem' }"
                 @click="setParent(node)"
             />
         </div>
@@ -343,11 +343,5 @@ const acceptNewListShortcutEntry = async () => {
     margin-left: 1rem;
     width: 100%;
     justify-content: space-between;
-}
-
-.p-button {
-    background-color: aliceblue;
-    color: black;
-    height: 2.5rem;
 }
 </style>
