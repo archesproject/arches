@@ -32,7 +32,7 @@ const iconLabel = (item: ControlledListItem) => {
             :href="item.uri"
             rel="noreferrer"
             target="_blank"
-            style="font-size: small; color: blue"
+            style="font-size: small; color: blue; text-decoration: underline"
         >
             {{ item.uri }}
         </a>
