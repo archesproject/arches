@@ -48,7 +48,9 @@ const { expandAll, collapseAll } = defineProps<{
                 v-model="selectedLanguage"
                 aria-labelledby="languageSelectLabel"
                 :options="arches.languages"
-                :option-label="(lang) => `${lang.name} (${lang.code})`"
+                :option-label="
+                    (lang: Language) => `${lang.name} (${lang.code})`
+                "
                 :placeholder="$gettext('Language')"
                 :pt="{
                     root: { class: 'p-button secondary-button' },

@@ -20,8 +20,15 @@ import type { ControlledListItem } from "@/arches_references/types";
 import type {
     FileUploadBeforeSendEvent,
     FileUploadErrorEvent,
+    FileUploadProps,
+    FileUploadState,
     FileUploadUploadEvent,
 } from "primevue/fileupload";
+
+interface FileUploadInternals {
+    props: FileUploadProps;
+    state: FileUploadState;
+}
 
 const item = inject(
     itemKey,
@@ -80,7 +87,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
                 chooseButton: {
                     style: { backgroundColor: 'aliceblue', color: 'black' },
                 },
-                content: ({ props, state }) => {
+                content: ({ props, state }: FileUploadInternals) => {
                     const done = [0, 100].includes(state.progress);
                     return {
                         style: { display: done ? 'none' : '' },

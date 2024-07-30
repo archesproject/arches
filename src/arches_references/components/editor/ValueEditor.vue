@@ -26,6 +26,7 @@ import AddValue from "@/arches_references/components/editor/AddValue.vue";
 
 import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
+import type { Language } from "arches/arches/app/src/arches/types";
 import type {
     ControlledListItem,
     Value,
@@ -345,7 +346,9 @@ const focusInput = () => {
                     <Dropdown
                         v-model="data[field]"
                         :options="arches.languages"
-                        :option-label="(lang) => `${lang.name} (${lang.code})`"
+                        :option-label="
+                            (lang: Language) => `${lang.name} (${lang.code})`
+                        "
                         option-value="code"
                         :pt="{
                             input: {
