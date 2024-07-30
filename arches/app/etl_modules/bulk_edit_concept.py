@@ -97,263 +97,8 @@ def perth_items(items):
 
 
 class BulkConceptEditor(BaseBulkEditor):
-    def editor_log(self, cursor, tile, node_id, resourceid, old_value, new_value):
-        id = uuid.uuid4()
-        cursor.execute(
-            """INSERT INTO edit_log (editlogid, resourceinstanceid, nodegroupid, tileinstanceid, oldvalue, newvalue, edittype, transactionid) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-            (
-                id,
-                resourceid,
-                node_id,
-                tile,
-                old_value,
-                new_value,
-                "tile edit",
-                str(self.loadid),
-            ),
-        )
-
     def validate_inputs(self, request):
         pass
-
-    # def save_tiles(
-    #     self,
-    #     cursor,
-    #     loadid,
-    #     userid,
-    #     tileids,
-    #     newids,
-    #     tiledatas,
-    #     nodeids,
-    #     newresources,
-    #     oldid,
-    # ):
-    #     log_event_details(cursor, loadid, "done|Saving the tiles...")
-    #     log_event_details(cursor, loadid, "done|Getting the statistics...")
-
-    #     cursor.execute(
-    #         """SELECT g.name graph, COUNT(DISTINCT l.resourceid)
-    #                     FROM load_staging l, resource_instances r, graphs g
-    #                     WHERE l.loadid = %s
-    #                     AND r.resourceinstanceid = l.resourceid
-    #                     AND g.graphid = r.graphid
-    #                     GROUP BY g.name""",
-    #         [loadid],
-    #     )
-    #     resources = cursor.fetchall()
-    #     number_of_resources = {}
-
-    #     for resource in resources:
-    #         graph = json.loads(resource[0])[settings.LANGUAGE_CODE]
-    #         number_of_resources.update({graph: {"total": resource[1]}})
-
-    #     cursor.execute(
-    #         """SELECT g.name graph, n.name, COUNT(*)
-    #                     FROM load_staging l, nodes n, graphs g
-    #                     WHERE l.loadid = %s
-    #                     AND n.nodeid = l.nodegroupid
-    #                     AND n.graphid = g.graphid
-    #                     GROUP BY n.name, g.name;""",
-    #         [loadid],
-    #     )
-    #     tiles = cursor.fetchall()
-
-    #     for tile in tiles:
-    #         graph = json.loads(tile[0])[settings.LANGUAGE_CODE]
-    #         number_of_resources[graph].setdefault("tiles", []).append(
-    #             {"tile": tile[1], "count": tile[2]}
-    #         )
-
-    #     number_of_import = json.dumps(
-    #         {
-    #             "number_of_import": [
-    #                 {"name": k, "total": v["total"], "tiles": v["tiles"]}
-    #                 for k, v in number_of_resources.items()
-    #             ]
-    #         }
-    #     )
-
-    #     cursor.execute(
-    #         """UPDATE load_event SET (status, load_end_time, load_details) = (%s, %s, load_details || %s::JSONB) WHERE loadid = %s""",
-    #         ("completed", datetime.now(), number_of_import, loadid),
-    #     )
-
-    #     log_event_details(cursor, loadid, "done|Indexing...")
-    #     index_resources_by_transaction(
-    #         loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True
-    #     )
-    #     user = User.objects.get(id=userid)
-    #     user_email = getattr(user, "email", "")
-    #     user_firstname = getattr(user, "first_name", "")
-    #     user_lastname = getattr(user, "last_name", "")
-    #     user_username = getattr(user, "username", "")
-    #     log_event_details(cursor, loadid, "done|Updating the edit log...")
-    #     new_tiledata = []
-    #     match_tileid = []
-    #     match_resourceid = []
-    #     for tileid, tiledata, newresource in zip(tileids, tiledatas, newresources):
-
-    #         if str(oldid) in tiledata.get(str(nodeids), []):
-    #             if isinstance(tiledata[str(nodeids)], list):
-    #                 tiledata[str(nodeids)][tiledata[str(nodeids)].index(str(oldid))] = (
-    #                     str(newids)
-    #                 )
-    #             else:
-    #                 tiledata[str(nodeids)] = str(newids)
-    #             new_tiledata.append(tiledata)
-    #             match_tileid.append(tileid)
-    #             match_resourceid.append(newresource)
-
-    #     update_data = [
-    #         (json.dumps(data_json), str(resource_id), str(tile_id))
-    #         for data_json, resource_id, tile_id in zip(
-    #             new_tiledata, match_resourceid, match_tileid
-    #         )
-    #     ]
-    #     update_query = "UPDATE tiles SET tiledata = %s WHERE resourceinstanceid = %s AND tileid = %s;"
-    #     try:
-
-    #         cursor.executemany(update_query, update_data)
-
-    #     except Exception as e:
-    #         cursor.execute(
-    #             """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-    #             ("failed", datetime.now(), self.loadid),
-    #         )
-
-    #         print("Error:", e)
-    #         return None
-
-    #     for tiledata in new_tiledata:
-    #         json_data = json.dumps(tiledata)
-    #         cursor.execute(
-    #             """
-    #             UPDATE edit_log e
-    #             SET (resourcedisplayname, userid, user_firstname, user_lastname, user_email, user_username, newvalue, timestamp) = (r.name ->> %s, %s, %s, %s, %s, %s, %s, %s)
-    #             FROM resource_instances r
-    #             WHERE e.resourceinstanceid::uuid = r.resourceinstanceid
-    #             AND transactionid = %s
-    #             """,
-    #             (
-    #                 settings.LANGUAGE_CODE,
-    #                 userid,
-    #                 user_firstname,
-    #                 user_lastname,
-    #                 user_email,
-    #                 user_username,
-    #                 json_data,
-    #                 datetime.now(),
-    #                 loadid,
-    #             ),
-    #         )
-
-    #     log_event_details(cursor, loadid, "done")
-
-    #     cursor.execute(
-    #         """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
-    #         ("indexed", datetime.now(), True, True, loadid),
-    #     )
-
-    def return_value(self, cursor, resource_ids, node_id, old_id, new_id):
-        select_query = "SELECT tileid, tiledata  FROM tiles WHERE resourceinstanceid = %s AND Not tiledata -> %s @> %s;"
-
-        tiles_data = []
-        tile_ids = []
-        resources = []
-        for resource_id in resource_ids:
-
-            newid_json = f'["{str(new_id)}"]'
-            cursor.execute(select_query, [resource_id, str(node_id), newid_json])
-            rows = cursor.fetchall()
-
-            for row in rows:
-                tile_id = str(row[0])
-                data = json.loads(row[1])
-                if data and tile_id not in tile_ids:
-                    key = str(node_id)
-                else:
-                    continue
-                if key in data and isinstance(data[key], list):
-                    for see_data in data[key]:
-                        if len(see_data) == 36 and str(see_data) == str(old_id):
-                            tiles_data.append(data)
-                            tile_ids.append(tile_id)
-                            resources.append(resource_id)
-                elif key in data:
-                    tiles_data.append(data)
-                    tile_ids.append(tile_id)
-                    resources.append(str(resource_id))
-
-        return tile_ids, tiles_data, resources
-
-    def stage_data(
-        self,
-        cursor,
-        graphid,
-        nodeid,
-        language_old,
-        resource_ids,
-        language_new,
-        oldid,
-        newid,
-        tiles,
-        tile_datas,
-    ):
-
-        for resourceid, tile, tiledata in zip(resource_ids, tiles, tile_datas):
-            result = {"success": False}
-            value = {
-                "graph": str(graphid),
-                "node": str(nodeid),
-                "new": str(newid),
-                "old": tiledata,
-                "languageold": language_old,
-                "languagenew": language_new,
-            }
-            operation = "update"
-            sql_query = "SELECT nodegroupid FROM public.nodes WHERE nodeid = %s"
-            cursor.execute(sql_query, [str(nodeid)])
-            node_group = cursor.fetchone()
-            try:
-                cursor.execute(
-                    """INSERT INTO load_staging (nodegroupid, resourceid, tileid, value, loadid, nodegroup_depth, source_description, passes_validation, operation) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-                    (
-                        str(node_group[0]),
-                        str(resourceid),
-                        str(tile),
-                        json.dumps(value),
-                        str(self.loadid),
-                        0,
-                        "bulk_edit",
-                        True,
-                        operation,
-                    ),
-                )
-
-                result["success"] = True
-            except Exception as e:
-                logger.error(e)
-                result["message"] = _("Unable to edit staged data: {}").format(str(e))
-                return result  # Exit early if an exception occurs
-        for resourceid, tile, tile_data in zip(resource_ids, tiles, tile_datas):
-            self.editor_log(
-                cursor, str(tile), str(nodeid), str(resourceid), json.dumps(tile_data)
-            )
-        return result
-
-    # def all_node_by_conept(self, request):
-
-    #     with connection.cursor() as cursor:
-    #         select_nodes = "SELECT name, config, nodeid FROM nodes Where (datatype = 'concept-list' or datatype = 'concept') ORDER BY name ASC ;"
-    #         # cursor.execute(select_nodes,[select_value[0]])
-    #         cursor.execute(select_nodes)
-    #         nodes = cursor.fetchall()
-    #         all_node = []
-    #         for node in nodes:
-    #             name = json.loads(node[1])
-    #             if name["rdmCollection"]:
-    #                 all_node.append([node[0], name["rdmCollection"], node[2]])
-    #     return {"success": True, "data": all_node}
 
     def get_graphs_node(self, request):
         graphid = request.POST.get("selectedGraph", None)
@@ -370,30 +115,6 @@ class BulkConceptEditor(BaseBulkEditor):
             cursor.execute(select_nodes, [graphid])
             nodes = dictfetchall(cursor)
             return {"success": True, "data": nodes}
-
-    # def list_concepts(self, request):
-    #     selected_node_info = request.POST.get("selectedNode", None)
-    #     if not selected_node_info:
-    #         return {}
-
-    #     selected_rdmCollection = json.loads(selected_node_info)["rdmCollection"]
-    #     with connection.cursor() as cursor:
-    #         select_nodes = """
-    #             SELECT relations.conceptidto as conceptid, values_table.value as label, values_table.valueid as valueid
-    #             FROM relations
-    #             INNER JOIN (
-    #                 SELECT conceptid, value, valueid
-    #                 FROM public."values"
-    #                 WHERE valuetype = 'prefLabel'
-    #             ) AS values_table ON relations.conceptidto = values_table.conceptid
-    #             WHERE relations.conceptidfrom = %s;
-    #         """
-    #         cursor.execute(select_nodes, [selected_rdmCollection])
-    #         conceptall = dictfetchall(cursor)
-    #     return {
-    #         "success": True,
-    #         "data": conceptall,
-    #     }
 
     def get_resourceids_from_search_url(self, search_url):
         request = HttpRequest()
@@ -601,207 +322,6 @@ class BulkConceptEditor(BaseBulkEditor):
             },
         }
 
-    # def get_preview_data(self, request):
-    #     preview_limit = 100  # ETLModule.objects.get(pk=self.moduleid).config.get(
-    #     #     "previewLimit", 5
-    #     # )
-    #     language_old = request.POST.get("conceptOldLang", None)
-    #     language_new = request.POST.get("conceptNewLang", None)
-    #     old = request.POST.get("conceptOld", None)
-    #     new = request.POST.get("conceptNew", None)
-    #     old_prefLabel = Value.objects.values_list("value", flat=True).get(
-    #         pk=old, valuetype__valuetype="prefLabel"
-    #     )
-    #     new_prefLabel = Value.objects.values_list("value", flat=True).get(
-    #         pk=new, valuetype__valuetype="prefLabel"
-    #     )
-    #     # all_child_concept = request.POST.get("allchildconcept", None)
-    #     # nodeid = request.POST.get("nodeid", None)
-    #     import ipdb
-
-    #     ipdb.sset_trace()
-
-    #     selected_node_info = request.POST.get("selectedNode", None)
-    #     if not selected_node_info:
-    #         return {}
-    #     # selected_node = json.loads(selected_node_info)["nodeid"]
-    #     nodeid = json.loads(selected_node_info)["node"]
-    #     node_datatype = Node.objects.get(pk=nodeid).datatype
-
-    #     search_url = request.POST.get("search_url", None)
-    #     resourceids = ["6925e6ab-e019-4a46-92f4-63cb730c80cf"]  # None
-    #     resourceids = tuple(resourceids)
-    #     # items = all_child_concept.split(",")
-    #     # id_name_pairs = []
-    #     # if len(items) % 2 == 0:
-    #     #     id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
-    #     # else:
-    #     #     id_name_pairs = perth_items(items)
-    #     # oldid = next((pair for pair in id_name_pairs if pair[1] == old), None)
-    #     # newid = next((pair for pair in id_name_pairs if pair[1] == new), None)
-    #     if search_url:
-    #         try:
-    #             resourceids = self.get_resourceids_from_search_url(search_url)
-    #             resourceids = tuple(resourceids)
-    #         except ValidationError:
-    #             return {
-    #                 "success": False,
-    #                 "data": {
-    #                     "title": _("Invalid Search Url"),
-    #                     "message": _("Please, enter a valid search url"),
-    #                 },
-    #             }
-
-    #     with connection.cursor() as cursor:
-    #         # select_query = "SELECT valueid FROM values Where conceptid = %s and languageid = %s and value= %s;"
-    #         # cursor.execute(select_query, [oldid[0], language_old, old])
-    #         # valueid = cursor.fetchall()
-    #         # oldid = valueid[0][0]
-    #         # select_query = "SELECT valueid FROM values Where conceptid = %s and languageid = %s and value= %s;"
-    #         # cursor.execute(select_query, [newid[0], language_new, new])
-    #         # valueid = cursor.fetchall()
-    #         # newid = valueid[0][0]
-
-    #         oldid = old
-    #         newid = new
-
-    #         if node_datatype == "concept-list":
-    #             select_resource = """
-    #                 SELECT resourceinstanceid, tiledata, tileid
-    #                 FROM tiles
-    #                 WHERE tiledata -> %s @> %s
-    #                 --AND resourceinstanceid in %s
-    #                 AND CASE
-    #                     WHEN %s IS NULL THEN true
-    #                     ELSE tiles.resourceinstanceid = ANY(%s)
-    #                     END
-    #                 AND Not tiledata -> %s @> %s
-    #                 LIMIT %s;
-    #             """
-    #             cursor.execute(
-    #                 select_resource,
-    #                 [
-    #                     str(nodeid),
-    #                     f'["{str(oldid)}"]',
-    #                     resourceids,
-    #                     resourceids,
-    #                     str(nodeid),
-    #                     f'["{str(newid)}"]',
-    #                     preview_limit,
-    #                 ],
-    #             )
-    #         else:  # concept
-    #             select_resource = """
-    #                 SELECT resourceinstanceid, tiledata, tileid
-    #                 FROM tiles
-    #                 WHERE tiledata ->> %s = %s
-    #                 AND CASE
-    #                     WHEN %s IS NULL THEN true
-    #                     ELSE tiles.resourceinstanceid = ANY(%s)
-    #                     END
-    #                 LIMIT %s;"""
-    #             print(
-    #                 select_resource
-    #                 % (str(nodeid), str(oldid), resourceids, resourceids, preview_limit)
-    #             )
-    #             cursor.execute(
-    #                 select_resource,
-    #                 [str(nodeid), str(oldid), resourceids, resourceids, preview_limit],
-    #             )
-    #             rows = cursor.fetchall()
-
-    #         # if resourceids:
-    #         #     resources_id = tuple(resourceids)
-    #         #     oldid_json = f'["{str(oldid)}"]'
-    #         #     newid_json = f'["{str(newid)}"]'
-    #         #     select_resource = "SELECT resourceinstanceid, tiledata, tileid FROM tiles WHERE tiledata -> %s @>%s AND resourceinstanceid in %s AND Not tiledata -> %s @> %s limit %s;"
-    #         #     cursor.execute(
-    #         #         select_resource,
-    #         #         [
-    #         #             str(nodeid),
-    #         #             oldid_json,
-    #         #             resources_id,
-    #         #             str(nodeid),
-    #         #             newid_json,
-    #         #             preview_limit,
-    #         #         ],
-    #         #     )
-    #         #     print(cursor.query)
-
-    #         #     rows = cursor.fetchall()
-    #         #     if len(rows) == 0:
-    #         #         select_resource = "SELECT resourceinstanceid, tiledata, tileid FROM tiles WHERE tiledata ->> %s = %s limit %s;"
-    #         #         cursor.execute(
-    #         #             select_resource, [str(nodeid), str(oldid), preview_limit]
-    #         #         )
-    #         #         rows = cursor.fetchall()
-    #         # else:
-    #         #     oldid_json = f'["{str(oldid)}"]'
-    #         #     newid_json = f'["{str(newid)}"]'
-    #         #     select_resource = "SELECT resourceinstanceid, tiledata, tileid FROM tiles WHERE tiledata -> %s @>%s AND Not tiledata -> %s @> %s limit %s;"
-    #         #     cursor.execute(
-    #         #         select_resource,
-    #         #         [str(nodeid), oldid_json, str(nodeid), newid_json, preview_limit],
-    #         #     )
-    #         #     rows = cursor.fetchall()
-    #         #     print(cursor.query)
-    #         #     if len(rows) == 0:
-    #         #         select_resource = "SELECT resourceinstanceid, tiledata, tileid FROM tiles WHERE tiledata ->> %s = %s limit %s;"
-
-    #         #         cursor.execute(
-    #         #             select_resource, [str(nodeid), str(oldid), preview_limit]
-    #         #         )
-    #         #         rows = cursor.fetchall()
-    #         #         print(cursor.query)
-
-    #         information = []
-
-    #         for row in rows:
-    #             data = json.loads(row[1])
-    #             if data:
-    #                 key = str(nodeid)
-    #             else:
-    #                 break
-
-    #             if key in data and isinstance(data[key], list):
-
-    #                 for item in data[key]:
-    #                     if len(item) == 36 and str(item) == str(oldid):
-    #                         select_name = "SELECT name FROM resource_instances WHERE resourceinstanceid = %s;"
-    #                         cursor.execute(select_name, [row[0]])
-    #                         name = cursor.fetchone()
-    #                         if name:
-    #                             fulname = json.loads(name[0])
-    #                             information.append(
-    #                                 [
-    #                                     str(row[0]),
-    #                                     str(fulname.get("en", "")),
-    #                                     f"{old_prefLabel} ({language_old})",
-    #                                     f"{new_prefLabel} ({language_new})",
-    #                                 ]
-    #                             )
-    #             elif key in data:
-    #                 item = data[key]
-    #                 if len(item) == 36 and str(item) == str(oldid):
-    #                     select_name = "SELECT name FROM resource_instances WHERE resourceinstanceid = %s;"
-    #                     cursor.execute(select_name, [row[0]])
-    #                     name = cursor.fetchone()
-    #                     if name:
-    #                         fulname = json.loads(name[0])
-    #                         information.append(
-    #                             [
-    #                                 str(row[0]),
-    #                                 str(fulname.get("en", "")),
-    #                                 f"{old_prefLabel} ({language_old})",
-    #                                 f"{new_prefLabel} ({language_new})",
-    #                             ]
-    #                         )
-
-    #     return {
-    #         "success": True,
-    #         "data": information,
-    #     }
-
     def get_collection_languages(self, request):
         from arches.app.utils.i18n import rank_label
 
@@ -863,26 +383,26 @@ class BulkConceptEditor(BaseBulkEditor):
                 resourceids.append(resource)
             except ValueError:
                 pass
+        print(table, resourceids)
 
         with connection.cursor() as cursor:
             event_created = self.create_load_event(cursor, load_details)
             if not event_created["success"]:
                 self.log_event(cursor, "failed")
                 return {"success": False, "data": event_created["message"]}
-        use_celery_bulk_edit = True
+
+        use_celery_bulk_edit = False
         if use_celery_bulk_edit:
-            response = self.run_load_task_async(request, self.loadid)
+            response = self.run_load_task_async(request)
         else:
-            self.run_load_task(
+            response = self.run_load_task(
                 self.userid,
                 self.loadid,
                 self.moduleid,
                 graphid,
                 nodeid,
-                None,
-                language_old,
-                new,
                 resourceids,
+                language_old,
                 language_new,
                 old,
                 new,
@@ -896,35 +416,37 @@ class BulkConceptEditor(BaseBulkEditor):
         old = request.POST.get("conceptOld", None)
         language_old = request.POST.get("conceptOldLang", None)
         language_new = request.POST.get("conceptNewLang", None)
-        table = request.POST.get("table", None)
+        # table = request.POST.get("table", None)
         nodeid = request.POST.get("nodeid", None)
-        all_child_concept = request.POST.get("allchildconcept", None)
+        # all_child_concept = request.POST.get("allchildconcept", None)
+
         # saveid = request.POST.get("saveid", None)
-        items = all_child_concept.split(",")
-        id_name_pairs = []
-        if len(items) % 2 == 0:
-            id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
-        else:
-            id_name_pairs = perth_items(items)
-        oldid = next((pair for pair in id_name_pairs if pair[1] == old), None)
-        newid = next((pair for pair in id_name_pairs if pair[1] == new), None)
-        # items = saveid.split(",")
-        id_name_pairs = []
-        id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
-        graphid = next(
-            (pair for pair in id_name_pairs if pair[1] == selected_graph), None
-        )
-        resourceids = []
-        for resource in table.split(","):
-            try:
-                uuid.UUID(resource)
-                resourceids.append(resource)
-            except ValueError:
-                pass
-        if resourceids:
-            resourceids_json_string = json.dumps(resourceids)
-            resourceids = json.loads(resourceids_json_string)
-        pattern = old
+        # items = all_child_concept.split(",")
+        # id_name_pairs = []
+        # if len(items) % 2 == 0:
+        #     id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
+        # else:
+        #     id_name_pairs = perth_items(items)
+        # oldid = next((pair for pair in id_name_pairs if pair[1] == old), None)
+        # newid = next((pair for pair in id_name_pairs if pair[1] == new), None)
+        # # items = saveid.split(",")
+        # id_name_pairs = []
+        # id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
+        # graphid = next(
+        #     (pair for pair in id_name_pairs if pair[1] == selected_graph), None
+        # )
+        # resourceids = []
+        # for resource in table.split(","):
+        #     try:
+        #         uuid.UUID(resource)
+        #         resourceids.append(resource)
+        #     except ValueError:
+        #         pass
+        # if resourceids:
+        #     resourceids_json_string = json.dumps(resourceids)
+        #     resourceids = json.loads(resourceids_json_string)
+        # pattern = old
+
         edit_task = edit_bulk_concept_data.apply_async(
             (
                 self.userid,
@@ -947,15 +469,71 @@ class BulkConceptEditor(BaseBulkEditor):
                 (edit_task.task_id, self.loadid),
             )
 
+    def stage_data(
+        self,
+        cursor,
+        nodeid,
+        module_id,
+        resource_ids,
+        language_old,
+        language_new,
+        oldid,
+        newid,
+    ):
+        result = {"success": False}
+        update_limit = ETLModule.objects.get(pk=module_id).config.get(
+            "updateLimit", 5000
+        )
+        nodeid_path = [nodeid]
+        try:
+            sql = """
+                INSERT INTO load_staging (value, tileid, nodegroupid, parenttileid, resourceid, loadid, nodegroup_depth, source_description, operation, passes_validation)
+                    (SELECT 
+                        jsonb_set(
+                            tiledata,
+                            %s,
+                            replace(tiledata ->> %s,%s,%s)::jsonb,
+                            false
+                        ),
+                        tileid, nodegroupid, parenttileid, resourceinstanceid, %s, 0, 'bulk_edit', 'update', true
+                    FROM tiles t
+                    WHERE nodegroupid in (select nodegroupid from nodes where nodeid = %s)
+                    AND tiledata -> %s ? %s);
+            """
+            cursor.execute(
+                sql,
+                [nodeid_path, nodeid, oldid, newid, self.loadid, nodeid, nodeid, oldid],
+            )
+            result["success"] = True
+
+        except Exception as e:
+            logger.error(e)
+            result["message"] = _("Unable to edit staged data: {}").format(str(e))
+
+        return result
+
+    def edit_staged_data(self, cursor, graph_id, node_id):
+        result = {"success": False}
+        try:
+            cursor.execute(
+                """SELECT * FROM __arches_edit_staged_string_data(%s, %s, %s, %s, %s, %s, %s)""",
+                (self.loadid, graph_id, node_id, "", "", "", ""),
+            )
+            result["success"] = True
+        except Exception as e:
+            logger.error(e)
+            result["message"] = _("Unable to edit staged data: {}").format(str(e))
+        return result
+
     def run_load_task(
         self,
         userid,
         loadid,
         module_id,
-        graphid,
-        nodeid,
+        graph_id,
+        node_id,
+        resource_ids,
         language_old,
-        resourceids,
         language_new,
         oldid,
         newid,
@@ -963,44 +541,30 @@ class BulkConceptEditor(BaseBulkEditor):
 
         with connection.cursor() as cursor:
             self.log_event_details(cursor, "done|Staging the data for edit...")
-            # select_query = "SELECT valueid FROM values Where conceptid = %s and languageid = %s and valuetype = 'prefLabel';"
-            # cursor.execute(select_query, [oldid[0], language_old])
-            # valueid = cursor.fetchall()
-            # oldid = valueid[0][0]
-            # select_query = "SELECT valueid FROM values Where conceptid = %s and languageid = %s and valuetype = 'prefLabel';"
-            # cursor.execute(select_query, [newid[0], language_new])
-            # valueid = cursor.fetchall()
-            # newid = valueid[0][0]
-            self.log_event_details(cursor, "done|Editing the data...")
-            tile = self.return_value(cursor, resourceids, nodeid, oldid, newid)
-            self.log_event_details(cursor, "done|returm data...")
-            data_updated = self.stage_data(
+            data_staged = self.stage_data(
                 cursor,
-                graphid[0],
-                nodeid,
+                node_id,
+                module_id,
+                resource_ids,
                 language_old,
-                tile[2],
                 language_new,
                 oldid,
                 newid,
-                tile[0],
-                tile[1],
             )
+
+            if data_staged["success"]:
+                self.log_event_details(cursor, "done|Editing the data...")
+                data_updated = self.edit_staged_data(cursor, graph_id, node_id)
+            else:
+                self.log_event(cursor, "failed")
+                return {
+                    "success": False,
+                    "data": {"title": _("Error"), "message": data_staged["message"]},
+                }
+
             if data_updated["success"]:
                 self.loadid = loadid  # currently redundant, but be certain
-                # for resource in resourceids:
-                tile = self.return_value(cursor, resourceids, nodeid, oldid, newid)
-                self.save_tiles(
-                    cursor,
-                    loadid,
-                    userid,
-                    tile[0],
-                    newid,
-                    tile[1],
-                    nodeid,
-                    tile[2],
-                    oldid,
-                )
+                save_to_tiles(userid, loadid)
                 return {"success": True, "data": "done"}
             else:
                 self.log_event(cursor, "failed")

@@ -509,10 +509,8 @@ def edit_bulk_concept_data(
     module_id,
     graph_id,
     node_id,
+    resource_ids,
     language_old,
-    old_text,
-    new_text,
-    resourceids,
     language_new,
     oldid,
     newid,
@@ -521,17 +519,15 @@ def edit_bulk_concept_data(
 
     logger = logging.getLogger(__name__)
     try:
-        BulkStringEditor = bulk_edit_concept.BulkConceptEditor(loadid=load_id)
-        BulkStringEditor.run_load_task(
+        BulkConceptEditor = bulk_edit_concept.BulkConceptEditor(loadid=load_id)
+        BulkConceptEditor.run_load_task(
             userid,
             load_id,
             module_id,
             graph_id,
             node_id,
+            resource_ids,
             language_old,
-            old_text,
-            new_text,
-            resourceids,
             language_new,
             oldid,
             newid,
