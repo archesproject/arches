@@ -332,7 +332,7 @@ class Command(BaseCommand):  # pragma: no cover
             os.path.join("..", ".coveragerc"),
             os.path.join("..", ".gitignore"),
             os.path.join("..", ".github/workflows/main.yml"),
-            os.path.join("..", ".pre-commit-cxsonfig.yaml"),
+            os.path.join("..", ".pre-commit-config.yaml"),
             os.path.join("..", "tsconfig.json"),
             os.path.join("..", "tests/test_settings.py"),
             os.path.join("..", "tests/search_indexes/sample_index_tests.py"),
