@@ -36,13 +36,13 @@ runs:
       with:
         secrets: ${{ inputs.secrets }}
 
-    - name: Checkout into feature branch
-      if: inputs.branch-type == 'feature'
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ github.repository }}
-        ref: ${{ github.ref }}
-        path: .
+    # - name: Checkout into feature branch
+    #   if: inputs.branch-type == 'feature'
+    #   uses: actions/checkout@v4
+    #   with:
+    #     repository: ${{ github.repository }}
+    #     ref: ${{ github.ref }}
+    #     path: .
 
     - name: Checkout into target branch
       if: inputs.branch-type == 'target'
@@ -51,6 +51,12 @@ runs:
         repository: ${{ github.repository }}
         ref: ${{ github.event.pull_request.base.ref }}
         path: .
+
+    - name: Clean install dependencies
+      run: |
+        npm ci
+        npm cache clean --force
+      shell: bash
 
     - name: Install frontend dependencies
       run: |
