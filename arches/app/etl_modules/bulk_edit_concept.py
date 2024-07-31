@@ -319,13 +319,13 @@ class BulkConceptEditor(BaseBulkEditor):
         }
         resourceids = []
         ### get all the resourceids and (-) removed resourceids
-        for resource in table.split(","):
-            try:
-                uuid.UUID(resource)
-                resourceids.append(resource)
-            except ValueError:
-                pass
-        print(table, resourceids)
+        # for resource in table.split(","):
+        #     try:
+        #         uuid.UUID(resource)
+        #         resourceids.append(resource)
+        #     except ValueError:
+        #         pass
+        # print(table, resourceids)
 
         with connection.cursor() as cursor:
             event_created = self.create_load_event(cursor, load_details)
@@ -428,15 +428,8 @@ class BulkConceptEditor(BaseBulkEditor):
         try:
             sql = """
                 INSERT INTO load_staging (value, tileid, nodegroupid, parenttileid, resourceid, loadid, nodegroup_depth, source_description, operation, passes_validation)
-                    (SELECT 
-                        jsonb_set(
-                            tiledata,
-                            %(node_id_path)s,
-                            replace((tiledata -> %(node_id)s)::text, %(old_id)s, %(new_id)s)::jsonb,
-                            false
-                        ),
-                        tileid, nodegroupid, parenttileid, resourceinstanceid, %(load_id)s, 0, 'bulk_edit', 'update', true
-                    FROM tiles t
+                    (SELECT tiledata, tileid, nodegroupid, parenttileid, resourceinstanceid, %(load_id)s, 0, 'bulk_edit', 'update', true
+                    FROM tiles
                     WHERE nodegroupid in (select nodegroupid from nodes where nodeid = %(node_id)s)
                     AND tiledata -> %(node_id)s ? %(old_id)s);
             """
@@ -458,12 +451,12 @@ class BulkConceptEditor(BaseBulkEditor):
 
         return result
 
-    def edit_staged_data(self, cursor, graph_id, node_id):
+    def edit_staged_data(self, cursor, node_id, old_id, new_id):
         result = {"success": False}
         try:
             cursor.execute(
-                """SELECT * FROM __arches_edit_staged_string_data(%s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, graph_id, node_id, "", "", "", ""),
+                """SELECT * FROM __arches_edit_staged_concept(%s, %s, %s, %s)""",
+                (self.loadid, node_id, old_id, new_id),
             )
             result["success"] = True
         except Exception as e:
@@ -481,8 +474,8 @@ class BulkConceptEditor(BaseBulkEditor):
         resource_ids,
         language_old,
         language_new,
-        oldid,
-        newid,
+        old_id,
+        new_id,
     ):
 
         with connection.cursor() as cursor:
@@ -494,13 +487,13 @@ class BulkConceptEditor(BaseBulkEditor):
                 resource_ids,
                 language_old,
                 language_new,
-                oldid,
-                newid,
+                old_id,
+                new_id,
             )
 
             if data_staged["success"]:
                 self.log_event_details(cursor, "done|Editing the data...")
-                data_updated = self.edit_staged_data(cursor, graph_id, node_id)
+                data_updated = self.edit_staged_data(cursor, node_id, old_id, new_id)
             else:
                 self.log_event(cursor, "failed")
                 return {
