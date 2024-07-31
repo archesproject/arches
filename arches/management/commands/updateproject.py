@@ -151,9 +151,15 @@ class Command(BaseCommand):  # pragma: no cover
                 os.path.join(settings.APP_ROOT, ".."),
             )
 
-        if not os.path.exists(
+        if os.path.exists(
             os.path.join(settings.APP_ROOT, "..", ".github", "workflows", "main.yml")
         ):
+            warnings.warn(
+                "Existing .github/workflows/main.yml detected. "
+                "Manually reconcile existing file with new template.",
+                UserWarning,
+            )
+        else:
             self.stdout.write("Copying .github/workflows/main.yml directory to project")
 
             os.makedirs(
