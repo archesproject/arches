@@ -16,7 +16,7 @@ module.exports = () => {
     return new Promise((resolve, _reject) => {
         // BEGIN get data from `.webpack-configuration-settings.json`
 
-        const rawData = fs.readFileSync(Path.join(__dirname, '..', '.webpack-configuration-settings.json'), 'utf-8');
+        const rawData = fs.readFileSync(Path.join(__dirname, '.webpack-configuration-settings.json'), 'utf-8');
         const parsedData = JSON.parse(rawData);
 
         console.log('Data imported from .webpack-configuration-settings.json:', parsedData);
