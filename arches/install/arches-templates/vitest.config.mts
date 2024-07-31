@@ -12,10 +12,10 @@ function generateConfig(): Promise<UserConfigExport> {
         const exclude = [
             '**/node_modules/**',
             '**/dist/**',
+            '**/install/**',
             '**/cypress/**',
             '**/.{idea,git,cache,output,temp}/**',
             '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
-            path.join(path.basename(__dirname), 'install', '**')
         ];
 
         const rawData = fs.readFileSync(path.join(__dirname, '.frontend-configuration-settings.json'), 'utf-8');
@@ -31,7 +31,7 @@ function generateConfig(): Promise<UserConfigExport> {
                 parsedData['ARCHES_APPLICATIONS_PATHS'] as { [key: string]: string }
             )
         ) {
-            alias[path.join('@', archesApplicationName)] = path.join(archesApplicationPath, 'src', archesApplicationName);
+            alias[`@/${archesApplicationName}`] = path.join(archesApplicationPath, 'src', archesApplicationName);
         }
 
         resolve({
@@ -39,7 +39,7 @@ function generateConfig(): Promise<UserConfigExport> {
             test: {
                 alias: alias,
                 coverage: {
-                    include: [path.join(path.basename(__dirname), 'src', '/')],
+                    include: [path.join(path.basename(__dirname), 'app', 'src', path.sep)],
                     exclude: exclude,
                     reporter: [
                         ['clover', { 'file': 'coverage.xml' }],
