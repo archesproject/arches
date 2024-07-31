@@ -77,30 +77,30 @@ class Migration(migrations.Migration):
 
                 -- If overwrite flag is provided, completely recreate the list/items/values
                 if overwrite then
-                    delete from controlled_list_item_values
-                    where itemid in (
+                    delete from arches_references_listitemvalue
+                    where list_item_id in (
                         select id
-                        from controlled_list_items
-                        where listid in (
+                        from arches_references_listitem
+                        where list_id in (
                             select id
-                            from controlled_lists
+                            from arches_references_list
                             where name = any(collection_names)
                         )
                     );
 
-                    delete from controlled_list_items
-                    where listid in (
+                    delete from arches_references_listitem
+                    where list_id in (
                         select id
-                        from controlled_lists
+                        from arches_references_list
                         where name = any(collection_names)
                     );
 
-                    delete from controlled_lists
+                    delete from arches_references_list
                     where name = any(collection_names);
                 end if;
 
                 -- Migrate Collection -> Controlled List
-                insert into controlled_lists (
+                insert into arches_references_list (
                     id,
                     name,
                     dynamic,
@@ -171,43 +171,43 @@ class Migration(migrations.Migration):
                 alpha_sorted_list_item_hierarchy as (
                     select child as id,
                         row_number() over (partition by root_list order by depth, LOWER(value)) - 1 as sortorder,
-                        root_list as listid,
+                        root_list as list_id,
                         case when conceptidfrom = root_list then null -- list items at top of hierarchy have no parent list item
                             else conceptidfrom
                         end as parent_id,
                         depth
                     from ranked_prefLabels rpl
                     where language_rank = 1 and
-                        root_list in (select id from controlled_lists where name = ANY(collection_names))
+                        root_list in (select id from arches_references_list where name = ANY(collection_names))
                 )
-                insert into controlled_list_items(
+                insert into arches_references_listitem(
                     id,
                     uri,
                     sortorder,
                     guide,
-                    listid,
+                    list_id,
                     parent_id
                 )
                 select id,
                     host || id as uri,
                     sortorder,
                     false as guide,
-                    listid,
+                    list_id,
                     parent_id
                 from alpha_sorted_list_item_hierarchy;
 
 
                 -- Migrate concept values -> controlled list item values
-                insert into controlled_list_item_values (
+                insert into arches_references_listitemvalue (
                     id,
                     value,
-                    itemid,
+                    list_item_id,
                     languageid,
                     valuetype_id
                 )
                 select distinct (v.valueid) id,
                     value,
-                    r.conceptidto as itemid,
+                    r.conceptidto as list_item_id,
                     languageid,
                     valuetype as valuetype_id
                 from relations r
@@ -215,8 +215,8 @@ class Migration(migrations.Migration):
                 where relationtype = 'member' and
                     (valuetype = 'prefLabel' or valuetype = 'altLabel') and
                     r.conceptidto in (
-                        select id from controlled_list_items where listid in (
-                            select id from controlled_lists where name = ANY(collection_names)
+                        select id from arches_references_listitem where list_id in (
+                            select id from arches_references_list where name = ANY(collection_names)
                         )
                     );
 
