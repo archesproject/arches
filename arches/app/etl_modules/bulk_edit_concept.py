@@ -1,25 +1,3 @@
-details = {
-    "etlmoduleid": "",
-    "name": "Bulk Replace Concept",
-    "description": "Replace concept",
-    "etl_type": "edit",
-    "component": "views/components/etl_modules/bulk_edit_concept",
-    "componentname": "bulk_edit_concept",
-    "modulename": "bulk_edit_concept.py",
-    "classname": "BulkConceptEditor",
-    "config": {
-        "bgColor": "#f5c60a",
-        "circleColor": "#f9dd6c",
-        "previewLimit": 5,
-        "show": True,
-    },
-    "reversible": True,
-    "icon": "fa fa-edit",
-    "slug": "bulk_edit_concept",
-    "helpsortorder": 9,
-    "helptemplate": "bulk_edit_concept-help",
-}
-
 from datetime import datetime
 import json
 import logging
