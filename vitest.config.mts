@@ -12,10 +12,10 @@ function generateConfig(): Promise<UserConfigExport> {
         const exclude = [
             '**/node_modules/**',
             '**/dist/**',
+            '**/install/**',
             '**/cypress/**',
             '**/.{idea,git,cache,output,temp}/**',
             '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
-            path.join(path.basename(__dirname), 'install', '**')
         ];
 
         const rawData = fs.readFileSync(path.join(__dirname, '.webpack-configuration-settings.json'), 'utf-8');
