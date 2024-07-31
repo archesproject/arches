@@ -14,12 +14,12 @@ const { buildFilepathLookup } = require('./webpack-utils/build-filepath-lookup')
 
 module.exports = () => {
     return new Promise((resolve, _reject) => {
-        // BEGIN get data from `.webpack-configuration-settings.json`
+        // BEGIN get data from `.frontend-configuration-settings.json`
 
-        const rawData = fs.readFileSync(Path.join(__dirname, '.webpack-configuration-settings.json'), 'utf-8');
+        const rawData = fs.readFileSync(Path.join(__dirname, "..", '.frontend-configuration-settings.json'), 'utf-8');
         const parsedData = JSON.parse(rawData);
 
-        console.log('Data imported from .webpack-configuration-settings.json:', parsedData);
+        console.log('Data imported from .frontend-configuration-settings.json:', parsedData);
     
         global.APP_ROOT = parsedData['APP_ROOT'];
         global.ARCHES_APPLICATIONS = parsedData['ARCHES_APPLICATIONS'];
@@ -30,7 +30,7 @@ module.exports = () => {
         global.PUBLIC_SERVER_ADDRESS = parsedData['PUBLIC_SERVER_ADDRESS'];
         global.WEBPACK_DEVELOPMENT_SERVER_PORT = parsedData['WEBPACK_DEVELOPMENT_SERVER_PORT'];
 
-        // END get data from `.webpack-configuration-settings.json`
+        // END get data from `.frontend-configuration-settings.json`
         // BEGIN workaround for handling node_modules paths in arches-core vs projects
 
         let PROJECT_RELATIVE_NODE_MODULES_PATH;
