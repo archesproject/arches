@@ -5,7 +5,6 @@ import { useGettext } from "vue3-gettext";
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import Button from "primevue/button";
-import ConfirmDialog from "primevue/confirmdialog";
 import SplitButton from "primevue/splitbutton";
 
 import {
@@ -113,7 +112,6 @@ const createList = () => {
     };
 
     nextNewList.value = newList;
-    newListFormValue.value = "";
     newListCounter.value += 1;
 
     tree.value.push(listAsNode(newList, selectedLanguage.value));
@@ -261,29 +259,6 @@ await fetchListsAndPopulateTree();
         raised
         :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
         @click="createList"
-    />
-    <ConfirmDialog
-        :draggable="false"
-        :pt="{
-            root: {
-                style: {
-                    fontSize: 'small',
-                },
-            },
-            header: {
-                style: {
-                    background: 'var(--p-navigation)',
-                    color: 'white',
-                    borderRadius: '1rem',
-                    marginBottom: '1rem',
-                },
-            },
-            title: {
-                style: {
-                    fontWeight: 800,
-                },
-            },
-        }"
     />
     <SplitButton
         class="list-button"

@@ -53,26 +53,36 @@ export const languageNameFromCode = (code: string) => {
     return arches.languages.find((lang: Language) => lang.code === code).name;
 };
 
-export const findNodeInTree = (tree: TreeNode[], itemId: string) => {
+export const findNodeInTree = (
+    tree: TreeNode[],
+    itemId: string,
+): {
+    found: TreeNode | undefined;
+    path: TreeNode[];
+} => {
+    const path: TreeNode[] = [];
+
     function recurse(items: TreeNode[]): TreeNode | undefined {
         for (const item of items) {
             if (item.data.id === itemId) {
                 return item;
             }
             for (const child of item.items ?? item.children) {
-                const maybeFound = recurse([child]);
-                if (maybeFound) {
-                    return maybeFound;
+                const found = recurse([child]);
+                if (found) {
+                    path.push(item);
+                    return found;
                 }
             }
         }
     }
 
-    const result = recurse(tree);
-    if (!result) {
+    const found = recurse(tree);
+    if (!found) {
         throw new Error();
     }
-    return result;
+
+    return { found, path };
 };
 
 // Shapers

@@ -138,7 +138,7 @@ const setParent = async (parentNode: TreeNode) => {
         siblings.push(item);
     } else {
         item.parent_id = parentNode.key;
-        list = findNodeInTree(tree.value, item.list_id).data;
+        list = findNodeInTree(tree.value, item.list_id).found!.data;
         siblings = parentNode.data.children;
         siblings.push(item);
     }
@@ -213,7 +213,11 @@ const acceptNewItemShortcutEntry = async () => {
     const parent = findNodeInTree(
         tree.value,
         newItem.parent_id ?? newItem.list_id,
-    );
+    ).found;
+    if (!parent) {
+        throw new Error();
+    }
+
     parent.children = [
         ...parent.children!.filter((child: TreeNode) => !dataIsNew(child.data)),
         itemAsNode(newItem, selectedLanguage.value),
@@ -226,6 +230,7 @@ const acceptNewItemShortcutEntry = async () => {
 
     selectedKeys.value = { [newItem.id]: true };
     setDisplayedRow(newItem);
+    newLabelFormValue.value = "";
 };
 
 const triggerAcceptNewItemShortcut = () => {
@@ -259,6 +264,7 @@ const acceptNewListShortcutEntry = async () => {
     ];
     selectedKeys.value = { [newList.id]: true };
     setDisplayedRow(newList);
+    newLabelFormValue.value = "";
 };
 </script>
 
@@ -332,7 +338,6 @@ const acceptNewListShortcutEntry = async () => {
                 v-model:selected-keys="selectedKeys"
                 v-model:moving-item="movingItem"
                 v-model:next-new-item="nextNewItem"
-                v-model:new-label-form-value="newLabelFormValue"
                 :node
                 :move-labels
             />
