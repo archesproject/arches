@@ -42,14 +42,17 @@ def get_class_from_modulename(modulename, classname, extension_type: ExtensionTy
     for directory in get_directories(extension_type):
         try:
             module = importlib.import_module(directory + ".%s" % mod_path)
-            import_success = True
         except ImportError as e:
             import_error = e
-        if module is not None:
+            continue
+        try:
+            func = getattr(module, classname)
+            import_success = True
+        except AttributeError as e:
+            import_error = e
+        if import_success:
             break
-    if import_success == False:
-        print("Failed to import " + mod_path)
-        print(import_error)
+    if not import_success:
+        raise import_error
 
-    func = getattr(module, classname)
     return func

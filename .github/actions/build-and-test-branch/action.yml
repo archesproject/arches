@@ -36,22 +36,6 @@ runs:
       with:
         secrets: ${{ inputs.secrets }}
 
-    - name: Checkout into feature branch
-      if: inputs.branch-type == 'feature'
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ github.repository }}
-        ref: ${{ github.ref }}
-        path: .
-
-    - name: Checkout into target branch
-      if: inputs.branch-type == 'target'
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ github.repository }}
-        ref: ${{ github.event.pull_request.base.ref }}
-        path: .
-
     - name: Install frontend dependencies
       run: |
           npm install
