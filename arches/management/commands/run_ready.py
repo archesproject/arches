@@ -1,5 +1,5 @@
-import importlib
-import os
+# pragma: no cover
+
 from django.core.management.base import BaseCommand
 from django.apps import apps
 from django.conf import settings
