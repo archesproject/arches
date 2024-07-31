@@ -1,3 +1,5 @@
+# pragma: no cover
+
 import warnings
 
 from django.apps import AppConfig
