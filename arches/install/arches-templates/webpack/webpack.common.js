@@ -19,7 +19,7 @@ module.exports = () => {
         const rawData = fs.readFileSync(Path.join(__dirname, '..', '.webpack-configuration-settings.json'), 'utf-8');
         const parsedData = JSON.parse(rawData);
 
-        console.log('Data imported from settings.py:', parsedData);
+        console.log('Data imported from .webpack-configuration-settings.json:', parsedData);
     
         global.APP_ROOT = parsedData['APP_ROOT'];
         global.ARCHES_APPLICATIONS = parsedData['ARCHES_APPLICATIONS'];
