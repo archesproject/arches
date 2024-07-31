@@ -116,23 +116,6 @@ class BulkConceptEditor(BaseBulkEditor):
             nodes = dictfetchall(cursor)
             return {"success": True, "data": nodes}
 
-    def get_resourceids_from_search_url(self, search_url):
-        request = HttpRequest()
-        request.user = self.request.user
-        request.method = "GET"
-        request.GET["export"] = True
-        validate = URLValidator()
-        try:
-            validate(search_url)
-        except:
-            raise
-        params = parse_qs(urlsplit(search_url).query)
-        for k, v in params.items():
-            request.GET.__setitem__(k, v[0])
-        response = search_results(request)
-        results = json.loads(response.content)["results"]["hits"]["hits"]
-        return [result["_source"]["resourceinstanceid"] for result in results]
-
     def get_preview_data(
         self,
         node_id,
@@ -149,12 +132,6 @@ class BulkConceptEditor(BaseBulkEditor):
         request.GET["tiles"] = True
 
         if search_url:
-            validate = URLValidator()
-            try:
-                validate(search_url)
-            except:
-                raise
-
             params = parse_qs(urlsplit(search_url).query)
             for k, v in params.items():
                 request.GET.__setitem__(k, v[0])
@@ -169,17 +146,17 @@ class BulkConceptEditor(BaseBulkEditor):
         search_bool_agg = Bool()
         search_bool_agg.must(search_query)
 
-        string_search_nested = Nested(path="tiles", query=search_query)
+        concept_search_nested = Nested(path="tiles", query=search_query)
         inner_hits_query = {
             "inner_hits": {
                 "_source": False,
                 "docvalue_fields": [f"tiles.data.{node_id}.keyword", "tiles.tileid"],
             }
         }
-        string_search_nested.dsl["nested"].update(inner_hits_query)
+        concept_search_nested.dsl["nested"].update(inner_hits_query)
 
         search_bool_query = Bool()
-        search_bool_query.must(string_search_nested)
+        search_bool_query.must(concept_search_nested)
 
         search_url_query["bool"]["must"].append(search_bool_query.dsl)
 
@@ -244,7 +221,6 @@ class BulkConceptEditor(BaseBulkEditor):
         return values[:preview_limit], number_of_tiles, number_of_resources
 
     def preview(self, request):
-        resourceids = None
         return_list = []
         preview_limit = ETLModule.objects.get(pk=self.moduleid).config.get(
             "previewLimit", 5
@@ -252,25 +228,13 @@ class BulkConceptEditor(BaseBulkEditor):
 
         page_index = int(request.POST.get("currentPageIndex", 0))
         page_index += 1
-        language_old = request.POST.get("conceptOldLang", None)
-        language_new = request.POST.get("conceptNewLang", None)
+        search_url = request.POST.get("search_url", None)
         old_concept = request.POST.get("conceptOld", None)
         new_concept = request.POST.get("conceptNew", None)
-        old_prefLabel = Value.objects.values_list("value", flat=True).get(
-            pk=old_concept, valuetype__valuetype="prefLabel"
-        )
-        new_prefLabel = Value.objects.values_list("value", flat=True).get(
-            pk=new_concept, valuetype__valuetype="prefLabel"
-        )
-
         selected_node_info = request.POST.get("selectedNode", None)
         if not selected_node_info:
             return {}
-
         nodeid = json.loads(selected_node_info)["node"]
-        node_datatype = Node.objects.get(pk=nodeid).datatype
-
-        search_url = request.POST.get("search_url", None)
 
         try:
             self.validate_inputs(request)
@@ -282,7 +246,9 @@ class BulkConceptEditor(BaseBulkEditor):
 
         if search_url:
             try:
-                resourceids = self.get_resourceids_from_search_url(search_url)
+                validate = URLValidator()
+                validate.max_length = 1000000
+                validate(search_url)
             except ValidationError:
                 return {
                     "success": False,
@@ -291,8 +257,6 @@ class BulkConceptEditor(BaseBulkEditor):
                         "message": _("Please, enter a valid search url"),
                     },
                 }
-        if resourceids:
-            resourceids = tuple(resourceids)
 
         try:
             return_list, number_of_tiles, number_of_resources = self.get_preview_data(
