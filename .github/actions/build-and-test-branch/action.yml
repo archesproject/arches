@@ -33,7 +33,7 @@ runs:
 
     - name: Ensure frontend configuration files exist
       run: |
-          python manage.py run_ready
+          python manage.py check
       shell: bash
 
     - name: Install Arches applications

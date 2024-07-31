@@ -31,7 +31,7 @@ function generateConfig(): Promise<UserConfigExport> {
                 parsedData['ARCHES_APPLICATIONS_PATHS'] as { [key: string]: string }
             )
         ) {
-            alias[path.join('@', archesApplicationName)] = path.join(archesApplicationPath, 'src', archesApplicationName);
+            alias[`@/${archesApplicationName}`] = path.join(archesApplicationPath, 'src', archesApplicationName);
         }
 
         resolve({
@@ -39,7 +39,7 @@ function generateConfig(): Promise<UserConfigExport> {
             test: {
                 alias: alias,
                 coverage: {
-                    include: [path.join(path.basename(__dirname), 'app', 'src', '/')],
+                    include: [path.join(path.basename(__dirname), 'app', 'src', path.sep)],
                     exclude: exclude,
                     reporter: [
                         ['clover', { 'file': 'coverage.xml' }],
