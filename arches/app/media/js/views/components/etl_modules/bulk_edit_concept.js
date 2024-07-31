@@ -102,6 +102,7 @@ define([
             // if any of these values change then clear the preview results
             self.showPreview(false);
             self.tilesToRemove.removeAll();
+            self.currentPageIndex(0);
             // we don't actually care about the results of the following
             let clearResults = '';
             [
