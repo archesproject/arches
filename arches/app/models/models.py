@@ -2044,6 +2044,7 @@ class GeoJSONGeometry(models.Model):
     )
     node = models.ForeignKey(Node, on_delete=models.CASCADE, db_column="nodeid")
     geom = models.GeometryField(srid=3857)
+    featureid = models.UUIDField(serialize=False, blank=True, null=True)
 
     class Meta:
         managed = True

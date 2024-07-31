@@ -56,9 +56,7 @@ class ArchesCommand(TemplateCommand):
         super(ArchesCommand, self).handle("project", project_name, target, **options)
 
         # need to manually replace instances of {{ project_name }} in some files
-        path_to_project = (
-            os.path.join(target) if target else os.path.join(os.getcwd(), project_name)
-        )
+        path_to_project = target if target else os.path.join(os.getcwd(), project_name)
 
         for relative_file_path in [
             os.path.join(project_name, "apps.py"),

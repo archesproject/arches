@@ -296,7 +296,11 @@ module.exports = () => {
                         ...nodeModulesAliases,
                         ...parsedPackageJSONFilepaths,
                         '@': [Path.resolve(__dirname, APP_ROOT, 'src'), ...archesApplicationsVuePaths, Path.resolve(__dirname, ROOT_DIR, 'app', 'src')],
-                        'node_modules': Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH)
+                        'node_modules': Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH),
+                        'arches/arches/app': Path.resolve(__dirname, ROOT_DIR, 'app'),  // ensure project-level imports of arches components point to local file
+                        ...Object.fromEntries(ARCHES_APPLICATIONS.map(app => [  // ensure project-level imports of arches application components point to local file
+                            Path.join(app, app), Path.resolve(__dirname, ARCHES_APPLICATIONS_PATHS[app])
+                        ])),
                     },
                 },
                 module: {
