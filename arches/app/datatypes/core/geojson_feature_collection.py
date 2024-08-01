@@ -428,7 +428,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         return self.validate(value)
 
     def pre_tile_save(self, tile, nodeid):
-        if tile.data[nodeid] == "":
-            tile.data[nodeid] = None
+        if tile.data[nodeid]:
+            tile.data[nodeid] = self.check_geojson_value(tile.data[nodeid])
         else:
             tile.data[nodeid] = self.check_geojson_value(tile.data[nodeid])
