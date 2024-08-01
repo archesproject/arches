@@ -1478,6 +1478,9 @@ class GraphTests(ArchesTestCase):
             list(state2.previous_resource_instance_lifecycle_states.all()), [state1]
         )
 
+        resource_instance_lifecycle_states = (
+            lifecycle.resource_instance_lifecycle_states.all()
+        )
         # Verify the lifecycle contains the states
-        self.assertIn(state1, lifecycle.resource_instance_lifecycle_states.all())
-        self.assertIn(state2, lifecycle.resource_instance_lifecycle_states.all())
+        self.assertIn(state1, resource_instance_lifecycle_states)
+        self.assertIn(state2, resource_instance_lifecycle_states)

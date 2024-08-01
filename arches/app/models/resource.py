@@ -1101,16 +1101,6 @@ class Resource(models.ResourceInstance):
         self, user, resource_instance_lifecycle_state
     ):
         if (
-            self.graph.resource_instance_lifecycle.pk
-            != resource_instance_lifecycle_state.resource_instance_lifecycle.pk
-        ):
-            raise ValueError(
-                _(
-                    "The given ResourceInstanceLifecycleState is not part of the model's ResourceInstanceLifecycle."
-                )
-            )
-
-        if (
             self.resource_instance_lifecycle_state.pk
             != resource_instance_lifecycle_state.pk
         ):

@@ -32,7 +32,7 @@ from django.core.validators import RegexValidator, validate_slug
 from django.db.models import JSONField, Max, Q
 from django.db.models.constraints import UniqueConstraint
 from django.utils import translation
-from django.utils.translation import gettext as _, gettext_lazy as _
+from django.utils.translation import gettext as _
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -1225,6 +1225,17 @@ class ResourceInstance(models.Model):
 
         return creatorid
 
+    def clean(self):
+        if (
+            self.graph.resource_instance_lifecycle.pk
+            != self.resource_instance_lifecycle_state.resource_instance_lifecycle.pk
+        ):
+            raise ValueError(
+                _(
+                    "The given ResourceInstanceLifecycleState is not part of the model's ResourceInstanceLifecycle."
+                )
+            )
+
     def save(self, *args, **kwargs):
         try:
             self.graph_publication = self.graph.publication
@@ -1252,7 +1263,9 @@ class ResourceInstance(models.Model):
 
 
 class ResourceInstanceLifecycle(models.Model):
-    id = models.UUIDField(primary_key=True, serialize=False)
+    id = models.UUIDField(
+        primary_key=True, serialize=False, default=uuid.uuid4, unique=True
+    )
     name = I18n_TextField()
 
     def get_initial_resource_instance_lifecycle_state(self):
@@ -1276,7 +1289,9 @@ class ResourceInstanceLifecycle(models.Model):
 
 
 class ResourceInstanceLifecycleState(models.Model):
-    id = models.UUIDField(primary_key=True, serialize=False)
+    id = models.UUIDField(
+        primary_key=True, serialize=False, default=uuid.uuid4, unique=True
+    )
     name = I18n_TextField()
     action_label = I18n_TextField()
     is_initial_state = models.BooleanField(default=False)

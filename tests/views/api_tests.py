@@ -561,7 +561,7 @@ class ResourceInstanceLifecycleStateTest(ArchesTestCase):
     def test_post_lifecycle_state(
         self, mock_update, mock_get_lifecycle_state, mock_get_resource
     ):
-        self.client.login(username="testuser", password="testpass")
+        self.client.login(username="admin", password="admin")
 
         original_lifecycle_state = models.ResourceInstanceLifecycleState(
             id=self.lifecycle_state_id, name="State 1"
@@ -585,11 +585,31 @@ class ResourceInstanceLifecycleStateTest(ArchesTestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.json()["original_resource_instance_lifecycle_state"]["name"],
-            "State 1",
-        )
-        self.assertEqual(
-            response.json()["current_resource_instance_lifecycle_state"]["name"],
-            "State 2",
+
+        self.assertDictEqual(
+            response.json(),
+            {
+                "current_resource_instance_lifecycle_state": {
+                    "action_label": "",
+                    "can_delete_resource_instances": False,
+                    "can_edit_resource_instances": False,
+                    "id": str(self.new_lifecycle_state_id),
+                    "is_initial_state": False,
+                    "name": "State 2",
+                    "next_resource_instance_lifecycle_states": [],
+                    "previous_resource_instance_lifecycle_states": [],
+                    "resource_instance_lifecycle_id": None,
+                },
+                "original_resource_instance_lifecycle_state": {
+                    "action_label": "",
+                    "can_delete_resource_instances": False,
+                    "can_edit_resource_instances": False,
+                    "id": str(self.lifecycle_state_id),
+                    "is_initial_state": False,
+                    "name": "State 1",
+                    "next_resource_instance_lifecycle_states": [],
+                    "previous_resource_instance_lifecycle_states": [],
+                    "resource_instance_lifecycle_id": None,
+                },
+            },
         )

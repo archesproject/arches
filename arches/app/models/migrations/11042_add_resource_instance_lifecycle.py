@@ -97,7 +97,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="ResourceInstanceLifecycle",
             fields=[
-                ("id", models.UUIDField(primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.UUIDField(
+                        primary_key=True,
+                        serialize=False,
+                        default=uuid.uuid4,
+                        unique=True,
+                    ),
+                ),
                 ("name", arches.app.models.fields.i18n.I18n_TextField()),
             ],
             options={
@@ -108,7 +116,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="ResourceInstanceLifecycleState",
             fields=[
-                ("id", models.UUIDField(primary_key=True, serialize=False)),
+                (
+                    "id",
+                    models.UUIDField(
+                        primary_key=True,
+                        serialize=False,
+                        default=uuid.uuid4,
+                        unique=True,
+                    ),
+                ),
                 (
                     "name",
                     arches.app.models.fields.i18n.I18n_TextField(

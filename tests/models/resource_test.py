@@ -244,15 +244,13 @@ class ResourceTests(ArchesTestCase):
             resource_instance_lifecycle=different_lifecycle,
         )
 
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaisesMessage(
+            ValueError,
+            "The given ResourceInstanceLifecycleState is not part of the model's ResourceInstanceLifecycle.",
+        ):
             self.test_resource.update_resource_instance_lifecycle_state(
                 self.user, different_state
             )
-
-        self.assertEqual(
-            str(context.exception),
-            "The given ResourceInstanceLifecycleState is not part of the model's ResourceInstanceLifecycle.",
-        )
 
     def test_update_resource_instance_lifecycle_state_no_change(self):
         self.test_resource.graph.resource_instance_lifecycle = self.lifecycle
