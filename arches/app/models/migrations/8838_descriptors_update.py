@@ -34,7 +34,9 @@ class Migration(migrations.Migration):
                     )
                 ),
             ],
-            reverse_sql=[("update resource_instances set name = replace(name, '\"', '')")],
+            reverse_sql=[
+                ("update resource_instances set name = replace(name, '\"', '')")
+            ],
         ),
         migrations.AlterField(
             model_name="resourceinstance",

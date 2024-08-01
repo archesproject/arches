@@ -30,7 +30,11 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument("operation", nargs="?", help="operation 'livereload' starts livereload for this project on port 35729")
+        parser.add_argument(
+            "operation",
+            nargs="?",
+            help="operation 'livereload' starts livereload for this project on port 35729",
+        )
         parser.add_argument(
             "-lrh",
             "--livereloadhost",

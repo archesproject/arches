@@ -19,9 +19,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import logging
 import importlib
 
-from arches.app.models.system_settings import settings
-            
+from django.conf import settings
+
 logger = logging.getLogger(__name__)
+
 
 class ThumbnailFactory(object):
     def create(self):
@@ -33,10 +34,15 @@ class ThumbnailFactory(object):
                 modulename = (".").join(components[0 : len(components) - 1])
                 return getattr(importlib.import_module(modulename), classname)()
             except:
-                logger.warning(f"A 'THUMBNAIL_GENERATOR' in settings.py is specified but can't be found or instantiated.  Thumbnails for uploaded files won't be created")
+                logger.warning(
+                    f"A 'THUMBNAIL_GENERATOR' in settings.py is specified but can't be found or instantiated.  Thumbnails for uploaded files won't be created"
+                )
                 return None
         else:
-            logger.info(f"A thumbnail generator isn't specified.  Set 'THUMBNAIL_GENERATOR' in settings.py to enable generation of thumbnails for uploded files.")
+            logger.info(
+                f"A thumbnail generator isn't specified.  Set 'THUMBNAIL_GENERATOR' in settings.py to enable generation of thumbnails for uploded files."
+            )
             return None
+
 
 ThumbnailGeneratorInstance = ThumbnailFactory().create()

@@ -33,9 +33,23 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("operation", nargs="?")
 
-        parser.add_argument("-s", "--source", action="store", dest="source", default="", help="Widget json file to be loaded")
+        parser.add_argument(
+            "-s",
+            "--source",
+            action="store",
+            dest="source",
+            default="",
+            help="Widget json file to be loaded",
+        )
 
-        parser.add_argument("-n", "--name", action="store", dest="name", default="", help="The name of the widget to unregister")
+        parser.add_argument(
+            "-n",
+            "--name",
+            action="store",
+            dest="name",
+            default="",
+            help="The name of the widget to unregister",
+        )
 
     def handle(self, *args, **options):
         if options["operation"] == "register":
@@ -66,7 +80,11 @@ class Command(BaseCommand):
             uuid.UUID(details["componentid"])
         except:
             details["componentid"] = str(uuid.uuid4())
-            print("Registering card component with componentid: {}".format(details["componentid"]))
+            print(
+                "Registering card component with componentid: {}".format(
+                    details["componentid"]
+                )
+            )
 
         instance = models.CardComponent(
             componentid=details["componentid"],

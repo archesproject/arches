@@ -52,7 +52,11 @@ class SearchEngine(object):
         if index is None or index == "":
             raise NotImplementedError("Elasticsearch index not specified.")
 
-        prefix = "%s_" % self.prefix.strip() if self.prefix and self.prefix.strip() != "" else ""
+        prefix = (
+            "%s_" % self.prefix.strip()
+            if self.prefix and self.prefix.strip() != ""
+            else ""
+        )
         ret = []
         for idx in index.split(","):
             ret.append("%s%s" % (prefix, idx))
@@ -87,7 +91,8 @@ class SearchEngine(object):
                     pass
                 else:
                     self.logger.warning(
-                        "%s: WARNING: failed to delete document by query: %s \nException detail: %s\n" % (datetime.now(), body, detail)
+                        "%s: WARNING: failed to delete document by query: %s \nException detail: %s\n"
+                        % (datetime.now(), body, detail)
                     )
                     raise detail
             except Exception as detail:
@@ -97,14 +102,18 @@ class SearchEngine(object):
                         pass
                 except:
                     self.logger.warning(
-                        "%s: WARNING: failed to delete document by query: %s \nException detail: %s\n" % (datetime.now(), query, detail)
+                        "%s: WARNING: failed to delete document by query: %s \nException detail: %s\n"
+                        % (datetime.now(), query, detail)
                     )
                     raise detail
         else:
             try:
                 return self.es.options(ignore_status=404).delete(**kwargs)
             except Exception as detail:
-                self.logger.warning("%s: WARNING: failed to delete document: %s \nException detail: %s\n" % (datetime.now(), kwargs, detail))
+                self.logger.warning(
+                    "%s: WARNING: failed to delete document: %s \nException detail: %s\n"
+                    % (datetime.now(), kwargs, detail)
+                )
                 raise detail
 
     def delete_index(self, **kwargs):
@@ -150,10 +159,15 @@ class SearchEngine(object):
         try:
             ret = self.es.search(**kwargs).body
         except RequestError as detail:
-            self.logger.exception("%s: WARNING: search failed for query: %s \nException detail: %s\n" % (datetime.now(), query, detail))
+            self.logger.exception(
+                "%s: WARNING: search failed for query: %s \nException detail: %s\n"
+                % (datetime.now(), query, detail)
+            )
         return ret
 
-    def create_mapping(self, index, fieldname="", fieldtype="string", fieldindex=None, body=None):
+    def create_mapping(
+        self, index, fieldname="", fieldtype="string", fieldindex=None, body=None
+    ):
         """
         Creates an Elasticsearch body for a single field given an index name and type name
 
@@ -194,7 +208,8 @@ class SearchEngine(object):
                 self.es.index(index=index, document=document, id=id)
             except Exception as detail:
                 self.logger.warning(
-                    "%s: WARNING: failed to index document: %s \nException detail: %s\n" % (datetime.now(), document, detail)
+                    "%s: WARNING: failed to index document: %s \nException detail: %s\n"
+                    % (datetime.now(), document, detail)
                 )
                 raise detail
 
@@ -202,10 +217,18 @@ class SearchEngine(object):
         try:
             helpers.bulk(self.es, data, **kwargs)
         except Exception as detail:
-            self.logger.warning("%s: WARNING: failed to bulk index documents, \nException detail: %s\n" % (datetime.now(), detail))
+            self.logger.warning(
+                "%s: WARNING: failed to bulk index documents, \nException detail: %s\n"
+                % (datetime.now(), detail)
+            )
 
     def create_bulk_item(self, op_type="index", index=None, id=None, data=None):
-        return {"_op_type": op_type, "_index": self._add_prefix(index), "_id": id, "_source": data}
+        return {
+            "_op_type": op_type,
+            "_index": self._add_prefix(index),
+            "_id": id,
+            "_source": data,
+        }
 
     def count(self, **kwargs):
         kwargs = self._add_prefix(**kwargs)
@@ -215,7 +238,7 @@ class SearchEngine(object):
         # as other keys (eg: _source) are not allowed
         if query:
             index = None
-            if 'index' in kwargs:
+            if "index" in kwargs:
                 index = kwargs["index"]
             kwargs = {"query": query}
             if index:
@@ -243,7 +266,12 @@ class SearchEngine(object):
                 self.kwargs = kwargs
 
             def add(self, op_type="index", index=None, id=None, data=None):
-                doc = {"_op_type": op_type, "_index": outer_self._add_prefix(index), "_id": id, "_source": data}
+                doc = {
+                    "_op_type": op_type,
+                    "_index": outer_self._add_prefix(index),
+                    "_id": id,
+                    "_source": data,
+                }
                 self.queue.append(doc)
 
                 if len(self.queue) >= self.batch_size:

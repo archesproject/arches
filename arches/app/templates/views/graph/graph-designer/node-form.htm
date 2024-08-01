@@ -6,7 +6,7 @@
 
         <div class="settings-panel-heading">
             <div class="graph-designer-title">
-                <div data-bind="text: (node() && node().name()) ? node().name() : {% quoted_trans 'Unnamed node' %}"></div>
+                <div data-bind="text: (node() && node().name()) ? node().name() : {% quoted_trans _('Unnamed node') %}"></div>
                 <span class="graph-crm-class">
                     (
                     <!-- ko if: hasOntology -->
@@ -73,7 +73,7 @@
                             </div>
 
                             <div class="col-xs-12 crm-selector">
-                                <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: {% quoted_trans "Choose a property" %}, chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                <select class="design" data-bind="value: node().parentproperty, options: node().validproperties, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: {% quoted_trans _("Choose a property") %}, chosen: {disable_search_threshold: 10, width: '500px'}"></select>
                             </div>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                             </div>
 
                             <div class="col-xs-12 crm-selector">
-                                <select class="" data-bind="value: node().ontologyclass, options: node().validclasses, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: {% quoted_trans 'Choose a class'%}, chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                <select class="" data-bind="value: node().ontologyclass, options: node().validclasses, optionsText: node().getFriendlyOntolgyName.bind(node()), valueAllowUnset: true, optionsCaption: {% quoted_trans _('Choose a class')%}, chosen: {disable_search_threshold: 10, width: '500px'}"></select>
                             </div>
                         </div>
                     </div>
@@ -146,7 +146,7 @@
                             </div>
 
                             <div class="col-xs-12 crm-selector">
-                                <select class="design" data-bind="disable: disableDatatype(), value: node().datatype, options: datatypes, optionsCaption: {% quoted_trans 'Choose a data type' %}, chosen: {disable_search_threshold: 10, width: '500px'}"></select>
+                                <select class="design" data-bind="disable: disableDatatype(), value: node().datatype, options: datatypes, optionsCaption: {% quoted_trans _('Choose a data type') %}, chosen: {disable_search_threshold: 10, width: '500px'}"></select>
                             </div>
                         </div>
                     </div>
@@ -245,7 +245,7 @@
 
                             <div class="col-xs-12">
                                 <p class="control-label graph-settings-switch-label">
-                                    <span data-bind="text: (node().nodeGroupId() && !node().isCollector() || graphModel.isNodeInChildGroup(node())) ? {% quoted_trans "Place node(s) in a separate card" %} : {% quoted_trans "Make card" %}"></span>
+                                    <span data-bind="text: (node().nodeGroupId() && !node().isCollector() || graphModel.isNodeInChildGroup(node())) ? {% quoted_trans _("Place node(s) in a separate card") %} : {% quoted_trans _("Make card") %}"></span>
                                 </p>
                                 <span class="graph-settings-switch-subtitle">
                                     <!-- ko if: node().istopnode -->

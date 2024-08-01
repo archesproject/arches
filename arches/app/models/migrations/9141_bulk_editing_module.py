@@ -436,6 +436,10 @@ class Migration(migrations.Migration):
             update_staging_to_tile_function,
             revert_staging_to_tile_function,
         ),
-        migrations.RunSQL(add_edit_staged_data_function, remove_edit_staged_data_function),
-        migrations.RunSQL(add_save_tile_for_edit_function, remove_save_tile_for_edit_function),
+        migrations.RunSQL(
+            add_edit_staged_data_function, remove_edit_staged_data_function
+        ),
+        migrations.RunSQL(
+            add_save_tile_for_edit_function, remove_save_tile_for_edit_function
+        ),
     ]

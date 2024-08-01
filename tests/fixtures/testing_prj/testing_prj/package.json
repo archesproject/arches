@@ -153,7 +153,7 @@
     "overrides": {
         "moment-timezone": "^0.5.45",
         "nomnom": "npm:@gerhobbelt/nomnom",
-        "rimraf": "^5.0.7", 
+        "rimraf": "^5.0.7",
         "underscore": "^1.13.6"
     }
 }

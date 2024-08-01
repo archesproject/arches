@@ -22,14 +22,12 @@ import os
 
 try:
     from django.utils.translation import gettext_lazy as _
-except ImportError:  # unable to import prior to installing requirements.txt in setup.py
+except ImportError:  # unable to import prior to installing requirements
     pass
 
 PACKAGE_NAME = "arches"
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 APP_ROOT = ""
-
-ARCHES_APPLICATIONS = ()
 
 MIN_ARCHES_VERSION = arches.__version__
 MAX_ARCHES_VERSION = arches.__version__
@@ -44,6 +42,7 @@ RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, "fixtures", "resource_graphs
 
 ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, "fixtures", "ontologies", "test_ontology")
 ONTOLOGY_PATH = os.path.join(TEST_ROOT, "fixtures", "ontologies", "cidoc_crm")
+MEDIA_ROOT = os.path.join(TEST_ROOT, "fixtures", "data")
 
 BUSINESS_DATA_FILES = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -66,7 +65,11 @@ LOGGING["loggers"]["arches"]["level"] = "ERROR"
 ELASTICSEARCH_PREFIX = "test"
 
 TEST_RUNNER = "tests.base_test.ArchesTestRunner"
-SILENCED_SYSTEM_CHECKS.append("arches.W001")  # Cache backend does not support rate-limiting
+SILENCED_SYSTEM_CHECKS.append(
+    "arches.W001"
+)  # Cache backend does not support rate-limiting
+
+FILE_TYPE_CHECKING = "lenient"
 
 # could add Chrome, PhantomJS etc... here
 LOCAL_BROWSERS = []  # ['Firefox']
@@ -80,7 +83,9 @@ ENABLE_TWO_FACTOR_AUTHENTICATION = False
 FORCE_TWO_FACTOR_AUTHENTICATION = False
 
 DATATYPE_LOCATIONS.append("tests.fixtures.datatypes")
-ELASTICSEARCH_HOSTS = [{"scheme": "http", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}]
+ELASTICSEARCH_HOSTS = [
+    {"scheme": "http", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}
+]
 LANGUAGES = [
     ("de", _("German")),
     ("en", _("English")),
