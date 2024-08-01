@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
             'bulk_edit_concept',
             'bulk_edit_concept.py',
             'BulkConceptEditor',
-            '{ "bgColor": "#f5c60a", "circleColor": "#f9dd6c", "previewLimit": 5, "show": true }',
+            '{ "bgColor": "#f5c60a", "circleColor": "#f9dd6c", "updateLimit": 5000, "previewLimit": 5, "show": true }',
             true,
             'fa fa-edit',
             'bulk_edit_concept',
