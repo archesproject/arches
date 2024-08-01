@@ -1226,17 +1226,6 @@ class ResourceInstance(models.Model):
 
         return creatorid
 
-    def clean(self):
-        if (
-            self.graph.resource_instance_lifecycle.pk
-            != self.resource_instance_lifecycle_state.resource_instance_lifecycle.pk
-        ):
-            raise ValueError(
-                _(
-                    "The given ResourceInstanceLifecycleState is not part of the model's ResourceInstanceLifecycle."
-                )
-            )
-
     def save(self, *args, **kwargs):
         try:
             self.graph_publication = self.graph.publication
