@@ -99,6 +99,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         if tile.data[nodeid] is not None and "features" in tile.data[nodeid]:
             if len(tile.data[nodeid]["features"]) == 0:
                 tile.data[nodeid] = None
+        if tile.data[nodeid] == "":
+            tile.data[nodeid] = None
 
     def check_geojson_value(self, value):
         if type(value) is str:
@@ -429,6 +431,4 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
     def pre_tile_save(self, tile, nodeid):
         if tile.data[nodeid]:
-            tile.data[nodeid] = self.check_geojson_value(tile.data[nodeid])
-        else:
             tile.data[nodeid] = self.check_geojson_value(tile.data[nodeid])
