@@ -23,17 +23,19 @@ define([
         this.configForm = params.configForm;
         this.configType = params.configType;
 
-        this.graphHasDifferentPublication = ko.observable(params.graph_has_different_publication === "True" ? true : false);
-        this.graphHasUnpublishedChanges = ko.observable(params.graph_has_unpublished_changes === "True" ? true : false);
+        this.graphHasDifferentPublication = ko.observable(params.graph_has_different_publication === "True");
+        this.graphHasUnpublishedChanges = ko.observable(params.graph_has_unpublished_changes === "True");
         this.graphHasDifferentPublicationAndUserHasInsufficientPermissions = ko.observable(
-            params.graph_has_different_publication_and_user_has_insufficient_permissions === "True" ? true : false
+            params.graph_has_different_publication_and_user_has_insufficient_permissions === "True"
         );
 
         const urlSearchParams = new URLSearchParams(window.location.search);
         this.userHasBeenRedirected = urlSearchParams.get('redirected');
 
-        this.resoureceInstanceLifecycleStatePermitsEditing = params.resource_instance_lifecycle_state_permits_editing === "True" ? true : false;
-        this.userCanEditResource = params.user_can_edit_resource === "True" ? true : false;
+        this.resourceInstanceLifecycleStatePermitsEditing = 
+            params.resource_instance_lifecycle_state_permits_editing === "True";
+            
+        this.userCanEditResource = params.user_can_edit_resource === "True";
 
         this.template = ko.observable();
         this.report = ko.observable();
@@ -43,7 +45,7 @@ define([
             params.cache = params.cache === undefined ? true : params.cache;
 
             if (params.view) {
-                if (self.userHasBeenRedirected && !self.resoureceInstanceLifecycleStatePermitsEditing) {
+                if (self.userHasBeenRedirected && !self.resourceInstanceLifecycleStatePermitsEditing) {
                     params.view.alert(new AlertViewmodel(
                         'ep-alert-blue',
                         arches.translations.resourceReportRedirectFromResourceEditorLifecycleState.title,

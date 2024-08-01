@@ -1,5 +1,6 @@
 import uuid
 from django.db import migrations, models
+from django.utils.translation import gettext_lazy as _
 
 import arches.app.models.fields.i18n
 import arches.app.utils.betterJSONSerializer
@@ -28,7 +29,7 @@ def create_default_resource_instance_lifecycle_states(apps, schema_editor):
     draft_state = ResourceInstanceLifecycleState.objects.create(
         id=uuid.UUID("9375c9a7-dad2-4f14-a5c1-d7e329fdde4f"),
         name="Draft",
-        action_label="Revert to Draft",
+        action_label=_("Revert to Draft"),
         resource_instance_lifecycle_id=uuid.UUID(
             "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
         ),
@@ -39,7 +40,7 @@ def create_default_resource_instance_lifecycle_states(apps, schema_editor):
     active_state = ResourceInstanceLifecycleState.objects.create(
         id=uuid.UUID("f75bb034-36e3-4ab4-8167-f520cf0b4c58"),
         name="Active",
-        action_label="Make Active",
+        action_label=_("Make Active"),
         resource_instance_lifecycle_id=uuid.UUID(
             "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
         ),
@@ -50,7 +51,7 @@ def create_default_resource_instance_lifecycle_states(apps, schema_editor):
     retired_state = ResourceInstanceLifecycleState.objects.create(
         id=uuid.UUID("d95d9c0e-0e2c-4450-93a3-d788b91abcc8"),
         name="Retired",
-        action_label="Retire",
+        action_label=_("Retire"),
         resource_instance_lifecycle_id=uuid.UUID(
             "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
         ),
@@ -97,7 +98,7 @@ class Migration(migrations.Migration):
             name="ResourceInstanceLifecycle",
             fields=[
                 ("id", models.UUIDField(primary_key=True, serialize=False)),
-                ("name", models.TextField()),
+                ("name", arches.app.models.fields.i18n.I18n_TextField()),
             ],
             options={
                 "db_table": "resource_instance_lifecycles",
@@ -248,7 +249,6 @@ class Migration(migrations.Migration):
             name="resource_instance_lifecycle",
             field=models.ForeignKey(
                 default=uuid.UUID("7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"),
-                null=True,
                 on_delete=models.deletion.PROTECT,
                 related_name="graphs",
                 to="models.resourceinstancelifecycle",

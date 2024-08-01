@@ -496,42 +496,63 @@ class Graph(models.GraphModel):
         return function
 
     def add_resource_instance_lifecycle(self, resource_instance_lifecycle):
-        self.resource_instance_lifecycle = models.ResourceInstanceLifecycle(
-            id=resource_instance_lifecycle["id"],
-            name=resource_instance_lifecycle["name"],
+        """
+        Adds a ResourceInstanceLifecycle to this graph
+
+        Arguments:
+        resource_instance_lifecycle -- a dictionary representing a models.ResourceInstanceLifecycle instance
+
+        """
+
+        resource_instance_lifecycle_query = (
+            models.ResourceInstanceLifecycle.objects.filter(
+                pk=resource_instance_lifecycle["id"]
+            )
         )
 
-        resource_instance_lifecycle_states = []
-        for resource_instance_lifecycle_state_json in resource_instance_lifecycle[
-            "resource_instance_lifecycle_states"
-        ]:
-            next_resource_instance_lifecycle_states = (
-                resource_instance_lifecycle_state_json.pop(
-                    "next_resource_instance_lifecycle_states"
+        if resource_instance_lifecycle_query.exists():
+            self.resource_instance_lifecycle = resource_instance_lifecycle_query.first()
+        else:
+            self.resource_instance_lifecycle = models.ResourceInstanceLifecycle(
+                id=resource_instance_lifecycle["id"],
+                name=resource_instance_lifecycle["name"],
+            )
+
+            resource_instance_lifecycle_states = []
+            for resource_instance_lifecycle_state_json in resource_instance_lifecycle[
+                "resource_instance_lifecycle_states"
+            ]:
+                next_resource_instance_lifecycle_states = (
+                    resource_instance_lifecycle_state_json.pop(
+                        "next_resource_instance_lifecycle_states"
+                    )
                 )
-            )
-            previous_resource_instance_lifecycle_states = (
-                resource_instance_lifecycle_state_json.pop(
-                    "previous_resource_instance_lifecycle_states"
+                previous_resource_instance_lifecycle_states = (
+                    resource_instance_lifecycle_state_json.pop(
+                        "previous_resource_instance_lifecycle_states"
+                    )
                 )
-            )
 
-            resource_instance_lifecycle_state = models.ResourceInstanceLifecycleState(
-                **resource_instance_lifecycle_state_json
-            )
+                resource_instance_lifecycle_state = (
+                    models.ResourceInstanceLifecycleState(
+                        **resource_instance_lifecycle_state_json
+                    )
+                )
 
-            resource_instance_lifecycle_state.next_resource_instance_lifecycle_states.set(
-                next_resource_instance_lifecycle_states
-            )
-            resource_instance_lifecycle_state.previous_resource_instance_lifecycle_states.set(
-                previous_resource_instance_lifecycle_states
-            )
+                resource_instance_lifecycle_state.next_resource_instance_lifecycle_states.set(
+                    next_resource_instance_lifecycle_states
+                )
+                resource_instance_lifecycle_state.previous_resource_instance_lifecycle_states.set(
+                    previous_resource_instance_lifecycle_states
+                )
 
-            resource_instance_lifecycle_states.append(resource_instance_lifecycle_state)
+                resource_instance_lifecycle_states.append(
+                    resource_instance_lifecycle_state
+                )
 
-        self.resource_instance_lifecycle.resource_instance_lifecycle_states.set(
-            resource_instance_lifecycle_states, bulk=False
-        )
+            self.resource_instance_lifecycle.resource_instance_lifecycle_states.set(
+                resource_instance_lifecycle_states, bulk=False
+            )
 
     def _compare(self, obj1, obj2, additional_excepted_keys=[]):
         excluded_keys = ["_state"] + additional_excepted_keys

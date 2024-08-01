@@ -5,6 +5,9 @@ import logging
 import uuid
 import pyprind
 import sys
+import django
+
+django.setup()
 
 from datetime import datetime
 from django.db import connection, connections
@@ -19,13 +22,6 @@ from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_IN
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils import import_class_from_string
 from typing import Iterable
-
-try:
-    import django
-
-    django.setup()
-except RuntimeError:
-    pass
 
 
 logger = logging.getLogger(__name__)

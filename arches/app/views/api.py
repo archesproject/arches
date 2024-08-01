@@ -1473,6 +1473,11 @@ class ResourceInstanceLifecycleState(APIBase):
         return JSONResponse(resource_instance.resource_instance_lifecycle_state)
 
     def post(self, request, resourceid):
+        if not user_is_resource_editor(request.user):
+            return JSONErrorResponse(
+                _("Request Failed"), _("Permission Denied"), status=403
+            )
+
         data = json.loads(request.body)
 
         resource = Resource.objects.get(pk=resourceid)

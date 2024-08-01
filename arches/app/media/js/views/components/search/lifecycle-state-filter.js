@@ -24,7 +24,7 @@ define([
                     self.lifecycleStates.push(lifecycleState);
                 });
             } else {
-                console.log('Failed to fetch resource instance list');
+                console.error('Failed to fetch resource instance list');
             }
 
             var filterUpdated = ko.computed(function() {

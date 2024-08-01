@@ -551,7 +551,6 @@ class GraphModel(models.Model):
     has_unpublished_changes = models.BooleanField(default=False)
     resource_instance_lifecycle = models.ForeignKey(
         default=uuid.UUID(settings.DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID),
-        null=True,
         on_delete=models.PROTECT,
         to="models.ResourceInstanceLifecycle",
         related_name="graphs",
@@ -1254,7 +1253,7 @@ class ResourceInstance(models.Model):
 
 class ResourceInstanceLifecycle(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False)
-    name = models.TextField()
+    name = I18n_TextField()
 
     def get_initial_resource_instance_lifecycle_state(self):
         return self.resource_instance_lifecycle_states.get(is_initial_state=True)

@@ -1,5 +1,4 @@
-import uuid
-from django.db import migrations, models
+from django.db import migrations
 
 
 class Migration(migrations.Migration):
@@ -33,6 +32,9 @@ class Migration(migrations.Migration):
                 'lifecycle-state-filter',
                 0,
                 true);
+            """,
+            """
+            delete from search_component where searchcomponentid = '9e40969b-78c2-40b8-898b-c29265050e2f';
             """,
         ),
     ]
