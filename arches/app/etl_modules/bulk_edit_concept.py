@@ -310,10 +310,10 @@ class BulkConceptEditor(BaseBulkEditor):
             pk=new, valuetype__valuetype="prefLabel"
         )
 
+        unselected_tiles = []
+        resourceids = []
         if tiles_to_remove:
             unselected_tiles = tiles_to_remove.split(",")
-
-        resourceids = []
         if search_url:
             with connection.cursor() as cursor:
                 self.log_event_details(
