@@ -533,7 +533,7 @@
                 "ontologyclass": null,
                 "sortorder": 0
             },
-            "slug": null,
+            "slug": "resource_test_model",
             "subtitle": "",
             "template_id": "50000000-0000-0000-0000-000000000001",
             "version": ""

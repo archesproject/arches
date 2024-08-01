@@ -97,7 +97,7 @@ class Command(BaseCommand):
             action="store",
             dest="resource_types",
             default="",
-            help="UUID of resource_model to index resources of.",
+            help="Comma separated list of resource model UUIDs or slugs to index resources of.",
         )
 
         parser.add_argument(
