@@ -6,6 +6,53 @@ import arches.app.models.fields.i18n
 import arches.app.utils.betterJSONSerializer
 
 
+def create_perpetual_resource_instance_lifecycle(apps, schema_editor):
+    ResourceInstanceLifecycle = apps.get_model("models", "ResourceInstanceLifecycle")
+    ResourceInstanceLifecycle.objects.create(
+        id=uuid.UUID("e9a8a2b0-63b5-47a3-bbc4-9c09c0e759b1"),
+        name="Perpetual",
+    )
+
+
+def remove_perpetual_resource_instance_lifecycle(apps, schema_editor):
+    ResourceInstanceLifecycle = apps.get_model("models", "ResourceInstanceLifecycle")
+    resource_instance_lifecycle = ResourceInstanceLifecycle.objects.get(
+        id="e9a8a2b0-63b5-47a3-bbc4-9c09c0e759b1"
+    )
+    resource_instance_lifecycle.delete()
+
+
+def create_perpetual_resource_instance_lifecycle_states(apps, schema_editor):
+    ResourceInstanceLifecycleState = apps.get_model(
+        "models", "ResourceInstanceLifecycleState"
+    )
+    perpetual_state = ResourceInstanceLifecycleState.objects.create(
+        id=uuid.UUID("4e2a6b8e-2489-4377-9c9f-29cfbd3e76c8"),
+        name="Perpetual",
+        action_label=_(""),
+        resource_instance_lifecycle_id=uuid.UUID(
+            "e9a8a2b0-63b5-47a3-bbc4-9c09c0e759b1"
+        ),
+        is_initial_state=True,
+        can_delete_resource_instances=True,
+        can_edit_resource_instances=True,
+    )
+
+    perpetual_state.save()
+
+
+def remove_perpetual_resource_instance_lifecycle_states(apps, schema_editor):
+    ResourceInstanceLifecycleState = apps.get_model(
+        "models", "ResourceInstanceLifecycleState"
+    )
+
+    perpetual_state = ResourceInstanceLifecycleState.objects.get(
+        id="4e2a6b8e-2489-4377-9c9f-29cfbd3e76c8"
+    )
+
+    perpetual_state.delete()
+
+
 def create_default_resource_instance_lifecycle(apps, schema_editor):
     ResourceInstanceLifecycle = apps.get_model("models", "ResourceInstanceLifecycle")
     ResourceInstanceLifecycle.objects.create(
@@ -260,10 +307,19 @@ class Migration(migrations.Migration):
             create_default_resource_instance_lifecycle_states,
             remove_default_resource_instance_lifecycle_states,
         ),
+        migrations.RunPython(
+            create_perpetual_resource_instance_lifecycle,
+            remove_perpetual_resource_instance_lifecycle,
+        ),
+        migrations.RunPython(
+            create_perpetual_resource_instance_lifecycle_states,
+            remove_perpetual_resource_instance_lifecycle_states,
+        ),
         migrations.AddField(
             model_name="graphmodel",
             name="resource_instance_lifecycle",
             field=models.ForeignKey(
+                null=True,
                 default=uuid.UUID("7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"),
                 on_delete=models.deletion.PROTECT,
                 related_name="graphs",
