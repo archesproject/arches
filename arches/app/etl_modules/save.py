@@ -172,7 +172,7 @@ def _post_save_edit_log(cursor, userid, loadid):
             ("unindexed", datetime.now(), loadid),
         )
         return {"success": False, "data": "saved"}
-    
+
 
 def get_resourceids_from_search_url(search_url, user=None):
     request = HttpRequest()
@@ -187,8 +187,8 @@ def get_resourceids_from_search_url(search_url, user=None):
     params = parse_qs(urlsplit(search_url).query)
     for k, v in params.items():
         request.GET.__setitem__(k, v[0])
-    func, args, kwargs = resolve(reverse('search_results'))
+    func, args, kwargs = resolve(reverse("search_results"))
     kwargs["request"] = request
     response = func(*args, **kwargs)
-    results = json.loads(response.content)['results']['hits']['hits']
+    results = json.loads(response.content)["results"]["hits"]["hits"]
     return [result["_source"]["resourceinstanceid"] for result in results]

@@ -63,15 +63,11 @@ class BranchExcelTests(TransactionTestCase):
                 "summary": {
                     "name": "branch_excel_test.xlsx",
                     "size": "6.61 kb",
-                    "cumulative_files_size":6773,"files": {
-                        "branch_excel_test.xlsx": {
-                                "size":"6.61 kb"
-                        }
-                    }
+                    "cumulative_files_size": 6773,
+                    "files": {"branch_excel_test.xlsx": {"size": "6.61 kb"}},
                 }
             }
         }
-
 
         with connection.cursor() as cursor:
             cursor.execute(
@@ -101,7 +97,9 @@ class BranchExcelTests(TransactionTestCase):
     @classmethod
     def tearDownClass(cls):
         file_name = "branch_exporter_test"
-        exported_file_path = os.path.join("tests/fixtures/data/archestemp", file_name + '.' + 'zip')
+        exported_file_path = os.path.join(
+            "tests/fixtures/data/archestemp", file_name + "." + "zip"
+        )
         os.remove(exported_file_path)
         super().tearDownClass()
 
@@ -120,9 +118,15 @@ class BranchExcelTests(TransactionTestCase):
 
         exporter = BranchExcelExporter(loadid=load_id)
         exporter.run_export_task(
-            load_id=load_id, graph_id=graph_id, graph_name=graph_name, resource_ids=resource_ids, **kwargs
+            load_id=load_id,
+            graph_id=graph_id,
+            graph_name=graph_name,
+            resource_ids=resource_ids,
+            **kwargs,
         )
-        exported_file_path = os.path.join("tests/fixtures/data/archestemp", file_name + '.' + 'zip')
+        exported_file_path = os.path.join(
+            "tests/fixtures/data/archestemp", file_name + "." + "zip"
+        )
         exported = os.path.exists(exported_file_path)
 
         self.assertTrue(exported)

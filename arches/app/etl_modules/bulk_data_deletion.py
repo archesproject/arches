@@ -248,7 +248,9 @@ class BulkDataDeletion(BaseBulkEditor):
             resourceids = json.loads(resourceids)
         if search_url:
             try:
-                resourceids = get_resourceids_from_search_url(search_url, self.request.user)
+                resourceids = get_resourceids_from_search_url(
+                    search_url, self.request.user
+                )
             except ValidationError:
                 return {
                     "success": False,
@@ -288,7 +290,9 @@ class BulkDataDeletion(BaseBulkEditor):
             resourceids = tuple(resourceids)
         if search_url:
             try:
-                resourceids = get_resourceids_from_search_url(search_url, self.request.user)
+                resourceids = get_resourceids_from_search_url(
+                    search_url, self.request.user
+                )
             except ValidationError:
                 return {
                     "success": False,

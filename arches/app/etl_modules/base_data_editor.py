@@ -422,7 +422,9 @@ class BulkStringEditor(BaseBulkEditor):
             resourceids = json.loads(resourceids)
         if search_url:
             try:
-                resourceids = get_resourceids_from_search_url(search_url, self.request.user)
+                resourceids = get_resourceids_from_search_url(
+                    search_url, self.request.user
+                )
             except ValidationError:
                 return {
                     "success": False,
@@ -568,7 +570,9 @@ class BulkStringEditor(BaseBulkEditor):
                     self.log_event_details(
                         cursor, "done|Getting resources from search url..."
                     )
-                resourceids = get_resourceids_from_search_url(search_url, self.request.user)
+                resourceids = get_resourceids_from_search_url(
+                    search_url, self.request.user
+                )
             if resourceids:
                 resourceids = tuple(resourceids)
             response = self.run_load_task(
@@ -605,7 +609,7 @@ class BulkStringEditor(BaseBulkEditor):
         if search_url:
             with connection.cursor() as cursor:
                 self.log_event_details(
-                     cursor, "done|Getting resources from search url..."
+                    cursor, "done|Getting resources from search url..."
                 )
             resourceids = get_resourceids_from_search_url(search_url, self.request.user)
 

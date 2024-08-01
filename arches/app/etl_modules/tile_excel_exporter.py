@@ -147,7 +147,9 @@ class TileExcelExporter(BaseExcelExporter):
         filename = request.POST.get("filename")
         search_url = request.POST.get("search_url", None)
         if search_url is not None and resource_ids is None:
-            resource_ids = get_resourceids_from_search_url(search_url, self.request.user)
+            resource_ids = get_resourceids_from_search_url(
+                search_url, self.request.user
+            )
 
         export_task = tasks.export_tile_excel.apply_async(
             (

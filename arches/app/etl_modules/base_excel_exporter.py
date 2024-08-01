@@ -11,6 +11,7 @@ from arches.app.etl_modules.decorators import load_data_async
 from arches.app.models.models import File, TempFile
 from arches.app.models.system_settings import settings
 
+
 class BaseExcelExporter:
     def __init__(self, request=None, loadid=None):
         self.request = request if request else None
@@ -106,7 +107,9 @@ class BaseExcelExporter:
         export_concepts_as = request.POST.get("export_concepts_as")
         search_url = request.POST.get("search_url", None)
         if search_url is not None and resource_ids is None:
-            resource_ids = get_resourceids_from_search_url(search_url, self.request.user)
+            resource_ids = get_resourceids_from_search_url(
+                search_url, self.request.user
+            )
         use_celery = True
 
         with connection.cursor() as cursor:
