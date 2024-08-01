@@ -2071,6 +2071,15 @@ class FileListDataType(BaseDataType):
         try:
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
+                if value["op"] == "gte" or value["op"] == "lte":
+                    operators = {"gte": None, "lte": None, "lt": None, "gt": None}
+                    operators[value["op"]] = float(value["val"]) * 1000
+                search_query = Range(
+                    field="tiles.data.%s.size" % (str(node.pk)), **operators
+                )
+                query.must(search_query)
+
         except KeyError as e:
             pass
 
