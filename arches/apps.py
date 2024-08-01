@@ -12,6 +12,7 @@ class ArchesAppConfig(AppConfig):
     is_arches_application = False
 
     def ready(self):
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
         import arches.app.signals
 
 
