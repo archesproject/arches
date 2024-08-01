@@ -1338,6 +1338,24 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 }
             )
 
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif (
+                value["op"] == "Point"
+                or value["op"] == "LineString"
+                or value["op"] == "Polygon"
+            ):
+                match_query = Match(
+                    field="tiles.data.%s.features.geometry.type" % (str(node.pk)),
+                    query=value["op"],
+                    type="phrase",
+                )
+                query.must(match_query)
+        except KeyError as e:
+            pass
+
     def split_geom(self, feature, max_feature_in_bytes=32766):
         geom = feature["geometry"]
         coordinates = (
@@ -2048,6 +2066,13 @@ class FileListDataType(BaseDataType):
                         "provisional": provisional,
                     }
                     document["strings"].append(val)
+
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+        except KeyError as e:
+            pass
 
     def get_search_terms(self, nodevalue, nodeid):
         terms = []
