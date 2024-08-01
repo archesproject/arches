@@ -335,19 +335,9 @@ class BulkConceptEditor(BaseBulkEditor):
                 self.log_event(cursor, "failed")
                 return {"success": False, "data": event_created["message"]}
 
-        use_celery_bulk_edit = False
+        use_celery_bulk_edit = True
         if use_celery_bulk_edit:
-            response = self.run_load_task_async(
-                self.userid,
-                self.loadid,
-                self.moduleid,
-                graphid,
-                nodeid,
-                resourceids,
-                unselected_tiles,
-                old,
-                new,
-            )
+            response = self.run_load_task_async(request)
         else:
             response = self.run_load_task(
                 self.userid,
@@ -363,24 +353,32 @@ class BulkConceptEditor(BaseBulkEditor):
         return response
 
     @load_data_async
-    def run_load_task_async(
-        self,
-        userid,
-        loadid,
-        module_id,
-        graph_id,
-        node_id,
-        resource_ids,
-        unselected_tiles,
-        old_id,
-        new_id,
-    ):
+    def run_load_task_async(self, request):
+        graph_id = request.POST.get("selectedGraph", None)
+        selected_node_info = request.POST.get("selectedNode", None)
+        node_id = json.loads(selected_node_info)["node"]
+        new_id = request.POST.get("conceptNew", None)
+        old_id = request.POST.get("conceptOld", None)
+        tiles_to_remove = request.POST.get("tilesToRemove", None)
+        search_url = request.POST.get("search_url", None)
+
+        if tiles_to_remove:
+            unselected_tiles = tiles_to_remove.split(",")
+
         resource_ids = []
+        if search_url:
+            with connection.cursor() as cursor:
+                self.log_event_details(
+                    cursor, "done|Getting resources from search url..."
+                )
+            resource_ids = self.get_resourceids_from_search_url(search_url)
+            resource_ids = tuple(resource_ids)
+
         edit_task = edit_bulk_concept_data.apply_async(
             (
-                userid,
-                loadid,
-                module_id,
+                self.userid,
+                self.loadid,
+                self.module_id,
                 graph_id,
                 node_id,
                 resource_ids,
