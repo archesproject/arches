@@ -300,32 +300,34 @@ class BulkConceptEditor(BaseBulkEditor):
         nodeid = json.loads(selected_node_info)["node"]
         new = request.POST.get("conceptNew", None)
         old = request.POST.get("conceptOld", None)
-        language_old = request.POST.get("conceptOldLang", None)
-        language_new = request.POST.get("conceptNewLang", None)
+        tiles_to_remove = request.POST.get("tilesToRemove", None)
+        search_url = request.POST.get("search_url", None)
+
         old_prefLabel = Value.objects.values_list("value", flat=True).get(
             pk=old, valuetype__valuetype="prefLabel"
         )
         new_prefLabel = Value.objects.values_list("value", flat=True).get(
             pk=new, valuetype__valuetype="prefLabel"
         )
-        table = request.POST.get("table", None)
+
+        if tiles_to_remove:
+            unselected_tiles = tiles_to_remove.split(",")
+
+        resourceids = []
+        if search_url:
+            with connection.cursor() as cursor:
+                self.log_event_details(
+                    cursor, "done|Getting resources from search url..."
+                )
+            resourceids = self.get_resourceids_from_search_url(search_url)
+            resourceids = tuple(resourceids)
+
         load_details = {
             "graph": graphid,
             "node": nodeid,
             "new": new_prefLabel,
             "old": old_prefLabel,
-            "languageold": language_old,
-            "languagenew": language_new,
         }
-        resourceids = []
-        ### get all the resourceids and (-) removed resourceids
-        # for resource in table.split(","):
-        #     try:
-        #         uuid.UUID(resource)
-        #         resourceids.append(resource)
-        #     except ValueError:
-        #         pass
-        # print(table, resourceids)
 
         with connection.cursor() as cursor:
             event_created = self.create_load_event(cursor, load_details)
@@ -335,7 +337,17 @@ class BulkConceptEditor(BaseBulkEditor):
 
         use_celery_bulk_edit = False
         if use_celery_bulk_edit:
-            response = self.run_load_task_async(request)
+            response = self.run_load_task_async(
+                self.userid,
+                self.loadid,
+                self.moduleid,
+                graphid,
+                nodeid,
+                resourceids,
+                unselected_tiles,
+                old,
+                new,
+            )
         else:
             response = self.run_load_task(
                 self.userid,
@@ -344,63 +356,37 @@ class BulkConceptEditor(BaseBulkEditor):
                 graphid,
                 nodeid,
                 resourceids,
-                language_old,
-                language_new,
+                unselected_tiles,
                 old,
                 new,
             )
         return response
 
     @load_data_async
-    def run_load_task_async(self, request):
-        graphid = request.POST.get("selectedGraph", None)
-        newid = request.POST.get("conceptNew", None)
-        oldid = request.POST.get("conceptOld", None)
-        language_old = request.POST.get("conceptOldLang", None)
-        language_new = request.POST.get("conceptNewLang", None)
-        # table = request.POST.get("table", None)
-        nodeid = request.POST.get("nodeid", None)
-        # all_child_concept = request.POST.get("allchildconcept", None)
-
-        # saveid = request.POST.get("saveid", None)
-        # items = all_child_concept.split(",")
-        # id_name_pairs = []
-        # if len(items) % 2 == 0:
-        #     id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
-        # else:
-        #     id_name_pairs = perth_items(items)
-        # oldid = next((pair for pair in id_name_pairs if pair[1] == old), None)
-        # newid = next((pair for pair in id_name_pairs if pair[1] == new), None)
-        # # items = saveid.split(",")
-        # id_name_pairs = []
-        # id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
-        # graphid = next(
-        #     (pair for pair in id_name_pairs if pair[1] == selected_graph), None
-        # )
-        # resourceids = []
-        # for resource in table.split(","):
-        #     try:
-        #         uuid.UUID(resource)
-        #         resourceids.append(resource)
-        #     except ValueError:
-        #         pass
-        # if resourceids:
-        #     resourceids_json_string = json.dumps(resourceids)
-        #     resourceids = json.loads(resourceids_json_string)
-        # pattern = old
+    def run_load_task_async(
+        self,
+        userid,
+        loadid,
+        module_id,
+        graph_id,
+        node_id,
+        resource_ids,
+        unselected_tiles,
+        old_id,
+        new_id,
+    ):
         resource_ids = []
         edit_task = edit_bulk_concept_data.apply_async(
             (
-                self.userid,
-                self.loadid,
-                self.moduleid,
-                graphid,
-                nodeid,
+                userid,
+                loadid,
+                module_id,
+                graph_id,
+                node_id,
                 resource_ids,
-                language_old,
-                language_new,
-                oldid,
-                newid,
+                unselected_tiles,
+                old_id,
+                new_id,
             ),
         )
         with connection.cursor() as cursor:
@@ -415,8 +401,7 @@ class BulkConceptEditor(BaseBulkEditor):
         nodeid,
         module_id,
         resource_ids,
-        language_old,
-        language_new,
+        unselected_tiles,
         oldid,
         newid,
     ):
@@ -472,12 +457,10 @@ class BulkConceptEditor(BaseBulkEditor):
         graph_id,
         node_id,
         resource_ids,
-        language_old,
-        language_new,
+        unselected_tiles,
         old_id,
         new_id,
     ):
-
         with connection.cursor() as cursor:
             self.log_event_details(cursor, "done|Staging the data for edit...")
             data_staged = self.stage_data(
@@ -485,8 +468,6 @@ class BulkConceptEditor(BaseBulkEditor):
                 node_id,
                 module_id,
                 resource_ids,
-                language_old,
-                language_new,
                 old_id,
                 new_id,
             )

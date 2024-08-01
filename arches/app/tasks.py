@@ -510,8 +510,7 @@ def edit_bulk_concept_data(
     graph_id,
     node_id,
     resource_ids,
-    language_old,
-    language_new,
+    unselected_tiles,
     oldid,
     newid,
 ):
@@ -527,8 +526,7 @@ def edit_bulk_concept_data(
             graph_id,
             node_id,
             resource_ids,
-            language_old,
-            language_new,
+            unselected_tiles,
             oldid,
             newid,
         )
