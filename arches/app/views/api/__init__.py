@@ -1302,7 +1302,7 @@ class SearchExport(View):
             else:
                 response = JSONResponse(export_files)
             return response
-        return JSONResponse(status=404)
+        return JSONErrorResponse(status=404)
 
 
 class SearchComponentData(APIBase):
@@ -1311,7 +1311,7 @@ class SearchComponentData(APIBase):
         search_filter = search_filter_factory.get_filter(componentname)
         if search_filter:
             return JSONResponse(search_filter.view_data())
-        return JSONResponse(status=404)
+        return JSONErrorResponse(status=404)
 
 
 @method_decorator(csrf_exempt, name="dispatch")
