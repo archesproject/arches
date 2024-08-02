@@ -6,6 +6,8 @@ eea27d316c5ff975556e15ccd4c11d7c393dd95c
 8de09526329685ee4d80c816c3475a66b19d46e9
 9740c846eda0cc067f49d7abffdcb1a93fe3e0a9
 eff6710e8b44faef5a628b0ea1373cd99cb47e9e
+# Reformatting of 7.6 features under dev (2024)
+9740c846eda0cc067f49d7abffdcb1a93fe3e0a9
 # Relevant subset of git log --grep black
 9b7e30d4499cb02dec6d17c7c99f9a7087fcdd47
 b959f1139a1d789e6c116d43d8be7daa0baa6075
