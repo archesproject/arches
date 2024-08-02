@@ -293,6 +293,7 @@ class Command(BaseCommand):  # pragma: no cover
                     "arches-templates",
                     "project_name",
                     "src",
+                    "project_name",
                     "declarations.d.ts",
                 ),
                 os.path.join(settings.APP_ROOT, "src"),
