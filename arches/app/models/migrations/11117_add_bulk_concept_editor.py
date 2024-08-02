@@ -5,11 +5,11 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10999_update_principaluser"),
+        ("models", "10799_geojsongeometry_featureid"),
     ]
 
     add_bulk_concept_editor = """
-        insert into etl_modules (
+        INSERT INTO etl_modules (
             etlmoduleid,
             name,
             description,
@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
             helpsortorder,
             helptemplate
         )
-        values (
+        VALUES (
             '87ce44cd-3935-49fb-a9ff-37b256d23ec9',
             'Bulk Replace Concept',
             'Replace concept',
@@ -43,7 +43,9 @@ class Migration(migrations.Migration):
         )
     """
     remove_bulk_concept_editor = """
-        delete from etl_modules where etlmoduleid = '87ce44cd-3935-49fb-a9ff-37b256d23ec9';
+        DELETE FROM load_staging WHERE loadid IN (SELECT loadid FROM load_event WHERE etl_module_id = '87ce44cd-3935-49fb-a9ff-37b256d23ec9');
+        DELETE FROM load_event WHERE etl_module_id = '87ce44cd-3935-49fb-a9ff-37b256d23ec9';
+        DELETE FROM etl_modules WHERE etlmoduleid = '87ce44cd-3935-49fb-a9ff-37b256d23ec9';
     """
 
     add_functions_to_edit_concepts = """
