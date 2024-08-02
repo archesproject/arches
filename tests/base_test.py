@@ -75,11 +75,11 @@ class ArchesTestRunner(DiscoverRunner):
         ret = super().setup_databases(**kwargs)
 
         # Some tests don't use the database.
-        if kwargs.get("aliases", None):
-            app_settings()  # adds languages to system
-            prepare_terms_index(create=True)
-            prepare_concepts_index(create=True)
-            prepare_search_index(create=True)
+        # if kwargs.get("aliases", None):
+        app_settings()  # adds languages to system
+        prepare_terms_index(create=True)
+        prepare_concepts_index(create=True)
+        prepare_search_index(create=True)
 
         return ret
 
