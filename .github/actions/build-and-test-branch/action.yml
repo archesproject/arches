@@ -31,6 +31,11 @@ runs:
         echo Python packages installed
       shell: bash
 
+    - name: Ensure frontend configuration files exist
+      run: |
+          python manage.py check
+      shell: bash
+
     - name: Install Arches applications
       uses: ./.github/actions/install-arches-applications
       with:
