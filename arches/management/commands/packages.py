@@ -339,7 +339,7 @@ class Command(BaseCommand):
             warnings.warn(
                 "The install operation does nothing since Arches 7.6. "
                 "In Arches 8.0, calling this operation will raise an exception.",
-                DeprecationWarning,
+                UserWarning,
             )
 
         if options["operation"] == "setup_indexes":
