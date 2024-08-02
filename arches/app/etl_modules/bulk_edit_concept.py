@@ -313,7 +313,7 @@ class BulkConceptEditor(BaseBulkEditor):
         unselected_tiles = []
         resourceids = []
         if tiles_to_remove:
-            unselected_tiles = tiles_to_remove.split(",")
+            unselected_tiles = tuple(tiles_to_remove.split(","))
         if search_url:
             with connection.cursor() as cursor:
                 self.log_event_details(
@@ -363,7 +363,7 @@ class BulkConceptEditor(BaseBulkEditor):
         search_url = request.POST.get("search_url", None)
 
         if tiles_to_remove:
-            unselected_tiles = tiles_to_remove.split(",")
+            unselected_tiles = tuple(tiles_to_remove.split(","))
 
         resource_ids = []
         if search_url:
@@ -371,8 +371,7 @@ class BulkConceptEditor(BaseBulkEditor):
                 self.log_event_details(
                     cursor, "done|Getting resources from search url..."
                 )
-            resource_ids = self.get_resourceids_from_search_url(search_url)
-            resource_ids = tuple(resource_ids)
+            resource_ids = tuple(self.get_resourceids_from_search_url(search_url))
 
         edit_task = edit_bulk_concept_data.apply_async(
             (
@@ -408,14 +407,29 @@ class BulkConceptEditor(BaseBulkEditor):
             "updateLimit", 5000
         )
 
+        tile_selection_query = (
+            " AND tileid NOT IN %(tile_ids)s" if unselected_tiles else ""
+        )
+
+        resourceids_query = (
+            " AND resourceinstanceid IN %(resource_ids)s" if resource_ids else ""
+        )
+
+        limit_query = " LIMIT %(update_limit)s)"
         try:
-            sql = """
+            sql = (
+                """
                 INSERT INTO load_staging (value, tileid, nodegroupid, parenttileid, resourceid, loadid, nodegroup_depth, source_description, operation, passes_validation)
                     (SELECT tiledata, tileid, nodegroupid, parenttileid, resourceinstanceid, %(load_id)s, 0, 'bulk_edit', 'update', true
                     FROM tiles
-                    WHERE nodegroupid in (select nodegroupid from nodes where nodeid = %(node_id)s)
-                    AND tiledata -> %(node_id)s ? %(old_id)s);
-            """
+                    WHERE nodegroupid in (SELECT nodegroupid FROM nodes WHERE nodeid = %(node_id)s)
+                    AND tiledata -> %(node_id)s ? %(old_id)s
+                """
+                + tile_selection_query
+                + resourceids_query
+                + limit_query
+            )
+
             cursor.execute(
                 sql,
                 {
@@ -424,6 +438,9 @@ class BulkConceptEditor(BaseBulkEditor):
                     "old_id": oldid,
                     "new_id": newid,
                     "load_id": self.loadid,
+                    "tile_ids": unselected_tiles,
+                    "update_limit": update_limit,
+                    "resource_ids": resource_ids,
                 },
             )
             result["success"] = True
@@ -466,6 +483,7 @@ class BulkConceptEditor(BaseBulkEditor):
                 node_id,
                 module_id,
                 resource_ids,
+                unselected_tiles,
                 old_id,
                 new_id,
             )
