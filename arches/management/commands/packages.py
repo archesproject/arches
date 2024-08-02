@@ -332,6 +332,13 @@ class Command(BaseCommand):
         if options["operation"] == "setup":
             self.setup(package_name, es_install_location=options["dest_dir"])
 
+        if options["operation"] == "install":
+            warnings.warn(
+                "The install operation does nothing since Arches 7.6. "
+                "In Arches 8.0, calling this operation will raise an exception.",
+                UserWarning,
+            )
+
         if options["operation"] == "setup_indexes":
             self.setup_indexes()
 
