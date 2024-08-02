@@ -150,10 +150,9 @@ class BulkConceptEditor(BaseBulkEditor):
         query.add_query(search_url_query)
         query.add_aggregation(nested_agg)
 
-        limit = settings.SEARCH_ITEMS_PER_PAGE
-        start = limit * int(page_index - 1)
+        start = preview_limit * int(page_index - 1)
 
-        results = query.search(index=RESOURCES_INDEX, start=start, limit=limit)
+        results = query.search(index=RESOURCES_INDEX, start=start, limit=preview_limit)
         values = []
         for hit in results["hits"]["hits"]:
             resourceid = hit["_id"]
