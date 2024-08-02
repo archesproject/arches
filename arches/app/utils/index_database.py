@@ -7,10 +7,7 @@ import pyprind
 import sys
 import django
 
-try:
-    django.setup()
-except:
-    pass
+django.setup()
 
 from datetime import datetime
 from django.db import connection, connections
