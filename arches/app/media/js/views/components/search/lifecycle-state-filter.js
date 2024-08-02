@@ -17,15 +17,15 @@ define([
 
             const self = this;  // eslint-disable-line @typescript-eslint/no-this-alias
 
-            const response = await fetch(arches.urls.api_resource_instance_lifecycle_states);
-            if (response.ok) {
-                const data = await response.json();
-                data.forEach(function(lifecycleState) {
-                    self.lifecycleStates.push(lifecycleState);
-                });
-            } else {
-                console.error('Failed to fetch resource instance list');
-            }
+            // const response = await fetch(arches.urls.api_resource_instance_lifecycle_states);
+            // if (response.ok) {
+            //     const data = await response.json();
+            //     data.forEach(function(lifecycleState) {
+            //         self.lifecycleStates.push(lifecycleState);
+            //     });
+            // } else {
+            //     console.error('Failed to fetch resource instance list');
+            // }
 
             var filterUpdated = ko.computed(function() {
                 return JSON.stringify(ko.toJS(this.filter()));
