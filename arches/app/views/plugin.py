@@ -43,15 +43,6 @@ class PluginView(MapBaseManagerView):
         if request.GET.get("json"):
             return JSONResponse(plugin)
 
-        if plugin.config.get("is_standalone"):
-            context = self.get_context_data(
-                plugin=plugin,
-                plugin_json=JSONSerializer().serialize(plugin),
-                main_script="views/plugin-standalone",
-            )
-
-            return render(request, "views/plugin-standalone.htm", context)
-
         resource_graphs = (
             models.GraphModel.objects.exclude(
                 pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID

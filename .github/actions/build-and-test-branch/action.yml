@@ -31,26 +31,15 @@ runs:
         echo Python packages installed
       shell: bash
 
+    - name: Ensure frontend configuration files exist
+      run: |
+          python manage.py check
+      shell: bash
+
     - name: Install Arches applications
       uses: ./.github/actions/install-arches-applications
       with:
         secrets: ${{ inputs.secrets }}
-
-    - name: Checkout into feature branch
-      if: inputs.branch-type == 'feature'
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ github.repository }}
-        ref: ${{ github.ref }}
-        path: .
-
-    - name: Checkout into target branch
-      if: inputs.branch-type == 'target'
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ github.repository }}
-        ref: ${{ github.event.pull_request.base.ref }}
-        path: .
 
     - name: Install frontend dependencies
       run: |
