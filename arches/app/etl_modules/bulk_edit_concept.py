@@ -313,13 +313,15 @@ class BulkConceptEditor(BaseBulkEditor):
         unselected_tiles = ()
         resource_ids = ()
         if tiles_to_remove:
-            unselected_tiles = tuple(tiles_to_remove.split(","))
+            unselected_tiles = [uuid.UUID(id) for id in tiles_to_remove.split(",")]
         if search_url:
             with connection.cursor() as cursor:
                 self.log_event_details(
                     cursor, "done|Getting resources from search url..."
                 )
-            resource_ids = tuple(self.get_resourceids_from_search_url(search_url))
+            resource_ids = [
+                uuid.UUID(id) for id in self.get_resourceids_from_search_url(search_url)
+            ]
 
         load_details = {
             "graph": graphid,
@@ -364,14 +366,16 @@ class BulkConceptEditor(BaseBulkEditor):
         unselected_tiles = ()
         resource_ids = ()
         if tiles_to_remove:
-            unselected_tiles = tuple(tiles_to_remove.split(","))
+            unselected_tiles = [uuid.UUID(id) for id in tiles_to_remove.split(",")]
 
         if search_url:
             with connection.cursor() as cursor:
                 self.log_event_details(
                     cursor, "done|Getting resources from search url..."
                 )
-            resource_ids = tuple(self.get_resourceids_from_search_url(search_url))
+            resource_ids = [
+                uuid.UUID(id) for id in self.get_resourceids_from_search_url(search_url)
+            ]
 
         edit_task = edit_bulk_concept_data.apply_async(
             (
@@ -408,11 +412,11 @@ class BulkConceptEditor(BaseBulkEditor):
         )
 
         tile_selection_query = (
-            " AND tileid NOT IN %(tile_ids)s" if unselected_tiles else ""
+            " AND NOT (tileid = ANY(%(tile_ids)s))" if unselected_tiles else ""
         )
 
         resourceids_query = (
-            " AND resourceinstanceid IN %(resource_ids)s" if resource_ids else ""
+            " AND resourceinstanceid = ANY(%(resource_ids)s)" if resource_ids else ""
         )
 
         limit_query = " LIMIT %(update_limit)s)"
