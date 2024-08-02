@@ -20,15 +20,13 @@ import json
 import uuid
 
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import User, Group
 from django.db import transaction
 from django.forms.models import model_to_dict
 from django.http import HttpResponseNotFound
-from django.http import HttpResponse
 from django.http import Http404
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import redirect, render
-from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
@@ -45,26 +43,22 @@ from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.decorators import can_edit_resource_instance
-from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.i18n import LanguageSynchronizer, localize_complex_input
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.permission_backend import (
     user_is_resource_editor,
     user_is_resource_reviewer,
-    user_can_delete_resource,
     user_can_edit_resource,
-    user_can_read_resource,
+    user_can_delete_resource,
 )
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.string_utils import str_to_bool
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
-from elasticsearch import Elasticsearch
 from arches.app.utils.permission_backend import (
     assign_perm,
     get_perms,
@@ -117,7 +111,9 @@ def get_resource_relationship_types():
 class ResourceEditorView(MapBaseManagerView):
     action = None
 
-    @method_decorator(can_edit_resource_instance, name="dispatch")
+    @method_decorator(
+        can_edit_resource_instance(redirect_to_report=True), name="dispatch"
+    )
     def get(
         self,
         request,
@@ -307,7 +303,9 @@ class ResourceEditorView(MapBaseManagerView):
             serialized_cards = serialized_graph["cards"]
             cardwidgets = [
                 models.CardXNodeXWidget(**card_x_node_x_widget_dict)
-                for card_x_node_x_widget_dict in serialized_graph["widgets"]
+                for card_x_node_x_widget_dict in serialized_graph[
+                    "cards_x_nodes_x_widgets"
+                ]
             ]
         else:
             cards = (
@@ -388,6 +386,12 @@ class ResourceEditorView(MapBaseManagerView):
 
         context["graph_has_unpublished_changes"] = graph.has_unpublished_changes
 
+        context["resource_instance_lifecycle_state"] = JSONSerializer().serialize(
+            resource_instance.resource_instance_lifecycle_state
+            if resource_instance
+            else None
+        )
+
         context["nav"]["title"] = ""
         context["nav"]["menu"] = nav_menu
 
@@ -405,9 +409,8 @@ class ResourceEditorView(MapBaseManagerView):
                 "templates": ["resource-editor-help"],
             }
 
-        if (
-            graph.has_unpublished_changes
-            or resource_instance
+        if graph.has_unpublished_changes or (
+            resource_instance
             and resource_instance.graph_publication_id != graph.publication_id
         ):
             return redirect("resource_report", resourceid=resourceid)
@@ -977,7 +980,9 @@ class ResourceDescriptors(View):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
-        resource = Resource.objects.only("graph_id").get(pk=resourceid)
+        resource = Resource.objects.only(
+            "graph_id", "resource_instance_lifecycle_state"
+        ).get(pk=resourceid)
         graph = Graph.objects.get(graphid=resource.graph_id)
         graph_has_different_publication = bool(
             resource.graph_publication_id != graph.publication_id
@@ -1012,6 +1017,14 @@ class ResourceReportView(MapBaseManagerView):
                 ).exists()
             ),
             graph_has_unpublished_changes=bool(graph.has_unpublished_changes),
+        )
+
+        context["user_can_edit_resource"] = user_can_edit_resource(
+            request.user, resourceid=resourceid
+        )
+
+        context["resource_instance_lifecycle_state_permits_editing"] = (
+            resource.resource_instance_lifecycle_state.can_edit_resource_instances
         )
 
         if graph.iconclass:

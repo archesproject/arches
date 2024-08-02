@@ -1208,7 +1208,8 @@ class Card(APIBase):
                 widget
                 for widget in models.CardXNodeXWidget.objects.filter(
                     pk__in=[
-                        widget_dict["id"] for widget_dict in serialized_graph["widgets"]
+                        widget_dict["id"]
+                        for widget_dict in serialized_graph["cards_x_nodes_x_widgets"]
                     ]
                 )
             ]
@@ -1461,6 +1462,43 @@ class OntologyProperty(APIBase):
         return JSONResponse(ret)
 
 
+class ResourceInstanceLifecycleStates(APIBase):
+    def get(self, request):
+        return JSONResponse(models.ResourceInstanceLifecycleState.objects.all())
+
+
+class ResourceInstanceLifecycleState(APIBase):
+    def get(self, request, resourceid):
+        resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+        return JSONResponse(resource_instance.resource_instance_lifecycle_state)
+
+    def post(self, request, resourceid):
+        data = json.loads(request.body)
+
+        resource = Resource.objects.get(pk=resourceid)
+        resource_instance_lifecycle_state = (
+            models.ResourceInstanceLifecycleState.objects.get(pk=data)
+        )
+
+        original_resource_instance_lifecycle_state = (
+            resource.resource_instance_lifecycle_state
+        )
+
+        current_resource_instance_lifecycle_state = (
+            resource.update_resource_instance_lifecycle_state(
+                user=request.user,
+                resource_instance_lifecycle_state=resource_instance_lifecycle_state,
+            )
+        )
+
+        return JSONResponse(
+            {
+                "original_resource_instance_lifecycle_state": original_resource_instance_lifecycle_state,
+                "current_resource_instance_lifecycle_state": current_resource_instance_lifecycle_state,
+            }
+        )
+
+
 class ResourceReport(APIBase):
     def get(self, request, resourceid):
         exclude = request.GET.get("exclude", [])
@@ -1557,14 +1595,14 @@ class ResourceReport(APIBase):
 
         if "cards" not in exclude:
             readable_nodegroup_ids = [
-                nodegroup.pk
-                for nodegroup in get_nodegroups_by_perm(
+                nodegroup_id
+                for nodegroup_id in get_nodegroups_by_perm(
                     request.user, perm, any_perm=True
                 )
             ]
             writable_nodegroup_ids = [
-                nodegroup.pk
-                for nodegroup in get_nodegroups_by_perm(
+                nodegroup_id
+                for nodegroup_id in get_nodegroups_by_perm(
                     request.user,
                     "write_nodegroup",
                     any_perm=True,

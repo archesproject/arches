@@ -31,6 +31,7 @@ from arches.app.models.models import (
     GraphXPublishedGraph,
     Language,
     PublishedGraph,
+    Resource2ResourceConstraint,
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.models import GraphXMapping

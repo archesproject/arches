@@ -829,6 +829,8 @@ RENDERERS = [
     },
 ]
 
+DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID = "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
+
 # --- JSON LD sortorder generating functions --- #
 #
 # The functions in the array below will be called in the order given with the json-ld of the node

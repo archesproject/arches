@@ -9,7 +9,6 @@
 # into your database.
 
 
-import os
 import sys
 import json
 import uuid
@@ -25,21 +24,15 @@ from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.models.utils import add_to_update_fields
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils import import_class_from_string
+from django.contrib.auth.models import Group, User
 from django.contrib.gis.db import models
-from django.db.models import JSONField
-from django.core.cache import caches
-from django.core.mail import EmailMultiAlternatives
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers.json import DjangoJSONEncoder
-from django.template.loader import get_template, render_to_string
-from django.core.validators import RegexValidator
-from django.db.models import Q, Max
-from django.db.models.signals import post_delete, pre_save, post_save, m2m_changed
-from django.dispatch import receiver
+from django.core.validators import RegexValidator, validate_slug
+from django.db.models import JSONField, Max, Q
+from django.db.models.constraints import UniqueConstraint
 from django.utils import translation
-from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import User
-from django.contrib.auth.models import Group
-from django.core.validators import validate_slug
+from django.utils.translation import gettext as _, gettext_lazy as _
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -459,48 +452,6 @@ class TempFile(models.Model):
         db_table = "files_temporary"
 
 
-# These two event listeners auto-delete files from filesystem when they are unneeded:
-# from http://stackoverflow.com/questions/16041232/django-delete-filefield
-@receiver(post_delete, sender=File)
-def delete_file_on_delete(sender, instance, **kwargs):
-    """Deletes file from filesystem
-    when corresponding `File` object is deleted.
-    """
-
-    if instance.path:
-        try:
-            if os.path.isfile(instance.path.path):
-                os.remove(instance.path.path)
-        # except block added to deal with S3 file deletion
-        # see comments on 2nd answer below
-        # http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
-        except Exception as e:
-            storage, name = instance.path.storage, instance.path.name
-            storage.delete(name)
-
-
-@receiver(pre_save, sender=File)
-def delete_file_on_change(sender, instance, **kwargs):
-    """Deletes file from filesystem
-    when corresponding `File` object is changed.
-    """
-    if not instance.pk:
-        return False
-
-    try:
-        old_file = File.objects.get(pk=instance.pk).path
-    except File.DoesNotExist:
-        return False
-
-    new_file = instance.path
-    if not old_file == new_file:
-        try:
-            if os.path.isfile(old_file.path):
-                os.remove(old_file.path)
-        except Exception:
-            return False
-
-
 class Function(models.Model):
     functionid = models.UUIDField(primary_key=True)
     name = models.TextField(blank=True, null=True)
@@ -598,6 +549,13 @@ class GraphModel(models.Model):
         to="models.graphmodel",
     )
     has_unpublished_changes = models.BooleanField(default=False)
+    resource_instance_lifecycle = models.ForeignKey(
+        default=uuid.UUID(settings.DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID),
+        null=True,
+        on_delete=models.PROTECT,
+        to="models.ResourceInstanceLifecycle",
+        related_name="graphs",
+    )
 
     @property
     def disable_instance_creation(self):
@@ -890,14 +848,6 @@ class Node(models.Model):
                 fields=["alias", "graph"], name="unique_alias_graph"
             ),
         ]
-
-
-@receiver(post_save, sender=Node)
-def clear_user_permission_cache(sender, instance, **kwargs):
-    user_permission_cache = caches["user_permission"]
-
-    if user_permission_cache:
-        user_permission_cache.clear()
 
 
 class Ontology(models.Model):
@@ -1223,6 +1173,21 @@ class ResourceInstance(models.Model):
     descriptors = models.JSONField(blank=True, null=True)
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
+    resource_instance_lifecycle_state = models.ForeignKey(
+        null=True,
+        on_delete=models.PROTECT,
+        to="models.ResourceInstanceLifecycleState",
+        related_name="resource_instances",
+    )
+
+    def get_initial_resource_instance_lifecycle_state(self, *args, **kwargs):
+        try:
+            return (
+                self.graph.resource_instance_lifecycle.get_initial_resource_instance_lifecycle_state()
+            )
+        except (ObjectDoesNotExist, AttributeError):
+            return None
+
     # This could be used as a lock, but primarily addresses the issue that a creating user
     # may not yet match the criteria to edit a ResourceInstance (via Set/LogicalSet) simply
     # because the details may not yet be complete. Only one user can create, as it is an
@@ -1266,6 +1231,13 @@ class ResourceInstance(models.Model):
             self.graph_publication = self.graph.publication
         except ResourceInstance.graph.RelatedObjectDoesNotExist:
             pass
+
+        if self.resource_instance_lifecycle_state is None:
+            self.resource_instance_lifecycle_state = (
+                self.get_initial_resource_instance_lifecycle_state()
+            )
+
+        add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
         add_to_update_fields(kwargs, "graph_publication")
         super(ResourceInstance, self).save(*args, **kwargs)
 
@@ -1278,6 +1250,118 @@ class ResourceInstance(models.Model):
         managed = True
         db_table = "resource_instances"
         permissions = (("no_access_to_resourceinstance", "No Access"),)
+
+
+class ResourceInstanceLifecycle(models.Model):
+    id = models.UUIDField(primary_key=True, serialize=False)
+    name = models.TextField()
+
+    def get_initial_resource_instance_lifecycle_state(self):
+        return self.resource_instance_lifecycle_states.get(is_initial_state=True)
+
+    def serialize(self, fields=None, exclude=None, **kwargs):
+        ret = JSONSerializer().handle_model(
+            self, fields=fields, exclude=exclude, **kwargs
+        )
+
+        ret["resource_instance_lifecycle_states"] = [
+            JSONSerializer().handle_model(resource_instance_lifecycle_state)
+            for resource_instance_lifecycle_state in self.resource_instance_lifecycle_states.all()
+        ]
+
+        return ret
+
+    class Meta:
+        db_table = "resource_instance_lifecycles"
+        managed = True
+
+
+class ResourceInstanceLifecycleState(models.Model):
+    id = models.UUIDField(primary_key=True, serialize=False)
+    name = I18n_TextField()
+    action_label = I18n_TextField()
+    is_initial_state = models.BooleanField(default=False)
+    can_delete_resource_instances = models.BooleanField(default=False)
+    can_edit_resource_instances = models.BooleanField(default=False)
+    resource_instance_lifecycle = models.ForeignKey(
+        on_delete=models.CASCADE,
+        to="models.ResourceInstanceLifecycle",
+        related_name="resource_instance_lifecycle_states",
+    )
+    previous_resource_instance_lifecycle_states = models.ManyToManyField(
+        "self",
+        through="ResourceInstanceLifecycleStateFromXRef",
+        symmetrical=False,
+        related_name="next_lifecycle_states",
+    )
+    next_resource_instance_lifecycle_states = models.ManyToManyField(
+        "self",
+        through="ResourceInstanceLifecycleStateToXRef",
+        symmetrical=False,
+        related_name="previous_lifecycle_states",
+    )
+
+    def serialize(self, fields=None, exclude=None, **kwargs):
+        ret = JSONSerializer().handle_model(
+            self, fields=fields, exclude=exclude, **kwargs
+        )
+
+        # for serialization we shouldn't need to recurse, 1 level down is enough
+        ret["next_resource_instance_lifecycle_states"] = [
+            JSONSerializer().handle_model(resource_instance_lifecycle_state)
+            for resource_instance_lifecycle_state in self.next_resource_instance_lifecycle_states.all()
+        ]
+        ret["previous_resource_instance_lifecycle_states"] = [
+            JSONSerializer().handle_model(resource_instance_lifecycle_state)
+            for resource_instance_lifecycle_state in self.previous_resource_instance_lifecycle_states.all()
+        ]
+
+        return ret
+
+    class Meta:
+        db_table = "resource_instance_lifecycle_states"
+        managed = True
+        constraints = [
+            UniqueConstraint(
+                fields=["resource_instance_lifecycle"],
+                condition=Q(is_initial_state=True),
+                name="unique_initial_state_per_lifecycle",
+            ),
+        ]
+
+
+class ResourceInstanceLifecycleStateFromXRef(models.Model):
+    resource_instance_lifecycle_state_from = models.ForeignKey(
+        ResourceInstanceLifecycleState,
+        related_name="from_xref_next_lifecycle_states",
+        on_delete=models.CASCADE,
+    )
+    resource_instance_lifecycle_state_to = models.ForeignKey(
+        ResourceInstanceLifecycleState,
+        related_name="from_xref_previous_lifecycle_states",
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        db_table = "resource_instance_lifecycle_states_from_xref"
+        managed = True
+
+
+class ResourceInstanceLifecycleStateToXRef(models.Model):
+    resource_instance_lifecycle_state_from = models.ForeignKey(
+        ResourceInstanceLifecycleState,
+        related_name="to_xref_next_lifecycle_states",
+        on_delete=models.CASCADE,
+    )
+    resource_instance_lifecycle_state_to = models.ForeignKey(
+        ResourceInstanceLifecycleState,
+        related_name="to_xref_previous_lifecycle_states",
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        db_table = "resource_instance_lifecycle_states_to_xref"
+        managed = True
 
 
 class SearchComponent(models.Model):
@@ -1519,47 +1603,6 @@ class FileValue(models.Model):
         return ""
 
 
-# These two event listeners auto-delete files from filesystem when they are unneeded:
-# from http://stackoverflow.com/questions/16041232/django-delete-filefield
-@receiver(post_delete, sender=FileValue)
-def auto_delete_file_on_delete(sender, instance, **kwargs):
-    """Deletes file from filesystem
-    when corresponding `FileValue` object is deleted.
-    """
-    if instance.value.path:
-        try:
-            if os.path.isfile(instance.value.path):
-                os.remove(instance.value.path)
-        # except block added to deal with S3 file deletion
-        # see comments on 2nd answer below
-        # http://stackoverflow.com/questions/5372934/how-do-i-get-django-admin-to-delete-files-when-i-remove-an-object-from-the-datab
-        except Exception as e:
-            storage, name = instance.value.storage, instance.value.name
-            storage.delete(name)
-
-
-@receiver(pre_save, sender=FileValue)
-def auto_delete_file_on_change(sender, instance, **kwargs):
-    """Deletes file from filesystem
-    when corresponding `FileValue` object is changed.
-    """
-    if not instance.pk:
-        return False
-
-    try:
-        old_file = FileValue.objects.get(pk=instance.pk).value
-    except FileValue.DoesNotExist:
-        return False
-
-    new_file = instance.value
-    if not old_file == new_file:
-        try:
-            if os.path.isfile(old_file.value):
-                os.remove(old_file.value)
-        except Exception:
-            return False
-
-
 class Widget(models.Model):
     widgetid = models.UUIDField(primary_key=True)
     name = models.TextField(unique=True)
@@ -1732,14 +1775,6 @@ class UserProfile(models.Model):
         db_table = "user_profile"
 
 
-@receiver(post_save, sender=User)
-def save_profile(sender, instance, **kwargs):
-    if kwargs.get("raw", False):
-        return
-
-    UserProfile.objects.get_or_create(user=instance)
-
-
 class UserXTask(models.Model):
     id = models.UUIDField(primary_key=True, serialize=False)
     taskid = models.UUIDField(serialize=False, blank=True, null=True)
@@ -1852,88 +1887,6 @@ class UserXNotificationType(models.Model):
     class Meta:
         managed = True
         db_table = "user_x_notification_types"
-
-
-@receiver(post_save, sender=User)
-def create_permissions_for_new_users(sender, instance, created, **kwargs):
-    if kwargs.get("raw", False):
-        return
-
-    from arches.app.utils.permission_backend import process_new_user
-
-    if created:
-        process_new_user(instance, created)
-
-
-@receiver(m2m_changed, sender=User.groups.through)
-def update_groups_for_user(sender, instance, action, **kwargs):
-    from arches.app.utils.permission_backend import update_groups_for_user
-
-    if action in ("post_add", "post_remove"):
-        update_groups_for_user(instance)
-
-
-@receiver(m2m_changed, sender=User.user_permissions.through)
-def update_permissions_for_user(sender, instance, action, **kwargs):
-    from arches.app.utils.permission_backend import update_permissions_for_user
-
-    if action in ("post_add", "post_remove"):
-        update_permissions_for_user(instance)
-
-
-@receiver(m2m_changed, sender=Group.permissions.through)
-def update_permissions_for_group(sender, instance, action, **kwargs):
-    from arches.app.utils.permission_backend import update_permissions_for_group
-
-    if action in ("post_add", "post_remove"):
-        update_permissions_for_group(instance)
-
-
-@receiver(post_save, sender=UserXNotification)
-def send_email_on_save(sender, instance, **kwargs):
-    """Checks if a notification type needs to send an email, does so if email server exists"""
-
-    if instance.notif.notiftype is not None and instance.isread is False:
-        if UserXNotificationType.objects.filter(
-            user=instance.recipient,
-            notiftype=instance.notif.notiftype,
-            emailnotify=False,
-        ).exists():
-            return False
-
-        try:
-            context = instance.notif.context.copy()
-            text_content = render_to_string(
-                instance.notif.notiftype.emailtemplate, context
-            )
-            html_template = get_template(instance.notif.notiftype.emailtemplate)
-            html_content = html_template.render(context)
-            if context["email"] == instance.recipient.email:
-                email_to = instance.recipient.email
-            else:
-                email_to = context["email"]
-
-            if type(email_to) is not list:
-                email_to = [email_to]
-
-            subject, from_email, to = (
-                instance.notif.notiftype.name,
-                settings.DEFAULT_FROM_EMAIL,
-                email_to,
-            )
-            msg = EmailMultiAlternatives(subject, text_content, from_email, to)
-            msg.attach_alternative(html_content, "text/html")
-            msg.send()
-            if instance.notif.notiftype.webnotify is not True:
-                instance.isread = True
-                instance.save()
-        except Exception as e:
-            logger.warning(e)
-            logger.warning(
-                "Error occurred sending email.  See previous stack trace and check email configuration in settings.py."
-            )
-
-    return False
 
 
 def getDataDownloadConfigDefaults():

@@ -220,7 +220,15 @@ class Resource(models.ResourceInstance):
     def displayname(self, context=None):
         return self.get_descriptor("name", context)
 
-    def save_edit(self, user={}, note="", edit_type="", transaction_id=None):
+    def save_edit(
+        self,
+        user={},
+        note="",
+        edit_type="",
+        oldvalue=None,
+        newvalue=None,
+        transaction_id=None,
+    ):
         timestamp = datetime.datetime.now()
         edit = EditLog()
         edit.resourceclassid = self.graph_id
@@ -229,8 +237,11 @@ class Resource(models.ResourceInstance):
         edit.user_email = getattr(user, "email", "")
         edit.user_firstname = getattr(user, "first_name", "")
         edit.user_lastname = getattr(user, "last_name", "")
+        edit.user_username = getattr(user, "username", "")
         edit.note = note
         edit.timestamp = timestamp
+        edit.oldvalue = oldvalue
+        edit.newvalue = newvalue
         if transaction_id is not None:
             edit.transactionid = transaction_id
         edit.edittype = edit_type
@@ -250,11 +261,17 @@ class Resource(models.ResourceInstance):
         if not self.get_serialized_graph():
             pass
 
-        request = kwargs.pop("request", None)
-        user = kwargs.pop("user", None)
-        index = kwargs.pop("index", True)
         context = kwargs.pop("context", None)
+        index = kwargs.pop("index", True)
+        request = kwargs.pop("request", None)
         transaction_id = kwargs.pop("transaction_id", None)
+        should_update_resource_instance_lifecycle_state = kwargs.pop(
+            "should_update_resource_instance_lifecycle_state", False
+        )
+        current_resource_instance_lifecycle_state = kwargs.pop(
+            "current_resource_instance_lifecycle_state", None
+        )
+        user = kwargs.pop("user", None)
 
         if request is None:
             if user is None:
@@ -266,6 +283,18 @@ class Resource(models.ResourceInstance):
             self.principaluser_id = user.id
 
         super(Resource, self).save(*args, **kwargs)
+
+        if should_update_resource_instance_lifecycle_state:
+            self.save_edit(
+                user=user,
+                edit_type="update_resource_instance_lifecycle_state",
+                oldvalue=f"{current_resource_instance_lifecycle_state.name} ({current_resource_instance_lifecycle_state.id})",
+                newvalue=f"{self.resource_instance_lifecycle_state.name} ({self.resource_instance_lifecycle_state.id})",
+                transaction_id=transaction_id,
+            )
+            self.index(context)
+            return
+
         self.save_edit(user=user, edit_type="create", transaction_id=transaction_id)
 
         for tile in self.tiles:
@@ -416,6 +445,7 @@ class Resource(models.ResourceInstance):
             )
             document["root_ontology_class"] = self.get_root_ontology()
             doc = JSONSerializer().serializeToPython(document)
+
             se.index_data(index=RESOURCES_INDEX, body=doc, id=self.pk)
             for term in terms:
                 se.index_data("terms", body=term["_source"], id=term["_id"])
@@ -470,6 +500,9 @@ class Resource(models.ResourceInstance):
         document["displayname"] = None
         document["root_ontology_class"] = self.get_root_ontology()
         document["legacyid"] = self.legacyid
+        document["resource_instance_lifecycle_state_id"] = str(
+            self.resource_instance_lifecycle_state.pk
+        )
 
         document["displayname"] = []
         document["displaydescription"] = []
@@ -1063,6 +1096,36 @@ class Resource(models.ResourceInstance):
         for identity in groups + users:
             assign_perm(permission, identity, self)
         self.index()
+
+    def update_resource_instance_lifecycle_state(
+        self, user, resource_instance_lifecycle_state
+    ):
+        if (
+            self.graph.resource_instance_lifecycle.pk
+            != resource_instance_lifecycle_state.resource_instance_lifecycle.pk
+        ):
+            raise ValueError(
+                _(
+                    "The given ResourceInstanceLifecycleState is not part of the model's ResourceInstanceLifecycle."
+                )
+            )
+
+        if (
+            self.resource_instance_lifecycle_state.pk
+            != resource_instance_lifecycle_state.pk
+        ):
+            current_resource_instance_lifecycle_state = (
+                self.resource_instance_lifecycle_state
+            )
+            self.resource_instance_lifecycle_state = resource_instance_lifecycle_state
+
+            self.save(
+                user=user,
+                current_resource_instance_lifecycle_state=current_resource_instance_lifecycle_state,
+                should_update_resource_instance_lifecycle_state=True,
+            )
+
+        return self.resource_instance_lifecycle_state
 
 
 def parse_node_value(value):

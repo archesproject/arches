@@ -1383,6 +1383,8 @@ class GraphTests(ArchesTestCase):
                 "functions",
                 "root",
                 "widgets",
+                "resource_instance_lifecycle",
+                "resource_instance_lifecycle_id",
                 "source_identifier",
                 "source_identifier_id",
                 "publication_id",
@@ -1423,3 +1425,59 @@ class GraphTests(ArchesTestCase):
             models.Node.objects.get(pk=child_node_source_identifier)
 
         self.assertEqual(len(updated_source_graph.nodes), 2)
+
+    def test_add_resource_instance_lifecycle(self):
+        resource_instance_lifecycle = {
+            "id": "f7a0fd46-4c71-49cb-ae1e-778c96763440",
+            "name": "Test Lifecycle",
+            "resource_instance_lifecycle_states": [
+                {
+                    "id": "e2ac2a61-c140-43f5-bf65-3fe8ce47a594",
+                    "name": "State 1",
+                    "next_resource_instance_lifecycle_states": [
+                        "0b52dbac-405a-49e0-9151-43ebf2100e6c"
+                    ],
+                    "previous_resource_instance_lifecycle_states": [],
+                },
+                {
+                    "id": "0b52dbac-405a-49e0-9151-43ebf2100e6c",
+                    "name": "State 2",
+                    "next_resource_instance_lifecycle_states": [],
+                    "previous_resource_instance_lifecycle_states": [
+                        "e2ac2a61-c140-43f5-bf65-3fe8ce47a594"
+                    ],
+                },
+            ],
+        }
+
+        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph.add_resource_instance_lifecycle(resource_instance_lifecycle)
+        graph.save()
+
+        lifecycle = models.ResourceInstanceLifecycle.objects.get(
+            id="f7a0fd46-4c71-49cb-ae1e-778c96763440"
+        )
+
+        self.assertEqual(lifecycle.name, "Test Lifecycle")
+
+        # Verify the states were created correctly
+        state1 = models.ResourceInstanceLifecycleState.objects.get(
+            id="e2ac2a61-c140-43f5-bf65-3fe8ce47a594"
+        )
+        state2 = models.ResourceInstanceLifecycleState.objects.get(
+            id="0b52dbac-405a-49e0-9151-43ebf2100e6c"
+        )
+        self.assertEqual(state1.name, "State 1")
+        self.assertEqual(state2.name, "State 2")
+
+        # Verify the relationships between states
+        self.assertEqual(
+            list(state1.next_resource_instance_lifecycle_states.all()), [state2]
+        )
+        self.assertEqual(
+            list(state2.previous_resource_instance_lifecycle_states.all()), [state1]
+        )
+
+        # Verify the lifecycle contains the states
+        self.assertIn(state1, lifecycle.resource_instance_lifecycle_states.all())
+        self.assertIn(state2, lifecycle.resource_instance_lifecycle_states.all())

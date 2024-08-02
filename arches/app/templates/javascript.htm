@@ -138,6 +138,14 @@
             "title": "{% trans "Redirected from editable_future_graph" %}",
             "text": "{% trans "editable_future_graphs cannot be manually accessed from the graph designer. You have been redirected to the appropriate page." %}"
         }'
+        resource-report-redirect-from-resource-editor-not-permissioned='{
+            "title": "{% trans "Redirected from the Resource Editor" %}",
+            "text": "{% trans "The current user does not have permission to edit this resource. You have been redirected to the appropriate page." %}"
+        }'
+        resource-report-redirect-from-resource-editor-lifecycle-state='{
+            "title": "{% trans "Redirected from the Resource Editor" %}",
+            "text": "{% trans "This lifecycle state of this resource does not allow editing. You have been redirected to the appropriate page." %}"
+        }'
         graph-publication-update-success='{
             "title": "{% trans "Success!" %}",
             "text": "{% trans "The published graph has been successfully updated." %}"
@@ -621,6 +629,7 @@
         image-tools='{% trans "Image Tools" as imageTools %} "{{ imageTools|escapejs }}"'
         image-service='{% trans "Image Service" as imageService %} "{{ imageService|escapejs }}"'
         switch-image-service='{% trans "Switch Image Service" as switchImageService %} "{{ switchImageService|escapejs }}"'
+        lifecycle-state='{% trans "Lifecycle State" as lifecycleState %} "{{ lifecycleState|escapejs }}"'
         resource-instance-name='{% trans "Resource Instance Name" as resourceInstanceName %} "{{ resourceInstanceName|escapejs }}"'
         related-resource-summary='{% trans "Related Resource Summary" as relatedResourceSummary %} "{{ relatedResourceSummary|escapejs }}"'
         resource-model='{% trans "Resource Model" as resourceModel %} "{{ resourceModel|escapejs }}"'

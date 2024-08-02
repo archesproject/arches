@@ -1,3 +1,4 @@
+import os
 import warnings
 
 from django.apps import AppConfig
@@ -9,6 +10,10 @@ class ArchesAppConfig(AppConfig):
     name = "arches"
     verbose_name = "Arches"
     is_arches_application = False
+
+    def ready(self):
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
+        import arches.app.signals
 
 
 ### GLOBAL DEPRECATIONS ###
