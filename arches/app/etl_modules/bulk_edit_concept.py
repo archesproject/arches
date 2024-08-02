@@ -310,8 +310,8 @@ class BulkConceptEditor(BaseBulkEditor):
             pk=new, valuetype__valuetype="prefLabel"
         )
 
-        unselected_tiles = []
-        resourceids = []
+        unselected_tiles = ()
+        resource_ids = ()
         if tiles_to_remove:
             unselected_tiles = tuple(tiles_to_remove.split(","))
         if search_url:
@@ -319,8 +319,7 @@ class BulkConceptEditor(BaseBulkEditor):
                 self.log_event_details(
                     cursor, "done|Getting resources from search url..."
                 )
-            resourceids = self.get_resourceids_from_search_url(search_url)
-            resourceids = tuple(resourceids)
+            resource_ids = tuple(self.get_resourceids_from_search_url(search_url))
 
         load_details = {
             "graph": graphid,
@@ -337,7 +336,7 @@ class BulkConceptEditor(BaseBulkEditor):
 
         use_celery_bulk_edit = True
         if use_celery_bulk_edit:
-            response = self.run_load_task_async(request)
+            response = self.run_load_task_async(request, self.loadid)
         else:
             response = self.run_load_task(
                 self.userid,
@@ -345,7 +344,7 @@ class BulkConceptEditor(BaseBulkEditor):
                 self.moduleid,
                 graphid,
                 nodeid,
-                resourceids,
+                resource_ids,
                 unselected_tiles,
                 old,
                 new,
@@ -362,10 +361,11 @@ class BulkConceptEditor(BaseBulkEditor):
         tiles_to_remove = request.POST.get("tilesToRemove", None)
         search_url = request.POST.get("search_url", None)
 
+        unselected_tiles = ()
+        resource_ids = ()
         if tiles_to_remove:
             unselected_tiles = tuple(tiles_to_remove.split(","))
 
-        resource_ids = []
         if search_url:
             with connection.cursor() as cursor:
                 self.log_event_details(
@@ -377,7 +377,7 @@ class BulkConceptEditor(BaseBulkEditor):
             (
                 self.userid,
                 self.loadid,
-                self.module_id,
+                self.moduleid,
                 graph_id,
                 node_id,
                 resource_ids,
