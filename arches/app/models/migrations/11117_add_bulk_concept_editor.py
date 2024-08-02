@@ -104,18 +104,10 @@ class Migration(migrations.Migration):
                         SELECT datatype INTO data_type FROM nodes WHERE nodeid = _key::uuid;
                         updated_value = _value::jsonb;
                         IF _key::uuid = node_id THEN
-                            IF data_type = 'concept' THEN
-                                IF _value = old_id THEN
-                                    updated_value = new_id;
-                                END IF;
-                            ELSEIF data_type = 'concept-list' THEN
-                                IF _value::jsonb ? old_id THEN
-                                    IF _value::jsonb ? new_id THEN
-                                        updated_value = _value::jsonb - old_id;
-                                    ELSE
-                                        updated_value = REPLACE(_value, old_id, new_id);
-                                    END IF;
-                                END IF;
+                            IF _value::jsonb ? old_id AND _value::jsonb ? new_id THEN
+                                updated_value = _value::jsonb - old_id;
+                            ELSE
+                                updated_value = (REPLACE(_value, old_id, new_id))::jsonb;
                             END IF;
                         END IF;
                         updated_staged_data = __arches_build_staged_data(
