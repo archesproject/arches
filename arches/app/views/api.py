@@ -113,6 +113,11 @@ class APIBase(View):
         return super(APIBase, self).dispatch(request, *args, **kwargs)
 
 
+class Foo(APIBase):
+    def get(self, request):
+        pass
+
+
 class GetFrontendI18NData(APIBase):
     def get(self, request):
         user_language = get_language()

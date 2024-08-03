@@ -726,6 +726,11 @@ urlpatterns = [
         api.TransformEdtfForTile.as_view(),
         name="transform_edtf_for_tile",
     ),
+    re_path(
+        r"^foo",
+        api.Foo.as_view(),
+        name="api_foo",
+    ),
 ]
 
 # This must be included in core to keep webpack happy, but cannot be appended when running a project.
