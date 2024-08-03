@@ -1,4 +1,3 @@
-from datetime import datetime
 import json
 import logging
 import uuid
@@ -7,16 +6,13 @@ from django.db import connection
 from django.http import HttpRequest
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
-from django.contrib.auth.models import User
 from django.utils.translation import get_language, gettext as _
 from arches.app.etl_modules.base_data_editor import BaseBulkEditor
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
-from arches.app.models.system_settings import settings
 from arches.app.models.models import Value, Language, Node, ETLModule
 from arches.app.models.concept import Concept
 from arches.app.utils.db_utils import dictfetchall
-from arches.app.utils.index_database import index_resources_by_transaction
 from arches.app.views.search import search_results
 from arches.app.tasks import edit_bulk_concept_data
 from arches.app.search.mappings import RESOURCES_INDEX
@@ -28,9 +24,6 @@ from arches.app.search.elasticsearch_dsl_builder import (
     Nested,
     NestedAgg,
     Query,
-    Terms,
-    Wildcard,
-    Regex,
 )
 
 logger = logging.getLogger(__name__)
@@ -45,33 +38,6 @@ def log_event_details(cursor, loadid, details):
         """UPDATE load_event SET load_description = concat(load_description, %s) WHERE loadid = %s""",
         (details, loadid),
     )
-
-
-def perth_items(items):
-    id_name_pairs = []
-    if len(items) % 2 == 0:
-        id_name_pairs = [[items[i], items[i + 1]] for i in range(0, len(items), 2)]
-    else:
-        count = 0
-        help_var = ""
-        extra = ""
-
-        for i in range(len(items)):
-
-            if count == 0:
-                extra = ""  # Reset extra for each iteration
-                count += 1
-                help_var = items[i]
-            else:
-                if i + 1 <= len(items):
-                    try:
-                        uuid.UUID(items[i + 1])
-                        count = 0
-                        extra = extra + items[i]
-                        id_name_pairs.append([help_var, extra])
-                    except:
-                        extra = items[i] + ","
-    return id_name_pairs
 
 
 class BulkConceptEditor(BaseBulkEditor):
