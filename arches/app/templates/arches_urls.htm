@@ -111,8 +111,6 @@
         return "{% url "api_nodes" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", nodeid);
     }'
     api_node_value="{% url 'api_node_value' %}"
-    api_resource_instance_lifecycle_states='{% url "api_resource_instance_lifecycle_states" %}'
-    api_resource_instance_lifecycle_state='(resourceid)=>{return "{% url "api_resource_instance_lifecycle_state" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", resourceid)}'
     api_resource_report='(resourceid)=>{return "{% url "api_resource_report" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", resourceid)}'
     api_bulk_resource_report="{% url 'api_bulk_resource_report' %}"
     api_bulk_disambiguated_resource_instance="{% url 'api_bulk_disambiguated_resource_instance' %}"
