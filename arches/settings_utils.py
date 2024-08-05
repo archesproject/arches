@@ -216,6 +216,9 @@ def generate_frontend_configuration():
             },
         }
 
+        sys.stderr.write(
+            "!!!!!!!!!!", os.path.join(base_path, "..", ".tsconfig-paths.json")
+        )
         with open(os.path.join(base_path, "..", ".tsconfig-paths.json"), "w") as file:
             json.dump(tsconfig_paths_data, file, indent=4)
 
