@@ -18,42 +18,116 @@ from arches.app.models.resource import Resource
 from django.contrib.auth.models import User
 from arches.app.models.models import ResourceInstance
 
-from arches.app.permissions.arches_standard import (
-    ArchesStandardPermissionFramework,
+from arches.app.models.system_settings import settings
+
+from arches.app.permissions.arches_permission_base import (
     ResourceInstancePermissions,
 )
+from arches.app.permissions.arches_permission_base import ArchesPermissionBase
 from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Terms
+from guardian.shortcuts import (
+    get_perms,
+    get_group_perms,
+    get_user_perms,
+    get_users_with_perms,
+    get_groups_with_perms,
+    get_perms_for_model,
+    assign_perm,
+    remove_perm,
+)
 
 
-class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
+class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
     def get_sets_for_user(self, user: User, perm: str) -> set[str] | None:
         # We do not do set filtering - None is allow-all for sets.
         return None if user and user.username != "anonymous" else set()
 
     def get_restricted_users(self, resource: ResourceInstance) -> dict[str, list[int]]:
-        """Fetches _explicitly_ restricted users."""
-        return super().get_restricted_users(resource)
+        """
+        Takes a resource instance and identifies which users are explicitly restricted from
+        reading, editing, deleting, or accessing it.
+
+        """
+
+        user_perms = get_users_with_perms(
+            resource, attach_perms=True, with_group_users=False
+        )
+        user_and_group_perms = get_users_with_perms(
+            resource, attach_perms=True, with_group_users=True
+        )
+
+        result: dict[str, list[int]] = {
+            "no_access": [],
+            "cannot_read": [],
+            "cannot_write": [],
+            "cannot_delete": [],
+        }
+
+        for user, perms in user_and_group_perms.items():
+            if user.is_superuser:
+                pass
+            elif user not in user_perms:
+                for k, v in result.items():
+                    v.append(user.id)
+            else:
+                if "view_resourceinstance" not in perms:
+                    result["cannot_read"].append(user.id)
+                if "change_resourceinstance" not in perms:
+                    result["cannot_write"].append(user.id)
+                if "delete_resourceinstance" not in perms:
+                    result["cannot_delete"].append(user.id)
+
+        return result
 
     def check_resource_instance_permissions(
         self, user: User, resourceid: str, permission: str
     ) -> ResourceInstancePermissions:
-        result = super().check_resource_instance_permissions(
-            user, resourceid, permission
-        )
+
+        result = ResourceInstancePermissions()
+        if resourceid == settings.SYSTEM_SETTINGS_RESOURCE_ID:
+            if not user.groups.filter(name="System Administrator").exists():
+                result["permitted"] = False
+                return result
+
+        resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
+        result["resource"] = resource
+
+        all_perms = self.get_perms(user, resource)
+        if len(all_perms) == 0:  # no permissions assigned. deny.
+            result["permitted"] = False
+        else:
+            user_permissions = self.get_user_perms(user, resource)
+            group_permissions = self.get_group_perms(user, resource)
+            if permission in user_permissions:  # user is permitted
+                result["permitted"] = True
+
+            elif (
+                permission in group_permissions
+            ):  # group is permitted - no user override
+                result["permitted"] = True
+
+            elif (
+                permission not in all_perms
+            ):  # neither user nor group explicitly permits or restricts.
+                result["permitted"] = False  # restriction implied
 
         if result and result.get("permitted", None) is not None:
+            print("Permitted is not None")
             # This is a safety check - we don't want an unpermissioned user
             # defaulting to having access (allowing anonymous users is still
             # possible by assigning appropriate group permissions).
             if result["permitted"] == "unknown":
+                print("permitted is unknown")
                 result["permitted"] = False
             elif result["permitted"] is False:
+                print("permitted is false")
                 # This covers the case where one group denies permission and another
                 # allows it. Ideally, the deny would override (as normal in Arches) but
                 # this prevents us from having a default deny rule that another group
                 # can override (as deny rules in Arches must be explicit for a resource).
                 resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
                 user_permissions = self.get_user_perms(user, resource)
+                print("user_permissions", user_permissions)
                 if "no_access_to_resourceinstance" not in user_permissions:
                     group_permissions = self.get_group_perms(user, resource)
 
@@ -62,9 +136,6 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
                         result["permitted"] = True
 
         return result
-
-    def process_new_user(self, instance: User, created: bool) -> None:
-        pass
 
     def update_mappings(self):
         mappings = {}
@@ -85,22 +156,30 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
         permissions = {}
         group_read_allowances = [
             group.id
-            for group in self.get_groups_for_object("view_resourceinstance", resource)
+            for group in self.get_groups_with_permission_for_object(
+                "view_resourceinstance", resource
+            )
         ]
         permissions["groups_read"] = group_read_allowances
         group_edit_allowances = [
             group.id
-            for group in self.get_groups_for_object("change_resourceinstance", resource)
+            for group in self.get_groups_with_permission_for_object(
+                "change_resourceinstance", resource
+            )
         ]
         permissions["groups_edit"] = group_edit_allowances
         users_read_allowances = [
             user.id
-            for user in self.get_users_for_object("view_resourceinstance", resource)
+            for user in self.get_users_with_permission_for_object(
+                "view_resourceinstance", resource
+            )
         ]
         permissions["users_read"] = users_read_allowances
         users_edit_allowances = [
             user.id
-            for user in self.get_users_for_object("change_resourceinstance", resource)
+            for user in self.get_users_with_permission_for_object(
+                "change_resourceinstance", resource
+            )
         ]
         permissions["users_edit"] = users_edit_allowances
         permissions["principal_user"] = [resource.principaluser_id]
@@ -171,3 +250,31 @@ class ArchesDefaultDenyPermissionFramework(ArchesStandardPermissionFramework):
         )
 
         return result
+
+    def user_can_read_resource(self, user: User, resourceid: str | None = None) -> bool:
+        """
+        Requires that a user be able to read an instance and read a single nodegroup of a resource
+
+        """
+        if user.is_authenticated:
+            if user.is_superuser:
+                return True
+            if resourceid is not None and resourceid != "":
+                result = self.check_resource_instance_permissions(
+                    user, resourceid, "view_resourceinstance"
+                )
+                if result is not None:
+                    if result["permitted"] == "unknown":
+                        return self.user_has_resource_model_permissions(
+                            user, ["models.read_nodegroup"], result["resource"]
+                        )
+                    else:
+                        return result["permitted"]
+                else:
+                    return False
+
+            return (
+                len(self.get_resource_types_by_perm(user, ["models.read_nodegroup"]))
+                > 0
+            )
+        return False
