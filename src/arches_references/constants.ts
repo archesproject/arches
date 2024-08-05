@@ -1,13 +1,17 @@
-import type { InjectionKey } from "vue";
+import type { InjectionKey, Ref } from "vue";
 import type { Language } from "@/arches/types";
 import type {
     ControlledList,
     ControlledListItem,
 } from "@/arches_references/types";
 
-export const displayedRowKey = Symbol() as InjectionKey<ControlledList | null>;
-export const itemKey = Symbol() as InjectionKey<ControlledListItem>;
-export const selectedLanguageKey = Symbol() as InjectionKey<Language>;
+// Injection keys
+type DisplayedRowRef = Ref<ControlledList | ControlledListItem | null>;
+export const displayedRowKey = Symbol() as InjectionKey<DisplayedRowRef>;
+type ItemRef = Ref<ControlledListItem>;
+export const itemKey = Symbol() as InjectionKey<ItemRef>;
+type LanguageRef = Ref<Language>;
+export const selectedLanguageKey = Symbol() as InjectionKey<LanguageRef>;
 
 // Constants
 export const PREF_LABEL = "prefLabel";

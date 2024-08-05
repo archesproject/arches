@@ -7,11 +7,12 @@ import LetterCircle from "@/arches_references/components/misc/LetterCircle.vue";
 import ListCharacteristic from "@/arches_references/components/editor/ListCharacteristic.vue";
 import ReferenceNodeLink from "@/arches_references/components/editor/ReferenceNodeLink.vue";
 
-import type { DisplayedListRefAndSetter } from "@/arches_references/types";
+import type { Ref } from "vue";
+import type { ControlledList } from "@/arches_references/types";
 
-const { displayedRow: list } = inject(
-    displayedRowKey,
-) as DisplayedListRefAndSetter;
+const { displayedRow: list } = inject(displayedRowKey) as unknown as {
+    displayedRow: Ref<ControlledList>;
+};
 
 const { $gettext } = useGettext();
 </script>

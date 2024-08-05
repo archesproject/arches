@@ -1,5 +1,3 @@
-import type { Ref } from "vue";
-
 export interface Value {
     id: string;
     valuetype_id: string;
@@ -93,6 +91,8 @@ export type Selectable =
     | ControlledListItem
     | NewControlledListItem;
 
+export type RowSetter = (val: Selectable | null) => void;
+
 export interface ReferencingNode {
     id: string;
     name: string;
@@ -106,22 +106,6 @@ export interface MoveLabels {
     moveUp: string;
     moveDown: string;
     changeParent: string;
-}
-
-// Prop injection types
-export interface DisplayedRowRefAndSetter {
-    displayedRow: Ref<Selectable | null>;
-    setDisplayedRow: (val: Selectable | null) => void;
-}
-
-export interface DisplayedListRefAndSetter {
-    displayedRow: Ref<ControlledList | null>;
-    setDisplayedRow: (val: Selectable | null) => void;
-}
-
-export interface DisplayedListItemRefAndSetter {
-    displayedRow: Ref<ControlledListItem | null>;
-    setDisplayedRow: (val: Selectable | null) => void;
 }
 
 // From PrimeVue, not importable directly

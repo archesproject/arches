@@ -14,12 +14,14 @@ import type { Language } from "@/arches/types";
 import type {
     ControlledList,
     ControlledListItem,
-    DisplayedRowRefAndSetter,
+    Selectable,
 } from "@/arches_references/types";
 
 const { $gettext } = useGettext();
 
-const { displayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
+const { displayedRow } = inject(displayedRowKey) as unknown as {
+    displayedRow: Ref<Selectable>;
+};
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
 const heading = computed(() => {

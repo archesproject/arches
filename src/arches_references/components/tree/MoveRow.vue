@@ -14,6 +14,7 @@ import {
     selectedLanguageKey,
 } from "@/arches_references/constants.ts";
 import {
+    dataIsItem,
     findNodeInTree,
     itemAsNode,
     listAsNode,
@@ -29,17 +30,27 @@ import type { Language } from "@/arches/types";
 import type {
     ControlledList,
     ControlledListItem,
-    DisplayedListItemRefAndSetter,
     MoveLabels,
+    RowSetter,
+    Selectable,
 } from "@/arches_references/types";
 
 const toast = useToast();
 const { $gettext } = useGettext();
 
-const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
-const { displayedRow, setDisplayedRow } = inject(
-    displayedRowKey,
-) as DisplayedListItemRefAndSetter;
+const selectedLanguage = inject(
+    selectedLanguageKey,
+) as Ref<Language> as Ref<Language>;
+const {
+    displayedRow,
+    setDisplayedRow,
+}: {
+    displayedRow: Ref<Selectable>;
+    setDisplayedRow: RowSetter;
+} = inject(displayedRowKey) as unknown as {
+    displayedRow: Ref<Selectable>;
+    setDisplayedRow: RowSetter;
+};
 
 const { moveLabels, node } = defineProps<{
     moveLabels: MoveLabels;
@@ -88,8 +99,16 @@ const isLastItem = (item: ControlledListItem) => {
 };
 
 const setMovingItem = (node: TreeNode) => {
+    if (!displayedRow.value || !dataIsItem(displayedRow.value)) {
+        throw new Error();
+    }
     movingItem.value = findNodeInTree(
-        [itemAsNode(displayedRow.value, selectedLanguage.value)],
+        [
+            itemAsNode(
+                displayedRow.value as ControlledListItem,
+                selectedLanguage.value,
+            ),
+        ],
         node.key,
     );
 };

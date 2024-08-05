@@ -15,11 +15,12 @@ import {
     PREF_LABEL,
 } from "@/arches_references/constants.ts";
 
-import type { DisplayedListItemRefAndSetter } from "@/arches_references/types";
+import type { Ref } from "vue";
+import type { ControlledListItem } from "@/arches_references/types";
 
-const { displayedRow: item } = inject(
-    displayedRowKey,
-) as DisplayedListItemRefAndSetter;
+const { displayedRow: item } = inject(displayedRowKey) as unknown as {
+    displayedRow: Ref<ControlledListItem>;
+};
 provide(itemKey, item);
 </script>
 

@@ -25,9 +25,10 @@ import type { Selectable } from "@/arches_references/types";
 const splash = "splash";
 
 const displayedRow: Ref<Selectable | null> = ref(null);
-function setDisplayedRow(val: Selectable | null) {
+const setDisplayedRow = (val: Selectable | null) => {
     displayedRow.value = val;
-}
+};
+// @ts-expect-error vue-tsc doesn't like arbitrary properties here
 provide(displayedRowKey, { displayedRow, setDisplayedRow });
 
 const selectedLanguage: Ref<Language> = ref(

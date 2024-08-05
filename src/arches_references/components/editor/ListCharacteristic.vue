@@ -13,15 +13,16 @@ import {
 } from "@/arches_references/constants.ts";
 import { vFocus } from "@/arches_references/utils.ts";
 
-import type { DisplayedListRefAndSetter } from "@/arches_references/types";
+import type { Ref } from "vue";
+import type { ControlledList } from "@/arches_references/types";
 
 const props = defineProps<{
     editable: boolean;
     label: string;
 }>();
-const { displayedRow: list } = inject(
-    displayedRowKey,
-) as DisplayedListRefAndSetter;
+const { displayedRow: list } = inject(displayedRowKey) as unknown as {
+    displayedRow: Ref<ControlledList>;
+};
 
 const editing = ref(false);
 const disabled = computed(() => {

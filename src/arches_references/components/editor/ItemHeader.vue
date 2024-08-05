@@ -11,7 +11,9 @@ import type { Language } from "@/arches/types";
 import type { ControlledListItem } from "@/arches_references/types";
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
-const item = inject(itemKey) as Ref<ControlledListItem>;
+const item = inject(
+    itemKey,
+) as Ref<ControlledListItem> as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
 

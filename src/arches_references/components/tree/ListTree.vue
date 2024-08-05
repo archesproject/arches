@@ -18,9 +18,9 @@ import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/arches/types";
 import type {
-    DisplayedRowRefAndSetter,
     ControlledList,
     ControlledListItem,
+    RowSetter,
 } from "@/arches_references/types";
 
 const { $gettext } = useGettext();
@@ -52,7 +52,9 @@ const nextFilterChangeNeedsExpandAll = ref(false);
 const expandedKeysSnapshotBeforeSearch = ref<TreeExpandedKeys>({});
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
-const { setDisplayedRow } = inject(displayedRowKey) as DisplayedRowRefAndSetter;
+const { setDisplayedRow } = inject(displayedRowKey) as unknown as {
+    setDisplayedRow: RowSetter;
+};
 
 const updateSelectedAndExpanded = (node: TreeNode) => {
     setDisplayedRow(node.data);

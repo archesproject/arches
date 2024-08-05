@@ -20,7 +20,6 @@ import type { ControlledListItem } from "@/arches_references/types";
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const editing = ref(false);
-
 const formValue = ref("");
 
 const inputValue = computed({
