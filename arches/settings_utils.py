@@ -170,6 +170,12 @@ def generate_frontend_configuration(app_config):
         app_root_path = app_config.path
         root_dir_path = os.path.realpath(settings.ROOT_DIR)
 
+        if app_config.name == "arches":
+            app_root_path = os.path.join(app_config.path, "app")
+            base_path = root_dir_path
+        else:
+            base_path = app_root_path
+
         arches_app_names = list_arches_app_names(application_name=app_config.name)
         arches_app_paths = list_arches_app_paths(application_name=app_config.name)
         path_lookup = dict(zip(arches_app_names, arches_app_paths, strict=True))
@@ -185,11 +191,6 @@ def generate_frontend_configuration(app_config):
             "STATIC_URL": settings.STATIC_URL,
             "WEBPACK_DEVELOPMENT_SERVER_PORT": settings.WEBPACK_DEVELOPMENT_SERVER_PORT,
         }
-
-        if app_config.name == "Arches":
-            base_path = root_dir_path
-        else:
-            base_path = app_root_path
 
         frontend_configuration_settings_path = os.path.realpath(
             os.path.join(base_path, "..", ".frontend-configuration-settings.json")
