@@ -6,8 +6,8 @@ import type {
 } from "@/arches_references/types";
 
 export const displayedRowKey = Symbol() as InjectionKey<ControlledList | null>;
-export const itemKey = Symbol() as InjectionKey<ControlledListItem | null>;
-export const selectedLanguageKey = Symbol() as InjectionKey<Language | null>;
+export const itemKey = Symbol() as InjectionKey<ControlledListItem>;
+export const selectedLanguageKey = Symbol() as InjectionKey<Language>;
 
 // Constants
 export const PREF_LABEL = "prefLabel";

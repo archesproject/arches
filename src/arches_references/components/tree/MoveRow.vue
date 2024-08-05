@@ -54,7 +54,7 @@ const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", {
 const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
     required: true,
 });
-const movingItem = defineModel<TreeNode>("movingItem", { required: true });
+const movingItem = defineModel<TreeNode>("movingItem");
 const nextNewItem = defineModel<NewControlledListItem>("nextNewItem");
 const newLabelFormValue = defineModel<string>("newLabelFormValue", {
     required: true,
@@ -70,8 +70,8 @@ watch(displayedRow, () => {
 
 const isFirstItem = (item: ControlledListItem) => {
     const siblings: TreeNode[] = item.parent_id
-        ? findNodeInTree(tree.value, item.parent_id).data.children
-        : findNodeInTree(tree.value, item.list_id).data.items;
+        ? findNodeInTree(tree.value, item.parent_id).data!.children
+        : findNodeInTree(tree.value, item.list_id).data!.items;
     if (!siblings) {
         throw new Error();
     }
@@ -136,7 +136,7 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
 
     let siblings: ControlledListItem[];
     if (item.parent_id) {
-        siblings = findNodeInTree(tree.value, item.parent_id).children.map(
+        siblings = findNodeInTree(tree.value, item.parent_id).children!.map(
             (child: TreeNode) => child.data,
         );
     } else {

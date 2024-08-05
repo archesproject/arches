@@ -5,6 +5,7 @@ import type { Language } from "@/arches/types";
 import type {
     ControlledList,
     ControlledListItem,
+    NewOrExistingControlledListItem,
     Selectable,
 } from "@/arches_references/types";
 
@@ -55,11 +56,15 @@ export const findNodeInTree = (tree: TreeNode[], itemId: string) => {
         }
     }
 
-    return recurse(tree);
+    const result = recurse(tree);
+    if (!result) {
+        throw new Error();
+    }
+    return result;
 };
 
 export const itemAsNode = (
-    item: ControlledListItem,
+    item: NewOrExistingControlledListItem,
     selectedLanguage: Language,
 ): TreeNode => {
     return {

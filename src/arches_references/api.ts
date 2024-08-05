@@ -9,6 +9,7 @@ import type {
     ControlledListItemImage,
     ControlledListItemImageMetadata,
     Value,
+    NewControlledListItem,
     NewControlledListItemImageMetadata,
     NewOrExistingValue,
 } from "@/arches_references/types";
@@ -51,7 +52,7 @@ export const createList = async (name: string) => {
     }
 };
 
-export const createItem = async (item: ControlledListItem) => {
+export const createItem = async (item: NewControlledListItem) => {
     const response = await fetch(arches.urls.controlled_list_item_add, {
         method: "POST",
         headers: { "X-CSRFToken": getToken() },

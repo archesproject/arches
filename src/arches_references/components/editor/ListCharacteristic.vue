@@ -49,7 +49,7 @@ const save = async () => {
     const originalValue = list.value!.name;
     list.value!.name = formValue.value.trim();
     try {
-        await patchList(list.value, field);
+        await patchList(list.value!, field);
     } catch (error) {
         toast.add({
             severity: ERROR,

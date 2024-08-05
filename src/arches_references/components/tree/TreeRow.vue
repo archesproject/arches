@@ -207,7 +207,7 @@ const acceptNewItemShortcutEntry = async () => {
         newItem.parent_id ?? newItem.list_id,
     );
     parent.children = [
-        ...parent.children.filter(
+        ...parent.children!.filter(
             (child: TreeNode) => typeof child.key === "string",
         ),
         itemAsNode(newItem, selectedLanguage.value),
@@ -249,7 +249,7 @@ const acceptNewListShortcutEntry = async () => {
     }
     tree.value = [
         ...tree.value.filter((cList) => typeof cList.data.id === "string"),
-        listAsNode(newList),
+        listAsNode(newList, selectedLanguage.value),
     ];
     selectedKeys.value = { [newList.id]: true };
     setDisplayedRow(newList);

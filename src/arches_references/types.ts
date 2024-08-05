@@ -9,7 +9,7 @@ export interface Value {
 }
 
 export interface NewValue {
-    id: number;
+    id: string | null;
     valuetype_id: string;
     language_id: string;
     value: string;
@@ -30,7 +30,7 @@ export interface ControlledListItemImageMetadata {
 }
 
 export interface NewControlledListItemImageMetadata {
-    id: number;
+    id: string | null;
     list_item_image_id: string;
     language_id: string;
     metadata_type: string;
@@ -68,7 +68,7 @@ export interface ControlledListItem {
 }
 
 export interface NewControlledListItem {
-    id: number;
+    id: string | null;
     list_id: string;
     uri: string;
     sortorder: number;
@@ -79,6 +79,10 @@ export interface NewControlledListItem {
     parent_id: string | null;
     depth: number;
 }
+
+export type NewOrExistingControlledListItem =
+    | ControlledListItem
+    | NewControlledListItem;
 
 export interface ControlledList {
     id: string;
