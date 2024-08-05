@@ -22,7 +22,7 @@ import {
     METADATA_CHOICES,
     itemKey,
 } from "@/arches_references/constants.ts";
-import { languageNameFromCode } from "@/arches_references/utils.ts";
+import { dataIsNew, languageNameFromCode } from "@/arches_references/utils.ts";
 import AddMetadata from "@/arches_references/components/editor/AddMetadata.vue";
 
 import type { Ref } from "vue";
@@ -73,9 +73,9 @@ const metadataLabel = (metadataType: string) => {
 
 const saveMetadata = async (event: DataTableRowEditInitEvent) => {
     // normalize new metadata numbers to null
-    const normalizedNewData: ControlledListItemImageMetadata = {
+    const normalizedNewData: NewOrExistingControlledListItemImageMetadata = {
         ...event.newData,
-        id: typeof event.newData.id === "string" ? event.newData.id : null,
+        id: dataIsNew(event.newData) ? null : event.newData.id,
     };
     let upsertedMetadata: ControlledListItemImageMetadata;
     try {
@@ -101,9 +101,9 @@ const saveMetadata = async (event: DataTableRowEditInitEvent) => {
 };
 
 const issueDeleteMetadata = async (
-    metadata: NewOrExistingControlledListItemImageMetadata,
+    metadata: ControlledListItemImageMetadata,
 ) => {
-    if (typeof metadata.id === "number") {
+    if (dataIsNew(metadata)) {
         removeImageMetadata(metadata);
         return;
     }

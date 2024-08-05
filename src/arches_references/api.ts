@@ -8,10 +8,10 @@ import type {
     ControlledListItem,
     ControlledListItemImage,
     ControlledListItemImageMetadata,
-    Value,
     NewControlledListItem,
-    NewControlledListItemImageMetadata,
-    NewOrExistingValue,
+    NewOrExistingControlledListItemImageMetadata,
+    NewValue,
+    Value,
 } from "@/arches_references/types";
 
 function getToken() {
@@ -174,7 +174,7 @@ export const deleteItems = async (itemIds: string[]) => {
     return true;
 };
 
-export const upsertValue = async (value: NewOrExistingValue) => {
+export const upsertValue = async (value: Value | NewValue) => {
     const url = value.id
         ? arches.urls.controlled_list_item_value(value.id)
         : arches.urls.controlled_list_item_value_add;
@@ -215,7 +215,7 @@ export const deleteValue = async (value: Value) => {
 };
 
 export const upsertMetadata = async (
-    metadata: NewControlledListItemImageMetadata,
+    metadata: NewOrExistingControlledListItemImageMetadata,
 ) => {
     const url = metadata.id
         ? arches.urls.controlled_list_item_image_metadata(metadata.id)

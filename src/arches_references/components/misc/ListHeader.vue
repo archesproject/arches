@@ -13,6 +13,7 @@ import type { Ref } from "vue";
 import type { Language } from "@/arches/types";
 import type {
     ControlledList,
+    ControlledListItem,
     DisplayedRowRefAndSetter,
 } from "@/arches_references/types";
 
@@ -36,7 +37,7 @@ const heading = computed(() => {
         "Item Editor > %{bestLabel}",
         {
             bestLabel: bestLabel(
-                displayedRow.value,
+                displayedRow.value as ControlledListItem,
                 selectedLanguage.value.code,
             ).value,
         },
@@ -63,10 +64,12 @@ const heading = computed(() => {
     display: flex;
     align-items: center;
 }
+
 i {
     margin-left: 1rem;
     margin-top: 0.25rem;
 }
+
 h2 {
     font-size: 1.6rem;
     margin: 1rem;

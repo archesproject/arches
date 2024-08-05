@@ -31,7 +31,6 @@ import type {
     ControlledList,
     ControlledListItem,
     DisplayedRowRefAndSetter,
-    NewControlledList,
 } from "@/arches_references/types";
 
 const { displayedRow, setDisplayedRow } = inject(
@@ -46,7 +45,7 @@ const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
 const isMultiSelecting = defineModel<boolean>("isMultiSelecting", {
     required: true,
 });
-const nextNewList = defineModel<NewControlledList>("nextNewList");
+const nextNewList = defineModel<ControlledList>("nextNewList");
 const newListFormValue = defineModel<string>("newListFormValue", {
     required: true,
 });
@@ -59,10 +58,10 @@ const confirm = useConfirm();
 const toast = useToast();
 
 const multiSelectStateFromDisplayedRow = computed(() => {
-    if (!displayedRow.value) {
+    if (!displayedRow.value || !displayedRow.value.id) {
         return {};
     }
-    const newSelectedKeys = {
+    const newSelectedKeys: TreeSelectionKeys = {
         [displayedRow.value.id]: { checked: true, partialChecked: false },
     };
 
@@ -94,8 +93,8 @@ const deleteDropdownOptions = [
 ];
 
 const createList = () => {
-    const newList: NewControlledList = {
-        id: newListCounter.value,
+    const newList: ControlledList = {
+        id: newListCounter.value.toString(),
         name: newListFormValue.value,
         dynamic: false,
         search_only: false,

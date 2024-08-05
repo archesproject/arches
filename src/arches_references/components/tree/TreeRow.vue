@@ -21,6 +21,7 @@ import {
 } from "@/arches_references/constants.ts";
 import {
     bestLabel,
+    dataIsNew,
     findNodeInTree,
     itemAsNode,
     listAsNode,
@@ -39,6 +40,7 @@ import type {
     DisplayedListItemRefAndSetter,
     MoveLabels,
     NewControlledListItem,
+    NewValue,
 } from "@/arches_references/types";
 
 const toast = useToast();
@@ -56,7 +58,7 @@ const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
 const movingItem = defineModel<TreeNode>("movingItem");
 const refetcher = defineModel<number>("refetcher", { required: true });
 const rerenderTree = defineModel<number>("rerenderTree", { required: true });
-const nextNewItem = defineModel<NewControlledListItem>("nextNewItem");
+const nextNewItem = defineModel<ControlledListItem>("nextNewItem");
 const newLabelFormValue = defineModel<string>("newLabelFormValue", {
     required: true,
 });
@@ -160,17 +162,20 @@ const setParent = async (parentNode: TreeNode) => {
 };
 
 const isNewList = (node: TreeNode) => {
-    return nodeIsList(node) && typeof node.data.id === "number";
+    return nodeIsList(node) && dataIsNew(node.data);
 };
 
 const isNewItem = (node: TreeNode) => {
-    return !nodeIsList(node) && typeof node.data.id === "number";
+    return !nodeIsList(node) && dataIsNew(node.data);
 };
 
 const acceptNewItemShortcutEntry = async () => {
     let newItem: ControlledListItem;
     try {
-        newItem = await createItem({ ...nextNewItem.value, id: null });
+        newItem = await createItem({
+            ...nextNewItem.value,
+            id: null,
+        } as NewControlledListItem);
     } catch (error) {
         toast.add({
             severity: ERROR,
@@ -180,7 +185,7 @@ const acceptNewItemShortcutEntry = async () => {
         });
         return;
     }
-    const newValue = {
+    const newValue: NewValue = {
         ...nextNewItem.value!.values[0],
         id: null,
         list_item_id: newItem.id,
@@ -207,9 +212,7 @@ const acceptNewItemShortcutEntry = async () => {
         newItem.parent_id ?? newItem.list_id,
     );
     parent.children = [
-        ...parent.children!.filter(
-            (child: TreeNode) => typeof child.key === "string",
-        ),
+        ...parent.children!.filter((child: TreeNode) => !dataIsNew(child.data)),
         itemAsNode(newItem, selectedLanguage.value),
     ];
     if (nodeIsList(parent)) {
@@ -248,7 +251,7 @@ const acceptNewListShortcutEntry = async () => {
         return;
     }
     tree.value = [
-        ...tree.value.filter((cList) => typeof cList.data.id === "string"),
+        ...tree.value.filter((cList) => !dataIsNew(cList.data)),
         listAsNode(newList, selectedLanguage.value),
     ];
     selectedKeys.value = { [newList.id]: true };

@@ -5,8 +5,9 @@ import type { Language } from "@/arches/types";
 import type {
     ControlledList,
     ControlledListItem,
-    NewOrExistingControlledListItem,
+    ControlledListItemImageMetadata,
     Selectable,
+    Value,
 } from "@/arches_references/types";
 
 // Duck-typing helpers
@@ -22,7 +23,18 @@ export const nodeIsItem = (node: TreeNode) => {
 export const nodeIsList = (node: TreeNode) => {
     return dataIsList(node.data);
 };
+export const dataIsNew = (
+    node:
+        | Selectable
+        | ControlledListItem
+        | Value
+        | ControlledListItemImageMetadata,
+) => {
+    // UUID minted by the server will have a `-`.
+    return node.id === null || !node.id.includes("-");
+};
 
+// Finders
 export const bestLabel = (item: ControlledListItem, languageCode: string) => {
     const valuesInLang = item.values.filter(
         (value) => value.language_id === languageCode,
@@ -63,8 +75,9 @@ export const findNodeInTree = (tree: TreeNode[], itemId: string) => {
     return result;
 };
 
+// Shapers
 export const itemAsNode = (
-    item: NewOrExistingControlledListItem,
+    item: ControlledListItem,
     selectedLanguage: Language,
 ): TreeNode => {
     return {
@@ -123,6 +136,7 @@ export const makeSortOrderMap = (list: ControlledList) => {
     return map;
 };
 
+// Actions
 export const reorderItems = (
     list: ControlledList,
     item: ControlledListItem,
@@ -217,6 +231,7 @@ export const reorderItems = (
     recalculateSortOrderRecursive(list, list.items);
 };
 
+// Directives
 export const vFocus = {
     /*
     The editor (pencil) button from the DataTable hogs focus with a

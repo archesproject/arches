@@ -12,28 +12,28 @@ import {
     NOTE_CHOICES,
     PREF_LABEL,
 } from "@/arches_references/constants.ts";
+import { dataIsNew } from "@/arches_references/utils.ts";
 
 import type { Ref } from "vue";
 import type { Language } from "@/arches/types";
 import type {
     ControlledListItem,
     Value,
-    NewValue,
     ValueType,
 } from "@/arches_references/types";
 
 const { valueType, makeNewValueEditable } = defineProps<{
     valueType?: ValueType;
-    makeNewValueEditable: (newValue: NewValue, index: number) => void;
+    makeNewValueEditable: (newValue: Value, index: number) => void;
 }>();
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
 
-const newValue: Ref<NewValue> = computed(() => {
+const newValue: Ref<Value> = computed(() => {
     const otherNewValueIds = item.value.values
-        .filter((value: NewValue | Value) => typeof value.id === "number")
-        .map((value) => value.id as number);
+        .filter((value: Value) => dataIsNew(value))
+        .map((value) => Number.parseInt(value.id));
 
     const maxOtherNewValueId = Math.max(...otherNewValueIds, 0);
 
@@ -68,7 +68,7 @@ const newValue: Ref<NewValue> = computed(() => {
     }
 
     return {
-        id: maxOtherNewValueId + 1,
+        id: (maxOtherNewValueId + 1).toString(),
         valuetype_id: nextValueType ?? NOTE_CHOICES.scope,
         language_id: nextLanguageCode,
         value: "",

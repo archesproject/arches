@@ -9,14 +9,13 @@ export interface Value {
 }
 
 export interface NewValue {
-    id: string | null;
+    id: null;
     valuetype_id: string;
     language_id: string;
     value: string;
-    list_item_id: string | number;
+    list_item_id: string;
 }
 
-export type NewOrExistingValue = Value | NewValue;
 export type ValueCategory = string;
 export type ValueType = string;
 
@@ -30,7 +29,7 @@ export interface ControlledListItemImageMetadata {
 }
 
 export interface NewControlledListItemImageMetadata {
-    id: string | null;
+    id: null;
     list_item_image_id: string;
     language_id: string;
     metadata_type: string;
@@ -51,7 +50,7 @@ export interface ControlledListItemImage {
     id: string;
     list_item_id: string;
     url: string;
-    metadata: NewOrExistingControlledListItemImageMetadata[];
+    metadata: ControlledListItemImageMetadata[];
 }
 
 export interface ControlledListItem {
@@ -60,29 +59,25 @@ export interface ControlledListItem {
     uri: string;
     sortorder: number;
     guide: boolean;
-    values: NewOrExistingValue[];
+    values: Value[];
     images: ControlledListItemImage[];
     children: ControlledListItem[];
-    parent_id: string | null;
+    parent_id: string;
     depth: number;
 }
 
 export interface NewControlledListItem {
-    id: string | null;
+    id: null;
     list_id: string;
     uri: string;
     sortorder: number;
     guide: boolean;
-    values: NewOrExistingValue[];
+    values: Value[];
     images: ControlledListItemImage[];
     children: ControlledListItem[];
     parent_id: string | null;
     depth: number;
 }
-
-export type NewOrExistingControlledListItem =
-    | ControlledListItem
-    | NewControlledListItem;
 
 export interface ControlledList {
     id: string;
@@ -93,19 +88,9 @@ export interface ControlledList {
     nodes: ReferencingNode[];
 }
 
-export interface NewControlledList {
-    id: number;
-    name: string;
-    dynamic: boolean;
-    search_only: boolean;
-    items: ControlledListItem[];
-    nodes: ReferencingNode[];
-}
-
 export type Selectable =
     | ControlledList
     | ControlledListItem
-    | NewControlledList
     | NewControlledListItem;
 
 export interface ReferencingNode {

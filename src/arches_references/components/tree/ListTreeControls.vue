@@ -5,7 +5,7 @@ import PresentationControls from "@/arches_references/components/tree/Presentati
 
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree/Tree";
 import type { TreeNode } from "primevue/treenode";
-import type { NewControlledList } from "@/arches_references/types";
+import type { ControlledList } from "@/arches_references/types";
 
 const controlledListItemsTree = defineModel<TreeNode[]>({ required: true });
 const rerenderTree = defineModel<number>("rerenderTree", { required: true });
@@ -19,7 +19,7 @@ const movingItem = defineModel<TreeNode>("movingItem");
 const isMultiSelecting = defineModel<boolean>("isMultiSelecting", {
     required: true,
 });
-const nextNewList = defineModel<NewControlledList>("nextNewList");
+const nextNewList = defineModel<ControlledList>("nextNewList");
 const newListFormValue = defineModel<string>("newListFormValue", {
     required: true,
 });
@@ -36,7 +36,7 @@ const collapseAll = () => {
 
 const expandNode = (node: TreeNode) => {
     if (node.children && node.children.length) {
-        expandedKeys.value[node.key as string] = true;
+        expandedKeys.value[node.key] = true;
 
         for (const child of node.children) {
             expandNode(child);

@@ -7,20 +7,21 @@ import Button from "primevue/button";
 
 import { ARCHES_CHROME_BLUE } from "@/arches_references/theme.ts";
 import { itemKey } from "@/arches_references/constants.ts";
+import { dataIsNew } from "@/arches_references/utils.ts";
 
 import type { Ref } from "vue";
 import type {
     ControlledListItem,
     ControlledListItemImage,
+    ControlledListItemImageMetadata,
     LabeledChoice,
-    NewControlledListItemImageMetadata,
 } from "@/arches_references/types";
 
 const { labeledChoices, image, makeMetadataEditable } = defineProps<{
     labeledChoices: LabeledChoice[];
     image: ControlledListItemImage;
     makeMetadataEditable: (
-        clickedMetadata: NewControlledListItemImageMetadata,
+        clickedMetadata: ControlledListItemImageMetadata,
         index: number,
     ) => void;
 }>();
@@ -28,10 +29,10 @@ const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
 
-const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
+const newMetadata: Ref<ControlledListItemImageMetadata> = computed(() => {
     const otherNewMetadataIds = image.metadata
-        .filter((metadatum) => typeof metadatum.id === "number")
-        .map((metadatum) => metadatum.id as number);
+        .filter((metadatum) => dataIsNew(metadatum))
+        .map((metadatum) => Number.parseInt(metadatum.id));
 
     const maxOtherNewMetadataId = Math.max(...otherNewMetadataIds, 0);
 
@@ -44,7 +45,7 @@ const newMetadata: Ref<NewControlledListItemImageMetadata> = computed(() => {
         ) ?? labeledChoices[0];
 
     return {
-        id: maxOtherNewMetadataId + 1,
+        id: (maxOtherNewMetadataId + 1).toString(),
         metadata_type: nextMetadataType.type,
         metadata_label: nextMetadataType.label,
         language_id: arches.activeLanguage,

@@ -19,8 +19,8 @@ import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/arches/types";
 import type {
     DisplayedRowRefAndSetter,
-    NewControlledList,
-    NewControlledListItem,
+    ControlledList,
+    ControlledListItem,
 } from "@/arches_references/types";
 
 const { $gettext } = useGettext();
@@ -43,10 +43,10 @@ const treeDOMRef: Ref<ComponentPublicInstance | null> = ref(null);
 
 // For next new item's pref label (input textbox)
 const newLabelFormValue = ref("");
-const nextNewItem = ref<NewControlledListItem>();
+const nextNewItem = ref<ControlledListItem>();
 // For new list entry (input textbox)
 const newListFormValue = ref("");
-const nextNewList = ref<NewControlledList>();
+const nextNewList = ref<ControlledList>();
 const rerenderTree = ref(0);
 const nextFilterChangeNeedsExpandAll = ref(false);
 const expandedKeysSnapshotBeforeSearch = ref<TreeExpandedKeys>({});
@@ -58,7 +58,7 @@ const updateSelectedAndExpanded = (node: TreeNode) => {
     setDisplayedRow(node.data);
     expandedKeys.value = {
         ...expandedKeys.value,
-        [node.key as string]: true,
+        [node.key]: true,
     };
 };
 
@@ -72,7 +72,7 @@ const expandAll = () => {
 
 const expandNode = (node: TreeNode, newExpandedKeys: TreeExpandedKeys) => {
     if (node.children && node.children.length) {
-        newExpandedKeys[node.key as string] = true;
+        newExpandedKeys[node.key] = true;
 
         for (const child of node.children) {
             expandNode(child, newExpandedKeys);

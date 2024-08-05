@@ -31,7 +31,6 @@ import type {
     ControlledListItem,
     DisplayedListItemRefAndSetter,
     MoveLabels,
-    NewControlledListItem,
 } from "@/arches_references/types";
 
 const toast = useToast();
@@ -55,7 +54,7 @@ const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
     required: true,
 });
 const movingItem = defineModel<TreeNode>("movingItem");
-const nextNewItem = defineModel<NewControlledListItem>("nextNewItem");
+const nextNewItem = defineModel<ControlledListItem>("nextNewItem");
 const newLabelFormValue = defineModel<string>("newLabelFormValue", {
     required: true,
 });
@@ -96,20 +95,20 @@ const setMovingItem = (node: TreeNode) => {
 };
 
 const addItem = (parent: TreeNode) => {
-    const newItem: NewControlledListItem = {
+    const newItem: ControlledListItem = {
         parent_id: nodeIsItem(parent) ? parent.data.id : null,
-        id: newLabelCounter.value,
+        id: newLabelCounter.value.toString(),
         list_id: parent.data.list_id ?? parent.data.id,
         uri: "",
         sortorder: 0,
         guide: false,
         values: [
             {
-                id: 0,
+                id: "0",
                 valuetype_id: PREF_LABEL,
                 language_id: selectedLanguage.value.code,
                 value: "",
-                list_item_id: newLabelCounter.value,
+                list_item_id: newLabelCounter.value.toString(),
             },
         ],
         images: [],
@@ -125,7 +124,7 @@ const addItem = (parent: TreeNode) => {
 
     expandedKeys.value = {
         ...expandedKeys.value,
-        [parent.key as string]: true,
+        [parent.key]: true,
     };
     selectedKeys.value = { [newItem.id]: true };
     setDisplayedRow(newItem);

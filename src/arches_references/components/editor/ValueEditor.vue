@@ -21,7 +21,7 @@ import {
     PREF_LABEL,
     itemKey,
 } from "@/arches_references/constants.ts";
-import { languageNameFromCode } from "@/arches_references/utils.ts";
+import { dataIsNew, languageNameFromCode } from "@/arches_references/utils.ts";
 import AddValue from "@/arches_references/components/editor/AddValue.vue";
 
 import type { Ref } from "vue";
@@ -30,8 +30,6 @@ import type {
     ControlledListItem,
     Value,
     ValueCategory,
-    NewOrExistingValue,
-    NewValue,
     ValueType,
 } from "@/arches_references/types";
 
@@ -39,7 +37,7 @@ const { valueType, valueCategory } = defineProps<{
     valueType?: ValueType;
     valueCategory?: ValueCategory;
 }>();
-const editingRows: Ref<NewOrExistingValue[]> = ref([]);
+const editingRows: Ref<Value[]> = ref([]);
 const rowIndexToFocus = ref(-1);
 const editorRef: Ref<HTMLDivElement | null> = ref(null);
 
@@ -140,7 +138,7 @@ const saveValue = async (event: DataTableRowEditInitEvent) => {
     // normalize new value numbers to null
     const normalizedNewData: Value = {
         ...event.newData,
-        id: typeof event.newData.id === "string" ? event.newData.id : null,
+        id: dataIsNew(event.newData) ? null : event.newData.id,
         value: event.newData.value.trim(),
     };
     let upsertedValue: Value;
@@ -166,8 +164,8 @@ const saveValue = async (event: DataTableRowEditInitEvent) => {
     }
 };
 
-const issueDeleteValue = async (value: NewValue | Value) => {
-    if (typeof value.id === "number") {
+const issueDeleteValue = async (value: Value) => {
+    if (dataIsNew(value)) {
         removeItemValue(value);
         return;
     }
@@ -189,7 +187,7 @@ const appendItemValue = (newValue: Value) => {
     item.value.values.push(newValue);
 };
 
-const removeItemValue = (removedValue: Value | NewValue) => {
+const removeItemValue = (removedValue: Value) => {
     const toDelete = item.value.values.findIndex(
         (valueFromItem) => valueFromItem.id === removedValue.id,
     );
@@ -211,7 +209,7 @@ const setRowFocus = (event: DataTableRowEditInitEvent) => {
     rowIndexToFocus.value = event.index;
 };
 
-const makeValueEditable = (clickedValue: NewOrExistingValue, index: number) => {
+const makeValueEditable = (clickedValue: Value, index: number) => {
     if (!editingRows.value.includes(clickedValue)) {
         editingRows.value = [...editingRows.value, clickedValue];
     }
