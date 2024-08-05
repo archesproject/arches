@@ -55,7 +55,7 @@ def get_app_configs_from_module(module_name):
 def list_arches_app_names(application_name=None):
     module_name = (
         f"{application_name if application_name else settings.APP_NAME}.settings"
-    )
+    ).lower()
     app_configs = get_app_configs_from_module(module_name=module_name)
 
     return [config.name for config in app_configs]
@@ -64,7 +64,7 @@ def list_arches_app_names(application_name=None):
 def list_arches_app_paths(application_name=None):
     module_name = (
         f"{application_name if application_name else settings.APP_NAME}.settings"
-    )
+    ).lower()
     app_configs = get_app_configs_from_module(module_name=module_name)
 
     return [config.module.__path__[0] for config in app_configs]
