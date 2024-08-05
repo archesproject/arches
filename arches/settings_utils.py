@@ -2,7 +2,9 @@ import json
 import os
 import site
 import sys
+
 from contextlib import contextmanager
+from importlib import import_module
 
 from django.apps import apps
 from django.conf import settings
@@ -40,20 +42,32 @@ def _move_to_end_of_sys_path(*paths, add_cwd=False):
         sys.path = _orig_sys_path
 
 
-def list_arches_app_names():
-    return [
-        config.name
-        for config in apps.get_app_configs()
-        if getattr(config, "is_arches_application", False)
-    ]
+def get_app_configs_from_module(module_name):
+    module = import_module(module_name)
+    app_configs = []
+    for app_name in getattr(module, "INSTALLED_APPS", []):
+        app_config = apps.get_app_config(app_name.split(".")[-1])
+        if getattr(app_config, "is_arches_application", False):
+            app_configs.append(app_config)
+    return app_configs
 
 
-def list_arches_app_paths():
-    return [
-        config.module.__path__[0]
-        for config in apps.get_app_configs()
-        if getattr(config, "is_arches_application", False)
-    ]
+def list_arches_app_names(application_name=None):
+    module_name = (
+        f"{application_name if application_name else settings.APP_NAME}.settings"
+    )
+    app_configs = get_app_configs_from_module(module_name=module_name)
+
+    return [config.name for config in app_configs]
+
+
+def list_arches_app_paths(application_name=None):
+    module_name = (
+        f"{application_name if application_name else settings.APP_NAME}.settings"
+    )
+    app_configs = get_app_configs_from_module(module_name=module_name)
+
+    return [config.module.__path__[0] for config in app_configs]
 
 
 def build_staticfiles_dirs(*, app_root=None, additional_directories=None):
@@ -151,13 +165,13 @@ def build_templates_config(
         raise e
 
 
-def generate_frontend_configuration():
+def generate_frontend_configuration(app_config):
     try:
-        app_root_path = os.path.realpath(settings.APP_ROOT)
+        app_root_path = app_config.path
         root_dir_path = os.path.realpath(settings.ROOT_DIR)
 
-        arches_app_names = list_arches_app_names()
-        arches_app_paths = list_arches_app_paths()
+        arches_app_names = list_arches_app_names(application_name=app_config.name)
+        arches_app_paths = list_arches_app_paths(application_name=app_config.name)
         path_lookup = dict(zip(arches_app_names, arches_app_paths, strict=True))
 
         frontend_configuration_settings_data = {
@@ -172,16 +186,13 @@ def generate_frontend_configuration():
             "WEBPACK_DEVELOPMENT_SERVER_PORT": settings.WEBPACK_DEVELOPMENT_SERVER_PORT,
         }
 
-        if settings.APP_NAME == "Arches":
+        if app_config.name == "Arches":
             base_path = root_dir_path
         else:
             base_path = app_root_path
 
         frontend_configuration_settings_path = os.path.realpath(
             os.path.join(base_path, "..", ".frontend-configuration-settings.json")
-        )
-        sys.stdout.write(
-            f"Writing frontend configuration to: {frontend_configuration_settings_path} \n"
         )
 
         with open(
@@ -226,7 +237,6 @@ def generate_frontend_configuration():
         tsconfig_path = os.path.realpath(
             os.path.join(base_path, "..", ".tsconfig-paths.json")
         )
-        sys.stdout.write(f"Writing tsconfig path data to: {tsconfig_path} \n")
 
         with open(tsconfig_path, "w") as file:
             json.dump(tsconfig_paths_data, file, indent=4)

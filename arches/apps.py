@@ -13,7 +13,7 @@ class ArchesAppConfig(AppConfig):
     is_arches_application = False
 
     def ready(self):
-        generate_frontend_configuration()
+        generate_frontend_configuration(self)
 
 
 ### GLOBAL DEPRECATIONS ###
