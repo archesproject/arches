@@ -349,7 +349,7 @@ AUTHENTICATION_BACKENDS = (
     "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
     "oauth2_provider.backends.OAuth2Backend",
     "django.contrib.auth.backends.ModelBackend",  # this is default
-    "arches.app.permissions.arches_standard.PermissionBackend",
+    "arches.app.permissions.arches_permission_base.PermissionBackend",
     "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend",
 )
 
@@ -874,7 +874,7 @@ def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
 
-PERMISSION_FRAMEWORK = "arches_standard.ArchesStandardPermissionFramework"
+PERMISSION_FRAMEWORK = "arches_default_allow.ArchesDefaultAllowPermissionFramework"
 
 PERMISSION_DEFAULTS = {}
 # PERMISSION_DEFAULTS = {
