@@ -1557,14 +1557,14 @@ class ResourceReport(APIBase):
 
         if "cards" not in exclude:
             readable_nodegroup_ids = [
-                nodegroup.pk
-                for nodegroup in get_nodegroups_by_perm(
+                nodegroup_id
+                for nodegroup_id in get_nodegroups_by_perm(
                     request.user, perm, any_perm=True
                 )
             ]
             writable_nodegroup_ids = [
-                nodegroup.pk
-                for nodegroup in get_nodegroups_by_perm(
+                nodegroup_id
+                for nodegroup_id in get_nodegroups_by_perm(
                     request.user,
                     "write_nodegroup",
                     any_perm=True,
@@ -1578,7 +1578,7 @@ class ResourceReport(APIBase):
                     if card.nodegroup_id in readable_nodegroup_ids
                     and card.nodegroup_id in writable_nodegroup_ids
                 ],
-                key=lambda card: card.sortorder,
+                key=lambda card: card.sortorder or 0,
             )
 
             permitted_card_ids = [card.pk for card in permitted_cards]
@@ -1588,7 +1588,7 @@ class ResourceReport(APIBase):
                     for widget in graph.widgets
                     if widget["card_id"] in permitted_card_ids
                 ],
-                key=lambda widget: widget["sortorder"],
+                key=lambda widget: widget["sortorder"] or 0,
             )
 
             resp["cards"] = permitted_cards
