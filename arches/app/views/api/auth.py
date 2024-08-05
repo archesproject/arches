@@ -42,6 +42,8 @@ class Login(LoginView, APIBase):
                 failure_title, failure_msg_invalid, status=HTTPStatus.UNAUTHORIZED
             )
         if not user.is_active:
+            # ModelBackend already disallows inactive users, but add some safety
+            # and disallow this no matter the backend for now.
             return JSONErrorResponse(
                 failure_title, failure_msg_inactive, status=HTTPStatus.FORBIDDEN
             )
