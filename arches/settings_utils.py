@@ -177,8 +177,15 @@ def generate_frontend_configuration():
         else:
             base_path = app_root_path
 
+        frontend_configuration_settings_path = os.path.realpath(
+            os.path.join(base_path, "..", ".frontend-configuration-settings.json")
+        )
+        sys.stdout.write(
+            f"Writing frontend configuration to: {frontend_configuration_settings_path} \n"
+        )
+
         with open(
-            os.path.join(base_path, "..", ".frontend-configuration-settings.json"),
+            frontend_configuration_settings_path,
             "w",
         ) as file:
             json.dump(frontend_configuration_settings_data, file, indent=4)
@@ -216,7 +223,12 @@ def generate_frontend_configuration():
             },
         }
 
-        with open(os.path.join(base_path, "..", ".tsconfig-paths.json"), "w") as file:
+        tsconfig_path = os.path.realpath(
+            os.path.join(base_path, "..", ".tsconfig-paths.json")
+        )
+        sys.stdout.write(f"Writing tsconfig path data to: {tsconfig_path} \n")
+
+        with open(tsconfig_path, "w") as file:
             json.dump(tsconfig_paths_data, file, indent=4)
 
     except Exception as e:
