@@ -6,7 +6,7 @@ define([
     'bindings/scrollTo'
 ], function(ko, _, arches, AlertViewModel) {
     return function(params) {
-        var self = this
+        var self = this;
 
         if (!params.card && ko.unwrap(params.form.card)) {
             params.card = ko.unwrap(params.form.card);
@@ -173,7 +173,7 @@ define([
                 }
             }
         };
-        document.addEventListener("keydown", keyListener);
+        document.addEventListener("keydown", keyListener)
         // dispose of eventlistener
         this.dispose = function(){
             document.removeEventListener("keydown", keyListener);
