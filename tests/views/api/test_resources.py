@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import json
 import os
 import uuid
+from http import HTTPStatus
 
 from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
@@ -26,7 +27,7 @@ from tests.base_test import ArchesTestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.core import management
-from django.test.client import RequestFactory, Client
+from django.test.client import RequestFactory
 from django.test.utils import captured_stdout
 from unittest.mock import patch, MagicMock
 
@@ -37,10 +38,10 @@ from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
-# python manage.py test tests.views.api_tests --settings="tests.test_settings"
+# python manage.py test tests.views.api.test_resources --settings="tests.test_settings"
 
 
-class APITests(ArchesTestCase):
+class ResourceAPITests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         cls.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
@@ -506,6 +507,25 @@ class APITests(ArchesTestCase):
             )
 
         self.assertEqual(response.status_code, 400)
+
+    def test_api_resources_handles_null_sortorder(self):
+        zeroth_card = self.data_type_graph.cardmodel_set.get(sortorder=0)
+        zeroth_card.sortorder = None
+        zeroth_card.save()
+        # Refreshes ORM card cache (.cardmodel_set)
+        self.data_type_graph.refresh_from_db()
+        # Clears proxy model cache (.cards), which reads from .cardmodel_set
+        self.data_type_graph.refresh_from_database()
+        self.data_type_graph.publish()
+        self.test_prj_user.graph_publication = self.data_type_graph.publication
+        self.test_prj_user.save()
+
+        response = self.client.get(
+            reverse("api_resource_report", kwargs={"resourceid": self.test_prj_user.pk})
+        )
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        result = json.loads(response.content)
+        self.assertIsNone(result["cards"][0]["sortorder"])
 
 
 class ResourceInstanceLifecycleStatesTest(ArchesTestCase):

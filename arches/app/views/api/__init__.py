@@ -1303,7 +1303,7 @@ class SearchExport(View):
             else:
                 response = JSONResponse(export_files)
             return response
-        return JSONResponse(status=404)
+        return JSONErrorResponse(status=404)
 
 
 class SearchComponentData(APIBase):
@@ -1312,7 +1312,7 @@ class SearchComponentData(APIBase):
         search_filter = search_filter_factory.get_filter(componentname)
         if search_filter:
             return JSONResponse(search_filter.view_data())
-        return JSONResponse(status=404)
+        return JSONErrorResponse(status=404)
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -1621,7 +1621,7 @@ class ResourceReport(APIBase):
                     if card.nodegroup_id in readable_nodegroup_ids
                     and card.nodegroup_id in writable_nodegroup_ids
                 ],
-                key=lambda card: card.sortorder,
+                key=lambda card: card.sortorder or 0,
             )
 
             permitted_card_ids = [card.pk for card in permitted_cards]
@@ -1631,7 +1631,7 @@ class ResourceReport(APIBase):
                     for widget in graph.widgets
                     if widget["card_id"] in permitted_card_ids
                 ],
-                key=lambda widget: widget["sortorder"],
+                key=lambda widget: widget["sortorder"] or 0,
             )
 
             resp["cards"] = permitted_cards

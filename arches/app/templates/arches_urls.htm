@@ -104,6 +104,8 @@
     api_tiles='(tileid)=>{
         return "{% url "api_tiles" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", tileid);
     }'
+    api_login="{% url 'api_login' %}"
+    api_logout="{% url 'api_logout' %}"
     api_nodegroup='(nodegroupid)=>{
         return "{% url "api_nodegroup" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", nodegroupid);
     }'
@@ -111,8 +113,6 @@
         return "{% url "api_nodes" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", nodeid);
     }'
     api_node_value="{% url 'api_node_value' %}"
-    api_resource_instance_lifecycle_states='{% url "api_resource_instance_lifecycle_states" %}'
-    api_resource_instance_lifecycle_state='(resourceid)=>{return "{% url "api_resource_instance_lifecycle_state" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", resourceid)}'
     api_resource_report='(resourceid)=>{return "{% url "api_resource_report" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", resourceid)}'
     api_bulk_resource_report="{% url 'api_bulk_resource_report' %}"
     api_bulk_disambiguated_resource_instance="{% url 'api_bulk_disambiguated_resource_instance' %}"
@@ -132,5 +132,7 @@
     get_dsl="{% url 'get_dsl' %}"
     transform_edtf_for_tile="{% url 'transform_edtf_for_tile' %}"
     api_get_nodegroup_tree="{% url 'api_get_nodegroup_tree' %}"
-</div>
+    signup="{% url 'signup' %}"
+    auth="{% url 'auth' %}"
+></div>
 {% endblock arches_urls %}
