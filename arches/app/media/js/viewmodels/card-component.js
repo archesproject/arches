@@ -6,7 +6,7 @@ define([
     'bindings/scrollTo'
 ], function(ko, _, arches, AlertViewModel) {
     return function(params) {
-        var self = this;  // eslint-disable-line @typescript-eslint/no-this-alias
+        var self = this;
 
         if (!params.card && ko.unwrap(params.form.card)) {
             params.card = ko.unwrap(params.form.card);
@@ -189,12 +189,6 @@ define([
             else if (ko.unwrap(params.form?.resourceId)){
                 self.tile.resourceinstance_id = ko.unwrap(params.form.resourceId);
             }
-
-            let isCreatingNewResource = false;
-            if (!self.tile.resourceinstance_id) {
-                isCreatingNewResource = true;
-            }
-
             self.tile.save(function(response) {
                 self.loading(false);
                 if(params?.form?.error){
@@ -213,20 +207,13 @@ define([
                     params.form.onSaveError(self.tile);
                 }
             }, function() {
-                if (typeof self.onSaveSuccess === 'function') self.onSaveSuccess();
+                self.loading(false);
 
+                if (typeof self.onSaveSuccess === 'function') self.onSaveSuccess();
                 if (params.form.onSaveSuccess) {
                     params.form.onSaveSuccess(self.tile);
                 }
-
                 if (typeof callback === 'function') callback();
-
-                if (isCreatingNewResource) {
-                    window.location.reload();
-                } 
-                else {
-                    self.loading(false);
-                }
             });
         };
 
