@@ -46,9 +46,8 @@ from arches.app.utils.skos import SKOSReader
 class ConceptEditTests(TransactionTestCase):
     serialized_rollback = True
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUp(self):
+        """setUpClass doesn't work because the rollback fixture is applied after that."""
         LanguageSynchronizer.synchronize_settings_with_db()
 
         for skospath in [
