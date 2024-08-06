@@ -47,7 +47,8 @@ class ConceptEditTests(TransactionTestCase):
     serialized_rollback = True
 
     @classmethod
-    def setUpClass(clas):
+    def setUpClass(cls):
+        super().setUpClass()
         LanguageSynchronizer.synchronize_settings_with_db()
 
         for skospath in [
