@@ -151,9 +151,15 @@ class Command(BaseCommand):  # pragma: no cover
                 os.path.join(settings.APP_ROOT, ".."),
             )
 
-        if not os.path.exists(
+        if os.path.exists(
             os.path.join(settings.APP_ROOT, "..", ".github", "workflows", "main.yml")
         ):
+            warnings.warn(
+                "Existing .github/workflows/main.yml detected. "
+                "Manually reconcile existing file with new template.",
+                UserWarning,
+            )
+        else:
             self.stdout.write("Copying .github/workflows/main.yml directory to project")
 
             os.makedirs(
@@ -234,9 +240,26 @@ class Command(BaseCommand):  # pragma: no cover
                             os.path.join(dirpath, filename[:-7] + ".py"),
                         )
 
+        if not os.path.isfile(os.path.join(settings.APP_ROOT, "hosts.py")):
+            self.stdout.write("Copying hosts.py to project directory")
+            shutil.copy2(
+                os.path.join(
+                    settings.ROOT_DIR,
+                    "install",
+                    "arches-templates",
+                    "project_name",
+                    "hosts.py-tpl",
+                ),
+                settings.APP_ROOT,
+            )
+            os.rename(
+                os.path.join(settings.APP_ROOT, "hosts.py-tpl"),
+                os.path.join(settings.APP_ROOT, "hosts.py-tpl"[:-7] + ".py"),
+            )
+
         if os.path.isfile(os.path.join(settings.APP_ROOT, "apps.py")):
             warnings.warn(
-                "Existing apps.py detected. Manually add is_arches_application=True.",
+                "Existing apps.py detected. Manually reconcile existing file with new template.",
                 UserWarning,
             )
         else:
@@ -270,6 +293,7 @@ class Command(BaseCommand):  # pragma: no cover
                     "arches-templates",
                     "project_name",
                     "src",
+                    "project_name",
                     "declarations.d.ts",
                 ),
                 os.path.join(settings.APP_ROOT, "src"),
@@ -296,7 +320,7 @@ class Command(BaseCommand):  # pragma: no cover
                 os.path.join(settings.APP_ROOT, "..", "webpack"), ignore_errors=True
             )
 
-        self.stdout.write("Creating updated webpack directory at root")
+        self.stdout.write("Creating updated webpack directory at project root")
         shutil.copytree(
             os.path.join(settings.ROOT_DIR, "install", "arches-templates", "webpack"),
             os.path.join(settings.APP_ROOT, "..", "webpack"),
@@ -310,27 +334,27 @@ class Command(BaseCommand):  # pragma: no cover
             [str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"]
         )
 
-        path_to_project = os.path.join(settings.APP_ROOT, "..")
         for relative_file_path in [
-            os.path.join(settings.APP_NAME, "apps.py"),
-            "gettext.config.js",
-            ".coveragerc",
-            ".gitignore",
-            ".github/workflows/main.yml",
-            ".pre-commit-config.yaml",
-            "tsconfig.json",
-            "tests/test_settings.py",
-            "tests/search_indexes/sample_index_tests.py",
-            "pyproject.toml",
+            os.path.join("..", "gettext.config.js"),
+            os.path.join("..", ".coveragerc"),
+            os.path.join("..", ".gitignore"),
+            os.path.join("..", ".github/workflows/main.yml"),
+            os.path.join("..", ".pre-commit-config.yaml"),
+            os.path.join("..", "tsconfig.json"),
+            os.path.join("..", "tests/test_settings.py"),
+            os.path.join("..", "tests/search_indexes/sample_index_tests.py"),
+            os.path.join("..", "pyproject.toml"),
+            "hosts.py",
         ]:  # relative to app root directory
             try:
-                file = open(os.path.join(path_to_project, relative_file_path), "r")
+                file = open(os.path.join(settings.APP_ROOT, relative_file_path), "r")
                 file_data = file.read()
                 file.close()
 
                 updated_file_data = (
                     file_data.replace(
-                        "{{ project_name_title_case }}", settings.APP_NAME.title()
+                        "{{ project_name_title_case }}",
+                        settings.APP_NAME.title().replace("_", ""),
                     )
                     .replace("{{ project_name }}", settings.APP_NAME)
                     .replace("{{ arches_semantic_version }}", arches_semantic_version)
@@ -339,7 +363,7 @@ class Command(BaseCommand):  # pragma: no cover
                     )
                 )
 
-                file = open(os.path.join(path_to_project, relative_file_path), "w")
+                file = open(os.path.join(settings.APP_ROOT, relative_file_path), "w")
                 file.write(updated_file_data)
                 file.close()
             except FileNotFoundError:
