@@ -30,6 +30,7 @@ def index(request):
             "main_script": "index",
             "active_page": "Home",
             "app_title": settings.APP_TITLE,
+            "GOOGLE_ANALYTICS_TRACKING_ID": settings.GOOGLE_ANALYTICS_TRACKING_ID,
             "copyright_text": settings.COPYRIGHT_TEXT,
             "copyright_year": settings.COPYRIGHT_YEAR,
             "version": __version__,
