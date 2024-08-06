@@ -1,6 +1,6 @@
 import uuid
 from django.db import migrations, models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 import arches.app.models.fields.i18n
 import arches.app.utils.betterJSONSerializer
