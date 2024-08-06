@@ -25,7 +25,8 @@ class ArchesAppConfig(AppConfig):
     is_arches_application = False
 
     def ready(self):
-        generate_frontend_configuration()
+        if settings.APP_NAME.lower() == self.name:
+            generate_frontend_configuration()
 
 
 ### GLOBAL DEPRECATIONS ###
