@@ -63,7 +63,6 @@ define([
 
     var TileViewModel = function(params) {
         var CardViewModel = require('viewmodels/card');
-
         var self = this;
         var selection = params.selection || ko.observable();
         var scrollTo = params.scrollTo || ko.observable();
