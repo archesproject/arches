@@ -6,7 +6,7 @@ define([
     'bindings/scrollTo'
 ], function(ko, _, arches, AlertViewModel) {
     return function(params) {
-        var self = this;
+        var self = this
 
         if (!params.card && ko.unwrap(params.form.card)) {
             params.card = ko.unwrap(params.form.card);
@@ -208,7 +208,6 @@ define([
                 }
             }, function() {
                 self.loading(false);
-
                 if (typeof self.onSaveSuccess === 'function') self.onSaveSuccess();
                 if (params.form.onSaveSuccess) {
                     params.form.onSaveSuccess(self.tile);
