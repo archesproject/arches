@@ -89,9 +89,15 @@ define(['utils/set-csrf-token'], function() {
         }
     }
 
-    return {
-        ...parsedArchesData,
-        translations: parsedArchesTranslations,
-        urls: parsedArchesUrls,
-    };
+    const archesObject = { ...parsedArchesData };
+
+    if (Object.keys(parsedArchesTranslations).length) {
+        archesObject["translations"] = parsedArchesTranslations;
+    }
+
+    if (Object.keys(parsedArchesUrls).length) {
+        archesObject["urls"] = parsedArchesUrls;
+    }
+
+    return archesObject;
 });

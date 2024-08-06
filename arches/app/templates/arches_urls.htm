@@ -1,0 +1,126 @@
+{% block arches_urls %}
+<div
+    class='arches-urls'
+    root="{% url 'root' %}"
+    home="{% url 'home' %}"
+    media="{{ STATIC_URL }}"
+    rdm="{% url 'rdm' ''%}"
+    uploadedfiles="{{ MEDIA_URL }}"
+    url_subpath="{{app_settings.FORCE_SCRIPT_NAME}}"
+    concept_tree="{% url 'concept_tree' '' %}"
+    concept="{% url 'concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+    concept_search="{% url 'concept_search' %}"
+    concept_value="{% url 'concept_value' %}"
+    concept_manage_parents="{% url 'concept_manage_parents' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+    concept_make_collection="{% url 'make_collection' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+    change_password="{% url 'change_password' %}"
+    export_concept="{% url 'export_concept' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+    export_concept_collections="{% url 'export_concept_collections' %}"
+    get_concept_collections="{% url 'get_concept_collections' %}"
+    dropdown="{% url 'dropdown' %}"
+    paged_dropdown="{% url 'paged_dropdown' %}"
+    get_pref_label="{% url 'get_pref_label' %}"
+    from_sparql_endpoint="{% url 'from_sparql_endpoint' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+    search_sparql_endpoint="{% url 'search_sparql_endpoint' %}"
+    confirm_delete="{% url 'confirm_delete' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+    search_home="{% url 'search_home' %}"
+    search_terms="{% url 'search_terms' %}"
+    search_results="{% url 'search_results' %}"
+    export_results="{% url 'export_results' %}"
+    get_export_file="{% url 'get_export_file' %}"
+    buffer="{% url 'buffer'%}"
+    config="{% url 'config' %}"
+    node="{% url 'node' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+    graph_nodes='(graphid)=>{return "{% url "graph_nodes" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+    nodegroup="{% url 'nodegroup' %}"
+    node_layer="{% url 'node_layer' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+    graph='"{% url "graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+    graph_designer='(graphid)=>{return "{% url "graph_designer" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+    graph_settings='(graphid)=>{return "{% url "graph_settings" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+    get_notifications="{% url 'get_notifications' %}"
+    dismiss_notifications="{% url 'dismiss_notifications' %}"
+    get_notification_types="{% url 'get_notification_types' %}"
+    update_notification_types="{% url 'update_notification_types' %}"
+    card="{% url 'card' '' %}"
+    reorder_cards="{% url 'reorder_cards'%}"
+    resource="{% url 'resource' %}"
+    resource_editor='"{% url "resource_editor" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+    resource_copy='"{% url "resource_copy" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+    resource_report='"{% url "resource_report" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+    resource_edit_log='"{% url "resource_edit_log" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+    get_resource_edit_log='(graphid)=>{return "{% url "resource_edit_log" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+    resource_data='"{% url "resource_data" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace(/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/g, "")'
+    resource_cards='"{% url "resource_cards" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+    related_resources='"{% url "related_resources" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+    resource_descriptors='"{% url "resource_descriptors" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+    resource_tiles="{% url 'resource_tiles' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}"
+    tile="{% url 'tile' %}"
+    reorder_tiles="{% url 'reorder_tiles' %}"
+    reorder_nodes="{% url 'reorder_nodes' %}"
+    delete_provisional_tile="{% url 'delete_provisional_tile' %}"
+    edit_history="{% url 'edit_history' %}"
+    tile_history="{% url 'tile_history' %}"
+    download_files="{% url 'download_files' %}"
+    apply_functions='"{% url "apply_functions" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+    remove_functions='"{% url "remove_functions" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+    time_wheel_config="{% url 'time_wheel_config' %}"
+    two_factor_authentication_reset="{% url 'two-factor-authentication-reset' %}"
+    reindex="{% url 'reindex' %}"
+    permission_data="{% url 'permission_data' %}"
+    resource_permission_data="{% url 'resource_permission_data' %}"
+    permission_manager_data="{% url 'permission_manager_data' %}"
+    clear_user_permission_cache="{% url 'clear_user_permission_cache' %}"
+    get_user_names="{% url 'get_user_names' %}"
+    feature_popup_content="{% url 'feature_popup_content' %}"
+    related_resource_candidates="{% url 'related_resource_candidates' %}"
+    relatable_resources="{% url 'relatable_resources' %}"
+    languages="{% url 'language' %}"
+    get_domain_connections='(graphid)=>{return "{% url "get_domain_connections" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+    clone_graph='(graphid)=>{return "{% url "clone_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+    export_graph='(graphid)=>{return "{% url "export_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+    publish_graph='(graphid)=>{return "{% url "publish_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+    unpublish_graph='(graphid)=>{return "{% url "unpublish_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+    delete_graph='(graphid)=>{return "{% url "delete_graph" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+    delete_instances='(graphid)=>{return "{% url "delete_instances" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+    export_mapping_file='(graphid)=>{return "{% url "export_mapping_file" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+    add_resource='(graphid)=>{return "{% url "add_resource" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+    function_manager='(graphid)=>{return "{% url "function_manager" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graphid)}'
+    plugin='(pluginid)=>{return "{% url "plugins" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", pluginid)}'
+    workflow_history='"{% url "workflow_history" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+    transaction_reverse='(transactionid)=> {return "{% url "transaction_reverse" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", transactionid)}'
+    mvt='(nodeid)=>{return decodeURI("{% url "mvt" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" "{z}" "{x}" "{y}" %}").replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", nodeid)}'
+    help_template="{% url 'help_templates' %}"
+    api_plugins='"{% url "api_plugins" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+    graphs_api='"{% url "graphs_api" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+    api_card='"{% url "api_card" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "")'
+    api_tiles='(tileid)=>{
+        return "{% url "api_tiles" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", tileid);
+    }'
+    api_nodegroup='(nodegroupid)=>{
+        return "{% url "api_nodegroup" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", nodegroupid);
+    }'
+    api_nodes='(nodeid)=>{
+        return "{% url "api_nodes" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", nodeid);
+    }'
+    api_node_value="{% url 'api_node_value' %}"
+    api_resource_report='(resourceid)=>{return "{% url "api_resource_report" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", resourceid)}'
+    api_bulk_resource_report="{% url 'api_bulk_resource_report' %}"
+    api_bulk_disambiguated_resource_instance="{% url 'api_bulk_disambiguated_resource_instance' %}"
+    api_resources='(resourceid)=>{return "{% url "resources" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", resourceid)}'
+    api_search_component_data='"{% url "api_search_component_data" "aaaa"%}".replace("aaaa", "")'
+    api_user_incomplete_workflows="{% url 'api_user_incomplete_workflows' %}"
+    api_get_frontend_i18n_data="{% url 'get_frontend_i18n_data' %}"
+    geojson="{% url 'geojson' %}"
+    icons="{% url 'icons' %}"
+    ontology_properties="{% url 'ontology_properties' %}"
+    iiifmanifest="{% url 'iiifmanifest' %}"
+    manifest_manager="{% url 'manifest_manager' %}"
+    etl_manager="{% url 'etl_manager' %}"
+    iiifannotations="{% url 'iiifannotations' %}"
+    iiifannotationnodes="{% url 'iiifannotationnodes' %}"
+    validatejson='"{% url "validatejson" "aaaa"%}".replace("aaaa", "")'
+    get_dsl="{% url 'get_dsl' %}"
+    transform_edtf_for_tile="{% url 'transform_edtf_for_tile' %}"
+    api_get_nodegroup_tree="{% url 'api_get_nodegroup_tree' %}"
+></div>
+{% endblock arches_urls %}

@@ -69,6 +69,7 @@ from arches.app.utils.permission_backend import user_is_resource_editor
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.settings_utils import list_arches_app_paths
 
 logger = logging.getLogger(__name__)
 
@@ -119,19 +120,16 @@ class GetFrontendI18NData(APIBase):
         language_file_path = []
 
         language_file_path.append(
-            os.path.join(settings.APP_ROOT, "locale", user_language + ".json")
+            os.path.join(settings.ROOT_DIR, "locale", user_language + ".json")
         )
 
-        for arches_application_name in settings.ARCHES_APPLICATIONS:
-            application_path = os.path.split(
-                sys.modules[arches_application_name].__spec__.origin
-            )[0]
+        for arches_app_path in list_arches_app_paths():
             language_file_path.append(
-                os.path.join(application_path, "locale", user_language + ".json")
+                os.path.join(arches_app_path, "locale", user_language + ".json")
             )
 
         language_file_path.append(
-            os.path.join(settings.ROOT_DIR, "locale", user_language + ".json")
+            os.path.join(settings.APP_ROOT, "locale", user_language + ".json")
         )
 
         localized_strings = {}
@@ -461,14 +459,15 @@ class MVT(APIBase):
                                 id,
                                 resourceinstanceid,
                                 nodeid,
+                                featureid::text AS featureid,
                                 ST_AsMVTGeom(
                                     geom,
                                     TileBBox(%s, %s, %s, 3857)
                                 ) AS geom,
                                 1 AS total
                             FROM geojson_geometries
-                            WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
-                            [nodeid, zoom, x, y, nodeid, resource_ids],
+                            WHERE nodeid = %s and resourceinstanceid not in %s and (geom && ST_TileEnvelope(%s, %s, %s))) AS tile;""",
+                            [nodeid, zoom, x, y, nodeid, resource_ids, zoom, x, y],
                         )
                     else:
                         tile = ""
@@ -478,14 +477,15 @@ class MVT(APIBase):
                             id,
                             resourceinstanceid,
                             nodeid,
+                            featureid::text AS featureid,
                             ST_AsMVTGeom(
                                 geom,
                                 TileBBox(%s, %s, %s, 3857)
                             ) AS geom,
                             1 AS total
                         FROM geojson_geometries
-                        WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
-                        [nodeid, zoom, x, y, nodeid, resource_ids],
+                        WHERE nodeid = %s and resourceinstanceid not in %s and (geom && ST_TileEnvelope(%s, %s, %s))) AS tile;""",
+                        [nodeid, zoom, x, y, nodeid, resource_ids, zoom, x, y],
                     )
                 tile = bytes(cursor.fetchone()[0]) if tile is None else tile
                 cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
@@ -1708,7 +1708,7 @@ class Tile(APIBase):
         permitted_nodegroups = get_nodegroups_by_perm(
             request.user, "models.read_nodegroup"
         )
-        if str(tile.nodegroup_id) in permitted_nodegroups:
+        if tile.nodegroup_id in permitted_nodegroups:
             return JSONResponse(tile, status=200)
         else:
             return JSONResponse(_("Tile not found."), status=404)
@@ -1803,7 +1803,7 @@ class Node(APIBase):
 
         # filter nodes from attribute query based on user permissions
         permitted_nodes = [
-            node for node in nodes if str(node["nodegroup_id"]) in permitted_nodegroups
+            node for node in nodes if node["nodegroup_id"] in permitted_nodegroups
         ]
         for node in permitted_nodes:
             try:

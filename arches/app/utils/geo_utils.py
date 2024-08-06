@@ -50,10 +50,11 @@ class GeoUtils(object):
         if geom is not None:
             multipart = geom
             fc = {"type": "FeatureCollection", "features": []}
+            geom_type = multipart["type"].replace("Multi", "")
             for coords in multipart["coordinates"]:
                 geom = {
                     "type": "Feature",
-                    "geometry": {"type": "Polygon", "coordinates": coords},
+                    "geometry": {"type": geom_type, "coordinates": coords},
                     "properties": {},
                 }
                 fc["features"].append(geom)
