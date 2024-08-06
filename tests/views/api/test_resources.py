@@ -34,10 +34,10 @@ from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
-# python manage.py test tests.views.api_tests --settings="tests.test_settings"
+# python manage.py test tests.views.api.test_resources --settings="tests.test_settings"
 
 
-class APITests(ArchesTestCase):
+class ResourceAPITests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         cls.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
