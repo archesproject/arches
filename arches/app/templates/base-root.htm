@@ -56,6 +56,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <link rel="stylesheet" href="{% webpack_static 'node_modules/font-awesome/css/font-awesome.min.css' %}" />
     {% endblock css %}
 </head>
+{% endblock head %}
 
 {% block body_content %}
 <body dir="{{ app_settings.ACTIVE_LANGUAGE_DIR }}" {% block body_attributes %}class="scroll-y-auto"{% endblock %}>
