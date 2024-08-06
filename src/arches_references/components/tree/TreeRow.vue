@@ -98,7 +98,7 @@ const rowLabel = computed(() => {
     }
     const unstyledLabel =
         node.data.name ??
-        bestLabel(node.data, selectedLanguage!.value.code).value;
+        bestLabel(node.data, selectedLanguage.value.code).value;
     if (!filterValue.value) {
         return unstyledLabel;
     }
@@ -213,7 +213,7 @@ const acceptNewItemShortcutEntry = async () => {
     );
     parent.children = [
         ...parent.children!.filter((child: TreeNode) => !dataIsNew(child.data)),
-        itemAsNode(newItem, selectedLanguage!.value),
+        itemAsNode(newItem, selectedLanguage.value),
     ];
     if (nodeIsList(parent)) {
         parent.data.items.push(newItem);
@@ -252,7 +252,7 @@ const acceptNewListShortcutEntry = async () => {
     }
     tree.value = [
         ...tree.value.filter((cList) => !dataIsNew(cList.data)),
-        listAsNode(newList, selectedLanguage!.value),
+        listAsNode(newList, selectedLanguage.value),
     ];
     selectedKeys.value = { [newList.id]: true };
     setDisplayedRow(newList);
@@ -308,7 +308,7 @@ const acceptNewListShortcutEntry = async () => {
                         {
                             item: bestLabel(
                                 movingItem.data,
-                                selectedLanguage!.code,
+                                selectedLanguage.code,
                             ).value,
                         },
                         true,

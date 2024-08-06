@@ -80,8 +80,8 @@ watch(displayedRow, () => {
 
 const isFirstItem = (item: ControlledListItem) => {
     const siblings: TreeNode[] = item.parent_id
-        ? findNodeInTree(tree.value, item.parent_id).data!.children
-        : findNodeInTree(tree.value, item.list_id).data!.items;
+        ? findNodeInTree(tree.value, item.parent_id).data.children
+        : findNodeInTree(tree.value, item.list_id).data.items;
     if (!siblings.length) {
         throw new Error();
     }

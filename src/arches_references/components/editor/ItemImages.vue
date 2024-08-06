@@ -34,7 +34,7 @@ const addHeader = (event: FileUploadBeforeSendEvent) => {
     const token = Cookies.get("csrftoken");
     if (token) {
         event.xhr.setRequestHeader("X-CSRFToken", token);
-        event.formData.set("list_item_id", item.value!.id);
+        event.formData.set("list_item_id", item.value.id);
     }
 };
 
@@ -44,7 +44,7 @@ const upload = (event: FileUploadUploadEvent) => {
         return;
     }
     const newImage = JSON.parse(event.xhr.responseText);
-    item.value!.images.push(newImage);
+    item.value.images.push(newImage);
 };
 
 const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {

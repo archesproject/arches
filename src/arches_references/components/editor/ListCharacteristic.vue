@@ -35,7 +35,7 @@ const field = "name";
 
 const inputValue = computed({
     get() {
-        return list.value!.name;
+        return list.value.name;
     },
     set(newVal: string) {
         formValue.value = newVal;
@@ -47,8 +47,8 @@ const { $gettext } = useGettext();
 
 const save = async () => {
     editing.value = false;
-    const originalValue = list.value!.name;
-    list.value!.name = formValue.value.trim();
+    const originalValue = list.value.name;
+    list.value.name = formValue.value.trim();
     try {
         await patchList(list.value!, field);
     } catch (error) {
@@ -58,13 +58,13 @@ const save = async () => {
             summary: $gettext("Save failed"),
             detail: error instanceof Error ? error.message : undefined,
         });
-        list.value!.name = originalValue;
+        list.value.name = originalValue;
     }
 };
 
 const cancel = () => {
     editing.value = false;
-    formValue.value = list.value!.name;
+    formValue.value = list.value.name;
 };
 </script>
 

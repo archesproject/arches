@@ -122,7 +122,7 @@ const issueDeleteMetadata = async (
 };
 
 const appendImageMetadata = (newMetadata: ControlledListItemImageMetadata) => {
-    const imageFromItem = item.value!.images.find(
+    const imageFromItem = item.value.images.find(
         (imageCandidateFromItem) =>
             imageCandidateFromItem.id === newMetadata.list_item_image_id,
     );
@@ -134,7 +134,7 @@ const appendImageMetadata = (newMetadata: ControlledListItemImageMetadata) => {
 const removeImageMetadata = (
     removedMetadata: NewOrExistingControlledListItemImageMetadata,
 ) => {
-    const imageFromItem = item.value!.images.find(
+    const imageFromItem = item.value.images.find(
         (imageCandidateFromItem) =>
             imageCandidateFromItem.id === removedMetadata.list_item_image_id,
     );
@@ -152,7 +152,7 @@ const removeImageMetadata = (
 const updateImageMetadata = (
     updatedMetadata: ControlledListItemImageMetadata,
 ) => {
-    const imageFromItem = item.value!.images.find(
+    const imageFromItem = item.value.images.find(
         (imageCandidateFromItem) =>
             imageCandidateFromItem.id === updatedMetadata.list_item_image_id,
     );
@@ -185,10 +185,10 @@ const issueDeleteImage = async () => {
 };
 
 const removeImage = (removedImage: ControlledListItemImage) => {
-    const toDelete = item.value!.images.findIndex(
+    const toDelete = item.value.images.findIndex(
         (imageFromItem) => imageFromItem.id === removedImage.id,
     );
-    item.value!.images.splice(toDelete, 1);
+    item.value.images.splice(toDelete, 1);
 };
 
 const makeMetadataEditable = (
