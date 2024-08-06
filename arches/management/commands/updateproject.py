@@ -344,6 +344,7 @@ class Command(BaseCommand):  # pragma: no cover
             os.path.join("..", "tests/test_settings.py"),
             os.path.join("..", "tests/search_indexes/sample_index_tests.py"),
             os.path.join("..", "pyproject.toml"),
+            os.path.join("..", "vitest.setup.mts"),
             "hosts.py",
         ]:  # relative to app root directory
             try:
