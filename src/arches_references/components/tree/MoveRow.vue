@@ -82,7 +82,7 @@ const isFirstItem = (item: ControlledListItem) => {
     const siblings: TreeNode[] = item.parent_id
         ? findNodeInTree(tree.value, item.parent_id).data!.children
         : findNodeInTree(tree.value, item.list_id).data!.items;
-    if (!siblings) {
+    if (!siblings.length) {
         throw new Error();
     }
     return siblings[0].id === item.id;
@@ -92,7 +92,7 @@ const isLastItem = (item: ControlledListItem) => {
     const siblings: TreeNode[] = item.parent_id
         ? findNodeInTree(tree.value, item.parent_id).data.children
         : findNodeInTree(tree.value, item.list_id).data.items;
-    if (!siblings) {
+    if (!siblings.length) {
         throw new Error();
     }
     return siblings[siblings.length - 1].id === item.id;
