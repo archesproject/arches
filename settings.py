@@ -2,13 +2,11 @@
 Django settings for arches_references project.
 """
 
-import json
-import os
-import sys
-import arches
 import inspect
-import semantic_version
+import os
 from datetime import datetime, timedelta
+
+import semantic_version
 from django.utils.translation import gettext_lazy as _
 
 try:
@@ -19,9 +17,6 @@ except ImportError:
 APP_NAME = "arches_references"
 APP_VERSION = semantic_version.Version(major=0, minor=0, patch=0)
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-MIN_ARCHES_VERSION = arches.__version__
-MAX_ARCHES_VERSION = arches.__version__
-
 
 WEBPACK_LOADER = {
     "DEFAULT": {
@@ -423,6 +418,9 @@ LANGUAGES = [
 
 # override this to permenantly display/hide the language switcher
 SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
+
+# TODO: remove when finalizing release
+SILENCED_SYSTEM_CHECKS += ["arches.E002"]
 
 try:
     from .package_settings import *
