@@ -25,21 +25,6 @@ class CoreArchesStaticFilesFinderNodeModules(AppDirectoriesFinder):
     source_dir = os.path.normpath(os.path.join("..", "node_modules"))
 
 
-@contextmanager
-def _move_to_end_of_sys_path(*paths, add_cwd=False):
-    _orig_sys_path = sys.path[:]
-    for path in paths:
-        if path in sys.path:
-            sys.path.remove(path)
-            sys.path.append(path)
-    if add_cwd:
-        sys.path.append(os.getcwd())
-    try:
-        yield
-    finally:
-        sys.path = _orig_sys_path
-
-
 def list_arches_app_names():
     return [
         config.name
