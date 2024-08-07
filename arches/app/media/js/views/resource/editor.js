@@ -168,7 +168,7 @@ define([
         userIsCreator: userIsCreator,
         showGrid: ko.observable(false),
         creator: creator,
-        resourceInstanceLifecycleState: data.resource_instance_lifecycle_state,
+        resourceInstanceLifecycleState: ko.observable(data.resource_instance_lifecycle_state),
         // appliedFunctions: appliedFunctions(),
         graph: {
             graphid: data.graphid,
@@ -296,9 +296,23 @@ define([
                     vm.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON));
                 },
                 success: function() {
-                    window.location.reload();
+                    window.location.reload();  // reload is important here, for enforcing a report redirect on an unpermissioned user 
                 }
             });
+        },
+        onSaveSuccess: function() {
+            if (!vm.resourceInstanceLifecycleState()) {
+                $.ajax({
+                    type: "GET",
+                    url: arches.urls.api_resource_instance_lifecycle_state(resourceId()),
+                    error: function(err) {
+                        vm.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON));
+                    },
+                    success: function(data) {
+                        vm.resourceInstanceLifecycleState(data);
+                    }
+                });
+            }
         },
         viewEditHistory: function() {
             if (resourceId()) {

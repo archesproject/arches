@@ -110,7 +110,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
 
         <div class="main-panel card-component-panel" style="height: calc(100vh - 50px);">
-            <!-- ko if: resourceInstanceLifecycleState -->
+            <!-- ko if: ko.unwrap(resourceInstanceLifecycleState) -->
             <div 
                 style="
                     background-color: #fff;
@@ -125,11 +125,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <span>
                             {% trans 'Resource Instance Lifecycle State:' %}
                         </span>
-                        <span data-bind="text: resourceInstanceLifecycleState['name']" style="margin: 0 10px;"></span>
+                        <span data-bind="text: ko.unwrap(resourceInstanceLifecycleState)['name']" style="margin: 0 10px;"></span>
                     </div>
                     
                     <div>
-                        <!-- ko foreach: resourceInstanceLifecycleState['previous_resource_instance_lifecycle_states'] -->
+                        <!-- ko foreach: ko.unwrap(resourceInstanceLifecycleState)['previous_resource_instance_lifecycle_states'] -->
                         <button 
                             class="btn btn-info"
                             data-bind="click: function() { $parent.updateResourceInstanceLifecycleState($data) }"
@@ -141,7 +141,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             ></span>
                         </button>
                         <!-- /ko -->
-                        <!-- ko foreach: resourceInstanceLifecycleState['next_resource_instance_lifecycle_states'] -->
+                        <!-- ko foreach: ko.unwrap(resourceInstanceLifecycleState)['next_resource_instance_lifecycle_states'] -->
                         <button 
                             class="btn btn-info"
                             data-bind="click: function() { $parent.updateResourceInstanceLifecycleState($data) }"
