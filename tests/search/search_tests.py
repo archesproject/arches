@@ -59,11 +59,9 @@ class SearchTests(ArchesTestCase):
             se.index_data(index="test", body=y, idfield="id", refresh=True)
 
         time.sleep(3)
-
         query = Query(se, start=0, limit=100)
         match = Match(field="type", query="altLabel")
         query.add_query(match)
-
         query.delete(index="test", refresh=True)
 
         self.assertEqual(se.count(index="test"), 10)
