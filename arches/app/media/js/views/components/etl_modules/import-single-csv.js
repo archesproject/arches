@@ -12,7 +12,7 @@ define([
     'bindings/datatable',
     'bindings/dropzone',
     'bindings/resizable-sidepanel',
-], function(ko, koMapping, $, dropzone, fuzzyset, uuid, arches, JsonErrorAlertViewModel, importSingleCSVTemplate) {
+], function(ko, koMapping, $, dropzone, FuzzySet, uuid, arches, JsonErrorAlertViewModel, importSingleCSVTemplate) {
     const viewModel = function(params) {
         const self = this;
         this.loadDetails = params.load_details || ko.observable();
@@ -63,19 +63,26 @@ define([
             let highestScore = 0;
             if (!!self.headers() && self.headers()[i] != 'resourceid') {
                 const header = normalizeText(self.headers()[i]);
+                const fuzzySet = FuzzySet();
                 self.nodes().forEach(function(node) {
                     if (node.name) {
                         const nameNorm = normalizeText(node.name);
                         const aliasNorm = normalizeText(node.alias);
-                        const nameScore = stringSimilarity.compareTwoStrings(header, nameNorm);
-                        const aliasScore = stringSimilarity.compareTwoStrings(header, aliasNorm);
-                        const bestNodeScore = Math.max(nameScore, aliasScore);
-                        if (bestNodeScore > highestScore) {
-                            highestScore = bestNodeScore;
-                            bestMatch = node;
-                        }
+                        fuzzySet.add(nameNorm);
+                        fuzzySet.add(aliasNorm);
                     }
                 });
+                const results = fuzzySet.get(header);
+                if (results) {
+                    const [bestScore, bestMatchName] = results[0]; // results are sorted by score
+                    if (bestScore > highestScore) {
+                        highestScore = bestScore;
+                        bestMatch = self.nodes().find(node =>
+                            normalizeText(node.name) === bestMatchName ||
+                            normalizeText(node.alias) === bestMatchName
+                        );
+                    }
+                }
                 if (bestMatch && highestScore > 0.8) { return bestMatch.alias; }
             }
             return null;
