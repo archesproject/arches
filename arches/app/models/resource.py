@@ -1105,7 +1105,7 @@ class Resource(models.ResourceInstance):
 
         if (
             self.graph.resource_instance_lifecycle.pk
-            != self.resource_instance_lifecycle_state.resource_instance_lifecycle.pk
+            != resource_instance_lifecycle_state.resource_instance_lifecycle.pk
         ):
             raise ValueError(
                 _(

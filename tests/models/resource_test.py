@@ -21,7 +21,7 @@ import os
 import time
 import uuid
 
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, Permission
 from django.db import connection
 from django.urls import reverse
 from django.test.client import Client
@@ -83,6 +83,18 @@ class ResourceTests(ArchesTestCase):
             "test", "test@archesproject.org", "password"
         )
         cls.user.groups.add(Group.objects.get(name="Guest"))
+
+        cls.permissioned_user = User.objects.create_user(
+            "permissioned_test_user",
+            "permissioned_test_user@archesproject.org",
+            "password",
+        )
+        cls.permissioned_user.groups.add(Group.objects.get(name="Resource Reviewer"))
+        cls.permissioned_user.user_permissions.add(
+            Permission.objects.get(
+                codename="can_edit_all_resource_instance_lifecycle_states"
+            )
+        )
 
         graph = Graph.objects.get(pk=cls.search_model_graphid)
         graph.publish(user=cls.user)
@@ -206,6 +218,8 @@ class ResourceTests(ArchesTestCase):
             id=uuid.uuid4(), name="State 2", resource_instance_lifecycle=cls.lifecycle
         )
 
+        cls.test_resource.resource_instance_lifecycle_state = cls.state1
+
         cls.test_resource.save()
 
         # add delay to allow for indexes to be updated
@@ -226,7 +240,7 @@ class ResourceTests(ArchesTestCase):
         self.test_resource.graph.save()
 
         updated_state = self.test_resource.update_resource_instance_lifecycle_state(
-            self.user, self.state2
+            self.permissioned_user, self.state2
         )
 
         self.assertEqual(updated_state.pk, self.state2.pk)
@@ -249,7 +263,7 @@ class ResourceTests(ArchesTestCase):
             "The given ResourceInstanceLifecycleState is not part of the model's ResourceInstanceLifecycle.",
         ):
             self.test_resource.update_resource_instance_lifecycle_state(
-                self.user, different_state
+                self.permissioned_user, different_state
             )
 
     def test_update_resource_instance_lifecycle_state_no_change(self):
@@ -257,7 +271,7 @@ class ResourceTests(ArchesTestCase):
         self.test_resource.graph.save()
 
         same_state = self.test_resource.update_resource_instance_lifecycle_state(
-            self.user, self.state1
+            self.permissioned_user, self.state1
         )
 
         self.assertEqual(same_state.pk, self.state1.pk)
