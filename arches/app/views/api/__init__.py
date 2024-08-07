@@ -1477,24 +1477,32 @@ class ResourceInstanceLifecycleState(APIBase):
             return JSONErrorResponse(
                 _("Request Failed"), _("Permission Denied"), status=403
             )
+        try:
+            data = json.loads(request.body)
+        except Exception as e:
+            return JSONErrorResponse(str(e), status=400)
 
-        data = json.loads(request.body)
-
-        resource = Resource.objects.get(pk=resourceid)
-        resource_instance_lifecycle_state = (
-            models.ResourceInstanceLifecycleState.objects.get(pk=data)
-        )
-
-        original_resource_instance_lifecycle_state = (
-            resource.resource_instance_lifecycle_state
-        )
-
-        current_resource_instance_lifecycle_state = (
-            resource.update_resource_instance_lifecycle_state(
-                user=request.user,
-                resource_instance_lifecycle_state=resource_instance_lifecycle_state,
+        try:
+            resource = Resource.objects.get(pk=resourceid)
+            resource_instance_lifecycle_state = (
+                models.ResourceInstanceLifecycleState.objects.get(pk=data)
             )
-        )
+        except Exception as e:
+            return JSONErrorResponse(str(e), status=404)
+
+        try:
+            original_resource_instance_lifecycle_state = (
+                resource.resource_instance_lifecycle_state
+            )
+
+            current_resource_instance_lifecycle_state = (
+                resource.update_resource_instance_lifecycle_state(
+                    user=request.user,
+                    resource_instance_lifecycle_state=resource_instance_lifecycle_state,
+                )
+            )
+        except ValueError as e:
+            return JSONErrorResponse(str(e), status=400)
 
         return JSONResponse(
             {
