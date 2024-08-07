@@ -25,7 +25,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.utils.translation import gettext as _
 from django.utils.translation import get_language
 from arches.app.models import models
@@ -1100,6 +1100,9 @@ class Resource(models.ResourceInstance):
     def update_resource_instance_lifecycle_state(
         self, user, resource_instance_lifecycle_state
     ):
+        if not user_is_resource_reviewer(user):
+            raise PermissionDenied
+
         if (
             self.graph.resource_instance_lifecycle.pk
             != self.resource_instance_lifecycle_state.resource_instance_lifecycle.pk

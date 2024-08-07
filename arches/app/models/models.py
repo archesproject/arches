@@ -1287,9 +1287,7 @@ class ResourceInstance(models.Model):
 
 
 class ResourceInstanceLifecycle(models.Model):
-    id = models.UUIDField(
-        primary_key=True, serialize=False, default=uuid.uuid4, unique=True
-    )
+    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid4)
     name = I18n_TextField()
 
     def get_initial_resource_instance_lifecycle_state(self):
@@ -1313,9 +1311,7 @@ class ResourceInstanceLifecycle(models.Model):
 
 
 class ResourceInstanceLifecycleState(models.Model):
-    id = models.UUIDField(
-        primary_key=True, serialize=False, default=uuid.uuid4, unique=True
-    )
+    id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid4)
     name = I18n_TextField()
     action_label = I18n_TextField()
     is_initial_state = models.BooleanField(default=False)

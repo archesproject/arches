@@ -26,10 +26,11 @@ def create_perpetual_resource_instance_lifecycle_states(apps, schema_editor):
     ResourceInstanceLifecycleState = apps.get_model(
         "models", "ResourceInstanceLifecycleState"
     )
-    perpetual_state = ResourceInstanceLifecycleState.objects.create(
+
+    ResourceInstanceLifecycleState.objects.create(
         id=uuid.UUID("4e2a6b8e-2489-4377-9c9f-29cfbd3e76c8"),
         name="Perpetual",
-        action_label=_(""),
+        action_label="",
         resource_instance_lifecycle_id=uuid.UUID(
             "e9a8a2b0-63b5-47a3-bbc4-9c09c0e759b1"
         ),
@@ -37,8 +38,6 @@ def create_perpetual_resource_instance_lifecycle_states(apps, schema_editor):
         can_delete_resource_instances=True,
         can_edit_resource_instances=True,
     )
-
-    perpetual_state.save()
 
 
 def remove_perpetual_resource_instance_lifecycle_states(apps, schema_editor):
@@ -150,7 +149,6 @@ class Migration(migrations.Migration):
                         primary_key=True,
                         serialize=False,
                         default=uuid.uuid4,
-                        unique=True,
                     ),
                 ),
                 ("name", arches.app.models.fields.i18n.I18n_TextField()),
@@ -169,7 +167,6 @@ class Migration(migrations.Migration):
                         primary_key=True,
                         serialize=False,
                         default=uuid.uuid4,
-                        unique=True,
                     ),
                 ),
                 (

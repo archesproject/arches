@@ -510,9 +510,9 @@ class Graph(models.GraphModel):
             )
         )
 
-        if resource_instance_lifecycle_query.exists():
-            self.resource_instance_lifecycle = resource_instance_lifecycle_query.first()
-        else:
+        self.resource_instance_lifecycle = resource_instance_lifecycle_query.first()
+
+        if not self.resource_instance_lifecycle:
             self.resource_instance_lifecycle = models.ResourceInstanceLifecycle(
                 id=resource_instance_lifecycle["id"],
                 name=resource_instance_lifecycle["name"],
