@@ -1450,7 +1450,11 @@ class GraphTests(ArchesTestCase):
             ],
         }
 
-        graph = Graph.objects.get(graphid=self.rootNode.graph_id)
+        graph = Graph.new(
+            name="RESOURCE_INSTANCE_LIFECYCLE_TEST_GRAPH",
+            is_resource=True,
+            author="ARCHES TEST",
+        )
         graph.add_resource_instance_lifecycle(resource_instance_lifecycle)
         graph.save()
 
