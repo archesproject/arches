@@ -355,7 +355,6 @@ class Migration(migrations.Migration):
             model_name="resourceinstance",
             name="resource_instance_lifecycle_state",
             field=models.ForeignKey(
-                null=True,
                 default=uuid.UUID("f75bb034-36e3-4ab4-8167-f520cf0b4c58"),
                 on_delete=models.deletion.PROTECT,
                 related_name="resource_instances",
