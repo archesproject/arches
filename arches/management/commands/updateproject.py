@@ -259,7 +259,7 @@ class Command(BaseCommand):  # pragma: no cover
 
         if os.path.isfile(os.path.join(settings.APP_ROOT, "apps.py")):
             warnings.warn(
-                "Existing apps.py detected. Manually add is_arches_application=True.",
+                "Existing apps.py detected. Manually reconcile existing file with new template.",
                 UserWarning,
             )
         else:
@@ -293,6 +293,7 @@ class Command(BaseCommand):  # pragma: no cover
                     "arches-templates",
                     "project_name",
                     "src",
+                    "project_name",
                     "declarations.d.ts",
                 ),
                 os.path.join(settings.APP_ROOT, "src"),
