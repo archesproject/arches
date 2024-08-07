@@ -69,7 +69,7 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 - Default deny permissions
 - Support for pluggable permissions frameworks
 - Standalone plugins
-- Componentized Search
+- Customizable Search
 - Concept label bulk editor module
 - Map performance improvments
 - Postgres 14 becomes minimum Postgres version
