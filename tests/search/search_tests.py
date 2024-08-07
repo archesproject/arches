@@ -90,7 +90,7 @@ class SearchTests(ArchesTestCase):
                 )
             )
 
-        ret = se.bulk_index(documents, refresh=True)
+        se.bulk_index(documents, refresh=True)
         count_after = se.count(index="test")
         self.assertEqual(count_after - count_before, 10)
 
