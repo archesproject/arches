@@ -35,7 +35,7 @@ from arches.app.search.elasticsearch_dsl_builder import (
 # python manage.py test tests.search.search_tests --settings="tests.test_settings"
 
 
-class SearchTests(ArchesTestCase):
+class SearchTests(TestCase):
     @classmethod
     def tearDownClass(cls):
         se = SearchEngineFactory().create()
