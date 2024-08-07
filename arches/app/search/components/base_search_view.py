@@ -6,13 +6,13 @@ details = {}
 #     "searchcomponentid": "",  # leave blank for the system to generate a uuid
 #     "name": "",  # the name that shows up in the UI
 #     "icon": "",  # the icon class to use
-#     "modulename": "custom_search_logic.py",  # the name of this file
-#     "classname": "BaseSearchLogic",  # the classname below",
-#     "type": "search-logic",  # 'search-logic' if you want this to govern the search
+#     "modulename": "custom_search_view.py",  # the name of this file
+#     "classname": "BaseSearchView",  # the classname below",
+#     "type": "search-view",  # 'search-view' if you want this to govern the search
 #     "componentpath": "views/components/search/...",  # path to ko component
-#     "componentname": "custom-search-logic",  # lowercase unique name
+#     "componentname": "custom-search-view",  # lowercase unique name
 #     "config": {
-#         "default": True, # set for search logic components; only 1 can be the default
+#         "default": True, # set for search-view components; only 1 can be the default
 #         "availableComponents": [ # search components available to the frontend and permitted to be executed on the backend
 #             {
 #                 "componentname":"map-filter","searchcomponentid":"09d97fc6-8c83-4319-9cef-3aaa08c3fbec","sortorder":1
@@ -57,7 +57,7 @@ details = {}
 # }
 
 
-class BaseSearchLogic(BaseSearchFilter):
+class BaseSearchView(BaseSearchFilter):
     """
     Special type of component that specifies which other components to be used,
     how to execute a search in the search_results method
@@ -65,18 +65,18 @@ class BaseSearchLogic(BaseSearchFilter):
 
     def __init__(self, request=None, user=None, componentname=None):
         super().__init__(request=request, user=user, componentname=componentname)
-        self.search_logic_component = models.SearchComponent.objects.get(
+        self.searchview_component = models.SearchComponent.objects.get(
             componentname=componentname
         )
         required_component_sort_order = {
             item["componentname"]: int(item["sortorder"])
-            for item in self.search_logic_component.config["requiredComponents"]
+            for item in self.searchview_component.config["requiredComponents"]
         }
         self._required_search_components = list(
             models.SearchComponent.objects.filter(
                 searchcomponentid__in=[
                     required_component["searchcomponentid"]
-                    for required_component in self.search_logic_component.config[
+                    for required_component in self.searchview_component.config[
                         "requiredComponents"
                     ]
                 ]
@@ -90,13 +90,13 @@ class BaseSearchLogic(BaseSearchFilter):
         )
         available_component_sort_order = {
             item["componentname"]: int(item["sortorder"])
-            for item in self.search_logic_component.config["availableComponents"]
+            for item in self.searchview_component.config["availableComponents"]
         }
         self._available_search_components = list(
             models.SearchComponent.objects.filter(
                 searchcomponentid__in=[
                     available_component["searchcomponentid"]
-                    for available_component in self.search_logic_component.config[
+                    for available_component in self.searchview_component.config[
                         "availableComponents"
                     ]
                 ]
@@ -118,7 +118,7 @@ class BaseSearchLogic(BaseSearchFilter):
         return self._available_search_components
 
     def get_searchview_components(self):
-        return self._available_search_components + [self.search_logic_component]
+        return self._available_search_components + [self.searchview_component]
 
     def handle_search_results_query(
         self, search_query_object, response_object, search_filter_factory, returnDsl

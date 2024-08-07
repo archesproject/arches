@@ -194,7 +194,7 @@ define([
                 });
                 queryObj[componentName] = JSON.stringify(advanced);
 
-                if (this.getFilterByType('term-filter').hasTag(this.tagId) === false) {
+                if (this.getFilter('term-filter').hasTag(this.tagId) === false) {
                     this.getFilterByType('term-filter').addTag(this.tagId, this.name, ko.observable(false));
                 }
             } else {

@@ -45,8 +45,8 @@ define([
     var CommonSearchViewModel = function() {
         this.searchComponentVms = {};
         this.filtersList = Object.values(SearchComponents);
-        this.defaultSearchLogicComponent = this.filtersList.find(component => component.type == "search-logic" && component.config.default == true); // approach: let the backend decide
-        this.searchLogicComponentName = ko.observable(false);
+        this.defaultSearchViewComponent = this.filtersList.find(component => component.type == "search-view" && component.config.default == true); // approach: let the backend decide
+        this.searchViewComponentName = ko.observable(false);
         this.requiredFiltersLookup = this.filtersList.reduce((lookup, item) => {
             if (item.config.availableComponents && item.config.availableComponents.length > 0) {
                 lookup[item.componentname] = item.config.availableComponents.map(filter => filter.searchcomponentid);
@@ -77,10 +77,10 @@ define([
             this.searchComponentVms[component.componentname] = ko.observable(null);
         }, this);
         this.query = ko.observable(getQueryObject());
-        if (this.query()["search-logic"] !== undefined) {
-            this.searchLogicComponentName(this.query()["search-logic"]);
+        if (this.query()["search-view"] !== undefined) {
+            this.searchViewComponentName(this.query()["search-view"]);
         } else {
-            this.searchLogicComponentName(this.defaultSearchLogicComponent.componentname);
+            this.searchViewComponentName(this.defaultSearchViewComponent.componentname);
         }
         this.queryString = ko.computed(function() {
             return JSON.stringify(this.query());

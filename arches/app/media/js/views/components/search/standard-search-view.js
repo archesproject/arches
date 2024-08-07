@@ -4,16 +4,16 @@ define([
     'knockout',
     'arches',
     'viewmodels/alert',
-    'views/components/search/base-search-logic',
-    'templates/views/components/search/standard-search-logic.htm',
-], function($, _, ko, arches, AlertViewModel, BaseSearchLogicComponent, standardSearchLogicTemplate) {
-    const componentName = 'standard-search-logic';
-    const viewModel = BaseSearchLogicComponent.extend({ 
+    'views/components/search/base-search-view',
+    'templates/views/components/search/standard-search-view.htm',
+], function($, _, ko, arches, AlertViewModel, BaseSearchViewComponent, standardSearchViewTemplate) {
+    const componentName = 'standard-search-view';
+    const viewModel = BaseSearchViewComponent.extend({ 
         initialize: function(sharedStateObject) {
             const self = this;
             sharedStateObject.componentName = componentName;
-            BaseSearchLogicComponent.prototype.initialize.call(this, sharedStateObject);
-            this.defaultQuery = {"paging-filter": "1", "search-logic":"standard-search-logic", tiles: "true"};
+            BaseSearchViewComponent.prototype.initialize.call(this, sharedStateObject);
+            this.defaultQuery = {"paging-filter": "1", "search-view":"standard-search-view", tiles: "true"};
             
             this.selectedPopup = ko.observable('');
             this.sharedStateObject.selectedPopup = this.selectedPopup;
@@ -57,6 +57,6 @@ define([
 
     return ko.components.register(componentName, {
         viewModel: viewModel,
-        template: standardSearchLogicTemplate,
+        template: standardSearchViewTemplate,
     });
 });

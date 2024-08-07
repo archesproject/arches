@@ -98,35 +98,35 @@ class SearchFilterFactory(object):
         else:
             return None
 
-    def get_search_logic_component_name(self):
+    def get_searchview_component_name(self):
         if not self.request:
-            search_logic_component_name = None
+            searchview_component_name = None
         elif self.request.method == "POST":
-            search_logic_component_name = self.request.POST.get("search-logic", None)
+            searchview_component_name = self.request.POST.get("search-view", None)
         else:
-            search_logic_component_name = self.request.GET.get("search-logic", None)
+            searchview_component_name = self.request.GET.get("search-view", None)
 
-        if not search_logic_component_name:
-            # get default search_logic component
-            search_logic_component = list(
+        if not searchview_component_name:
+            # get default search_view component
+            searchview_component = list(
                 filter(
                     lambda x: x.config.get("default", False)
-                    and x.type == "search-logic",
+                    and x.type == "search-view",
                     list(self.search_filters.values()),
                 )
             )[0]
-            search_logic_component_name = search_logic_component.componentname
+            searchview_component_name = searchview_component.componentname
 
-        return search_logic_component_name
+        return searchview_component_name
 
-    def get_search_logic_instance(self):
-        search_logic_component_name = self.get_search_logic_component_name()
-        return self.get_filter(search_logic_component_name)
+    def get_searchview_component_instance(self):
+        searchview_component_name = self.get_searchview_component_name()
+        return self.get_filter(searchview_component_name)
 
-    def get_sorted_query_dict(self, query_dict, search_logic_component):
+    def get_sorted_query_dict(self, query_dict, searchview_component):
         component_sort_order = {
             item["componentname"]: int(item["sortorder"])
-            for item in search_logic_component.config["requiredComponents"]
+            for item in searchview_component.config["requiredComponents"]
         }
         # Sort the query_dict items based on the requiredComponent's sortorder
         sorted_items = sorted(
@@ -136,26 +136,26 @@ class SearchFilterFactory(object):
 
         return dict(sorted_items)
 
-    def get_query_dict_with_search_logic_component(self, query_dict: Dict[str, Any]):
+    def get_query_dict_with_searchview_component(self, query_dict: Dict[str, Any]):
         """
-        Set search-logic=arches-search-logic on query_dict to arches-search-logic=True
+        Set search-view=arches-search-view on query_dict to arches-search-view=True
         """
         ret = dict(query_dict)
-        search_logic_component_name = self.get_search_logic_component_name()
-        ret[search_logic_component_name] = True
+        searchview_component_name = self.get_searchview_component_name()
+        ret[searchview_component_name] = True
         # check that all core-search component requiredComponents are present
-        for required_component in self.search_filters[
-            search_logic_component_name
-        ].config["requiredComponents"]:
+        for required_component in self.search_filters[searchview_component_name].config[
+            "requiredComponents"
+        ]:
             if required_component["componentname"] not in ret:
                 ret[required_component["componentname"]] = {}
 
-        return ret, self.search_filters[search_logic_component_name]
+        return ret, self.search_filters[searchview_component_name]
 
     def create_search_query_dict(self, key_value_pairs: List[Tuple[str, Any]]):
         # handles list of key,value tuples so that dict-like data from POST and GET
         # requests can be concatenated into single method call
-        query_dict, search_logic_component = (
-            self.get_query_dict_with_search_logic_component(dict(key_value_pairs))
+        query_dict, searchview_component = (
+            self.get_query_dict_with_searchview_component(dict(key_value_pairs))
         )
-        return self.get_sorted_query_dict(query_dict, search_logic_component)
+        return self.get_sorted_query_dict(query_dict, searchview_component)

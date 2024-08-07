@@ -1232,10 +1232,10 @@ class SearchComponent(models.Model):
 
 
 @receiver(pre_save, sender=SearchComponent)
-def ensure_single_default_search_logic(sender, instance, **kwargs):
-    if instance.config.get("default", False) and instance.type == "search-logic":
+def ensure_single_default_searchview(sender, instance, **kwargs):
+    if instance.config.get("default", False) and instance.type == "search-view":
         existing_default = SearchComponent.objects.filter(
-            config__default=True, type="search-logic"
+            config__default=True, type="search-view"
         ).exclude(searchcomponentid=instance.searchcomponentid)
         if existing_default.exists():
             raise ValidationError(

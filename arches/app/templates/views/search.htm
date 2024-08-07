@@ -6,9 +6,9 @@
 {% block title %} {{ block.super }} {% trans "Search" %} {% endblock title %}
 
 {% block main_content %}
-<!-- ko if: sharedStateObject.searchLogicComponentName -->
+<!-- ko if: sharedStateObject.searchViewComponentName -->
 <div data-bind="component: {
-    name: sharedStateObject.searchLogicComponentName(),
+    name: sharedStateObject.searchViewComponentName(),
     params: sharedStateObject
 }">
 </div>
