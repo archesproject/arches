@@ -244,7 +244,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                     result["permitted"] = False
                     return result
 
-            resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
+            resource = ResourceInstance.objects.select_related(
+                "resource_instance_lifecycle_state"
+            ).get(resourceinstanceid=resourceid)
             result["resource"] = resource
 
             all_perms = self.get_perms(user, resource)
@@ -537,9 +539,10 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                     user, resourceid, "change_resourceinstance"
                 )
                 if result is not None:
-                    if not result[
-                        "resource"
-                    ].resource_instance_lifecycle_state.can_edit_resource_instances:
+                    if not user.has_perm(
+                        "can_edit_all_resource_instance_lifecycle_states",
+                        result["resource"].resource_instance_lifecycle_state,
+                    ):
                         return False
 
                     if result["permitted"] == "unknown":
@@ -574,9 +577,10 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                     user, resourceid, "delete_resourceinstance"
                 )
                 if result is not None:
-                    if not result[
-                        "resource"
-                    ].resource_instance_lifecycle_state.can_delete_resource_instances:
+                    if not user.has_perm(
+                        "can_delete_all_resource_instance_lifecycle_states",
+                        result["resource"].resource_instance_lifecycle_state,
+                    ):
                         return False
 
                     if result["permitted"] == "unknown":

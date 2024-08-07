@@ -1355,6 +1355,16 @@ class ResourceInstanceLifecycleState(models.Model):
     class Meta:
         db_table = "resource_instance_lifecycle_states"
         managed = True
+        permissions = (
+            (
+                "can_edit_all_resource_instance_lifecycle_states",
+                "Can edit all resource instance lifecycle states",
+            ),
+            (
+                "can_delete_all_resource_instance_lifecycle_states",
+                "Can delete all resource instance lifecycle states",
+            ),
+        )
         constraints = [
             UniqueConstraint(
                 fields=["resource_instance_lifecycle"],

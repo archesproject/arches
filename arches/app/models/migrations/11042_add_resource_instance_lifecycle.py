@@ -197,6 +197,16 @@ class Migration(migrations.Migration):
             ],
             options={
                 "db_table": "resource_instance_lifecycle_states",
+                "permissions": (
+                    (
+                        "can_edit_all_resource_instance_lifecycle_states",
+                        "Can edit all resource instance lifecycle states",
+                    ),
+                    (
+                        "can_delete_all_resource_instance_lifecycle_states",
+                        "Can delete all resource instance lifecycle states",
+                    ),
+                ),
                 "managed": True,
             },
         ),
