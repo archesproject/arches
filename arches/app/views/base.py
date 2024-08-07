@@ -16,12 +16,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from arches import __version__
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.compatibility import is_compatible_with_arches, CompatibilityError
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -35,10 +33,6 @@ from arches.app.utils.permission_backend import (
 
 
 class BaseManagerView(TemplateView):
-    if is_compatible_with_arches() is False:
-        message = _("This project is incompatible with Arches {0}.").format(__version__)
-        raise CompatibilityError(message)
-
     template_name = ""
 
     def get_context_data(self, **kwargs):
