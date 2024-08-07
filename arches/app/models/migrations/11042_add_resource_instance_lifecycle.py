@@ -320,10 +320,28 @@ class Migration(migrations.Migration):
             name="resource_instance_lifecycle",
             field=models.ForeignKey(
                 null=True,
-                default=uuid.UUID("7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"),
                 on_delete=models.deletion.PROTECT,
                 related_name="graphs",
                 to="models.resourceinstancelifecycle",
+            ),
+        ),
+        migrations.AddConstraint(
+            model_name="graphmodel",
+            constraint=models.CheckConstraint(
+                check=(
+                    models.Q(isresource=False, resource_instance_lifecycle__isnull=True)
+                    | models.Q(
+                        isresource=True,
+                        source_identifier__isnull=False,
+                        resource_instance_lifecycle__isnull=True,
+                    )
+                    | models.Q(
+                        isresource=True,
+                        source_identifier__isnull=True,
+                        resource_instance_lifecycle__isnull=False,
+                    )
+                ),
+                name="resource_instance_lifecycle_conditional_null",
             ),
         ),
         migrations.AddField(

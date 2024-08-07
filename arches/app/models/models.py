@@ -551,7 +551,6 @@ class GraphModel(models.Model):
     has_unpublished_changes = models.BooleanField(default=False)
     resource_instance_lifecycle = models.ForeignKey(
         null=True,
-        default=uuid.UUID(settings.DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID),
         on_delete=models.PROTECT,
         to="models.ResourceInstanceLifecycle",
         related_name="graphs",
@@ -592,6 +591,17 @@ class GraphModel(models.Model):
 
         return graph
 
+    def save(self, *args, **kwargs):
+        if (
+            self.isresource
+            and not self.source_identifier
+            and not self.resource_instance_lifecycle
+        ):
+            self.resource_instance_lifecycle = ResourceInstanceLifecycle.objects.get(
+                id=settings.DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID
+            )
+        super(GraphModel, self).save(*args, **kwargs)
+
     def __str__(self):
         return str(self.name)
 
@@ -603,6 +613,25 @@ class GraphModel(models.Model):
     class Meta:
         managed = True
         db_table = "graphs"
+
+        constraints = [
+            models.CheckConstraint(
+                check=(
+                    Q(isresource=False, resource_instance_lifecycle__isnull=True)
+                    | Q(
+                        isresource=True,
+                        source_identifier__isnull=False,
+                        resource_instance_lifecycle__isnull=True,
+                    )
+                    | Q(
+                        isresource=True,
+                        source_identifier__isnull=True,
+                        resource_instance_lifecycle__isnull=False,
+                    )
+                ),
+                name="resource_instance_lifecycle_conditional_null",
+            )
+        ]
 
 
 class GraphXPublishedGraph(models.Model):
