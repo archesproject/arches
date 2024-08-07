@@ -1203,7 +1203,6 @@ class ResourceInstance(models.Model):
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
     resource_instance_lifecycle_state = models.ForeignKey(
-        null=True,
         on_delete=models.PROTECT,
         to="models.ResourceInstanceLifecycleState",
         related_name="resource_instances",
@@ -1261,7 +1260,7 @@ class ResourceInstance(models.Model):
         except ResourceInstance.graph.RelatedObjectDoesNotExist:
             pass
 
-        if self.resource_instance_lifecycle_state is None:
+        if not hasattr(self, "resource_instance_lifecycle_state"):
             self.resource_instance_lifecycle_state = (
                 self.get_initial_resource_instance_lifecycle_state()
             )
@@ -1279,6 +1278,12 @@ class ResourceInstance(models.Model):
         managed = True
         db_table = "resource_instances"
         permissions = (("no_access_to_resourceinstance", "No Access"),)
+        constraints = [
+            models.CheckConstraint(
+                check=Q(resource_instance_lifecycle_state__isnull=False),
+                name="check_resource_instance_lifecycle_state_not_null",
+            )
+        ]
 
 
 class ResourceInstanceLifecycle(models.Model):
