@@ -17,12 +17,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import json
-import os
 import time
 import uuid
 
 from arches.app.models import models
-from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.search.elasticsearch_dsl_builder import (
@@ -30,22 +28,18 @@ from arches.app.search.elasticsearch_dsl_builder import (
     Query,
 )
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.utils.data_management.resource_graphs.importer import (
-    import_graph as resource_graph_importer,
-)
 from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.views.search import search_terms
 from django.http import HttpRequest
 from django.contrib.auth.models import User
-from django.test import TestCase
 from django.test.utils import captured_stdout
+from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
 # python manage.py test tests.search.search_tests --settings="tests.test_settings"
 
 
-class SearchTests(TestCase):
+class SearchTests(ArchesTestCase):
     @classmethod
     def tearDownClass(cls):
         models.GraphModel.objects.filter(
@@ -63,17 +57,11 @@ class SearchTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         LanguageSynchronizer.synchronize_settings_with_db()
-
-        with open(
-            os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "r"
-        ) as f:
-            archesfile = JSONDeserializer().deserialize(f)
-
-        resource_graph_importer(archesfile["graph"])
-        user = User.objects.create_user(
+        User.objects.create_user(
             username="Tester", email="test@test.com", password="test12345!"
         )
-        Graph.objects.get(pk="c9b37a14-17b3-11eb-a708-acde48001122").publish(user=user)
+        cls.loadOntology()
+        cls.ensure_resource_test_model_loaded()
 
     def test_delete_by_query(self):
         """
@@ -150,9 +138,7 @@ class SearchTests(TestCase):
         resource = Resource(uuid.UUID(resourceinstanceid))
         user = User.objects.get(username="Tester")
         resource.graph_id = "c9b37a14-17b3-11eb-a708-acde48001122"
-
         resource.save(user=user, transaction_id=uuid.uuid4())
-
         tile_data = {}
         tile_data[nodeid] = {
             "en": {"value": "Etiwanda Avenue Street Trees", "direction": "ltr"}
@@ -163,10 +149,8 @@ class SearchTests(TestCase):
             data=tile_data,
             nodegroup_id=nodeid,
         )
-
         new_tile.save()
         time.sleep(1)  # wait a moment for ES to finish indexing
-
         request = HttpRequest()
         request.method = "GET"
         request.GET.__setitem__("lang", "en")
