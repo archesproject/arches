@@ -74,7 +74,7 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 - Map performance improvments
 - Postgres 14 becomes minimum Postgres version
 
-## v7 Applications
+## 7.6 - Supported Applications
  - Workflow Builder
 
 ## 8.0 - Release date: June 15, 2025
@@ -90,8 +90,8 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 - Django 5.2 support
 - Python 3.11 becomes minimum Python version
 
-## v8 Applications
-- Implementation of the Controlled List Manager and reference data type
+## 8.0 - Supported Applications
+- Arches References
 - Arches Lingo
 
 ## 9.0 - Release date: Sept 15, 2027
