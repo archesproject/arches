@@ -12,7 +12,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 7.5.2 release notes](https://github.com/archesproject/arches/blob/stable/7.5.2/releases/7.5.2.md)
+[Version 7.6.0 release notes](https://github.com/archesproject/arches/blob/dev/7.6.x/releases/7.6.0.md)
 
 #### Quick Install
 
@@ -49,15 +49,15 @@ If you run into problems, please review our full [installation documentation](ht
 
 #### Release Cycle
 
-Our general release cycle will typically be a functional release (either major if there are backward incompatible changes or minor, if there are not) every 6 months. Each functional release will typically be followed by one or more patch releases. See [semver.org](https://semver.org/) for version numbering.
+Our general release cycle will typically be a functional release (either major if there are backward incompatible changes or minor, if there are not) every 9 months. Each functional release will typically be followed by one or more patch releases. See [semver.org](https://semver.org/) for version numbering.
 
 -   Functional releases will usually introduce new functionality to the application, but could also include styling updates, enhancements to the UX, bug fixes, and performance improvements.
 -   Patch releases are really only concerned with fixing any bugs related to the previous release or any other issues not yet addressed
 
 #### Support for previous releases
 
-- Stable releases will be supported with patch releases for at least 18 months. Typically the stable release will be the second or third minor release of a major release. 
-- Functional releases (with the exception of stable releases) will be supported only until the next functional release. After that users are expected to upgrade to the latest release on [pypi.python.org](https://pypi.python.org/pypi/arches)
+- LTS (Long Term Support) releases will be maintained with patch releases for at least 27 months. Typically an LTS release will be the second minor release following a major release. 
+- Feature releases (with the exception of stable releases) will be supported only until the next feature release. After that users are expected to upgrade to the latest release on [pypi.python.org](https://pypi.python.org/pypi/arches)
 
 #### Feature roadmap
 
