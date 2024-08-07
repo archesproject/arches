@@ -1,7 +1,7 @@
 *.pyc
 *.log
 node_modules
-*.coverage
+coverage/
 {{ project_name }}/logs
 {{ project_name }}/export_deliverables
 {{ project_name }}/cantaloupe/*
@@ -15,3 +15,5 @@ webpack-stats.json
 *.egg-info
 .DS_STORE
 CACHE
+.tsconfig-paths.json
+.frontend-configuration-settings.json
