@@ -72,6 +72,7 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 - Componentized Search
 - Concept label bulk editor module
 - Map performance improvments
+- Postgres 14 becomes minimum Postgres version
 
 ## v7 Applications
  - Workflow Builder
@@ -86,6 +87,8 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 - Implementation resource lifecycles
 - Bulk Data Manager CLI interface
 - Migration to MapLibre
+- Django 5.2 support
+- Python 3.11 becomes minimum Python version
 
 ## v8 Applications
 - Implementation of the Controlled List Manager and reference data type
