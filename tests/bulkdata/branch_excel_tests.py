@@ -94,12 +94,13 @@ class BranchExcelTests(TransactionTestCase):
         importer = BranchExcelImporter(request=request, loadid=load_id)
         importer.write(request)
 
-    # def tearDown(self):
-    #     file_name = "branch_exporter_test"
-    #     exported_file_path = os.path.join(
-    #         "tests/fixtures/data/archestemp", file_name + "." + "zip"
-    #     )
-    #     os.remove(exported_file_path)
+    def tearDown(self):
+        file_name = "branch_exporter_test"
+        exported_file_path = os.path.join(
+            "tests/fixtures/data/archestemp", file_name + "." + "zip"
+        )
+        if os.path.exists(exported_file_path):
+            os.remove(exported_file_path)
 
     def test_write(self):
         load_id = "d481d116-7c1e-4b36-b7ef-85963d482db0"
