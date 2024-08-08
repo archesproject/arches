@@ -156,6 +156,7 @@ class TileData(View):
                 if tile_id is not None and tile_id != "":
                     try:
                         old_tile = Tile.objects.get(pk=tile_id)
+                        data["_original_data"] = old_tile.data
                     except ObjectDoesNotExist as e:
                         return self.handle_save_error(
                             e,
