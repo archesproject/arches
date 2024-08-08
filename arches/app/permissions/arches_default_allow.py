@@ -1,5 +1,5 @@
 from __future__ import annotations
-import sys
+import logging
 import uuid
 
 from django.contrib.auth.models import User
@@ -25,6 +25,8 @@ from guardian.shortcuts import (
     remove_perm,
 )
 
+logger = logging.getLogger(__name__)
+
 
 class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
     def process_new_user(self, instance: User, created: bool) -> None:
@@ -47,6 +49,9 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
     def get_search_ui_permissions(
         self, user: User, search_result: dict, groups
     ) -> dict:
+        """
+        Determintes whether or not read/edit buttons show up in search results.
+        """
         result = {}
         user_read_permissions = self.get_resource_types_by_perm(
             user,
@@ -56,10 +61,30 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
                 "models.read_nodegroup",
             ],
         )
+
         user_can_read = len(user_read_permissions) > 0
-        result["can_read"] = (
+
+        # validate permissions structure for search result
+        deny_read_exists = (
             "permissions" in search_result["_source"]
             and "users_without_read_perm" in search_result["_source"]["permissions"]
+        )
+        deny_edit_exists = (
+            "permissions" in search_result["_source"]
+            and "users_without_edit_perm" in search_result["_source"]["permissions"]
+        )
+
+        if not deny_read_exists or not deny_edit_exists:
+            logger.warning(
+                """
+                PROBLEM WITH INDEX - it appears that your index permissions are malformed.  
+                This can happen when switching permission frameworks and may cause search 
+                results to appear incorrectly or with invalid permissions.  You can correct it by reindexing arches.
+                """
+            )
+
+        result["can_read"] = (
+            deny_read_exists
             and (
                 user.id
                 not in search_result["_source"]["permissions"][
@@ -69,17 +94,17 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         ) and user_can_read
 
         user_can_edit = len(self.get_editable_resource_types(user)) > 0
+
         result["can_edit"] = (
-            "permissions" in search_result["_source"]
-            and "users_without_edit_perm" in search_result["_source"]["permissions"]
+            deny_edit_exists
             and (
                 user.id
                 not in search_result["_source"]["permissions"][
                     "users_without_edit_perm"
                 ]
             )
-            and user_can_edit
-        )
+        ) and user_can_edit
+
         result["is_principal"] = (
             "permissions" in search_result["_source"]
             and "principal_user" in search_result["_source"]["permissions"]

@@ -382,6 +382,9 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
     def get_resource_types_by_perm(
         self, user: User, perms: str | Iterable[str]
     ) -> list[str]:
+        """
+        Returns list of graph ids that the user has specified permissions on
+        """
         nodegroups = self.get_nodegroups_by_perm(user, perms)
         graphs = (
             Node.objects.values("graph_id")
@@ -589,26 +592,45 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         user_or_group: User | Group = None,
         resource_instance: ResourceInstance = None,
         cls: str | Model = None,
-    ) -> list[Permission]:
+    ) -> list[str]:
         """
         Gets default permissions (if any) for a resource instance.
         """
-        return []
-        # default_permissions = settings.PERMISSION_DEFAULTS
-        # if not default_permissions: return []
+        default_permissions_settings = settings.PERMISSION_DEFAULTS
+        if not default_permissions_settings:
+            return []
 
-        # permissions = set()
-        # for graph in default_permissions.keys():
-        #     for entity in default_permissions[graph].keys():
-        #         Permissions
+        default_permissions_for_graph = (
+            default_permissions_settings[str(resource_instance.graph_id)]
+            if str(resource_instance.graph_id) in default_permissions_settings
+            else None
+        )
 
-        # permissions = Permission.objects.filter(codename__in=[])
-        # if user_or_group.isinstance(Group):
-        # elif user_or_group.isinstance(User):
-        # elif cls.isinstance(Model):
-        # elif cls.isinstance(str):
+        print("DEFAULT_PERMISSIONS_FOR_GRAPH")
+        print(default_permissions_for_graph)
+        print(user_or_group.id)
+        user_ids = []
+        group_ids = []
 
-        print(resource_instance.graph_id)
+        if isinstance(user_or_group, Group):
+            group_ids.append(user_or_group.id)
+        elif isinstance(user_or_group, User):
+            user_ids.append(user_or_group.id)
+            group_ids = [x.id for x in user_or_group.groups.all()]
+
+        default_permissions = [
+            item
+            for sub_list in [
+                x["permissions"]
+                for x in default_permissions_for_graph
+                if (x["type"] == "user" and x["id"] in user_ids)
+                or (x["type"] == "group" and x["id"] in group_ids)
+            ]
+            for item in sub_list
+        ]
+        print("DEFAULT_PERMISSIONS")
+        print(default_permissions)
+        return default_permissions
 
 
 class PermissionBackend(ObjectPermissionBackend):  # type: ignore
