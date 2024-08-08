@@ -539,11 +539,14 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                     user, resourceid, "change_resourceinstance"
                 )
                 if result is not None:
-                    if not user.has_perm(
-                        "can_edit_all_resource_instance_lifecycle_states",
-                        result["resource"].resource_instance_lifecycle_state,
-                    ):
-                        return False
+                    if not result[
+                        "resource"
+                    ].resource_instance_lifecycle_state.can_edit_resource_instances:
+                        if not user.has_perm(
+                            "can_edit_all_resource_instance_lifecycle_states",
+                            result["resource"].resource_instance_lifecycle_state,
+                        ):
+                            return False
 
                     if result["permitted"] == "unknown":
                         return user.groups.filter(
@@ -577,11 +580,14 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                     user, resourceid, "delete_resourceinstance"
                 )
                 if result is not None:
-                    if not user.has_perm(
-                        "can_delete_all_resource_instance_lifecycle_states",
-                        result["resource"].resource_instance_lifecycle_state,
-                    ):
-                        return False
+                    if not result[
+                        "resource"
+                    ].resource_instance_lifecycle_state.can_delete_resource_instances:
+                        if not user.has_perm(
+                            "can_delete_all_resource_instance_lifecycle_states",
+                            result["resource"].resource_instance_lifecycle_state,
+                        ):
+                            return False
 
                     if result["permitted"] == "unknown":
                         nodegroups = self.get_nodegroups_by_perm(
