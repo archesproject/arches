@@ -29,6 +29,7 @@ from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.urls import reverse
 from django.utils.translation import get_language, gettext as _
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -2104,3 +2105,307 @@ class GetNodegroupTree(APIBase):
             ]
 
         return JSONResponse({"path": permitted_result})
+
+
+class SpatialView(APIBase):
+    """ """
+
+    def get(self, request, identifier=None):
+        """
+        Returns a permitted spatial view given an id
+        otherwise returns a list of permitted spatial views
+        """
+        spatialview_id = None
+
+        # ensure specific spatial view exists before proceeding
+        if identifier:
+            if self.identifier_is_uuid(identifier):
+                spatialview_id = identifier
+                if not models.SpatialView.objects.filter(pk=identifier).exists():
+                    return JSONErrorResponse(
+                        _("No Spatial View Exists with this id"), status=404
+                    )
+            else:
+                return JSONErrorResponse(_("Invalid spatialview id"), status=400)
+
+        permitted_nodegroupids = get_nodegroups_by_perm(
+            request.user, "models.read_nodegroup"
+        )
+
+        permitted_spatialviews = models.SpatialView.objects.filter(
+            geometrynode__nodegroup_id__in=permitted_nodegroupids
+        )
+
+        if identifier:
+            permitted_spatialviews = permitted_spatialviews.filter(pk=spatialview_id)
+            if not len(permitted_spatialviews):
+                return JSONErrorResponse(
+                    _("Request Failed"), _("Permission Denied"), status=403
+                )
+
+        response_data = [
+            self.create_json_data_object_from_spatialview(spatialview)
+            for spatialview in permitted_spatialviews
+        ]
+
+        # when using identifier, return a single object instead of a list
+        if len(response_data) == 1 and identifier:
+            response_data = response_data[0]
+
+        return JSONResponse(response_data)
+
+    def attribute_nodes_are_valid(self, geom_node=models.Node, attribute_nodeids=[]):
+        attribute_node_graphs = [
+            n.graph_id for n in models.Node.objects.filter(nodeid__in=attribute_nodeids)
+        ]
+        # if any of the graphs in attribute_node_graphs != geom_node.graph return False
+        are_valid = not any(
+            graph_id != geom_node.graph_id for graph_id in attribute_node_graphs
+        )
+
+        return are_valid
+
+    def identifier_is_uuid(self, identifier):
+        uuid_pattern = re.compile(settings.UUID_REGEX, re.IGNORECASE)
+        return uuid_pattern.match(identifier)
+
+    def create_json_data_object_from_spatialview(self, spatialview):
+        """
+        Returns a JSON object representing the spatialview
+        """
+        return {
+            "spatialviewid": str(spatialview.spatialviewid),
+            "schema": spatialview.schema,
+            "slug": spatialview.slug,
+            "description": spatialview.description,
+            "geometrynodeid": str(spatialview.geometrynode.pk),
+            "ismixedgeometrytypes": spatialview.ismixedgeometrytypes,
+            "language": spatialview.language.code,
+            "attributenodes": spatialview.attributenodes,
+            "isactive": spatialview.isactive,
+        }
+
+    def create_spatialview_from_json_data(self, json_data):
+        """
+        Returns a SpatialView object from the JSON data. Should only be used if the JSON data has been validated.
+        """
+
+        # if json_data has spatialviewid, try and get the spatialview object. If it doesn't exist, create a new one and use the spatialviewid
+        try:
+            spatialview = models.SpatialView.objects.get(pk=json_data["spatialviewid"])
+        except KeyError:
+            spatialview = models.SpatialView()
+        except ObjectDoesNotExist:
+            spatialview = models.SpatialView()
+            spatialview.spatialviewid = uuid.UUID(json_data["spatialviewid"])
+
+        spatialview.schema = json_data["schema"]
+        spatialview.slug = json_data["slug"]
+        spatialview.description = json_data["description"]
+        spatialview.geometrynode = models.Node.objects.get(
+            nodeid=json_data["geometrynodeid"]
+        )
+        spatialview.ismixedgeometrytypes = json_data["ismixedgeometrytypes"]
+        spatialview.language = models.Language.objects.get(code=json_data["language"])
+        spatialview.attributenodes = json_data["attributenodes"]
+        spatialview.isactive = json_data["isactive"]
+        return spatialview
+
+    def validate_json_data_content(self, json_data, spatialviewid_identifier=None):
+        """
+        Validates the JSON data passed in the request body
+
+        returns a JSONErrorResponse if validation fails or SpatialView if validation passes
+        """
+        # Check if spatialviewid_identifier matches the spatialviewid in the json_data
+        if spatialviewid_identifier:
+            if "spatialviewid" in json_data:
+                if spatialviewid_identifier != json_data["spatialviewid"]:
+                    return JSONErrorResponse(
+                        _("Incorrect Spatialview json data"),
+                        _(
+                            "Spatialviewid in the URL does not match the spatialviewid in the JSON data."
+                        ),
+                        status=400,
+                    )
+            else:
+                return JSONErrorResponse(
+                    _("Incorrect Spatialview json data"),
+                    _("No spatialviewid provided in the JSON data."),
+                    status=400,
+                )
+
+        # Check for required properties
+        required_properties = [
+            "slug",
+            "schema",
+            "geometrynodeid",
+            "language",
+            "attributenodes",
+            "isactive",
+            "ismixedgeometrytypes",
+            "description",
+        ]
+
+        for prop in required_properties:
+            if prop not in json_data:
+                return JSONErrorResponse(
+                    _("Missing spatialview JSON data"),
+                    _("No %s property provided" % prop),
+                    status=400,
+                )
+
+        # get the geometry node
+        try:
+            geom_node = models.Node.objects.get(nodeid=json_data["geometrynodeid"])
+        except ObjectDoesNotExist:
+            return JSONErrorResponse(
+                _("Incorrect Spatialview json data"),
+                _("No Node exists for supplied geometrynodeid"),
+                status=400,
+            )
+
+        # get the language
+        try:
+            lang = models.Language.objects.get(code=json_data["language"])
+        except ObjectDoesNotExist:
+            return JSONErrorResponse(
+                _("Incorrect Spatialview json data"),
+                _("No Language exists for supplied language code"),
+                status=400,
+            )
+
+        # check if the attribute nodes are on the same graph as the geometry node
+        attributenodes = json_data["attributenodes"]
+        attributenodes_nodeids = [n["nodeid"] for n in attributenodes]
+        attributenodes_are_valid = self.attribute_nodes_are_valid(
+            geom_node, attributenodes_nodeids
+        )
+        if not attributenodes_are_valid:
+            return JSONErrorResponse(
+                _("Incorrect Spatialview json data"),
+                _(
+                    "One or more Attribute Nodes are not on the same Graph as the Geometry Node."
+                ),
+                status=400,
+            )
+
+        return self.create_spatialview_from_json_data(json_data)
+
+    @method_decorator(group_required("Application Administrator"))
+    def post(self, request):
+
+        try:
+            json_data = json.loads(request.body.decode("utf-8"))
+        except ValueError:
+            return JSONErrorResponse(
+                _("Invalid JSON data"),
+                _("The Spatialview API was sent invalid JSON"),
+                status=400,
+            )
+
+        if json_data is not None:
+
+            validate_json_data_content_result = self.validate_json_data_content(
+                json_data
+            )
+            if isinstance(validate_json_data_content_result, JSONErrorResponse):
+                return validate_json_data_content_result
+
+            spatialview = validate_json_data_content_result
+
+            try:
+                spatialview.clean()
+                spatialview.save()
+            except ValidationError as e:
+                return JSONErrorResponse(
+                    _("Validation Error when creating Spatialview"),
+                    e.message,
+                    status=400,
+                )
+
+            return JSONResponse(
+                self.create_json_data_object_from_spatialview(spatialview), status=201
+            )
+        return JSONErrorResponse(_("No json request payload"), status=400)
+
+    @method_decorator(group_required("Application Administrator"))
+    def put(self, request, identifier=None):
+
+        if not identifier:
+            return JSONErrorResponse(
+                _("Spatialview update failed"),
+                _(
+                    "PUT REST request requires a spatialviewid to be provided in the URL"
+                ),
+                status=400,
+            )
+
+        try:
+            json_data = json.loads(request.body.decode("utf-8"))
+        except ValueError:
+            return JSONErrorResponse(
+                _("Invalid JSON data"),
+                _("The Spatialview API was sent invalid JSON"),
+                status=400,
+            )
+
+        if json_data is not None:
+
+            validate_json_data_content_result = self.validate_json_data_content(
+                json_data, identifier
+            )
+            if isinstance(validate_json_data_content_result, JSONErrorResponse):
+                return validate_json_data_content_result
+
+            spatialview = validate_json_data_content_result
+
+            try:
+                spatialview.clean()
+                spatialview.save()
+            except ValidationError as e:
+                return JSONErrorResponse(
+                    _("Validation Error when updating Spatialview"),
+                    e.message,
+                    status=400,
+                )
+
+            return JSONResponse(
+                self.create_json_data_object_from_spatialview(spatialview), status=200
+            )
+        return JSONErrorResponse(
+            _("Spatialview update falied"), _("No json request payload"), status=400
+        )
+
+    @method_decorator(group_required("Application Administrator"))
+    def delete(self, request, identifier=None):
+        if identifier:
+            spatialview = None
+            try:
+                spatialview = models.SpatialView.objects.get(pk=identifier)
+            except ObjectDoesNotExist:
+                return JSONErrorResponse(
+                    _("Spatialview delete failed"),
+                    _("Spatialview does not exist"),
+                    status=404,
+                )
+
+            try:
+                spatialview.delete()
+            except Exception as e:
+                logger.error(e)
+                return JSONErrorResponse(
+                    _("Spatialview delete failed"),
+                    _("An error occurred when trying to delete the spatialview"),
+                    status=500,
+                )
+
+        else:
+            return JSONErrorResponse(
+                _("Spatialview delete falied"),
+                _(
+                    "DELETE REST request requires a spatialviewid to be provided in the URL"
+                ),
+                status=400,
+            )
+        return JSONResponse(status=200)

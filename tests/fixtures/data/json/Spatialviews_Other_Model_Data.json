@@ -1,0 +1,132 @@
+{
+    "business_data": {
+        "resources": [
+            {
+                "resourceinstance": {
+                    "descriptors": {
+                        "en": {
+                            "description": "Other Model 1",
+                            "map_popup": "Other Model 1",
+                            "name": "Other Model 1"
+                        }
+                    },
+                    "graph_id": "114dd3fb-404d-4fb3-a639-1333b89cf60c",
+                    "graph_publication_id": "91a50b0c-1cf9-11ef-a3bb-0242ac130005",
+                    "legacyid": null,
+                    "name": "Other Model 1",
+                    "resourceinstanceid": "91a55b62-df8b-449a-8345-c1d7b7d8e608",
+                    "publication_id": "91a50b0c-1cf9-11ef-a3bb-0242ac130005"
+                },
+                "tiles": [
+                    {
+                        "data": {
+                            "89e85234-1cf9-11ef-ab82-0242ac130005": {
+                                "de": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "el": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "en": {
+                                    "direction": "ltr",
+                                    "value": "Other Model 1"
+                                },
+                                "en-US": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "fr": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "pt": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "ru": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "zh": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                }
+                            }
+                        },
+                        "nodegroup_id": "89e85234-1cf9-11ef-ab82-0242ac130005",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "91a55b62-df8b-449a-8345-c1d7b7d8e608",
+                        "sortorder": 0,
+                        "tileid": "4ae38e33-324f-4a2a-bfed-8e221d788160"
+                    }
+                ]
+            },
+            {
+                "resourceinstance": {
+                    "descriptors": {
+                        "en": {
+                            "description": "Other Model 2",
+                            "map_popup": "Other Model 2",
+                            "name": "Other Model 2"
+                        }
+                    },
+                    "graph_id": "114dd3fb-404d-4fb3-a639-1333b89cf60c",
+                    "graph_publication_id": "91a50b0c-1cf9-11ef-a3bb-0242ac130005",
+                    "legacyid": null,
+                    "name": "Other Model 2",
+                    "resourceinstanceid": "baf236a3-63f4-4fcb-8612-a002f316446c",
+                    "publication_id": "91a50b0c-1cf9-11ef-a3bb-0242ac130005"
+                },
+                "tiles": [
+                    {
+                        "data": {
+                            "89e85234-1cf9-11ef-ab82-0242ac130005": {
+                                "de": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "el": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "en": {
+                                    "direction": "ltr",
+                                    "value": "Other Model 2"
+                                },
+                                "en-US": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "fr": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "pt": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "ru": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                },
+                                "zh": {
+                                    "direction": "ltr",
+                                    "value": ""
+                                }
+                            }
+                        },
+                        "nodegroup_id": "89e85234-1cf9-11ef-ab82-0242ac130005",
+                        "parenttile_id": null,
+                        "provisionaledits": null,
+                        "resourceinstance_id": "baf236a3-63f4-4fcb-8612-a002f316446c",
+                        "sortorder": 0,
+                        "tileid": "83824e66-afff-473f-8e14-e32e41f13962"
+                    }
+                ]
+            }
+        ]
+    }
+}

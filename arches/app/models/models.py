@@ -10,6 +10,7 @@
 
 
 import os
+import re
 import sys
 import json
 import uuid
@@ -25,6 +26,7 @@ from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.models.utils import add_to_update_fields
 from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
+from django.db import connection
 from django.db.models import JSONField
 from django.core.cache import caches
 from django.core.mail import EmailMultiAlternatives
@@ -39,6 +41,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.core.validators import validate_slug
+from django.core.exceptions import ValidationError
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -2123,10 +2126,16 @@ class SpatialView(models.Model):
     description = models.TextField(
         default="arches spatial view"
     )  # provide a description of the spatial view
-    geometrynodeid = models.ForeignKey(
-        Node, on_delete=models.CASCADE, db_column="geometrynodeid"
+    geometrynode = models.ForeignKey(
+        Node,
+        on_delete=models.CASCADE,
+        db_column="geometrynodeid",
+        limit_choices_to={"datatype": "geojson-feature-collection"},
     )
     ismixedgeometrytypes = models.BooleanField(default=False)
+    language = models.ForeignKey(
+        Language, db_column="languageid", to_field="code", on_delete=models.CASCADE
+    )
     attributenodes = JSONField(blank=True, null=True, db_column="attributenodes")
     isactive = models.BooleanField(
         default=True
@@ -2138,3 +2147,55 @@ class SpatialView(models.Model):
     class Meta:
         managed = True
         db_table = "spatial_views"
+
+    def clean(self):
+        """
+        Validate the spatial view before saving it to the database as the database triggers have proved hard to test.
+        """
+        super().clean()
+        if self.geometrynode:
+            if self.geometrynode.datatype != "geojson-feature-collection":
+                raise ValidationError(
+                    "Geometry node must be of type geojson-feature-collection"
+                )
+            else:
+                graph = self.geometrynode.graph
+                if not self.attributenodes or len(self.attributenodes) == 0:
+                    raise ValidationError(
+                        "Attribute nodes must have at least one entry"
+                    )
+                else:
+                    for node in self.attributenodes:
+                        if not Node.objects.filter(
+                            pk=node["nodeid"], graph=graph
+                        ).exists():
+                            raise ValidationError(
+                                f"Attribute nodes must belong to the same graph as the geometry node (error nodeid:{str(node.id)})"
+                            )
+
+                # language must be be a valid language code beloging to the current publication
+                published_graphs = PublishedGraph.objects.filter(
+                    publication=graph.publication
+                )
+                if self.language not in [
+                    published_graph.language for published_graph in published_graphs
+                ]:
+                    raise ValidationError(
+                        "Language must belong to a published graph for the graph of the geometry node"
+                    )
+
+                # validate the slug
+                if not re.match(r"^[a-zA-Z_]([a-zA-Z0-9_]+)$", self.slug):
+                    raise ValidationError(
+                        "Slug must contain only letters, numbers and hyphens, but not begin with a number."
+                    )
+
+                # validate the schema is a valid schema in the database
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{self.schema}'"
+                    )
+                    if cursor.rowcount == 0:
+                        raise ValidationError("Schema does not exist in the database")
+        else:
+            raise ValidationError("Geometry node must be set")
