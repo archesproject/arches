@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def save_to_tiles(userid, loadid):
+def save_to_tiles(userid, loadid, multiprocessing=False):
     with connection.cursor() as cursor:
         disable_tile_triggers(cursor, loadid)
         error_saving_tiles = _save_to_tiles(cursor, loadid)
@@ -19,8 +19,8 @@ def save_to_tiles(userid, loadid):
         if error_saving_tiles:
             return error_saving_tiles
 
-        _post_save_edit_log(cursor, userid, loadid)
-
+        response = _post_save_edit_log(cursor, userid, loadid, multiprocessing)
+    return response
 
 def log_event_details(cursor, loadid, details):
     cursor.execute(
@@ -125,11 +125,14 @@ def _save_to_tiles(cursor, loadid):
         }
 
 
-def _post_save_edit_log(cursor, userid, loadid):
+def _post_save_edit_log(cursor, userid, loadid, multiprocessing=False):
     try:
         log_event_details(cursor, loadid, "done|Indexing...")
         index_resources_by_transaction(
-            loadid, quiet=True, use_multiprocessing=False, recalculate_descriptors=True
+            loadid,
+            use_multiprocessing=multiprocessing,
+            quiet=True,
+            recalculate_descriptors=True,
         )
         user = User.objects.get(id=userid)
         user_email = getattr(user, "email", "")
