@@ -45,7 +45,11 @@ CANTALOUPE_HTTP_ENDPOINT = "http://{}:{}".format(
 )
 ELASTICSEARCH_HTTP_PORT = get_env_variable("ESPORT")
 ELASTICSEARCH_HOSTS = [
-    {"host": get_env_variable("ESHOST"), "port": int(ELASTICSEARCH_HTTP_PORT)}
+    {
+        "scheme": "http",
+        "host": get_env_variable("ESHOST"),
+        "port": int(ELASTICSEARCH_HTTP_PORT),
+    }
 ]
 
 USER_ELASTICSEARCH_PREFIX = get_optional_env_variable("ELASTICSEARCH_PREFIX")

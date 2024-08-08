@@ -70,10 +70,10 @@ class PermissionFramework(metaclass=ABCMeta):
     ): ...
 
     @abstractmethod
-    def get_groups_for_object(self, perm, obj): ...
+    def get_groups_with_permission_for_object(self, perm, obj): ...
 
     @abstractmethod
-    def get_users_for_object(self, perm, obj): ...
+    def get_users_with_permission_for_object(self, perm, obj): ...
 
     @abstractmethod
     def check_resource_instance_permissions(self, user, resourceid, permission): ...
@@ -141,6 +141,9 @@ class PermissionFramework(metaclass=ABCMeta):
     @abstractmethod
     def get_search_ui_permissions(self, user, search_result, groups=None): ...
 
+    @abstractmethod
+    def get_default_permissions(self, resource): ...
+
 
 _PERMISSION_FRAMEWORK = None
 
@@ -159,11 +162,11 @@ def _get_permission_framework():
             )
             _PERMISSION_FRAMEWORK = PermissionFramework()
         else:
-            from arches.app.permissions.arches_standard import (
-                ArchesStandardPermissionFramework,
+            from arches.app.permissions.arches_default_allow import (
+                ArchesDefaultAllowPermissionFramework,
             )
 
-            _PERMISSION_FRAMEWORK = ArchesStandardPermissionFramework()
+            _PERMISSION_FRAMEWORK = ArchesDefaultAllowPermissionFramework()
     return _PERMISSION_FRAMEWORK
 
 
@@ -197,12 +200,12 @@ def get_restricted_instances(user, search_engine=None, allresources=False):
     )
 
 
-def get_groups_for_object(perm, obj):
-    return _get_permission_framework().get_groups_for_object(perm, obj)
+def get_groups_with_permission_for_object(perm, obj):
+    return _get_permission_framework().get_groups_with_permission_for_object(perm, obj)
 
 
-def get_users_for_object(perm, obj):
-    return _get_permission_framework().get_users_for_object(perm, obj)
+def get_users_with_permission_for_object(perm, obj):
+    return _get_permission_framework().get_users_with_permission_for_object(perm, obj)
 
 
 def check_resource_instance_permissions(user, resourceid, permission):
@@ -377,3 +380,7 @@ def get_search_ui_permissions(user, search_result, groups=None):
     return _get_permission_framework().get_search_ui_permissions(
         user, search_result, groups
     )
+
+
+def get_default_permissions(resource):
+    return _get_permission_framework().get_default_permissions(resource)
