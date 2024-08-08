@@ -40,27 +40,26 @@ class Migration(migrations.Migration):
                 resource_object jsonb;
                 resource_obejct_array jsonb;
             BEGIN
-                FOR staged_value, instance_id, legacy_id, tile_id, parent_id, nodegroup_id, passed, graph_id, source, op, resource_instance_lifecycle_state_uuid
-                    IN (
-                        SELECT value, resourceid, legacyid, tileid, parenttileid, ls.nodegroupid, passes_validation, n.graphid, source_description, operation, ri.resource_instance_lifecycle_state_id
+                FOR staged_value, instance_id, legacy_id, tile_id, parent_id, nodegroup_id, passed, graph_id, source, op, resource_instance_lifecycle_state_uuid IN
+                    (
+                        SELECT value, resourceid, legacyid, tileid, parenttileid, ls.nodegroupid, passes_validation, n.graphid, source_description, operation, rils.id
                         FROM load_staging ls 
                         INNER JOIN (SELECT DISTINCT nodegroupid, graphid FROM nodes) n
                         ON ls.nodegroupid = n.nodegroupid
-                        INNER JOIN (SELECT resourceinstanceid, resource_instance_lifecycle_state_id FROM resource_instances) ri
-                        ON ls.resourceid = ri.resourceinstanceid
+                        INNER JOIN (SELECT graphid, resource_instance_lifecycle_id FROM graphs) g
+                        ON g.graphid = n.graphid
+                        INNER JOIN (SELECT id, resource_instance_lifecycle_id FROM resource_instance_lifecycle_states WHERE is_initial_state = true) rils
+                        ON g.resource_instance_lifecycle_id = rils.resource_instance_lifecycle_id
                         WHERE loadid = load_id
                         ORDER BY nodegroup_depth ASC
                     )
                 LOOP
                     IF passed THEN
-                        SELECT resourceinstanceid 
-                        FROM resource_instances 
-                        INTO selected_resource
-                        WHERE resourceinstanceid = instance_id;
+                        SELECT resourceinstanceid FROM resource_instances INTO selected_resource WHERE resourceinstanceid = instance_id;
                         -- create a resource first if the resource is not yet created
                         IF NOT FOUND THEN
-                            INSERT INTO resource_instances(resourceinstanceid, graphid, legacyid, createdtime, resource_instance_lifecycle_state_uuid)
-                                VALUES (instance_id, graph_id, legacy_id, now(), resource_instance_lifecycle_state_id);
+                            INSERT INTO resource_instances(resourceinstanceid, graphid, legacyid, createdtime, resource_instance_lifecycle_state_id)
+                                VALUES (instance_id, graph_id, legacy_id, now(), resource_instance_lifecycle_state_uuid);
                             -- create resource instance edit log
                             INSERT INTO edit_log (resourceclassid, resourceinstanceid, edittype, timestamp, note, transactionid)
                                 VALUES (graph_id, instance_id, 'create', now(), 'loaded from staging_table', load_id);
