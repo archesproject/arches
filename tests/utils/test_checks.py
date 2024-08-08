@@ -28,14 +28,16 @@ class SystemCheckTests(SimpleTestCase):
 
         # Test something pip-installed.
         with self.assertRaisesMessage(
-            SystemCheckError, "Invalid or missing arches requirement"
+            SystemCheckError,
+            "Arches requirement is invalid, missing, or given by a URL.",
         ):
             call_command("check")
 
         # Mock having to go to the pyproject.toml
         with mock.patch("arches.apps.requires", raise_package_not_found_error):
             with self.assertRaisesMessage(
-                SystemCheckError, "Invalid or missing arches requirement"
+                SystemCheckError,
+                "Arches requirement is invalid, missing, or given by a URL.",
             ):
                 call_command("check")
 
