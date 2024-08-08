@@ -72,7 +72,7 @@ class BaseSearchView(BaseSearchFilter):
             item["componentname"]: int(item["sortorder"])
             for item in self.searchview_component.config["requiredComponents"]
         }
-        self._required_search_components = list(
+        self._required_search_filters = list(
             models.SearchComponent.objects.filter(
                 searchcomponentid__in=[
                     required_component["searchcomponentid"]
@@ -82,8 +82,8 @@ class BaseSearchView(BaseSearchFilter):
                 ]
             )
         )
-        self._required_search_components = sorted(
-            self._required_search_components,
+        self._required_search_filters = sorted(
+            self._required_search_filters,
             key=lambda item: required_component_sort_order.get(
                 item.componentname, float("inf")
             ),
@@ -110,8 +110,8 @@ class BaseSearchView(BaseSearchFilter):
         )
 
     @property
-    def required_search_components(self):
-        return self._required_search_components
+    def required_search_filters(self):
+        return self._required_search_filters
 
     @property
     def available_search_components(self):
