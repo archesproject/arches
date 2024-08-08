@@ -16,9 +16,9 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from arches.settings import *
-import arches
 import os
+
+from arches.settings import *
 
 try:
     from django.utils.translation import gettext_lazy as _
@@ -28,9 +28,6 @@ except ImportError:  # unable to import prior to installing requirements
 PACKAGE_NAME = "arches"
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 APP_ROOT = ""
-
-MIN_ARCHES_VERSION = arches.__version__
-MAX_ARCHES_VERSION = arches.__version__
 
 # LOAD_V3_DATA_DURING_TESTS = True will engage the most extensive the of the v3
 # data migration tests, which could add over a minute to the test process. It's
