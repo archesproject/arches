@@ -649,8 +649,6 @@ SPARQL_ENDPOINT_PROVIDERS = (
 
 APP_NAME = "Arches"
 APP_VERSION = None
-MIN_ARCHES_VERSION = None
-MAX_ARCHES_VERSION = None
 
 APP_TITLE = "Arches | Heritage Data Management"
 COPYRIGHT_TEXT = "All Rights Reserved."
@@ -882,7 +880,3 @@ except ImportError:
         from arches.settings_local import *
     except ImportError:
         pass
-
-# returns an output that can be read by NODEJS
-if __name__ == "__main__":
-    transmit_webpack_django_config(**locals())
