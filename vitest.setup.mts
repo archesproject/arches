@@ -1,5 +1,5 @@
 import { beforeAll, vi } from 'vitest';
-import '@/declarations.d.ts';
+import '@/arches/declarations.d.ts';
 
 beforeAll(() => {
     vi.mock('vue3-gettext', () => ({

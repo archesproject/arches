@@ -2,10 +2,7 @@
 Django settings for {{ project_name }} project.
 """
 
-import json
 import os
-import sys
-import arches
 import inspect
 import semantic_version
 from datetime import datetime, timedelta
@@ -19,8 +16,6 @@ except ImportError:
 APP_NAME = '{{ project_name }}'
 APP_VERSION = semantic_version.Version(major=0, minor=0, patch=0)
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-MIN_ARCHES_VERSION = arches.__version__
-MAX_ARCHES_VERSION = arches.__version__
 
 WEBPACK_LOADER = {
     "DEFAULT": {
@@ -428,7 +423,3 @@ except ImportError as e:
         from settings_local import *
     except ImportError as e:
         pass
-
-# returns an output that can be read by NODEJS
-if __name__ == "__main__":
-    transmit_webpack_django_config(**locals())
