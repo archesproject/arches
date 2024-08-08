@@ -1,29 +1,20 @@
 {
+  "extends": "./.tsconfig-paths.json",
   "compilerOptions": {
-    "noEmit": true,
+    "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "resolveJsonModule": true,
     "jsx": "preserve",
     "jsxImportSource": "vue",
-    "noImplicitThis": false,
     "strict": true,
+    "noEmit": true,
+    "noImplicitThis": false,
     "verbatimModuleSyntax": true,
-    "target": "ESNext",
     "useDefineForClassFields": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
-    "baseUrl": "{{ project_name }}/src/",
-    "paths": {
-      "@/*": [
-        "*.ts",
-        "*.vue"
-      ]
-    }
-  },
-  "include": [
-    "**/*.ts",
-    "**/*.vue"
-  ]
+    "allowImportingTsExtensions": true
+  }
 }
