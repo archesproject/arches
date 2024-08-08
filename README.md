@@ -12,7 +12,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 7.5.4 release notes](https://github.com/archesproject/arches/blob/stable/7.5.4/releases/7.5.4.md)
+[Version 7.6.0 release notes](https://github.com/archesproject/arches/blob/dev/7.6.x/releases/7.6.0.md)
 
 #### Quick Install
 
@@ -56,8 +56,8 @@ Our general release cycle will typically be a functional release (either major i
 
 #### Support for previous releases
 
-- Stable releases will be supported with patch releases for at least 18 months. Typically the stable release will be the second or third minor release of a major release. 
-- Functional releases (with the exception of stable releases) will be supported only until the next functional release. After that users are expected to upgrade to the latest release on [pypi.python.org](https://pypi.python.org/pypi/arches)
+- LTS (Long Term Support) releases will be maintained with patch releases for at least 27 months. Typically an LTS release will be the second minor release following a major release. 
+- Feature releases (with the exception of stable releases) will be supported only until the next feature release. After that users are expected to upgrade to the latest release on [pypi.python.org](https://pypi.python.org/pypi/arches)
 
 #### Feature roadmap
 
@@ -65,21 +65,40 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 
 ## 7.6 LTS - Release date: Sept 15, 2024
 - Arches Application improvements
-- Activity stream edit logs
 - Security enhancements
 - Default deny permissions
 - Support for pluggable permissions frameworks
 - Standalone plugins
+- Customizable Search
+- Concept label bulk editor module
+- Map performance improvments
+- Postgres 14 becomes minimum Postgres version
+
+## 7.6 - Supported Applications
+ - Workflow Builder
 
 ## 8.0 - Release date: June 15, 2025
+- Activity stream enhancements
 - Support for editing and publishing graphs without having to remove resource instances
 - Support for viewing and restoring previous graph publications
 - Support for configuring currently published graphs
-- Support for search by resource relationship
-- Implementation of the Controlled List Manager and reference data type
-- Persistent uris for resource instance data
-- Implementation of logical deletion of resources
+- Support for search through resource relationships
+- Persistent uris for resource instance and tile data
+- Implementation resource lifecycles
 - Bulk Data Manager CLI interface
+- Migration to MapLibre
+- Django 5.2 support
+- Python 3.11 becomes minimum Python version
+
+## 8.0 - Supported Applications
+- Arches References
+- Arches Lingo
 
 ## 9.0 - Release date: Sept 15, 2027
 - Full migration to Vue
+- Deprecation of the RDM
+- Deprecation of the following datatypes:
+    - concept
+    - concept-list
+    - domain
+    - domain-list datatypes
