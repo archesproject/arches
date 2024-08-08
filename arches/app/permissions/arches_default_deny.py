@@ -222,24 +222,36 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
                 "models.read_nodegroup",
             ],
         )
-        result["can_read"] = user.is_superuser or (
+
+        # validate permissions structure for search result
+        groups_read_exists = (
             "permissions" in search_result["_source"]
             and "groups_read" in search_result["_source"]["permissions"]
-            and (
+        )
+        groups_edit_exists = (
+            "permissions" in search_result["_source"]
+            and "groups_edit" in search_result["_source"]["permissions"]
+        )
+        result["can_read"] = user.is_superuser or (
+            groups_read_exists
+            and len(
                 set(
                     search_result["_source"]["permissions"]["groups_read"]
                 ).intersection(set(groups))
             )
+            > 0
             and user_can_read
         )
 
         user_can_edit = len(self.get_editable_resource_types(user)) > 0
         result["can_edit"] = user.is_superuser or (
-            "permissions" in search_result["_source"]
-            and "groups_edit" in search_result["_source"]["permissions"]
-            and set(
-                search_result["_source"]["permissions"]["groups_edit"]
-            ).intersection(set(groups))
+            groups_edit_exists
+            and len(
+                set(
+                    search_result["_source"]["permissions"]["groups_edit"]
+                ).intersection(set(groups))
+            )
+            > 0
             and user_can_edit
         )
 

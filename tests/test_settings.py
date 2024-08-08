@@ -96,6 +96,9 @@ LANGUAGES = [
 
 DOCKER = False
 
+PERMISSION_DEFAULTS = {}
+
+
 try:
     from arches.settings_local import *
 except ImportError:
