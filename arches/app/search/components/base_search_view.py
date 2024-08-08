@@ -117,7 +117,7 @@ class BaseSearchView(BaseSearchFilter):
     def available_search_components(self):
         return self._available_search_components
 
-    def get_searchview_components(self):
+    def get_searchview_filters(self):
         return self._available_search_components + [self.searchview_component]
 
     def handle_search_results_query(

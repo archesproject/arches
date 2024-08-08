@@ -79,7 +79,7 @@ class SearchView(MapBaseManagerView):
         searchview_component_instance = (
             search_component_factory.get_searchview_component_instance()
         )
-        search_components = searchview_component_instance.get_searchview_components()
+        search_components = searchview_component_instance.get_searchview_filters()
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()

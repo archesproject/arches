@@ -169,7 +169,7 @@ class StandardSearchView(BaseSearchView):
         response_object["total_results"] = dsl.count(index=RESOURCES_INDEX)
         response_object["userid"] = self.request.user.id
 
-    def get_searchview_components(self):
+    def get_searchview_filters(self):
         search_components = [
             available_component
             for available_component in self._available_search_components
