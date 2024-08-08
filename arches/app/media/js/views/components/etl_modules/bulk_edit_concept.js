@@ -9,8 +9,8 @@ define([
     'select-woo'
 ], function(ko, $, uuid, arches, JsonErrorAlertViewModel, baseStringEditorTemplate) {
     const ViewModel = function(params) {
-        console.log(params);
         const self = this;
+        this.config = params.config;
         this.state = params.state;
         this.editHistoryUrl = `${arches.urls.edit_history}?transactionid=${ko.unwrap(params.selectedLoadEvent)?.loadid}`;
         this.load_details = params.load_details ?? {};
@@ -34,6 +34,10 @@ define([
         //paging
         this.currentPageIndex = ko.observable(0);
         this.tilesToRemove = ko.observableArray();
+        //length table
+        this.numberOfTiles = ko.observable();
+        this.numberOfResources = ko.observable();
+        this.previewLimit = ko.observable();
         //loading status
         this.formatTime = params.formatTime;
         this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
@@ -55,9 +59,6 @@ define([
             self.formData.append('tilesToRemove', self.tilesToRemove());
         };
 
-        //length table
-        self.listLength = ko.observable();
-
         //paging
         // Function to navigate to the previous page
         self.previousPage = function() {
@@ -77,7 +78,7 @@ define([
         });
         // Computed observable to calculate the maximum page index
         self.maxPageIndex = ko.computed(function() {
-            return Math.ceil(self.listLength() / 5) - 1;
+            return Math.ceil(self.numberOfTiles() / 5) - 1;
         });
 
         // Computed observable to paginate rows
@@ -119,7 +120,7 @@ define([
         });
 
         this.allowEditOperation = ko.computed(() => {
-            return self.ready() && self.listLength() > 0 && self.showPreview();
+            return self.ready() && self.numberOfTiles() > 0 && self.showPreview();
         });
 
         this.inTileList = (tileToFind) => {
@@ -139,9 +140,10 @@ define([
         this.getPreviewData = function() {
             self.showPreview(true);
             self.submit('preview').then(data => {
-                self.listLength(data.result.number_of_tiles);
+                self.numberOfResources(data.result.number_of_resources);
+                self.numberOfTiles(data.result.number_of_tiles);
+                self.previewLimit(data.result.preview_limit);
                 self.paginatedRows(data.result.values);
-                
             }).fail(function(err) {
                 self.alert(
                     new JsonErrorAlertViewModel(

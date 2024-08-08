@@ -110,24 +110,23 @@
 
         <!-- ko if: showPreview-->
         <section  class="etl-preview">
-            <!-- ko if: listLength() === 0 -->
+            <!-- ko if: numberOfTiles() === 0 -->
             <h3 style="margin-top: 0px;">
                 <span style="margin: 2px;" class="fa fa-info-circle"></span><span data-bind="text: $root.translations.noDataToPreview"></span>
             </h3>
             <!-- /ko -->
-            <!-- ko if: listLength() > 0 -->
-            <div data-bind="visible: ready">
-                <div>
-                    <p style="margin-top: 10px; color: rgb(17, 15, 15); display: inline-block; font-size: 15px;">
-                        Affected resources:<span data-bind="text: listLength() === 0 ? 0 : (currentPageIndex() * 5 + 1)"></span> 
-                        <!-- ko if: listLength() !== 0 -->
-                            to <span data-bind="text: Math.min((currentPageIndex() + 1) * 5, listLength())"></span> 
-                            out of <span data-bind="text: listLength()"></span>
-                        <!-- /ko -->
-                    </p>
+            <!-- ko if: numberOfTiles() > 0 -->
+            <h3 style="margin-top: 0px;">
+                <span data-bind="text: $root.translations.previewCountStats(numberOfTiles()>previewLimit()?previewLimit():numberOfTiles(),numberOfTiles(),numberOfResources())"></span>
+                <div style="display: inline-flex;">
                     <button data-bind="click: previousPage, enable: currentPageIndex() > 0" class="btn btn-success" style="display: inline-block;  margin-right: 10px;">Previous</button>
                     <button data-bind="click: nextPage, enable: currentPageIndex() < maxPageIndex()" class="btn btn-success" style="display: inline-block;">Next</button>
                 </div>
+            </h3>
+            <h3 style="margin-top: 0px;color:red;" data-bind="if: numberOfTiles() > config.updateLimit">
+                <span style="margin: 2px;" class="fa fa-info-circle"></span><span data-bind="text: $root.translations.bulkEditLimitWarning(config.updateLimit.toLocaleString())"></span>
+            </h3>
+            <div data-bind="visible: ready">
                 <table class="table table-striped csv-mapping-table">
                     <thead>
                         <tr>
