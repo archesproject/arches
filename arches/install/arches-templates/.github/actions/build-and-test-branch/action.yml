@@ -1,0 +1,109 @@
+name: 'Build and test branch'
+description: 'Builds and tests a branch'
+inputs: 
+  branch-type:
+    description: 'String denoting either `target` or `feature` branch'
+    required: true
+  project-name:
+    description: 'String denoting the name of the project'
+    required: true
+  secrets:
+    description: 'Secrets from main.yml as JSON'
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Java, GDAL, and other system dependencies
+      run: |
+        sudo apt update
+        sudo apt-get install libxml2-dev libpq-dev openjdk-8-jdk libgdal-dev libxslt-dev
+        echo Postgres and ES dependencies installed
+      shell: bash
+
+    - name: Set up Elasticsearch
+      uses: ankane/setup-elasticsearch@v1
+      with:
+        elasticsearch-version: 8
+
+    - name: Install Python packages
+      run: |
+        python -m pip install --upgrade pip
+        pip install '.[dev]'
+        echo Python packages installed
+      shell: bash
+    
+    - name: Ensure frontend configuration files exist
+      run: |
+          python manage.py check
+      shell: bash
+
+    - name: Install Arches applications
+      uses: ./.github/actions/install-arches-applications
+      with:
+        secrets: ${{ inputs.secrets }}
+
+    - name: Install frontend dependencies
+      run: |
+          npm install
+      shell: bash
+
+    - name: Webpack frontend files
+      run: |
+          npm run build_test
+      shell: bash
+
+    - name: Check frontend formatting with prettier
+      run: |
+        npm run prettier:check
+      shell: bash
+
+    - name: Check backend formatting with black
+      run: |
+        black . --check --exclude=node_modules
+      shell: bash
+
+    - name: Check line endings on all but ontology (.xml) files
+      run: |
+        ! git ls-files --eol | grep -v '.xml' | grep 'w/crlf\|w/mixed'
+      shell: bash
+
+    - name: Run frontend tests
+      run: |
+        npm run vitest
+        mv coverage/frontend/coverage.xml ${{ inputs.branch-type }}_branch_frontend_coverage.xml
+      shell: bash
+
+    - name: Check for missing migrations
+      run: |
+        python manage.py makemigrations --check
+      shell: bash
+
+    - name: Ensure previous Python coverage data is erased
+      run: |
+        coverage erase
+      shell: bash
+
+    - name: Run Python unit tests
+      run: |
+        python -W default::DeprecationWarning -m coverage run manage.py test tests --settings="tests.test_settings"
+      shell: bash
+
+    - name: Generate Python report coverage
+      run: |
+        coverage report
+        coverage json
+        mv coverage/python/coverage.json ${{ inputs.branch-type }}_branch_python_coverage.json
+      shell: bash
+
+    - name: Upload frontend coverage report as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.branch-type }}-branch-frontend-coverage-report
+        path: ${{ inputs.branch-type }}_branch_frontend_coverage.xml
+        overwrite: true
+
+    - name: Upload Python coverage report as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.branch-type }}-branch-python-coverage-report
+        path: ${{ inputs.branch-type }}_branch_python_coverage.json
+        overwrite: true

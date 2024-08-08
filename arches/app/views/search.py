@@ -397,6 +397,7 @@ def search_results(request, returnDsl=False):
     dsl.include("displaydescription")
     dsl.include("map_popup")
     dsl.include("provisional_resource")
+    dsl.include("permissions")
     if load_tiles:
         dsl.include("tiles")
     if for_export or pages:
