@@ -15,11 +15,8 @@ define([
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             var self = this;
-
-             
             options.name = 'Search Result Details';
-            this.requiredFilters = ['search-results'];
-
+            options.componentName = componentName;
             BaseFilter.prototype.initialize.call(this, options);
 
             this.options = options;
@@ -29,9 +26,9 @@ define([
             this.reportExpanded = ko.observable();
 
             var setSearchResults = function(){
-                options.searchResultsVm = self.getFilter('search-results');
+                options.searchResultsVm = self.getFilterByType('search-results');
                 options.searchResultsVm.details = self;
-                options.filters[componentName](self);           
+                options.searchComponentVms[componentName](self);           
             };
 
             if (this.requiredFiltersLoaded() === false) {

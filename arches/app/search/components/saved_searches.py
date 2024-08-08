@@ -11,14 +11,13 @@ details = {
     "type": "popup",
     "componentpath": "views/components/search/saved-searches",
     "componentname": "saved-searches",
-    "sortorder": "2",
-    "enabled": True,
+    "config": {},
 }
 
 
 class SavedSearches(BaseSearchFilter):
     def view_data(self):
         ret = {}
-        ret["saved_searches"] = settings.SAVED_SEARCHES
+        ret[self.componentname] = settings.SAVED_SEARCHES
 
         return ret

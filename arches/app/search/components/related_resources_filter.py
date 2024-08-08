@@ -7,6 +7,5 @@ details = {
     "type": "filter",
     "componentpath": "views/components/search/related-resources-filter",
     "componentname": "related-resources-filter",
-    "sortorder": "4",
-    "enabled": True,
+    "config": {},
 }

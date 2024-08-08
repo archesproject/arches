@@ -16,17 +16,16 @@ details = {
     "type": "popup",
     "componentpath": "views/components/search/time-filter",
     "componentname": "time-filter",
-    "sortorder": "1",
-    "enabled": True,
+    "config": {},
 }
 
 
 class TimeFilter(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def append_dsl(self, search_query_object, **kwargs):
+        permitted_nodegroups = kwargs.get("permitted_nodegroups")
+        include_provisional = kwargs.get("include_provisional")
         search_query = Bool()
-        querysting_params = self.request.GET.get(details["componentname"], "")
+        querysting_params = self.request.GET.get(self.componentname, "")
         temporal_filter = JSONDeserializer().deserialize(querysting_params)
         if "fromDate" in temporal_filter and "toDate" in temporal_filter:
             # now = str(datetime.utcnow())
@@ -153,7 +152,7 @@ class TimeFilter(BaseSearchFilter):
 
             search_query.filter(temporal_query)
 
-            search_results_object["query"].add_query(search_query)
+            search_query_object["query"].add_query(search_query)
 
     def view_data(self):
         ret = {}

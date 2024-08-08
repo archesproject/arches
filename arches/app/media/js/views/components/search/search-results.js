@@ -37,9 +37,8 @@ define([
             },
 
             initialize: function (options) {
-                options.name = "Search Results";
-
-                this.requiredFilters = ["map-filter"];
+                options.name = 'Search Results';
+                options.componentName = componentName;
                 BaseFilter.prototype.initialize.call(this, options);
                 this.results = ko.observableArray();
                 this.showRelationships = ko.observable();
@@ -54,14 +53,14 @@ define([
                     this.updateResults();
                 }, this);
 
-                this.filters[componentName](this);
+                this.searchComponentVms[componentName](this);
                 this.restoreState();
                 if (this.requiredFiltersLoaded() === false) {
                     this.requiredFiltersLoaded.subscribe(function () {
-                        this.mapFilter = this.getFilter("map-filter");
+                        this.mapFilter = this.getFilterByType("map-filter");
                     }, this);
                 } else {
-                    this.mapFilter = this.getFilter("map-filter");
+                    this.mapFilter = this.getFilterByType("map-filter");
                 }
                 this.selectedTab.subscribe(function (tab) {
                     var self = this;

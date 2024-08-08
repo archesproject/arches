@@ -14,8 +14,7 @@ details = {
     "type": "resource-type-filter",
     "componentpath": "views/components/search/resource-type-filter",
     "componentname": "resource-type-filter",
-    "sortorder": "0",
-    "enabled": True,
+    "config": {},
 }
 
 
@@ -27,11 +26,10 @@ def get_permitted_graphids(permitted_nodegroups):
 
 
 class ResourceTypeFilter(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def append_dsl(self, search_query_object, **kwargs):
+        permitted_nodegroups = kwargs.get("permitted_nodegroups")
         search_query = Bool()
-        querystring_params = self.request.GET.get(details["componentname"], "")
+        querystring_params = self.request.GET.get(self.componentname, "")
         graph_ids = []
         permitted_graphids = get_permitted_graphids(permitted_nodegroups)
 
@@ -53,7 +51,7 @@ class ResourceTypeFilter(BaseSearchFilter):
 
         search_query.filter(terms)
 
-        search_results_object["query"].add_query(search_query)
+        search_query_object["query"].add_query(search_query)
 
     def view_data(self):
         return {
