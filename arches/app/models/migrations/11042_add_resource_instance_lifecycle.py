@@ -133,6 +133,34 @@ def remove_default_resource_instance_lifecycle_states(apps, schema_editor):
     retired_state.delete()
 
 
+def add_default_resource_instance_lifecycles_to_graphs(apps, schema_editor):
+    Graph = apps.get_model("models", "Graph")
+    ResourceInstanceLifecycle = apps.get_model("models", "ResourceInstanceLifecycle")
+
+    default_resource_instance_lifecycle = ResourceInstanceLifecycle.objects.get(
+        id="7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
+    )
+
+    for graph in Graph.objects.all():
+        if (
+            graph.isresource
+            and not graph.source_identifier
+            and not graph.resource_instance_lifecycle
+        ):
+            graph.resource_instance_lifecycle = default_resource_instance_lifecycle
+            graph.save()
+            graph.update_published_graphs()
+
+
+def remove_default_resource_instance_lifecycles_from_graphs(apps, schema_editor):
+    Graph = apps.get_model("models", "Graph")
+
+    for graph in Graph.objects.all():
+        graph.resource_instance_lifecycle = None
+        graph.save()
+        graph.update_published_graphs()
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -331,6 +359,10 @@ class Migration(migrations.Migration):
                 related_name="graphs",
                 to="models.resourceinstancelifecycle",
             ),
+        ),
+        migrations.RunPython(
+            add_default_resource_instance_lifecycles_to_graphs,
+            remove_default_resource_instance_lifecycles_from_graphs,
         ),
         migrations.AddConstraint(
             model_name="graphmodel",
