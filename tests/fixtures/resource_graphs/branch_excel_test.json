@@ -1,0 +1,321 @@
+{
+    "graph": [
+        {
+            "author": " ",
+            "cards": [
+                {
+                    "active": true,
+                    "cardid": "ea297049-8bf2-42d5-80b2-9ea730f70fc9",
+                    "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
+                    "config": null,
+                    "constraints": [],
+                    "cssclass": null,
+                    "description": null,
+                    "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
+                    "helpenabled": false,
+                    "helptext": {
+                        "en": ""
+                    },
+                    "helptitle": {
+                        "en": ""
+                    },
+                    "instructions": {
+                        "en": ""
+                    },
+                    "is_editable": true,
+                    "name": {
+                        "en": "geometry"
+                    },
+                    "nodegroup_id": "1d6afbca-4f62-11ef-be0d-323af0a1fd6a",
+                    "sortorder": null,
+                    "visible": true
+                },
+                {
+                    "active": true,
+                    "cardid": "edb02f80-e03f-436c-893a-5027a670c225",
+                    "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
+                    "config": null,
+                    "constraints": [],
+                    "cssclass": null,
+                    "description": null,
+                    "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
+                    "helpenabled": false,
+                    "helptext": {
+                        "en": ""
+                    },
+                    "helptitle": {
+                        "en": ""
+                    },
+                    "instructions": {
+                        "en": ""
+                    },
+                    "is_editable": true,
+                    "name": {
+                        "en": "string"
+                    },
+                    "nodegroup_id": "1dd75892-4f62-11ef-be0d-323af0a1fd6a",
+                    "sortorder": null,
+                    "visible": true
+                }
+            ],
+            "cards_x_nodes_x_widgets": [
+                {
+                    "card_id": "edb02f80-e03f-436c-893a-5027a670c225",
+                    "config": {
+                        "defaultValue": {
+                            "en": {
+                                "direction": "ltr",
+                                "value": ""
+                            }
+                        },
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
+                        "label": "string",
+                        "maxLength": null,
+                        "placeholder": {
+                            "en": "Enter text"
+                        },
+                        "uneditable": false,
+                        "width": "100%%"
+                    },
+                    "id": "376d98fb-04e9-40aa-85a5-ee22ba1f3662",
+                    "label": {
+                        "en": "string"
+                    },
+                    "node_id": "1dd75892-4f62-11ef-be0d-323af0a1fd6a",
+                    "sortorder": 0,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000001"
+                },
+                {
+                    "card_id": "ea297049-8bf2-42d5-80b2-9ea730f70fc9",
+                    "config": {
+                        "basemap": "streets",
+                        "bearing": 0,
+                        "centerX": 0,
+                        "centerY": 0,
+                        "defaultValue": "",
+                        "defaultValueType": "",
+                        "featureColor": "#FF0000",
+                        "featureLineWidth": 1,
+                        "featurePointSize": 3,
+                        "geocodePlaceholder": "Search",
+                        "geocodeProvider": "10000000-0000-0000-0000-010000000000",
+                        "geocoderVisible": true,
+                        "geometryTypes": [
+                            {
+                                "id": "Point",
+                                "text": "Point"
+                            },
+                            {
+                                "id": "Line",
+                                "text": "Line"
+                            },
+                            {
+                                "id": "Polygon",
+                                "text": "Polygon"
+                            }
+                        ],
+                        "label": "geometry",
+                        "maxZoom": 20,
+                        "minZoom": 0,
+                        "overlayConfigs": [],
+                        "overlayOpacity": 0,
+                        "pitch": 0,
+                        "rerender": true,
+                        "zoom": 0
+                    },
+                    "id": "d1d1b7d5-08fb-4a43-b5a9-39d9a12c183f",
+                    "label": {
+                        "en": "geometry"
+                    },
+                    "node_id": "1d6afbca-4f62-11ef-be0d-323af0a1fd6a",
+                    "sortorder": 0,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000007"
+                }
+            ],
+            "color": null,
+            "config": {},
+            "deploymentdate": null,
+            "deploymentfile": null,
+            "description": {
+                "en": ""
+            },
+            "edges": [
+                {
+                    "description": null,
+                    "domainnode_id": "c31eb25c-4f5b-11ef-be0d-323af0a1fd6a",
+                    "edgeid": "346e11b3-c7f5-478d-84af-41b95600ac94",
+                    "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "1d6afbca-4f62-11ef-be0d-323af0a1fd6a"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "c31eb25c-4f5b-11ef-be0d-323af0a1fd6a",
+                    "edgeid": "52e35d5c-ab35-4454-8a99-cc8017a1a86a",
+                    "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "1dd75892-4f62-11ef-be0d-323af0a1fd6a"
+                }
+            ],
+            "functions_x_graphs": [],
+            "graphid": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
+            "iconclass": "",
+            "is_editable": true,
+            "isresource": true,
+            "jsonldcontext": null,
+            "name": {
+                "en": "branch_excel_test"
+            },
+            "nodegroups": [
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
+                    "nodegroupid": "1d6afbca-4f62-11ef-be0d-323af0a1fd6a",
+                    "parentnodegroup_id": null
+                },
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
+                    "nodegroupid": "1dd75892-4f62-11ef-be0d-323af0a1fd6a",
+                    "parentnodegroup_id": null
+                }
+            ],
+            "nodes": [
+                {
+                    "alias": "geometry",
+                    "config": {
+                        "addToMap": false,
+                        "advancedStyle": "",
+                        "advancedStyling": false,
+                        "clusterDistance": 20,
+                        "clusterMaxZoom": 5,
+                        "clusterMinPoints": 3,
+                        "fillColor": "rgba(130, 130, 130, 0.5)",
+                        "haloRadius": 4,
+                        "haloWeight": 4,
+                        "layerActivated": true,
+                        "layerIcon": "",
+                        "layerLegend": "",
+                        "layerName": "",
+                        "lineColor": "rgba(130, 130, 130, 0.7)",
+                        "lineHaloColor": "rgba(200, 200, 200, 0.5)",
+                        "outlineColor": "rgba(200, 200, 200, 0.7)",
+                        "outlineWeight": 2,
+                        "pointColor": "rgba(130, 130, 130, 0.7)",
+                        "pointHaloColor": "rgba(200, 200, 200, 0.5)",
+                        "radius": 2,
+                        "simplification": 0.3,
+                        "weight": 2
+                    },
+                    "datatype": "geojson-feature-collection",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
+                    "hascustomalias": false,
+                    "is_collector": true,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "geometry",
+                    "nodegroup_id": "1d6afbca-4f62-11ef-be0d-323af0a1fd6a",
+                    "nodeid": "1d6afbca-4f62-11ef-be0d-323af0a1fd6a",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
+                },
+                {
+                    "alias": "string",
+                    "config": {
+                        "en": ""
+                    },
+                    "datatype": "string",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
+                    "hascustomalias": false,
+                    "is_collector": true,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "string",
+                    "nodegroup_id": "1dd75892-4f62-11ef-be0d-323af0a1fd6a",
+                    "nodeid": "1dd75892-4f62-11ef-be0d-323af0a1fd6a",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
+                },
+                {
+                    "alias": null,
+                    "config": {
+                        "en": ""
+                    },
+                    "datatype": "semantic",
+                    "description": "",
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": true,
+                    "name": "branch_excel_test",
+                    "nodegroup_id": null,
+                    "nodeid": "c31eb25c-4f5b-11ef-be0d-323af0a1fd6a",
+                    "ontologyclass": null,
+                    "parentproperty": "",
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
+                }
+            ],
+            "ontology_id": null,
+            "publication": null,
+            "relatable_resource_model_ids": [],
+            "resource_2_resource_constraints": [],
+            "root": {
+                "alias": null,
+                "config": {
+                    "en": ""
+                },
+                "datatype": "semantic",
+                "description": "",
+                "exportable": false,
+                "fieldname": null,
+                "graph_id": "a5c3946a-a9c0-4472-9191-ffc0f35a5901",
+                "hascustomalias": false,
+                "is_collector": false,
+                "isrequired": false,
+                "issearchable": true,
+                "istopnode": true,
+                "name": "branch_excel_test",
+                "nodegroup_id": null,
+                "nodeid": "c31eb25c-4f5b-11ef-be0d-323af0a1fd6a",
+                "ontologyclass": null,
+                "sortorder": 0,
+                "sourcebranchpublication_id": null
+            },
+            "slug": null,
+            "subtitle": {
+                "en": ""
+            },
+            "template_id": "50000000-0000-0000-0000-000000000001",
+            "version": ""
+        }
+    ],
+    "metadata": {
+        "db": "PostgreSQL 16.2 (Postgres.app) on aarch64-apple-darwin21.6.0, compiled by Apple clang version 14.0.0 (clang-1400.0.29.102), 64-bit",
+        "git hash": "7a23de45b 2024-07-31 01:51:10 -0700",
+        "os": "Darwin",
+        "os version": "23.5.0"
+    }
+}

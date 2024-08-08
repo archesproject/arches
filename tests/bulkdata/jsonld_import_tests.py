@@ -46,9 +46,7 @@ class JSONLDImportTests(TransactionTestCase):
 
     serialized_rollback = True
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUp(self):
         ArchesTestCase.loadOntology()
         LanguageSynchronizer.synchronize_settings_with_db()
 
@@ -69,16 +67,16 @@ class JSONLDImportTests(TransactionTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-        cls.basic_graph = GraphModel.objects.get(slug="basic")
-        cls.basic_resource_1 = ResourceInstance.objects.create(
+        self.basic_graph = GraphModel.objects.get(slug="basic")
+        self.basic_resource_1 = ResourceInstance.objects.create(
             pk=uuid.UUID("58da1c67-187e-460e-a94f-6b45f9cbc219"),
-            graph=cls.basic_graph,
+            graph=self.basic_graph,
         )
-        cls.note_node = Node.objects.get(pk="cdfc22b2-f6b5-11e9-8f09-a4d18cec433a")
+        self.note_node = Node.objects.get(pk="cdfc22b2-f6b5-11e9-8f09-a4d18cec433a")
         tile = TileModel(
-            nodegroup=cls.note_node.nodegroup,
+            nodegroup=self.note_node.nodegroup,
             data={
-                str(cls.note_node.pk): {
+                str(self.note_node.pk): {
                     "en": {
                         "direction": "ltr",
                         "value": "Test value",
@@ -86,35 +84,36 @@ class JSONLDImportTests(TransactionTestCase):
                 },
             },
         )
-        cls.basic_resource_1.tilemodel_set.add(tile, bulk=False)
-        cls.basic_resource_1_as_jsonld_bytes = (
-            Client().get(reverse("resources", args=[cls.basic_resource_1.pk])).content
+        self.basic_resource_1.tilemodel_set.add(tile, bulk=False)
+        self.basic_resource_1_as_jsonld_bytes = (
+            Client().get(reverse("resources", args=[self.basic_resource_1.pk])).content
         )
 
-        cls.write_zip_file_to_uploaded_files()
+        self.write_zip_file_to_uploaded_files()
 
-    @classmethod
-    def write_zip_file_to_uploaded_files(cls):
+    def write_zip_file_to_uploaded_files(self):
         basic_resource_1_dest = (
             Path(settings.UPLOADED_FILES_DIR)
             / "testzip"
             / "basic"
             / "58"
-            / f"{cls.basic_resource_1.pk}.json"
+            / f"{self.basic_resource_1.pk}.json"
         )
         default_storage.save(
-            basic_resource_1_dest, io.BytesIO(cls.basic_resource_1_as_jsonld_bytes)
+            basic_resource_1_dest, io.BytesIO(self.basic_resource_1_as_jsonld_bytes)
         )
-        cls.dir_to_zip = (
+        self.dir_to_zip = (
             Path(default_storage.location)
             / default_storage.location
             / Path(settings.UPLOADED_FILES_DIR)
             / "testzip"
         )
-        zip_dest = Path(cls.dir_to_zip.parent) / "test-jsonld-import"
-        cls.addClassCleanup(shutil.rmtree, cls.dir_to_zip)
-        cls.uploaded_zip_location = shutil.make_archive(zip_dest, "zip", cls.dir_to_zip)
-        cls.addClassCleanup(os.unlink, cls.uploaded_zip_location)
+        zip_dest = Path(self.dir_to_zip.parent) / "test-jsonld-import"
+        self.addCleanup(shutil.rmtree, self.dir_to_zip)
+        self.uploaded_zip_location = shutil.make_archive(
+            zip_dest, "zip", self.dir_to_zip
+        )
+        self.addCleanup(os.unlink, self.uploaded_zip_location)
 
     def test_write(self):
         request = HttpRequest()
