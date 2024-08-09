@@ -8,7 +8,9 @@ class Command(BaseCommand):  # pragma: no cover
     """
 
     def handle(self, *args, **options):
-        answer = input("This operation currently does nothing.\n" "Continue? ")
+        answer = input(
+            "This operation will upgrade your project to version 8.0\n" "Continue? "
+        )
 
         if answer.lower() in ["y", "yes"]:
             self.update_to_v8()

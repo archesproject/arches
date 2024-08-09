@@ -37,7 +37,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block main_content %}
 <div class="content-panel">
-    <div style="height: inherit;" class="flex">
+    <div class="flex">
         <div class="left-panel graph-designer" data-bind="resizableSidepanel:true">
             <div class="left-panel-inner-container">
                 <div class="jstree jstree-default" data-bind="visible: true, css: {'jstree-rtl': activeLanguageDir() == 'rtl' }" style="display: none;">
@@ -109,181 +109,230 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </div>
         </div>
 
-        <div class="main-panel card-component-panel" style="display:none;" data-bind="visible: true">
-
-
-            <!--ko if: selection() === 'related-resources' -->
-            <div>
-                 <div data-bind="component: {
-                    name: 'related-resources-manager',
-                    params: $data.relatedResourcesManagerObj
-                }"></div>
+        <div class="main-panel card-component-panel" style="height: calc(100vh - 50px);">
+            <!-- ko if: ko.unwrap(resourceInstanceLifecycleState) -->
+            <div 
+                style="
+                    background-color: #fff;
+                    border-bottom: 1px solid #ddd; 
+                    height: 50px;
+                    padding: 0px 10px;
+                    display: flex;
+                "
+            >
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div>
+                        <span>
+                            {% trans 'Resource Instance Lifecycle State:' %}
+                        </span>
+                        <span data-bind="text: ko.unwrap(resourceInstanceLifecycleState)['name']" style="margin: 0 10px;"></span>
+                    </div>
+                    
+                    <div>
+                        <!-- ko foreach: ko.unwrap(resourceInstanceLifecycleState)['previous_resource_instance_lifecycle_states'] -->
+                        <button 
+                            class="btn btn-info"
+                            data-bind="click: function() { $parent.updateResourceInstanceLifecycleState($data) }"
+                        >
+                            <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                            <span 
+                                style="margin: 0 4px"
+                                data-bind="text: $data['action_label']"
+                            ></span>
+                        </button>
+                        <!-- /ko -->
+                        <!-- ko foreach: ko.unwrap(resourceInstanceLifecycleState)['next_resource_instance_lifecycle_states'] -->
+                        <button 
+                            class="btn btn-info"
+                            data-bind="click: function() { $parent.updateResourceInstanceLifecycleState($data) }"
+                        >
+                            <i class="fa fa-arrow-right" aria-hidden="true"></i>
+                            <span 
+                                style="margin: 0 4px"
+                                data-bind="text: $data['action_label']"
+                            ></span>
+                        </button>
+                        <!-- /ko -->
+                    </div>
+                </div>
             </div>
-            <!--/ko -->
-
-            <!--ko if: selection() === 'permissions-manager' -->
-            <div>
-                <div data-bind="component: {
-                    name: 'permissions-manager',
-                    params: {
-                        graphId: graphid,
-                        resourceId: resourceId,
-                        creator: creator,
-                        userIsCreator: userIsCreator,
-                        alert: alert,
-                        permissionLabelLookup: {
-                            'view_resourceinstance':{% quoted_trans _('Read') %},
-                            'change_resourceinstance':{% quoted_trans _('Update') %},
-                            'no_access_to_resourceinstance':{% quoted_trans _('No Access') %},
-                            'delete_resourceinstance':{% quoted_trans _('Delete') %},
+            <!-- /ko -->
+             
+            <div style="height: inherit;">
+                <!--ko if: selection() === 'related-resources' -->
+                <div>
+                     <div data-bind="component: {
+                        name: 'related-resources-manager',
+                        params: $data.relatedResourcesManagerObj
+                    }"></div>
+                </div>
+                <!--/ko -->
+    
+                <!--ko if: selection() === 'permissions-manager' -->
+                <div>
+                    <div data-bind="component: {
+                        name: 'permissions-manager',
+                        params: {
+                            graphId: graphid,
+                            resourceId: resourceId,
+                            creator: creator,
+                            userIsCreator: userIsCreator,
+                            alert: alert,
+                            permissionLabelLookup: {
+                                'view_resourceinstance':{% quoted_trans 'Read' %},
+                                'change_resourceinstance':{% quoted_trans 'Update' %},
+                                'no_access_to_resourceinstance':{% quoted_trans 'No Access' %},
+                                'delete_resourceinstance':{% quoted_trans 'Delete' %},
+                            },
+                            alertTitle: {% quoted_trans 'You are about assign normal user access to this instance' %},
+                            alertMessage: {% quoted_trans 'Would you like to proceed?' %}
                         },
-                        alertTitle: {% quoted_trans _('You are about assign normal user access to this instance') %},
-                        alertMessage: {% quoted_trans _('Would you like to proceed?') %}},
-                }"></div>
-            </div>
-            <!--/ko -->
-
-            <!--ko if: selection() === 'root' -->
-                <!--ko if: resourceId() -->
-                <div class='resource-report editor-report' data-bind='component: {
-                    name: "resource-report-abstract",
+                    }"></div>
+                </div>
+                <!--/ko -->
+    
+                <!--ko if: selection() === 'root' -->
+                    <!--ko if: resourceId() -->
+                    <div class='resource-report editor-report' data-bind='component: {
+                        name: "resource-report-abstract",
+                        params: {
+                            report: report,
+                            editorContext: true,
+                            cache: false
+                        }
+                    }'></div>
+                    <!--/ko -->
+                    <!--ko if: !resourceId() -->
+                    <div id="rr-splash" class="rr-splash">
+    
+                        <!-- Image -->
+                        <div class="img-lg img-circle rr-splash-img-container">
+                            <img class="rr-splash-img" src="{% webpack_static "img/inspection.png" %}" alt="Resource Editor">
+                        </div>
+    
+                        <!-- Splash Title -->
+                        <div class="rr-splash-title">{% trans "Welcome to Arches' Resource Editor" %}</div>
+    
+                        <!-- Splash Instructions -->
+                        <div class="rr-splash-description">{% trans "You are about to create a new resource record.  Select any data card from the list on the left and start entering information." %}</div>
+                        <div class="rr-splash-description">{% trans "Don't worry if you decide not to enter any data just yet." %}</div>
+                        <div class="rr-splash-description">{% trans "Arches will create your new resource record once you've saved a data entry card." %}</div>
+                    </div>
+                    <!--/ko -->
+                <!--/ko -->
+    
+                <!-- ko if: !selection() && topCards.length == 0 -->
+                <div class="card-header">{% trans "No cards are available for this model." %}</div>
+                <!-- /ko -->
+    
+                <!-- ko if: selectedTile() && selectedCard() -->
+                <div class="card-header">
+                    <div class="card-header-title">
+    
+    
+                        <div class="card-breadcrumbs">
+    
+                            <a href="" class="toggle-tree"><i class="ion-arrow-left-b"></i></a>
+    
+                            <!-- ko foreach: { data: selectionBreadcrumbs(), as: 'crumb' } -->
+                                <!-- ko if: crumb.tileid -->
+                                <a href="#" data-bind="click: function () { crumb.selected(true) }">
+                                    <!-- ko if: crumb.parent.widgets.length > 0 -->
+                                    <span data-bind="text: crumb.parent.widgets[0].label || crumb.parent.model.name"></span>:
+                                    <div style="display: inline;" data-bind="component: {
+                                        name: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].name,
+                                        params: {
+                                            tile: crumb,
+                                            node: $parent.nodeLookup[crumb.parent.widgets[0].node_id],
+                                            config: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].config,
+                                            label: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].label,
+                                            value: crumb.data[crumb.parent.widgets[0].node_id],
+                                            type: 'resource-editor',
+                                            state: 'display_value'
+                                        }
+                                    }"></div> &gt;
+                                    <!-- /ko -->
+                                    <!-- ko if: crumb.parent.widgets.length === 0 -->
+                                    <span data-bind="text: crumb.parent.model.name"></span> &gt;
+                                    <!-- /ko -->
+                                </a>
+                                <!-- /ko -->
+                            <!-- /ko -->
+                            <span class="current-crumb">
+                                <!-- ko if: selectedTile().tileid -->
+                                    <!-- ko if: selectedCard().widgets.length > 0 -->
+                                    <span data-bind="text: selectedCard().widgets[0].label || selectedCard().model.name"></span>:
+                                    <div style="display: inline;" data-bind="component: {
+                                        name: widgetLookup[selectedCard().widgets[0].widget_id].name,
+                                        params: {
+                                            tile: selectedTile(),
+                                            node: nodeLookup[selectedCard().widgets[0].node_id],
+                                            config: widgetLookup[selectedCard().widgets[0].widget_id].config,
+                                            label: widgetLookup[selectedCard().widgets[0].widget_id].label,
+                                            value: selectedTile().data[selectedCard().widgets[0].node_id],
+                                            type: 'resource-editor',
+                                            state: 'display_value'
+                                        }
+                                    }"></div>
+                                    <!-- /ko -->
+                                    <!-- ko if: selectedCard().widgets.length === 0 -->
+                                    <span data-bind="text: selectedCard().model.name"></span>
+                                    <!-- /ko -->
+                                <!-- /ko -->
+                                <!-- ko if: !selectedTile().tileid -->
+                                {% trans "New" %} <span data-bind="text: selectedCard().model.name"></span>
+                                <!-- /ko -->
+                            </span>
+                            <!-- ko if: selectedTile().tileid && selectedTile().cards.length > 0 -->
+                            &gt;
+                            <!-- ko if: addableCards().length > 0 -->
+                            <span class="dropdown">
+                                <a class="dropdown-toggle" href="javascript:void(0)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    {% trans "Add new" %}... <i class="fa fa-caret-down"></i>
+                                </a>
+                                <ul class="dropdown-menu" style="padding-bottom: 5px;">
+                                    <!-- ko foreach: { data: addableCards(), as: 'card' } -->
+                                        <li>
+                                            <a href="javascript:void(0)" data-bind="text: card.model.name, click: function () { card.selected(true) }"></a>
+                                        </li>
+                                    <!-- /ko -->
+                                </ul>
+                            </span>
+                            <!-- /ko -->
+    
+                            <!-- /ko -->
+    
+                            <!-- ko if: selectedCard().cardinality === 'n' && selectedTile().tileid  -->
+                            <span class="add-new-crumb current-crumb" data-bind="click: function() {
+                                selectedCard().selected(true); setTimeout(function(){selectedCard().showForm(true)}, 50);
+                            }">
+                                <i class="fa fa-plus"></i>
+                                {% trans 'Add New' %}
+                            </span>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- ko if: !selectedCard().isWritable -->
+                <div class='msm-locked-warning'>{% trans 'You do not have permission to edit this card.' %}</div>
+                <!-- /ko -->
+    
+                <div class="card-component-wrapper-editor" data-bind="component: {
+                    name: cardComponentLookup[selectedCard().model.component_id()].componentname,
                     params: {
-                        report: report,
-                        editorContext: true,
-                        cache: false
+                        card: selectedCard(),
+                        tile: selectedTile(),
+                        provisionalTileViewModel: provisionalTileViewModel,
+                        reviewer: reviewer,
+                        loading: loading,
+                        form: $data,
+                        pageVm: $root
+    
                     }
-                }'></div>
-                <!--/ko -->
-                <!--ko if: !resourceId() -->
-                <div id="rr-splash" class="rr-splash">
-
-                    <!-- Image -->
-                    <div class="img-lg img-circle rr-splash-img-container">
-                        <img class="rr-splash-img" src="{% webpack_static "img/inspection.png" %}" alt="Resource Editor">
-                    </div>
-
-                    <!-- Splash Title -->
-                    <div class="rr-splash-title">{% trans "Welcome to Arches' Resource Editor" %}</div>
-
-                    <!-- Splash Instructions -->
-                    <div class="rr-splash-description">{% trans "You are about to create a new resource record.  Select any data card from the list on the left and start entering information." %}</div>
-                    <div class="rr-splash-description">{% trans "Don't worry if you decide not to enter any data just yet." %}</div>
-                    <div class="rr-splash-description">{% trans "Arches will create your new resource record once you've saved a data entry card." %}</div>
-                </div>
-                <!--/ko -->
-            <!--/ko -->
-
-            <!-- ko if: !selection() && topCards.length == 0 -->
-            <div class="card-header">{% trans "No cards are available for this model." %}</div>
-            <!-- /ko -->
-
-            <!-- ko if: selectedTile() && selectedCard() -->
-            <div class="card-header">
-                <div class="card-header-title">
-
-
-                    <div class="card-breadcrumbs">
-
-                        <a href="" class="toggle-tree"><i class="ion-arrow-left-b"></i></a>
-
-                        <!-- ko foreach: { data: selectionBreadcrumbs(), as: 'crumb' } -->
-                            <!-- ko if: crumb.tileid -->
-                            <a href="#" data-bind="click: function () { crumb.selected(true) }">
-                                <!-- ko if: crumb.parent.widgets.length > 0 -->
-                                <span data-bind="text: crumb.parent.widgets[0].label || crumb.parent.model.name"></span>:
-                                <div style="display: inline;" data-bind="component: {
-                                    name: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].name,
-                                    params: {
-                                        tile: crumb,
-                                        node: $parent.nodeLookup[crumb.parent.widgets[0].node_id],
-                                        config: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].config,
-                                        label: $parent.widgetLookup[crumb.parent.widgets[0].widget_id].label,
-                                        value: crumb.data[crumb.parent.widgets[0].node_id],
-                                        type: 'resource-editor',
-                                        state: 'display_value'
-                                    }
-                                }"></div> &gt;
-                                <!-- /ko -->
-                                <!-- ko if: crumb.parent.widgets.length === 0 -->
-                                <span data-bind="text: crumb.parent.model.name"></span> &gt;
-                                <!-- /ko -->
-                            </a>
-                            <!-- /ko -->
-                        <!-- /ko -->
-                        <span class="current-crumb">
-                            <!-- ko if: selectedTile().tileid -->
-                                <!-- ko if: selectedCard().widgets.length > 0 -->
-                                <span data-bind="text: selectedCard().widgets[0].label || selectedCard().model.name"></span>:
-                                <div style="display: inline;" data-bind="component: {
-                                    name: widgetLookup[selectedCard().widgets[0].widget_id].name,
-                                    params: {
-                                        tile: selectedTile(),
-                                        node: nodeLookup[selectedCard().widgets[0].node_id],
-                                        config: widgetLookup[selectedCard().widgets[0].widget_id].config,
-                                        label: widgetLookup[selectedCard().widgets[0].widget_id].label,
-                                        value: selectedTile().data[selectedCard().widgets[0].node_id],
-                                        type: 'resource-editor',
-                                        state: 'display_value'
-                                    }
-                                }"></div>
-                                <!-- /ko -->
-                                <!-- ko if: selectedCard().widgets.length === 0 -->
-                                <span data-bind="text: selectedCard().model.name"></span>
-                                <!-- /ko -->
-                            <!-- /ko -->
-                            <!-- ko if: !selectedTile().tileid -->
-                            {% trans "New" %} <span data-bind="text: selectedCard().model.name"></span>
-                            <!-- /ko -->
-                        </span>
-                        <!-- ko if: selectedTile().tileid && selectedTile().cards.length > 0 -->
-                        &gt;
-                        <!-- ko if: addableCards().length > 0 -->
-                        <span class="dropdown">
-                            <a class="dropdown-toggle" href="javascript:void(0)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                {% trans "Add new" %}... <i class="fa fa-caret-down"></i>
-                            </a>
-                            <ul class="dropdown-menu" style="padding-bottom: 5px;">
-                                <!-- ko foreach: { data: addableCards(), as: 'card' } -->
-                                    <li>
-                                        <a href="javascript:void(0)" data-bind="text: card.model.name, click: function () { card.selected(true) }"></a>
-                                    </li>
-                                <!-- /ko -->
-                            </ul>
-                        </span>
-                        <!-- /ko -->
-
-                        <!-- /ko -->
-
-                        <!-- ko if: selectedCard().cardinality === 'n' && selectedTile().tileid  -->
-                        <span class="add-new-crumb current-crumb" data-bind="click: function() {
-                            selectedCard().selected(true); setTimeout(function(){selectedCard().showForm(true)}, 50);
-                        }">
-                            <i class="fa fa-plus"></i>
-                            {% trans 'Add New' %}
-                        </span>
-                        <!-- /ko -->
-                    </div>
-                </div>
+                }"></div>
+                <!-- /ko -->
             </div>
-
-            <!-- ko if: !selectedCard().isWritable -->
-            <div class='msm-locked-warning'>{% trans 'You do not have permission to edit this card.' %}</div>
-            <!-- /ko -->
-
-            <div class="card-component-wrapper-editor" data-bind="component: {
-                name: cardComponentLookup[selectedCard().model.component_id()].componentname,
-                params: {
-                    card: selectedCard(),
-                    tile: selectedTile(),
-                    provisionalTileViewModel: provisionalTileViewModel,
-                    reviewer: reviewer,
-                    loading: loading,
-                    form: $data,
-                    pageVm: $root
-
-                }
-            }"></div>
-            <!-- /ko -->
         </div>
     </div>
 </div>
@@ -317,6 +366,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         "templates": {{templates_json}},
         "graph": {{graph_json}},
         "graph_has_unpublished_changes": "{{graph_has_unpublished_changes}}",
+        "resource_instance_lifecycle_state": {{resource_instance_lifecycle_state}},
         "issystemsettings": {{is_system_settings|yesno:"true,false"}}
     }'
 ></div>

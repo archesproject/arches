@@ -50,8 +50,8 @@ class TileTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         sql = """
-        INSERT INTO public.resource_instances(resourceinstanceid, legacyid, graphid, createdtime)
-            VALUES ('40000000-0000-0000-0000-000000000000', '40000000-0000-0000-0000-000000000000', '2f7f8e40-adbc-11e6-ac7f-14109fd34195', '1/1/2000');
+        INSERT INTO public.resource_instances(resourceinstanceid, legacyid, graphid, createdtime, resource_instance_lifecycle_state_id)
+            VALUES ('40000000-0000-0000-0000-000000000000', '40000000-0000-0000-0000-000000000000', '2f7f8e40-adbc-11e6-ac7f-14109fd34195', '1/1/2000', '4e2a6b8e-2489-4377-9c9f-29cfbd3e76c8');
 
         INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
             VALUES ('99999999-0000-0000-0000-000000000001', '', 'n');

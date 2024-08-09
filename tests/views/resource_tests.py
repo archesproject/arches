@@ -182,9 +182,11 @@ class CommandLineTests(ArchesTestCase):
             resourceinstanceid=self.resource_instance_id
         )
         assign_perm("view_resourceinstance", group, resource)
-        with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.get(url)
-        self.assertTrue(response.status_code == 403)
+        response = self.client.get(url)
+
+        self.assertRedirects(
+            response, "/report/" + self.resource_instance_id + "?redirected=true"
+        )
 
     def test_user_cannot_delete_without_permission(self):
         """
@@ -227,13 +229,14 @@ class CommandLineTests(ArchesTestCase):
         assign_perm("no_access_to_resourceinstance", user, resource)
         with self.assertLogs("django.request", level="WARNING"):
             view = self.client.get(view_url)
-        with self.assertLogs("django.request", level="WARNING"):
-            edit = self.client.get(edit_url)
+
+        edit = self.client.get(edit_url)
+
         with self.assertLogs("django.request", level="ERROR"):
             delete = self.client.delete(edit_url)
         self.assertTrue(
             view.status_code == 403
-            and edit.status_code == 403
+            and edit.status_code == 302
             and delete.status_code == 500
         )
 

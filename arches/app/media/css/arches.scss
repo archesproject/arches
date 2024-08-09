@@ -10403,6 +10403,10 @@ a.filter-tools:hover {
     height: 100%;
 }
 
+.editor-report .resource-report-abstract-container .resource-component-abstract {
+    height: calc(100vh - 150px);
+}
+
 .editor-report .rp-report-section {
     border-bottom: none;
     padding-bottom: 0;

@@ -314,7 +314,9 @@ class GraphDesignerView(GraphBaseView):
             card_components=card_components,
             card_components_json=JSONSerializer().serialize(card_components),
             cards=JSONSerializer().serialize(serialized_graph["cards"]),
-            cardwidgets=JSONSerializer().serialize(serialized_graph["widgets"]),
+            cardwidgets=JSONSerializer().serialize(
+                serialized_graph["cards_x_nodes_x_widgets"]
+            ),
             map_layers=models.MapLayer.objects.all(),
             map_markers=models.MapMarker.objects.all(),
             map_sources=models.MapSource.objects.all(),

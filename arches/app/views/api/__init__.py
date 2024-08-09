@@ -1208,7 +1208,8 @@ class Card(APIBase):
                 widget
                 for widget in models.CardXNodeXWidget.objects.filter(
                     pk__in=[
-                        widget_dict["id"] for widget_dict in serialized_graph["widgets"]
+                        widget_dict["id"]
+                        for widget_dict in serialized_graph["cards_x_nodes_x_widgets"]
                     ]
                 )
             ]
@@ -1459,6 +1460,56 @@ class OntologyProperty(APIBase):
                     ret.append(ontologyclass["ontology_property"])
 
         return JSONResponse(ret)
+
+
+class ResourceInstanceLifecycleStates(APIBase):
+    def get(self, request):
+        return JSONResponse(models.ResourceInstanceLifecycleState.objects.all())
+
+
+class ResourceInstanceLifecycleState(APIBase):
+    def get(self, request, resourceid):
+        resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
+        return JSONResponse(resource_instance.resource_instance_lifecycle_state)
+
+    def post(self, request, resourceid):
+        if not user_is_resource_editor(request.user):
+            return JSONErrorResponse(
+                _("Request Failed"), _("Permission Denied"), status=403
+            )
+        try:
+            data = json.loads(request.body)
+        except Exception as e:
+            return JSONErrorResponse(str(e), status=400)
+
+        try:
+            resource = Resource.objects.get(pk=resourceid)
+            resource_instance_lifecycle_state = (
+                models.ResourceInstanceLifecycleState.objects.get(pk=data)
+            )
+        except Exception as e:
+            return JSONErrorResponse(str(e), status=404)
+
+        try:
+            original_resource_instance_lifecycle_state = (
+                resource.resource_instance_lifecycle_state
+            )
+
+            current_resource_instance_lifecycle_state = (
+                resource.update_resource_instance_lifecycle_state(
+                    user=request.user,
+                    resource_instance_lifecycle_state=resource_instance_lifecycle_state,
+                )
+            )
+        except ValueError as e:
+            return JSONErrorResponse(str(e), status=400)
+
+        return JSONResponse(
+            {
+                "original_resource_instance_lifecycle_state": original_resource_instance_lifecycle_state,
+                "current_resource_instance_lifecycle_state": current_resource_instance_lifecycle_state,
+            }
+        )
 
 
 class ResourceReport(APIBase):

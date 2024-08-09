@@ -1,4 +1,4 @@
-require([
+require([  // eslint-disable-line @typescript-eslint/no-require-imports
     'jquery',
     'underscore',
     'knockout',
@@ -9,15 +9,17 @@ require([
 ], function($, _, ko, moment, BaseManagerView, data) {
     var ResourceEditLogView = BaseManagerView.extend({
         initialize: function(options){
-            var self = this;
+            const self = this;  // eslint-disable-line @typescript-eslint/no-this-alias
             var cards = data.cards;
             var edits = data.edits;
+
             var editTypeLookup = {
                 'create': {icon: 'fa fa-chevron-circle-right fa-lg', color: 'bg-mint'},
                 'tile edit': {icon: 'fa fa-repeat fa-lg', color: 'bg-purple'},
                 'tile create': {icon: 'fa fa-plus fa-lg', color: 'bg-dark'},
                 'tile delete': {icon: 'fa fa-minus fa-lg', color: 'bg-danger'},
-                'delete edit': {icon: 'fa fa-minus fa-lg', color: 'bg-danger'}
+                'delete edit': {icon: 'fa fa-minus fa-lg', color: 'bg-danger'},
+                'update_resource_instance_lifecycle_state': {icon: 'fa fa-exclamation fa-lg', color: 'bg-warning'},
             };
 
             var handleChildCards = function(card) {
@@ -59,7 +61,7 @@ require([
                         }, this);
                     }
                 });
-                return _.map(full_value, function(v,k){return v;});
+                return _.map(full_value, function(v,k){return v;});   // eslint-disable-line @typescript-eslint/no-unused-vars
             };
 
             _.each(edits, function(edit){
