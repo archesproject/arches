@@ -7,7 +7,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10999_update_principaluser"),
+        ("models", "10799_geojsongeometry_featureid"),
     ]
 
     operations = [
