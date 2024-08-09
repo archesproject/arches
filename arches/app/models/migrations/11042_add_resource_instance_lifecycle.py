@@ -7,7 +7,7 @@ def create_perpetual_resource_instance_lifecycle(apps, schema_editor):
     ResourceInstanceLifecycle = apps.get_model("models", "ResourceInstanceLifecycle")
     ResourceInstanceLifecycle.objects.create(
         id=uuid.UUID("e9a8a2b0-63b5-47a3-bbc4-9c09c0e759b1"),
-        name="Perpetual",
+        name=_("Perpetual"),
     )
 
 
@@ -26,7 +26,7 @@ def create_perpetual_resource_instance_lifecycle_states(apps, schema_editor):
 
     ResourceInstanceLifecycleState.objects.create(
         id=uuid.UUID("4e2a6b8e-2489-4377-9c9f-29cfbd3e76c8"),
-        name="Perpetual",
+        name=_("Perpetual"),
         action_label="",
         resource_instance_lifecycle_id=uuid.UUID(
             "e9a8a2b0-63b5-47a3-bbc4-9c09c0e759b1"
@@ -53,7 +53,7 @@ def create_default_resource_instance_lifecycle(apps, schema_editor):
     ResourceInstanceLifecycle = apps.get_model("models", "ResourceInstanceLifecycle")
     ResourceInstanceLifecycle.objects.create(
         id=uuid.UUID("7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"),
-        name="standard",
+        name=_("Standard"),
     )
 
 
@@ -71,7 +71,7 @@ def create_default_resource_instance_lifecycle_states(apps, schema_editor):
     )
     draft_state = ResourceInstanceLifecycleState.objects.create(
         id=uuid.UUID("9375c9a7-dad2-4f14-a5c1-d7e329fdde4f"),
-        name="Draft",
+        name=_("Draft"),
         action_label=_("Revert to Draft"),
         resource_instance_lifecycle_id=uuid.UUID(
             "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
@@ -82,7 +82,7 @@ def create_default_resource_instance_lifecycle_states(apps, schema_editor):
     )
     active_state = ResourceInstanceLifecycleState.objects.create(
         id=uuid.UUID("f75bb034-36e3-4ab4-8167-f520cf0b4c58"),
-        name="Active",
+        name=_("Active"),
         action_label=_("Make Active"),
         resource_instance_lifecycle_id=uuid.UUID(
             "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
@@ -93,7 +93,7 @@ def create_default_resource_instance_lifecycle_states(apps, schema_editor):
     )
     retired_state = ResourceInstanceLifecycleState.objects.create(
         id=uuid.UUID("d95d9c0e-0e2c-4450-93a3-d788b91abcc8"),
-        name="Retired",
+        name=_("Retired"),
         action_label=_("Retire"),
         resource_instance_lifecycle_id=uuid.UUID(
             "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"

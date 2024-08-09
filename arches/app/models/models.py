@@ -597,9 +597,11 @@ class GraphModel(models.Model):
             and not self.source_identifier
             and not self.resource_instance_lifecycle
         ):
-            self.resource_instance_lifecycle = ResourceInstanceLifecycle.objects.get(
-                id=settings.DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID
+            self.resource_instance_lifecycle_id = (
+                settings.DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID
             )
+            add_to_update_fields(kwargs, "resource_instance_lifecycle_id")
+
         super(GraphModel, self).save(*args, **kwargs)
 
     def __str__(self):
@@ -1278,12 +1280,6 @@ class ResourceInstance(models.Model):
         managed = True
         db_table = "resource_instances"
         permissions = (("no_access_to_resourceinstance", "No Access"),)
-        constraints = [
-            models.CheckConstraint(
-                check=Q(resource_instance_lifecycle_state__isnull=False),
-                name="check_resource_instance_lifecycle_state_not_null",
-            )
-        ]
 
 
 class ResourceInstanceLifecycle(models.Model):
