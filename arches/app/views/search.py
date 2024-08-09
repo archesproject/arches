@@ -128,7 +128,7 @@ class SearchView(MapBaseManagerView):
             "title": _("Searching the Database"),
             "templates": ["search-help"],
         }
-        context["celery_running"] = task_management.check_if_celery_available()
+
         context["export_html_templates"] = (
             HtmlWriter.get_graphids_with_export_template()
         )
