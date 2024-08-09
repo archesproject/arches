@@ -1,3 +1,4 @@
+import os
 import re
 import warnings
 from importlib.metadata import PackageNotFoundError, requires
@@ -25,11 +26,13 @@ class ArchesAppConfig(AppConfig):
     is_arches_application = False
 
     def ready(self):
+        import arches.app.signals
+
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
         if settings.APP_NAME.lower() == self.name:
             generate_frontend_configuration()
 
 
-### GLOBAL DEPRECATIONS ###
 FILE_TYPE_CHECKING_MSG = (
     "Providing boolean values to FILE_TYPE_CHECKING is deprecated. "
     "Starting with Arches 8.0, the only allowed options will be "
