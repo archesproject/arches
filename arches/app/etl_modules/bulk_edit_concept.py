@@ -10,7 +10,7 @@ from django.utils.translation import get_language, gettext as _
 from arches.app.etl_modules.base_data_editor import BaseBulkEditor
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
-from arches.app.models.models import Value, Language, Node, ETLModule
+from arches.app.models.models import Value, Language, Node, ETLModule, GraphModel
 from arches.app.models.concept import Concept
 from arches.app.utils.db_utils import dictfetchall
 from arches.app.views.search import search_results
@@ -262,7 +262,9 @@ class BulkConceptEditor(BaseBulkEditor):
     def write(self, request):
         graphid = request.POST.get("selectedGraph", None)
         selected_node_info = request.POST.get("selectedNode", None)
-        nodeid = json.loads(selected_node_info)["node"]
+        node_info = json.loads(selected_node_info)
+        nodeid = node_info["node"]
+        node_label = node_info["label"]
         new = request.POST.get("conceptNew", None)
         old = request.POST.get("conceptOld", None)
         tiles_to_remove = request.POST.get("tilesToRemove", None)
@@ -288,9 +290,10 @@ class BulkConceptEditor(BaseBulkEditor):
                 uuid.UUID(id) for id in self.get_resourceids_from_search_url(search_url)
             ]
 
+        graph_name = str(GraphModel.objects.get(pk=graphid).name)
         load_details = {
-            "graph": graphid,
-            "node": nodeid,
+            "graph": graph_name,
+            "node": node_label,
             "new": new_prefLabel,
             "old": old_prefLabel,
         }
