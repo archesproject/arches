@@ -11,7 +11,7 @@ define([
         params.configKeys = ['placeholder', 'defaultValue'];
         
         this.multiple = params.multiple || false;
-        this.allowClear = true;
+        this.allowClear = params.allowClear ?? true;
         this.displayName = ko.observable('');
 
         WidgetViewModel.apply(this, [params]);
@@ -83,7 +83,7 @@ define([
             multiple: self.multiple,
             closeOnSelect: true,
             placeholder: self.placeholder,
-            allowClear: true,
+            allowClear: self.allowClear,
             ajax: {
                 url: arches.urls.paged_dropdown,
                 dataType: 'json',
@@ -94,7 +94,8 @@ define([
                     return {
                         conceptid: ko.unwrap(params.node.config.rdmCollection),
                         query: term,
-                        page: page
+                        page: page,
+                        lang: ko.unwrap(params.lang)
                     };
                 },
                 processResults: function(data) {

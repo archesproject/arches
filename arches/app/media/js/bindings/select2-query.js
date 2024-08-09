@@ -33,10 +33,11 @@ define([
 
             var placeholder = select2Config.placeholder;
             if (ko.isObservable(placeholder)) {
-                placeholder.subscribe(function(newItems) {
+                const placeholderSubscription = placeholder.subscribe(function(newItems) {
                     select2Config.placeholder = newItems;
                     $(el).selectWoo(select2Config);
                 }, this);
+                placeholderSubscription.disposeWhenNodeIsRemoved(el);
                 select2Config.placeholder = select2Config.placeholder();
                 if (select2Config.allowClear) {
                     select2Config.placeholder = select2Config.placeholder === "" ? " " : select2Config.placeholder;
@@ -45,15 +46,16 @@ define([
 
             var disabled = select2Config.disabled;
             if (ko.isObservable(disabled)) {
-                disabled.subscribe(function(val) {
+                const disabledSubscription = disabled.subscribe(function(val) {
                     $(el).prop("disabled", !!val);
                 });
+                disabledSubscription.disposeWhenNodeIsRemoved(el);
                 select2Config.disabled = select2Config.disabled();
             }
 
             var data = select2Config.data;
             if (ko.isObservable(data)) {
-                data.subscribe(function(data) {
+                const dataSubscription = data.subscribe(function(data) {
                     var currentSelection = $(el).select2('data').map(selected => selected.id);
                     $(el).find("option").remove();
                     data.forEach(data => {
@@ -68,6 +70,7 @@ define([
                     // maintain the current selection after adding new dropdown options
                     $(el).val(currentSelection).trigger('change');
                 });
+                dataSubscription.disposeWhenNodeIsRemoved(el);
                 select2Config.data = select2Config.data();
             }
 
@@ -97,7 +100,7 @@ define([
                     $(el).trigger('change.select2'); 
     
                     // update the dropdown if something else changes the value
-                    value.subscribe(function(newVal) {
+                    const valueSubscription = value.subscribe(function(newVal) {
                         //console.log(newVal);
                         // select2Config.value = newVal;
                         $(el).val(newVal);
@@ -109,6 +112,7 @@ define([
                             },300);
                         }
                     }, this);
+                    valueSubscription.disposeWhenNodeIsRemoved(el);
                 }
                 window.setTimeout(function(){
                     renderPlaceholder();
