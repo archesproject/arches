@@ -38,6 +38,7 @@ const setDisplayedRow = (val: Selectable | null) => {
         router.push({ name: routes.item, params: { id: val.id } });
     }
 };
+// @ts-expect-error vue-tsc doesn't like arbitrary properties here
 provide(displayedRowKey, { displayedRow, setDisplayedRow });
 
 const selectedLanguage: Ref<Language> = ref(
