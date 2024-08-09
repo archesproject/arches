@@ -253,11 +253,4 @@ class Migration(migrations.Migration):
             ),
             preserve_default=False,
         ),
-        migrations.AddConstraint(
-            model_name="resourceinstance",
-            constraint=models.CheckConstraint(
-                check=models.Q(resource_instance_lifecycle_state__isnull=False),
-                name="check_resource_instance_lifecycle_state_not_null",
-            ),
-        ),
     ]
