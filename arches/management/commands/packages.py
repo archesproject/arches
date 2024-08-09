@@ -7,6 +7,7 @@ import uuid
 import sys
 import urllib.request, urllib.parse, urllib.error
 import os
+import warnings
 import logging
 from arches.management.commands import utils
 from arches.app.utils.i18n import LanguageSynchronizer
@@ -335,7 +336,11 @@ class Command(BaseCommand):
             self.setup(package_name, es_install_location=options["dest_dir"])
 
         if options["operation"] == "install":
-            self.install(package_name)
+            warnings.warn(
+                "The install operation does nothing since Arches 7.6. "
+                "In Arches 8.0, calling this operation will raise an exception.",
+                UserWarning,
+            )
 
         if options["operation"] == "setup_indexes":
             self.setup_indexes()
@@ -1318,15 +1323,6 @@ class Command(BaseCommand):
         """
 
         self.setup_db(package_name)
-
-    def install(self, package_name):
-        """
-        Runs the setup.py file found in the package root
-
-        """
-
-        install = import_string("%s.setup.install" % package_name)
-        install()
 
     def setup_db(self, package_name):
         """

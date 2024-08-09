@@ -4,9 +4,8 @@ import site
 import sys
 from contextlib import contextmanager
 
-import django
 from django.apps import apps
-from django.conf import global_settings, settings
+from django.conf import settings
 from django.contrib.staticfiles.finders import AppDirectoriesFinder
 
 
@@ -24,21 +23,6 @@ class CoreArchesStaticFilesFinderMediaRoot(AppDirectoriesFinder):
 
 class CoreArchesStaticFilesFinderNodeModules(AppDirectoriesFinder):
     source_dir = os.path.normpath(os.path.join("..", "node_modules"))
-
-
-@contextmanager
-def _move_to_end_of_sys_path(*paths, add_cwd=False):
-    _orig_sys_path = sys.path[:]
-    for path in paths:
-        if path in sys.path:
-            sys.path.remove(path)
-            sys.path.append(path)
-    if add_cwd:
-        sys.path.append(os.getcwd())
-    try:
-        yield
-    finally:
-        sys.path = _orig_sys_path
 
 
 def list_arches_app_names():
@@ -152,46 +136,87 @@ def build_templates_config(
         raise e
 
 
-def transmit_webpack_django_config(**kwargs):
+def generate_frontend_configuration():
     try:
-        is_arches_core = kwargs["APP_NAME"] == "Arches"
-        transmitted_project_settings = {k: v for k, v in kwargs.items() if k.isupper()}
-        settings.configure(
-            default_settings=global_settings, **transmitted_project_settings
-        )
-
-        # Without this `import celery` might resolve to arches.celery or project.celery
-        if is_arches_core:
-            with _move_to_end_of_sys_path(os.path.realpath(kwargs["ROOT_DIR"])):
-                django.setup()
-        else:
-            with _move_to_end_of_sys_path(
-                os.path.realpath(kwargs["APP_ROOT"]), add_cwd=True
-            ):
-                django.setup()
+        app_root_path = os.path.realpath(settings.APP_ROOT)
+        root_dir_path = os.path.realpath(settings.ROOT_DIR)
 
         arches_app_names = list_arches_app_names()
         arches_app_paths = list_arches_app_paths()
         path_lookup = dict(zip(arches_app_names, arches_app_paths, strict=True))
 
-        sys.stdout.write(
-            json.dumps(
-                {
-                    "APP_ROOT": os.path.realpath(kwargs["APP_ROOT"]),
-                    "ARCHES_APPLICATIONS": arches_app_names,
-                    "ARCHES_APPLICATIONS_PATHS": path_lookup,
-                    "SITE_PACKAGES_DIRECTORY": site.getsitepackages()[0],
-                    "PUBLIC_SERVER_ADDRESS": kwargs["PUBLIC_SERVER_ADDRESS"],
-                    "ROOT_DIR": os.path.realpath(kwargs["ROOT_DIR"]),
-                    "STATIC_URL": kwargs["STATIC_URL"],
-                    "WEBPACK_DEVELOPMENT_SERVER_PORT": kwargs[
-                        "WEBPACK_DEVELOPMENT_SERVER_PORT"
-                    ],
-                }
-            )
+        frontend_configuration_settings_data = {
+            "_comment": "This is a generated file. Do not edit directly.",
+            "APP_ROOT": app_root_path,
+            "ARCHES_APPLICATIONS": arches_app_names,
+            "ARCHES_APPLICATIONS_PATHS": path_lookup,
+            "SITE_PACKAGES_DIRECTORY": site.getsitepackages()[0],
+            "PUBLIC_SERVER_ADDRESS": settings.PUBLIC_SERVER_ADDRESS,
+            "ROOT_DIR": root_dir_path,
+            "STATIC_URL": settings.STATIC_URL,
+            "WEBPACK_DEVELOPMENT_SERVER_PORT": settings.WEBPACK_DEVELOPMENT_SERVER_PORT,
+        }
+
+        if settings.APP_NAME == "Arches":
+            base_path = root_dir_path
+        else:
+            base_path = app_root_path
+
+        frontend_configuration_settings_path = os.path.realpath(
+            os.path.join(base_path, "..", ".frontend-configuration-settings.json")
         )
-        sys.stdout.flush()
+        sys.stdout.write(
+            f"Writing frontend configuration to: {frontend_configuration_settings_path} \n"
+        )
+
+        with open(
+            frontend_configuration_settings_path,
+            "w",
+        ) as file:
+            json.dump(frontend_configuration_settings_data, file, indent=4)
+
+        tsconfig_paths_data = {
+            "_comment": "This is a generated file. Do not edit directly.",
+            "compilerOptions": {
+                "paths": {
+                    "@/arches/*": [
+                        os.path.join(
+                            ".",
+                            os.path.relpath(
+                                root_dir_path,
+                                os.path.join(base_path, ".."),
+                            ),
+                            "app",
+                            "src",
+                            "arches",
+                            "*",
+                        )
+                    ],
+                    **{
+                        os.path.join("@", path_name, "*"): [
+                            os.path.join(
+                                ".",
+                                os.path.relpath(path, os.path.join(base_path, "..")),
+                                "src",
+                                path_name,
+                                "*",
+                            )
+                        ]
+                        for path_name, path in path_lookup.items()
+                    },
+                }
+            },
+        }
+
+        tsconfig_path = os.path.realpath(
+            os.path.join(base_path, "..", ".tsconfig-paths.json")
+        )
+        sys.stdout.write(f"Writing tsconfig path data to: {tsconfig_path} \n")
+
+        with open(tsconfig_path, "w") as file:
+            json.dump(tsconfig_paths_data, file, indent=4)
+
     except Exception as e:
-        # Ensures error message is shown if error encountered in webpack build
-        sys.stdout.write(str(e))
+        # Ensures error message is shown if error encountered
+        sys.stderr.write(str(e))
         raise e
