@@ -2,9 +2,6 @@ import uuid
 from django.db import migrations, models
 from django.utils.translation import gettext as _
 
-import arches.app.models.fields.i18n
-import arches.app.utils.betterJSONSerializer
-
 
 def create_perpetual_resource_instance_lifecycle(apps, schema_editor):
     ResourceInstanceLifecycle = apps.get_model("models", "ResourceInstanceLifecycle")
@@ -134,14 +131,14 @@ def remove_default_resource_instance_lifecycle_states(apps, schema_editor):
 
 
 def add_default_resource_instance_lifecycles_to_graphs(apps, schema_editor):
-    Graph = apps.get_model("models", "Graph")
+    GraphModel = apps.get_model("models", "GraphModel")
     ResourceInstanceLifecycle = apps.get_model("models", "ResourceInstanceLifecycle")
 
     default_resource_instance_lifecycle = ResourceInstanceLifecycle.objects.get(
         id="7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
     )
 
-    for graph_model in Graph.objects.all():
+    for graph_model in GraphModel.objects.all():
         if (
             graph_model.isresource
             and not graph_model.source_identifier
@@ -154,9 +151,9 @@ def add_default_resource_instance_lifecycles_to_graphs(apps, schema_editor):
 
 
 def remove_default_resource_instance_lifecycles_from_graphs(apps, schema_editor):
-    Graph = apps.get_model("models", "Graph")
+    GraphModel = apps.get_model("models", "GraphModel")
 
-    for graph_model in Graph.objects.all():
+    for graph_model in GraphModel.objects.all():
         graph_model.resource_instance_lifecycle = None
         graph_model.save()
 
@@ -164,148 +161,10 @@ def remove_default_resource_instance_lifecycles_from_graphs(apps, schema_editor)
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "9525_add_published_graph_edits"),
+        ("models", "11042_create_resource_instance_lifecycle"),
     ]
 
     operations = [
-        migrations.CreateModel(
-            name="ResourceInstanceLifecycle",
-            fields=[
-                (
-                    "id",
-                    models.UUIDField(
-                        primary_key=True,
-                        serialize=False,
-                        default=uuid.uuid4,
-                    ),
-                ),
-                ("name", arches.app.models.fields.i18n.I18n_TextField()),
-            ],
-            options={
-                "db_table": "resource_instance_lifecycles",
-                "managed": True,
-            },
-        ),
-        migrations.CreateModel(
-            name="ResourceInstanceLifecycleState",
-            fields=[
-                (
-                    "id",
-                    models.UUIDField(
-                        primary_key=True,
-                        serialize=False,
-                        default=uuid.uuid4,
-                    ),
-                ),
-                (
-                    "name",
-                    arches.app.models.fields.i18n.I18n_TextField(
-                        default="",
-                        encoder=arches.app.utils.betterJSONSerializer.JSONSerializer,
-                    ),
-                ),
-                (
-                    "action_label",
-                    arches.app.models.fields.i18n.I18n_TextField(
-                        default="",
-                        encoder=arches.app.utils.betterJSONSerializer.JSONSerializer,
-                    ),
-                ),
-                ("is_initial_state", models.BooleanField(default=False)),
-                ("can_edit_resource_instances", models.BooleanField(default=False)),
-                ("can_delete_resource_instances", models.BooleanField(default=False)),
-                (
-                    "resource_instance_lifecycle",
-                    models.ForeignKey(
-                        on_delete=models.deletion.CASCADE,
-                        related_name="resource_instance_lifecycle_states",
-                        to="models.ResourceInstanceLifecycle",
-                    ),
-                ),
-            ],
-            options={
-                "db_table": "resource_instance_lifecycle_states",
-                "permissions": (
-                    (
-                        "can_edit_all_resource_instance_lifecycle_states",
-                        "Can edit all resource instance lifecycle states",
-                    ),
-                    (
-                        "can_delete_all_resource_instance_lifecycle_states",
-                        "Can delete all resource instance lifecycle states",
-                    ),
-                ),
-                "managed": True,
-            },
-        ),
-        migrations.CreateModel(
-            name="ResourceInstanceLifecycleStateFromXRef",
-            fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "resource_instance_lifecycle_state_from",
-                    models.ForeignKey(
-                        on_delete=models.deletion.CASCADE,
-                        related_name="from_xref_next_lifecycle_states",
-                        to="models.resourceinstancelifecyclestate",
-                    ),
-                ),
-                (
-                    "resource_instance_lifecycle_state_to",
-                    models.ForeignKey(
-                        on_delete=models.deletion.CASCADE,
-                        related_name="from_xref_previous_lifecycle_states",
-                        to="models.resourceinstancelifecyclestate",
-                    ),
-                ),
-            ],
-            options={
-                "db_table": "resource_instance_lifecycle_states_from_xref",
-                "managed": True,
-            },
-        ),
-        migrations.CreateModel(
-            name="ResourceInstanceLifecycleStateToXRef",
-            fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "resource_instance_lifecycle_state_from",
-                    models.ForeignKey(
-                        on_delete=models.deletion.CASCADE,
-                        related_name="to_xref_next_lifecycle_states",
-                        to="models.resourceinstancelifecyclestate",
-                    ),
-                ),
-                (
-                    "resource_instance_lifecycle_state_to",
-                    models.ForeignKey(
-                        on_delete=models.deletion.CASCADE,
-                        related_name="to_xref_previous_lifecycle_states",
-                        to="models.resourceinstancelifecyclestate",
-                    ),
-                ),
-            ],
-            options={
-                "db_table": "resource_instance_lifecycle_states_to_xref",
-                "managed": True,
-            },
-        ),
         migrations.AddField(
             model_name="resourceinstancelifecyclestate",
             name="previous_resource_instance_lifecycle_states",
