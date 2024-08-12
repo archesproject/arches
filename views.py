@@ -1,13 +1,12 @@
-import logging
 from http import HTTPStatus
 from uuid import UUID
 
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Max
-from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
+from django.views.generic import View
 
 from arches.app.models.utils import field_names
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
@@ -24,8 +23,6 @@ from arches_references.models import (
     ListItemValue,
     NodeProxy,
 )
-
-logger = logging.getLogger(__name__)
 
 
 def _prefetch_terms(request):
@@ -90,7 +87,7 @@ class ListsView(APIBase):
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
-class ListView(View):
+class ListView(APIBase):
     def get(self, request, list_id):
         """Returns either a flat representation (?flat=true) or a tree (default)."""
         try:
@@ -176,7 +173,7 @@ class ListView(View):
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
-class ListItemView(View):
+class ListItemView(APIBase):
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
         try:
@@ -247,7 +244,7 @@ class ListItemView(View):
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
-class ListItemValueView(View):
+class ListItemValueView(APIBase):
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
         value = ListItemValue(**data)
@@ -301,7 +298,7 @@ class ListItemValueView(View):
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
-class ListItemImageView(View):
+class ListItemImageView(APIBase):
     def post(self, request):
         uploaded_file = request.FILES["item_image"]
         img = ListItemImage(
@@ -328,7 +325,7 @@ class ListItemImageView(View):
 @method_decorator(
     group_required("RDM Administrator", raise_exception=True), name="dispatch"
 )
-class ListItemImageMetadataView(View):
+class ListItemImageMetadataView(APIBase):
     def post(self, request):
         data = JSONDeserializer().deserialize(request.body)
         data.pop("metadata_label", None)
