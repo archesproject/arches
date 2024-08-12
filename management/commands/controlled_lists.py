@@ -1,4 +1,4 @@
-from arches.app.models.models import Concept, Value
+from arches.app.models.models import Value
 from django.core.management.base import BaseCommand
 
 
@@ -99,7 +99,7 @@ class Command(BaseCommand):
         ]
 
         if len(failed_collections) > 0:
-            self.stdout.write(
+            self.stderr.write(
                 "Failed to find the following collections in the database: %s"
                 % ", ".join(failed_collections)
             )
