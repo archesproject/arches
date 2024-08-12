@@ -17,7 +17,7 @@ define([
             
             this.selectedPopup = ko.observable('');
             this.sharedStateObject.selectedPopup = this.selectedPopup;
-            var firstEnabledFilter = _.find(this.sharedStateObject.filtersList, function(filter) {
+            var firstEnabledFilter = _.find(this.sharedStateObject.searchFilterConfigs, function(filter) {
                 return filter.config.layoutType === 'tabbed';
             }, this);
             this.selectedTab = ko.observable(firstEnabledFilter.componentname);

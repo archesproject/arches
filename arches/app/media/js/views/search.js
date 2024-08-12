@@ -44,50 +44,43 @@ define([
 
     var CommonSearchViewModel = function() {
         this.searchComponentVms = {};
-        this.filtersList = Object.values(SearchComponents);
-        this.defaultSearchViewComponent = this.filtersList.find(component => component.type == "search-view" && component.config.default == true); // approach: let the backend decide
+        this.searchFilterConfigs = Object.values(SearchComponents);
+        this.defaultSearchViewConfig = this.searchFilterConfigs.find(filter => filter.type == "search-view");
         this.searchViewComponentName = ko.observable(false);
-        this.requiredFiltersLookup = this.filtersList.reduce((lookup, item) => {
-            if (item.config.availableComponents && item.config.availableComponents.length > 0) {
-                lookup[item.componentname] = item.config.availableComponents.map(filter => filter.searchcomponentid);
-            } else if (item.config.requiredComponents && item.config.requiredComponents.length > 0) {
-                lookup[item.componentname] = item.config.requiredComponents.map(filter => filter.searchcomponentid);
-            } else {
-                lookup[item.componentname] = [];
-            }
-            return lookup;
-        }, {});
-        this.getRequiredFilters = function(componentname) {
-            // Map these IDs to their corresponding component names from filtersList
-            const requiredComponentNames = this.requiredFiltersLookup[componentname].map(id => {
-                // Find the component in filtersList that matches the id and return its componentname
-                const component = this.filtersList.find(component => component.searchcomponentid == id);
-                return component ? component.componentname : undefined;
-            }).filter(name => name); // This removes any undefined entries in case some IDs don't match any component
-        
-            return requiredComponentNames;
+        this.getFilter = function(filterName) {
+            return ko.unwrap(this.searchComponentVms[filterName]);
         };
-        this.getFilterByType = function(type) {
-            const filter = this.filtersList.find(component => component.type == type);
+        this.getFilterByType = function(type, unwrap=true) {
+            const filter = this.searchFilterConfigs.find(component => component.type == type);
             if (!filter)
                 return null;
-            return ko.unwrap(this.searchComponentVms[filter.componentname]);
+            if (unwrap)
+                return ko.unwrap(this.searchComponentVms[filter.componentname]);
+            return this.searchComponentVms[filter.componentname];
         };
         Object.values(SearchComponents).forEach(function(component) {
             this.searchComponentVms[component.componentname] = ko.observable(null);
+            this.searchComponentVms[component.componentname].subscribe(vm => {if (vm) console.log(component.componentname);})
+        }, this);
+        this.searchViewFiltersLoaded = ko.computed(function() {
+            let res = true;
+            Object.entries(this.searchComponentVms).forEach(function([componentName, filter]) {
+                res = res && ko.unwrap(filter);
+            });
+            return res;
         }, this);
         this.query = ko.observable(getQueryObject());
         if (this.query()["search-view"] !== undefined) {
             this.searchViewComponentName(this.query()["search-view"]);
         } else {
-            this.searchViewComponentName(this.defaultSearchViewComponent.componentname);
+            this.searchViewComponentName(this.defaultSearchViewConfig.componentname);
         }
         this.queryString = ko.computed(function() {
             return JSON.stringify(this.query());
         }, this);
         this.mouseoverInstanceId = ko.observable();
         this.mapLinkData = ko.observable(null);
-        this.userIsReviewer = ko.observable(false);
+        this.userIsReviewer = ko.observable(null);
         this.userid = ko.observable(null);
         this.searchResults = {'timestamp': ko.observable()};
     };

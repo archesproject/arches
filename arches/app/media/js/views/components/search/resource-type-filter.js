@@ -39,8 +39,8 @@ define([
 
             this.searchComponentVms[componentName](this);
 
-            if (this.requiredFiltersLoaded() === false) {
-                this.requiredFiltersLoaded.subscribe(function() {
+            if (this.searchViewFiltersLoaded() === false) {
+                this.searchViewFiltersLoaded.subscribe(function() {
                     this.restoreState();
                 }, this);
             } else {

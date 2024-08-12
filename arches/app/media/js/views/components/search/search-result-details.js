@@ -24,17 +24,21 @@ define([
             this.report = ko.observable();
             this.loading = ko.observable(false);
             this.reportExpanded = ko.observable();
+            this.searchComponentVms[componentName](this);  
 
             var setSearchResults = function(){
-                options.searchResultsVm = self.getFilterByType('search-results');
-                options.searchResultsVm.details = self;
-                options.searchComponentVms[componentName](self);           
+                self.searchResultsVm().details = self;         
             };
 
-            if (this.requiredFiltersLoaded() === false) {
-                this.requiredFiltersLoaded.subscribe(setSearchResults, this);
-            } else {
+            this.searchResultsVm = this.getFilterByType('search-results', false);
+            if (ko.unwrap(this.searchResultsVm)) {
                 setSearchResults();
+            } else {
+                this.searchResultsVm.subscribe(searchResultsFilter => {
+                    if (searchResultsFilter) {
+                        setSearchResults();
+                    }
+                }, this);
             }
 
             var query = this.query();

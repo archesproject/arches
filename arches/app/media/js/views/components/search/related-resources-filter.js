@@ -16,22 +16,23 @@ define([
             this.options = options;
             this.urls = arches.urls;
             var self = this;
-            // this component is just a light weight wrapper around the relatd resources manager
-            // need to wait for the search-resutls filter to be ready
-            // before we can load the realated-resources-filter
-            // because we need to pass the entire rsearch results filter into the
-            // related resources filter
             var setSearchResults = function(){
-                options.searchResultsVm = self.getFilterByType('search-results');
-                options.searchResultsVm.relatedResourcesManager = self;
-                options.searchComponentVms[componentName](self);
+                self.searchResultsVm.relatedResourcesManager = self;
                 self.ready(true);
             };
+            this.searchComponentVms[componentName](this);
 
-            if (this.requiredFiltersLoaded() === false) {
-                this.requiredFiltersLoaded.subscribe(setSearchResults, this);
-            } else {
+            this.searchResultsVm = self.getFilterByType('search-results', false);
+            if (ko.unwrap(this.searchResultsVm)) {
+                this.searchResultsVm = this.searchResultsVm();
                 setSearchResults();
+            } else {
+                this.searchResultsVm.subscribe(searchResultsFilter => {
+                    if (searchResultsFilter) {
+                        this.searchResultsVm = searchResultsFilter;
+                        setSearchResults();
+                    }
+                }, this);
             }
         }
     });

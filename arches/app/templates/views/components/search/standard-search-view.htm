@@ -12,7 +12,7 @@
 
                 <!-- Inline Filters (for QA and Resource Type) -->
                 <div class="search-inline-filters">
-                    <!--ko if: sharedStateObject.userIsReviewer-->
+                    <!--ko if: sharedStateObject.userIsReviewer !== false-->
                         <div class="qa-filter" data-bind="component: {
                             name: 'provisional-filter',
                             params: sharedStateObject
@@ -61,7 +61,7 @@
         <section class="flex search-map-container" aria-label="{% trans 'Map and filters' %}">
             <!-- Title Block -->
             <div class="search-toolbar">
-                <div class="search-type-btn-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}" role="tablist">
+                <div class="search-type-btn-panel" data-bind="foreach: {data: sharedStateObject.searchFilterConfigs, as: 'filter'}" role="tablist">
                     <!-- ko if: filter.config.layoutType === 'tabbed' && $parent.sharedStateObject.userCanReadResources -->
                     <button class="search-type-btn relative" role="tab" data-bind="onEnterkeyClick, onSpaceClick,
                         css: {'active': $parent.selectedTab() === filter.componentname}, 
@@ -81,7 +81,7 @@
                 </div>
 
                 <div class="search-type-btn-popup-panel">
-                    <div class="popup-panel-row" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}" role="tablist">
+                    <div class="popup-panel-row" data-bind="foreach: {data: sharedStateObject.searchFilterConfigs, as: 'filter'}" role="tablist">
                         <!-- ko if: filter.config.layoutType === 'popup' && $parent.sharedStateObject.userCanReadResources -->
                         <button class="saved-search-container search-type-btn-popup relative" role="tab" data-bind="onEnterkeyClick, onSpaceClick,
                             css: {'active': $parent.selectedPopup() === filter.componentname}, 
@@ -115,7 +115,7 @@
             <div class="flex">
                 <!-- Card Container -->
                 <div class="card-form-preview-container relative">
-                    <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}">
+                    <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.searchFilterConfigs, as: 'filter'}">
                         <!-- ko if: filter.config.layoutType === 'tabbed' -->
                         <div class="tab-pane" role="tabpanel" tabindex="-1" data-bind="css: {'active': $parent.selectedTab() === filter.componentname}, 
                             attr: {
@@ -131,7 +131,7 @@
                         <!-- /ko -->
                     </div>
 
-                    <div class="tab-content search-popup-panel" data-bind="foreach: {data: sharedStateObject.filtersList, as: 'filter'}, visible: selectedPopup() !== ''">
+                    <div class="tab-content search-popup-panel" data-bind="foreach: {data: sharedStateObject.searchFilterConfigs, as: 'filter'}, visible: selectedPopup() !== ''">
                         <!-- ko if: filter.config.layoutType === 'popup' -->
                         <div class="tab-pane" role="tabpanel" tabindex="-1" data-bind="css: {'active': $parent.selectedPopup() === filter.componentname}, 
                             attr: {

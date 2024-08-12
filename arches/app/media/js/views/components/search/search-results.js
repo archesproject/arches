@@ -55,21 +55,30 @@ define([
 
                 this.searchComponentVms[componentName](this);
                 this.restoreState();
-                if (this.requiredFiltersLoaded() === false) {
-                    this.requiredFiltersLoaded.subscribe(function () {
-                        this.mapFilter = this.getFilterByType("map-filter");
+                this.mapFilter = this.getFilterByType("map-filter", false);
+                if (ko.unwrap(this.mapFilter)) {
+                    this.mapFilter = this.mapFilter();
+                    this.selectedTab.subscribe(function (tab) {
+                        if (tab === "map-filter") {
+                            if (ko.unwrap(this.mapFilter.map)) {
+                                this.mapFilter.map().resize();
+                            }
+                        }
                     }, this);
                 } else {
-                    this.mapFilter = this.getFilterByType("map-filter");
-                }
-                this.selectedTab.subscribe(function (tab) {
-                    var self = this;
-                    if (tab === "map-filter") {
-                        if (ko.unwrap(this.mapFilter.map)) {
-                            self.mapFilter.map().resize();
+                    this.mapFilter.subscribe(mapFilter => {
+                        if (mapFilter) {
+                            this.mapFilter = mapFilter;
+                            this.selectedTab.subscribe(function (tab) {
+                                if (tab === "map-filter") {
+                                    if (ko.unwrap(this.mapFilter.map)) {
+                                        this.mapFilter.map().resize();
+                                    }
+                                }
+                            }, this);
                         }
-                    }
-                }, this);
+                    }, this);
+                }
 
                 this.bulkResourceReportCache = ko.observable({});
                 this.bulkDisambiguatedResourceInstanceCache = ko.observable({});

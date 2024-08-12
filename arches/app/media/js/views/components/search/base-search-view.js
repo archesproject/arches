@@ -10,22 +10,12 @@ define([
         constructor: function() {
             this.name = 'Base Search View';
             this.filter = {};
-            this.requiredFilters = [];
             Backbone.View.apply(this, arguments);
         },
 
         initialize: function(sharedStateObject) {
             const self = this;
             $.extend(this, sharedStateObject);
-            this.requiredFilters = this.getRequiredFilters(this.componentName);
-            this.requiredFiltersLoaded = ko.computed(function() {
-                let res = true;
-                Object.entries(this.searchComponentVms).forEach(function([componentName, filter]) {
-                    res = res && filter !== null;
-                });
-                return res;
-            }, this);
-
             this.query = sharedStateObject.query;
             this.queryString = sharedStateObject.queryString;
             this.defaultQuery = {};
@@ -37,20 +27,20 @@ define([
             this.alert = sharedStateObject.alert;
             this.sharedStateObject = sharedStateObject;
             this.queryString.subscribe(function() {
-                if (this.requiredFiltersLoaded()) {
+                if (this.searchViewFiltersLoaded()) {
                     this.doQuery();
                 } else {
-                    this.requiredFiltersLoaded.subscribe(function() {
+                    this.searchViewFiltersLoaded.subscribe(function() {
                         this.doQuery();
                     }, this);
                 }
             }, this);
             // init query
             if (self.updateRequest === undefined) {
-                if (this.requiredFiltersLoaded()) {
+                if (this.searchViewFiltersLoaded()) {
                     this.doQuery();
                 } else {
-                    this.requiredFiltersLoaded.subscribe(function() {
+                    this.searchViewFiltersLoaded.subscribe(function() {
                         this.doQuery();
                     }, this);
                 }

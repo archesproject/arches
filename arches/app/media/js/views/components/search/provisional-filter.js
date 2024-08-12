@@ -13,15 +13,6 @@ define([
             BaseFilter.prototype.initialize.call(this, options);
             this.filter = ko.observableArray();
             this.provisionalOptions = [{'name': 'Authoritative'},{'name': 'Provisional'}];
-
-            if (this.requiredFiltersLoaded() === false) {
-                this.requiredFiltersLoaded.subscribe(function() {
-                    this.restoreState();
-                }, this);
-            } else {
-                this.restoreState();
-            }
-
             var filterUpdated = ko.computed(function() {
                 return JSON.stringify(ko.toJS(this.filter()));
             }, this);
@@ -30,6 +21,14 @@ define([
             }, this);
 
             this.searchComponentVms[componentName](this);
+
+            if (this.searchViewFiltersLoaded() === false) {
+                this.searchViewFiltersLoaded.subscribe(function() {
+                    this.restoreState();
+                }, this);
+            } else {
+                this.restoreState();
+            }
         },
 
         updateQuery: function() {
