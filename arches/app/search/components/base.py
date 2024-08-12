@@ -119,7 +119,7 @@ class SearchFilterFactory(object):
 
         return searchview_component_name
 
-    def get_searchview_component_instance(self):
+    def get_searchview_instance(self):
         searchview_component_name = self.get_searchview_component_name()
         return self.get_filter(searchview_component_name)
 

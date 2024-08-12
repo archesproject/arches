@@ -76,10 +76,8 @@ class SearchView(MapBaseManagerView):
         )
         geocoding_providers = models.Geocoder.objects.all()
         search_component_factory = SearchFilterFactory(request)
-        searchview_component_instance = (
-            search_component_factory.get_searchview_component_instance()
-        )
-        search_components = searchview_component_instance.get_searchview_filters()
+        searchview_instance = search_component_factory.get_searchview_instance()
+        search_components = searchview_instance.get_searchview_filters()
 
         datatypes = models.DDataType.objects.all()
         widgets = models.Widget.objects.all()
@@ -344,9 +342,7 @@ def get_dsl_from_search_string(request):
 def search_results(request, returnDsl=False):
     se = SearchEngineFactory().create()
     search_filter_factory = SearchFilterFactory(request)
-    searchview_component_instance = (
-        search_filter_factory.get_searchview_component_instance()
-    )
+    searchview_component_instance = search_filter_factory.get_searchview_instance()
     if not searchview_component_instance:
         unavailable_core_name = search_filter_factory.get_searchview_component_name()
         ret = {

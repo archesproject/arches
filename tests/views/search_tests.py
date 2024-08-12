@@ -785,7 +785,7 @@ class SearchTests(ArchesTestCase):
         request.user = User.objects.get(username="admin")
         search_component_factory = SearchFilterFactory(request)
         searchview_component_instance = (
-            search_component_factory.get_searchview_component_instance()
+            search_component_factory.get_searchview_instance()
         )
         self.assertTrue(searchview_component_instance is not None)
 
@@ -799,7 +799,7 @@ class SearchTests(ArchesTestCase):
         request.user = User.objects.get(username="anonymous")
         search_component_factory = SearchFilterFactory(request)
         searchview_component_instance = (
-            search_component_factory.get_searchview_component_instance()
+            search_component_factory.get_searchview_instance()
         )
         self.assertTrue(searchview_component_instance is not None)
 
