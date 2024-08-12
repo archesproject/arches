@@ -65,7 +65,7 @@ export const DEFAULT_THEME = {
         options: {
             prefix: "p",
             darkModeSelector: "system",
-            cssLayer: false,
+            cssLayer: true,
         },
     },
 };
