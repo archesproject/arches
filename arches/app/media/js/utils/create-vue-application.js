@@ -11,7 +11,7 @@ import { createApp } from 'vue';
 import { createGettext } from "vue3-gettext";
 
 import arches from 'arches';
-import { DEFAULT_THEME } from "@/arches/theme.ts";
+import { DEFAULT_THEME } from "@/arches/themes/default.ts";
 
 export default async function createVueApplication(vueComponent, themeConfiguration) {
     /**
