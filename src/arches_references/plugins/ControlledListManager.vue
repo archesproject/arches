@@ -13,10 +13,3 @@ import ControlledListsMain from "@/arches_references/components/ControlledListsM
     </div>
     <Toast />
 </template>
-
-<!-- Not scoped: workaround for lack of font-family in <body> -->
-<style>
-div {
-    font-family: "Open Sans";
-}
-</style>

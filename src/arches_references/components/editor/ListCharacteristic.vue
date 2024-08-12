@@ -126,6 +126,7 @@ const cancel = () => {
 <style scoped>
 h4 {
     font-size: 1.33rem;
+    font-weight: 600;
 }
 
 input {

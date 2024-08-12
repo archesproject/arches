@@ -71,6 +71,7 @@ i {
 
 h2 {
     font-size: 1.6rem;
+    font-weight: 600;
     margin: 1rem;
     color: white;
 }

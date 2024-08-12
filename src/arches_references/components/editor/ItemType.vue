@@ -78,6 +78,7 @@ h4 {
     color: var(--p-header-950);
     margin-top: 0;
     font-size: 1.33rem;
+    font-weight: 600;
 }
 
 p {
