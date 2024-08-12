@@ -249,7 +249,7 @@ export const vFocus = {
 };
 
 export const shouldUseContrast = () => {
-    return Array.from(document.getElementsByTagName("link")).some((el) =>
-        el.href.endsWith("accessibility.css"),
+    return Array.from(document.getElementsByTagName("body")).some(
+        (el) => el.getAttribute("accessibility-mode") === "True",
     );
 };
