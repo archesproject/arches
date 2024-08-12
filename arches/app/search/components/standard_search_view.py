@@ -27,7 +27,7 @@ details = {
     "componentname": "standard-search-view",
     "config": {
         "default": True,
-        "requiredComponents": [
+        "linkedSearchFilters": [
             {
                 "componentname": "paging-filter",
                 "searchcomponentid": "7aff5819-651c-4390-9b9a-a61221ba52c6",
@@ -38,8 +38,6 @@ details = {
                 "searchcomponentid": "00673743-8c1c-4cc0-bd85-c073a52e03ec",
                 "sortorder": 2,
             },
-        ],
-        "availableComponents": [
             {
                 "componentname": "map-filter",
                 "searchcomponentid": "09d97fc6-8c83-4319-9cef-3aaa08c3fbec",
@@ -170,23 +168,23 @@ class StandardSearchView(BaseSearchView):
         response_object["userid"] = self.request.user.id
 
     def get_searchview_filters(self):
-        search_components = [
-            available_component
-            for available_component in self._available_search_components
-            if available_component.componentname != "search-export"
+        search_filters = [
+            available_filter
+            for available_filter in self.available_search_filters
+            if available_filter.componentname != "search-export"
         ]
         if user_is_resource_exporter(self.request.user):
-            search_components.extend(
+            search_filters.extend(
                 [
-                    available_component
-                    for available_component in self._available_search_components
-                    if available_component.componentname == "search-export"
+                    available_filter
+                    for available_filter in self.available_search_filters
+                    if available_filter.componentname == "search-export"
                 ]
             )
 
-        search_components.append(self.searchview_component)
+        search_filters.append(self.searchview_component)
 
-        return search_components
+        return search_filters
 
     def handle_search_results_query(
         self, search_query_object, response_object, search_filter_factory, returnDsl

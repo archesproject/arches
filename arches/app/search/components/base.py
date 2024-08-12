@@ -15,7 +15,7 @@ details = {}
 #     "componentpath": "views/components/search/...",  # path to ko component
 #     "componentname": "advanced-search",  # lowercase unique name
 #     "config": {
-#         "requiredComponents": [ # other components on which this one depends
+#         "linkedSearchFilters": [ # other components on which this one depends
 #             {
 #                 "componentname": "search-results",
 #                 "searchcomponentid": "00673743-8c1c-4cc0-bd85-c073a52e03ec",
@@ -123,39 +123,9 @@ class SearchFilterFactory(object):
         searchview_component_name = self.get_searchview_component_name()
         return self.get_filter(searchview_component_name)
 
-    def get_sorted_query_dict(self, query_dict, searchview_component):
-        component_sort_order = {
-            item["componentname"]: int(item["sortorder"])
-            for item in searchview_component.config["requiredComponents"]
-        }
-        # Sort the query_dict items based on the requiredComponent's sortorder
-        sorted_items = sorted(
-            query_dict.items(),
-            key=lambda item: component_sort_order.get(item[0], float("inf")),
-        )
-
-        return dict(sorted_items)
-
-    def get_query_dict_with_searchview_component(self, query_dict: Dict[str, Any]):
-        """
-        Set search-view=arches-search-view on query_dict to arches-search-view=True
-        """
-        ret = dict(query_dict)
-        searchview_component_name = self.get_searchview_component_name()
-        ret[searchview_component_name] = True
-        # check that all core-search component requiredComponents are present
-        for required_component in self.search_filters[searchview_component_name].config[
-            "requiredComponents"
-        ]:
-            if required_component["componentname"] not in ret:
-                ret[required_component["componentname"]] = {}
-
-        return ret, self.search_filters[searchview_component_name]
-
     def create_search_query_dict(self, key_value_pairs: List[Tuple[str, Any]]):
         # handles list of key,value tuples so that dict-like data from POST and GET
         # requests can be concatenated into single method call
-        query_dict, searchview_component = (
-            self.get_query_dict_with_searchview_component(dict(key_value_pairs))
-        )
-        return self.get_sorted_query_dict(query_dict, searchview_component)
+        searchview_component_name = self.get_searchview_component_name()
+        searchview_instance = self.get_filter(searchview_component_name)
+        return searchview_instance.create_query_dict(dict(key_value_pairs))

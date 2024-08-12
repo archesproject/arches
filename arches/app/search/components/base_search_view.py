@@ -36,7 +36,7 @@ details = {}
 #                 "componentname":"search-results","searchcomponentid":"00673743-8c1c-4cc0-bd85-c073a52e03ec","sortorder":13
 #             }
 #         ],
-#         "requiredComponents": [ # components that must be applied on the backend
+#         "linkedSearchFilters": [ # components that must be applied on the backend
 #             {
 #                 "componentname": "paging-filter",
 #                 "searchcomponentid": "7aff5819-651c-4390-9b9a-a61221ba52c6",
@@ -68,43 +68,45 @@ class BaseSearchView(BaseSearchFilter):
         self.searchview_component = models.SearchComponent.objects.get(
             componentname=componentname
         )
-        required_component_sort_order = {
-            item["componentname"]: int(item["sortorder"])
-            for item in self.searchview_component.config["requiredComponents"]
+        required_filter_sort_order = {
+            item["componentname"]: int(item.get("executionSortorder", 99))
+            for item in self.searchview_component.config["linkedSearchFilters"]
         }
         self._required_search_filters = list(
             models.SearchComponent.objects.filter(
                 searchcomponentid__in=[
-                    required_component["searchcomponentid"]
-                    for required_component in self.searchview_component.config[
-                        "requiredComponents"
+                    linked_filter["searchcomponentid"]
+                    for linked_filter in self.searchview_component.config[
+                        "linkedSearchFilters"
                     ]
+                    if linked_filter.get("required", False)
                 ]
             )
         )
         self._required_search_filters = sorted(
             self._required_search_filters,
-            key=lambda item: required_component_sort_order.get(
+            key=lambda item: required_filter_sort_order.get(
                 item.componentname, float("inf")
             ),
         )
-        available_component_sort_order = {
-            item["componentname"]: int(item["sortorder"])
-            for item in self.searchview_component.config["availableComponents"]
+        available_filter_sort_order = {
+            item["componentname"]: int(item.get("layoutSortorder"))
+            for item in self.searchview_component.config["linkedSearchFilters"]
         }
-        self._available_search_components = list(
+        self._available_search_filters = list(
             models.SearchComponent.objects.filter(
                 searchcomponentid__in=[
-                    available_component["searchcomponentid"]
-                    for available_component in self.searchview_component.config[
-                        "availableComponents"
+                    available_filter["searchcomponentid"]
+                    for available_filter in self.searchview_component.config[
+                        "linkedSearchFilters"
                     ]
-                ]
+                ],
+                componentpath__isnull=False,
             )
         )
-        self._available_search_components = sorted(
-            self._available_search_components,
-            key=lambda item: available_component_sort_order.get(
+        self._available_search_filters = sorted(
+            self._available_search_filters,
+            key=lambda item: available_filter_sort_order.get(
                 item.componentname, float("inf")
             ),
         )
@@ -114,11 +116,34 @@ class BaseSearchView(BaseSearchFilter):
         return self._required_search_filters
 
     @property
-    def available_search_components(self):
-        return self._available_search_components
+    def available_search_filters(self):
+        return self._available_search_filters
 
     def get_searchview_filters(self):
-        return self._available_search_components + [self.searchview_component]
+        return self.available_search_filters + [self.searchview_component]
+
+    def sort_query_dict(self, query_dict):
+        filter_sort_order = {
+            item["componentname"]: int(item.get("executionSortorder", 99))
+            for item in self.searchview_component.config["linkedSearchFilters"]
+        }
+        sorted_items = sorted(
+            query_dict.items(),
+            key=lambda item: filter_sort_order.get(item[0], float("inf")),
+        )
+
+        return dict(sorted_items)
+
+    def create_query_dict(self, query_dict):
+        # check that all searchview required linkedSearchFilters are present
+        query_dict[self.searchview_component.componentname] = True
+        for linked_filter in self.searchview_component.config["linkedSearchFilters"]:
+            if (
+                linked_filter.get("required", False)
+                and linked_filter["componentname"] not in query_dict
+            ):
+                query_dict[linked_filter["componentname"]] = {}
+        return self.sort_query_dict(query_dict)
 
     def handle_search_results_query(
         self, search_query_object, response_object, search_filter_factory, returnDsl
