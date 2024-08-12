@@ -61,7 +61,7 @@ const heading = computed(() => {
 .header {
     display: flex;
     align-items: center;
-    background: var(--p-primary-950);
+    background: var(--p-header-950);
 }
 
 i {
