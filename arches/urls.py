@@ -648,10 +648,10 @@ urlpatterns = [
         api.Concepts.as_view(),
         name="concepts",
     ),
-    re_path(
-        r"^plugins/(?P<pluginid>%s)$" % uuid_regex, PluginView.as_view(), name="plugins"
-    ),
-    re_path(r"^plugins/(?P<slug>[-\w]+)$", PluginView.as_view(), name="plugins"),
+    path("plugins/<uuid:pluginid>", PluginView.as_view(), name="plugins"),
+    path("plugins/<uuid:pluginid>/<path:path>", PluginView.as_view(), name="plugins"),
+    path("plugins/<slug:slug>", PluginView.as_view(), name="plugins"),
+    path("plugins/<slug:slug>/<path:path>", PluginView.as_view(), name="plugins"),
     re_path(
         r"^workflow_history/(?P<workflowid>%s|())$" % uuid_regex,
         WorkflowHistoryView.as_view(),
