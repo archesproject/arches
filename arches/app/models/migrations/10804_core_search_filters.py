@@ -45,6 +45,7 @@ class Migration(migrations.Migration):
         UPDATE search_component SET config = '{"layoutType":"popup"}' where componentname = 'saved-searches';
         UPDATE search_component SET config = '{"layoutType":"popup"}' where componentname = 'search-export';
         UPDATE search_component SET type = 'term-filter' where componentname = 'term-filter';
+        UPDATE search_component SET componentpath = null where componentpath = '';
         
     """
     reverse_sql = """
@@ -53,9 +54,15 @@ class Migration(migrations.Migration):
         UPDATE search_component SET type = 'filter', sortorder = 1 where componentname = 'map-filter';
         UPDATE search_component SET type = 'results-list' where componentname = 'search-results';
         UPDATE search_component SET type = 'text-input' where componentname = 'term-filter';
+        UPDATE search_component SET componentpath = '' where componentpath is null;
     """
 
     operations = [
+        migrations.AlterField(
+            model_name="searchcomponent",
+            name="componentpath",
+            field=models.TextField(null=True, unique=True),
+        ),
         migrations.AddField(
             model_name="searchcomponent",
             name="config",

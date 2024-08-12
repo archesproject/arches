@@ -1201,7 +1201,7 @@ class SearchComponent(models.Model):
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
     type = models.TextField()
-    componentpath = models.TextField(unique=True)
+    componentpath = models.TextField(unique=True, null=True)
     componentname = models.TextField(unique=True)
     config = models.JSONField(default=dict)
 
