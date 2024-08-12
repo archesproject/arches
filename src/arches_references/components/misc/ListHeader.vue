@@ -53,7 +53,7 @@ const heading = computed(() => {
             class="fa fa-inverse fa-list"
             aria-hidden="true"
         />
-        <h2>{{ heading }}</h2>
+        <h2 style="margin: 1rem">{{ heading }}</h2>
     </div>
 </template>
 
@@ -62,17 +62,11 @@ const heading = computed(() => {
     display: flex;
     align-items: center;
     background: var(--p-header-950);
+    color: white;
 }
 
 i {
     margin-left: 1rem;
     margin-top: 0.25rem;
-}
-
-h2 {
-    font-size: 1.6rem;
-    font-weight: 600;
-    margin: 1rem;
-    color: white;
 }
 </style>

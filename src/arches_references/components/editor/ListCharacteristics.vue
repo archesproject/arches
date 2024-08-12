@@ -70,13 +70,6 @@ const { $gettext } = useGettext();
 
 h3 {
     margin: 0;
-    font-size: 1.6rem;
-    font-weight: 600;
-}
-
-h4 {
-    font-size: 1.33rem;
-    font-weight: 600;
 }
 
 .nodes-heading {
