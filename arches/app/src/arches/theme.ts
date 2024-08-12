@@ -3,8 +3,13 @@ import Aura from "@primevue/themes/aura";
 
 export const ArchesPreset = definePreset(Aura, {
     primitive: {
-        sky: {
-            950: "#2d3c4b", // matches arches sidebar
+        arches: {
+            blue: {
+                400: "#54abd9", // legacy paginator button color
+                500: "#579ddb", // legacy light button color
+                600: "#2986b8", // legacy sidebar highlight
+                950: "#2d3c4b", // legacy sidebar
+            },
         },
     },
     semantic: {
@@ -20,6 +25,15 @@ export const ArchesPreset = definePreset(Aura, {
             800: "{sky.800}",
             900: "{sky.900}",
             950: "{sky.950}",
+        },
+        header: {
+            950: "{arches.blue.950}",
+        },
+        navigation: {
+            950: "{arches.blue.950}",
+        },
+        pagination: {
+            800: "{arches.blue.400}",
         },
     },
     components: {
