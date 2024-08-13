@@ -88,13 +88,7 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
 
         all_perms = self.get_perms(user, resource)
 
-        user_permissions = [x.codename for x in self.get_user_perms(user, resource)]
-        group_permissions = [x.codename for x in self.get_group_perms(user, resource)]
-
-        if permission in user_permissions:  # user is permitted
-            result["permitted"] = True
-
-        elif permission in group_permissions:  # group is permitted
+        if permission in all_perms:  # user is permitted
             result["permitted"] = True
 
         return result

@@ -99,7 +99,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
     def get_perms(
         self, user_or_group: User | Group, obj: ResourceInstance
     ) -> list[str]:
-        return self.get_default_permissions(user_or_group, obj) + get_perms(user_or_group, obj)  # type: ignore
+        return self.get_default_permissions(user_or_group, obj, all_permissions=True) + get_perms(user_or_group, obj)  # type: ignore
 
     def get_group_perms(
         self, user_or_group: User | Group, obj: ResourceInstance
@@ -595,6 +595,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         self,
         user_or_group: User | Group = None,
         resource_instance: ResourceInstance = None,
+        all_permissions: bool = False,
         cls: str | Model = None,
     ) -> list[str]:
         """
@@ -620,7 +621,8 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
             group_ids.append(user_or_group.id)
         elif isinstance(user_or_group, User):
             user_ids.append(user_or_group.id)
-            # group_ids = [x.id for x in user_or_group.groups.all()]
+            if all_permissions:
+                group_ids = [x.id for x in user_or_group.groups.all()]
         default_permissions = [
             item
             for sub_list in [

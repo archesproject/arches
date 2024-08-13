@@ -55,13 +55,17 @@ class ArchesDefaultDenyPermissionTests(ArchesPermissionFrameworkTestCase):
             "arches.app.permissions.arches_permission_base.settings",
             default_permissions,
         ):
-            default_permission = self.framework.user_can_read_resource(
-                self.user, self.resource_instance_id
-            )
+            with patch(
+                "arches.app.permissions.arches_default_deny.settings",
+                default_permissions,
+            ):
+                default_permission = self.framework.user_can_read_resource(
+                    self.user, self.resource_instance_id
+                )
 
-            # implicit permission is true here, because we've specified that the user has view_resourceinstance on this
-            # type of resource
-            self.assertTrue(default_permission)
+                # implicit permission is true here, because we've specified that the user has view_resourceinstance on this
+                # type of resource
+                self.assertTrue(default_permission)
 
     def test_user_cannot_view_without_permission(self):
         """

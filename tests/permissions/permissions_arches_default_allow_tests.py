@@ -49,27 +49,35 @@ class ArchesDefaultAllowPermissionsTests(ArchesPermissionFrameworkTestCase):
             "arches.app.permissions.arches_permission_base.settings",
             default_permissions,
         ):
-            implicit_permission = self.framework.user_can_read_resource(
-                self.user, self.resource_instance_id
-            )
-            resource = ResourceInstance.objects.get(
-                resourceinstanceid=self.resource_instance_id
-            )
-            can_access_without_view_permission = self.framework.user_can_read_resource(
-                self.user, self.resource_instance_id
-            )
-            self.framework.assign_perm("view_resourceinstance", self.group, resource)
-            can_access_with_view_permission = self.framework.user_can_read_resource(
-                self.user, self.resource_instance_id
-            )
+            with patch(
+                "arches.app.permissions.arches_default_allow.settings",
+                default_permissions,
+            ):
+                implicit_permission = self.framework.user_can_read_resource(
+                    self.user, self.resource_instance_id
+                )
+                resource = ResourceInstance.objects.get(
+                    resourceinstanceid=self.resource_instance_id
+                )
+                can_access_without_view_permission = (
+                    self.framework.user_can_read_resource(
+                        self.user, self.resource_instance_id
+                    )
+                )
+                self.framework.assign_perm(
+                    "view_resourceinstance", self.group, resource
+                )
+                can_access_with_view_permission = self.framework.user_can_read_resource(
+                    self.user, self.resource_instance_id
+                )
 
-            # implicit permission is false here, because change_resourceinstance will negate implicit permissions
-            self.assertFalse(implicit_permission)
+                # implicit permission is false here, because change_resourceinstance will negate implicit permissions
+                self.assertFalse(implicit_permission)
 
-            # cannot access the resource instance because view has not been specified
-            self.assertFalse(can_access_without_view_permission)
+                # cannot access the resource instance because view has not been specified
+                self.assertFalse(can_access_without_view_permission)
 
-            self.assertTrue(can_access_with_view_permission)
+                self.assertTrue(can_access_with_view_permission)
 
     def test_get_search_ui_permissions(self):
 
