@@ -47,8 +47,10 @@ define([
         this.searchFilterConfigs = Object.values(SearchComponents);
         this.defaultSearchViewConfig = this.searchFilterConfigs.find(filter => filter.type == "search-view");
         this.searchViewComponentName = ko.observable(false);
-        this.getFilter = function(filterName) {
-            return ko.unwrap(this.searchFilterVms[filterName]);
+        this.getFilter = function(filterName, unwrap=true) {
+            if (unwrap)
+                return ko.unwrap(this.searchFilterVms[filterName]);
+            return this.searchFilterVms[filterName];
         };
         this.getFilterByType = function(type, unwrap=true) {
             const filter = this.searchFilterConfigs.find(component => component.type == type);

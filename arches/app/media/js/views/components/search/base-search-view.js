@@ -88,10 +88,6 @@ define([
             });
         },
 
-        getFilter: function(filterName) {
-            return ko.unwrap(this.searchFilterVms[filterName]);
-        },
-
         clearQuery: function(){
             Object.values(this.searchFilterVms).forEach(function(value){
                 if (value()){
