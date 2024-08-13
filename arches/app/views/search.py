@@ -168,6 +168,9 @@ def search_terms(request):
                 prefix_length=settings.SEARCH_TERM_SENSITIVITY,
             )
         )
+        boolquery.should(
+            Match(field="displayname.value", query=searchString, fuzziness=2, boost=2)
+        )
 
         if user_is_reviewer is False and index == "terms":
             boolquery.filter(Terms(field="provisional", terms=["false"]))
@@ -226,6 +229,7 @@ def search_terms(request):
                             "id": i,
                             "text": result["key"],
                             "value": result["key"],
+                            "nodegroupid": result["nodegroupid"]["buckets"][0]["key"],
                         }
                     )
                     i = i + 1
