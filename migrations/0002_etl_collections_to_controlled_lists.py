@@ -14,12 +14,12 @@ class Migration(migrations.Migration):
             create or replace function __arches_migrate_collections_to_clm(
                 collection_names text[] default null, -- one or more collections to be migrated to controlled lists
                 host text default 'http://localhost:8000/plugins/controlled-list-manager/item/',
-	            overwrite boolean default FALSE,
+                overwrite boolean default FALSE,
                 preferred_sort_language text default 'en'
             )
             returns text as $$
             declare failed_collections text[];
-				collection text;
+                collection text;
             begin
                 -- RDM Collections to Controlled Lists & List Items Migration --
                 -- To use, run: 
@@ -156,6 +156,19 @@ class Migration(migrations.Migration):
                         where relationtype = 'member'
                     )
                     select * from collection_hierarchy;
+                
+                create temporary table temp_list_items_and_values (
+                    list_item_id uuid,
+                    sortorder bigint,
+                    list_id uuid,
+                    parent_id uuid,
+                    depth int,
+                    legacy_conceptid uuid,
+                    listitemvalue_id uuid,
+                    listitemvalue text,
+                    listitemvalue_languageid text,
+                    listitemvalue_valuetype text
+                );
 
                 foreach collection in array collection_names loop
                     with filtered_collection_hierarchy as (
@@ -202,24 +215,57 @@ class Migration(migrations.Migration):
                         where language_rank = 1 and
                             root_list in (select id from arches_references_list where name = collection)
                     )
-                    insert into arches_references_listitem(
-                        id,
-                        uri,
+                    insert into temp_list_items_and_values (
+                        list_item_id,
                         sortorder,
-                        guide,
                         list_id,
-                        parent_id
+                        parent_id,
+                        depth,
+                        legacy_conceptid,
+                        listitemvalue_id,
+                        listitemvalue,
+                        listitemvalue_languageid,
+                        listitemvalue_valuetype
                     )
-                    select id,
-                        host || id as uri,
-                        sortorder,
-                        false as guide,
-                        list_id,
-                        parent_id
-                    from alpha_sorted_list_item_hierarchy;
+                    select lih.id as list_item_id,
+                        lih.sortorder,
+                        lih.list_id,
+                        lih.parent_id,
+                        lih.depth,
+                        lih.id as legacy_conceptid,
+                        v.valueid as listitemvalue_id,
+                        v.value,
+                        v.languageid,
+                        v.valuetype
+                    from alpha_sorted_list_item_hierarchy lih
+                    join values v on v.conceptid = lih.id
+                    where valuetype = 'prefLabel' 
+                        or valuetype = 'altLabel' 
+                        or valuetype = 'scopeNote'
+                        or valuetype = 'definition'
+                        or valuetype = 'example'
+                        or valuetype = 'historyNote'
+                        or valuetype = 'editorialNote'
+                        or valuetype = 'changeNote'
+                        or valuetype = 'note'
+                        or valuetype = 'description';
                 end loop;
-
-                drop table if exists temp_collection_hierarchy;
+                
+                insert into arches_references_listitem (
+                    id,
+                    uri,
+                    sortorder,
+                    guide,
+                    list_id,
+                    parent_id
+                )
+                select distinct list_item_id,
+                    host || legacy_conceptid as uri,
+                    sortorder,
+                    false as guide,
+                    list_id,
+                    parent_id
+                from temp_list_items_and_values;
 
                 -- Migrate concept values -> controlled list item values
                 insert into arches_references_listitemvalue (
@@ -229,20 +275,15 @@ class Migration(migrations.Migration):
                     languageid,
                     valuetype_id
                 )
-                select distinct (v.valueid) id,
-                    value,
-                    r.conceptidto as list_item_id,
-                    languageid,
-                    valuetype as valuetype_id
-                from relations r
-                full join values v on r.conceptidto = v.conceptid
-                where relationtype = 'member' and
-                    (valuetype = 'prefLabel' or valuetype = 'altLabel') and
-                    r.conceptidto in (
-                        select id from arches_references_listitem where list_id in (
-                            select id from arches_references_list where name = ANY(collection_names)
-                        )
-                    );
+                select listitemvalue_id,
+                    listitemvalue,
+                    list_item_id,
+                    listitemvalue_languageid,
+                    listitemvalue_valuetype
+                from temp_list_items_and_values;
+                
+                drop table if exists temp_collection_hierarchy;
+                drop table if exists temp_list_items_and_values;
 
                 return format('Collection(s) %s migrated to controlled list(s)', array_to_string(collection_names, ', '));
             end;
