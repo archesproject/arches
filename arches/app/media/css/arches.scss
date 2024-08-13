@@ -21,7 +21,6 @@
 @import url(node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 @import url(node_modules/leaflet.fullscreen/Control.FullScreen.css);
 @import url(../css/base-manager.css);
-@import url(vue-style-base.css);
 @import "abstracts";
 @import "sidenav";
 @import "edit-history";
@@ -29,13 +28,8 @@
 @import "jqtree";
 @import "rdm";
 
-
-html {
-    font-size: 0.62rem;
-}
-
-body {
-    font-size: 1.4rem;
+html {  // font size _must_ be reverted to web-standard to retain parity for `rem`-based elements in standalone applications
+    font-size: 16px;
 }
 
 img {

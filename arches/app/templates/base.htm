@@ -34,6 +34,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block title %}{{ app_settings.APP_NAME }} - {% endblock title %}
 
 {% block css %}
+    {% render_bundle 'css/vue-style-base' 'css' %}
     {% render_bundle 'css/arches' 'css' %}
     {% render_bundle 'css/core' 'css' %}
 
