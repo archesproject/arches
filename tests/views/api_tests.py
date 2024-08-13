@@ -16,13 +16,15 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import json
 import os
+
 from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.urls import reverse
 from django.core import management
-from django.test.client import RequestFactory, Client
+from django.test.client import RequestFactory
 from django.test.utils import captured_stdout
 
 from arches.app.views.api import APIBase
@@ -112,6 +114,13 @@ class APITests(ArchesTestCase):
         with self.assertLogs("django.request", level="WARNING"):
             response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.1")
+
+    def test_api_404(self):
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.get(reverse("api_404"))
+        self.assertEqual(
+            set(json.loads(response.content)), {"message", "status", "success", "title"}
+        )
 
     def test_api_resources_archesjson(self):
         """
