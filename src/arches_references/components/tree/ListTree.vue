@@ -1,19 +1,26 @@
 <script setup lang="ts">
-import { computed, inject, ref } from "vue";
+import { computed, inject, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 import { useGettext } from "vue3-gettext";
 
 import Tree from "primevue/tree";
 
 import {
     displayedRowKey,
+    routes,
     selectedLanguageKey,
 } from "@/arches_references/constants.ts";
-import { bestLabel, nodeIsList } from "@/arches_references/utils.ts";
+import {
+    bestLabel,
+    findNodeInTree,
+    nodeIsList,
+} from "@/arches_references/utils.ts";
 import LetterCircle from "@/arches_references/components/misc/LetterCircle.vue";
 import ListTreeControls from "@/arches_references/components/tree/ListTreeControls.vue";
 import TreeRow from "@/arches_references/components/tree/TreeRow.vue";
 
 import type { ComponentPublicInstance, Ref } from "vue";
+import type { RouteLocationNormalizedLoadedGeneric } from "vue-router";
 import type { TreePassThroughMethodOptions } from "primevue/tree";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree";
 import type { TreeNode } from "primevue/treenode";
@@ -56,6 +63,81 @@ const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 const { setDisplayedRow } = inject(displayedRowKey) as unknown as {
     setDisplayedRow: RowSetter;
 };
+
+const route = useRoute();
+watch(
+    [
+        () => {
+            return { ...route };
+        },
+    ],
+    ([newRoute]) => {
+        navigate(newRoute);
+    },
+);
+const navigate = (newRoute: RouteLocationNormalizedLoadedGeneric) => {
+    switch (newRoute.name) {
+        case routes.splash:
+            setDisplayedRow(null);
+            expandedKeys.value = {};
+            selectedKeys.value = {};
+            break;
+        case routes.list: {
+            if (!tree.value.length) {
+                return;
+            }
+            const list = tree.value.find(
+                (node) => node.data.id === newRoute.params.id,
+            );
+            if (list) {
+                setDisplayedRow(list.data);
+                expandedKeys.value = {
+                    ...expandedKeys.value,
+                    [list.data.id]: true,
+                };
+                selectedKeys.value = { [list.data.id]: true };
+            } else {
+                setDisplayedRow(null);
+            }
+            break;
+        }
+        case routes.item: {
+            if (!tree.value.length) {
+                return;
+            }
+            const { found, path } = findNodeInTree(
+                tree.value,
+                newRoute.params.id as string,
+            );
+            if (found) {
+                setDisplayedRow(found.data);
+                const itemsToExpandIds = path.map(
+                    (itemInPath: TreeNode) => itemInPath.key,
+                );
+                expandedKeys.value = {
+                    ...expandedKeys.value,
+                    ...Object.fromEntries(
+                        [
+                            found.data.controlled_list_id,
+                            ...itemsToExpandIds,
+                        ].map((x) => [x, true]),
+                    ),
+                };
+                selectedKeys.value = { [found.data.id]: true };
+            }
+            break;
+        }
+    }
+};
+
+// Navigate on initial load of the tree.
+watch(
+    tree,
+    () => {
+        navigate(route);
+    },
+    { once: true },
+);
 
 const updateSelectedAndExpanded = (node: TreeNode) => {
     if (isMultiSelecting.value || movingItem.value?.key) {
