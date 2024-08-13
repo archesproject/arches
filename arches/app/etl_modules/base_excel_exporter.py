@@ -106,7 +106,7 @@ class BaseExcelExporter:
         resource_ids = request.POST.get("resource_ids", None)
         export_concepts_as = request.POST.get("export_concepts_as")
         search_url = request.POST.get("search_url", None)
-        if search_url is not None and resource_ids is None:
+        if search_url and not resource_ids:
             resource_ids = get_resourceids_from_search_url(
                 search_url, self.request.user
             )

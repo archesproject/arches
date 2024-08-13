@@ -181,7 +181,7 @@ class BranchExcelExporter(BaseExcelExporter):
         resource_ids = request.POST.get("resource_ids", None)
         filename = request.POST.get("filename")
         search_url = request.POST.get("search_url", None)
-        if search_url is not None and resource_ids is None:
+        if search_url and not resource_ids:
             resource_ids = get_resourceids_from_search_url(
                 search_url, self.request.user
             )

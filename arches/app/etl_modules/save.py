@@ -180,10 +180,7 @@ def get_resourceids_from_search_url(search_url, user=None):
     request.method = "GET"
     request.GET["export"] = True
     validate = URLValidator()
-    try:
-        validate(search_url)
-    except:
-        raise
+    validate(search_url)
     params = parse_qs(urlsplit(search_url).query)
     for k, v in params.items():
         request.GET.__setitem__(k, v[0])

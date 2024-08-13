@@ -298,11 +298,7 @@ class BulkStringEditor(BaseBulkEditor):
 
         if search_url:
             validate = URLValidator()
-            try:
-                validate(search_url)
-            except:
-                raise
-
+            validate(search_url)
             params = parse_qs(urlsplit(search_url).query)
             for k, v in params.items():
                 request.GET.__setitem__(k, v[0])
