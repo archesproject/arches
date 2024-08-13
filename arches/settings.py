@@ -872,6 +872,7 @@ def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
 
+# If either of the following PERMISSION settings is changed, you must run a reindex.
 PERMISSION_FRAMEWORK = "arches_default_allow.ArchesDefaultAllowPermissionFramework"
 
 PERMISSION_DEFAULTS = {}

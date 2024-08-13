@@ -58,9 +58,6 @@ class ArchesDefaultDenyPermissionTests(ArchesPermissionFrameworkTestCase):
             default_permission = self.framework.user_can_read_resource(
                 self.user, self.resource_instance_id
             )
-            resource = ResourceInstance.objects.get(
-                resourceinstanceid=self.resource_instance_id
-            )
 
             # implicit permission is true here, because we've specified that the user has view_resourceinstance on this
             # type of resource

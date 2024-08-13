@@ -3,27 +3,22 @@ import logging
 import uuid
 
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
-from arches.app.models.models import ResourceInstance
-from arches.app.permissions.arches_permission_base import ArchesPermissionBase
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
 from guardian.models import GroupObjectPermission
+from guardian.shortcuts import (
+    get_users_with_perms,
+)
+
+from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
-from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nested
+from arches.app.models.system_settings import settings
 from arches.app.permissions.arches_permission_base import (
+    ArchesPermissionBase,
     ResourceInstancePermissions,
 )
-from arches.app.models.system_settings import settings
-from guardian.shortcuts import (
-    get_perms,
-    get_group_perms,
-    get_user_perms,
-    get_users_with_perms,
-    get_groups_with_perms,
-    get_perms_for_model,
-    assign_perm,
-    remove_perm,
-)
+from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, Nested
+
 
 logger = logging.getLogger(__name__)
 
@@ -186,7 +181,9 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
                 result["permitted"] = "unknown"
                 return result
             else:
-                user_permissions = self.get_user_perms(user, resource)
+                user_permissions = [
+                    x.codename for x in self.get_user_perms(user, resource)
+                ]
                 if (
                     "no_access_to_resourceinstance" in user_permissions
                 ):  # user is restricted
@@ -196,7 +193,10 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
                     result["permitted"] = True
                     return result
 
-                group_permissions = self.get_group_perms(user, resource)
+                group_permissions = [
+                    x.codename for x in self.get_group_perms(user, resource)
+                ]
+
                 if (
                     "no_access_to_resourceinstance" in group_permissions
                 ):  # group is restricted - no user override
@@ -265,3 +265,14 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
                 if perm in permission.codename:
                     return True
             return False
+
+    def get_default_settable_permissions(self) -> list[str]:
+        """
+        Get default settable permissions for a resource instance that will be displayed in the permissions designer.
+        """
+        return [
+            "view_resourceinstance",
+            "change_resourceinstance",
+            "delete_resourceinstance",
+            "no_access_to_resourceinstance",
+        ]
