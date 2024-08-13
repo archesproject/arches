@@ -344,7 +344,7 @@ def search_results(request, returnDsl=False):
     search_filter_factory = SearchFilterFactory(request)
     searchview_component_instance = search_filter_factory.get_searchview_instance()
     if not searchview_component_instance:
-        unavailable_core_name = search_filter_factory.get_searchview_component_name()
+        unavailable_core_name = search_filter_factory.get_searchview_name()
         ret = {
             "success": False,
             "message": _("No core-search component named {0}").format(

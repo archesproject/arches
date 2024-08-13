@@ -98,7 +98,7 @@ class SearchFilterFactory(object):
         else:
             return None
 
-    def get_searchview_component_name(self):
+    def get_searchview_name(self):
         if not self.request:
             searchview_component_name = None
         elif self.request.method == "POST":
@@ -120,12 +120,12 @@ class SearchFilterFactory(object):
         return searchview_component_name
 
     def get_searchview_instance(self):
-        searchview_component_name = self.get_searchview_component_name()
+        searchview_component_name = self.get_searchview_name()
         return self.get_filter(searchview_component_name)
 
     def create_search_query_dict(self, key_value_pairs: List[Tuple[str, Any]]):
         # handles list of key,value tuples so that dict-like data from POST and GET
         # requests can be concatenated into single method call
-        searchview_component_name = self.get_searchview_component_name()
+        searchview_component_name = self.get_searchview_name()
         searchview_instance = self.get_filter(searchview_component_name)
         return searchview_instance.create_query_dict(dict(key_value_pairs))
