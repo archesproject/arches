@@ -40,6 +40,15 @@ img {
     image-orientation: from-image;
 }
 
+.css-reset * {
+    all: revert-layer;
+    font-family: 'Open Sans';
+}
+
+.css-reset .fa {
+    font-family: fontAwesome;
+}
+
 [class^="col-"]:not(.pad-no) {
     padding-left: 0px;
     padding-right: 0px;
