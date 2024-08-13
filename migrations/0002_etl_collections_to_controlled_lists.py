@@ -37,8 +37,7 @@ class Migration(migrations.Migration):
                 --      a concept at the top of a collection does NOT have a parent list item and should have a depth of 0
                 --      a concept below the top concepts of the collection will have a parent list item and should have a depth of > 0
                 --      a prefLabel and any altLabels for a concept become list item values
-                --      a concept that participates in multiple collections will have different list item id's for each new list it belongs to
-                --      
+                --      a concept that participates in multiple collections will have distinct list items for each new list it belongs to
 
                 --      in the RDM concepts are sorted alphabetically, but list items are explicitly ordered using sortorder...
                 --      sort order is calculated at the list level and ordered alphabetically within each leaf of the hierarchy
