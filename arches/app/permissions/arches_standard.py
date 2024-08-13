@@ -764,7 +764,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             and "users_without_read_perm" in search_result["_source"]["permissions"]
             and (
                 user.id
-                in search_result["_source"]["permissions"]["users_without_read_perm"]
+                not in search_result["_source"]["permissions"][
+                    "users_without_read_perm"
+                ]
             )
         ) and user_can_read
 
@@ -774,7 +776,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             and "users_without_edit_perm" in search_result["_source"]["permissions"]
             and (
                 user.id
-                in search_result["_source"]["permissions"]["users_without_edit_perm"]
+                not in search_result["_source"]["permissions"][
+                    "users_without_edit_perm"
+                ]
             )
             and user_can_edit
         )

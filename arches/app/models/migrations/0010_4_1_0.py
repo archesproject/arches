@@ -12,13 +12,7 @@ from arches.app.models.concept import Concept
 
 
 def forwards_func(apps, schema_editor):
-    # We get the model from the versioned app registry;
-    # if we directly import it, it'll be the wrong version
-
-    arches_concept = Concept().get(
-        id="00000000-0000-0000-0000-000000000007", include=["label"]
-    )
-    arches_concept.index()
+    pass
 
 
 def reverse_func(apps, schema_editor):

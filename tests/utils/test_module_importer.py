@@ -1,9 +1,10 @@
+import inspect
 from unittest import mock
 
 from django.test import TestCase, override_settings
 
 from arches.app.const import ExtensionType
-from arches.app.utils.module_importer import get_directories
+from arches.app.utils.module_importer import get_directories, get_class_from_modulename
 from tests.base_test import sync_overridden_test_settings_to_arches
 
 # these tests can be run from the command line via
@@ -18,7 +19,7 @@ def patched_arches_applications():
     "arches.app.utils.module_importer.list_arches_app_names",
     patched_arches_applications,
 )
-class ModuleImporterTests(TestCase):
+class GetDirectoriesTests(TestCase):
     @override_settings(
         APP_NAME="hiphop",
         FUNCTION_LOCATIONS=[
@@ -105,3 +106,25 @@ class ModuleImporterTests(TestCase):
                 "arches.app.datatypes",
             ],
         )
+
+
+class GetClassFromModuleNameTests(TestCase):
+    @override_settings(DATATYPE_LOCATIONS=["nonexistent_module"])
+    def test_nonexistent_module(self):
+        with sync_overridden_test_settings_to_arches():
+            with self.assertRaises(ModuleNotFoundError):
+                get_class_from_modulename(
+                    "nonexistent_module",
+                    "BaseDataType",
+                    ExtensionType.DATATYPES,
+                )
+
+    @override_settings(DATATYPE_LOCATIONS=["tests.fixtures.datatypes"])
+    def test_module_without_url_datatype(self):
+        with sync_overridden_test_settings_to_arches():
+            result = get_class_from_modulename(
+                "url",
+                "URLDataType",
+                ExtensionType.DATATYPES,
+            )
+            self.assertTrue(inspect.isclass(result))

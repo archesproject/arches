@@ -31,26 +31,15 @@ runs:
         echo Python packages installed
       shell: bash
 
+    - name: Ensure frontend configuration files exist
+      run: |
+          python manage.py check
+      shell: bash
+
     - name: Install Arches applications
       uses: ./.github/actions/install-arches-applications
       with:
         secrets: ${{ inputs.secrets }}
-
-    - name: Checkout into feature branch
-      if: inputs.branch-type == 'feature'
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ github.repository }}
-        ref: ${{ github.ref }}
-        path: .
-
-    - name: Checkout into target branch
-      if: inputs.branch-type == 'target'
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ github.repository }}
-        ref: ${{ github.event.pull_request.base.ref }}
-        path: .
 
     - name: Install frontend dependencies
       run: |
@@ -72,9 +61,9 @@ runs:
         black . --check --exclude=node_modules
       shell: bash
 
-    - name: Check line endings
+    - name: Check line endings on all but ontology (.xml) files
       run: |
-        ! git ls-files --eol | grep 'w/crlf\|w/mixed'
+        ! git ls-files --eol | grep -v '.xml' | grep 'w/crlf\|w/mixed'
       shell: bash
 
     - name: Run frontend tests

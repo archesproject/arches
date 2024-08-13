@@ -46,6 +46,12 @@ class TermFilter(BaseSearchFilter):
                             field="strings.string", query=term["value"], type="phrase"
                         )
                     )
+                    if term.get("nodegroupid", None):
+                        string_filter.must(
+                            Match(
+                                field="strings.nodegroup_id", query=term["nodegroupid"]
+                            )
+                        )
                 elif term["type"] == "string":
                     try:
                         uuid.UUID(str(term["value"]))
