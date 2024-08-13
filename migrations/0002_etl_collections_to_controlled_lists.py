@@ -19,6 +19,7 @@ class Migration(migrations.Migration):
             )
             returns text as $$
             declare failed_collections text[];
+				collection text;
             begin
                 -- RDM Collections to Controlled Lists & List Items Migration --
                 -- To use, run: 
@@ -36,8 +37,10 @@ class Migration(migrations.Migration):
                 --      a concept at the top of a collection does NOT have a parent list item and should have a depth of 0
                 --      a concept below the top concepts of the collection will have a parent list item and should have a depth of > 0
                 --      a prefLabel and any altLabels for a concept become list item values
+                --      a concept that participates in multiple collections will have different list item id's for each new list it belongs to
+                --      
 
-                --      in the RDM concepts are sorted alphabetically, but are explicitly ordered using a list item's sortorder...
+                --      in the RDM concepts are sorted alphabetically, but list items are explicitly ordered using sortorder...
                 --      sort order is calculated at the list level and ordered alphabetically within each leaf of the hierarchy
 
                 -- Check if collection_names are provided
@@ -133,69 +136,91 @@ class Migration(migrations.Migration):
 
                 -- The recursive CTE below is used to assign the conceptid of the list at the root to each concept to be migrated
                 -- On each recursion, it checks if the child (aka conceptidto in relations table) is a parent for another concept
-                -- All the while, it keeps track of the depth of the child concept, to be used for sorting in the next CTE 
-                with recursive collection_hierarchy as (
-                    select conceptidfrom as root_list,
-                        conceptidto as child, 
-                        0 as depth
-                    from relations
-                    where not exists (
-                        select 1 from relations r2 where r2.conceptidto = relations.conceptidfrom
-                    ) and relationtype = 'member'
-                    union all
-                    select ch.root_list,
-                        r.conceptidto,
-                        ch.depth + 1
-                    from collection_hierarchy ch
-                    join relations r on ch.child = r.conceptidfrom
-                    where relationtype = 'member'
-                ),
-                -- Rank prefLabels by user provided language, 
-                -- if no prefLabel in that language exists for a concept, fall back on next prefLabel ordered by languageid
-                ranked_prefLabels as (
-                    select ch.root_list,
-                        ch.child,
-                        ch.depth,
-                        v.languageid, v.value, 
-                        ROW_NUMBER() OVER (PARTITION BY ch.child ORDER BY (v.languageid = preferred_sort_language) DESC, languages.id) AS language_rank,
-                        r.conceptidfrom
-                    from collection_hierarchy ch
-                    left join values v on v.conceptid = ch.child
-                    left join relations r on r.conceptidto = ch.child
-                    left join languages on v.languageid = languages.code
-                    where v.valuetype = 'prefLabel' and 
-                        r.relationtype = 'member' 
-                ),
-                -- Once we've assigned our root_list, we want to sort the children (to depth n) alphabetically based on their ranked prefLabel
-                -- We also want to take INTO account the child's parent value, so the relations table is joined back to capture the parent.
-                alpha_sorted_list_item_hierarchy as (
-                    select child as id,
-                        row_number() over (partition by root_list order by depth, LOWER(value)) - 1 as sortorder,
-                        root_list as list_id,
-                        case when conceptidfrom = root_list then null -- list items at top of hierarchy have no parent list item
-                            else conceptidfrom
-                        end as parent_id,
-                        depth
-                    from ranked_prefLabels rpl
-                    where language_rank = 1 and
-                        root_list in (select id from arches_references_list where name = ANY(collection_names))
-                )
-                insert into arches_references_listitem(
-                    id,
-                    uri,
-                    sortorder,
-                    guide,
-                    list_id,
-                    parent_id
-                )
-                select id,
-                    host || id as uri,
-                    sortorder,
-                    false as guide,
-                    list_id,
-                    parent_id
-                from alpha_sorted_list_item_hierarchy;
+                -- All the while, it keeps track of the depth of the child concept, to be used for sorting in the next CTE
+                -- The results are stored in a temporary table to avoid re-running non-filtered recursion (done on the whole relations table)
+                
+                create temporary table temp_collection_hierarchy as
+                    with recursive collection_hierarchy as (
+                        select conceptidfrom as root_list,
+                            conceptidto as child, 
+                            0 as depth
+                        from relations
+                        where not exists (
+                            select 1 from relations r2 where r2.conceptidto = relations.conceptidfrom
+                        ) and relationtype = 'member'
+                        union all
+                        select ch.root_list,
+                            r.conceptidto,
+                            ch.depth + 1
+                        from collection_hierarchy ch
+                        join relations r on ch.child = r.conceptidfrom
+                        where relationtype = 'member'
+                    )
+                    select * from collection_hierarchy;
 
+                foreach collection in array collection_names loop
+                    with filtered_collection_hierarchy as (
+                        select * 
+                        from temp_collection_hierarchy
+                        where root_list in (select id from arches_references_list where name = collection)
+                    ),
+                    -- Rank prefLabels by user provided language, 
+                    -- if no prefLabel in that language exists for a concept, fall back on next prefLabel ordered by languageid
+                    ranked_prefLabels as (
+                        select ch.root_list,
+                            ch.child,
+                            ch.depth,
+                            v.languageid, v.value, 
+                            ROW_NUMBER() OVER (PARTITION BY ch.child ORDER BY (v.languageid = preferred_sort_language) DESC, languages.id) AS language_rank,
+                            r.conceptidfrom
+                        from filtered_collection_hierarchy ch
+                        left join values v on v.conceptid = ch.child
+                        left join relations r on r.conceptidto = ch.child
+                        left join languages on v.languageid = languages.code
+                        where v.valuetype = 'prefLabel' and 
+                            r.relationtype = 'member' 
+                    ),
+                    filtered_ranked_prefLabels as (
+                        select *
+                        from ranked_prefLabels
+                        where conceptidfrom in (
+                            select root_list from ranked_prefLabels
+                            union
+                            select child from ranked_prefLabels
+                        )
+                    ),
+                    -- Once we've assigned our root_list, we want to sort the children (to depth n) alphabetically based on their ranked prefLabel
+                    -- We also want to take into account the child's parent value, so the relations table is joined back to capture the parent.
+                    alpha_sorted_list_item_hierarchy as (
+                        select child as id,
+                            row_number() over (partition by root_list order by depth, LOWER(value)) - 1 as sortorder,
+                            root_list as list_id,
+                            case when conceptidfrom = root_list then null -- list items at top of hierarchy have no parent list item
+                                else conceptidfrom
+                            end as parent_id,
+                            depth
+                        from filtered_ranked_prefLabels rpl
+                        where language_rank = 1 and
+                            root_list in (select id from arches_references_list where name = collection)
+                    )
+                    insert into arches_references_listitem(
+                        id,
+                        uri,
+                        sortorder,
+                        guide,
+                        list_id,
+                        parent_id
+                    )
+                    select id,
+                        host || id as uri,
+                        sortorder,
+                        false as guide,
+                        list_id,
+                        parent_id
+                    from alpha_sorted_list_item_hierarchy;
+                end loop;
+
+                drop table if exists temp_collection_hierarchy;
 
                 -- Migrate concept values -> controlled list item values
                 insert into arches_references_listitemvalue (
