@@ -21,12 +21,14 @@
 @import url(node_modules/@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css);
 @import url(node_modules/leaflet.fullscreen/Control.FullScreen.css);
 @import url(../css/base-manager.css);
+@import url(vue-style-base.css);
 @import "abstracts";
 @import "sidenav";
 @import "edit-history";
 @import "tree";
 @import "jqtree";
 @import "rdm";
+
 
 html {
     font-size: 0.62rem;
@@ -3613,6 +3615,7 @@ div.dropdown-menu.open {
 }
 
 .loading-mask {
+    display: none;
     position: fixed;
     background-color: #fafafa;
     top: 0;
