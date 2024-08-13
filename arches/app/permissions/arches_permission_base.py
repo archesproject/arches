@@ -21,7 +21,7 @@ import uuid
 from typing import Iterable
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, Permission
 from django.contrib.gis.db.models import Model
 from django.core.cache import caches
 from django.db.models import Count
@@ -29,7 +29,7 @@ from guardian.backends import check_support, ObjectPermissionBackend
 from guardian.core import ObjectPermissionChecker
 from guardian.exceptions import NotUserNorGroup
 from arches.app.models.resource import Resource
-
+from django.db.models.query import QuerySet
 from guardian.models import GroupObjectPermission, UserObjectPermission, Permission
 from guardian.exceptions import WrongAppError
 from guardian.shortcuts import (
@@ -50,6 +50,7 @@ from arches.app.models.models import ResourceInstance, MapLayer
 
 from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nested
 from arches.app.search.mappings import RESOURCES_INDEX
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.permission_backend import (
     PermissionFramework,
     NotUserNorGroup as ArchesNotUserNorGroup,
@@ -73,7 +74,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
     def setup(self): ...
 
     def get_perms_for_model(self, cls: str | Model) -> list[Permission]:
-        return self.get_default_permissions(cls) + get_perms_for_model(cls)  # type: ignore
+        return self.get_default_permissions_objects(cls) | get_perms_for_model(cls)  # type: ignore
 
     def assign_perm(
         self,
@@ -97,16 +98,18 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
 
     def get_perms(
         self, user_or_group: User | Group, obj: ResourceInstance
-    ) -> list[Permission]:
+    ) -> list[str]:
         return self.get_default_permissions(user_or_group, obj) + get_perms(user_or_group, obj)  # type: ignore
 
     def get_group_perms(
         self, user_or_group: User | Group, obj: ResourceInstance
-    ) -> list[Permission]:
-        return self.get_default_permissions(user_or_group, obj) + list(get_group_perms(user_or_group, obj))  # type: ignore
+    ) -> QuerySet[Permission]:
+        return self.get_default_permissions_objects(user_or_group, obj) | get_group_perms(user_or_group, obj)  # type: ignore
 
-    def get_user_perms(self, user: User, obj: ResourceInstance) -> list[Permission]:
-        return self.get_default_permissions(user, obj) + list(get_user_perms(user, obj))  # type: ignore
+    def get_user_perms(self, user: User, obj: ResourceInstance) -> QuerySet[Permission]:
+        return self.get_default_permissions_objects(user, obj) | get_user_perms(
+            user, obj
+        )
 
     def get_map_layers_by_perm(
         self, user: User, perms: str | Iterable[str], any_perm: bool = True
@@ -260,7 +263,8 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
 
         ret = []
         for user in User.objects.all():
-            if user.has_perm(perm, obj):
+            default_perms = self.get_default_permissions(user, obj)
+            if user.has_perm(perm, obj) or perm in default_perms:
                 ret.append(user)
         return ret
 
@@ -597,7 +601,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         Gets default permissions (if any) for a resource instance.
         """
         default_permissions_settings = settings.PERMISSION_DEFAULTS
-        if not default_permissions_settings:
+        if not default_permissions_settings or resource_instance is None:
             return []
 
         default_permissions_for_graph = (
@@ -606,9 +610,9 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
             else None
         )
 
-        print("DEFAULT_PERMISSIONS_FOR_GRAPH")
-        print(default_permissions_for_graph)
-        print(user_or_group.id)
+        if default_permissions_for_graph is None:
+            return []
+
         user_ids = []
         group_ids = []
 
@@ -616,8 +620,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
             group_ids.append(user_or_group.id)
         elif isinstance(user_or_group, User):
             user_ids.append(user_or_group.id)
-            group_ids = [x.id for x in user_or_group.groups.all()]
-
+            # group_ids = [x.id for x in user_or_group.groups.all()]
         default_permissions = [
             item
             for sub_list in [
@@ -628,41 +631,50 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
             ]
             for item in sub_list
         ]
-        print("DEFAULT_PERMISSIONS")
-        print(default_permissions)
         return default_permissions
+
+    def get_default_permissions_objects(
+        self,
+        user_or_group: User | Group = None,
+        resource_instance: ResourceInstance = None,
+        cls: str | Model = None,
+    ) -> QuerySet[Permission]:
+        default_permissions = self.get_default_permissions(
+            user_or_group, resource_instance, cls
+        )
+        permissions = Permission.objects.filter(codename__in=default_permissions)
+        return permissions
 
 
 class PermissionBackend(ObjectPermissionBackend):  # type: ignore
     def has_perm(self, user_obj: User, perm: str, obj: Model | None = None) -> bool:
-        # check if user_obj and object are supported (pulled directly from guardian)
-        support, user_obj = check_support(user_obj, obj)
-        if not support:
-            return False
-
-        if "." in perm:
-            app_label, perm = perm.split(".")
-            if obj is None:
-                raise ValueError("Passed perm has app label of '%s' and obj is None")
-            if app_label != obj._meta.app_label:
-                raise WrongAppError(
-                    "Passed perm has app label of '%s' and "
-                    "given obj has '%s'" % (app_label, obj._meta.app_label)
-                )
-
-        obj_checker: ObjectPermissionChecker = CachedObjectPermissionChecker(
-            user_obj, obj
-        )
-        explicitly_defined_perms = obj_checker.get_perms(obj)
-
-        if len(explicitly_defined_perms) > 0:
-            if "no_access_to_nodegroup" in explicitly_defined_perms:
+        if isinstance(obj, NodeGroup):
+            # check if user_obj and object are supported (pulled directly from guardian)
+            support, user_obj = check_support(user_obj, obj)
+            if not support:
                 return False
+
+            if "." in perm:
+                app_label, perm = perm.split(".")
+                if app_label != obj._meta.app_label:
+                    raise WrongAppError(
+                        "Passed perm has app label of '%s' and "
+                        "given obj has '%s'" % (app_label, obj._meta.app_label)
+                    )
+
+            obj_checker: ObjectPermissionChecker = CachedObjectPermissionChecker(
+                user_obj, obj
+            )
+            explicitly_defined_perms = obj_checker.get_perms(obj)
+
+            if len(explicitly_defined_perms) > 0:
+                if "no_access_to_nodegroup" in explicitly_defined_perms:
+                    return False
+                else:
+                    return perm in explicitly_defined_perms
             else:
-                return perm in explicitly_defined_perms
-        else:
-            user_checker = CachedUserPermissionChecker(user_obj)
-            return user_checker.user_has_permission(perm)
+                user_checker = CachedUserPermissionChecker(user_obj)
+                return user_checker.user_has_permission(perm)
 
 
 class CachedUserPermissionChecker:

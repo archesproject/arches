@@ -142,7 +142,7 @@ class PermissionFramework(metaclass=ABCMeta):
     def get_search_ui_permissions(self, user, search_result, groups=None): ...
 
     @abstractmethod
-    def get_default_permissions(self, resource): ...
+    def get_default_settable_permissions(self): ...
 
 
 _PERMISSION_FRAMEWORK = None
@@ -257,10 +257,16 @@ def get_groups_with_perms(obj, attach_perms=False):
 
 
 def get_user_perms(user, obj):
+    """
+    returns a queryset of permissions objects for a given user on a particular resource
+    """
     return _get_permission_framework().get_user_perms(user, obj)
 
 
 def get_group_perms(user_or_group, obj):
+    """
+    returns a queryset of permissions objects for a given group on a particular resource
+    """
     return _get_permission_framework().get_group_perms(user_or_group, obj)
 
 
@@ -382,5 +388,5 @@ def get_search_ui_permissions(user, search_result, groups=None):
     )
 
 
-def get_default_permissions(resource):
-    return _get_permission_framework().get_default_permissions(resource)
+def get_default_settable_permissions():
+    return _get_permission_framework().get_default_settable_permissions()

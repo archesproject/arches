@@ -21,7 +21,7 @@
             </div>
 
 
-            <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link" data-bind="click: function(){makeInstancePrivate()}">
+            <button class="btn btn-shim btn-rr btn-labeled btn-lg fa fa-link" data-bind="click: function(){setInstancePermissions()}">
                 <span data-bind="text: $root.translations.configureAccessToThisInstance"></span>
             </button>
 
@@ -123,9 +123,6 @@
                 </button>
             </div>
             <div class="remove-permissions-btn mar-btm" style="align-self: end">
-            <button id="cc-save-btn" class="btn btn-shim btn-warning btn-labeled btn-lg fa fa-unlock" data-bind="click: function(){makeInstancePublic()}">
-                <span data-bind="text: $root.translations.allowNormalAccess"></span>
-            </button>
         </div>
         </div>
 

@@ -14,27 +14,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from __future__ import annotations
-from arches.app.models.resource import Resource
+
 from django.contrib.auth.models import User
+from guardian.shortcuts import (
+    get_users_with_perms,
+)
+
 from arches.app.models.models import ResourceInstance
-
+from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
-
 from arches.app.permissions.arches_permission_base import (
+    ArchesPermissionBase,
     ResourceInstancePermissions,
 )
-from arches.app.permissions.arches_permission_base import ArchesPermissionBase
 from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Terms
-from guardian.shortcuts import (
-    get_perms,
-    get_group_perms,
-    get_user_perms,
-    get_users_with_perms,
-    get_groups_with_perms,
-    get_perms_for_model,
-    assign_perm,
-    remove_perm,
-)
 
 
 class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
@@ -91,49 +84,18 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
 
         resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
         result["resource"] = resource
+        result["permitted"] = False  # by default, deny
 
         all_perms = self.get_perms(user, resource)
-        if len(all_perms) == 0:  # no permissions assigned. deny.
-            result["permitted"] = False
-        else:
-            user_permissions = self.get_user_perms(user, resource)
-            group_permissions = self.get_group_perms(user, resource)
-            if permission in user_permissions:  # user is permitted
-                result["permitted"] = True
 
-            elif (
-                permission in group_permissions
-            ):  # group is permitted - no user override
-                result["permitted"] = True
+        user_permissions = [x.codename for x in self.get_user_perms(user, resource)]
+        group_permissions = [x.codename for x in self.get_group_perms(user, resource)]
 
-            elif (
-                permission not in all_perms
-            ):  # neither user nor group explicitly permits or restricts.
-                result["permitted"] = False  # restriction implied
+        if permission in user_permissions:  # user is permitted
+            result["permitted"] = True
 
-        if result and result.get("permitted", None) is not None:
-            print("Permitted is not None")
-            # This is a safety check - we don't want an unpermissioned user
-            # defaulting to having access (allowing anonymous users is still
-            # possible by assigning appropriate group permissions).
-            if result["permitted"] == "unknown":
-                print("permitted is unknown")
-                result["permitted"] = False
-            elif result["permitted"] is False:
-                print("permitted is false")
-                # This covers the case where one group denies permission and another
-                # allows it. Ideally, the deny would override (as normal in Arches) but
-                # this prevents us from having a default deny rule that another group
-                # can override (as deny rules in Arches must be explicit for a resource).
-                resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
-                user_permissions = self.get_user_perms(user, resource)
-                print("user_permissions", user_permissions)
-                if "no_access_to_resourceinstance" not in user_permissions:
-                    group_permissions = self.get_group_perms(user, resource)
-
-                    # This should correspond to the exact case we wish to flip.
-                    if permission in group_permissions:
-                        result["permitted"] = True
+        elif permission in group_permissions:  # group is permitted
+            result["permitted"] = True
 
         return result
 
@@ -224,6 +186,14 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
         )
 
         # validate permissions structure for search result
+        users_read_exists = (
+            "permissions" in search_result["_source"]
+            and "users_read" in search_result["_source"]["permissions"]
+        )
+        users_edit_exists = (
+            "permissions" in search_result["_source"]
+            and "users_edit" in search_result["_source"]["permissions"]
+        )
         groups_read_exists = (
             "permissions" in search_result["_source"]
             and "groups_read" in search_result["_source"]["permissions"]
@@ -233,26 +203,50 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
             and "groups_edit" in search_result["_source"]["permissions"]
         )
         result["can_read"] = user.is_superuser or (
-            groups_read_exists
-            and len(
-                set(
-                    search_result["_source"]["permissions"]["groups_read"]
-                ).intersection(set(groups))
+            (
+                groups_read_exists
+                and len(
+                    set(
+                        search_result["_source"]["permissions"]["groups_read"]
+                    ).intersection(set(groups))
+                )
+                > 0
             )
-            > 0
+            or (
+                users_read_exists
+                and len(
+                    set(
+                        search_result["_source"]["permissions"]["users_read"]
+                    ).intersection(set([user.id]))
+                )
+                > 0
+            )
             and user_can_read
         )
 
         user_can_edit = len(self.get_editable_resource_types(user)) > 0
-        result["can_edit"] = user.is_superuser or (
-            groups_edit_exists
-            and len(
-                set(
-                    search_result["_source"]["permissions"]["groups_edit"]
-                ).intersection(set(groups))
+        result["can_edit"] = (
+            user.is_superuser
+            or (
+                groups_edit_exists
+                and len(
+                    set(
+                        search_result["_source"]["permissions"]["groups_edit"]
+                    ).intersection(set(groups))
+                )
+                > 0
+                and user_can_edit
             )
-            > 0
-            and user_can_edit
+            or (
+                users_edit_exists
+                and len(
+                    set(
+                        search_result["_source"]["permissions"]["users_edit"]
+                    ).intersection(set([user.id]))
+                )
+                > 0
+                and user_can_edit
+            )
         )
 
         result["is_principal"] = (
@@ -290,3 +284,13 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
                 > 0
             )
         return False
+
+    def get_default_settable_permissions(self) -> list[str]:
+        """
+        Get default settable permissions for a resource instance that will be displayed in the permissions designer.
+        """
+        return [
+            "view_resourceinstance",
+            "change_resourceinstance",
+            "delete_resourceinstance",
+        ]
