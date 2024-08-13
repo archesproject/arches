@@ -89,4 +89,18 @@ provide(selectedLanguageKey, selectedLanguage);
     flex-direction: column;
     height: 100%;
 }
+
+:deep(h1, h5, h6) {
+    font-weight: 600;
+}
+
+:deep(h2, h3) {
+    font-weight: 600;
+    font-size: 1.6rem;
+}
+
+:deep(h4) {
+    font-weight: 600;
+    font-size: 1.33rem;
+}
 </style>
