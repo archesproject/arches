@@ -13,7 +13,6 @@ define([
             const self = this;
             sharedStateObject.componentName = componentName;
             BaseSearchViewComponent.prototype.initialize.call(this, sharedStateObject);
-            this.defaultQuery = {"paging-filter": "1", "search-view":"standard-search-view", tiles: "true"};
             
             this.selectedPopup = ko.observable('');
             this.sharedStateObject.selectedPopup = this.selectedPopup;

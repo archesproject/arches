@@ -60,7 +60,6 @@ define([
         };
         Object.values(SearchComponents).forEach(function(component) {
             this.searchFilterVms[component.componentname] = ko.observable(null);
-            this.searchFilterVms[component.componentname].subscribe(vm => {if (vm) console.log(component.componentname);})
         }, this);
         this.searchViewFiltersLoaded = ko.computed(function() {
             let res = true;

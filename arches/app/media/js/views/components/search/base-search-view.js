@@ -10,6 +10,7 @@ define([
         constructor: function() {
             this.name = 'Base Search View';
             this.filter = {};
+            this.defaultQuery = {};
             Backbone.View.apply(this, arguments);
         },
 
@@ -18,7 +19,6 @@ define([
             $.extend(this, sharedStateObject);
             this.query = sharedStateObject.query;
             this.queryString = sharedStateObject.queryString;
-            this.defaultQuery = {};
             this.updateRequest = sharedStateObject.updateRequest;
             this.userIsReviewer = sharedStateObject.userIsReviewer;
             this.total = sharedStateObject.total;
