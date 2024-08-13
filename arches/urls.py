@@ -21,7 +21,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.contrib.auth import views as auth_views
 from django.urls import include, path, re_path
 from arches.app.views import concept, main, map, search, graph, api
-from arches.app.views.api import auth as api_auth
+from arches.app.views.api import auth as api_auth, user as api_user
 from arches.app.views.admin import ReIndexResources, ClearUserPermissionCache
 from arches.app.views.etl_manager import ETLManagerView
 from arches.app.views.file import FileView, TempFileView
@@ -572,6 +572,7 @@ urlpatterns = [
     ),
     path("api/login", api_auth.Login.as_view(), name="api_login"),
     path("api/logout", api_auth.Logout.as_view(), name="api_logout"),
+    path("api/user", api_user.UserView.as_view(), name="api_user"),
     re_path(
         r"^api/tiles/(?P<tileid>%s|())$" % (uuid_regex),
         api.Tile.as_view(),
