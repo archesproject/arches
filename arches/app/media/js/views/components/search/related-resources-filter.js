@@ -20,7 +20,7 @@ define([
                 self.searchResultsVm.relatedResourcesManager = self;
                 self.ready(true);
             };
-            this.searchComponentVms[componentName](this);
+            this.searchFilterVms[componentName](this);
 
             this.searchResultsVm = self.getFilterByType('search-results', false);
             if (ko.unwrap(this.searchResultsVm)) {

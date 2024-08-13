@@ -8,7 +8,7 @@ define([
     const componentName = 'saved-searches';
     const viewModel = function(params) {
         var self = this;
-        self.searchComponentVms = params.searchComponentVms;
+        self.searchFilterVms = params.searchFilterVms;
 
          
         self.urls = arches.urls;
@@ -29,7 +29,7 @@ define([
                     searchUrl: search.SEARCH_URL[arches.activeLanguage].value
                 });
             });
-            self.searchComponentVms[componentName](self);
+            self.searchFilterVms[componentName](self);
         });
 
         self.options = {

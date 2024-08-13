@@ -43,28 +43,28 @@ define([
     };
 
     var CommonSearchViewModel = function() {
-        this.searchComponentVms = {};
+        this.searchFilterVms = {};
         this.searchFilterConfigs = Object.values(SearchComponents);
         this.defaultSearchViewConfig = this.searchFilterConfigs.find(filter => filter.type == "search-view");
         this.searchViewComponentName = ko.observable(false);
         this.getFilter = function(filterName) {
-            return ko.unwrap(this.searchComponentVms[filterName]);
+            return ko.unwrap(this.searchFilterVms[filterName]);
         };
         this.getFilterByType = function(type, unwrap=true) {
             const filter = this.searchFilterConfigs.find(component => component.type == type);
             if (!filter)
                 return null;
             if (unwrap)
-                return ko.unwrap(this.searchComponentVms[filter.componentname]);
-            return this.searchComponentVms[filter.componentname];
+                return ko.unwrap(this.searchFilterVms[filter.componentname]);
+            return this.searchFilterVms[filter.componentname];
         };
         Object.values(SearchComponents).forEach(function(component) {
-            this.searchComponentVms[component.componentname] = ko.observable(null);
-            this.searchComponentVms[component.componentname].subscribe(vm => {if (vm) console.log(component.componentname);})
+            this.searchFilterVms[component.componentname] = ko.observable(null);
+            this.searchFilterVms[component.componentname].subscribe(vm => {if (vm) console.log(component.componentname);})
         }, this);
         this.searchViewFiltersLoaded = ko.computed(function() {
             let res = true;
-            Object.entries(this.searchComponentVms).forEach(function([componentName, filter]) {
+            Object.entries(this.searchFilterVms).forEach(function([componentName, filter]) {
                 res = res && ko.unwrap(filter);
             });
             return res;

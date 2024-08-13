@@ -50,7 +50,7 @@ define([
                     this.selectedPopup(componentname);
                 }
             };
-            this.searchComponentVms[componentName](this);
+            this.searchFilterVms[componentName](this);
         },
 
     });

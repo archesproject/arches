@@ -89,11 +89,11 @@ define([
         },
 
         getFilter: function(filterName) {
-            return ko.unwrap(this.searchComponentVms[filterName]);
+            return ko.unwrap(this.searchFilterVms[filterName]);
         },
 
         clearQuery: function(){
-            Object.values(this.searchComponentVms).forEach(function(value){
+            Object.values(this.searchFilterVms).forEach(function(value){
                 if (value()){
                     if (value().clear){
                         value().clear();

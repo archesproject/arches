@@ -24,7 +24,7 @@ define([
             this.report = ko.observable();
             this.loading = ko.observable(false);
             this.reportExpanded = ko.observable();
-            this.searchComponentVms[componentName](this);  
+            this.searchFilterVms[componentName](this);  
 
             var setSearchResults = function(){
                 self.searchResultsVm().details = self;         

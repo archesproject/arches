@@ -53,7 +53,7 @@ define([
                     this.updateResults();
                 }, this);
 
-                this.searchComponentVms[componentName](this);
+                this.searchFilterVms[componentName](this);
                 this.restoreState();
                 this.mapFilter = this.getFilterByType("map-filter", false);
                 if (ko.unwrap(this.mapFilter)) {

@@ -46,7 +46,7 @@ define([
                 this.updateResults();
             }, this);
 
-            this.searchComponentVms[componentName](this);
+            this.searchFilterVms[componentName](this);
             this.restoreState();
             this.pageInitialized = true;
         },

@@ -338,7 +338,7 @@ define([
                 updateSearchResultPointLayer();
             };
 
-            this.searchComponentVms[componentName](this);
+            this.searchFilterVms[componentName](this);
             this.map.subscribe(function(){
                 this.setupDraw();
                 this.restoreState();
