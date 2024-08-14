@@ -2180,29 +2180,39 @@ class SpatialView(APIBase):
             "isactive": spatialview.isactive,
         }
 
-    def create_spatialview_from_json_data(self, json_data, is_post=False):
+    def transform_json_data_for_spatialview(self, json_data):
+        """
+        Transforms the JSON data object to be used in the spatialview model
+        """
+        json_data["geometrynode"] = models.Node.objects.get(
+            nodeid=json_data["geometrynodeid"]
+        )
+        del json_data["geometrynodeid"]
+
+        json_data["language"] = models.Language.objects.get(code=json_data["language"])
+        
+        return json_data
+
+    def create_spatialview_from_json_data(self, json_data):
         """
         Returns a SpatialView object from the JSON data. Should only be used if the JSON data has been validated.
         """
 
-        # if json_data has spatialviewid, get the spatialview object. If it doesn't exist, create a new one and use the spatialviewid.
+        json_data = self.transform_json_data_for_spatialview(json_data)
+
         try:
             spatialview = models.SpatialView.objects.get(pk=json_data["spatialviewid"])
         except KeyError:
-            spatialview = models.SpatialView()
+            # if no spatialviewid is provided then is from POST so create a new spatialview object
+            spatialview = models.SpatialView(**json_data)
+            return spatialview
         except ObjectDoesNotExist:
             return JSONErrorResponse(_("Spatialview not found"), _("No Spatialview exists for the provided spatialviewid"), status=400)
 
-        spatialview.schema = json_data["schema"]
-        spatialview.slug = json_data["slug"]
-        spatialview.description = json_data["description"]
-        spatialview.geometrynode = models.Node.objects.get(
-            nodeid=json_data["geometrynodeid"]
-        )
-        spatialview.ismixedgeometrytypes = json_data["ismixedgeometrytypes"]
-        spatialview.language = models.Language.objects.get(code=json_data["language"])
-        spatialview.attributenodes = json_data["attributenodes"]
-        spatialview.isactive = json_data["isactive"]
+        # update the spatialview object with the new data
+        for key, value in json_data.items():
+            setattr(spatialview, key, value)
+
         return spatialview
 
     def validate_json_data_content(self, json_data, spatialviewid_identifier=None, is_post=False):
