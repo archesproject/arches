@@ -20,6 +20,9 @@ class Migration(migrations.Migration):
             returns text as $$
             declare failed_collections text[];
                 collection text;
+                rec record;
+                new_listitem_id uuid;
+                new_listitemvalue_id uuid;
             begin
                 -- RDM Collections to Controlled Lists & List Items Migration --
                 -- To use, run: 
@@ -169,7 +172,8 @@ class Migration(migrations.Migration):
                     listitemvalue_id uuid,
                     listitemvalue text,
                     listitemvalue_languageid text,
-                    listitemvalue_valuetype text
+                    listitemvalue_valuetype text,
+                    rownumber int
                 );
 
                 foreach collection in array collection_names loop
@@ -244,6 +248,57 @@ class Migration(migrations.Migration):
                         or valuetype = 'changeNote'
                         or valuetype = 'note'
                         or valuetype = 'description';
+                end loop;
+
+                with assign_row_num as (
+                    select list_item_id,
+                        sortorder,
+                        list_id,
+                        parent_id,
+                        depth, 
+                        ROW_NUMBER() OVER (PARTITION BY list_item_id ORDER BY depth ASC, sortorder ASC) as init_rownumber
+                    from temp_list_items_and_values t
+                )
+                update temp_list_items_and_values t
+                set rownumber = init_rownumber
+                from assign_row_num a
+                where t.list_item_id = a.list_item_id 
+                    and t.list_id = a.list_id;
+
+                for rec in 
+                    select *
+                    from temp_list_items_and_values
+                    where list_item_id in (
+                        with list_item_parent_count as (
+                            select list_item_id, count (list_item_id)
+                            from temp_list_items_and_values
+                            where listitemvalue_valuetype = 'prefLabel'
+                            group by list_item_id
+                            union
+                            select id as list_item_id, count(id)
+                            from arches_references_listitem
+                            group by id
+                        )
+                        select list_item_id
+                        from temp_list_items_and_values
+                        where list_item_id in (
+                            select list_item_id
+                            from list_item_parent_count
+                            where count > 1
+                        ) 
+                    ) and listitemvalue_valuetype = 'prefLabel'
+                    order by list_item_id, depth asc, sortorder asc
+                loop
+                    if rec.rownumber > 1
+                    then 
+                        new_listitem_id := uuid_generate_v4();
+                        new_listitemvalue_id := uuid_generate_v4();
+                    update temp_list_items_and_values
+                    set list_item_id = new_listitem_id,
+                        listitemvalue_id = new_listitemvalue_id
+                    where list_item_id = rec.list_item_id
+                        and rownumber = rec.rownumber;
+                    end if;
                 end loop;
                 
                 insert into arches_references_listitem (
