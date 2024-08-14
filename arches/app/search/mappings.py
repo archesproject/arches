@@ -287,7 +287,9 @@ def prepare_search_index(create=False):
     if CustomResourceSearchValue.has_custom_search_class():
         index_settings["mappings"]["properties"][
             CustomResourceSearchValue.get_custom_search_class().get_custom_search_path()
-        ] = CustomResourceSearchValue.get_custom_search_class().get_custom_search_config()
+        ] = (
+            CustomResourceSearchValue.get_custom_search_class().get_custom_search_config()
+        )
 
     index_settings["mappings"]["properties"]["permissions"]["properties"].update(
         permission_backend.update_mappings()
