@@ -62,6 +62,8 @@ define([
         };
         Object.values(SearchComponents).forEach(function(component) {
             this.searchFilterVms[component.componentname] = ko.observable(null);
+            // uncomment below to test for any filters that don't load as expected
+            // this.searchFilterVms[component.componentname].subscribe(vm => {console.log(component.componentname+" loaded");})
         }, this);
         this.searchViewFiltersLoaded = ko.computed(function() {
             let res = true;
