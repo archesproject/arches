@@ -2172,7 +2172,7 @@ class SpatialView(models.Model):
         for node in self.attributenodes:
             if not Node.objects.filter(pk=node["nodeid"], graph=graph).exists():
                 raise ValidationError(
-                    f"Attribute nodes must belong to the same graph as the geometry node (error nodeid:{str(node.id)})"
+                    f"Attribute nodes must belong to the same graph as the geometry node (error nodeid:{str(node['nodeid'])})"
                 )
 
         # language must be be a valid language code belonging to the current publication
