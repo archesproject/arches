@@ -10,7 +10,7 @@ authors = [
     {name = "Farallon Geographics, Inc", email = "dev@fargeo.com"}
 ]
 license = {text = "GNU AGPL3"}
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 description = "Arches is an open-source, web-based, geospatial information system for cultural heritage inventory and management."
 keywords = ["django", "arches", "cultural heritage"]
 classifiers = [
@@ -20,7 +20,6 @@ classifiers = [
     "Intended Audience :: Information Technology",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Framework :: Django",

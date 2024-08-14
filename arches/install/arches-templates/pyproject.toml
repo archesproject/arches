@@ -12,7 +12,6 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Framework :: Django",
@@ -22,7 +21,7 @@ classifiers = [
     "Intended Audience :: Information Technology",
     "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "arches>={{ arches_semantic_version }},<{{ arches_next_minor_version }}",
 ]
