@@ -2149,7 +2149,11 @@ class SpatialView(APIBase):
 
         return JSONResponse(response_data)
 
-    def attribute_nodes_are_valid(self, geom_node, attribute_nodeids=[]):
+    def attribute_nodes_are_valid(self, geom_node, attribute_nodeids=None):
+        
+        if not attribute_nodeids:
+            return False
+        
         attribute_node_graphs = [
             n.graph_id for n in models.Node.objects.filter(nodeid__in=attribute_nodeids)
         ]
