@@ -2335,7 +2335,7 @@ class SpatialView(APIBase):
                 spatialview.to_json(), status=200
             )
         return JSONErrorResponse(
-            _("Spatialview update falied"), _("No json request payload"), status=400
+            _("Spatialview update failed"), _("No json request payload"), status=400
         )
 
     @method_decorator(group_required("Application Administrator"))
@@ -2363,7 +2363,7 @@ class SpatialView(APIBase):
 
         else:
             return JSONErrorResponse(
-                _("Spatialview delete falied"),
+                _("Spatialview delete failed"),
                 _(
                     "DELETE REST request requires a spatialviewid to be provided in the URL"
                 ),
