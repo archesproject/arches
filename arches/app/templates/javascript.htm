@@ -673,6 +673,7 @@
         ri-select-placeholder='{% trans "Add new Relationship" as riSelectPlaceholder %} "{{ riSelectPlaceholder|escapejs }}"'
         re-network-reponse-error='{% trans "Network response was not ok" as reNetworkReponseError %} "{{ reNetworkReponseError|escapejs }}"'
         term-search-concept='{% trans "Concepts" as termSearchConcept %} "{{ termSearchConcept|escapejs }}"'
+        contains-term='(term) => { return {% trans "Contains Term: ${term}" as containsTerm %} `{{ containsTerm|escapejs }}` }'
         term-search-term='{% trans "Term Matches" as termSearchTerm %} "{{ termSearchTerm|escapejs }}"'
         time-wheel-date-matches='{% trans "${total} date values" as timeWheelDateMatches %} "{{ timeWheelDateMatches|escapejs }}"'
         card-constraints-placeholder='{% trans "Select Widgets" as cardConstraintsPlaceholder %} "{{ cardConstraintsPlaceholder|escapejs }}"'
