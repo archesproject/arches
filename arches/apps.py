@@ -1,5 +1,6 @@
 import os
 import re
+import tomllib
 from importlib.metadata import PackageNotFoundError, requires
 from pathlib import Path
 
@@ -11,12 +12,6 @@ from semantic_version import SimpleSpec, Version
 
 from arches import __version__
 from arches.settings_utils import generate_frontend_configuration
-
-try:
-    import tomllib  # Python 3.11+
-except ImportError:  # pragma: no cover
-    # Python 3.10 depends on tomli instead
-    import tomli as tomllib
 
 
 class ArchesAppConfig(AppConfig):
