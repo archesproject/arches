@@ -40,6 +40,22 @@ class Migration(migrations.Migration):
         UPDATE search_component SET config = '{"layoutType":"popup"}' where componentname in ('time-filter', 'saved-searches', 'search-export');
         UPDATE search_component SET type = 'term-filter' where componentname = 'term-filter';
         UPDATE search_component SET componentpath = null where componentpath = '';
+        UPDATE search_component SET type = componentname || '-type' 
+        WHERE componentname IN (
+            'advanced-search',
+            'related-resources-filter',
+            'search-result-details',
+            'search-results',
+            'map-filter',
+            'time-filter',
+            'saved-searches',
+            'search-export',
+            'term-filter',
+            'paging-filter',
+            'provisional-filter',
+            'resource-type-filter',
+            'sort-results',
+        );
         
     """
     reverse_sql = """
@@ -49,6 +65,7 @@ class Migration(migrations.Migration):
         UPDATE search_component SET type = 'results-list' where componentname = 'search-results';
         UPDATE search_component SET type = 'text-input' where componentname = 'term-filter';
         UPDATE search_component SET componentpath = '' where componentpath is null;
+        UPDATE search_component SET type = 'filter' where type like '%-type';
     """
 
     operations = [

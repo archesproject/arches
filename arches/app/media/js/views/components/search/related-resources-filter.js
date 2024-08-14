@@ -22,7 +22,7 @@ define([
             };
             this.searchFilterVms[componentName](this);
 
-            this.searchResultsVm = self.getFilterByType('search-results', false);
+            this.searchResultsVm = self.getFilterByType('search-results-type', false);
             if (ko.unwrap(this.searchResultsVm)) {
                 this.searchResultsVm = this.searchResultsVm();
                 setSearchResults();

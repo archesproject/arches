@@ -55,7 +55,7 @@ define([
 
                 this.searchFilterVms[componentName](this);
                 this.restoreState();
-                this.mapFilter = this.getFilterByType("map-filter", false);
+                this.mapFilter = this.getFilter("map-filter", false);
                 if (ko.unwrap(this.mapFilter)) {
                     this.mapFilter = this.mapFilter();
                     this.selectedTab.subscribe(function (tab) {

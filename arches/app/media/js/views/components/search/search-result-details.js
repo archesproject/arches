@@ -30,7 +30,7 @@ define([
                 self.searchResultsVm().details = self;         
             };
 
-            this.searchResultsVm = this.getFilterByType('search-results', false);
+            this.searchResultsVm = this.getFilterByType('search-results-type', false);
             if (ko.unwrap(this.searchResultsVm)) {
                 setSearchResults();
             } else {
