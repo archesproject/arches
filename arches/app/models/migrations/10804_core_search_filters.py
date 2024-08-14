@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
             'paging-filter',
             'provisional-filter',
             'resource-type-filter',
-            'sort-results',
+            'sort-results'
         );
         
     """
