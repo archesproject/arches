@@ -119,8 +119,7 @@ class ArchesTestCase(TestCase):
             )
 
     @classmethod
-    def ensure_resource_test_model_loaded(cls):
-        resource_test_model_graph_id = "c9b37a14-17b3-11eb-a708-acde48001122"
+    def ensure_test_resource_models_are_loaded(cls):
         custom_string_datatype_filename = os.path.join(
             test_settings.TEST_ROOT,
             "fixtures",
@@ -135,12 +134,23 @@ class ArchesTestCase(TestCase):
                 source=custom_string_datatype_filename,
                 verbosity=0,
             )
-        if not Graph.objects.filter(pk=resource_test_model_graph_id).exists():
-            for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
+        # if not Graph.objects.filter(pk=resource_test_model_graph_id).exists():
+        for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
+            file_paths = [
+                file_path
+                for file_path in os.listdir(path)
+                if file_path.endswith(".json")
+            ]
+            for file_path in file_paths:
                 with captured_stdout():
-                    management.call_command(
-                        "packages", operation="import_graphs", source=path, verbosity=0
-                    )
+                    with open(os.path.join(path, file_path), "r") as f:
+                        archesfile = JSONDeserializer().deserialize(f)
+                        errs, importer = ResourceGraphImporter(
+                            archesfile["graph"], overwrite_graphs=False
+                        )
+                    # management.call_command(
+                    #     "packages", operation="import_graphs", source=path, verbosity=0
+                    # )
 
     @classmethod
     def setUpClass(cls):
