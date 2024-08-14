@@ -12,12 +12,11 @@
 
                 <!-- Inline Filters (for QA and Resource Type) -->
                 <div class="search-inline-filters">
-                    <!--ko if: sharedStateObject.userIsReviewer !== false-->
-                        <div class="qa-filter" data-bind="component: {
+                        <div class="qa-filter" data-bind="visible: sharedStateObject.userIsReviewer() !== false,
+                        component: {
                             name: 'provisional-filter',
                             params: sharedStateObject
                         }"></div>
-                    <!--/ko-->
                     <div class="resource-filter" data-bind="component: {
                         name: 'resource-type-filter',
                         params: sharedStateObject
