@@ -49,12 +49,20 @@ class CustomResourceSearchValue:
         original_must_filter = search_query.dsl["bool"]["must"]
         search_query.dsl["bool"]["must"] = []
         for must_element in original_must_filter:
-            search_query.must(CustomResourceSearchValue.create_nested_custom_filter(term, must_element))
+            search_query.must(
+                CustomResourceSearchValue.create_nested_custom_filter(
+                    term, must_element
+                )
+            )
 
         original_must_filter = search_query.dsl["bool"]["must_not"]
         search_query.dsl["bool"]["must_not"] = []
         for must_element in original_must_filter:
-            search_query.must_not(CustomResourceSearchValue.create_nested_custom_filter(term, must_element))
+            search_query.must_not(
+                CustomResourceSearchValue.create_nested_custom_filter(
+                    term, must_element
+                )
+            )
         # print("Search query after: %s" % search_query)
 
     @staticmethod
