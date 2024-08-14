@@ -79,6 +79,32 @@ class ArchesDefaultAllowPermissionsTests(ArchesPermissionFrameworkTestCase):
 
                 self.assertTrue(can_access_with_view_permission)
 
+    def test_noaccess_default(self):
+        default_permissions = MagicMock()
+        default_permissions.PERMISSION_DEFAULTS = {
+            "330802c5-95bd-11e8-b7ac-acde48001122": [
+                {
+                    "id": self.group.id,
+                    "type": "group",
+                    "permissions": ["no_access_to_resourceinstance"],
+                },
+            ]
+        }
+
+        with patch(
+            "arches.app.permissions.arches_permission_base.settings",
+            default_permissions,
+        ):
+            with patch(
+                "arches.app.permissions.arches_default_allow.settings",
+                default_permissions,
+            ):
+                resource = ResourceInstance.objects.get(
+                    resourceinstanceid=self.resource_instance_id
+                )
+                result = self.framework.get_restricted_users(resource)
+                self.assertIn(self.user.id, result["no_access"])
+
     def test_get_search_ui_permissions(self):
 
         with patch.object(

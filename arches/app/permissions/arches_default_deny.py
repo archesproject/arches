@@ -36,41 +36,7 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
         return None if user and user.username != "anonymous" else set()
 
     def get_restricted_users(self, resource: ResourceInstance) -> dict[str, list[int]]:
-        """
-        Takes a resource instance and identifies which users are explicitly restricted from
-        reading, editing, deleting, or accessing it.
-
-        """
-
-        user_perms = get_users_with_perms(
-            resource, attach_perms=True, with_group_users=False
-        )
-        user_and_group_perms = get_users_with_perms(
-            resource, attach_perms=True, with_group_users=True
-        )
-
-        result: dict[str, list[int]] = {
-            "no_access": [],
-            "cannot_read": [],
-            "cannot_write": [],
-            "cannot_delete": [],
-        }
-
-        for user, perms in user_and_group_perms.items():
-            if user.is_superuser:
-                pass
-            elif user not in user_perms:
-                for k, v in result.items():
-                    v.append(user.id)
-            else:
-                if "view_resourceinstance" not in perms:
-                    result["cannot_read"].append(user.id)
-                if "change_resourceinstance" not in perms:
-                    result["cannot_write"].append(user.id)
-                if "delete_resourceinstance" not in perms:
-                    result["cannot_delete"].append(user.id)
-
-        return result
+        pass
 
     def check_resource_instance_permissions(
         self, user: User, resourceid: str, permission: str
