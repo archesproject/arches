@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 db_column="languageid",
                 default="en",
-                on_delete=django.db.models.deletion.CASCADE,
+                on_delete=django.db.models.deletion.PROTECT,
                 to="models.language",
                 to_field="code",
             ),
