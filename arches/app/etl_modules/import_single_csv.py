@@ -2,11 +2,13 @@ import csv
 from datetime import datetime
 import json
 import os
+import sys
 import uuid
 import zipfile
 from django.contrib.auth.models import User
 from django.core.files import File
 from django.core.files.storage import default_storage
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import connection
 from django.db.models.functions import Lower
 from django.http import HttpRequest
@@ -26,13 +28,13 @@ class ImportSingleCsv(BaseImportModule):
     def __init__(self, request=None, loadid=None, params=None):
         self.loadid = request.POST.get("load_id") if request else loadid
         self.userid = request.user.id if request else 1
-        if request is None and params is not None:
+        # self.mode = "cli" if params else "ui"
+        if not request and params:
             request = HttpRequest()
             request.user = User.objects.get(id=self.userid)
             request.method = "POST"
             for k, v in params.items():
                 request.POST.__setitem__(k, v)
-            # self.params = params
         self.request = request if request else None
         self.moduleid = request.POST.get("module") if request else None
         self.config = (
@@ -84,7 +86,7 @@ class ImportSingleCsv(BaseImportModule):
         initiated = self.start(self.request)
 
         if initiated["success"]:
-            read = self.read_for_cli(source)
+            read = self.read(source=source)
         else:
             return {
                 "success": False,
@@ -107,64 +109,29 @@ class ImportSingleCsv(BaseImportModule):
                 "data": {"title": _("Error"), "message": written["message"]},
             }
 
-    def read_for_cli(self, source):
+    def read(self, request=None, source=None):
         """
         Reads added csv file and returns all the rows
-        If the loadid already exsists also returns the load_details
+        If the loadid already exists also returns the load_details
         """
 
-        temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
-        try:
-            self.delete_from_default_storage(temp_dir)
-        except FileNotFoundError:
-            pass
+        if request:
+            content = request.FILES.get("file")
+        else:
+            if source.split(".")[-1].lower() == "csv":
+                file_type = "text/csv"
+            elif source.split(".")[-1].lower() == "zip":
+                file_type = "application/zip"
+            file = open(source, "rb")
+            content= InMemoryUploadedFile(
+                file,
+                "file",
+                os.path.basename(source),
+                file_type,
+                sys.getsizeof(file),
+                None
+            )
 
-        csv_file_name = None
-        if source.split(".")[-1].lower() == "csv":
-            csv_file_name = os.path.basename(source).split("/")[-1]
-            csv_file_path = os.path.join(temp_dir, csv_file_name)
-            default_storage.save(csv_file_path, File(open(source, "r")))
-        elif source.split(".")[-1].lower() == "zip":
-            with zipfile.ZipFile(source, "r") as zip_ref:
-                files = zip_ref.infolist()
-                for file in files:
-                    if not file.filename.startswith("__MACOSX"):
-                        default_storage.save(
-                            os.path.join(temp_dir, file.filename),
-                            File(zip_ref.open(file)),
-                        )
-                        if file.filename.endswith(".csv"):
-                            csv_file_name = file.filename
-            csv_file_path = os.path.join(temp_dir, csv_file_name)
-
-        if csv_file_name is None:
-            return {
-                "status": 400,
-                "success": False,
-                "title": _("No csv file found"),
-                "message": _("Upload a valid csv file"),
-            }
-
-        with default_storage.open(csv_file_path, mode="r") as csvfile:
-            reader = csv.reader(csvfile)
-            data = {"csv": [line for line in reader], "csv_file": csv_file_name}
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """SELECT load_details FROM load_event WHERE loadid = %s""",
-                    [self.loadid],
-                )
-                row = cursor.fetchall()
-            if len(row) > 0:
-                data["config"] = row[0][0]
-        return {"success": True, "data": data}
-
-    def read(self, request):
-        """
-        Reads added csv file and returns all the rows
-        If the loadid already exsists also returns the load_details
-        """
-
-        content = request.FILES.get("file")
         temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         try:
             self.delete_from_default_storage(temp_dir)
