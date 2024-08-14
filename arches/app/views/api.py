@@ -2139,7 +2139,7 @@ class SpatialView(APIBase):
                 )
 
         response_data = [
-            self.create_json_data_object_from_spatialview(spatialview)
+            spatialview.to_json()
             for spatialview in permitted_spatialviews
         ]
 
