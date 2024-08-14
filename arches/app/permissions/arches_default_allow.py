@@ -111,7 +111,7 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         # We do not do set filtering - None is allow-all for sets.
         return None
 
-    def get_restricted_users(self, resource: ResourceInstance) -> dict[str, list[int]]:
+    def get_restricted_users(self, resource: ResourceInstance) -> dict[str, set[int]]:
         """
         Takes a resource instance and identifies which users are explicitly restricted from
         reading, editing, deleting, or accessing it.
@@ -125,31 +125,43 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
             resource, attach_perms=True, with_group_users=True
         )
 
-        result: dict[str, list[int]] = {
-            "no_access": [],
-            "cannot_read": [],
-            "cannot_write": [],
-            "cannot_delete": [],
+        result: dict[str, set[int]] = {
+            "no_access": set(),
+            "cannot_read": set(),
+            "cannot_write": set(),
+            "cannot_delete": set(),
         }
-
-        for user, perms in user_and_group_perms.items():
-            if user.is_superuser:
-                pass
-            elif (
-                user in user_perms
-                and "no_access_to_resourceinstance" in user_perms[user]
+        for user in User.objects.all():
+            default_permissions = self.get_default_permissions(
+                user, resource, all_permissions=True
+            )
+            if (
+                not (user.is_superuser)
+                and resource.principaluser_id != user.id
+                and "no_access_to_resourceinstance" in default_permissions
             ):
                 for k, v in result.items():
-                    v.append(user.id)
+                    v.add(user.id)
+        for user, perms in user_and_group_perms.items():
+            default_permissions = self.get_default_permissions(
+                user, resource, all_permissions=True
+            )
+            if user.is_superuser:
+                pass
+            elif user in user_perms and (
+                "no_access_to_resourceinstance" in user_perms[user]
+            ):
+                for k, v in result.items():
+                    v.add(user.id)
             else:
                 if "view_resourceinstance" not in perms:
-                    result["cannot_read"].append(user.id)
+                    result["cannot_read"].add(user.id)
                 if "change_resourceinstance" not in perms:
-                    result["cannot_write"].append(user.id)
+                    result["cannot_write"].add(user.id)
                 if "delete_resourceinstance" not in perms:
-                    result["cannot_delete"].append(user.id)
+                    result["cannot_delete"].add(user.id)
                 if "no_access_to_resourceinstance" in perms and len(perms) == 1:
-                    result["no_access"].append(user.id)
+                    result["no_access"].add(user.id)
 
         return result
 
@@ -231,10 +243,10 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
     def get_index_values(self, resource: Resource):
         restrictions = self.get_restricted_users(resource)
         permissions = {}
-        permissions["users_without_read_perm"] = restrictions["cannot_read"]
-        permissions["users_without_edit_perm"] = restrictions["cannot_write"]
-        permissions["users_without_delete_perm"] = restrictions["cannot_delete"]
-        permissions["users_with_no_access"] = restrictions["no_access"]
+        permissions["users_without_read_perm"] = list(restrictions["cannot_read"])
+        permissions["users_without_edit_perm"] = list(restrictions["cannot_write"])
+        permissions["users_without_delete_perm"] = list(restrictions["cannot_delete"])
+        permissions["users_with_no_access"] = list(restrictions["no_access"])
         return permissions
 
     def get_permission_inclusions(self) -> list:
