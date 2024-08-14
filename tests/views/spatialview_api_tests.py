@@ -152,27 +152,6 @@ class SpatialViewApiTest(TransactionTestCase):
         ]
         return spatialview
 
-    def create_json_data_object_from_spatialview(self, spatialview, exclude_spatialviewid=False):
-        """
-        Returns a JSON object representing the spatialview
-        """
-        json_data = {
-            "spatialviewid": str(spatialview.spatialviewid),
-            "schema": spatialview.schema,
-            "slug": spatialview.slug,
-            "description": spatialview.description,
-            "geometrynodeid": str(spatialview.geometrynode.pk),
-            "ismixedgeometrytypes": spatialview.ismixedgeometrytypes,
-            "language": spatialview.language.code,
-            "attributenodes": spatialview.attributenodes,
-            "isactive": spatialview.isactive,
-        }
-
-        if exclude_spatialviewid:
-            del json_data["spatialviewid"]
-
-        return json_data
-
     def test_spatialview_api_crud(self):
         """
         Test the CRUD operations of the spatialview api. Putting these in a single test avoids issues with the order of tests
@@ -182,10 +161,8 @@ class SpatialViewApiTest(TransactionTestCase):
 
         # test post
         new_spatialview = self.generate_valid_spatiatview()
-        new_spatialview_json = self.create_json_data_object_from_spatialview(
-            new_spatialview,
-            exclude_spatialviewid=True,
-        )
+        new_spatialview_json = new_spatialview.to_json()
+        del new_spatialview_json["spatialviewid"]
 
         # elevated
         self.client.login(username="admin", password="admin")
@@ -267,9 +244,7 @@ class SpatialViewApiTest(TransactionTestCase):
         # test put by changing the description
         updated_spatialview = new_spatialview
         updated_spatialview.description = "updated_description"
-        updated_spatialview_json = self.create_json_data_object_from_spatialview(
-            updated_spatialview
-        )
+        updated_spatialview_json = updated_spatialview.to_json()
         response = self.client.put(
             reverse(
                 "spatialview_api", 
@@ -294,9 +269,7 @@ class SpatialViewApiTest(TransactionTestCase):
 
         # test create with spatialviewid - should error
         bad_id_create_spatialview = self.generate_valid_spatiatview()
-        bad_id_create_spatialview_json = self.create_json_data_object_from_spatialview(
-            bad_id_create_spatialview
-        )
+        bad_id_create_spatialview_json = bad_id_create_spatialview.to_json()
         with self.assertLogs("django.request", level="WARNING"): # suppress expected warning log
             response = self.client.post(
                 reverse("spatialview_api", kwargs={"identifier": ""}),
