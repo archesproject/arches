@@ -123,13 +123,13 @@ class ImportSingleCsv(BaseImportModule):
                 file_type = "application/zip"
             file = open(source, "rb")
             file_stat = os.stat(source)
-            content= InMemoryUploadedFile(
+            content = InMemoryUploadedFile(
                 file,
                 "file",
                 os.path.basename(source),
                 file_type,
                 file_stat.st_size,
-                None
+                None,
             )
 
         temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)

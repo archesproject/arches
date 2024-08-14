@@ -21,6 +21,7 @@ def save_to_tiles(userid, loadid, multiprocessing=False):
 
         return _post_save_edit_log(cursor, userid, loadid, multiprocessing)
 
+
 def log_event_details(cursor, loadid, details):
     cursor.execute(
         """UPDATE load_event SET load_description = concat(load_description, %s) WHERE loadid = %s""",
