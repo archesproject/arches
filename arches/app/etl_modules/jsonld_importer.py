@@ -371,7 +371,7 @@ class JSONLDImporter(BaseImportModule):
         finally:
             reenable_tile_triggers(cursor, loadid)
 
-        _post_save_edit_log(cursor, userid, loadid)
+        return _post_save_edit_log(cursor, userid, loadid)
 
     @load_data_async
     def run_load_task_async(self, request):

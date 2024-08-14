@@ -19,8 +19,7 @@ def save_to_tiles(userid, loadid, multiprocessing=False):
         if error_saving_tiles:
             return error_saving_tiles
 
-        response = _post_save_edit_log(cursor, userid, loadid, multiprocessing)
-    return response
+        return _post_save_edit_log(cursor, userid, loadid, multiprocessing)
 
 def log_event_details(cursor, loadid, details):
     cursor.execute(
