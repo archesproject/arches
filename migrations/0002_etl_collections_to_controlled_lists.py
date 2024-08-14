@@ -141,7 +141,8 @@ class Migration(migrations.Migration):
                 create temporary table temp_collection_hierarchy as
                     with recursive collection_hierarchy as (
                         select conceptidfrom as root_list,
-                            conceptidto as child, 
+                            conceptidto as child,
+                            ARRAY[conceptidfrom] AS path,
                             0 as depth
                         from relations
                         where not exists (
@@ -150,6 +151,7 @@ class Migration(migrations.Migration):
                         union all
                         select ch.root_list,
                             r.conceptidto,
+                            ch.path || r.conceptidfrom,
                             ch.depth + 1
                         from collection_hierarchy ch
                         join relations r on ch.child = r.conceptidfrom
@@ -184,22 +186,15 @@ class Migration(migrations.Migration):
                             ch.depth,
                             v.languageid, v.value, 
                             ROW_NUMBER() OVER (PARTITION BY ch.child ORDER BY (v.languageid = preferred_sort_language) DESC, languages.id) AS language_rank,
-                            r.conceptidfrom
+                            r.conceptidfrom,
+                            ch.path
                         from filtered_collection_hierarchy ch
                         left join values v on v.conceptid = ch.child
                         left join relations r on r.conceptidto = ch.child
                         left join languages on v.languageid = languages.code
-                        where v.valuetype = 'prefLabel' and 
-                            r.relationtype = 'member' 
-                    ),
-                    filtered_ranked_prefLabels as (
-                        select *
-                        from ranked_prefLabels
-                        where conceptidfrom in (
-                            select root_list from ranked_prefLabels
-                            union
-                            select child from ranked_prefLabels
-                        )
+                        where v.valuetype = 'prefLabel'
+                            and r.relationtype = 'member'
+                            and r.conceptidfrom in (select unnest(path) from filtered_collection_hierarchy)
                     ),
                     -- Once we've assigned our root_list, we want to sort the children (to depth n) alphabetically based on their ranked prefLabel
                     -- We also want to take into account the child's parent value, so the relations table is joined back to capture the parent.
@@ -211,7 +206,7 @@ class Migration(migrations.Migration):
                                 else conceptidfrom
                             end as parent_id,
                             depth
-                        from filtered_ranked_prefLabels rpl
+                        from ranked_prefLabels rpl
                         where language_rank = 1 and
                             root_list in (select id from arches_references_list where name = collection)
                     )
