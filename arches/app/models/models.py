@@ -2136,6 +2136,7 @@ class SpatialView(models.Model):
             )
         ],
         unique=True,
+        null=False
     )
     description = models.TextField(
         default="arches spatial view"
@@ -2145,10 +2146,11 @@ class SpatialView(models.Model):
         on_delete=models.CASCADE,
         db_column="geometrynodeid",
         limit_choices_to={"datatype": "geojson-feature-collection"},
+        null=False
     )
     ismixedgeometrytypes = models.BooleanField(default=False)
     language = models.ForeignKey(
-        Language, db_column="languageid", to_field="code", on_delete=models.PROTECT
+        Language, db_column="languageid", to_field="code", on_delete=models.PROTECT, null=False
     )
     attributenodes = JSONField(blank=False, null=False, db_column="attributenodes")
     isactive = models.BooleanField(
