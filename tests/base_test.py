@@ -28,6 +28,7 @@ from arches.app.utils.data_management.resource_graphs.importer import (
     import_graph as ResourceGraphImporter,
 )
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
+from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
 from arches.app.utils.context_processors import app_settings
 from django.db import connection
@@ -120,6 +121,7 @@ class ArchesTestCase(TestCase):
 
     @classmethod
     def ensure_test_resource_models_are_loaded(cls):
+        LanguageSynchronizer.synchronize_settings_with_db()
         custom_string_datatype_filename = os.path.join(
             test_settings.TEST_ROOT,
             "fixtures",
