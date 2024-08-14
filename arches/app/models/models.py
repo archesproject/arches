@@ -2166,7 +2166,6 @@ class SpatialView(models.Model):
         """
         Validate the spatial view before saving it to the database as the database triggers have proved hard to test.
         """
-        super().clean()
         graph = self.geometrynode.graph
         for node in self.attributenodes:
             if not Node.objects.filter(pk=node["nodeid"], graph=graph).exists():
