@@ -90,7 +90,7 @@ class BaseSearchView(BaseSearchFilter):
             ),
         )
         available_filter_sort_order = {
-            item["componentname"]: int(item.get("layoutSortorder"))
+            item["componentname"]: int(item.get("layoutSortorder", 99))
             for item in self.searchview_component.config["linkedSearchFilters"]
         }
         self._available_search_filters = list(
