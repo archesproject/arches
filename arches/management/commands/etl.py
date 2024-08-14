@@ -58,7 +58,7 @@ class Command(BaseCommand):
     def run(self, module, source, config):
         """
         Run the specified module
-        Params --module(-m), --source(-s), and --config(-c)
+        Params --source(-s), and --config(-c)
 
         """
         loadid = str(uuid.uuid4())
