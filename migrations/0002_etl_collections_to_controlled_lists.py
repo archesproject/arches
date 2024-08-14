@@ -140,6 +140,7 @@ class Migration(migrations.Migration):
                 -- On each recursion, it checks if the child (aka conceptidto in relations table) is a parent for another concept
                 -- All the while, it keeps track of the depth of the child concept, to be used for sorting in the next CTE
                 -- The results are stored in a temporary table to avoid re-running non-filtered recursion (done on the whole relations table)
+                -- We keep track of the hierarchy path in order to account for concepts that participate in multiple collections
                 
                 create temporary table temp_collection_hierarchy as
                     with recursive collection_hierarchy as (
@@ -162,6 +163,7 @@ class Migration(migrations.Migration):
                     )
                     select * from collection_hierarchy;
                 
+                -- This temp table is used to stage list items and values 
                 create temporary table temp_list_items_and_values (
                     list_item_id uuid,
                     sortorder bigint,
@@ -176,6 +178,8 @@ class Migration(migrations.Migration):
                     rownumber int
                 );
 
+                -- Build the new hierarchies at the list level, mainly to account for concepts that participate in multiple collections
+                -- then stash results in temp table for preprocessing before inserting into CLM tables
                 foreach collection in array collection_names loop
                     with filtered_collection_hierarchy as (
                         select * 
@@ -250,6 +254,7 @@ class Migration(migrations.Migration):
                         or valuetype = 'description';
                 end loop;
 
+                -- Assign row number to help identify concepts that participate in multiple collections
                 with assign_row_num as (
                     select list_item_id,
                         sortorder,
@@ -265,6 +270,7 @@ class Migration(migrations.Migration):
                 where t.list_item_id = a.list_item_id 
                     and t.list_id = a.list_id;
 
+                -- For concepts that participate in multiple collections, mint new listitem_id's and listitemvalue_id's
                 for rec in 
                     select *
                     from temp_list_items_and_values
