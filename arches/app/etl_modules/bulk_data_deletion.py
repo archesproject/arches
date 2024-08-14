@@ -10,6 +10,7 @@ from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from arches.app.etl_modules.base_data_editor import BaseBulkEditor
 from arches.app.etl_modules.decorators import load_data_async
+from arches.app.etl_modules.save import get_resourceids_from_search_url
 from arches.app.models.models import TileModel
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -247,7 +248,9 @@ class BulkDataDeletion(BaseBulkEditor):
             resourceids = json.loads(resourceids)
         if search_url:
             try:
-                resourceids = self.get_resourceids_from_search_url(search_url)
+                resourceids = get_resourceids_from_search_url(
+                    search_url, self.request.user
+                )
             except ValidationError:
                 return {
                     "success": False,
@@ -287,7 +290,9 @@ class BulkDataDeletion(BaseBulkEditor):
             resourceids = tuple(resourceids)
         if search_url:
             try:
-                resourceids = self.get_resourceids_from_search_url(search_url)
+                resourceids = get_resourceids_from_search_url(
+                    search_url, self.request.user
+                )
             except ValidationError:
                 return {
                     "success": False,
@@ -330,7 +335,7 @@ class BulkDataDeletion(BaseBulkEditor):
         if resourceids:
             resourceids = json.loads(resourceids)
         if search_url:
-            resourceids = self.get_resourceids_from_search_url(search_url)
+            resourceids = get_resourceids_from_search_url(search_url, self.request.user)
 
         edit_task = tasks.bulk_data_deletion.apply_async(
             (self.userid, self.loadid, graph_id, nodegroup_id, resourceids),
