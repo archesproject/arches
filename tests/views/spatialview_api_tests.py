@@ -297,9 +297,10 @@ class SpatialViewApiTest(TransactionTestCase):
         bad_id_create_spatialview_json = self.create_json_data_object_from_spatialview(
             bad_id_create_spatialview
         )
-        response = self.client.post(
-            reverse("spatialview_api", kwargs={"identifier": ""}),
-            data=bad_id_create_spatialview_json,
-            content_type="application/json",
-        )
+        with self.assertLogs("django.request", level="WARNING"): # suppress expected warning log
+            response = self.client.post(
+                reverse("spatialview_api", kwargs={"identifier": ""}),
+                data=bad_id_create_spatialview_json,
+                content_type="application/json",
+            )
         self.assertEqual(response.status_code, 400)
