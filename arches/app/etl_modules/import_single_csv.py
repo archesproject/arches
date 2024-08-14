@@ -2,7 +2,6 @@ import csv
 from datetime import datetime
 import json
 import os
-import sys
 import uuid
 import zipfile
 from django.contrib.auth.models import User
@@ -123,12 +122,13 @@ class ImportSingleCsv(BaseImportModule):
             elif source.split(".")[-1].lower() == "zip":
                 file_type = "application/zip"
             file = open(source, "rb")
+            file_stat = os.stat(source)
             content= InMemoryUploadedFile(
                 file,
                 "file",
                 os.path.basename(source),
                 file_type,
-                sys.getsizeof(file),
+                file_stat.st_size,
                 None
             )
 
