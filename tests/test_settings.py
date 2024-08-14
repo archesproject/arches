@@ -48,7 +48,7 @@ BUSINESS_DATA_FILES = (
 )
 
 # Class for custom ES document generator and search functionality
-CUSTOM_SEARCH_CLASS = "tests.views.search_tests.CustomResourceSearchValue"
+CUSTOM_SEARCH_CLASS = "tests.views.search_tests.TestCustomResourceSearchValue"
 
 CACHES = {
     "default": {

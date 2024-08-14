@@ -13,8 +13,7 @@ from arches.app.search.elasticsearch_dsl_builder import (
     Term,
 )
 from arches.app.search.components.base import BaseSearchFilter
-from arches.app.models.system_settings import settings
-from arches.app.utils import import_class_from_string
+from arches.app.search.custom_resource_search import CustomResourceSearchValue
 
 details = {
     "searchcomponentid": "",
@@ -153,14 +152,10 @@ class TermFilter(BaseSearchFilter):
                     search_query.filter(nested_conceptid_filter)
 
             # Add additional search query if configured
-            if (
-                settings.setting_exists("CUSTOM_SEARCH_CLASS")
-                and settings.CUSTOM_SEARCH_CLASS
-            ):
-                custom_index_class = import_class_from_string(
-                    settings.CUSTOM_SEARCH_CLASS
+            if CustomResourceSearchValue.has_custom_search_class():
+                CustomResourceSearchValue.get_custom_search_class().add_search_filter(
+                    search_query, term
                 )
-                custom_index_class.add_search_filter(search_query, term)
 
         search_results_object["query"].add_query(search_query)
 
