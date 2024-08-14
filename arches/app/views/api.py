@@ -2119,14 +2119,11 @@ class SpatialView(APIBase):
 
         # ensure specific spatial view exists before proceeding
         if identifier:
-            if self.identifier_is_uuid(identifier):
-                spatialview_id = identifier
-                if not models.SpatialView.objects.filter(pk=identifier).exists():
-                    return JSONErrorResponse(
-                        _("No Spatial View Exists with this id"), status=404
-                    )
-            else:
-                return JSONErrorResponse(_("Invalid spatialview id"), status=400)
+            spatialview_id = identifier
+            if not models.SpatialView.objects.filter(pk=identifier).exists():
+                return JSONErrorResponse(
+                    _("No Spatial View Exists with this id"), status=404
+                )
 
         permitted_nodegroupids = get_nodegroups_by_perm(
             request.user, "models.read_nodegroup"
@@ -2320,7 +2317,7 @@ class SpatialView(APIBase):
             except ValidationError as e:
                 return JSONErrorResponse(
                     _("Validation Error when creating Spatialview"),
-                    e.message,
+                    e.messages,
                     status=400,
                 )
 
@@ -2366,7 +2363,7 @@ class SpatialView(APIBase):
             except ValidationError as e:
                 return JSONErrorResponse(
                     _("Validation Error when updating Spatialview"),
-                    e.message,
+                    e.messages,
                     status=400,
                 )
 

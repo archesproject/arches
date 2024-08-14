@@ -727,11 +727,10 @@ urlpatterns = [
         name="transform_edtf_for_tile",
     ),
     re_path(
-        r"^api/spatialview/(?P<identifier>[a-f0-9\-]+|[\w-]+)/?$",
+        r"^api/spatialview/(?P<identifier>%s|())/?$" % uuid_regex,
         api.SpatialView.as_view(),
         name="spatialview_api",
     ),
-    re_path(r"^api/spatialview$", api.SpatialView.as_view(), name="spatialview_list"),
 ]
 
 # This must be included in core to keep webpack happy, but cannot be appended when running a project.
