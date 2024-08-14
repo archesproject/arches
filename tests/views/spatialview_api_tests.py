@@ -152,11 +152,11 @@ class SpatialViewApiTest(TransactionTestCase):
         ]
         return spatialview
 
-    def create_json_data_object_from_spatialview(self, spatialview):
+    def create_json_data_object_from_spatialview(self, spatialview, exclude_spatialviewid=False):
         """
         Returns a JSON object representing the spatialview
         """
-        return {
+        json_data = {
             "spatialviewid": str(spatialview.spatialviewid),
             "schema": spatialview.schema,
             "slug": spatialview.slug,
@@ -168,30 +168,33 @@ class SpatialViewApiTest(TransactionTestCase):
             "isactive": spatialview.isactive,
         }
 
+        if exclude_spatialviewid:
+            del json_data["spatialviewid"]
+
+        return json_data
+
     def test_spatialview_api_crud(self):
         """
         Test the CRUD operations of the spatialview api. Putting these in a single test avoids issues with the order of tests
         and the database errors I get with ContentTypes disappearing
         """
-        # test get all
-        response = self.client.get(reverse("spatialview_list"))
-        self.assertEqual(response.status_code, 200)
-
-        # check content is a list
-        response_json = json.loads(response.content)
-        self.assertTrue(isinstance(response_json, list))
+        
 
         # test post
         new_spatialview = self.generate_valid_spatiatview()
         new_spatialview_json = self.create_json_data_object_from_spatialview(
-            new_spatialview
+            new_spatialview,
+            exclude_spatialviewid=True,
         )
 
         # elevated
         self.client.login(username="admin", password="admin")
+
+        # create a new spatialview
         response = self.client.post(
             reverse(
-                "spatialview_list"  # use the list endpoint to create a new spatialview so we don't need to know the spatialviewid
+                "spatialview_api", 
+                kwargs={"identifier": ""}
             ),
             data=new_spatialview_json,
             content_type="application/json",
@@ -199,9 +202,12 @@ class SpatialViewApiTest(TransactionTestCase):
         self.assertEqual(response.status_code, 201)
         response_json = json.loads(response.content)
 
-        self.assertEqual(
-            response_json["spatialviewid"], str(new_spatialview.spatialviewid)
+        self.assertTrue(
+            "spatialviewid" in response_json.keys()
         )
+
+        new_spatialview.spatialviewid = response_json["spatialviewid"]
+
         self.assertEqual(response_json["schema"], new_spatialview.schema)
         self.assertEqual(response_json["slug"], new_spatialview.slug)
         self.assertEqual(response_json["description"], new_spatialview.description)
@@ -217,10 +223,24 @@ class SpatialViewApiTest(TransactionTestCase):
             response_json["attributenodes"], new_spatialview.attributenodes
         )
 
+        # test get all
+        response = self.client.get(
+            reverse(
+                "spatialview_api", 
+                kwargs={"identifier": ""}
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+
+        # check content is a list
+        response_json = json.loads(response.content)
+        self.assertTrue(isinstance(response_json, list))
+        
         # test get one
         response = self.client.get(
             reverse(
-                "spatialview_api", kwargs={"identifier": new_spatialview.spatialviewid}
+                "spatialview_api", 
+                kwargs={"identifier": new_spatialview.spatialviewid}
             )
         )
         self.assertEqual(response.status_code, 200)
@@ -252,7 +272,8 @@ class SpatialViewApiTest(TransactionTestCase):
         )
         response = self.client.put(
             reverse(
-                "spatialview_api", kwargs={"identifier": new_spatialview.spatialviewid}
+                "spatialview_api", 
+                kwargs={"identifier": new_spatialview.spatialviewid}
             ),
             data=updated_spatialview_json,
             content_type="application/json",
@@ -269,3 +290,16 @@ class SpatialViewApiTest(TransactionTestCase):
             )
         )
         self.assertEqual(response.status_code, 200)
+
+
+        # test create with spatialviewid - should error
+        bad_id_create_spatialview = self.generate_valid_spatiatview()
+        bad_id_create_spatialview_json = self.create_json_data_object_from_spatialview(
+            bad_id_create_spatialview
+        )
+        response = self.client.post(
+            reverse("spatialview_api", kwargs={"identifier": ""}),
+            data=bad_id_create_spatialview_json,
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 400)
