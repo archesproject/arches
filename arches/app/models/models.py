@@ -2189,3 +2189,19 @@ class SpatialView(models.Model):
             )
             if cursor.rowcount == 0:
                     raise ValidationError("Schema does not exist in the database")
+
+    def to_json(self):
+        """
+        Returns a JSON object representing the spatialview
+        """
+        return {
+            "spatialviewid": str(self.spatialviewid),
+            "schema": self.schema,
+            "slug": self.slug,
+            "description": self.description,
+            "geometrynodeid": str(self.geometrynode.pk),
+            "ismixedgeometrytypes": self.ismixedgeometrytypes,
+            "language": self.language.code,
+            "attributenodes": self.attributenodes,
+            "isactive": self.isactive,
+        }

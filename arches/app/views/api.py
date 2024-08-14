@@ -2164,22 +2164,6 @@ class SpatialView(APIBase):
         uuid_pattern = re.compile(settings.UUID_REGEX, re.IGNORECASE)
         return uuid_pattern.match(identifier)
 
-    def create_json_data_object_from_spatialview(self, spatialview):
-        """
-        Returns a JSON object representing the spatialview
-        """
-        return {
-            "spatialviewid": str(spatialview.spatialviewid),
-            "schema": spatialview.schema,
-            "slug": spatialview.slug,
-            "description": spatialview.description,
-            "geometrynodeid": str(spatialview.geometrynode.pk),
-            "ismixedgeometrytypes": spatialview.ismixedgeometrytypes,
-            "language": spatialview.language.code,
-            "attributenodes": spatialview.attributenodes,
-            "isactive": spatialview.isactive,
-        }
-
     def transform_json_data_for_spatialview(self, json_data):
         """
         Transforms the JSON data object to be used in the spatialview model
@@ -2351,7 +2335,7 @@ class SpatialView(APIBase):
                 )
 
             return JSONResponse(
-                self.create_json_data_object_from_spatialview(spatialview), status=201
+                spatialview.to_json(), status=201
             )
         return JSONErrorResponse(_("No json request payload"), status=400)
 
@@ -2397,7 +2381,7 @@ class SpatialView(APIBase):
                 )
 
             return JSONResponse(
-                self.create_json_data_object_from_spatialview(spatialview), status=200
+                spatialview.to_json(), status=200
             )
         return JSONErrorResponse(
             _("Spatialview update falied"), _("No json request payload"), status=400
