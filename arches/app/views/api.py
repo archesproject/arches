@@ -2288,7 +2288,18 @@ class SpatialView(APIBase):
         return self.create_spatialview_from_json_data(json_data)
 
     @method_decorator(group_required("Application Administrator"))
-    def post(self, request):
+    def post(self, request, identifier=None):
+
+        #if identifier is not None then the user is trying to update a spatialview so an error should be returned with a message
+        if identifier:
+            return JSONErrorResponse(
+                _("Spatialview creation failed"),
+                _(
+                    "POST REST request should not have a spatialviewid provided in the URL"
+                ),
+                status=400,
+            )
+        
 
         try:
             json_data = json.loads(request.body.decode("utf-8"))
