@@ -1,6 +1,9 @@
+# pragma: no cover
+
 import arches
 import os
 import shutil
+import warnings
 
 from django.core.management.base import BaseCommand
 from django.core import management
@@ -8,7 +11,7 @@ from django.db import connection
 from arches.app.models.system_settings import settings
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # pragma: no cover
     """
     Command for migrating projects between versions
 
@@ -18,8 +21,8 @@ class Command(BaseCommand):
         answer = input(
             "This will replace the following files in your project:\n"
             ".babelrc, eslintrc.js, .eslintignore, .browserslistrc, .stylelintrc.json,\n"
-            ".yarnrc, .gitignore, nodemon.json, .prettierrc, .pre-commit-config.yaml,\n"
-            "tsconfig.json, and the entire webpack directory.\n\n"
+            ".yarnrc, .gitattributes, .gitignore, nodemon.json, .prettierrc,\n"
+            ".pre-commit-config.yaml, tsconfig.json, and the entire webpack directory.\n\n"
             "Continue? "
         )
 
@@ -122,6 +125,7 @@ class Command(BaseCommand):
             "nodemon.json",
             "tsconfig.json",
             ".coveragerc",
+            ".gitattributes",
             ".gitignore",
             ".babelrc",
             ".browserslistrc",
@@ -147,14 +151,77 @@ class Command(BaseCommand):
                 os.path.join(settings.APP_ROOT, ".."),
             )
 
-        if not os.path.exists(os.path.join(settings.APP_ROOT, "..", ".github")):
-            self.stdout.write("Copying .github directory to project")
-            shutil.copytree(
-                os.path.join(
-                    settings.ROOT_DIR, "install", "arches-templates", ".github"
-                ),
-                os.path.join(settings.APP_ROOT, "..", ".github"),
+        if os.path.exists(
+            os.path.join(settings.APP_ROOT, "..", ".github", "workflows", "main.yml")
+        ):
+            warnings.warn(
+                "Existing .github/workflows/main.yml detected. "
+                "Manually reconcile existing file with new template.",
+                UserWarning,
             )
+        else:
+            self.stdout.write("Copying .github/workflows/main.yml directory to project")
+
+            os.makedirs(
+                os.path.join(settings.APP_ROOT, "..", ".github", "workflows"),
+                exist_ok=True,
+            )
+
+            shutil.copy(
+                os.path.join(
+                    settings.ROOT_DIR,
+                    "install",
+                    "arches-templates",
+                    ".github",
+                    "workflows",
+                    "main.yml",
+                ),
+                os.path.join(
+                    settings.APP_ROOT, "..", ".github", "workflows", "main.yml"
+                ),
+            )
+
+        for action_name in ["build-and-test-branch", "install-arches-applications"]:
+            if not os.path.exists(
+                os.path.join(
+                    settings.APP_ROOT,
+                    "..",
+                    ".github",
+                    "actions",
+                    action_name,
+                    "action.yml",
+                )
+            ):
+                self.stdout.write(
+                    f"Copying .github/actions/{action_name}/action.yml directory to project"
+                )
+
+                os.makedirs(
+                    os.path.join(
+                        settings.APP_ROOT, "..", ".github", "actions", action_name
+                    ),
+                    exist_ok=True,
+                )
+
+                shutil.copy(
+                    os.path.join(
+                        settings.ROOT_DIR,
+                        "install",
+                        "arches-templates",
+                        ".github",
+                        "actions",
+                        action_name,
+                        "action.yml",
+                    ),
+                    os.path.join(
+                        settings.APP_ROOT,
+                        "..",
+                        ".github",
+                        "actions",
+                        action_name,
+                        "action.yml",
+                    ),
+                )
 
         if not os.path.exists(os.path.join(settings.APP_ROOT, "..", "tests")):
             self.stdout.write("Copying tests directory to project")
@@ -173,22 +240,43 @@ class Command(BaseCommand):
                             os.path.join(dirpath, filename[:-7] + ".py"),
                         )
 
-        if not os.path.isfile(
-            os.path.join(settings.APP_ROOT, "install", "requirements_dev.txt")
-        ):
-            self.stdout.write(
-                "Copying requirements_dev.txt to project install directory"
-            )
+        if not os.path.isfile(os.path.join(settings.APP_ROOT, "hosts.py")):
+            self.stdout.write("Copying hosts.py to project directory")
             shutil.copy2(
                 os.path.join(
                     settings.ROOT_DIR,
                     "install",
                     "arches-templates",
                     "project_name",
-                    "install",
-                    "requirements_dev.txt",
+                    "hosts.py-tpl",
                 ),
-                os.path.join(settings.APP_ROOT, "install"),
+                settings.APP_ROOT,
+            )
+            os.rename(
+                os.path.join(settings.APP_ROOT, "hosts.py-tpl"),
+                os.path.join(settings.APP_ROOT, "hosts.py-tpl"[:-7] + ".py"),
+            )
+
+        if os.path.isfile(os.path.join(settings.APP_ROOT, "apps.py")):
+            warnings.warn(
+                "Existing apps.py detected. Manually reconcile existing file with new template.",
+                UserWarning,
+            )
+        else:
+            self.stdout.write("Copying apps.py to project root")
+            shutil.copy2(
+                os.path.join(
+                    settings.ROOT_DIR,
+                    "install",
+                    "arches-templates",
+                    "project_name",
+                    "apps.py-tpl",
+                ),
+                settings.APP_ROOT,
+            )
+            os.rename(
+                os.path.join(settings.APP_ROOT, "apps.py-tpl"),
+                os.path.join(settings.APP_ROOT, "apps.py"),
             )
 
         if not os.path.isfile(
@@ -205,6 +293,7 @@ class Command(BaseCommand):
                     "arches-templates",
                     "project_name",
                     "src",
+                    "project_name",
                     "declarations.d.ts",
                 ),
                 os.path.join(settings.APP_ROOT, "src"),
@@ -231,7 +320,7 @@ class Command(BaseCommand):
                 os.path.join(settings.APP_ROOT, "..", "webpack"), ignore_errors=True
             )
 
-        self.stdout.write("Creating updated webpack directory at root")
+        self.stdout.write("Creating updated webpack directory at project root")
         shutil.copytree(
             os.path.join(settings.ROOT_DIR, "install", "arches-templates", "webpack"),
             os.path.join(settings.APP_ROOT, "..", "webpack"),
@@ -245,31 +334,38 @@ class Command(BaseCommand):
             [str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"]
         )
 
-        path_to_project = os.path.join(settings.APP_ROOT, "..")
         for relative_file_path in [
-            "gettext.config.js",
-            ".coveragerc",
-            ".gitignore",
-            "tsconfig.json",
-            "tests/test_settings.py",
-            "tests/search_indexes/sample_index_tests.py",
-            "pyproject.toml",
-            ".pre-commit-config.yaml",
+            os.path.join("..", "gettext.config.js"),
+            os.path.join("..", ".coveragerc"),
+            os.path.join("..", ".gitignore"),
+            os.path.join("..", ".github/workflows/main.yml"),
+            os.path.join("..", ".pre-commit-config.yaml"),
+            os.path.join("..", "tsconfig.json"),
+            os.path.join("..", "tests/test_settings.py"),
+            os.path.join("..", "tests/search_indexes/sample_index_tests.py"),
+            os.path.join("..", "pyproject.toml"),
+            os.path.join("..", "vitest.config.mts"),
+            os.path.join("..", "vitest.setup.mts"),
+            "hosts.py",
         ]:  # relative to app root directory
             try:
-                file = open(os.path.join(path_to_project, relative_file_path), "r")
+                file = open(os.path.join(settings.APP_ROOT, relative_file_path), "r")
                 file_data = file.read()
                 file.close()
 
                 updated_file_data = (
-                    file_data.replace("{{ project_name }}", settings.APP_NAME)
+                    file_data.replace(
+                        "{{ project_name_title_case }}",
+                        settings.APP_NAME.title().replace("_", ""),
+                    )
+                    .replace("{{ project_name }}", settings.APP_NAME)
                     .replace("{{ arches_semantic_version }}", arches_semantic_version)
                     .replace(
                         "{{ arches_next_minor_version }}", arches_next_minor_version
                     )
                 )
 
-                file = open(os.path.join(path_to_project, relative_file_path), "w")
+                file = open(os.path.join(settings.APP_ROOT, relative_file_path), "w")
                 file.write(updated_file_data)
                 file.close()
             except FileNotFoundError:

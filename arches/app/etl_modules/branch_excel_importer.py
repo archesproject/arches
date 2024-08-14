@@ -227,6 +227,10 @@ class BranchExcelImporter(BaseImportModule):
         graphid = workbook.get_sheet_by_name("metadata")["B1"].value
         return graphid
 
+    def stage_files(self, files, summary, cursor):
+        for file in files:
+            self.stage_excel_file(file, summary, cursor)
+
     def stage_excel_file(self, file, summary, cursor):
         if file.endswith("xlsx"):
             summary["files"][file]["worksheets"] = []

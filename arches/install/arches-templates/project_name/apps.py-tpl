@@ -1,0 +1,13 @@
+from django.apps import AppConfig
+from django.conf import settings
+
+from arches.settings_utils import generate_frontend_configuration
+
+
+class {{ project_name_title_case }}Config(AppConfig):
+    name = "{{ project_name }}"
+    is_arches_application = True
+
+    def ready(self):
+        if settings.APP_NAME.lower() == self.name:
+            generate_frontend_configuration()

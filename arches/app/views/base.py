@@ -16,34 +16,23 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from arches import __version__
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.compatibility import is_compatible_with_arches, CompatibilityError
 from django.utils.translation import gettext as _
 from django.views.generic import TemplateView
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.permission_backend import (
-    get_createable_resource_types,
+    get_createable_resource_models,
     user_is_resource_reviewer,
     get_editable_resource_types,
     get_resource_types_by_perm,
     user_can_read_map_layers,
 )
-from arches.app.utils.permission_backend import (
-    get_createable_resource_types,
-    user_is_resource_reviewer,
-)
 
 
 class BaseManagerView(TemplateView):
-
-    if is_compatible_with_arches() is False:
-        message = _("This project is incompatible with Arches {0}.").format(__version__)
-        raise CompatibilityError(message)
-
     template_name = ""
 
     def get_context_data(self, **kwargs):
@@ -56,7 +45,7 @@ class BaseManagerView(TemplateView):
             if self.request.user.has_perm("view_plugin", plugin):
                 context["plugins"].append(plugin)
 
-        createable = get_createable_resource_types(self.request.user)
+        createable = list(get_createable_resource_models(self.request.user))
         createable.sort(key=lambda x: x.name.lower())
         context["createable_resources"] = JSONSerializer().serialize(
             createable,

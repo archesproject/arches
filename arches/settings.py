@@ -21,19 +21,12 @@ import os
 from datetime import datetime, timedelta
 from contextlib import suppress
 
-
-try:
-    from settings_utils import *
-except ModuleNotFoundError:
-    try:
-        from .settings_utils import *
-    except ModuleNotFoundError:
-        pass
+from arches.settings_utils import *
 
 try:
     from django.utils.translation import gettext_lazy as _
     from corsheaders.defaults import default_headers
-except ImportError:  # unable to import prior to installing requirements.txt in setup.py
+except ImportError:  # unable to import prior to installing requirements
     pass
 
 #########################################
@@ -82,8 +75,8 @@ ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30}
 # ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
 
 # If you need to connect to Elasticsearch via an API key instead of username/password, use the syntax below:
-# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": "<ENCODED_API_KEY>"}
-# ELASTICSEARCH_CONNECTION_OPTIONS = {"timeout": 30, "verify_certs": False, "api_key": ("<ID>", "<API_KEY>")}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "api_key": "<ENCODED_API_KEY>"}
+# ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "api_key": ("<ID>", "<API_KEY>")}
 
 # Your Elasticsearch instance needs to be configured with xpack.security.enabled=true to use API keys - update elasticsearch.yml or .env file and restart.
 
@@ -321,14 +314,20 @@ FORCE_SCRIPT_NAME = None
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
 ADMIN_MEDIA_PREFIX = "/media/admin/"
 
-STATICFILES_DIRS = build_staticfiles_dirs(root_dir=ROOT_DIR)
-TEMPLATES = build_templates_config(root_dir=ROOT_DIR, debug=DEBUG)
+STATICFILES_DIRS = build_staticfiles_dirs(
+    app_root=ROOT_DIR
+)  # app_root=ROOT_DIR is a workaround to find `node_modules` when running Arches without a project
+TEMPLATES = build_templates_config(debug=DEBUG)
 
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "arches.settings_utils.ArchesApplicationsStaticFilesFinder",
+    "arches.settings_utils.CoreArchesStaticFilesFinderBuildDirectory",
+    "arches.settings_utils.CoreArchesStaticFilesFinderMediaRoot",
+    "arches.settings_utils.CoreArchesStaticFilesFinderNodeModules",
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -350,8 +349,7 @@ AUTHENTICATION_BACKENDS = (
     "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
     "oauth2_provider.backends.OAuth2Backend",
     "django.contrib.auth.backends.ModelBackend",  # this is default
-    "arches.app.utils.permission_backend.PermissionBackend",
-    "guardian.backends.ObjectPermissionBackend",
+    "arches.app.permissions.arches_standard.PermissionBackend",
     "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend",
 )
 
@@ -364,6 +362,7 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.gis",
+    "django_hosts",
     "arches",
     "arches.app.models",
     "arches.management",
@@ -375,7 +374,9 @@ INSTALLED_APPS = (
     "django_celery_results",
 )
 
-ARCHES_APPLICATIONS = ()
+# Placing this last ensures any templates provided by Arches Applications
+# take precedence over core arches templates in arches/app/templates.
+INSTALLED_APPS += ("arches.app",)
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -393,6 +394,14 @@ MIDDLEWARE = [
     "arches.app.utils.middleware.SetAnonymousUser",
 ]
 
+MIDDLEWARE.insert(  # this must resolve to first MIDDLEWARE entry
+    0, "django_hosts.middleware.HostsRequestMiddleware"
+)
+
+MIDDLEWARE.append(  # this must resolve last MIDDLEWARE entry
+    "django_hosts.middleware.HostsResponseMiddleware"
+)
+
 WEBPACK_LOADER = {
     "DEFAULT": {
         "STATS_FILE": os.path.join(ROOT_DIR, "..", "webpack/webpack-stats.json"),
@@ -402,6 +411,9 @@ WEBPACK_LOADER = {
 WEBPACK_DEVELOPMENT_SERVER_PORT = 9000
 
 ROOT_URLCONF = "arches.urls"
+ROOT_HOSTCONF = "arches.hosts"
+
+DEFAULT_HOST = "arches"
 
 WSGI_APPLICATION = "arches.wsgi.application"
 
@@ -489,8 +501,10 @@ ENABLE_CAPTCHA = True
 # RECAPTCHA_USE_SSL = False
 NOCAPTCHA = True
 # RECAPTCHA_PROXY = 'http://127.0.0.1:8000'
+SILENCED_SYSTEM_CHECKS = ["guardian.W001"]
+
 if DEBUG is True:
-    SILENCED_SYSTEM_CHECKS = ["captcha.recaptcha_test_key_error"]
+    SILENCED_SYSTEM_CHECKS += ["captcha.recaptcha_test_key_error"]
 
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"
@@ -635,8 +649,6 @@ SPARQL_ENDPOINT_PROVIDERS = (
 
 APP_NAME = "Arches"
 APP_VERSION = None
-MIN_ARCHES_VERSION = None
-MAX_ARCHES_VERSION = None
 
 APP_TITLE = "Arches | Heritage Data Management"
 COPYRIGHT_TEXT = "All Rights Reserved."
@@ -660,6 +672,9 @@ BUSINESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+PERMISSION_LOCATIONS = [
+    "arches.app.permissions",
+]
 DATATYPE_LOCATIONS = [
     "arches.app.datatypes",
 ]
@@ -674,12 +689,13 @@ ETL_MODULE_LOCATIONS = [
     "arches.app.etl_modules",
 ]
 
-FILE_TYPE_CHECKING = False
+FILE_TYPE_CHECKING = "lenient"
 FILE_TYPES = [
     "bmp",
     "gif",
     "jpg",
     "jpeg",
+    "json",
     "pdf",
     "png",
     "psd",
@@ -858,6 +874,8 @@ def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
 
+PERMISSION_FRAMEWORK = "arches_standard.ArchesStandardPermissionFramework"
+
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
 ##########################################
@@ -869,13 +887,3 @@ except ImportError:
         from arches.settings_local import *
     except ImportError:
         pass
-
-# returns an output that can be read by NODEJS
-if __name__ == "__main__":
-    transmit_webpack_django_config(
-        root_dir=ROOT_DIR,
-        app_root=APP_ROOT,
-        public_server_address=PUBLIC_SERVER_ADDRESS,
-        static_url=STATIC_URL,
-        webpack_development_server_port=WEBPACK_DEVELOPMENT_SERVER_PORT,
-    )

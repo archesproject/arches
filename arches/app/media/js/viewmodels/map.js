@@ -479,7 +479,7 @@ define([
                     map.addControl(new MapboxGeocoder({
                         accessToken: MapboxGl.accessToken,
                         mapboxgl: MapboxGl,
-                        placeholder: arches.geocoderPlaceHolder,
+                        placeholder: arches.translations.geocoderPlaceHolder,
                         bbox: arches.hexBinBounds
                     }), 'top-right');
 
