@@ -9,6 +9,7 @@ from openpyxl import load_workbook
 
 from django.core.files import File
 from django.core.files.storage import default_storage
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
 from django.db import connection
@@ -207,9 +208,10 @@ class BaseImportModule:
             with connection.cursor() as cursor:
                 self.stage_files(files, summary, cursor)
                 self.check_tile_cardinality(cursor)
-                result["validation"] = self.validate(loadid)
-                if len(result["validation"]["data"]) == 0:
-                    self.save_to_tiles(cursor, userid, loadid, multiprocessing)
+            result["validation"] = self.validate(loadid)
+            if len(result["validation"]["data"]) == 0:
+                save_to_tiles(userid, loadid, multiprocessing)
+                with connection.cursor() as cursor:
                     cursor.execute(
                         """CALL __arches_update_resource_x_resource_with_graphids();"""
                     )
@@ -217,7 +219,8 @@ class BaseImportModule:
                     refresh_successful = cursor.fetchone()[0]
                     if not refresh_successful:
                         raise Exception("Unable to refresh spatial views")
-                else:
+            else:
+                with connection.cursor() as cursor:
                     cursor.execute(
                         """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
                         ("failed", datetime.now(), loadid),
@@ -232,7 +235,6 @@ class BaseImportModule:
         raise NotImplementedError
 
     def prepare_temp_dir(self, request):
-        self.loadid = request.POST.get("load_id")
         self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         try:
             self.delete_from_default_storage(self.temp_dir)
@@ -260,9 +262,6 @@ class BaseImportModule:
             [self.loadid],
         )
 
-    def save_to_tiles(self, cursor, userid, loadid, multiprocessing=False):
-        return save_to_tiles(userid, loadid, multiprocessing)
-
     ### Actions ###
 
     def validate(self, loadid):
@@ -277,10 +276,26 @@ class BaseImportModule:
         row = self.get_validation_result(loadid)
         return {"success": success, "data": row}
 
-    def read(self, request):
+    def read(self, request=None, source=None):
         self.prepare_temp_dir(request)
         self.cumulative_files_size = 0
-        content = request.FILES["file"]
+        if request:
+            content = request.FILES.get("file")
+        else:
+            if source.split(".")[-1].lower() == "xlsx":
+                file_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            elif source.split(".")[-1].lower() == "zip":
+                file_type = "application/zip"
+            file = open(source, "rb")
+            file_stat = os.stat(source)
+            content = InMemoryUploadedFile(
+                file,
+                "file",
+                os.path.basename(source),
+                file_type,
+                file_stat.st_size,
+                None,
+            )
 
         result = {
             "summary": {
@@ -401,7 +416,7 @@ class BaseImportModule:
         initiated = self.start(self.request)
 
         if initiated["success"]:
-            read = self.read_for_cli(source)
+            read = self.read(source=source)
         else:
             return {
                 "success": False,
@@ -412,7 +427,7 @@ class BaseImportModule:
             self.request.POST.__setitem__(
                 "load_details", json.dumps({"result": read["data"]})
             )
-            self.request.POST.__setitem__("multiprocessing", True)
+            self.request.POST.__setitem__("multiprocessing", False)
             written = self.write(self.request)
         else:
             return {
