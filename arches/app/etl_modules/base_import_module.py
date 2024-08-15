@@ -308,11 +308,10 @@ class BaseImportModule:
         extension = content.name.split(".")[-1] or None
         if len(validator.validate_file_type(content, extension=extension)) > 0:
             return {
+                "status": 400,
                 "success": False,
-                "data": FileValidationError(
-                    message=_("Upload a valid excel file"),
-                    code=400,
-                ),
+                "title": _("Invalid excel file/zip specified"),
+                "message": _("Upload a valid .xlsx or .zip file"),
             }
         if content.name.split(".")[-1].lower() == "zip":
             with zipfile.ZipFile(content, "r") as zip_ref:
@@ -465,7 +464,7 @@ class BaseImportModule:
                 "status": 400,
                 "success": False,
                 "title": _("Invalid excel file/zip specified"),
-                "message": _("Upload a valid excel file"),
+                "message": _("Upload a valid .xlsx or .zip file"),
             }
 
         if source.split(".")[-1].lower() == "zip":
