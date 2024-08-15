@@ -26,14 +26,14 @@ from arches.app.etl_modules.base_import_module import (
 class BranchExcelImporter(BaseImportModule):
     def __init__(self, request=None, loadid=None, temp_dir=None, params=None):
         self.loadid = request.POST.get("load_id") if request else loadid
-        self.userid = request.user.id if request else 1
-        if request is None:
+        self.userid = request.user.id if request else User.objects.filter(is_superuser=True)[0].id
+        self.mode = "cli" if not request and params else "ui"
+        if not request and params:
             request = HttpRequest()
             request.user = User.objects.get(id=self.userid)
             request.method = "POST"
-            if params is not None and params != "":
-                for k, v in params.items():
-                    request.POST.__setitem__(k, v)
+            for k, v in params.items():
+                request.POST.__setitem__(k, v)
         self.request = request
         self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
