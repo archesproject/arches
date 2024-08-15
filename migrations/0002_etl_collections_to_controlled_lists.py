@@ -21,8 +21,6 @@ class Migration(migrations.Migration):
             declare failed_collections text[];
                 collection text;
                 rec record;
-                new_listitem_id uuid;
-                new_listitemvalue_id uuid;
             begin
                 -- RDM Collections to Controlled Lists & List Items Migration --
                 -- To use, run: 
@@ -253,6 +251,7 @@ class Migration(migrations.Migration):
                 end loop;
 
                 -- Assign row number to help identify concepts that participate in multiple collections
+                -- or exist already as listitems and therefore need new listitem_id's and listitemvalue_id's
                 with assign_row_num as (
                     select list_item_id,
                         sortorder,
@@ -283,23 +282,11 @@ class Migration(migrations.Migration):
                     and t.list_id = a.list_id;
 
                 -- For concepts that participate in multiple collections, mint new listitem_id's and listitemvalue_id's
-                for rec in 
-                    select *
-                    from temp_list_items_and_values
-                    where rownumber > 1
-                    and listitemvalue_valuetype = 'prefLabel'
-                loop
-                    if rec.rownumber > 1
-                    then 
-                        new_listitem_id := uuid_generate_v4();
-                        new_listitemvalue_id := uuid_generate_v4();
-                    update temp_list_items_and_values
-                    set list_item_id = new_listitem_id,
-                        listitemvalue_id = new_listitemvalue_id
-                    where list_item_id = rec.list_item_id
-                        and rownumber = rec.rownumber;
-                    end if;
-                end loop;
+                update temp_list_items_and_values
+                set list_item_id = uuid_generate_v4(),
+                    listitemvalue_id = uuid_generate_v4()
+                where rownumber > 1
+                and listitemvalue_valuetype = 'prefLabel';
                 
                 insert into arches_references_listitem (
                     id,
