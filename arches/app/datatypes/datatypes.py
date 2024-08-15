@@ -2274,6 +2274,34 @@ class ResourceInstanceDataType(BaseDataType):
                         }
                     )
 
+    def get_search_terms(self, nodevalue, nodeid=None):
+        terms = []
+        nodevalue = self.get_nodevalues(nodevalue)
+        lang = get_language()
+        for relatedResourceItem in nodevalue:
+            if relatedResourceItem.get("resourceName", "") != "":
+                terms.append(
+                    SearchTerm(value=relatedResourceItem["resourceName"], lang=lang)
+                )
+            for ontology_property_item in [
+                relatedResourceItem.get("ontologyProperty", ""),
+                relatedResourceItem.get("inverseOntologyProperty", ""),
+            ]:
+                if ontology_property_item != "":
+                    try:
+                        uuid.UUID(ontology_property_item)
+                        relationship = (
+                            self.get_relationship_display_value(ontology_property_item)
+                            or ontology_property_item
+                        )
+                        terms.append(SearchTerm(value=relationship, lang=lang))
+                    except ValueError:
+                        terms.append(
+                            SearchTerm(value=ontology_property_item, lang=lang)
+                        )
+
+        return terms
+
     def transform_value_for_tile(self, value, **kwargs):
         try:
             return json.loads(value)
