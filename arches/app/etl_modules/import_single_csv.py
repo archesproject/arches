@@ -225,7 +225,7 @@ class ImportSingleCsv(BaseImportModule):
         csv_size = default_storage.size(csv_file_path)  # file size in byte
         use_celery_threshold = self.config.get("celeryByteSizeLimit", 500)
 
-        if csv_size > use_celery_threshold:
+        if self.mode != "cli" and csv_size > use_celery_threshold:
             response = self.run_load_task_async(request, self.loadid)
         else:
             response = self.run_load_task(

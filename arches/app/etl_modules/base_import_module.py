@@ -396,7 +396,7 @@ class BaseImportModule:
                 "celeryByteSizeLimit", 100000
             )
 
-            if summary["cumulative_files_size"] > use_celery_file_size_threshold:
+            if self.mode != "cli" and summary["cumulative_files_size"] > use_celery_file_size_threshold:
                 response = self.run_load_task_async(request, self.loadid)
             else:
                 response = self.run_load_task(
