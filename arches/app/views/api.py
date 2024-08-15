@@ -2155,7 +2155,7 @@ class SpatialView(APIBase):
         """
 
         json_data["geometrynode_id"] = json_data.pop("geometrynodeid")
-        json_data["language"] = models.Language.objects.get(code=json_data["language"])
+        json_data["language_id"] = json_data.pop("language")
         
         return json_data
 
@@ -2173,7 +2173,7 @@ class SpatialView(APIBase):
             spatialview = models.SpatialView(**json_data)
             return spatialview
         except ObjectDoesNotExist:
-            return JSONErrorResponse(_("Spatialview not found"), _("No Spatialview exists for the provided spatialviewid"), status=400)
+            return JSONErrorResponse(_("Spatialview not found"), _("No Spatialview exists for the provided spatialviewid"), status=404)
 
         # update the spatialview object with the new data
         for key, value in json_data.items():
