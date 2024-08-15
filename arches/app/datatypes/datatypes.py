@@ -2254,50 +2254,28 @@ class ResourceInstanceDataType(BaseDataType):
                         "provisional": provisional,
                     }
                 )
-            if (
-                relatedResourceItem["ontologyProperty"]
-                and relatedResourceItem["ontologyProperty"] != ""
-            ):
-                try:
-                    uuid.UUID(relatedResourceItem["ontologyProperty"])
-                    relationship = (
-                        self.get_relationship_display_value(
-                            relatedResourceItem["ontologyProperty"]
+         for ontology_property_item in [
+                relatedResourceItem.get("ontologyProperty", ""), 
+                relatedResourceItem.get("inverseOntologyProperty", ""), 
+            ]:
+                if ontology_property_item != "":
+                    try:
+                        uuid.UUID(ontology_property_item)
+                        relationship = (
+                            self.get_relationship_display_value(
+                                ontology_property_item
+                            )
+                            or ontology_property_item
                         )
-                        or relatedResourceItem["ontologyProperty"]
+                    except ValueError:
+                        relationship = ontology_property_item
+                    document["strings"].append(
+                        {
+                            "string": relationship,
+                            "nodegroup_id": tile.nodegroup_id,
+                            "provisional": provisional,
+                        }
                     )
-                except ValueError:
-                    relationship = relatedResourceItem["ontologyProperty"]
-                document["strings"].append(
-                    {
-                        "string": relationship,
-                        "nodegroup_id": tile.nodegroup_id,
-                        "provisional": provisional,
-                    }
-                )
-            if (
-                relatedResourceItem["inverseOntologyProperty"]
-                and relatedResourceItem["inverseOntologyProperty"] != ""
-            ):
-                try:
-                    uuid.UUID(relatedResourceItem["inverseOntologyProperty"])
-                    inverse_relationship = (
-                        self.get_relationship_display_value(
-                            relatedResourceItem["inverseOntologyProperty"]
-                        )
-                        or relatedResourceItem["inverseOntologyProperty"]
-                    )
-                except ValueError:
-                    inverse_relationship = relatedResourceItem[
-                        "inverseOntologyProperty"
-                    ]
-                document["strings"].append(
-                    {
-                        "string": inverse_relationship,
-                        "nodegroup_id": tile.nodegroup_id,
-                        "provisional": provisional,
-                    }
-                )
 
     def transform_value_for_tile(self, value, **kwargs):
         try:
