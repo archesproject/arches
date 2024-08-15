@@ -285,7 +285,7 @@ class Migration(migrations.Migration):
                 -- For concepts that participate in multiple collections, mint new listitem_id's and listitemvalue_id's
                 for rec in 
                     select *
-                    from testing_list_items_and_values
+                    from temp_list_items_and_values
                     where rownumber > 1
                     and listitemvalue_valuetype = 'prefLabel'
                 loop
