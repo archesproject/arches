@@ -61,11 +61,24 @@ class Migration(migrations.Migration):
     reverse_sql = """
         delete from search_component where searchcomponentid = '69695d63-6f03-4536-8da9-841b07116381';
         UPDATE search_component SET enabled = true, sortorder = 2 where type != 'search-view';
+        UPDATE search_component SET type = 'filter' where type like '%-type';
         UPDATE search_component SET type = 'filter', sortorder = 1 where componentname = 'map-filter';
         UPDATE search_component SET type = 'results-list' where componentname = 'search-results';
         UPDATE search_component SET type = 'text-input' where componentname = 'term-filter';
         UPDATE search_component SET componentpath = '' where componentpath is null;
-        UPDATE search_component SET type = 'filter' where type like '%-type';
+        UPDATE search_component SET type = 'inline-filter' 
+        where componentname in (
+            'sort-results',
+            'provisional-filter',
+            'paging-filter',
+            'resource-type-filter'
+        );
+        UPDATE search_component SET type = 'popup' where componentname in (
+            'time-filter',
+            'search-export',
+            'saved-searches'
+        );
+
     """
 
     operations = [
