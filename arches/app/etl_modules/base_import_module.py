@@ -427,7 +427,6 @@ class BaseImportModule:
             self.request.POST.__setitem__(
                 "load_details", json.dumps({"result": read["data"]})
             )
-            self.request.POST.__setitem__("multiprocessing", False)
             written = self.write(self.request)
         else:
             return {
