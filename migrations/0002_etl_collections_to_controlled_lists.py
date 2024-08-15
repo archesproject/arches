@@ -33,6 +33,7 @@ class Migration(migrations.Migration):
                 --          'en'
                 --       );
                 -- where the input array values are concept prefLabels or identifiers and the optional language is used for sorting
+                -- for collections that contain an apostrophe, use two single quotes, e.g. 'John''s list'
 
                 -- Conceptually:
                 --      a collection becomes a list
