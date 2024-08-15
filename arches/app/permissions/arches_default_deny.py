@@ -124,11 +124,14 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
             terms=[str(group.id) for group in user.groups.all()],
         )
         user_read = Terms(field="permissions.users_read", terms=[str(user.id)])
+        principal_user = Terms(field="permissions.principal_user", terms=[str(user.id)])
 
         nested_group_term_filter = Nested(path="permissions", query=group_read)
         nested_user_term_filter = Nested(path="permissions", query=user_read)
+        principal_user_term_filter = Nested(path="permissions", query=principal_user)
         should_access.should(nested_group_term_filter)
         should_access.should(nested_user_term_filter)
+        should_access.should(principal_user_term_filter)
         has_access.filter(should_access)
         return has_access
 
