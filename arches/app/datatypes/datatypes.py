@@ -2238,7 +2238,6 @@ class ResourceInstanceDataType(BaseDataType):
         nodevalue = self.get_nodevalues(nodevalue)
         for relatedResourceItem in nodevalue:
             relationship = None
-            inverse_relationship = None
             document["ids"].append(
                 {
                     "id": relatedResourceItem["resourceId"],
@@ -2246,7 +2245,7 @@ class ResourceInstanceDataType(BaseDataType):
                     "provisional": provisional,
                 }
             )
-            if "resourceName" in relatedResourceItem:
+            if relatedResourceItem.get("resourceName", "") != "":
                 document["strings"].append(
                     {
                         "string": relatedResourceItem["resourceName"],
@@ -2254,17 +2253,15 @@ class ResourceInstanceDataType(BaseDataType):
                         "provisional": provisional,
                     }
                 )
-         for ontology_property_item in [
-                relatedResourceItem.get("ontologyProperty", ""), 
-                relatedResourceItem.get("inverseOntologyProperty", ""), 
+            for ontology_property_item in [
+                relatedResourceItem.get("ontologyProperty", ""),
+                relatedResourceItem.get("inverseOntologyProperty", ""),
             ]:
                 if ontology_property_item != "":
                     try:
                         uuid.UUID(ontology_property_item)
                         relationship = (
-                            self.get_relationship_display_value(
-                                ontology_property_item
-                            )
+                            self.get_relationship_display_value(ontology_property_item)
                             or ontology_property_item
                         )
                     except ValueError:
