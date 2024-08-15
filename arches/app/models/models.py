@@ -23,6 +23,7 @@ from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.models.utils import add_to_update_fields
 from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
 from django.db import connection
@@ -36,7 +37,7 @@ from django.db.models import Q, Max
 from django.db.models.signals import post_delete, pre_save, post_save, m2m_changed
 from django.dispatch import receiver
 from django.utils import translation
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.core.validators import validate_slug
@@ -48,22 +49,6 @@ from django.conf import settings
 
 
 logger = logging.getLogger(__name__)
-
-
-def add_to_update_fields(kwargs, field_name):
-    """
-    Update the `update_field` arg inside `kwargs` (if present) in-place
-    with `field_name`.
-    """
-    if (update_fields := kwargs.get("update_fields")) is not None:
-        # Django sends a set from update_or_create()
-        if isinstance(update_fields, set):
-            update_fields.add(field_name)
-        # Arches sends a list from tile POST view
-        else:
-            new = set(update_fields)
-            new.add(field_name)
-            kwargs["update_fields"] = new
 
 
 class BulkIndexQueue(models.Model):
@@ -2020,6 +2005,7 @@ class GeoJSONGeometry(models.Model):
     )
     node = models.ForeignKey(Node, on_delete=models.CASCADE, db_column="nodeid")
     geom = models.GeometryField(srid=3857)
+    featureid = models.UUIDField(serialize=False, blank=True, null=True)
 
     class Meta:
         managed = True

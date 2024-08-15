@@ -4,10 +4,11 @@ source =
 
 omit =
     */python?.?/*
-    */models/migrations/*
+    */migrations/*
     */settings*.py
     */urls.py
     */wsgi.py
+    */hosts.py
     */celery.py
     */__init__.py
 

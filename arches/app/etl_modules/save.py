@@ -1,9 +1,13 @@
 from datetime import datetime
 import json
+from urllib.parse import urlsplit, parse_qs
 from django.db.utils import IntegrityError, ProgrammingError
 from django.contrib.auth.models import User
+from django.core.validators import URLValidator
 from django.db import connection
+from django.http import HttpRequest
 from django.utils.translation import gettext as _
+from django.urls import reverse, resolve
 from arches.app.models.system_settings import settings
 from arches.app.utils.index_database import index_resources_by_transaction
 import logging
@@ -168,3 +172,20 @@ def _post_save_edit_log(cursor, userid, loadid):
             ("unindexed", datetime.now(), loadid),
         )
         return {"success": False, "data": "saved"}
+
+
+def get_resourceids_from_search_url(search_url, user=None):
+    request = HttpRequest()
+    request.user = user
+    request.method = "GET"
+    request.GET["export"] = True
+    validate = URLValidator()
+    validate(search_url)
+    params = parse_qs(urlsplit(search_url).query)
+    for k, v in params.items():
+        request.GET.__setitem__(k, v[0])
+    func, args, kwargs = resolve(reverse("search_results"))
+    kwargs["request"] = request
+    response = func(*args, **kwargs)
+    results = json.loads(response.content)["results"]["hits"]["hits"]
+    return [result["_source"]["resourceinstanceid"] for result in results]

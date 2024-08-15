@@ -114,6 +114,13 @@ class APIBase(View):
         return super(APIBase, self).dispatch(request, *args, **kwargs)
 
 
+class API404(View):
+    def dispatch(self, request, *args, **kwargs):
+        return JSONErrorResponse(
+            _("Request failed"), _("Route not found"), status=HTTPStatus.NOT_FOUND
+        )
+
+
 class GetFrontendI18NData(APIBase):
     def get(self, request):
         user_language = get_language()
@@ -460,14 +467,15 @@ class MVT(APIBase):
                                 id,
                                 resourceinstanceid,
                                 nodeid,
+                                featureid::text AS featureid,
                                 ST_AsMVTGeom(
                                     geom,
                                     TileBBox(%s, %s, %s, 3857)
                                 ) AS geom,
                                 1 AS total
                             FROM geojson_geometries
-                            WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
-                            [nodeid, zoom, x, y, nodeid, resource_ids],
+                            WHERE nodeid = %s and resourceinstanceid not in %s and (geom && ST_TileEnvelope(%s, %s, %s))) AS tile;""",
+                            [nodeid, zoom, x, y, nodeid, resource_ids, zoom, x, y],
                         )
                     else:
                         tile = ""
@@ -477,14 +485,15 @@ class MVT(APIBase):
                             id,
                             resourceinstanceid,
                             nodeid,
+                            featureid::text AS featureid,
                             ST_AsMVTGeom(
                                 geom,
                                 TileBBox(%s, %s, %s, 3857)
                             ) AS geom,
                             1 AS total
                         FROM geojson_geometries
-                        WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
-                        [nodeid, zoom, x, y, nodeid, resource_ids],
+                        WHERE nodeid = %s and resourceinstanceid not in %s and (geom && ST_TileEnvelope(%s, %s, %s))) AS tile;""",
+                        [nodeid, zoom, x, y, nodeid, resource_ids, zoom, x, y],
                     )
                 tile = bytes(cursor.fetchone()[0]) if tile is None else tile
                 cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
@@ -1707,7 +1716,7 @@ class Tile(APIBase):
         permitted_nodegroups = get_nodegroups_by_perm(
             request.user, "models.read_nodegroup"
         )
-        if str(tile.nodegroup_id) in permitted_nodegroups:
+        if tile.nodegroup_id in permitted_nodegroups:
             return JSONResponse(tile, status=200)
         else:
             return JSONResponse(_("Tile not found."), status=404)
@@ -1802,7 +1811,7 @@ class Node(APIBase):
 
         # filter nodes from attribute query based on user permissions
         permitted_nodes = [
-            node for node in nodes if str(node["nodegroup_id"]) in permitted_nodegroups
+            node for node in nodes if node["nodegroup_id"] in permitted_nodegroups
         ]
         for node in permitted_nodes:
             try:

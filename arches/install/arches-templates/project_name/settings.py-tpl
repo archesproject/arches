@@ -2,10 +2,7 @@
 Django settings for {{ project_name }} project.
 """
 
-import json
 import os
-import sys
-import arches
 import inspect
 import semantic_version
 from datetime import datetime, timedelta
@@ -19,9 +16,6 @@ except ImportError:
 APP_NAME = '{{ project_name }}'
 APP_VERSION = semantic_version.Version(major=0, minor=0, patch=0)
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-MIN_ARCHES_VERSION = arches.__version__
-MAX_ARCHES_VERSION = arches.__version__
-
 
 WEBPACK_LOADER = {
     "DEFAULT": {
@@ -62,7 +56,10 @@ SECRET_KEY = '{{ secret_key }}'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ROOT_URLCONF = '{{ project_name }}.urls'
+ROOT_URLCONF = "{{ project_name }}.urls"
+ROOT_HOSTCONF = "{{ project_name }}.hosts"
+
+DEFAULT_HOST = "{{ project_name }}"
 
 # Modify this line as needed for your project to connect to elasticsearch with a password that you generate
 ELASTICSEARCH_CONNECTION_OPTIONS = {"request_timeout": 30, "verify_certs": False, "basic_auth": ("elastic", "E1asticSearchforArche5")}
@@ -135,6 +132,7 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.gis",
+    "django_hosts",
     "arches",
     "arches.app.models",
     "arches.management",
@@ -168,6 +166,15 @@ MIDDLEWARE = [
     "arches.app.utils.middleware.SetAnonymousUser",
     # "silk.middleware.SilkyMiddleware",
 ]
+
+MIDDLEWARE.insert(  # this must resolve to first MIDDLEWARE entry
+    0, 
+    "django_hosts.middleware.HostsRequestMiddleware"
+)
+
+MIDDLEWARE.append(  # this must resolve last MIDDLEWARE entry
+    "django_hosts.middleware.HostsResponseMiddleware"
+)  
 
 STATICFILES_DIRS = build_staticfiles_dirs(app_root=APP_ROOT)
 
@@ -416,7 +423,3 @@ except ImportError as e:
         from settings_local import *
     except ImportError as e:
         pass
-
-# returns an output that can be read by NODEJS
-if __name__ == "__main__":
-    transmit_webpack_django_config(**locals())

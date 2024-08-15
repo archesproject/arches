@@ -314,7 +314,9 @@ FORCE_SCRIPT_NAME = None
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
 ADMIN_MEDIA_PREFIX = "/media/admin/"
 
-STATICFILES_DIRS = build_staticfiles_dirs()
+STATICFILES_DIRS = build_staticfiles_dirs(
+    app_root=ROOT_DIR
+)  # app_root=ROOT_DIR is a workaround to find `node_modules` when running Arches without a project
 TEMPLATES = build_templates_config(debug=DEBUG)
 
 # List of finder classes that know how to find static files in
@@ -360,6 +362,7 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.gis",
+    "django_hosts",
     "arches",
     "arches.app.models",
     "arches.management",
@@ -391,6 +394,14 @@ MIDDLEWARE = [
     "arches.app.utils.middleware.SetAnonymousUser",
 ]
 
+MIDDLEWARE.insert(  # this must resolve to first MIDDLEWARE entry
+    0, "django_hosts.middleware.HostsRequestMiddleware"
+)
+
+MIDDLEWARE.append(  # this must resolve last MIDDLEWARE entry
+    "django_hosts.middleware.HostsResponseMiddleware"
+)
+
 WEBPACK_LOADER = {
     "DEFAULT": {
         "STATS_FILE": os.path.join(ROOT_DIR, "..", "webpack/webpack-stats.json"),
@@ -400,6 +411,9 @@ WEBPACK_LOADER = {
 WEBPACK_DEVELOPMENT_SERVER_PORT = 9000
 
 ROOT_URLCONF = "arches.urls"
+ROOT_HOSTCONF = "arches.hosts"
+
+DEFAULT_HOST = "arches"
 
 WSGI_APPLICATION = "arches.wsgi.application"
 
@@ -635,8 +649,6 @@ SPARQL_ENDPOINT_PROVIDERS = (
 
 APP_NAME = "Arches"
 APP_VERSION = None
-MIN_ARCHES_VERSION = None
-MAX_ARCHES_VERSION = None
 
 APP_TITLE = "Arches | Heritage Data Management"
 COPYRIGHT_TEXT = "All Rights Reserved."
@@ -875,7 +887,3 @@ except ImportError:
         from arches.settings_local import *
     except ImportError:
         pass
-
-# returns an output that can be read by NODEJS
-if __name__ == "__main__":
-    transmit_webpack_django_config(**locals())
