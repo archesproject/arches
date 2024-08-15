@@ -169,7 +169,6 @@ class Migration(migrations.Migration):
                     sortorder bigint,
                     list_id uuid,
                     parent_id uuid,
-                    depth int,
                     legacy_conceptid uuid,
                     listitemvalue_id uuid,
                     listitemvalue text,
@@ -223,7 +222,6 @@ class Migration(migrations.Migration):
                         sortorder,
                         list_id,
                         parent_id,
-                        depth,
                         legacy_conceptid,
                         listitemvalue_id,
                         listitemvalue,
@@ -234,7 +232,6 @@ class Migration(migrations.Migration):
                         lih.sortorder,
                         lih.list_id,
                         lih.parent_id,
-                        lih.depth,
                         lih.id as legacy_conceptid,
                         v.valueid as listitemvalue_id,
                         v.value,
@@ -260,9 +257,23 @@ class Migration(migrations.Migration):
                         sortorder,
                         list_id,
                         parent_id,
-                        depth, 
-                        ROW_NUMBER() OVER (PARTITION BY list_item_id ORDER BY depth ASC, sortorder ASC) as init_rownumber
-                    from temp_list_items_and_values t
+                        existing_item,
+                        ROW_NUMBER() OVER (PARTITION BY list_item_id ORDER BY existing_item DESC, sortorder ASC) as init_rownumber
+                    from (
+                        select list_item_id,
+                            sortorder,
+                            list_id,
+                            parent_id,
+                            FALSE as existing_item
+                        from temp_list_items_and_values
+                        union all
+                        select id as list_item_id,
+                            sortorder,
+                            list_id,
+                            parent_id,
+                            TRUE as existing_item
+                        from arches_references_listitem
+                        ) as t
                 )
                 update temp_list_items_and_values t
                 set rownumber = init_rownumber
@@ -273,27 +284,9 @@ class Migration(migrations.Migration):
                 -- For concepts that participate in multiple collections, mint new listitem_id's and listitemvalue_id's
                 for rec in 
                     select *
-                    from temp_list_items_and_values
-                    where list_item_id in (
-                        with list_item_parent_count as (
-                            select list_item_id, count (list_item_id)
-                            from temp_list_items_and_values
-                            where listitemvalue_valuetype = 'prefLabel'
-                            group by list_item_id
-                            union
-                            select id as list_item_id, count(id)
-                            from arches_references_listitem
-                            group by id
-                        )
-                        select list_item_id
-                        from temp_list_items_and_values
-                        where list_item_id in (
-                            select list_item_id
-                            from list_item_parent_count
-                            where count > 1
-                        ) 
-                    ) and listitemvalue_valuetype = 'prefLabel'
-                    order by list_item_id, depth asc, sortorder asc
+                    from testing_list_items_and_values
+                    where rownumber > 1
+                    and listitemvalue_valuetype = 'prefLabel'
                 loop
                     if rec.rownumber > 1
                     then 
