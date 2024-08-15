@@ -12,7 +12,7 @@ from django.db import connection
 from django.http import HttpRequest, HttpResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.decorators import load_data_async
-from arches.app.models.models import TileModel
+from arches.app.models.models import ETLModule, TileModel
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -40,6 +40,9 @@ class BranchExcelImporter(BaseImportModule):
         self.legacyid_lookup = {}
         self.temp_path = ""
         self.temp_dir = temp_dir if temp_dir else None
+        self.config = (
+            ETLModule.objects.get(pk=self.moduleid).config if self.moduleid else {}
+        )
 
     @load_data_async
     def run_load_task_async(self, request):
