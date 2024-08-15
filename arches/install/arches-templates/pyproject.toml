@@ -34,7 +34,7 @@ dev = [
     "sst",
     "coverage",
     "django-silk==5.1.0",
-    "pre-commit",
+    "pre-commit==3.8.0",
     "black==24.4.2",
 ]
 

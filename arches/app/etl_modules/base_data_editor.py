@@ -27,7 +27,7 @@ from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.search.search_engine_factory import SearchEngineFactory
 import arches.app.tasks as tasks
 from arches.app.etl_modules.decorators import load_data_async
-from arches.app.etl_modules.save import save_to_tiles
+from arches.app.etl_modules.save import get_resourceids_from_search_url, save_to_tiles
 from arches.app.utils.decorators import user_created_transaction_match
 import arches.app.utils.task_management as task_management
 from arches.app.utils.db_utils import dictfetchall
@@ -224,23 +224,6 @@ class BaseBulkEditor:
             (details, self.loadid),
         )
 
-    def get_resourceids_from_search_url(self, search_url):
-        request = HttpRequest()
-        request.user = self.request.user
-        request.method = "GET"
-        request.GET["export"] = True
-        validate = URLValidator()
-        try:
-            validate(search_url)
-        except:
-            raise
-        params = parse_qs(urlsplit(search_url).query)
-        for k, v in params.items():
-            request.GET.__setitem__(k, v[0])
-        response = search_results(request)
-        results = json.loads(response.content)["results"]["hits"]["hits"]
-        return [result["_source"]["resourceinstanceid"] for result in results]
-
     def validate(self, request):
         raise NotImplementedError
 
@@ -315,11 +298,7 @@ class BulkStringEditor(BaseBulkEditor):
 
         if search_url:
             validate = URLValidator()
-            try:
-                validate(search_url)
-            except:
-                raise
-
+            validate(search_url)
             params = parse_qs(urlsplit(search_url).query)
             for k, v in params.items():
                 request.GET.__setitem__(k, v[0])
@@ -439,7 +418,9 @@ class BulkStringEditor(BaseBulkEditor):
             resourceids = json.loads(resourceids)
         if search_url:
             try:
-                resourceids = self.get_resourceids_from_search_url(search_url)
+                resourceids = get_resourceids_from_search_url(
+                    search_url, self.request.user
+                )
             except ValidationError:
                 return {
                     "success": False,
@@ -585,7 +566,9 @@ class BulkStringEditor(BaseBulkEditor):
                     self.log_event_details(
                         cursor, "done|Getting resources from search url..."
                     )
-                resourceids = self.get_resourceids_from_search_url(search_url)
+                resourceids = get_resourceids_from_search_url(
+                    search_url, self.request.user
+                )
             if resourceids:
                 resourceids = tuple(resourceids)
             response = self.run_load_task(
@@ -624,7 +607,7 @@ class BulkStringEditor(BaseBulkEditor):
                 self.log_event_details(
                     cursor, "done|Getting resources from search url..."
                 )
-            resourceids = self.get_resourceids_from_search_url(search_url)
+            resourceids = get_resourceids_from_search_url(search_url, self.request.user)
 
         pattern = old_text
         if operation == "replace":
