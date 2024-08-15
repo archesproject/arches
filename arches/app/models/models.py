@@ -2159,11 +2159,12 @@ class SpatialView(models.Model):
         Validate the spatial view before saving it to the database as the database triggers have proved hard to test.
         """
         graph = self.geometrynode.graph
-        for node in self.attributenodes:
-            if not Node.objects.filter(pk=node["nodeid"], graph=graph).exists():
-                raise ValidationError(
-                    f"Attribute nodes must belong to the same graph as the geometry node (error nodeid:{str(node['nodeid'])})"
-                )
+        node_ids = set(node["nodeid"] for node in self.attributenodes)
+        found_graph_nodes = Node.objects.filter(pk__in=node_ids, graph=graph)
+        if len(node_ids) != found_graph_nodes.count():
+            raise ValidationError(
+                "One or more attributenodes do not belong to the graph of the geometry node"
+            )
 
         # language must be be a valid language code belonging to the current publication
         published_graphs = graph.publication.publishedgraph_set.all()
