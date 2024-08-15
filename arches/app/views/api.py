@@ -2153,11 +2153,8 @@ class SpatialView(APIBase):
         """
         Transforms the JSON data object to be used in the spatialview model
         """
-        json_data["geometrynode"] = models.Node.objects.get(
-            nodeid=json_data["geometrynodeid"]
-        )
-        del json_data["geometrynodeid"]
 
+        json_data["geometrynode_id"] = json_data.pop("geometrynodeid")
         json_data["language"] = models.Language.objects.get(code=json_data["language"])
         
         return json_data
@@ -2241,7 +2238,7 @@ class SpatialView(APIBase):
 
         return self.create_spatialview_from_json_data(json_data)
 
-    @method_decorator(group_required("Application Administrator"))
+    @method_decorator(group_required("Application Administrator", raise_exception=True))
     def post(self, request, identifier=None):
 
         #if identifier is not None then the user is trying to update a spatialview so an error should be returned with a message
@@ -2256,7 +2253,7 @@ class SpatialView(APIBase):
         
 
         try:
-            json_data = json.loads(request.body.decode("utf-8"))
+            json_data = JSONDeserializer().deserialize(request.body)
         except ValueError:
             return JSONErrorResponse(
                 _("Invalid JSON data"),
@@ -2290,7 +2287,7 @@ class SpatialView(APIBase):
             )
         return JSONErrorResponse(_("No json request payload"), status=400)
 
-    @method_decorator(group_required("Application Administrator"))
+    @method_decorator(group_required("Application Administrator", raise_exception=True))
     def put(self, request, identifier=None):
 
         if not identifier:
@@ -2303,7 +2300,7 @@ class SpatialView(APIBase):
             )
 
         try:
-            json_data = json.loads(request.body.decode("utf-8"))
+            json_data = JSONDeserializer().deserialize(request.body)
         except ValueError:
             return JSONErrorResponse(
                 _("Invalid JSON data"),
@@ -2338,7 +2335,7 @@ class SpatialView(APIBase):
             _("Spatialview update failed"), _("No json request payload"), status=400
         )
 
-    @method_decorator(group_required("Application Administrator"))
+    @method_decorator(group_required("Application Administrator", raise_exception=True))
     def delete(self, request, identifier=None):
         if identifier:
             spatialview = None
