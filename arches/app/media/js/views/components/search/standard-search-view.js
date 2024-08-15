@@ -11,7 +11,6 @@ define([
     const viewModel = BaseSearchViewComponent.extend({ 
         initialize: function(sharedStateObject) {
             const self = this;
-            sharedStateObject.componentName = componentName;
             BaseSearchViewComponent.prototype.initialize.call(this, sharedStateObject);
             
             this.selectedPopup = ko.observable('');

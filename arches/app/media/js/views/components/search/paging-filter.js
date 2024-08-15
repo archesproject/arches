@@ -9,7 +9,6 @@ define([
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             options.name = 'Paging Filter';
-            options.componentName = componentName;
             BaseFilter.prototype.initialize.call(this, options);
             this.page = ko.observable();
             this.preventLoop = false;

@@ -38,7 +38,6 @@ define([
 
             initialize: function (options) {
                 options.name = 'Search Results';
-                options.componentName = componentName;
                 BaseFilter.prototype.initialize.call(this, options);
                 this.results = ko.observableArray();
                 this.showRelationships = ko.observable();

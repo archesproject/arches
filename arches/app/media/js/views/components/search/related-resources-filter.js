@@ -10,7 +10,6 @@ define([
     const viewModel = BaseFilter.extend ({
         initialize: function(options) {
             options.name = 'Related Resources Filter';
-            options.componentName = componentName;
             BaseFilter.prototype.initialize.call(this, options);
             this.ready = ko.observable(false);
             this.options = options;

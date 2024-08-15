@@ -38,7 +38,6 @@ define([
             });
 
             options.name = "Map Filter";
-            options.componentName = componentName;
             BaseFilter.prototype.initialize.call(this, options);
 
             options.sources = {

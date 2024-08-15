@@ -11,7 +11,6 @@ define([
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             options.name = 'Term Filter';
-            options.componentName = componentName;
             BaseFilter.prototype.initialize.call(this, options);
 
             this.filter.terms = ko.observableArray();

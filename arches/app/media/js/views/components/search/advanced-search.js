@@ -14,7 +14,6 @@ define([
         initialize: function(options) {
             var self = this;
             options.name = 'Advanced Search Filter';
-            options.componentName = componentName;
             BaseFilter.prototype.initialize.call(this, options);
             this.urls = arches.urls;
             this.tagId = "Advanced Search";

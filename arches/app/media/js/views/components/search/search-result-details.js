@@ -16,7 +16,6 @@ define([
         initialize: function(options) {
             var self = this;
             options.name = 'Search Result Details';
-            options.componentName = componentName;
             BaseFilter.prototype.initialize.call(this, options);
 
             this.options = options;

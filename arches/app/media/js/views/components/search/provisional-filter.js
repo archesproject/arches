@@ -8,7 +8,6 @@ define([
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             options.name = 'Provisional Filter';
-            options.componentName = componentName;
             this.translations = arches.translations;
             BaseFilter.prototype.initialize.call(this, options);
             this.filter = ko.observableArray();
