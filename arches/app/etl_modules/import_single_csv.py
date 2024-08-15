@@ -195,13 +195,6 @@ class ImportSingleCsv(BaseImportModule):
         """
         Move the records from load_staging to tiles table using db function
         """
-        # # if self.params:
-        # #     graphid = self.params["graphid"]
-        # #     has_headers = bool(self.params["has_headers"])
-        # #     fieldnames = self.params["fieldnames"]
-        # #     csv_mapping = self.params["csv_mapping"]
-        # #     csv_file_name = self.params["csv_file_name"]
-        # else:
         graphid = request.POST.get("graphid")
         has_headers = request.POST.get("hasHeaders")
         fieldnames = request.POST.get("fieldnames")
