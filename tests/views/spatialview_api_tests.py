@@ -264,7 +264,7 @@ class SpatialViewApiTest(TransactionTestCase):
                 kwargs={"identifier": updated_spatialview.spatialviewid},
             )
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 204)
 
 
         # test create with spatialviewid - should error
