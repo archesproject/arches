@@ -2187,7 +2187,8 @@ class SpatialView(models.Model):
         # validate the schema is a valid schema in the database
         with connection.cursor() as cursor:
             cursor.execute(
-                f"SELECT schema_name FROM information_schema.schemata WHERE schema_name = '{self.schema}'"
+                "SELECT schema_name FROM information_schema.schemata WHERE schema_name = %s",
+                [self.schema]
             )
             if cursor.rowcount == 0:
                     raise ValidationError("Schema does not exist in the database")
