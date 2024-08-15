@@ -2369,4 +2369,4 @@ class SpatialView(APIBase):
                 ),
                 status=400,
             )
-        return JSONResponse(status=200)
+        return JSONResponse(status=204)
