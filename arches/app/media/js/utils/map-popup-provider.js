@@ -49,8 +49,15 @@ define([
          */
         sendFeatureToMapFilter: function(popupFeatureObject)
         {
-            let feature = popupFeatureObject.geometries()[0].geom.features[0];
-            popupFeatureObject.mapCard.filterByFeatureGeom(feature);
+            let foundFeature = null;
+            for (let geometry of popupFeatureObject.geometries()) {
+                if (geometry.geom && Array.isArray(geometry.geom.features)) {
+                    foundFeature = geometry.geom.features.find(feature => feature.id === popupFeatureObject.featureid);
+                    if (foundFeature)
+                        break;
+                }
+            }
+            popupFeatureObject.mapCard.filterByFeatureGeom(foundFeature);
         },
 
         /**
