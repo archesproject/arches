@@ -59,7 +59,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock head %}
 
 {% block body_content %}
-<body dir="{{ app_settings.ACTIVE_LANGUAGE_DIR }}" {% block body_attributes %}class="scroll-y-auto"{% endblock %}>
+<body dir="{{ app_settings.ACTIVE_LANGUAGE_DIR }}" {% block body_attributes %}{% endblock %}>
     {% block loading_mask %}
     {% endblock loading_mask %}
 
