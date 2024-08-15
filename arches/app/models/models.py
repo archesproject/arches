@@ -2122,7 +2122,7 @@ class SpatialView(models.Model):
             )
         ],
         unique=True,
-        null=False
+        null=False,
     )
     description = models.TextField(
         default="arches spatial view"
@@ -2132,11 +2132,15 @@ class SpatialView(models.Model):
         on_delete=models.CASCADE,
         db_column="geometrynodeid",
         limit_choices_to={"datatype": "geojson-feature-collection"},
-        null=False
+        null=False,
     )
     ismixedgeometrytypes = models.BooleanField(default=False)
     language = models.ForeignKey(
-        Language, db_column="languageid", to_field="code", on_delete=models.PROTECT, null=False
+        Language,
+        db_column="languageid",
+        to_field="code",
+        on_delete=models.PROTECT,
+        null=False,
     )
     attributenodes = JSONField(blank=False, null=False, db_column="attributenodes")
     isactive = models.BooleanField(
@@ -2174,10 +2178,10 @@ class SpatialView(models.Model):
         with connection.cursor() as cursor:
             cursor.execute(
                 "SELECT schema_name FROM information_schema.schemata WHERE schema_name = %s",
-                [self.schema]
+                [self.schema],
             )
             if cursor.rowcount == 0:
-                    raise ValidationError("Schema does not exist in the database")
+                raise ValidationError("Schema does not exist in the database")
 
     def to_json(self):
         """

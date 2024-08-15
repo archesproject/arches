@@ -2148,8 +2148,7 @@ class SpatialView(APIBase):
                 )
 
         response_data = [
-            spatialview.to_json()
-            for spatialview in permitted_spatialviews
+            spatialview.to_json() for spatialview in permitted_spatialviews
         ]
 
         # when using identifier, return a single object instead of a list
@@ -2165,7 +2164,7 @@ class SpatialView(APIBase):
 
         json_data["geometrynode_id"] = json_data.pop("geometrynodeid")
         json_data["language_id"] = json_data.pop("language")
-        
+
         return json_data
 
     def create_spatialview_from_json_data(self, json_data):
@@ -2182,7 +2181,11 @@ class SpatialView(APIBase):
             spatialview = models.SpatialView(**json_data)
             return spatialview
         except ObjectDoesNotExist:
-            return JSONErrorResponse(_("Spatialview not found"), _("No Spatialview exists for the provided spatialviewid"), status=404)
+            return JSONErrorResponse(
+                _("Spatialview not found"),
+                _("No Spatialview exists for the provided spatialviewid"),
+                status=404,
+            )
 
         # update the spatialview object with the new data
         for key, value in json_data.items():
@@ -2190,7 +2193,9 @@ class SpatialView(APIBase):
 
         return spatialview
 
-    def validate_json_data_content(self, json_data, spatialviewid_identifier=None, is_post=False):
+    def validate_json_data_content(
+        self, json_data, spatialviewid_identifier=None, is_post=False
+    ):
         """
         Validates the JSON data passed in the request body where not handled by model validation.
 
@@ -2200,7 +2205,9 @@ class SpatialView(APIBase):
         if is_post and "spatialviewid" in json_data.keys():
             return JSONErrorResponse(
                 _("Incorrect Spatialview json data"),
-                _("POST REST request should not have a spatialviewid provided in the JSON data."),
+                _(
+                    "POST REST request should not have a spatialviewid provided in the JSON data."
+                ),
                 status=400,
             )
 
@@ -2230,7 +2237,7 @@ class SpatialView(APIBase):
                     _("No geometrynode exists with the provided geometrynodeid."),
                     status=400,
                 )
-                
+
             # Check if language exists in the database before transforming the json data
             if not models.Language.objects.filter(code=json_data["language"]).exists():
                 return JSONErrorResponse(
@@ -2250,16 +2257,13 @@ class SpatialView(APIBase):
     @method_decorator(group_required("Application Administrator", raise_exception=True))
     def post(self, request, identifier=None):
 
-        #if identifier is not None then the user is trying to update a spatialview so an error should be returned with a message
+        # if identifier is not None then the user is trying to update a spatialview so an error should be returned with a message
         if identifier:
             return JSONErrorResponse(
                 _("Spatialview creation failed"),
-                _(
-                    "POST request should not have a spatialviewid provided in the URL"
-                ),
+                _("POST request should not have a spatialviewid provided in the URL"),
                 status=400,
             )
-        
 
         try:
             json_data = JSONDeserializer().deserialize(request.body)
@@ -2271,10 +2275,9 @@ class SpatialView(APIBase):
             )
 
         if json_data is not None:
-            
+
             validate_json_data_content_result = self.validate_json_data_content(
-                json_data,
-                is_post=True
+                json_data, is_post=True
             )
             if isinstance(validate_json_data_content_result, JSONErrorResponse):
                 return validate_json_data_content_result
@@ -2291,9 +2294,7 @@ class SpatialView(APIBase):
                     status=400,
                 )
 
-            return JSONResponse(
-                spatialview.to_json(), status=201
-            )
+            return JSONResponse(spatialview.to_json(), status=201)
         return JSONErrorResponse(_("No json request payload"), status=400)
 
     @method_decorator(group_required("Application Administrator", raise_exception=True))
@@ -2337,9 +2338,7 @@ class SpatialView(APIBase):
                     status=400,
                 )
 
-            return JSONResponse(
-                spatialview.to_json(), status=200
-            )
+            return JSONResponse(spatialview.to_json(), status=200)
         return JSONErrorResponse(
             _("Spatialview update failed"), _("No json request payload"), status=400
         )
