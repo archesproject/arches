@@ -3,7 +3,7 @@ define([
     'knockout-mapping',
     'jquery',
     'dropzone',
-    'fuzzyset',
+    'utils/strings',
     'uuid',
     'arches',
     'viewmodels/alert-json',
@@ -12,7 +12,7 @@ define([
     'bindings/datatable',
     'bindings/dropzone',
     'bindings/resizable-sidepanel',
-], function(ko, koMapping, $, dropzone, FuzzySet, uuid, arches, JsonErrorAlertViewModel, importSingleCSVTemplate) {
+], function(ko, koMapping, $, dropzone, stringUtils, uuid, arches, JsonErrorAlertViewModel, importSingleCSVTemplate) {
     const viewModel = function(params) {
         const self = this;
         this.loadDetails = params.load_details || ko.observable();
@@ -58,32 +58,33 @@ define([
             return self.selectedGraph() && self.fieldMapping().find((mapping) => mapping.node());
         });
         this.suggestField = function(i) {
-            function normalizeText(text) { return text.toLowerCase().replace(/\W+/g, ''); }
             let bestMatch = null;
             let highestScore = 0;
-            if (!!self.headers() && self.headers()[i] != 'resourceid') {
-                const header = normalizeText(self.headers()[i]);
-                const fuzzySet = FuzzySet();
+            if (!!self.headers()) {
+                const header = stringUtils.normalizeText(self.headers()[i]);
+                if (header == 'resourceid')
+                    return null;
+        
                 self.nodes().forEach(function(node) {
                     if (node.name) {
-                        const nameNorm = normalizeText(node.name);
-                        const aliasNorm = normalizeText(node.alias);
-                        fuzzySet.add(nameNorm);
-                        fuzzySet.add(aliasNorm);
+                        const nameNorm = stringUtils.normalizeText(node.name);
+                        const aliasNorm = node.alias ? stringUtils.normalizeText(node.alias) : '';
+        
+                        // Compute similarity scores
+                        const scoreWithName = stringUtils.compareTwoStrings(header, nameNorm);
+                        const scoreWithAlias = stringUtils.compareTwoStrings(header, aliasNorm);
+                        const bestNodeScore = Math.max(scoreWithName, scoreWithAlias);
+                        if (bestNodeScore > highestScore) {
+                            highestScore = bestNodeScore;
+                            bestMatch = node;
+                        }
                     }
                 });
-                const results = fuzzySet.get(header);
-                if (results) {
-                    const [bestScore, bestMatchName] = results[0]; // results are sorted by score
-                    if (bestScore > highestScore) {
-                        highestScore = bestScore;
-                        bestMatch = self.nodes().find(node =>
-                            normalizeText(node.name) === bestMatchName ||
-                            normalizeText(node.alias) === bestMatchName
-                        );
-                    }
+        
+                // Return the alias of the best match if the highest score is above a certain threshold (e.g., 0.8)
+                if (bestMatch && highestScore > 0.5) {
+                    return bestMatch.alias;
                 }
-                if (bestMatch && highestScore > 0.8) { return bestMatch.alias; }
             }
             return null;
         }
