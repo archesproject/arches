@@ -573,7 +573,7 @@ class GraphModel(models.Model):
         else:
             return True
 
-    def get_published_graph(self, language=None, raise_if_missing=False):
+    def get_published_graph(self, language=None, raise_if_missing=True):
         if not language:
             language = translation.get_language()
 
@@ -583,7 +583,11 @@ class GraphModel(models.Model):
             )
         except PublishedGraph.DoesNotExist:
             if raise_if_missing:
-                raise
+                raise ValueError(
+                    _(
+                        "The requested Graph publication does not exist, or may not be published in the specified language."
+                    )
+                )
             graph = None
 
         return graph
