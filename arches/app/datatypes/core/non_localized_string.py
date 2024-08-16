@@ -4,7 +4,7 @@ from rdflib.namespace import RDF
 
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.core.util import get_value_from_jsonld
-from arches.app.models.system_settings import settings
+from django.conf import settings
 from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
     Exists,
@@ -14,7 +14,6 @@ from arches.app.search.elasticsearch_dsl_builder import (
     Wildcard,
     Nested,
 )
-from arches.app.models.system_settings import settings
 from arches.app.search.search_term import SearchTerm
 
 
@@ -69,11 +68,10 @@ class NonLocalizedStringDataType(BaseDataType):
                 terms.append(SearchTerm(value=nodevalue, lang=""))
         return terms
 
-    def append_null_search_filters(self, value, node, query, request):
+    def append_null_search_filters(self, value, node, query: Bool, request):
         """
         Appends the search query dsl to search for fields that have not been populated or are empty strings
         """
-
         query.filter(Terms(field="graph_id", terms=[str(node.graph_id)]))
 
         data_exists_query = Exists(field=f"tiles.data.{str(node.pk)}")
