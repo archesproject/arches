@@ -2277,11 +2277,10 @@ class ResourceInstanceDataType(BaseDataType):
     def get_search_terms(self, nodevalue, nodeid=None):
         terms = []
         nodevalue = self.get_nodevalues(nodevalue)
-        lang = get_language()
         for relatedResourceItem in nodevalue:
             if relatedResourceItem.get("resourceName", "") != "":
                 terms.append(
-                    SearchTerm(value=relatedResourceItem["resourceName"], lang=lang)
+                    SearchTerm(value=relatedResourceItem["resourceName"], lang="")
                 )
             for ontology_property_item in [
                 relatedResourceItem.get("ontologyProperty", ""),
@@ -2294,11 +2293,9 @@ class ResourceInstanceDataType(BaseDataType):
                             self.get_relationship_display_value(ontology_property_item)
                             or ontology_property_item
                         )
-                        terms.append(SearchTerm(value=relationship, lang=lang))
+                        terms.append(SearchTerm(value=relationship, lang=""))
                     except ValueError:
-                        terms.append(
-                            SearchTerm(value=ontology_property_item, lang=lang)
-                        )
+                        terms.append(SearchTerm(value=ontology_property_item, lang=""))
 
         return terms
 
