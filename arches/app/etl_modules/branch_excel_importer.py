@@ -26,7 +26,9 @@ from arches.app.etl_modules.base_import_module import (
 class BranchExcelImporter(BaseImportModule):
     def __init__(self, request=None, loadid=None, temp_dir=None, params=None):
         self.loadid = request.POST.get("load_id") if request else loadid
-        self.userid = request.user.id if request else User.objects.filter(is_superuser=True)[0].id
+        self.userid = (
+            request.user.id if request else User.objects.filter(is_superuser=True)[0].id
+        )
         self.mode = "cli" if not request and params else "ui"
         if not request and params:
             request = HttpRequest()

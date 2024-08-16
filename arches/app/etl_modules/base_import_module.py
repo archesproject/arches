@@ -283,7 +283,9 @@ class BaseImportModule:
             content = request.FILES.get("file")
         else:
             if source.split(".")[-1].lower() == "xlsx":
-                file_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                file_type = (
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
             elif source.split(".")[-1].lower() == "zip":
                 file_type = "application/zip"
             file = open(source, "rb")
@@ -396,7 +398,10 @@ class BaseImportModule:
                 "celeryByteSizeLimit", 100000
             )
 
-            if self.mode != "cli" and summary["cumulative_files_size"] > use_celery_file_size_threshold:
+            if (
+                self.mode != "cli"
+                and summary["cumulative_files_size"] > use_celery_file_size_threshold
+            ):
                 response = self.run_load_task_async(request, self.loadid)
             else:
                 response = self.run_load_task(
