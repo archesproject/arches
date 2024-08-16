@@ -677,6 +677,7 @@ class PermissionBackend(ObjectPermissionBackend):  # type: ignore
             else:
                 user_checker = CachedUserPermissionChecker(user_obj)
                 return user_checker.user_has_permission(perm)
+        return super().has_perm(user_obj, perm, obj)
 
 
 class CachedUserPermissionChecker:
