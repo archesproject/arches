@@ -84,7 +84,9 @@ class Command(BaseCommand):
                     _("You must supply the valid name or the uuid for the etl module.")
                 )
                 for etl_module in etl_modules:
-                    self.stdout.write("\t", etl_module.componentname, "\t", etl_module.etlmoduleid)
+                    self.stdout.write(
+                        "\t", etl_module.componentname, "\t", etl_module.etlmoduleid
+                    )
                 return
         import_function = getattr(EtlModule, "cli")
         response = import_function(source)
