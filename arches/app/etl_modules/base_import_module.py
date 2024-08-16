@@ -42,7 +42,7 @@ class BaseImportModule:
         self.config = (
             ETLModule.objects.get(pk=self.moduleid).config if self.moduleid else {}
         )
-        self.mode = 'ui'
+        self.mode = "ui"
         if self.request:
             self.userid = request.user.id
             self.moduleid = request.POST.get("module")
