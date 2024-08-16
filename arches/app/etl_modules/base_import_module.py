@@ -208,10 +208,9 @@ class BaseImportModule:
             with connection.cursor() as cursor:
                 self.stage_files(files, summary, cursor)
                 self.check_tile_cardinality(cursor)
-            result["validation"] = self.validate(loadid)
-            if len(result["validation"]["data"]) == 0:
-                save_to_tiles(userid, loadid, multiprocessing)
-                with connection.cursor() as cursor:
+                result["validation"] = self.validate(loadid)
+                if len(result["validation"]["data"]) == 0:
+                    self.save_to_tiles(cursor, userid, loadid, multiprocessing)
                     cursor.execute(
                         """CALL __arches_update_resource_x_resource_with_graphids();"""
                     )
@@ -219,12 +218,12 @@ class BaseImportModule:
                     refresh_successful = cursor.fetchone()[0]
                     if not refresh_successful:
                         raise Exception("Unable to refresh spatial views")
-            else:
-                with connection.cursor() as cursor:
-                    cursor.execute(
-                        """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                        ("failed", datetime.now(), loadid),
-                    )
+                else:
+                    with connection.cursor() as cursor:
+                        cursor.execute(
+                            """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                            ("failed", datetime.now(), loadid),
+                        )
         finally:
             self.delete_from_default_storage(temp_dir)
         result["summary"] = summary
@@ -261,6 +260,9 @@ class BaseImportModule:
             """,
             [self.loadid],
         )
+
+    def save_to_tiles(self, cursor, userid, loadid, multiprocessing=False):
+        return save_to_tiles(userid, loadid, multiprocessing)
 
     ### Actions ###
 
