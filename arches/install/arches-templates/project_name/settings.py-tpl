@@ -409,7 +409,7 @@ LANGUAGES = [
 SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
 
 # Implement this class to associate custom documents to the ES resource index
-# See arches.app.util.custom_resource_search.py for example
+# See tests.views.search_tests.TestCustomResourceSearchValue class for example
 # CUSTOM_SEARCH_CLASS = "{{ project_name }}.search.custom_resource_search.CustomResourceSearchValue"
 
 try:
