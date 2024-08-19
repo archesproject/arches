@@ -119,7 +119,6 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
 }
 
 h4 {
-    color: var(--p-header-950);
     margin-top: 0;
 }
 

@@ -272,7 +272,7 @@ await fetchListsAndPopulateTree();
             },
             header: {
                 style: {
-                    background: 'var(--p-header-950)',
+                    background: 'var(--p-navigation)',
                     color: 'white',
                     borderRadius: '1rem',
                     marginBottom: '1rem',
