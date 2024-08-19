@@ -26,15 +26,7 @@ export const ArchesPreset = definePreset(Aura, {
             900: "{sky.900}",
             950: "{sky.950}",
         },
-        header: {
-            950: "{arches.blue.950}",
-        },
-        navigation: {
-            950: "{arches.blue.950}",
-        },
-        pagination: {
-            800: "{arches.blue.400}",
-        },
+        navigation: "{arches.blue.950}",
     },
     components: {
         button: {
