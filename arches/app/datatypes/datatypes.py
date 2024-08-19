@@ -1323,7 +1323,7 @@ class FileListDataType(BaseDataType):
             elif value["val"] != "":
                 if value["op"] == "gte" or value["op"] == "lte":
                     operators = {"gte": None, "lte": None, "lt": None, "gt": None}
-                    operators[value["op"]] = float(value["val"]) * 1000
+                    operators[value["op"]] = float(value["val"]) * 1000000
                 search_query = Range(
                     field="tiles.data.%s.size" % (str(node.pk)), **operators
                 )
