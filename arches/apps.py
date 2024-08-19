@@ -1,6 +1,5 @@
 import os
 import re
-import warnings
 from importlib.metadata import PackageNotFoundError, requires
 from pathlib import Path
 
@@ -33,13 +32,8 @@ class ArchesAppConfig(AppConfig):
             generate_frontend_configuration()
 
 
-FILE_TYPE_CHECKING_MSG = (
-    "Providing boolean values to FILE_TYPE_CHECKING is deprecated. "
-    "Starting with Arches 8.0, the only allowed options will be "
-    "None, 'lenient', and 'strict'."
-)
-if settings.FILE_TYPE_CHECKING in (True, False):
-    warnings.warn(FILE_TYPE_CHECKING_MSG, DeprecationWarning)
+if settings.FILE_TYPE_CHECKING not in (None, "lenient", "strict"):
+    raise ValueError("FILE_TYPE_CHECKING must be one of: None, 'lenient', 'strict'.")
 
 
 ### SYSTEM CHECKS ###
