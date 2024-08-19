@@ -560,6 +560,8 @@ define([
             
             var unorderedSavedData = ko.observableArray();
 
+            var errorTiles = [];
+
             self.tiles().forEach(function(tile) {
                 tile.save(
                     function(response){
@@ -570,6 +572,13 @@ define([
                             null, 
                             function(){ return; }
                         ));
+
+                        // Put error tiles back onto right side
+                        self.tiles(null);
+                        errorTiles.push(tile);
+                        self.tiles(errorTiles);
+
+                        self.saving(false); // Get node list to reappear
                     }, 
                     function(savedTileData) {
                         unorderedSavedData.push(savedTileData);
