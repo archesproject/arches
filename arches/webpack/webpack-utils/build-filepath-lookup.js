@@ -24,6 +24,10 @@ function buildFilepathLookup(path, staticUrlPrefix) {
     };
 
     return getFileList(path).reduce((lookup, file) => {
+        // Ignore dotfiles
+        if (file.match(new RegExp(Path.sep + '\\.')) || file.match(/^\./)) {
+            return lookup;
+        }
         const extension = file.match(/[^.]+$/).toString();
         if (extension === 'js') {
             lookup[file.replace(path,'').replace(/\\/g, '/').replace(/\.js$/,'').replace(/^\//,'')] = {"import": file, "filename": `${prefix}/[name].${extension}`};
