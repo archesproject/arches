@@ -65,16 +65,7 @@ const { setDisplayedRow } = inject(displayedRowKey) as unknown as {
 };
 
 const route = useRoute();
-watch(
-    [
-        () => {
-            return { ...route };
-        },
-    ],
-    ([newRoute]) => {
-        navigate(newRoute);
-    },
-);
+
 const navigate = (newRoute: RouteLocationNormalizedLoadedGeneric) => {
     switch (newRoute.name) {
         case routeNames.splash:
@@ -129,6 +120,18 @@ const navigate = (newRoute: RouteLocationNormalizedLoadedGeneric) => {
         }
     }
 };
+
+// React to route changes.
+watch(
+    [
+        () => {
+            return { ...route };
+        },
+    ],
+    ([newRoute]) => {
+        navigate(newRoute);
+    },
+);
 
 // Navigate on initial load of the tree.
 watch(
