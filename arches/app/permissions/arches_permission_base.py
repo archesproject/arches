@@ -264,7 +264,13 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         ret = []
         for user in User.objects.all():
             default_perms = self.get_default_permissions(user, obj)
-            if user.has_perm(perm, obj) or perm in default_perms:
+            if (
+                perm
+                in list(
+                    self.get_user_perms(user, obj).values_list("codename", flat=True)
+                )
+                or perm in default_perms
+            ):
                 ret.append(user)
         return ret
 
