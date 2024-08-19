@@ -7,9 +7,9 @@ import Tree from "primevue/tree";
 
 import {
     displayedRowKey,
-    routes,
     selectedLanguageKey,
 } from "@/arches_references/constants.ts";
+import { routeNames } from "@/arches_references/routes.ts";
 import {
     bestLabel,
     findNodeInTree,
@@ -77,12 +77,12 @@ watch(
 );
 const navigate = (newRoute: RouteLocationNormalizedLoadedGeneric) => {
     switch (newRoute.name) {
-        case routes.splash:
+        case routeNames.splash:
             setDisplayedRow(null);
             expandedKeys.value = {};
             selectedKeys.value = {};
             break;
-        case routes.list: {
+        case routeNames.list: {
             if (!tree.value.length) {
                 return;
             }
@@ -101,7 +101,7 @@ const navigate = (newRoute: RouteLocationNormalizedLoadedGeneric) => {
             }
             break;
         }
-        case routes.item: {
+        case routeNames.item: {
             if (!tree.value.length) {
                 return;
             }

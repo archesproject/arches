@@ -5,7 +5,8 @@ import ProgressSpinner from "primevue/progressspinner";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 
-import { displayedRowKey, routes } from "@/arches_references/constants.ts";
+import { displayedRowKey } from "@/arches_references/constants.ts";
+import { routeNames } from "@/arches_references/routes.ts";
 import { dataIsList } from "@/arches_references/utils.ts";
 import ControlledListSplash from "@/arches_references/components/misc/ControlledListSplash.vue";
 import ItemEditor from "@/arches_references/components/editor/ItemEditor.vue";
@@ -55,7 +56,7 @@ const panel = computed(() => {
         >
             <component
                 :is="panel"
-                :key="displayedRow?.id ?? routes.splash"
+                :key="displayedRow?.id ?? routeNames.splash"
             />
         </SplitterPanel>
     </Splitter>
