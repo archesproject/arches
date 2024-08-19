@@ -26,7 +26,7 @@ class ArchesTestRunner(DiscoverRunner):
 
         # If the collected tests don't involve the database,
         # e.g. subclasses of SimpleTestCase, then "aliases" will
-        # be None. Return early before attempting to setup
+        # test false. Return early before attempting to setup
         # something that doesn't exist.
         if not kwargs.get("aliases"):
             return ret
