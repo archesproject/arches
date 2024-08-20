@@ -7,7 +7,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10799_geojsongeometry_featureid"),
+        ("models", "10705_spatialviews_internationalisation_support"),
     ]
 
     operations = [
