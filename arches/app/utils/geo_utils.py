@@ -3,9 +3,12 @@ import uuid
 from arcgis2geojson import arcgis2geojson
 from django.contrib.gis.geos import GEOSGeometry, GeometryCollection, WKTWriter
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.models.system_settings import settings
 
 
 class GeoUtils(object):
+    preferred_srid = int(settings.PREFERRED_COORDINATE_SYSTEMS[0]["srid"])
+
     def set_precision(self, coordinates, precision):
         """
         returns the passed in coordinates with the specified precision
