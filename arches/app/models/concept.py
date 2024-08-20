@@ -1728,6 +1728,15 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
 
 
 def get_preflabel_from_valueid(valueid, lang):
-    concept_label = se.search(index=CONCEPTS_INDEX, id=valueid)
-    if concept_label["found"]:
-        return get_preflabel_from_conceptid(concept_label["_source"]["conceptid"], lang)
+    query = Query(se=se, start=0, limit=100)
+    bool_query = Bool()
+    bool_query.filter(Term(field="id", term=valueid))
+    query.add_query(bool_query)
+    results = query.search(index=CONCEPTS_INDEX)
+
+    if len(results["hits"]["hits"]):
+        return get_preflabel_from_conceptid(
+            results["hits"]["hits"][0]["_source"]["conceptid"], lang
+        )
+    else:
+        return None
