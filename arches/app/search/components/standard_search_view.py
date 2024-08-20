@@ -160,7 +160,6 @@ class StandardSearchView(BaseSearchView):
         response_object["results"] = results
 
     def post_search_hook(self, search_query_object, response_object, **kwargs):
-
         dsl = search_query_object["query"]
         response_object["reviewer"] = user_is_resource_reviewer(self.request.user)
         response_object["timestamp"] = datetime.now()
