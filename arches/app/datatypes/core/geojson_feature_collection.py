@@ -20,6 +20,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
     def __init__(self, model=None):
         super(GeojsonFeatureCollectionDataType, self).__init__(model=model)
         self.geo_utils = GeoUtils()
+        self.preferred_srid = int(settings.PREFERRED_COORDINATE_SYSTEMS[0]["srid"])
 
     def validate(
         self,
@@ -35,7 +36,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
 
         def validate_geom_bbox(geom):
             try:
-                bbox = Polygon(settings.DATA_VALIDATION_BBOX)
+                bbox = Polygon(settings.DATA_VALIDATION_BBOX, srid=self.preferred_srid)
 
                 if bbox.contains(geom) == False:
                     message = _(
@@ -76,7 +77,10 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         if value is not None:
             for feature in value["features"]:
                 try:
-                    geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
+                    geom = GEOSGeometry(
+                        JSONSerializer().serialize(feature["geometry"]),
+                        srid=self.preferred_srid,
+                    )
                     if geom.valid:
                         validate_geom_bbox(geom)
                     else:
@@ -141,7 +145,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 arches_geojson = self.check_geojson_value(value)
             except (json.JSONDecodeError, KeyError, TypeError):
                 try:
-                    geometry = GEOSGeometry(value, srid=4326)
+                    geometry = GEOSGeometry(value, srid=self.preferred_srid)
                     if geometry.geom_type == "GeometryCollection":
                         arches_geojson = self.geo_utils.convert_geos_geom_collection_to_feature_collection(
                             geometry
@@ -167,7 +171,9 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
     def transform_export_values(self, value, *args, **kwargs):
         wkt_geoms = []
         for feature in value["features"]:
-            wkt_geoms.append(GEOSGeometry(json.dumps(feature["geometry"])))
+            wkt_geoms.append(
+                GEOSGeometry(json.dumps(feature["geometry"]), srid=self.preferred_srid)
+            )
         return GeometryCollection(wkt_geoms)
 
     def update(self, tile, data, nodeid=None, action=None):
@@ -270,7 +276,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
         bounds = None
         for feature in node_data["features"]:
             geom_collection = GEOSGeometry(
-                JSONSerializer().serialize(feature["geometry"])
+                JSONSerializer().serialize(feature["geometry"]),
+                srid=self.preferred_srid,
             )
 
             if bounds is None:
