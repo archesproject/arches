@@ -20,7 +20,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
     def __init__(self, model=None):
         super(GeojsonFeatureCollectionDataType, self).__init__(model=model)
         self.geo_utils = GeoUtils()
-        self.preferred_srid = int(settings.PREFERRED_COORDINATE_SYSTEMS[0]["srid"])
+        self.preferred_srid = 4326
 
     def validate(
         self,

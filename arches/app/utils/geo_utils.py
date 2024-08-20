@@ -7,7 +7,7 @@ from arches.app.models.system_settings import settings
 
 
 class GeoUtils(object):
-    preferred_srid = int(settings.PREFERRED_COORDINATE_SYSTEMS[0]["srid"])
+    preferred_srid = 4326
 
     def set_precision(self, coordinates, precision):
         """
