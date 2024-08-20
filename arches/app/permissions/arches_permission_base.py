@@ -20,37 +20,26 @@ import sys
 import uuid
 from typing import Iterable
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.gis.db.models import Model
 from django.core.cache import caches
-from django.db.models import Count
+from django.apps import apps
 from guardian.backends import check_support, ObjectPermissionBackend
 from guardian.core import ObjectPermissionChecker
 from guardian.exceptions import NotUserNorGroup
-from arches.app.models.resource import Resource
 from django.db.models.query import QuerySet
 from guardian.models import GroupObjectPermission, UserObjectPermission, Permission
 from guardian.exceptions import WrongAppError
-from guardian.shortcuts import (
-    get_perms,
-    get_group_perms,
-    get_user_perms,
-    get_users_with_perms,
-    get_groups_with_perms,
-    get_perms_for_model,
-    assign_perm,
-    remove_perm,
-)
+import guardian.shortcuts as gsc
 
 import inspect
-from arches.app.models.models import *
+from arches.app.models.models import Node, NodeGroup, TileModel
+from django.db.models import Q
 from arches.app.models.system_settings import settings
 from arches.app.models.models import ResourceInstance, MapLayer
 
 from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nested
 from arches.app.search.mappings import RESOURCES_INDEX
-from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.permission_backend import (
     PermissionFramework,
     NotUserNorGroup as ArchesNotUserNorGroup,
@@ -67,14 +56,12 @@ if sys.version_info >= (3, 11):
 else:
     ResourceInstancePermissions = dict
 
-from datetime import datetime
-
 
 class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
     def setup(self): ...
 
     def get_perms_for_model(self, cls: str | Model) -> list[Permission]:
-        return self.get_default_permissions_objects(cls) | get_perms_for_model(cls)  # type: ignore
+        return self.get_default_permissions_objects(cls) | gsc.get_perms_for_model(cls)  # type: ignore
 
     def assign_perm(
         self,
@@ -83,7 +70,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         obj: ResourceInstance | None = None,
     ) -> Permission:
         try:
-            return assign_perm(perm, user_or_group, obj=obj)
+            return gsc.assign_perm(perm, user_or_group, obj=obj)
         except NotUserNorGroup:
             raise ArchesNotUserNorGroup()
 
@@ -91,7 +78,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         return PermissionBackend()
 
     def remove_perm(self, perm, user_or_group=None, obj=None):
-        return remove_perm(perm, user_or_group=user_or_group, obj=obj)
+        return gsc.remove_perm(perm, user_or_group=user_or_group, obj=obj)
 
     def process_new_user(self, instance: User, created: bool) -> None:
         pass
@@ -99,15 +86,15 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
     def get_perms(
         self, user_or_group: User | Group, obj: ResourceInstance
     ) -> list[str]:
-        return self.get_default_permissions(user_or_group, obj, all_permissions=True) + get_perms(user_or_group, obj)  # type: ignore
+        return self.get_default_permissions(user_or_group, obj, all_permissions=True) + gsc.get_perms(user_or_group, obj)  # type: ignore
 
     def get_group_perms(
         self, user_or_group: User | Group, obj: ResourceInstance
     ) -> QuerySet[Permission]:
-        return self.get_default_permissions_objects(user_or_group, obj) | get_group_perms(user_or_group, obj)  # type: ignore
+        return self.get_default_permissions_objects(user_or_group, obj) | gsc.get_group_perms(user_or_group, obj)  # type: ignore
 
     def get_user_perms(self, user: User, obj: ResourceInstance) -> QuerySet[Permission]:
-        return self.get_default_permissions_objects(user, obj) | get_user_perms(
+        return self.get_default_permissions_objects(user, obj) | gsc.get_user_perms(
             user, obj
         )
 
@@ -168,9 +155,9 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         map_layers_allowed = []
 
         for map_layer in map_layers_with_read_permission:
-            if ("no_access_to_maplayer" not in get_user_perms(user, map_layer)) or (
-                map_layer.addtomap is False and map_layer.isoverlay is False
-            ):
+            if (
+                "no_access_to_maplayer" not in self.get_user_perms(user, map_layer)
+            ) or (map_layer.addtomap is False and map_layer.isoverlay is False):
                 map_layers_allowed.append(map_layer)
 
         return map_layers_allowed
@@ -182,9 +169,9 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         map_layers_allowed = []
 
         for map_layer in map_layers_with_write_permission:
-            if ("no_access_to_maplayer" not in get_user_perms(user, map_layer)) or (
-                map_layer.addtomap is False and map_layer.isoverlay is False
-            ):
+            if (
+                "no_access_to_maplayer" not in self.get_user_perms(user, map_layer)
+            ) or (map_layer.addtomap is False and map_layer.isoverlay is False):
                 map_layers_allowed.append(map_layer)
 
         return map_layers_allowed
@@ -218,12 +205,12 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         with_group_users: bool = True,
         only_with_perms_in: Iterable[str] | None = None,
     ) -> list[User]:
-        return get_users_with_perms(obj, attach_perms=attach_perms, with_superusers=with_superusers, with_group_users=with_group_users, only_with_perms_in=only_with_perms_in)  # type: ignore
+        return gsc.get_users_with_perms(obj, attach_perms=attach_perms, with_superusers=with_superusers, with_group_users=with_group_users, only_with_perms_in=only_with_perms_in)  # type: ignore
 
     def get_groups_with_perms(
         self, obj: Model, attach_perms: bool = False
     ) -> list[Group]:
-        return get_groups_with_perms(obj, attach_perms=attach_perms)  # type: ignore
+        return gsc.get_groups_with_perms(obj, attach_perms=attach_perms)  # type: ignore
 
     @abstractmethod
     def has_group_perm(self, group, perm, obj): ...
@@ -729,10 +716,8 @@ class CachedObjectPermissionChecker:
             classname = input.__name__
         elif isinstance(input, Model):
             classname = input.__class__.__name__
-        elif isinstance(input, str) and globals().get(input):
+        elif isinstance(input, str):
             classname = input
-        else:
-            raise Exception("Cannot derive model from input.")
 
         user_permission_cache = caches["user_permission"]
 
@@ -743,7 +728,7 @@ class CachedObjectPermissionChecker:
             checker = current_user_cached_permissions.get(classname)
         else:
             checker = ObjectPermissionChecker(user)
-            checker.prefetch_perms(globals()[classname].objects.all())
+            checker.prefetch_perms(apps.get_model("models", classname).objects.all())
 
             current_user_cached_permissions[classname] = checker
             user_permission_cache.set(key, current_user_cached_permissions)

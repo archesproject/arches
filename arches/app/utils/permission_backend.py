@@ -1,8 +1,9 @@
 from abc import abstractmethod, ABCMeta
 
 from arches.app.const import ExtensionType
-from arches.app.models.models import *
+from arches.app.models.models import EditLog, GraphModel
 from arches.app.models.system_settings import settings
+from arches.app.utils.module_importer import get_class_from_modulename
 
 
 class NotUserNorGroup(Exception): ...
