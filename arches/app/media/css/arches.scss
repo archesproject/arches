@@ -12823,6 +12823,11 @@ section .etl-preview table {
 .csv-import-options {
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
+}
+
+.csv-import-options .toggle-container{
+    padding-bottom: 0px;    
 }
 
 .csv-mapping-table-container {
