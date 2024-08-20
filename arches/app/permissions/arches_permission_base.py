@@ -718,6 +718,8 @@ class CachedObjectPermissionChecker:
             classname = input.__class__.__name__
         elif isinstance(input, str):
             classname = input
+        else:
+            raise Exception("Cannot derive model from input.")
 
         user_permission_cache = caches["user_permission"]
 
