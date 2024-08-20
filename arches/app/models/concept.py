@@ -1648,9 +1648,14 @@ class ConceptValue(object):
         query.delete(index=CONCEPTS_INDEX)
 
     def get_scheme_id(self):
-        result = se.search(index=CONCEPTS_INDEX, id=self.id)
-        if result["found"]:
-            return Concept(result["top_concept"])
+        query = Query(se=se, start=0, limit=100)
+        bool_query = Bool()
+        bool_query.filter(Term(field="id", term=self.id))
+        query.add_query(bool_query)
+        results = query.search(index=CONCEPTS_INDEX)
+
+        if len(results["hits"]["hits"]):
+            return Concept(results["hits"]["hits"]["_source"]["top_concept"])
         else:
             return None
 
