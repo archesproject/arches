@@ -260,6 +260,7 @@ const focusInput = () => {
             edit-mode="row"
             striped-rows
             scrollable
+            :style="{ fontSize: 'small' }"
             @row-edit-init="setRowFocus"
             @row-edit-save="saveValue"
         >
@@ -432,5 +433,9 @@ p {
 
 :deep(td > input, textarea) {
     width: 100%;
+}
+
+:deep(.p-datatable-column-title) {
+    font-size: small;
 }
 </style>

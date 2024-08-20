@@ -405,4 +405,8 @@ const focusInput = () => {
     margin-top: 1rem;
     font-size: smaller;
 }
+
+:deep(.p-datatable-column-title) {
+    font-size: small;
+}
 </style>
