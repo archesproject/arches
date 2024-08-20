@@ -57,10 +57,7 @@ class SpatialViewApiTest(TransactionTestCase):
         )
 
         with captured_stdout():
-            management.call_command(
-                "es",
-                operation="index_concepts"
-            )
+            management.call_command("es", operation="index_concepts")
             management.call_command(
                 "packages",
                 operation="import_graphs",
