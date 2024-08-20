@@ -29,20 +29,6 @@ export const ArchesPreset = definePreset(Aura, {
         navigation: "{arches.legacy.sidebar}",
     },
     components: {
-        button: {
-            root: {
-                label: {
-                    fontWeight: 600,
-                },
-            },
-        },
-        datatable: {
-            column: {
-                title: {
-                    fontWeight: 600,
-                },
-            },
-        },
         splitter: {
             handle: {
                 background: "{surface.500}",
