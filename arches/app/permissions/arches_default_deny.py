@@ -16,9 +16,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 from django.contrib.auth.models import User
-from guardian.shortcuts import (
-    get_users_with_perms,
-)
 
 from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource

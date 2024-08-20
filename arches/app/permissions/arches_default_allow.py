@@ -6,9 +6,6 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from guardian.models import GroupObjectPermission
-from guardian.shortcuts import (
-    get_users_with_perms,
-)
 
 from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
@@ -118,10 +115,10 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
 
         """
 
-        user_perms = get_users_with_perms(
+        user_perms = self.get_users_with_perms(
             resource, attach_perms=True, with_group_users=False
         )
-        user_and_group_perms = get_users_with_perms(
+        user_and_group_perms = self.get_users_with_perms(
             resource, attach_perms=True, with_group_users=True
         )
 
