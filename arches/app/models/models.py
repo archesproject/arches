@@ -2323,3 +2323,18 @@ class SpatialView(models.Model):
             "attributenodes": self.attributenodes,
             "isactive": self.isactive,
         }
+
+
+# Import proxy models to ensure they are always discovered.
+# For example, if the urls.py module is not imported because a management command
+# skips system checks, the coincidental importing of the Graph(Proxy)Model
+# by certain views will not happen, and Django will never find the proxy models.
+# Long term, we want the module in INSTALLED_APPS (arches.app.models)
+# to contain all the models, usually done by creating arches.app.models.__init__,
+# but there's a circular import between the model and proxy model that subclasses it.
+# The circular import is the same reason these imports are at the bottom of this file.
+# Or can we replace the proxy models by moving functionality to plain model methods?
+from .card import *
+from .graph import *
+from .resource import *
+from .tile import *
