@@ -41,7 +41,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 if bbox.contains(geom) == False:
                     message = _(
                         "Geometry does not fall within the bounding box of the selected coordinate system. \
-                         Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property."
+                         Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property. \
+                         Also check whether Latitude and Longitude coordinate pairs are ordered correctly."
                     )
                     title = _("Geometry Out Of Bounds")
                     errors.append(
