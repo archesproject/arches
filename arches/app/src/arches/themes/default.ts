@@ -4,11 +4,11 @@ import Aura from "@primevue/themes/aura";
 export const ArchesPreset = definePreset(Aura, {
     primitive: {
         arches: {
-            blue: {
-                400: "#54abd9", // legacy paginator button color
-                500: "#579ddb", // legacy light button color
-                600: "#2986b8", // legacy sidebar highlight
-                950: "#2d3c4b", // legacy sidebar
+            legacy: {
+                paginator: "#54abd9",
+                buttonLight: "#579ddb",
+                sidebarHighlight: "#2986b8",
+                sidebar: "#2d3c4b",
             },
         },
     },
@@ -26,7 +26,7 @@ export const ArchesPreset = definePreset(Aura, {
             900: "{sky.900}",
             950: "{sky.950}",
         },
-        navigation: "{arches.blue.950}",
+        navigation: "{arches.legacy.sidebar}",
     },
     components: {
         button: {
