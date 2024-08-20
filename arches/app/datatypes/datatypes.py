@@ -2,6 +2,7 @@ import copy
 import uuid
 import json
 import decimal
+from arches.app.datatypes.core.util import get_value_from_jsonld
 from arches.app.utils.file_validator import FileValidator
 import filetype
 import base64
@@ -20,6 +21,7 @@ from django.db.models import fields
 from arches.app.const import ExtensionType
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
+from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.system_settings import settings
 from arches.app.models.fields.i18n import I18n_JSONField, I18n_String
 from arches.app.utils.date_utils import ExtendedDateFormat
@@ -453,104 +455,6 @@ class StringDataType(BaseDataType):
         tile_language_codes = set(tile.data[nodeid].keys())
         for code in all_language_codes - tile_language_codes:
             tile.data[nodeid][code] = {"value": "", "direction": direction_lookup[code]}
-
-
-class NonLocalizedStringDataType(BaseDataType):
-    def validate(
-        self,
-        value,
-        row_number=None,
-        source=None,
-        node=None,
-        nodeid=None,
-        strict=False,
-        **kwargs,
-    ):
-        errors = []
-        try:
-            if value is not None:
-                value.upper()
-        except:
-            message = _("This is not a string")
-            error_message = self.create_error_message(
-                value, source, row_number, message
-            )
-            errors.append(error_message)
-        return errors
-
-    def clean(self, tile, nodeid):
-        if tile.data[nodeid] in ["", "''"]:
-            tile.data[nodeid] = None
-
-    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        if nodevalue is not None:
-            val = {
-                "string": nodevalue,
-                "language": "",
-                "nodegroup_id": tile.nodegroup_id,
-                "provisional": provisional,
-            }
-            document["strings"].append(val)
-
-    def transform_export_values(self, value, *args, **kwargs):
-        if value is not None:
-            return value
-
-    def get_search_terms(self, nodevalue, nodeid=None):
-        terms = []
-
-        if nodevalue is not None:
-            if settings.WORDS_PER_SEARCH_TERM is None or (
-                len(nodevalue.split(" ")) < settings.WORDS_PER_SEARCH_TERM
-            ):
-                terms.append(SearchTerm(value=nodevalue, lang=""))
-        return terms
-
-    def append_search_filters(self, value, node, query, request):
-        try:
-            if value["op"] == "null" or value["op"] == "not_null":
-                self.append_null_search_filters(value, node, query, request)
-            elif value["val"] != "":
-                match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
-                match_query = Match(
-                    field="tiles.data.%s" % (str(node.pk)),
-                    query=value["val"],
-                    type=match_type,
-                )
-                if "!" in value["op"]:
-                    query.must_not(match_query)
-                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
-                else:
-                    query.must(match_query)
-        except KeyError as e:
-            pass
-
-    def is_a_literal_in_rdf(self):
-        return True
-
-    def to_rdf(self, edge_info, edge):
-        # returns an in-memory graph object, containing the domain resource, its
-        # type and the string as a string literal
-        g = Graph()
-        if edge_info["range_tile_data"] is not None:
-            g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
-            g.add(
-                (
-                    edge_info["d_uri"],
-                    URIRef(edge.ontologyproperty),
-                    Literal(edge_info["range_tile_data"]),
-                )
-            )
-        return g
-
-    def from_rdf(self, json_ld_node):
-        # returns the string value only
-        # FIXME: Language?
-        value = get_value_from_jsonld(json_ld_node)
-        try:
-            return value[0]
-        except (AttributeError, KeyError) as e:
-            pass
 
 
 class NumberDataType(BaseDataType):
@@ -2111,11 +2015,6 @@ class ResourceInstanceDataType(BaseDataType):
 
     """
 
-    def get_id_list(self, nodevalue):
-        if not isinstance(nodevalue, list):
-            nodevalue = [nodevalue]
-        return nodevalue
-
     def validate(
         self,
         value,
@@ -2128,7 +2027,7 @@ class ResourceInstanceDataType(BaseDataType):
     ):
         errors = []
         if value is not None:
-            resourceXresourceIds = self.get_id_list(value)
+            resourceXresourceIds = self.get_nodevalues(value)
             for resourceXresourceId in resourceXresourceIds:
                 try:
                     resourceid = resourceXresourceId["resourceId"]
@@ -2213,7 +2112,7 @@ class ResourceInstanceDataType(BaseDataType):
 
         resourceid = None
         data = self.get_tile_data(tile)
-        nodevalue = self.get_id_list(data[str(node.nodeid)])
+        nodevalue = self.get_nodevalues(data[str(node.nodeid)])
 
         items = []
         for resourceXresource in nodevalue:
@@ -2229,6 +2128,13 @@ class ResourceInstanceDataType(BaseDataType):
                 logger.info(f'Resource with id "{resourceid}" not in the system.')
         return ", ".join(items)
 
+    def get_relationship_display_value(self, relationship_valueid):
+        preflabel = get_preflabel_from_valueid(relationship_valueid, get_language())
+        if preflabel:
+            return preflabel["value"]
+        else:
+            return None
+
     def to_json(self, tile, node):
         from arches.app.models.resource import (
             Resource,
@@ -2236,7 +2142,7 @@ class ResourceInstanceDataType(BaseDataType):
 
         data = self.get_tile_data(tile)
         if data:
-            nodevalue = self.get_id_list(data[str(node.nodeid)])
+            nodevalue = self.get_nodevalues(data[str(node.nodeid)])
 
             for resourceXresource in nodevalue:
                 try:
@@ -2248,28 +2154,69 @@ class ResourceInstanceDataType(BaseDataType):
                     logger.info(f'Resource with id "{resourceid}" not in the system.')
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        if type(nodevalue) != list and nodevalue is not None:
-            nodevalue = [nodevalue]
-        if nodevalue:
-            for relatedResourceItem in nodevalue:
-                document["ids"].append(
+        nodevalue = self.get_nodevalues(nodevalue)
+        for relatedResourceItem in nodevalue:
+            relationship = None
+            document["ids"].append(
+                {
+                    "id": relatedResourceItem["resourceId"],
+                    "nodegroup_id": tile.nodegroup_id,
+                    "provisional": provisional,
+                }
+            )
+            if relatedResourceItem.get("resourceName", "") != "":
+                document["strings"].append(
                     {
-                        "id": relatedResourceItem["resourceId"],
+                        "string": relatedResourceItem["resourceName"],
                         "nodegroup_id": tile.nodegroup_id,
                         "provisional": provisional,
                     }
                 )
-                if (
-                    "resourceName" in relatedResourceItem
-                    and relatedResourceItem["resourceName"] not in document["strings"]
-                ):
+            for ontology_property_item in [
+                relatedResourceItem.get("ontologyProperty", ""),
+                relatedResourceItem.get("inverseOntologyProperty", ""),
+            ]:
+                if ontology_property_item != "":
+                    try:
+                        uuid.UUID(ontology_property_item)
+                        relationship = (
+                            self.get_relationship_display_value(ontology_property_item)
+                            or ontology_property_item
+                        )
+                    except ValueError:
+                        relationship = ontology_property_item
                     document["strings"].append(
                         {
-                            "string": relatedResourceItem["resourceName"],
+                            "string": relationship,
                             "nodegroup_id": tile.nodegroup_id,
                             "provisional": provisional,
                         }
                     )
+
+    def get_search_terms(self, nodevalue, nodeid=None):
+        terms = []
+        nodevalue = self.get_nodevalues(nodevalue)
+        for relatedResourceItem in nodevalue:
+            if relatedResourceItem.get("resourceName", "") != "":
+                terms.append(
+                    SearchTerm(value=relatedResourceItem["resourceName"], lang="")
+                )
+            for ontology_property_item in [
+                relatedResourceItem.get("ontologyProperty", ""),
+                relatedResourceItem.get("inverseOntologyProperty", ""),
+            ]:
+                if ontology_property_item != "":
+                    try:
+                        uuid.UUID(ontology_property_item)
+                        relationship = (
+                            self.get_relationship_display_value(ontology_property_item)
+                            or ontology_property_item
+                        )
+                        terms.append(SearchTerm(value=relationship, lang=""))
+                    except ValueError:
+                        terms.append(SearchTerm(value=ontology_property_item, lang=""))
+
+        return terms
 
     def transform_value_for_tile(self, value, **kwargs):
         try:
@@ -2414,7 +2361,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         resourceid = None
         data = self.get_tile_data(tile)
         if data:
-            nodevalue = self.get_id_list(data[str(node.nodeid)])
+            nodevalue = self.get_nodevalues(data[str(node.nodeid)])
             items = []
 
             for resourceXresource in nodevalue:
@@ -2538,21 +2485,3 @@ class AnnotationDataType(BaseDataType):
             }
         }
         return mapping
-
-
-def get_value_from_jsonld(json_ld_node):
-    try:
-        language = json_ld_node[0].get("@language")
-        if language is None:
-            language = get_language()
-        return (json_ld_node[0].get("@value"), language)
-    except KeyError as e:
-        try:
-            language = json_ld_node.get("@language")
-            if language is None:
-                language = get_language()
-            return (json_ld_node.get("@value"), language)
-        except AttributeError as e:
-            return
-    except IndexError as e:
-        return

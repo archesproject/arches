@@ -218,13 +218,13 @@ class BranchExcelImporter(BaseImportModule):
 
     def validate_uploaded_file(self, workbook):
         try:
-            graphid = workbook.get_sheet_by_name("metadata")["B1"].value
+            graphid = workbook["metadata"]["B1"].value
             uuid.UUID(graphid)
         except:
             raise FileValidationError()
 
     def get_graphid(self, workbook):
-        graphid = workbook.get_sheet_by_name("metadata")["B1"].value
+        graphid = workbook["metadata"]["B1"].value
         return graphid
 
     def stage_files(self, files, summary, cursor):
