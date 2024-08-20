@@ -26,7 +26,12 @@ class GeoUtils(object):
     def create_geom_collection_from_geojson(self, geojson):
         geoms = []
         for feature in geojson["features"]:
-            geoms.append(GEOSGeometry(JSONSerializer().serialize(feature["geometry"])))
+            geoms.append(
+                GEOSGeometry(
+                    JSONSerializer().serialize(feature["geometry"]),
+                    srid=self.preferred_srid,
+                )
+            )
         return GeometryCollection(geoms)
 
     def get_bounds_from_geojson(self, geojson):
@@ -90,7 +95,7 @@ class GeoUtils(object):
         for geom in geometry:
             arches_json_geometry = {}
             arches_json_geometry["geometry"] = JSONDeserializer().deserialize(
-                GEOSGeometry(geom, srid=4326).json
+                GEOSGeometry(geom, srid=self.preferred_srid).json
             )
             arches_json_geometry["type"] = "Feature"
             arches_json_geometry["id"] = str(uuid.uuid4())
