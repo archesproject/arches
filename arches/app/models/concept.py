@@ -1655,7 +1655,7 @@ class ConceptValue(object):
         results = query.search(index=CONCEPTS_INDEX)
 
         if len(results["hits"]["hits"]):
-            return Concept(results["hits"]["hits"]["_source"]["top_concept"])
+            return Concept(results["hits"]["hits"][0]["_source"]["top_concept"])
         else:
             return None
 
