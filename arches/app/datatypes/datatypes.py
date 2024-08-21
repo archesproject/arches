@@ -1220,6 +1220,22 @@ class FileListDataType(BaseDataType):
                     }
                     document["strings"].append(val)
 
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
+                if value["op"] == "gte" or value["op"] == "lte":
+                    operators = {"gte": None, "lte": None, "lt": None, "gt": None}
+                    operators[value["op"]] = float(value["val"]) * 1000000
+                search_query = Range(
+                    field="tiles.data.%s.size" % (str(node.pk)), **operators
+                )
+                query.must(search_query)
+
+        except KeyError as e:
+            pass
+
     def get_search_terms(self, nodevalue, nodeid):
         terms = []
         for file_obj in nodevalue:
