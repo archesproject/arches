@@ -30,7 +30,8 @@ from arches.app.utils.data_management.resource_graphs.importer import (
     import_graph as resource_graph_importer,
 )
 from arches.app.utils.i18n import LanguageSynchronizer
-from tests.base_test import ArchesTestCase, sync_overridden_test_settings_to_arches
+from arches.test.utils import sync_overridden_test_settings_to_arches
+from tests.base_test import ArchesTestCase
 from django.test import override_settings
 
 

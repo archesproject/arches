@@ -5,7 +5,7 @@ from django.test import TestCase, override_settings
 
 from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_directories, get_class_from_modulename
-from tests.base_test import sync_overridden_test_settings_to_arches
+from arches.test.utils import sync_overridden_test_settings_to_arches
 
 # these tests can be run from the command line via
 # python manage.py test tests.utils.test_module_importer --settings="tests.test_settings"
