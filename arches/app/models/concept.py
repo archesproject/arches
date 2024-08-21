@@ -32,6 +32,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.i18n import capitalize_region, rank_label
 from django.utils.translation import get_language, gettext as _
 from django.db import IntegrityError
+from elasticsearch.exceptions import NotFoundError
 from psycopg2.extensions import AsIs
 
 import logging
@@ -1648,11 +1649,12 @@ class ConceptValue(object):
         query.delete(index=CONCEPTS_INDEX)
 
     def get_scheme_id(self):
-        result = se.search(index=CONCEPTS_INDEX, id=self.id)
-        if result["found"]:
-            return Concept(result["top_concept"])
-        else:
-            return None
+        try:
+            result = se.search(index=CONCEPTS_INDEX, id=self.id)
+            if result["found"]:
+                return Concept(result["top_concept"])
+        except NotFoundError:
+            logger.error(f"concept with id: {self.id} not in index")
 
 
 def get_preflabel_from_conceptid(conceptid, lang):
@@ -1723,6 +1725,11 @@ def get_valueids_from_concept_label(label, conceptid=None, lang=None):
 
 
 def get_preflabel_from_valueid(valueid, lang):
-    concept_label = se.search(index=CONCEPTS_INDEX, id=valueid)
-    if concept_label["found"]:
-        return get_preflabel_from_conceptid(concept_label["_source"]["conceptid"], lang)
+    try:
+        concept_label = se.search(index=CONCEPTS_INDEX, id=valueid)
+        if concept_label["found"]:
+            return get_preflabel_from_conceptid(
+                concept_label["_source"]["conceptid"], lang
+            )
+    except NotFoundError:
+        logger.error(f"concept value with id: {valueid} not in index")
