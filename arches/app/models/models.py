@@ -29,6 +29,7 @@ from django.contrib.gis.db import models
 from django.db import connection
 from django.db.models import JSONField
 from django.core.cache import caches
+from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template, render_to_string
@@ -1203,10 +1204,9 @@ class SearchComponent(models.Model):
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
     type = models.TextField()
-    componentpath = models.TextField(unique=True)
+    componentpath = models.TextField(unique=True, null=True)
     componentname = models.TextField(unique=True)
-    sortorder = models.IntegerField(blank=True, null=True, default=None)
-    enabled = models.BooleanField(default=False)
+    config = models.JSONField(default=dict)
 
     def __str__(self):
         return self.name
@@ -1232,6 +1232,18 @@ class SearchComponent(models.Model):
         )
 
         return JSONSerializer().serialize(self)
+
+
+@receiver(pre_save, sender=SearchComponent)
+def ensure_single_default_searchview(sender, instance, **kwargs):
+    if instance.config.get("default", False) and instance.type == "search-view":
+        existing_default = SearchComponent.objects.filter(
+            config__default=True, type="search-view"
+        ).exclude(searchcomponentid=instance.searchcomponentid)
+        if existing_default.exists():
+            raise ValidationError(
+                "Only one search logic component can be default at a time."
+            )
 
 
 class SearchExportHistory(models.Model):

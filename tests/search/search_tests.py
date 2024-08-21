@@ -35,6 +35,7 @@ from django.http import HttpRequest
 from django.contrib.auth.models import User
 from django.test.utils import captured_stdout
 from tests.base_test import ArchesTestCase
+from tests.utils.search_test_utils import sync_es
 
 # these tests can be run from the command line via
 # python manage.py test tests.search.search_tests --settings="tests.test_settings"
@@ -96,7 +97,7 @@ class SearchTests(ArchesTestCase):
             y = {"id": i + 100, "type": "altLabel", "value": "test alt label"}
             se.index_data(index="test", body=y, idfield="id", refresh=True)
 
-        time.sleep(3)
+        sync_es(se)
 
         query = Query(se, start=0, limit=100)
         match = Match(field="type", query="altLabel")
