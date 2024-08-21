@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10799_geojsongeometry_featureid"),
+        ("models", "11179_file_and_geom_search"),
     ]
 
     sql = """
