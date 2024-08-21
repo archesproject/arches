@@ -12820,6 +12820,11 @@ section .etl-preview table {
     width: 240px;
 }
 
+.csv-import-options {
+    display: flex;
+    flex-direction: row;
+}
+
 .csv-mapping-table-container {
     overflow: auto;
     width: calc(100vw - 100px);

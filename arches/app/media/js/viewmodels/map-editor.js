@@ -8,6 +8,7 @@ define([
     "geojson-extent",
     "geojsonhint",
     "togeojson",
+    "shpjsesm",
     "proj4",
     "views/components/map",
     "views/components/cards/select-feature-layers",
@@ -22,6 +23,7 @@ define([
     geojsonExtent,
     geojsonhint,
     toGeoJSON,
+    shpjs,
     proj4,
     MapComponentViewModel,
     selectFeatureLayersFactory
@@ -719,32 +721,44 @@ define([
             var promises = [];
             for (var i = 0; i < files.length; i++) {
                 var extension = files[i].name.split(".").pop();
-                if (!["kml", "json", "geojson"].includes(extension)) {
+                if (!["kml", "json", "geojson", "shp", "zip"].includes(extension)) {
                     errors.push({
                         message: 'File unsupported: "' + files[i].name + '"',
                     });
                 } else {
                     promises.push(
-                        new Promise(function (resolve) {
-                            var file = files[i];
-                            var extension = file.name.split(".").pop();
-                            var reader = new window.FileReader();
-                            reader.onload = function (e) {
-                                var geoJSON;
-                                if (["json", "geojson"].includes(extension))
-                                    geoJSON = JSON.parse(e.target.result);
-                                else
-                                    geoJSON = toGeoJSON.kml(
-                                        new window.DOMParser().parseFromString(
-                                            e.target.result,
-                                            "text/xml"
-                                        )
-                                    );
+                        new Promise (function(resolve) {
+                        var file = files[i];
+                        var extension = file.name.split(".").pop();
+                        var reader = new window.FileReader();
+                        reader.onload = function(e) {
+                            var geoJSON;
+                            if (["json", "geojson"].includes(extension))
+                                geoJSON = JSON.parse(e.target.result);
+                            else if (extension === "kml")
+                                geoJSON = toGeoJSON.kml(
+                                    new window.DOMParser().parseFromString(
+                                        e.target.result,
+                                        "text/xml")
+                                );
+                            else if (extension === "shp")
+                                geoJSON = {"type": "FeatureCollection", "features":
+                                        shpjs.parseShp(e.target.result).reduce(function(features, geometry) {
+                                            features = features.concat({"type": "Feature", "geometry": geometry, "properties": {}});
+                                            return features;
+                                        }, [])};
+                            else if (extension === "zip")
+                                shpjs.parseZip(e.target.result).then(function(parsedZip) {
+                                    resolve(parsedZip);
+                                });
+                            if (extension !== "zip")
                                 resolve(geoJSON);
-                            };
+                        };
+                        if (["shp", "zip"].includes(extension))
+                            reader.readAsArrayBuffer(file);
+                        else
                             reader.readAsText(file);
-                        })
-                    );
+                    }));
                 }
             }
             Promise.all(promises).then(function (results) {
