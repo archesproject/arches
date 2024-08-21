@@ -34,51 +34,6 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
     ):
         errors = []
 
-        def validate_lat_lon(coords):
-            # from geom.coords
-            for coord_tuple in coords:
-                if isinstance(coord_tuple, tuple):  # still in a ring
-                    validate_lat_lon(coord_tuple)
-                else:
-                    lon = coord_tuple[0]
-                    lat = coord_tuple[1]
-                    if -90 <= lon <= 90 and -180 <= lat <= 180:
-                        message = _(
-                            "It appears that the latitude and longitude values may be swapped in one or more coordinate pairs."
-                        )
-                        title = _("Latitude and Longitude Swapped")
-                        errors.append(
-                            {
-                                "type": "ERROR",
-                                "message": "datatype: {0} value: {1} {2} - {3}. {4}".format(
-                                    self.datatype_model.datatype,
-                                    value,
-                                    source,
-                                    message,
-                                    "This data was not imported.",
-                                ),
-                                "title": title,
-                            }
-                        )
-                    if not (-180 <= lon <= 180 and -90 <= lat <= 90):
-                        message = _(
-                            "Longitude and/or latitude values are out of their valid ranges."
-                        )
-                        title = _("Invalid Longitude or Latitude")
-                        errors.append(
-                            {
-                                "type": "ERROR",
-                                "message": "datatype: {0} value: {1} {2} - {3}. {4}".format(
-                                    self.datatype_model.datatype,
-                                    value,
-                                    source,
-                                    message,
-                                    "This data was not imported.",
-                                ),
-                                "title": title,
-                            }
-                        )
-
         def validate_geom_bbox(geom):
             try:
                 bbox = Polygon(settings.DATA_VALIDATION_BBOX)
@@ -124,7 +79,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 try:
                     geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
                     if geom.valid:
-                        validate_lat_lon(geom.coords)
+                        errors += self.validate_lat_lon(geom.coords, source, value)
                         validate_geom_bbox(geom)
                     else:
                         raise Exception
@@ -136,6 +91,40 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     )
                     errors.append(error_message)
         return errors
+
+    def validate_lat_lon(self, coords, source, value, new_errors=[]):
+        # from GEOSGeometry().coords
+        if len(coords) == 2 and isinstance(coords[0], float):
+            lon = coord_tuple[0]
+            lat = coord_tuple[1]
+            if -90 <= lon <= 90 and -180 <= lat <= 180:
+                message = _(
+                    "It appears that the latitude and longitude values may be swapped in one or more coordinate pairs."
+                )
+                title = _("Latitude and Longitude Swapped")
+                new_errors.append(
+                    {
+                        "type": "ERROR",
+                        "message": "datatype: {0} value: {1} {2} - {3}. {4}".format(
+                            self.datatype_model.datatype,
+                            value,
+                            source,
+                            message,
+                            "This data was not imported.",
+                        ),
+                        "title": title,
+                    }
+                )
+
+        else:  # still in a ring
+            for coord_tuple in coords:
+                returned_errors = self.validate_lat_lon(
+                    coord_tuple, source, value, new_errors
+                )
+                if len(returned_errors):
+                    break
+
+        return new_errors
 
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
