@@ -40,6 +40,7 @@ pip-wheel-metadata
 .eggs
 *.code-workspace
 webpack-stats.json
+lcov.info
 .DS_STORE
 CACHE
 .tsconfig-paths.json
