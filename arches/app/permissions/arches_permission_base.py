@@ -93,7 +93,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
     ) -> QuerySet[Permission]:
         return self.get_default_permissions_objects(user_or_group, obj) | gsc.get_group_perms(user_or_group, obj)  # type: ignore
 
-    def get_user_perms(self, user: User, obj: ResourceInstance) -> QuerySet[Permission]:
+    def get_user_perms(self, user: User, obj: Model) -> QuerySet[Permission]:
         return self.get_default_permissions_objects(user, obj) | gsc.get_user_perms(
             user, obj
         )
@@ -585,7 +585,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
     def get_default_permissions(
         self,
         user_or_group: User | Group = None,
-        resource_instance: ResourceInstance = None,
+        model: Model = None,
         all_permissions: bool = False,
         cls: str | Model = None,
     ) -> list[str]:
@@ -593,14 +593,17 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         Gets default permissions (if any) for a resource instance.
         """
         default_permissions_settings = settings.PERMISSION_DEFAULTS
-        if not default_permissions_settings or resource_instance is None:
+        if not default_permissions_settings or model is None:
             return []
 
-        default_permissions_for_graph = (
-            default_permissions_settings[str(resource_instance.graph_id)]
-            if str(resource_instance.graph_id) in default_permissions_settings
-            else None
-        )
+        if isinstance(model, ResourceInstance):
+            default_permissions_for_graph = (
+                default_permissions_settings[str(model.graph_id)]
+                if str(model.graph_id) in default_permissions_settings
+                else None
+            )
+        else:
+            return []  # default permissions for nodegroups not currently supported
 
         if default_permissions_for_graph is None:
             return []
@@ -629,12 +632,10 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
     def get_default_permissions_objects(
         self,
         user_or_group: User | Group = None,
-        resource_instance: ResourceInstance = None,
+        model: Model = None,
         cls: str | Model = None,
     ) -> QuerySet[Permission]:
-        default_permissions = self.get_default_permissions(
-            user_or_group, resource_instance, cls
-        )
+        default_permissions = self.get_default_permissions(user_or_group, model, cls)
         permissions = Permission.objects.filter(codename__in=default_permissions)
         return permissions
 
