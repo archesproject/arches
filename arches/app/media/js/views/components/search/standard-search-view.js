@@ -18,7 +18,7 @@ define([
             var firstEnabledFilter = _.find(this.sharedStateObject.searchFilterConfigs, function(filter) {
                 return filter.config.layoutType === 'tabbed';
             }, this);
-            this.selectedTab = ko.observable(firstEnabledFilter.componentname);
+            this.selectedTab = ko.observable(firstEnabledFilter.type);
             this.sharedStateObject.selectedTab = this.selectedTab;
             this.resultsExpanded = ko.observable(true);
             this.isResourceRelatable = function(graphId) {
@@ -41,11 +41,11 @@ define([
             };
             this.sharedStateObject.toggleRelationshipCandidacy = this.toggleRelationshipCandidacy;
 
-            this.selectPopup = function(componentname) {
-                if(this.selectedPopup() !== '' && componentname === this.selectedPopup()) {
+            this.selectPopup = function(component_type) {
+                if(this.selectedPopup() !== '' && component_type === this.selectedPopup()) {
                     this.selectedPopup('');
                 } else {
-                    this.selectedPopup(componentname);
+                    this.selectedPopup(component_type);
                 }
             };
             this.searchFilterVms[componentName](this);

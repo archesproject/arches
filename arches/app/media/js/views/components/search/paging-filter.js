@@ -60,7 +60,7 @@ define([
             if(page){
                 this.userRequestedNewPage = true;
                 this.page(page);
-                this.shiftFocus('#search-results-list');
+                this.shiftFocus('#search-results-list-type');
             }
         },
 

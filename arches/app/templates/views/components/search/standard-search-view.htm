@@ -63,14 +63,14 @@
                 <div class="search-type-btn-panel" data-bind="foreach: {data: sharedStateObject.searchFilterConfigs, as: 'filter'}" role="tablist">
                     <!-- ko if: filter.config.layoutType === 'tabbed' && $parent.sharedStateObject.userCanReadResources -->
                     <button class="search-type-btn relative" role="tab" data-bind="onEnterkeyClick, onSpaceClick,
-                        css: {'active': $parent.selectedTab() === filter.componentname}, 
+                        css: {'active': $parent.selectedTab() === filter.type}, 
                         click: function(){
-                            $parent.selectedTab(filter.componentname); 
-                            $root.shiftFocus('#' + filter.componentname + '-tabpanel');
+                            $parent.selectedTab(filter.type); 
+                            $root.shiftFocus('#' + filter.type + '-tabpanel');
                         },
                         attr: {
-                            'aria-selected': ($parent.selectedTab() === filter.componentname).toString(), 
-                            'aria-controls': filter.componentname + '-tabpanel'
+                            'aria-selected': ($parent.selectedTab() === filter.type).toString(), 
+                            'aria-controls': filter.type + '-tabpanel'
                         }                  
                     ">
                         <i data-bind="css: filter.icon"></i>
@@ -83,20 +83,20 @@
                     <div class="popup-panel-row" data-bind="foreach: {data: sharedStateObject.searchFilterConfigs, as: 'filter'}" role="tablist">
                         <!-- ko if: filter.config.layoutType === 'popup' && $parent.sharedStateObject.userCanReadResources -->
                         <button class="saved-search-container search-type-btn-popup relative" role="tab" data-bind="onEnterkeyClick, onSpaceClick,
-                            css: {'active': $parent.selectedPopup() === filter.componentname}, 
+                            css: {'active': $parent.selectedPopup() === filter.type}, 
                             click: function(data, event){
-                                $parent.selectPopup(filter.componentname); 
+                                $parent.selectPopup(filter.type); 
                                 $root.handleEscKey(
                                     event.currentTarget,
-                                    '#' + filter.componentname + '-popup-tabpanel',
-                                    '#' + filter.componentname + '-close-btn'
+                                    '#' + filter.type + '-popup-tabpanel',
+                                    '#' + filter.type + '-close-btn'
                                 );
                             },
                             attr: {
-                                id: filter.componentname + '-open-btn',
-                                'aria-expanded': ($parent.selectedPopup() === filter.componentname).toString(),
+                                id: filter.type + '-open-btn',
+                                'aria-expanded': ($parent.selectedPopup() === filter.type).toString(),
                                 'aria-label': filter.name,
-                                'aria-controls': filter.componentname + '-popup-tabpanel'
+                                'aria-controls': filter.type + '-popup-tabpanel'
                             }
                         ">
                             <div data-placement="auto" data-toggle="tooltip" 
@@ -116,9 +116,9 @@
                 <div class="card-form-preview-container relative">
                     <div class="tab-content relative" data-bind="foreach: {data: sharedStateObject.searchFilterConfigs, as: 'filter'}">
                         <!-- ko if: filter.config.layoutType === 'tabbed' -->
-                        <div class="tab-pane" role="tabpanel" tabindex="-1" data-bind="css: {'active': $parent.selectedTab() === filter.componentname}, 
+                        <div class="tab-pane" role="tabpanel" tabindex="-1" data-bind="css: {'active': $parent.selectedTab() === filter.type}, 
                             attr: {
-                                id: filter.componentname + '-tabpanel',
+                                id: filter.type + '-tabpanel',
                                 'aria-label': filter.name,
                             },
                         ">
@@ -132,9 +132,9 @@
 
                     <div class="tab-content search-popup-panel" data-bind="foreach: {data: sharedStateObject.searchFilterConfigs, as: 'filter'}, visible: selectedPopup() !== ''">
                         <!-- ko if: filter.config.layoutType === 'popup' -->
-                        <div class="tab-pane" role="tabpanel" tabindex="-1" data-bind="css: {'active': $parent.selectedPopup() === filter.componentname}, 
+                        <div class="tab-pane" role="tabpanel" tabindex="-1" data-bind="css: {'active': $parent.selectedPopup() === filter.type}, 
                             attr: {
-                                id: filter.componentname + '-popup-tabpanel',
+                                id: filter.type + '-popup-tabpanel',
                                 'aria-label': filter.name,
                             },
                         ">
