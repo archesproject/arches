@@ -226,7 +226,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="graphmodel",
             constraint=models.CheckConstraint(
-                check=(
+                condition=(
                     models.Q(isresource=False, resource_instance_lifecycle__isnull=True)
                     | models.Q(
                         isresource=True,
