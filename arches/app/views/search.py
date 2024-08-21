@@ -16,7 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from base64 import b64decode
 import logging
 import os
 from django.contrib.auth import authenticate
@@ -26,9 +25,18 @@ from django.db import connection
 from django.shortcuts import render
 from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
-from arches.app.models import models
-from arches.app.models.concept import Concept
-from arches.app.models.system_settings import settings
+from arches.app.models.models import (
+    MapMarker,
+    GraphModel,
+    DDataType,
+    Widget,
+    ReportTemplate,
+    CardComponent,
+    Geocoder,
+    Node,
+    SearchExportHistory,
+)
+from arches.app.models.concept import Concept, get_preflabel_from_conceptid
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -36,7 +44,6 @@ from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
     Match,
     Query,
-    Nested,
     Term,
     Terms,
     MaxAgg,
@@ -46,7 +53,6 @@ from arches.app.search.search_export import SearchResultsExporter
 from arches.app.search.time_wheel import TimeWheel
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.views.base import MapBaseManagerView
-from arches.app.models.concept import get_preflabel_from_conceptid
 from arches.app.utils import permission_backend
 from arches.app.utils.permission_backend import (
     get_nodegroups_by_perm,
@@ -66,23 +72,21 @@ logger = logging.getLogger(__name__)
 
 class SearchView(MapBaseManagerView):
     def get(self, request):
-        map_markers = models.MapMarker.objects.all()
+        map_markers = MapMarker.objects.all()
         resource_graphs = (
-            models.GraphModel.objects.exclude(
-                pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
-            )
+            GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
             .exclude(publication=None)
         )
-        geocoding_providers = models.Geocoder.objects.all()
+        geocoding_providers = Geocoder.objects.all()
         search_component_factory = SearchFilterFactory(request)
         searchview_instance = search_component_factory.get_searchview_instance()
         search_components = searchview_instance.get_searchview_filters()
 
-        datatypes = models.DDataType.objects.all()
-        widgets = models.Widget.objects.all()
-        templates = models.ReportTemplate.objects.all()
-        card_components = models.CardComponent.objects.all()
+        datatypes = DDataType.objects.all()
+        widgets = Widget.objects.all()
+        templates = ReportTemplate.objects.all()
+        card_components = CardComponent.objects.all()
 
         context = self.get_context_data(
             map_markers=map_markers,
@@ -241,7 +245,7 @@ def get_resource_model_label(result):
     if len(result["nodegroupid"]["buckets"]) > 0:
         for nodegroup in result["nodegroupid"]["buckets"]:
             nodegroup_id = nodegroup["key"]
-            node = models.Node.objects.get(nodeid=nodegroup_id)
+            node = Node.objects.get(nodeid=nodegroup_id)
             graph = node.graph
         return "{0} - {1}".format(graph.name, node.name)
     else:
@@ -489,7 +493,7 @@ def get_export_file(request):
     user = request.user
     url = None
     if exportid is not None:
-        export = models.SearchExportHistory.objects.get(pk=exportid)
+        export = SearchExportHistory.objects.get(pk=exportid)
         try:
             url = export.downloadfile.url
             return JSONResponse({"message": _("Downloading"), "url": url}, indent=4)
