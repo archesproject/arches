@@ -618,7 +618,7 @@ class GraphModel(models.Model):
 
         constraints = [
             models.CheckConstraint(
-                check=(
+                condition=(
                     Q(isresource=False, resource_instance_lifecycle__isnull=True)
                     | Q(
                         isresource=True,
