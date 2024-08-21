@@ -560,9 +560,26 @@ define([
             
             var unorderedSavedData = ko.observableArray();
 
+            var errorTiles = [];
+
             self.tiles().forEach(function(tile) {
                 tile.save(
-                    function(){/* onFail */}, 
+                    function(response){
+                        self.alert(new AlertViewModel(
+                            'ep-alert-red', 
+                            response.responseJSON.title,
+                            response.responseJSON.message,
+                            null, 
+                            function(){ return; }
+                        ));
+
+                        // Put error tiles back onto right side
+                        self.tiles(null);
+                        errorTiles.push(tile);
+                        self.tiles(errorTiles);
+
+                        self.saving(false); // Get node list to reappear
+                    }, 
                     function(savedTileData) {
                         unorderedSavedData.push(savedTileData);
                     }
