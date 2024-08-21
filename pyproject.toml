@@ -23,14 +23,14 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Framework :: Django",
-    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
     "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
 ]
 dependencies = [
     "arcgis2geojson==2.0.0",
     "celery==5.3.6",
     "defusedxml==0.7.1",
-    "Django>=5.0.8,<5.1.0",
+    "Django>=5.1.0,<5.2.0",
     "django-celery-results==2.5.1",
     "django-cors-headers==4.2.0",
     "django-guardian==2.4.0",
