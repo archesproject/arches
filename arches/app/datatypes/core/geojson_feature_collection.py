@@ -5,6 +5,7 @@ import uuid
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
 from arches.app.models.system_settings import settings
+from arches.app.search.elasticsearch_dsl_builder import Match
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
 from arches.app.utils.geo_utils import GeoUtils
 from django.contrib.gis.geos import GEOSGeometry
@@ -231,6 +232,24 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     "provisional": provisional,
                 }
             )
+
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif (
+                value["op"] == "Point"
+                or value["op"] == "LineString"
+                or value["op"] == "Polygon"
+            ):
+                match_query = Match(
+                    field="tiles.data.%s.features.geometry.type" % (str(node.pk)),
+                    query=value["op"],
+                    type="phrase",
+                )
+                query.must(match_query)
+        except KeyError as e:
+            pass
 
     def split_geom(self, feature, max_feature_in_bytes=32766):
         geom = feature["geometry"]

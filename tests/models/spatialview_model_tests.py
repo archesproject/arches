@@ -72,7 +72,9 @@ class SpatialViewTests(ArchesTestCase):
             "json",
             "SpatialViews_Test_Model_Data.json",
         )
+
         with captured_stdout():
+            management.call_command("es", operation="index_concepts")
             management.call_command(
                 "packages",
                 operation="import_graphs",
@@ -89,25 +91,6 @@ class SpatialViewTests(ArchesTestCase):
                 spatialviews_other_test_data_path
             ).import_business_data()
             BusinessDataImporter(spatialviews_test_data_path).import_business_data()
-
-        # load en concepts value
-        self.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (%s, '00000000-0000-0000-0000-000000000007', 'prefLabel', '(en) is related to', 'en');",
-                [self.extra_concept_value_id],
-            )
-        self.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
-
-    @classmethod
-    def tearDownClass(self):
-        # delete extra concept value
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "DELETE FROM values WHERE valueid = %s;", [self.extra_concept_value_id]
-            )
-
-        super().tearDownClass()
 
     def setUp(self):
         # test ids
@@ -336,6 +319,7 @@ class SpatialViewTriggerTests(TransactionTestCase):
         )
 
         with captured_stdout():
+            management.call_command("es", operation="index_concepts")
             management.call_command(
                 "packages",
                 operation="import_graphs",
@@ -356,15 +340,6 @@ class SpatialViewTriggerTests(TransactionTestCase):
         self.spatialviews_test_model_id = "5db49c51-2c70-47b3-b7be-66afced863c8"
         self.spatialviews_other_test_model_id = "114dd3fb-404d-4fb3-a639-1333b89cf60c"
         self.spatialview_geometrynode_id = "95b2c8de-1cf8-11ef-971a-0242ac130005"
-
-        # load en concepts value
-        self.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "INSERT INTO values(valueid, conceptid, valuetype, value, languageid) VALUES (%s, '00000000-0000-0000-0000-000000000007', 'prefLabel', '(en) is related to', 'en');",
-                [self.extra_concept_value_id],
-            )
-        self.extra_concept_value_id = "ac41d9be-79db-4256-b368-2f4559cfbe66"
 
         # create a spatialview with objects to test triggers
         self.spatialview_slug = "spatialviews_test"

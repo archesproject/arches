@@ -3,6 +3,7 @@ define([
     'knockout-mapping',
     'jquery',
     'dropzone',
+    'utils/strings',
     'uuid',
     'arches',
     'viewmodels/alert-json',
@@ -11,7 +12,7 @@ define([
     'bindings/datatable',
     'bindings/dropzone',
     'bindings/resizable-sidepanel',
-], function(ko, koMapping, $, dropzone, uuid, arches, JsonErrorAlertViewModel, importSingleCSVTemplate) {
+], function(ko, koMapping, $, dropzone, stringUtils, uuid, arches, JsonErrorAlertViewModel, importSingleCSVTemplate) {
     const viewModel = function(params) {
         const self = this;
         this.loadDetails = params.load_details || ko.observable();
@@ -56,6 +57,47 @@ define([
         this.ready = ko.computed(() => {
             return self.selectedGraph() && self.fieldMapping().find((mapping) => mapping.node());
         });
+        this.suggestField = function(i) {
+            let bestMatch = null;
+            let highestScore = 0;
+            if (!!self.headers()) {
+                const header = stringUtils.normalizeText(self.headers()[i]);
+                if (header == 'resourceid')
+                    return null;
+        
+                self.nodes().forEach(function(node) {
+                    if (node.name) {
+                        const nameNorm = stringUtils.normalizeText(node.name);
+                        const aliasNorm = node.alias ? stringUtils.normalizeText(node.alias) : '';
+        
+                        // Compute similarity scores
+                        const scoreWithName = stringUtils.compareTwoStrings(header, nameNorm);
+                        const scoreWithAlias = stringUtils.compareTwoStrings(header, aliasNorm);
+                        const bestNodeScore = Math.max(scoreWithName, scoreWithAlias);
+                        if (bestNodeScore > highestScore) {
+                            highestScore = bestNodeScore;
+                            bestMatch = node;
+                        }
+                    }
+                });
+        
+                // Return the alias of the best match if the highest score is above a certain threshold (e.g., 0.8)
+                if (bestMatch && highestScore > 0.5) {
+                    return bestMatch.alias;
+                }
+            }
+            return null;
+        }
+        this.guessAllMappings = function() {
+            if (self.headers()) {
+                self.headers().forEach((header, i) => {
+                    const bestMatchNode = self.suggestField(i);
+                    if (bestMatchNode && self.fieldMapping().length > i) {
+                        self.fieldMapping()[i].node(bestMatchNode);
+                    }
+                });
+            }
+        };
 
         this.createTableConfig = function(col) {
             return {
