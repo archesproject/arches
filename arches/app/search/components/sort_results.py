@@ -1,5 +1,4 @@
 from arches.app.search.components.base import BaseSearchFilter
-from arches.app.search.elasticsearch_dsl_builder import Nested
 from django.utils.translation import get_language
 
 details = {
@@ -8,7 +7,7 @@ details = {
     "icon": "",
     "modulename": "sort_results.py",
     "classname": "SortResults",
-    "type": "",
+    "type": "sort-results-type",
     "componentpath": "views/components/search/sort-results",
     "componentname": "sort-results",
     "config": {},

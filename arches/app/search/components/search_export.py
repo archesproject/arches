@@ -1,5 +1,3 @@
-from arches.app.models.system_settings import settings
-from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.search.components.base import BaseSearchFilter
 
 details = {
@@ -8,7 +6,7 @@ details = {
     "icon": "fa fa-download",
     "modulename": "search_export.py",
     "classname": "SearchExport",
-    "type": "popup",
+    "type": "search-export-type",
     "componentpath": "views/components/search/search-export",
     "componentname": "search-export",
     "config": {},

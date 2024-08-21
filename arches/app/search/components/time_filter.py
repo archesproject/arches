@@ -1,11 +1,8 @@
-from datetime import datetime
-from arches.app.models import models
-from arches.app.models.system_settings import settings
+from arches.app.models.models import CardModel, CardXNodeXWidget, GraphModel, Node
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Term, Terms, Range
 from arches.app.search.components.base import BaseSearchFilter
-from django.db.models import Q
 
 details = {
     "searchcomponentid": "",
@@ -13,7 +10,7 @@ details = {
     "icon": "fa fa-calendar",
     "modulename": "time_filter.py",
     "classname": "TimeFilter",
-    "type": "popup",
+    "type": "time-filter-type",
     "componentpath": "views/components/search/time-filter",
     "componentname": "time-filter",
     "config": {},
@@ -157,7 +154,7 @@ class TimeFilter(BaseSearchFilter):
     def view_data(self):
         ret = {}
         date_datatypes = ["date", "edtf"]
-        date_nodes = models.Node.objects.filter(
+        date_nodes = Node.objects.filter(
             datatype__in=date_datatypes,
             graph__isresource=True,
             graph__publication__isnull=False,
@@ -168,11 +165,11 @@ class TimeFilter(BaseSearchFilter):
             if self.request.user.has_perm("read_nodegroup", node.nodegroup)
         }
 
-        date_cardxnodesxwidgets = models.CardXNodeXWidget.objects.filter(
+        date_cardxnodesxwidgets = CardXNodeXWidget.objects.filter(
             node_id__in=list(node_graph_dict.keys())
         )
         card_ids = [cnw.card_id for cnw in date_cardxnodesxwidgets]
-        cards = models.CardModel.objects.filter(cardid__in=card_ids)
+        cards = CardModel.objects.filter(cardid__in=card_ids)
         card_name_dict = {str(card.cardid): card.name for card in cards}
         node_obj_list = []
         for cnw in date_cardxnodesxwidgets:
@@ -183,7 +180,7 @@ class TimeFilter(BaseSearchFilter):
             node_obj_list.append(node_obj)
 
         ret["date_nodes"] = node_obj_list
-        ret["graph_models"] = models.GraphModel.objects.filter(
+        ret["graph_models"] = GraphModel.objects.filter(
             graphid__in=list(node_graph_dict.values())
         )
         return ret

@@ -1,8 +1,14 @@
-from arches.app.models import models
+from arches.app.models.models import (
+    Node,
+    DDataType,
+    GraphModel,
+    CardModel,
+    CardXNodeXWidget,
+)
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Terms
+from arches.app.search.elasticsearch_dsl_builder import Bool, Nested
 from arches.app.search.components.base import BaseSearchFilter
 
 details = {
@@ -11,7 +17,7 @@ details = {
     "icon": "fa fa-check-circle-o",
     "modulename": "advanced_search.py",
     "classname": "AdvancedSearch",
-    "type": "filter",
+    "type": "advanced-search-type",
     "componentpath": "views/components/search/advanced-search",
     "componentname": "advanced-search",
     "config": {},
@@ -32,7 +38,7 @@ class AdvancedSearch(BaseSearchFilter):
             null_query = Bool()
             for key, val in advanced_filter.items():
                 if key != "op":
-                    node = models.Node.objects.get(pk=key)
+                    node = Node.objects.get(pk=key)
                     if self.request.user.has_perm("read_nodegroup", node.nodegroup):
                         datatype = datatype_factory.get_instance(node.datatype)
                         try:
@@ -69,27 +75,25 @@ class AdvancedSearch(BaseSearchFilter):
     def view_data(self):
         ret = {}
         resource_graphs = (
-            models.GraphModel.objects.exclude(
-                pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
-            )
+            GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
             .exclude(publication=None)
         )
         searchable_datatypes = [
-            d.pk for d in models.DDataType.objects.filter(issearchable=True)
+            d.pk for d in DDataType.objects.filter(issearchable=True)
         ]
-        searchable_nodes = models.Node.objects.filter(
+        searchable_nodes = Node.objects.filter(
             graph__isresource=True,
             graph__publication__isnull=False,
             datatype__in=searchable_datatypes,
             issearchable=True,
         )
 
-        resource_cards = models.CardModel.objects.filter(
+        resource_cards = CardModel.objects.filter(
             graph__isresource=True, graph__publication__isnull=False
         ).select_related("nodegroup")
-        cardwidgets = models.CardXNodeXWidget.objects.filter(node__in=searchable_nodes)
-        datatypes = models.DDataType.objects.all()
+        cardwidgets = CardXNodeXWidget.objects.filter(node__in=searchable_nodes)
+        datatypes = DDataType.objects.all()
 
         # only allow cards that the user has permission to read
         searchable_cards = []

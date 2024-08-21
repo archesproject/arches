@@ -1,5 +1,4 @@
 from arches.app.models.system_settings import settings
-from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.search.components.base import BaseSearchFilter
 
 details = {
@@ -8,7 +7,7 @@ details = {
     "icon": "fa fa-bookmark",
     "modulename": "saved_searches.py",
     "classname": "SavedSearches",
-    "type": "popup",
+    "type": "saved-searches-type",
     "componentpath": "views/components/search/saved-searches",
     "componentname": "saved-searches",
     "config": {},

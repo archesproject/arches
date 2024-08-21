@@ -20,7 +20,7 @@ details = {
     "icon": "",
     "modulename": "term_filter.py",
     "classname": "TermFilter",
-    "type": "text-input",
+    "type": "term-filter-type",
     "componentpath": "views/components/search/term-filter",
     "componentname": "term-filter",
     "config": {},

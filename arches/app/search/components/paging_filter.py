@@ -8,7 +8,7 @@ details = {
     "icon": "",
     "modulename": "paging_filter.py",
     "classname": "PagingFilter",
-    "type": "paging",
+    "type": "paging-filter-type",
     "componentpath": "views/components/search/paging-filter",
     "componentname": "paging-filter",
     "config": {},

@@ -15,7 +15,7 @@ details = {
     "icon": "fa fa-map-marker",
     "modulename": "map_filter.py",
     "classname": "MapFilter",
-    "type": "filter",
+    "type": "map-filter-type",
     "componentpath": "views/components/search/map-filter",
     "componentname": "map-filter",
     "config": {},

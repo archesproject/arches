@@ -1,5 +1,5 @@
 import uuid
-from arches.app.models import models
+from arches.app.models.models import Node
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
@@ -22,7 +22,7 @@ details = {
     "icon": "",
     "modulename": "search_results.py",
     "classname": "SearchResultsFilter",
-    "type": "results-list",
+    "type": "search-results-type",
     "componentpath": "views/components/search/search-results",
     "componentname": "search-results",
     "config": {},
@@ -144,7 +144,7 @@ class SearchResultsFilter(BaseSearchFilter):
 
 def get_nodegroups_by_datatype_and_perm(request, datatype, permission):
     nodes = []
-    for node in models.Node.objects.filter(datatype=datatype):
+    for node in Node.objects.filter(datatype=datatype):
         if request.user.has_perm(permission, node.nodegroup):
             nodes.append(str(node.nodegroup_id))
     return nodes
