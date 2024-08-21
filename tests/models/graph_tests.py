@@ -34,7 +34,7 @@ class GraphTests(ArchesTestCase):
         super().setUpClass()
 
         cls.loadOntology()
-        cls.ensure_resource_test_model_loaded()
+        cls.ensure_test_resource_models_are_loaded()
 
         cls.NODE_NODETYPE_GRAPHID = "22000000-0000-0000-0000-000000000001"
         cls.SINGLE_NODE_GRAPHID = "22000000-0000-0000-0000-000000000000"
