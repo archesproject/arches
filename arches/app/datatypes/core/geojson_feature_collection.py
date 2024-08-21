@@ -34,11 +34,11 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
     ):
         errors = []
 
-        def validate_lat_lon_order(coords):
+        def validate_lat_lon(coords):
             # from geom.coords
             for coord_tuple in coords:
                 if isinstance(coord_tuple, tuple):  # still in a ring
-                    validate_lat_lon_order(coord_tuple)
+                    validate_lat_lon(coord_tuple)
                 else:
                     lon = coord_tuple[0]
                     lat = coord_tuple[1]
@@ -124,7 +124,7 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                 try:
                     geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
                     if geom.valid:
-                        validate_lat_lon_order(geom.coords)
+                        validate_lat_lon(geom.coords)
                         validate_geom_bbox(geom)
                     else:
                         raise Exception
