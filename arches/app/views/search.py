@@ -370,9 +370,10 @@ def search_results(request, returnDsl=False):
         )
     )
 
+    if returnDsl:
+        return search_query_object.pop("query")
+
     if response_object:
-        if returnDsl:
-            return response_object
         return JSONResponse(content=response_object)
 
     else:
