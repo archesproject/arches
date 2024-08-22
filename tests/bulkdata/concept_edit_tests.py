@@ -117,7 +117,9 @@ class ConceptEditTests(TransactionTestCase):
             "search_url": None,
             "conceptOld": "beb53e39-8c48-4533-a6ef-b04882540be2",
             "conceptNew": "9c721b1d-8a38-425e-9455-41ee5f5edfab",
-            "selectedNode": json.dumps({"node": "14e202da-514e-11ef-90df-323af0a1fd6a"}),
+            "selectedNode": json.dumps(
+                {"node": "14e202da-514e-11ef-90df-323af0a1fd6a"}
+            ),
             "module": ETLModule.objects.get(slug="bulk_edit_concept").pk,
         }
 
