@@ -206,6 +206,7 @@ class StandardSearchView(BaseSearchView):
                         search_query_object,
                         permitted_nodegroups=permitted_nodegroups,
                         include_provisional=include_provisional,
+                        querystring=querystring,
                     )
             append_instance_permission_filter_dsl(self.request, search_query_object)
         except Exception as err:
