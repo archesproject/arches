@@ -131,7 +131,9 @@ class ConceptEditTests(TransactionTestCase):
 
         editor = BulkConceptEditor(request=request)
         response = editor.preview(request=request)
-        number_of_edits = len(response["data"]["values"]) if "values" in response["data"] else 0
+        number_of_edits = (
+            len(response["data"]["values"]) if "values" in response["data"] else 0
+        )
 
         self.assertEqual(number_of_edits, 2)
 
