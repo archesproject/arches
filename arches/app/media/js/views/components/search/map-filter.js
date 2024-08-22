@@ -276,17 +276,13 @@ define([
 
             this.filterByFeatureGeom = function(feature) {
                 if (feature.geometry.type == 'Point' && this.buffer() == 0) { this.buffer(25); }
-                let currentSearchGeoms = self.searchGeometries();
+                self.searchGeometries.removeAll();
+                this.draw.deleteAll();
                 this.draw.set({
                     "type": "FeatureCollection",
                     "features": [feature]
                 });
-                if (currentSearchGeoms != null) {
-                    currentSearchGeoms.push(feature);
-                } else {
-                    currentSearchGeoms = [feature];
-                }
-                self.searchGeometries(currentSearchGeoms);
+                self.searchGeometries([feature]);
                 self.updateFilter();
             };
 
