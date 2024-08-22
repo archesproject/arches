@@ -371,6 +371,8 @@ def search_results(request, returnDsl=False):
     )
 
     if response_object:
+        if returnDsl:
+            return response_object
         return JSONResponse(content=response_object)
 
     else:
