@@ -92,6 +92,12 @@ class Command(BaseCommand):  # pragma: no cover
         self.stdout.write("Publishing finished! \n\n")
 
     def update_to_v7_6(self):
+        path_to_possible_outermost_init = os.path.normpath(
+            os.path.join(settings.APP_ROOT, "..", "__init__.py")
+        )
+        if os.path.exists(path_to_possible_outermost_init):
+            os.remove(path_to_possible_outermost_init)
+
         for file_to_delete in [".eslintrc.js", ".eslintignore", ".yarnrc", "yarn.lock"]:
             if os.path.exists(os.path.join(settings.APP_ROOT, file_to_delete)):
                 self.stdout.write(
