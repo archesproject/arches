@@ -5,7 +5,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10799_geojsongeometry_featureid"),
+        ("models", "10804_core_search_filters"),
     ]
 
     add_bulk_concept_editor = """
