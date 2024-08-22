@@ -39,6 +39,8 @@ class MapFilter(BaseSearchFilter):
         search_query = Bool()
         querysting_params = self.request.GET.get(self.componentname, "{}")
         spatial_filter = JSONDeserializer().deserialize(querysting_params)
+        if not search_query_object.get(self.componentname, None):
+            search_query_object[self.componentname] = {}
 
         if "features" in spatial_filter:
             if len(spatial_filter["features"]) > 0:
