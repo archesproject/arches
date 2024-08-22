@@ -29,17 +29,36 @@ from arches.app.search.elasticsearch_dsl_builder import (
 )
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.i18n import LanguageSynchronizer
-from arches.app.views.search import search_terms
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
+from arches.app.views.search import search_terms, search_results
 from django.http import HttpRequest
 from django.contrib.auth.models import User
 from django.test.utils import captured_stdout
 from tests.base_test import ArchesTestCase
+from tests.utils.search_test_utils import sync_es
 
 # these tests can be run from the command line via
 # python manage.py test tests.search.search_tests --settings="tests.test_settings"
 
 
 class SearchTests(ArchesTestCase):
+    def sync_es(self, search_engine=None, index="resources"):
+        se = search_engine if search_engine else SearchEngineFactory().create()
+        se.refresh(index=index)
+
+    def setUp(self):
+        super().setUp()
+        self.delete_resources()
+
+    def delete_resources(self):
+        for res in Resource.objects.all():
+            res.delete()
+
+        se = SearchEngineFactory().create()
+        q = {"query": {"match_all": {}}}
+        se.delete(index="resources", query=q)
+        self.sync_es(se)
+
     @classmethod
     def tearDownClass(cls):
         models.GraphModel.objects.filter(
@@ -61,7 +80,8 @@ class SearchTests(ArchesTestCase):
             username="Tester", email="test@test.com", password="test12345!"
         )
         cls.loadOntology()
-        cls.ensure_resource_test_model_loaded()
+        cls.ensure_test_resource_models_are_loaded()
+        cls.allDataTypeGraphId = "d71a8f56-987f-4fd1-87b5-538378740f15"
 
     def test_delete_by_query(self):
         """
@@ -77,11 +97,13 @@ class SearchTests(ArchesTestCase):
             y = {"id": i + 100, "type": "altLabel", "value": "test alt label"}
             se.index_data(index="test", body=y, idfield="id", refresh=True)
 
-        time.sleep(3)
+        sync_es(se)
+
         query = Query(se, start=0, limit=100)
         match = Match(field="type", query="altLabel")
         query.add_query(match)
         query.delete(index="test", refresh=True)
+        self.sync_es(se)
 
         self.assertEqual(se.count(index="test"), 10)
 
@@ -150,7 +172,8 @@ class SearchTests(ArchesTestCase):
             nodegroup_id=nodeid,
         )
         new_tile.save()
-        time.sleep(1)  # wait a moment for ES to finish indexing
+        self.sync_es()
+        # wait a moment for ES to finish indexing
         request = HttpRequest()
         request.method = "GET"
         request.GET.__setitem__("lang", "en")
@@ -164,3 +187,267 @@ class SearchTests(ArchesTestCase):
         except json.decoder.JSONDecodeError:
             print("Failed to parse search result")
         self.assertTrue("terms" in result and len(result["terms"]) == 1)
+
+    def test_adv_search_on_non_null_geom_node(self):
+        geojson_nodeid = "be25bdf0-c8bf-11ed-a172-0242ac130009"
+        user = User.objects.get(username="admin")
+        graphid = self.allDataTypeGraphId
+
+        tileid = "aaaaaaaa-daf6-414e-80c2-530ec88d2705"
+        resourceinstanceid = "bbbbbbbb-d645-4c50-bafc-c677ea95f060"
+        resource = Resource(uuid.UUID(resourceinstanceid))
+        resource.graph_id = graphid
+        resource.save(user=user, transaction_id=uuid.uuid4())
+        tile_data = {}
+        tile_data[geojson_nodeid] = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "id": "b3496f23d0e20fe8fedd646dad1cb723",
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-123.79236180702188, 32.369335685437285],
+                                [-113.79980207919247, 32.437401858468235],
+                                [-114.83484221180882, 42.146158503110485],
+                                [-124.85535408028454, 42.13410461202932],
+                                [-123.79236180702188, 32.369335685437285],
+                            ]
+                        ],
+                    },
+                }
+            ],
+        }
+        new_tile = Tile(
+            tileid=uuid.UUID(tileid),
+            resourceinstance_id=resourceinstanceid,
+            data=tile_data,
+            nodegroup_id=geojson_nodeid,
+        )
+        new_tile.save()
+
+        tileid = "cccccccc-daf6-414e-80c2-530ec88d2705"
+        resourceinstanceid = "dddddddd-d645-4c50-bafc-c677ea95f060"
+        resource = Resource(uuid.UUID(resourceinstanceid))
+        resource.graph_id = graphid
+        resource.save(user=user, transaction_id=uuid.uuid4())
+        tile_data = {}
+        tile_data[geojson_nodeid] = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "id": "a3496f23d0e20fe8fedd646dad1cb723",
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-123.79236180702188, 32.369335685437285],
+                    },
+                }
+            ],
+        }
+        new_tile = Tile(
+            tileid=uuid.UUID(tileid),
+            resourceinstance_id=resourceinstanceid,
+            data=tile_data,
+            nodegroup_id=geojson_nodeid,
+        )
+        new_tile.save()
+        self.sync_es()
+
+        # test search for non-null geom
+        request = HttpRequest()
+        request.method = "GET"
+        request.GET.__setitem__("paging-filter", "1")
+        request.GET.__setitem__(
+            "advanced-search",
+            json.dumps(
+                [
+                    {
+                        "op": "and",
+                        geojson_nodeid: {
+                            "op": "not_null",
+                            "val": "",
+                        },
+                    }
+                ]
+            ),
+        )
+        request.user = user
+        results = search_results(request=request)
+        results = JSONDeserializer().deserialize(results.content)["results"]["hits"]
+        self.assertEqual(2, len(results["hits"]))
+
+        # test search for geom with Polygon type
+        request = HttpRequest()
+        request.method = "GET"
+        request.GET.__setitem__("paging-filter", "1")
+        request.GET.__setitem__(
+            "advanced-search",
+            json.dumps(
+                [
+                    {
+                        "op": "and",
+                        geojson_nodeid: {
+                            "op": "Polygon",
+                            "val": "",
+                        },
+                    }
+                ]
+            ),
+        )
+        request.user = user
+        results = search_results(request=request)
+        results = JSONDeserializer().deserialize(results.content)["results"]["hits"]
+        self.assertEqual(1, len(results["hits"]))
+
+    def test_adv_search_on_null_geom_node(self):
+        non_localized_string_nodeid = "cb30d5aa-59c5-11ef-a45a-faffc210b420"
+        geojson_nodeid = "be25bdf0-c8bf-11ed-a172-0242ac130009"
+        tileid = "bebffbea-daf6-414e-80c2-530ec88d2705"
+        resourceinstanceid = "745f5e4a-d645-4c50-bafc-c677ea95f060"
+        resource = Resource(uuid.UUID(resourceinstanceid))
+        user = User.objects.get(username="admin")
+        resource.graph_id = self.allDataTypeGraphId
+        resource.save(user=user, transaction_id=uuid.uuid4())
+        tile_data = {}
+        tile_data[non_localized_string_nodeid] = "Etiwanda Avenue Street Trees"
+        new_tile = Tile(
+            tileid=uuid.UUID(tileid),
+            resourceinstance_id=resourceinstanceid,
+            data=tile_data,
+            nodegroup_id=non_localized_string_nodeid,
+        )
+        new_tile.save()
+        self.sync_es()
+
+        # test search for null geom
+        request = HttpRequest()
+        request.method = "GET"
+        request.GET.__setitem__("paging-filter", "1")
+        request.GET.__setitem__(
+            "advanced-search",
+            json.dumps(
+                [
+                    {
+                        "op": "and",
+                        geojson_nodeid: {
+                            "op": "null",
+                            "val": "",
+                        },
+                    }
+                ]
+            ),
+        )
+        request.user = user
+        results = search_results(request=request)
+        results = JSONDeserializer().deserialize(results.content)["results"]["hits"]
+        self.assertEqual(1, len(results["hits"]))
+
+    def test_adv_search_on_non_null_file_list_node(self):
+        filelist_nodeid = "1d1bfbea-c8bf-11ed-bf64-0242ac130009"
+        user = User.objects.get(username="admin")
+        graphid = self.allDataTypeGraphId
+
+        tileid = "aaaaaaaa-daf6-414e-80c2-530ec88d2705"
+        resourceinstanceid = "bbbbbbbb-d645-4c50-bafc-c677ea95f060"
+        resource = Resource(uuid.UUID(resourceinstanceid))
+        resource.graph_id = graphid
+        resource.save(user=user, transaction_id=uuid.uuid4())
+        tile_data = {}
+        tile_data[filelist_nodeid] = [
+            {
+                "url": None,
+                "name": "Screenshot 2024-08-12 at 3.57.42\u202fPM.png",
+                "size": 103033,
+                "type": "image/png",
+                "index": 0,
+                "title": {"en": {"value": "", "direction": "ltr"}},
+                "width": 1046,
+                "height": 1082,
+                "status": "added",
+                "altText": {"en": {"value": "", "direction": "ltr"}},
+                "content": "blob:http://localhost:8000/599de288-f394-4e2b-8b49-05452360c0d0",
+                "file_id": None,
+                "accepted": True,
+                "attribution": {"en": {"value": "", "direction": "ltr"}},
+                "description": {"en": {"value": "", "direction": "ltr"}},
+                "lastModified": 1723503486969,
+            }
+        ]
+
+        new_tile = Tile(
+            tileid=uuid.UUID(tileid),
+            resourceinstance_id=resourceinstanceid,
+            data=tile_data,
+            nodegroup_id=filelist_nodeid,
+        )
+        new_tile.save()
+        self.sync_es()
+
+        # test search for non-null file
+        request = HttpRequest()
+        request.method = "GET"
+        request.GET.__setitem__("paging-filter", "1")
+        request.GET.__setitem__(
+            "advanced-search",
+            json.dumps(
+                [
+                    {
+                        "op": "and",
+                        filelist_nodeid: {
+                            "op": "not_null",
+                            "val": "",
+                        },
+                    }
+                ]
+            ),
+        )
+        request.user = user
+        results = search_results(request=request)
+        results = JSONDeserializer().deserialize(results.content)["results"]["hits"]
+        self.assertEqual(1, len(results["hits"]))
+
+    def test_adv_search_on_null_file_node(self):
+        non_localized_string_nodeid = "cb30d5aa-59c5-11ef-a45a-faffc210b420"
+        filelist_nodeid = "1d1bfbea-c8bf-11ed-bf64-0242ac130009"
+        tileid = "bebffbea-daf6-414e-80c2-530ec88d2705"
+        resourceinstanceid = "745f5e4a-d645-4c50-bafc-c677ea95f060"
+        resource = Resource(uuid.UUID(resourceinstanceid))
+        user = User.objects.get(username="admin")
+        resource.graph_id = self.allDataTypeGraphId
+        resource.save(user=user, transaction_id=uuid.uuid4())
+        tile_data = {}
+        tile_data[non_localized_string_nodeid] = "Etiwanda Avenue Street Trees"
+        new_tile = Tile(
+            tileid=uuid.UUID(tileid),
+            resourceinstance_id=resourceinstanceid,
+            data=tile_data,
+            nodegroup_id=non_localized_string_nodeid,
+        )
+        new_tile.save()
+        self.sync_es()
+
+        # test search for null geom
+        request = HttpRequest()
+        request.method = "GET"
+        request.GET.__setitem__("paging-filter", "1")
+        request.GET.__setitem__(
+            "advanced-search",
+            json.dumps(
+                [
+                    {
+                        "op": "and",
+                        filelist_nodeid: {
+                            "op": "null",
+                            "val": "",
+                        },
+                    }
+                ]
+            ),
+        )
+        request.user = user
+        results = search_results(request=request)
+        results = JSONDeserializer().deserialize(results.content)["results"]["hits"]
+        self.assertEqual(1, len(results["hits"]))

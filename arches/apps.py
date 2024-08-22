@@ -48,6 +48,7 @@ def check_cache_backend_for_production(app_configs, **kwargs):
         errors.append(
             Error(
                 "Using dummy cache in production",
+                obj=settings.APP_NAME,
                 id="arches.E001",
             )
         )
@@ -68,6 +69,7 @@ def check_cache_backend(app_configs, **kwargs):
             Warning(
                 "Cache backend does not support rate-limiting",
                 hint=f"Your cache: {your_cache}\n\tSupported caches: {supported_by_django_ratelimit}",
+                obj=settings.APP_NAME,
                 id="arches.W001",
             )
         )
@@ -124,8 +126,9 @@ def check_arches_compatibility(app_configs, **kwargs):
             break
         else:
             errors.append(
-                Error(
-                    f"Invalid or missing arches requirement",
+                CheckMessage(
+                    level=WARNING if settings.DEBUG else ERROR,
+                    msg="Arches requirement is invalid, missing, or given by a URL.",
                     obj=config.name,
                     hint=project_requirements,
                     id="arches.E002",
@@ -158,6 +161,7 @@ def warn_old_compatibility_settings(app_configs, **kwargs):
             Warning(
                 msg=f"MIN_ARCHES_VERSION and MAX_ARCHES_VERSION have no effect.",
                 hint="Migrate your version range to pyproject.toml.",
+                obj=settings.APP_NAME,
                 id="arches.W002",
             )
         )

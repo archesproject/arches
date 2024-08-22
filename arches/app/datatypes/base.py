@@ -428,6 +428,13 @@ class BaseDataType(object):
 
         return False
 
+    def get_nodevalues(self, nodevalue):
+        if nodevalue is None:
+            return []
+        elif not isinstance(nodevalue, (list, tuple)):
+            return [nodevalue]
+        return nodevalue
+
     def ignore_keys(self):
         """
         Each entry returned in the array is a string, consisting of the combination of two full URIs
