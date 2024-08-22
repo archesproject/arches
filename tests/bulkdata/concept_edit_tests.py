@@ -131,8 +131,9 @@ class ConceptEditTests(TransactionTestCase):
 
         editor = BulkConceptEditor(request=request)
         response = editor.preview(request=request)
+        number_of_edits = len(response["data"]["values"]) if ["values"] in response["data"] else 0
 
-        self.assertEqual(len(response["data"]["values"]), 2)
+        self.assertEqual(number_of_edits, 2)
 
     def test_write(self):
         load_id = "2046b340-baa3-4e80-9bab-dd2147a99818"
