@@ -4,6 +4,7 @@ env
 tests/elasticsearch
 tests/logs
 tests/fixtures/testing_prj/testing_prj/media/packages/*
+tests/fixtures/data/archestemp
 arches/install/elasticsearch-*.zip
 build/
 arches.egg*

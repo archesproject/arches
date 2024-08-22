@@ -25,23 +25,20 @@ details = {
     "icon": "fa fa-map-marker",
     "modulename": "map_filter.py",
     "classname": "MapFilter",
-    "type": "filter",
+    "type": "map-filter-type",
     "componentpath": "views/components/search/map-filter",
     "componentname": "map-filter",
-    "sortorder": "0",
-    "enabled": True,
+    "config": {},
 }
 
 
 class MapFilter(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def append_dsl(self, search_query_object, **kwargs):
+        permitted_nodegroups = kwargs.get("permitted_nodegroups")
+        include_provisional = kwargs.get("include_provisional")
         search_query = Bool()
-        querysting_params = self.request.GET.get(details["componentname"], "")
+        querysting_params = self.request.GET.get(self.componentname, "{}")
         spatial_filter = JSONDeserializer().deserialize(querysting_params)
-        if details["componentname"] not in search_results_object:
-            search_results_object[details["componentname"]] = {}
 
         if "features" in spatial_filter:
             if len(spatial_filter["features"]) > 0:
@@ -50,70 +47,17 @@ class MapFilter(BaseSearchFilter):
                 if "properties" in spatial_filter["features"][0]:
                     feature_properties = spatial_filter["features"][0]["properties"]
 
-                add_geoshape_query_to_search_query(
+                buffered_feature_geom = add_geoshape_query_to_search_query(
                     feature_geom,
                     feature_properties,
                     permitted_nodegroups,
                     include_provisional,
                     search_query,
                 )
-                search_results_object["query"].add_query(search_query)
-
-        elif "featureid" in spatial_filter and "resourceid" in spatial_filter:
-            se = SearchEngineFactory().create()
-            main_query = Query(se)
-            nested_query = Nested(path="geometries")
-            match_feature = Match(
-                field="geometries.geom.features.id", query=spatial_filter["featureid"]
-            )
-            bool_nested_query = Bool()
-            bool_nested_query.must(match_feature.dsl)
-            nested_query.add_query(bool_nested_query.dsl)
-
-            bool_query = Bool()
-            match_resource = Term(
-                field="resourceinstanceid", term=spatial_filter["resourceid"]
-            )
-            bool_query.must(
-                match_resource.dsl
-            )  # Match resource instance ID at the document level
-            bool_query.must(nested_query.dsl)  # Add the nested query
-
-            # Set the entire bool query to the main query object
-            main_query.add_query(bool_query.dsl)
-
-            response = main_query.search(index=RESOURCES_INDEX)
-            geometries = []
-            for hit in response["hits"]["hits"]:
-                if len(geometries) > 0:
-                    break
-                for geom in hit["_source"]["geometries"]:
-                    if len(geometries) > 0:
-                        break
-                    for feature in geom["geom"]["features"]:
-                        if len(geometries) > 0:
-                            break
-                        if feature["id"] == spatial_filter["featureid"]:
-                            geometries.append(feature)
-
-            if len(geometries) > 0:
-                feature_geom = geometries[0]["geometry"]
-                buffered_feature_geom = add_geoshape_query_to_search_query(
-                    feature_geom,
-                    spatial_filter,
-                    permitted_nodegroups,
-                    include_provisional,
-                    search_query,
-                )
-                search_results_object[details["componentname"]] = buffered_feature_geom
-                search_results_object["query"].add_query(search_query)
-
-        try:
-            search_results_object[details["componentname"]][
-                "search_buffer"
-            ] = feature_geom
-        except NameError:
-            logger.info(_("Feature geometry is not defined"))
+                search_query_object["query"].add_query(search_query)
+                search_query_object[self.componentname][
+                    "search_buffer"
+                ] = buffered_feature_geom
 
 
 def _buffer(geojson, width=0, unit="ft"):

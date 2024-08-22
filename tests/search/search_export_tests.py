@@ -24,6 +24,7 @@ from django.urls import reverse
 
 from arches.app.views.api import SearchExport
 from tests.base_test import ArchesTestCase
+from tests.utils.search_test_utils import sync_es
 
 # these tests can be run from the command line via
 # python manage.py test tests.search.search_export_tests --settings="tests.test_settings"
@@ -62,7 +63,7 @@ class SearchExportTests(ArchesTestCase):
         cls.test_resourceinstanceid = uuid.uuid4()
 
         cls.loadOntology()
-        cls.ensure_resource_test_model_loaded()
+        cls.ensure_test_resource_models_are_loaded()
         models.ResourceInstance.objects.get_or_create(
             graph_id=cls.search_model_graphid,
             resourceinstanceid=cls.test_resourceinstanceid,
@@ -226,7 +227,3 @@ def is_valid_uuid(value, version=4):
         return str(uuid_obj) == value
     except ValueError:
         return False
-
-
-def sync_es(search_engine, index="test_resources"):
-    search_engine.es.indices.refresh(index=index)

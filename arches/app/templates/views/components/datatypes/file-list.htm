@@ -1,4 +1,33 @@
 {% load i18n %}
+<!-- ko if: $data.search -->
+<div class="col-md-4 col-lg-3">
+    <select class="resources" data-bind="
+        attr: {'data-label': node.label},
+        select2Query: {
+            select2Config:{
+                data: [
+                    { text: $root.translations.sizeGreaterThan, id: 'gte' },
+                    { text: $root.translations.sizeLessThan, id: 'lte' },
+                    { text: $root.translations.hasNoValue, id: 'null' },
+                    { text: $root.translations.hasAnyValue, id: 'not_null' },
+                ],
+                value: op,
+            }}">
+    </select>
+</div>
+<div class="col-md-5 col-lg-7" data-bind="visible: op() !== 'null' && op() !== 'not_null'">
+    <input 
+        type="text" 
+        class="form-control input-lg" 
+        style="height: 36px;" 
+        data-bind="
+            attr: {placeholder: $root.translations.value, 'aria-label': node.label},
+            textInput: searchValue
+        "
+    >
+</div>
+<!-- /ko -->
+
 <!-- ko ifnot: $data.search -->
 <div class="relative">
     <div class="node-config-item">

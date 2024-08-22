@@ -21,7 +21,7 @@ class BulkDataDeletionTests(ArchesTestCase):
         LanguageSynchronizer.synchronize_settings_with_db()
         self.bulk_deleter = BulkDataDeletion()
         self.loadOntology()
-        self.ensure_resource_test_model_loaded()
+        self.ensure_test_resource_models_are_loaded()
 
     def test_get_number_of_deletions_with_no_resourceids(self):
         loadid = str(uuid.uuid4())

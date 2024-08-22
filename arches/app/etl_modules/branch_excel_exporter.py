@@ -7,6 +7,7 @@ from arches.app.etl_modules.decorators import load_data_async
 from arches.app.models.models import Node
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
+from arches.app.etl_modules.save import get_resourceids_from_search_url
 from arches.app.utils.db_utils import dictfetchall
 from arches.management.commands.etl_template import create_workbook
 
@@ -179,6 +180,11 @@ class BranchExcelExporter(BaseExcelExporter):
         graph_name = request.POST.get("graph_name", None)
         resource_ids = request.POST.get("resource_ids", None)
         filename = request.POST.get("filename")
+        search_url = request.POST.get("search_url", None)
+        if search_url and not resource_ids:
+            resource_ids = get_resourceids_from_search_url(
+                search_url, self.request.user
+            )
 
         export_task = tasks.export_branch_excel.apply_async(
             (self.userid, self.loadid, graph_id, graph_name, resource_ids, filename),

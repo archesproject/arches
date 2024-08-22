@@ -3,7 +3,6 @@
 import arches
 import os
 import shutil
-import warnings
 
 from django.core.management.base import BaseCommand
 from django.core import management
@@ -105,9 +104,15 @@ class Command(BaseCommand):  # pragma: no cover
             shutil.rmtree(os.path.join(settings.APP_ROOT, "media", "node_modules"))
 
         for project_metadata_file in ["LICENSE", "MANIFEST.in", "pyproject.toml"]:
-            if not os.path.exists(
+            if os.path.exists(
                 os.path.join(settings.APP_ROOT, "..", project_metadata_file)
             ):
+                if project_metadata_file == "pyproject.toml":
+                    self.stderr.write(
+                        "Existing pyproject.toml detected. "
+                        "Manually reconcile existing file with new template.",
+                    )
+            else:
                 self.stdout.write(
                     "Copying {} to project directory".format(project_metadata_file)
                 )
@@ -154,10 +159,9 @@ class Command(BaseCommand):  # pragma: no cover
         if os.path.exists(
             os.path.join(settings.APP_ROOT, "..", ".github", "workflows", "main.yml")
         ):
-            warnings.warn(
+            self.stderr.write(
                 "Existing .github/workflows/main.yml detected. "
                 "Manually reconcile existing file with new template.",
-                UserWarning,
             )
         else:
             self.stdout.write("Copying .github/workflows/main.yml directory to project")
@@ -182,7 +186,7 @@ class Command(BaseCommand):  # pragma: no cover
             )
 
         for action_name in ["build-and-test-branch", "install-arches-applications"]:
-            if not os.path.exists(
+            if os.path.exists(
                 os.path.join(
                     settings.APP_ROOT,
                     "..",
@@ -192,6 +196,11 @@ class Command(BaseCommand):  # pragma: no cover
                     "action.yml",
                 )
             ):
+                self.stderr.write(
+                    f"Existing .github/workflows/{action_name}.yml detected. "
+                    + "Manually reconcile existing file with new template.",
+                )
+            else:
                 self.stdout.write(
                     f"Copying .github/actions/{action_name}/action.yml directory to project"
                 )
@@ -223,7 +232,12 @@ class Command(BaseCommand):  # pragma: no cover
                     ),
                 )
 
-        if not os.path.exists(os.path.join(settings.APP_ROOT, "..", "tests")):
+        if os.path.exists(os.path.join(settings.APP_ROOT, "..", "tests")):
+            self.stderr.write(
+                "Existing tests directory detected. "
+                "Manually reconcile existing file with new template."
+            )
+        else:
             self.stdout.write("Copying tests directory to project")
             test_directory_path = os.path.join(settings.APP_ROOT, "..", "tests")
 
@@ -240,7 +254,12 @@ class Command(BaseCommand):  # pragma: no cover
                             os.path.join(dirpath, filename[:-7] + ".py"),
                         )
 
-        if not os.path.isfile(os.path.join(settings.APP_ROOT, "hosts.py")):
+        if os.path.isfile(os.path.join(settings.APP_ROOT, "hosts.py")):
+            self.stderr.write(
+                "Existing hosts.py detected. "
+                "Manually reconcile existing file with new template."
+            )
+        else:
             self.stdout.write("Copying hosts.py to project directory")
             shutil.copy2(
                 os.path.join(
@@ -258,9 +277,8 @@ class Command(BaseCommand):  # pragma: no cover
             )
 
         if os.path.isfile(os.path.join(settings.APP_ROOT, "apps.py")):
-            warnings.warn(
+            self.stderr.write(
                 "Existing apps.py detected. Manually reconcile existing file with new template.",
-                UserWarning,
             )
         else:
             self.stdout.write("Copying apps.py to project root")
@@ -279,9 +297,11 @@ class Command(BaseCommand):  # pragma: no cover
                 os.path.join(settings.APP_ROOT, "apps.py"),
             )
 
-        if not os.path.isfile(
-            os.path.join(settings.APP_ROOT, "src", "declarations.d.ts")
-        ):
+        if os.path.isfile(os.path.join(settings.APP_ROOT, "src", "declarations.d.ts")):
+            self.stderr.write(
+                "Existing declarations.d.ts detected. Manually reconcile existing file with new template.",
+            )
+        else:
             self.stdout.write("Creating /src/declarations.d.ts")
             if not os.path.isdir(os.path.join(settings.APP_ROOT, "src")):
                 os.mkdir(os.path.join(settings.APP_ROOT, "src"))

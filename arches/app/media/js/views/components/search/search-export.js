@@ -7,14 +7,14 @@ define([
     'bindings/clipboard',
     'views/components/simple-switch',
 ], function($, ko, arches, searchExportTemplate) {
-    var componentName = 'search-export';
-    const viewModel = function(params) {
+    const componentName = 'search-export';
+    const viewModel = function(sharedStateObject) {
         var self = this;
 
          
-        this.total = params.total;
-        this.query = params.query;
-        this.selectedPopup = params.selectedPopup;
+        this.total = sharedStateObject.total;
+        this.query = sharedStateObject.query;
+        this.selectedPopup = sharedStateObject.selectedPopup;
         this.downloadStarted = ko.observable(false);
         this.reportlink = ko.observable(false);
         this.format = ko.observable('tilecsv');
@@ -25,7 +25,7 @@ define([
         this.celeryRunning = ko.observable(arches.celeryRunning);
         this.hasExportHtmlTemplates = ko.observable(arches.exportHtmlTemplates.length > 0);
         this.downloadPending = ko.observable(false);
-        this.hasResourceTypeFilter = ko.observable(!!params.query()['resource-type-filter']);
+        this.hasResourceTypeFilter = ko.observable(!!sharedStateObject.query()['resource-type-filter']);
         this.exportSystemValues = ko.observable(false);
 
         this.query.subscribe(function(val) {
@@ -98,6 +98,7 @@ define([
             }
         };
 
+        sharedStateObject.searchFilterVms[componentName](this);
     };
 
     return ko.components.register(componentName, {

@@ -726,6 +726,11 @@ urlpatterns = [
         api.TransformEdtfForTile.as_view(),
         name="transform_edtf_for_tile",
     ),
+    re_path(
+        r"^api/spatialview/(?P<identifier>%s|())/?$" % uuid_regex,
+        api.SpatialView.as_view(),
+        name="spatialview_api",
+    ),
     re_path("^api", api.API404.as_view(), name="api_404"),
 ]
 
