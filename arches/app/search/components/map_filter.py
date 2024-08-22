@@ -15,20 +15,19 @@ details = {
     "icon": "fa fa-map-marker",
     "modulename": "map_filter.py",
     "classname": "MapFilter",
-    "type": "filter",
+    "type": "map-filter-type",
     "componentpath": "views/components/search/map-filter",
     "componentname": "map-filter",
-    "sortorder": "0",
-    "enabled": True,
+    "config": {},
 }
 
 
 class MapFilter(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def append_dsl(self, search_query_object, **kwargs):
+        permitted_nodegroups = kwargs.get("permitted_nodegroups")
+        include_provisional = kwargs.get("include_provisional")
         search_query = Bool()
-        querysting_params = self.request.GET.get(details["componentname"], "")
+        querysting_params = self.request.GET.get(self.componentname, "")
         spatial_filter = JSONDeserializer().deserialize(querysting_params)
         if "features" in spatial_filter:
             if len(spatial_filter["features"]) > 0:
@@ -74,15 +73,13 @@ class MapFilter(BaseSearchFilter):
 
                 search_query.filter(Nested(path="geometries", query=spatial_query))
 
-        search_results_object["query"].add_query(search_query)
+        search_query_object["query"].add_query(search_query)
 
-        if details["componentname"] not in search_results_object:
-            search_results_object[details["componentname"]] = {}
+        if self.componentname not in search_query_object:
+            search_query_object[self.componentname] = {}
 
         try:
-            search_results_object[details["componentname"]][
-                "search_buffer"
-            ] = feature_geom
+            search_query_object[self.componentname]["search_buffer"] = feature_geom
         except NameError:
             logger.info(_("Feature geometry is not defined"))
 

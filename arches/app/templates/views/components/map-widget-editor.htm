@@ -10,7 +10,7 @@
         'active': activeTab() === 'editor'
     }, attr: {
         'aria-label': $root.translations.mapEditor,
-        'aria-expanded': (activeTab() === 'editor').toString() 
+        'aria-expanded': (activeTab() === 'editor').toString()
     },
 ">
     <i class="fa fa-pencil"></i>
@@ -24,9 +24,9 @@
 <!--ko if: activeTab() === 'editor' -->
 <div style="height: 95%">
     <div class="workbench-card-sidepanel-header-container">
-        <p class="workbench-card-sidepanel-header h4" tabindex="0" role="button" 
+        <p class="workbench-card-sidepanel-header h4" tabindex="0" role="button"
             data-bind="onEnterkeyClick, onSpaceClick, text: label,
-                click: function(){hideSidePanel('#toggle-editor-panel-button')},  
+                click: function(){hideSidePanel('#toggle-editor-panel-button')},
                 attr: {'aria-label': $root.translations.hideEditor},
         "></p>
     </div>
@@ -74,7 +74,7 @@
                         <div class="col-xs-12">
                             <div class="map-card-feature-list">
                                 <div class="add-new-feature">
-                                    <select 
+                                    <select
                                         data-bind="
                                             placeholder: $root.translations.addANewFeature + '...',
                                             value: self.featureLookup[widget.node_id()].selectedTool,
@@ -92,7 +92,7 @@
                                     ></select>
                                 </div>
                                 <div>
-                                    <div class="map-data-drop-area" tabindex="0" role="button" 
+                                    <div class="map-data-drop-area" tabindex="0" role="button"
                                         data-bind="event: {
                                             dragover: dropZoneOverHandler,
                                             drop: dropZoneHandler,
@@ -106,7 +106,7 @@
                                         <span data-bind="text: $root.translations.dragGeoJsonKml"></span>
                                     </div>
                                     <div class="hidden-file-input">
-                                        <input type="file" accept=".json,.geojson,.kml" data-bind="event: {
+                                        <input type="file" accept=".json,.geojson,.kml,.shp,.zip" data-bind="event: {
                                             change: self.dropZoneFileSelected
                                         }"/>
                                     </div>
@@ -161,9 +161,9 @@
                                         <span data-bind="text: $root.translations.editGeoJson"></span>
                                     </button>
                                     |
-                                    <button data-bind="click: canEditCoordinates() ? function(){self.coordinateEditing(true)} : null, 
+                                    <button data-bind="click: canEditCoordinates() ? function(){self.coordinateEditing(true)} : null,
                                         css: {
-                                            'inactive': !canEditCoordinates() 
+                                            'inactive': !canEditCoordinates()
                                         }, attr: {
                                             'aria-disabled': (!canEditCoordinates()).toString()
                                         }
@@ -174,7 +174,7 @@
                                     |
                                     <button data-bind="click: self.bufferFeature() ? function() {self.bufferNodeId(widget.node_id())} : null,
                                         css: {
-                                            'inactive': !self.bufferFeature() 
+                                            'inactive': !self.bufferFeature()
                                         }, attr: {
                                             'aria-disabled': !self.bufferFeature() && (!self.bufferFeature()).toString()
                                         }
