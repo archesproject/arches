@@ -1,23 +1,19 @@
 import logging
 import os
-import uuid
 
 from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.signals import user_logged_out, user_logged_in
-from django.contrib.contenttypes.models import ContentType
 from django.core.cache import caches
+from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.db.models.signals import pre_save, post_save, post_delete, m2m_changed
 from django.dispatch import receiver
 from django.template.loader import get_template, render_to_string
-from guardian.models import GroupObjectPermission
-from guardian.shortcuts import assign_perm
 
 from arches.app.models import models
-from arches.app.models.resource import Resource
 from arches.app.utils.external_oauth_backend import ExternalOauthAuthenticationBackend
 from arches.app.utils.permission_backend import process_new_user
 
@@ -276,3 +272,15 @@ def send_email_on_save(sender, instance, **kwargs):
             )
 
     return False
+
+
+@receiver(pre_save, sender=models.SearchComponent)
+def ensure_single_default_searchview(sender, instance, **kwargs):
+    if instance.config.get("default", False) and instance.type == "search-view":
+        existing_default = models.SearchComponent.objects.filter(
+            config__default=True, type="search-view"
+        ).exclude(searchcomponentid=instance.searchcomponentid)
+        if existing_default.exists():
+            raise ValidationError(
+                "Only one search logic component can be default at a time."
+            )

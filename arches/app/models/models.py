@@ -1443,18 +1443,6 @@ class SearchComponent(models.Model):
         return JSONSerializer().serialize(self)
 
 
-@receiver(pre_save, sender=SearchComponent)
-def ensure_single_default_searchview(sender, instance, **kwargs):
-    if instance.config.get("default", False) and instance.type == "search-view":
-        existing_default = SearchComponent.objects.filter(
-            config__default=True, type="search-view"
-        ).exclude(searchcomponentid=instance.searchcomponentid)
-        if existing_default.exists():
-            raise ValidationError(
-                "Only one search logic component can be default at a time."
-            )
-
-
 class SearchExportHistory(models.Model):
     searchexportid = models.UUIDField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
