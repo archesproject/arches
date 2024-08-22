@@ -7,7 +7,6 @@ from arches.app.models.system_settings import settings
 
 
 class GeoUtils(object):
-    preferred_srid = 4326
 
     def set_precision(self, coordinates, precision):
         """
@@ -29,7 +28,7 @@ class GeoUtils(object):
             geoms.append(
                 GEOSGeometry(
                     JSONSerializer().serialize(feature["geometry"]),
-                    srid=self.preferred_srid,
+                    srid=4326,
                 )
             )
         return GeometryCollection(geoms)
@@ -95,7 +94,7 @@ class GeoUtils(object):
         for geom in geometry:
             arches_json_geometry = {}
             arches_json_geometry["geometry"] = JSONDeserializer().deserialize(
-                GEOSGeometry(geom, srid=self.preferred_srid).json
+                GEOSGeometry(geom, srid=4326).json
             )
             arches_json_geometry["type"] = "Feature"
             arches_json_geometry["id"] = str(uuid.uuid4())
