@@ -111,6 +111,27 @@ class ConceptEditTests(TransactionTestCase):
         importer = BranchExcelImporter(request=request, loadid=load_id)
         importer.write(request)
 
+    def test_preview(self):
+        params = {
+            "currentPageIndex": 0,
+            "search_url": None,
+            "conceptOld": "beb53e39-8c48-4533-a6ef-b04882540be2",
+            "conceptNew": "9c721b1d-8a38-425e-9455-41ee5f5edfab",
+            "selectedNode": json.dumps({"node": "14e202da-514e-11ef-90df-323af0a1fd6a"}),
+            "module": ETLModule.objects.get(slug="bulk_edit_concept").pk,
+        }
+
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = User.objects.get(username="admin")
+        for k, v in params.items():
+            request.POST.__setitem__(k, v)
+
+        editor = BulkConceptEditor(request=request)
+        response = editor.preview(request=request)
+
+        self.assertEqual(len(response["data"]["values"]), 2)
+
     def test_write(self):
         load_id = "2046b340-baa3-4e80-9bab-dd2147a99818"
         node_id = "14e202da-514e-11ef-90df-323af0a1fd6a"
