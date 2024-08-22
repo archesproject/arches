@@ -20,7 +20,7 @@ import os
 import json
 import time
 from tests.base_test import ArchesTestCase
-from tests.utils.search_test_utils import sync_es
+from tests.utils.search_test_utils import sync_es, get_response_json
 from django.http import HttpRequest
 from django.urls import reverse
 from django.contrib.auth.models import User, Group
@@ -239,7 +239,7 @@ class SearchTests(ArchesTestCase):
             "dateNodeId": "",
             "inverted": False,
         }
-        response_json = get_response_json(self.client, temporal_filter=temporal_filter)
+        response_json = get_response_json(self.client, time_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 3)
         self.assertCountEqual(
             extract_pks(response_json),
@@ -262,7 +262,7 @@ class SearchTests(ArchesTestCase):
             "dateNodeId": "",
             "inverted": True,
         }
-        response_json = get_response_json(self.client, temporal_filter=temporal_filter)
+        response_json = get_response_json(self.client, time_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
         self.assertCountEqual(
             extract_pks(response_json),
@@ -284,7 +284,7 @@ class SearchTests(ArchesTestCase):
             "dateNodeId": self.search_model_creation_date_nodeid,
             "inverted": False,
         }
-        response_json = get_response_json(self.client, temporal_filter=temporal_filter)
+        response_json = get_response_json(self.client, time_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
         self.assertCountEqual(
             extract_pks(response_json),
@@ -306,7 +306,7 @@ class SearchTests(ArchesTestCase):
             "dateNodeId": self.search_model_creation_date_nodeid,
             "inverted": True,
         }
-        response_json = get_response_json(self.client, temporal_filter=temporal_filter)
+        response_json = get_response_json(self.client, time_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 0)
 
     def test_temporal_only_search_5(self):
@@ -321,7 +321,7 @@ class SearchTests(ArchesTestCase):
             "dateNodeId": "",
             "inverted": False,
         }
-        response_json = get_response_json(self.client, temporal_filter=temporal_filter)
+        response_json = get_response_json(self.client, time_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
         self.assertCountEqual(
             extract_pks(response_json),
@@ -343,7 +343,7 @@ class SearchTests(ArchesTestCase):
             "dateNodeId": "",
             "inverted": True,
         }
-        response_json = get_response_json(self.client, temporal_filter=temporal_filter)
+        response_json = get_response_json(self.client, time_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 3)
         self.assertCountEqual(
             extract_pks(response_json),
@@ -366,7 +366,7 @@ class SearchTests(ArchesTestCase):
             "dateNodeId": "",
             "inverted": False,
         }
-        response_json = get_response_json(self.client, temporal_filter=temporal_filter)
+        response_json = get_response_json(self.client, time_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 0)
 
     def test_temporal_only_search_8(self):
@@ -381,7 +381,7 @@ class SearchTests(ArchesTestCase):
             "dateNodeId": "",
             "inverted": True,
         }
-        response_json = get_response_json(self.client, temporal_filter=temporal_filter)
+        response_json = get_response_json(self.client, time_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 3)
         self.assertCountEqual(
             extract_pks(response_json),
@@ -404,7 +404,7 @@ class SearchTests(ArchesTestCase):
             "dateNodeId": "",
             "inverted": False,
         }
-        response_json = get_response_json(self.client, temporal_filter=temporal_filter)
+        response_json = get_response_json(self.client, time_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 3)
         self.assertCountEqual(
             extract_pks(response_json),
@@ -427,7 +427,7 @@ class SearchTests(ArchesTestCase):
             "dateNodeId": "",
             "inverted": True,
         }
-        response_json = get_response_json(self.client, temporal_filter=temporal_filter)
+        response_json = get_response_json(self.client, time_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 0)
 
     def test_temporal_only_search_11(self):
@@ -442,7 +442,7 @@ class SearchTests(ArchesTestCase):
             "dateNodeId": "",
             "inverted": True,
         }
-        response_json = get_response_json(self.client, temporal_filter=temporal_filter)
+        response_json = get_response_json(self.client, time_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
         self.assertCountEqual(
             extract_pks(response_json),
@@ -476,7 +476,7 @@ class SearchTests(ArchesTestCase):
             }
         ]
         response_json = get_response_json(
-            self.client, temporal_filter=temporal_filter, term_filter=term_filter
+            self.client, time_filter=temporal_filter, term_filter=term_filter
         )
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 1)
         self.assertCountEqual(extract_pks(response_json), [str(self.date_resource.pk)])
@@ -505,7 +505,7 @@ class SearchTests(ArchesTestCase):
             }
         ]
         response_json = get_response_json(
-            self.client, temporal_filter=temporal_filter, term_filter=term_filter
+            self.client, time_filter=temporal_filter, term_filter=term_filter
         )
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 0)
 
@@ -685,7 +685,7 @@ class SearchTests(ArchesTestCase):
                 }
             ],
         }
-        response_json = get_response_json(self.client, spatial_filter=spatial_filter)
+        response_json = get_response_json(self.client, map_filter=spatial_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 1)
         self.assertCountEqual(extract_pks(response_json), [str(self.name_resource.pk)])
 
@@ -712,7 +712,7 @@ class SearchTests(ArchesTestCase):
                 }
             ],
         }
-        response_json = get_response_json(self.client, spatial_filter=spatial_filter)
+        response_json = get_response_json(self.client, map_filter=spatial_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 0)
         # self.assertCountEqual(extract_pks(response_json), [str(self.name_resource.pk)])
 
@@ -731,7 +731,7 @@ class SearchTests(ArchesTestCase):
             "dateNodeId": "",
             "inverted": False,
         }
-        response_json = get_response_json(self.client, temporal_filter=temporal_filter)
+        response_json = get_response_json(self.client, time_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
         self.assertCountEqual(
             extract_pks(response_json),
@@ -753,7 +753,7 @@ class SearchTests(ArchesTestCase):
             "dateNodeId": "",
             "inverted": False,
         }
-        response_json = get_response_json(self.client, temporal_filter=temporal_filter)
+        response_json = get_response_json(self.client, time_filter=temporal_filter)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 2)
         self.assertCountEqual(
             extract_pks(response_json),
@@ -815,23 +815,3 @@ def extract_pks(response_json):
         result["_source"]["resourceinstanceid"]
         for result in response_json["results"]["hits"]["hits"]
     ]
-
-
-def get_response_json(
-    client, temporal_filter=None, term_filter=None, spatial_filter=None, query=None
-):
-    # declared here due to mutability issues
-    query = query if query else {}
-    if temporal_filter is not None:
-        query["time-filter"] = JSONSerializer().serialize(temporal_filter)
-    if term_filter is not None:
-        query["term-filter"] = JSONSerializer().serialize(term_filter)
-    if spatial_filter is not None:
-        query["map-filter"] = JSONSerializer().serialize(spatial_filter)
-    resource_reviewer_group = Group.objects.get(name="Resource Reviewer")
-    test_user = User.objects.get(username="unpriviliged_user")
-    test_user.groups.add(resource_reviewer_group)
-    client.login(username="unpriviliged_user", password="test")
-    response = client.get("/search/resources", query)
-    response_json = json.loads(response.content)
-    return response_json
