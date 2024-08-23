@@ -220,7 +220,7 @@ class Migration(migrations.Migration):
                     join node_groups g on g.nodegroupid = n.nodegroupid
                     where n.nodeid = n.nodegroupid
                     and g.parentnodegroupid is null
-                    and graphid = model_id
+                    and n.graphid = model_id
                 loop
                     perform __arches_create_branch_views(node.nodeid, schema_name, '');
                 end loop;
