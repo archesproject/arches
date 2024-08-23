@@ -111,6 +111,22 @@ class ConceptEditTests(TransactionTestCase):
         importer = BranchExcelImporter(request=request, loadid=load_id)
         importer.write(request)
 
+    def test_get_collection_languages(self):
+        params = {
+            "module": ETLModule.objects.get(slug="bulk_edit_concept").pk,
+            "rdmCollection": "4562ced4-0ca7-46ec-a461-90c0bcb2269a",
+        }
+        request = HttpRequest()
+        request.method = "POST"
+        request.user = User.objects.get(username="admin")
+        for k, v in params.items():
+            request.POST.__setitem__(k, v)
+
+        editor = BulkConceptEditor(request=request)
+        response = editor.get_collection_languages(request=request)
+
+        self.assertEqual(response["data"][0]["id"], "en-US")
+
     def test_preview(self):
         params = {
             "currentPageIndex": 0,
