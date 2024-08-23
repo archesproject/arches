@@ -76,7 +76,8 @@ class SearchView(MapBaseManagerView):
         resource_graphs = (
             GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(publication=None)
+            .exclude(is_active=False)
+            .exclude(source_identifier__isnull=False)
         )
         geocoding_providers = Geocoder.objects.all()
         search_component_factory = SearchFilterFactory(request)

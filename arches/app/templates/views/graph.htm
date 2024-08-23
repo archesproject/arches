@@ -98,22 +98,60 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 <a style="flex: 1" href="#" data-bind="click:function(){ $parent.navigate($parent.arches.urls.graph_designer(graphid)) }, attr: { href: $parent.arches.urls.graph_designer(graphid) }">
                     <div class="resource-grid-main-container" data-bind="hover: hover, css: {active: hover}, event: {mouseleave: $parent.leaveDropdown}">
                         <div class="resource-grid-main">
-                            <h1 class="page-header text-overflow resource-grid-title"><i data-bind="css: (iconclass() || 'fa fa-question') + ' icon-wrap resource-grid-icon' + (hover() ? ' resource-grid-icon-highlight':'')"></i> <span data-bind="text:name"></span></h1>
+                            <div style="display: flex;">
+                                <h1 class="page-header text-overflow resource-grid-title">
+                                    <i data-bind="css: (iconclass() || 'fa fa-question') + ' icon-wrap resource-grid-icon' + (hover() ? ' resource-grid-icon-highlight':'')"></i> 
+                                    <span data-bind="text: name"></span>
+                                </h1>
+                                <!-- ko if: $data.has_unpublished_changes -->
+                                <div style="display: flex; align-items: center; color: darkred;">( {% trans "Has unpublished changes" %} )</div>
+                                <!-- /ko -->
+                            </div>
                             <p class="resource-grid-subtitle" data-bind='text:subtitle'></p>
                         </div>
                     </div>
                 </a>
 
-                <div class="resource-grid-tools-container" data-bind="clickBubble: false, hover: hover">
+                <div class="resource-grid-tools-container" data-bind="hover: hover, css: {active: hover}, clickBubble: false">
                     <div class="btn-group">
                         <button class="btn btn-sm btn-mint dropdown-toggle graph-btn" data-toggle="dropdown" type="button" aria-expanded="false"> {% trans "Manage" %} <i class="ion-ios-more"></i></button>
                         <ul class="dropdown-menu manage-menu" data-bind="event: {mouseleave: $parent.leaveDropdown}">
                             <li>
-                                <a href="#" data-bind="click:function() { $parent.navigate($parent.arches.urls.graph_designer(graphid)) }, attr: { href: $parent.arches.urls.graph_designer(graphid) }"><i class="fa fa-sitemap"></i> {% trans "Manage Graph" %}</a>
+                                <a 
+                                    href="#" 
+                                    data-bind="
+                                        click:function() { $parent.navigate($parent.arches.urls.graph_designer(graphid)) }, 
+                                        attr: { href: $parent.arches.urls.graph_designer(graphid) }
+                                    "
+                                >
+                                    <i class="fa fa-sitemap"></i> 
+                                    <span>{% trans "Manage Graph" %}</span>
+                                </a>
                             </li>
+                            <li>
+                               <a 
+                                   href="#" 
+                                   data-bind="
+                                       click:function () { $parent.navigate($parent.arches.urls.model_history(graphid)) }, 
+                                       attr: { href: $parent.arches.urls.model_history(graphid)}
+                                   "
+                               >
+                                   <i class="fa fa-calendar"></i> 
+                                   <span>{% trans "View Model History" %}</span>
+                               </a>
+                           </li>
                             <!-- ko if: $parent.showResources() -->
                              <li>
-                                <a href="#" data-bind="click:function () { $parent.navigate($parent.arches.urls.function_manager(graphid)) }, attr: { href: $parent.arches.urls.function_manager(graphid)}"><i class="fa fa-code"></i> {% trans "Manage Functions" %}</a>
+                                <a 
+                                    href="#" 
+                                    data-bind="
+                                        click:function () { $parent.navigate($parent.arches.urls.function_manager(graphid)) }, 
+                                        attr: { href: $parent.arches.urls.function_manager(graphid)}
+                                    "
+                                >
+                                    <i class="fa fa-code"></i> 
+                                    <span>{% trans "Manage Functions" %}</span>
+                                </a>
                             </li>
                             <li>
                                 <a href="#" data-bind="click:exportMappingFile"><i class="fa fa-file"></i> {% trans "Create Mapping File" %}</a>
@@ -130,6 +168,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <li><a href="#" data-bind="click:deleteGraph">{% trans "Delete Model" %}</a>
                             </li>
                         </ul>
+                    </div>
+                    <div class="resource-status-label">
+                        <div style="margin-top: 2px;">{% trans "Status:" %}</div>
+                        <div 
+                            style="
+                                margin-left: 4px;
+                                font-size: 13px;
+                                font-weight: 600;
+                                color: #123;
+                            " 
+                            data-bind="text: $data.is_active ? $root.translations.active : $root.translations.inactive"
+                        ></div>
                     </div>
                 </div>
             </div>
@@ -148,7 +198,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     id="graphManagerData"
     style="display: none;"
     graphManagerData='{
-        "root_nodes": {{ root_nodes }}
+        "root_nodes": {{ root_nodes }},
+        "graphs": {{ graphs }},
     }'
 ></div>
 <script>

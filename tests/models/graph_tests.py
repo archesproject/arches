@@ -762,16 +762,23 @@ class GraphTests(ArchesTestCase):
 
         # test that data is persisited propertly when creating a new graph
         graph = Graph.new(is_resource=False)
+        graph.create_editable_future_graph()
 
         nodes_count_after = models.Node.objects.count()
         edges_count_after = models.Edge.objects.count()
         nodegroups_count_after = models.NodeGroup.objects.count()
         card_count_after = models.CardModel.objects.count()
 
-        self.assertEqual(nodes_count_after - nodes_count_before, 1)
+        self.assertEqual(
+            nodes_count_after - nodes_count_before, 2
+        )  # one for new graph, one for editable_future_graph
         self.assertEqual(edges_count_after - edges_count_before, 0)
-        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 1)
-        self.assertEqual(card_count_after - card_count_before, 1)
+        self.assertEqual(
+            nodegroups_count_after - nodegroups_count_before, 2
+        )  # one for new graph, one for editable_future_graph
+        self.assertEqual(
+            card_count_after - card_count_before, 2
+        )  # one for new graph, one for editable_future_graph
 
         # test that data is persisited propertly during an append opertation
         graph.append_branch(
@@ -785,10 +792,10 @@ class GraphTests(ArchesTestCase):
         nodegroups_count_after = models.NodeGroup.objects.count()
         card_count_after = models.CardModel.objects.count()
 
-        self.assertEqual(nodes_count_after - nodes_count_before, 3)
+        self.assertEqual(nodes_count_after - nodes_count_before, 4)
         self.assertEqual(edges_count_after - edges_count_before, 2)
-        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 2)
-        self.assertEqual(card_count_after - card_count_before, 2)
+        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 3)
+        self.assertEqual(card_count_after - card_count_before, 3)
 
         # test that removing a node group by setting it to None, removes it from the db
         node_to_update = None
@@ -806,8 +813,8 @@ class GraphTests(ArchesTestCase):
         nodegroups_count_after = models.NodeGroup.objects.count()
         card_count_after = models.CardModel.objects.count()
 
-        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 1)
-        self.assertEqual(card_count_after - card_count_before, 1)
+        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 2)
+        self.assertEqual(card_count_after - card_count_before, 2)
 
         # test that adding back a node group adds it back to the db
         node_to_update["nodegroup_id"] = node_to_update["nodeid"]
@@ -817,8 +824,8 @@ class GraphTests(ArchesTestCase):
         nodegroups_count_after = models.NodeGroup.objects.count()
         card_count_after = models.CardModel.objects.count()
 
-        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 2)
-        self.assertEqual(card_count_after - card_count_before, 2)
+        self.assertEqual(nodegroups_count_after - nodegroups_count_before, 3)
+        self.assertEqual(card_count_after - card_count_before, 3)
 
     def test_delete_graph(self):
         """
@@ -1208,24 +1215,276 @@ class GraphTests(ArchesTestCase):
         with self.assertRaises(GraphValidationError) as cm:
             graph.save()
 
-    def test_appending_to_published_graph(self):
-        graph = Graph.objects.get(node=self.rootNode)
-        admin = User.objects.get(username="admin")
-        graph.publish(user=admin)
+    def test_update_empty_graph_from_editable_future_graph(self):
+        source_graph = Graph.new(name="TEST RESOURCE")
+        editable_future_graph = (
+            source_graph.create_editable_future_graph()
+        )  # TODO: replace with db lookup after 9114 signal work
 
-        with self.assertRaises(GraphValidationError) as cm:
-            graph.append_node()
-        self.assertEqual(cm.exception.code, 1012)
-        with self.assertRaises(GraphValidationError) as cm:
-            graph.append_branch(
-                "http://www.nasa.gov/", graphid=self.NODE_NODETYPE_GRAPHID
-            )
-        self.assertEqual(cm.exception.code, 1012)
+        editable_future_graph.append_branch(
+            "http://www.cidoc-crm.org/cidoc-crm/E1_Entity", graphid=source_graph.pk
+        )
+        editable_future_graph.save()
+        serialized_editable_future_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(editable_future_graph)
+        )
 
-    def test_appending_published_branch_to_unpublished_graph(self):
-        graph = Graph.objects.get(node=self.rootNode)
-        admin = User.objects.get(username="admin")
-        branch = Graph.objects.get(graphid=self.NODE_NODETYPE_GRAPHID)
-        branch.publish(user=admin)
+        updated_source_graph = source_graph.update_from_editable_future_graph()
+        serialized_updated_source_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(updated_source_graph)
+        )
 
-        graph.append_branch("http://www.nasa.gov/", graphid=self.NODE_NODETYPE_GRAPHID)
+        for idx, editable_future_graph_serialized_card in enumerate(
+            serialized_editable_future_graph["cards"]
+        ):
+            updated_source_graph_serialized_card = serialized_updated_source_graph[
+                "cards"
+            ][idx]
+
+            # ensures all relevant values are equal between graphs
+            for key, value in editable_future_graph_serialized_card.items():
+                if key not in [
+                    "graph_id",
+                    "nodegroup_id",
+                    "name",
+                    "cardid",
+                    "source_identifier_id",
+                ]:
+                    if type(value) == "dict":
+                        self.assertDictEqual(
+                            value, updated_source_graph_serialized_card[key]
+                        )
+                    else:
+                        updated_value = updated_source_graph_serialized_card[key]
+                        if (
+                            updated_value == '{"en": ""}'
+                        ):  # workaround for updated str default values
+                            updated_value = ""
+
+                        self.assertEqual(value, updated_value)
+
+            # ensures all superflous values relating to `editable_future_graph` have been deleted
+            try:
+                future_card_from_database = models.CardModel.objects.get(
+                    pk=editable_future_graph_serialized_card["cardid"]
+                )
+                self.assertEqual(
+                    str(future_card_from_database.graph_id),
+                    updated_source_graph_serialized_card["graph_id"],
+                )
+            except models.CardModel.DoesNotExist:
+                pass  # card has been successfully deleted
+
+        for idx, editable_future_graph_serialized_node in enumerate(
+            serialized_editable_future_graph["nodes"]
+        ):
+            updated_source_graph_serialized_node = serialized_updated_source_graph[
+                "nodes"
+            ][idx]
+
+            # ensures all relevant values are equal between graphs
+            for key, value in editable_future_graph_serialized_node.items():
+                if key not in [
+                    "graph_id",
+                    "nodegroup_id",
+                    "nodeid",
+                    "source_identifier_id",
+                ]:
+                    if type(value) == "dict":
+                        self.assertDictEqual(
+                            value, updated_source_graph_serialized_node[key]
+                        )
+                    else:
+                        updated_value = updated_source_graph_serialized_node[key]
+                        if (
+                            updated_value == '{"en": ""}'
+                        ):  # workaround for updated str default values
+                            updated_value = ""
+
+                        self.assertEqual(value, updated_value)
+
+            # ensures all superflous values relating to `editable_future_graph` have been deleted
+            try:
+                future_node_from_database = models.Node.objects.get(
+                    pk=editable_future_graph_serialized_node["nodeid"]
+                )
+                self.assertEqual(
+                    str(future_node_from_database.graph_id),
+                    updated_source_graph_serialized_node["graph_id"],
+                )
+            except models.Node.DoesNotExist:
+                pass  # node has been successfully deleted
+
+        for idx, editable_future_graph_serialized_edge in enumerate(
+            serialized_editable_future_graph["edges"]
+        ):
+            updated_source_graph_serialized_edge = serialized_updated_source_graph[
+                "edges"
+            ][idx]
+
+            # ensures all relevant values are equal between graphs
+            for key, value in editable_future_graph_serialized_edge.items():
+                if key not in [
+                    "graph_id",
+                    "domainnode_id",
+                    "rangenode_id",
+                    "edgeid",
+                    "source_identifier_id",
+                ]:
+                    if type(value) == "dict":
+                        self.assertDictEqual(
+                            value, updated_source_graph_serialized_edge[key]
+                        )
+                    else:
+                        self.assertEqual(
+                            value, updated_source_graph_serialized_edge[key]
+                        )
+
+            # ensures all superflous values relating to `editable_future_graph` have been deleted
+            try:
+                future_edge_from_database = models.Edge.objects.get(
+                    pk=editable_future_graph_serialized_edge["edgeid"]
+                )
+                self.assertEqual(
+                    str(future_edge_from_database.graph_id),
+                    updated_source_graph_serialized_edge["graph_id"],
+                )
+            except models.Edge.DoesNotExist:
+                pass  # edge has been successfully deleted
+
+        for idx, editable_future_graph_serialized_nodegroup in enumerate(
+            serialized_editable_future_graph["nodegroups"]
+        ):
+            updated_source_graph_serialized_nodegroup = serialized_updated_source_graph[
+                "nodegroups"
+            ][idx]
+
+            # ensures all relevant values are equal between graphs
+            for key, value in editable_future_graph_serialized_nodegroup.items():
+                if key not in ["parentnodegroup_id", "nodegroupid", "legacygroupid"]:
+                    if type(value) == "dict":
+                        self.assertDictEqual(
+                            value, updated_source_graph_serialized_nodegroup[key]
+                        )
+                    else:
+                        self.assertEqual(
+                            value, updated_source_graph_serialized_nodegroup[key]
+                        )
+
+        for key, value in serialized_editable_future_graph.items():
+            if key == "name":
+                self.assertEqual(value, serialized_updated_source_graph[key])
+            elif key not in [
+                "graphid",
+                "cards",
+                "nodes",
+                "edges",
+                "nodegroups",
+                "functions",
+                "root",
+                "widgets",
+                "resource_instance_lifecycle",
+                "resource_instance_lifecycle_id",
+                "source_identifier",
+                "source_identifier_id",
+                "publication_id",
+            ]:
+                if type(value) == "dict":
+                    self.assertDictEqual(value, serialized_updated_source_graph[key])
+                else:
+                    self.assertEqual(value, serialized_updated_source_graph[key])
+
+    def test_update_graph_from_editable_future_graph_after_node_deletion(self):
+        source_graph = Graph.new(name="TEST RESOURCE")
+
+        source_graph.append_branch(
+            "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        source_graph.save()
+
+        self.assertEqual(len(source_graph.nodes), 3)
+
+        editable_future_graph = (
+            source_graph.create_editable_future_graph()
+        )  # TODO: replace with db lookup after 9114 signal work
+
+        child_node = [node for node in editable_future_graph.nodes.values()][
+            len(editable_future_graph.nodes.values()) - 1
+        ]
+        child_node_source_identifier = child_node.source_identifier_id
+
+        editable_future_graph.delete_node(child_node)
+        editable_future_graph = Graph.objects.get(
+            pk=editable_future_graph.pk
+        )  # updates from DB to refresh node list
+
+        updated_source_graph = source_graph.update_from_editable_future_graph()
+
+        with self.assertRaises(Exception):
+            models.Node.objects.get(pk=child_node_source_identifier)
+
+        self.assertEqual(len(updated_source_graph.nodes), 2)
+
+    def test_add_resource_instance_lifecycle(self):
+        resource_instance_lifecycle = {
+            "id": "f7a0fd46-4c71-49cb-ae1e-778c96763440",
+            "name": "Test Lifecycle",
+            "resource_instance_lifecycle_states": [
+                {
+                    "id": "e2ac2a61-c140-43f5-bf65-3fe8ce47a594",
+                    "name": "State 1",
+                    "next_resource_instance_lifecycle_states": [
+                        "0b52dbac-405a-49e0-9151-43ebf2100e6c"
+                    ],
+                    "previous_resource_instance_lifecycle_states": [],
+                },
+                {
+                    "id": "0b52dbac-405a-49e0-9151-43ebf2100e6c",
+                    "name": "State 2",
+                    "next_resource_instance_lifecycle_states": [],
+                    "previous_resource_instance_lifecycle_states": [
+                        "e2ac2a61-c140-43f5-bf65-3fe8ce47a594"
+                    ],
+                },
+            ],
+        }
+
+        graph = Graph.new(
+            name="RESOURCE_INSTANCE_LIFECYCLE_TEST_GRAPH",
+            is_resource=True,
+            author="ARCHES TEST",
+        )
+        graph.add_resource_instance_lifecycle(resource_instance_lifecycle)
+        graph.save()
+
+        lifecycle = models.ResourceInstanceLifecycle.objects.get(
+            id="f7a0fd46-4c71-49cb-ae1e-778c96763440"
+        )
+
+        self.assertEqual(lifecycle.name, "Test Lifecycle")
+
+        # Verify the states were created correctly
+        state1 = models.ResourceInstanceLifecycleState.objects.get(
+            id="e2ac2a61-c140-43f5-bf65-3fe8ce47a594"
+        )
+        state2 = models.ResourceInstanceLifecycleState.objects.get(
+            id="0b52dbac-405a-49e0-9151-43ebf2100e6c"
+        )
+        self.assertEqual(state1.name, "State 1")
+        self.assertEqual(state2.name, "State 2")
+
+        # Verify the relationships between states
+        self.assertEqual(
+            list(state1.next_resource_instance_lifecycle_states.all()), [state2]
+        )
+        self.assertEqual(
+            list(state2.previous_resource_instance_lifecycle_states.all()), [state1]
+        )
+
+        resource_instance_lifecycle_states = (
+            lifecycle.resource_instance_lifecycle_states.all()
+        )
+        # Verify the lifecycle contains the states
+        self.assertIn(state1, resource_instance_lifecycle_states)
+        self.assertIn(state2, resource_instance_lifecycle_states)

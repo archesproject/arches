@@ -19,6 +19,7 @@ from arches.app.models.models import (
     FunctionXGraph,
     Value,
     GraphXPublishedGraph,
+    ResourceInstanceLifecycle,
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from collections import OrderedDict
@@ -135,23 +136,37 @@ def sort(object, dict_key=None):
 
 
 def get_graphs_for_export(graphids=None):
+    def get_original_graphs(graphs):
+        for i in range(len(graphs)):
+            if graphs[i].source_identifier_id is not None:
+                graphs[i] = Graph.objects.get(pk=graphs[i].source_identifier_id)
+        return graphs
+
     graphs = {}
     graphs["graph"] = []
     if graphids is None or graphids[0] == "all" or graphids == [""]:
-        resource_graphs = Graph.objects.all().exclude(
-            pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+        resource_graphs = (
+            Graph.objects.all()
+            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            .exclude(source_identifier__isnull=True)
         )
     elif graphids[0] == "resource_models":
-        resource_graphs = Graph.objects.filter(isresource=True).exclude(
-            pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+        resource_graphs = (
+            Graph.objects.filter(isresource=True)
+            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            .exclude(source_identifier__isnull=True)
         )
     elif graphids[0] == "branches":
-        resource_graphs = Graph.objects.filter(isresource=False).exclude(
-            pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+        resource_graphs = (
+            Graph.objects.filter(isresource=False)
+            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            .exclude(source_identifier__isnull=True)
         )
     else:
         try:
-            resource_graphs = Graph.objects.filter(graphid__in=graphids)
+            resource_graphs = get_original_graphs(
+                list(Graph.objects.filter(graphid__in=graphids))
+            )
         except:
             # this warning should never get thrown while doing an export from the UI, but maybe it should be moved somewhere else.
             print("*" * 80)
@@ -193,6 +208,7 @@ def get_graphs_for_export(graphids=None):
             r2r_constraints_for_export(resource_graph)
         )
 
+        # Replace `publication_id` with `publication`
         publication_id = resource_graph.get("publication_id")
         publication = None
 
@@ -206,6 +222,24 @@ def get_graphs_for_export(graphids=None):
 
         resource_graph["publication"] = publication
         del resource_graph["publication_id"]
+
+        # Replace `resource_instance_lifecycle_id` with `resource_instance_lifecycle`
+        resource_instance_lifecycle_id = resource_graph.get(
+            "resource_instance_lifecycle_id"
+        )
+        resource_instance_lifecycle = None
+
+        if resource_instance_lifecycle_id:
+            resource_instance_lifecycle = JSONDeserializer().deserialize(
+                JSONSerializer().serialize(
+                    ResourceInstanceLifecycle.objects.get(
+                        pk=resource_instance_lifecycle_id
+                    )
+                )
+            )
+
+        resource_graph["resource_instance_lifecycle"] = resource_instance_lifecycle
+        del resource_graph["resource_instance_lifecycle_id"]
 
         graphs["graph"].append(resource_graph)
     return sort(graphs)

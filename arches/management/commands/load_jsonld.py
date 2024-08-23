@@ -297,7 +297,9 @@ class Command(BaseCommand):
             if not graphid:
                 # Check slug
                 try:
-                    graphid = archesmodels.GraphModel.objects.get(slug=m).pk
+                    graphid = archesmodels.GraphModel.objects.get(
+                        slug=m, source_identifier=None
+                    ).pk
                 except:
                     self.stderr.write(
                         f"Couldn't find a model definition for {m}; skipping"
@@ -416,6 +418,7 @@ class Command(BaseCommand):
                 break
             except:
                 raise
+
         if options["fast"] and not options["dry_run"] and self.resources:
             self.save_resources()
             self.index_resources(options["strip_search"])
@@ -502,6 +505,12 @@ class Command(BaseCommand):
         for resource in self.resources:
             resource.tiles = resource.get_flattened_tiles()
             tiles.extend(resource.tiles)
+
+            if not hasattr(resource, "resource_instance_lifecycle_state"):
+                resource.resource_instance_lifecycle_state = (
+                    resource.get_initial_resource_instance_lifecycle_state()
+                )
+
         Resource.objects.bulk_create(self.resources)
         TileModel.objects.bulk_create(tiles)
         for t in tiles:

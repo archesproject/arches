@@ -232,6 +232,8 @@ To create it, use:
             "packages", operation="import_graphs", source=settings_graph
         )
 
+        management.call_command("graph", operation="publish")
+
         settings_data = os.path.join(
             settings.ROOT_DIR, "db", "system_settings", "Arches_System_Settings.json"
         )
@@ -251,8 +253,6 @@ To create it, use:
                 source=settings_data_local,
                 overwrite="overwrite",
             )
-
-        management.call_command("graph", operation="publish")
 
         if development:
             management.call_command("add_test_users")

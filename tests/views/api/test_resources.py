@@ -18,25 +18,30 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import os
+import uuid
+from http import HTTPStatus
 
 from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.urls import reverse
+from django.contrib.auth.models import User
 from django.core import management
 from django.test.client import RequestFactory
 from django.test.utils import captured_stdout
+from unittest.mock import patch, MagicMock
 
 from arches.app.views.api import APIBase
 from arches.app.models import models
 from arches.app.models.graph import Graph
+from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
-# python manage.py test tests.views.api_tests --settings="tests.test_settings"
+# python manage.py test tests.views.api.test_resources --settings="tests.test_settings"
 
 
-class APITests(ArchesTestCase):
+class ResourceAPITests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
         cls.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
@@ -509,3 +514,129 @@ class APITests(ArchesTestCase):
             )
 
         self.assertEqual(response.status_code, 400)
+
+    def test_api_resources_handles_null_sortorder(self):
+        zeroth_card = self.data_type_graph.cardmodel_set.get(sortorder=0)
+        zeroth_card.sortorder = None
+        zeroth_card.save()
+        # Refreshes ORM card cache (.cardmodel_set)
+        self.data_type_graph.refresh_from_db()
+        # Clears proxy model cache (.cards), which reads from .cardmodel_set
+        self.data_type_graph.refresh_from_database()
+        self.data_type_graph.publish()
+        self.test_prj_user.graph_publication = self.data_type_graph.publication
+        self.test_prj_user.save()
+
+        response = self.client.get(
+            reverse("api_resource_report", kwargs={"resourceid": self.test_prj_user.pk})
+        )
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        result = json.loads(response.content)
+        self.assertIsNone(result["cards"][0]["sortorder"])
+
+
+class ResourceInstanceLifecycleStatesTest(ArchesTestCase):
+    @patch("arches.app.models.models.ResourceInstanceLifecycleState.objects.all")
+    def test_get_all_lifecycle_states(self, mock_all):
+        lifecycle_state1 = models.ResourceInstanceLifecycleState(
+            id=uuid.uuid4(), name="State 1"
+        )
+        lifecycle_state2 = models.ResourceInstanceLifecycleState(
+            id=uuid.uuid4(), name="State 2"
+        )
+        mock_all.return_value = [lifecycle_state1, lifecycle_state2]
+
+        response = self.client.get(reverse("api_resource_instance_lifecycle_states"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 2)
+        self.assertEqual(response.json()[0]["name"], "State 1")
+        self.assertEqual(response.json()[1]["name"], "State 2")
+
+
+class ResourceInstanceLifecycleStateTest(ArchesTestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.lifecycle_state_id = uuid.uuid4()
+        self.new_lifecycle_state_id = uuid.uuid4()
+        self.resource_instance_id = uuid.uuid4()
+        self.resource_id = uuid.uuid4()
+
+    @patch("arches.app.models.models.ResourceInstance.objects.get")
+    def test_get_lifecycle_state(self, mock_get):
+        lifecycle_state = models.ResourceInstanceLifecycleState(
+            id=self.lifecycle_state_id, name="State 1"
+        )
+        mock_resource_instance = MagicMock(
+            resource_instance_lifecycle_state=lifecycle_state
+        )
+        mock_get.return_value = mock_resource_instance
+
+        response = self.client.get(
+            reverse(
+                "api_resource_instance_lifecycle_state",
+                args=[self.resource_instance_id],
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["name"], "State 1")
+
+    @patch("arches.app.models.resource.Resource.objects.get")
+    @patch("arches.app.models.models.ResourceInstanceLifecycleState.objects.get")
+    @patch(
+        "arches.app.models.resource.Resource.update_resource_instance_lifecycle_state"
+    )
+    def test_post_lifecycle_state(
+        self, mock_update, mock_get_lifecycle_state, mock_get_resource
+    ):
+        self.client.login(username="admin", password="admin")
+
+        original_lifecycle_state = models.ResourceInstanceLifecycleState(
+            id=self.lifecycle_state_id, name="State 1"
+        )
+        new_lifecycle_state = models.ResourceInstanceLifecycleState(
+            id=self.new_lifecycle_state_id, name="State 2"
+        )
+
+        # Configure the mock to return actual instances
+        mock_get_resource.return_value = Resource(
+            pk=self.resource_id,
+            resource_instance_lifecycle_state=original_lifecycle_state,
+        )
+        mock_get_lifecycle_state.return_value = new_lifecycle_state
+        mock_update.return_value = new_lifecycle_state
+
+        response = self.client.post(
+            reverse("api_resource_instance_lifecycle_state", args=[self.resource_id]),
+            data=json.dumps(str(self.new_lifecycle_state_id)),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertDictEqual(
+            response.json(),
+            {
+                "current_resource_instance_lifecycle_state": {
+                    "action_label": "",
+                    "can_delete_resource_instances": False,
+                    "can_edit_resource_instances": False,
+                    "id": str(self.new_lifecycle_state_id),
+                    "is_initial_state": False,
+                    "name": "State 2",
+                    "next_resource_instance_lifecycle_states": [],
+                    "previous_resource_instance_lifecycle_states": [],
+                    "resource_instance_lifecycle_id": None,
+                },
+                "original_resource_instance_lifecycle_state": {
+                    "action_label": "",
+                    "can_delete_resource_instances": False,
+                    "can_edit_resource_instances": False,
+                    "id": str(self.lifecycle_state_id),
+                    "is_initial_state": False,
+                    "name": "State 1",
+                    "next_resource_instance_lifecycle_states": [],
+                    "previous_resource_instance_lifecycle_states": [],
+                    "resource_instance_lifecycle_id": None,
+                },
+            },
+        )

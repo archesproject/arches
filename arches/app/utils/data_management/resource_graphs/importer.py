@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import logging
-import sys
 import uuid
 from arches.app.models.graph import Graph
 from arches.app.models.models import (
@@ -32,6 +31,7 @@ from arches.app.models.models import (
     GraphXPublishedGraph,
     Language,
     PublishedGraph,
+    Resource2ResourceConstraint,
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.models import GraphXMapping
@@ -185,6 +185,12 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                     graph = Graph.objects.get(
                         pk=graph.graphid
                     )  # retrieve graph using the ORM to ensure strings are I18n_Strings
+
+                    try:
+                        Graph.objects.get(source_identifier_id=graph.graphid)
+                    except Graph.DoesNotExist:
+                        graph.create_editable_future_graph()
+
                     if publication_data:
                         GraphXPublishedGraph.objects.update_or_create(
                             publicationid=publication_data["publicationid"],
@@ -220,6 +226,8 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                             )
 
                         translation.deactivate()
+                    else:
+                        graph.publish()
 
             except GraphImportException as ge:
                 logger.exception(ge)

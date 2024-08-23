@@ -28,17 +28,14 @@ from arches.app.views.base import MapBaseManagerView
 class PluginView(MapBaseManagerView):
     action = None
 
-    def get(self, request, pluginid=None, slug=None):
+    def get(self, request, pluginid=None, slug=None, path=None):
         if slug is not None:
             plugin = models.Plugin.objects.get(slug=slug)
         else:
             plugin = models.Plugin.objects.get(pk=pluginid)
 
         if not request.user.has_perm("view_plugin", plugin):
-            if slug is not None:
-                return redirect("/auth?next=/plugins/{}".format(slug))
-            if slug is not None:
-                return redirect("/auth?next=/plugins/{}".format(pluginid))
+            return redirect("/auth/?next=" + request.path)
 
         if request.GET.get("json"):
             return JSONResponse(plugin)
@@ -48,7 +45,8 @@ class PluginView(MapBaseManagerView):
                 pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
             )
             .exclude(isresource=False)
-            .exclude(publication=None)
+            .exclude(is_active=False)
+            .exclude(source_identifier__isnull=False)
         )
         widgets = models.Widget.objects.all()
         card_components = models.CardComponent.objects.all()

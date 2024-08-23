@@ -107,7 +107,7 @@ class MapBaseManagerView(BaseManagerView):
         ]
         geom_nodes = models.Node.objects.filter(
             graph__isresource=True,
-            graph__publication__isnull=False,
+            graph__is_active=True,
             datatype__in=geom_datatypes,
         ).exclude(graph__graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         resource_layers = []

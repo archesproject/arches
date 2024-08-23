@@ -114,6 +114,50 @@
             "title": "{% jsescaped_trans _("Delete Branch/Resource Model?") %}",
             "text": "{% jsescaped_trans _("Deleting this branch/resource model will remove it (and all associated data) entirely.  Are you sure you would like to proceed?") %}"
         }'
+        confirm-graph-publication-delete='{
+            "title": "{% trans "Delete Published Graph?" %}",
+            "text": "{% trans "Deleting this publication will remove it (and all associated data) entirely.  Are you sure you would like to proceed?" %}"
+        }'
+        graph-publication-delete-success='{
+            "title": "{% trans "Success!" %}",
+            "text": "{% trans "The published graph has been successfully deleted." %}"
+        }'
+        graph-publication-delete-failure='{
+            "title": "{% jsescaped_trans "Delete Version Failed..."%}",
+            "text": "{% jsescaped_trans "Sorry! The request failed. Please try again. Contact your system administrator if the problem persists." %}"
+        }'
+        confirm-graph-publication-update='{
+            "title": "{% trans "Update Graph to selected version?" %}",
+            "text": "{% trans "Updating this Graph to the selected published version will change the Graph throughout the application.  Are you sure you would like to proceed?" %}"
+        }'
+        confirm-graph-publication-edit='{
+            "title": "{% trans "Apply Edits to Published Graphs?" %}",
+            "text": "{% trans "This will update the historical records of the Graph without creating a new publication. Are you sure you would like to proceed?" %}"
+        }'
+        graph-designer-redirect-from-editable-future-graph='{
+            "title": "{% trans "Redirected from editable_future_graph" %}",
+            "text": "{% trans "editable_future_graphs cannot be manually accessed from the graph designer. You have been redirected to the appropriate page." %}"
+        }'
+        resource-report-redirect-from-resource-editor-not-permissioned='{
+            "title": "{% trans "Redirected from the Resource Editor" %}",
+            "text": "{% trans "The current user does not have permission to edit this resource. You have been redirected to the appropriate page." %}"
+        }'
+        resource-report-redirect-from-resource-editor-lifecycle-state='{
+            "title": "{% trans "Redirected from the Resource Editor" %}",
+            "text": "{% trans "The lifecycle state of this resource does not allow editing. You have been redirected to the appropriate page." %}"
+        }'
+        graph-publication-update-success='{
+            "title": "{% trans "Success!" %}",
+            "text": "{% trans "The published graph has been successfully updated." %}"
+        }'
+        graph-publication-update-failure='{
+            "title": "{% jsescaped_trans "Restore Version Failed..."%}",
+            "text": "{% jsescaped_trans "Sorry! The request failed. Please try again. Contact your system administrator if the problem persists." %}"
+        }'
+        confirm-graph-revert='{
+            "title": "{% trans "Revert Branch/Resource Model?" %}",
+            "text": "{% trans "This will revert the current branch/resource model to the latest published version.  Are you sure you would like to proceed?" %}"
+        }'
         confirm-maplayer-delete='{
             "title": "{% jsescaped_trans _("Delete map layer?") %}",
             "text": "{% jsescaped_trans _("Deleting this map layer will remove it entirely.  You cannot undo this action.  Are you sure you would like to proceed?") %}"
@@ -137,6 +181,22 @@
             "title": "{% jsescaped_trans _("Send Two-Factor Authentication email?") %}",
             "text": "{% jsescaped_trans _("This will send an email containing instructions to change two-factor authentication settings to your registered email address.  Are you sure you would like to proceed?") %}"
         }'
+        resource-graph-has-unpublished-changes='{
+            "title": "{% jsescaped_trans "Graph Has Unpublished Changes" %}",
+            "text": "{% jsescaped_trans "This resource instance is based on a Graph that has unpublished changes. Your system administrator will need to update this instance before you can edit it." %}"
+        }'
+        resource-graph-has-different-publication='{
+            "title": "{% jsescaped_trans "Graph Has Different Published Version" %}",
+            "text": "{% jsescaped_trans "This resource instance is based on an older data model. Your system administrator will need to update this instance before you can edit it." %}"
+        }'
+        resource-graph-has-different-publication-user-is-not-permissioned='{
+            "title": "{% jsescaped_trans "Graph Has Different Publication" %}",
+            "text": "{% jsescaped_trans "This Resource Instance is based on a graph that has a different publication than the current one. If you want to view the Resource please contact your System Administrator." %}"
+        }'
+        resource-graph-change-active-status-error='{
+            "title": "{% jsescaped_trans "Could not update Resource Model active state" %}",
+            "text": "{% jsescaped_trans "Please contact your System Administrator" %}"
+        }'
         two-factor-authentication-email-success='{
             "title": "{% jsescaped_trans _("Success!") %}",
             "text": "{% jsescaped_trans _("An email with instructions to change two-factor authentication settings has been sent to your registered email address.") %}"
@@ -148,10 +208,16 @@
         resource-copy-success='{
             "title": "{% jsescaped_trans _("Resource Successfully Copied.")%}"
         }'
+        resource-is-not-active='{
+            "title": "{% jsescaped_trans "This resource has not been marked active." %}",
+            "text": "{% jsescaped_trans "To continue, please ensure the graph is marked active." %}"
+        }'
         resource-has-unpublished-graph='{
             "title": "{% jsescaped_trans _("This resource is based on an unpublished graph.") %}",
             "text": "{% jsescaped_trans _("To continue, please ensure the graph is published.") %}"
         }'
+        active='{% trans "Active" as active %}  "{{ active|escapejs }}"'
+        inactive='{% trans "Inactive" as inactive %}  "{{ inactive|escapejs }}"'
         two-factor-authentication='{% trans "Two-Factor Authentication" as twoFactorAuthentication %} "{{ twoFactorAuthentication|escapejs }}"'
         please-contact-system-administrator='{% trans "Please contact your system administrator for more details." as pleaseContactSystemAdministrator %}  "{{ pleaseContactSystemAdministrator|escapejs }}"'
         hide-null-values='{% trans "Hide Null Values" as hideNullValues %} "{{ hideNullValues|escapejs }}"'
@@ -568,6 +634,7 @@
         image-tools='{% trans "Image Tools" as imageTools %} "{{ imageTools|escapejs }}"'
         image-service='{% trans "Image Service" as imageService %} "{{ imageService|escapejs }}"'
         switch-image-service='{% trans "Switch Image Service" as switchImageService %} "{{ switchImageService|escapejs }}"'
+        lifecycle-state='{% trans "Lifecycle State" as lifecycleState %} "{{ lifecycleState|escapejs }}"'
         resource-instance-name='{% trans "Resource Instance Name" as resourceInstanceName %} "{{ resourceInstanceName|escapejs }}"'
         related-resource-summary='{% trans "Related Resource Summary" as relatedResourceSummary %} "{{ relatedResourceSummary|escapejs }}"'
         resource-model='{% trans "Resource Model" as resourceModel %} "{{ resourceModel|escapejs }}"'

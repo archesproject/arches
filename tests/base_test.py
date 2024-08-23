@@ -126,7 +126,8 @@ class ArchesTestCase(TestCase):
             VALUES (
                 44, '{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
                 '{oauth_client_secret}',
-                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000', '{jwt_algorithm}');
+                'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000', '{jwt_algorithm}')
+            ON CONFLICT DO NOTHING;
         """
 
         sql = sql.format(
@@ -135,6 +136,7 @@ class ArchesTestCase(TestCase):
             oauth_client_secret=OAUTH_CLIENT_SECRET,
             jwt_algorithm=test_settings.JWT_ALGORITHM,
         )
+
         cursor.execute(sql)
 
     @classmethod

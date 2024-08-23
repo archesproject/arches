@@ -224,6 +224,9 @@ class SearchTests(ArchesTestCase):
     def tearDownClass(cls):
         cls.user.delete()
         Resource.objects.filter(graph_id=cls.search_model_graphid).delete()
+        models.GraphModel.objects.filter(
+            source_identifier=cls.search_model_graphid
+        ).delete()
         models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
         super().tearDownClass()
 

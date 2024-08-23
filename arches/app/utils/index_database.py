@@ -1,16 +1,18 @@
-from typing import Iterable
+import multiprocessing
+import os
+import math
+import logging
 import uuid
+import pyprind
+import sys
 import django
 
 django.setup()
 
-import pyprind
-import sys
-from types import SimpleNamespace
+from datetime import datetime
 from django.db import connection, connections
 from django.db.models import prefetch_related_objects, Prefetch, Q, QuerySet
 from arches.app.models import models
-from arches.app.models.models import Value
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
@@ -19,13 +21,8 @@ from arches.app.search.base_index import get_index
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils import import_class_from_string
-from datetime import datetime
+from typing import Iterable
 
-
-import multiprocessing
-import os
-import math
-import logging
 
 logger = logging.getLogger(__name__)
 serialized_graphs = {}

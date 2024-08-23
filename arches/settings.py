@@ -199,6 +199,7 @@ RESOURCE_EDITOR_GROUPS = ("Resource Editor", "Crowdsource Editor")
 
 # Unique session cookie ensures that logins are treated separately for each app
 SESSION_COOKIE_NAME = "arches"
+SESSION_COOKIE_SAMESITE = "Strict"
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  #<-- Only need to uncomment this for testing without an actual email server
 # EMAIL_USE_TLS = True
@@ -722,13 +723,6 @@ MAP_MAX_ZOOM = 20
 # Map filter auto adjusts map extent to fit results. If False, map extent will not change when filtering results.
 MAP_FILTER_AUTO_ZOOM_ENABLED = True
 
-# If True, users can make edits to graphs that are locked
-# (generally because they have resource intances saved against them)
-# Changing this setting to True and making graph modifications may result in
-# disagreement between your Resource Models and Resource Instances potentially
-# causing your application to break.
-OVERRIDE_RESOURCE_MODEL_LOCK = False
-
 # If True, allows users to selectively enable two-factor authentication
 ENABLE_TWO_FACTOR_AUTHENTICATION = False
 
@@ -835,6 +829,8 @@ RENDERERS = [
         "exclude": "tif,tiff,psd",
     },
 ]
+
+DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID = "7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75"
 
 # --- JSON LD sortorder generating functions --- #
 #

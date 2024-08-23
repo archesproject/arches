@@ -20,15 +20,13 @@ import json
 import uuid
 
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import User, Group
 from django.db import transaction
 from django.forms.models import model_to_dict
 from django.http import HttpResponseNotFound
-from django.http import HttpResponse
 from django.http import Http404
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import redirect, render
-from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
@@ -39,32 +37,28 @@ from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
-from arches.app.models.resource import Resource, PublishedModelError
+from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.decorators import can_edit_resource_instance
-from arches.app.utils.decorators import can_delete_resource_instance
 from arches.app.utils.decorators import can_read_resource_instance
 from arches.app.utils.i18n import LanguageSynchronizer, localize_complex_input
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.permission_backend import (
     user_is_resource_editor,
     user_is_resource_reviewer,
-    user_can_delete_resource,
     user_can_edit_resource,
-    user_can_read_resource,
+    user_can_delete_resource,
 )
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.string_utils import str_to_bool
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Query, Terms
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
-from elasticsearch import Elasticsearch
 from arches.app.utils.permission_backend import (
     assign_perm,
     get_perms,
@@ -117,7 +111,9 @@ def get_resource_relationship_types():
 class ResourceEditorView(MapBaseManagerView):
     action = None
 
-    @method_decorator(can_edit_resource_instance, name="dispatch")
+    @method_decorator(
+        can_edit_resource_instance(redirect_to_report=True), name="dispatch"
+    )
     def get(
         self,
         request,
@@ -258,7 +254,7 @@ class ResourceEditorView(MapBaseManagerView):
                 displayname = _("System Settings")
 
             tiles = resource_instance.tilemodel_set.order_by("sortorder").filter(
-                nodegroup__in=nodegroups
+                nodegroup_id__in=[nodegroup.pk for nodegroup in nodegroups]
             )
             provisionaltiles = []
             for tile in tiles:
@@ -307,7 +303,9 @@ class ResourceEditorView(MapBaseManagerView):
             serialized_cards = serialized_graph["cards"]
             cardwidgets = [
                 models.CardXNodeXWidget(**card_x_node_x_widget_dict)
-                for card_x_node_x_widget_dict in serialized_graph["widgets"]
+                for card_x_node_x_widget_dict in serialized_graph[
+                    "cards_x_nodes_x_widgets"
+                ]
             ]
         else:
             cards = (
@@ -351,7 +349,8 @@ class ResourceEditorView(MapBaseManagerView):
                     pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
                 )
                 .exclude(isresource=False)
-                .exclude(publication=None)
+                .exclude(is_active=False)
+                .exclude(source_identifier__isnull=False)
             ),
             relationship_types=get_resource_relationship_types(),
             widgets=updated_widgets,
@@ -385,6 +384,14 @@ class ResourceEditorView(MapBaseManagerView):
             is_system_settings=is_system_settings,
         )
 
+        context["graph_has_unpublished_changes"] = graph.has_unpublished_changes
+
+        context["resource_instance_lifecycle_state"] = JSONSerializer().serialize(
+            resource_instance.resource_instance_lifecycle_state
+            if resource_instance
+            else None
+        )
+
         context["nav"]["title"] = ""
         context["nav"]["menu"] = nav_menu
 
@@ -402,7 +409,13 @@ class ResourceEditorView(MapBaseManagerView):
                 "templates": ["resource-editor-help"],
             }
 
-        return render(request, view_template, context)
+        if graph.has_unpublished_changes or (
+            resource_instance
+            and resource_instance.graph_publication_id != graph.publication_id
+        ):
+            return redirect("resource_report", resourceid=resourceid)
+        else:
+            return render(request, view_template, context)
 
     def delete(self, request, resourceid=None):
         delete_error = _("Unable to Delete Resource")
@@ -416,14 +429,6 @@ class ResourceEditorView(MapBaseManagerView):
                 ret = Resource.objects.get(pk=resourceid)
                 try:
                     deleted = ret.delete(user=request.user)
-                except PublishedModelError as e:
-                    message = _(
-                        "Unable to delete. Please verify the model is not currently published."
-                    )
-                    return JSONResponse(
-                        {"status": "false", "message": [_(e.title), _(str(message))]},
-                        status=500,
-                    )
                 except PermissionDenied:
                     return JSONErrorResponse(delete_error, delete_msg)
                 if deleted is True:
@@ -661,6 +666,9 @@ class ResourceEditLogView(BaseManagerView):
                 "tile edit": _("Tile Updated"),
                 "delete edit": _("Edit Deleted"),
                 "bulk_create": _("Resource Created"),
+                "update_resource_instance_lifecycle_state": _(
+                    "Resource Lifecycle State Updated"
+                ),
             }
             deleted_instances = [
                 e.resourceinstanceid for e in recent_edits if e.edittype == "delete"
@@ -873,7 +881,7 @@ class ResourceTiles(View):
         tiles = models.TileModel.objects.filter(resourceinstance_id=resourceid)
         if nodeid is not None:
             node = models.Node.objects.get(pk=nodeid)
-            tiles = tiles.filter(nodegroup=node.nodegroup)
+            tiles = tiles.filter(nodegroup_id=node.nodegroup_id)
 
         for tile in tiles:
             if request.user.has_perm(perm, tile.nodegroup):
@@ -975,8 +983,13 @@ class ResourceDescriptors(View):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
-        resource = Resource.objects.only("graph_id").get(pk=resourceid)
+        resource = Resource.objects.only(
+            "graph_id", "resource_instance_lifecycle_state"
+        ).get(pk=resourceid)
         graph = Graph.objects.get(graphid=resource.graph_id)
+        graph_has_different_publication = bool(
+            resource.graph_publication_id != graph.publication_id
+        )
 
         try:
             map_markers = models.MapMarker.objects.all()
@@ -994,6 +1007,27 @@ class ResourceReportView(MapBaseManagerView):
             widgets=models.Widget.objects.all(),
             map_markers=map_markers,
             geocoding_providers=geocoding_providers,
+            graph_has_different_publication=graph_has_different_publication,
+            graph_has_different_publication_and_user_has_insufficient_permissions=bool(
+                graph_has_different_publication
+                and not request.user.groups.filter(
+                    name__in=[
+                        "Graph Editor",
+                        "RDM Administrator",
+                        "Application Administrator",
+                        "System Administrator",
+                    ]
+                ).exists()
+            ),
+            graph_has_unpublished_changes=bool(graph.has_unpublished_changes),
+        )
+
+        context["user_can_edit_resource"] = user_can_edit_resource(
+            request.user, resourceid=resourceid
+        )
+
+        context["resource_instance_lifecycle_state_permits_editing"] = (
+            resource.resource_instance_lifecycle_state.can_edit_resource_instances
         )
 
         if graph.iconclass:
@@ -1012,7 +1046,8 @@ class RelatedResourcesView(BaseManagerView):
         models.GraphModel.objects.all()
         .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
         .exclude(isresource=False)
-        .exclude(publication=None)
+        .exclude(is_active=False)
+        .exclude(source_identifier__isnull=False)
     )
 
     def paginate_related_resources(self, related_resources, page, request):
@@ -1196,16 +1231,7 @@ class RelatedResourcesView(BaseManagerView):
                     datestarted=datefrom,
                     dateended=dateto,
                 )
-                try:
-                    rr.save()
-                except PublishedModelError as e:
-                    message = _(
-                        "Unable to save. Please verify the model is not currently published."
-                    )
-                    return JSONResponse(
-                        {"status": "false", "message": [_(e.title), _(str(message))]},
-                        status=500,
-                    )
+                rr.save()
             else:
                 print("relationship not permitted")
 
@@ -1215,16 +1241,7 @@ class RelatedResourcesView(BaseManagerView):
             rr.relationshiptype = relationshiptype
             rr.datestarted = datefrom
             rr.dateended = dateto
-            try:
-                rr.save()
-            except PublishedModelError as e:
-                message = _(
-                    "Unable to save. Please verify the model is not currently published."
-                )
-                return JSONResponse(
-                    {"status": "false", "message": [_(e.title), _(str(message))]},
-                    status=500,
-                )
+            rr.save()
 
         start = request.GET.get("start", 0)
         resource = Resource.objects.get(pk=root_resourceinstanceid[0])

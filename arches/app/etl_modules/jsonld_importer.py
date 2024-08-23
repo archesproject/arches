@@ -49,7 +49,7 @@ def get_graph_tree_from_slug(slug):
 
 @lru_cache(maxsize=1)
 def graph_id_from_slug(slug):
-    return GraphModel.objects.get(slug=slug).pk
+    return GraphModel.objects.get(slug=slug, source_identifier=None).pk
 
 
 @cache

@@ -137,7 +137,7 @@ define([
             cardComponentLookup: createLookup(data.cardComponents, 'componentid'),
             nodeLookup: createLookup(params.graphModel.get('nodes')(), 'nodeid'),
             graphid: params.graph.graphid,
-            graphname: params.graph.name,
+            graphname: params.graph.name(),
             graphiconclass: params.graph.iconclass,
             graph: params.graph,
             graphModel: params.graphModel,
@@ -357,6 +357,10 @@ define([
                     }),
                     url: arches.urls.reorder_cards,
                     complete: function() {
+                        // adds event to trigger dirty state in graph-designer
+                        document.dispatchEvent(
+                            new Event('reorderCards')
+                        );
                         loading(false);
                     }
                 });
@@ -388,7 +392,7 @@ define([
 
         this.topCards = ko.observableArray();
 
-        var tc = _.filter(data.cards, function(card) {
+        var tc = _.filter(params.isPermissionTree ? data.source_graph.cards : data.cards, function(card) {
             var nodegroup = _.find(ko.unwrap(params.graphModel.get('nodegroups')), function(group) {
                 return ko.unwrap(group.nodegroupid) === card.nodegroup_id;
             });

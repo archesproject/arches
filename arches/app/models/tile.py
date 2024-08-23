@@ -267,11 +267,13 @@ class Tile(models.TileModel):
         if constraints.exists():
             for constraint in constraints:
                 if constraint.uniquetoallinstances is True:
-                    tiles = models.TileModel.objects.filter(nodegroup=self.nodegroup)
+                    tiles = models.TileModel.objects.filter(
+                        nodegroup_id=self.nodegroup_id
+                    )
                 else:
                     tiles = models.TileModel.objects.filter(
                         Q(resourceinstance_id=self.resourceinstance.resourceinstanceid)
-                        & Q(nodegroup=self.nodegroup)
+                        & Q(nodegroup_id=self.nodegroup_id)
                     )
                 nodes = [node for node in constraint.nodes.all()]
                 for tile in tiles:

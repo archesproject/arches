@@ -67,14 +67,14 @@ class JSONLDImportTests(TransactionTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-        self.basic_graph = GraphModel.objects.get(slug="basic")
+        self.basic_graph = GraphModel.objects.get(slug="basic", source_identifier=None)
         self.basic_resource_1 = ResourceInstance.objects.create(
             pk=uuid.UUID("58da1c67-187e-460e-a94f-6b45f9cbc219"),
             graph=self.basic_graph,
         )
         self.note_node = Node.objects.get(pk="cdfc22b2-f6b5-11e9-8f09-a4d18cec433a")
         tile = TileModel(
-            nodegroup=self.note_node.nodegroup,
+            nodegroup_id=self.note_node.nodegroup.pk,
             data={
                 str(self.note_node.pk): {
                     "en": {

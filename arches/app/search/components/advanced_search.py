@@ -77,20 +77,21 @@ class AdvancedSearch(BaseSearchFilter):
         resource_graphs = (
             GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(publication=None)
+            .exclude(is_active=False)
+            .exclude(source_identifier__isnull=False)
         )
         searchable_datatypes = [
             d.pk for d in DDataType.objects.filter(issearchable=True)
         ]
         searchable_nodes = Node.objects.filter(
             graph__isresource=True,
-            graph__publication__isnull=False,
+            graph__is_active=True,
             datatype__in=searchable_datatypes,
             issearchable=True,
         )
 
         resource_cards = CardModel.objects.filter(
-            graph__isresource=True, graph__publication__isnull=False
+            graph__isresource=True, graph__is_active=True
         ).select_related("nodegroup")
         cardwidgets = CardXNodeXWidget.objects.filter(node__in=searchable_nodes)
         datatypes = DDataType.objects.all()

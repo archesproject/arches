@@ -112,6 +112,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("contenttypes", "0002_remove_content_type_name"),
+        ("auth", "0002_alter_permission_name_max_length"),
     ]
 
     initial = True

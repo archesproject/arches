@@ -275,7 +275,7 @@ class LabelBasedGraph(object):
 
         user_language = translation.get_language()
         published_graph = models.PublishedGraph.objects.get(
-            publication=resource.graph.publication, language=user_language
+            publication=resource.graph_publication, language=user_language
         )
         serialized_graph = published_graph.serialized_graph
 

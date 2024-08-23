@@ -30,7 +30,7 @@ define([
         if(typeof data.displayname == 'string') {
             parsedDisplayName = JSON.parse(data.displayname);
         }
-    } catch(e){
+    } catch(e){  // eslint-disable-line  @typescript-eslint/no-unused-vars
         // empty
     }
 
@@ -45,6 +45,7 @@ define([
     var resourceId = ko.observable(data.resourceid);
     var appliedFunctions = ko.observable(data['appliedFunctions']);
     var primaryDescriptorFunction = ko.observable(data['primaryDescriptorFunction']);
+    var graphHasUnpublishedChanges = ko.observable(data['graph_has_unpublished_changes'] === "True" ? true : false);
     var userIsCreator = data['useriscreator'];
     var creator = data['creator'];
     var selectedTile = ko.computed(function() {
@@ -167,6 +168,7 @@ define([
         userIsCreator: userIsCreator,
         showGrid: ko.observable(false),
         creator: creator,
+        resourceInstanceLifecycleState: ko.observable(data.resource_instance_lifecycle_state),
         // appliedFunctions: appliedFunctions(),
         graph: {
             graphid: data.graphid,
@@ -215,12 +217,12 @@ define([
         resourceId: resourceId,
         reportLookup: reportLookup,
         copyResource: function() {
-            if (data.graph && !data.graph.publication_id) {
+            if (data.graph && !data.graph.is_active) {
                 vm.alert(new AlertViewModel(
-                    'ep-alert-red',
-                    arches.translations.resourceHasUnpublishedGraph.title,
-                    arches.translations.resourceHasUnpublishedGraph.text,
-                    null,
+                    'ep-alert-red', 
+                    arches.translations.resourceIsNotActive.title, 
+                    arches.translations.resourceIsNotActive.text, 
+                    null, 
                     function(){}
                 ));
             }
@@ -285,6 +287,33 @@ define([
                 ));
             }
         },
+        updateResourceInstanceLifecycleState: function(data) {
+            $.ajax({
+                type: "POST",
+                url: arches.urls.api_resource_instance_lifecycle_state(resourceId()),
+                data: JSON.stringify(data['id']),
+                error: function(err) {
+                    vm.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON));
+                },
+                success: function() {
+                    window.location.reload();  // reload is important here, for enforcing a report redirect on an unpermissioned user 
+                }
+            });
+        },
+        onSaveSuccess: function() {
+            if (!vm.resourceInstanceLifecycleState()) {
+                $.ajax({
+                    type: "GET",
+                    url: arches.urls.api_resource_instance_lifecycle_state(resourceId()),
+                    error: function(err) {
+                        vm.alert(new JsonErrorAlertViewModel('ep-alert-red', err.responseJSON));
+                    },
+                    success: function(data) {
+                        vm.resourceInstanceLifecycleState(data);
+                    }
+                });
+            }
+        },
         viewEditHistory: function() {
             if (resourceId()) {
                 vm.menuActive(false);
@@ -316,7 +345,7 @@ define([
     });
 
     vm.showRelatedResourcesManager = function(){
-        require(['views/resource/related-resources-manager'], () => {
+        require(['views/resource/related-resources-manager'], () => {  // eslint-disable-line  @typescript-eslint/no-require-imports
             if (vm.graph.domain_connections == undefined) {
                 $.ajax({
                     url: arches.urls.relatable_resources,
@@ -347,7 +376,7 @@ define([
     };
 
     vm.showInstancePermissionsManager = function(){
-        require(['views/resource/permissions-manager'], () => {
+        require(['views/resource/permissions-manager'], () => {  // eslint-disable-line  @typescript-eslint/no-require-imports
             if (vm.userIsCreator === true || vm.userIsCreator === null) {
                 vm.selection('permissions-manager');
             }
@@ -365,6 +394,19 @@ define([
         }
         return crumbs;
     });
+
+    if (graphHasUnpublishedChanges()) {
+        // need setTimeout 0 here to push logic to bottom of call stack to wait for the viewModel to have the alert observable
+        setTimeout(function() {
+            vm.alert(new AlertViewModel(
+                'ep-alert-red', 
+                arches.translations.resourceGraphHasUnpublishedChanges.title, 
+                arches.translations.resourceGraphHasUnpublishedChanges.text, 
+                null,
+                function(){}
+            ));
+        }, 0); 
+    }
 
     return new BaseManagerView({
         viewModel: vm

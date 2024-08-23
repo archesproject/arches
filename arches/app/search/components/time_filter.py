@@ -155,9 +155,7 @@ class TimeFilter(BaseSearchFilter):
         ret = {}
         date_datatypes = ["date", "edtf"]
         date_nodes = Node.objects.filter(
-            datatype__in=date_datatypes,
-            graph__isresource=True,
-            graph__publication__isnull=False,
+            datatype__in=date_datatypes, graph__isresource=True, graph__is_active=True
         ).prefetch_related("nodegroup")
         node_graph_dict = {
             str(node.nodeid): str(node.graph_id)

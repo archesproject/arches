@@ -39,15 +39,6 @@ define([
             });
         } else {
             this.conceptCollections = ko.observableArray([]);
-            this.isEditable = true;
-            if (params.graph) {
-                var cards = _.filter(params.graph.get('cards')(), function(card){return card.nodegroup_id === params.nodeGroupId();});
-                if (cards.length) {
-                    this.isEditable = cards[0].is_editable;
-                }
-            } else if (params.widget) {
-                this.isEditable = params.widget.card.get('is_editable');
-            }
             this.topConcept = params.config.rdmCollection;
             this.initialTopConcept = this.topConcept();
             if (arches.conceptCollections.length === 0) {
@@ -62,6 +53,7 @@ define([
                         'id': null
                     });
                     self.topConcept(self.initialTopConcept);
+                    params._node(JSON.stringify(params))  // prevents dirty state trigger on Graph Designer concept node load
                 }).fail(function(error){
                     console.log(error);
                 });

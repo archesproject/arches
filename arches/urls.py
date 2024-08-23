@@ -21,6 +21,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.contrib.auth import views as auth_views
 from django.urls import include, path, re_path
 from arches.app.views import concept, main, map, search, graph, api
+from arches.app.views.api import auth as api_auth, user as api_user
 from arches.app.views.admin import ReIndexResources, ClearUserPermissionCache
 from arches.app.views.etl_manager import ETLManagerView
 from arches.app.views.file import FileView, TempFileView
@@ -35,6 +36,7 @@ from arches.app.views.graph import (
     CardView,
     FunctionManagerView,
     PermissionDataView,
+    ModelHistoryView,
     IconDataView,
     NodegroupView,
 )
@@ -304,9 +306,34 @@ urlpatterns = [
         name="publish_graph",
     ),
     re_path(
-        r"^graph/(?P<graphid>%s)/unpublish$" % uuid_regex,
-        GraphPublicationView.as_view(action="unpublish"),
-        name="unpublish_graph",
+        r"^graph/(?P<graphid>%s)/revert$" % uuid_regex,
+        GraphPublicationView.as_view(action="revert"),
+        name="revert_graph",
+    ),
+    re_path(
+        r"^graph/(?P<graphid>%s)/restore_state_from_serialized_graph$" % uuid_regex,
+        GraphPublicationView.as_view(action="restore_state_from_serialized_graph"),
+        name="restore_state_from_serialized_graph",
+    ),
+    re_path(
+        r"^graph/(?P<graphid>%s)/update_published_graphs$" % uuid_regex,
+        GraphPublicationView.as_view(action="update_published_graphs"),
+        name="update_published_graphs",
+    ),
+    re_path(
+        r"^graph/(?P<graphid>%s)/model_history$" % uuid_regex,
+        ModelHistoryView.as_view(),
+        name="model_history",
+    ),
+    re_path(
+        r"^graph/(?P<graphid>%s)/update_published_graph$" % uuid_regex,
+        ModelHistoryView.as_view(),
+        name="update_published_graph",
+    ),
+    re_path(
+        r"^graph/(?P<graphid>%s)/delete_published_graph$" % uuid_regex,
+        ModelHistoryView.as_view(),
+        name="delete_published_graph",
     ),
     re_path(
         r"^graph/(?P<graphid>%s)/function_manager$" % uuid_regex,
@@ -519,6 +546,16 @@ urlpatterns = [
         name="get_graph_models_api",
     ),
     re_path(
+        r"^graph_has_unpublished_changes/(?P<graph_id>%s)$" % (uuid_regex),
+        api.GraphHasUnpublishedChanges.as_view(),
+        name="graph_has_unpublished_changes_api",
+    ),
+    re_path(
+        r"^graph_is_active/(?P<graph_id>%s)$" % (uuid_regex),
+        api.GraphIsActive.as_view(),
+        name="graph_is_active_api",
+    ),
+    re_path(
         r"^resources/(?P<graphid>%s)/(?P<resourceid>%s|())$" % (uuid_regex, uuid_regex),
         api.Resources.as_view(),
         name="resources_graphid",
@@ -533,6 +570,9 @@ urlpatterns = [
         api.Resources.as_view(),
         name="resources",
     ),
+    path("api/login", api_auth.Login.as_view(), name="api_login"),
+    path("api/logout", api_auth.Logout.as_view(), name="api_logout"),
+    path("api/user", api_user.UserView.as_view(), name="api_user"),
     re_path(
         r"^api/tiles/(?P<tileid>%s|())$" % (uuid_regex),
         api.Tile.as_view(),
@@ -554,6 +594,16 @@ urlpatterns = [
         name="api_instance_permissions",
     ),
     re_path(r"^api/node_value/$", api.NodeValue.as_view(), name="api_node_value"),
+    re_path(
+        r"^api/resource_instance_lifecycle/$",
+        api.ResourceInstanceLifecycleStates.as_view(),
+        name="api_resource_instance_lifecycle_states",
+    ),
+    re_path(
+        r"^api/resource_instance_lifecycle_state/(?P<resourceid>%s|())$" % (uuid_regex),
+        api.ResourceInstanceLifecycleState.as_view(),
+        name="api_resource_instance_lifecycle_state",
+    ),
     re_path(
         r"^api/resource_report/(?P<resourceid>%s|())$" % (uuid_regex),
         api.ResourceReport.as_view(),
@@ -599,10 +649,10 @@ urlpatterns = [
         api.Concepts.as_view(),
         name="concepts",
     ),
-    re_path(
-        r"^plugins/(?P<pluginid>%s)$" % uuid_regex, PluginView.as_view(), name="plugins"
-    ),
-    re_path(r"^plugins/(?P<slug>[-\w]+)$", PluginView.as_view(), name="plugins"),
+    path("plugins/<uuid:pluginid>", PluginView.as_view(), name="plugins"),
+    path("plugins/<uuid:pluginid>/<path:path>", PluginView.as_view(), name="plugins"),
+    path("plugins/<slug:slug>", PluginView.as_view(), name="plugins"),
+    path("plugins/<slug:slug>/<path:path>", PluginView.as_view(), name="plugins"),
     re_path(
         r"^workflow_history/(?P<workflowid>%s|())$" % uuid_regex,
         WorkflowHistoryView.as_view(),

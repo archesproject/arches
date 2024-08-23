@@ -139,7 +139,6 @@ class Card(models.CardModel):
                         "cards",
                         "widgets",
                         "nodes",
-                        "is_editable",
                         "nodegroup",
                         "constraints",
                     ):
@@ -293,11 +292,6 @@ class Card(models.CardModel):
         )
         ret["active"] = (
             self.active if "active" not in exclude else ret.pop("active", None)
-        )
-        ret["is_editable"] = (
-            self.is_editable()
-            if "is_editable" not in exclude
-            else ret.pop("is_editable", None)
         )
         ret["ontologyproperty"] = (
             self.ontologyproperty

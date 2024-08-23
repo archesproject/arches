@@ -25,6 +25,7 @@ from tests.base_test import ArchesTestCase
 from django.contrib.auth import get_user_model
 from django.test import Client
 from django.urls import reverse
+from urllib.parse import urlencode
 from arches.app.models.graph import Graph
 from arches.app.models.models import Node, NodeGroup, GraphModel, CardModel, Edge
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -36,6 +37,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 class GraphManagerViewTests(ArchesTestCase):
     @classmethod
     def setUpClass(cls):
+        LanguageSynchronizer.synchronize_settings_with_db()
         super().setUpClass()
 
         cls.loadOntology()
@@ -161,6 +163,8 @@ class GraphManagerViewTests(ArchesTestCase):
             Edge.objects.create(**edges_dict).save()
 
         graph = Graph.new()
+        graph.ontology_id = "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
+        graph.root.ontologyclass = "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
         graph.name = "TEST GRAPH"
         graph.subtitle = "ARCHES TEST GRAPH"
         graph.author = "Arches"
@@ -170,8 +174,6 @@ class GraphManagerViewTests(ArchesTestCase):
         graph.iconclass = "fa fa-building"
         graph.nodegroups = []
         graph.root.ontologyclass = "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
-        graph.save()
-
         graph.root.name = "ROOT NODE"
         graph.root.description = "Test Root Node"
         graph.root.datatype = "semantic"
@@ -186,6 +188,7 @@ class GraphManagerViewTests(ArchesTestCase):
             graphid=self.NODE_NODETYPE_GRAPHID,
         )
         graph.save()
+        graph.create_editable_future_graph()
 
         self.ROOT_ID = graph.root.nodeid
         self.GRAPH_ID = str(graph.pk)
@@ -194,11 +197,11 @@ class GraphManagerViewTests(ArchesTestCase):
         self.graph = graph
 
         self.client = Client()
-        LanguageSynchronizer.synchronize_settings_with_db()
 
     def tearDown(self):
         try:
-            self.deleteGraph(self.GRAPH_ID)
+            graph = Graph.objects.get(source_identifier_id=self.GRAPH_ID)
+            graph.delete()
         except:
             pass
 
@@ -227,6 +230,22 @@ class GraphManagerViewTests(ArchesTestCase):
 
         edge_count = len(graph["edges"])
         self.assertEqual(edge_count, self.NODE_COUNT - 1)
+
+    def test_graph_manager_redirects_future_graph(self):
+        self.client.login(username="admin", password="admin")
+
+        editable_future_graph = Graph.objects.get(source_identifier_id=self.GRAPH_ID)
+        url = reverse(
+            "graph_designer", kwargs={"graphid": editable_future_graph.graphid}
+        )
+        response = self.client.get(url)
+
+        redirect_url = reverse("graph_designer", kwargs={"graphid": self.GRAPH_ID})
+        query_string = urlencode(
+            {"has_been_redirected_from_editable_future_graph": True}
+        )
+
+        self.assertRedirects(response, "{}?{}".format(redirect_url, query_string))
 
     def test_graph_settings(self):
         """
