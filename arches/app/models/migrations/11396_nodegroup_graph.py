@@ -10,6 +10,19 @@ class Migration(migrations.Migration):
         ("models", "10804_core_search_filters"),
     ]
 
+    sql = """
+    UPDATE node_groups
+    SET graphid = sub.graphid
+    FROM (
+        SELECT DISTINCT ng.nodegroupid, n.graphid
+        FROM nodes n
+        JOIN node_groups ng ON n.nodegroupid = ng.nodegroupid
+    ) AS sub
+    WHERE node_groups.nodegroupid = sub.nodegroupid;
+    """
+
+    reverse_sql = """"""
+
     operations = [
         migrations.AddField(
             model_name="nodegroup",
@@ -21,5 +34,9 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.CASCADE,
                 to="models.graphmodel",
             ),
+        ),
+        migrations.RunSQL(
+            sql,
+            reverse_sql,
         ),
     ]
