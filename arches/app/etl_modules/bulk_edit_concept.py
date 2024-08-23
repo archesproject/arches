@@ -9,7 +9,7 @@ from django.core.validators import URLValidator
 from django.utils.translation import get_language, gettext as _
 from arches.app.etl_modules.base_data_editor import BaseBulkEditor
 from arches.app.etl_modules.decorators import load_data_async
-from arches.app.etl_modules.save import save_to_tiles
+from arches.app.etl_modules.save import get_resourceids_from_search_url, save_to_tiles
 from arches.app.models.models import Value, Language, Node, ETLModule, GraphModel
 from arches.app.models.concept import Concept
 from arches.app.utils.db_utils import dictfetchall
@@ -287,7 +287,7 @@ class BulkConceptEditor(BaseBulkEditor):
                     cursor, "done|Getting resources from search url..."
                 )
             resource_ids = [
-                uuid.UUID(id) for id in self.get_resourceids_from_search_url(search_url)
+                uuid.UUID(id) for id in get_resourceids_from_search_url(search_url)
             ]
 
         graph_name = str(GraphModel.objects.get(pk=graphid).name)
@@ -342,7 +342,7 @@ class BulkConceptEditor(BaseBulkEditor):
                     cursor, "done|Getting resources from search url..."
                 )
             resource_ids = [
-                uuid.UUID(id) for id in self.get_resourceids_from_search_url(search_url)
+                uuid.UUID(id) for id in get_resourceids_from_search_url(search_url)
             ]
 
         edit_task = edit_bulk_concept_data.apply_async(
