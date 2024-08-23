@@ -176,7 +176,7 @@ add_functions_to_get_nodegroup_tree = """
             (select alias from nodes where nodeid = nodegroup_id) as path,
             cardinality
         FROM
-        (SELECT ng.nodegroupid, ng.parentnodegroupid, alias, name, cardinality, graphid FROM node_groups ng
+        (SELECT ng.nodegroupid, ng.parentnodegroupid, n.alias, n.name, ng.cardinality, n.graphid FROM node_groups ng
         INNER JOIN nodes n ON ng.nodegroupid = n.nodeid
         ORDER by ng.nodegroupid) AS root
         WHERE nodegroupid = nodegroup_id
@@ -190,7 +190,7 @@ add_functions_to_get_nodegroup_tree = """
                 path || ' - ' || parent.alias,
                 parent.cardinality
             FROM
-            (SELECT ng.nodegroupid, ng.parentnodegroupid, alias, name, cardinality, graphid FROM node_groups ng
+            (SELECT ng.nodegroupid, ng.parentnodegroupid, n.alias, n.name, ng.cardinality, n.graphid FROM node_groups ng
             INNER JOIN nodes n ON ng.nodegroupid = n.nodeid
             ORDER by ng.nodegroupid) AS parent
             INNER JOIN nodegroup_tree nt ON nt.nodegroupid = parent.parentnodegroupid
