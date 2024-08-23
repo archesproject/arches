@@ -14,7 +14,6 @@ define([
         initialize: function(options) {
             var self = this;
             options.name = 'Advanced Search Filter';
-             
             BaseFilter.prototype.initialize.call(this, options);
             this.urls = arches.urls;
             this.tagId = "Advanced Search";
@@ -180,7 +179,7 @@ define([
                 options.loading(false);
             });
 
-            this.filters[componentName](this);
+            this.searchFilterVms[componentName](this);
         },
 
         updateQuery: function() {
@@ -195,12 +194,12 @@ define([
                 });
                 queryObj[componentName] = JSON.stringify(advanced);
 
-                if (this.getFilter('term-filter').hasTag(this.tagId) === false) {
-                    this.getFilter('term-filter').addTag(this.tagId, this.name, ko.observable(false));
+                if (this.getFilterByType('term-filter-type').hasTag(this.tagId) === false) {
+                    this.getFilterByType('term-filter-type').addTag(this.tagId, this.name, ko.observable(false));
                 }
             } else {
                 delete queryObj[componentName];
-                this.getFilter('term-filter').removeTag(this.tagId);
+                this.getFilterByType('term-filter-type').removeTag(this.tagId);
             }
             this.query(queryObj);
         },
@@ -224,7 +223,7 @@ define([
                 var facets = JSON.parse(query[componentName]);
 
                 if (facets.length > 0) {
-                    this.getFilter('term-filter').addTag("Advanced Search", this.name, ko.observable(false));    
+                    this.getFilterByType('term-filter-type').addTag("Advanced Search", this.name, ko.observable(false));    
                 }
                 _.each(facets, function(facet) {
                     var nodeIds = _.filter(Object.keys(facet), function(key) {

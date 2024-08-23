@@ -1,5 +1,5 @@
 import uuid
-from arches.app.models import models
+from arches.app.models.models import Node
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
@@ -13,6 +13,8 @@ from arches.app.search.elasticsearch_dsl_builder import (
 from arches.app.search.components.base import BaseSearchFilter
 from arches.app.search.components.resource_type_filter import get_permitted_graphids
 from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.utils import permission_backend
+from django.utils.translation import get_language, gettext as _
 
 details = {
     "searchcomponentid": "",
@@ -20,24 +22,23 @@ details = {
     "icon": "",
     "modulename": "search_results.py",
     "classname": "SearchResultsFilter",
-    "type": "results-list",
+    "type": "search-results-type",
     "componentpath": "views/components/search/search-results",
     "componentname": "search-results",
-    "sortorder": "0",
-    "enabled": True,
+    "config": {},
 }
 
 
 class SearchResultsFilter(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def append_dsl(self, search_query_object, **kwargs):
+        permitted_nodegroups = kwargs.get("permitted_nodegroups")
+        include_provisional = kwargs.get("include_provisional")
         nested_agg = NestedAgg(path="points", name="geo_aggs")
         nested_agg_filter = FiltersAgg(name="inner")
         geo_agg_filter = Bool()
 
         try:
-            search_results_object["query"].dsl["query"]["bool"]["filter"][0]["terms"][
+            search_query_object["query"].dsl["query"]["bool"]["filter"][0]["terms"][
                 "graph_id"
             ]  # check if resource_type filter is already applied
         except (KeyError, IndexError):
@@ -45,7 +46,7 @@ class SearchResultsFilter(BaseSearchFilter):
             permitted_graphids = get_permitted_graphids(permitted_nodegroups)
             terms = Terms(field="graph_id", terms=list(permitted_graphids))
             resource_model_filter.filter(terms)
-            search_results_object["query"].add_query(resource_model_filter)
+            search_query_object["query"].add_query(resource_model_filter)
 
         if include_provisional is True:
             geo_agg_filter.filter(
@@ -88,19 +89,30 @@ class SearchResultsFilter(BaseSearchFilter):
                 )
             )
             search_query.must(subsearch_query)
-            search_results_object["query"].add_query(search_query)
+            search_query_object["query"].add_query(search_query)
 
-        search_results_object["query"].add_aggregation(nested_agg)
+        search_query_object["query"].add_aggregation(nested_agg)
 
-    def post_search_hook(self, search_results_object, results, permitted_nodegroups):
+    def post_search_hook(self, search_query_object, response_object, **kwargs):
+        permitted_nodegroups = kwargs.get("permitted_nodegroups")
         user_is_reviewer = user_is_resource_reviewer(self.request.user)
+
+        descriptor_types = ("displaydescription", "displayname")
+        active_and_default_language_codes = (get_language(), settings.LANGUAGE_CODE)
+        groups = [group.id for group in self.request.user.groups.all()]
+        response_object["groups"] = groups
 
         # only reuturn points and geometries a user is allowed to view
         geojson_nodes = get_nodegroups_by_datatype_and_perm(
             self.request, "geojson-feature-collection", "read_nodegroup"
         )
 
-        for result in results["hits"]["hits"]:
+        for result in response_object["results"]["hits"]["hits"]:
+            result.update(
+                permission_backend.get_search_ui_permissions(
+                    self.request.user, result, groups
+                )
+            )
             result["_source"]["points"] = select_geoms_for_results(
                 result["_source"]["points"], geojson_nodes, user_is_reviewer
             )
@@ -116,10 +128,23 @@ class SearchResultsFilter(BaseSearchFilter):
             except KeyError:
                 pass
 
+            for descriptor_type in descriptor_types:
+                descriptor = get_localized_descriptor(
+                    result, descriptor_type, active_and_default_language_codes
+                )
+                if descriptor:
+                    result["_source"][descriptor_type] = descriptor["value"]
+                    if descriptor_type == "displayname":
+                        result["_source"]["displayname_language"] = descriptor[
+                            "language"
+                        ]
+                else:
+                    result["_source"][descriptor_type] = _("Undefined")
+
 
 def get_nodegroups_by_datatype_and_perm(request, datatype, permission):
     nodes = []
-    for node in models.Node.objects.filter(datatype=datatype):
+    for node in Node.objects.filter(datatype=datatype):
         if request.user.has_perm(permission, node.nodegroup):
             nodes.append(str(node.nodegroup_id))
     return nodes
@@ -139,3 +164,13 @@ def select_geoms_for_results(features, geojson_nodes, user_is_reviewer):
                 res.append(feature)
 
     return res
+
+
+def get_localized_descriptor(resource, descriptor_type, language_codes):
+    descriptor = resource["_source"][descriptor_type]
+    result = descriptor[0] if len(descriptor) > 0 else None
+    for language_code in language_codes:
+        for entry in descriptor:
+            if entry["language"] == language_code and entry["value"] != "":
+                return entry
+    return result

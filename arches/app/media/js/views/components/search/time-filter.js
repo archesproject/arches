@@ -105,7 +105,7 @@ define([
             
             this.filterChanged = ko.computed(function(){
                 if(!!this.filter.fromDate() || !!this.filter.toDate()){
-                    this.getFilter('term-filter').addTag(this.name, this.name, this.filter.inverted);
+                    this.getFilterByType('term-filter-type').addTag(this.name, this.name, this.filter.inverted);
                 }
                 return ko.toJSON(this.filter);
             }, this).extend({ deferred: true });
@@ -113,7 +113,7 @@ define([
             this.filterChanged.subscribe(function() {
                 this.updateQuery();
             }, this);
-            this.filters[componentName](this);
+            this.searchFilterVms[componentName](this);
         },
 
         updateQuery: function() {
@@ -147,7 +147,7 @@ define([
             if (componentName in query) {
                 var timeQuery = JSON.parse(query[componentName]);
                 this.filter.inverted(!!timeQuery.inverted);
-                this.getFilter('term-filter').addTag(this.name, this.name, this.filter.inverted);
+                this.getFilterByType('term-filter-type').addTag(this.name, this.name, this.filter.inverted);
                 ['fromDate', 'toDate', 'dateNodeId'].forEach(function(key) {
                     if (key in timeQuery) {
                         this.filter[key](timeQuery[key]);
@@ -179,7 +179,7 @@ define([
             this.filter.dateNodeId(null);
             this.filter.inverted(false);
             this.dateRangeType('custom');
-            this.getFilter('term-filter').removeTag(this.name);
+            this.getFilterByType('term-filter-type').removeTag(this.name);
             this.selectedPeriod(null);
             return;
         }

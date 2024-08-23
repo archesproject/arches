@@ -1,5 +1,4 @@
 from arches.app.search.components.base import BaseSearchFilter
-from arches.app.search.elasticsearch_dsl_builder import Nested
 from django.utils.translation import get_language
 
 details = {
@@ -8,22 +7,19 @@ details = {
     "icon": "",
     "modulename": "sort_results.py",
     "classname": "SortResults",
-    "type": "",
+    "type": "sort-results-type",
     "componentpath": "views/components/search/sort-results",
     "componentname": "sort-results",
-    "sortorder": "0",
-    "enabled": True,
+    "config": {},
 }
 
 
 class SortResults(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
-        sort_param = self.request.GET.get(details["componentname"], None)
+    def append_dsl(self, search_query_object, **kwargs):
+        sort_param = self.request.GET.get(self.componentname, None)
 
         if sort_param is not None and sort_param != "":
-            search_results_object["query"].sort(
+            search_query_object["query"].sort(
                 field="displayname.value",
                 dsl={
                     "order": sort_param,

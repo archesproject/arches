@@ -75,7 +75,7 @@ dev = [
     "coverage",
     "django-silk==5.1.0",
     "livereload",
-    "pre-commit",
+    "pre-commit==3.8.0",
     "sst",
 ]
 

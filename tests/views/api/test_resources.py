@@ -120,6 +120,13 @@ class ResourceAPITests(ArchesTestCase):
             response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.1")
 
+    def test_api_404(self):
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.get(reverse("api_404"))
+        self.assertEqual(
+            set(json.loads(response.content)), {"message", "status", "success", "title"}
+        )
+
     def test_api_resources_archesjson(self):
         """
         Test that resources POST and PUT accept arches-json format data.

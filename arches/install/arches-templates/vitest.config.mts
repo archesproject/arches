@@ -14,6 +14,7 @@ function generateConfig(): Promise<UserConfigExport> {
             '**/dist/**',
             '**/install/**',
             '**/cypress/**',
+            '**/themes/**',
             '**/.{idea,git,cache,output,temp}/**',
             '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
         ];
@@ -39,7 +40,7 @@ function generateConfig(): Promise<UserConfigExport> {
             test: {
                 alias: alias,
                 coverage: {
-                    include: [path.join(path.basename(__dirname), 'app', 'src', path.sep)],
+                    include: [path.join('{{ project_name }}', 'src', path.sep)],
                     exclude: exclude,
                     reporter: [
                         ['clover', { 'file': 'coverage.xml' }],

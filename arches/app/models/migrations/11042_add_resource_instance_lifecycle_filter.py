@@ -19,8 +19,8 @@ class Migration(migrations.Migration):
                 "type",
                 "componentpath",
                 "componentname",
-                "sortorder",
-                "enabled")
+                "config"
+            )
             values (
                 '9e40969b-78c2-40b8-898b-c29265050e2f',
                 'Lifecycle State Filter',
@@ -30,8 +30,8 @@ class Migration(migrations.Migration):
                 '',
                 'views/components/search/lifecycle-state-filter',
                 'lifecycle-state-filter',
-                0,
-                true);
+                '{}'
+            );
             """,
             """
             delete from search_component where searchcomponentid = '9e40969b-78c2-40b8-898b-c29265050e2f';
