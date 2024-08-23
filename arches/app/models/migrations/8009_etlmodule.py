@@ -208,7 +208,7 @@ add_functions_to_get_nodegroup_tree = """
     DECLARE
     _nodegroupid uuid;
     BEGIN
-    FOR _nodegroupid IN select ng.nodegroupid from node_groups ng join nodes n on ng.nodegroupid = nodeid where graphid = graph_id and ng.parentnodegroupid is null
+    FOR _nodegroupid IN select nodegroupid from node_groups where graphid = graph_id and parentnodegroupid is null
     LOOP
         RETURN QUERY SELECT _nodegroupid, * FROM __get_nodegroup_tree(_nodegroupid);
     END LOOP;
