@@ -1,3 +1,4 @@
+import hashlib
 import importlib
 import json
 import logging
@@ -361,6 +362,11 @@ class MVT(APIBase):
         search_geom_count = 0
         config = node.config
         cache_key = MVT.create_mvt_cache_key(node, zoom, x, y, request.user)
+        # to modify this for a search-layer, you would have to:
+        # 1. include a query string
+        # 2. execute the query with a particular filter added so that only ids get returned
+        # 3. create a special layer in map.js that uses the search-layer
+        # 4. send the results ids to the tile query
         tile = cache.get(cache_key)
         if tile is None:
             resource_ids = get_restricted_instances(request.user, allresources=True)
@@ -503,6 +509,35 @@ class MVT(APIBase):
 
     def create_mvt_cache_key(node, zoom, x, y, user):
         return f"mvt_{str(node.nodeid)}_{zoom}_{x}_{y}_{user.id}"
+
+    def create_searchresults_cache_key(request, search_query, **kwargs):
+        """
+        method to create a hash cache key
+        cleans/sorts the searchquery before converting to string in order to normalize
+        kwargs:
+        - dict: search_query - contains search query filters/parameters
+        """
+
+        user_proxy = (
+            request.user.username
+            if request.user.username == "anonymous"
+            else str(request.user.id)
+        )
+        search_query_string = "".join(
+            [k + str(v) for k, v in sorted(search_query.items())]
+        )
+
+        search_query_string = search_query_string.strip()
+        snapshot = ""
+        # snapshot = str(
+        #     EditLog.objects.all().count()
+        # )  # proxy for db state (temporal)
+        b = bytearray()
+        b.extend((search_query_string + snapshot + user_proxy).encode())
+        search_query_cache_key_hash = hashlib.sha1(b)
+        search_query_cache_key_hash = search_query_cache_key_hash.hexdigest()
+
+        return search_query_cache_key_hash
 
 
 @method_decorator(csrf_exempt, name="dispatch")
