@@ -287,7 +287,7 @@ class BulkConceptEditor(BaseBulkEditor):
                     cursor, "done|Getting resources from search url..."
                 )
             resource_ids = [
-                uuid.UUID(id) for id in get_resourceids_from_search_url(search_url)
+                uuid.UUID(id) for id in get_resourceids_from_search_url(search_url, request.user)
             ]
 
         graph_name = str(GraphModel.objects.get(pk=graphid).name)
@@ -342,7 +342,7 @@ class BulkConceptEditor(BaseBulkEditor):
                     cursor, "done|Getting resources from search url..."
                 )
             resource_ids = [
-                uuid.UUID(id) for id in get_resourceids_from_search_url(search_url)
+                uuid.UUID(id) for id in get_resourceids_from_search_url(search_url, request.user)
             ]
 
         edit_task = edit_bulk_concept_data.apply_async(
