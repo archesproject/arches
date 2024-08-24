@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10804_core_search_filters"),
+        ("models", "9053_add_future_graphs"),
     ]
 
     sql = """
