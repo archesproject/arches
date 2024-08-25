@@ -53,6 +53,9 @@ define([
                     };
                     self._currentPermissions.identities.forEach(
                         function (identity) {
+                            if(identity.system_permissions.length > 0){
+                                return
+                            }
                             var selectedPermissions =
                                 identity.default_permissions.map(
                                     function (perm) {
@@ -236,9 +239,14 @@ define([
 
                 data["identities"].forEach(function (id) {
                     id.selected = ko.observable(false);
+                    id.disabled = ko.observable(false);
                     id.creatorOrSuperUser =
                         Number(self.creatorid) === Number(id.id) &&
                         id.type === "user";
+
+                    if(id.system_permissions.length > 0){
+                        id.disabled(true);
+                    }
 
                     id.availablePermissions = JSON.parse(
                         JSON.stringify(data["permissions"]),

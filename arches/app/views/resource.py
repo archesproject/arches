@@ -59,16 +59,8 @@ from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.views.base import BaseManagerView, MapBaseManagerView
 from arches.app.views.concept import Concept
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.utils.permission_backend import (
-    assign_perm,
-    get_perms,
-    remove_perm,
-    get_group_perms,
-    get_user_perms,
-    get_groups_with_perms,
-    get_users_with_perms,
-    get_perms_for_model,
-)
+
+import arches.app.utils.permission_backend as apb
 
 logger = logging.getLogger(__name__)
 
@@ -459,11 +451,14 @@ class ResourcePermissionDataView(View):
         self.apply_permissions(data, request.user, revert=True)
         return JSONResponse(data)
 
+    def get_system_permissions(self):
+        pass
+
     def get_perms(self, identity, type, obj, perms):
         if type == "user":
-            identity_perms = get_user_perms(identity, obj)
+            identity_perms = apb.get_user_perms(identity, obj)
         else:
-            identity_perms = get_group_perms(identity, obj)
+            identity_perms = apb.get_group_perms(identity, obj)
         res = []
         for perm in identity_perms:
             res += list(filter(lambda x: (x["codename"] == perm.codename), perms))
@@ -475,7 +470,7 @@ class ResourcePermissionDataView(View):
             JSONSerializer().serialize(
                 {
                     p.codename: p
-                    for p in get_perms_for_model(resource_instance)
+                    for p in apb.get_perms_for_model(resource_instance)
                     if p.codename != "add_resourceinstance"
                 }
             )
@@ -491,6 +486,9 @@ class ResourcePermissionDataView(View):
                 "default_permissions": self.get_perms(
                     user, "user", resource_instance, ordered_perms
                 ),
+                "system_permissions": apb.get_default_permissions(
+                    user, resource_instance
+                ),
                 "is_editor_or_reviewer": bool(
                     user_is_resource_editor(user) or user_is_resource_reviewer(user)
                 ),
@@ -502,6 +500,9 @@ class ResourcePermissionDataView(View):
                 "name": group.name,
                 "id": group.id,
                 "type": "group",
+                "system_permissions": apb.get_default_permissions(
+                    group, resource_instance
+                ),
                 "default_permissions": self.get_perms(
                     group, "group", resource_instance, ordered_perms
                 ),
@@ -511,8 +512,8 @@ class ResourcePermissionDataView(View):
         result = {"identities": identities}
         result["permissions"] = ordered_perms
         result["limitedaccess"] = (
-            len(get_users_with_perms(resource_instance))
-            + len(get_groups_with_perms(resource_instance))
+            len(apb.get_users_with_perms(resource_instance))
+            + len(apb.get_groups_with_perms(resource_instance))
         ) > 1
         instance_creator = resource_instance.get_instance_creator_and_edit_permissions()
         result["creatorid"] = instance_creator["creatorid"]
@@ -539,8 +540,8 @@ class ResourcePermissionDataView(View):
 
                 if user_can_modify_permissions:
                     # first remove all the current permissions
-                    for perm in get_perms(identityModel, resource_instance):
-                        remove_perm(perm, identityModel, resource_instance)
+                    for perm in apb.get_perms(identityModel, resource_instance):
+                        apb.remove_perm(perm, identityModel, resource_instance)
 
                     if not revert:
                         # then add the new permissions
@@ -549,14 +550,14 @@ class ResourcePermissionDataView(View):
                             for perm in identity["selectedPermissions"]
                         )
                         if no_access:
-                            assign_perm(
+                            apb.assign_perm(
                                 "no_access_to_resourceinstance",
                                 identityModel,
                                 resource_instance,
                             )
                         else:
                             for perm in identity["selectedPermissions"]:
-                                result = assign_perm(
+                                result = apb.assign_perm(
                                     perm["codename"],
                                     identityModel,
                                     resource_instance,
