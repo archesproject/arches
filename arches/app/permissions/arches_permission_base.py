@@ -24,6 +24,8 @@ from django.contrib.auth.models import User, Group, Permission
 from django.contrib.gis.db.models import Model
 from django.core.cache import caches
 from django.apps import apps
+from django.contrib.contenttypes.models import ContentType
+from arches.app.utils.module_importer import get_class_from_modulename
 from guardian.backends import check_support, ObjectPermissionBackend
 from guardian.core import ObjectPermissionChecker
 from guardian.exceptions import NotUserNorGroup
@@ -61,7 +63,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
     def setup(self): ...
 
     def get_perms_for_model(self, cls: str | Model) -> list[Permission]:
-        return self.get_default_permissions_objects(cls) | gsc.get_perms_for_model(cls)  # type: ignore
+        return self.get_default_permissions_objects(cls=cls) | gsc.get_perms_for_model(cls)  # type: ignore
 
     def assign_perm(
         self,
@@ -587,7 +589,6 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         user_or_group: User | Group = None,
         model: Model = None,
         all_permissions: bool = False,
-        cls: str | Model = None,
     ) -> list[str]:
         """
         Gets default permissions (if any) for a resource instance.
@@ -617,13 +618,14 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
             user_ids.append(user_or_group.id)
             if all_permissions:
                 group_ids = [x.id for x in user_or_group.groups.all()]
+
         default_permissions = [
             item
             for sub_list in [
                 x["permissions"]
                 for x in default_permissions_for_graph
-                if (x["type"] == "user" and x["id"] in user_ids)
-                or (x["type"] == "group" and x["id"] in group_ids)
+                if (x["type"] == "user" and int(x["id"]) in user_ids)
+                or (x["type"] == "group" and int(x["id"]) in group_ids)
             ]
             for item in sub_list
         ]
@@ -633,9 +635,24 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         self,
         user_or_group: User | Group = None,
         model: Model = None,
-        cls: str | Model = None,
+        cls: str | Model | None = None,
     ) -> QuerySet[Permission]:
-        default_permissions = self.get_default_permissions(user_or_group, model, cls)
+        if cls is not None:
+            if inspect.isclass(cls) and issubclass(cls, Model):
+                content_type = ContentType.objects.get_for_model(cls)
+            elif not inspect.isclass(cls) and issubclass(cls.__class__, Model):
+                content_type = ContentType.objects.get_for_model(cls.__class__)
+                pass
+            elif type(cls) is str:
+                content_type = ContentType.objects.get_for_model(
+                    get_class_from_modulename(cls)
+                )
+            else:
+                return Permission.objects.filter(codename__in=None)
+
+            return Permission.objects.filter(content_type_id=content_type.id)
+
+        default_permissions = self.get_default_permissions(user_or_group, model)
         permissions = Permission.objects.filter(codename__in=default_permissions)
         return permissions
 
