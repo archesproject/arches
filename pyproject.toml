@@ -122,7 +122,7 @@ exclude = '''
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.test_settings"
-python_files = "*_tests.py"
+python_files = "*test*.py"
 python_classes = "*Test*"
 addopts = "--cov --cov-report=lcov:lcov.info --cov-report=term"
 testpaths = ["tests"]
