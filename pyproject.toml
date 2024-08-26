@@ -76,10 +76,13 @@ dev = [
     "django-silk==5.1.0",
     "livereload",
     "pre-commit",
-    "sst",
+    "sst"
+]
+pytest = [
     "pytest",
     "pytest-django",
-    "pytest-cov"
+    "pytest-cov",
+    "pytest-watcher"
 ]
 
 [project.scripts]
@@ -120,7 +123,7 @@ exclude = '''
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.test_settings"
 python_files = "*_tests.py"
-python_classes = "*Test"
+python_classes = "*Test*"
 addopts = "--cov --cov-report=lcov:lcov.info --cov-report=term"
 testpaths = ["tests"]
 
