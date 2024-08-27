@@ -264,7 +264,7 @@ const acceptNewListShortcutEntry = async () => {
     ];
     selectedKeys.value = { [newList.id]: true };
     setDisplayedRow(newList);
-    newLabelFormValue.value = "";
+    newListFormValue.value = "";
 };
 </script>
 
