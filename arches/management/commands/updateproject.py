@@ -373,6 +373,7 @@ class Command(BaseCommand):  # pragma: no cover
             os.path.join("..", "vitest.config.mts"),
             os.path.join("..", "vitest.setup.mts"),
             "hosts.py",
+            "apps.py",
         ]:  # relative to app root directory
             try:
                 file = open(os.path.join(settings.APP_ROOT, relative_file_path), "r")
