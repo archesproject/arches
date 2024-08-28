@@ -142,7 +142,7 @@ class BaseSearchView(BaseSearchFilter):
         Method that handles core logic of how search filters
         should mutate the search query and response objects.
         Returns tuple of the mutated (response_object, search_query_object)
-        See arches.app.search.components.arches_core_search for example implementation
+        See arches.app.search.components.standard_search_view for example implementation
         """
 
         pass
