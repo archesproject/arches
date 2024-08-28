@@ -378,6 +378,7 @@
         distance='{% trans "Distance" as distance %} "{{ distance|escapejs }}"'
         buffer-distance='{% trans "Buffer Distance" as bufferDistance %} "{{ bufferDistance|escapejs }}"'
         new='{% trans "New" as new %} "{{ new|escapejs }}"'
+        old='{% trans "Old" as old %} "{{ old|escapejs }}"'
         add-new='{% trans "Add New" as addNew %} "{{ addNew|escapejs }}"'
         return='{% trans "Return" as return %} "{{ return|escapejs }}"'
         csv='{% trans "csv" as csv %} "{{ csv|escapejs }}"'
@@ -954,6 +955,15 @@
         delete-workflow-warning='{% trans "All data created during the course of this workflow will be deleted." as deleteWorkflowWarning %} "{{ deleteWorkflowWarning|escapejs }}"'
         show-facet-path='{% trans "Show facet path" as showFacetPath %} "{{ showFacetPath|escapejs }}"'
         hide-facet-path='{% trans "Hide facet path" as hideFacetPath %} "{{ hideFacetPath|escapejs }}"'
+        select-replacement-concept='{% trans "Select a replacement concept" as selectReplacementConcept %} "{{ selectReplacementConcept|escapejs }}"'
+        select-concept-to-replace='{% trans "Select a concept to replace" as selectConceptToReplace %} "{{ selectConceptToReplace|escapejs }}"'
+        concept='{% trans "Concept" as concept %} "{{ concept|escapejs }}"'
+        replace-concept='{% trans "Replace Concept" as replaceConcept %} "{{ replaceConcept|escapejs }}"'
+        previous='{% trans "Previous" as previous %} "{{ previous|escapejs }}"'
+        next='{% trans "Next" as next %} "{{ next|escapejs }}"'
+        resource-id='{% trans "Resource Id" as resourceId %} "{{ resourceId|escapejs }}"'
+        remove-from-edit-queue='{% trans "Remove from Edit Queue" as removeFromEditQueue %} "{{ removeFromEditQueue|escapejs }}"'
+        replace-concept-or-conceptlist='{% trans "Replace (Concept or Concept-list)" as replaceConceptOrConceptList %} "{{ replaceConceptOrConceptList|escapejs }}"'
     ></div>
     {% endblock arches_translations %}
 
