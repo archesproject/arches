@@ -16,6 +16,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
+import importlib
 import sys
 import uuid
 from typing import Iterable
@@ -635,20 +636,15 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         self,
         user_or_group: User | Group = None,
         model: Model = None,
-        cls: str | Model | None = None,
+        cls: Model | None = None,
     ) -> QuerySet[Permission]:
         if cls is not None:
             if inspect.isclass(cls) and issubclass(cls, Model):
                 content_type = ContentType.objects.get_for_model(cls)
             elif not inspect.isclass(cls) and issubclass(cls.__class__, Model):
                 content_type = ContentType.objects.get_for_model(cls.__class__)
-                pass
-            elif type(cls) is str:
-                content_type = ContentType.objects.get_for_model(
-                    get_class_from_modulename(cls)
-                )
             else:
-                return Permission.objects.filter(codename__in=None)
+                return Permission.objects.filter(codename__in=[])
 
             return Permission.objects.filter(content_type_id=content_type.id)
 

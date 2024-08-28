@@ -211,13 +211,13 @@ class CommandLineTests(ArchesTestCase):
             )
 
             rev = ResourcePermissionDataView()
+
+            assign_perm("view_resourceinstance", group, resource)
             permissions = rev.get_instance_permissions(resource)
-            print(permissions)
             group_dict = next(
                 item for item in permissions["identities"] if item["id"] == group.id
             )
-            print(group_dict)
-            len(group_dict["system_permissions"]) > 1
+
             self.assertGreater(len(group_dict["system_permissions"]), 0)
 
     def test_user_cannot_delete_without_permission(self):

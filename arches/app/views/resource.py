@@ -451,9 +451,6 @@ class ResourcePermissionDataView(View):
         self.apply_permissions(data, request.user, revert=True)
         return JSONResponse(data)
 
-    def get_system_permissions(self):
-        pass
-
     def get_perms(self, identity, type, obj, perms):
         if type == "user":
             identity_perms = apb.get_user_perms(identity, obj)
@@ -466,11 +463,12 @@ class ResourcePermissionDataView(View):
 
     def get_instance_permissions(self, resource_instance):
         permission_order = get_default_settable_permissions()
+        resource_permissions = apb.get_perms_for_model(resource_instance)
         perms = json.loads(
             JSONSerializer().serialize(
                 {
                     p.codename: p
-                    for p in apb.get_perms_for_model(resource_instance)
+                    for p in resource_permissions
                     if p.codename != "add_resourceinstance"
                 }
             )
