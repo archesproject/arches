@@ -143,7 +143,7 @@ class BaseSearchView(BaseSearchFilter):
         for filter_type, querystring in list(sorted_query_obj.items()):
             search_filter = search_filter_factory.get_filter(filter_type)
             if search_filter:
-                search_filter.append_dsl(search_query_object)
+                search_filter.append_dsl(search_query_object, querystring=querystring)
 
         if returnDsl:
             return None, search_query_object
