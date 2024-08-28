@@ -70,7 +70,14 @@ class ArchesDefaultAllowPermissionsTests(ArchesPermissionFrameworkTestCase):
                 can_access_with_view_permission = self.framework.user_can_read_resource(
                     self.user, self.resource_instance_id
                 )
-
+                perms = self.framework.get_default_permissions_objects(
+                    self.user, cls=Resource
+                )
+                perms_invalid = self.framework.get_default_permissions_objects(
+                    self.user, cls=self.__class__
+                )
+                self.assertGreater(len(perms), 0)
+                self.assertEqual(len(perms_invalid), 0)
                 # implicit permission is false here, because change_resourceinstance will negate implicit permissions
                 self.assertFalse(implicit_permission)
 
@@ -252,9 +259,3 @@ class ArchesDefaultAllowPermissionsTests(ArchesPermissionFrameworkTestCase):
         filter_text = str(filter.dsl)
         self.assertIn("permissions.users_with_no_access", filter_text)
         self.assertIn(str(mock_User.id), filter_text)
-
-    # @mock.patch()
-    # @mock.patch("arches.app.models.models.ResourceInstance")
-    # def test_permission(self, mock_resourceinstance):
-    #     values = self.framework.get_index_values(mock_resourceinstance)
-    #     print(values)
