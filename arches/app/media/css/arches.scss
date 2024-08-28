@@ -4,6 +4,7 @@
 @import url(node_modules/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css);
 @import url(nifty.css);
 @import url(node_modules/font-awesome/css/font-awesome.min.css);
+@import url(node_modules/primeicons/primeicons.css);
 @import url(node_modules/ionicons/css/ionicons.min.css);
 @import url(node_modules/lt-themify-icons/themify-icons.css);
 @import url(node_modules/chosen-js/chosen.css);
@@ -10063,7 +10064,7 @@ table.table.dataTable {
 
 .search-type-btn {
     height: 50px;
-    padding: 0px;
+    padding: 0px 4px;
     font-size: 1.2rem;
     font-weight: 600;
     color: #888;
@@ -12860,6 +12861,16 @@ section .etl-preview table {
 .etl-from-to {
     display: inline-block;
     width: 240px;
+}
+
+.csv-import-options {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.csv-import-options .toggle-container{
+    padding-bottom: 0px;    
 }
 
 .csv-mapping-table-container {

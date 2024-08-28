@@ -4,6 +4,9 @@ define([], function() {
     return function loadComponentDependencies(componentPaths){
         for (const componentPath of componentPaths) {
             try {
+                if (!ARCHES_APPLICATIONS.length) {  // assumption os running Arches without a project
+                    throw new Error()
+                }
                 for (const archesApp of ARCHES_APPLICATIONS) {
                     try {
                         require(`${SITE_PACKAGES_DIRECTORY}/${archesApp}/media/js/${componentPath}`);

@@ -4,24 +4,14 @@ define([
     'views/components/search/base-filter',
     'templates/views/components/search/provisional-filter.htm',
 ], function(ko, arches, BaseFilter, provisionalFilterTemplate) {
-    var componentName = 'provisional-filter';
+    const componentName = 'provisional-filter';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             options.name = 'Provisional Filter';
-            this.translations = arches. translations;
-            this.requiredFilters = ['term-filter'];
+            this.translations = arches.translations;
             BaseFilter.prototype.initialize.call(this, options);
             this.filter = ko.observableArray();
             this.provisionalOptions = [{'name': 'Authoritative'},{'name': 'Provisional'}];
-
-            if (this.requiredFiltersLoaded() === false) {
-                this.requiredFiltersLoaded.subscribe(function() {
-                    this.restoreState();
-                }, this);
-            } else {
-                this.restoreState();
-            }
-
             var filterUpdated = ko.computed(function() {
                 return JSON.stringify(ko.toJS(this.filter()));
             }, this);
@@ -29,7 +19,15 @@ define([
                 this.updateQuery();
             }, this);
 
-            this.filters[componentName](this);
+            this.searchFilterVms[componentName](this);
+
+            if (this.searchViewFiltersLoaded() === false) {
+                this.searchViewFiltersLoaded.subscribe(function() {
+                    this.restoreState();
+                }, this);
+            } else {
+                this.restoreState();
+            }
         },
 
         updateQuery: function() {
@@ -49,7 +47,7 @@ define([
                 if (provisionalQuery.length > 0) {
                     provisionalQuery.forEach(function(type){
                         type.inverted = ko.observable(!!type.inverted);
-                        this.getFilter('term-filter').addTag(type.provisionaltype, this.name, type.inverted);
+                        this.getFilterByType('term-filter-type').addTag(type.provisionaltype, this.name, type.inverted);
                     }, this);
                     this.filter(provisionalQuery);
                 }
@@ -58,12 +56,12 @@ define([
 
         selectProvisional: function(item) {
             this.filter().forEach(function(val){
-                this.getFilter('term-filter').removeTag(val.provisionaltype);
+                this.getFilterByType('term-filter-type').removeTag(val.provisionaltype);
             }, this);
 
             if(!!item){
                 var inverted = ko.observable(false);
-                this.getFilter('term-filter').addTag(item.name, this.name, inverted);
+                this.getFilterByType('term-filter-type').addTag(item.name, this.name, inverted);
                 this.filter([{provisionaltype: item.name, inverted: inverted}]);
 
             }else{

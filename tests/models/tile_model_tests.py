@@ -45,7 +45,7 @@ class TileTests(ArchesTestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.loadOntology()
-        cls.ensure_resource_test_model_loaded()
+        cls.ensure_test_resource_models_are_loaded()
 
     @classmethod
     def setUpTestData(cls):

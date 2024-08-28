@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10799_geojsongeometry_featureid"),
+        ("models", "10804_core_search_filters"),
     ]
 
     operations = [

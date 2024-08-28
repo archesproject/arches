@@ -11,7 +11,6 @@ define([
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             options.name = 'Term Filter';
-             
             BaseFilter.prototype.initialize.call(this, options);
 
             this.filter.terms = ko.observableArray();
@@ -42,7 +41,7 @@ define([
                             return tag.value.type === currentTag.type;
                         }, this);
                         if(!found){
-                            _.each(this.filters, function(filter){
+                            _.each(this.searchFilterVms, function(filter){
                                 if(!!filter() && filter().name === tag.value.type){
                                     filter().clear();
                                 }
@@ -52,7 +51,7 @@ define([
                 }, this);
             }, this, "arrayChange");
 
-            this.filters[componentName](this);
+            this.searchFilterVms[componentName](this);
             this.restoreState();
         },
 
