@@ -1,4 +1,6 @@
-from arches.app.search.components.base import BaseSearchFilter
+from abc import abstractmethod
+from typing import Dict, Tuple
+from arches.app.search.components.base import BaseSearchFilter, SearchFilterFactory
 from arches.app.models.models import SearchComponent
 
 details = {}
@@ -128,43 +130,19 @@ class BaseSearchView(BaseSearchFilter):
                 query_dict[linked_filter["componentname"]] = {}
         return self.sort_query_dict(query_dict)
 
+    @abstractmethod
     def handle_search_results_query(
-        self, search_query_object, response_object, search_filter_factory, returnDsl
-    ):
+        self,
+        search_query_object: Dict,
+        response_object: Dict,
+        search_filter_factory: SearchFilterFactory,
+        returnDsl: bool,
+    ) -> Tuple[Dict, Dict]:
         """
-        returns response_object, search_query_object
+        Method that handles core logic of how search filters
+        should mutate the search query and response objects.
+        Returns tuple of the mutated (response_object, search_query_object)
         See arches.app.search.components.arches_core_search for example implementation
         """
 
-        sorted_query_obj = search_filter_factory.create_search_query_dict(
-            list(self.request.GET.items()) + list(self.request.POST.items())
-        )
-
-        for filter_type, querystring in list(sorted_query_obj.items()):
-            search_filter = search_filter_factory.get_filter(filter_type)
-            if search_filter:
-                search_filter.append_dsl(search_query_object)
-
-        if returnDsl:
-            return None, search_query_object
-
-        for filter_type, querystring in list(sorted_query_obj.items()):
-            search_filter = search_filter_factory.get_filter(filter_type)
-            if search_filter:
-                search_filter.execute_query(search_query_object, response_object)
-
-        if response_object["results"] is not None:
-            # allow filters to modify the results
-            for filter_type, querystring in list(sorted_query_obj.items()):
-                search_filter = search_filter_factory.get_filter(filter_type)
-                if search_filter:
-                    search_filter.post_search_hook(search_query_object, response_object)
-
-            search_query_object.pop("query")
-            # ensure that if a search filter modified the query in some way
-            # that the modification is set on the response_object
-            for key, value in list(search_query_object.items()):
-                if key not in response_object:
-                    response_object[key] = value
-
-        return response_object, search_query_object
+        pass
