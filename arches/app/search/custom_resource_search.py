@@ -2,7 +2,24 @@ from arches.app.models.system_settings import settings
 from arches.app.utils import import_class_from_string
 
 
-class CustomResourceSearchValue:
+class CustomResourceSearchFactory:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def get_custom_search_classes():
+        return (
+            [
+                import_class_from_string(classname)
+                for classname in settings.CUSTOM_SEARCH_CLASSES
+            ]
+            if settings.setting_exists("CUSTOM_SEARCH_CLASSES")
+            and settings.CUSTOM_SEARCH_CLASSES
+            else []
+        )
+
+
+class CustomResourceSearch:
     """
     Base class for creating custom sections in the Resource Instance elasticsearch document.
     """
@@ -13,19 +30,6 @@ class CustomResourceSearchValue:
         pass
 
     @staticmethod
-    def has_custom_search_class():
-        return CustomResourceSearchValue.get_custom_search_class() is not None
-
-    @staticmethod
-    def get_custom_search_class():
-        return (
-            import_class_from_string(settings.CUSTOM_SEARCH_CLASS)
-            if settings.setting_exists("CUSTOM_SEARCH_CLASS")
-            and settings.CUSTOM_SEARCH_CLASS
-            else None
-        )
-
-    @staticmethod
     def get_custom_search_path():
         """
         Identifies the document key where the custom ES document section is located.
@@ -33,7 +37,7 @@ class CustomResourceSearchValue:
         :return: ES document key
         :rtype String
         """
-        return CustomResourceSearchValue.custom_search_path
+        return CustomResourceSearch.custom_search_path
 
     @staticmethod
     def add_search_terms(resourceinstance, document, terms):

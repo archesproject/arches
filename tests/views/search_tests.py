@@ -39,7 +39,7 @@ from arches.app.search.components.base import SearchFilterFactory
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Match, Nested
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
-from arches.app.search.custom_resource_search import CustomResourceSearchValue
+from arches.app.search.custom_resource_search import CustomResourceSearch
 
 # these tests can be run from the command line via
 # python manage.py test tests.views.search_tests --settings="tests.test_settings"
@@ -921,7 +921,7 @@ def get_response_json(
     return response_json
 
 
-class TestCustomResourceSearchValue(CustomResourceSearchValue):
+class TestCustomResourceSearch(CustomResourceSearch):
 
     counter = 1
 
@@ -930,23 +930,21 @@ class TestCustomResourceSearchValue(CustomResourceSearchValue):
 
     @staticmethod
     def add_search_terms(resourceinstance, document, terms):
-        if CustomResourceSearchValue.get_custom_search_path() not in document:
-            document[CustomResourceSearchValue.get_custom_search_path()] = []
-        document[CustomResourceSearchValue.get_custom_search_path()].append(
+        if CustomResourceSearch.get_custom_search_path() not in document:
+            document[CustomResourceSearch.get_custom_search_path()] = []
+        document[CustomResourceSearch.get_custom_search_path()].append(
             {
                 "custom_value": "business-specific-search-value-%s"
                 % str(resourceinstance.resourceinstanceid)[:6]
             }
         )
-        TestCustomResourceSearchValue.counter = (
-            TestCustomResourceSearchValue.counter + 1
-        )
+        TestCustomResourceSearch.counter = TestCustomResourceSearch.counter + 1
 
     @staticmethod
     def create_nested_custom_filter(term, original_element):
         if "nested" not in original_element:
             return original_element
-        document_key = CustomResourceSearchValue.get_custom_search_path()
+        document_key = CustomResourceSearch.get_custom_search_path()
         custom_filter = Bool()
         custom_filter.should(
             Match(
@@ -975,16 +973,12 @@ class TestCustomResourceSearchValue(CustomResourceSearchValue):
         search_query.dsl["bool"]["must"] = []
         for must_element in original_must_filter:
             search_query.must(
-                TestCustomResourceSearchValue.create_nested_custom_filter(
-                    term, must_element
-                )
+                TestCustomResourceSearch.create_nested_custom_filter(term, must_element)
             )
 
         original_must_filter = search_query.dsl["bool"]["must_not"]
         search_query.dsl["bool"]["must_not"] = []
         for must_element in original_must_filter:
             search_query.must_not(
-                TestCustomResourceSearchValue.create_nested_custom_filter(
-                    term, must_element
-                )
+                TestCustomResourceSearch.create_nested_custom_filter(term, must_element)
             )

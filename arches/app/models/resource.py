@@ -36,7 +36,7 @@ from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import TERMS_INDEX, RESOURCES_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms, Nested
-from arches.app.search.custom_resource_search import CustomResourceSearchValue
+from arches.app.search.custom_resource_search import CustomResourceSearchFactory
 from arches.app.tasks import index_resource
 from arches.app.utils import import_class_from_string, task_management
 from arches.app.utils import permission_backend
@@ -634,10 +634,8 @@ class Resource(models.ResourceInstance):
                                             }
                                         )
 
-        if CustomResourceSearchValue.has_custom_search_class():
-            CustomResourceSearchValue.get_custom_search_class().add_search_terms(
-                self, document, terms
-            )
+        for custom_search_class in CustomResourceSearchFactory.get_custom_search_classes():
+            custom_search_class.add_search_terms(self, document, terms)
 
         return document, terms
 

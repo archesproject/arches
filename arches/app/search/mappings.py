@@ -20,7 +20,7 @@ from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils import permission_backend
 from django.db.utils import ProgrammingError
-from arches.app.search.custom_resource_search import CustomResourceSearchValue
+from arches.app.search.custom_resource_search import CustomResourceSearchFactory
 
 
 CONCEPTS_INDEX = "concepts"
@@ -284,12 +284,10 @@ def prepare_search_index(create=False):
         },
     }
 
-    if CustomResourceSearchValue.has_custom_search_class():
+    for custom_search_class in CustomResourceSearchFactory.get_custom_search_classes():
         index_settings["mappings"]["properties"][
-            CustomResourceSearchValue.get_custom_search_class().get_custom_search_path()
-        ] = (
-            CustomResourceSearchValue.get_custom_search_class().get_custom_search_config()
-        )
+            custom_search_class.get_custom_search_path()
+        ] = custom_search_class.get_custom_search_config()
 
     index_settings["mappings"]["properties"]["permissions"]["properties"].update(
         permission_backend.update_mappings()
