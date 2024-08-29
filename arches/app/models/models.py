@@ -1166,7 +1166,7 @@ class ResourceInstance(models.Model):
         if create_record:
             try:
                 creatorid = int(create_record.userid)
-            except ValueError:
+            except (ValueError, TypeError):
                 pass
 
         if creatorid is None:
