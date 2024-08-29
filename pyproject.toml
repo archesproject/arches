@@ -10,7 +10,7 @@ authors = [
     {name = "Farallon Geographics, Inc", email = "dev@fargeo.com"}
 ]
 license = {text = "GNU AGPL3"}
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 description = "Arches is an open-source, web-based, geospatial information system for cultural heritage inventory and management."
 keywords = ["django", "arches", "cultural heritage"]
 classifiers = [
@@ -20,20 +20,19 @@ classifiers = [
     "Intended Audience :: Information Technology",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Framework :: Django",
-    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.1",
     "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
 ]
 dependencies = [
     "arcgis2geojson==2.0.0",
     "celery==5.3.6",
     "defusedxml==0.7.1",
-    "Django>=4.2.15,<5.0.0",
+    "Django>=5.1.0,<5.2.0",
     "django-celery-results==2.5.1",
-    "django-cors-headers==4.2.0",
+    "django-cors-headers==4.4.0",
     "django-guardian==2.4.0",
     "django-hosts==6.0.0",
     "django-oauth-toolkit==1.7.0",
@@ -64,7 +63,6 @@ dependencies = [
     "requests[security]>=2.31.0",
     "semantic-version==2.10.0",
     "SPARQLWrapper==1.8.5",
-    "tomli==2.0.1;python_version<'3.11'",
     "tzdata==2023.3",
     "urllib3<2",
 ]

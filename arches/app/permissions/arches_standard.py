@@ -15,9 +15,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import annotations
 
-import sys
 import uuid
-from typing import Iterable
+from datetime import datetime
+from typing import Iterable, Literal, NotRequired, TypedDict
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User, Group
@@ -60,17 +60,10 @@ from arches.app.utils.permission_backend import (
 )
 from arches.app.search.search import SearchEngine
 
-if sys.version_info >= (3, 11):
-    from typing import NotRequired, TypedDict, Literal
 
-    class ResourceInstancePermissions(TypedDict):
-        permitted: NotRequired[bool | Literal["unknown"]]
-        resource: NotRequired[ResourceInstance]
-
-else:
-    ResourceInstancePermissions = dict
-
-from datetime import datetime
+class ResourceInstancePermissions(TypedDict):
+    permitted: NotRequired[bool | Literal["unknown"]]
+    resource: NotRequired[ResourceInstance]
 
 
 class ArchesStandardPermissionFramework(PermissionFramework):
