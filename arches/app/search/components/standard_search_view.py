@@ -13,8 +13,8 @@ from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
     user_is_resource_exporter,
 )
-from arches.app.utils.response import JSONErrorResponse
 from arches.app.utils.string_utils import get_str_kwarg_as_bool
+from django.utils.translation import gettext as _
 from datetime import datetime
 import logging
 
@@ -218,9 +218,16 @@ class StandardSearchView(BaseSearchView):
             append_instance_permission_filter_dsl(self.request, search_query_object)
         except Exception as err:
             logger.exception(err)
-            return JSONErrorResponse(message=str(err))
+            return (
+                {
+                    "success": False,
+                    "message": _("Error: {0}. Search failed.").format(str(err)),
+                },
+                search_query_object,
+            )
 
         if returnDsl:
+            response_object["success"] = True
             return response_object, search_query_object
 
         for filter_type, querystring in list(sorted_query_obj.items()):
@@ -246,4 +253,5 @@ class StandardSearchView(BaseSearchView):
                 if key not in response_object:
                     response_object[key] = value
 
+            response_object["success"] = True
         return response_object, search_query_object
