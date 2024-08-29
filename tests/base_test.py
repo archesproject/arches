@@ -17,32 +17,22 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
-from contextlib import contextmanager
 
+from django.db import connection
+from django.core import management
 from django.test import TestCase
+from django.test.utils import captured_stdout
+
 from arches.app.models.graph import Graph
 from arches.app.models.models import DDataType, Ontology
 from arches.app.models.system_settings import settings
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import (
     import_graph as ResourceGraphImporter,
 )
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
+from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
-from arches.app.utils.context_processors import app_settings
-from django.db import connection
-from django.core import management
-from django.test.runner import DiscoverRunner
-from django.test.utils import captured_stdout
-
-from arches.app.search.mappings import (
-    prepare_terms_index,
-    delete_terms_index,
-    prepare_concepts_index,
-    delete_concepts_index,
-    prepare_search_index,
-    delete_search_index,
-)
 
 # these tests can be run from the command line via
 # python manage.py test tests --settings="tests.test_settings"
@@ -59,35 +49,6 @@ DELETE_TOKEN_SQL = (
     "DELETE FROM public.oauth2_provider_accesstoken WHERE application_id = 44;"
 )
 SYSTEM_SETINGS_GRAPH_ID = "ff623370-fa12-11e6-b98b-6c4008b05c4c"
-
-
-class ArchesTestRunner(DiscoverRunner):
-    def __init__(self, *args, **kwargs) -> None:
-        kwargs["debug_mode"] = True
-        # Unless the user has something other than the Django default, give them
-        # what they probably want.
-        if kwargs["pattern"] == "test*.py":
-            kwargs["pattern"] = "*.py"
-        super().__init__(*args, **kwargs)
-
-    def setup_databases(self, **kwargs):
-        ret = super().setup_databases(**kwargs)
-
-        # Some tests don't use the database.
-        if kwargs.get("aliases", None):
-            app_settings()  # adds languages to system
-            prepare_terms_index(create=True)
-            prepare_concepts_index(create=True)
-            prepare_search_index(create=True)
-
-        return ret
-
-    def teardown_databases(self, old_config, **kwargs):
-        delete_terms_index()
-        delete_concepts_index()
-        delete_search_index()
-
-        super().teardown_databases(old_config, **kwargs)
 
 
 class ArchesTestCase(TestCase):
@@ -119,8 +80,8 @@ class ArchesTestCase(TestCase):
             )
 
     @classmethod
-    def ensure_resource_test_model_loaded(cls):
-        resource_test_model_graph_id = "c9b37a14-17b3-11eb-a708-acde48001122"
+    def ensure_test_resource_models_are_loaded(cls):
+        LanguageSynchronizer.synchronize_settings_with_db()
         custom_string_datatype_filename = os.path.join(
             test_settings.TEST_ROOT,
             "fixtures",
@@ -135,12 +96,23 @@ class ArchesTestCase(TestCase):
                 source=custom_string_datatype_filename,
                 verbosity=0,
             )
-        if not Graph.objects.filter(pk=resource_test_model_graph_id).exists():
-            for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
+        # if not Graph.objects.filter(pk=resource_test_model_graph_id).exists():
+        for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
+            file_paths = [
+                file_path
+                for file_path in os.listdir(path)
+                if file_path.endswith(".json")
+            ]
+            for file_path in file_paths:
                 with captured_stdout():
-                    management.call_command(
-                        "packages", operation="import_graphs", source=path, verbosity=0
-                    )
+                    with open(os.path.join(path, file_path), "r") as f:
+                        archesfile = JSONDeserializer().deserialize(f)
+                        errs, importer = ResourceGraphImporter(
+                            archesfile["graph"], overwrite_graphs=False
+                        )
+                    # management.call_command(
+                    #     "packages", operation="import_graphs", source=path, verbosity=0
+                    # )
 
     @classmethod
     def setUpClass(cls):
@@ -176,20 +148,3 @@ class ArchesTestCase(TestCase):
     def deleteGraph(cls, root):
         graph = Graph.objects.get(graphid=str(root))
         graph.delete()
-
-
-@contextmanager
-def sync_overridden_test_settings_to_arches():
-    """Django's @override_settings test util acts on django.conf.settings,
-    which is not enough for us, because we use SystemSettings at runtime.
-
-    This context manager swaps in the overridden django.conf.settings for SystemSettings.
-    """
-    from django.conf import settings as patched_settings
-
-    original_settings_wrapped = settings._wrapped
-    try:
-        settings._wrapped = patched_settings._wrapped
-        yield
-    finally:
-        settings._wrapped = original_settings_wrapped

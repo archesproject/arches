@@ -5,7 +5,7 @@ define([
     'utils/aria',
     'templates/views/components/search/paging-filter.htm',
 ], function(BaseFilter, ko, koMapping, ariaUtils, pagingFilterTemplate) {
-    var componentName = 'paging-filter';
+    const componentName = 'paging-filter';
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             options.name = 'Paging Filter';
@@ -45,7 +45,7 @@ define([
                 this.updateResults();
             }, this);
 
-            this.filters[componentName](this);
+            this.searchFilterVms[componentName](this);
             this.restoreState();
             this.pageInitialized = true;
         },
@@ -60,7 +60,7 @@ define([
             if(page){
                 this.userRequestedNewPage = true;
                 this.page(page);
-                this.shiftFocus('#search-results-list');
+                this.shiftFocus('#search-results-list-type');
             }
         },
 

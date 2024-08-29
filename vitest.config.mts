@@ -14,6 +14,7 @@ function generateConfig(): Promise<UserConfigExport> {
             '**/dist/**',
             '**/install/**',
             '**/cypress/**',
+            '**/themes/**',
             '**/.{idea,git,cache,output,temp}/**',
             '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
         ];
@@ -23,6 +24,7 @@ function generateConfig(): Promise<UserConfigExport> {
 
         const alias: { [key: string]: string } = {
             '@/arches': path.join(parsedData['ROOT_DIR'], 'app', 'src', 'arches'),
+            'arches': path.join(parsedData['ROOT_DIR'], 'app', 'media', 'js', 'arches.js'),
         };
 
         for (

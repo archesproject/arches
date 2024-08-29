@@ -537,7 +537,6 @@ class Resource(models.ResourceInstance):
                 [int(self.principaluser_id)] if self.principaluser_id else []
             )
         }
-
         document["permissions"].update(permission_backend.get_index_values(self))
 
         document["strings"] = []

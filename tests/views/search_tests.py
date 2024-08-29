@@ -20,6 +20,8 @@ import os
 import json
 import time
 from tests.base_test import ArchesTestCase
+from tests.utils.search_test_utils import sync_es
+from django.http import HttpRequest
 from django.urls import reverse
 from django.contrib.auth.models import User, Group
 from django.test.client import Client
@@ -31,7 +33,9 @@ from arches.app.utils.data_management.resource_graphs.importer import (
     import_graph as ResourceGraphImporter,
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.views.search import search_results
 from guardian.shortcuts import assign_perm
+from arches.app.search.components.base import SearchFilterFactory
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Match, Nested
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
@@ -93,7 +97,7 @@ class SearchTests(ArchesTestCase):
                     "values": [
                         {
                             "value": "Mock concept",
-                            "language": "en-US",
+                            "language": "en",
                             "category": "label",
                             "type": "prefLabel",
                             "id": "",
@@ -101,7 +105,7 @@ class SearchTests(ArchesTestCase):
                         },
                         {
                             "value": "1950",
-                            "language": "en-US",
+                            "language": "en",
                             "category": "note",
                             "type": "min_year",
                             "id": "",
@@ -109,7 +113,7 @@ class SearchTests(ArchesTestCase):
                         },
                         {
                             "value": "1980",
-                            "language": "en-US",
+                            "language": "en",
                             "category": "note",
                             "type": "max_year",
                             "id": "",
@@ -216,8 +220,7 @@ class SearchTests(ArchesTestCase):
         cls.name_resource.tiles.append(tile)
         cls.name_resource.save()
 
-        # add delay to allow for indexes to be updated
-        time.sleep(1)
+        sync_es(se)
 
     @classmethod
     def tearDownClass(cls):
@@ -762,6 +765,77 @@ class SearchTests(ArchesTestCase):
             ],
         )
 
+    def test_search_returnDsl(self):
+        """
+        test that a Query object is returned when returnDsl is set to True
+
+        """
+
+        term_filter = [
+            {
+                "type": "string",
+                "context": "",
+                "context_label": "",
+                "id": "test",
+                "text": "test",
+                "value": "test",
+                "inverted": False,
+            }
+        ]
+
+        request = HttpRequest()
+        request.method = "GET"
+        request.user = User.objects.get(username="anonymous")
+        request.GET.__setitem__("term-filter", json.dumps(term_filter))
+        resp = search_results(request, returnDsl=True)
+        self.assertTrue(isinstance(resp, Query))
+
+    def test_search_without_searchview(self):
+        """
+        Execute a search without setting a search-view component on the query
+
+        """
+
+        response_json = get_response_json(self.client)
+        self.assertTrue(response_json["results"]["hits"]["total"]["value"] > 0)
+
+    def test_search_with_bad_searchview(self):
+        """
+        Execute a search with a search-view component name that does not exist
+
+        """
+        query = {"search-view": "unavailable-search-view"}
+        response_json = get_response_json(self.client, query=query)
+        self.assertFalse(response_json["success"])
+
+    def test_searchview_searchview_component_from_admin(self):
+        request = HttpRequest()
+        request.method = "GET"
+        request.user = User.objects.get(username="admin")
+        search_component_factory = SearchFilterFactory(request)
+        searchview_component_instance = (
+            search_component_factory.get_searchview_instance()
+        )
+        self.assertTrue(searchview_component_instance is not None)
+
+        search_components = searchview_component_instance.get_searchview_filters()
+        # 13 available components + search-view component
+        self.assertEqual(len(search_components), 14)
+
+    def test_searchview_searchview_component_from_anonymous(self):
+        request = HttpRequest()
+        request.method = "GET"
+        request.user = User.objects.get(username="anonymous")
+        search_component_factory = SearchFilterFactory(request)
+        searchview_component_instance = (
+            search_component_factory.get_searchview_instance()
+        )
+        self.assertTrue(searchview_component_instance is not None)
+
+        search_components = searchview_component_instance.get_searchview_filters()
+        # 13 available components + search-view component
+        self.assertEqual(len(search_components), 14)
+
     def test_custom_resource_index(self):
         for hit in get_response_json(self.client)["results"]["hits"]["hits"]:
             term_filter = [
@@ -828,9 +902,10 @@ def extract_pks(response_json):
 
 
 def get_response_json(
-    client, temporal_filter=None, term_filter=None, spatial_filter=None
+    client, temporal_filter=None, term_filter=None, spatial_filter=None, query=None
 ):
-    query = {}
+    # declared here due to mutability issues
+    query = query if query else {}
     if temporal_filter is not None:
         query["time-filter"] = JSONSerializer().serialize(temporal_filter)
     if term_filter is not None:

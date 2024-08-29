@@ -37,9 +37,7 @@ define([
             },
 
             initialize: function (options) {
-                options.name = "Search Results";
-
-                this.requiredFilters = ["map-filter"];
+                options.name = 'Search Results';
                 BaseFilter.prototype.initialize.call(this, options);
                 this.results = ko.observableArray();
                 this.showRelationships = ko.observable();
@@ -54,20 +52,19 @@ define([
                     this.updateResults();
                 }, this);
 
-                this.filters[componentName](this);
+                this.searchFilterVms[componentName](this);
                 this.restoreState();
-                if (this.requiredFiltersLoaded() === false) {
-                    this.requiredFiltersLoaded.subscribe(function () {
-                        this.mapFilter = this.getFilter("map-filter");
-                    }, this);
-                } else {
-                    this.mapFilter = this.getFilter("map-filter");
-                }
+                
+                this.mapFilter = this.getFilterByType("map-filter-type", false);
+                this.mapFilter.subscribe(mapFilter => {
+                    if (mapFilter) {
+                        this.mapFilter = mapFilter;
+                    }
+                }, this);
                 this.selectedTab.subscribe(function (tab) {
-                    var self = this;
-                    if (tab === "map-filter") {
+                    if (tab === "map-filter-type") {
                         if (ko.unwrap(this.mapFilter.map)) {
-                            self.mapFilter.map().resize();
+                            this.mapFilter.map().resize();
                         }
                     }
                 }, this);
@@ -112,10 +109,10 @@ define([
                         }
                     }
                     self.showRelationships(resourceinstance);
-                    if (self.selectedTab() !== "related-resources-filter") {
-                        self.selectedTab("related-resources-filter");
+                    if (self.selectedTab() !== "related-resources-filter-type") {
+                        self.selectedTab("related-resources-filter-type");
                     }
-                    self.shiftFocus("#related-resources-filter-tabpanel");
+                    self.shiftFocus("#related-resources-filter-type-tabpanel");
                 };
             },
 
@@ -168,8 +165,8 @@ define([
                         }
                     });
 
-                    if (self.selectedTab() !== "search-result-details") {
-                        self.selectedTab("search-result-details");
+                    if (self.selectedTab() !== "search-result-details-type") {
+                        self.selectedTab("search-result-details-type");
                     }
                 };
             },
@@ -327,8 +324,8 @@ define([
                                     self.selectedResourceId(
                                         result._source.resourceinstanceid,
                                     );
-                                    if (self.selectedTab() !== "map-filter") {
-                                        self.selectedTab("map-filter");
+                                    if (self.selectedTab() !== "map-filter-type") {
+                                        self.selectedTab("map-filter-type");
                                     }
                                     self.mapLinkData({
                                         properties: result._source,

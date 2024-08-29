@@ -2997,13 +2997,13 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     cursor: pointer;
 }
 
-.permissions-table-row:first-child {
+.permissions-table-row.disabled{
     background-color: #f8f8f8;
     color: #777;
     font-weight: 600;
 }
 
-.permissions-table-row:first-child:hover {
+.permissions-table-row.disabled:hover {
     cursor: default;
 }
 
@@ -10025,7 +10025,7 @@ table.table.dataTable {
 
 .search-type-btn {
     height: 50px;
-    padding: 0px;
+    padding: 0px 4px;
     font-size: 1.2rem;
     font-weight: 600;
     color: #888;
@@ -12818,6 +12818,16 @@ section .etl-preview table {
 .etl-from-to {
     display: inline-block;
     width: 240px;
+}
+
+.csv-import-options {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.csv-import-options .toggle-container{
+    padding-bottom: 0px;    
 }
 
 .csv-mapping-table-container {
