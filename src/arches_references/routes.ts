@@ -1,18 +1,19 @@
+import arches from "arches";
 import ControlledListsMain from "@/arches_references/components/ControlledListsMain.vue";
 
 export const routes = [
     {
-        path: "/plugins/controlled-list-manager",
+        path: arches.urls.plugin("controlled-list-manager"),
         name: "splash",
         component: ControlledListsMain,
     },
     {
-        path: "/plugins/controlled-list-manager/list/:id",
+        path: arches.urls.plugin("controlled-list-manager/list/:id"),
         name: "list",
         component: ControlledListsMain,
     },
     {
-        path: "/plugins/controlled-list-manager/item/:id",
+        path: arches.urls.plugin("controlled-list-manager/item/:id"),
         name: "item",
         component: ControlledListsMain,
     },
