@@ -82,6 +82,8 @@ class Command(BaseCommand):
                 -ho 'http://localhost:8000/plugins/controlled-list-manager/item/'
                 -psl 'fr'
                 -ow
+
+            for collections that contain an apostrophe, use wrap the concept in double quotes, e.g. "John''s list"
         """
 
         collections_in_db = list(
