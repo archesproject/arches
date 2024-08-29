@@ -151,7 +151,9 @@ class TermFilter(BaseSearchFilter):
                     search_query.filter(nested_conceptid_filter)
 
             # Add additional search query if configured
-            for custom_search_class in CustomResourceSearchFactory.get_custom_search_classes():
+            for (
+                custom_search_class
+            ) in CustomResourceSearchFactory.get_custom_search_classes():
                 custom_search_class.add_search_filter(search_query, term)
 
         search_query_object["query"].add_query(search_query)

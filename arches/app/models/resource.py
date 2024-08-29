@@ -634,7 +634,9 @@ class Resource(models.ResourceInstance):
                                             }
                                         )
 
-        for custom_search_class in CustomResourceSearchFactory.get_custom_search_classes():
+        for (
+            custom_search_class
+        ) in CustomResourceSearchFactory.get_custom_search_classes():
             custom_search_class.add_search_terms(self, document, terms)
 
         return document, terms
