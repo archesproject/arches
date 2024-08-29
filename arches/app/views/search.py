@@ -370,18 +370,19 @@ def search_results(request, returnDsl=False):
         )
     )
 
-    if returnDsl:
-        return search_query_object.pop("query", None)
-
-    if response_object:
-        return JSONResponse(content=response_object)
-
-    else:
+    if not response_object.get("success", False):
+        message = response_object.get(
+            "message", _("There was an error retrieving the search results")
+        )
         ret = {
             "success": False,
-            "message": _("There was an error retrieving the search results"),
+            "message": message,
         }
         return JSONResponse(ret, status=500)
+    elif returnDsl:
+        return search_query_object.pop("query", None)
+    else:
+        return JSONResponse(content=response_object)
 
 
 def get_provisional_type(request):
