@@ -37,11 +37,8 @@ class MapFilter(BaseSearchFilter):
         permitted_nodegroups = kwargs.get("permitted_nodegroups")
         include_provisional = kwargs.get("include_provisional")
         search_query = Bool()
-        querysting_params = self.request.GET.get(self.componentname, "{}")
-        spatial_filter = JSONDeserializer().deserialize(querysting_params)
-        if not search_query_object.get(self.componentname, None):
-            search_query_object[self.componentname] = {}
-
+        querystring_params = kwargs.get("querystring", "{}")
+        spatial_filter = JSONDeserializer().deserialize(querystring_params)
         if "features" in spatial_filter:
             if len(spatial_filter["features"]) > 0:
                 feature_geom = spatial_filter["features"][0]["geometry"]
