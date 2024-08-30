@@ -54,6 +54,10 @@ class MapFilter(BaseSearchFilter):
                     search_query,
                 )
                 search_query_object["query"].add_query(search_query)
+
+                # Add the buffered feature geometry to the search query object
+                if self.componentname not in search_query_object:
+                    search_query_object[self.componentname] = {}
                 search_query_object[self.componentname][
                     "search_buffer"
                 ] = buffered_feature_geom
