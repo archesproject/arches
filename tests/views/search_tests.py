@@ -804,7 +804,8 @@ class SearchTests(ArchesTestCase):
 
         """
         query = {"search-view": "unavailable-search-view"}
-        response_json = get_response_json(self.client, query=query)
+        with self.assertLogs("django.request", level="WARNING"):
+            response_json = get_response_json(self.client, query=query)
         self.assertFalse(response_json["success"])
 
     def test_searchview_searchview_component_from_admin(self):
