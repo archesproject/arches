@@ -380,7 +380,7 @@ def search_results(request, returnDsl=False):
         }
         return JSONResponse(ret, status=500)
     elif returnDsl:
-        return search_query_object.pop("query", None)
+        return search_query_object.pop("query")
     else:
         return JSONResponse(content=response_object)
 
