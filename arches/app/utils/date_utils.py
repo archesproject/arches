@@ -69,6 +69,20 @@ class ExtendedDateFormat(SortableDateRange):
             except Exception as err:
                 self.error = err
                 raise err
+    
+    def get_long_year(self, date):
+        """
+        Dates with long years will fail to parse unless properly formatted.
+        Example: '-200000-01-01' and '20000-01-01' will fail to parse.
+        The day and month must be stripped and the year prefixed with a y.
+        """
+        
+        date_elements = date.split("-")
+        if len(date_elements) == 4:
+            long_year = f"y-{date_elements[1]}"
+        if len(date_elements) == 3:
+            long_year = f"y{date_elements[0]}"
+        return long_year
 
     def parse(self, date=None):
         if date is None:
@@ -91,7 +105,12 @@ class ExtendedDateFormat(SortableDateRange):
         except Exception:
             pass
 
-        self.edtf = parse_edtf(date)
+        try:
+            self.edtf = parse_edtf(date)
+        except Exception as e: #Exception is likely because year has more than 4 digits
+            long_year = self.get_long_year(date)
+            self.edtf = parse_edtf(long_year)
+
         result = self.handle_object(self.edtf)
         if isinstance(result, list):
             self.result_set = result
