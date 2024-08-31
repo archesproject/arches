@@ -134,13 +134,7 @@ watch(
 );
 
 // Navigate on initial load of the tree.
-watch(
-    tree,
-    () => {
-        navigate(route);
-    },
-    { once: true },
-);
+watch(tree, () => navigate(route), { once: true });
 
 const updateSelectedAndExpanded = (node: TreeNode) => {
     if (isMultiSelecting.value || movingItem.value?.key) {
