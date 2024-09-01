@@ -33,7 +33,6 @@ from django.http import HttpRequest
 from django.contrib.auth.models import User
 from django.test.utils import captured_stdout
 from tests.base_test import ArchesTestCase
-from tests.utils.search_test_utils import sync_es
 
 # these tests can be run from the command line via
 # python manage.py test tests.search.search_tests --settings="tests.test_settings"
@@ -85,7 +84,7 @@ class SearchTests(ArchesTestCase):
             y = {"id": i + 100, "type": "altLabel", "value": "test alt label"}
             se.index_data(index="test", body=y, idfield="id", refresh=True)
 
-        sync_es(se)
+        self.sync_es(se)
 
         query = Query(se, start=0, limit=100)
         match = Match(field="type", query="altLabel")
@@ -141,7 +140,6 @@ class SearchTests(ArchesTestCase):
         Test finding a resource by a term
 
         """
-
         nodeid = "c9b37b7c-17b3-11eb-a708-acde48001122"
         tileid = "bebffbea-daf6-414e-80c2-530ec88d2705"
         resourceinstanceid = "745f5e4a-d645-4c50-bafc-c677ea95f060"
