@@ -219,13 +219,6 @@ class SearchTests(ArchesTestCase):
 
         sync_es(se)
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.user.delete()
-        Resource.objects.filter(graph_id=cls.search_model_graphid).delete()
-        models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
-        super().tearDownClass()
-
     def test_temporal_only_search_1(self):
         """
         Search for resources that fall between 1940 and 1960

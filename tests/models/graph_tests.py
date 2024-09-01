@@ -16,7 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os, json, uuid
+import uuid
+
 from django.contrib.auth.models import User
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
@@ -150,7 +151,6 @@ class GraphTests(ArchesTestCase):
         }
         models.Edge.objects.create(**edges_dict).save()
 
-    def setUp(self):
         graph = Graph.new()
         graph.name = "TEST GRAPH"
         graph.subtitle = "ARCHES TEST GRAPH"
@@ -168,10 +168,7 @@ class GraphTests(ArchesTestCase):
         graph.root.datatype = "semantic"
         graph.root.save()
 
-        self.rootNode = graph.root
-
-    def tearDown(self):
-        self.deleteGraph(self.rootNode.graph_id)
+        cls.rootNode = graph.root
 
     def test_new_graph(self):
         name = "TEST NEW GRAPH"
