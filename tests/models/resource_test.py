@@ -291,24 +291,13 @@ class ResourceTests(ArchesTestCase):
         """
         If a resource lacks a graph publication, it is restored by a call to save().
         """
-
-        publication = self.test_resource.graph_publication
-        cursor = connection.cursor()
-        # Hack out the graph publication
-        sql = """
-            UPDATE resource_instances
-            SET graphpublicationid = NULL
-            WHERE resourceinstanceid = '{resource_pk}';
-        """.format(
-            resource_pk=self.test_resource.pk
+        # Hack out the graph publication (bypass the guard in save())
+        models.ResourceInstance.objects.filter(pk=self.test_resource.pk).update(
+            graph_publication=None
         )
-        cursor.execute(sql)
-        self.addCleanup(setattr, self.test_resource, "graph_publication", publication)
-        self.addCleanup(self.test_resource.save)
         self.test_resource.refresh_from_db()
-        self.assertIsNone(
-            self.test_resource.graph_publication
-        )  # ensure test setup is good
+        # Ensure test setup is good
+        self.assertIsNone(self.test_resource.graph_publication)
 
         # update_or_create() delegates to save()
         obj, created = models.ResourceInstance.objects.filter(
