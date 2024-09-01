@@ -52,18 +52,14 @@ from tests.base_test import ArchesTestCase
 
 
 class ResourceTests(ArchesTestCase):
+    graph_fixtures = ["Resource Test Model"]
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
         cls.client = Client()
         cls.client.login(username="admin", password="admin")
-
-        with open(
-            os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "r"
-        ) as f:
-            archesfile = JSONDeserializer().deserialize(f)
-        resource_graph_importer(archesfile["graph"])
 
         cls.search_model_graphid = uuid.UUID("c9b37a14-17b3-11eb-a708-acde48001122")
         cls.search_model_cultural_period_nodeid = "c9b3882e-17b3-11eb-a708-acde48001122"
