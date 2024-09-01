@@ -17,26 +17,13 @@ import os
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.core import management
-from django.urls import reverse
-from django.test.client import RequestFactory, Client
 from django.test.utils import captured_stdout
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-from guardian.shortcuts import (
-    assign_perm,
-    get_perms,
-    remove_perm,
-    get_group_perms,
-    get_user_perms,
-)
+from guardian.shortcuts import assign_perm
 from arches.app.models.models import GraphModel, ResourceInstance, Node
 from arches.app.models.resource import Resource
-from arches.app.utils.permission_backend import get_editable_resource_types
-from arches.app.utils.permission_backend import get_resource_types_by_perm
 from arches.app.utils.permission_backend import user_can_read_resource
-from arches.app.utils.permission_backend import user_can_edit_resource
-from arches.app.utils.permission_backend import user_can_read_concepts
 from arches.app.utils.permission_backend import user_has_resource_model_permissions
 from arches.app.utils.permission_backend import get_restricted_users
 
@@ -54,9 +41,6 @@ class PermissionTests(ArchesTestCase):
         resource = Resource.objects.get(pk=self.resource_instance_id)
         resource.graph_id = self.data_type_graphid
         resource.remove_resource_instance_permissions()
-
-    def tearDown(self):
-        ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
 
     @classmethod
     def add_users(cls):
