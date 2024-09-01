@@ -1,6 +1,4 @@
-import time
 import uuid
-import os
 import csv
 import io
 from base64 import b64encode
@@ -11,12 +9,7 @@ from arches.app.search.elasticsearch_dsl_builder import Query
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.search_export import SearchResultsExporter
-from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.utils.data_management.resource_graphs.importer import (
-    import_graph as ResourceGraphImporter,
-)
 from arches.app.utils.skos import SKOSReader
-from arches.app.utils.i18n import LanguageSynchronizer
 
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
@@ -44,18 +37,13 @@ class SearchExportTests(ArchesTestCase):
         sync_es(se)
 
     @classmethod
-    def setUpTestData(cls):
+    def setUpClass(cls):
+        super().setUpClass()
         se = SearchEngineFactory().create()
         q = Query(se=se)
         for indexname in [TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX]:
             q.delete(index=indexname, refresh=True)
         cls.factory = RequestFactory()
-
-        with open(
-            os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "r"
-        ) as f:
-            archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile["graph"])
 
         cls.user = User.objects.create_user(
             "unprivileged_user", "unprivileged_user@test.com", "test"
@@ -93,6 +81,13 @@ class SearchExportTests(ArchesTestCase):
         cultural_period_tile.save(index=False)
         cultural_period_tile.index()
         # TODO: create geospatial test data
+
+    @classmethod
+    def tearDownClass(cls):
+        se = SearchEngineFactory().create()
+        q = Query(se=se)
+        for indexname in [TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX]:
+            q.delete(index=indexname, refresh=True)
 
     def test_search_export_no_request(self):
         """Test SearchResultsExporter without search request"""
