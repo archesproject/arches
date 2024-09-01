@@ -193,13 +193,6 @@ class ResourceTests(ArchesTestCase):
         # add delay to allow for indexes to be updated
         time.sleep(1)
 
-    @classmethod
-    def tearDownClass(cls):
-        Resource.objects.filter(graph_id=cls.search_model_graphid).delete()
-        models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
-        cls.user.delete()
-        super().tearDownClass()
-
     def test_get_node_value_string(self):
         """
         Query a string value
