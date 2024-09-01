@@ -67,7 +67,7 @@ class SearchTests(ArchesTestCase):
 
     @classmethod
     def setUpTestData(cls):
-        User.objects.create_user(
+        cls.tester = User.objects.create_user(
             username="Tester", email="test@test.com", password="test12345!"
         )
 
@@ -146,9 +146,8 @@ class SearchTests(ArchesTestCase):
         tileid = "bebffbea-daf6-414e-80c2-530ec88d2705"
         resourceinstanceid = "745f5e4a-d645-4c50-bafc-c677ea95f060"
         resource = Resource(uuid.UUID(resourceinstanceid))
-        user = User.objects.get(username="Tester")
         resource.graph_id = "c9b37a14-17b3-11eb-a708-acde48001122"
-        resource.save(user=user, transaction_id=uuid.uuid4())
+        resource.save(user=self.tester, transaction_id=uuid.uuid4())
         tile_data = {}
         tile_data[nodeid] = {
             "en": {"value": "Etiwanda Avenue Street Trees", "direction": "ltr"}
@@ -168,7 +167,7 @@ class SearchTests(ArchesTestCase):
         request.GET.__setitem__("lang", "en")
         request.GET.__setitem__("q", "Etiwanda")
         request.LANGUAGE_CODE = "en"
-        request.user = user
+        request.user = self.tester
         response = search_terms(request)
         result = {}
         try:
