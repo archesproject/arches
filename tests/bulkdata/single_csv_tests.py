@@ -41,7 +41,6 @@ class SingleCSVTests(TransactionTestCase):
     serialized_rollback = True
 
     def setUp(self):
-        LanguageSynchronizer.synchronize_settings_with_db()
         with open(
             os.path.join("tests/fixtures/single_csv_bulk_manager_test_model.json"), "r"
         ) as f:

@@ -56,10 +56,6 @@ class ResourceTests(ArchesTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        LanguageSynchronizer.synchronize_settings_with_db()
-
-        models.ResourceInstance.objects.all().delete()
-
         cls.client = Client()
         cls.client.login(username="admin", password="admin")
 

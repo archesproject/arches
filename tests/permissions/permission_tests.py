@@ -13,34 +13,39 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
-from tests import test_settings
-from tests.base_test import ArchesTestCase
-from django.core import management
-from django.test.utils import captured_stdout
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from guardian.shortcuts import assign_perm
-from arches.app.models.models import GraphModel, ResourceInstance, Node
+from arches.app.models.models import ResourceInstance, Node
 from arches.app.models.resource import Resource
 from arches.app.utils.permission_backend import user_can_read_resource
 from arches.app.utils.permission_backend import user_has_resource_model_permissions
 from arches.app.utils.permission_backend import get_restricted_users
+from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
 # python manage.py test tests.permissions.permission_tests --settings="tests.test_settings"
 
 
 class PermissionTests(ArchesTestCase):
-    def setUp(self):
-        self.expected_resource_count = 2
-        self.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
-        self.resource_instance_id = "f562c2fa-48d3-4798-a723-10209806c068"
-        self.user = User.objects.get(username="ben")
-        self.group = Group.objects.get(pk=2)
-        resource = Resource.objects.get(pk=self.resource_instance_id)
-        resource.graph_id = self.data_type_graphid
+    graph_fixtures = ["Data_Type_Model"]
+    data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
+    resource_instance_id = "f562c2fa-48d3-4798-a723-10209806c068"
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.add_users()
+        cls.expected_resource_count = 2
+        cls.user = User.objects.get(username="ben")
+        cls.group = Group.objects.get(pk=2)
+        cls.legacy_load_testing_package()
+        resource = Resource.objects.get(pk=cls.resource_instance_id)
+        resource.graph_id = cls.data_type_graphid
         resource.remove_resource_instance_permissions()
+
+    def setUp(self):
+        resource = Resource.objects.get(pk=self.resource_instance_id)
+        resource.index()
 
     @classmethod
     def add_users(cls):
@@ -80,27 +85,6 @@ class PermissionTests(ArchesTestCase):
 
             except Exception as e:
                 print(e)
-
-    @classmethod
-    def setUpClass(cls):
-        cls.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
-        if not GraphModel.objects.filter(pk=cls.data_type_graphid).exists():
-            # TODO: Fix this to run inside transaction, i.e. after super().setUpClass()
-            # https://github.com/archesproject/arches/issues/10719
-            test_pkg_path = os.path.join(
-                test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg"
-            )
-            with captured_stdout():
-                management.call_command(
-                    "packages",
-                    operation="load_package",
-                    source=test_pkg_path,
-                    yes=True,
-                    verbosity=0,
-                )
-
-        super().setUpClass()
-        cls.add_users()
 
     def test_user_cannot_view_without_permission(self):
         """

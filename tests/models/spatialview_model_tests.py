@@ -43,8 +43,6 @@ class SpatialViewTests(ArchesTestCase):
     def setUpClass(self):
         super().setUpClass()
 
-        LanguageSynchronizer.synchronize_settings_with_db()
-
         spatialviews_other_test_model_path = os.path.join(
             test_settings.TEST_ROOT,
             "fixtures",

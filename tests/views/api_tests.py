@@ -19,8 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import json
 import os
 
-from arches.app.utils.i18n import LanguageSynchronizer
-from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.urls import reverse
 from django.core import management
@@ -36,28 +34,13 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 # python manage.py test tests.views.api_tests --settings="tests.test_settings"
 
 
-class APITests(ArchesTestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
-        if not models.GraphModel.objects.filter(pk=cls.data_type_graphid).exists():
-            # TODO: Fix this to run inside transaction, i.e. after super().setUpClass()
-            # https://github.com/archesproject/arches/issues/10719
-            test_pkg_path = os.path.join(
-                test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg"
-            )
-            with captured_stdout():
-                management.call_command(
-                    "packages",
-                    operation="load_package",
-                    source=test_pkg_path,
-                    yes=True,
-                    verbosity=0,
-                )
+class ResourceAPITests(ArchesTestCase):
+    graph_fixtures = ["Data_Type_Model"]
+    data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
 
-        super().setUpClass()
-        cls.loadOntology()
-        LanguageSynchronizer.synchronize_settings_with_db()
+    @classmethod
+    def setUpTestData(cls):
+        cls.legacy_load_testing_package()
         with open(
             os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "r"
         ) as f:

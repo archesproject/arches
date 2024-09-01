@@ -33,8 +33,6 @@ class JsonLDImportTests(ArchesTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        # This runs once per instantiation
-        cls.loadOntology()
         cls.factory = RequestFactory()
         cls.token = "abc123"
         cls.client = Client(HTTP_AUTHORIZATION="Bearer %s" % cls.token)
@@ -42,7 +40,6 @@ class JsonLDImportTests(ArchesTestCase):
         sql_str = CREATE_TOKEN_SQL.format(token=cls.token, user_id=1)
         cursor = connection.cursor()
         cursor.execute(sql_str)
-        LanguageSynchronizer.synchronize_settings_with_db()
 
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/jsonld_test_thesaurus.xml")

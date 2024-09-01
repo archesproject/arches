@@ -30,12 +30,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 
 class GraphTests(ArchesTestCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
-        cls.loadOntology()
-        cls.ensure_test_resource_models_are_loaded()
-
+    def setUpTestData(cls):
         cls.NODE_NODETYPE_GRAPHID = "22000000-0000-0000-0000-000000000001"
         cls.SINGLE_NODE_GRAPHID = "22000000-0000-0000-0000-000000000000"
 
