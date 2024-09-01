@@ -57,8 +57,6 @@ class SearchTests(ArchesTestCase):
         cls.client = Client()
         cls.client.login(username="admin", password="admin")
 
-        LanguageSynchronizer.synchronize_settings_with_db()
-        models.ResourceInstance.objects.all().delete()
         with open(
             os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "r"
         ) as f:

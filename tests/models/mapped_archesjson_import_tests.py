@@ -16,7 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
 from tests.base_test import ArchesTestCase
 from django.test.utils import captured_stdout
 from arches.app.models.models import TileModel
@@ -36,13 +35,8 @@ from arches.app.utils.data_management.resources.importer import (
 class mappedArchesJSONImportTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.loadOntology()
-        cls.ensure_test_resource_models_are_loaded()
-
-        with open(
-            os.path.join("tests/fixtures/data/json/cardinality_test_data/target.json"),
-            "r",
-        ) as f:
+        path = "tests/fixtures/data/json/cardinality_test_data/target.json"
+        with open(path, "r") as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 

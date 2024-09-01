@@ -23,14 +23,7 @@ class JsonLDExportTests(ArchesTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        # This runs once per instantiation
-        cls.loadOntology()
         cls.factory = RequestFactory()
-        cls.client = Client()
-
-        # cls.client.login(username='admin', password='admin')
-        # cls.user = User.objects.get(username='anonymous')
-        LanguageSynchronizer.synchronize_settings_with_db()
 
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/jsonld_test_thesaurus.xml")

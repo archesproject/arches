@@ -17,6 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+from unittest import mock
+from pathlib import Path
 
 from django.db import connection
 from django.core import management
@@ -24,7 +26,7 @@ from django.test import TestCase
 from django.test.utils import captured_stdout
 
 from arches.app.models.graph import Graph
-from arches.app.models.models import DDataType, Ontology
+from arches.app.models.models import Ontology
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import (
@@ -52,6 +54,12 @@ SYSTEM_SETINGS_GRAPH_ID = "ff623370-fa12-11e6-b98b-6c4008b05c4c"
 
 
 class ArchesTestCase(TestCase):
+    graph_fixtures = []
+    """
+    Similar to TestCase.fixtures, but uses ResourceGraphImporter to avoid flushing.
+    Uses the name of the .json file (case-sensitive), not graph name.
+    """
+
     def __init__(self, *args, **kwargs):
         super(ArchesTestCase, self).__init__(*args, **kwargs)
         if settings.DEFAULT_BOUNDS is None:
@@ -80,44 +88,9 @@ class ArchesTestCase(TestCase):
             )
 
     @classmethod
-    def ensure_test_resource_models_are_loaded(cls):
-        LanguageSynchronizer.synchronize_settings_with_db()
-        custom_string_datatype_filename = os.path.join(
-            test_settings.TEST_ROOT,
-            "fixtures",
-            "datatypes",
-            "extended_string_datatype.py",
-        )
-
-        if not DDataType.objects.filter(datatype="extended-string-datatype").exists():
-            management.call_command(
-                "datatype",
-                "register",
-                source=custom_string_datatype_filename,
-                verbosity=0,
-            )
-        # if not Graph.objects.filter(pk=resource_test_model_graph_id).exists():
-        for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
-            file_paths = [
-                file_path
-                for file_path in os.listdir(path)
-                if file_path.endswith(".json")
-            ]
-            for file_path in file_paths:
-                with captured_stdout():
-                    with open(os.path.join(path, file_path), "r") as f:
-                        archesfile = JSONDeserializer().deserialize(f)
-                        errs, importer = ResourceGraphImporter(
-                            archesfile["graph"], overwrite_graphs=False
-                        )
-                    # management.call_command(
-                    #     "packages", operation="import_graphs", source=path, verbosity=0
-                    # )
-
-    @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cursor = connection.cursor()
+
         sql = """
             INSERT INTO public.oauth2_provider_application(
                 id, client_id, redirect_uris, client_type, authorization_grant_type,
@@ -135,7 +108,69 @@ class ArchesTestCase(TestCase):
             oauth_client_secret=OAUTH_CLIENT_SECRET,
             jwt_algorithm=test_settings.JWT_ALGORITHM,
         )
-        cursor.execute(sql)
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
+
+        LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
+        cls.loadOntology()
+        for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
+            file_paths = [
+                file_path
+                for file_path in os.listdir(path)
+                if file_path.endswith(".json")
+                and Path(file_path).stem in cls.graph_fixtures
+            ]
+            for file_path in file_paths:
+                with captured_stdout():
+                    with open(os.path.join(path, file_path), "r") as f:
+                        archesfile = JSONDeserializer().deserialize(f)
+                        errs, importer = ResourceGraphImporter(
+                            archesfile["graph"], overwrite_graphs=True
+                        )
+
+    @classmethod
+    def legacy_load_testing_package(cls):
+        """Do not write new tests with this method."""
+        with (
+            captured_stdout(),
+            mock.patch(
+                "arches.management.commands.packages.Command.update_resource_geojson_geometries"
+            ),
+        ):
+            management.call_command(
+                "packages",
+                "-o import_reference_data -s tests/fixtures/testing_prj/testing_prj/pkg/reference_data/concepts/Test-scheme.xml".split(),
+            )
+            management.call_command(
+                "packages",
+                [
+                    "-o",
+                    "import_reference_data",
+                    "-s",
+                    "tests/fixtures/testing_prj/testing_prj/pkg/reference_data/concepts/4.3 Test RDM Thesaurus.xml",
+                ],
+            )
+            management.call_command(
+                "packages",
+                "-o import_reference_data -s tests/fixtures/testing_prj/testing_prj/pkg/reference_data/collections/Test-scheme-collections.xml".split(),
+            )
+            management.call_command(
+                "packages",
+                [
+                    "-o",
+                    "import_reference_data",
+                    "-s",
+                    "tests/fixtures/testing_prj/testing_prj/pkg/reference_data/collections/4.3 Test RDM Collections.xml",
+                ],
+            )
+            management.call_command(
+                "packages",
+                "-o load_package -s tests/fixtures/testing_prj/testing_prj/pkg -ow True -y".split(),
+            )
+
+        path_to_cheesy_image = Path(settings.MEDIA_ROOT) / "uploadedfiles" / "test.png"
+        cls.addClassCleanup(os.unlink, path_to_cheesy_image)
 
     @classmethod
     def tearDownClass(cls):

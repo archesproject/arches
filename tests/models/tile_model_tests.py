@@ -41,11 +41,11 @@ from arches.app.models.models import (
 
 
 class TileTests(ArchesTestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.loadOntology()
-        cls.ensure_test_resource_models_are_loaded()
+    graph_fixtures = [
+        "rdf_export_document_model",
+        "rdf_export_object_model",
+        "Cardinality Test Model",
+    ]
 
     @classmethod
     def setUpTestData(cls):

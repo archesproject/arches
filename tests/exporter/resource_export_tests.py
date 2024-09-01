@@ -47,7 +47,6 @@ class BusinessDataExportTests(ArchesTestCase):
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.loadOntology()
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/data/concept_label_test_scheme.xml")
         ret = skos.save_concepts_from_skos(rdf)
@@ -61,7 +60,6 @@ class BusinessDataExportTests(ArchesTestCase):
             "r",
         ) as f:
             archesfile = JSONDeserializer().deserialize(f)
-        LanguageSynchronizer.synchronize_settings_with_db()
         ResourceGraphImporter(archesfile["graph"])
 
     def test_invalid_writer_config(self):

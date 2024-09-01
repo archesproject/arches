@@ -31,6 +31,13 @@ from tests.utils.search_test_utils import sync_es
 
 
 class SearchExportTests(ArchesTestCase):
+    graph_fixtures = ["Search Test Model"]
+
+    search_model_graphid = "d291a445-fa5f-11e6-afa8-14109fd34195"
+    search_model_cultural_period_nodeid = "7a182580-fa60-11e6-96d1-14109fd34195"
+    search_model_cultural_period_nodename = "Cultural Period Concept"
+    search_model_name_nodeid = "2fe14de3-fa61-11e6-897b-14109fd34195"
+
     def setUp(self):
         super().setUp()
         se = SearchEngineFactory().create()
@@ -44,17 +51,11 @@ class SearchExportTests(ArchesTestCase):
             q.delete(index=indexname, refresh=True)
         cls.factory = RequestFactory()
 
-        LanguageSynchronizer.synchronize_settings_with_db()
         with open(
             os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "r"
         ) as f:
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
-
-        cls.search_model_graphid = "d291a445-fa5f-11e6-afa8-14109fd34195"
-        cls.search_model_cultural_period_nodeid = "7a182580-fa60-11e6-96d1-14109fd34195"
-        cls.search_model_cultural_period_nodename = "Cultural Period Concept"
-        cls.search_model_name_nodeid = "2fe14de3-fa61-11e6-897b-14109fd34195"
 
         cls.user = User.objects.create_user(
             "unprivileged_user", "unprivileged_user@test.com", "test"
@@ -62,8 +63,6 @@ class SearchExportTests(ArchesTestCase):
 
         cls.test_resourceinstanceid = uuid.uuid4()
 
-        cls.loadOntology()
-        cls.ensure_test_resource_models_are_loaded()
         models.ResourceInstance.objects.get_or_create(
             graph_id=cls.search_model_graphid,
             resourceinstanceid=cls.test_resourceinstanceid,
