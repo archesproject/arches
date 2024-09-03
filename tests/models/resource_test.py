@@ -50,8 +50,8 @@ class ResourceTests(ArchesTestCase):
     graph_fixtures = ["Resource Test Model"]
 
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpTestData(cls):
+        super().setUpTestData()
 
         cls.client = Client()
         cls.client.login(username="admin", password="admin")

@@ -37,6 +37,7 @@ class mappedCSVFileImportTests(ArchesTestCase):
 
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/data/concept_label_test_scheme.xml")
         ret = skos.save_concepts_from_skos(rdf)

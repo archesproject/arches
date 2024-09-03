@@ -46,15 +46,12 @@ class SearchTests(ArchesTestCase):
         se = search_engine if search_engine else SearchEngineFactory().create()
         se.refresh(index=index)
 
-    def setUp(self):
-        super().setUp()
-        self.delete_resources()
-
-    def delete_resources(self):
-        se = SearchEngineFactory().create()
-        q = {"query": {"match_all": {}}}
-        se.delete(index="resources", query=q)
-        self.sync_es(se)
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.tester = User.objects.create_user(
+            username="Tester", email="test@test.com", password="test12345!"
+        )
 
     @classmethod
     def tearDownClass(cls):
@@ -64,11 +61,15 @@ class SearchTests(ArchesTestCase):
             se.delete_index(index="bulk")
         super().tearDownClass()
 
-    @classmethod
-    def setUpTestData(cls):
-        cls.tester = User.objects.create_user(
-            username="Tester", email="test@test.com", password="test12345!"
-        )
+    def setUp(self):
+        super().setUp()
+        self.delete_resources()
+
+    def delete_resources(self):
+        se = SearchEngineFactory().create()
+        q = {"query": {"match_all": {}}}
+        se.delete(index="resources", query=q)
+        self.sync_es(se)
 
     def test_delete_by_query(self):
         """

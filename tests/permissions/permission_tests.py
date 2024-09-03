@@ -34,6 +34,7 @@ class PermissionTests(ArchesTestCase):
 
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         cls.add_users()
         cls.expected_resource_count = 2
         cls.user = User.objects.get(username="ben")

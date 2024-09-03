@@ -43,8 +43,8 @@ class SearchTests(ArchesTestCase):
     graph_fixtures = ["Search Test Model"]
 
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpTestData(cls):
+        super().setUpTestData()
 
         se = SearchEngineFactory().create()
         q = Query(se=se)

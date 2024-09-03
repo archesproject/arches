@@ -40,6 +40,7 @@ class ResourceAPITests(ArchesTestCase):
 
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         cls.legacy_load_testing_package()
         with open(
             os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "r"

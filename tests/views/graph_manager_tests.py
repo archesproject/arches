@@ -34,6 +34,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 class GraphManagerViewTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         cls.loadOntology()
         cls.NODE_NODETYPE_GRAPHID = "22000000-0000-0000-0000-000000000001"
 

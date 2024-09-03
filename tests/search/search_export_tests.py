@@ -37,8 +37,8 @@ class SearchExportTests(ArchesTestCase):
         sync_es(se)
 
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpTestData(cls):
+        super().setUpTestData()
         se = SearchEngineFactory().create()
         q = Query(se=se)
         for indexname in [TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX]:

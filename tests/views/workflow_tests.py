@@ -14,7 +14,8 @@ from tests.base_test import ArchesTestCase
 
 class WorkflowHistoryTests(ArchesTestCase):
     @classmethod
-    def setUpClass(cls):
+    def setUpTestData(cls):
+        super().setUpTestData()
         cls.client = Client()
         cls.admin = User.objects.get(username="admin")
         cls.anonymous = User.objects.get(username="anonymous")
@@ -23,10 +24,7 @@ class WorkflowHistoryTests(ArchesTestCase):
         )
         group = Group.objects.get(name="Resource Editor")
         group.user_set.add(cls.editor)
-        super().setUpClass()
 
-    @classmethod
-    def setUpTestData(cls):
         cls.history = WorkflowHistory.objects.create(
             workflowid=str(uuid.uuid1()),
             workflowname="test-name",

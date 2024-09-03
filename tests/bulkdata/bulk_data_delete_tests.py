@@ -13,12 +13,12 @@ class BulkDataDeletionTests(ArchesTestCase):
     graph_fixtures = ["Search Test Model"]
 
     @classmethod
-    def setUpClass(self):
-        super().setUpClass()
-        self.search_model_graphid = "d291a445-fa5f-11e6-afa8-14109fd34195"
-        self.search_model_name_nodeid = "2fe14de3-fa61-11e6-897b-14109fd34195"
-        self.user = User.objects.create(username="testuser", password="securepassword")
-        self.bulk_deleter = BulkDataDeletion()
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.search_model_graphid = "d291a445-fa5f-11e6-afa8-14109fd34195"
+        cls.search_model_name_nodeid = "2fe14de3-fa61-11e6-897b-14109fd34195"
+        cls.user = User.objects.create(username="testuser", password="securepassword")
+        cls.bulk_deleter = BulkDataDeletion()
 
     def test_get_number_of_deletions_with_no_resourceids(self):
         loadid = uuid.uuid4()

@@ -49,6 +49,7 @@ class TileTests(ArchesTestCase):
 
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         sql = """
         INSERT INTO public.resource_instances(resourceinstanceid, legacyid, graphid, createdtime)
             VALUES ('40000000-0000-0000-0000-000000000000', '40000000-0000-0000-0000-000000000000', '2f7f8e40-adbc-11e6-ac7f-14109fd34195', '1/1/2000');
