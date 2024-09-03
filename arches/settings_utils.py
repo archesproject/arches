@@ -191,22 +191,23 @@ def generate_frontend_configuration():
                             "arches",
                             "*",
                         )
-                    ],
-                    **{
-                        os.path.join("@", path_name, "*"): [
-                            os.path.join(
-                                ".",
-                                os.path.relpath(path, os.path.join(base_path, "..")),
-                                "src",
-                                path_name,
-                                "*",
-                            )
-                        ]
-                        for path_name, path in path_lookup.items()
-                    },
+                    ]
                 }
             },
         }
+
+        if settings.APP_NAME != "Arches":
+            tsconfig_paths_data["compilerOptions"]["paths"][
+                os.path.join("@", settings.APP_NAME, "*")
+            ] = [
+                os.path.join(
+                    ".",
+                    os.path.relpath(settings.APP_NAME, os.path.join(base_path, "..")),
+                    "src",
+                    settings.APP_NAME,
+                    "*",
+                )
+            ]
 
         tsconfig_path = os.path.realpath(
             os.path.join(base_path, "..", ".tsconfig-paths.json")
