@@ -42,6 +42,7 @@ class CommandLineTests(ArchesTestCase):
 
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         add_users()
         cls.legacy_load_testing_package()
         cls.expected_resource_count = 2

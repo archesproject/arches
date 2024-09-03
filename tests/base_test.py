@@ -88,9 +88,7 @@ class ArchesTestCase(TestCase):
             )
 
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
+    def setUpTestData(cls):
         sql = """
             INSERT INTO public.oauth2_provider_application(
                 id, client_id, redirect_uris, client_type, authorization_grant_type,

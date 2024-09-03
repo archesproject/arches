@@ -37,21 +37,9 @@ class RelationalDataModelTests(ArchesTestCase):
     datatype_filename = None
 
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        # Create the Datatype Graph if it doesn't exist
-        if not Graph.objects.filter(graphid=cls.custom_data_type_graphid).exists():
-            with captured_stdout():
-                management.call_command(
-                    "packages",
-                    operation="import_graphs",
-                    source=cls.custom_datatype_graph_filename,
-                    verbosity=0,
-                )
-
-    @classmethod
     def setUpTestData(cls):
-        super().loadOntology()
+        super().setUpTestData()
+
         cls.custom_data_type_graphid = "ceed156d-aadf-4a13-b383-c044624c64bb"
         cls.custom_datatype_graph_filename = os.path.join(
             test_settings.TEST_ROOT,
@@ -77,6 +65,16 @@ class RelationalDataModelTests(ArchesTestCase):
                 source=cls.custom_string_datatype_filename,
                 verbosity=0,
             )
+
+        # Create the Datatype Graph if it doesn't exist
+        if not Graph.objects.filter(graphid=cls.custom_data_type_graphid).exists():
+            with captured_stdout():
+                management.call_command(
+                    "packages",
+                    operation="import_graphs",
+                    source=cls.custom_datatype_graph_filename,
+                    verbosity=0,
+                )
 
     def test_extended_string_postgres_datatype(self):
         """

@@ -35,6 +35,7 @@ from arches.app.utils.data_management.resources.importer import (
 class mappedArchesJSONImportTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         path = "tests/fixtures/data/json/cardinality_test_data/target.json"
         with open(path, "r") as f:
             archesfile = JSONDeserializer().deserialize(f)

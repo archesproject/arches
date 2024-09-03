@@ -24,12 +24,10 @@ from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import (
     import_graph as ResourceGraphImporter,
 )
-from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.utils.skos import SKOSReader
-from arches.app.models.models import ResourceInstance
 from arches.app.datatypes.datatypes import DataTypeFactory
 from rdflib import Namespace, URIRef, Literal
-from rdflib.namespace import RDF, RDFS, XSD
+from rdflib.namespace import RDFS, XSD
 from django.utils import translation
 
 # these tests can be run from the command line via
@@ -45,8 +43,8 @@ class RDFExportUnitTests(ArchesTestCase):
     """
 
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpTestData(cls):
+        super().setUpTestData()
         for skospath in [
             "tests/fixtures/data/rdf_export_thesaurus.xml",
             "tests/fixtures/data/rdf_export_collections.xml",
