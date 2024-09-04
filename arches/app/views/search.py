@@ -361,7 +361,7 @@ def search_results(request, returnDsl=False):
 
     response_object, search_query_object = (
         searchview_component_instance.handle_search_results_query(
-            search_query_object, response_object, search_filter_factory, returnDsl
+            search_filter_factory, returnDsl
         )
     )
 
