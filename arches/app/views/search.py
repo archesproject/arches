@@ -352,17 +352,13 @@ def search_results(request, returnDsl=False):
     search_filter_factory = SearchFilterFactory(request)
     searchview_component_instance = search_filter_factory.get_searchview_instance()
     if not searchview_component_instance:
-        unavailable_core_name = search_filter_factory.get_searchview_name()
-        ret = {
-            "success": False,
-            "message": _("No core-search component named {0}").format(
-                unavailable_core_name
-            ),
-        }
-        return JSONResponse(ret, status=406)
-
-    search_query_object = {"query": Query(se)}
-    response_object = {"results": None}
+        unavailable_searchview_name = search_filter_factory.get_searchview_name()
+        message = _("No search-view named {0}").format(unavailable_searchview_name)
+        return JSONErrorResponse(
+            _("Search Failed"),
+            message,
+            status=406,
+        )
 
     response_object, search_query_object = (
         searchview_component_instance.handle_search_results_query(
