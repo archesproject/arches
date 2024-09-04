@@ -2,6 +2,7 @@ from abc import abstractmethod
 from typing import Dict, Tuple
 from arches.app.search.components.base import BaseSearchFilter, SearchFilterFactory
 from arches.app.models.models import SearchComponent
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 
 details = {}
 # details = {
@@ -135,11 +136,13 @@ class BaseSearchView(BaseSearchFilter):
         self,
         search_filter_factory: SearchFilterFactory,
         returnDsl: bool,
-    ) -> Tuple[Dict, Dict]:
+    ) -> Tuple[JSONResponse | JSONErrorResponse | Dict, Dict]:
         """
         Method that handles core logic of how search filters
         should mutate the search query and response objects.
-        Returns ordered tuple of Dicts (response_object, search_query_object)
+        Returns ordered tuple:
+        - response_object: can be arches json response when needed, else must be a dict
+        - search_query_object: a dict whose key "query" must be an instance of arches.app.search.elasticsearch_dsl_builder.Query
         See arches.app.search.components.standard_search_view for example implementation
         """
 
