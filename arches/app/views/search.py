@@ -370,11 +370,11 @@ def search_results(request, returnDsl=False):
         message = response_object.get(
             "message", _("There was an error retrieving the search results")
         )
-        ret = {
-            "success": False,
-            "message": message,
-        }
-        return JSONResponse(ret, status=500)
+        return JSONErrorResponse(
+            _("Search Failed"),
+            message,
+            status=500,
+        )
     elif returnDsl:
         return search_query_object.pop("query")
     else:
