@@ -3,7 +3,9 @@ from typing import Dict, Tuple
 from arches.app.models.system_settings import settings
 from arches.app.search.components.base_search_view import BaseSearchView
 from arches.app.search.components.base import SearchFilterFactory
+from arches.app.search.elasticsearch_dsl_builder import Query
 from arches.app.search.mappings import RESOURCES_INDEX
+from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.views.search import (
     append_instance_permission_filter_dsl,
     get_permitted_nodegroups,
@@ -195,11 +197,12 @@ class StandardSearchView(BaseSearchView):
 
     def handle_search_results_query(
         self,
-        search_query_object: Dict,
-        response_object: Dict,
         search_filter_factory: SearchFilterFactory,
         returnDsl: bool,
     ) -> Tuple[Dict, Dict]:
+        se = SearchEngineFactory().create()
+        search_query_object = {"query": Query(se)}
+        response_object = {"results": None, "success": False}
         sorted_query_obj = search_filter_factory.create_search_query_dict(
             list(self.request.GET.items()) + list(self.request.POST.items())
         )

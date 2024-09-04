@@ -133,15 +133,13 @@ class BaseSearchView(BaseSearchFilter):
     @abstractmethod
     def handle_search_results_query(
         self,
-        search_query_object: Dict,
-        response_object: Dict,
         search_filter_factory: SearchFilterFactory,
         returnDsl: bool,
     ) -> Tuple[Dict, Dict]:
         """
         Method that handles core logic of how search filters
         should mutate the search query and response objects.
-        Returns tuple of the mutated (response_object, search_query_object)
+        Returns ordered tuple of Dicts (response_object, search_query_object)
         See arches.app.search.components.standard_search_view for example implementation
         """
 

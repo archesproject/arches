@@ -37,7 +37,7 @@ from arches.app.models.models import (
     SearchExportHistory,
 )
 from arches.app.models.concept import Concept, get_preflabel_from_conceptid
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import (
@@ -348,7 +348,6 @@ def get_dsl_from_search_string(request):
 
 
 def search_results(request, returnDsl=False):
-    se = SearchEngineFactory().create()
     search_filter_factory = SearchFilterFactory(request)
     searchview_component_instance = search_filter_factory.get_searchview_instance()
     if not searchview_component_instance:
