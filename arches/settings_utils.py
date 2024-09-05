@@ -180,7 +180,9 @@ def generate_frontend_configuration():
             "compilerOptions": {
                 "paths": {
                     **{
-                        os.path.join("@", path_name, "*"): [
+                        "@/"
+                        + path_name
+                        + "/*": [
                             os.path.join(
                                 ".",
                                 os.path.relpath(path, os.path.join(base_path, "..")),
@@ -191,7 +193,9 @@ def generate_frontend_configuration():
                         ]
                         for path_name, path in path_lookup.items()
                     },
-                    os.path.join("@", settings.APP_NAME, "*"): [
+                    "@/"
+                    + settings.APP_NAME
+                    + "/*": [
                         os.path.join(
                             ".",
                             os.path.relpath(
