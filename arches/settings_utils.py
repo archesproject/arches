@@ -179,6 +179,29 @@ def generate_frontend_configuration():
             "_comment": "This is a generated file. Do not edit directly.",
             "compilerOptions": {
                 "paths": {
+                    **{
+                        os.path.join("@", path_name, "*"): [
+                            os.path.join(
+                                ".",
+                                os.path.relpath(path, os.path.join(base_path, "..")),
+                                "src",
+                                path_name,
+                                "declarations.d.ts",
+                            )
+                        ]
+                        for path_name, path in path_lookup.items()
+                    },
+                    os.path.join("@", settings.APP_NAME, "*"): [
+                        os.path.join(
+                            ".",
+                            os.path.relpath(
+                                settings.APP_NAME, os.path.join(base_path, "..")
+                            ),
+                            "src",
+                            settings.APP_NAME,
+                            "*",
+                        )
+                    ],
                     "@/arches/*": [
                         os.path.join(
                             ".",
@@ -192,18 +215,6 @@ def generate_frontend_configuration():
                             "*",
                         )
                     ],
-                    **{
-                        os.path.join("@", path_name, "*"): [
-                            os.path.join(
-                                ".",
-                                os.path.relpath(path, os.path.join(base_path, "..")),
-                                "src",
-                                path_name,
-                                "*",
-                            )
-                        ]
-                        for path_name, path in path_lookup.items()
-                    },
                 }
             },
         }
