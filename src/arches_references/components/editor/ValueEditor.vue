@@ -254,7 +254,7 @@ const focusInput = () => {
         <p>{{ headings.subheading }}</p>
         <DataTable
             v-if="values.length"
-            v-model:editingRows="editingRows"
+            v-model:editing-rows="editingRows"
             :value="values"
             data-key="id"
             edit-mode="row"

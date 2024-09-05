@@ -242,7 +242,7 @@ const focusInput = () => {
     <div ref="editorRef">
         <DataTable
             v-if="image.metadata.length"
-            v-model:editingRows="editingRows"
+            v-model:editing-rows="editingRows"
             :value="image.metadata"
             data-key="id"
             edit-mode="row"
