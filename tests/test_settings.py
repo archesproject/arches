@@ -28,6 +28,7 @@ except ImportError:  # unable to import prior to installing requirements
 PACKAGE_NAME = "arches"
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 APP_ROOT = ""
+STATICFILES_DIRS = []
 
 # LOAD_V3_DATA_DURING_TESTS = True will engage the most extensive the of the v3
 # data migration tests, which could add over a minute to the test process. It's
