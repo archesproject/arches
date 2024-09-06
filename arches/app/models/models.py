@@ -2171,7 +2171,11 @@ class SpatialView(models.Model):
         Validate the spatial view before saving it to the database as the database triggers have proved hard to test.
         """
         graph = self.geometrynode.graph
-        node_ids = set(node["nodeid"] for node in self.attributenodes)
+        try:
+            node_ids = set(node["nodeid"] for node in self.attributenodes)
+        except (KeyError, TypeError):
+            raise ValidationError("attributenodes must be a list of node objects")
+        
         found_graph_nodes = Node.objects.filter(pk__in=node_ids, graph=graph)
         if len(node_ids) != found_graph_nodes.count():
             raise ValidationError(
