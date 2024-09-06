@@ -20,10 +20,7 @@ import os
 
 from arches.settings import *
 
-try:
-    from django.utils.translation import gettext_lazy as _
-except ImportError:  # unable to import prior to installing requirements
-    pass
+from django.utils.translation import gettext_lazy as _
 
 PACKAGE_NAME = "arches"
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
