@@ -75,6 +75,7 @@
         "normalize.css": "^8.0.1",
         "nouislider": "11.0.3",
         "numeral": "^2.0.6",
+        "primeicons": "^7.0.0",
         "primevue": "4.0.1",
         "proj4": "^2.3.15",
         "regenerator-runtime": "^0.14.1",
