@@ -88,7 +88,8 @@ class ArchesTestCase(TestCase):
             )
 
     @classmethod
-    def setUpTestData(cls):
+    def setUpClass(cls):
+        super().setUpClass()
         sql = """
             INSERT INTO public.oauth2_provider_application(
                 id, client_id, redirect_uris, client_type, authorization_grant_type,
@@ -110,6 +111,8 @@ class ArchesTestCase(TestCase):
         with connection.cursor() as cursor:
             cursor.execute(sql)
 
+    @classmethod
+    def setUpTestData(cls):
         LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
         cls.loadOntology()
         for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
@@ -172,7 +175,7 @@ class ArchesTestCase(TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cursor = connection.cursor()
         sql = "DELETE FROM public.oauth2_provider_application WHERE id = 44;"
-        cursor.execute(sql)
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
         super().tearDownClass()
