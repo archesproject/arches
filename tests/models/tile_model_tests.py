@@ -70,8 +70,8 @@ class TileTests(ArchesTestCase):
             VALUES ('41111111-0000-0000-0000-000000000000', '', 'n');
         """
 
-        cursor = connection.cursor()
-        cursor.execute(sql)
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
 
     def test_load_from_python_dict(self):
         """

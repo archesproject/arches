@@ -115,6 +115,8 @@ class ArchesTestCase(TestCase):
     def setUpTestData(cls):
         LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
         cls.loadOntology()
+        if not cls.graph_fixtures:
+            return
         for path in test_settings.RESOURCE_GRAPH_LOCATIONS:
             file_paths = [
                 file_path

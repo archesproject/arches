@@ -85,10 +85,8 @@ class RelationalDataModelTests(ArchesTestCase):
             f"select public.__arches_create_resource_model_views('%s'::uuid);"
             % RelationalDataModelTests.custom_data_type_graphid
         )
-        cursor = connection.cursor()
-        cursor.execute(sql)
-        # row = cursor.fetchone()
-        # print("Result: %s" % str(row))
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
 
         schema_name = "relational_data_model_tests"
         view_name = "custom_datatypes"
@@ -106,7 +104,8 @@ class RelationalDataModelTests(ArchesTestCase):
             column_name,
         )
 
-        cursor.execute(validation_sql)
-        row = cursor.fetchone()
+        with connection.cursor() as cursor:
+            cursor.execute(validation_sql)
+            row = cursor.fetchone()
 
         assert row is not None and row[0] == expected_datatype
