@@ -135,6 +135,14 @@ class ArchesTestCase(TestCase):
     @classmethod
     def legacy_load_testing_package(cls):
         """Do not write new tests with this method."""
+        test_concepts_path = (
+            Path(test_settings.REFERENCE_DATA_FIXTURE_LOCATION) / "concepts"
+        )
+        test_collections_path = (
+            Path(test_settings.REFERENCE_DATA_FIXTURE_LOCATION) / "collections"
+        )
+        test_package_path = Path(test_settings.REFERENCE_DATA_FIXTURE_LOCATION).parent
+
         with (
             captured_stdout(),
             mock.patch(
@@ -143,7 +151,12 @@ class ArchesTestCase(TestCase):
         ):
             management.call_command(
                 "packages",
-                "-o import_reference_data -s tests/fixtures/testing_prj/testing_prj/pkg/reference_data/concepts/Test-scheme.xml".split(),
+                [
+                    "-o",
+                    "import_reference_data",
+                    "-s",
+                    test_concepts_path / "Test-scheme.xml",
+                ],
             )
             management.call_command(
                 "packages",
@@ -151,12 +164,8 @@ class ArchesTestCase(TestCase):
                     "-o",
                     "import_reference_data",
                     "-s",
-                    "tests/fixtures/testing_prj/testing_prj/pkg/reference_data/concepts/4.3 Test RDM Thesaurus.xml",
+                    test_concepts_path / "4.3 Test RDM Thesaurus.xml",
                 ],
-            )
-            management.call_command(
-                "packages",
-                "-o import_reference_data -s tests/fixtures/testing_prj/testing_prj/pkg/reference_data/collections/Test-scheme-collections.xml".split(),
             )
             management.call_command(
                 "packages",
@@ -164,12 +173,29 @@ class ArchesTestCase(TestCase):
                     "-o",
                     "import_reference_data",
                     "-s",
-                    "tests/fixtures/testing_prj/testing_prj/pkg/reference_data/collections/4.3 Test RDM Collections.xml",
+                    test_collections_path / "Test-scheme-collections.xml",
                 ],
             )
             management.call_command(
                 "packages",
-                "-o load_package -s tests/fixtures/testing_prj/testing_prj/pkg -ow True -y".split(),
+                [
+                    "-o",
+                    "import_reference_data",
+                    "-s",
+                    test_collections_path / "4.3 Test RDM collections.xml",
+                ],
+            )
+            management.call_command(
+                "packages",
+                [
+                    "-o",
+                    "load_package",
+                    "-s",
+                    test_package_path,
+                    "-ow",
+                    "True",
+                    "-y",
+                ],
             )
 
         path_to_cheesy_image = Path(settings.MEDIA_ROOT) / "uploadedfiles" / "test.png"

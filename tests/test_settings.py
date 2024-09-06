@@ -45,6 +45,9 @@ RESOURCE_GRAPH_LOCATIONS = [
         "resource_models",
     ),
 ]
+REFERENCE_DATA_FIXTURE_LOCATION = os.path.join(
+    TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg", "reference_data"
+)
 
 ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, "fixtures", "ontologies", "test_ontology")
 ONTOLOGY_PATH = os.path.join(TEST_ROOT, "fixtures", "ontologies", "cidoc_crm")
