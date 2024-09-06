@@ -88,6 +88,7 @@ class SearchExportTests(ArchesTestCase):
         q = Query(se=se)
         for indexname in [TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX]:
             q.delete(index=indexname, refresh=True)
+        super().tearDownClass()
 
     def test_search_export_no_request(self):
         """Test SearchResultsExporter without search request"""
