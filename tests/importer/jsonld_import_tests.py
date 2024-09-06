@@ -34,8 +34,8 @@ class JsonLDImportTests(ArchesTestCase):
         cls.client = Client(HTTP_AUTHORIZATION="Bearer %s" % cls.token)
 
         sql_str = CREATE_TOKEN_SQL.format(token=cls.token, user_id=1)
-        cursor = connection.cursor()
-        cursor.execute(sql_str)
+        with connection.cursor() as cursor:
+            cursor.execute(sql_str)
 
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/jsonld_test_thesaurus.xml")
@@ -185,8 +185,8 @@ class JsonLDImportTests(ArchesTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cursor = connection.cursor()
-        cursor.execute(DELETE_TOKEN_SQL)
+        with connection.cursor() as cursor:
+            cursor.execute(DELETE_TOKEN_SQL)
 
         super().tearDownClass()
 
