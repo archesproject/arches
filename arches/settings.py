@@ -48,6 +48,9 @@ DATABASES = {
         "HOST": "localhost",  # Set to empty string for localhost. Not used with sqlite3.
         "PORT": "5432",  # Set to empty string for default. Not used with sqlite3.
         "POSTGIS_TEMPLATE": "template_postgis",
+        "OPTIONS": {
+            "options": "-c cursor_tuple_fraction=1",
+        },
     }
 }
 
