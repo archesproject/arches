@@ -44,10 +44,6 @@ class PermissionTests(ArchesTestCase):
         resource.graph_id = cls.data_type_graphid
         resource.remove_resource_instance_permissions()
 
-    def setUp(self):
-        resource = Resource.objects.get(pk=self.resource_instance_id)
-        resource.index()
-
     @classmethod
     def add_users(cls):
         profiles = (
