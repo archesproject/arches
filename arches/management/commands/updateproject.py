@@ -303,14 +303,22 @@ class Command(BaseCommand):  # pragma: no cover
                 os.path.join(settings.APP_ROOT, "apps.py"),
             )
 
-        if os.path.isfile(os.path.join(settings.APP_ROOT, "src", "declarations.d.ts")):
+        if os.path.isfile(
+            os.path.join(
+                settings.APP_ROOT, "src", settings.APP_NAME, "declarations.d.ts"
+            )
+        ):
             self.stderr.write(
                 "Existing declarations.d.ts detected. Manually reconcile existing file with new template.",
             )
         else:
-            self.stdout.write("Creating /src/declarations.d.ts")
-            if not os.path.isdir(os.path.join(settings.APP_ROOT, "src")):
-                os.mkdir(os.path.join(settings.APP_ROOT, "src"))
+            self.stdout.write("Creating /src/project_name/declarations.d.ts")
+            src_path = os.path.join(settings.APP_ROOT, "src")
+            src_project_subdir = os.path.join(src_path, settings.APP_NAME)
+            if not os.path.isdir(src_path):
+                os.mkdir(src_path)
+            if not os.path.isdir(src_project_subdir):
+                os.mkdir(src_project_subdir)
 
             shutil.copy2(
                 os.path.join(
@@ -322,7 +330,19 @@ class Command(BaseCommand):  # pragma: no cover
                     "project_name",
                     "declarations.d.ts",
                 ),
-                os.path.join(settings.APP_ROOT, "src"),
+                os.path.join(settings.APP_ROOT, "src", settings.APP_NAME),
+            )
+            shutil.copy2(
+                os.path.join(
+                    settings.ROOT_DIR,
+                    "install",
+                    "arches-templates",
+                    "project_name",
+                    "src",
+                    "project_name",
+                    "declarations.test.ts",
+                ),
+                os.path.join(settings.APP_ROOT, "src", settings.APP_NAME),
             )
 
         if not os.path.isfile(
