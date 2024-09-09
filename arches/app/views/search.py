@@ -356,7 +356,7 @@ def search_results(request, returnDsl=False):
         return JSONErrorResponse(
             _("Search Failed"),
             message,
-            status=406,
+            status=400,
         )
 
     response_object, search_query_object = (
