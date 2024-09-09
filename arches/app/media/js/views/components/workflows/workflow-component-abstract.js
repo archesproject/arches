@@ -560,7 +560,9 @@ define([
             
             var unorderedSavedData = ko.observableArray();
 
+            var allTileLength = self.tiles().length
             var errorTiles = [];
+            var successfulTiles = [];
 
             self.tiles().forEach(function(tile) {
                 tile.save(
@@ -572,16 +574,15 @@ define([
                             null, 
                             function(){ return; }
                         ));
-
-                        // Put error tiles back onto right side
-                        self.tiles(null);
+                        
                         errorTiles.push(tile);
-                        self.tiles(errorTiles);
-
-                        self.saving(false); // Get node list to reappear
+                        self.saving(false);
+                        checkErrorTiles();
                     }, 
                     function(savedTileData) {
                         unorderedSavedData.push(savedTileData);
+                        successfulTiles.push(savedTileData);
+                        checkErrorTiles();
                     }
                 );
             });
@@ -625,6 +626,21 @@ define([
                     saveSubscription.dispose();  /* self-disposing subscription only runs once */ 
                 }
             });
+
+            var checkErrorTiles = () => {
+                if (errorTiles) {
+                    if (allTileLength == errorTiles.length + successfulTiles.length) {
+                        if (self.tiles().length === 1) {
+                            self.tiles(errorTiles);
+                        } else {
+                            self.tiles(errorTiles)
+                        }
+                        self.saving(false);
+                        self.complete(false);
+                        // self.loading(false);
+                    }
+                }
+            }
         };
 
         this.clearEditor = function() {
