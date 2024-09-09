@@ -364,10 +364,8 @@ def search_results(request, returnDsl=False):
             search_filter_factory, returnDsl
         )
     )
-    if isinstance(response_object, JSONResponse) or isinstance(
-        response_object, JSONErrorResponse
-    ):
-        return response_object
+    if isinstance(response_object, str):
+        return JSONResponse(content=response_object)
     elif not response_object.get("success", False):
         message = response_object.get(
             "message", _("There was an error retrieving the search results")
