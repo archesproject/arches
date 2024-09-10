@@ -29,6 +29,11 @@ export const ArchesPreset = definePreset(Aura, {
             },
             color: "{arches.legacy.sidebar}",
         },
+        iconSize: "small",
+        // Additional tokens
+        content: {
+            gap: "1rem",
+        },
     },
     components: {
         button: {
