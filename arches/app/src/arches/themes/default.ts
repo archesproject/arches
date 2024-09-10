@@ -61,7 +61,7 @@ export const DEFAULT_THEME = {
         preset: ArchesPreset,
         options: {
             prefix: "p",
-            darkModeSelector: "system",
+            darkModeSelector: ".arches-dark",
             cssLayer: false,
         },
     },
