@@ -73,7 +73,6 @@ class GeoJsonDataTypeTest(ArchesTestCase):
                 self.assertEqual(len(errors), 0)
 
     @mock.patch("arches.app.utils.label_based_graph.models.Node")
-    @mock.patch("arches.app.utils.label_based_graph.models.TileModel")
     def test_get_map_source(self, mock_Node):
         geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
         node = models.Node.objects.get(pk="c9b37f96-17b3-11eb-a708-acde48001122")
