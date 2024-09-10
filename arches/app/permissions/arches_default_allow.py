@@ -180,7 +180,7 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
                 if not user.groups.filter(name="System Administrator").exists():
                     result["permitted"] = False
                     return result
-            
+
             resource = ResourceInstance.objects.select_related(
                 "resource_instance_lifecycle_state"
             ).get(resourceinstanceid=resourceid)
