@@ -28,6 +28,10 @@ define([
                 }); 
                 searchbox.trigger('change');
             });
+            terms.subscribe(function(terms) {
+                if (terms.length == 0 && searchbox.tags.length == 0)
+                    searchbox.empty();
+            });
             var self = this;
             this.stripMarkup = function(m){
                 return m.replace(/(<([^>]+)>)/gi, "");
