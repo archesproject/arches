@@ -17,6 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+from unittest.mock import MagicMock, patch
+from arches.app.views.resource import ResourceEditorView, ResourcePermissionDataView
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.core import management
@@ -187,6 +189,38 @@ class CommandLineTests(ArchesTestCase):
         self.assertRedirects(
             response, "/report/" + self.resource_instance_id + "?redirected=true"
         )
+
+    def test_get_instance_permissions(self):
+        default_permissions = MagicMock()
+        group = Group.objects.get(name="Resource Exporter")
+        default_permissions.PERMISSION_DEFAULTS = {
+            "330802c5-95bd-11e8-b7ac-acde48001122": [
+                {
+                    "id": group.id,
+                    "type": "group",
+                    "permissions": ["view_resourceinstance"],
+                },
+            ]
+        }
+
+        with patch(
+            "arches.app.permissions.arches_permission_base.settings",
+            default_permissions,
+        ):
+
+            resource = ResourceInstance.objects.get(
+                resourceinstanceid=self.resource_instance_id
+            )
+
+            rev = ResourcePermissionDataView()
+
+            assign_perm("view_resourceinstance", group, resource)
+            permissions = rev.get_instance_permissions(resource)
+            group_dict = next(
+                item for item in permissions["identities"] if item["id"] == group.id
+            )
+
+            self.assertGreater(len(group_dict["system_permissions"]), 0)
 
     def test_user_cannot_delete_without_permission(self):
         """

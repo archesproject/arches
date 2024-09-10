@@ -14,6 +14,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+from unittest.mock import MagicMock, Mock, patch
 from tests import test_settings
 from tests.permissions.base_permissions_framework_test import (
     ArchesPermissionFrameworkTestCase,
@@ -37,6 +38,34 @@ from arches.app.permissions.arches_default_deny import (
 
 class ArchesDefaultDenyPermissionTests(ArchesPermissionFrameworkTestCase):
     FRAMEWORK = ArchesDefaultDenyPermissionFramework
+
+    def test_default_permissions(self):
+        default_permissions = MagicMock()
+        default_permissions.PERMISSION_DEFAULTS = {
+            "330802c5-95bd-11e8-b7ac-acde48001122": [
+                {
+                    "id": self.group.id,
+                    "type": "group",
+                    "permissions": ["view_resourceinstance"],
+                },
+            ]
+        }
+
+        with patch(
+            "arches.app.permissions.arches_permission_base.settings",
+            default_permissions,
+        ):
+            with patch(
+                "arches.app.permissions.arches_default_deny.settings",
+                default_permissions,
+            ):
+                default_permission = self.framework.user_can_read_resource(
+                    self.user, self.resource_instance_id
+                )
+
+                # implicit permission is true here, because we've specified that the user has view_resourceinstance on this
+                # type of resource
+                self.assertTrue(default_permission)
 
     def test_user_cannot_view_without_permission(self):
         """
@@ -82,49 +111,29 @@ class ArchesDefaultDenyPermissionTests(ArchesPermissionFrameworkTestCase):
         )
         self.assertFalse(hasperms)
 
-    def test_get_restricted_users(self):
-        """
-        Tests that users are properly identified as restricted.
-        """
+    def test_get_search_ui_permissions(self):
 
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
-        self.framework.assign_perm(
-            "no_access_to_resourceinstance", self.group, resource
-        )
-        ben = self.user
-        jim = User.objects.get(username="jim")
-        sam = User.objects.get(username="sam")
-        admin = User.objects.get(username="admin")
-        self.framework.assign_perm("view_resourceinstance", ben, resource)
-        self.framework.assign_perm("change_resourceinstance", jim, resource)
-
-        restrictions = self.framework.get_restricted_users(resource)
-
-        results = [
-            ("jim", "cannot read", jim.id in restrictions["cannot_read"]),
-            ("ben", "cannot write", ben.id in restrictions["cannot_write"]),
-            ("sam", "cannot delete", sam.id in restrictions["cannot_delete"]),
-            ("sam", "has no access", sam.id in restrictions["no_access"]),
-            (
-                "admin",
-                "not in cannot read",
-                admin.id not in restrictions["cannot_read"],
-            ),
-            (
-                "admin",
-                "not in cannot write",
-                admin.id not in restrictions["cannot_write"],
-            ),
-            (
-                "admin",
-                "not in cannot delete",
-                admin.id not in restrictions["cannot_delete"],
-            ),
-            ("admin", "not in no access", admin.id not in restrictions["no_access"]),
-        ]
-
-        for result in results:
-            with self.subTest(user=result[0], restriction=result[1]):
-                self.assertTrue(result[2])
+        with patch.object(
+            self.framework,
+            "get_resource_types_by_perm",
+            Mock(return_value=["330802c5-95bd-11e8-b7ac-acde48001122"]),
+        ):
+            with patch.object(
+                self.framework, "get_editable_resource_types", Mock(return_value=[""])
+            ):
+                user_mock = Mock()
+                user_mock.is_superuser = False
+                result = self.framework.get_search_ui_permissions(
+                    user_mock,
+                    {
+                        "_source": {
+                            "permissions": {
+                                "groups_read": [self.group.id],
+                                "groups_edit": [],
+                            }
+                        }
+                    },
+                    [self.group.id],
+                )
+                self.assertTrue(result["can_read"])
+                self.assertFalse(result["can_edit"])

@@ -32,9 +32,9 @@ class TermFilter(BaseSearchFilter):
         permitted_nodegroups = kwargs.get("permitted_nodegroups")
         include_provisional = kwargs.get("include_provisional")
         search_query = Bool()
-        querysting_params = self.request.GET.get(self.componentname, "")
+        querystring_params = kwargs.get("querystring", "")
         language = self.request.GET.get("language", "*")
-        for term in JSONDeserializer().deserialize(querysting_params):
+        for term in JSONDeserializer().deserialize(querystring_params):
             if term["type"] == "term" or term["type"] == "string":
                 string_filter = Bool()
                 if term["type"] == "term":

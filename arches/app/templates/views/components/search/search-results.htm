@@ -65,7 +65,7 @@
                 </button>
                 <!-- /ko -->
 
-                <!--ko if: canEdit -->
+                <!--ko if: canEdit || isPrincipal -->
                 <a class="search-candidate-link" href="#" data-bind="onEnterkeyClick, onSpaceClick, click: $parent.editResource.bind($parent),
                     attr: {'aria-label': $root.translations.editResource(displayname)},
                 ">
