@@ -1,34 +1,48 @@
-import { definePreset } from "@primevue/themes";
+import { definePreset, palette } from "@primevue/themes";
 import Aura from "@primevue/themes/aura";
+
+const archesColors = Object.freeze({
+    blue: "#579ddb",
+    green: "#3acaa1",
+    red: "#f75d3f",
+});
 
 export const ArchesPreset = definePreset(Aura, {
     primitive: {
         arches: {
+            ...archesColors,
             legacy: {
-                paginator: "#54abd9",
-                buttonLight: "#579ddb",
-                sidebarHighlight: "#2986b8",
                 sidebar: "#2d3c4b",
             },
         },
+        green: palette(archesColors.green),
+        red: palette(archesColors.red),
     },
     semantic: {
-        primary: {
-            50: "{sky.50}",
-            100: "{sky.100}",
-            200: "{sky.200}",
-            300: "{sky.300}",
-            400: "{sky.400}",
-            500: "{sky.500}",
-            600: "{sky.600}",
-            700: "{sky.700}",
-            800: "{sky.800}",
-            900: "{sky.900}",
-            950: "{sky.950}",
+        primary: palette(archesColors.blue),
+        navigation: {
+            list: {
+                padding: "0",
+            },
+            item: {
+                padding: "1rem",
+            },
+            color: "{arches.legacy.sidebar}",
         },
-        navigation: "{arches.legacy.sidebar}",
     },
     components: {
+        button: {
+            root: {
+                label: {
+                    fontWeight: 600,
+                },
+            },
+        },
+        menubar: {
+            border: {
+                radius: 0,
+            },
+        },
         splitter: {
             handle: {
                 background: "{surface.500}",
