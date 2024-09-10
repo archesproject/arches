@@ -33,6 +33,7 @@ from arches.app.utils.data_management.resource_graphs.importer import (
     import_graph as ResourceGraphImporter,
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.views.search import search_results
 from guardian.shortcuts import assign_perm
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -766,6 +767,31 @@ class SearchTests(ArchesTestCase):
             ],
         )
 
+    def test_search_returnDsl(self):
+        """
+        test that a Query object is returned when returnDsl is set to True
+
+        """
+
+        term_filter = [
+            {
+                "type": "string",
+                "context": "",
+                "context_label": "",
+                "id": "test",
+                "text": "test",
+                "value": "test",
+                "inverted": False,
+            }
+        ]
+
+        request = HttpRequest()
+        request.method = "GET"
+        request.user = User.objects.get(username="anonymous")
+        request.GET.__setitem__("term-filter", json.dumps(term_filter))
+        resp = search_results(request, returnDsl=True)
+        self.assertTrue(isinstance(resp, Query))
+
     def test_search_without_searchview(self):
         """
         Execute a search without setting a search-view component on the query
@@ -781,7 +807,8 @@ class SearchTests(ArchesTestCase):
 
         """
         query = {"search-view": "unavailable-search-view"}
-        response_json = get_response_json(self.client, query=query)
+        with self.assertLogs("django.request", level="WARNING"):
+            response_json = get_response_json(self.client, query=query)
         self.assertFalse(response_json["success"])
 
     def test_searchview_searchview_component_from_admin(self):

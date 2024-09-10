@@ -204,6 +204,7 @@ def generate_frontend_configuration():
                         ]
                         for path_name, path in path_lookup.items()
                     },
+                    "*": ["./node_modules/*"],
                 }
             },
         }
