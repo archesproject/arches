@@ -13,20 +13,15 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from __future__ import annotations
-
 from abc import ABCMeta, abstractmethod
-import importlib
-import sys
 import uuid
-from typing import Iterable
+from typing import Iterable, Literal, NotRequired, TypedDict
 
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.gis.db.models import Model
 from django.core.cache import caches
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
-from arches.app.utils.module_importer import get_class_from_modulename
 from guardian.backends import check_support, ObjectPermissionBackend
 from guardian.core import ObjectPermissionChecker
 from guardian.exceptions import NotUserNorGroup
@@ -49,15 +44,10 @@ from arches.app.utils.permission_backend import (
 )
 from arches.app.search.search import SearchEngine
 
-if sys.version_info >= (3, 11):
-    from typing import NotRequired, TypedDict, Literal
 
-    class ResourceInstancePermissions(TypedDict):
-        permitted: NotRequired[bool | Literal["unknown"]]
-        resource: NotRequired[ResourceInstance]
-
-else:
-    ResourceInstancePermissions = dict
+class ResourceInstancePermissions(TypedDict):
+    permitted: NotRequired[bool | Literal["unknown"]]
+    resource: NotRequired[ResourceInstance]
 
 
 class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):

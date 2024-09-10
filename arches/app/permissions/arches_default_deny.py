@@ -13,8 +13,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from __future__ import annotations
-
 from django.contrib.auth.models import User
 
 from arches.app.models.models import ResourceInstance
