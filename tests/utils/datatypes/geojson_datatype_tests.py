@@ -76,7 +76,7 @@ class GeoJsonDataTypeTest(ArchesTestCase):
         geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
         node = models.Node.objects.get(pk="c9b37f96-17b3-11eb-a708-acde48001122")
         # mock_Node.nodeid = "c9b37f96-17b3-11eb-a708-acde48001122"
-        nodeconfig = json.loads(node.config.value)
+        nodeconfig = json.loads(node.config["value"])
         nodeconfig["minzoom"] = 12
         nodeconfig["maxzoom"] = 15
         node.config = {}
