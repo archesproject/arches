@@ -216,9 +216,18 @@ class SpatialViewTests(ArchesTestCase):
 
     def test_create_spatialview_invalid_attributenode(self):
         spatialview = self.generate_valid_spatiatview()
+
+        # invalid nodeid
         spatialview.attributenodes.append(
             {"nodeid": "7584e966-1cf8-9999-9999-0242ac130005", "description": "invalid"}
         )
+
+        with self.assertRaises(Exception):
+            spatialview.full_clean()
+            spatialview.save()
+
+        # empty attributenodes
+        spatialview.attributenodes = None
 
         with self.assertRaises(Exception):
             spatialview.full_clean()

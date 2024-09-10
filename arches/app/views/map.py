@@ -31,8 +31,8 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from arches.app.utils.decorators import group_required
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.permission_backend import (
-    get_users_for_object,
-    get_groups_for_object,
+    get_users_with_permission_for_object,
+    get_groups_with_permission_for_object,
 )
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, GeoBoundsAgg, Term
@@ -94,7 +94,7 @@ class MapLayerManagerView(MapBaseManagerView):
                 "users": sorted(
                     [
                         user.email or user.username
-                        for user in get_users_for_object(
+                        for user in get_users_with_permission_for_object(
                             "read_nodegroup", node.nodegroup
                         )
                     ]
@@ -102,7 +102,7 @@ class MapLayerManagerView(MapBaseManagerView):
                 "groups": sorted(
                     [
                         group.name
-                        for group in get_groups_for_object(
+                        for group in get_groups_with_permission_for_object(
                             "read_nodegroup", node.nodegroup
                         )
                     ]

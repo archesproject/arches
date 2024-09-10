@@ -151,10 +151,13 @@ class PermissionTests(ArchesTestCase):
         resource = ResourceInstance.objects.get(
             resourceinstanceid=self.resource_instance_id
         )
-        nodes = Node.objects.filter(graph_id=resource.graph_id)
+        nodes = (
+            Node.objects.filter(graph_id=resource.graph_id)
+            .exclude(nodegroup__isnull=True)
+            .select_related("nodegroup")
+        )
         for node in nodes:
-            if node.nodegroup:
-                assign_perm("no_access_to_nodegroup", self.group, node.nodegroup)
+            assign_perm("no_access_to_nodegroup", self.group, node.nodegroup)
         hasperms = user_has_resource_model_permissions(
             self.user, ["models.read_nodegroup"], resource
         )
