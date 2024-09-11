@@ -27,12 +27,24 @@ class BranchExcelImporter(BaseImportModule):
     def __init__(self, request=None, loadid=None, temp_dir=None, params=None):
         self.loadid = request.POST.get("load_id") if request else loadid
         self.userid = (
-            request.user.id if request else User.objects.filter(is_superuser=True)[0].id
+            request.user.id
+            if request
+            else settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
         )
         self.mode = "cli" if not request and params else "ui"
+        try:
+            self.user = User.objects.get(pk=self.userid)
+        except User.DoesNotExist:
+            raise User.DoesNotExist(
+                _(
+                    "The userid {} does not exist. Probably DEFAULT_RESOURCE_IMPORT_USER is not configured correctly in settings.py.".format(
+                        self.userid
+                    )
+                )
+            )
         if not request and params:
             request = HttpRequest()
-            request.user = User.objects.get(id=self.userid)
+            request.user = self.user
             request.method = "POST"
             for k, v in params.items():
                 request.POST.__setitem__(k, v)

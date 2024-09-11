@@ -78,16 +78,19 @@ class Command(BaseCommand):
                 EtlModule = ETLModule.objects.get(pk=moduleid).get_class_module()(
                     loadid=loadid, params=config
                 )
-            except ValueError:
+            except (ValueError, TypeError):
                 etl_modules = ETLModule.objects.all()
                 self.stdout.write(
                     _("You must supply the valid name or the uuid for the etl module.")
                 )
                 for etl_module in etl_modules:
                     self.stdout.write(
-                        "\t", etl_module.componentname, "\t", etl_module.etlmoduleid
+                        "\t{0}\t{1}\n".format(
+                            etl_module.componentname, etl_module.etlmoduleid
+                        )
                     )
                 return
+
         import_function = getattr(EtlModule, "cli")
         response = import_function(source)
         if response["success"]:
