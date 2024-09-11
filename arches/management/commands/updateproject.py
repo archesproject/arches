@@ -20,7 +20,7 @@ class Command(BaseCommand):  # pragma: no cover
         answer = input(
             "This will replace the following files in your project:\n"
             ".babelrc, eslintrc.js, .eslintignore, .browserslistrc, .stylelintrc.json,\n"
-            ".yarnrc, .gitattributes, .gitignore, nodemon.json, .prettierrc,\n"
+            ".yarnrc, .gitattributes, nodemon.json, .prettierrc,\n"
             ".pre-commit-config.yaml, tsconfig.json, and the entire webpack directory.\n\n"
             "Continue? "
         )
@@ -137,7 +137,6 @@ class Command(BaseCommand):  # pragma: no cover
             "tsconfig.json",
             ".coveragerc",
             ".gitattributes",
-            ".gitignore",
             ".babelrc",
             ".browserslistrc",
             ".stylelintrc.json",
@@ -384,7 +383,6 @@ class Command(BaseCommand):  # pragma: no cover
         for relative_file_path in [
             os.path.join("..", "gettext.config.js"),
             os.path.join("..", ".coveragerc"),
-            os.path.join("..", ".gitignore"),
             os.path.join("..", ".github/workflows/main.yml"),
             os.path.join("..", ".pre-commit-config.yaml"),
             os.path.join("..", "tsconfig.json"),
