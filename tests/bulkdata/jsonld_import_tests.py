@@ -47,6 +47,7 @@ class JSONLDImportTests(TransactionTestCase):
     serialized_rollback = True
 
     def setUp(self):
+        """setUpClass doesn't work because the rollback fixture is applied after that."""
         ArchesTestCase.loadOntology()
         LanguageSynchronizer.synchronize_settings_with_db()
 
