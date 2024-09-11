@@ -312,7 +312,7 @@ class Command(BaseCommand):  # pragma: no cover
                 "Existing declarations.d.ts detected. Manually reconcile existing file with new template.",
             )
         else:
-            self.stdout.write("Creating /src/project_name/declarations.d.ts")
+            self.stdout.write(f"Creating /src/{settings.APP_NAME}/declarations.d.ts")
             src_path = os.path.join(settings.APP_ROOT, "src")
             src_project_subdir = os.path.join(src_path, settings.APP_NAME)
             if not os.path.isdir(src_path):
@@ -332,6 +332,7 @@ class Command(BaseCommand):  # pragma: no cover
                 ),
                 os.path.join(settings.APP_ROOT, "src", settings.APP_NAME),
             )
+            self.stdout.write(f"Creating /src/{settings.APP_NAME}/declarations.test.ts")
             shutil.copy2(
                 os.path.join(
                     settings.ROOT_DIR,
