@@ -1,14 +1,8 @@
 import json
-import os
 import uuid
 
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
-from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.utils.data_management.resource_graphs.importer import (
-    import_graph as resource_graph_importer,
-)
-from arches.app.utils.i18n import LanguageSynchronizer
 from arches.test.utils import sync_overridden_test_settings_to_arches
 from tests.base_test import ArchesTestCase
 from django.test import override_settings
@@ -18,24 +12,8 @@ from django.test import override_settings
 
 
 class GeoJsonDataTypeTest(ArchesTestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        LanguageSynchronizer.synchronize_settings_with_db()
-
-        with open(
-            os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "r"
-        ) as f:
-            archesfile = JSONDeserializer().deserialize(f)
-
-        resource_graph_importer(archesfile["graph"])
-        cls.search_model_graphid = uuid.UUID("c9b37a14-17b3-11eb-a708-acde48001122")
-
-    @classmethod
-    def tearDownClass(cls):
-        models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
-        super().tearDownClass()
+    search_model_graphid = uuid.UUID("c9b37a14-17b3-11eb-a708-acde48001122")
+    graph_fixtures = ["Resource Test Model"]
 
     def test_validate_reduce_byte_size(self):
         with open("tests/fixtures/problematic_excessive_vertices.geojson") as f:
