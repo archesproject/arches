@@ -1,6 +1,5 @@
 import json
 import os
-from unittest import mock
 import uuid
 
 from arches.app.datatypes.datatypes import DataTypeFactory
