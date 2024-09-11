@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             returns text as $$
             declare failed_collections text[];
                 collection text;
-                rec record;
+                listitems_to_update_with_multiple_values uuid[];
             begin
                 -- RDM Collections to Controlled Lists & List Items Migration --
                 -- To use, run: 
@@ -282,11 +282,39 @@ class Migration(migrations.Migration):
                     and t.list_id = a.list_id;
 
                 -- For concepts that participate in multiple collections, mint new listitem_id's and listitemvalue_id's
+                -- However, if a concept needs a new listitem_id, and has multiple values associated with it, ensure that
+                -- the new listitem_id is the same for all listitemvalues
+                listitems_to_update_with_multiple_values := array(
+                    select list_item_id
+                    from temp_list_items_and_values
+                    where rownumber > 1
+                    group by list_item_id
+                    having count(*) > 1
+                );
+
+                with new_list_item_ids as (
+                    select legacy_list_item_id,
+                        uuid_generate_v4() as new_list_item_id
+                    from unnest(listitems_to_update_with_multiple_values) as t(legacy_list_item_id)
+                )
+                update temp_list_items_and_values t
+                set list_item_id = new_list_item_id
+                from new_list_item_ids n
+                where t.list_item_id = n.legacy_list_item_id
+                    and rownumber > 1;
+
+                -- Update list_item_ids for items that don't have multiple values
                 update temp_list_items_and_values
-                set list_item_id = uuid_generate_v4(),
-                    listitemvalue_id = uuid_generate_v4()
+                set list_item_id = uuid_generate_v4()
                 where rownumber > 1
-                and listitemvalue_valuetype = 'prefLabel';
+                    and listitemvalue_valuetype = 'prefLabel'
+                    and legacy_conceptid != any(listitems_to_update_with_multiple_values)
+                    and list_item_id = legacy_conceptid;
+
+                -- Update listitemvalue_ids
+                update temp_list_items_and_values
+                set listitemvalue_id = uuid_generate_v4()
+                where rownumber > 1;
                 
                 insert into arches_references_listitem (
                     id,
@@ -296,7 +324,8 @@ class Migration(migrations.Migration):
                     list_id,
                     parent_id
                 )
-                select distinct list_item_id,
+                select distinct on (list_item_id, list_id)
+                    list_item_id,
                     host || legacy_conceptid as uri,
                     sortorder,
                     false as guide,
