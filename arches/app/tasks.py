@@ -503,6 +503,48 @@ def edit_bulk_string_data(
 
 
 @shared_task
+def edit_bulk_concept_data(
+    userid,
+    load_id,
+    module_id,
+    graph_id,
+    node_id,
+    resource_ids,
+    unselected_tiles,
+    oldid,
+    newid,
+):
+    from arches.app.etl_modules import bulk_edit_concept
+
+    logger = logging.getLogger(__name__)
+    try:
+        BulkConceptEditor = bulk_edit_concept.BulkConceptEditor(loadid=load_id)
+        BulkConceptEditor.run_load_task(
+            userid,
+            load_id,
+            module_id,
+            graph_id,
+            node_id,
+            resource_ids,
+            unselected_tiles,
+            oldid,
+            newid,
+        )
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        status = _("Completed") if load_event.status == "indexed" else _("Failed")
+    except Exception as e:
+        logger.error(e)
+        load_event = models.LoadEvent.objects.get(loadid=load_id)
+        load_event.status = "failed"
+        load_event.save()
+        status = _("Failed")
+    finally:
+        msg = _("Bulk Concept Editor: [{}]").format(status)
+        user = User.objects.get(id=userid)
+        notify_completion(msg, user)
+
+
+@shared_task
 def bulk_data_deletion(userid, load_id, graph_id, nodegroup_id, resourceids):
     from arches.app.etl_modules import bulk_data_deletion
 
