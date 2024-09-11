@@ -6,20 +6,13 @@ from glob import glob
 from django.core import management
 from django.test.utils import captured_stdout
 from arches.app.models.tile import Tile
-from arches.app.models.graph import Graph
 from arches.app.models.models import ResourceInstance, ResourceXResource
-from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.data_management.resource_graphs.importer import import_graph
-from arches.app.utils.data_management.resources.formats.archesfile import (
-    ArchesFileReader,
-)
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.skos import SKOSReader
 from arches.app.utils import v3utils
 from arches.app.utils.v3migration import (
     v3Importer,
     v3PreparedResource,
-    DataValueConverter,
 )
 from tests import test_settings
 from tests.base_test import ArchesTestCase
@@ -31,10 +24,8 @@ class v3MigrationTests(ArchesTestCase):
     pkg = os.path.join(test_settings.TEST_ROOT, "v3migration", "pkg")
 
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
-        cls.loadOntology()
+    def setUpTestData(cls):
+        super().setUpTestData()
         with captured_stdout():
             management.call_command(
                 "packages",

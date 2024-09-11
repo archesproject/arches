@@ -35,8 +35,8 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 
 class ConceptImportTests(ArchesTestCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpTestData(cls):
+        super().setUpTestData()
 
         se = SearchEngineFactory().create()
         with captured_stdout():
