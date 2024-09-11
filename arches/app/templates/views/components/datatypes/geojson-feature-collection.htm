@@ -1,7 +1,28 @@
 {% load template_tags %}
 {% load i18n %}
+<!-- ko if: $data.search -->
+<div class="col-md-4 col-lg-3">
+    <select class="resources" data-bind="
+        attr: {'data-label': node.label},
+        select2Query: {
+            select2Config:{
+                data: [
+                    { text: '', id: '' },
+                    { text: $root.translations.containsAPoint, id: 'Point' },
+                    { text: $root.translations.containsALine, id: 'LineString' },
+                    { text: $root.translations.containsAPolygon, id: 'Polygon' },
+                    { text: $root.translations.hasNoValue, id: 'null' },
+                    { text: $root.translations.hasAnyValue, id: 'not_null' },
+                ],
+                value: op,
+                allowClear: true,
+                placeholder: ''
+            }}">
+    </select>
+</div>
+<!-- /ko -->
 
-<!-- ko if: $data.layer -->
+<!-- ko if: $data.layer && !$data.search -->
 <div class="map-service-container">
 
 

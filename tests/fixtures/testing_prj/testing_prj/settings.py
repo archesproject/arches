@@ -25,7 +25,7 @@ TEMPLATES[0]["DIRS"].insert(0, os.path.join(APP_ROOT, "templates"))
 LOCALE_PATHS.append(os.path.join(APP_ROOT, "locale"))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "x5=ea3t2-f392y$c2&7rxfypg3+m3p^-e#9zw8h^e7b%p9q2p$"
+SECRET_KEY = "django-insecure-x5=ea3t2-f392y$c2&7rxfypg3+m3p^-e#9zw8h^e7b%p9q2p$"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

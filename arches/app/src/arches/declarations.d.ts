@@ -8,6 +8,7 @@ declare module "cross-env";
 declare module "cytoscape-cola";
 declare module "font-awesome";
 declare module "jquery-validation";
+declare module "js-cookie";
 declare module "knockout-mapping";
 declare module "leaflet-iiif";
 declare module "lt-themify-icons";

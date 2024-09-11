@@ -16,14 +16,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
-from tests import test_settings
+from unittest.mock import MagicMock, patch
+from arches.app.views.resource import ResourcePermissionDataView
 from tests.base_test import ArchesTestCase
-from django.core import management
-from django.test.utils import captured_stdout
 from django.urls import reverse
-from arches.app.models.models import GraphModel, ResourceInstance, EditLog
-from django.test.client import Client
+from arches.app.models.models import EditLog, ResourceInstance
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
@@ -39,45 +36,23 @@ from tests.utils.permission_test_utils import add_users
 
 
 class CommandLineTests(ArchesTestCase):
-    def setUp(self):
-        self.expected_resource_count = 2
-        self.client = Client()
+    graph_fixtures = ["Data_Type_Model"]
+    data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
+    resource_instance_id = "f562c2fa-48d3-4798-a723-10209806c068"
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        add_users()
+        cls.legacy_load_testing_package()
+        cls.expected_resource_count = 2
         user = User.objects.get(username="ben")
         edit_records = EditLog.objects.filter(
-            resourceinstanceid=self.resource_instance_id
+            resourceinstanceid=cls.resource_instance_id
         ).filter(edittype="create")
         for edit in edit_records:
             edit.userid = user.id
             edit.save()
-
-    def tearDown(self):
-        ResourceInstance.objects.filter(graph_id=self.data_type_graphid).delete()
-        EditLog.objects.filter(resourceinstanceid=self.resource_instance_id).filter(
-            edittype="create"
-        ).delete()
-
-    @classmethod
-    def setUpClass(cls):
-        cls.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
-        cls.resource_instance_id = "f562c2fa-48d3-4798-a723-10209806c068"
-
-        if not GraphModel.objects.filter(pk=cls.data_type_graphid).exists():
-            # TODO: Fix this to run inside transaction, i.e. after super().setUpClass()
-            # https://github.com/archesproject/arches/issues/10719
-            test_pkg_path = os.path.join(
-                test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg"
-            )
-            with captured_stdout():
-                management.call_command(
-                    "packages",
-                    operation="load_package",
-                    source=test_pkg_path,
-                    yes=True,
-                    verbosity=0,
-                )
-
-        super().setUpClass()
-        add_users()
 
     def test_resource_instance_permission_assignment(self):
         """
@@ -185,6 +160,38 @@ class CommandLineTests(ArchesTestCase):
         with self.assertLogs("django.request", level="WARNING"):
             response = self.client.get(url)
         self.assertTrue(response.status_code == 403)
+
+    def test_get_instance_permissions(self):
+        default_permissions = MagicMock()
+        group = Group.objects.get(name="Resource Exporter")
+        default_permissions.PERMISSION_DEFAULTS = {
+            "330802c5-95bd-11e8-b7ac-acde48001122": [
+                {
+                    "id": group.id,
+                    "type": "group",
+                    "permissions": ["view_resourceinstance"],
+                },
+            ]
+        }
+
+        with patch(
+            "arches.app.permissions.arches_permission_base.settings",
+            default_permissions,
+        ):
+
+            resource = ResourceInstance.objects.get(
+                resourceinstanceid=self.resource_instance_id
+            )
+
+            rev = ResourcePermissionDataView()
+
+            assign_perm("view_resourceinstance", group, resource)
+            permissions = rev.get_instance_permissions(resource)
+            group_dict = next(
+                item for item in permissions["identities"] if item["id"] == group.id
+            )
+
+            self.assertGreater(len(group_dict["system_permissions"]), 0)
 
     def test_user_cannot_delete_without_permission(self):
         """

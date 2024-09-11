@@ -53,13 +53,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <link rel="apple-touch-icon" sizes="180x180" href="{% webpack_static 'favicons/apple-touch-icon-180x180.png' %}" />
 
     {% block css %}
+        <link rel="stylesheet" href="{% webpack_static 'node_modules/normalize.css/normalize.css' %}" />
         <link rel="stylesheet" href="{% webpack_static 'node_modules/font-awesome/css/font-awesome.min.css' %}" />
+        <link rel="stylesheet" href="{% webpack_static 'node_modules/primeicons/primeicons.css' %}" />
     {% endblock css %}
 </head>
 {% endblock head %}
 
 {% block body_content %}
-<body dir="{{ app_settings.ACTIVE_LANGUAGE_DIR }}" {% block body_attributes %}class="scroll-y-auto"{% endblock %}>
+<body dir="{{ app_settings.ACTIVE_LANGUAGE_DIR }}" {% block body_attributes %}{% endblock %}>
     {% block loading_mask %}
     {% endblock loading_mask %}
 

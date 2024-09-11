@@ -15,11 +15,7 @@ define([
     const viewModel = BaseFilter.extend({
         initialize: function(options) {
             var self = this;
-
-             
             options.name = 'Search Result Details';
-            this.requiredFilters = ['search-results'];
-
             BaseFilter.prototype.initialize.call(this, options);
 
             this.options = options;
@@ -27,17 +23,21 @@ define([
             this.report = ko.observable();
             this.loading = ko.observable(false);
             this.reportExpanded = ko.observable();
+            this.searchFilterVms[componentName](this);  
 
             var setSearchResults = function(){
-                options.searchResultsVm = self.getFilter('search-results');
-                options.searchResultsVm.details = self;
-                options.filters[componentName](self);           
+                self.searchResultsVm().details = self;         
             };
 
-            if (this.requiredFiltersLoaded() === false) {
-                this.requiredFiltersLoaded.subscribe(setSearchResults, this);
-            } else {
+            this.searchResultsVm = this.getFilterByType('search-results-type', false);
+            if (ko.unwrap(this.searchResultsVm)) {
                 setSearchResults();
+            } else {
+                this.searchResultsVm.subscribe(searchResultsFilter => {
+                    if (searchResultsFilter) {
+                        setSearchResults();
+                    }
+                }, this);
             }
 
             var query = this.query();

@@ -10,6 +10,7 @@
 
 
 import os
+import re
 import sys
 import json
 import uuid
@@ -25,8 +26,10 @@ from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.models.utils import add_to_update_fields
 from arches.app.utils import import_class_from_string
 from django.contrib.gis.db import models
+from django.db import connection
 from django.db.models import JSONField
 from django.core.cache import caches
+from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.core.serializers.json import DjangoJSONEncoder
 from django.template.loader import get_template, render_to_string
@@ -39,6 +42,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from django.core.validators import validate_slug
+from django.core.exceptions import ValidationError
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -1166,7 +1170,7 @@ class ResourceInstance(models.Model):
         if create_record:
             try:
                 creatorid = int(create_record.userid)
-            except ValueError:
+            except (ValueError, TypeError):
                 pass
 
         if creatorid is None:
@@ -1200,10 +1204,9 @@ class SearchComponent(models.Model):
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
     type = models.TextField()
-    componentpath = models.TextField(unique=True)
+    componentpath = models.TextField(unique=True, null=True)
     componentname = models.TextField(unique=True)
-    sortorder = models.IntegerField(blank=True, null=True, default=None)
-    enabled = models.BooleanField(default=False)
+    config = models.JSONField(default=dict)
 
     def __str__(self):
         return self.name
@@ -1229,6 +1232,18 @@ class SearchComponent(models.Model):
         )
 
         return JSONSerializer().serialize(self)
+
+
+@receiver(pre_save, sender=SearchComponent)
+def ensure_single_default_searchview(sender, instance, **kwargs):
+    if instance.config.get("default", False) and instance.type == "search-view":
+        existing_default = SearchComponent.objects.filter(
+            config__default=True, type="search-view"
+        ).exclude(searchcomponentid=instance.searchcomponentid)
+        if existing_default.exists():
+            raise ValidationError(
+                "Only one search logic component can be default at a time."
+            )
 
 
 class SearchExportHistory(models.Model):
@@ -2119,15 +2134,27 @@ class SpatialView(models.Model):
             )
         ],
         unique=True,
+        null=False,
     )
     description = models.TextField(
         default="arches spatial view"
     )  # provide a description of the spatial view
-    geometrynodeid = models.ForeignKey(
-        Node, on_delete=models.CASCADE, db_column="geometrynodeid"
+    geometrynode = models.ForeignKey(
+        Node,
+        on_delete=models.CASCADE,
+        db_column="geometrynodeid",
+        limit_choices_to={"datatype": "geojson-feature-collection"},
+        null=False,
     )
     ismixedgeometrytypes = models.BooleanField(default=False)
-    attributenodes = JSONField(blank=True, null=True, db_column="attributenodes")
+    language = models.ForeignKey(
+        Language,
+        db_column="languageid",
+        to_field="code",
+        on_delete=models.PROTECT,
+        null=False,
+    )
+    attributenodes = JSONField(blank=False, null=False, db_column="attributenodes")
     isactive = models.BooleanField(
         default=True
     )  # the view is not created in the DB until set to active.
@@ -2138,3 +2165,53 @@ class SpatialView(models.Model):
     class Meta:
         managed = True
         db_table = "spatial_views"
+
+    def clean(self):
+        """
+        Validate the spatial view before saving it to the database as the database triggers have proved hard to test.
+        """
+        graph = self.geometrynode.graph
+        try:
+            node_ids = set(node["nodeid"] for node in self.attributenodes)
+        except (KeyError, TypeError):
+            raise ValidationError("attributenodes must be a list of node objects")
+
+        found_graph_nodes = Node.objects.filter(pk__in=node_ids, graph=graph)
+        if len(node_ids) != found_graph_nodes.count():
+            raise ValidationError(
+                "One or more attributenodes do not belong to the graph of the geometry node"
+            )
+
+        # language must be be a valid language code belonging to the current publication
+        published_graphs = graph.publication.publishedgraph_set.all()
+        if self.language_id not in [
+            published_graph.language_id for published_graph in published_graphs
+        ]:
+            raise ValidationError(
+                "Language must belong to a published graph for the graph of the geometry node"
+            )
+
+        # validate the schema is a valid schema in the database
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT schema_name FROM information_schema.schemata WHERE schema_name = %s",
+                [self.schema],
+            )
+            if cursor.rowcount == 0:
+                raise ValidationError("Schema does not exist in the database")
+
+    def to_json(self):
+        """
+        Returns a JSON object representing the spatialview
+        """
+        return {
+            "spatialviewid": str(self.spatialviewid),
+            "schema": self.schema,
+            "slug": self.slug,
+            "description": self.description,
+            "geometrynodeid": str(self.geometrynode.pk),
+            "ismixedgeometrytypes": self.ismixedgeometrytypes,
+            "language": self.language.code,
+            "attributenodes": self.attributenodes,
+            "isactive": self.isactive,
+        }
