@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
 
                 -- Check if collection_names are provided
                 if collection_names is null or array_length(collection_names, 1) = 0 then
-                    return 'No collection names or identifiers provided.';
+                    raise exception 'No collection names or identifiers provided.';
                 end if;
 
                 -- Check if input collection names or identifiers exist in the database

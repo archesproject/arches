@@ -83,7 +83,8 @@ class Command(BaseCommand):
                 -psl 'fr'
                 -ow
 
-            for collections that contain an apostrophe, use wrap the concept in double quotes, e.g. "John''s list"
+            for collections that contain an apostrophe, wrap the concept in double quotes, e.g. "John''s list"
+
         """
 
         collections_in_db = list(
