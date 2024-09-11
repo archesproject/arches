@@ -307,7 +307,6 @@ class Migration(migrations.Migration):
                 update temp_list_items_and_values
                 set list_item_id = uuid_generate_v4()
                 where rownumber > 1
-                    and listitemvalue_valuetype = 'prefLabel'
                     and legacy_conceptid != any(listitems_to_update_with_multiple_values)
                     and list_item_id = legacy_conceptid;
 
