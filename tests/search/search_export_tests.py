@@ -1,6 +1,7 @@
 import uuid
 import csv
 import io
+import time
 from base64 import b64encode
 from http import HTTPStatus
 from arches.app.models import models
@@ -81,6 +82,10 @@ class SearchExportTests(ArchesTestCase):
         cultural_period_tile.save(index=False)
         cultural_period_tile.index()
         # TODO: create geospatial test data
+
+        # Without some sleep, the next class's setup might fail when
+        # get_resource_model_label() raises Node.DoesNotExist
+        time.sleep(1)
 
     @classmethod
     def tearDownClass(cls):
