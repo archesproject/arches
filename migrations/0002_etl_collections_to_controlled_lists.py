@@ -238,17 +238,9 @@ class Migration(migrations.Migration):
                         v.valuetype
                     from alpha_sorted_list_item_hierarchy lih
                     join values v on v.conceptid = lih.id
-                    where valuetype = 'prefLabel' 
-                        or valuetype = 'altLabel' 
-                        or valuetype = 'hiddenLabel'
-                        or valuetype = 'scopeNote'
-                        or valuetype = 'definition'
-                        or valuetype = 'example'
-                        or valuetype = 'historyNote'
-                        or valuetype = 'editorialNote'
-                        or valuetype = 'changeNote'
-                        or valuetype = 'note'
-                        or valuetype = 'description';
+                    where valuetype in (
+                        select valuetype from d_value_types where category in ('note', 'label')
+                    );
                 end loop;
 
                 -- Assign row number to help identify concepts that participate in multiple collections
