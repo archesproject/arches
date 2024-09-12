@@ -41,7 +41,7 @@ from django.db.models import Q
 from arches.app.models.system_settings import settings
 from arches.app.models.models import ResourceInstance, MapLayer
 
-from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nested
+from arches.app.search.elasticsearch_dsl_builder import Bool, Ids, Query, Terms, Nested
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.utils.permission_backend import (
     PermissionFramework,
@@ -267,22 +267,31 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         user: User,
         search_engine: SearchEngine | None = None,
         allresources: bool = False,
+        resources: list[str] = None,
     ) -> list[str]:
         if allresources is False and user.is_superuser is True:
             return []
 
         if allresources is True:
+            group_object_permissions = GroupObjectPermission.objects.filter(
+                permission__codename="no_access_to_resourceinstance"
+            )
+            if resources is not None:
+                group_object_permissions.filter(object_pk__in=resources)
+
             restricted_group_instances = {
                 perm["object_pk"]
-                for perm in GroupObjectPermission.objects.filter(
-                    permission__codename="no_access_to_resourceinstance"
-                ).values("object_pk")
+                for perm in group_object_permissions.values("object_pk")
             }
+            user_object_permissions = UserObjectPermission.objects.filter(
+                permission__codename="no_access_to_resourceinstance"
+            )
+            if resources is not None:
+                user_object_permissions.filter(object_pk__in=resources)
+
             restricted_user_instances = {
                 perm["object_pk"]
-                for perm in UserObjectPermission.objects.filter(
-                    permission__codename="no_access_to_resourceinstance"
-                ).values("object_pk")
+                for perm in user_object_permissions.values("object_pk")
             }
             all_restricted_instances = list(
                 restricted_group_instances | restricted_user_instances
@@ -294,6 +303,13 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
             has_access = Bool()  # type: ignore
             nested_term_filter = Nested(path="permissions", query=terms)  # type: ignore
             has_access.must(nested_term_filter)  # type: ignore
+            if resources is not None:
+                has_access.filter(
+                    Ids(
+                        ids=resources,
+                    )
+                )
+
             query.add_query(has_access)  # type: ignore
             results = query.search(index=RESOURCES_INDEX, scroll="1m")  # type: ignore
             scroll_id = results["_scroll_id"]

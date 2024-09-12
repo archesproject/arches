@@ -16,15 +16,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 from django.contrib.auth.models import User
+from django.db.models import Count
 
 from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
+from guardian.models import GroupObjectPermission, UserObjectPermission
 from arches.app.permissions.arches_permission_base import (
     ArchesPermissionBase,
     ResourceInstancePermissions,
 )
-from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Terms
+from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nested, Ids
+from arches.app.search.search import SearchEngine
+from arches.app.search.mappings import RESOURCES_INDEX
 
 
 class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
@@ -34,6 +38,54 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
 
     def get_restricted_users(self, resource: ResourceInstance) -> dict[str, list[int]]:
         pass
+
+    def get_restricted_instances(
+        self,
+        user: User,
+        search_engine: SearchEngine | None = None,
+        allresources: bool = False,
+        resources: list[str] | None = None,
+    ):
+        if user.is_superuser is True:
+            return []
+
+        query = Query(search_engine, start=0, limit=settings.SEARCH_RESULT_LIMIT)  # type: ignore
+        nested_groups_read = Nested(
+            path="permissions",
+            query=Terms(
+                field="permissions.groups_read",
+                terms=[str(group.id) for group in user.groups.all()],
+            ),
+        )
+
+        nested_users_read = Nested(
+            path="permissions",
+            query=Terms(field="permissions.users_read", terms=[str(user.id)]),
+        )
+
+        if resources is not None:
+            subset_query = Bool()
+            subset_query.filter(
+                Ids(
+                    ids=resources,
+                )
+            )
+            subset_query.must_not(nested_users_read)
+            subset_query.must_not(nested_groups_read)
+            query.add_query(subset_query)
+        else:
+            query.add_query(Bool().must_not(nested_groups_read).must_not(nested_users_read))  # type: ignore
+
+        results = query.search(index=RESOURCES_INDEX, scroll="1m")  # type: ignore
+        scroll_id = results["_scroll_id"]
+        total = results["hits"]["total"]["value"]
+        if total > settings.SEARCH_RESULT_LIMIT:
+            pages = total // settings.SEARCH_RESULT_LIMIT
+            for page in range(pages):
+                results_scrolled = query.se.es.scroll(scroll_id=scroll_id, scroll="1m")
+                results["hits"]["hits"] += results_scrolled["hits"]["hits"]
+        restricted_ids = [res["_id"] for res in results["hits"]["hits"]]
+        return restricted_ids
 
     def check_resource_instance_permissions(
         self, user: User, resourceid: str, permission: str

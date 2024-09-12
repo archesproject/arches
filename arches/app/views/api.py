@@ -345,6 +345,7 @@ class GeoJSON(APIBase):
 
 
 class MVT(APIBase):
+    se = SearchEngineFactory().create()
     EARTHCIRCUM = 40075016.6856
     PIXELSPERTILE = 256
 
@@ -363,13 +364,29 @@ class MVT(APIBase):
         cache_key = MVT.create_mvt_cache_key(node, zoom, x, y, request.user)
         tile = cache.get(cache_key)
         if tile is None:
-            resource_ids = get_restricted_instances(request.user, allresources=True)
-            if len(resource_ids) == 0:
-                resource_ids.append(
-                    "10000000-0000-0000-0000-000000000001"
-                )  # This must have a uuid that will never be a resource id.
-            resource_ids = tuple(resource_ids)
             with connection.cursor() as cursor:
+                resource_query = """
+                    SELECT resourceinstanceid::text
+                    FROM geojson_geometries
+                    WHERE 
+                    ST_Intersects(geom, TileBBox(%s, %s, %s, 3857))
+                    AND
+                    nodeid = %s
+                    """
+
+                # get all of the resources in this bbox
+                cursor.execute(resource_query, [zoom, x, y, nodeid])
+                resources = [record[0] for record in cursor.fetchall()]
+
+                resource_ids = get_restricted_instances(
+                    request.user, search_engine=self.se, resources=resources
+                )
+                if len(resource_ids) == 0:
+                    resource_ids.append(
+                        "10000000-0000-0000-0000-000000000001"
+                    )  # This must have a uuid that will never be a resource id.
+                resource_ids = tuple(resource_ids)
+
                 if int(zoom) <= int(config["clusterMaxZoom"]):
                     arc = self.EARTHCIRCUM / ((1 << int(zoom)) * self.PIXELSPERTILE)
                     distance = arc * float(config["clusterDistance"])

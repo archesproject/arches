@@ -198,9 +198,14 @@ def get_restricted_users(resource):
     return _get_permission_framework().get_restricted_users(resource)
 
 
-def get_restricted_instances(user, search_engine=None, allresources=False):
+def get_restricted_instances(
+    user, search_engine=None, allresources=False, resources=list[str]
+):
     return _get_permission_framework().get_restricted_instances(
-        user, search_engine=search_engine, allresources=allresources
+        user,
+        search_engine=search_engine,
+        allresources=allresources,
+        resources=resources,
     )
 
 
