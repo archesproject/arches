@@ -37,21 +37,9 @@ class RelationalDataModelTests(ArchesTestCase):
     datatype_filename = None
 
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        # Create the Datatype Graph if it doesn't exist
-        if not Graph.objects.filter(graphid=cls.custom_data_type_graphid).exists():
-            with captured_stdout():
-                management.call_command(
-                    "packages",
-                    operation="import_graphs",
-                    source=cls.custom_datatype_graph_filename,
-                    verbosity=0,
-                )
-
-    @classmethod
     def setUpTestData(cls):
-        super().loadOntology()
+        super().setUpTestData()
+
         cls.custom_data_type_graphid = "ceed156d-aadf-4a13-b383-c044624c64bb"
         cls.custom_datatype_graph_filename = os.path.join(
             test_settings.TEST_ROOT,
@@ -78,6 +66,16 @@ class RelationalDataModelTests(ArchesTestCase):
                 verbosity=0,
             )
 
+        # Create the Datatype Graph if it doesn't exist
+        if not Graph.objects.filter(graphid=cls.custom_data_type_graphid).exists():
+            with captured_stdout():
+                management.call_command(
+                    "packages",
+                    operation="import_graphs",
+                    source=cls.custom_datatype_graph_filename,
+                    verbosity=0,
+                )
+
     def test_extended_string_postgres_datatype(self):
         """
         Test that the generated Postgres datatype is JSON
@@ -87,10 +85,8 @@ class RelationalDataModelTests(ArchesTestCase):
             f"select public.__arches_create_resource_model_views('%s'::uuid);"
             % RelationalDataModelTests.custom_data_type_graphid
         )
-        cursor = connection.cursor()
-        cursor.execute(sql)
-        # row = cursor.fetchone()
-        # print("Result: %s" % str(row))
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
 
         schema_name = "relational_data_model_tests"
         view_name = "custom_datatypes"
@@ -108,7 +104,8 @@ class RelationalDataModelTests(ArchesTestCase):
             column_name,
         )
 
-        cursor.execute(validation_sql)
-        row = cursor.fetchone()
+        with connection.cursor() as cursor:
+            cursor.execute(validation_sql)
+            row = cursor.fetchone()
 
         assert row is not None and row[0] == expected_datatype
