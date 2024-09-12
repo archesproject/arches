@@ -653,6 +653,11 @@ class Command(BaseCommand):
                 print("Could not save system settings")
             self.export_package_settings(dest_dir, "true")
 
+    @staticmethod
+    def update_resource_geojson_geometries():
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM refresh_geojson_geometries();")
+
     def load_package(
         self,
         source,
@@ -1167,10 +1172,6 @@ class Command(BaseCommand):
         def load_etl_modules(package_dir):
             load_extensions(package_dir, "etl_modules", "etl_module")
 
-        def update_resource_geojson_geometries():
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT * FROM refresh_geojson_geometries();")
-
         def load_apps(package_dir):
             package_apps = glob.glob(os.path.join(package_dir, "apps", "*"))
             for app in package_apps:
@@ -1289,7 +1290,7 @@ class Command(BaseCommand):
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
         print("Refreshing the resource view")
-        update_resource_geojson_geometries()
+        self.update_resource_geojson_geometries()
         print("loading post sql")
         load_sql(package_location, "post_sql")
         print("loading templates")

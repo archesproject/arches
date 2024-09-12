@@ -24,7 +24,6 @@ from arches.app.utils.data_management.resources.formats.csvfile import (
     CsvWriter,
     MissingConfigException,
 )
-from arches.app.utils.i18n import LanguageSynchronizer
 from operator import itemgetter
 from tests.base_test import ArchesTestCase
 from arches.app.utils.skos import SKOSReader
@@ -44,10 +43,9 @@ from arches.app.utils.data_management.resource_graphs.importer import (
 
 class BusinessDataExportTests(ArchesTestCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpTestData(cls):
+        super().setUpTestData()
 
-        cls.loadOntology()
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/data/concept_label_test_scheme.xml")
         ret = skos.save_concepts_from_skos(rdf)
@@ -61,7 +59,6 @@ class BusinessDataExportTests(ArchesTestCase):
             "r",
         ) as f:
             archesfile = JSONDeserializer().deserialize(f)
-        LanguageSynchronizer.synchronize_settings_with_db()
         ResourceGraphImporter(archesfile["graph"])
 
     def test_invalid_writer_config(self):

@@ -11,7 +11,6 @@ from arches.app.utils.data_management.resources.importer import BusinessDataImpo
 from arches.app.utils.data_management.resource_graphs.importer import (
     import_graph as ResourceGraphImporter,
 )
-from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.utils.skos import SKOSReader
 
 # these tests can be run from the command line via
@@ -20,17 +19,10 @@ from arches.app.utils.skos import SKOSReader
 
 class JsonLDExportTests(ArchesTestCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpTestData(cls):
+        super().setUpTestData()
 
-        # This runs once per instantiation
-        cls.loadOntology()
         cls.factory = RequestFactory()
-        cls.client = Client()
-
-        # cls.client.login(username='admin', password='admin')
-        # cls.user = User.objects.get(username='anonymous')
-        LanguageSynchronizer.synchronize_settings_with_db()
 
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/jsonld_test_thesaurus.xml")

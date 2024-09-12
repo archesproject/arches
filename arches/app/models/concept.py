@@ -535,7 +535,13 @@ class Concept(object):
         return concepts_to_delete
 
     def get_child_collections_hierarchically(
-        self, conceptid, child_valuetypes=None, offset=0, limit=50, query=None
+        self,
+        conceptid,
+        child_valuetypes=None,
+        offset=0,
+        limit=50,
+        query=None,
+        languageid=None,
     ):
         child_valuetypes = child_valuetypes if child_valuetypes else ["prefLabel"]
         columns = "valueidto::text, conceptidto::text, valueto, valuetypeto, depth, count(*) OVER() AS full_count, collector"
@@ -548,6 +554,7 @@ class Concept(object):
             order_hierarchically=True,
             query=query,
             columns=columns,
+            languageid=languageid,
         )
 
     def get_child_collections(

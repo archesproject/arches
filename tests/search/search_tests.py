@@ -20,7 +20,6 @@ import json
 import time
 import uuid
 
-from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.search.elasticsearch_dsl_builder import (
@@ -28,60 +27,49 @@ from arches.app.search.elasticsearch_dsl_builder import (
     Query,
 )
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.views.search import search_terms, search_results
 from django.http import HttpRequest
 from django.contrib.auth.models import User
 from django.test.utils import captured_stdout
 from tests.base_test import ArchesTestCase
-from tests.utils.search_test_utils import sync_es
 
 # these tests can be run from the command line via
 # python manage.py test tests.search.search_tests --settings="tests.test_settings"
 
 
 class SearchTests(ArchesTestCase):
+    graph_fixtures = ["All_Datatypes", "Resource Test Model"]
+    allDataTypeGraphId = "d71a8f56-987f-4fd1-87b5-538378740f15"
+
     def sync_es(self, search_engine=None, index="resources"):
         se = search_engine if search_engine else SearchEngineFactory().create()
         se.refresh(index=index)
 
-    def setUp(self):
-        super().setUp()
-        self.delete_resources()
-
-    def delete_resources(self):
-        for res in Resource.objects.all():
-            res.delete()
-
-        se = SearchEngineFactory().create()
-        q = {"query": {"match_all": {}}}
-        se.delete(index="resources", query=q)
-        self.sync_es(se)
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.tester = User.objects.create_user(
+            username="Tester", email="test@test.com", password="test12345!"
+        )
 
     @classmethod
     def tearDownClass(cls):
-        models.GraphModel.objects.filter(
-            pk="d291a445-fa5f-11e6-afa8-14109fd34195"
-        ).delete()
-        User.objects.filter(username="Tester").delete()
-        Resource.objects.filter(pk="745f5e4a-d645-4c50-bafc-c677ea95f060").delete()
         se = SearchEngineFactory().create()
         with captured_stdout():
             se.delete_index(index="test")
             se.delete_index(index="bulk")
         super().tearDownClass()
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        LanguageSynchronizer.synchronize_settings_with_db()
-        User.objects.create_user(
-            username="Tester", email="test@test.com", password="test12345!"
-        )
-        cls.loadOntology()
-        cls.ensure_test_resource_models_are_loaded()
-        cls.allDataTypeGraphId = "d71a8f56-987f-4fd1-87b5-538378740f15"
+    def setUp(self):
+        super().setUp()
+        self.delete_resources()
+
+    def delete_resources(self):
+        se = SearchEngineFactory().create()
+        q = {"query": {"match_all": {}}}
+        se.delete(index="resources", query=q)
+        self.sync_es(se)
 
     def test_delete_by_query(self):
         """
@@ -97,7 +85,7 @@ class SearchTests(ArchesTestCase):
             y = {"id": i + 100, "type": "altLabel", "value": "test alt label"}
             se.index_data(index="test", body=y, idfield="id", refresh=True)
 
-        sync_es(se)
+        self.sync_es(se)
 
         query = Query(se, start=0, limit=100)
         match = Match(field="type", query="altLabel")
@@ -153,14 +141,12 @@ class SearchTests(ArchesTestCase):
         Test finding a resource by a term
 
         """
-
         nodeid = "c9b37b7c-17b3-11eb-a708-acde48001122"
         tileid = "bebffbea-daf6-414e-80c2-530ec88d2705"
         resourceinstanceid = "745f5e4a-d645-4c50-bafc-c677ea95f060"
         resource = Resource(uuid.UUID(resourceinstanceid))
-        user = User.objects.get(username="Tester")
         resource.graph_id = "c9b37a14-17b3-11eb-a708-acde48001122"
-        resource.save(user=user, transaction_id=uuid.uuid4())
+        resource.save(user=self.tester, transaction_id=uuid.uuid4())
         tile_data = {}
         tile_data[nodeid] = {
             "en": {"value": "Etiwanda Avenue Street Trees", "direction": "ltr"}
@@ -174,12 +160,13 @@ class SearchTests(ArchesTestCase):
         new_tile.save()
         self.sync_es()
         # wait a moment for ES to finish indexing
+        time.sleep(1)
         request = HttpRequest()
         request.method = "GET"
         request.GET.__setitem__("lang", "en")
         request.GET.__setitem__("q", "Etiwanda")
         request.LANGUAGE_CODE = "en"
-        request.user = user
+        request.user = self.tester
         response = search_terms(request)
         result = {}
         try:

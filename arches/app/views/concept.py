@@ -479,11 +479,12 @@ def paged_dropdown(request):
     conceptid = request.GET.get("conceptid")
     query = request.GET.get("query", "")
     page = int(request.GET.get("page", 1))
+    lang = request.GET.get("lang", None)
     limit = 50
     offset = (page - 1) * limit
 
     results = Concept().get_child_collections_hierarchically(
-        conceptid, offset=offset, limit=limit, query=query
+        conceptid, offset=offset, limit=limit, query=query, languageid=lang
     )
     total_count = results[0][3] if len(results) > 0 else 0
     data = [dict(list(zip(["valueto", "depth", "collector"], d))) for d in results]
