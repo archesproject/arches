@@ -240,6 +240,7 @@ class Migration(migrations.Migration):
                     join values v on v.conceptid = lih.id
                     where valuetype = 'prefLabel' 
                         or valuetype = 'altLabel' 
+                        or valuetype = 'hiddenLabel'
                         or valuetype = 'scopeNote'
                         or valuetype = 'definition'
                         or valuetype = 'example'
