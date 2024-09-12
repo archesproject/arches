@@ -370,9 +370,13 @@ def search_results(request, returnDsl=False):
         else:
             return JSONResponse(content=response_object)
     except Exception as e:
-        message = e.args[0].get(
-            "message", _("There was an error retrieving the search results")
-        )
+        message = _("There was an error retrieving the search results")
+        try:
+            message = e.args[0].get("message", message)
+        except:
+            logger.exception("Error retrieving search results:")
+            logger.exception(e)
+
         return JSONErrorResponse(
             _("Search Failed"),
             message,
