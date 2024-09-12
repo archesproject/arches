@@ -13,27 +13,17 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
 from unittest.mock import MagicMock, Mock, patch
-from tests import test_settings
 from tests.permissions.base_permissions_framework_test import (
     ArchesPermissionFrameworkTestCase,
 )
-from django.core import management
-from django.urls import reverse
-from django.test.client import RequestFactory, Client
-from django.test.utils import captured_stdout
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from django.contrib.auth.models import User
-from django.contrib.auth.models import Group
-from arches.app.models.models import GraphModel, ResourceInstance, Node
-from arches.app.models.resource import Resource
+from arches.app.models.models import Node, ResourceInstance
 from arches.app.permissions.arches_default_deny import (
     ArchesDefaultDenyPermissionFramework,
 )
 
 # these tests can be run from the command line via
-# python manage.py test tests.permissions.permission_tests --settings="tests.test_settings"
+# python manage.py test tests.permissions.permissions_arches_default_deny_tests --settings="tests.test_settings"
 
 
 class ArchesDefaultDenyPermissionTests(ArchesPermissionFrameworkTestCase):

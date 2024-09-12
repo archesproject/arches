@@ -25,14 +25,8 @@ from django.core import management
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
 from arches.app.models.models import SpatialView
-from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
-from arches.app.utils.data_management.resource_graphs.importer import (
-    import_graph as resource_graph_importer,
-)
-from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
-from django.conf import settings
 
 # these tests can be run from the command line via
 # python manage.py test tests.models.spatialview_model_tests --settings="tests.test_settings"
@@ -40,10 +34,8 @@ from django.conf import settings
 
 class SpatialViewTests(ArchesTestCase):
     @classmethod
-    def setUpClass(self):
-        super().setUpClass()
-
-        LanguageSynchronizer.synchronize_settings_with_db()
+    def setUpTestData(cls):
+        super().setUpTestData()
 
         spatialviews_other_test_model_path = os.path.join(
             test_settings.TEST_ROOT,
@@ -216,9 +208,18 @@ class SpatialViewTests(ArchesTestCase):
 
     def test_create_spatialview_invalid_attributenode(self):
         spatialview = self.generate_valid_spatiatview()
+
+        # invalid nodeid
         spatialview.attributenodes.append(
             {"nodeid": "7584e966-1cf8-9999-9999-0242ac130005", "description": "invalid"}
         )
+
+        with self.assertRaises(Exception):
+            spatialview.full_clean()
+            spatialview.save()
+
+        # empty attributenodes
+        spatialview.attributenodes = None
 
         with self.assertRaises(Exception):
             spatialview.full_clean()
@@ -288,8 +289,6 @@ class SpatialViewTriggerTests(TransactionTestCase):
     serialized_rollback = True
 
     def setUp(self):
-        LanguageSynchronizer.synchronize_settings_with_db()
-
         spatialviews_other_test_model_path = os.path.join(
             test_settings.TEST_ROOT,
             "fixtures",

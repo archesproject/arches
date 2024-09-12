@@ -18,12 +18,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import json
-from arches.app.utils.i18n import LanguageSynchronizer
 from tests import test_settings
 from arches.app.models.system_settings import settings
 from tests.base_test import ArchesTestCase
 from django.contrib.auth import get_user_model
-from django.test import Client
 from django.urls import reverse
 from arches.app.models.graph import Graph
 from arches.app.models.models import Node, NodeGroup, GraphModel, CardModel, Edge
@@ -35,15 +33,12 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 
 class GraphManagerViewTests(ArchesTestCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
+    def setUpTestData(cls):
+        super().setUpTestData()
         cls.loadOntology()
+        cls.NODE_NODETYPE_GRAPHID = "22000000-0000-0000-0000-000000000001"
 
-    def setUp(self):
-        self.NODE_NODETYPE_GRAPHID = "22000000-0000-0000-0000-000000000001"
-
-        if len(Graph.objects.filter(graphid=self.NODE_NODETYPE_GRAPHID)) == 0:
+        if not Graph.objects.filter(graphid=cls.NODE_NODETYPE_GRAPHID).exists():
             # Node Branch
             graph_dict = {
                 "author": "Arches",
@@ -177,30 +172,21 @@ class GraphManagerViewTests(ArchesTestCase):
         graph.root.datatype = "semantic"
         graph.root.save()
         graph = Graph.objects.get(graphid=graph.pk)
-        self.appended_branch_1 = graph.append_branch(
+        cls.appended_branch_1 = graph.append_branch(
             "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as",
-            graphid=self.NODE_NODETYPE_GRAPHID,
+            graphid=cls.NODE_NODETYPE_GRAPHID,
         )
-        self.appended_branch_2 = graph.append_branch(
+        cls.appended_branch_2 = graph.append_branch(
             "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as",
-            graphid=self.NODE_NODETYPE_GRAPHID,
+            graphid=cls.NODE_NODETYPE_GRAPHID,
         )
         graph.save()
 
-        self.ROOT_ID = graph.root.nodeid
-        self.GRAPH_ID = str(graph.pk)
-        self.NODE_COUNT = 5
+        cls.ROOT_ID = graph.root.nodeid
+        cls.GRAPH_ID = str(graph.pk)
+        cls.NODE_COUNT = 5
 
-        self.graph = graph
-
-        self.client = Client()
-        LanguageSynchronizer.synchronize_settings_with_db()
-
-    def tearDown(self):
-        try:
-            self.deleteGraph(self.GRAPH_ID)
-        except:
-            pass
+        cls.graph = graph
 
     def test_graph_manager(self):
         """
