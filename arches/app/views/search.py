@@ -359,15 +359,18 @@ def search_results(request, returnDsl=False):
             status=400,
         )
 
-    response_object, search_query_object = (
-        searchview_component_instance.handle_search_results_query(
-            search_filter_factory, returnDsl
+    try:
+        response_object, search_query_object = (
+            searchview_component_instance.handle_search_results_query(
+                search_filter_factory, returnDsl
+            )
         )
-    )
-    if isinstance(response_object, str):
-        return JSONResponse(content=response_object)
-    elif not response_object.get("success", False):
-        message = response_object.get(
+        if returnDsl:
+            return search_query_object.pop("query")
+        else:
+            return JSONResponse(content=response_object)
+    except Exception as e:
+        message = e.args[0].get(
             "message", _("There was an error retrieving the search results")
         )
         return JSONErrorResponse(
@@ -375,10 +378,6 @@ def search_results(request, returnDsl=False):
             message,
             status=500,
         )
-    elif returnDsl:
-        return search_query_object.pop("query")
-    else:
-        return JSONResponse(content=response_object)
 
 
 def get_provisional_type(request):

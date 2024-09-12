@@ -202,7 +202,7 @@ class StandardSearchView(BaseSearchView):
     ) -> Tuple[Dict, Dict]:
         se = SearchEngineFactory().create()
         search_query_object = {"query": Query(se)}
-        response_object = {"results": None, "success": False}
+        response_object = {"results": None}
         sorted_query_obj = search_filter_factory.create_search_query_dict(
             list(self.request.GET.items()) + list(self.request.POST.items())
         )
@@ -221,16 +221,12 @@ class StandardSearchView(BaseSearchView):
             append_instance_permission_filter_dsl(self.request, search_query_object)
         except Exception as err:
             logger.exception(err)
-            return (
-                {
-                    "success": False,
-                    "message": _("Error: {0}. Search failed.").format(str(err)),
-                },
-                search_query_object,
-            )
+            message = {
+                "message": _("Error: {0}. Search failed.").format(str(err)),
+            }
+            raise Exception(message)
 
         if returnDsl:
-            response_object["success"] = True
             return response_object, search_query_object
 
         for filter_type, querystring in list(sorted_query_obj.items()):
@@ -256,5 +252,4 @@ class StandardSearchView(BaseSearchView):
                 if key not in response_object:
                     response_object[key] = value
 
-            response_object["success"] = True
         return response_object, search_query_object
