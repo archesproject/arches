@@ -835,6 +835,14 @@ class SearchTests(ArchesTestCase):
         # 13 available components + search-view component
         self.assertEqual(len(search_components), 14)
 
+    def test_search_bad_json(self):
+        request = HttpRequest()
+        request.method = "GET"
+        request.user = User.objects.get(username="anonymous")
+        request.GET.__setitem__("term-filter", '{"key": "value",}')
+        resp = search_results(request)
+        self.assertEqual(resp.status_code, 500)
+
 
 def extract_pks(response_json):
     return [
