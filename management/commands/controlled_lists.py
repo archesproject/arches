@@ -1,4 +1,5 @@
 from arches.app.models.models import Value, Language
+from arches_references.models import List
 from django.core.management.base import BaseCommand, CommandError
 
 
@@ -67,13 +68,20 @@ class Command(BaseCommand):
                         psl
                     )
                 )
-            else:
-                self.migrate_collections_to_controlled_lists(
-                    collections_to_migrate=options["collections_to_migrate"],
-                    host=options["host"],
-                    overwrite=options["overwrite"],
-                    preferred_sort_language=psl,
-                )
+
+            if not options["overwrite"]:
+                for collection_name in options["collections_to_migrate"]:
+                    if List.objects.filter(name=collection_name).exists():
+                        raise CommandError(
+                            f"The collection '{collection_name}' already exists."
+                        )
+
+            self.migrate_collections_to_controlled_lists(
+                collections_to_migrate=options["collections_to_migrate"],
+                host=options["host"],
+                overwrite=options["overwrite"],
+                preferred_sort_language=psl,
+            )
 
     def migrate_collections_to_controlled_lists(
         self,
