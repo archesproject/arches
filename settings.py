@@ -422,6 +422,9 @@ SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
 # TODO: remove when finalizing release
 SILENCED_SYSTEM_CHECKS += ["arches.E002"]
 
+# Location for test data fixtures
+FIXTURE_DIRS = [os.path.join(APP_ROOT, "..", "tests", "fixtures", "data")]
+
 try:
     from .package_settings import *
 except ImportError:
