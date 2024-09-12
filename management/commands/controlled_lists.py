@@ -1,5 +1,5 @@
-from arches.app.models.models import Value
-from django.core.management.base import BaseCommand
+from arches.app.models.models import Value, Language
+from django.core.management.base import BaseCommand, CommandError
 
 
 class Command(BaseCommand):
@@ -58,12 +58,22 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options["operation"] == "migrate_collections_to_controlled_lists":
-            self.migrate_collections_to_controlled_lists(
-                collections_to_migrate=options["collections_to_migrate"],
-                host=options["host"],
-                overwrite=options["overwrite"],
-                preferred_sort_language=options["preferred_sort_language"],
-            )
+            psl = options["preferred_sort_language"]
+            try:
+                Language.objects.get(code=psl)
+            except Language.DoesNotExist:
+                raise CommandError(
+                    "The preferred sort language, {0}, does not exist in the database.".format(
+                        psl
+                    )
+                )
+            else:
+                self.migrate_collections_to_controlled_lists(
+                    collections_to_migrate=options["collections_to_migrate"],
+                    host=options["host"],
+                    overwrite=options["overwrite"],
+                    preferred_sort_language=psl,
+                )
 
     def migrate_collections_to_controlled_lists(
         self,
