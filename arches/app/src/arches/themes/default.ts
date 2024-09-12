@@ -30,7 +30,7 @@ export const ArchesPreset = definePreset(Aura, {
             color: "{arches.legacy.sidebar}",
         },
         iconSize: "small",
-        // Additional tokens
+        // custom token
         content: {
             gap: "1rem",
         },
@@ -51,6 +51,18 @@ export const ArchesPreset = definePreset(Aura, {
         splitter: {
             handle: {
                 background: "{surface.500}",
+            },
+        },
+        toast: {
+            summary: {
+                fontSize: "medium",
+            },
+            detail: {
+                fontSize: "small",
+            },
+            // custom token
+            messageIcon: {
+                marginTop: "0.5rem",
             },
         },
     },
