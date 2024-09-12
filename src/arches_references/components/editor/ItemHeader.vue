@@ -2,8 +2,12 @@
 import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import { itemKey, selectedLanguageKey } from "@/arches_references/constants.ts";
-import { bestLabel } from "@/arches_references/utils.ts";
+import { getItemLabel } from "@/arches_vue_utils/utils.ts";
+import {
+    itemKey,
+    selectedLanguageKey,
+    systemLanguageKey,
+} from "@/arches_references/constants.ts";
 import LetterCircle from "@/arches_references/components/misc/LetterCircle.vue";
 
 import type { Ref } from "vue";
@@ -11,6 +15,7 @@ import type { Language } from "@/arches_vue_utils/types";
 import type { ControlledListItem } from "@/arches_references/types";
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
+const systemLanguage = inject(systemLanguageKey) as Language;
 const item = inject(
     itemKey,
 ) as Ref<ControlledListItem> as Ref<ControlledListItem>;
@@ -25,7 +30,12 @@ const iconLabel = (item: ControlledListItem) => {
 <template>
     <span class="item-header">
         <LetterCircle :labelled="item" />
-        <h3>{{ bestLabel(item, selectedLanguage.code).value }}</h3>
+        <h3>
+            {{
+                getItemLabel(item, selectedLanguage.code, systemLanguage.code)
+                    .value
+            }}
+        </h3>
         <span class="item-type">{{ iconLabel(item) }}</span>
         <a
             v-if="item.uri"

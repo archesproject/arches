@@ -5,12 +5,11 @@ import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 
+import { ALT_LABEL, PREF_LABEL } from "@/arches_vue_utils/constants.ts";
 import {
     itemKey,
-    ALT_LABEL,
     CONTRAST,
     NOTE_CHOICES,
-    PREF_LABEL,
     PRIMARY,
 } from "@/arches_references/constants.ts";
 import { dataIsNew, shouldUseContrast } from "@/arches_references/utils.ts";

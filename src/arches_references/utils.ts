@@ -34,21 +34,6 @@ export const dataIsNew = (
     return node.id === null || !node.id.includes("-");
 };
 
-// Finders
-export const bestLabel = (item: ControlledListItem, languageCode: string) => {
-    const valuesInLang = item.values.filter(
-        (value) => value.language_id === languageCode,
-    );
-    const bestLabel =
-        valuesInLang.find((value) => value.valuetype_id === "prefLabel") ??
-        valuesInLang.find((value) => value.valuetype_id === "altLabel") ??
-        item.values.find((value) => value.valuetype_id === "prefLabel");
-    if (!bestLabel) {
-        throw new Error();
-    }
-    return bestLabel;
-};
-
 export const languageNameFromCode = (code: string) => {
     return arches.languages.find((lang: Language) => lang.code === code).name;
 };

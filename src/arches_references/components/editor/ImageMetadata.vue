@@ -32,7 +32,7 @@ import AddMetadata from "@/arches_references/components/editor/AddMetadata.vue";
 
 import type { Ref } from "vue";
 import type { DataTableRowEditInitEvent } from "primevue/datatable";
-import type { Language } from "arches/arches/app/src/arches/types";
+import type { Language } from "@/arches_vue_utils/types";
 import type {
     ControlledListItem,
     ControlledListItemImage,

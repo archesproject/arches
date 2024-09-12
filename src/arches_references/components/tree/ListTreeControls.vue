@@ -71,6 +71,7 @@ const expandNode = (node: TreeNode) => {
         <PresentationControls
             :expand-all
             :collapse-all
+            font-family="sans-serif"
         />
     </div>
 </template>

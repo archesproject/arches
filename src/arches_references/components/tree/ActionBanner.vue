@@ -4,12 +4,14 @@ import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 
+import { getItemLabel } from "@/arches_vue_utils/utils.ts";
 import {
     selectedLanguageKey,
+    systemLanguageKey,
     CONTRAST,
     SECONDARY,
 } from "@/arches_references/constants.ts";
-import { bestLabel, shouldUseContrast } from "@/arches_references/utils.ts";
+import { shouldUseContrast } from "@/arches_references/utils.ts";
 
 import type { Ref } from "vue";
 import type { TreeSelectionKeys } from "primevue/tree";
@@ -26,6 +28,7 @@ const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
 });
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
+const systemLanguage = inject(systemLanguageKey) as Language;
 
 const { $gettext } = useGettext();
 
@@ -46,8 +49,11 @@ const abandonMove = () => {
             $gettext(
                 "Selecting new parent for: %{item}",
                 {
-                    item: bestLabel(movingItem.data, selectedLanguage.code)
-                        .value,
+                    item: getItemLabel(
+                        movingItem.data,
+                        selectedLanguage.code,
+                        systemLanguage.code,
+                    ).value,
                 },
                 true,
             )

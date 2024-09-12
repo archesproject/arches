@@ -5,16 +5,14 @@ import { useGettext } from "vue3-gettext";
 
 import Tree from "primevue/tree";
 
+import { getItemLabel } from "@/arches_vue_utils/utils.ts";
 import {
     displayedRowKey,
     selectedLanguageKey,
+    systemLanguageKey,
 } from "@/arches_references/constants.ts";
 import { routeNames } from "@/arches_references/routes.ts";
-import {
-    bestLabel,
-    findNodeInTree,
-    nodeIsList,
-} from "@/arches_references/utils.ts";
+import { findNodeInTree, nodeIsList } from "@/arches_references/utils.ts";
 import LetterCircle from "@/arches_references/components/misc/LetterCircle.vue";
 import ListTreeControls from "@/arches_references/components/tree/ListTreeControls.vue";
 import TreeRow from "@/arches_references/components/tree/TreeRow.vue";
@@ -60,6 +58,7 @@ const nextFilterChangeNeedsExpandAll = ref(false);
 const expandedKeysSnapshotBeforeSearch = ref<TreeExpandedKeys>({});
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
+const systemLanguage = inject(systemLanguageKey) as Language;
 const { setDisplayedRow } = inject(displayedRowKey) as unknown as {
     setDisplayedRow: RowSetter;
 };
@@ -232,8 +231,11 @@ const filterCallbackWrapped = computed(() => {
                     if (nodeIsList(node)) {
                         return node.data.name;
                     }
-                    return bestLabel(node.data, selectedLanguage.value.code)
-                        .value;
+                    return getItemLabel(
+                        node.data,
+                        selectedLanguage.value.code,
+                        systemLanguage.code,
+                    ).value;
                 },
             ];
         },

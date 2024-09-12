@@ -2,17 +2,24 @@
 import arches from "arches";
 import { computed, inject } from "vue";
 
-import { itemKey, METADATA_CHOICES } from "@/arches_references/constants.ts";
-import { bestLabel } from "@/arches_references/utils.ts";
+import { getItemLabel } from "@/arches_vue_utils/utils.ts";
+import {
+    itemKey,
+    METADATA_CHOICES,
+    systemLanguageKey,
+} from "@/arches_references/constants.ts";
 import ImageMetadata from "@/arches_references/components/editor/ImageMetadata.vue";
 
 import type { Ref } from "vue";
+import type { Language } from "@/arches_vue_utils/types";
 import type {
     ControlledListItem,
     ControlledListItemImage,
 } from "@/arches_references/types";
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
+const systemLanguage = inject(systemLanguageKey) as Language;
+
 const { image } = defineProps<{ image: ControlledListItemImage }>();
 
 const bestTitle = computed(() => {
@@ -34,7 +41,12 @@ const bestAlternativeText = computed(() => {
                     METADATA_CHOICES.alternativeText,
             )
             .find((altText) => altText.language_id === arches.activeLanguage)
-            ?.value || bestLabel(item.value, arches.activeLanguage).value
+            ?.value ||
+        getItemLabel(
+            item.value,
+            arches.activeLanguage.code,
+            systemLanguage.code,
+        ).value
     );
 });
 </script>

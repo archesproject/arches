@@ -7,6 +7,7 @@ import InputText from "primevue/inputtext";
 import ProgressSpinner from "primevue/progressspinner";
 import { useToast } from "primevue/usetoast";
 
+import { getItemLabel } from "@/arches_vue_utils/utils.ts";
 import {
     createItem,
     createList,
@@ -20,9 +21,9 @@ import {
     SECONDARY,
     displayedRowKey,
     selectedLanguageKey,
+    systemLanguageKey,
 } from "@/arches_references/constants.ts";
 import {
-    bestLabel,
     dataIsNew,
     findNodeInTree,
     itemAsNode,
@@ -50,6 +51,7 @@ const toast = useToast();
 const { $gettext } = useGettext();
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
+const systemLanguage = inject(systemLanguageKey) as Language;
 
 const tree = defineModel<TreeNode[]>("tree", { required: true });
 const expandedKeys = defineModel<TreeExpandedKeys>("expandedKeys", {
@@ -101,7 +103,11 @@ const rowLabel = computed(() => {
     }
     const unstyledLabel =
         node.data.name ??
-        bestLabel(node.data, selectedLanguage.value.code).value;
+        getItemLabel(
+            node.data,
+            selectedLanguage.value.code,
+            systemLanguage.code,
+        ).value;
     if (!filterValue.value) {
         return unstyledLabel;
     }
@@ -316,9 +322,10 @@ const acceptNewListShortcutEntry = async () => {
                     $gettext(
                         'Move %{item} here',
                         {
-                            item: bestLabel(
+                            item: getItemLabel(
                                 movingItem.data,
                                 selectedLanguage.code,
+                                systemLanguage.code,
                             ).value,
                         },
                         true,

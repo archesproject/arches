@@ -7,12 +7,11 @@ import ItemType from "@/arches_references/components/editor/ItemType.vue";
 import ItemURI from "@/arches_references/components/editor/ItemURI.vue";
 import ValueEditor from "@/arches_references/components/editor/ValueEditor.vue";
 
+import { ALT_LABEL, PREF_LABEL } from "@/arches_vue_utils/constants.ts";
 import {
     displayedRowKey,
     itemKey,
-    ALT_LABEL,
     NOTE,
-    PREF_LABEL,
 } from "@/arches_references/constants.ts";
 
 import type { Ref } from "vue";

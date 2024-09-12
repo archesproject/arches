@@ -20,9 +20,10 @@ const { $gettext } = useGettext();
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
-const { expandAll, collapseAll } = defineProps<{
+const { expandAll, collapseAll, fontFamily } = defineProps<{
     expandAll: () => void;
     collapseAll: () => void;
+    fontFamily: string;
 }>();
 </script>
 
@@ -67,6 +68,7 @@ const { expandAll, collapseAll } = defineProps<{
                     root: { class: 'secondary-button' },
                     label: { style: { alignSelf: 'center' } },
                     optionLabel: { style: { fontSize: 'small' } },
+                    overlay: { style: { fontFamily } },
                 }"
             />
         </div>

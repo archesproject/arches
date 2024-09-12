@@ -5,13 +5,13 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 import { useToast } from "primevue/usetoast";
 
+import { PREF_LABEL } from "@/arches_vue_utils/constants.ts";
 import { patchList } from "@/arches_references/api.ts";
 import {
     CONTRAST,
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
     PRIMARY,
-    PREF_LABEL,
     displayedRowKey,
     selectedLanguageKey,
 } from "@/arches_references/constants.ts";

@@ -12,10 +12,9 @@ type ItemRef = Ref<ControlledListItem>;
 export const itemKey = Symbol() as InjectionKey<ItemRef>;
 type LanguageRef = Ref<Language>;
 export const selectedLanguageKey = Symbol() as InjectionKey<LanguageRef>;
+export const systemLanguageKey = Symbol() as InjectionKey<Language>;
 
 // Constants
-export const PREF_LABEL = "prefLabel";
-export const ALT_LABEL = "altLabel";
 export const NOTE = "note";
 export const URI = "URI";
 export const CONTRAST = "contrast";
@@ -43,4 +42,14 @@ export const NOTE_CHOICES = {
     change: "changeNote",
     note: "note",
     description: "description",
+};
+
+// Temporary workaround until received from backend
+export const ENGLISH = {
+    code: "en",
+    default_direction: "ltr" as const,
+    id: 1,
+    isdefault: true,
+    name: "English",
+    scope: "system",
 };

@@ -2,11 +2,13 @@
 import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
+import { getItemLabel } from "@/arches_vue_utils/utils.ts";
 import {
     displayedRowKey,
     selectedLanguageKey,
+    systemLanguageKey,
 } from "@/arches_references/constants.ts";
-import { bestLabel, dataIsList } from "@/arches_references/utils.ts";
+import { dataIsList } from "@/arches_references/utils.ts";
 
 import type { Ref } from "vue";
 import type { Language } from "@/arches_vue_utils/types";
@@ -22,6 +24,7 @@ const { displayedRow } = inject(displayedRowKey) as unknown as {
     displayedRow: Ref<Selectable>;
 };
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
+const systemLanguage = inject(systemLanguageKey) as Language;
 
 const heading = computed(() => {
     if (!displayedRow.value) {
@@ -35,11 +38,12 @@ const heading = computed(() => {
         );
     }
     return $gettext(
-        "Item Editor > %{bestLabel}",
+        "Item Editor > %{itemLabel}",
         {
-            bestLabel: bestLabel(
+            itemLabel: getItemLabel(
                 displayedRow.value as ControlledListItem,
                 selectedLanguage.value.code,
+                systemLanguage.code,
             ).value,
         },
         true, // turn off escaping: vue template sanitizes
