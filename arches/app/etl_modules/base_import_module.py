@@ -290,16 +290,16 @@ class BaseImportModule:
                 )
             elif source.split(".")[-1].lower() == "zip":
                 file_type = "application/zip"
-            file = open(source, "rb")
             file_stat = os.stat(source)
-            content = InMemoryUploadedFile(
-                file,
-                "file",
-                os.path.basename(source),
-                file_type,
-                file_stat.st_size,
-                None,
-            )
+            with open(source, "rb") as file:
+                content = InMemoryUploadedFile(
+                    file,
+                    "file",
+                    os.path.basename(source),
+                    file_type,
+                    file_stat.st_size,
+                    None,
+                )
 
         result = {
             "summary": {
