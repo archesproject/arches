@@ -37,7 +37,7 @@ from arches.app.models.models import (
     SearchExportHistory,
 )
 from arches.app.models.concept import Concept, get_preflabel_from_conceptid
-from arches.app.utils.response import JSONResponse
+from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import (
@@ -348,40 +348,40 @@ def get_dsl_from_search_string(request):
 
 
 def search_results(request, returnDsl=False):
-    se = SearchEngineFactory().create()
     search_filter_factory = SearchFilterFactory(request)
     searchview_component_instance = search_filter_factory.get_searchview_instance()
     if not searchview_component_instance:
-        unavailable_core_name = search_filter_factory.get_searchview_name()
-        ret = {
-            "success": False,
-            "message": _("No core-search component named {0}").format(
-                unavailable_core_name
-            ),
-        }
-        return JSONResponse(ret, status=406)
-
-    search_query_object = {"query": Query(se)}
-    response_object = {"results": None}
-
-    response_object, search_query_object = (
-        searchview_component_instance.handle_search_results_query(
-            search_query_object, response_object, search_filter_factory, returnDsl
+        unavailable_searchview_name = search_filter_factory.get_searchview_name()
+        message = _("No search-view named {0}").format(unavailable_searchview_name)
+        return JSONErrorResponse(
+            _("Search Failed"),
+            message,
+            status=400,
         )
-    )
 
-    if returnDsl:
-        return search_query_object.pop("query", None)
+    try:
+        response_object, search_query_object = (
+            searchview_component_instance.handle_search_results_query(
+                search_filter_factory, returnDsl
+            )
+        )
+        if returnDsl:
+            return search_query_object.pop("query")
+        else:
+            return JSONResponse(content=response_object)
+    except Exception as e:
+        message = _("There was an error retrieving the search results")
+        try:
+            message = e.args[0].get("message", message)
+        except:
+            logger.exception("Error retrieving search results:")
+            logger.exception(e)
 
-    if response_object:
-        return JSONResponse(content=response_object)
-
-    else:
-        ret = {
-            "success": False,
-            "message": _("There was an error retrieving the search results"),
-        }
-        return JSONResponse(ret, status=500)
+        return JSONErrorResponse(
+            _("Search Failed"),
+            message,
+            status=500,
+        )
 
 
 def get_provisional_type(request):
