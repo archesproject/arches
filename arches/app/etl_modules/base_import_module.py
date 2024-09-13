@@ -434,8 +434,8 @@ class BaseImportModule:
         if initiated["success"]:
             try:
                 read = self.read(source=source)
-            except:
-                return return_with_error(_("Unexpected Error during reading the files"))
+            except Exception as e:
+                return return_with_error(_("Unexpected Error during reading the files: {}").format(e))
         else:
             return return_with_error(initiated["message"])
 
@@ -445,8 +445,8 @@ class BaseImportModule:
                     "load_details", json.dumps({"result": read["data"]})
                 )
                 written = self.write(self.request)
-            except:
-                return return_with_error(_("Unexpected Error during saving the tiels"))
+            except Exception as e:
+                return return_with_error(_("Unexpected Error during saving the tiels: {}").format(e))
         else:
             return return_with_error(read["data"]["message"])
 
