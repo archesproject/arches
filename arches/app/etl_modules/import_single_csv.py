@@ -137,15 +137,15 @@ class ImportSingleCsv(BaseImportModule):
             elif source.split(".")[-1].lower() == "zip":
                 file_type = "application/zip"
             file_stat = os.stat(source)
-            with open(source, "rb") as file:
-                content = InMemoryUploadedFile(
-                    file,
-                    "file",
-                    os.path.basename(source),
-                    file_type,
-                    file_stat.st_size,
-                    None,
-                )
+            file = open(source, "rb")
+            content = InMemoryUploadedFile(
+                file,
+                "file",
+                os.path.basename(source),
+                file_type,
+                file_stat.st_size,
+                None,
+            )
 
         temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         try:
@@ -176,6 +176,7 @@ class ImportSingleCsv(BaseImportModule):
                 csv_file_path = os.path.join(temp_dir, csv_file_name)
             except TypeError:
                 pass
+        content.file.close()
 
         if csv_file_name is None:
             return {

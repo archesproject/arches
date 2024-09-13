@@ -291,15 +291,15 @@ class BaseImportModule:
             elif source.split(".")[-1].lower() == "zip":
                 file_type = "application/zip"
             file_stat = os.stat(source)
-            with open(source, "rb") as file:
-                content = InMemoryUploadedFile(
-                    file,
-                    "file",
-                    os.path.basename(source),
-                    file_type,
-                    file_stat.st_size,
-                    None,
-                )
+            file = open(source, "rb")
+            content = InMemoryUploadedFile(
+                file,
+                "file",
+                os.path.basename(source),
+                file_type,
+                file_stat.st_size,
+                None,
+            )
 
         result = {
             "summary": {
@@ -344,6 +344,7 @@ class BaseImportModule:
             default_storage.save(
                 os.path.join(self.temp_dir, content.name), File(content)
             )
+        content.file.close()
 
         has_valid_excel_file = False
         for file in result["summary"]["files"]:
