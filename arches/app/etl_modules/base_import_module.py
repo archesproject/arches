@@ -420,37 +420,40 @@ class BaseImportModule:
             return response
 
     def cli(self, source):
-        read = {"success": False}
-        written = {"success": False}
+        def return_with_error(error):
+            return {
+                "success": False,
+                "data": {"title": _("Error"), "message": error},
+            }
+
+        read = {"success": False, "message": ""}
+        written = {"success": False, "message": ""}
 
         initiated = self.start(self.request)
 
         if initiated["success"]:
-            read = self.read(source=source)
+            try:
+                read = self.read(source=source)
+            except:
+                return return_with_error(_("Unexpected Error during reading the files"))
         else:
-            return {
-                "success": False,
-                "data": {"title": _("Error"), "message": initiated["data"]["message"]},
-            }
+            return return_with_error(initiated["message"])
 
         if read["success"]:
-            self.request.POST.__setitem__(
-                "load_details", json.dumps({"result": read["data"]})
-            )
-            written = self.write(self.request)
+            try:
+                self.request.POST.__setitem__(
+                    "load_details", json.dumps({"result": read["data"]})
+                )
+                written = self.write(self.request)
+            except:
+                return return_with_error(_("Unexpected Error during saving the tiels"))
         else:
-            return {
-                "success": False,
-                "data": {"title": _("Error"), "message": read["data"]["message"]},
-            }
+            return return_with_error(read["data"]["message"])
 
         if written["success"]:
-            return {"success": True, "data": "done"}
+            return {"success": True, "data": "Succenfully Imported"}
         else:
-            return {
-                "success": False,
-                "data": {"title": _("Error"), "message": written["data"]["message"]},
-            }
+            return return_with_error(written["data"]["message"])
 
 
 class FileValidationError(Exception):

@@ -97,34 +97,37 @@ class ImportSingleCsv(BaseImportModule):
         return self.node_lookup[graphid]
 
     def cli(self, source):
-        read = {"success": False}
-        written = {"success": False}
+        def return_with_error(error):
+            return {
+                "success": False,
+                "data": {"title": _("Error"), "message": error},
+            }
+
+        read = {"success": False, "message": ""}
+        written = {"success": False, "message": ""}
 
         initiated = self.start(self.request)
 
         if initiated["success"]:
-            read = self.read(source=source)
+            try:
+                read = self.read(source=source)
+            except:
+                return return_with_error(_("Unexpected Error during reading the files"))
         else:
-            return {
-                "success": False,
-                "data": {"title": _("Error"), "message": initiated["message"]},
-            }
+            return return_with_error(initiated["message"])
 
         if read["success"]:
-            written = self.write(self.request)
+            try:
+                written = self.write(self.request)
+            except:
+                return return_with_error(_("Unexpected Error during saving the tiels"))
         else:
-            return {
-                "success": False,
-                "data": {"title": _("Error"), "message": read["message"]},
-            }
+            return return_with_error(read["message"])
 
         if written["success"]:
-            return {"success": True, "data": "done"}
+            return {"success": True, "data": _("Successfully Imported")}
         else:
-            return {
-                "success": False,
-                "data": {"title": _("Error"), "message": written["message"]},
-            }
+            return return_with_error(written["message"])
 
     def read(self, request=None, source=None):
         """
