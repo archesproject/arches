@@ -435,7 +435,9 @@ class BaseImportModule:
             try:
                 read = self.read(source=source)
             except Exception as e:
-                return return_with_error(_("Unexpected Error during reading the files: {}").format(e))
+                return return_with_error(
+                    _("Unexpected Error during reading the files: {}").format(e)
+                )
         else:
             return return_with_error(initiated["message"])
 
@@ -446,7 +448,9 @@ class BaseImportModule:
                 )
                 written = self.write(self.request)
             except Exception as e:
-                return return_with_error(_("Unexpected Error during saving the tiels: {}").format(e))
+                return return_with_error(
+                    _("Unexpected Error during saving the tiels: {}").format(e)
+                )
         else:
             return return_with_error(read["data"]["message"])
 
