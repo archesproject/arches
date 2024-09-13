@@ -97,6 +97,9 @@ class ImportSingleCsv(BaseImportModule):
         return self.node_lookup[graphid]
 
     def cli(self, source):
+        read = {"success": False}
+        written = {"success": False}
+
         initiated = self.start(self.request)
 
         if initiated["success"]:

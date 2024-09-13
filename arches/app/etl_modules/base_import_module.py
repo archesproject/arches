@@ -420,6 +420,9 @@ class BaseImportModule:
             return response
 
     def cli(self, source):
+        read = {"success": False}
+        written = {"success": False}
+
         initiated = self.start(self.request)
 
         if initiated["success"]:
