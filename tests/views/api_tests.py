@@ -493,3 +493,15 @@ class ResourceAPITests(ArchesTestCase):
             )
 
         self.assertEqual(response.status_code, 400)
+
+    def test_resource_report_api(self):
+        previously_used_resourceid = "075957c4-d97f-4986-8d27-c32b6dec8e62"
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.get(
+                reverse(
+                    "api_resource_report",
+                    args=(previously_used_resourceid),
+                )
+            )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("related_resources" in response)
