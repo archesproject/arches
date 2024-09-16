@@ -889,14 +889,7 @@ class Resource(models.ResourceInstance):
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
                 for resource in related_resources["docs"]:
-                    relations = get_relations(
-                        resourceinstanceid=resource["_id"],
-                        start=0,
-                        limit=0,
-                    )
                     if resource["found"]:
-                        resource["_source"]["total_relations"] = relations["total"]
-
                         for descriptor_type in ("displaydescription", "displayname"):
                             descriptor = get_localized_descriptor(
                                 resource, descriptor_type
