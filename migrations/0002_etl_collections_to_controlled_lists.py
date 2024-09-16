@@ -296,12 +296,19 @@ class Migration(migrations.Migration):
                 where t.list_item_id = n.legacy_list_item_id
                     and rownumber > 1;
 
-                -- Update list_item_ids for items that don't have multiple values
-                update temp_list_items_and_values
-                set list_item_id = uuid_generate_v4()
-                where rownumber > 1
-                    and legacy_conceptid != any(listitems_to_update_with_multiple_values)
-                    and list_item_id = legacy_conceptid;
+                -- Update list_item_ids for items that don't have multiple values (like prefLabel)
+                if array_length(listitems_to_update_with_multiple_values, 1) > 0 then 
+                    update temp_list_items_and_values
+                    set list_item_id = uuid_generate_v4()
+                    where rownumber > 1
+                        and legacy_conceptid != any(listitems_to_update_with_multiple_values)
+                        and list_item_id = legacy_conceptid;
+                else
+                    update temp_list_items_and_values
+                    set list_item_id = uuid_generate_v4()
+                    where rownumber > 1
+                        and list_item_id = legacy_conceptid;
+                end if;
 
                 -- Update listitemvalue_ids
                 update temp_list_items_and_values
