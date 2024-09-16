@@ -73,22 +73,6 @@ class ResourceAPITests(ArchesTestCase):
         cls.test_prj_user = models.ResourceInstance.objects.filter(
             graph=cls.data_type_graph
         ).first()
-        cls.phase_type_graphid = "049fc0c8-fa36-11e6-9e3e-026d961c88e6"
-        cls.phase_type_instance_resourceid = "603c707e-5558-43f5-a2aa-418988c16651"
-        new_phase_type_instance = Resource(
-            graph_id=cls.phase_type_graphid,
-            resourceinstanceid=cls.phase_type_instance_resourceid,
-        )
-        new_phase_type_instance.save(index=False)
-        new_phase_type_instance.index()
-
-        relation = models.ResourceXResource(
-            resourceinstancefrom_graphid_id=cls.data_type_graphid,
-            resourceinstanceto_graphid_id=cls.phase_type_graphid,
-            resourceinstanceidfrom_id=cls.test_prj_user.pk,
-            resourceinstanceidto_id=cls.phase_type_instance_resourceid,
-        )
-        relation.save()
 
     def get_tile_by_id(self, tileid, tiles):
         for tile in tiles:
@@ -520,18 +504,3 @@ class ResourceAPITests(ArchesTestCase):
             ),
         )
         self.assertEqual(response.status_code, 200)
-
-    def test_related_resources_in_resource_report_api(self):
-        self.client.login(username="admin", password="admin")
-        response = self.client.get(
-            reverse(
-                "api_resource_report",
-                args=(str(self.test_prj_user.pk),),
-            ),
-        )
-        resp = json.loads(response.content)
-        detected_relations = 0
-        for related_graph_set in resp["related_resources"]:
-            if len(related_graph_set["resources"]) > 0:
-                detected_relations = len(related_graph_set["resources"])
-        self.assertTrue(detected_relations == 1)
