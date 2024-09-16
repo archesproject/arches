@@ -27,7 +27,6 @@ from django.test.utils import captured_stdout
 
 from arches.app.views.api import APIBase
 from arches.app.models import models
-from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
