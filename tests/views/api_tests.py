@@ -503,7 +503,6 @@ class ResourceAPITests(ArchesTestCase):
                 "api_resource_report",
                 args=(previously_used_resourceid,),
             ),
-            {"ver": "2.0"},
         )
         with self.assertLogs("django.request", level="WARNING"):
             response = view(request)
