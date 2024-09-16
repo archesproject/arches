@@ -853,6 +853,11 @@ class Resource(models.ResourceInstance):
         restricted_instances = (
             get_restricted_instances(user, se) if user is not None else []
         )
+        readable_graphids = set(
+            permission_backend.get_resource_types_by_perm(
+                user, ["models.read_nodegroup"]
+            )
+        )
         for relation in resource_relations["relations"]:
             relation = model_to_dict(relation)
             resourceid_to = relation["resourceinstanceidto"]
@@ -863,8 +868,8 @@ class Resource(models.ResourceInstance):
             if (
                 resourceid_to not in restricted_instances
                 and resourceid_from not in restricted_instances
-                and user_can_read_graph(user, resourceinstanceto_graphid)
-                and user_can_read_graph(user, resourceinstancefrom_graphid)
+                and str(resourceinstanceto_graphid) in readable_graphids
+                and str(resourceinstancefrom_graphid) in readable_graphids
             ):
                 try:
                     preflabel = get_preflabel_from_valueid(
