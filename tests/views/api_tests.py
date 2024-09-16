@@ -496,12 +496,16 @@ class ResourceAPITests(ArchesTestCase):
 
     def test_resource_report_api(self):
         previously_used_resourceid = "075957c4-d97f-4986-8d27-c32b6dec8e62"
+        factory = RequestFactory(HTTP_X_ARCHES_VER="2.1")
+        view = APIBase.as_view()
+        request = factory.get(
+            reverse(
+                "api_resource_report",
+                args=(previously_used_resourceid,),
+            ),
+            {"ver": "2.0"},
+        )
         with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.get(
-                reverse(
-                    "api_resource_report",
-                    args=(previously_used_resourceid),
-                )
-            )
+            response = view(request)
         self.assertEqual(response.status_code, 200)
         self.assertTrue("related_resources" in response)
