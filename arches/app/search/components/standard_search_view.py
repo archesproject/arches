@@ -167,6 +167,9 @@ class StandardSearchView(BaseSearchView):
                     results = {"hits": {"hits": results["docs"]}}
                 else:
                     results = {"hits": {"hits": [results]}}
+
+                results["total"] = {"value": len(results["hits"]["hits"])}
+
         response_object["results"] = results
 
     def post_search_hook(self, search_query_object, response_object, **kwargs):
