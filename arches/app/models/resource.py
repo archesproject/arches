@@ -816,7 +816,11 @@ class Resource(models.ResourceInstance):
             limit = number_per_page * page
 
         def get_relations(
-            resourceinstanceid, start, limit, resourceinstance_graphid=None
+            resourceinstanceid,
+            start,
+            limit,
+            resourceinstance_graphid=None,
+            count_only=False,
         ):
             final_query = Q(resourceinstanceidfrom_id=resourceinstanceid) | Q(
                 resourceinstanceidto_id=resourceinstanceid
@@ -831,14 +835,19 @@ class Resource(models.ResourceInstance):
                 ) & Q(resourceinstanceto_graphid_id=str(self.graph_id))
                 final_query = final_query & (to_graph_id_filter | from_graph_id_filter)
 
-            relations = {
-                "total": models.ResourceXResource.objects.filter(final_query).count(),
-                "relations": models.ResourceXResource.objects.filter(final_query)[
-                    start:limit
-                ],
-            }
+            if count_only:
+                return models.ResourceXResource.objects.filter(final_query).count()
 
-            return relations  # resourceinstance_graphid = "00000000-886a-374a-94a5-984f10715e3a"
+            return (
+                {  # resourceinstance_graphid = "00000000-886a-374a-94a5-984f10715e3a"
+                    "total": models.ResourceXResource.objects.filter(
+                        final_query
+                    ).count(),
+                    "relations": models.ResourceXResource.objects.filter(final_query)[
+                        start:limit
+                    ],
+                }
+            )
 
         resource_relations = get_relations(
             resourceinstanceid=self.resourceinstanceid,
@@ -894,14 +903,14 @@ class Resource(models.ResourceInstance):
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
                 for resource in related_resources["docs"]:
-                    relations = get_relations(
-                        resourceinstanceid=resource["_id"],
-                        start=0,
-                        limit=0,
-                    )
                     if resource["found"]:
-                        resource["_source"]["total_relations"] = relations["total"]
-
+                        rel_count = get_relations(
+                            resourceinstanceid=resource["_id"],
+                            start=0,
+                            limit=0,
+                            count_only=True,
+                        )
+                        resource["_source"]["total_relations"] = rel_count
                         for descriptor_type in ("displaydescription", "displayname"):
                             descriptor = get_localized_descriptor(
                                 resource, descriptor_type
