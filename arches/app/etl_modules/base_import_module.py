@@ -9,6 +9,7 @@ from openpyxl import load_workbook
 
 from django.core.files import File
 from django.core.files.storage import default_storage
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.translation import gettext as _
 from django.utils.decorators import method_decorator
 from django.db import connection
@@ -16,7 +17,7 @@ from django.db import connection
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
-from arches.app.models.models import Node
+from arches.app.models.models import ETLModule, Node
 from arches.app.models.system_settings import settings
 from arches.app.utils.decorators import user_created_transaction_match
 from arches.app.utils.file_validator import FileValidator
@@ -38,7 +39,10 @@ class BaseImportModule:
         self.loadid = loadid
         self.legacyid_lookup = {}
         self.datatype_factory = DataTypeFactory()
-
+        self.config = (
+            ETLModule.objects.get(pk=self.moduleid).config if self.moduleid else {}
+        )
+        self.mode = "ui"
         if self.request:
             self.userid = request.user.id
             self.moduleid = request.POST.get("module")
@@ -197,15 +201,16 @@ class BaseImportModule:
             }
         return lookup
 
-    def run_load_task(self, userid, files, summary, result, temp_dir, loadid):
-        self.loadid = loadid  # currently redundant, but be certain
+    def run_load_task(
+        self, userid, files, summary, result, temp_dir, loadid, multiprocessing=False
+    ):
         try:
             with connection.cursor() as cursor:
                 self.stage_files(files, summary, cursor)
                 self.check_tile_cardinality(cursor)
                 result["validation"] = self.validate(loadid)
                 if len(result["validation"]["data"]) == 0:
-                    self.save_to_tiles(cursor, userid, loadid)
+                    self.save_to_tiles(cursor, userid, loadid, multiprocessing)
                     cursor.execute(
                         """CALL __arches_update_resource_x_resource_with_graphids();"""
                     )
@@ -214,10 +219,11 @@ class BaseImportModule:
                     if not refresh_successful:
                         raise Exception("Unable to refresh spatial views")
                 else:
-                    cursor.execute(
-                        """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
-                        ("failed", datetime.now(), loadid),
-                    )
+                    with connection.cursor() as cursor:
+                        cursor.execute(
+                            """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                            ("failed", datetime.now(), loadid),
+                        )
         finally:
             self.delete_from_default_storage(temp_dir)
         result["summary"] = summary
@@ -228,7 +234,6 @@ class BaseImportModule:
         raise NotImplementedError
 
     def prepare_temp_dir(self, request):
-        self.loadid = request.POST.get("load_id")
         self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         try:
             self.delete_from_default_storage(self.temp_dir)
@@ -256,8 +261,8 @@ class BaseImportModule:
             [self.loadid],
         )
 
-    def save_to_tiles(self, cursor, userid, loadid):
-        return save_to_tiles(userid, loadid)
+    def save_to_tiles(self, cursor, userid, loadid, multiprocessing=False):
+        return save_to_tiles(userid, loadid, multiprocessing)
 
     ### Actions ###
 
@@ -273,10 +278,28 @@ class BaseImportModule:
         row = self.get_validation_result(loadid)
         return {"success": success, "data": row}
 
-    def read(self, request):
+    def read(self, request=None, source=None):
         self.prepare_temp_dir(request)
         self.cumulative_files_size = 0
-        content = request.FILES["file"]
+        if request:
+            content = request.FILES.get("file")
+        else:
+            if source.split(".")[-1].lower() == "xlsx":
+                file_type = (
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+            elif source.split(".")[-1].lower() == "zip":
+                file_type = "application/zip"
+            file_stat = os.stat(source)
+            file = open(source, "rb")
+            content = InMemoryUploadedFile(
+                file,
+                "file",
+                os.path.basename(source),
+                file_type,
+                file_stat.st_size,
+                None,
+            )
 
         result = {
             "summary": {
@@ -289,11 +312,10 @@ class BaseImportModule:
         extension = content.name.split(".")[-1] or None
         if len(validator.validate_file_type(content, extension=extension)) > 0:
             return {
+                "status": 400,
                 "success": False,
-                "data": FileValidationError(
-                    message=_("Upload a valid excel file"),
-                    code=400,
-                ),
+                "title": _("Invalid excel file/zip specified"),
+                "message": _("Upload a valid .xlsx or .zip file"),
             }
         if content.name.split(".")[-1].lower() == "zip":
             with zipfile.ZipFile(content, "r") as zip_ref:
@@ -322,6 +344,7 @@ class BaseImportModule:
             default_storage.save(
                 os.path.join(self.temp_dir, content.name), File(content)
             )
+        content.file.close()
 
         has_valid_excel_file = False
         for file in result["summary"]["files"]:
@@ -345,7 +368,6 @@ class BaseImportModule:
         return {"success": True, "data": result}
 
     def start(self, request):
-        self.loadid = request.POST.get("load_id")
         self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         result = {"started": False, "message": ""}
         with connection.cursor() as cursor:
@@ -367,26 +389,75 @@ class BaseImportModule:
         return {"success": result["started"], "data": result}
 
     def write(self, request):
-        self.loadid = request.POST.get("load_id")
         self.temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         self.file_details = request.POST.get("load_details", None)
+        multiprocessing = request.POST.get("multiprocessing", False)
         result = {}
         if self.file_details:
             details = json.loads(self.file_details)
             files = details["result"]["summary"]["files"]
             summary = details["result"]["summary"]
-            use_celery_file_size_threshold_in_MB = 0.1
+            use_celery_file_size_threshold = self.config.get(
+                "celeryByteSizeLimit", 100000
+            )
+
             if (
-                summary["cumulative_files_size"] / 1000000
-                > use_celery_file_size_threshold_in_MB
+                self.mode != "cli"
+                and summary["cumulative_files_size"] > use_celery_file_size_threshold
             ):
                 response = self.run_load_task_async(request, self.loadid)
             else:
                 response = self.run_load_task(
-                    self.userid, files, summary, result, self.temp_dir, self.loadid
+                    self.userid,
+                    files,
+                    summary,
+                    result,
+                    self.temp_dir,
+                    self.loadid,
+                    multiprocessing,
                 )
 
             return response
+
+    def cli(self, source):
+        def return_with_error(error):
+            return {
+                "success": False,
+                "data": {"title": _("Error"), "message": error},
+            }
+
+        read = {"success": False, "message": ""}
+        written = {"success": False, "message": ""}
+
+        initiated = self.start(self.request)
+
+        if initiated["success"]:
+            try:
+                read = self.read(source=source)
+            except Exception as e:
+                return return_with_error(
+                    _("Unexpected error while reading file(s): {}").format(e)
+                )
+        else:
+            return return_with_error(initiated["message"])
+
+        if read["success"]:
+            try:
+                self.request.POST.__setitem__(
+                    "load_details", json.dumps({"result": read["data"]})
+                )
+                written = self.write(self.request)
+            except Exception as e:
+                return return_with_error(
+                    _("Unexpected error while processing file(s): {}").format(e)
+                )
+        else:
+            return return_with_error(read["data"]["message"])
+
+        if written["success"]:
+            return {"success": True, "data": "Succenfully Imported"}
+        else:
+            return return_with_error(written["data"]["message"])
 
 
 class FileValidationError(Exception):
