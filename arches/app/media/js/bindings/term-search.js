@@ -27,6 +27,13 @@ define([
                     searchbox.tags.push(option);
                 }); 
                 searchbox.trigger('change');
+                if (ko.unwrap(terms).length == 0 && searchbox.tags.length == 0){
+                    searchbox.empty();
+                }
+            });
+            terms.subscribe(function(terms) {
+                if (terms.length == 0 && searchbox.tags.length == 0)
+                    searchbox.empty();
             });
             var self = this;
             this.stripMarkup = function(m){

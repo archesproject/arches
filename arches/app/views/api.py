@@ -1855,8 +1855,7 @@ class NodeValue(APIBase):
             return JSONResponse(e, status=404)
 
         # check if user has permissions to write to node
-        user_has_perms = request.user.has_perm("write_nodegroup", node)
-
+        user_has_perms = request.user.has_perm("write_nodegroup", node.nodegroup)
         if user_has_perms:
             # get datatype of node
             try:

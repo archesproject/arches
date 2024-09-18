@@ -31,8 +31,8 @@ class v3MigrationTests(ArchesTestCase):
     pkg = os.path.join(test_settings.TEST_ROOT, "v3migration", "pkg")
 
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpTestData(cls):
+        super().setUpTestData()
 
         cls.loadOntology()
         with captured_stdout():

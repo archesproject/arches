@@ -46,6 +46,7 @@ from arches.app.utils.middleware import SetAnonymousUser
 class AuthTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         cls.factory = RequestFactory()
         cls.client = Client()
 
@@ -62,8 +63,8 @@ class AuthTests(ArchesTestCase):
         cls.oauth_client_secret = OAUTH_CLIENT_SECRET
 
         sql_str = CREATE_TOKEN_SQL.format(token=cls.token, user_id=cls.user.pk)
-        cursor = connection.cursor()
-        cursor.execute(sql_str)
+        with connection.cursor() as cursor:
+            cursor.execute(sql_str)
 
     def tearDown(self):
         settings.ENABLE_TWO_FACTOR_AUTHENTICATION = False

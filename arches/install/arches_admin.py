@@ -102,7 +102,7 @@ class ArchesProjectCommand(TemplateCommand):
 
         # Create a random SECRET_KEY to put it in the main settings.
         chars = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)"
-        options["secret_key"] = get_random_string(50, chars)
+        options["secret_key"] = "django-insecure-" + get_random_string(50, chars)
 
         # this is used in the package.json file generated when "arches-admin startproject" is called
         # if this is not a final released version of arches (for developers) then arches_version will be blank

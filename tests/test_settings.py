@@ -20,14 +20,12 @@ import os
 
 from arches.settings import *
 
-try:
-    from django.utils.translation import gettext_lazy as _
-except ImportError:  # unable to import prior to installing requirements
-    pass
+from django.utils.translation import gettext_lazy as _
 
 PACKAGE_NAME = "arches"
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 APP_ROOT = ""
+STATICFILES_DIRS = []
 
 # LOAD_V3_DATA_DURING_TESTS = True will engage the most extensive the of the v3
 # data migration tests, which could add over a minute to the test process. It's
@@ -35,7 +33,21 @@ APP_ROOT = ""
 # and run in specific cases at the discretion of the developer.
 LOAD_V3_DATA_DURING_TESTS = False
 
-RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, "fixtures", "resource_graphs"),)
+RESOURCE_GRAPH_LOCATIONS = [
+    os.path.join(TEST_ROOT, "fixtures", "resource_graphs"),
+    os.path.join(
+        TEST_ROOT,
+        "fixtures",
+        "testing_prj",
+        "testing_prj",
+        "pkg",
+        "graphs",
+        "resource_models",
+    ),
+]
+REFERENCE_DATA_FIXTURE_LOCATION = os.path.join(
+    TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg", "reference_data"
+)
 
 ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, "fixtures", "ontologies", "test_ontology")
 ONTOLOGY_PATH = os.path.join(TEST_ROOT, "fixtures", "ontologies", "cidoc_crm")

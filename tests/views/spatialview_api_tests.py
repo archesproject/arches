@@ -1,19 +1,14 @@
 import json
 import random
 import os, uuid
-from django.test import TestCase, RequestFactory, TransactionTestCase
+from django.test import TransactionTestCase
 from django.urls import reverse
-from tests.base_test import ArchesTestCase
 from django.test.utils import captured_stdout
-from django.contrib.auth.models import User
 from django.core import management
-from django.db import connection, connections
 from arches.app.models.models import SpatialView as SpatialViewModel
-from arches.app.views.api import SpatialView
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.models import models
-from uuid import uuid4
 from tests import test_settings
 
 

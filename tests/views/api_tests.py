@@ -19,8 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import json
 import os
 
-from arches.app.utils.i18n import LanguageSynchronizer
-from tests import test_settings
 from tests.base_test import ArchesTestCase
 from django.urls import reverse
 from django.core import management
@@ -30,34 +28,21 @@ from django.test.utils import captured_stdout
 from arches.app.views.api import APIBase
 from arches.app.models import models
 from arches.app.models.graph import Graph
+from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 # these tests can be run from the command line via
 # python manage.py test tests.views.api_tests --settings="tests.test_settings"
 
 
-class APITests(ArchesTestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
-        if not models.GraphModel.objects.filter(pk=cls.data_type_graphid).exists():
-            # TODO: Fix this to run inside transaction, i.e. after super().setUpClass()
-            # https://github.com/archesproject/arches/issues/10719
-            test_pkg_path = os.path.join(
-                test_settings.TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg"
-            )
-            with captured_stdout():
-                management.call_command(
-                    "packages",
-                    operation="load_package",
-                    source=test_pkg_path,
-                    yes=True,
-                    verbosity=0,
-                )
+class ResourceAPITests(ArchesTestCase):
+    graph_fixtures = ["Data_Type_Model"]
+    data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
 
-        super().setUpClass()
-        cls.loadOntology()
-        LanguageSynchronizer.synchronize_settings_with_db()
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.legacy_load_testing_package()
         with open(
             os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "r"
         ) as f:
@@ -88,6 +73,22 @@ class APITests(ArchesTestCase):
         cls.test_prj_user = models.ResourceInstance.objects.filter(
             graph=cls.data_type_graph
         ).first()
+        cls.phase_type_graphid = "049fc0c8-fa36-11e6-9e3e-026d961c88e6"
+        cls.phase_type_instance_resourceid = "603c707e-5558-43f5-a2aa-418988c16651"
+        new_phase_type_instance = Resource(
+            graph_id=cls.phase_type_graphid,
+            resourceinstanceid=cls.phase_type_instance_resourceid,
+        )
+        new_phase_type_instance.save(index=False)
+        new_phase_type_instance.index()
+
+        relation = models.ResourceXResource(
+            resourceinstancefrom_graphid_id=cls.data_type_graphid,
+            resourceinstanceto_graphid_id=cls.phase_type_graphid,
+            resourceinstanceidfrom_id=cls.test_prj_user.pk,
+            resourceinstanceidto_id=cls.phase_type_instance_resourceid,
+        )
+        relation.save()
 
     def get_tile_by_id(self, tileid, tiles):
         for tile in tiles:
@@ -509,3 +510,18 @@ class APITests(ArchesTestCase):
             )
 
         self.assertEqual(response.status_code, 400)
+
+    def test_related_resources_in_resource_report_api(self):
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(
+            reverse(
+                "api_resource_report",
+                args=(str(self.test_prj_user.pk),),
+            ),
+        )
+        resp = json.loads(response.content)
+        detected_relations = 0
+        for related_graph_set in resp["related_resources"]:
+            if len(related_graph_set["resources"]) > 0:
+                detected_relations = len(related_graph_set["resources"])
+        self.assertTrue(detected_relations == 1)
