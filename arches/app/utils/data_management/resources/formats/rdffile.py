@@ -7,6 +7,7 @@ import datetime
 import logging
 from io import StringIO
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from .format import Writer, Reader
 from arches.app.models import models
 from arches.app.models.resource import Resource
