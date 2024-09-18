@@ -60,6 +60,10 @@ img {
     border-right: 1px solid rgba(0,0,0,0.07);
 }*/
 
+.cke_notification_warning {
+    display: none;
+}
+
 .btn:not(.disabled):not(:disabled).active {
     box-shadow: none;
 }
