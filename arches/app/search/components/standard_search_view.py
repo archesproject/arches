@@ -168,7 +168,7 @@ class StandardSearchView(BaseSearchView):
                 else:
                     results = {"hits": {"hits": [results]}}
 
-                results["total"] = {"value": len(results["hits"]["hits"])}
+                results["hits"]["total"] = {"value": len(results["hits"]["hits"])}
 
         response_object["results"] = results
 
