@@ -30,19 +30,11 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 class OntologyModelTests(ArchesTestCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpTestData(cls):
+        super().setUpTestData()
         management.call_command(
             "load_ontology", source=test_settings.ONTOLOGY_FIXTURES, verbosity=0
         )
-
-    @classmethod
-    def tearDownClass(cls):
-        ontology = models.Ontology.objects.get(
-            pk="11111111-0000-0000-0000-000000000000"
-        )
-        ontology.delete()
-        super().tearDownClass()
 
     def test_load_ontology(self):
         ontology_class = models.OntologyClass.objects.get(

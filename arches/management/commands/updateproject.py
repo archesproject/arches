@@ -20,7 +20,7 @@ class Command(BaseCommand):  # pragma: no cover
         answer = input(
             "This will replace the following files in your project:\n"
             ".babelrc, eslintrc.js, .eslintignore, .browserslistrc, .stylelintrc.json,\n"
-            ".yarnrc, .gitattributes, .gitignore, nodemon.json, .prettierrc,\n"
+            ".yarnrc, .gitattributes, nodemon.json, .prettierrc,\n"
             ".pre-commit-config.yaml, tsconfig.json, and the entire webpack directory.\n\n"
             "Continue? "
         )
@@ -137,7 +137,6 @@ class Command(BaseCommand):  # pragma: no cover
             "tsconfig.json",
             ".coveragerc",
             ".gitattributes",
-            ".gitignore",
             ".babelrc",
             ".browserslistrc",
             ".stylelintrc.json",
@@ -303,14 +302,22 @@ class Command(BaseCommand):  # pragma: no cover
                 os.path.join(settings.APP_ROOT, "apps.py"),
             )
 
-        if os.path.isfile(os.path.join(settings.APP_ROOT, "src", "declarations.d.ts")):
+        if os.path.isfile(
+            os.path.join(
+                settings.APP_ROOT, "src", settings.APP_NAME, "declarations.d.ts"
+            )
+        ):
             self.stderr.write(
                 "Existing declarations.d.ts detected. Manually reconcile existing file with new template.",
             )
         else:
-            self.stdout.write("Creating /src/declarations.d.ts")
-            if not os.path.isdir(os.path.join(settings.APP_ROOT, "src")):
-                os.mkdir(os.path.join(settings.APP_ROOT, "src"))
+            self.stdout.write(f"Creating /src/{settings.APP_NAME}/declarations.d.ts")
+            src_path = os.path.join(settings.APP_ROOT, "src")
+            src_project_subdir = os.path.join(src_path, settings.APP_NAME)
+            if not os.path.isdir(src_path):
+                os.mkdir(src_path)
+            if not os.path.isdir(src_project_subdir):
+                os.mkdir(src_project_subdir)
 
             shutil.copy2(
                 os.path.join(
@@ -322,7 +329,20 @@ class Command(BaseCommand):  # pragma: no cover
                     "project_name",
                     "declarations.d.ts",
                 ),
-                os.path.join(settings.APP_ROOT, "src"),
+                os.path.join(settings.APP_ROOT, "src", settings.APP_NAME),
+            )
+            self.stdout.write(f"Creating /src/{settings.APP_NAME}/declarations.test.ts")
+            shutil.copy2(
+                os.path.join(
+                    settings.ROOT_DIR,
+                    "install",
+                    "arches-templates",
+                    "project_name",
+                    "src",
+                    "project_name",
+                    "declarations.test.ts",
+                ),
+                os.path.join(settings.APP_ROOT, "src", settings.APP_NAME),
             )
 
         if not os.path.isfile(
@@ -363,7 +383,6 @@ class Command(BaseCommand):  # pragma: no cover
         for relative_file_path in [
             os.path.join("..", "gettext.config.js"),
             os.path.join("..", ".coveragerc"),
-            os.path.join("..", ".gitignore"),
             os.path.join("..", ".github/workflows/main.yml"),
             os.path.join("..", ".pre-commit-config.yaml"),
             os.path.join("..", "tsconfig.json"),

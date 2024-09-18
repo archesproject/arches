@@ -1,6 +1,11 @@
+from typing import Dict, Tuple
+
 from arches.app.models.system_settings import settings
 from arches.app.search.components.base_search_view import BaseSearchView
+from arches.app.search.components.base import SearchFilterFactory
+from arches.app.search.elasticsearch_dsl_builder import Query
 from arches.app.search.mappings import RESOURCES_INDEX
+from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.views.search import (
     append_instance_permission_filter_dsl,
     get_permitted_nodegroups,
@@ -10,8 +15,8 @@ from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
     user_is_resource_exporter,
 )
-from arches.app.utils.response import JSONErrorResponse
 from arches.app.utils.string_utils import get_str_kwarg_as_bool
+from django.utils.translation import gettext as _
 from datetime import datetime
 import logging
 
@@ -191,8 +196,13 @@ class StandardSearchView(BaseSearchView):
         return search_filters
 
     def handle_search_results_query(
-        self, search_query_object, response_object, search_filter_factory, returnDsl
-    ):
+        self,
+        search_filter_factory: SearchFilterFactory,
+        returnDsl: bool,
+    ) -> Tuple[Dict, Dict]:
+        se = SearchEngineFactory().create()
+        search_query_object = {"query": Query(se)}
+        response_object = {"results": None}
         sorted_query_obj = search_filter_factory.create_search_query_dict(
             list(self.request.GET.items()) + list(self.request.POST.items())
         )
@@ -211,10 +221,13 @@ class StandardSearchView(BaseSearchView):
             append_instance_permission_filter_dsl(self.request, search_query_object)
         except Exception as err:
             logger.exception(err)
-            return JSONErrorResponse(message=str(err))
+            message = {
+                "message": _("Error: {0}. Search failed.").format(str(err)),
+            }
+            raise Exception(message)
 
         if returnDsl:
-            return None, search_query_object
+            return response_object, search_query_object
 
         for filter_type, querystring in list(sorted_query_obj.items()):
             search_filter = search_filter_factory.get_filter(filter_type)

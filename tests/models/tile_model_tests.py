@@ -41,14 +41,15 @@ from arches.app.models.models import (
 
 
 class TileTests(ArchesTestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.loadOntology()
-        cls.ensure_test_resource_models_are_loaded()
+    graph_fixtures = [
+        "rdf_export_document_model",
+        "rdf_export_object_model",
+        "Cardinality Test Model",
+    ]
 
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         sql = """
         INSERT INTO public.resource_instances(resourceinstanceid, legacyid, graphid, createdtime)
             VALUES ('40000000-0000-0000-0000-000000000000', '40000000-0000-0000-0000-000000000000', '2f7f8e40-adbc-11e6-ac7f-14109fd34195', '1/1/2000');
@@ -69,8 +70,8 @@ class TileTests(ArchesTestCase):
             VALUES ('41111111-0000-0000-0000-000000000000', '', 'n');
         """
 
-        cursor = connection.cursor()
-        cursor.execute(sql)
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
 
     def test_load_from_python_dict(self):
         """

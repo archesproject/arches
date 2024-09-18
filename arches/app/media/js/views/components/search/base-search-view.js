@@ -76,7 +76,7 @@ define([
                 error: function(response, status, error) {
                     const alert = new AlertViewModel('ep-alert-red', arches.translations.requestFailed.title, response.responseJSON?.message);
                     if(self.updateRequest.statusText !== 'abort'){
-                        self.alert(alert);
+                        this.alert(alert);
                     }
                     this.sharedStateObject.loading(false);
                 },

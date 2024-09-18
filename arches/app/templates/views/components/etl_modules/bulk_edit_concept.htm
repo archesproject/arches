@@ -1,0 +1,280 @@
+{% extends "views/components/etl_modules/base-import.htm" %}
+{% load i18n %}
+
+{% block task_details %}
+<div class="etl-module-component-container">
+    <div class="etl-module-body">
+        <h2>
+            <span style="font-weight: 400; font-size: 1.7rem; color: #565656;" data-bind="text: $root.translations.replaceConcept"></span>
+        </h2>
+        <p class="pad-btm">
+            {% blocktrans %}Find and replace a concept for a given model{% endblocktrans %}
+        </p>
+        <div class="etl-module-component-block">
+            <h3>
+                <label style="font-weight: normal; font-size: 1.5rem; color: #565656;" for Celery does not appear to be running. Please contact your administrator. Celery does not appear to be running. Please contact your administrator.="search-url-input" data-bind="text: $root.translations.useSearchUrlOptional"></label>
+            </h3>
+            <textarea id="search-url-input"
+                style="min-height: 100px; width: 80%;"
+                class="form-control textarea textarea-resizable" data-bind="textInput: searchUrl"
+            ></textarea>
+        </div>
+
+        <div class="etl-module-component-block">
+            <h3>
+                <label style="font-weight: normal; font-size: 1.5rem; color: #565656;" data-bind="text: $root.translations.selectAResourceModel"></label>
+            </h3>
+            <div>
+                <select data-bind="options: dropdowngraph, optionsText: 'graphName', optionsValue: 'graphid', value: selectedGraph, valueAllowUnset: true, chosen: {width: '400px'}"></select>
+            </div>
+        </div>
+
+        <div class="etl-module-component-block" data-bind="visible: selectedGraph()">
+            <h3>
+                <label style="font-weight: normal; font-size: 1.5rem; color: #565656;" data-bind="text: $root.translations.selectANode"></label>
+            </h3>
+            <select data-bind="options: dropdownnodes, optionsText: 'label', value: selectedNode, valueAllowUnset: true, chosen: {width: '400px'}"></select>
+        </div>
+
+        <div data-bind="if: selectedNode" style="font-size: 1.5rem; margin: 30px 0px;">
+            <div display="flex" style="border:solid 1px lightgrey; border-radius: 5px; margin: 10px 0px;">
+                <div style="background-color: #ebebeb;padding: 5px;">
+                    <label style="font-weight: normal; color: #565656;" data-bind="text: $root.translations.selectConceptToReplace"></label>
+                </div>
+                <div style="display: flex; flex-direction: row;">
+                    <div style="padding: 0px 20px;">
+                        <label data-bind="text: $root.translations.language" style='display: flex; flex-direction: column; margin: 12px 0px 10px 0px;'></label>
+                        <select class="resources3" data-bind="
+                            attr: {'data-label': $root.translations.language},
+                            select2Query: {
+                                select2Config:{
+                                    value: conceptOldLang,
+                                    data: rdmCollectionLanguages
+                            }}">
+                        </select>
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <label style="font-weight: normal; color: #565656; margin: 10px 0px 0px 0px;" data-bind="text: $root.translations.concept"></label>
+                        <div data-bind="component: {
+                            name: 'concept-select-widget',
+                            params: {
+                                node: {'config': {'rdmCollection': selectedNode().rdmCollection }},
+                                value: conceptOld,
+                                allowClear: false,
+                                placeholder: $root.translations.selectReplacementConcept,
+                                lang: conceptOldLang
+                            }, 
+                        }
+                        "></div>
+                    </div>
+                </div>
+            </div>
+            <div display="flex" style="border:solid 1px lightgrey; border-radius: 5px;">
+                <div style="background-color: #ebebeb;padding: 5px;">
+                    <label style="font-weight: normal; color: #565656;" data-bind="text: $root.translations.selectReplacementConcept"></label>
+                </div>
+                <div style="display: flex; flex-direction: row;">
+                    <div style="padding: 0px 20px;">
+                        <label data-bind="text: $root.translations.language" style='display: flex; flex-direction: column; margin: 12px 0px 10px 0px;'></label>
+                        <select class="resources" data-bind="
+                            attr: {'data-label': $root.translations.language},
+                            select2Query: {
+                                select2Config:{
+                                    value: conceptNewLang,
+                                    data: rdmCollectionLanguages
+                            }}">
+                        </select>
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <label style="font-weight: normal; color: #565656; margin: 10px 0px 0px 0px;" data-bind="text: $root.translations.concept"></label>
+                        <div data-bind="component: {
+                            name: 'concept-select-widget',
+                            params: {
+                                node: {'config': {'rdmCollection': selectedNode().rdmCollection }},
+                                value: conceptNew,
+                                allowClear: false,
+                                placeholder: $root.translations.selectReplacementConcept,
+                                lang: conceptNewLang
+                            }, 
+                        }
+                        "></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button data-bind="click: getPreviewData, attr: {disabled: !ready()}" class="btn btn-success">
+            <span data-bind="text: $root.translations.preview"></span>
+            <i class="fa fa-spin fa-spinner" data-bind="visible: previewing()"></i>
+        </button>
+
+        <!-- ko if: showPreview-->
+        <section  class="etl-preview">
+            <!-- ko if: numberOfTiles() === 0 -->
+            <h3 style="margin-top: 0px;">
+                <span style="margin: 2px;" class="fa fa-info-circle"></span><span data-bind="text: $root.translations.noDataToPreview"></span>
+            </h3>
+            <!-- /ko -->
+            <!-- ko if: numberOfTiles() > 0 -->
+            <h3 style="margin-top: 0px;">
+                <span data-bind="text: $root.translations.previewCountStats(numberOfTiles()>previewLimit()?previewLimit():numberOfTiles(),numberOfTiles(),numberOfResources())"></span>
+                <div style="display: inline-flex;">
+                    <button data-bind="click: previousPage, enable: currentPageIndex() > 0, text:$root.translations.previous" class="btn btn-success" style="display: inline-block;  margin-right: 10px;"></button>
+                    <button data-bind="click: nextPage, enable: currentPageIndex() < maxPageIndex(), text:$root.translations.next" class="btn btn-success" style="display: inline-block;"></button>
+                </div>
+            </h3>
+            <h3 style="margin-top: 0px;color:red;" data-bind="if: numberOfTiles() > config.updateLimit">
+                <span style="margin: 2px;" class="fa fa-info-circle"></span><span data-bind="text: $root.translations.bulkEditLimitWarning(config.updateLimit.toLocaleString())"></span>
+            </h3>
+            <div data-bind="visible: ready">
+                <table class="table table-striped csv-mapping-table">
+                    <thead>
+                        <tr>
+                            <th data-bind="text: $root.translations.resourceId"></th>
+                            <th data-bind="text: $root.translations.name"></th>
+                            <th data-bind="text: $root.translations.old"></th>
+                            <th data-bind="text: $root.translations.new"></th>
+                            <th data-bind="text: $root.translations.removeFromEditQueue"></th>
+                        </tr>
+                    </thead>
+                    <tbody data-bind="foreach: paginatedRows">
+                        <tr>
+                            <td><a data-bind="attr: { href: $parent.constructReportUrl($data)}, text: $data.resourceid" target="_blank" style="color: rgb(145, 71, 235);"></a></td>
+                            <td data-bind="text: $data.displayname"></td>
+                            <td data-bind="text: $data.original_preflabels"></td>
+                            <td data-bind="text: $data.new_preflabels"></td>
+                            <td><input type="checkbox" data-bind="checkedValue: $data.tileid, checked: $parent.tilesToRemove"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+            </div>
+            <!-- /ko -->
+        </section>
+        <!-- /ko -->
+    </div>
+
+    <div class="tabbed-workflow-footer, etl-module-footer">
+        <button style="margin-right: 8px;" data-bind="click: write, attr: {disabled: !allowEditOperation()}" class="btn btn-success">
+            <span data-bind="text: $root.translations.start"></span>
+        </button>
+    </div>
+
+</div>
+{% endblock task_details %}
+{% block etl_status %}
+<div class="bulk-load-status">
+    <h4 class="summary-title">
+        <span data-bind="text: $root.translations.bulkDataEditSummary"></span>
+    </h4>
+    <div class="summary-header">
+        <span data-bind="text: $root.translations.editDetails"></span>
+    </div>
+    <div style="padding-top: 10px;" >
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.resourceModelEdited + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: load_details.graph"></span>
+    </div>
+    <div data-bind="if: load_details.node">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.fieldNameEdited + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: load_details.node"></span>      
+    </div>
+    <div >
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.editOperation + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: $root.translations.replaceConceptOrConceptList"></span>
+    </div>
+    <div data-bind="if: load_details.old">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.details + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: load_details.old"></span>
+        <i class="fa fa-long-arrow-right"></i>
+        <span class="etl-loading-metadata-value" data-bind="text: load_details.new"></span>
+    </div>
+    <div data-bind="if: load_details.languageold ">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.language + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: load_details.languageold"></span>
+        <i class="fa fa-long-arrow-right"></i>
+        <span class="etl-loading-metadata-value" data-bind="text: load_details.languagenew"></span>
+    </div>
+    <div>
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.numberOfResourcesUpdated"></span>
+        <!-- ko foreach: load_details.number_of_import -->
+        <div style="padding-left: 10px;" class="etl-loading-metadata-value" data-bind="text: $root.translations.countOfResourcesUpdated($data.total)"></div>
+            <!-- ko foreach: $data.tiles -->
+            <div style="padding-left: 20px;" class="etl-loading-metadata-value" data-bind="text: $root.translations.countOfTilesUpdated($data.count)"></div>
+            <!-- /ko -->
+        <!-- /ko -->
+    </div>
+    <div data-bind="if: editHistoryUrl">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.listOfEditedResources + ':'"></span>
+        <span class="etl-loading-metadata-value">
+            <a class="etl-status-link" target="_blank" data-bind="text: $root.translations.viewInEditLog, attr: { href: editHistoryUrl }"></a>
+        </span>
+    </div>
+    
+</div>
+{% endblock etl_status %}
+
+{% block loading_status %}
+<div class="bulk-load-status">
+    <h4 class="summary-header">
+        <span data-bind="text: $root.translations.bulkEditProgressDetails"></span>
+    </h4>
+    <div style="display:flex;" data-bind="click: function() { showStatusDetails(!showStatusDetails())}">
+        <a class="etl-status-link etl-loading-metadata-key" data-bind="text: $root.translations.bulkEditStatus + ':'"></a>
+        <div style="padding: 1px 4px;">
+            <div>
+                <!-- ko ifnot: showStatusDetails -->
+                <i class="fa fa-caret-right fa-lg"></i>
+                <!-- /ko -->
+                <!-- ko if: showStatusDetails -->
+                <i class="fa fa-caret-down fa-lg"></i>
+                <!-- /ko -->
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: column;">
+            <div class="etl-loading-metadata-value" data-bind="
+                text: selectedLoadEvent() ? 
+                selectedLoadEvent().status == 'indexed' ? $root.translations.completed
+                : selectedLoadEvent().status == 'completed' ? $root.translations.indexing
+                : selectedLoadEvent().status == 'validated' ? $root.translations.running
+                : selectedLoadEvent().status == 'running' ? $root.translations.running
+                : selectedLoadEvent().status == 'reversing' ? $root.translations.unloading
+                : selectedLoadEvent().status == 'unloaded' ? $root.translations.unloaded
+                : selectedLoadEvent().status == 'cancelled' ? $root.translations.cancelled
+                : $root.translations.failed
+            : $root.translations.failed
+            "></div>
+            <!-- ko if: showStatusDetails -->
+            <div data-bind="foreach: statusDetails">
+                <div data-bind="text: $data"></div>
+            </div>
+            <div data-bind="ifnot: ['indexed','failed'].includes(selectedLoadEvent().status)">
+                <i class="fa fa-spin fa-spinner fa-lg"></i>
+            </div>
+            <!-- /ko -->
+        </div>  
+    </div>
+    <div style="padding-top: 10px;">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.bulkEditStarted + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: selectedLoadEvent() ? formatTime(selectedLoadEvent().load_start_time) : ''"></span>    
+    </div>
+    <div data-bind="if: selectedLoadEvent() && selectedLoadEvent().load_end_time">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.bulkEditEnded + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: selectedLoadEvent() ? formatTime(selectedLoadEvent().load_end_time) : ''"></span>    
+    </div>
+    <div data-bind="if: selectedLoadEvent() && selectedLoadEvent().load_end_time">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.bulkEditDuration + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: selectedLoadEvent() ? timeDifference(selectedLoadEvent().load_end_time, selectedLoadEvent().load_start_time) : ''"></span>    
+    </div>
+    <div style="padding-top: 10px;" data-bind="if: selectedLoadEvent() && selectedLoadEvent().indexed_time">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.indexingEnded + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: selectedLoadEvent() ? formatTime(selectedLoadEvent().indexed_time) : ''"></span>    
+    </div>
+    <div data-bind="if: selectedLoadEvent() && selectedLoadEvent().indexed_time">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.indexingDuration + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: selectedLoadEvent() ? timeDifference(selectedLoadEvent().indexed_time, selectedLoadEvent().load_end_time) : ''"></span>    
+    </div>
+</div>
+{% endblock loading_status %}
+
+{% block etl_error_report %}
+{% endblock etl_error_report %}
