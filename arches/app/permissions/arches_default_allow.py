@@ -165,6 +165,19 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
 
         return result
 
+    def get_filtered_instances(
+        self,
+        user: User,
+        search_engine: SearchEngine | None = None,
+        allresources: bool = False,
+        resources: list[str] | None = None,
+    ):
+        allowed_instances = self.get_restricted_instances(
+            user, search_engine, allresources, resources
+        )
+
+        return (self.__class__.is_exclusive, allowed_instances)
+
     def get_restricted_instances(
         self,
         user: User,
