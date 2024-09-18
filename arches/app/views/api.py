@@ -54,7 +54,7 @@ from arches.app.utils.permission_backend import (
     user_can_delete_resource,
     user_can_read_concepts,
     user_is_resource_reviewer,
-    get_restricted_instances,
+    get_filtered_instances,
     get_nodegroups_by_perm,
 )
 from arches.app.utils.geo_utils import GeoUtils
@@ -215,7 +215,9 @@ class GeoJSON(APIBase):
         property_nodes = models.Node.objects.filter(
             nodegroup_id__in=nodegroups
         ).order_by("sortorder")
-        restricted_resource_ids = get_restricted_instances(request.user, self.se)
+        exclusive_set, filtered_instance_ids = get_filtered_instances(
+            request.user, self.se, resources=resourceid.split(",")
+        )
         for node in property_nodes:
             property_node_map[str(node.nodeid)] = {"node": node}
             if node.fieldname is None or node.fieldname == "":
@@ -233,11 +235,11 @@ class GeoJSON(APIBase):
         if tileid is not None:
             tiles = tiles.filter(tileid=tileid)
         tiles = tiles.order_by("sortorder")
-        tiles = [
-            tile
-            for tile in tiles
-            if str(tile.resourceinstance_id) not in restricted_resource_ids
-        ]
+        resource_available = str(tile.resourceinstance_id) not in filtered_instance_ids
+        resource_available = (
+            not (resource_available) if exclusive_set else resource_available
+        )
+        tiles = [tile for tile in tiles if resource_available]
         if limit is not None:
             start = (page - 1) * limit
             end = start + limit

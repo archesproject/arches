@@ -16,7 +16,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 from abc import ABCMeta, abstractmethod
-import importlib
 import sys
 import uuid
 from typing import Iterable
@@ -26,12 +25,11 @@ from django.contrib.gis.db.models import Model
 from django.core.cache import caches
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
-from arches.app.utils.module_importer import get_class_from_modulename
 from guardian.backends import check_support, ObjectPermissionBackend
 from guardian.core import ObjectPermissionChecker
 from guardian.exceptions import NotUserNorGroup
 from django.db.models.query import QuerySet
-from guardian.models import GroupObjectPermission, UserObjectPermission, Permission
+from guardian.models import Permission
 from guardian.exceptions import WrongAppError
 import guardian.shortcuts as gsc
 
@@ -41,13 +39,10 @@ from django.db.models import Q
 from arches.app.models.system_settings import settings
 from arches.app.models.models import ResourceInstance, MapLayer
 
-from arches.app.search.elasticsearch_dsl_builder import Bool, Ids, Query, Terms, Nested
-from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.utils.permission_backend import (
     PermissionFramework,
     NotUserNorGroup as ArchesNotUserNorGroup,
 )
-from arches.app.search.search import SearchEngine
 
 if sys.version_info >= (3, 11):
     from typing import NotRequired, TypedDict, Literal
@@ -261,68 +256,6 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
             ):
                 ret.append(user)
         return ret
-
-    def get_restricted_instances(
-        self,
-        user: User,
-        search_engine: SearchEngine | None = None,
-        allresources: bool = False,
-        resources: list[str] = None,
-    ) -> list[str]:
-        if allresources is False and user.is_superuser is True:
-            return []
-
-        if allresources is True:
-            group_object_permissions = GroupObjectPermission.objects.filter(
-                permission__codename="no_access_to_resourceinstance"
-            )
-            if resources is not None:
-                group_object_permissions.filter(object_pk__in=resources)
-
-            restricted_group_instances = {
-                perm["object_pk"]
-                for perm in group_object_permissions.values("object_pk")
-            }
-            user_object_permissions = UserObjectPermission.objects.filter(
-                permission__codename="no_access_to_resourceinstance"
-            )
-            if resources is not None:
-                user_object_permissions.filter(object_pk__in=resources)
-
-            restricted_user_instances = {
-                perm["object_pk"]
-                for perm in user_object_permissions.values("object_pk")
-            }
-            all_restricted_instances = list(
-                restricted_group_instances | restricted_user_instances
-            )
-            return all_restricted_instances
-        else:
-            terms = Terms(field="permissions.users_with_no_access", terms=[str(user.id)])  # type: ignore
-            query = Query(search_engine, start=0, limit=settings.SEARCH_RESULT_LIMIT)  # type: ignore
-            has_access = Bool()  # type: ignore
-            nested_term_filter = Nested(path="permissions", query=terms)  # type: ignore
-            has_access.must(nested_term_filter)  # type: ignore
-            if resources is not None:
-                has_access.filter(
-                    Ids(
-                        ids=resources,
-                    )
-                )
-
-            query.add_query(has_access)  # type: ignore
-            results = query.search(index=RESOURCES_INDEX, scroll="1m")  # type: ignore
-            scroll_id = results["_scroll_id"]
-            total = results["hits"]["total"]["value"]
-            if total > settings.SEARCH_RESULT_LIMIT:
-                pages = total // settings.SEARCH_RESULT_LIMIT
-                for page in range(pages):
-                    results_scrolled = query.se.es.scroll(
-                        scroll_id=scroll_id, scroll="1m"
-                    )
-                    results["hits"]["hits"] += results_scrolled["hits"]["hits"]
-            restricted_ids = [res["_id"] for res in results["hits"]["hits"]]
-            return restricted_ids
 
     def update_groups_for_user(self, user: User) -> None:
         """Hook for spotting group updates on a user."""

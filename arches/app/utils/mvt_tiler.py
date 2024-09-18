@@ -4,7 +4,9 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from django.core.cache import cache
 from django.db import connection
 
-from arches.app.utils.permission_backend import get_restricted_instances
+from arches.app.utils.permission_backend import (
+    get_filtered_instances,
+)
 
 
 class MVTTiler:
@@ -49,8 +51,13 @@ class MVTTiler:
                 cursor.execute(resource_query, [zoom, x, y, nodeid])
                 resources = [record[0] for record in cursor.fetchall()]
 
-                resource_ids = get_restricted_instances(
+                exclusive_set, resource_ids = get_filtered_instances(
                     user, search_engine=self.se, resources=resources
+                )
+                permission_framework_filter = (
+                    "resourceinstanceid in %s"
+                    if exclusive_set
+                    else "resourceinstanceid not in %s"
                 )
                 if len(resource_ids) == 0:
                     resource_ids.append(
@@ -73,11 +80,22 @@ class MVTTiler:
                     WHERE
                     ST_Intersects(geom, TileBBox(%s, %s, %s, 3857))
                     AND
-                    nodeid = %s and resourceinstanceid not in %s
-                    """
+                    nodeid = %s and {filter}
+                    """.format(
+                        filter=permission_framework_filter
+                    )
 
                     # get the count of matching geometries
-                    cursor.execute(count_query, [zoom, x, y, nodeid, resource_ids])
+                    cursor.execute(
+                        count_query,
+                        [
+                            zoom,
+                            x,
+                            y,
+                            nodeid,
+                            resource_ids,
+                        ],
+                    )
                     search_geom_count = cursor.fetchone()[0]
 
                     if search_geom_count >= min_points:
@@ -95,7 +113,7 @@ class MVTTiler:
                                     WHERE 
                                     ST_Intersects(geom, TileBBox(%s, %s, %s, 3857))
                                     AND
-                                    nodeid = %s and resourceinstanceid not in %s
+                                    nodeid = %s and {filter}
                                 ) m
                             )
                             SELECT ST_AsMVT(
@@ -131,7 +149,9 @@ class MVTTiler:
                                 FROM clusters
                                 WHERE cid IS NOT NULL
                                 GROUP BY cid
-                            ) as tile;""",
+                            ) as tile;""".format(
+                                filter=permission_framework_filter
+                            ),
                             [
                                 distance,
                                 min_points,
@@ -162,12 +182,28 @@ class MVTTiler:
                                 ) AS geom,
                                 1 AS total
                             FROM geojson_geometries
-                            WHERE nodeid = %s and resourceinstanceid not in %s and (geom && ST_TileEnvelope(%s, %s, %s))) AS tile;""",
+                            WHERE nodeid = %s and {filter} and (geom && ST_TileEnvelope(%s, %s, %s))) AS tile;""".format(
+                                filter=permission_framework_filter
+                            ),
                             [nodeid, zoom, x, y, nodeid, resource_ids, zoom, x, y],
                         )
                     else:
                         tile = ""
                 else:
+                    query = """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
+                            id,
+                            resourceinstanceid,
+                            nodeid,
+                            featureid::text AS featureid,
+                            ST_AsMVTGeom(
+                                geom,
+                                TileBBox(%s, %s, %s, 3857)
+                            ) AS geom,
+                            1 AS total
+                        FROM geojson_geometries
+                        WHERE nodeid = %s and {filter} and (geom && ST_TileEnvelope(%s, %s, %s))) AS tile;""".format(
+                        filter=permission_framework_filter
+                    )
                     cursor.execute(
                         """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
                             id,
@@ -180,7 +216,9 @@ class MVTTiler:
                             ) AS geom,
                             1 AS total
                         FROM geojson_geometries
-                        WHERE nodeid = %s and resourceinstanceid not in %s and (geom && ST_TileEnvelope(%s, %s, %s))) AS tile;""",
+                        WHERE nodeid = %s and {filter} and (geom && ST_TileEnvelope(%s, %s, %s))) AS tile;""".format(
+                            filter=permission_framework_filter
+                        ),
                         [nodeid, zoom, x, y, nodeid, resource_ids, zoom, x, y],
                     )
                 tile = bytes(cursor.fetchone()[0]) if tile is None else tile

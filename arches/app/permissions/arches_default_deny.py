@@ -16,12 +16,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from __future__ import annotations
 
 from django.contrib.auth.models import User
-from django.db.models import Count
 
 from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
-from guardian.models import GroupObjectPermission, UserObjectPermission
 from arches.app.permissions.arches_permission_base import (
     ArchesPermissionBase,
     ResourceInstancePermissions,
@@ -32,6 +30,8 @@ from arches.app.search.mappings import RESOURCES_INDEX
 
 
 class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
+    is_exclusive = True
+
     def get_sets_for_user(self, user: User, perm: str) -> set[str] | None:
         # We do not do set filtering - None is allow-all for sets.
         return None if user and user.username != "anonymous" else set()
@@ -39,15 +39,32 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
     def get_restricted_users(self, resource: ResourceInstance) -> dict[str, list[int]]:
         pass
 
-    def get_restricted_instances(
+    def get_filtered_instances(
         self,
         user: User,
         search_engine: SearchEngine | None = None,
         allresources: bool = False,
         resources: list[str] | None = None,
     ):
+        allowed_instances = self.get_allowed_instances(
+            user, search_engine, allresources, resources
+        )
+
+        return (self.__class__.is_exclusive, allowed_instances)
+
+    def get_allowed_instances(
+        self,
+        user: User,
+        search_engine: SearchEngine | None = None,
+        allresources: bool = False,
+        resources: list[str] | None = None,
+    ):
+        all = False
         if user.is_superuser is True:
-            return []
+            if resources is not None:
+                return resources
+            else:
+                all = True
 
         query = Query(search_engine, start=0, limit=settings.SEARCH_RESULT_LIMIT)  # type: ignore
         nested_groups_read = Nested(
@@ -63,18 +80,21 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
             query=Terms(field="permissions.users_read", terms=[str(user.id)]),
         )
 
-        if resources is not None:
-            subset_query = Bool()
-            subset_query.filter(
-                Ids(
-                    ids=resources,
+        if not all:
+            if resources is not None:
+                subset_query = Bool()
+                subset_query = (
+                    subset_query.filter(
+                        Ids(
+                            ids=resources,
+                        )
+                    )
+                    .should(nested_users_read)
+                    .should(nested_groups_read)
                 )
-            )
-            subset_query.must_not(nested_users_read)
-            subset_query.must_not(nested_groups_read)
-            query.add_query(subset_query)
-        else:
-            query.add_query(Bool().must_not(nested_groups_read).must_not(nested_users_read))  # type: ignore
+                query.add_query(subset_query)
+            else:
+                query.add_query(Bool().should(nested_groups_read).should(nested_users_read))  # type: ignore
 
         results = query.search(index=RESOURCES_INDEX, scroll="1m")  # type: ignore
         scroll_id = results["_scroll_id"]

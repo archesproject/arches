@@ -5,7 +5,7 @@ import uuid
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
-from guardian.models import GroupObjectPermission
+from guardian.models import GroupObjectPermission, UserObjectPermission
 
 from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
@@ -14,13 +14,16 @@ from arches.app.permissions.arches_permission_base import (
     ArchesPermissionBase,
     ResourceInstancePermissions,
 )
-from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, Nested
+from arches.app.search.elasticsearch_dsl_builder import Bool, Ids, Terms, Nested, Query
+from arches.app.search.search import SearchEngine
 
 
 logger = logging.getLogger(__name__)
 
 
 class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
+    is_exclusive = False
+
     def process_new_user(self, instance: User, created: bool) -> None:
         ct = ContentType.objects.get(app_label="models", model="resourceinstance")
         resourceInstanceIds = list(
@@ -161,6 +164,68 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
                     result["no_access"].add(user.id)
 
         return result
+
+    def get_restricted_instances(
+        self,
+        user: User,
+        search_engine: SearchEngine | None = None,
+        allresources: bool = False,
+        resources: list[str] = None,
+    ) -> list[str]:
+        if allresources is False and user.is_superuser is True:
+            return []
+
+        if allresources is True:
+            group_object_permissions = GroupObjectPermission.objects.filter(
+                permission__codename="no_access_to_resourceinstance"
+            )
+            if resources is not None:
+                group_object_permissions.filter(object_pk__in=resources)
+
+            restricted_group_instances = {
+                perm["object_pk"]
+                for perm in group_object_permissions.values("object_pk")
+            }
+            user_object_permissions = UserObjectPermission.objects.filter(
+                permission__codename="no_access_to_resourceinstance"
+            )
+            if resources is not None:
+                user_object_permissions.filter(object_pk__in=resources)
+
+            restricted_user_instances = {
+                perm["object_pk"]
+                for perm in user_object_permissions.values("object_pk")
+            }
+            all_restricted_instances = list(
+                restricted_group_instances | restricted_user_instances
+            )
+            return all_restricted_instances
+        else:
+            terms = Terms(field="permissions.users_with_no_access", terms=[str(user.id)])  # type: ignore
+            query = Query(search_engine, start=0, limit=settings.SEARCH_RESULT_LIMIT)  # type: ignore
+            has_access = Bool()  # type: ignore
+            nested_term_filter = Nested(path="permissions", query=terms)  # type: ignore
+            has_access.must(nested_term_filter)  # type: ignore
+            if resources is not None:
+                has_access.filter(
+                    Ids(
+                        ids=resources,
+                    )
+                )
+
+            query.add_query(has_access)  # type: ignore
+            results = query.search(index=RESOURCES_INDEX, scroll="1m")  # type: ignore
+            scroll_id = results["_scroll_id"]
+            total = results["hits"]["total"]["value"]
+            if total > settings.SEARCH_RESULT_LIMIT:
+                pages = total // settings.SEARCH_RESULT_LIMIT
+                for page in range(pages):
+                    results_scrolled = query.se.es.scroll(
+                        scroll_id=scroll_id, scroll="1m"
+                    )
+                    results["hits"]["hits"] += results_scrolled["hits"]["hits"]
+            restricted_ids = [res["_id"] for res in results["hits"]["hits"]]
+            return restricted_ids
 
     def check_resource_instance_permissions(
         self, user: User, resourceid: str, permission: str
