@@ -2,7 +2,7 @@ from arches.app.models.system_settings import settings
 from arches.app.utils import import_class_from_string
 
 
-class CustomResourceSearchFactory:
+class EsMappingModifierFactory:
     def __init__(self):
         pass
 
@@ -11,15 +11,15 @@ class CustomResourceSearchFactory:
         return (
             [
                 import_class_from_string(classname)
-                for classname in settings.CUSTOM_SEARCH_CLASSES
+                for classname in settings.ES_MAPPING_MODIFIER_CLASSES
             ]
-            if settings.setting_exists("CUSTOM_SEARCH_CLASSES")
-            and settings.CUSTOM_SEARCH_CLASSES
+            if settings.setting_exists("ES_MAPPING_MODIFIER_CLASSES")
+            and settings.ES_MAPPING_MODIFIER_CLASSES
             else []
         )
 
 
-class CustomResourceSearch:
+class EsMappingModifier:
     """
     Base class for creating custom sections in the Resource Instance elasticsearch document.
     """
@@ -37,7 +37,7 @@ class CustomResourceSearch:
         :return: ES document key
         :rtype String
         """
-        return CustomResourceSearch.custom_search_path
+        return EsMappingModifier.custom_search_path
 
     @staticmethod
     def add_search_terms(resourceinstance, document, terms):

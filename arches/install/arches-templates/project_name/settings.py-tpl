@@ -409,8 +409,8 @@ LANGUAGES = [
 SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
 
 # Implement this class to associate custom documents to the ES resource index
-# See tests.views.search_tests.TestCustomResourceSearch class for example
-# CUSTOM_SEARCH_CLASSES = ["{{ project_name }}.search.custom_resource_search.CustomResourceSearch"]
+# See tests.views.search_tests.TestEsMappingModifier class for example
+# ES_MAPPING_MODIFIER_CLASSES = ["{{ project_name }}.search.es_mapping_modifier.EsMappingModifier"]
 
 try:
     from .package_settings import *

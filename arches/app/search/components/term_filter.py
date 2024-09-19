@@ -13,7 +13,7 @@ from arches.app.search.elasticsearch_dsl_builder import (
     Term,
 )
 from arches.app.search.components.base import BaseSearchFilter
-from arches.app.search.custom_resource_search import CustomResourceSearchFactory
+from arches.app.search.es_mapping_modifier import EsMappingModifierFactory
 
 details = {
     "searchcomponentid": "",
@@ -153,7 +153,7 @@ class TermFilter(BaseSearchFilter):
             # Add additional search query if configured
             for (
                 custom_search_class
-            ) in CustomResourceSearchFactory.get_custom_search_classes():
+            ) in EsMappingModifierFactory.get_custom_search_classes():
                 custom_search_class.add_search_filter(search_query, term)
 
         search_query_object["query"].add_query(search_query)

@@ -34,7 +34,7 @@ from arches.app.search.components.base import SearchFilterFactory
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Match, Nested
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
-from arches.app.search.custom_resource_search import CustomResourceSearch
+from arches.app.search.es_mapping_modifier import EsMappingModifier
 
 # these tests can be run from the command line via
 # python manage.py test tests.views.search_tests --settings="tests.test_settings"
@@ -912,7 +912,7 @@ def get_response_json(
     return response_json
 
 
-class TestCustomResourceSearch(CustomResourceSearch):
+class TestEsMappingModifier(EsMappingModifier):
 
     counter = 1
 
@@ -921,21 +921,21 @@ class TestCustomResourceSearch(CustomResourceSearch):
 
     @staticmethod
     def add_search_terms(resourceinstance, document, terms):
-        if CustomResourceSearch.get_custom_search_path() not in document:
-            document[CustomResourceSearch.get_custom_search_path()] = []
-        document[CustomResourceSearch.get_custom_search_path()].append(
+        if EsMappingModifier.get_custom_search_path() not in document:
+            document[EsMappingModifier.get_custom_search_path()] = []
+        document[EsMappingModifier.get_custom_search_path()].append(
             {
                 "custom_value": "business-specific-search-value-%s"
                 % str(resourceinstance.resourceinstanceid)[:6]
             }
         )
-        TestCustomResourceSearch.counter = TestCustomResourceSearch.counter + 1
+        TestEsMappingModifier.counter = TestEsMappingModifier.counter + 1
 
     @staticmethod
     def create_nested_custom_filter(term, original_element):
         if "nested" not in original_element:
             return original_element
-        document_key = CustomResourceSearch.get_custom_search_path()
+        document_key = EsMappingModifier.get_custom_search_path()
         custom_filter = Bool()
         custom_filter.should(
             Match(
@@ -964,12 +964,12 @@ class TestCustomResourceSearch(CustomResourceSearch):
         search_query.dsl["bool"]["must"] = []
         for must_element in original_must_filter:
             search_query.must(
-                TestCustomResourceSearch.create_nested_custom_filter(term, must_element)
+                TestEsMappingModifier.create_nested_custom_filter(term, must_element)
             )
 
         original_must_filter = search_query.dsl["bool"]["must_not"]
         search_query.dsl["bool"]["must_not"] = []
         for must_element in original_must_filter:
             search_query.must_not(
-                TestCustomResourceSearch.create_nested_custom_filter(term, must_element)
+                TestEsMappingModifier.create_nested_custom_filter(term, must_element)
             )
