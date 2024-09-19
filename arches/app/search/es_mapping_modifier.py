@@ -30,7 +30,7 @@ class EsMappingModifier:
         pass
 
     @staticmethod
-    def get_custom_search_path():
+    def get_mapping_property():
         """
         Identifies the document key where the custom ES document section is located.
 
@@ -59,7 +59,7 @@ class EsMappingModifier:
         pass
 
     @staticmethod
-    def get_custom_search_config():
+    def get_mapping_definition():
         """
         Defines the ES structure of the custom search document section. Called when the initial ES resources index is created.
 

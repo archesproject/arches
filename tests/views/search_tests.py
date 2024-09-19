@@ -921,9 +921,9 @@ class TestEsMappingModifier(EsMappingModifier):
 
     @staticmethod
     def add_search_terms(resourceinstance, document, terms):
-        if EsMappingModifier.get_custom_search_path() not in document:
-            document[EsMappingModifier.get_custom_search_path()] = []
-        document[EsMappingModifier.get_custom_search_path()].append(
+        if EsMappingModifier.get_mapping_property() not in document:
+            document[EsMappingModifier.get_mapping_property()] = []
+        document[EsMappingModifier.get_mapping_property()].append(
             {
                 "custom_value": "business-specific-search-value-%s"
                 % str(resourceinstance.resourceinstanceid)[:6]
@@ -935,7 +935,7 @@ class TestEsMappingModifier(EsMappingModifier):
     def create_nested_custom_filter(term, original_element):
         if "nested" not in original_element:
             return original_element
-        document_key = EsMappingModifier.get_custom_search_path()
+        document_key = EsMappingModifier.get_mapping_property()
         custom_filter = Bool()
         custom_filter.should(
             Match(

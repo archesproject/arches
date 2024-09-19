@@ -288,8 +288,8 @@ def prepare_search_index(create=False):
         custom_search_class
     ) in EsMappingModifierFactory.get_es_mapping_modifier_classes():
         index_settings["mappings"]["properties"][
-            custom_search_class.get_custom_search_path()
-        ] = custom_search_class.get_custom_search_config()
+            custom_search_class.get_mapping_property()
+        ] = custom_search_class.get_mapping_definition()
 
     index_settings["mappings"]["properties"]["permissions"]["properties"].update(
         permission_backend.update_mappings()
