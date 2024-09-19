@@ -32,8 +32,9 @@ from arches.app.views.search import search_results
 from guardian.shortcuts import assign_perm
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Query
+from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Match, Nested
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
+from arches.app.search.es_mapping_modifier import EsMappingModifier
 
 # these tests can be run from the command line via
 # python manage.py test tests.views.search_tests --settings="tests.test_settings"
@@ -826,6 +827,63 @@ class SearchTests(ArchesTestCase):
         resp = search_results(request)
         self.assertEqual(resp.status_code, 500)
 
+    def test_custom_resource_index(self):
+        for hit in get_response_json(self.client)["results"]["hits"]["hits"]:
+            term_filter = [
+                {
+                    "type": "term",
+                    "context": "",
+                    "context_label": "",
+                    "id": "business-specific-search-value-%s" % hit["_id"][:6],
+                    "text": "business-specific-search-value-%s" % hit["_id"][:6],
+                    "value": "business-specific-search-value-%s" % hit["_id"][:6],
+                    "inverted": False,
+                }
+            ]
+            response_json = get_response_json(self.client, term_filter=term_filter)
+            self.assertEqual(response_json["results"]["hits"]["total"]["value"], 1)
+            term_filter = [
+                {
+                    "type": "term",
+                    "context": "",
+                    "context_label": "",
+                    "id": "business-specific-search-value-%s" % hit["_id"][:6],
+                    "text": "business-specific-search-value-%s" % hit["_id"][:6],
+                    "value": "business-specific-search-value-%s" % hit["_id"][:6],
+                    "inverted": True,
+                }
+            ]
+            response_json = get_response_json(self.client, term_filter=term_filter)
+            self.assertEqual(response_json["results"]["hits"]["total"]["value"], 3)
+
+        term_filter = [
+            {
+                "type": "term",
+                "context": "",
+                "context_label": "",
+                "id": "business-specific-search-value-",
+                "text": "business-specific-search-value-",
+                "value": "business-specific-search-value-",
+                "inverted": False,
+            }
+        ]
+        response_json = get_response_json(self.client, term_filter=term_filter)
+        self.assertEqual(response_json["results"]["hits"]["total"]["value"], 4)
+
+        term_filter = [
+            {
+                "type": "term",
+                "context": "",
+                "context_label": "",
+                "id": "business-specific-search-value-",
+                "text": "business-specific-search-value-",
+                "value": "business-specific-search-value-",
+                "inverted": True,
+            }
+        ]
+        response_json = get_response_json(self.client, term_filter=term_filter)
+        self.assertEqual(response_json["results"]["hits"]["total"]["value"], 0)
+
 
 def extract_pks(response_json):
     return [
@@ -852,3 +910,66 @@ def get_response_json(
     response = client.get("/search/resources", query)
     response_json = json.loads(response.content)
     return response_json
+
+
+class TestEsMappingModifier(EsMappingModifier):
+
+    counter = 1
+
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def add_search_terms(resourceinstance, document, terms):
+        if EsMappingModifier.get_mapping_property() not in document:
+            document[EsMappingModifier.get_mapping_property()] = []
+        document[EsMappingModifier.get_mapping_property()].append(
+            {
+                "custom_value": "business-specific-search-value-%s"
+                % str(resourceinstance.resourceinstanceid)[:6]
+            }
+        )
+        TestEsMappingModifier.counter = TestEsMappingModifier.counter + 1
+
+    @staticmethod
+    def create_nested_custom_filter(term, original_element):
+        if "nested" not in original_element:
+            return original_element
+        document_key = EsMappingModifier.get_mapping_property()
+        custom_filter = Bool()
+        custom_filter.should(
+            Match(
+                field="%s.custom_value" % document_key,
+                query=term["value"],
+                type="phrase_prefix",
+            )
+        )
+        custom_filter.should(
+            Match(
+                field="%s.custom_value.folded" % document_key,
+                query=term["value"],
+                type="phrase_prefix",
+            )
+        )
+        nested_custom_filter = Nested(path=document_key, query=custom_filter)
+        new_must_element = Bool()
+        new_must_element.should(original_element)
+        new_must_element.should(nested_custom_filter)
+        new_must_element.dsl["bool"]["minimum_should_match"] = 1
+        return new_must_element
+
+    @staticmethod
+    def add_search_filter(search_query, term):
+        original_must_filter = search_query.dsl["bool"]["must"]
+        search_query.dsl["bool"]["must"] = []
+        for must_element in original_must_filter:
+            search_query.must(
+                TestEsMappingModifier.create_nested_custom_filter(term, must_element)
+            )
+
+        original_must_filter = search_query.dsl["bool"]["must_not"]
+        search_query.dsl["bool"]["must_not"] = []
+        for must_element in original_must_filter:
+            search_query.must_not(
+                TestEsMappingModifier.create_nested_custom_filter(term, must_element)
+            )
