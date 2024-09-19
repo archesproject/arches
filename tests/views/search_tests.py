@@ -610,7 +610,7 @@ class SearchTests(ArchesTestCase):
 
     def test_term_search_on_resource_instance_id(self):
         """
-        Search for a resource by its id
+        Search for a resource by its id using a term search
 
         """
         resource_id = str(self.name_resource.pk)
