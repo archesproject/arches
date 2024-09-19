@@ -265,11 +265,6 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         users = gsc.get_users_with_perms(obj=obj, only_with_perms_in=[perm])
         return QuerySet.union(default_permissions, users)
 
-        # for user in User.objects.all():
-        #     if perm in self.get_user_perms(user, obj).values_list("codename", flat=True):
-        #         ret.append(user)
-        # return ret
-
     def get_restricted_instances(
         self,
         user: User,
