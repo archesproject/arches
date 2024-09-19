@@ -595,6 +595,43 @@ class SearchTests(ArchesTestCase):
             ],
         )
 
+    def test_resource_instance_id_search(self):
+        """
+        Search for a resource by its id
+
+        """
+        resource_id = str(self.name_resource.pk)
+        request = HttpRequest()
+        request.method = "GET"
+        request.user = User.objects.get(username="anonymous")
+        request.GET["id"] = resource_id
+        response = search_results(request)
+        response_json = json.loads(response.content)
+        self.assertEqual(response_json["results"]["hits"]["total"]["value"], 1)
+
+    def test_term_search_on_resource_instance_id(self):
+        """
+        Search for a resource by its id
+
+        """
+        resource_id = str(self.name_resource.pk)
+
+        term_filter = [
+            {
+                "inverted": False,
+                "type": "string",
+                "context": "",
+                "context_label": "",
+                "id": resource_id,
+                "text": resource_id,
+                "value": resource_id,
+                "selected": True,
+            }
+        ]
+
+        response_json = get_response_json(self.client, term_filter=term_filter)
+        self.assertEqual(response_json["results"]["hits"]["total"]["value"], 1)
+
     def test_concept_search_1(self):
         """
         Search for resources that have the concept "Mock concept" in them as a "concept" search
