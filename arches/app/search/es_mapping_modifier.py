@@ -7,7 +7,7 @@ class EsMappingModifierFactory:
         pass
 
     @staticmethod
-    def get_custom_search_classes():
+    def get_es_mapping_modifier_classes():
         return (
             [
                 import_class_from_string(classname)

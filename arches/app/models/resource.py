@@ -636,7 +636,7 @@ class Resource(models.ResourceInstance):
 
         for (
             custom_search_class
-        ) in EsMappingModifierFactory.get_custom_search_classes():
+        ) in EsMappingModifierFactory.get_es_mapping_modifier_classes():
             custom_search_class.add_search_terms(self, document, terms)
 
         return document, terms

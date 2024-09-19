@@ -284,7 +284,9 @@ def prepare_search_index(create=False):
         },
     }
 
-    for custom_search_class in EsMappingModifierFactory.get_custom_search_classes():
+    for (
+        custom_search_class
+    ) in EsMappingModifierFactory.get_es_mapping_modifier_classes():
         index_settings["mappings"]["properties"][
             custom_search_class.get_custom_search_path()
         ] = custom_search_class.get_custom_search_config()
