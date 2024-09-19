@@ -46,6 +46,7 @@ class BaseImportModule:
         if self.request:
             self.userid = request.user.id
             self.moduleid = request.POST.get("module")
+            self.loadid = request.POST.get("load_id")
 
     def filesize_format(self, bytes):
         """Convert bytes to readable units"""
