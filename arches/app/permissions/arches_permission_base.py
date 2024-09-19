@@ -229,12 +229,17 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         obj -- the model instance to check
 
         """
+        default_permissions = [
+            permission["id"]
+            for permission in self.get_all_default_permissions(obj)
+            if permission["type"] == "group" and perm in permission["permissions"]
+        ]
 
-        ret = []
-        for group in Group.objects.all():
-            if self.has_group_perm(group, perm, obj):  # type: ignore
-                ret.append(group)
-        return ret
+        default_permissions = Group.objects.filter(id__in=default_permissions)
+        groups = gsc.get_groups_with_perms(obj=obj).filter(
+            permissions__codename__in=[perm]
+        )
+        return QuerySet.union(default_permissions, groups)
 
     def get_users_with_permission_for_object(self, perm: str, obj: Model) -> list[User]:
         """
@@ -245,17 +250,15 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         obj -- the model instance to check
 
         """
+        default_permissions = [
+            permission["id"]
+            for permission in self.get_all_default_permissions(obj)
+            if permission["type"] == "user" and perm in permission["permissions"]
+        ]
 
-        ret = []
-        for user in User.objects.all():
-            default_perms = self.get_default_permissions(user, obj)
-            if (
-                perm
-                in self.get_user_perms(user, obj).values_list("codename", flat=True)
-                or perm in default_perms
-            ):
-                ret.append(user)
-        return ret
+        default_permissions = User.objects.filter(id__in=default_permissions)
+        users = gsc.get_users_with_perms(obj=obj, only_with_perms_in=[perm])
+        return QuerySet.union(default_permissions, users)
 
     def update_groups_for_user(self, user: User) -> None:
         """Hook for spotting group updates on a user."""
@@ -543,18 +546,14 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         """
         Gets default permissions (if any) for a resource instance.
         """
-        default_permissions_settings = settings.PERMISSION_DEFAULTS
-        if not default_permissions_settings or model is None:
-            return []
-
+        default_permissions_for_graph = []
         if isinstance(model, ResourceInstance):
-            default_permissions_for_graph = (
-                default_permissions_settings[str(model.graph_id)]
-                if str(model.graph_id) in default_permissions_settings
-                else None
-            )
-        else:
-            return []  # default permissions for nodegroups not currently supported
+            default_permissions_for_graph = self.get_all_default_permissions(
+                model
+            )  # default permissions for nodegroups not currently supported
+
+        if not len(default_permissions_for_graph):
+            return []
 
         if default_permissions_for_graph is None:
             return []
@@ -580,6 +579,17 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
             for item in sub_list
         ]
         return default_permissions
+
+    def get_all_default_permissions(self, model: Model = None):
+        default_permissions_settings = settings.PERMISSION_DEFAULTS
+        if not default_permissions_settings or model is None:
+            return []
+
+        return (
+            default_permissions_settings[str(model.graph_id)]
+            if str(model.graph_id) in default_permissions_settings
+            else None
+        )
 
     def get_default_permissions_objects(
         self,
