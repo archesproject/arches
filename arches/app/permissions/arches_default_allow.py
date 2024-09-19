@@ -15,6 +15,7 @@ from arches.app.permissions.arches_permission_base import (
     ResourceInstancePermissions,
 )
 from arches.app.search.elasticsearch_dsl_builder import Bool, Ids, Terms, Nested, Query
+from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.search.search import SearchEngine
 
 
