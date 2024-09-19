@@ -50,6 +50,7 @@ define([
         sendFeatureToMapFilter: function(popupFeatureObject)
         {
             let foundFeature = null;
+            const stripppedFeatureId = popupFeatureObject.feature.properties.featureid.replace(/-/g,"");
             for (let geometry of popupFeatureObject.geometries()) {
                 if (geometry.geom && Array.isArray(geometry.geom.features)) {
                     foundFeature = geometry.geom.features.find(feature => feature.id === popupFeatureObject.featureid);
