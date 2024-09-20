@@ -2,7 +2,17 @@ from arches.app.search.elasticsearch_dsl_builder import Bool, Terms
 from arches.app.search.components.base import BaseSearchFilter
 from arches.app.search.components.resource_type_filter import get_permitted_graphids
 
-details = {}
+details = {
+    "searchcomponentid": "",
+    "name": "Permitted Graphs Policy",
+    "icon": "",
+    "modulename": "permitted_graphs_policy.py",
+    "classname": "PermittedGraphsPolicy",
+    "type": "search-policy",
+    "componentpath": None,
+    "componentname": "permitted-graphs-policy",
+    "config": {},
+}
 
 
 class PermittedGraphsPolicy(BaseSearchFilter):
