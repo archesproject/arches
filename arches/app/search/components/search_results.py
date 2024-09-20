@@ -79,9 +79,12 @@ class SearchResultsFilter(BaseSearchFilter):
                 )
             )
             search_query.must(subsearch_query)
-            search_query_object["query"].add_query(search_query)
+        return search_query, nested_agg
 
-        search_query_object["query"].add_aggregation(nested_agg)
+    def append_dsl(self, search_query_object, **kwargs):
+        dsl, aggregation = self.generate_dsl(search_query_object, **kwargs)
+        search_query_object["query"].add_query(dsl)
+        search_query_object["query"].add_aggregation(aggregation)
 
     def post_search_hook(self, search_query_object, response_object, **kwargs):
         permitted_nodegroups = kwargs.get("permitted_nodegroups")
