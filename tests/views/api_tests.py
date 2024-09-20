@@ -511,6 +511,16 @@ class ResourceAPITests(ArchesTestCase):
 
         self.assertEqual(response.status_code, 400)
 
+    def test_resource_report_api(self):
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(
+            reverse(
+                "api_resource_report",
+                args=(str(self.test_prj_user.pk),),
+            ),
+        )
+        self.assertEqual(response.status_code, 200)
+
     def test_related_resources_in_resource_report_api(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(

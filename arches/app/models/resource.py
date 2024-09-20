@@ -36,6 +36,7 @@ from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import TERMS_INDEX, RESOURCES_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms, Nested
+from arches.app.search.es_mapping_modifier import EsMappingModifierFactory
 from arches.app.tasks import index_resource
 from arches.app.utils import import_class_from_string, task_management
 from arches.app.utils import permission_backend
@@ -53,8 +54,7 @@ from arches.app.utils.exceptions import (
 )
 from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
-    get_restricted_instances,
-    user_can_read_graph,
+    get_filtered_instances,
     get_nodegroups_by_perm,
 )
 import django.dispatch
@@ -64,6 +64,7 @@ logger = logging.getLogger(__name__)
 
 
 class Resource(models.ResourceInstance):
+
     class Meta:
         proxy = True
 
@@ -631,6 +632,12 @@ class Resource(models.ResourceInstance):
                                                 },
                                             }
                                         )
+
+        for (
+            custom_search_class
+        ) in EsMappingModifierFactory.get_es_mapping_modifier_classes():
+            custom_search_class.add_search_terms(self, document, terms)
+
         return document, terms
 
     def delete(self, user={}, index=True, transaction_id=None):
@@ -859,8 +866,10 @@ class Resource(models.ResourceInstance):
         ret["total"] = {"value": resource_relations["total"]}
         instanceids = set()
 
-        restricted_instances = (
-            get_restricted_instances(user, se) if user is not None else []
+        readable_graphids = set(
+            permission_backend.get_resource_types_by_perm(
+                user, ["models.read_nodegroup"]
+            )
         )
         for relation in resource_relations["relations"]:
             relation = model_to_dict(relation)
@@ -868,12 +877,23 @@ class Resource(models.ResourceInstance):
             resourceid_from = relation["resourceinstanceidfrom"]
             resourceinstanceto_graphid = relation["resourceinstanceto_graphid"]
             resourceinstancefrom_graphid = relation["resourceinstancefrom_graphid"]
+            exclusive_set, filtered_instances = get_filtered_instances(
+                user, se, resources=[resourceid_from, resourceid_to]
+            )
+            filtered_instances = filtered_instances if user is not None else []
+
+            resourceid_to_permission = resourceid_to not in filtered_instances
+            resourceid_from_permission = resourceid_from not in filtered_instances
+
+            if exclusive_set:
+                resourceid_to_permission = not (resourceid_to_permission)
+                resourceid_from_permission = not (resourceid_from_permission)
 
             if (
-                resourceid_to not in restricted_instances
-                and resourceid_from not in restricted_instances
-                and user_can_read_graph(user, resourceinstanceto_graphid)
-                and user_can_read_graph(user, resourceinstancefrom_graphid)
+                resourceid_to_permission
+                and resourceid_from_permission
+                and str(resourceinstanceto_graphid) in readable_graphids
+                and str(resourceinstancefrom_graphid) in readable_graphids
             ):
                 try:
                     preflabel = get_preflabel_from_valueid(

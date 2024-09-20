@@ -16,7 +16,9 @@ import arches.app.utils.task_management as task_management
 logger = logging.getLogger(__name__)
 
 
-@method_decorator(group_required("Resource Editor"), name="dispatch")
+@method_decorator(
+    group_required("Resource Editor", raise_exception=True), name="dispatch"
+)
 class ETLManagerView(View):
     """
     to get the ETL modules from db
@@ -160,7 +162,7 @@ class ETLManagerView(View):
                 "events": [
                     {
                         **model_to_dict(event),
-                        "user": {**model_to_dict(event.user)},
+                        "user_displayname": self.format_username(event.user),
                         "etl_module": {**model_to_dict(event.etl_module)},
                     }
                     for event in events
@@ -194,6 +196,14 @@ class ETLManagerView(View):
         elif action == "errorReport" and loadid:
             return JSONResponse(self.error_report(loadid)["data"], indent=2)
         return JSONResponse(response)
+
+    @staticmethod
+    def format_username(user):
+        parts = [part for part in (user.first_name, user.last_name) if part]
+        if parts:
+            return " ".join(parts)
+        else:
+            return user.username
 
     def post(self, request):
         """

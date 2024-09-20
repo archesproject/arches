@@ -59,6 +59,9 @@ BUSINESS_DATA_FILES = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+# Class for custom ES document generator and search functionality
+ES_MAPPING_MODIFIER_CLASSES = ["tests.views.search_tests.TestEsMappingModifier"]
+
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.dummy.DummyCache",
