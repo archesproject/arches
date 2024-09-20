@@ -99,16 +99,15 @@ class JSONLDImporter(BaseImportModule):
                 ),
             }
 
+        file_validation_error = None
         try:
             self.read_zip_file(content, result)
-        except zipfile.BadZipFile as e:
-            return {
-                "success": False,
-                "data": FileValidationError(
-                    message=e.args[0],
-                    code=400,
-                ),
-            }
+        except zipfile.BadZipFile as e1:
+            file_validation_error = FileValidationError(message=e1.args[0], code=400)
+        except FileValidationError as e2:
+            file_validation_error = e2
+        if file_validation_error:
+            return {"success": False, "data": file_validation_error}
 
         if not result["summary"]["files"]:
             title = _("Invalid Uploaded File")
@@ -135,10 +134,7 @@ class JSONLDImporter(BaseImportModule):
                 }
                 result["summary"]["cumulative_files_size"] = self.cumulative_files_size
                 with zip_ref.open(file) as opened_file:
-                    try:
-                        self.validate_uploaded_file(opened_file)
-                    except FileValidationError as ve:
-                        return {"success": False, "data": ve}
+                    self.validate_uploaded_file(opened_file)
                     f = File(opened_file)
 
                     # Discard outermost part ("e.g. myzip/")

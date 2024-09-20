@@ -1,5 +1,6 @@
 from celery import app, Celery
 from datetime import datetime
+from http import HTTPStatus
 import logging
 from django.db import connection
 from django.core.paginator import Paginator
@@ -7,6 +8,7 @@ from django.forms.models import model_to_dict
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.generic import View
+from arches.app.etl_modules.base_import_module import FileValidationError
 from arches.app.models.models import ETLModule, LoadEvent, LoadStaging
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.decorators import group_required
@@ -223,4 +225,6 @@ class ETLManagerView(View):
         elif response["success"] and "raw" in response:
             return response["raw"]
         else:
+            if (data := response.get("data")) and isinstance(data, FileValidationError):
+                return JSONErrorResponse(content=response, status=data.code)
             return JSONErrorResponse(content=response)
