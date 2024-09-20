@@ -154,5 +154,6 @@ class SpatialSearchTests(ArchesTestCase):
                 }
             ],
         }
-        response_json = get_response_json(self.client, map_filter=spatial_filter)
+        query = {"map-filter": spatial_filter}
+        response_json = get_response_json(self.client, query=query)
         self.assertEqual(response_json["results"]["hits"]["total"]["value"], 1)
