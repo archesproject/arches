@@ -15,17 +15,26 @@ details = {
 
 
 class SortResults(BaseSearchFilter):
-    def append_dsl(self, search_query_object, **kwargs):
-        sort_param = self.request.GET.get(self.componentname, None)
 
-        if sort_param is not None and sort_param != "":
-            search_query_object["query"].sort(
-                field="displayname.value",
-                dsl={
-                    "order": sort_param,
-                    "nested": {
-                        "path": "displayname",
-                        "filter": {"term": {"displayname.language": get_language()}},
-                    },
+    def generate_dsl(self, search_query_object, **kwargs):
+        sort_param = self.request.GET.get(self.componentname, "")
+        field = None
+        dsl = None
+        if sort_param != "":
+            field = "displayname.value"
+            dsl = {
+                "order": sort_param,
+                "nested": {
+                    "path": "displayname",
+                    "filter": {"term": {"displayname.language": get_language()}},
                 },
+            }
+        return field, dsl
+
+    def append_dsl(self, search_query_object, **kwargs):
+        sort_field, sort_dsl = self.generate_dsl(search_query_object, **kwargs)
+        if sort_field and sort_dsl:
+            search_query_object["query"].sort(
+                field=sort_field,
+                dsl=sort_dsl,
             )

@@ -18,13 +18,11 @@ details = {
 
 
 class LifecycleStateFilter(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def generate_dsl(self, search_query_object, **kwargs):
         search_query = Bool()
         resource_instance_lifecycle_state_filter = Bool()
 
-        querystring_params = self.request.GET.get(details["componentname"], "")
+        querystring_params = self.request.GET.get(self.componentname, "")
         resource_instance_lifecycle_state_filter_term = JSONDeserializer().deserialize(
             querystring_params
         )[0]
@@ -54,4 +52,8 @@ class LifecycleStateFilter(BaseSearchFilter):
             )
 
         search_query.must(resource_instance_lifecycle_state_filter)
-        search_results_object["query"].add_query(search_query)
+        return search_query
+
+    def append_dsl(self, search_results_object, **kwargs):
+        dsl = self.generate_dsl(search_results_object, kwargs)
+        search_results_object["query"].add_query(dsl)

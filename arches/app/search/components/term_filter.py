@@ -28,7 +28,8 @@ details = {
 
 
 class TermFilter(BaseSearchFilter):
-    def append_dsl(self, search_query_object, **kwargs):
+
+    def generate_dsl(self, search_query_object, **kwargs):
         permitted_nodegroups = kwargs.get("permitted_nodegroups")
         include_provisional = kwargs.get("include_provisional")
         search_query = Bool()
@@ -148,8 +149,11 @@ class TermFilter(BaseSearchFilter):
                     search_query.must_not(nested_conceptid_filter)
                 else:
                     search_query.filter(nested_conceptid_filter)
+        return search_query
 
-        search_query_object["query"].add_query(search_query)
+    def append_dsl(self, search_query_object, **kwargs):
+        dsl = self.generate_dsl(search_query_object, **kwargs)
+        search_query_object["query"].add_query(dsl)
 
 
 def _get_child_concepts(conceptid):

@@ -18,7 +18,7 @@ details = {
 
 
 class TimeFilter(BaseSearchFilter):
-    def append_dsl(self, search_query_object, **kwargs):
+    def generate_dsl(self, search_query_object, **kwargs):
         permitted_nodegroups = kwargs.get("permitted_nodegroups")
         include_provisional = kwargs.get("include_provisional")
         search_query = Bool()
@@ -148,8 +148,11 @@ class TimeFilter(BaseSearchFilter):
                 temporal_query.should(Nested(path="dates", query=date_query))
 
             search_query.filter(temporal_query)
+        return search_query
 
-            search_query_object["query"].add_query(search_query)
+    def append_dsl(self, search_query_object, **kwargs):
+        dsl = self.generate_dsl(search_query_object, **kwargs)
+        search_query_object["query"].add_query(dsl)
 
     def view_data(self):
         ret = {}
