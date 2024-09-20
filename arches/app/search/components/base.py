@@ -14,6 +14,14 @@ class BaseSearchFilter:
         self.user = user
         self.componentname = componentname
 
+    def generate_dsl(self, **kwargs):
+        """
+        used to generate ES query dsl
+
+        """
+
+        pass
+
     def append_dsl(self, search_query_object, **kwargs):
         """
         used to append ES query dsl to the search request
