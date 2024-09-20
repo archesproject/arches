@@ -112,12 +112,20 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
     ) -> ResourceInstancePermissions:
 
         result = ResourceInstancePermissions()
+        resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
         if resourceid == settings.SYSTEM_SETTINGS_RESOURCE_ID:
+            result["resource"] = resource
             if not user.groups.filter(name="System Administrator").exists():
                 result["permitted"] = False
-                return result
+            else:
+                result["permitted"] = True
+            return result
 
-        resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
+        if resource.principaluser_id == user.id:
+            result["permitted"] = True
+            result["resource"] = resource
+            return result
+
         result["resource"] = resource
         result["permitted"] = False  # by default, deny
 

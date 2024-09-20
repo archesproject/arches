@@ -582,7 +582,11 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
 
     def get_all_default_permissions(self, model: Model = None):
         default_permissions_settings = settings.PERMISSION_DEFAULTS
-        if not default_permissions_settings or model is None:
+        if (
+            not default_permissions_settings
+            or model is None
+            or model.graph_id not in default_permissions_settings
+        ):
             return []
 
         return (
