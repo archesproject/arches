@@ -1,8 +1,9 @@
 from abc import abstractmethod, ABCMeta
 
 from arches.app.const import ExtensionType
-from arches.app.models.models import *
+from arches.app.models.models import EditLog, GraphModel
 from arches.app.models.system_settings import settings
+from arches.app.utils.module_importer import get_class_from_modulename
 
 
 class NotUserNorGroup(Exception): ...
@@ -70,10 +71,10 @@ class PermissionFramework(metaclass=ABCMeta):
     ): ...
 
     @abstractmethod
-    def get_groups_for_object(self, perm, obj): ...
+    def get_groups_with_permission_for_object(self, perm, obj): ...
 
     @abstractmethod
-    def get_users_for_object(self, perm, obj): ...
+    def get_users_with_permission_for_object(self, perm, obj): ...
 
     @abstractmethod
     def check_resource_instance_permissions(self, user, resourceid, permission): ...
@@ -141,6 +142,12 @@ class PermissionFramework(metaclass=ABCMeta):
     @abstractmethod
     def get_search_ui_permissions(self, user, search_result, groups=None): ...
 
+    @abstractmethod
+    def get_default_permissions(user_or_group, model): ...
+
+    @abstractmethod
+    def get_default_settable_permissions(self): ...
+
 
 _PERMISSION_FRAMEWORK = None
 
@@ -159,11 +166,11 @@ def _get_permission_framework():
             )
             _PERMISSION_FRAMEWORK = PermissionFramework()
         else:
-            from arches.app.permissions.arches_standard import (
-                ArchesStandardPermissionFramework,
+            from arches.app.permissions.arches_default_allow import (
+                ArchesDefaultAllowPermissionFramework,
             )
 
-            _PERMISSION_FRAMEWORK = ArchesStandardPermissionFramework()
+            _PERMISSION_FRAMEWORK = ArchesDefaultAllowPermissionFramework()
     return _PERMISSION_FRAMEWORK
 
 
@@ -197,12 +204,12 @@ def get_restricted_instances(user, search_engine=None, allresources=False):
     )
 
 
-def get_groups_for_object(perm, obj):
-    return _get_permission_framework().get_groups_for_object(perm, obj)
+def get_groups_with_permission_for_object(perm, obj):
+    return _get_permission_framework().get_groups_with_permission_for_object(perm, obj)
 
 
-def get_users_for_object(perm, obj):
-    return _get_permission_framework().get_users_for_object(perm, obj)
+def get_users_with_permission_for_object(perm, obj):
+    return _get_permission_framework().get_users_with_permission_for_object(perm, obj)
 
 
 def check_resource_instance_permissions(user, resourceid, permission):
@@ -254,10 +261,16 @@ def get_groups_with_perms(obj, attach_perms=False):
 
 
 def get_user_perms(user, obj):
+    """
+    returns a queryset of permissions objects for a given user on a particular resource
+    """
     return _get_permission_framework().get_user_perms(user, obj)
 
 
 def get_group_perms(user_or_group, obj):
+    """
+    returns a queryset of permissions objects for a given group on a particular resource
+    """
     return _get_permission_framework().get_group_perms(user_or_group, obj)
 
 
@@ -377,3 +390,14 @@ def get_search_ui_permissions(user, search_result, groups=None):
     return _get_permission_framework().get_search_ui_permissions(
         user, search_result, groups
     )
+
+
+def get_default_permissions(
+    user_or_group,
+    model,
+):
+    return _get_permission_framework().get_default_permissions(user_or_group, model)
+
+
+def get_default_settable_permissions():
+    return _get_permission_framework().get_default_settable_permissions()

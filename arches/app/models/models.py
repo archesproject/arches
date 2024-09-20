@@ -625,7 +625,7 @@ class GraphModel(models.Model):
 
         constraints = [
             models.CheckConstraint(
-                check=(
+                condition=(
                     Q(isresource=False, resource_instance_lifecycle__isnull=True)
                     | Q(
                         isresource=True,
@@ -1255,7 +1255,7 @@ class ResourceInstance(models.Model):
         if create_record:
             try:
                 creatorid = int(create_record.userid)
-            except ValueError:
+            except (ValueError, TypeError):
                 pass
 
         if creatorid is None:
@@ -2244,7 +2244,11 @@ class SpatialView(models.Model):
         Validate the spatial view before saving it to the database as the database triggers have proved hard to test.
         """
         graph = self.geometrynode.graph
-        node_ids = set(node["nodeid"] for node in self.attributenodes)
+        try:
+            node_ids = set(node["nodeid"] for node in self.attributenodes)
+        except (KeyError, TypeError):
+            raise ValidationError("attributenodes must be a list of node objects")
+
         found_graph_nodes = Node.objects.filter(pk__in=node_ids, graph=graph)
         if len(node_ids) != found_graph_nodes.count():
             raise ValidationError(

@@ -13,45 +13,29 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from __future__ import annotations
-
-import sys
+from abc import ABCMeta, abstractmethod
 import uuid
-from typing import Iterable
+from typing import Iterable, Literal, NotRequired, TypedDict
 
-from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, Permission
 from django.contrib.gis.db.models import Model
 from django.core.cache import caches
-from django.db.models import Count
+from django.apps import apps
+from django.contrib.contenttypes.models import ContentType
 from guardian.backends import check_support, ObjectPermissionBackend
 from guardian.core import ObjectPermissionChecker
-from guardian.shortcuts import (
-    get_perms,
-    get_group_perms,
-    get_user_perms,
-    get_users_with_perms,
-    get_groups_with_perms,
-    get_perms_for_model,
-)
 from guardian.exceptions import NotUserNorGroup
-from arches.app.models.resource import Resource
-
+from django.db.models.query import QuerySet
 from guardian.models import GroupObjectPermission, UserObjectPermission, Permission
 from guardian.exceptions import WrongAppError
-from guardian.shortcuts import (
-    assign_perm,
-    get_perms,
-    remove_perm,
-    get_group_perms,
-    get_user_perms,
-)
+import guardian.shortcuts as gsc
 
 import inspect
-from arches.app.models.models import *
+from arches.app.models.models import Node, NodeGroup, TileModel
+from django.db.models import Q
 from arches.app.models.system_settings import settings
-from django.contrib.contenttypes.models import ContentType
 from arches.app.models.models import ResourceInstance, MapLayer
+
 from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nested
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.utils.permission_backend import (
@@ -60,24 +44,17 @@ from arches.app.utils.permission_backend import (
 )
 from arches.app.search.search import SearchEngine
 
-if sys.version_info >= (3, 11):
-    from typing import NotRequired, TypedDict, Literal
 
-    class ResourceInstancePermissions(TypedDict):
-        permitted: NotRequired[bool | Literal["unknown"]]
-        resource: NotRequired[ResourceInstance]
-
-else:
-    ResourceInstancePermissions = dict
-
-from datetime import datetime
+class ResourceInstancePermissions(TypedDict):
+    permitted: NotRequired[bool | Literal["unknown"]]
+    resource: NotRequired[ResourceInstance]
 
 
-class ArchesStandardPermissionFramework(PermissionFramework):
+class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
     def setup(self): ...
 
     def get_perms_for_model(self, cls: str | Model) -> list[Permission]:
-        return get_perms_for_model(cls)  # type: ignore
+        return self.get_default_permissions_objects(cls=cls) | gsc.get_perms_for_model(cls)  # type: ignore
 
     def assign_perm(
         self,
@@ -86,7 +63,7 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         obj: ResourceInstance | None = None,
     ) -> Permission:
         try:
-            return assign_perm(perm, user_or_group, obj=obj)
+            return gsc.assign_perm(perm, user_or_group, obj=obj)
         except NotUserNorGroup:
             raise ArchesNotUserNorGroup()
 
@@ -94,37 +71,25 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         return PermissionBackend()
 
     def remove_perm(self, perm, user_or_group=None, obj=None):
-        return remove_perm(perm, user_or_group=user_or_group, obj=obj)
+        return gsc.remove_perm(perm, user_or_group=user_or_group, obj=obj)
+
+    def process_new_user(self, instance: User, created: bool) -> None:
+        pass
 
     def get_perms(
         self, user_or_group: User | Group, obj: ResourceInstance
-    ) -> list[Permission]:
-        return get_perms(user_or_group, obj)  # type: ignore
+    ) -> list[str]:
+        return self.get_default_permissions(user_or_group, obj, all_permissions=True) + gsc.get_perms(user_or_group, obj)  # type: ignore
 
     def get_group_perms(
         self, user_or_group: User | Group, obj: ResourceInstance
-    ) -> list[Permission]:
-        return get_group_perms(user_or_group, obj)  # type: ignore
+    ) -> QuerySet[Permission]:
+        return self.get_default_permissions_objects(user_or_group, obj) | gsc.get_group_perms(user_or_group, obj)  # type: ignore
 
-    def get_user_perms(self, user: User, obj: ResourceInstance) -> list[Permission]:
-        return get_user_perms(user, obj)  # type: ignore
-
-    def process_new_user(self, instance: User, created: bool) -> None:
-        ct = ContentType.objects.get(app_label="models", model="resourceinstance")
-        resourceInstanceIds = list(
-            GroupObjectPermission.objects.filter(content_type=ct)
-            .values_list("object_pk", flat=True)
-            .distinct()
+    def get_user_perms(self, user: User, obj: Model) -> QuerySet[Permission]:
+        return self.get_default_permissions_objects(user, obj) | gsc.get_user_perms(
+            user, obj
         )
-        for resourceInstanceId in resourceInstanceIds:
-            resourceInstanceId = uuid.UUID(resourceInstanceId)
-        resources = ResourceInstance.objects.filter(pk__in=resourceInstanceIds)
-        self.assign_perm("no_access_to_resourceinstance", instance, resources)
-        for resource_instance in resources:
-            resource = Resource(resource_instance.resourceinstanceid)  # type: ignore
-            resource.graph_id = resource_instance.graph_id
-            resource.createdtime = resource_instance.createdtime
-            resource.index()  # type: ignore
 
     def get_map_layers_by_perm(
         self, user: User, perms: str | Iterable[str], any_perm: bool = True
@@ -183,9 +148,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         map_layers_allowed = []
 
         for map_layer in map_layers_with_read_permission:
-            if ("no_access_to_maplayer" not in get_user_perms(user, map_layer)) or (
-                map_layer.addtomap is False and map_layer.isoverlay is False
-            ):
+            if (
+                "no_access_to_maplayer" not in self.get_user_perms(user, map_layer)
+            ) or (map_layer.addtomap is False and map_layer.isoverlay is False):
                 map_layers_allowed.append(map_layer)
 
         return map_layers_allowed
@@ -197,9 +162,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         map_layers_allowed = []
 
         for map_layer in map_layers_with_write_permission:
-            if ("no_access_to_maplayer" not in get_user_perms(user, map_layer)) or (
-                map_layer.addtomap is False and map_layer.isoverlay is False
-            ):
+            if (
+                "no_access_to_maplayer" not in self.get_user_perms(user, map_layer)
+            ) or (map_layer.addtomap is False and map_layer.isoverlay is False):
                 map_layers_allowed.append(map_layer)
 
         return map_layers_allowed
@@ -225,70 +190,6 @@ class ArchesStandardPermissionFramework(PermissionFramework):
             )
         )
 
-    def check_resource_instance_permissions(
-        self, user: User, resourceid: str, permission: str
-    ) -> ResourceInstancePermissions:
-        """
-        Checks if a user has permission to access a resource instance
-
-        Arguments:
-        user -- the user to check
-        resourceid -- the id of the resource
-        permission -- the permission codename (e.g. 'view_resourceinstance') for which to check
-
-        """
-        result = ResourceInstancePermissions()
-        try:
-            if resourceid == settings.SYSTEM_SETTINGS_RESOURCE_ID:
-                if not user.groups.filter(name="System Administrator").exists():
-                    result["permitted"] = False
-                    return result
-
-            resource = ResourceInstance.objects.select_related(
-                "resource_instance_lifecycle_state"
-            ).get(resourceinstanceid=resourceid)
-            result["resource"] = resource
-
-            all_perms = self.get_perms(user, resource)
-
-            if len(all_perms) == 0:  # no permissions assigned. permission implied
-                result["permitted"] = "unknown"
-                return result
-            else:
-                user_permissions = self.get_user_perms(user, resource)
-                if (
-                    "no_access_to_resourceinstance" in user_permissions
-                ):  # user is restricted
-                    result["permitted"] = False
-                    return result
-                elif permission in user_permissions:  # user is permitted
-                    result["permitted"] = True
-                    return result
-
-                group_permissions = self.get_group_perms(user, resource)
-                if (
-                    "no_access_to_resourceinstance" in group_permissions
-                ):  # group is restricted - no user override
-                    result["permitted"] = False
-                    return result
-                elif (
-                    permission in group_permissions
-                ):  # group is permitted - no user override
-                    result["permitted"] = True
-                    return result
-
-                if (
-                    permission not in all_perms
-                ):  # neither user nor group explicitly permits or restricts.
-                    result["permitted"] = False  # restriction implied
-                    return result
-
-        except ObjectDoesNotExist:
-            result["permitted"] = (
-                True  # if the object does not exist, should return true - this prevents strange 403s.
-            )
-            return result
-
     def get_users_with_perms(
         self,
         obj: Model,
@@ -297,56 +198,24 @@ class ArchesStandardPermissionFramework(PermissionFramework):
         with_group_users: bool = True,
         only_with_perms_in: Iterable[str] | None = None,
     ) -> list[User]:
-        return get_users_with_perms(obj, attach_perms=attach_perms, with_superusers=with_superusers, with_group_users=with_group_users, only_with_perms_in=only_with_perms_in)  # type: ignore
+        return gsc.get_users_with_perms(obj, attach_perms=attach_perms, with_superusers=with_superusers, with_group_users=with_group_users, only_with_perms_in=only_with_perms_in)  # type: ignore
 
     def get_groups_with_perms(
         self, obj: Model, attach_perms: bool = False
     ) -> list[Group]:
-        return get_groups_with_perms(obj, attach_perms=attach_perms)  # type: ignore
+        return gsc.get_groups_with_perms(obj, attach_perms=attach_perms)  # type: ignore
 
-    def get_restricted_users(self, resource: ResourceInstance) -> dict[str, list[int]]:
-        """
-        Takes a resource instance and identifies which users are explicitly restricted from
-        reading, editing, deleting, or accessing it.
+    @abstractmethod
+    def has_group_perm(self, group, perm, obj): ...
 
-        """
+    @abstractmethod
+    def check_resource_instance_permissions(
+        self, user: User, resourceid: str, permission: str
+    ): ...
 
-        user_perms = get_users_with_perms(
-            resource, attach_perms=True, with_group_users=False
-        )
-        user_and_group_perms = get_users_with_perms(
-            resource, attach_perms=True, with_group_users=True
-        )
-
-        result: dict[str, list[int]] = {
-            "no_access": [],
-            "cannot_read": [],
-            "cannot_write": [],
-            "cannot_delete": [],
-        }
-
-        for user, perms in user_and_group_perms.items():
-            if user.is_superuser:
-                pass
-            elif (
-                user in user_perms
-                and "no_access_to_resourceinstance" in user_perms[user]
-            ):
-                for k, v in result.items():
-                    v.append(user.id)
-            else:
-                if "view_resourceinstance" not in perms:
-                    result["cannot_read"].append(user.id)
-                if "change_resourceinstance" not in perms:
-                    result["cannot_write"].append(user.id)
-                if "delete_resourceinstance" not in perms:
-                    result["cannot_delete"].append(user.id)
-                if "no_access_to_resourceinstance" in perms and len(perms) == 1:
-                    result["no_access"].append(user.id)
-
-        return result
-
-    def get_groups_for_object(self, perm: str, obj: Model) -> list[Group]:
+    def get_groups_with_permission_for_object(
+        self, perm: str, obj: Model
+    ) -> list[Group]:
         """
         returns a list of group objects that have the given permission on the given object
 
@@ -356,30 +225,13 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         """
 
-        def has_group_perm(group, perm, obj):
-            explicitly_defined_perms = self.get_perms(group, obj)
-            if len(explicitly_defined_perms) > 0:
-                if "no_access_to_nodegroup" in explicitly_defined_perms:
-                    return False
-                else:
-                    return perm in explicitly_defined_perms
-            else:
-                for permission in group.permissions.all():
-                    if perm in permission.codename:
-                        return True
-                return False
-
         ret = []
         for group in Group.objects.all():
-            if has_group_perm(group, perm, obj):  # type: ignore
+            if self.has_group_perm(group, perm, obj):  # type: ignore
                 ret.append(group)
         return ret
 
-    def get_sets_for_user(self, user: User, perm: str) -> set[str] | None:
-        # We do not do set filtering - None is allow-all for sets.
-        return None
-
-    def get_users_for_object(self, perm: str, obj: Model) -> list[User]:
+    def get_users_with_permission_for_object(self, perm: str, obj: Model) -> list[User]:
         """
         Returns a list of user objects that have the given permission on the given object
 
@@ -391,7 +243,12 @@ class ArchesStandardPermissionFramework(PermissionFramework):
 
         ret = []
         for user in User.objects.all():
-            if user.has_perm(perm, obj):
+            default_perms = self.get_default_permissions(user, obj)
+            if (
+                perm
+                in self.get_user_perms(user, obj).values_list("codename", flat=True)
+                or perm in default_perms
+            ):
                 ret.append(user)
         return ret
 
@@ -513,6 +370,9 @@ class ArchesStandardPermissionFramework(PermissionFramework):
     def get_resource_types_by_perm(
         self, user: User, perms: str | Iterable[str]
     ) -> list[str]:
+        """
+        Returns list of graph ids that the user has specified permissions on
+        """
         nodegroups = self.get_nodegroups_by_perm(user, perms)
         graphs = (
             Node.objects.values("graph_id")
@@ -539,15 +399,6 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                     user, resourceid, "change_resourceinstance"
                 )
                 if result is not None:
-                    if not result[
-                        "resource"
-                    ].resource_instance_lifecycle_state.can_edit_resource_instances:
-                        if not user.has_perm(
-                            "can_edit_all_resource_instance_lifecycle_states",
-                            result["resource"].resource_instance_lifecycle_state,
-                        ):
-                            return False
-
                     if result["permitted"] == "unknown":
                         return user.groups.filter(
                             name__in=settings.RESOURCE_EDITOR_GROUPS
@@ -580,15 +431,6 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                     user, resourceid, "delete_resourceinstance"
                 )
                 if result is not None:
-                    if not result[
-                        "resource"
-                    ].resource_instance_lifecycle_state.can_delete_resource_instances:
-                        if not user.has_perm(
-                            "can_delete_all_resource_instance_lifecycle_states",
-                            result["resource"].resource_instance_lifecycle_state,
-                        ):
-                            return False
-
                     if result["permitted"] == "unknown":
                         nodegroups = self.get_nodegroups_by_perm(
                             user, "models.delete_nodegroup"
@@ -733,113 +575,104 @@ class ArchesStandardPermissionFramework(PermissionFramework):
                 return True
         return False
 
-    def update_mappings(self):
-        mappings = {}
-        mappings["users_without_read_perm"] = {"type": "integer"}
-        mappings["users_without_edit_perm"] = {"type": "integer"}
-        mappings["users_without_delete_perm"] = {"type": "integer"}
-        mappings["users_with_no_access"] = {"type": "integer"}
-        return mappings
+    def get_default_permissions(
+        self,
+        user_or_group: User | Group = None,
+        model: Model = None,
+        all_permissions: bool = False,
+    ) -> list[str]:
+        """
+        Gets default permissions (if any) for a resource instance.
+        """
+        default_permissions_settings = settings.PERMISSION_DEFAULTS
+        if not default_permissions_settings or model is None:
+            return []
 
-    def get_index_values(self, resource: Resource):
-        restrictions = self.get_restricted_users(resource)
-        permissions = {}
-        permissions["users_without_read_perm"] = restrictions["cannot_read"]
-        permissions["users_without_edit_perm"] = restrictions["cannot_write"]
-        permissions["users_without_delete_perm"] = restrictions["cannot_delete"]
-        permissions["users_with_no_access"] = restrictions["no_access"]
-        return permissions
+        if isinstance(model, ResourceInstance):
+            default_permissions_for_graph = (
+                default_permissions_settings[str(model.graph_id)]
+                if str(model.graph_id) in default_permissions_settings
+                else None
+            )
+        else:
+            return []  # default permissions for nodegroups not currently supported
 
-    def get_permission_inclusions(self) -> list:
-        return [
-            "permissions.users_without_read_perm",
-            "permissions.users_without_edit_perm",
-            "permissions.users_without_delete_perm",
-            "permissions.users_with_no_access",
-            "permissions.principal_user",
+        if default_permissions_for_graph is None:
+            return []
+
+        user_ids = []
+        group_ids = []
+
+        if isinstance(user_or_group, Group):
+            group_ids.append(user_or_group.id)
+        elif isinstance(user_or_group, User):
+            user_ids.append(user_or_group.id)
+            if all_permissions:
+                group_ids = [x.id for x in user_or_group.groups.all()]
+
+        default_permissions = [
+            item
+            for sub_list in [
+                x["permissions"]
+                for x in default_permissions_for_graph
+                if (x["type"] == "user" and int(x["id"]) in user_ids)
+                or (x["type"] == "group" and int(x["id"]) in group_ids)
+            ]
+            for item in sub_list
         ]
+        return default_permissions
 
-    def get_permission_search_filter(self, user: User) -> Bool:
-        has_access = Bool()
-        terms = Terms(field="permissions.users_with_no_access", terms=[str(user.id)])
-        nested_term_filter = Nested(path="permissions", query=terms)
-        has_access.must_not(nested_term_filter)
-        return has_access
+    def get_default_permissions_objects(
+        self,
+        user_or_group: User | Group = None,
+        model: Model = None,
+        cls: Model | None = None,
+    ) -> QuerySet[Permission]:
+        if cls is not None:
+            if inspect.isclass(cls) and issubclass(cls, Model):
+                content_type = ContentType.objects.get_for_model(cls)
+            elif not inspect.isclass(cls) and issubclass(cls.__class__, Model):
+                content_type = ContentType.objects.get_for_model(cls.__class__)
+            else:
+                return Permission.objects.filter(codename__in=[])
 
-    def get_search_ui_permissions(
-        self, user: User, search_result: dict, groups
-    ) -> dict:
-        result = {}
-        user_read_permissions = self.get_resource_types_by_perm(
-            user,
-            [
-                "models.write_nodegroup",
-                "models.delete_nodegroup",
-                "models.read_nodegroup",
-            ],
-        )
-        user_can_read = len(user_read_permissions) > 0
-        result["can_read"] = (
-            "permissions" in search_result["_source"]
-            and "users_without_read_perm" in search_result["_source"]["permissions"]
-            and (
-                user.id
-                not in search_result["_source"]["permissions"][
-                    "users_without_read_perm"
-                ]
-            )
-        ) and user_can_read
+            return Permission.objects.filter(content_type_id=content_type.id)
 
-        user_can_edit = len(self.get_editable_resource_types(user)) > 0
-        result["can_edit"] = (
-            "permissions" in search_result["_source"]
-            and "users_without_edit_perm" in search_result["_source"]["permissions"]
-            and (
-                user.id
-                not in search_result["_source"]["permissions"][
-                    "users_without_edit_perm"
-                ]
-            )
-            and user_can_edit
-        )
-        result["is_principal"] = (
-            "permissions" in search_result["_source"]
-            and "principal_user" in search_result["_source"]["permissions"]
-            and user.id in search_result["_source"]["permissions"]["principal_user"]
-        )
-        return result
+        default_permissions = self.get_default_permissions(user_or_group, model)
+        permissions = Permission.objects.filter(codename__in=default_permissions)
+        return permissions
 
 
 class PermissionBackend(ObjectPermissionBackend):  # type: ignore
     def has_perm(self, user_obj: User, perm: str, obj: Model | None = None) -> bool:
-        # check if user_obj and object are supported (pulled directly from guardian)
-        support, user_obj = check_support(user_obj, obj)
-        if not support:
-            return False
-
-        if "." in perm:
-            app_label, perm = perm.split(".")
-            if obj is None:
-                raise ValueError("Passed perm has app label of '%s' and obj is None")
-            if app_label != obj._meta.app_label:
-                raise WrongAppError(
-                    "Passed perm has app label of '%s' and "
-                    "given obj has '%s'" % (app_label, obj._meta.app_label)
-                )
-
-        obj_checker: ObjectPermissionChecker = CachedObjectPermissionChecker(
-            user_obj, obj
-        )
-        explicitly_defined_perms = obj_checker.get_perms(obj)
-
-        if len(explicitly_defined_perms) > 0:
-            if "no_access_to_nodegroup" in explicitly_defined_perms:
+        if isinstance(obj, NodeGroup):
+            # check if user_obj and object are supported (pulled directly from guardian)
+            support, user_obj = check_support(user_obj, obj)
+            if not support:
                 return False
+
+            if "." in perm:
+                app_label, perm = perm.split(".")
+                if app_label != obj._meta.app_label:
+                    raise WrongAppError(
+                        "Passed perm has app label of '%s' and "
+                        "given obj has '%s'" % (app_label, obj._meta.app_label)
+                    )
+
+            obj_checker: ObjectPermissionChecker = CachedObjectPermissionChecker(
+                user_obj, obj
+            )
+            explicitly_defined_perms = obj_checker.get_perms(obj)
+
+            if len(explicitly_defined_perms) > 0:
+                if "no_access_to_nodegroup" in explicitly_defined_perms:
+                    return False
+                else:
+                    return perm in explicitly_defined_perms
             else:
-                return perm in explicitly_defined_perms
-        else:
-            user_checker = CachedUserPermissionChecker(user_obj)
-            return user_checker.user_has_permission(perm)
+                user_checker = CachedUserPermissionChecker(user_obj)
+                return user_checker.user_has_permission(perm)
+        return super().has_perm(user_obj, perm, obj)
 
 
 class CachedUserPermissionChecker:
@@ -885,7 +718,7 @@ class CachedObjectPermissionChecker:
             classname = input.__name__
         elif isinstance(input, Model):
             classname = input.__class__.__name__
-        elif isinstance(input, str) and globals().get(input):
+        elif isinstance(input, str):
             classname = input
         else:
             raise Exception("Cannot derive model from input.")
@@ -899,7 +732,7 @@ class CachedObjectPermissionChecker:
             checker = current_user_cached_permissions.get(classname)
         else:
             checker = ObjectPermissionChecker(user)
-            checker.prefetch_perms(globals()[classname].objects.all())
+            checker.prefetch_perms(apps.get_model("models", classname).objects.all())
 
             current_user_cached_permissions[classname] = checker
             user_permission_cache.set(key, current_user_cached_permissions)

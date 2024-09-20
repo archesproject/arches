@@ -16,9 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
 import json
-import time
+
 from tests.base_test import ArchesTestCase
 from tests.utils.search_test_utils import sync_es
 from django.http import HttpRequest
@@ -28,15 +27,12 @@ from django.test.client import Client
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
-from arches.app.utils.i18n import LanguageSynchronizer
-from arches.app.utils.data_management.resource_graphs.importer import (
-    import_graph as ResourceGraphImporter,
-)
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.views.search import search_results
 from guardian.shortcuts import assign_perm
 from arches.app.search.components.base import SearchFilterFactory
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Query, Term
+from arches.app.search.elasticsearch_dsl_builder import Query
 from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_INDEX
 
 # these tests can be run from the command line via
@@ -44,9 +40,11 @@ from arches.app.search.mappings import TERMS_INDEX, CONCEPTS_INDEX, RESOURCES_IN
 
 
 class SearchTests(ArchesTestCase):
+    graph_fixtures = ["Search Test Model"]
+
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpTestData(cls):
+        super().setUpTestData()
 
         se = SearchEngineFactory().create()
         q = Query(se=se)
@@ -55,14 +53,6 @@ class SearchTests(ArchesTestCase):
 
         cls.client = Client()
         cls.client.login(username="admin", password="admin")
-
-        LanguageSynchronizer.synchronize_settings_with_db()
-        models.ResourceInstance.objects.all().delete()
-        with open(
-            os.path.join("tests/fixtures/resource_graphs/Search Test Model.json"), "r"
-        ) as f:
-            archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile["graph"])
 
         cls.search_model_graphid = "d291a445-fa5f-11e6-afa8-14109fd34195"
         cls.search_model_cultural_period_nodeid = "7a182580-fa60-11e6-96d1-14109fd34195"
@@ -219,16 +209,6 @@ class SearchTests(ArchesTestCase):
         cls.name_resource.save()
 
         sync_es(se)
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.user.delete()
-        Resource.objects.filter(graph_id=cls.search_model_graphid).delete()
-        models.GraphModel.objects.filter(
-            source_identifier=cls.search_model_graphid
-        ).delete()
-        models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
-        super().tearDownClass()
 
     def test_temporal_only_search_1(self):
         """
@@ -766,6 +746,31 @@ class SearchTests(ArchesTestCase):
             ],
         )
 
+    def test_search_returnDsl(self):
+        """
+        test that a Query object is returned when returnDsl is set to True
+
+        """
+
+        term_filter = [
+            {
+                "type": "string",
+                "context": "",
+                "context_label": "",
+                "id": "test",
+                "text": "test",
+                "value": "test",
+                "inverted": False,
+            }
+        ]
+
+        request = HttpRequest()
+        request.method = "GET"
+        request.user = User.objects.get(username="anonymous")
+        request.GET.__setitem__("term-filter", json.dumps(term_filter))
+        resp = search_results(request, returnDsl=True)
+        self.assertTrue(isinstance(resp, Query))
+
     def test_search_without_searchview(self):
         """
         Execute a search without setting a search-view component on the query
@@ -781,7 +786,8 @@ class SearchTests(ArchesTestCase):
 
         """
         query = {"search-view": "unavailable-search-view"}
-        response_json = get_response_json(self.client, query=query)
+        with self.assertLogs("django.request", level="WARNING"):
+            response_json = get_response_json(self.client, query=query)
         self.assertFalse(response_json["success"])
 
     def test_searchview_searchview_component_from_admin(self):

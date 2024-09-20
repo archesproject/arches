@@ -333,7 +333,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = "c7ky-mc6vdnv+avp0r@(a)8y^51ex=25nogq@+q5$fnc*mxwdi"
+SECRET_KEY = "django-insecure-c7ky-mc6vdnv+avp0r@(a)8y^51ex=25nogq@+q5$fnc*mxwdi"
 JWT_KEY = SECRET_KEY
 JWT_TOKEN_EXPIRATION = 50  # days before the token becomes stale
 JWT_ALGORITHM = "HS256"
@@ -350,7 +350,7 @@ AUTHENTICATION_BACKENDS = (
     "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
     "oauth2_provider.backends.OAuth2Backend",
     "django.contrib.auth.backends.ModelBackend",  # this is default
-    "arches.app.permissions.arches_standard.PermissionBackend",
+    "arches.app.permissions.arches_permission_base.PermissionBackend",
     "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend",
 )
 
@@ -391,7 +391,7 @@ MIDDLEWARE = [
     "oauth2_provider.middleware.OAuth2TokenMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    # "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "arches.app.utils.middleware.SetAnonymousUser",
 ]
 
@@ -870,7 +870,13 @@ def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
 
-PERMISSION_FRAMEWORK = "arches_standard.ArchesStandardPermissionFramework"
+# If either of the following PERMISSION settings is changed, you must run a reindex.
+PERMISSION_FRAMEWORK = "arches_default_allow.ArchesDefaultAllowPermissionFramework"
+
+PERMISSION_DEFAULTS = {}
+# PERMISSION_DEFAULTS = {
+#     "graphid": [{"id": "1", "type": "user", "permissions": ["no_access_to_resourceinstance"]}]
+# }
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###

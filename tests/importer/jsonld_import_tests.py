@@ -7,16 +7,12 @@ from django.test.client import RequestFactory, Client
 from django.test.utils import captured_stdout
 from django.urls import reverse
 from django.db import connection
-from arches.app.utils.i18n import LanguageSynchronizer
 from tests.base_test import ArchesTestCase, CREATE_TOKEN_SQL, DELETE_TOKEN_SQL
 from arches.app.utils.skos import SKOSReader
 from arches.app.models.graph import Graph
 from arches.app.models.models import TileModel
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
-from arches.app.utils.data_management.resources.exporter import (
-    ResourceExporter as BusinessDataExporter,
-)
 from arches.app.utils.data_management.resource_graphs.importer import (
     import_graph as ResourceGraphImporter,
 )
@@ -30,19 +26,16 @@ from pyld.jsonld import expand
 
 class JsonLDImportTests(ArchesTestCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpTestData(cls):
+        super().setUpTestData()
 
-        # This runs once per instantiation
-        cls.loadOntology()
         cls.factory = RequestFactory()
         cls.token = "abc123"
         cls.client = Client(HTTP_AUTHORIZATION="Bearer %s" % cls.token)
 
         sql_str = CREATE_TOKEN_SQL.format(token=cls.token, user_id=1)
-        cursor = connection.cursor()
-        cursor.execute(sql_str)
-        LanguageSynchronizer.synchronize_settings_with_db()
+        with connection.cursor() as cursor:
+            cursor.execute(sql_str)
 
         skos = SKOSReader()
         rdf = skos.read_file("tests/fixtures/jsonld_base/rdm/jsonld_test_thesaurus.xml")
@@ -199,8 +192,8 @@ class JsonLDImportTests(ArchesTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cursor = connection.cursor()
-        cursor.execute(DELETE_TOKEN_SQL)
+        with connection.cursor() as cursor:
+            cursor.execute(DELETE_TOKEN_SQL)
 
         super().tearDownClass()
 

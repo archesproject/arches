@@ -444,6 +444,7 @@
         distance='{% trans "Distance" as distance %} "{{ distance|escapejs }}"'
         buffer-distance='{% trans "Buffer Distance" as bufferDistance %} "{{ bufferDistance|escapejs }}"'
         new='{% trans "New" as new %} "{{ new|escapejs }}"'
+        old='{% trans "Old" as old %} "{{ old|escapejs }}"'
         add-new='{% trans "Add New" as addNew %} "{{ addNew|escapejs }}"'
         return='{% trans "Return" as return %} "{{ return|escapejs }}"'
         csv='{% trans "csv" as csv %} "{{ csv|escapejs }}"'
@@ -1009,6 +1010,7 @@
         expand-relatioship-ontology-options='(resource, relatedResource) => {return {% trans "Expand relationship ontology options between ${resource} and ${relatedResource}" as expandRelatioshipOntologyOptions %} `{{ expandRelatioshipOntologyOptions|escapejs }}` }'
         remove-related-resource-model='(resourceModel) => {return {% trans "Remove resource model ${resourceModel} from the related resource options" as removeRelatedResourceModel %} `{{ removeRelatedResourceModel|escapejs }}` }'
         skip-to-content='{% trans "Skip to content" as skipToContent %} "{{ skipToContent|escapejs }}"'
+        disabled-by-default-permissions='{% trans "edit disabled due to default permissions" as disabledByDefaultPermissions %} "{{disabledByDefaultPermissions|escapejs}}"'
         welcome-user-edit-profile='(user) => {return {% trans "Logged in as ${user}. Click to edit your profile." as welcomeUserEditProfile %} `{{ welcomeUserEditProfile|escapejs }}` }'
         toggle-navigation='{% trans "Toggle navigation bar" as toggleNavigation %} "{{ toggleNavigation|escapejs }}"'
         toggle-navigation-description='{% trans "Expand the navigation panel to show more Arches tool and module options" as toggleNavigationDescription %} "{{ toggleNavigationDescription|escapejs }}"'
@@ -1021,6 +1023,15 @@
         delete-workflow-warning='{% trans "All data created during the course of this workflow will be deleted." as deleteWorkflowWarning %} "{{ deleteWorkflowWarning|escapejs }}"'
         show-facet-path='{% trans "Show facet path" as showFacetPath %} "{{ showFacetPath|escapejs }}"'
         hide-facet-path='{% trans "Hide facet path" as hideFacetPath %} "{{ hideFacetPath|escapejs }}"'
+        select-replacement-concept='{% trans "Select a replacement concept" as selectReplacementConcept %} "{{ selectReplacementConcept|escapejs }}"'
+        select-concept-to-replace='{% trans "Select a concept to replace" as selectConceptToReplace %} "{{ selectConceptToReplace|escapejs }}"'
+        concept='{% trans "Concept" as concept %} "{{ concept|escapejs }}"'
+        replace-concept='{% trans "Replace Concept" as replaceConcept %} "{{ replaceConcept|escapejs }}"'
+        previous='{% trans "Previous" as previous %} "{{ previous|escapejs }}"'
+        next='{% trans "Next" as next %} "{{ next|escapejs }}"'
+        resource-id='{% trans "Resource Id" as resourceId %} "{{ resourceId|escapejs }}"'
+        remove-from-edit-queue='{% trans "Remove from Edit Queue" as removeFromEditQueue %} "{{ removeFromEditQueue|escapejs }}"'
+        replace-concept-or-conceptlist='{% trans "Replace (Concept or Concept-list)" as replaceConceptOrConceptList %} "{{ replaceConceptOrConceptList|escapejs }}"'
     ></div>
     {% endblock arches_translations %}
 

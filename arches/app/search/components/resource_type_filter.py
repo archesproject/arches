@@ -29,7 +29,7 @@ class ResourceTypeFilter(BaseSearchFilter):
     def generate_dsl(self, search_query_object, **kwargs):
         permitted_nodegroups = kwargs.get("permitted_nodegroups")
         search_query = Bool()
-        querystring_params = self.request.GET.get(self.componentname, "")
+        querystring_params = kwargs.get("querystring", "")
         graph_ids = []
         permitted_graphids = get_permitted_graphids(permitted_nodegroups)
 
