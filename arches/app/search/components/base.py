@@ -24,7 +24,9 @@ class BaseSearchFilter:
 
     def append_dsl(self, search_query_object, **kwargs):
         """
-        used to append ES query dsl to the search request
+        used to append ES query dsl to the search request,
+        also used to modify the search query object
+        if custom index hooks are present
 
         """
 
