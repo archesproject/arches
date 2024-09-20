@@ -82,7 +82,7 @@ class MapFilter(BaseSearchFilter):
         return search_query
 
     def append_dsl(self, search_query_object, **kwargs):
-        dsl = self.generate_dsl(search_query_object, kwargs)
+        dsl = self.generate_dsl(search_query_object, **kwargs)
         search_query_object["query"].add_query(dsl)
 
         if self.componentname not in search_query_object:
