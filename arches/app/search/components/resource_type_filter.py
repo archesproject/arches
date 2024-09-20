@@ -25,7 +25,8 @@ def get_permitted_graphids(permitted_nodegroups):
 
 
 class ResourceTypeFilter(BaseSearchFilter):
-    def append_dsl(self, search_query_object, **kwargs):
+
+    def generate_dsl(self, search_query_object, **kwargs):
         permitted_nodegroups = kwargs.get("permitted_nodegroups")
         search_query = Bool()
         querystring_params = self.request.GET.get(self.componentname, "")
@@ -49,8 +50,11 @@ class ResourceTypeFilter(BaseSearchFilter):
             terms = Terms(field="graph_id", terms=graph_ids)
 
         search_query.filter(terms)
+        return search_query
 
-        search_query_object["query"].add_query(search_query)
+    def append_dsl(self, search_query_object, **kwargs):
+        dsl = self.generate_dsl(search_query_object, **kwargs)
+        search_query_object["query"].add_query(dsl)
 
     def view_data(self):
         return {
