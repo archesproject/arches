@@ -74,6 +74,20 @@ define([
 
             AbstractModel.prototype.constructor.call(this, attributes, options);
 
+            // Wrap I18n_JSON field values (signified as i18n_properties)
+            // in a shape like: { "en": "some value" }.
+            for (const [key, val] of Object.entries(this.config)) {
+                if (
+                    // Limit to string datatype for now.
+                    this.datatype.datatype === 'string'
+                    && ko.unwrap(this.config.i18n_properties)?.includes
+                    && ko.unwrap(this.config.i18n_properties).includes(key)
+                    && typeof ko.unwrap(val) === 'string'
+                ) {
+                    this.config[key]({ [arches.activeLanguage]: ko.unwrap(val) });
+                }
+            }
+
             this.configJSON = ko.computed({
                 read: function() {
                     var configJSON = {};

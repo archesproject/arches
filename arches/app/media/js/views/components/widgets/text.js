@@ -34,6 +34,7 @@ define([
         self.currentDefaultText = ko.observable();
         self.currentDefaultDirection = ko.observable();
         self.currentDefaultLanguage = ko.observable({code: arches.activeLanguage});
+        self.currentPlaceholder = ko.observable();
 
         const initialCurrent = {};
         const initialDefault = {};
@@ -82,9 +83,13 @@ define([
                 self.currentDefaultDirection('ltr');
                 currentDefaultValue[currentLanguage.code] = {value: '', direction: 'ltr'};
             }
-            if (ko.unwrap(self.placeholder) && (typeof ko.unwrap(self.placeholder) !== "string")) {
-                self.placeholder(self.placeholder()[self.currentLanguage().code]);
+
+            if (ko.unwrap(self.placeholder) && typeof ko.unwrap(self.placeholder) === 'string') {
+                self.placeholder({
+                    [self.currentLanguage().code]: ko.unwrap(self.placeholder),
+                });
             }
+            self.currentPlaceholder(self.placeholder()[self.currentLanguage().code]);
         };
 
         init();
@@ -177,9 +182,20 @@ define([
 
             self.currentText(koMapping.toJS(self.value)[currentLanguage.code]?.value);
             self.currentDirection(koMapping.toJS(self.value)[currentLanguage.code]?.direction);
-
+            self.currentPlaceholder(koMapping.toJS(self.placeholder)[currentLanguage.code]);
         });
 
+        self.currentPlaceholder.subscribe(newValue => {
+            if(!self.currentLanguage()){ return; }
+            const currentLanguage = self.currentLanguage();
+
+            if (ko.isObservable(self.placeholder)) {
+                const patchedPlaceholder = self.placeholder();
+                patchedPlaceholder[currentLanguage.code] = newValue;
+                self.placeholder(patchedPlaceholder);
+                self.card._card.valueHasMutated();
+            }
+        });
     };
 
     return ko.components.register('text-widget', {
