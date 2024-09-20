@@ -66,8 +66,8 @@ class PermissionFramework(metaclass=ABCMeta):
     def get_restricted_users(self, resource): ...
 
     @abstractmethod
-    def get_restricted_instances(
-        self, user, search_engine=None, allresources=False
+    def get_filtered_instances(
+        self, user, search_engine=None, allresources=False, resources=None
     ): ...
 
     @abstractmethod
@@ -198,9 +198,14 @@ def get_restricted_users(resource):
     return _get_permission_framework().get_restricted_users(resource)
 
 
-def get_restricted_instances(user, search_engine=None, allresources=False):
-    return _get_permission_framework().get_restricted_instances(
-        user, search_engine=search_engine, allresources=allresources
+def get_filtered_instances(
+    user, search_engine=None, allresources=False, resources=list[str]
+) -> tuple[bool, list[str]]:
+    return _get_permission_framework().get_filtered_instances(
+        user,
+        search_engine=search_engine,
+        allresources=allresources,
+        resources=resources,
     )
 
 

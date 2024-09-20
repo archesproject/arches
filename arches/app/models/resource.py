@@ -54,8 +54,7 @@ from arches.app.utils.exceptions import (
 )
 from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
-    get_restricted_instances,
-    user_can_read_graph,
+    get_filtered_instances,
     get_nodegroups_by_perm,
 )
 import django.dispatch
@@ -867,9 +866,6 @@ class Resource(models.ResourceInstance):
         ret["total"] = {"value": resource_relations["total"]}
         instanceids = set()
 
-        restricted_instances = (
-            get_restricted_instances(user, se) if user is not None else []
-        )
         readable_graphids = set(
             permission_backend.get_resource_types_by_perm(
                 user, ["models.read_nodegroup"]
@@ -881,10 +877,21 @@ class Resource(models.ResourceInstance):
             resourceid_from = relation["resourceinstanceidfrom"]
             resourceinstanceto_graphid = relation["resourceinstanceto_graphid"]
             resourceinstancefrom_graphid = relation["resourceinstancefrom_graphid"]
+            exclusive_set, filtered_instances = get_filtered_instances(
+                user, se, resources=[resourceid_from, resourceid_to]
+            )
+            filtered_instances = filtered_instances if user is not None else []
+
+            resourceid_to_permission = resourceid_to not in filtered_instances
+            resourceid_from_permission = resourceid_from not in filtered_instances
+
+            if exclusive_set:
+                resourceid_to_permission = not (resourceid_to_permission)
+                resourceid_from_permission = not (resourceid_from_permission)
 
             if (
-                resourceid_to not in restricted_instances
-                and resourceid_from not in restricted_instances
+                resourceid_to_permission
+                and resourceid_from_permission
                 and str(resourceinstanceto_graphid) in readable_graphids
                 and str(resourceinstancefrom_graphid) in readable_graphids
             ):
