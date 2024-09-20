@@ -583,7 +583,11 @@ class Tile(models.TileModel):
 
     def after_update_all(self):
         try: 
-            nodes = [SimpleNamespace(node) for node in self.serialized_graph["nodes"] if node["nodegroup_id"] == self.nodegroup_id]
+            nodes = [
+                SimpleNamespace(node)
+                for node in self.serialized_graph["nodes"]
+                if node["nodegroup_id"] == str(self.nodegroup_id)
+            ]
         except TypeError: # handle if serialized_graph is None
             nodes = self.nodegroup.node_set.all()
 
