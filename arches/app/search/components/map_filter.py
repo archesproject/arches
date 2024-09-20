@@ -23,7 +23,8 @@ details = {
 
 
 class MapFilter(BaseSearchFilter):
-    def append_dsl(self, search_query_object, **kwargs):
+
+    def generate_dsl(self, search_query_object, **kwargs):
         permitted_nodegroups = kwargs.get("permitted_nodegroups")
         include_provisional = kwargs.get("include_provisional")
         search_query = Bool()
@@ -72,16 +73,20 @@ class MapFilter(BaseSearchFilter):
                     )
 
                 search_query.filter(Nested(path="geometries", query=spatial_query))
+                try:
+                    search_query_object[self.componentname][
+                        "search_buffer"
+                    ] = feature_geom
+                except NameError:
+                    logger.info(_("Feature geometry is not defined"))
+        return search_query
 
-        search_query_object["query"].add_query(search_query)
+    def append_dsl(self, search_query_object, **kwargs):
+        dsl = self.generate_dsl(search_query_object, kwargs)
+        search_query_object["query"].add_query(dsl)
 
         if self.componentname not in search_query_object:
             search_query_object[self.componentname] = {}
-
-        try:
-            search_query_object[self.componentname]["search_buffer"] = feature_geom
-        except NameError:
-            logger.info(_("Feature geometry is not defined"))
 
 
 def _buffer(geojson, width=0, unit="ft"):

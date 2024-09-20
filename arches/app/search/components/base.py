@@ -14,7 +14,7 @@ class BaseSearchFilter:
         self.user = user
         self.componentname = componentname
 
-    def generate_dsl(self, **kwargs):
+    def generate_dsl(self, search_query_object, **kwargs):
         """
         used to generate ES query dsl
 
