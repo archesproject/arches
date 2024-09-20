@@ -25,7 +25,8 @@ details = {
 
 
 class AdvancedSearch(BaseSearchFilter):
-    def append_dsl(self, search_query_object, **kwargs):
+
+    def generate_dsl(self, **kwargs):
         querysting_params = self.request.GET.get(self.componentname, "")
         advanced_filters = JSONDeserializer().deserialize(querysting_params)
         datatype_factory = DataTypeFactory()
@@ -70,7 +71,11 @@ class AdvancedSearch(BaseSearchFilter):
         for grouped_query in grouped_queries:
             advanced_query.should(grouped_query)
         search_query.must(advanced_query)
-        search_query_object["query"].add_query(search_query)
+        return search_query
+
+    def append_dsl(self, search_query_object, **kwargs):
+        dsl = self.generate_dsl()
+        search_query_object["query"].add_query(dsl)
 
     def view_data(self):
         ret = {}
