@@ -46,6 +46,9 @@ class BaseImportModule:
         if self.request:
             self.userid = request.user.id
             self.moduleid = request.POST.get("module")
+            self.loadid = request.POST.get("load_id")
+            if loadid is not None and self.loadid != loadid:
+                raise ValueError("loadid from request does not match loadid argument")
 
     def filesize_format(self, bytes):
         """Convert bytes to readable units"""

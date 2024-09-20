@@ -149,7 +149,7 @@ class JSONLDImportTests(TransactionTestCase):
             """
             ),
         )
-        importer = JSONLDImporter(request=request, loadid=str(start_event.pk))
+        importer = JSONLDImporter(request=request)
         importer.prepare_temp_dir(request)  # ordinarily done with the .read() request
 
         # Do a hack job of a read.
