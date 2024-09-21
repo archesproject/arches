@@ -58,8 +58,7 @@ define([
                         break;
                 }
             }
-            if (foundFeature)
-                popupFeatureObject.mapCard.filterByFeatureGeom(foundFeature);
+            popupFeatureObject.mapCard.filterByFeatureGeom(foundFeature);
         },
 
         /**
@@ -69,7 +68,16 @@ define([
          * typically dependent on at least 1 feature with a geometry and/or a featureid/resourceid combo
          */
         showFilterByFeature: function(popupFeatureObject) {
-            return (ko.unwrap(popupFeatureObject.geometries) || []).length > 0;
+            let foundFeature = null;
+            const strippedFeatureId = popupFeatureObject.feature.properties.featureid.replace(/-/g,"");
+            for (let geometry of popupFeatureObject.geometries()) {
+                if (geometry.geom && Array.isArray(geometry.geom.features)) {
+                    foundFeature = geometry.geom.features.find(feature => feature.id.replace(/-/g, "") === strippedFeatureId);
+                    if (foundFeature)
+                        break;
+                }
+            }
+            return foundFeature !== null;
         },
 
     };
