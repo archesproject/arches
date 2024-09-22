@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.db.migrations.serializer import BaseSerializer, Serializer
 from django.db.models import JSONField
 from django.db.models.functions.comparison import Cast
+from django.db.models.sql import Query
 from django.db.models.sql.compiler import SQLInsertCompiler
 from django.db.models.sql.where import NothingNode
 from django.utils.translation import get_language
@@ -283,6 +284,8 @@ class I18n_JSON(NothingNode):
         If we're inserting a new value then we can just set the localzed column to the json object.
         If we're updating a value for a specific language, then use the postgres "jsonb_set" command to do that
         https://www.postgresql.org/docs/9.5/functions-json.html
+
+        Dangerous keys raise ValueError (with a descriptive message from Django).
         """
 
         if (len(self.i18n_properties) == 0 and self.function is None) or isinstance(
@@ -291,6 +294,11 @@ class I18n_JSON(NothingNode):
             params = [json.dumps(self.to_localized_object())]
             sql = "%s"
         else:
+            # Forbid dangerous values.
+            sanitizer = Query(model=None)
+            for prop in self.raw_value:
+                sanitizer.check_alias(prop)
+
             params = []
             if self.function is not None:
                 clss = import_class_from_string(self.function)()
