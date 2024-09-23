@@ -344,8 +344,8 @@ define([
                 var data = feature.properties;
                 var id = data.resourceinstanceid;
                 data.showEditButton = self.canEdit;
-                data.sendFeatureToMapFilter = mapPopupProvider.sendFeatureToMapFilter;
-                data.showFilterByFeature = mapPopupProvider.showFilterByFeature;
+                data.sendFeatureToMapFilter = mapPopupProvider.sendFeatureToMapFilter.bind(mapPopupProvider);
+                data.showFilterByFeature = mapPopupProvider.showFilterByFeature.bind(mapPopupProvider);
                 const descriptionProperties = ['displayname', 'graph_name', 'map_popup', 'geometries'];
                 if (id) {
                     if (!self.resourceLookup[id]){
