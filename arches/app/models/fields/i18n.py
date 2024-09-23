@@ -297,6 +297,8 @@ class I18n_JSON(NothingNode):
             # Forbid dangerous values.
             sanitizer = Query(model=None)
             for prop in self.raw_value:
+                if "%" in prop:
+                    raise ValueError
                 sanitizer.check_alias(prop)
 
             params = []
