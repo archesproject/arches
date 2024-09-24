@@ -881,7 +881,8 @@ class SearchTests(ArchesTestCase):
         request.method = "GET"
         request.user = User.objects.get(username="anonymous")
         request.GET.__setitem__("term-filter", '{"key": "value",}')
-        resp = search_results(request)
+        with self.assertLogs("arches.app.search.components", level="WARNING"):
+            resp = search_results(request)
         self.assertEqual(resp.status_code, 500)
 
     def test_custom_resource_index(self):
