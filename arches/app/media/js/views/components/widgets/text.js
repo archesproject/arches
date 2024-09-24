@@ -84,12 +84,14 @@ define([
                 currentDefaultValue[currentLanguage.code] = {value: '', direction: 'ltr'};
             }
 
-            if (ko.unwrap(self.placeholder) && typeof ko.unwrap(self.placeholder) === 'string') {
-                self.placeholder({
-                    [self.currentLanguage().code]: ko.unwrap(self.placeholder),
-                });
+            if (ko.unwrap(self.placeholder)) {
+                if (typeof ko.unwrap(self.placeholder) === 'string') {
+                    self.placeholder({
+                        [self.currentLanguage().code]: ko.unwrap(self.placeholder),
+                    });
+                }
+                self.currentPlaceholder(self.placeholder()[self.currentLanguage().code]);
             }
-            self.currentPlaceholder(self.placeholder()[self.currentLanguage().code]);
         };
 
         init();
@@ -189,7 +191,7 @@ define([
             if(!self.currentLanguage()){ return; }
             const currentLanguage = self.currentLanguage();
 
-            if (ko.isObservable(self.placeholder)) {
+            if (self.card && ko.isObservable(self.placeholder)) {
                 const patchedPlaceholder = self.placeholder();
                 patchedPlaceholder[currentLanguage.code] = newValue;
                 self.placeholder(patchedPlaceholder);
