@@ -710,6 +710,11 @@ class Resource(models.ResourceInstance):
 
         if resourceinstanceid is None:
             resourceinstanceid = self.resourceinstanceid
+            instance = self
+        else:
+            instance = Resource(pk=resourceinstanceid)
+            # ensure PK is UUID
+            instance.clean_fields(exclude=["graph", "graph_publication"])
         resourceinstanceid = str(resourceinstanceid)
 
         # delete any related terms
@@ -741,7 +746,7 @@ class Resource(models.ResourceInstance):
         # delete resources from custom indexes
         for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
             es_index = import_class_from_string(index["module"])(index["name"])
-            es_index.delete_resources(resources=self)
+            es_index.delete_resources(resources=instance)
 
     def validate(self, verbose=False, strict=False):
         """
