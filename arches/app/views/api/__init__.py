@@ -195,8 +195,6 @@ class GeoJSON(APIBase):
             indent = int(indent)
         if isinstance(nodegroups, str):
             nodegroups = nodegroups.split(",")
-        if hasattr(request.user, "userprofile") is not True:
-            models.UserProfile.objects.create(user=request.user)
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
         nodegroups = [i for i in nodegroups if i in viewable_nodegroups]
         nodes = models.Node.objects.filter(
@@ -341,8 +339,6 @@ class GeoJSON(APIBase):
 
 class MVT(APIBase):
     def get(self, request, nodeid, zoom, x, y):
-        if hasattr(request.user, "userprofile") is not True:
-            models.UserProfile.objects.create(user=request.user)
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
         user = request.user
 
