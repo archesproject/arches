@@ -27,7 +27,7 @@ class MapFilter(BaseSearchFilter):
         permitted_nodegroups = kwargs.get("permitted_nodegroups")
         include_provisional = kwargs.get("include_provisional")
         search_query = Bool()
-        querystring_params = kwargs.get("querystring", "")
+        querystring_params = kwargs.get("querystring", "{}")
         spatial_filter = JSONDeserializer().deserialize(querystring_params)
         if "features" in spatial_filter:
             if len(spatial_filter["features"]) > 0:
@@ -35,53 +35,22 @@ class MapFilter(BaseSearchFilter):
                 feature_properties = {}
                 if "properties" in spatial_filter["features"][0]:
                     feature_properties = spatial_filter["features"][0]["properties"]
-                buffer = {"width": 0, "unit": "ft"}
-                if "buffer" in feature_properties:
-                    buffer = feature_properties["buffer"]
-                search_buffer = _buffer(feature_geom, buffer["width"], buffer["unit"])
-                feature_geom = JSONDeserializer().deserialize(search_buffer.geojson)
-                geoshape = GeoShape(
-                    field="geometries.geom.features.geometry",
-                    type=feature_geom["type"],
-                    coordinates=feature_geom["coordinates"],
+
+                buffered_feature_geom = add_geoshape_query_to_search_query(
+                    feature_geom,
+                    feature_properties,
+                    permitted_nodegroups,
+                    include_provisional,
+                    search_query,
                 )
+                search_query_object["query"].add_query(search_query)
 
-                invert_spatial_search = False
-                if "inverted" in feature_properties:
-                    invert_spatial_search = feature_properties["inverted"]
-
-                spatial_query = Bool()
-                if invert_spatial_search is True:
-                    spatial_query.must_not(geoshape)
-                else:
-                    spatial_query.filter(geoshape)
-
-                # get the nodegroup_ids that the user has permission to search
-                spatial_query.filter(
-                    Terms(field="geometries.nodegroup_id", terms=permitted_nodegroups)
-                )
-
-                if include_provisional is False:
-                    spatial_query.filter(
-                        Terms(field="geometries.provisional", terms=["false"])
-                    )
-
-                elif include_provisional == "only provisional":
-                    spatial_query.filter(
-                        Terms(field="geometries.provisional", terms=["true"])
-                    )
-
-                search_query.filter(Nested(path="geometries", query=spatial_query))
-
-        search_query_object["query"].add_query(search_query)
-
-        if self.componentname not in search_query_object:
-            search_query_object[self.componentname] = {}
-
-        try:
-            search_query_object[self.componentname]["search_buffer"] = feature_geom
-        except NameError:
-            logger.info(_("Feature geometry is not defined"))
+                # Add the buffered feature geometry to the search query object
+                if self.componentname not in search_query_object:
+                    search_query_object[self.componentname] = {}
+                search_query_object[self.componentname][
+                    "search_buffer"
+                ] = buffered_feature_geom
 
 
 def _buffer(geojson, width=0, unit="ft"):
@@ -111,3 +80,48 @@ def _buffer(geojson, width=0, unit="ft"):
             res = cursor.fetchone()
             geom = GEOSGeometry(res[0], srid=4326)
     return geom
+
+
+def add_geoshape_query_to_search_query(
+    feature_geom,
+    feature_properties,
+    permitted_nodegroups,
+    include_provisional,
+    search_query,
+):
+
+    buffer = {"width": 0, "unit": "ft"}
+    if "buffer" in feature_properties:
+        buffer = feature_properties["buffer"]
+    # feature_geom = spatial_filter["features"][0]["geometry"]
+    search_buffer = _buffer(feature_geom, int(buffer["width"]), buffer["unit"])
+    feature_geom = JSONDeserializer().deserialize(search_buffer.geojson)
+    geoshape = GeoShape(
+        field="geometries.geom.features.geometry",
+        type=feature_geom["type"],
+        coordinates=feature_geom["coordinates"],
+    )
+    invert_spatial_search = False
+    if "inverted" in feature_properties:
+        invert_spatial_search = feature_properties["inverted"]
+
+    spatial_query = Bool()
+    if invert_spatial_search is True:
+        spatial_query.must_not(geoshape)
+    else:
+        spatial_query.filter(geoshape)
+
+    # get the nodegroup_ids that the user has permission to search
+    spatial_query.filter(
+        Terms(field="geometries.nodegroup_id", terms=permitted_nodegroups)
+    )
+
+    if include_provisional is False:
+        spatial_query.filter(Terms(field="geometries.provisional", terms=["false"]))
+
+    elif include_provisional == "only provisional":
+        spatial_query.filter(Terms(field="geometries.provisional", terms=["true"]))
+
+    search_query.filter(Nested(path="geometries", query=spatial_query))
+
+    return feature_geom
