@@ -58,10 +58,12 @@
                         <span data-bind="text: $root.translations.edit"></span>
                     </a>
                     <!--/ko-->
+                    <!-- ko if: showFilterByFeatureButton -->
                     <a data-bind="click: function() {sendFeatureToMapFilter($data);}, visible: showFilterByFeature($data)" href="#">
                         <i class="fa fa-search"></i>
                         <span data-bind="text: $root.translations.filterByFeature"></span>
                     </a>
+                    <!-- /ko -->
                 </div>
                 <!-- ko if: $parent.popupFeatures.length > 1 -->
                 <div style="display: flex; flex-direction: row; width: 60px; justify-content: space-evenly; font-weight: 500;">

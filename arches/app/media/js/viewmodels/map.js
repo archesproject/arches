@@ -343,6 +343,7 @@ define([
             const popupFeatures = features.map(feature => {
                 var data = feature.properties;
                 var id = data.resourceinstanceid;
+                data.showFilterByFeatureButton = !!params.search;
                 data.showEditButton = self.canEdit;
                 data.sendFeatureToMapFilter = mapPopupProvider.sendFeatureToMapFilter.bind(mapPopupProvider);
                 data.showFilterByFeature = mapPopupProvider.showFilterByFeature.bind(mapPopupProvider);
