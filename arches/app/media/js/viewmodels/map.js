@@ -343,8 +343,9 @@ define([
             const popupFeatures = features.map(feature => {
                 var data = feature.properties;
                 var id = data.resourceinstanceid;
+                const userid = ko.unwrap(self.userid);
                 data.showFilterByFeatureButton = !!params.search;
-                data.showEditButton = self.canEdit;
+                data.showEditButton = false;
                 data.sendFeatureToMapFilter = mapPopupProvider.sendFeatureToMapFilter.bind(mapPopupProvider);
                 data.showFilterByFeature = mapPopupProvider.showFilterByFeature.bind(mapPopupProvider);
                 const descriptionProperties = ['displayname', 'graph_name', 'map_popup', 'geometries'];
@@ -364,8 +365,13 @@ define([
                             } catch (err) {
                                 data.permissions = koMapping.toJS(ko.unwrap(data.permissions));
                             }
-                            if (data.permissions.users_without_edit_perm.indexOf(ko.unwrap(self.userid)) > 0) {
-                                data.showEditButton = false;
+
+                            const hasInstanceEditPermission = data.permissions.users_without_edit_perm?.includes(userid) === false || 
+                                data.permissions.principal_user?.includes(userid) || 
+                                data.permissions.users_edit?.includes(userid);
+
+                            if (self.canEdit && hasInstanceEditPermission) {
+                                data.showEditButton = true;
                             }
                         }
                         descriptionProperties.forEach(prop => data[prop] = ko.observable(data[prop]));
