@@ -308,9 +308,7 @@ define([
                         }
                         else {
                             viewModel.cardTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
-                            setTimeout(function () {
-                                viewModel.permissionTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
-                            }, 50);
+                            viewModel.permissionTree.updateCards(viewModel.selectedNode().nodeGroupId(), data.responseJSON);
                             viewModel.updatedCardinalityData([data.responseJSON, viewModel.graphSettingsViewModel]);
                         }
 
