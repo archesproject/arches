@@ -157,9 +157,11 @@ class Card(models.CardModel):
                         node_id = widget.get("node_id", None)
                         card_id = widget.get("card_id", None)
                         widget_id = widget.get("widget_id", None)
- 
+
                         try:
-                            widget_model = models.CardXNodeXWidget.objects.get(node_id=node_id, card_id=card_id)
+                            widget_model = models.CardXNodeXWidget.objects.get(
+                                node_id=node_id, card_id=card_id
+                            )
                         except models.CardXNodeXWidget.DoesNotExist:
                             widget_model = models.CardXNodeXWidget()
                             widget_model.node_id = node_id
