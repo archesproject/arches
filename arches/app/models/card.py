@@ -180,9 +180,6 @@ class Card(models.CardModel):
                         widget_model.label = widget.get("label", "")
                         widget_model.visible = widget.get("visible", None)
                         widget_model.sortorder = widget.get("sortorder", None)
-                        if widget_model.pk is None:
-                            widget_model.pk = uuid.uuid4()
-                            widget_model.save()
                         self.widgets.append(widget_model)
 
                 if "nodes" in args[0]:
