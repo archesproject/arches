@@ -157,17 +157,13 @@ class Card(models.CardModel):
                         node_id = widget.get("node_id", None)
                         card_id = widget.get("card_id", None)
                         widget_id = widget.get("widget_id", None)
-
-                        try:
-                            widget_model = models.CardXNodeXWidget.objects.get(
-                                node_id=node_id, card_id=card_id
+                        widget_model, _ = (
+                            models.CardXNodeXWidget.objects.update_or_create(
+                                node_id=node_id,
+                                card_id=card_id,
+                                defaults={"widget_id": uuid.UUID(widget_id)},
                             )
-                        except models.CardXNodeXWidget.DoesNotExist:
-                            widget_model = models.CardXNodeXWidget()
-                            widget_model.node_id = node_id
-                            widget_model.card_id = card_id
-
-                        widget_model.widget_id = widget_id
+                        )
                         widget_model.config = widget.get("config", {})
                         widget_model.label = widget.get("label", "")
                         widget_model.visible = widget.get("visible", None)
