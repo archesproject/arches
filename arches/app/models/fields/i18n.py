@@ -5,7 +5,8 @@ from arches.app.utils import import_class_from_string
 from django.utils.translation import gettext_lazy as _
 from django.db.migrations.serializer import BaseSerializer, Serializer
 from django.db.models import JSONField
-from django.db.models.functions.comparison import Cast
+from django.db.models.expressions import BaseExpression
+from django.db.models.functions import Cast
 from django.db.models.sql.compiler import SQLInsertCompiler
 from django.db.models.sql.where import NothingNode
 from django.utils.translation import get_language
@@ -254,6 +255,9 @@ class I18n_JSON(NothingNode):
                     "Heterogenous values provided to I18n_JSON field bulk_update():\n"
                     f"{tuple(str(v) for v in values)}"
                 )
+        elif isinstance(value, BaseExpression):
+            self.raw_value = value
+            return
         if isinstance(value, str):
             try:
                 ret = json.loads(value)
@@ -284,6 +288,8 @@ class I18n_JSON(NothingNode):
         If we're updating a value for a specific language, then use the postgres "jsonb_set" command to do that
         https://www.postgresql.org/docs/9.5/functions-json.html
         """
+        if isinstance(self.raw_value, BaseExpression):
+            return self.raw_value.as_sql(compiler, connection)
 
         if (len(self.i18n_properties) == 0 and self.function is None) or isinstance(
             compiler, SQLInsertCompiler
