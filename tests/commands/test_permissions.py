@@ -9,7 +9,7 @@ from arches.app.utils.permission_backend import PermissionBackend
 from arches.app.models import models
 
 
-class PermissionsCommandTet(ArchesTestCase):
+class PermissionsCommandTest(ArchesTestCase):
 
     def setUp(cls):
         resource_reviewer_group = Group.objects.get(name="Resource Reviewer")
