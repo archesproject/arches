@@ -67,12 +67,12 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        
+
         self.edit_permissions(
             permission=options["permission"],
             action=options["action"],
             group=options["group"],
-            type=options["type"]
+            type=options["type"],
         )
 
     def edit_permissions(self, permission, action, group, type):
@@ -85,7 +85,7 @@ class Command(BaseCommand):
             permission_action = getattr(permission_backend, "assign_perm")
         elif action == "revoke":
             permission_action = getattr(permission_backend, "remove_perm")
-        
+
         try:
             permission_group = Group.objects.get(name=group)
         except Group.DoesNotExist:

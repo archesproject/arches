@@ -19,12 +19,34 @@ class PermissionsCommandTet(ArchesTestCase):
         cls.permission_backend = PermissionBackend()
 
     def test_grant_perm(self):
-        call_command("permissions", permission="view", action="grant", group="Resource Reviewer", type="etlmodule")
-        has_perm = self.permission_backend.has_perm(self.user, "view_etlmodule", obj=self.etl_module)
+        call_command(
+            "permissions",
+            permission="view",
+            action="grant",
+            group="Resource Reviewer",
+            type="etlmodule",
+        )
+        has_perm = self.permission_backend.has_perm(
+            self.user, "view_etlmodule", obj=self.etl_module
+        )
         self.assertTrue(has_perm)
 
     def test_revoke_perm(self):
-        call_command("permissions", permission="view", action="grant", group="Resource Reviewer", type="etlmodule")
-        call_command("permissions", permission="view", action="revoke", group="Resource Reviewer", type="etlmodule")
-        has_perm = self.permission_backend.has_perm(self.user, "view_etlmodule", obj=self.etl_module)
+        call_command(
+            "permissions",
+            permission="view",
+            action="grant",
+            group="Resource Reviewer",
+            type="etlmodule",
+        )
+        call_command(
+            "permissions",
+            permission="view",
+            action="revoke",
+            group="Resource Reviewer",
+            type="etlmodule",
+        )
+        has_perm = self.permission_backend.has_perm(
+            self.user, "view_etlmodule", obj=self.etl_module
+        )
         self.assertFalse(has_perm)
