@@ -24,7 +24,8 @@ import arches.app.utils.permission_backend as permission_backend
 
 class Command(BaseCommand):
     """
-    Commands for adding arches test users
+    Command for granting or revoking object permissions
+    Example: python manage.py permissions --permission view --action grant --group 'Resource Reviewer' --type etlmodule
 
     """
 
