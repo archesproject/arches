@@ -89,7 +89,7 @@ class Command(BaseCommand):
         try:
             permission_group = Group.objects.get(name=group)
         except Group.DoesNotExist:
-            print(f"{group} does not exist")
+            self.stderr.write(f"{group} group does not exist")
 
         permission_type = f"{permission}_{type}"
 
