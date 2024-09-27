@@ -27,7 +27,7 @@
         <div class="workflow-select-plugin">
             <div class="workflow-select-card-container">
                 <!--ko if: etlModules.length === 0 -->
-                <div style="display: flex; justify-content: center; padding: 25px; width: 100%"><div data-bind="text: $parent.translations.bulkDataPermissionNotification" style="font-size: 1.9rem">TEST</div></div>
+                <div style="display: flex; justify-content: center; padding: 25px; width: 100%"><div data-bind="text: $parent.translations.bulkDataPermissionNotification" style="font-size: 1.9rem"></div></div>
                 <!--/ko-->
                 <!-- ko foreach: {data: etlModules, as: 'etlmodule', noChildContext: true} -->
                     <!-- ko if: activeModules() == 'import' && (!moduleSearchString() || !!moduleSearchString() && etlmodule.name.toLowerCase().includes(moduleSearchString().toLowerCase()) ) -->
