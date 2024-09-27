@@ -304,6 +304,44 @@ class Command(BaseCommand):  # pragma: no cover
 
         if os.path.isfile(
             os.path.join(
+                settings.APP_ROOT, "search_indexes", "sample_index.py"
+            )
+        ):
+            self.stderr.write(
+                "Existing sample_index.py detected. Skipping creation of sample_index.py",
+            )
+        else:
+            self.stdout.write(f"Creating /{settings.APP_NAME}/search_indexes/sample_index.py")
+            src_path = os.path.join(settings.APP_ROOT, "search_indexes")
+            if not os.path.isdir(src_path):
+                os.mkdir(src_path)
+
+            shutil.copy2(
+                os.path.join(
+                    settings.ROOT_DIR,
+                    "install",
+                    "arches-templates",
+                    "project_name",
+                    "search_indexes",
+                    "sample_index.py",
+                ),
+                src_path,
+            )
+            self.stdout.write(f"Creating /{settings.APP_NAME}/search_indexes/__init__.py")
+            shutil.copy2(
+                os.path.join(
+                    settings.ROOT_DIR,
+                    "install",
+                    "arches-templates",
+                    "project_name",
+                    "search_indexes",
+                    "__init__.py",
+                ),
+                src_path,
+            )
+
+        if os.path.isfile(
+            os.path.join(
                 settings.APP_ROOT, "src", settings.APP_NAME, "declarations.d.ts"
             )
         ):
