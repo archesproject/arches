@@ -108,9 +108,6 @@ class GeoUtils(object):
         Takes a FeatureCollection object and returns a dictionary of resource instances
         that intersect the geometries of it, grouped by graph.
         """
-        # Convert the entire FeatureCollection to a GeoJSON string
-        combined_geojson = json.dumps(feature_collection)
-
         with connection.cursor() as cursor:
             cursor.execute(
                 """
@@ -135,7 +132,10 @@ class GeoUtils(object):
                 AND resource_instances.graphid != %s
                 GROUP BY resource_instances.graphid;
                 """,
-                [combined_geojson, settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID],
+                [
+                    json.dumps(feature_collection),
+                    settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID,
+                ],
             )
 
             results = cursor.fetchall()
