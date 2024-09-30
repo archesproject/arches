@@ -615,18 +615,14 @@ class ResourceTests(ArchesTestCase):
                 self.assertEqual(display_type(), "test value")
 
     def test_recalculate_descriptors_prefetch_related_objects(self):
+        other_graph = Graph.objects.create_graph(name="Other graph", is_resource=True)
         r1 = Resource(graph_id=self.search_model_graphid)
-        r2 = Resource(graph_id=self.search_model_graphid)
+        r2 = Resource(graph_id=other_graph.pk)
         r1_tile = Tile(
             data={self.search_model_creation_date_nodeid: "1941-01-01"},
             nodegroup_id=self.search_model_creation_date_nodeid,
         )
         r1.tiles.append(r1_tile)
-        r2_tile = Tile(
-            data={self.search_model_creation_date_nodeid: "1941-01-01"},
-            nodegroup_id=self.search_model_creation_date_nodeid,
-        )
-        r2.tiles.append(r2_tile)
         r1.save(index=False)
         r2.save(index=False)
 

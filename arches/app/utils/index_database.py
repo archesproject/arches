@@ -12,6 +12,8 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.db import connection, connections
 from django.db.models import prefetch_related_objects, Prefetch, Q, QuerySet
+from django.utils.translation import get_language
+
 from arches.app.models import models
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -25,21 +27,6 @@ from typing import Iterable
 
 
 logger = logging.getLogger(__name__)
-serialized_graphs = {}
-
-
-def get_serialized_graph(graph):
-    """
-    Returns the serialized version of the graph from the database
-
-    """
-    if not graph:
-        return None
-
-    if graph.graphid not in serialized_graphs:
-        published_graph = graph.get_published_graph()
-        serialized_graphs[graph.graphid] = published_graph.serialized_graph
-    return serialized_graphs[graph.graphid]
 
 
 def index_db(
@@ -203,15 +190,16 @@ def optimize_resource_iteration(resources: Iterable[Resource], chunk_size: int):
     - select related graphs
     - prefetch tiles (onto .prefetched_tiles)
     - prefetch primary descriptors (onto graph.descriptor_function)
+    - prefetch published graphs (onto graph.publication.published_graph_active_lang)
     - apply chunk_size to reduce memory footprint and spread the work
       of prefetching tiles across multiple queries
 
     The caller is responsible for moving the descriptor function
-    prefetch from the graph to the resource instance--a symptom of
-    this being more of a graph property--and for moving the prefetched
-    tiles to .tiles (because the Resource proxy model initializes
-    .tiles to an empty array and Django thinks that represents the
-    state in the db.)
+    and published graph prefetches from the graph to the resource instances
+    --a symptom of these being more like graph properties--
+    and for moving the prefetched tiles to .tiles (because the Resource
+    proxy model initializes .tiles to an empty array and Django thinks
+    that represents the state in the db.)
     """
     tiles_prefetch = Prefetch("tilemodel_set", to_attr="prefetched_tiles")
     # Same queryset as Resource.save_descriptors()
@@ -223,18 +211,30 @@ def optimize_resource_iteration(resources: Iterable[Resource], chunk_size: int):
         queryset=descriptor_query,
         to_attr="descriptor_function",
     )
+    published_graph_query = models.PublishedGraph.objects.filter(
+        language=get_language()
+    )
+    published_graph_prefetch = Prefetch(
+        "graph__publication__publishedgraph_set",
+        queryset=published_graph_query,
+        to_attr="published_graph_active_lang",
+    )
 
     if isinstance(resources, QuerySet):
         return (
             resources.select_related("graph")
-            .prefetch_related(tiles_prefetch, descriptor_prefetch)
+            .prefetch_related(
+                tiles_prefetch, descriptor_prefetch, published_graph_prefetch
+            )
             .iterator(chunk_size=chunk_size)
         )
     else:  # public API that arches itself does not currently use
         for r in resources:
             r.clean_fields()  # ensure strings become UUIDs
 
-        prefetch_related_objects(resources, tiles_prefetch, descriptor_prefetch)
+        prefetch_related_objects(
+            resources, tiles_prefetch, descriptor_prefetch, published_graph_prefetch
+        )
         return resources
 
 
@@ -266,10 +266,16 @@ def index_resources_using_singleprocessing(
             for resource in optimize_resource_iteration(
                 resources, chunk_size=chunk_size
             ):
+                # Move prefetched relations to where the Proxy Model expects them.
                 resource.tiles = resource.prefetched_tiles
                 resource.descriptor_function = resource.graph.descriptor_function
+                in_language = resource.graph.publication.published_graph_active_lang
+                if in_language:
+                    resource.serialized_graph = in_language[0].serialized_graph
+                else:
+                    resource.serialized_graph = None
+
                 resource.set_node_datatypes(node_datatypes)
-                resource.set_serialized_graph(get_serialized_graph(resource.graph))
                 if recalculate_descriptors:
                     resource.save_descriptors()
                 if quiet is False and bar is not None:
