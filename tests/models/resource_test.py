@@ -422,18 +422,15 @@ class ResourceTests(ArchesTestCase):
             self.assertFalse(result)
 
     def test_recalculate_descriptors_prefetch_related_objects(self):
+        other_graph = Graph.new(name="Other graph", is_resource=True)
+        other_graph.publish()
         r1 = Resource(graph_id=self.search_model_graphid)
-        r2 = Resource(graph_id=self.search_model_graphid)
+        r2 = Resource(graph_id=other_graph.pk)
         r1_tile = Tile(
             data={self.search_model_creation_date_nodeid: "1941-01-01"},
             nodegroup_id=self.search_model_creation_date_nodeid,
         )
         r1.tiles.append(r1_tile)
-        r2_tile = Tile(
-            data={self.search_model_creation_date_nodeid: "1941-01-01"},
-            nodegroup_id=self.search_model_creation_date_nodeid,
-        )
-        r2.tiles.append(r2_tile)
         r1.save(index=False)
         r2.save(index=False)
 
@@ -464,6 +461,13 @@ class ResourceTests(ArchesTestCase):
                     q for q in queries if q["sql"].startswith('SELECT "tiles"."tileid"')
                 ]
                 self.assertEqual(len(tile_selects), 1)
+
+                published_graph_selects = [
+                    q
+                    for q in queries
+                    if q["sql"].startswith('SELECT "published_graphs"."id"')
+                ]
+                self.assertEqual(len(published_graph_selects), 1)
 
     def test_self_referring_resource_instance_descriptor(self):
         # Create a nodegroup with a string node and a resource-instance node.
