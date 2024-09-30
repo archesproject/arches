@@ -4,9 +4,6 @@ from arcgis2geojson import arcgis2geojson
 from django.contrib.gis.geos import (
     GEOSGeometry,
     GeometryCollection,
-    MultiPoint,
-    MultiLineString,
-    MultiPolygon,
 )
 from django.db import connection
 from arches.app.models.system_settings import settings
