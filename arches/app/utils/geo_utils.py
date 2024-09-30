@@ -105,57 +105,37 @@ class GeoUtils(object):
 
     def get_resource_instances_within_feature_collection(self, feature_collection):
         """
-        Takes a FeatureCollection object with and returns a dictionary of resource instances that intersect the geometries of it, grouped by graph.
-
+        Takes a FeatureCollection object and returns a dictionary of resource instances
+        that intersect the geometries of it, grouped by graph.
         """
-        points = []
-        lines = []
-        polygons = []
-
-        for feature in feature_collection["features"]:
-            geom = GEOSGeometry(json.dumps(feature["geometry"]))
-
-            if geom.geom_type == "Point":
-                points.append(geom)
-            elif geom.geom_type == "LineString":
-                lines.append(geom)
-            elif geom.geom_type == "Polygon":
-                polygons.append(geom)
-
-        combined_points = MultiPoint(points) if points else None
-        combined_lines = MultiLineString(lines) if lines else None
-        combined_polygons = MultiPolygon(polygons) if polygons else None
-
-        combined_geometries = [
-            geometry
-            for geometry in [combined_points, combined_lines, combined_polygons]
-            if geometry is not None
-        ]
-
-        if len(combined_geometries) == 1:
-            combined_geometry = combined_geometries[0]
-        else:
-            combined_geometry = GeometryCollection(combined_geometries)
+        # Convert the entire FeatureCollection to a GeoJSON string
+        combined_geojson = json.dumps(feature_collection)
 
         with connection.cursor() as cursor:
             cursor.execute(
                 """
+                WITH combined_geom AS (
+                    SELECT ST_Union(
+                        ST_Transform(
+                            ST_SetSRID(ST_GeomFromGeoJSON(feature->>'geometry'), 4326), 
+                            3857
+                        )
+                    ) AS geom
+                    FROM jsonb_array_elements(%s::jsonb->'features') AS feature
+                )
                 SELECT resource_instances.graphid, 
                     array_agg(geojson_geometries.resourceinstanceid) AS resourceinstanceids
                 FROM geojson_geometries 
                 JOIN resource_instances 
                 ON geojson_geometries.resourceinstanceid = resource_instances.resourceinstanceid
                 WHERE ST_Intersects(
-                        geom, 
-                        ST_Transform(
-                            ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326), 
-                            3857
-                        )
+                        geojson_geometries.geom, 
+                        (SELECT geom FROM combined_geom)
                     )
                 AND resource_instances.graphid != %s
                 GROUP BY resource_instances.graphid;
                 """,
-                [combined_geometry.geojson, settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID],
+                [combined_geojson, settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID],
             )
 
             results = cursor.fetchall()
@@ -197,6 +177,9 @@ class GeoUtils(object):
         def _build_feature_collection(geometries):
             features = []
 
+            if geometries is None or geometries.empty:
+                return {"type": "FeatureCollection", "features": []}
+
             if geometries.geom_type in [
                 "GeometryCollection",
                 "MultiPolygon",
@@ -204,14 +187,15 @@ class GeoUtils(object):
                 "MultiPoint",
             ]:
                 for geometry in geometries:
-                    features.append(
-                        {
-                            "type": "Feature",
-                            "id": str(uuid.uuid4()),
-                            "properties": {},
-                            "geometry": json.loads(geometry.geojson),
-                        }
-                    )
+                    if not geometry.empty:
+                        features.append(
+                            {
+                                "type": "Feature",
+                                "id": str(uuid.uuid4()),
+                                "properties": {},
+                                "geometry": json.loads(geometry.geojson),
+                            }
+                        )
             else:
                 features.append(
                     {
