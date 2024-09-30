@@ -180,6 +180,7 @@ class GeoUtils(object):
 
             buffered_feature = {
                 "type": "Feature",
+                "id": str(uuid.uuid4()),
                 "properties": feature.get("properties", {}),
                 "geometry": json.loads(buffered_geom.geojson),
             }
@@ -188,4 +189,71 @@ class GeoUtils(object):
         return {
             "type": "FeatureCollection",
             "features": buffered_features,
+        }
+
+    def get_intersection_and_difference_of_feature_collections(
+        self, feature_collection_1, feature_collection_2
+    ):
+        def _build_feature_collection(geometries):
+            features = []
+
+            if geometries.geom_type in [
+                "GeometryCollection",
+                "MultiPolygon",
+                "MultiLineString",
+                "MultiPoint",
+            ]:
+                for geometry in geometries:
+                    features.append(
+                        {
+                            "type": "Feature",
+                            "id": str(uuid.uuid4()),
+                            "properties": {},
+                            "geometry": json.loads(geometry.geojson),
+                        }
+                    )
+            else:
+                features.append(
+                    {
+                        "type": "Feature",
+                        "id": str(uuid.uuid4()),
+                        "properties": {},
+                        "geometry": json.loads(geometries.geojson),
+                    }
+                )
+
+            return {"type": "FeatureCollection", "features": features}
+
+        feature_collection_1_geometries = [
+            GEOSGeometry(json.dumps(feature["geometry"]))
+            for feature in feature_collection_1["features"]
+        ]
+        feature_collection_1_geometries_union = GeometryCollection(
+            *feature_collection_1_geometries
+        ).unary_union
+
+        feature_collection_2_geometries = [
+            GEOSGeometry(json.dumps(feature["geometry"]))
+            for feature in feature_collection_2["features"]
+        ]
+        feature_collection_2_geometries_union = GeometryCollection(
+            *feature_collection_2_geometries
+        ).unary_union
+
+        return {
+            "difference_derived_from_first_collection": _build_feature_collection(
+                feature_collection_1_geometries_union.difference(
+                    feature_collection_2_geometries_union
+                )
+            ),
+            "difference_derived_from_second_collection": _build_feature_collection(
+                feature_collection_2_geometries_union.difference(
+                    feature_collection_1_geometries_union
+                )
+            ),
+            "intersection_derived_from_both_collections": _build_feature_collection(
+                feature_collection_1_geometries_union.intersection(
+                    feature_collection_2_geometries_union
+                )
+            ),
         }
