@@ -61,6 +61,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
         severity: ERROR,
         life: DEFAULT_ERROR_TOAST_LIFE,
         summary: event?.xhr?.statusText || $gettext("Image upload failed"),
+        detail: JSON.parse(event?.xhr?.responseText ?? "{}").message,
     });
 };
 </script>
