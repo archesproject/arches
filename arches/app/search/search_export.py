@@ -80,11 +80,11 @@ class SearchResultsExporter(object):
     def return_ordered_header(self, graphid, export_type):
 
         subcard_list_with_sort = []
-        all_cards = models.CardModel.objects.filter(graph=graphid).prefetch_related(
+        all_cards = models.CardModel.objects.filter(graph=graphid).select_related(
             "nodegroup"
         )
-        all_card_list_with_sort = list(
-            all_cards.exclude(sortorder=None).order_by("sortorder")
+        all_card_list_with_sort = all_cards.exclude(sortorder=None).order_by(
+            "sortorder"
         )
         card_list_no_sort = list(all_cards.filter(sortorder=None))
         sorted_card_list = []
@@ -123,11 +123,10 @@ class SearchResultsExporter(object):
 
         ordered_list_all_nodes = []
         for sorted_card in sorted_card_list:
-            card_node_objects = list(
-                models.CardXNodeXWidget.objects.filter(
-                    card_id=sorted_card.cardid
-                ).prefetch_related("node")
-            )
+            card_node_objects = models.CardXNodeXWidget.objects.filter(
+                card_id=sorted_card.cardid
+            ).select_related("node")
+
             if len(card_node_objects) > 0:
                 nodes_in_card = []
                 for card_node_object in card_node_objects:
