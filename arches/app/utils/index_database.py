@@ -248,43 +248,45 @@ def index_resources_using_singleprocessing(
         str(nodeid): datatype
         for nodeid, datatype in models.Node.objects.values_list("nodeid", "datatype")
     }
-    with se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer:
-        with se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer:
-            if quiet is False:
-                if isinstance(resources, QuerySet):
-                    resource_count = resources.count()
-                else:
-                    resource_count = len(resources)
-                if resource_count > 1:
-                    bar = pyprind.ProgBar(resource_count, bar_char="█", title=title)
-                else:
-                    bar = None
+    with (
+        se.BulkIndexer(batch_size=batch_size, refresh=True) as doc_indexer,
+        se.BulkIndexer(batch_size=batch_size, refresh=True) as term_indexer,
+    ):
+        if quiet is False:
+            if isinstance(resources, QuerySet):
+                resource_count = resources.count()
+            else:
+                resource_count = len(resources)
+            if resource_count > 1:
+                bar = pyprind.ProgBar(resource_count, bar_char="█", title=title)
+            else:
+                bar = None
 
-            for resource in optimize_resource_iteration(
-                resources, chunk_size=batch_size // 8
-            ):
-                resource.tiles = resource.prefetched_tiles
-                resource.descriptor_function = resource.graph.descriptor_function
-                resource.set_node_datatypes(node_datatypes)
-                resource.set_serialized_graph(get_serialized_graph(resource.graph))
-                if recalculate_descriptors:
-                    resource.save_descriptors()
-                if quiet is False and bar is not None:
-                    bar.update(item_id=resource)
-                document, terms = resource.get_documents_to_index(
-                    fetchTiles=False,
-                    datatype_factory=datatype_factory,
-                    node_datatypes=node_datatypes,
+        for resource in optimize_resource_iteration(
+            resources, chunk_size=batch_size // 8
+        ):
+            resource.tiles = resource.prefetched_tiles
+            resource.descriptor_function = resource.graph.descriptor_function
+            resource.set_node_datatypes(node_datatypes)
+            resource.set_serialized_graph(get_serialized_graph(resource.graph))
+            if recalculate_descriptors:
+                resource.save_descriptors()
+            if quiet is False and bar is not None:
+                bar.update(item_id=resource)
+            document, terms = resource.get_documents_to_index(
+                fetchTiles=False,
+                datatype_factory=datatype_factory,
+                node_datatypes=node_datatypes,
+            )
+            doc_indexer.add(
+                index=RESOURCES_INDEX,
+                id=document["resourceinstanceid"],
+                data=document,
+            )
+            for term in terms:
+                term_indexer.add(
+                    index=TERMS_INDEX, id=term["_id"], data=term["_source"]
                 )
-                doc_indexer.add(
-                    index=RESOURCES_INDEX,
-                    id=document["resourceinstanceid"],
-                    data=document,
-                )
-                for term in terms:
-                    term_indexer.add(
-                        index=TERMS_INDEX, id=term["_id"], data=term["_source"]
-                    )
 
     return os.getpid()
 
