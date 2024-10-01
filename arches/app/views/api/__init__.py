@@ -910,7 +910,7 @@ class Concepts(APIBase):
             allowed_formats = ["json", "json-ld"]
             format = request.GET.get("format", "json-ld")
             if format not in allowed_formats:
-                return JSONResponse(
+                return JSONErrorResponse(
                     status=406,
                     reason="incorrect format specified, only %s formats allowed"
                     % allowed_formats,
@@ -948,13 +948,15 @@ class Concepts(APIBase):
 
                     ret.append(concept_graph)
                 except models.Concept.DoesNotExist:
-                    return JSONResponse(status=404)
+                    return JSONErrorResponse(status=404)
                 except Exception as e:
-                    return JSONResponse(status=500, reason=e)
+                    return JSONErrorResponse(status=500, reason=e)
             else:
-                return JSONResponse(status=500)
+                return JSONErrorResponse(status=400)
         else:
-            return JSONResponse(status=500)
+            return JSONErrorResponse(
+                status=401 if request.user.username == "anonymous" else 403
+            )
 
         if format == "json-ld":
             try:
@@ -971,7 +973,7 @@ class Concepts(APIBase):
 
                 ret = compact(js, context)
             except Exception as e:
-                return JSONResponse(status=500, reason=e)
+                return JSONErrorResponse(status=500, reason=e)
 
         return JSONResponse(ret, indent=indent)
 
