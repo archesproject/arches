@@ -322,16 +322,16 @@ def index_resources_by_type(
     for resource_type in resource_types:
         start = datetime.now()
 
-        graph_name = models.GraphModel.objects.get(graphid=str(resource_type)).name
+        graph_name = models.GraphModel.objects.get(graphid=resource_type).name
         logger.info("Indexing resource type '{0}'".format(graph_name))
 
         if clear_index:
             tq = Query(se=se)
-            cards = models.CardModel.objects.filter(
-                graph_id=str(resource_type)
-            ).select_related("nodegroup")
-            for nodegroup in [card.nodegroup for card in cards]:
-                term = Term(field="nodegroupid", term=str(nodegroup.nodegroupid))
+            cards = models.CardModel.objects.filter(graph_id=resource_type).only(
+                "nodegroup_id"
+            )
+            for card in cards:
+                term = Term(field="nodegroupid", term=str(card.nodegroup_id))
                 tq.add_query(term)
             tq.delete(index=TERMS_INDEX, refresh=True)
 
@@ -341,14 +341,11 @@ def index_resources_by_type(
             rq.delete(index=RESOURCES_INDEX, refresh=True)
 
         if use_multiprocessing:
-            resources = [
-                str(rid)
-                for rid in Resource.objects.filter(
-                    graph_id=str(resource_type)
-                ).values_list("resourceinstanceid", flat=True)
-            ]
+            resource_ids = models.ResourceInstance.objects.filter(
+                graph_id=resource_type
+            ).values_list("resourceinstanceid", flat=True)
             index_resources_using_multiprocessing(
-                resourceids=resources,
+                resourceids=resource_ids,
                 batch_size=batch_size,
                 quiet=quiet,
                 max_subprocesses=max_subprocesses,
@@ -360,7 +357,7 @@ def index_resources_by_type(
                 SearchEngineInstance as _se,
             )
 
-            resources = Resource.objects.filter(graph_id=str(resource_type))
+            resources = Resource.objects.filter(graph_id=resource_type)
             index_resources_using_singleprocessing(
                 resources=resources,
                 batch_size=batch_size,
