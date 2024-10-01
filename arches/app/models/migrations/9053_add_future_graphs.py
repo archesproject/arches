@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "11117_add_bulk_concept_editor"),
+        ("models", "11499_add_editlog_resourceinstance_idx"),
     ]
 
     operations = [
