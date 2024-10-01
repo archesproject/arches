@@ -18,6 +18,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import json
+from http import HTTPStatus
+
 from tests import test_settings
 from arches.app.models.system_settings import settings
 from tests.base_test import ArchesTestCase
@@ -288,6 +290,31 @@ class GraphManagerViewTests(ArchesTestCase):
         graph = Graph.objects.get(graphid=self.GRAPH_ID).serialize()
         self.assertEqual(len(graph["nodes"]), 3)
         self.assertEqual(len(graph["edges"]), 2)
+
+    def test_update_node_malicious_config_key(self):
+        self.client.login(username="admin", password="admin")
+        url = reverse("update_node", kwargs={"graphid": self.GRAPH_ID})
+        node = Node.objects.get(nodeid=self.appended_branch_1.root.pk)
+        nodegroup, _created = NodeGroup.objects.get_or_create(
+            pk=self.appended_branch_1.root.pk
+        )
+        node.nodegroup = nodegroup
+        node.config = {
+            "placeholder": {"en": "Enter text"},
+            "i18n_properties": ["placeholder"],
+            "malicious'": None,
+        }
+        data = JSONSerializer().serializeToPython(node)
+        data["parentproperty"] = "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as"
+
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.post(url, data, content_type="application/json")
+        self.assertContains(
+            response,
+            "aliases cannot contain",
+            # TODO: should become BAD_REQUEST eventually
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+        )
 
     def test_graph_clone_on_unpublished_graph(self):
         """

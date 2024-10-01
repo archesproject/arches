@@ -60,6 +60,10 @@ img {
     border-right: 1px solid rgba(0,0,0,0.07);
 }*/
 
+.cke_notification_warning {
+    display: none;
+}
+
 .btn:not(.disabled):not(:disabled).active {
     box-shadow: none;
 }
@@ -9276,9 +9280,9 @@ a.search-query-link-captions:focus {
 }
 
 .search-control-container {
-    -ms-flex: 0 0 400px;
-    -webkit-flex: 0 0 400px;
-    flex: 1 0 400px;
+    -ms-flex: 1 1 400px;
+    -webkit-flex: 1 1 400px;
+    flex: 1 1 400px;
     margin-bottom: 0px;
     background-color: #fafafa;
     border-top: 1px solid #ddd;

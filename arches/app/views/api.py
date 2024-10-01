@@ -1,30 +1,22 @@
-import importlib
 import json
 import logging
 import os
-import re
-import site
 import sys
 import uuid
 import traceback
-from oauth2_provider.views import ProtectedResourceView
 from base64 import b64decode
 from http import HTTPStatus
-from pyld.jsonld import compact, frame, from_rdf
+from pyld.jsonld import compact, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
 from revproxy.views import ProxyView
 from slugify import slugify
-from urllib import parse
 from collections import OrderedDict
 from django.contrib.auth import authenticate
-from django.shortcuts import render
 from django.views.generic import View
 from django.db import transaction, connection
 from django.db.models import Q
 from django.http import Http404, HttpResponse
-from django.http.request import QueryDict
-from django.core import management
 from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.urls import reverse
@@ -41,6 +33,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.models.tile import Tile as TileProxyModel, TileValidationError
+from arches.app.utils.mvt_tiler import MVTTiler
 from arches.app.views.tile import TileData as TileView
 from arches.app.views.resource import (
     RelatedResourcesView,
@@ -48,7 +41,7 @@ from arches.app.views.resource import (
 )
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
-from arches.app.utils.decorators import can_read_concept, group_required
+from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
@@ -61,14 +54,13 @@ from arches.app.utils.permission_backend import (
     user_can_delete_resource,
     user_can_read_concepts,
     user_is_resource_reviewer,
-    get_restricted_instances,
-    check_resource_instance_permissions,
+    get_filtered_instances,
     get_nodegroups_by_perm,
 )
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.permission_backend import user_is_resource_editor
 from arches.app.search.components.base import SearchFilterFactory
-from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.settings_utils import list_arches_app_paths
 
@@ -223,7 +215,9 @@ class GeoJSON(APIBase):
         property_nodes = models.Node.objects.filter(
             nodegroup_id__in=nodegroups
         ).order_by("sortorder")
-        restricted_resource_ids = get_restricted_instances(request.user, self.se)
+        exclusive_set, filtered_instance_ids = get_filtered_instances(
+            request.user, self.se, resources=resourceid.split(",")
+        )
         for node in property_nodes:
             property_node_map[str(node.nodeid)] = {"node": node}
             if node.fieldname is None or node.fieldname == "":
@@ -241,11 +235,11 @@ class GeoJSON(APIBase):
         if tileid is not None:
             tiles = tiles.filter(tileid=tileid)
         tiles = tiles.order_by("sortorder")
-        tiles = [
-            tile
-            for tile in tiles
-            if str(tile.resourceinstance_id) not in restricted_resource_ids
-        ]
+        resource_available = str(tile.resourceinstance_id) not in filtered_instance_ids
+        resource_available = (
+            not (resource_available) if exclusive_set else resource_available
+        )
+        tiles = [tile for tile in tiles if resource_available]
         if limit is not None:
             start = (page - 1) * limit
             end = start + limit
@@ -345,164 +339,16 @@ class GeoJSON(APIBase):
 
 
 class MVT(APIBase):
-    EARTHCIRCUM = 40075016.6856
-    PIXELSPERTILE = 256
-
     def get(self, request, nodeid, zoom, x, y):
         if hasattr(request.user, "userprofile") is not True:
             models.UserProfile.objects.create(user=request.user)
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
-        try:
-            node = models.Node.objects.get(
-                nodeid=nodeid, nodegroup_id__in=viewable_nodegroups
-            )
-        except models.Node.DoesNotExist:
-            raise Http404()
-        search_geom_count = 0
-        config = node.config
-        cache_key = MVT.create_mvt_cache_key(node, zoom, x, y, request.user)
-        tile = cache.get(cache_key)
-        if tile is None:
-            resource_ids = get_restricted_instances(request.user, allresources=True)
-            if len(resource_ids) == 0:
-                resource_ids.append(
-                    "10000000-0000-0000-0000-000000000001"
-                )  # This must have a uuid that will never be a resource id.
-            resource_ids = tuple(resource_ids)
-            with connection.cursor() as cursor:
-                if int(zoom) <= int(config["clusterMaxZoom"]):
-                    arc = self.EARTHCIRCUM / ((1 << int(zoom)) * self.PIXELSPERTILE)
-                    distance = arc * float(config["clusterDistance"])
-                    min_points = int(config["clusterMinPoints"])
-                    distance = (
-                        settings.CLUSTER_DISTANCE_MAX
-                        if distance > settings.CLUSTER_DISTANCE_MAX
-                        else distance
-                    )
+        user = request.user
 
-                    count_query = """
-                    SELECT count(*) FROM geojson_geometries
-                    WHERE
-                    ST_Intersects(geom, TileBBox(%s, %s, %s, 3857))
-                    AND
-                    nodeid = %s and resourceinstanceid not in %s
-                    """
-
-                    # get the count of matching geometries
-                    cursor.execute(count_query, [zoom, x, y, nodeid, resource_ids])
-                    search_geom_count = cursor.fetchone()[0]
-
-                    if search_geom_count >= min_points:
-                        cursor.execute(
-                            """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
-                            AS (
-                                SELECT m.*,
-                                ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
-                                FROM (
-                                    SELECT tileid,
-                                        resourceinstanceid,
-                                        nodeid,
-                                        geom
-                                    FROM geojson_geometries
-                                    WHERE 
-                                    ST_Intersects(geom, TileBBox(%s, %s, %s, 3857))
-                                    AND
-                                    nodeid = %s and resourceinstanceid not in %s
-                                ) m
-                            )
-                            SELECT ST_AsMVT(
-                                tile,
-                                %s,
-                                4096,
-                                'geom',
-                                'id'
-                            ) FROM (
-                                SELECT resourceinstanceid::text,
-                                    row_number() over () as id,
-                                    1 as total,
-                                    ST_AsMVTGeom(
-                                        geom,
-                                        TileBBox(%s, %s, %s, 3857)
-                                    ) AS geom,
-                                    '' AS extent
-                                FROM clusters
-                                WHERE cid is NULL
-                                UNION
-                                SELECT NULL as resourceinstanceid,
-                                    row_number() over () as id,
-                                    count(*) as total,
-                                    ST_AsMVTGeom(
-                                        ST_Centroid(
-                                            ST_Collect(geom)
-                                        ),
-                                        TileBBox(%s, %s, %s, 3857)
-                                    ) AS geom,
-                                    ST_AsGeoJSON(
-                                        ST_Extent(geom)
-                                    ) AS extent
-                                FROM clusters
-                                WHERE cid IS NOT NULL
-                                GROUP BY cid
-                            ) as tile;""",
-                            [
-                                distance,
-                                min_points,
-                                zoom,
-                                x,
-                                y,
-                                nodeid,
-                                resource_ids,
-                                nodeid,
-                                zoom,
-                                x,
-                                y,
-                                zoom,
-                                x,
-                                y,
-                            ],
-                        )
-                    elif search_geom_count:
-                        cursor.execute(
-                            """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
-                                id,
-                                resourceinstanceid,
-                                nodeid,
-                                featureid::text AS featureid,
-                                ST_AsMVTGeom(
-                                    geom,
-                                    TileBBox(%s, %s, %s, 3857)
-                                ) AS geom,
-                                1 AS total
-                            FROM geojson_geometries
-                            WHERE nodeid = %s and resourceinstanceid not in %s and (geom && ST_TileEnvelope(%s, %s, %s))) AS tile;""",
-                            [nodeid, zoom, x, y, nodeid, resource_ids, zoom, x, y],
-                        )
-                    else:
-                        tile = ""
-                else:
-                    cursor.execute(
-                        """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
-                            id,
-                            resourceinstanceid,
-                            nodeid,
-                            featureid::text AS featureid,
-                            ST_AsMVTGeom(
-                                geom,
-                                TileBBox(%s, %s, %s, 3857)
-                            ) AS geom,
-                            1 AS total
-                        FROM geojson_geometries
-                        WHERE nodeid = %s and resourceinstanceid not in %s and (geom && ST_TileEnvelope(%s, %s, %s))) AS tile;""",
-                        [nodeid, zoom, x, y, nodeid, resource_ids, zoom, x, y],
-                    )
-                tile = bytes(cursor.fetchone()[0]) if tile is None else tile
-                cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
-        if not len(tile):
+        tile = MVTTiler().createTile(nodeid, viewable_nodegroups, user, zoom, x, y)
+        if not tile or not len(tile):
             raise Http404()
         return HttpResponse(tile, content_type="application/x-protobuf")
-
-    def create_mvt_cache_key(node, zoom, x, y, user):
-        return f"mvt_{str(node.nodeid)}_{zoom}_{x}_{y}_{user.id}"
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -1855,8 +1701,7 @@ class NodeValue(APIBase):
             return JSONResponse(e, status=404)
 
         # check if user has permissions to write to node
-        user_has_perms = request.user.has_perm("write_nodegroup", node)
-
+        user_has_perms = request.user.has_perm("write_nodegroup", node.nodegroup)
         if user_has_perms:
             # get datatype of node
             try:

@@ -3,6 +3,7 @@ import os
 import shutil
 import textwrap
 import uuid
+from http import HTTPStatus
 from pathlib import Path
 
 from arches.app.etl_modules.jsonld_importer import JSONLDImporter
@@ -112,22 +113,51 @@ class JSONLDImportTests(TransactionTestCase):
         zip_dest = Path(self.dir_to_zip.parent) / "test-jsonld-import"
         self.addCleanup(shutil.rmtree, self.dir_to_zip)
         self.uploaded_zip_location = shutil.make_archive(
-            zip_dest, "zip", self.dir_to_zip
+            zip_dest, "zip", root_dir=self.dir_to_zip.parent, base_dir=self.dir_to_zip
         )
         self.addCleanup(os.unlink, self.uploaded_zip_location)
+
+        self.module = ETLModule.objects.get(slug="jsonld-importer")
+
+    def test_read_validates_graph_exists(self):
+        self.client.login(username="admin", password="admin")
+        start_event = LoadEvent.objects.create(
+            user_id=1, etl_module=self.module, status="running"
+        )
+
+        self.basic_resource_1.delete()
+        self.basic_graph.delete()
+
+        with (
+            open(self.uploaded_zip_location, "rb") as f,
+            self.assertLogs("django.request", level="WARNING"),
+        ):
+            response = self.client.post(
+                reverse("etl_manager"),
+                data={
+                    "action": "read",
+                    "load_id": str(start_event.pk),
+                    "module": str(self.module.pk),
+                    "file": f,
+                },
+            )
+
+        self.assertContains(
+            response,
+            'The model \\"basic\\" does not exist.',
+            status_code=HTTPStatus.NOT_FOUND,
+        )
 
     def test_write(self):
         request = HttpRequest()
         request.method = "POST"
         request.user = User.objects.get(username="admin")
 
-        # Mock a load event
-        module = ETLModule.objects.get(slug="jsonld-importer")
         start_event = LoadEvent.objects.create(
-            user=request.user, etl_module=module, status="running"
+            user=request.user, etl_module=self.module, status="running"
         )
-        request.POST.__setitem__("load_id", str(start_event.pk))
-        request.POST.__setitem__("module", str(module.pk))
+        request.POST["load_id"] = str(start_event.pk)
+        request.POST["module"] = str(self.module.pk)
 
         # Mock a read() operation
         request.POST.__setitem__(
@@ -149,7 +179,7 @@ class JSONLDImportTests(TransactionTestCase):
             """
             ),
         )
-        importer = JSONLDImporter(request=request, loadid=str(start_event.pk))
+        importer = JSONLDImporter(request=request)
         importer.prepare_temp_dir(request)  # ordinarily done with the .read() request
 
         # Do a hack job of a read.
