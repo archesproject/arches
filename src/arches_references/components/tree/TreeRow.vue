@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, ref, watch } from "vue";
+import { computed, inject, ref, useTemplateRef, watch } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
@@ -82,16 +82,16 @@ const { setDisplayedRow }: { setDisplayedRow: RowSetter } =
 const awaitingMove = ref(false);
 // Workaround for autofocusing the new list/label input boxes
 // https://github.com/primefaces/primevue/issues/2397
-const newListInputRef = ref();
-const newLabelInputRef = ref();
-watch(newLabelInputRef, () => {
-    if (newLabelInputRef.value) {
-        newLabelInputRef.value.$el.focus();
+const newListInput = useTemplateRef("newListInput");
+const newLabelInput = useTemplateRef("newLabelInput");
+watch(newLabelInput, () => {
+    if (newLabelInput.value) {
+        newLabelInput.value.$el.focus();
     }
 });
-watch(newListInputRef, () => {
-    if (newListInputRef.value) {
-        newListInputRef.value.$el.focus();
+watch(newListInput, () => {
+    if (newListInput.value) {
+        newListInput.value.$el.focus();
     }
 });
 
@@ -235,13 +235,13 @@ const acceptNewItemShortcutEntry = async () => {
 
 const triggerAcceptNewItemShortcut = () => {
     if (newLabelFormValue.value.trim()) {
-        newLabelInputRef.value.$el.blur();
+        newLabelInput.value!.$el.blur();
     }
 };
 
 const triggerAcceptNewListShortcut = () => {
     if (newListFormValue.value.trim()) {
-        newListInputRef.value.$el.blur();
+        newListInput.value!.$el.blur();
     }
 };
 
@@ -275,7 +275,7 @@ const acceptNewListShortcutEntry = async () => {
     >
         <div v-if="isNewItem(node)">
             <InputText
-                ref="newLabelInputRef"
+                ref="newLabelInput"
                 v-model="newLabelFormValue"
                 autofocus
                 @blur="acceptNewItemShortcutEntry"
@@ -284,7 +284,7 @@ const acceptNewListShortcutEntry = async () => {
         </div>
         <div v-else-if="isNewList(node)">
             <InputText
-                ref="newListInputRef"
+                ref="newListInput"
                 v-model="newListFormValue"
                 autofocus
                 @blur="acceptNewListShortcutEntry"

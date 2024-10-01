@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import arches from "arches";
-import { computed, ref, inject } from "vue";
+import { computed, inject, ref, useTemplateRef } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
@@ -52,7 +52,7 @@ const item = inject(itemKey) as Ref<ControlledListItem>;
 const { image } = defineProps<{ image: ControlledListItemImage }>();
 const editingRows = ref<NewOrExistingControlledListItemImageMetadata[]>([]);
 const rowIndexToFocus = ref(-1);
-const editorRef: Ref<HTMLDivElement | null> = ref(null);
+const editorDiv = useTemplateRef("editorDiv");
 
 const labeledChoices: LabeledChoice[] = [
     {
@@ -227,8 +227,7 @@ const focusInput = () => {
     // This should be reported/clarified with PrimeVue with a MWE.
     setTimeout(() => {
         if (rowIndexToFocus.value !== -1) {
-            const editorDiv = editorRef.value;
-            const rowEl = editorDiv!.querySelector(inputSelector.value);
+            const rowEl = editorDiv.value!.querySelector(inputSelector.value);
             const inputEl = rowEl!.children[1].children[0];
             // @ts-expect-error focusVisible not yet in typeshed
             (inputEl as HTMLInputElement).focus({ focusVisible: true });
@@ -239,7 +238,7 @@ const focusInput = () => {
 </script>
 
 <template>
-    <div ref="editorRef">
+    <div ref="editorDiv">
         <DataTable
             v-if="image.metadata.length"
             v-model:editing-rows="editingRows"

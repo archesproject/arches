@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, ref, watch } from "vue";
+import { computed, inject, ref, useTemplateRef, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useGettext } from "vue3-gettext";
 
@@ -19,7 +19,7 @@ import LetterCircle from "@/arches_references/components/misc/LetterCircle.vue";
 import ListTreeControls from "@/arches_references/components/tree/ListTreeControls.vue";
 import TreeRow from "@/arches_references/components/tree/TreeRow.vue";
 
-import type { ComponentPublicInstance, Ref } from "vue";
+import type { Ref } from "vue";
 import type { RouteLocationNormalizedLoadedGeneric } from "vue-router";
 import type { TreePassThroughMethodOptions } from "primevue/tree";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree";
@@ -47,7 +47,7 @@ const movingItem: Ref<TreeNode | undefined> = ref();
 const isMultiSelecting = ref(false);
 const refetcher = ref(0);
 const filterValue = ref("");
-const treeDOMRef: Ref<ComponentPublicInstance | null> = ref(null);
+const treeComponent = useTemplateRef("treeComponent");
 
 // For next new item's pref label (input textbox)
 const newLabelFormValue = ref("");
@@ -188,8 +188,8 @@ const expandPathsToFilterResults = (newFilterValue: string) => {
 };
 
 const getInputElement = () => {
-    if (treeDOMRef.value !== null) {
-        return treeDOMRef.value.$el.ownerDocument.querySelector(
+    if (treeComponent.value !== null) {
+        return treeComponent.value.$el.ownerDocument.querySelector(
             'input[data-pc-name="pcfilter"]',
         ) as HTMLInputElement;
     }
@@ -263,7 +263,7 @@ const ptNodeContent = ({ instance }: TreePassThroughMethodOptions) => {
     />
     <Tree
         v-if="tree"
-        ref="treeDOMRef"
+        ref="treeComponent"
         :key="rerenderTree"
         v-model:selection-keys="selectedKeys"
         v-model:expanded-keys="expandedKeys"

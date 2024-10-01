@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, ref } from "vue";
+import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
@@ -24,8 +24,6 @@ const rerenderTree = defineModel<number>("rerenderTree", { required: true });
 const selectedKeys = defineModel<TreeSelectionKeys>("selectedKeys", {
     required: true,
 });
-
-const abandonMoveRef = ref();
 
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
@@ -55,7 +53,6 @@ const abandonMove = () => {
             )
         }}
         <Button
-            ref="abandonMoveRef"
             type="button"
             class="banner-button"
             :severity="shouldUseContrast() ? CONTRAST : SECONDARY"

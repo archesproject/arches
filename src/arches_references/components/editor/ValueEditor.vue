@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import arches from "arches";
-import { computed, inject, ref } from "vue";
+import { computed, inject, ref, useTemplateRef } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import Column from "primevue/column";
@@ -39,7 +39,7 @@ const { valueType, valueCategory } = defineProps<{
 }>();
 const editingRows: Ref<Value[]> = ref([]);
 const rowIndexToFocus = ref(-1);
-const editorRef: Ref<HTMLDivElement | null> = ref(null);
+const editorDiv = useTemplateRef("editorDiv");
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
 
@@ -234,8 +234,7 @@ const focusInput = () => {
         // Note editor uses the second column.
         const indexOfInputCol = valueCategory ? 1 : 0;
         if (rowIndexToFocus.value !== -1) {
-            const editorDiv = editorRef.value;
-            const rowEl = editorDiv!.querySelector(inputSelector.value);
+            const rowEl = editorDiv.value!.querySelector(inputSelector.value);
             const inputEl = rowEl!.children[indexOfInputCol].children[0];
             // @ts-expect-error focusVisible not yet in typeshed
             (inputEl as HTMLInputElement).focus({ focusVisible: true });
@@ -247,7 +246,7 @@ const focusInput = () => {
 
 <template>
     <div
-        ref="editorRef"
+        ref="editorDiv"
         class="value-editor-container"
     >
         <h4>{{ headings.heading }}</h4>
