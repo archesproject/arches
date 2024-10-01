@@ -361,6 +361,7 @@ class EditLog(models.Model):
         db_table = "edit_log"
         indexes = [
             models.Index(fields=["transactionid"]),
+            models.Index(fields=["resourceinstanceid"]),
         ]
 
 

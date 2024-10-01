@@ -143,7 +143,7 @@ INSTALLED_APPS = (
     "oauth2_provider",
     "django_celery_results",
     # "silk",
-    "{{ project_name }}",  # Ensure the project is listed before any other arches applications 
+    "{{ project_name }}",  # Ensure the project is listed before any other arches applications
 )
 
 # Placing this last ensures any templates provided by Arches Applications
@@ -168,13 +168,13 @@ MIDDLEWARE = [
 ]
 
 MIDDLEWARE.insert(  # this must resolve to first MIDDLEWARE entry
-    0, 
+    0,
     "django_hosts.middleware.HostsRequestMiddleware"
 )
 
 MIDDLEWARE.append(  # this must resolve last MIDDLEWARE entry
     "django_hosts.middleware.HostsResponseMiddleware"
-)  
+)
 
 STATICFILES_DIRS = build_staticfiles_dirs(app_root=APP_ROOT)
 
@@ -407,6 +407,10 @@ LANGUAGES = [
 
 # override this to permenantly display/hide the language switcher
 SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
+
+# Implement this class to associate custom documents to the ES resource index
+# See tests.views.search_tests.TestEsMappingModifier class for example
+# ES_MAPPING_MODIFIER_CLASSES = ["{{ project_name }}.search.es_mapping_modifier.EsMappingModifier"]
 
 try:
     from .package_settings import *

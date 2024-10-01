@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from io import StringIO
 import json
 import shutil
 import os
@@ -31,12 +32,14 @@ from arches.app.etl_modules.branch_excel_exporter import BranchExcelExporter
 from arches.app.models.system_settings import settings
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
+from django.core.management import call_command
 from django.db import connection
 from django.http import HttpRequest
 from django.test import TransactionTestCase
 
+
 # these tests can be run from the command line via
-# python manage.py test tests.bulkdata.excel_export_tests --settings="tests.test_settings"
+# python manage.py test tests.bulkdata.branch_excel_tests --settings="tests.test_settings"
 
 
 class BranchExcelTests(TransactionTestCase):
@@ -129,3 +132,10 @@ class BranchExcelTests(TransactionTestCase):
         exported = os.path.exists(exported_file_path)
 
         self.assertTrue(exported)
+
+    def test_cli(self):
+        out = StringIO()
+        excel_file_path = "tests/fixtures/data/uploadedfiles/branch_excel_test.xlsx"
+        call_command("etl", "branch-excel-importer", source=excel_file_path, stdout=out)
+
+        self.assertIn("succeeded", out.getvalue())

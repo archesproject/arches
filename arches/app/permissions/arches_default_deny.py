@@ -22,10 +22,14 @@ from arches.app.permissions.arches_permission_base import (
     ArchesPermissionBase,
     ResourceInstancePermissions,
 )
-from arches.app.search.elasticsearch_dsl_builder import Bool, Nested, Terms
+from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms, Nested, Ids
+from arches.app.search.search import SearchEngine
+from arches.app.search.mappings import RESOURCES_INDEX
 
 
 class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
+    is_exclusive = True
+
     def get_sets_for_user(self, user: User, perm: str) -> set[str] | None:
         # We do not do set filtering - None is allow-all for sets.
         return None if user and user.username != "anonymous" else set()
@@ -33,17 +37,93 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
     def get_restricted_users(self, resource: ResourceInstance) -> dict[str, list[int]]:
         pass
 
+    def get_filtered_instances(
+        self,
+        user: User,
+        search_engine: SearchEngine | None = None,
+        allresources: bool = False,
+        resources: list[str] | None = None,
+    ):
+        allowed_instances = self.get_allowed_instances(
+            user, search_engine, allresources, resources
+        )
+
+        return (self.__class__.is_exclusive, allowed_instances)
+
+    def get_allowed_instances(
+        self,
+        user: User,
+        search_engine: SearchEngine | None = None,
+        allresources: bool = False,
+        resources: list[str] | None = None,
+    ):
+        all = False
+        if user.is_superuser is True:
+            if resources is not None:
+                return resources
+            else:
+                all = True
+
+        query = Query(search_engine, start=0, limit=settings.SEARCH_RESULT_LIMIT)  # type: ignore
+        nested_groups_read = Nested(
+            path="permissions",
+            query=Terms(
+                field="permissions.groups_read",
+                terms=[str(group.id) for group in user.groups.all()],
+            ),
+        )
+
+        nested_users_read = Nested(
+            path="permissions",
+            query=Terms(field="permissions.users_read", terms=[str(user.id)]),
+        )
+
+        if not all:
+            if resources is not None:
+                subset_query = Bool()
+                subset_query = (
+                    subset_query.filter(
+                        Ids(
+                            ids=resources,
+                        )
+                    )
+                    .should(nested_users_read)
+                    .should(nested_groups_read)
+                )
+                query.add_query(subset_query)
+            else:
+                query.add_query(Bool().should(nested_groups_read).should(nested_users_read))  # type: ignore
+
+        results = query.search(index=RESOURCES_INDEX, scroll="1m")  # type: ignore
+        scroll_id = results["_scroll_id"]
+        total = results["hits"]["total"]["value"]
+        if total > settings.SEARCH_RESULT_LIMIT:
+            pages = total // settings.SEARCH_RESULT_LIMIT
+            for page in range(pages):
+                results_scrolled = query.se.es.scroll(scroll_id=scroll_id, scroll="1m")
+                results["hits"]["hits"] += results_scrolled["hits"]["hits"]
+        restricted_ids = [res["_id"] for res in results["hits"]["hits"]]
+        return restricted_ids
+
     def check_resource_instance_permissions(
         self, user: User, resourceid: str, permission: str
     ) -> ResourceInstancePermissions:
 
         result = ResourceInstancePermissions()
+        resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
         if resourceid == settings.SYSTEM_SETTINGS_RESOURCE_ID:
+            result["resource"] = resource
             if not user.groups.filter(name="System Administrator").exists():
                 result["permitted"] = False
-                return result
+            else:
+                result["permitted"] = True
+            return result
 
-        resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
+        if resource.principaluser_id == user.id:
+            result["permitted"] = True
+            result["resource"] = resource
+            return result
+
         result["resource"] = resource
         result["permitted"] = False  # by default, deny
 

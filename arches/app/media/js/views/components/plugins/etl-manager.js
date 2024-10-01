@@ -142,14 +142,6 @@ define([
                 ));
             };
 
-            this.formatUserName = function(event){
-                if (event.first_name || event.last_name) {
-                    return [event.first_name, event.last_name].join(" ");
-                } else {
-                    return event.username;
-                }
-            };
-
             this.fetchStagedData = function(loadid){
                 const url = arches.urls.etl_manager + "?action=stagedData&loadid="+loadid;
                 window.fetch(url).then(function(response){

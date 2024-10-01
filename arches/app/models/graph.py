@@ -587,7 +587,7 @@ class Graph(models.GraphModel):
 
     def save(self, validate=True, nodeid=None):
         """
-        Saves an a graph and its nodes, edges, and nodegroups back to the db
+        Saves a graph and its nodes, edges, and nodegroups back to the db
         creates associated card objects if any of the nodegroups don't already have a card
 
         Arguments:
@@ -613,6 +613,8 @@ class Graph(models.GraphModel):
                 self.create_node_alias(node)
                 try:
                     node.save()
+                except ValueError as ve:
+                    raise GraphValidationError(ve.args[0])
                 except IntegrityError as err:
                     if "unique_alias_graph" in str(err):
                         message = _(

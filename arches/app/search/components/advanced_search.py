@@ -26,7 +26,7 @@ details = {
 
 class AdvancedSearch(BaseSearchFilter):
     def append_dsl(self, search_query_object, **kwargs):
-        querystring_params = kwargs.get("querystring", "")
+        querystring_params = kwargs.get("querystring", "[]")
         advanced_filters = JSONDeserializer().deserialize(querystring_params)
         datatype_factory = DataTypeFactory()
         search_query = Bool()

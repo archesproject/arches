@@ -72,7 +72,7 @@
                         <!-- ko foreach: { data: self.preview ? tile.parent.cards : tile.cards, as: 'card' } -->
                             <!-- ko if: card.tiles().length > 0 || ko.unwrap(tile.parent.hideEmptyNodes) === false -->
                                 <!-- ko component: {
-                                    name: tile.parent.model.cardComponentLookup[tile.parent.model.component_id()].componentname,
+                                    name: tile.parent.model.cardComponentLookup[card.model.component_id()].componentname,
                                     params: {
                                         state: 'report',
                                         preview: self.preview,

@@ -5,13 +5,16 @@ import json
 import os
 import uuid
 import zipfile
+from django.contrib.auth.models import User
 from django.core.files import File
 from django.core.files.storage import default_storage
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import connection
 from django.db.models.functions import Lower
+from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import GraphModel, Node, NodeGroup, ETLModule
+from arches.app.models.models import ETLModule, GraphModel, Node, NodeGroup
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -22,10 +25,31 @@ from arches.app.etl_modules.save import save_to_tiles
 
 
 class ImportSingleCsv(BaseImportModule):
-    def __init__(self, request=None, loadid=None):
-        self.request = request if request else None
+    def __init__(self, request=None, loadid=None, params=None):
         self.loadid = request.POST.get("load_id") if request else loadid
-        self.userid = request.user.id if request else None
+        self.userid = (
+            request.user.id
+            if request
+            else settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
+        )
+        self.mode = "cli" if not request and params else "ui"
+        try:
+            self.user = User.objects.get(pk=self.userid)
+        except User.DoesNotExist:
+            raise User.DoesNotExist(
+                _(
+                    "The userid {} does not exist. Probably DEFAULT_RESOURCE_IMPORT_USER is not configured correctly in settings.py.".format(
+                        self.userid
+                    )
+                )
+            )
+        if not request and params:
+            request = HttpRequest()
+            request.user = self.user
+            request.method = "POST"
+            for k, v in params.items():
+                request.POST.__setitem__(k, v)
+        self.request = request if request else None
         self.moduleid = request.POST.get("module") if request else None
         self.config = (
             ETLModule.objects.get(pk=self.moduleid).config if self.moduleid else {}
@@ -73,13 +97,67 @@ class ImportSingleCsv(BaseImportModule):
             self.node_lookup[graphid] = Node.objects.filter(graph_id=graphid)
         return self.node_lookup[graphid]
 
-    def read(self, request):
+    def cli(self, source):
+        def return_with_error(error):
+            return {
+                "success": False,
+                "data": {"title": _("Error"), "message": error},
+            }
+
+        read = {"success": False, "message": ""}
+        written = {"success": False, "message": ""}
+
+        initiated = self.start(self.request)
+
+        if initiated["success"]:
+            try:
+                read = self.read(source=source)
+            except Exception as e:
+                return return_with_error(
+                    _("Unexpected error while reading file(s): {}").format(e)
+                )
+        else:
+            return return_with_error(initiated["message"])
+
+        if read["success"]:
+            try:
+                written = self.write(self.request)
+            except Exception as e:
+                return return_with_error(
+                    _("Unexpected error while processing file(s): {}").format(e)
+                )
+        else:
+            return return_with_error(read["message"])
+
+        if written["success"]:
+            return {"success": True, "data": _("Successfully Imported")}
+        else:
+            return return_with_error(written["message"])
+
+    def read(self, request=None, source=None):
         """
         Reads added csv file and returns all the rows
-        If the loadid already exsists also returns the load_details
+        If the loadid already exists also returns the load_details
         """
 
-        content = request.FILES.get("file")
+        if request:
+            content = request.FILES.get("file")
+        else:
+            if source.split(".")[-1].lower() == "csv":
+                file_type = "text/csv"
+            elif source.split(".")[-1].lower() == "zip":
+                file_type = "application/zip"
+            file_stat = os.stat(source)
+            file = open(source, "rb")
+            content = InMemoryUploadedFile(
+                file,
+                "file",
+                os.path.basename(source),
+                file_type,
+                file_stat.st_size,
+                None,
+            )
+
         temp_dir = os.path.join(settings.UPLOADED_FILES_DIR, "tmp", self.loadid)
         try:
             self.delete_from_default_storage(temp_dir)
@@ -109,6 +187,7 @@ class ImportSingleCsv(BaseImportModule):
                 csv_file_path = os.path.join(temp_dir, csv_file_name)
             except TypeError:
                 pass
+        content.file.close()
 
         if csv_file_name is None:
             return {
@@ -144,12 +223,13 @@ class ImportSingleCsv(BaseImportModule):
         """
         Move the records from load_staging to tiles table using db function
         """
-
         graphid = request.POST.get("graphid")
         has_headers = request.POST.get("hasHeaders")
-        fieldnames = request.POST.get("fieldnames").split(",")
+        fieldnames = request.POST.get("fieldnames")
+        if type(fieldnames) != list:
+            fieldnames = fieldnames.split(",")
         csv_mapping = request.POST.get("fieldMapping")
-        if csv_mapping:
+        if csv_mapping and type(csv_mapping) == str:
             csv_mapping = json.loads(csv_mapping)
         csv_file_name = request.POST.get("csvFileName")
         column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
@@ -173,7 +253,7 @@ class ImportSingleCsv(BaseImportModule):
         csv_size = default_storage.size(csv_file_path)  # file size in byte
         use_celery_threshold = self.config.get("celeryByteSizeLimit", 500)
 
-        if csv_size > use_celery_threshold:
+        if self.mode != "cli" and csv_size > use_celery_threshold:
             response = self.run_load_task_async(request, self.loadid)
         else:
             response = self.run_load_task(
@@ -270,8 +350,10 @@ class ImportSingleCsv(BaseImportModule):
         graphid = request.POST.get("graphid")
         csv_mapping = request.POST.get("fieldMapping")
         csv_file_name = request.POST.get("csvFileName")
+        if type(csv_mapping) == str:
+            csv_mapping = json.loads(csv_mapping)
         mapping_details = {
-            "mapping": json.loads(csv_mapping),
+            "mapping": csv_mapping,
             "graph": graphid,
             "file_name": csv_file_name,
         }
