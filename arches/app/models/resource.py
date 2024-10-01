@@ -745,7 +745,13 @@ class Resource(models.ResourceInstance):
         else:
             instance = Resource(pk=resourceinstanceid)
             # ensure PK is UUID
-            instance.clean_fields(exclude=["graph", "graph_publication"])
+            instance.clean_fields(
+                exclude=[
+                    "graph",
+                    "graph_publication",
+                    "resource_instance_lifecycle_state",
+                ]
+            )
         resourceinstanceid = str(resourceinstanceid)
 
         # delete any related terms
