@@ -153,35 +153,20 @@ class Card(models.CardModel):
 
                 if "widgets" in args[0]:
                     for widget in args[0]["widgets"]:
-                        cardxnodexwidgetid = widget.get("id", None)
                         node_id = widget.get("node_id", None)
                         card_id = widget.get("card_id", None)
                         widget_id = widget.get("widget_id", None)
-                        if cardxnodexwidgetid is None and (
-                            node_id is not None
-                            and card_id is not None
-                            and widget_id is not None
-                        ):
-                            widget_model, _ = (
-                                models.CardXNodeXWidget.objects.get_or_create(
-                                    node_id=node_id,
-                                    card_id=card_id,
-                                    widget_id=widget_id,
-                                )
+                        widget_model, _ = (
+                            models.CardXNodeXWidget.objects.update_or_create(
+                                node_id=node_id,
+                                card_id=card_id,
+                                defaults={"widget_id": uuid.UUID(widget_id)},
                             )
-                        else:
-                            widget_model = models.CardXNodeXWidget()
-                            widget_model.pk = cardxnodexwidgetid
-                            widget_model.node_id = node_id
-                            widget_model.card_id = card_id
-                            widget_model.widget_id = widget_id
+                        )
                         widget_model.config = widget.get("config", {})
                         widget_model.label = widget.get("label", "")
                         widget_model.visible = widget.get("visible", None)
                         widget_model.sortorder = widget.get("sortorder", None)
-                        if widget_model.pk is None:
-                            widget_model.pk = uuid.uuid4()
-                            widget_model.save()
                         self.widgets.append(widget_model)
 
                 if "nodes" in args[0]:

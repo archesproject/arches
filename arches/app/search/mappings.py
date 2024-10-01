@@ -20,6 +20,7 @@ from arches.app.models import models
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils import permission_backend
 from django.db.utils import ProgrammingError
+from arches.app.search.es_mapping_modifier import EsMappingModifierFactory
 
 
 CONCEPTS_INDEX = "concepts"
@@ -283,6 +284,13 @@ def prepare_search_index(create=False):
             },
         },
     }
+
+    for (
+        custom_search_class
+    ) in EsMappingModifierFactory.get_es_mapping_modifier_classes():
+        index_settings["mappings"]["properties"][
+            custom_search_class.get_mapping_property()
+        ] = custom_search_class.get_mapping_definition()
 
     index_settings["mappings"]["properties"]["permissions"]["properties"].update(
         permission_backend.update_mappings()

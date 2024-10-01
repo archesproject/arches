@@ -21,6 +21,13 @@
 
 .sidenav-lg {
     grid-template-columns: 220px auto;
+    .sidenav {
+        height: 100vh;
+        overflow-y: auto;
+        .mainnav-container {
+            height: calc(100vh - 50px);
+        }
+    }
 }
 
 .sidenav-menu {

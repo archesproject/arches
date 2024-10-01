@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import json
 import time
 import uuid
+from unittest.mock import patch
 
 from django.contrib.auth.models import User, Group, Permission
 from django.db import connection
@@ -39,8 +40,10 @@ from arches.app.utils.index_database import (
     index_resources_by_type,
     index_resources_using_singleprocessing,
 )
+from arches.test.utils import sync_overridden_test_settings_to_arches
 from tests.base_test import ArchesTestCase
 
+from django.test import override_settings
 
 # these tests can be run from the command line via
 # python manage.py test tests.models.resource_test --settings="tests.test_settings"
@@ -334,6 +337,22 @@ class ResourceTests(ArchesTestCase):
         )
 
         self.assertEqual(result, "Passed")
+
+    @override_settings(
+        ELASTICSEARCH_CUSTOM_INDEXES=[
+            {
+                "module": "arches.app.search.base_index.BaseIndex",
+                "name": "mock",
+                "should_update_asynchronously": True,
+            }
+        ]
+    )
+    @patch("arches.app.search.base_index.BaseIndex.delete_resources")
+    def test_delete_acts_on_custom_indices(self, mock):
+        other_resource = Resource(pk=uuid.uuid4())
+        with sync_overridden_test_settings_to_arches():
+            self.test_resource.delete_index(other_resource.pk)
+        self.assertIn(str(other_resource.pk), str(mock._mock_call_args))
 
     def test_publication_restored_on_save(self):
         """

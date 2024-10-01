@@ -772,7 +772,7 @@ define([
 
             viewModel.activeTab.subscribe(function(tab) {
                 viewModel.helpTemplate(helpContentLookup[tab]['template']);
-                viewModel.getHelp();
+                viewModel.getHelp(viewModel.helpTemplate());
                 switch (tab) {
                 case 'card':
                     updateCardSelection();

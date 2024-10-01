@@ -6,6 +6,7 @@ import codecs
 import os
 import sys
 import subprocess
+import warnings
 
 from django.utils.crypto import get_random_string
 from django.core.management.templates import TemplateCommand
@@ -28,6 +29,12 @@ class ArchesCommand(TemplateCommand):
     missing_args_message = "You must provide a project name."
 
     def handle(self, options):
+        self.stderr.write("DEPRECATION WARNING ⤵️")
+        warnings.warn(
+            "`arches-project create` was deprecated in 7.6.0 and will be removed in a future version.\n"
+            "Call `arches-admin startproject` instead.",
+            UserWarning,
+        )
         project_name, target = options.pop("name"), options.pop("directory")
 
         # Create a random SECRET_KEY to put it in the main settings.
@@ -116,7 +123,7 @@ parent_parser = argparse.ArgumentParser(add_help=False)
 
 parser = argparse.ArgumentParser(
     prog="arches",
-    description="Manage Arches-based Applications",
+    description="DEPRECATED: Manage Arches-based Applications",
     parents=[parent_parser],
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
 )

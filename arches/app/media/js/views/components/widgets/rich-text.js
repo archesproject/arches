@@ -29,6 +29,7 @@ define([
         const currentLanguage = {"code": arches.activeLanguage};
         let currentValue = koMapping.toJS(self.value) || initialCurrent;
         self.currentLanguage = ko.observable(currentLanguage);
+        self.currentPlaceholder = ko.observable();
         let updating = false;
 
         if(self.form){
@@ -52,6 +53,15 @@ define([
         } else {
             self.currentText = ko.observable(currentValue?.[currentLanguage.code]?.value);
             self.currentDirection = ko.observable(ko.unwrap(currentValue?.[currentLanguage.code]?.direction));
+        }
+
+        if (ko.unwrap(self.placeholder)) {
+            if (typeof ko.unwrap(self.placeholder) === 'string') {
+                self.placeholder({
+                    [self.currentLanguage().code]: ko.unwrap(self.placeholder),
+                });
+            }
+            self.currentPlaceholder(self.placeholder()[self.currentLanguage().code]);
         }
 
         self.strippedValue = ko.pureComputed(() => {
@@ -121,6 +131,19 @@ define([
 
             self.currentText(koMapping.toJS(self.value)[currentLanguage.code]?.value);
             self.currentDirection(koMapping.toJS(self.value)[currentLanguage.code]?.direction);
+            self.currentPlaceholder(koMapping.toJS(self.placeholder)[currentLanguage.code]);
+        });
+
+        self.currentPlaceholder.subscribe(newValue => {
+            if(!self.currentLanguage()){ return; }
+            const currentLanguage = self.currentLanguage();
+
+            if (self.card && ko.isObservable(self.placeholder)) {
+                const patchedPlaceholder = self.placeholder();
+                patchedPlaceholder[currentLanguage.code] = newValue;
+                self.placeholder(patchedPlaceholder);
+                self.card._card.valueHasMutated();
+            }
         });
 
         this.displayfullvalue(params.displayfullvalue);
