@@ -33,6 +33,9 @@ DATABASES = {
         "HOST": get_env_variable("PGHOST"),
         "PORT": get_env_variable("PGPORT"),
         "POSTGIS_TEMPLATE": "template_postgis",
+        "OPTIONS": {
+            "options": "-c cursor_tuple_fraction=1",
+        },
     }
 }
 
