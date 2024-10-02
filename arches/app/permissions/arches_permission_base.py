@@ -585,6 +585,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         if (
             not default_permissions_settings
             or model is None
+            or hasattr(model, "graph_id") is False
             or str(model.graph_id) not in default_permissions_settings
         ):
             return []
