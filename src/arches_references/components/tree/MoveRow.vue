@@ -29,7 +29,7 @@ import {
 import type { Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree";
 import type { TreeNode } from "primevue/treenode";
-import type { Language } from "@/arches/types";
+import type { Language } from "@/arches_vue_utils/types";
 import type {
     ControlledList,
     ControlledListItem,

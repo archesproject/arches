@@ -17,7 +17,7 @@ import ListHeader from "@/arches_references/components/misc/ListHeader.vue";
 import MainSplitter from "@/arches_references/components/MainSplitter.vue";
 
 import type { Ref } from "vue";
-import type { Language } from "@/arches/types";
+import type { Language } from "@/arches_vue_utils/types";
 import type { Selectable } from "@/arches_references/types";
 
 const router = useRouter();
