@@ -45,15 +45,15 @@ class Command(PackagesCommand):
             wb = openpyxl.load_workbook(source)
             with transaction.atomic():
                 for sheet in wb.sheetnames:
-                    if sheet == "ControlledList":
+                    if sheet == "List":
                         created_instances_pks.extend(
                             self.import_sheet_to_model(wb[sheet], List)
                         )
-                    elif sheet == "ControlledListItem":
+                    elif sheet == "ListItem":
                         created_instances_pks.extend(
                             self.import_sheet_to_model(wb[sheet], ListItem)
                         )
-                    elif sheet == "ControlledListItemValue":
+                    elif sheet == "ListItemValue":
                         created_instances_pks.extend(
                             self.import_sheet_to_model(wb[sheet], ListItemValue)
                         )
@@ -146,7 +146,7 @@ class Command(PackagesCommand):
     def export_controlled_lists(self, data_dest, file_name):
         wb = openpyxl.Workbook()
         ws = wb.active
-        ws.title = "ControlledList"
+        ws.title = "List"
         self.export_model_to_sheet(ws, List)
         self.export_model_to_sheet(wb, ListItem)
         self.export_model_to_sheet(wb, ListItemValue)
@@ -155,14 +155,14 @@ class Command(PackagesCommand):
         #     data_dest = os.path.dirname(settings.SYSTEM_SETTINGS_LOCAL_PATH)
         if data_dest != "" and data_dest != ".":
             wb.save(os.path.join(data_dest, file_name))
-            self.stdout.write("Data exported successfully to controlled_lists.xlsx")
+            self.stdout.write(f"Data exported successfully to {file_name}")
         else:
             self.stdout.write(
                 "No destination directory specified. Please rerun this command with the '-d' parameter populated."
             )
 
     def export_model_to_sheet(self, wb, model):
-        # For the first sheet (ControlledList), use blank sheet that is initiallized with workbook
+        # For the first sheet (List), use blank sheet that is initiallized with workbook
         # otherwise, append a new sheet
         if isinstance(wb, openpyxl.worksheet.worksheet.Worksheet):
             ws = wb
