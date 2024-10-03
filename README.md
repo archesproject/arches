@@ -63,20 +63,6 @@ Our general release cycle will typically be a functional release (either major i
 
 The following a general plan for the Arches project. Be aware this plan is tentative and subject to change.
 
-## 7.6 LTS - Release date: Sept 15, 2024
-- Arches Application improvements
-- Security enhancements
-- Default deny permissions
-- Support for pluggable permissions frameworks
-- Standalone plugins
-- Customizable Search
-- Concept label bulk editor module
-- Map performance improvments
-- Postgres 14 becomes minimum Postgres version
-
-## 7.6 - Supported Applications
- - Workflow Builder
-
 ## 8.0 - Release date: June 15, 2025
 - Activity stream enhancements
 - Support for editing and publishing graphs without having to remove resource instances
