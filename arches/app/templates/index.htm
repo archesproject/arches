@@ -114,6 +114,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             </li>
                         {% endif %}
                         {% if show_language_swtich %}
+                        {% csrf_token %}
                             <li>
                                 {% get_current_language as LANGUAGE_CODE %}
                                 <div class="lang-switch" style="max-width: none;" data-bind='component: {
