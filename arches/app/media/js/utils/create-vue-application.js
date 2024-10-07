@@ -7,23 +7,11 @@ import StyleClass from 'primevue/styleclass';
 import ToastService from 'primevue/toastservice';
 import Tooltip from 'primevue/tooltip';
 
-import Aura from '@primevue/themes/aura';
-
 import { createApp } from 'vue';
 import { createGettext } from "vue3-gettext";
 
 import arches from 'arches';
-
-const DEFAULT_THEME = {
-    theme: {
-        preset: Aura,
-        options: {
-            prefix: 'p',
-            darkModeSelector: 'system',
-            cssLayer: false
-        }
-    }
-};
+import { DEFAULT_THEME } from "@/arches/themes/default.ts";
 
 export default async function createVueApplication(vueComponent, themeConfiguration) {
     /**
