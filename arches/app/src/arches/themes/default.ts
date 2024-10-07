@@ -20,7 +20,9 @@ export const ArchesPreset = definePreset(Aura, {
         red: palette(archesColors.red),
     },
     semantic: {
+        // PrimeVue token override
         primary: palette(archesColors.blue),
+        // PrimeVue token override
         navigation: {
             list: {
                 padding: "0",
@@ -28,7 +30,10 @@ export const ArchesPreset = definePreset(Aura, {
             item: {
                 padding: "1rem",
             },
-            color: "{arches.legacy.sidebar}",
+            // custom tokens
+            header: {
+                color: "{arches.legacy.sidebar}",
+            },
         },
     },
     components: {
