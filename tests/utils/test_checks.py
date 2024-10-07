@@ -2,6 +2,7 @@ from importlib.metadata import PackageNotFoundError
 from unittest import mock
 
 from django.apps import apps
+from django.core.checks import Tags
 from django.core.management import call_command
 from django.core.management.base import SystemCheckError
 from django.test import SimpleTestCase, override_settings
@@ -31,7 +32,7 @@ class SystemCheckTests(SimpleTestCase):
             SystemCheckError,
             "Arches requirement is invalid, missing, or given by a URL.",
         ):
-            call_command("check")
+            call_command("check", tag=[Tags.compatibility])
 
         # Mock having to go to the pyproject.toml
         with mock.patch("arches.apps.requires", raise_package_not_found_error):
@@ -39,7 +40,7 @@ class SystemCheckTests(SimpleTestCase):
                 SystemCheckError,
                 "Arches requirement is invalid, missing, or given by a URL.",
             ):
-                call_command("check")
+                call_command("check", tag=[Tags.compatibility])
 
         # Mock an incompatible version requirement.
         with mock.patch(
@@ -47,4 +48,4 @@ class SystemCheckTests(SimpleTestCase):
             lambda app_name: ["arches-for-x==0.0.1", "arches==1.0.1"],
         ):
             with self.assertRaisesMessage(SystemCheckError, "arches==1.0.1"):
-                call_command("check")
+                call_command("check", tag=[Tags.compatibility])

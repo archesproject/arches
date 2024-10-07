@@ -36,6 +36,9 @@ class Command(BaseCommand):
     during development.
     """
 
+    # Silence system checks: this command should always succeed.
+    requires_system_checks = []
+
     def add_arguments(self, parser):
 
         parser.add_argument(
