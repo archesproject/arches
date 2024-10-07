@@ -30,10 +30,11 @@ export const ArchesPreset = definePreset(Aura, {
             color: "{arches.legacy.sidebar}",
         },
         iconSize: "small",
-        // custom token
+        // custom tokens
         content: {
             gap: "1rem",
         },
+        fontFamily: "system-ui, sans-serif",
     },
     components: {
         button: {
