@@ -15,6 +15,7 @@ export const ArchesPreset = definePreset(Aura, {
                 sidebar: "#2d3c4b",
             },
         },
+        blue: palette(archesColors.blue),
         green: palette(archesColors.green),
         red: palette(archesColors.red),
     },
@@ -29,41 +30,11 @@ export const ArchesPreset = definePreset(Aura, {
             },
             color: "{arches.legacy.sidebar}",
         },
-        iconSize: "small",
-        // custom tokens
-        content: {
-            gap: "1rem",
-        },
-        fontFamily: "system-ui, sans-serif",
     },
     components: {
-        button: {
-            root: {
-                label: {
-                    fontWeight: 600,
-                },
-            },
-        },
-        menubar: {
-            border: {
-                radius: 0,
-            },
-        },
         splitter: {
             handle: {
                 background: "{surface.500}",
-            },
-        },
-        toast: {
-            summary: {
-                fontSize: "medium",
-            },
-            detail: {
-                fontSize: "small",
-            },
-            // custom token
-            messageIcon: {
-                marginTop: "0.5rem",
             },
         },
     },
