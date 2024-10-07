@@ -6,6 +6,7 @@ import codecs
 import os
 import sys
 import subprocess
+import warnings
 
 from django.utils.crypto import get_random_string
 from django.core.management.templates import TemplateCommand
@@ -28,11 +29,17 @@ class ArchesCommand(TemplateCommand):
     missing_args_message = "You must provide a project name."
 
     def handle(self, options):
+        self.stderr.write("DEPRECATION WARNING ⤵️")
+        warnings.warn(
+            "`arches-project create` was deprecated in 7.6.0 and will be removed in a future version.\n"
+            "Call `arches-admin startproject` instead.",
+            UserWarning,
+        )
         project_name, target = options.pop("name"), options.pop("directory")
 
         # Create a random SECRET_KEY to put it in the main settings.
         chars = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)"
-        options["secret_key"] = get_random_string(50, chars)
+        options["secret_key"] = "django-insecure-" + get_random_string(50, chars)
 
         # this is used in the package.json file generated when "arches-project create" is called
         # if this is not a final released version of arches (for developers) then arches_version will be blank
@@ -51,25 +58,31 @@ class ArchesCommand(TemplateCommand):
         options["arches_next_minor_version"] = ".".join(
             [str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"]
         )
+        options["project_name_title_case"] = project_name.title().replace("_", "")
 
         super(ArchesCommand, self).handle("project", project_name, target, **options)
 
         # need to manually replace instances of {{ project_name }} in some files
-        path_to_project = (
-            os.path.join(target) if target else os.path.join(os.getcwd(), project_name)
-        )
+        path_to_project = target if target else os.path.join(os.getcwd(), project_name)
 
         for relative_file_path in [
+            os.path.join(project_name, "apps.py"),
             ".coveragerc",
             "pyproject.toml",
             ".pre-commit-config.yaml",
+            ".github/workflows/main.yml",
+            "vitest.config.mts",
+            "vitest.setup.mts",
         ]:  # relative to app root directory
             file = open(os.path.join(path_to_project, relative_file_path), "r")
             file_data = file.read()
             file.close()
 
             updated_file_data = (
-                file_data.replace("{{ project_name }}", project_name)
+                file_data.replace(
+                    "{{ project_name_title_case }}", options["project_name_title_case"]
+                )
+                .replace("{{ project_name }}", project_name)
                 .replace(
                     "{{ arches_semantic_version }}", options["arches_semantic_version"]
                 )
@@ -110,7 +123,7 @@ parent_parser = argparse.ArgumentParser(add_help=False)
 
 parser = argparse.ArgumentParser(
     prog="arches",
-    description="Manage Arches-based Applications",
+    description="DEPRECATED: Manage Arches-based Applications",
     parents=[parent_parser],
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
 )

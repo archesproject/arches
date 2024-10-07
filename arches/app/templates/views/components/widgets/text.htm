@@ -69,7 +69,7 @@
             <div class="col-xs-12" style="display:flex;flex-wrap: wrap;flex-direction: column;">
                 <input type="text" style="flex:1" class="form-control input-lg widget-input"
                     data-bind="textInput: currentText,
-                        attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable, 'aria-label': label, dir: currentDirection},
+                        attr: {placeholder: currentPlaceholder, maxlength: maxLength, disabled: disable, 'aria-label': label, dir: currentDirection},
                 ">
             </div>
         </div>
@@ -87,7 +87,7 @@
         class="form-control input-md widget-input"
         data-bind="
             attr: {placeholder: $root.translations.placeholder, 'aria-label': $root.translations.placeholder},
-            textInput: placeholder
+            textInput: currentPlaceholder
         "
     >
 </div>
@@ -164,7 +164,7 @@
     <div class="col-xs-12" style="display:flex;flex-wrap: wrap;flex-direction: column;">
         <input type="text" style="flex:1" id="input-default-value" class="form-control input-lg widget-input"
             data-bind="textInput: currentDefaultText,
-                attr: {placeholder: placeholder, maxlength: maxLength, disabled: disable, dir: currentDefaultDirection, 'aria-label': $root.translations.defaultValue}
+                attr: {placeholder: currentPlaceholder, maxlength: maxLength, disabled: disable, dir: currentDefaultDirection, 'aria-label': $root.translations.defaultValue}
         ">
     </div>
     </div>

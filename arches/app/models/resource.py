@@ -36,6 +36,7 @@ from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import TERMS_INDEX, RESOURCES_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms, Nested
+from arches.app.search.es_mapping_modifier import EsMappingModifierFactory
 from arches.app.tasks import index_resource
 from arches.app.utils import import_class_from_string, task_management
 from arches.app.utils import permission_backend
@@ -53,8 +54,7 @@ from arches.app.utils.exceptions import (
 )
 from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
-    get_restricted_instances,
-    user_can_read_graph,
+    get_filtered_instances,
     get_nodegroups_by_perm,
 )
 import django.dispatch
@@ -64,6 +64,7 @@ logger = logging.getLogger(__name__)
 
 
 class Resource(models.ResourceInstance):
+
     class Meta:
         proxy = True
 
@@ -535,7 +536,6 @@ class Resource(models.ResourceInstance):
                 [int(self.principaluser_id)] if self.principaluser_id else []
             )
         }
-
         document["permissions"].update(permission_backend.get_index_values(self))
 
         document["strings"] = []
@@ -632,6 +632,12 @@ class Resource(models.ResourceInstance):
                                                 },
                                             }
                                         )
+
+        for (
+            custom_search_class
+        ) in EsMappingModifierFactory.get_es_mapping_modifier_classes():
+            custom_search_class.add_search_terms(self, document, terms)
+
         return document, terms
 
     def delete(self, user={}, index=True, transaction_id=None):
@@ -704,6 +710,11 @@ class Resource(models.ResourceInstance):
 
         if resourceinstanceid is None:
             resourceinstanceid = self.resourceinstanceid
+            instance = self
+        else:
+            instance = Resource(pk=resourceinstanceid)
+            # ensure PK is UUID
+            instance.clean_fields(exclude=["graph", "graph_publication"])
         resourceinstanceid = str(resourceinstanceid)
 
         # delete any related terms
@@ -735,7 +746,7 @@ class Resource(models.ResourceInstance):
         # delete resources from custom indexes
         for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:
             es_index = import_class_from_string(index["module"])(index["name"])
-            es_index.delete_resources(resources=self)
+            es_index.delete_resources(resources=instance)
 
     def validate(self, verbose=False, strict=False):
         """
@@ -817,7 +828,11 @@ class Resource(models.ResourceInstance):
             limit = number_per_page * page
 
         def get_relations(
-            resourceinstanceid, start, limit, resourceinstance_graphid=None
+            resourceinstanceid,
+            start,
+            limit,
+            resourceinstance_graphid=None,
+            count_only=False,
         ):
             final_query = Q(resourceinstanceidfrom_id=resourceinstanceid) | Q(
                 resourceinstanceidto_id=resourceinstanceid
@@ -832,14 +847,19 @@ class Resource(models.ResourceInstance):
                 ) & Q(resourceinstanceto_graphid_id=str(self.graph_id))
                 final_query = final_query & (to_graph_id_filter | from_graph_id_filter)
 
-            relations = {
-                "total": models.ResourceXResource.objects.filter(final_query).count(),
-                "relations": models.ResourceXResource.objects.filter(final_query)[
-                    start:limit
-                ],
-            }
+            if count_only:
+                return models.ResourceXResource.objects.filter(final_query).count()
 
-            return relations  # resourceinstance_graphid = "00000000-886a-374a-94a5-984f10715e3a"
+            return (
+                {  # resourceinstance_graphid = "00000000-886a-374a-94a5-984f10715e3a"
+                    "total": models.ResourceXResource.objects.filter(
+                        final_query
+                    ).count(),
+                    "relations": models.ResourceXResource.objects.filter(final_query)[
+                        start:limit
+                    ],
+                }
+            )
 
         resource_relations = get_relations(
             resourceinstanceid=self.resourceinstanceid,
@@ -851,8 +871,10 @@ class Resource(models.ResourceInstance):
         ret["total"] = {"value": resource_relations["total"]}
         instanceids = set()
 
-        restricted_instances = (
-            get_restricted_instances(user, se) if user is not None else []
+        readable_graphids = set(
+            permission_backend.get_resource_types_by_perm(
+                user, ["models.read_nodegroup"]
+            )
         )
         for relation in resource_relations["relations"]:
             relation = model_to_dict(relation)
@@ -860,12 +882,23 @@ class Resource(models.ResourceInstance):
             resourceid_from = relation["resourceinstanceidfrom"]
             resourceinstanceto_graphid = relation["resourceinstanceto_graphid"]
             resourceinstancefrom_graphid = relation["resourceinstancefrom_graphid"]
+            exclusive_set, filtered_instances = get_filtered_instances(
+                user, se, resources=[resourceid_from, resourceid_to]
+            )
+            filtered_instances = filtered_instances if user is not None else []
+
+            resourceid_to_permission = resourceid_to not in filtered_instances
+            resourceid_from_permission = resourceid_from not in filtered_instances
+
+            if exclusive_set:
+                resourceid_to_permission = not (resourceid_to_permission)
+                resourceid_from_permission = not (resourceid_from_permission)
 
             if (
-                resourceid_to not in restricted_instances
-                and resourceid_from not in restricted_instances
-                and user_can_read_graph(user, resourceinstanceto_graphid)
-                and user_can_read_graph(user, resourceinstancefrom_graphid)
+                resourceid_to_permission
+                and resourceid_from_permission
+                and str(resourceinstanceto_graphid) in readable_graphids
+                and str(resourceinstancefrom_graphid) in readable_graphids
             ):
                 try:
                     preflabel = get_preflabel_from_valueid(
@@ -890,14 +923,14 @@ class Resource(models.ResourceInstance):
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
                 for resource in related_resources["docs"]:
-                    relations = get_relations(
-                        resourceinstanceid=resource["_id"],
-                        start=0,
-                        limit=0,
-                    )
                     if resource["found"]:
-                        resource["_source"]["total_relations"] = relations["total"]
-
+                        rel_count = get_relations(
+                            resourceinstanceid=resource["_id"],
+                            start=0,
+                            limit=0,
+                            count_only=True,
+                        )
+                        resource["_source"]["total_relations"] = rel_count
                         for descriptor_type in ("displaydescription", "displayname"):
                             descriptor = get_localized_descriptor(
                                 resource, descriptor_type

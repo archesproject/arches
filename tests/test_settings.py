@@ -16,23 +16,16 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from arches.settings import *
-import arches
 import os
 
-try:
-    from django.utils.translation import gettext_lazy as _
-except ImportError:  # unable to import prior to installing requirements
-    pass
+from arches.settings import *
+
+from django.utils.translation import gettext_lazy as _
 
 PACKAGE_NAME = "arches"
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 APP_ROOT = ""
-
-ARCHES_APPLICATIONS = ()
-
-MIN_ARCHES_VERSION = arches.__version__
-MAX_ARCHES_VERSION = arches.__version__
+STATICFILES_DIRS = []
 
 # LOAD_V3_DATA_DURING_TESTS = True will engage the most extensive the of the v3
 # data migration tests, which could add over a minute to the test process. It's
@@ -40,7 +33,21 @@ MAX_ARCHES_VERSION = arches.__version__
 # and run in specific cases at the discretion of the developer.
 LOAD_V3_DATA_DURING_TESTS = False
 
-RESOURCE_GRAPH_LOCATIONS = (os.path.join(TEST_ROOT, "fixtures", "resource_graphs"),)
+RESOURCE_GRAPH_LOCATIONS = [
+    os.path.join(TEST_ROOT, "fixtures", "resource_graphs"),
+    os.path.join(
+        TEST_ROOT,
+        "fixtures",
+        "testing_prj",
+        "testing_prj",
+        "pkg",
+        "graphs",
+        "resource_models",
+    ),
+]
+REFERENCE_DATA_FIXTURE_LOCATION = os.path.join(
+    TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg", "reference_data"
+)
 
 ONTOLOGY_FIXTURES = os.path.join(TEST_ROOT, "fixtures", "ontologies", "test_ontology")
 ONTOLOGY_PATH = os.path.join(TEST_ROOT, "fixtures", "ontologies", "cidoc_crm")
@@ -51,6 +58,9 @@ BUSINESS_DATA_FILES = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
+
+# Class for custom ES document generator and search functionality
+ES_MAPPING_MODIFIER_CLASSES = ["tests.views.search_tests.TestEsMappingModifier"]
 
 CACHES = {
     "default": {
@@ -66,7 +76,7 @@ LOGGING["loggers"]["arches"]["level"] = "ERROR"
 
 ELASTICSEARCH_PREFIX = "test"
 
-TEST_RUNNER = "tests.base_test.ArchesTestRunner"
+TEST_RUNNER = "arches.test.runner.ArchesTestRunner"
 SILENCED_SYSTEM_CHECKS.append(
     "arches.W001"
 )  # Cache backend does not support rate-limiting
@@ -97,6 +107,9 @@ LANGUAGES = [
 ]
 
 DOCKER = False
+
+PERMISSION_DEFAULTS = {}
+
 
 try:
     from arches.settings_local import *

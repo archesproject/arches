@@ -17,9 +17,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import json
-import os
 import time
 import uuid
+from unittest.mock import patch
 
 from django.contrib.auth.models import User, Group
 from django.db import connection
@@ -31,43 +31,33 @@ from arches.app.models import models
 from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.data_management.resource_graphs.importer import (
-    import_graph as resource_graph_importer,
-)
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.exceptions import (
     InvalidNodeNameException,
     MultipleNodesFoundException,
 )
-from arches.app.utils.i18n import LanguageSynchronizer
 from arches.app.utils.index_database import (
     index_resources_by_type,
     index_resources_using_singleprocessing,
 )
+from arches.test.utils import sync_overridden_test_settings_to_arches
 from tests.base_test import ArchesTestCase
 
+from django.test import override_settings
 
 # these tests can be run from the command line via
 # python manage.py test tests.models.resource_test --settings="tests.test_settings"
 
 
 class ResourceTests(ArchesTestCase):
+    graph_fixtures = ["Resource Test Model"]
+
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-
-        LanguageSynchronizer.synchronize_settings_with_db()
-
-        models.ResourceInstance.objects.all().delete()
+    def setUpTestData(cls):
+        super().setUpTestData()
 
         cls.client = Client()
         cls.client.login(username="admin", password="admin")
-
-        with open(
-            os.path.join("tests/fixtures/resource_graphs/Resource Test Model.json"), "r"
-        ) as f:
-            archesfile = JSONDeserializer().deserialize(f)
-        resource_graph_importer(archesfile["graph"])
 
         cls.search_model_graphid = uuid.UUID("c9b37a14-17b3-11eb-a708-acde48001122")
         cls.search_model_cultural_period_nodeid = "c9b3882e-17b3-11eb-a708-acde48001122"
@@ -201,13 +191,6 @@ class ResourceTests(ArchesTestCase):
         # add delay to allow for indexes to be updated
         time.sleep(1)
 
-    @classmethod
-    def tearDownClass(cls):
-        Resource.objects.filter(graph_id=cls.search_model_graphid).delete()
-        models.GraphModel.objects.filter(pk=cls.search_model_graphid).delete()
-        cls.user.delete()
-        super().tearDownClass()
-
     def test_get_node_value_string(self):
         """
         Query a string value
@@ -287,28 +270,33 @@ class ResourceTests(ArchesTestCase):
 
         self.assertEqual(result, "Passed")
 
+    @override_settings(
+        ELASTICSEARCH_CUSTOM_INDEXES=[
+            {
+                "module": "arches.app.search.base_index.BaseIndex",
+                "name": "mock",
+                "should_update_asynchronously": True,
+            }
+        ]
+    )
+    @patch("arches.app.search.base_index.BaseIndex.delete_resources")
+    def test_delete_acts_on_custom_indices(self, mock):
+        other_resource = Resource(pk=uuid.uuid4())
+        with sync_overridden_test_settings_to_arches():
+            self.test_resource.delete_index(other_resource.pk)
+        self.assertIn(str(other_resource.pk), str(mock._mock_call_args))
+
     def test_publication_restored_on_save(self):
         """
         If a resource lacks a graph publication, it is restored by a call to save().
         """
-
-        publication = self.test_resource.graph_publication
-        cursor = connection.cursor()
-        # Hack out the graph publication
-        sql = """
-            UPDATE resource_instances
-            SET graphpublicationid = NULL
-            WHERE resourceinstanceid = '{resource_pk}';
-        """.format(
-            resource_pk=self.test_resource.pk
+        # Hack out the graph publication (bypass the guard in save())
+        models.ResourceInstance.objects.filter(pk=self.test_resource.pk).update(
+            graph_publication=None
         )
-        cursor.execute(sql)
-        self.addCleanup(setattr, self.test_resource, "graph_publication", publication)
-        self.addCleanup(self.test_resource.save)
         self.test_resource.refresh_from_db()
-        self.assertIsNone(
-            self.test_resource.graph_publication
-        )  # ensure test setup is good
+        # Ensure test setup is good
+        self.assertIsNone(self.test_resource.graph_publication)
 
         # update_or_create() delegates to save()
         obj, created = models.ResourceInstance.objects.filter(

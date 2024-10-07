@@ -3,43 +3,77 @@
 define([], function() {
     return function loadComponentDependencies(componentPaths){
         for (const componentPath of componentPaths) {
-            try {  // first try to load project path
-                require(`${APP_ROOT_DIRECTORY}/media/js/${componentPath}`);
-            }
-            catch(e) {  // if project path fails, look in applications
-                try {
-                    if (ARCHES_APPLICATIONS.length === 0) {  // ensures fallthrough to Arches-core
-                        throw new Error();
+            try {
+                if (!ARCHES_APPLICATIONS.length) {  // assumption os running Arches without a project
+                    throw new Error()
+                }
+                for (const archesApp of ARCHES_APPLICATIONS) {
+                    try {
+                        require(`${SITE_PACKAGES_DIRECTORY}/${archesApp}/media/js/${componentPath}`);
+                        break;
                     }
-                    for (const archesApp of ARCHES_APPLICATIONS) {
+                    // Handle editable installations (with pip install -e).
+                    // Webpack needs string literals, hence arbitrary limit of 9.
+                    // https://github.com/archesproject/arches/issues/11274
+                    catch(e) {
                         try {
-                            require(`${SITE_PACKAGES_DIRECTORY}/${archesApp}/media/js/${componentPath}`);
+                            require(`${LINKED_APPLICATION_PATH_0}/media/js/${componentPath}`);
                             break;
                         }
-                        catch(e) { // handles egg/wheel links, cannot access them programatically hence manual access
+                        catch {
                             try {
-                                require(`${LINKED_APPLICATION_PATH_0}/media/js/${componentPath}`);
+                                require(`${LINKED_APPLICATION_PATH_1}/media/js/${componentPath}`);
                                 break;
                             }
-                            catch {  // handles egg/wheel links, cannot access them programatically hence manual access
+                            catch {
                                 try {
-                                    require(`${LINKED_APPLICATION_PATH_1}/media/js/${componentPath}`);
+                                    require(`${LINKED_APPLICATION_PATH_2}/media/js/${componentPath}`);
                                     break;
                                 }
-                                catch { // handles egg/wheel links, cannot access them programatically hence manual access
+                                catch {
                                     try {
-                                        require(`${LINKED_APPLICATION_PATH_2}/media/js/${componentPath}`);
+                                        require(`${LINKED_APPLICATION_PATH_3}/media/js/${componentPath}`);
                                         break;
                                     }
-                                    catch { throw new Error(); } // if all attempts fail within the loop, throw error for outer try/catch
+                                    catch {
+                                        try {
+                                            require(`${LINKED_APPLICATION_PATH_4}/media/js/${componentPath}`);
+                                            break;
+                                        }
+                                        catch {
+                                            try {
+                                                require(`${LINKED_APPLICATION_PATH_5}/media/js/${componentPath}`);
+                                                break;
+                                            }
+                                            catch {
+                                                try {
+                                                    require(`${LINKED_APPLICATION_PATH_6}/media/js/${componentPath}`);
+                                                    break;
+                                                }
+                                                catch {
+                                                    try {
+                                                        require(`${LINKED_APPLICATION_PATH_7}/media/js/${componentPath}`);
+                                                        break;
+                                                    }
+                                                    catch {
+                                                        try {
+                                                            require(`${LINKED_APPLICATION_PATH_8}/media/js/${componentPath}`);
+                                                            break;
+                                                        }
+                                                        catch { throw new Error(); } // if all attempts fail within the loop, throw error for outer try/catch
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                catch(e) {  // finally, look in Arches core for component
-                    require(`${ARCHES_CORE_DIRECTORY}/app/media/js/${componentPath}`);
-                }
+            }
+            catch(e) {  // finally, look in Arches core for component
+                require(`${ARCHES_CORE_DIRECTORY}/app/media/js/${componentPath}`);
             }
         }
     };

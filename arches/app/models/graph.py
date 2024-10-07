@@ -506,7 +506,7 @@ class Graph(models.GraphModel):
 
     def save(self, validate=True, nodeid=None):
         """
-        Saves an a graph and its nodes, edges, and nodegroups back to the db
+        Saves a graph and its nodes, edges, and nodegroups back to the db
         creates associated card objects if any of the nodegroups don't already have a card
 
         Arguments:
@@ -533,6 +533,8 @@ class Graph(models.GraphModel):
                 try:
                     node.sourcebranchpublication_id = None
                     node.save()
+                except ValueError as ve:
+                    raise GraphValidationError(ve.args[0])
                 except IntegrityError as err:
                     if "unique_alias_graph" in str(err):
                         message = _(
@@ -1968,8 +1970,12 @@ class Graph(models.GraphModel):
             return fieldname
 
         fieldnames = {}
-        for node_id, node in self.nodes.items():
+        datatype_factory = DataTypeFactory()
+
+        for node in self.nodes.values():
             self._validate_node_name(node)
+            datatype = datatype_factory.get_instance(node.datatype)
+            datatype.validate_node(node)
             if node.exportable is True:
                 if node.fieldname is not None:
                     validated_fieldname = validate_fieldname(node.fieldname, fieldnames)

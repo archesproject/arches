@@ -1,34 +1,27 @@
-import importlib
 import json
 import logging
 import os
-import re
-import site
 import sys
 import uuid
 import traceback
-from oauth2_provider.views import ProtectedResourceView
 from base64 import b64decode
 from http import HTTPStatus
-from pyld.jsonld import compact, frame, from_rdf
+from pyld.jsonld import compact, from_rdf
 from rdflib import RDF
 from rdflib.namespace import SKOS, DCTERMS
 from revproxy.views import ProxyView
 from slugify import slugify
-from urllib import parse
 from collections import OrderedDict
 from django.contrib.auth import authenticate
-from django.shortcuts import render
 from django.views.generic import View
 from django.db import transaction, connection
 from django.db.models import Q
 from django.http import Http404, HttpResponse
-from django.http.request import QueryDict
-from django.core import management
 from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.urls import reverse
 from django.utils.translation import get_language, gettext as _
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -40,6 +33,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.models.tile import Tile as TileProxyModel, TileValidationError
+from arches.app.utils.mvt_tiler import MVTTiler
 from arches.app.views.tile import TileData as TileView
 from arches.app.views.resource import (
     RelatedResourcesView,
@@ -47,7 +41,7 @@ from arches.app.views.resource import (
 )
 from arches.app.utils.skos import SKOSWriter
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
-from arches.app.utils.decorators import can_read_concept, group_required
+from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
 from arches.app.utils.data_management.resources.formats.rdffile import JsonLdReader
@@ -60,15 +54,15 @@ from arches.app.utils.permission_backend import (
     user_can_delete_resource,
     user_can_read_concepts,
     user_is_resource_reviewer,
-    get_restricted_instances,
-    check_resource_instance_permissions,
+    get_filtered_instances,
     get_nodegroups_by_perm,
 )
 from arches.app.utils.geo_utils import GeoUtils
 from arches.app.utils.permission_backend import user_is_resource_editor
 from arches.app.search.components.base import SearchFilterFactory
-from arches.app.datatypes.datatypes import DataTypeFactory, EDTFDataType
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.settings_utils import list_arches_app_paths
 
 logger = logging.getLogger(__name__)
 
@@ -112,6 +106,13 @@ class APIBase(View):
         return super(APIBase, self).dispatch(request, *args, **kwargs)
 
 
+class API404(View):
+    def dispatch(self, request, *args, **kwargs):
+        return JSONErrorResponse(
+            _("Request failed"), _("Route not found"), status=HTTPStatus.NOT_FOUND
+        )
+
+
 class GetFrontendI18NData(APIBase):
     def get(self, request):
         user_language = get_language()
@@ -119,19 +120,16 @@ class GetFrontendI18NData(APIBase):
         language_file_path = []
 
         language_file_path.append(
-            os.path.join(settings.APP_ROOT, "locale", user_language + ".json")
+            os.path.join(settings.ROOT_DIR, "locale", user_language + ".json")
         )
 
-        for arches_application_name in settings.ARCHES_APPLICATIONS:
-            application_path = os.path.split(
-                sys.modules[arches_application_name].__spec__.origin
-            )[0]
+        for arches_app_path in list_arches_app_paths():
             language_file_path.append(
-                os.path.join(application_path, "locale", user_language + ".json")
+                os.path.join(arches_app_path, "locale", user_language + ".json")
             )
 
         language_file_path.append(
-            os.path.join(settings.ROOT_DIR, "locale", user_language + ".json")
+            os.path.join(settings.APP_ROOT, "locale", user_language + ".json")
         )
 
         localized_strings = {}
@@ -217,7 +215,9 @@ class GeoJSON(APIBase):
         property_nodes = models.Node.objects.filter(
             nodegroup_id__in=nodegroups
         ).order_by("sortorder")
-        restricted_resource_ids = get_restricted_instances(request.user, self.se)
+        exclusive_set, filtered_instance_ids = get_filtered_instances(
+            request.user, self.se, resources=resourceid.split(",")
+        )
         for node in property_nodes:
             property_node_map[str(node.nodeid)] = {"node": node}
             if node.fieldname is None or node.fieldname == "":
@@ -235,11 +235,11 @@ class GeoJSON(APIBase):
         if tileid is not None:
             tiles = tiles.filter(tileid=tileid)
         tiles = tiles.order_by("sortorder")
-        tiles = [
-            tile
-            for tile in tiles
-            if str(tile.resourceinstance_id) not in restricted_resource_ids
-        ]
+        resource_available = str(tile.resourceinstance_id) not in filtered_instance_ids
+        resource_available = (
+            not (resource_available) if exclusive_set else resource_available
+        )
+        tiles = [tile for tile in tiles if resource_available]
         if limit is not None:
             start = (page - 1) * limit
             end = start + limit
@@ -339,162 +339,16 @@ class GeoJSON(APIBase):
 
 
 class MVT(APIBase):
-    EARTHCIRCUM = 40075016.6856
-    PIXELSPERTILE = 256
-
     def get(self, request, nodeid, zoom, x, y):
         if hasattr(request.user, "userprofile") is not True:
             models.UserProfile.objects.create(user=request.user)
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
-        try:
-            node = models.Node.objects.get(
-                nodeid=nodeid, nodegroup_id__in=viewable_nodegroups
-            )
-        except models.Node.DoesNotExist:
-            raise Http404()
-        search_geom_count = 0
-        config = node.config
-        cache_key = MVT.create_mvt_cache_key(node, zoom, x, y, request.user)
-        tile = cache.get(cache_key)
-        if tile is None:
-            resource_ids = get_restricted_instances(request.user, allresources=True)
-            if len(resource_ids) == 0:
-                resource_ids.append(
-                    "10000000-0000-0000-0000-000000000001"
-                )  # This must have a uuid that will never be a resource id.
-            resource_ids = tuple(resource_ids)
-            with connection.cursor() as cursor:
-                if int(zoom) <= int(config["clusterMaxZoom"]):
-                    arc = self.EARTHCIRCUM / ((1 << int(zoom)) * self.PIXELSPERTILE)
-                    distance = arc * float(config["clusterDistance"])
-                    min_points = int(config["clusterMinPoints"])
-                    distance = (
-                        settings.CLUSTER_DISTANCE_MAX
-                        if distance > settings.CLUSTER_DISTANCE_MAX
-                        else distance
-                    )
+        user = request.user
 
-                    count_query = """
-                    SELECT count(*) FROM geojson_geometries
-                    WHERE
-                    ST_Intersects(geom, TileBBox(%s, %s, %s, 3857))
-                    AND
-                    nodeid = %s and resourceinstanceid not in %s
-                    """
-
-                    # get the count of matching geometries
-                    cursor.execute(count_query, [zoom, x, y, nodeid, resource_ids])
-                    search_geom_count = cursor.fetchone()[0]
-
-                    if search_geom_count >= min_points:
-                        cursor.execute(
-                            """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
-                            AS (
-                                SELECT m.*,
-                                ST_ClusterDBSCAN(geom, eps := %s, minpoints := %s) over () AS cid
-                                FROM (
-                                    SELECT tileid,
-                                        resourceinstanceid,
-                                        nodeid,
-                                        geom
-                                    FROM geojson_geometries
-                                    WHERE 
-                                    ST_Intersects(geom, TileBBox(%s, %s, %s, 3857))
-                                    AND
-                                    nodeid = %s and resourceinstanceid not in %s
-                                ) m
-                            )
-                            SELECT ST_AsMVT(
-                                tile,
-                                %s,
-                                4096,
-                                'geom',
-                                'id'
-                            ) FROM (
-                                SELECT resourceinstanceid::text,
-                                    row_number() over () as id,
-                                    1 as total,
-                                    ST_AsMVTGeom(
-                                        geom,
-                                        TileBBox(%s, %s, %s, 3857)
-                                    ) AS geom,
-                                    '' AS extent
-                                FROM clusters
-                                WHERE cid is NULL
-                                UNION
-                                SELECT NULL as resourceinstanceid,
-                                    row_number() over () as id,
-                                    count(*) as total,
-                                    ST_AsMVTGeom(
-                                        ST_Centroid(
-                                            ST_Collect(geom)
-                                        ),
-                                        TileBBox(%s, %s, %s, 3857)
-                                    ) AS geom,
-                                    ST_AsGeoJSON(
-                                        ST_Extent(geom)
-                                    ) AS extent
-                                FROM clusters
-                                WHERE cid IS NOT NULL
-                                GROUP BY cid
-                            ) as tile;""",
-                            [
-                                distance,
-                                min_points,
-                                zoom,
-                                x,
-                                y,
-                                nodeid,
-                                resource_ids,
-                                nodeid,
-                                zoom,
-                                x,
-                                y,
-                                zoom,
-                                x,
-                                y,
-                            ],
-                        )
-                    elif search_geom_count:
-                        cursor.execute(
-                            """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
-                                id,
-                                resourceinstanceid,
-                                nodeid,
-                                ST_AsMVTGeom(
-                                    geom,
-                                    TileBBox(%s, %s, %s, 3857)
-                                ) AS geom,
-                                1 AS total
-                            FROM geojson_geometries
-                            WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
-                            [nodeid, zoom, x, y, nodeid, resource_ids],
-                        )
-                    else:
-                        tile = ""
-                else:
-                    cursor.execute(
-                        """SELECT ST_AsMVT(tile, %s, 4096, 'geom', 'id') FROM (SELECT tileid,
-                            id,
-                            resourceinstanceid,
-                            nodeid,
-                            ST_AsMVTGeom(
-                                geom,
-                                TileBBox(%s, %s, %s, 3857)
-                            ) AS geom,
-                            1 AS total
-                        FROM geojson_geometries
-                        WHERE nodeid = %s and resourceinstanceid not in %s) AS tile;""",
-                        [nodeid, zoom, x, y, nodeid, resource_ids],
-                    )
-                tile = bytes(cursor.fetchone()[0]) if tile is None else tile
-                cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
-        if not len(tile):
+        tile = MVTTiler().createTile(nodeid, viewable_nodegroups, user, zoom, x, y)
+        if not tile or not len(tile):
             raise Http404()
         return HttpResponse(tile, content_type="application/x-protobuf")
-
-    def create_mvt_cache_key(node, zoom, x, y, user):
-        return f"mvt_{str(node.nodeid)}_{zoom}_{x}_{y}_{user.id}"
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -1708,7 +1562,7 @@ class Tile(APIBase):
         permitted_nodegroups = get_nodegroups_by_perm(
             request.user, "models.read_nodegroup"
         )
-        if str(tile.nodegroup_id) in permitted_nodegroups:
+        if tile.nodegroup_id in permitted_nodegroups:
             return JSONResponse(tile, status=200)
         else:
             return JSONResponse(_("Tile not found."), status=404)
@@ -1803,7 +1657,7 @@ class Node(APIBase):
 
         # filter nodes from attribute query based on user permissions
         permitted_nodes = [
-            node for node in nodes if str(node["nodegroup_id"]) in permitted_nodegroups
+            node for node in nodes if node["nodegroup_id"] in permitted_nodegroups
         ]
         for node in permitted_nodes:
             try:
@@ -1847,8 +1701,7 @@ class NodeValue(APIBase):
             return JSONResponse(e, status=404)
 
         # check if user has permissions to write to node
-        user_has_perms = request.user.has_perm("write_nodegroup", node)
-
+        user_has_perms = request.user.has_perm("write_nodegroup", node.nodegroup)
         if user_has_perms:
             # get datatype of node
             try:
@@ -2104,3 +1957,266 @@ class GetNodegroupTree(APIBase):
             ]
 
         return JSONResponse({"path": permitted_result})
+
+
+class SpatialView(APIBase):
+    """ """
+
+    def get(self, request, identifier=None):
+        """
+        Returns a permitted spatial view given an id
+        otherwise returns a list of permitted spatial views
+        """
+        spatialview_id = None
+
+        # ensure specific spatial view exists before proceeding
+        if identifier:
+            spatialview_id = identifier
+            if not models.SpatialView.objects.filter(pk=identifier).exists():
+                return JSONErrorResponse(
+                    _("No Spatial View Exists with this id"), status=404
+                )
+
+        permitted_nodegroupids = get_nodegroups_by_perm(
+            request.user, "models.read_nodegroup"
+        )
+
+        permitted_spatialviews = models.SpatialView.objects.filter(
+            geometrynode__nodegroup_id__in=permitted_nodegroupids
+        )
+
+        if identifier:
+            permitted_spatialviews = permitted_spatialviews.filter(pk=spatialview_id)
+            if not len(permitted_spatialviews):
+                return JSONErrorResponse(
+                    _("Request Failed"), _("Permission Denied"), status=403
+                )
+
+        response_data = [
+            spatialview.to_json() for spatialview in permitted_spatialviews
+        ]
+
+        # when using identifier, return a single object instead of a list
+        if len(response_data) == 1 and identifier:
+            response_data = response_data[0]
+
+        return JSONResponse(response_data)
+
+    def transform_json_data_for_spatialview(self, json_data):
+        """
+        Transforms the JSON data object to be used in the spatialview model
+        """
+
+        json_data["geometrynode_id"] = json_data.pop("geometrynodeid")
+        json_data["language_id"] = json_data.pop("language")
+
+        return json_data
+
+    def create_spatialview_from_json_data(self, json_data):
+        """
+        Returns a SpatialView object from the JSON data. Should only be used if the JSON data has been validated.
+        """
+
+        json_data = self.transform_json_data_for_spatialview(json_data)
+
+        try:
+            spatialview = models.SpatialView.objects.get(pk=json_data["spatialviewid"])
+        except KeyError:
+            # if no spatialviewid is provided then is from POST so create a new spatialview object
+            spatialview = models.SpatialView(**json_data)
+            return spatialview
+        except ObjectDoesNotExist:
+            return JSONErrorResponse(
+                _("Spatialview not found"),
+                _("No Spatialview exists for the provided spatialviewid"),
+                status=404,
+            )
+
+        # update the spatialview object with the new data
+        for key, value in json_data.items():
+            setattr(spatialview, key, value)
+
+        return spatialview
+
+    def validate_json_data_content(
+        self, json_data, spatialviewid_identifier=None, is_post=False
+    ):
+        """
+        Validates the JSON data passed in the request body where not handled by model validation.
+
+        returns a JSONErrorResponse if validation fails or SpatialView if validation passes
+        """
+
+        if is_post and "spatialviewid" in json_data.keys():
+            return JSONErrorResponse(
+                _("Incorrect Spatialview json data"),
+                _(
+                    "POST REST request should not have a spatialviewid provided in the JSON data."
+                ),
+                status=400,
+            )
+
+        # Check if spatialviewid_identifier matches the spatialviewid in the json_data
+        if spatialviewid_identifier:
+            if "spatialviewid" in json_data:
+                if spatialviewid_identifier != json_data["spatialviewid"]:
+                    return JSONErrorResponse(
+                        _("Incorrect Spatialview json data"),
+                        _(
+                            "Spatialviewid in the URL does not match the spatialviewid in the JSON data."
+                        ),
+                        status=400,
+                    )
+            else:
+                return JSONErrorResponse(
+                    _("Incorrect Spatialview json data"),
+                    _("No spatialviewid provided in the JSON data."),
+                    status=400,
+                )
+
+        # Check if geometrynodeid exists in the database before transforming the json data
+        try:
+            if not models.Node.objects.filter(pk=json_data["geometrynodeid"]).exists():
+                return JSONErrorResponse(
+                    _("Incorrect Spatialview json data"),
+                    _("No geometrynode exists with the provided geometrynodeid."),
+                    status=400,
+                )
+
+            # Check if language exists in the database before transforming the json data
+            if not models.Language.objects.filter(code=json_data["language"]).exists():
+                return JSONErrorResponse(
+                    _("Incorrect Spatialview json data"),
+                    _("No language exists with the provided language code."),
+                    status=400,
+                )
+        except KeyError:
+            return JSONErrorResponse(
+                _("Incorrect Spatialview json data"),
+                _("The JSON data provided is missing required fields."),
+                status=400,
+            )
+
+        return self.create_spatialview_from_json_data(json_data)
+
+    @method_decorator(group_required("Application Administrator", raise_exception=True))
+    def post(self, request, identifier=None):
+
+        # if identifier is not None then the user is trying to update a spatialview so an error should be returned with a message
+        if identifier:
+            return JSONErrorResponse(
+                _("Spatialview creation failed"),
+                _("POST request should not have a spatialviewid provided in the URL"),
+                status=400,
+            )
+
+        try:
+            json_data = JSONDeserializer().deserialize(request.body)
+        except ValueError:
+            return JSONErrorResponse(
+                _("Invalid JSON data"),
+                _("The Spatialview API was sent invalid JSON"),
+                status=400,
+            )
+
+        if json_data is not None:
+
+            validate_json_data_content_result = self.validate_json_data_content(
+                json_data, is_post=True
+            )
+            if isinstance(validate_json_data_content_result, JSONErrorResponse):
+                return validate_json_data_content_result
+
+            spatialview = validate_json_data_content_result
+
+            try:
+                spatialview.full_clean()
+                spatialview.save()
+            except ValidationError as e:
+                return JSONErrorResponse(
+                    _("Validation Error when creating Spatialview"),
+                    e.messages,
+                    status=400,
+                )
+
+            return JSONResponse(spatialview.to_json(), status=201)
+        return JSONErrorResponse(_("No json request payload"), status=400)
+
+    @method_decorator(group_required("Application Administrator", raise_exception=True))
+    def put(self, request, identifier=None):
+
+        if not identifier:
+            return JSONErrorResponse(
+                _("Spatialview update failed"),
+                _(
+                    "PUT REST request requires a spatialviewid to be provided in the URL"
+                ),
+                status=400,
+            )
+
+        try:
+            json_data = JSONDeserializer().deserialize(request.body)
+        except ValueError:
+            return JSONErrorResponse(
+                _("Invalid JSON data"),
+                _("The Spatialview API was sent invalid JSON"),
+                status=400,
+            )
+
+        if json_data is not None:
+
+            validate_json_data_content_result = self.validate_json_data_content(
+                json_data, identifier
+            )
+            if isinstance(validate_json_data_content_result, JSONErrorResponse):
+                return validate_json_data_content_result
+
+            spatialview = validate_json_data_content_result
+
+            try:
+                spatialview.full_clean()
+                spatialview.save()
+            except ValidationError as e:
+                return JSONErrorResponse(
+                    _("Validation Error when updating Spatialview"),
+                    e.messages,
+                    status=400,
+                )
+
+            return JSONResponse(spatialview.to_json(), status=200)
+        return JSONErrorResponse(
+            _("Spatialview update failed"), _("No json request payload"), status=400
+        )
+
+    @method_decorator(group_required("Application Administrator", raise_exception=True))
+    def delete(self, request, identifier=None):
+        if identifier:
+            spatialview = None
+            try:
+                spatialview = models.SpatialView.objects.get(pk=identifier)
+            except ObjectDoesNotExist:
+                return JSONErrorResponse(
+                    _("Spatialview delete failed"),
+                    _("Spatialview does not exist"),
+                    status=404,
+                )
+
+            try:
+                spatialview.delete()
+            except Exception as e:
+                logger.error(e)
+                return JSONErrorResponse(
+                    _("Spatialview delete failed"),
+                    _("An error occurred when trying to delete the spatialview"),
+                    status=500,
+                )
+
+        else:
+            return JSONErrorResponse(
+                _("Spatialview delete failed"),
+                _(
+                    "DELETE REST request requires a spatialviewid to be provided in the URL"
+                ),
+                status=400,
+            )
+        return JSONResponse(status=204)

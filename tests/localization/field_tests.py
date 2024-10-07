@@ -19,8 +19,8 @@ from django.db import connection
 
 class Customi18nTextFieldTests(ArchesTestCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpTestData(cls):
+        super().setUpTestData()
 
         sql = """
         CREATE TABLE public._localization_test_model
@@ -44,13 +44,13 @@ class Customi18nTextFieldTests(ArchesTestCase):
             OWNER to postgres;
         """
 
-        cursor = connection.cursor()
-        cursor.execute(sql)
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
 
     @classmethod
     def tearDownClass(cls):
-        cursor = connection.cursor()
-        cursor.execute("DROP TABLE public._localization_test_model")
+        with connection.cursor() as cursor:
+            cursor.execute("DROP TABLE public._localization_test_model")
         super().tearDownClass()
 
     class LocalizationTestModel(models.Model):
@@ -231,8 +231,8 @@ class Customi18nTextFieldTests(ArchesTestCase):
 
 class Customi18nJSONFieldTests(ArchesTestCase):
     @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUpTestData(cls):
+        super().setUpTestData()
 
         sql = """
         CREATE TABLE public._localization_test_json_model
@@ -246,13 +246,13 @@ class Customi18nJSONFieldTests(ArchesTestCase):
             OWNER to postgres;
         """
 
-        cursor = connection.cursor()
-        cursor.execute(sql)
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
 
     @classmethod
     def tearDownClass(cls):
-        cursor = connection.cursor()
-        cursor.execute("DROP TABLE public._localization_test_json_model")
+        with connection.cursor() as cursor:
+            cursor.execute("DROP TABLE public._localization_test_json_model")
         super().tearDownClass()
 
     class LocalizationTestJsonModel(models.Model):

@@ -7,6 +7,7 @@ import uuid
 import sys
 import urllib.request, urllib.parse, urllib.error
 import os
+import warnings
 import logging
 from arches.management.commands import utils
 from arches.app.utils.i18n import LanguageSynchronizer
@@ -335,7 +336,11 @@ class Command(BaseCommand):
             self.setup(package_name, es_install_location=options["dest_dir"])
 
         if options["operation"] == "install":
-            self.install(package_name)
+            warnings.warn(
+                "The install operation does nothing since Arches 7.6. "
+                "In Arches 8.0, calling this operation will raise an exception.",
+                UserWarning,
+            )
 
         if options["operation"] == "setup_indexes":
             self.setup_indexes()
@@ -657,6 +662,11 @@ class Command(BaseCommand):
                 print(e)
                 print("Could not save system settings")
             self.export_package_settings(dest_dir, "true")
+
+    @staticmethod
+    def update_resource_geojson_geometries():
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM refresh_geojson_geometries();")
 
     def load_package(
         self,
@@ -1172,10 +1182,6 @@ class Command(BaseCommand):
         def load_etl_modules(package_dir):
             load_extensions(package_dir, "etl_modules", "etl_module")
 
-        def update_resource_geojson_geometries():
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT * FROM refresh_geojson_geometries();")
-
         def load_apps(package_dir):
             package_apps = glob.glob(os.path.join(package_dir, "apps", "*"))
             for app in package_apps:
@@ -1294,7 +1300,7 @@ class Command(BaseCommand):
             for css_file in css_files:
                 shutil.copy(css_file, css_dest)
         print("Refreshing the resource view")
-        update_resource_geojson_geometries()
+        self.update_resource_geojson_geometries()
         print("loading post sql")
         load_sql(package_location, "post_sql")
         print("loading templates")
@@ -1318,15 +1324,6 @@ class Command(BaseCommand):
         """
 
         self.setup_db(package_name)
-
-    def install(self, package_name):
-        """
-        Runs the setup.py file found in the package root
-
-        """
-
-        install = import_string("%s.setup.install" % package_name)
-        install()
 
     def setup_db(self, package_name):
         """

@@ -835,18 +835,24 @@ class PermissionDataView(View):
             identity = Group.objects.get(pk=identityId)
             for nodegroup_id in nodegroup_ids:
                 nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
+                group_perm_strings = [
+                    perm.codename for perm in get_group_perms(identity, nodegroup)
+                ]
                 perms = [
                     {"codename": codename, "name": self.get_perm_name(codename).name}
-                    for codename in get_group_perms(identity, nodegroup)
+                    for codename in group_perm_strings
                 ]
                 ret.append({"perms": perms, "nodegroup_id": nodegroup_id})
         else:
             identity = User.objects.get(pk=identityId)
             for nodegroup_id in nodegroup_ids:
                 nodegroup = models.NodeGroup.objects.get(pk=nodegroup_id)
+                user_perm_strings = [
+                    perm.codename for perm in get_user_perms(identity, nodegroup)
+                ]
                 perms = [
                     {"codename": codename, "name": self.get_perm_name(codename).name}
-                    for codename in get_user_perms(identity, nodegroup)
+                    for codename in user_perm_strings
                 ]
 
                 # only get the group perms ("defaults") if no user defined object settings have been saved

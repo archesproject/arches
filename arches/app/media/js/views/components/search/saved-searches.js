@@ -5,9 +5,10 @@ define([
     'templates/views/components/search/saved-searches.htm',
     'bindings/smartresize',
 ], function($, ko, arches, savedSearchesTemplate) {
-    var componentName = 'saved-searches';
+    const componentName = 'saved-searches';
     const viewModel = function(params) {
         var self = this;
+        self.searchFilterVms = params.searchFilterVms;
 
          
         self.urls = arches.urls;
@@ -18,7 +19,7 @@ define([
             url: arches.urls.api_search_component_data + componentName,
             context: this
         }).done(function(response) {
-            response.saved_searches.forEach(function(search) {
+            response[componentName].forEach(function(search) {
                 let searchImageUrl = arches.urls.url_subpath + ((search.IMAGE && search.IMAGE.length > 0) ? search.IMAGE[0].url : '');
                 searchImageUrl = searchImageUrl.replace('//', '/');
                 self.items.push({
@@ -28,6 +29,7 @@ define([
                     searchUrl: search.SEARCH_URL[arches.activeLanguage].value
                 });
             });
+            self.searchFilterVms[componentName](self);
         });
 
         self.options = {

@@ -428,6 +428,13 @@ class BaseDataType(object):
 
         return False
 
+    def get_nodevalues(self, nodevalue):
+        if nodevalue is None:
+            return []
+        elif not isinstance(nodevalue, (list, tuple)):
+            return [nodevalue]
+        return nodevalue
+
     def ignore_keys(self):
         """
         Each entry returned in the array is a string, consisting of the combination of two full URIs
@@ -515,5 +522,13 @@ class BaseDataType(object):
     def pre_structure_tile_data(self, tile, nodeid, **kwargs):
         """
         Adds properties to a tile necessary for some clients, but not essential to the tile
+        """
+        pass
+
+    def validate_node(self, node):
+        """
+        Confirms a node is properly configured to collect data.
+        If improperly configured, this method should raise
+        a GraphValidationError
         """
         pass

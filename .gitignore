@@ -4,6 +4,7 @@ env
 tests/elasticsearch
 tests/logs
 tests/fixtures/testing_prj/testing_prj/media/packages/*
+tests/fixtures/data/archestemp
 arches/install/elasticsearch-*.zip
 build/
 arches.egg*
@@ -42,3 +43,5 @@ pip-wheel-metadata
 webpack-stats.json
 .DS_STORE
 CACHE
+.tsconfig-paths.json
+.frontend-configuration-settings.json

@@ -1,5 +1,6 @@
 from celery import app, Celery
 from datetime import datetime
+from http import HTTPStatus
 import logging
 from django.db import connection
 from django.core.paginator import Paginator
@@ -7,6 +8,7 @@ from django.forms.models import model_to_dict
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.generic import View
+from arches.app.etl_modules.base_import_module import FileValidationError
 from arches.app.models.models import ETLModule, LoadEvent, LoadStaging
 from arches.app.utils.pagination import get_paginator
 from arches.app.utils.decorators import group_required
@@ -16,7 +18,9 @@ import arches.app.utils.task_management as task_management
 logger = logging.getLogger(__name__)
 
 
-@method_decorator(group_required("Resource Editor"), name="dispatch")
+@method_decorator(
+    group_required("Resource Editor", raise_exception=True), name="dispatch"
+)
 class ETLManagerView(View):
     """
     to get the ETL modules from db
@@ -160,7 +164,7 @@ class ETLManagerView(View):
                 "events": [
                     {
                         **model_to_dict(event),
-                        "user": {**model_to_dict(event.user)},
+                        "user_displayname": self.format_username(event.user),
                         "etl_module": {**model_to_dict(event.etl_module)},
                     }
                     for event in events
@@ -195,6 +199,14 @@ class ETLManagerView(View):
             return JSONResponse(self.error_report(loadid)["data"], indent=2)
         return JSONResponse(response)
 
+    @staticmethod
+    def format_username(user):
+        parts = [part for part in (user.first_name, user.last_name) if part]
+        if parts:
+            return " ".join(parts)
+        else:
+            return user.username
+
     def post(self, request):
         """
         instantiate the proper module with proper action and pass the request
@@ -213,4 +225,6 @@ class ETLManagerView(View):
         elif response["success"] and "raw" in response:
             return response["raw"]
         else:
+            if (data := response.get("data")) and isinstance(data, FileValidationError):
+                return JSONErrorResponse(content=response, status=data.code)
             return JSONErrorResponse(content=response)

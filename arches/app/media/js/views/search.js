@@ -3,13 +3,11 @@ define([
     'underscore',
     'knockout',
     'knockout-mapping',
-    'arches',
-    'viewmodels/alert',
     'search-components',
     'views/base-manager',
     'utils/aria',
     'datatype-config-components'
-], function($, _, ko, koMapping, arches, AlertViewModel, SearchComponents, BaseManagerView, ariaUtils) {
+], function($, _, ko, koMapping, SearchComponents, BaseManagerView, ariaUtils) {
     // a method to track the old and new values of a subscribable
     // from https://github.com/knockout/knockout/issues/914
     //
@@ -45,71 +43,49 @@ define([
     };
 
     var CommonSearchViewModel = function() {
-        this.filters = {};
-        this.filtersList = _.sortBy(Object.values(SearchComponents), function(filter) {
-            return filter.sortorder;
-        }, this);
-        Object.values(SearchComponents).forEach(function(component) {
-            this.filters[component.componentname] = ko.observable(null);
-        }, this);
-        var firstEnabledFilter = _.find(this.filtersList, function(filter) {
-            return filter.type === 'filter' && filter.enabled === true;
-        }, this);
-        this.selectedTab = ko.observable(firstEnabledFilter.componentname);
-        this.selectedPopup = ko.observable('');
-        this.resultsExpanded = ko.observable(true);
-        this.query = ko.observable(getQueryObject());
-        this.clearQuery = function(){
-            Object.values(this.filters).forEach(function(value){
-                if (value()){
-                    if (value().clear){
-                        value().clear();
-                    }
-                }
-            }, this);
-            this.query({"paging-filter": "1", tiles: "true"});
+        this.searchFilterVms = {};
+        this.searchFilterConfigs = Object.values(SearchComponents);
+        this.defaultSearchViewConfig = this.searchFilterConfigs.find(filter => filter.type == "search-view");
+        this.searchViewComponentName = ko.observable(false);
+        this.getFilter = function(filterName, unwrap=true) {
+            if (unwrap)
+                return ko.unwrap(this.searchFilterVms[filterName]);
+            return this.searchFilterVms[filterName];
         };
-        this.filterApplied = ko.pureComputed(function(){
-            var self = this;
-            var filterNames = Object.keys(this.filters);
-            return filterNames.some(function(filterName){
-                if (ko.unwrap(self.filters[filterName]) && filterName !== 'paging-filter') {
-                    return !!ko.unwrap(self.filters[filterName]).query()[filterName];
-                } else {
-                    return false;
-                }
+        this.getFilterByType = function(type, unwrap=true) {
+            const filter = this.searchFilterConfigs.find(component => component.type == type);
+            if (!filter)
+                return null;
+            if (unwrap)
+                return ko.unwrap(this.searchFilterVms[filter.componentname]);
+            return this.searchFilterVms[filter.componentname];
+        };
+        Object.values(SearchComponents).forEach(function(component) {
+            this.searchFilterVms[component.componentname] = ko.observable(null);
+            // uncomment below to test for any filters that don't load as expected
+            // this.searchFilterVms[component.componentname].subscribe(vm => {console.log(component.componentname+" loaded");})
+        }, this);
+        this.searchViewFiltersLoaded = ko.computed(function() {
+            let res = true;
+            Object.entries(this.searchFilterVms).forEach(function([componentName, filter]) {
+                res = res && ko.unwrap(filter);
             });
+            return res;
+        }, this);
+        this.query = ko.observable(getQueryObject());
+        if (this.query()["search-view"] !== undefined) {
+            this.searchViewComponentName(this.query()["search-view"]);
+        } else {
+            this.searchViewComponentName(this.defaultSearchViewConfig.componentname);
+        }
+        this.queryString = ko.computed(function() {
+            return JSON.stringify(this.query());
         }, this);
         this.mouseoverInstanceId = ko.observable();
         this.mapLinkData = ko.observable(null);
-        this.userIsReviewer = ko.observable(false);
+        this.userIsReviewer = ko.observable(null);
         this.userid = ko.observable(null);
         this.searchResults = {'timestamp': ko.observable()};
-        this.selectPopup = function(componentname) {
-            if(this.selectedPopup() !== '' && componentname === this.selectedPopup()) {
-                this.selectedPopup('');
-            } else {
-                this.selectedPopup(componentname);
-            }
-        };
-        this.isResourceRelatable = function(graphId) {
-            var relatable = false;
-            if (this.graph) {
-                relatable = _.contains(this.graph.relatable_resource_model_ids, graphId);
-            }
-            return relatable;
-        };
-        this.toggleRelationshipCandidacy = function() {
-            var self = this;
-            return function(resourceinstanceid){
-                var candidate = _.contains(self.relationshipCandidates(), resourceinstanceid);
-                if (candidate) {
-                    self.relationshipCandidates.remove(resourceinstanceid);
-                } else {
-                    self.relationshipCandidates.push(resourceinstanceid);
-                }
-            };
-        };
     };
     
     var SearchView = BaseManagerView.extend({
@@ -119,66 +95,18 @@ define([
             this.viewModel.hits = ko.observable();
             _.extend(this, this.viewModel.sharedStateObject);
             this.viewModel.sharedStateObject.total = this.viewModel.total;
+            this.viewModel.sharedStateObject.hits = this.viewModel.hits;
+            this.viewModel.sharedStateObject.alert = this.viewModel.alert;
             this.viewModel.sharedStateObject.loading = this.viewModel.loading;
             this.viewModel.sharedStateObject.resources = this.viewModel.resources;
             this.viewModel.sharedStateObject.userCanEditResources = this.viewModel.userCanEditResources;
             this.viewModel.sharedStateObject.userCanReadResources = this.viewModel.userCanReadResources;
             this.shiftFocus = ariaUtils.shiftFocus;
-            this.queryString = ko.computed(function() {
-                return JSON.stringify(this.query());
-            }, this);
-            
-            this.queryString.subscribe(function() {
-                this.doQuery();
-            }, this);
-
             this.viewModel.loading(true);
 
             BaseManagerView.prototype.initialize.call(this, options);
+            this.viewModel.sharedStateObject.menuActive = this.viewModel.menuActive;
         },
-
-        doQuery: function() {
-            var queryString = JSON.parse(this.queryString());
-
-            if (this.updateRequest) {
-                this.updateRequest.abort();
-            }
-
-            this.updateRequest = $.ajax({
-                type: "GET",
-                url: arches.urls.search_results,
-                data: queryString,
-                context: this,
-                success: function(response) {
-                    _.each(this.viewModel.sharedStateObject.searchResults, function(value, key, results) {
-                        if (key !== 'timestamp') {
-                            delete this.viewModel.sharedStateObject.searchResults[key];
-                        }
-                    }, this);
-                    _.each(response, function(value, key, response) {
-                        if (key !== 'timestamp') {
-                            this.viewModel.sharedStateObject.searchResults[key] = value;
-                        }
-                    }, this);
-                    this.viewModel.sharedStateObject.searchResults.timestamp(response.timestamp);
-                    this.viewModel.sharedStateObject.userIsReviewer(response.reviewer);
-                    this.viewModel.sharedStateObject.userid(response.userid);
-                    this.viewModel.total(response.total_results);
-                    this.viewModel.hits(response.results.hits.hits.length);
-                    this.viewModel.alert(false);
-                },
-                error: function(response, status, error) {
-                    const alert = new AlertViewModel('ep-alert-red', arches.translations.requestFailed.title, response.responseJSON?.message);
-                    if(this.updateRequest.statusText !== 'abort'){
-                        this.viewModel.alert(alert);
-                    }
-                },
-                complete: function(request, status) {
-                    this.updateRequest = undefined;
-                    window.history.pushState({}, '', '?' + $.param(queryString).split('+').join('%20'));
-                }
-            });
-        }
     });
 
     return new SearchView();

@@ -274,6 +274,18 @@ define([
                 }
             }, this);
 
+            this.filterByFeatureGeom = function(feature) {
+                if (feature.geometry.type == 'Point' && this.buffer() == 0) { this.buffer(25); }
+                self.searchGeometries.removeAll();
+                this.draw.deleteAll();
+                this.draw.set({
+                    "type": "FeatureCollection",
+                    "features": [feature]
+                });
+                self.searchGeometries([feature]);
+                self.updateFilter();
+            };
+
             var updateSearchResultPointLayer = function() {
                 var pointSource = self.map().getSource('search-results-points');
                 var agg = ko.unwrap(self.searchAggregations);
@@ -337,7 +349,7 @@ define([
                 updateSearchResultPointLayer();
             };
 
-            this.filters[componentName](this);
+            this.searchFilterVms[componentName](this);
             this.map.subscribe(function(){
                 this.setupDraw();
                 this.restoreState();
@@ -514,8 +526,8 @@ define([
             var self = this;
             var queryObj = this.query();
             if (this.filter.feature_collection().features.length > 0) {
-                if (this.getFilter('term-filter').hasTag(this.type) === false) {
-                    this.getFilter('term-filter').addTag('Map Filter Enabled', this.name, this.filter.inverted);
+                if (this.getFilterByType('term-filter-type').hasTag(this.type) === false) {
+                    this.getFilterByType('term-filter-type').addTag('Map Filter Enabled', this.name, this.filter.inverted);
                 }
                 this.filter.feature_collection().features[0].properties['inverted'] = this.filter.inverted();
                 queryObj[componentName] = ko.toJSON(this.filter.feature_collection());
@@ -552,7 +564,7 @@ define([
             this.bufferUnit = ko.observable(bufferUnit).extend({ deferred: true });
             this.filter.inverted = ko.observable(inverted).extend({ deferred: true });
             if (hasSpatialFilter) {
-                this.getFilter('term-filter').addTag('Map Filter Enabled', this.name, this.filter.inverted);
+                this.getFilterByType('term-filter-type').addTag('Map Filter Enabled', this.name, this.filter.inverted);
             }
             this.updateResults();
             this.pageLoaded = true;
@@ -581,7 +593,7 @@ define([
                 "type": "FeatureCollection",
                 "features": []
             });
-            this.getFilter('term-filter').removeTag('Map Filter Enabled');
+            this.getFilterByType('term-filter-type').removeTag('Map Filter Enabled');
             this.draw.deleteAll();
             this.searchGeometries([]);
         },

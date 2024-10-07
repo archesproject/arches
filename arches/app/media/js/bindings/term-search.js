@@ -27,6 +27,13 @@ define([
                     searchbox.tags.push(option);
                 }); 
                 searchbox.trigger('change');
+                if (ko.unwrap(terms).length == 0 && searchbox.tags.length == 0){
+                    searchbox.empty();
+                }
+            });
+            terms.subscribe(function(terms) {
+                if (terms.length == 0 && searchbox.tags.length == 0)
+                    searchbox.empty();
             });
             var self = this;
             this.stripMarkup = function(m){
@@ -74,14 +81,14 @@ define([
                             context: '',
                             context_label: '',
                             id: params.term,
-                            text: params.term,
+                            text: arches.translations.containsTerm(params.term),
                             value: params.term
                         });
                         if(data.terms.length > 0){
-                            res.push({"text": "Terms", "children": data.terms});
+                            res.push({"text": arches.translations.termSearchTerm, "children": data.terms});
                         }
                         if(data.concepts.length > 0){
-                            res.push({"text": "Concepts", "children": data.concepts});
+                            res.push({"text": arches.translations.termSearchConcept, "children": data.concepts});
                         }
                         return {
                             results: res

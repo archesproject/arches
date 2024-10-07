@@ -4,6 +4,7 @@
 @import url(node_modules/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css);
 @import url(nifty.css);
 @import url(node_modules/font-awesome/css/font-awesome.min.css);
+@import url(node_modules/primeicons/primeicons.css);
 @import url(node_modules/ionicons/css/ionicons.min.css);
 @import url(node_modules/lt-themify-icons/themify-icons.css);
 @import url(node_modules/chosen-js/chosen.css);
@@ -58,6 +59,10 @@ img {
 /*.navbar-top-links:last-child>li {
     border-right: 1px solid rgba(0,0,0,0.07);
 }*/
+
+.cke_notification_warning {
+    display: none;
+}
 
 .btn:not(.disabled):not(:disabled).active {
     box-shadow: none;
@@ -2997,13 +3002,13 @@ span.icon-wrap.icon-circle.bg-gray-dark:hover {
     cursor: pointer;
 }
 
-.permissions-table-row:first-child {
+.permissions-table-row.disabled{
     background-color: #f8f8f8;
     color: #777;
     font-weight: 600;
 }
 
-.permissions-table-row:first-child:hover {
+.permissions-table-row.disabled:hover {
     cursor: default;
 }
 
@@ -9275,9 +9280,9 @@ a.search-query-link-captions:focus {
 }
 
 .search-control-container {
-    -ms-flex: 0 0 400px;
-    -webkit-flex: 0 0 400px;
-    flex: 1 0 400px;
+    -ms-flex: 1 1 400px;
+    -webkit-flex: 1 1 400px;
+    flex: 1 1 400px;
     margin-bottom: 0px;
     background-color: #fafafa;
     border-top: 1px solid #ddd;
@@ -10025,7 +10030,7 @@ table.table.dataTable {
 
 .search-type-btn {
     height: 50px;
-    padding: 0px;
+    padding: 0px 4px;
     font-size: 1.2rem;
     font-weight: 600;
     color: #888;
@@ -12139,9 +12144,6 @@ a.filter-tools:hover {
         // border: 1px solid rgb(221, 221, 221);
         overflow-y: auto;
         .relationships-list-item {
-            &:last-child{
-                border-bottom: 1px solid #e9e9e9;
-            }
             border-top: 1px solid #e9e9e9;
             border-left: 1px solid #e9e9e9;
             border-right: 1px solid #e9e9e9;
@@ -12174,6 +12176,9 @@ a.filter-tools:hover {
             }
             .relationships-list-item-name.element-hover {
                 color: darken($accent-color, 40%)
+            }
+            &:last-child{
+                border-bottom: 1px solid #e9e9e9;
             }
         }
         .relationships-list-item:nth-of-type(odd) {
@@ -12818,6 +12823,16 @@ section .etl-preview table {
 .etl-from-to {
     display: inline-block;
     width: 240px;
+}
+
+.csv-import-options {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.csv-import-options .toggle-container{
+    padding-bottom: 0px;    
 }
 
 .csv-mapping-table-container {

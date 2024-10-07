@@ -726,14 +726,17 @@ urlpatterns = [
         api.TransformEdtfForTile.as_view(),
         name="transform_edtf_for_tile",
     ),
+    re_path(
+        r"^api/spatialview/(?P<identifier>%s|())/?$" % uuid_regex,
+        api.SpatialView.as_view(),
+        name="spatialview_api",
+    ),
+    re_path("^api", api.API404.as_view(), name="api_404"),
 ]
 
 # This must be included in core to keep webpack happy, but cannot be appended when running a project.
 # See https://github.com/archesproject/arches/pull/10754
-if (
-    settings.APP_NAME == "Arches"
-    and settings.APP_NAME not in settings.ARCHES_APPLICATIONS
-):
+if settings.APP_NAME == "Arches":
     if settings.SHOW_LANGUAGE_SWITCH is True:
         urlpatterns = i18n_patterns(*urlpatterns)
 

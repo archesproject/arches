@@ -4,15 +4,15 @@ import os
 import uuid
 from tempfile import NamedTemporaryFile
 
-from django.http import HttpResponse
 from openpyxl import load_workbook
+from django.contrib.auth.models import User
 from django.utils.translation import gettext as _
 from django.core.files.storage import default_storage
 from django.db import connection
-
+from django.http import HttpRequest, HttpResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.decorators import load_data_async
-from arches.app.models.models import TileModel
+from arches.app.models.models import ETLModule, TileModel
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -24,15 +24,39 @@ from arches.app.etl_modules.base_import_module import (
 
 
 class BranchExcelImporter(BaseImportModule):
-    def __init__(self, request=None, loadid=None, temp_dir=None):
-        self.request = request if request else None
-        self.userid = request.user.id if request else None
+    def __init__(self, request=None, loadid=None, temp_dir=None, params=None):
+        self.loadid = request.POST.get("load_id") if request else loadid
+        self.userid = (
+            request.user.id
+            if request
+            else settings.DEFAULT_RESOURCE_IMPORT_USER["userid"]
+        )
+        self.mode = "cli" if not request and params else "ui"
+        try:
+            self.user = User.objects.get(pk=self.userid)
+        except User.DoesNotExist:
+            raise User.DoesNotExist(
+                _(
+                    "The userid {} does not exist. Probably DEFAULT_RESOURCE_IMPORT_USER is not configured correctly in settings.py.".format(
+                        self.userid
+                    )
+                )
+            )
+        if not request and params:
+            request = HttpRequest()
+            request.user = self.user
+            request.method = "POST"
+            for k, v in params.items():
+                request.POST.__setitem__(k, v)
+        self.request = request
         self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
         self.legacyid_lookup = {}
         self.temp_path = ""
-        self.loadid = loadid if loadid else None
         self.temp_dir = temp_dir if temp_dir else None
+        self.config = (
+            ETLModule.objects.get(pk=self.moduleid).config if self.moduleid else {}
+        )
 
     @load_data_async
     def run_load_task_async(self, request):
@@ -218,13 +242,13 @@ class BranchExcelImporter(BaseImportModule):
 
     def validate_uploaded_file(self, workbook):
         try:
-            graphid = workbook.get_sheet_by_name("metadata")["B1"].value
+            graphid = workbook["metadata"]["B1"].value
             uuid.UUID(graphid)
         except:
             raise FileValidationError()
 
     def get_graphid(self, workbook):
-        graphid = workbook.get_sheet_by_name("metadata")["B1"].value
+        graphid = workbook["metadata"]["B1"].value
         return graphid
 
     def stage_files(self, files, summary, cursor):

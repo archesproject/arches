@@ -2,6 +2,7 @@ import copy
 import uuid
 import json
 import decimal
+from arches.app.datatypes.core.util import get_value_from_jsonld
 from arches.app.utils.file_validator import FileValidator
 import filetype
 import base64
@@ -20,10 +21,9 @@ from django.db.models import fields
 from arches.app.const import ExtensionType
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
+from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.system_settings import settings
 from arches.app.models.fields.i18n import I18n_JSONField, I18n_String
-from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
@@ -51,10 +51,6 @@ from django.core.cache import cache
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, default_storage
-from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis.geos import GeometryCollection
-from django.contrib.gis.geos import fromstr
-from django.contrib.gis.geos import Polygon
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.db import connection, transaction
@@ -63,13 +59,15 @@ from django.utils.translation import get_language, gettext as _
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
 
-
 # One benefit of shifting to python3.x would be to use
 # importlib.util.LazyLoader to load rdflib (and other lesser
 # used but memory soaking libs)
 from rdflib import Namespace, URIRef, Literal, BNode
 from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+
+# do not delete, used by module importer
+from .core import *
 
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
@@ -457,104 +455,6 @@ class StringDataType(BaseDataType):
         tile_language_codes = set(tile.data[nodeid].keys())
         for code in all_language_codes - tile_language_codes:
             tile.data[nodeid][code] = {"value": "", "direction": direction_lookup[code]}
-
-
-class NonLocalizedStringDataType(BaseDataType):
-    def validate(
-        self,
-        value,
-        row_number=None,
-        source=None,
-        node=None,
-        nodeid=None,
-        strict=False,
-        **kwargs,
-    ):
-        errors = []
-        try:
-            if value is not None:
-                value.upper()
-        except:
-            message = _("This is not a string")
-            error_message = self.create_error_message(
-                value, source, row_number, message
-            )
-            errors.append(error_message)
-        return errors
-
-    def clean(self, tile, nodeid):
-        if tile.data[nodeid] in ["", "''"]:
-            tile.data[nodeid] = None
-
-    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        if nodevalue is not None:
-            val = {
-                "string": nodevalue,
-                "language": "",
-                "nodegroup_id": tile.nodegroup_id,
-                "provisional": provisional,
-            }
-            document["strings"].append(val)
-
-    def transform_export_values(self, value, *args, **kwargs):
-        if value is not None:
-            return value
-
-    def get_search_terms(self, nodevalue, nodeid=None):
-        terms = []
-
-        if nodevalue is not None:
-            if settings.WORDS_PER_SEARCH_TERM is None or (
-                len(nodevalue.split(" ")) < settings.WORDS_PER_SEARCH_TERM
-            ):
-                terms.append(SearchTerm(value=nodevalue, lang=""))
-        return terms
-
-    def append_search_filters(self, value, node, query, request):
-        try:
-            if value["op"] == "null" or value["op"] == "not_null":
-                self.append_null_search_filters(value, node, query, request)
-            elif value["val"] != "":
-                match_type = "phrase_prefix" if "~" in value["op"] else "phrase"
-                match_query = Match(
-                    field="tiles.data.%s" % (str(node.pk)),
-                    query=value["val"],
-                    type=match_type,
-                )
-                if "!" in value["op"]:
-                    query.must_not(match_query)
-                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
-                else:
-                    query.must(match_query)
-        except KeyError as e:
-            pass
-
-    def is_a_literal_in_rdf(self):
-        return True
-
-    def to_rdf(self, edge_info, edge):
-        # returns an in-memory graph object, containing the domain resource, its
-        # type and the string as a string literal
-        g = Graph()
-        if edge_info["range_tile_data"] is not None:
-            g.add((edge_info["d_uri"], RDF.type, URIRef(edge.domainnode.ontologyclass)))
-            g.add(
-                (
-                    edge_info["d_uri"],
-                    URIRef(edge.ontologyproperty),
-                    Literal(edge_info["range_tile_data"]),
-                )
-            )
-        return g
-
-    def from_rdf(self, json_ld_node):
-        # returns the string value only
-        # FIXME: Language?
-        value = get_value_from_jsonld(json_ld_node)
-        try:
-            return value[0]
-        except (AttributeError, KeyError) as e:
-            pass
 
 
 class NumberDataType(BaseDataType):
@@ -1156,734 +1056,6 @@ class EDTFDataType(BaseDataType):
         return mapping
 
 
-class GeojsonFeatureCollectionDataType(BaseDataType):
-    def __init__(self, model=None):
-        super(GeojsonFeatureCollectionDataType, self).__init__(model=model)
-        self.geo_utils = GeoUtils()
-
-    def validate(
-        self,
-        value,
-        row_number=None,
-        source=None,
-        node=None,
-        nodeid=None,
-        strict=False,
-        **kwargs,
-    ):
-        errors = []
-
-        def validate_geom_bbox(geom):
-            try:
-                bbox = Polygon(settings.DATA_VALIDATION_BBOX)
-
-                if bbox.contains(geom) == False:
-                    message = _(
-                        "Geometry does not fall within the bounding box of the selected coordinate system. \
-                         Adjust your coordinates or your settings.DATA_EXTENT_VALIDATION property."
-                    )
-                    title = _("Geometry Out Of Bounds")
-                    errors.append(
-                        {
-                            "type": "ERROR",
-                            "message": "datatype: {0} value: {1} {2} - {3}. {4}".format(
-                                self.datatype_model.datatype,
-                                value,
-                                source,
-                                message,
-                                "This data was not imported.",
-                            ),
-                            "title": title,
-                        }
-                    )
-            except Exception:
-                message = _("Not a properly formatted geometry")
-                title = _("Invalid Geometry Format")
-                errors.append(
-                    {
-                        "type": "ERROR",
-                        "message": "datatype: {0} value: {1} {2} - {3}. {4}.".format(
-                            self.datatype_model.datatype,
-                            value,
-                            source,
-                            message,
-                            "This data was not imported.",
-                        ),
-                        "title": title,
-                    }
-                )
-
-        if value is not None:
-            for feature in value["features"]:
-                try:
-                    geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"]))
-                    if geom.valid:
-                        validate_geom_bbox(geom)
-                    else:
-                        raise Exception
-                except Exception:
-                    message = _("Unable to serialize some geometry features.")
-                    title = _("Unable to Serialize Geometry")
-                    error_message = self.create_error_message(
-                        value, source, row_number, message, title
-                    )
-                    errors.append(error_message)
-        return errors
-
-    def to_json(self, tile, node):
-        data = self.get_tile_data(tile)
-        if data:
-            return self.compile_json(tile, node, geojson=data.get(str(node.nodeid)))
-
-    def clean(self, tile, nodeid):
-        if tile.data[nodeid] is not None and "features" in tile.data[nodeid]:
-            if len(tile.data[nodeid]["features"]) == 0:
-                tile.data[nodeid] = None
-
-    def transform_value_for_tile(self, value, **kwargs):
-        if "format" in kwargs and kwargs["format"] == "esrijson":
-            arches_geojson = self.geo_utils.arcgisjson_to_geojson(value)
-        else:
-            try:
-                geojson = json.loads(value)
-                if geojson["type"] == "FeatureCollection":
-                    for feature in geojson["features"]:
-                        feature["id"] = str(uuid.uuid4())
-                    arches_geojson = geojson
-                else:
-                    raise TypeError
-            except (json.JSONDecodeError, KeyError, TypeError):
-                try:
-                    geometry = GEOSGeometry(value, srid=4326)
-                    if geometry.geom_type == "GeometryCollection":
-                        arches_geojson = self.geo_utils.convert_geos_geom_collection_to_feature_collection(
-                            geometry
-                        )
-                    else:
-                        arches_geojson = {}
-                        arches_geojson["type"] = "FeatureCollection"
-                        arches_geojson["features"] = []
-                        arches_json_geometry = {}
-                        arches_json_geometry["geometry"] = (
-                            JSONDeserializer().deserialize(geometry.json)
-                        )
-                        arches_json_geometry["type"] = "Feature"
-                        arches_json_geometry["id"] = str(uuid.uuid4())
-                        arches_json_geometry["properties"] = {}
-                        arches_geojson["features"].append(arches_json_geometry)
-                except ValueError:
-                    if value in ("", None, "None"):
-                        return None
-
-        return arches_geojson
-
-    def transform_export_values(self, value, *args, **kwargs):
-        wkt_geoms = []
-        for feature in value["features"]:
-            wkt_geoms.append(GEOSGeometry(json.dumps(feature["geometry"])))
-        return GeometryCollection(wkt_geoms)
-
-    def update(self, tile, data, nodeid=None, action=None):
-        new_features_array = tile.data[nodeid]["features"] + data["features"]
-        tile.data[nodeid]["features"] = new_features_array
-        updated_data = tile.data[nodeid]
-        return updated_data
-
-    def find_num(self, current_item):
-        if len(current_item) and isinstance(current_item[0], float):
-            return decimal.Decimal(str(current_item[0])).as_tuple().exponent
-        else:
-            return self.find_num(current_item[0])
-
-    def _feature_length_in_bytes(self, feature):
-        return len(str(feature).encode("UTF-8"))
-
-    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        max_length = (
-            32000  # this was 32766, but do we need space for extra part of JSON?
-        )
-
-        features = []
-        nodevalue["properties"] = {}
-        if self._feature_length_in_bytes(nodevalue) < max_length:
-            features.append(nodevalue)
-        else:
-            for feature in nodevalue["features"]:
-                new_feature = {"type": "FeatureCollection", "features": [feature]}
-                if self._feature_length_in_bytes(new_feature) < max_length:
-                    features.append(new_feature)
-                else:
-                    chunks = self.split_geom(feature, max_length)
-                    features = features + chunks
-
-        for feature in features:
-            document["geometries"].append(
-                {
-                    "geom": feature,
-                    "nodegroup_id": tile.nodegroup_id,
-                    "provisional": provisional,
-                    "tileid": tile.pk,
-                }
-            )
-        bounds = self.get_bounds_from_value(nodevalue)
-        if bounds is not None:
-            minx, miny, maxx, maxy = bounds
-            centerx = maxx - (maxx - minx) / 2
-            centery = maxy - (maxy - miny) / 2
-            document["points"].append(
-                {
-                    "point": {"lon": centerx, "lat": centery},
-                    "nodegroup_id": tile.nodegroup_id,
-                    "provisional": provisional,
-                }
-            )
-
-    def split_geom(self, feature, max_feature_in_bytes=32766):
-        geom = feature["geometry"]
-        coordinates = (
-            geom["coordinates"]
-            if geom["type"] == "LineString"
-            else geom["coordinates"][0]
-        )
-        num_points = len(coordinates)
-        num_chunks = self._feature_length_in_bytes(feature) / max_feature_in_bytes
-        max_points = int(num_points / num_chunks)
-
-        with connection.cursor() as cur:
-            cur.execute(
-                "select st_asgeojson(st_subdivide(ST_GeomFromGeoJSON(%s::jsonb), %s))",
-                [JSONSerializer().serialize(feature["geometry"]), max_points],
-            )
-            smaller_chunks = [
-                {
-                    "id": feature["id"],
-                    "type": "Feature",
-                    "geometry": json.loads(item[0]),
-                }
-                for item in cur.fetchall()
-            ]
-            feature_collections = [
-                {"type": "FeatureCollection", "features": [geometry]}
-                for geometry in smaller_chunks
-            ]
-            return feature_collections
-
-    def get_bounds(self, tile, node):
-        bounds = None
-        try:
-            node_data = tile.data[str(node.pk)]
-            bounds = self.get_bounds_from_value(node_data)
-        except KeyError as e:
-            print(e)
-        return bounds
-
-    def get_bounds_from_value(self, node_data):
-        bounds = None
-        for feature in node_data["features"]:
-            geom_collection = GEOSGeometry(
-                JSONSerializer().serialize(feature["geometry"])
-            )
-
-            if bounds is None:
-                bounds = geom_collection.extent
-            else:
-                minx, miny, maxx, maxy = bounds
-                if geom_collection.extent[0] < minx:
-                    minx = geom_collection.extent[0]
-                if geom_collection.extent[1] < miny:
-                    miny = geom_collection.extent[1]
-                if geom_collection.extent[2] > maxx:
-                    maxx = geom_collection.extent[2]
-                if geom_collection.extent[3] > maxy:
-                    maxy = geom_collection.extent[3]
-
-                bounds = (minx, miny, maxx, maxy)
-
-        return bounds
-
-    def get_map_layer(self, node=None, preview=False):
-        if node is None:
-            return None
-        elif node.config is None:
-            return None
-        tile_exists = models.TileModel.objects.filter(
-            nodegroup_id=node.nodegroup_id, data__has_key=str(node.nodeid)
-        ).exists()
-        if not preview and (not tile_exists or not node.config["layerActivated"]):
-            return None
-
-        source_name = "resources-%s" % node.nodeid
-        layer_name = "%s - %s" % (node.graph.name, node.name)
-        if not preview and node.config["layerName"] != "":
-            layer_name = node.config["layerName"]
-        layer_icon = node.graph.iconclass
-        if not preview and node.config["layerIcon"] != "":
-            layer_icon = node.config["layerIcon"]
-
-        layer_legend = node.config["layerLegend"]
-
-        if not preview and node.config["advancedStyling"]:
-            try:
-                style = json.loads(node.config["advancedStyle"])
-                for layer in style:
-                    layer["source-layer"] = str(node.pk)
-                layer_def = json.dumps(style)
-            except ValueError:
-                layer_def = "[]"
-        else:
-            layer_def = """[
-                {
-                    "id": "resources-fill-%(nodeid)s",
-                    "type": "fill",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1]],
-                    "paint": {
-                        "fill-color": "%(fillColor)s"
-                    }
-                },
-                {
-                    "id": "resources-fill-%(nodeid)s-click",
-                    "type": "fill",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1],["==", "resourceinstanceid", ""]],
-                    "paint": {
-                        "fill-color": "%(fillColor)s"
-                    }
-                },
-                {
-                    "id": "resources-fill-%(nodeid)s-hover",
-                    "type": "fill",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all", ["==", "$type", "Polygon"],["==", "total", 1],["==", "resourceinstanceid", ""]],
-                    "paint": {
-                        "fill-color": "%(fillColor)s"
-                    }
-                },
-                {
-                    "id": "resources-poly-outline-%(nodeid)s",
-                    "type": "line",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all",["==", "$type", "Polygon"],["==", "total", 1]],
-                    "paint": {
-                        "line-width": ["case",
-                            ["boolean", ["feature-state", "hover"], false],
-                            %(expanded_outlineWeight)s,
-                            %(outlineWeight)s
-                        ],
-                        "line-color": "%(outlineColor)s"
-                    }
-                },
-                {
-                    "id": "resources-poly-outline-%(nodeid)s-hover",
-                    "type": "line",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all",["==", "$type", "Polygon"],["==", "total", 1],["==", "resourceinstanceid", ""]],
-                    "paint": {
-                        "line-width": %(expanded_outlineWeight)s,
-                        "line-color": "%(outlineColor)s"
-                    }
-                },
-                {
-                    "id": "resources-poly-outline-%(nodeid)s-click",
-                    "type": "line",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all",["==", "$type", "Polygon"],["==", "total", 1],["==", "resourceinstanceid", ""]],
-                    "paint": {
-                        "line-width": %(expanded_outlineWeight)s,
-                        "line-color": "%(outlineColor)s"
-                    }
-                },
-                {
-                    "id": "resources-line-halo-%(nodeid)s",
-                    "type": "line",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "total", 1]],
-                    "paint": {
-                        "line-width": ["case",
-                            ["boolean", ["feature-state", "hover"], false],
-                            %(expanded_haloWeight)s,
-                            %(haloWeight)s
-                        ],
-                        "line-color": "%(lineHaloColor)s"
-                    }
-                },
-                {
-                    "id": "resources-line-%(nodeid)s",
-                    "type": "line",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all",["==", "$type", "LineString"],["==", "total", 1]],
-                    "paint": {
-                        "line-width": ["case",
-                            ["boolean", ["feature-state", "hover"], false],
-                            %(expanded_weight)s,
-                            %(weight)s
-                        ],
-                        "line-color": "%(lineColor)s"
-                    }
-                },
-                {
-                    "id": "resources-line-halo-%(nodeid)s-hover",
-                    "type": "line",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all",["==", "$type", "LineString"],["==", "total", 1],["==", "resourceinstanceid", ""]],
-                    "paint": {
-                        "line-width": %(expanded_haloWeight)s,
-                        "line-color": "%(lineHaloColor)s"
-                    }
-                },
-                {
-                    "id": "resources-line-%(nodeid)s-hover",
-                    "type": "line",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all",["==", "$type", "LineString"],["==", "total", 1],["==", "resourceinstanceid", ""]],
-                    "paint": {
-                        "line-width": %(expanded_weight)s,
-                        "line-color": "%(lineColor)s"
-                    }
-                },
-                {
-                    "id": "resources-line-halo-%(nodeid)s-click",
-                    "type": "line",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "total", 1],["==", "resourceinstanceid", ""]],
-                    "paint": {
-                        "line-width": %(expanded_haloWeight)s,
-                        "line-color": "%(lineHaloColor)s"
-                    }
-                },
-                {
-                    "id": "resources-line-%(nodeid)s-click",
-                    "type": "line",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all", ["==", "$type", "LineString"],["==", "total", 1],["==", "resourceinstanceid", ""]],
-                    "paint": {
-                        "line-width": %(expanded_weight)s,
-                        "line-color": "%(lineColor)s"
-                    }
-                },
-
-                {
-                    "id": "resources-point-halo-%(nodeid)s-hover",
-                    "type": "circle",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all", ["==", "$type", "Point"],["==", "total", 1],["==", "resourceinstanceid", ""]],
-                    "paint": {
-                        "circle-radius": %(expanded_haloRadius)s,
-                        "circle-color": "%(pointHaloColor)s"
-                    }
-                },
-                {
-                    "id": "resources-point-%(nodeid)s-hover",
-                    "type": "circle",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all", ["==", "$type", "Point"],["==", "total", 1],["==", "resourceinstanceid", ""]],
-                    "paint": {
-                        "circle-radius": %(expanded_radius)s,
-                        "circle-color": "%(pointColor)s"
-                    }
-                },
-
-                {
-                    "id": "resources-point-halo-%(nodeid)s",
-                    "type": "circle",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
-                    "paint": {
-                        "circle-radius": ["case",
-                            ["boolean", ["feature-state", "hover"], false],
-                            %(expanded_haloRadius)s,
-                            %(haloRadius)s
-                        ],
-                        "circle-color": "%(pointHaloColor)s"
-                    }
-                },
-                {
-                    "id": "resources-point-%(nodeid)s",
-                    "type": "circle",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all", ["==", "$type", "Point"],["==", "total", 1]],
-                    "paint": {
-                        "circle-radius": ["case",
-                            ["boolean", ["feature-state", "hover"], false],
-                            %(expanded_radius)s,
-                            %(radius)s
-                        ],
-                        "circle-color": "%(pointColor)s"
-                    }
-                },
-
-                {
-                    "id": "resources-point-halo-%(nodeid)s-click",
-                    "type": "circle",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all", ["==", "$type", "Point"],["==", "total", 1],["==", "resourceinstanceid", ""]],
-                    "paint": {
-                        "circle-radius": %(expanded_haloRadius)s,
-                        "circle-color": "%(pointHaloColor)s"
-                    }
-                },
-                {
-                    "id": "resources-point-%(nodeid)s-click",
-                    "type": "circle",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all", ["==", "$type", "Point"],["==", "total", 1],["==", "resourceinstanceid", ""]],
-                    "paint": {
-                        "circle-radius": %(expanded_radius)s,
-                        "circle-color": "%(pointColor)s"
-                    }
-                },
-                {
-                    "id": "resources-cluster-point-halo-%(nodeid)s",
-                    "type": "circle",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all", ["==", "$type", "Point"],[">", "total", 1]],
-                    "paint": {
-                        "circle-radius": {
-                            "property": "total",
-                            "stops": [
-                                [0,   22],
-                                [50, 24],
-                                [100, 26],
-                                [200, 28],
-                                [400, 30],
-                                [800, 32],
-                                [1200, 34],
-                                [1600, 36],
-                                [2000, 38],
-                                [2500, 40],
-                                [3000, 42],
-                                [4000, 44],
-                                [5000, 46]
-                            ]
-                        },
-                        "circle-color": "%(pointHaloColor)s"
-                    }
-                },
-                {
-                    "id": "resources-cluster-point-%(nodeid)s",
-                    "type": "circle",
-                    "source": "%(source_name)s",
-                    "source-layer": "%(nodeid)s",
-                    "layout": {
-                        "visibility": "visible"
-                    },
-                    "filter": ["all", ["==", "$type", "Point"],[">", "total", 1]],
-                    "paint": {
-                         "circle-radius": {
-                             "property": "total",
-                             "type": "exponential",
-                             "stops": [
-                                 [0,   12],
-                                 [50, 14],
-                                 [100, 16],
-                                 [200, 18],
-                                 [400, 20],
-                                 [800, 22],
-                                 [1200, 24],
-                                 [1600, 26],
-                                 [2000, 28],
-                                 [2500, 30],
-                                 [3000, 32],
-                                 [4000, 34],
-                                 [5000, 36]
-                             ]
-                         },
-                        "circle-color": "%(pointColor)s"
-                    }
-                },
-                {
-                     "id": "resources-cluster-count-%(nodeid)s",
-                     "type": "symbol",
-                     "source": "%(source_name)s",
-                     "source-layer": "%(nodeid)s",
-                     "layout": {
-                         "text-field": "{total}",
-                         "text-size": 10
-                     },
-                     "paint": {
-                        "text-color": "#fff"
-                    },
-                     "filter": ["all", [">", "total", 1]]
-                 }
-            ]""" % {
-                "source_name": source_name,
-                "nodeid": node.nodeid,
-                "pointColor": node.config["pointColor"],
-                "pointHaloColor": node.config["pointHaloColor"],
-                "radius": node.config["radius"],
-                "expanded_radius": int(node.config["radius"]) * 2,
-                "haloRadius": node.config["haloRadius"],
-                "expanded_haloRadius": int(node.config["haloRadius"]) * 2,
-                "lineColor": node.config["lineColor"],
-                "lineHaloColor": node.config["lineHaloColor"],
-                "weight": node.config["weight"],
-                "haloWeight": node.config["haloWeight"],
-                "expanded_weight": int(node.config["weight"]) * 2,
-                "expanded_haloWeight": int(node.config["haloWeight"]) * 2,
-                "fillColor": node.config["fillColor"],
-                "outlineColor": node.config["outlineColor"],
-                "outlineWeight": node.config["outlineWeight"],
-                "expanded_outlineWeight": int(node.config["outlineWeight"]) * 2,
-            }
-        return {
-            "nodeid": node.nodeid,
-            "name": layer_name,
-            "layer_definitions": layer_def,
-            "icon": layer_icon,
-            "legend": layer_legend,
-            "addtomap": node.config["addToMap"],
-        }
-
-    def after_update_all(self, tile=None):
-        with connection.cursor() as cursor:
-            if tile is not None:
-                cursor.execute(
-                    "SELECT * FROM refresh_tile_geojson_geometries(%s);",
-                    [tile.pk],
-                )
-            else:
-                cursor.execute("SELECT * FROM refresh_geojson_geometries();")
-
-    def default_es_mapping(self):
-        mapping = {
-            "properties": {
-                "features": {
-                    "properties": {
-                        "geometry": {
-                            "properties": {
-                                "coordinates": {"type": "float"},
-                                "type": {"type": "keyword"},
-                            }
-                        },
-                        "id": {"type": "keyword"},
-                        "type": {"type": "keyword"},
-                        "properties": {"type": "object"},
-                    }
-                },
-                "type": {"type": "keyword"},
-            }
-        }
-        return mapping
-
-    def is_a_literal_in_rdf(self):
-        return True
-
-    def to_rdf(self, edge_info, edge):
-        # Default to string containing JSON
-        g = Graph()
-        if edge_info["range_tile_data"] is not None:
-            data = edge_info["range_tile_data"]
-            if data["type"] == "FeatureCollection":
-                for f in data["features"]:
-                    del f["id"]
-                    del f["properties"]
-            g.add(
-                (
-                    edge_info["d_uri"],
-                    URIRef(edge.ontologyproperty),
-                    Literal(JSONSerializer().serialize(data)),
-                )
-            )
-        return g
-
-    def from_rdf(self, json_ld_node):
-        # Allow either a JSON literal or a string containing JSON
-        try:
-            val = json.loads(json_ld_node["@value"])
-        except:
-            raise ValueError(
-                f"Bad Data in GeoJSON, should be JSON string: {json_ld_node}"
-            )
-        if "features" not in val or type(val["features"]) != list:
-            raise ValueError(f"GeoJSON must have features array")
-        for f in val["features"]:
-            if "properties" not in f:
-                f["properties"] = {}
-        return val
-
-    def validate_from_rdf(self, value):
-        if type(value) == str:
-            # first deserialize it from a string
-            value = json.loads(value)
-        return self.validate(value)
-
-
 class FileListDataType(BaseDataType):
     def __init__(self, model=None):
         super(FileListDataType, self).__init__(model=model)
@@ -2047,6 +1219,22 @@ class FileListDataType(BaseDataType):
                         "provisional": provisional,
                     }
                     document["strings"].append(val)
+
+    def append_search_filters(self, value, node, query, request):
+        try:
+            if value["op"] == "null" or value["op"] == "not_null":
+                self.append_null_search_filters(value, node, query, request)
+            elif value["val"] != "":
+                if value["op"] == "gte" or value["op"] == "lte":
+                    operators = {"gte": None, "lte": None, "lt": None, "gt": None}
+                    operators[value["op"]] = float(value["val"]) * 1000000
+                search_query = Range(
+                    field="tiles.data.%s.size" % (str(node.pk)), **operators
+                )
+                query.must(search_query)
+
+        except KeyError as e:
+            pass
 
     def get_search_terms(self, nodevalue, nodeid):
         terms = []
@@ -2423,7 +1611,7 @@ class BaseDomainDataType(BaseDataType):
                 return get_localized_value(option["text"], return_lang=return_lang)
         raise Exception(
             _(
-                "No domain option found for option id {0}, in node conifg: {1}".format(
+                "No domain option found for option id {0}, in node config: {1}".format(
                     option_id, node.config["options"]
                 )
             )
@@ -2827,11 +2015,6 @@ class ResourceInstanceDataType(BaseDataType):
 
     """
 
-    def get_id_list(self, nodevalue):
-        if not isinstance(nodevalue, list):
-            nodevalue = [nodevalue]
-        return nodevalue
-
     def validate(
         self,
         value,
@@ -2844,7 +2027,7 @@ class ResourceInstanceDataType(BaseDataType):
     ):
         errors = []
         if value is not None:
-            resourceXresourceIds = self.get_id_list(value)
+            resourceXresourceIds = self.get_nodevalues(value)
             for resourceXresourceId in resourceXresourceIds:
                 try:
                     resourceid = resourceXresourceId["resourceId"]
@@ -2929,7 +2112,7 @@ class ResourceInstanceDataType(BaseDataType):
 
         resourceid = None
         data = self.get_tile_data(tile)
-        nodevalue = self.get_id_list(data[str(node.nodeid)])
+        nodevalue = self.get_nodevalues(data[str(node.nodeid)])
 
         items = []
         for resourceXresource in nodevalue:
@@ -2945,6 +2128,13 @@ class ResourceInstanceDataType(BaseDataType):
                 logger.info(f'Resource with id "{resourceid}" not in the system.')
         return ", ".join(items)
 
+    def get_relationship_display_value(self, relationship_valueid):
+        preflabel = get_preflabel_from_valueid(relationship_valueid, get_language())
+        if preflabel:
+            return preflabel["value"]
+        else:
+            return None
+
     def to_json(self, tile, node):
         from arches.app.models.resource import (
             Resource,
@@ -2952,7 +2142,7 @@ class ResourceInstanceDataType(BaseDataType):
 
         data = self.get_tile_data(tile)
         if data:
-            nodevalue = self.get_id_list(data[str(node.nodeid)])
+            nodevalue = self.get_nodevalues(data[str(node.nodeid)])
 
             for resourceXresource in nodevalue:
                 try:
@@ -2964,28 +2154,69 @@ class ResourceInstanceDataType(BaseDataType):
                     logger.info(f'Resource with id "{resourceid}" not in the system.')
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
-        if type(nodevalue) != list and nodevalue is not None:
-            nodevalue = [nodevalue]
-        if nodevalue:
-            for relatedResourceItem in nodevalue:
-                document["ids"].append(
+        nodevalue = self.get_nodevalues(nodevalue)
+        for relatedResourceItem in nodevalue:
+            relationship = None
+            document["ids"].append(
+                {
+                    "id": relatedResourceItem["resourceId"],
+                    "nodegroup_id": tile.nodegroup_id,
+                    "provisional": provisional,
+                }
+            )
+            if relatedResourceItem.get("resourceName", "") != "":
+                document["strings"].append(
                     {
-                        "id": relatedResourceItem["resourceId"],
+                        "string": relatedResourceItem["resourceName"],
                         "nodegroup_id": tile.nodegroup_id,
                         "provisional": provisional,
                     }
                 )
-                if (
-                    "resourceName" in relatedResourceItem
-                    and relatedResourceItem["resourceName"] not in document["strings"]
-                ):
+            for ontology_property_item in [
+                relatedResourceItem.get("ontologyProperty", ""),
+                relatedResourceItem.get("inverseOntologyProperty", ""),
+            ]:
+                if ontology_property_item != "":
+                    try:
+                        uuid.UUID(ontology_property_item)
+                        relationship = (
+                            self.get_relationship_display_value(ontology_property_item)
+                            or ontology_property_item
+                        )
+                    except ValueError:
+                        relationship = ontology_property_item
                     document["strings"].append(
                         {
-                            "string": relatedResourceItem["resourceName"],
+                            "string": relationship,
                             "nodegroup_id": tile.nodegroup_id,
                             "provisional": provisional,
                         }
                     )
+
+    def get_search_terms(self, nodevalue, nodeid=None):
+        terms = []
+        nodevalue = self.get_nodevalues(nodevalue)
+        for relatedResourceItem in nodevalue:
+            if relatedResourceItem.get("resourceName", "") != "":
+                terms.append(
+                    SearchTerm(value=relatedResourceItem["resourceName"], lang="")
+                )
+            for ontology_property_item in [
+                relatedResourceItem.get("ontologyProperty", ""),
+                relatedResourceItem.get("inverseOntologyProperty", ""),
+            ]:
+                if ontology_property_item != "":
+                    try:
+                        uuid.UUID(ontology_property_item)
+                        relationship = (
+                            self.get_relationship_display_value(ontology_property_item)
+                            or ontology_property_item
+                        )
+                        terms.append(SearchTerm(value=relationship, lang=""))
+                    except ValueError:
+                        terms.append(SearchTerm(value=ontology_property_item, lang=""))
+
+        return terms
 
     def transform_value_for_tile(self, value, **kwargs):
         try:
@@ -3130,7 +2361,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         resourceid = None
         data = self.get_tile_data(tile)
         if data:
-            nodevalue = self.get_id_list(data[str(node.nodeid)])
+            nodevalue = self.get_nodevalues(data[str(node.nodeid)])
             items = []
 
             for resourceXresource in nodevalue:
@@ -3254,21 +2485,3 @@ class AnnotationDataType(BaseDataType):
             }
         }
         return mapping
-
-
-def get_value_from_jsonld(json_ld_node):
-    try:
-        language = json_ld_node[0].get("@language")
-        if language is None:
-            language = get_language()
-        return (json_ld_node[0].get("@value"), language)
-    except KeyError as e:
-        try:
-            language = json_ld_node.get("@language")
-            if language is None:
-                language = get_language()
-            return (json_ld_node.get("@value"), language)
-        except AttributeError as e:
-            return
-    except IndexError as e:
-        return

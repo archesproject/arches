@@ -21,14 +21,7 @@ import os
 from datetime import datetime, timedelta
 from contextlib import suppress
 
-
-try:
-    from settings_utils import *
-except ModuleNotFoundError:
-    try:
-        from .settings_utils import *
-    except ModuleNotFoundError:
-        pass
+from arches.settings_utils import *
 
 try:
     from django.utils.translation import gettext_lazy as _
@@ -321,19 +314,25 @@ FORCE_SCRIPT_NAME = None
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
 ADMIN_MEDIA_PREFIX = "/media/admin/"
 
-STATICFILES_DIRS = build_staticfiles_dirs(root_dir=ROOT_DIR)
-TEMPLATES = build_templates_config(root_dir=ROOT_DIR, debug=DEBUG)
+STATICFILES_DIRS = build_staticfiles_dirs(
+    app_root=ROOT_DIR
+)  # app_root=ROOT_DIR is a workaround to find `node_modules` when running Arches without a project
+TEMPLATES = build_templates_config(debug=DEBUG)
 
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "arches.settings_utils.ArchesApplicationsStaticFilesFinder",
+    "arches.settings_utils.CoreArchesStaticFilesFinderBuildDirectory",
+    "arches.settings_utils.CoreArchesStaticFilesFinderMediaRoot",
+    "arches.settings_utils.CoreArchesStaticFilesFinderNodeModules",
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = "c7ky-mc6vdnv+avp0r@(a)8y^51ex=25nogq@+q5$fnc*mxwdi"
+SECRET_KEY = "django-insecure-c7ky-mc6vdnv+avp0r@(a)8y^51ex=25nogq@+q5$fnc*mxwdi"
 JWT_KEY = SECRET_KEY
 JWT_TOKEN_EXPIRATION = 50  # days before the token becomes stale
 JWT_ALGORITHM = "HS256"
@@ -350,7 +349,7 @@ AUTHENTICATION_BACKENDS = (
     "arches.app.utils.email_auth_backend.EmailAuthenticationBackend",
     "oauth2_provider.backends.OAuth2Backend",
     "django.contrib.auth.backends.ModelBackend",  # this is default
-    "arches.app.permissions.arches_standard.PermissionBackend",
+    "arches.app.permissions.arches_permission_base.PermissionBackend",
     "arches.app.utils.external_oauth_backend.ExternalOauthAuthenticationBackend",
 )
 
@@ -363,6 +362,7 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.gis",
+    "django_hosts",
     "arches",
     "arches.app.models",
     "arches.management",
@@ -374,7 +374,9 @@ INSTALLED_APPS = (
     "django_celery_results",
 )
 
-ARCHES_APPLICATIONS = ()
+# Placing this last ensures any templates provided by Arches Applications
+# take precedence over core arches templates in arches/app/templates.
+INSTALLED_APPS += ("arches.app",)
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -388,9 +390,17 @@ MIDDLEWARE = [
     "oauth2_provider.middleware.OAuth2TokenMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    # "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "arches.app.utils.middleware.SetAnonymousUser",
 ]
+
+MIDDLEWARE.insert(  # this must resolve to first MIDDLEWARE entry
+    0, "django_hosts.middleware.HostsRequestMiddleware"
+)
+
+MIDDLEWARE.append(  # this must resolve last MIDDLEWARE entry
+    "django_hosts.middleware.HostsResponseMiddleware"
+)
 
 WEBPACK_LOADER = {
     "DEFAULT": {
@@ -401,6 +411,9 @@ WEBPACK_LOADER = {
 WEBPACK_DEVELOPMENT_SERVER_PORT = 9000
 
 ROOT_URLCONF = "arches.urls"
+ROOT_HOSTCONF = "arches.hosts"
+
+DEFAULT_HOST = "arches"
 
 WSGI_APPLICATION = "arches.wsgi.application"
 
@@ -636,8 +649,6 @@ SPARQL_ENDPOINT_PROVIDERS = (
 
 APP_NAME = "Arches"
 APP_VERSION = None
-MIN_ARCHES_VERSION = None
-MAX_ARCHES_VERSION = None
 
 APP_TITLE = "Arches | Heritage Data Management"
 COPYRIGHT_TEXT = "All Rights Reserved."
@@ -863,7 +874,13 @@ def JSON_LD_FIX_DATA_FUNCTION(data, jsdata, model):
     return jsdata
 
 
-PERMISSION_FRAMEWORK = "arches_standard.ArchesStandardPermissionFramework"
+# If either of the following PERMISSION settings is changed, you must run a reindex.
+PERMISSION_FRAMEWORK = "arches_default_allow.ArchesDefaultAllowPermissionFramework"
+
+PERMISSION_DEFAULTS = {}
+# PERMISSION_DEFAULTS = {
+#     "graphid": [{"id": "1", "type": "user", "permissions": ["no_access_to_resourceinstance"]}]
+# }
 
 ##########################################
 ### END RUN TIME CONFIGURABLE SETTINGS ###
@@ -876,13 +893,3 @@ except ImportError:
         from arches.settings_local import *
     except ImportError:
         pass
-
-# returns an output that can be read by NODEJS
-if __name__ == "__main__":
-    transmit_webpack_django_config(
-        root_dir=ROOT_DIR,
-        app_root=APP_ROOT,
-        public_server_address=PUBLIC_SERVER_ADDRESS,
-        static_url=STATIC_URL,
-        webpack_development_server_port=WEBPACK_DEVELOPMENT_SERVER_PORT,
-    )

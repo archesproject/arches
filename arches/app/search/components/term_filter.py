@@ -13,6 +13,7 @@ from arches.app.search.elasticsearch_dsl_builder import (
     Term,
 )
 from arches.app.search.components.base import BaseSearchFilter
+from arches.app.search.es_mapping_modifier import EsMappingModifierFactory
 
 details = {
     "searchcomponentid": "",
@@ -20,22 +21,21 @@ details = {
     "icon": "",
     "modulename": "term_filter.py",
     "classname": "TermFilter",
-    "type": "text-input",
+    "type": "term-filter-type",
     "componentpath": "views/components/search/term-filter",
     "componentname": "term-filter",
-    "sortorder": "0",
-    "enabled": True,
+    "config": {},
 }
 
 
 class TermFilter(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def append_dsl(self, search_query_object, **kwargs):
+        permitted_nodegroups = kwargs.get("permitted_nodegroups")
+        include_provisional = kwargs.get("include_provisional")
         search_query = Bool()
-        querysting_params = self.request.GET.get(details["componentname"], "")
+        querystring_params = kwargs.get("querystring", "[]")
         language = self.request.GET.get("language", "*")
-        for term in JSONDeserializer().deserialize(querysting_params):
+        for term in JSONDeserializer().deserialize(querystring_params):
             if term["type"] == "term" or term["type"] == "string":
                 string_filter = Bool()
                 if term["type"] == "term":
@@ -44,6 +44,12 @@ class TermFilter(BaseSearchFilter):
                             field="strings.string", query=term["value"], type="phrase"
                         )
                     )
+                    if term.get("nodegroupid", None):
+                        string_filter.must(
+                            Match(
+                                field="strings.nodegroup_id", query=term["nodegroupid"]
+                            )
+                        )
                 elif term["type"] == "string":
                     try:
                         uuid.UUID(str(term["value"]))
@@ -118,7 +124,7 @@ class TermFilter(BaseSearchFilter):
                 else:
                     search_query.must(nested_string_filter)
                     # need to set min_score because the query returns results with score 0 and those have to be removed, which I don't think it should be doing
-                    search_results_object["query"].min_score("0.01")
+                    search_query_object["query"].min_score("0.01")
             elif term["type"] == "concept":
                 concept_ids = _get_child_concepts(term["value"])
                 conceptid_filter = Bool()
@@ -144,7 +150,13 @@ class TermFilter(BaseSearchFilter):
                 else:
                     search_query.filter(nested_conceptid_filter)
 
-        search_results_object["query"].add_query(search_query)
+            # Add additional search query if configured
+            for (
+                custom_search_class
+            ) in EsMappingModifierFactory.get_es_mapping_modifier_classes():
+                custom_search_class.add_search_filter(search_query, term)
+
+        search_query_object["query"].add_query(search_query)
 
 
 def _get_child_concepts(conceptid):

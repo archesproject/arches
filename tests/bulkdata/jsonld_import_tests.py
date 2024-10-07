@@ -3,6 +3,7 @@ import os
 import shutil
 import textwrap
 import uuid
+from http import HTTPStatus
 from pathlib import Path
 
 from arches.app.etl_modules.jsonld_importer import JSONLDImporter
@@ -46,9 +47,8 @@ class JSONLDImportTests(TransactionTestCase):
 
     serialized_rollback = True
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUp(self):
+        """setUpClass doesn't work because the rollback fixture is applied after that."""
         ArchesTestCase.loadOntology()
         LanguageSynchronizer.synchronize_settings_with_db()
 
@@ -69,16 +69,16 @@ class JSONLDImportTests(TransactionTestCase):
             archesfile = JSONDeserializer().deserialize(f)
         ResourceGraphImporter(archesfile["graph"])
 
-        cls.basic_graph = GraphModel.objects.get(slug="basic")
-        cls.basic_resource_1 = ResourceInstance.objects.create(
+        self.basic_graph = GraphModel.objects.get(slug="basic")
+        self.basic_resource_1 = ResourceInstance.objects.create(
             pk=uuid.UUID("58da1c67-187e-460e-a94f-6b45f9cbc219"),
-            graph=cls.basic_graph,
+            graph=self.basic_graph,
         )
-        cls.note_node = Node.objects.get(pk="cdfc22b2-f6b5-11e9-8f09-a4d18cec433a")
+        self.note_node = Node.objects.get(pk="cdfc22b2-f6b5-11e9-8f09-a4d18cec433a")
         tile = TileModel(
-            nodegroup=cls.note_node.nodegroup,
+            nodegroup=self.note_node.nodegroup,
             data={
-                str(cls.note_node.pk): {
+                str(self.note_node.pk): {
                     "en": {
                         "direction": "ltr",
                         "value": "Test value",
@@ -86,48 +86,78 @@ class JSONLDImportTests(TransactionTestCase):
                 },
             },
         )
-        cls.basic_resource_1.tilemodel_set.add(tile, bulk=False)
-        cls.basic_resource_1_as_jsonld_bytes = (
-            Client().get(reverse("resources", args=[cls.basic_resource_1.pk])).content
+        self.basic_resource_1.tilemodel_set.add(tile, bulk=False)
+        self.basic_resource_1_as_jsonld_bytes = (
+            Client().get(reverse("resources", args=[self.basic_resource_1.pk])).content
         )
 
-        cls.write_zip_file_to_uploaded_files()
+        self.write_zip_file_to_uploaded_files()
 
-    @classmethod
-    def write_zip_file_to_uploaded_files(cls):
+    def write_zip_file_to_uploaded_files(self):
         basic_resource_1_dest = (
             Path(settings.UPLOADED_FILES_DIR)
             / "testzip"
             / "basic"
             / "58"
-            / f"{cls.basic_resource_1.pk}.json"
+            / f"{self.basic_resource_1.pk}.json"
         )
         default_storage.save(
-            basic_resource_1_dest, io.BytesIO(cls.basic_resource_1_as_jsonld_bytes)
+            basic_resource_1_dest, io.BytesIO(self.basic_resource_1_as_jsonld_bytes)
         )
-        cls.dir_to_zip = (
+        self.dir_to_zip = (
             Path(default_storage.location)
             / default_storage.location
             / Path(settings.UPLOADED_FILES_DIR)
             / "testzip"
         )
-        zip_dest = Path(cls.dir_to_zip.parent) / "test-jsonld-import"
-        cls.addClassCleanup(shutil.rmtree, cls.dir_to_zip)
-        cls.uploaded_zip_location = shutil.make_archive(zip_dest, "zip", cls.dir_to_zip)
-        cls.addClassCleanup(os.unlink, cls.uploaded_zip_location)
+        zip_dest = Path(self.dir_to_zip.parent) / "test-jsonld-import"
+        self.addCleanup(shutil.rmtree, self.dir_to_zip)
+        self.uploaded_zip_location = shutil.make_archive(
+            zip_dest, "zip", root_dir=self.dir_to_zip.parent, base_dir=self.dir_to_zip
+        )
+        self.addCleanup(os.unlink, self.uploaded_zip_location)
+
+        self.module = ETLModule.objects.get(slug="jsonld-importer")
+
+    def test_read_validates_graph_exists(self):
+        self.client.login(username="admin", password="admin")
+        start_event = LoadEvent.objects.create(
+            user_id=1, etl_module=self.module, status="running"
+        )
+
+        self.basic_resource_1.delete()
+        self.basic_graph.delete()
+
+        with (
+            open(self.uploaded_zip_location, "rb") as f,
+            self.assertLogs("django.request", level="WARNING"),
+        ):
+            response = self.client.post(
+                reverse("etl_manager"),
+                data={
+                    "action": "read",
+                    "load_id": str(start_event.pk),
+                    "module": str(self.module.pk),
+                    "file": f,
+                },
+            )
+
+        self.assertContains(
+            response,
+            'The model \\"basic\\" does not exist.',
+            status_code=HTTPStatus.NOT_FOUND,
+        )
 
     def test_write(self):
         request = HttpRequest()
         request.method = "POST"
         request.user = User.objects.get(username="admin")
 
-        # Mock a load event
-        module = ETLModule.objects.get(slug="jsonld-importer")
         start_event = LoadEvent.objects.create(
-            user=request.user, etl_module=module, status="running"
+            user=request.user, etl_module=self.module, status="running"
         )
-        request.POST.__setitem__("load_id", str(start_event.pk))
-        request.POST.__setitem__("module", str(module.pk))
+        request.POST["load_id"] = str(start_event.pk)
+        request.POST["module"] = str(self.module.pk)
 
         # Mock a read() operation
         request.POST.__setitem__(
@@ -149,7 +179,7 @@ class JSONLDImportTests(TransactionTestCase):
             """
             ),
         )
-        importer = JSONLDImporter(request=request, loadid=str(start_event.pk))
+        importer = JSONLDImporter(request=request)
         importer.prepare_temp_dir(request)  # ordinarily done with the .read() request
 
         # Do a hack job of a read.
