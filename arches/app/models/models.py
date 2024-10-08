@@ -1217,15 +1217,6 @@ class ResourceInstance(models.Model):
         to="models.ResourceInstanceLifecycleState",
         related_name="resource_instances",
     )
-
-    def get_initial_resource_instance_lifecycle_state(self, *args, **kwargs):
-        try:
-            return (
-                self.graph.resource_instance_lifecycle.get_initial_resource_instance_lifecycle_state()
-            )
-        except (ObjectDoesNotExist, AttributeError):
-            return None
-
     # This could be used as a lock, but primarily addresses the issue that a creating user
     # may not yet match the criteria to edit a ResourceInstance (via Set/LogicalSet) simply
     # because the details may not yet be complete. Only one user can create, as it is an
@@ -1236,6 +1227,14 @@ class ResourceInstance(models.Model):
     principaluser = models.ForeignKey(
         User, on_delete=models.SET_NULL, blank=True, null=True
     )
+
+    def get_initial_resource_instance_lifecycle_state(self, *args, **kwargs):
+        try:
+            return (
+                self.graph.resource_instance_lifecycle.get_initial_resource_instance_lifecycle_state()
+            )
+        except (ObjectDoesNotExist, AttributeError):
+            return None
 
     def get_instance_creator_and_edit_permissions(self, user=None):
         creatorid = None
