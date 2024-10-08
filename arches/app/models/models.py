@@ -21,6 +21,7 @@ from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.models.querysets import PythonicModelQuerySet
 from arches.app.models.utils import add_to_update_fields
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils import import_class_from_string
@@ -1227,6 +1228,12 @@ class ResourceInstance(models.Model):
     principaluser = models.ForeignKey(
         User, on_delete=models.SET_NULL, blank=True, null=True
     )
+
+    objects = PythonicModelQuerySet.as_manager()
+
+    @classmethod
+    def as_model(cls, *args, **kwargs):
+        return cls.objects.with_unpacked_tiles(*args, **kwargs)
 
     def get_initial_resource_instance_lifecycle_state(self, *args, **kwargs):
         try:
