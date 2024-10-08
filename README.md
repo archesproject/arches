@@ -22,7 +22,7 @@ Installation is fully documented in the official documentation, [arches.readthed
 ```
 then
 ```
-    arches-project create myproject
+    arches-admin startproject myproject
 ```
 enter the new `myproject` directory
 ```
