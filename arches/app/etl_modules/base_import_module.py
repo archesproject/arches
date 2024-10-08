@@ -354,13 +354,14 @@ class BaseImportModule:
             if file.split(".")[-1] == "xlsx":
                 try:
                     uploaded_file_path = os.path.join(self.temp_dir, file)
-                    workbook = load_workbook(
-                        filename=default_storage.open(uploaded_file_path)
-                    )
+                    opened_file = default_storage.open(uploaded_file_path)
+                    workbook = load_workbook(filename=opened_file, read_only=True)
                     self.validate_uploaded_file(workbook)
                     has_valid_excel_file = True
                 except:
                     pass
+                else:
+                    opened_file.close()
         if not has_valid_excel_file:
             title = _("Invalid Uploaded File")
             message = _(

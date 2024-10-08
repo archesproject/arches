@@ -215,7 +215,7 @@ init_arches_project() {
 			cd_web_root
 			[[ -d ${APP_FOLDER} ]] || mkdir ${APP_FOLDER}
 
-			arches-project create ${ARCHES_PROJECT} --directory ${ARCHES_PROJECT}
+			arches-admin startproject ${ARCHES_PROJECT} --directory ${ARCHES_PROJECT}
 
 			exit_code=$?
 			if [[ ${exit_code} != 0 ]]; then

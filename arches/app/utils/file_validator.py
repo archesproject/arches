@@ -31,7 +31,7 @@ class FileValidator(object):
                 errors.append(f"File type is not permitted: {extension}")
             case "xlsx":
                 try:
-                    load_workbook(io.BytesIO(file))
+                    load_workbook(io.BytesIO(file), read_only=True)
                 except (InvalidFileException, zipfile.BadZipFile):
                     errors.append("Invalid xlsx workbook")
             case "csv":
