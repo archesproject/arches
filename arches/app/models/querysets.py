@@ -1,3 +1,4 @@
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
@@ -7,25 +8,30 @@ class PythonicModelQuerySet(models.QuerySet):
         """Annotates a ResourceInstance QuerySet with tile data unpacked
         and mapped onto node aliases, e.g.:
 
-        ResourceInstance.objects.with_unpacked_tiles("mymodel")
+        >>> ResourceInstance.objects.with_unpacked_tiles("mymodel")
 
         With slightly fewer keystrokes:
 
-        ResourceInstance.as_model("mymodel")
+        >>> ResourceInstance.as_model("mymodel")
 
         Or with defer/only as in the QuerySet interface:
 
-        ResourceInstance.as_model("mymodel", only="my_node_alias")
+        >>> ResourceInstance.as_model("mymodel", only=["alias1", "alias2"])
 
         ...although this is a pessimization if you will end up
         manipulating other node data besides "my_node_alias".
 
-        Use it like:
-        MyModel = ResourceInstance.as_model("mymodel")
-        MyModel.filter(my_node_alias="some tile value")
+        Example:
+
+        >>> MyModel = ResourceInstance.as_model("mymodel")
+        >>> result = MyModel.filter(my_node_alias="some tile value")
+        >>> result.first().my_node_alias
+        "some tile value"
         """
         from arches.app.models.models import GraphModel
 
+        if defer and only and (overlap := set(defer).intersection(set(only))):
+            raise ValueError(f"Got intersecting defer/only args: {overlap}")
         try:
             source_graph = (
                 GraphModel.objects.filter(
@@ -33,7 +39,7 @@ class PythonicModelQuerySet(models.QuerySet):
                     # TODO: Verify that source_identifier=None is really what I want?
                     source_identifier=None,
                 )
-                .prefetch_related("node_set")
+                .prefetch_related("node_set", "node_set__nodegroup")
                 .get()
             )
         except ObjectDoesNotExist as e:
@@ -41,15 +47,25 @@ class PythonicModelQuerySet(models.QuerySet):
             raise
 
         node_alias_annotations = {}
-        for node in source_graph.node_set.prefetch_related("nodegroup"):
-            if defer and node.alias in defer:
+        for node in source_graph.node_set.all():
+            if node.nodegroup is None:
                 continue
-            if only and node.alias not in only:
+            if (defer and node.alias in defer) or (only and node.alias not in only):
                 continue
             # TODO: unwrap with datatype-aware transforms
             # TODO: don't worry about name collisions for now, e.g. "name"
-            # TODO: how to group cardinality N tiles?
-            node_alias_annotations[node.alias] = models.F(f"tilemodel__data__{node.pk}")
+            tile_lookup = models.F(f"tilemodel__data__{node.pk}")
+
+            if node.nodegroup.cardinality == "n":
+                # TODO: May produce duplicates until we add unique constraint
+                # on TileModel.resourceinstance_id, nodegroup_id, sortorder
+                tile_lookup = ArrayAgg(
+                    tile_lookup,
+                    filter=models.Q(tilemodel__nodegroup_id=node.nodegroup.pk),
+                    ordering="tilemodel__sortorder",
+                )
+            # TODO: raise django bug: extra arrayagg's if alias contains "_"
+            node_alias_annotations[node.alias] = tile_lookup
 
         return (
             self.filter(graph=source_graph)
