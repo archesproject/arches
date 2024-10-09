@@ -4,6 +4,7 @@ import uuid
 import datetime
 import logging
 import traceback
+from collections import defaultdict
 
 from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
@@ -1220,6 +1221,16 @@ class ResourceInstance(models.Model):
 
     objects = PythonicModelQuerySet.as_manager()
 
+    class Meta:
+        managed = True
+        db_table = "resource_instances"
+        permissions = (("no_access_to_resourceinstance", "No Access"),)
+
+    def __init__(self, *args, **kwargs):
+        super(ResourceInstance, self).__init__(*args, **kwargs)
+        if not self.resourceinstanceid:
+            self.resourceinstanceid = uuid.uuid4()
+
     @classmethod
     def as_model(cls, *args, **kwargs):
         return cls.objects.with_unpacked_tiles(*args, **kwargs)
@@ -1273,29 +1284,77 @@ class ResourceInstance(models.Model):
         add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
         add_to_update_fields(kwargs, "graph_publication")
 
-        if getattr(self, "_pythonic_model", False):
+        if getattr(self, "_pythonic_model_fields", False):
             self.save_tiles_for_pythonic_model(*args, **kwargs)
         else:
             super().save(*args, **kwargs)
 
     def clean(self):
-        if getattr(self, "_pythonic_model", False):
+        if getattr(self, "_pythonic_model_fields", False):
             pass  # run datatype validation on tile data
 
     def save_tiles_for_pythonic_model(self, *args, **kwargs):
-        with transaction.atomic():
-            # for nodeid, alias in self._pythonic_model_fields.items():
-            #     new_val = getattr(self, alias)
-            # TODO: handle x-list, currently assuming list ~ cardinality N.
-            # if isinstance(new_val, list):
+        from arches.app.models.tile import Tile
 
-            # for tile_to_update in self._prefetched_objects_cache["tilemodel_set"]:
+        tiles_by_node_id = self._map_prefetched_tiles_to_node_ids()
+        for_insert = []
+        for_update = []
+        for_delete = []
+
+        for node in self.graph.node_set.all():
+            node_id_str = str(node.pk)
+            if attribute_name := self._pythonic_model_fields.get(node_id_str, ""):
+                db_tiles = tiles_by_node_id[node_id_str]
+                new_val = getattr(self, attribute_name)
+                # TODO: handle x-list, currently assuming list ~ cardinality N.
+                if not isinstance(new_val, list):
+                    new_val = (new_val,)
+                for i, inner_val in enumerate(new_val):
+                    try:
+                        tile = db_tiles[i]
+                    except IndexError:
+                        # parenttile? use Tile.get_blank_tile() instead?
+                        # Does unnecessary node queries--fix.
+                        tile = Tile.get_blank_tile_from_nodegroup_id(
+                            node.nodegroup_id, resourceid=self.pk
+                        )
+                        if db_tiles:
+                            # TODO: small risk of race condition--fix.
+                            tile.sortorder = max(t.sortorder or 0 for t in db_tiles) + 1
+                        tiles_by_node_id[node_id_str].append(tile)
+                        for_insert.append(tile)
+                    else:
+                        for_update.append(tile)
+                    # skipping validation...
+                    # skipping transform_value_for_tile
+                    tile.data[node_id_str] = inner_val
+
+                for_delete.extend(db_tiles[: len(new_val)])
+
+        with transaction.atomic():
+            # TODO: indexing, editlog, etc. (use/adapt proxy model methods?)
+            if for_insert:
+                TileModel.objects.bulk_create(for_insert)
+            if for_update:
+                TileModel.objects.bulk_update(for_update, {"data"})
+            if for_delete:
+                TileModel.objects.filter(pk__in=[t.pk for t in for_delete]).delete()
 
             super().save(*args, **kwargs)
-            self.refresh_from_db(
-                using=kwargs.get("using", None),
-                fields=kwargs.get("update_fields", None),
-            )
+
+        del self._pythonic_model_fields
+        # TODO: add unique constraint for TileModel re: sortorder
+        self.refresh_from_db(
+            using=kwargs.get("using", None),
+            fields=kwargs.get("update_fields", None),
+        )
+
+    def _map_prefetched_tiles_to_node_ids(self):
+        tiles_by_node = defaultdict(list)
+        for tile_to_update in self._prefetched_objects_cache["tilemodel_set"]:
+            for node_id in tile_to_update.data:
+                tiles_by_node[node_id].append(tile_to_update)
+        return tiles_by_node
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None):
         if not from_queryset and (
@@ -1305,16 +1364,6 @@ class ResourceInstance(models.Model):
                 self.graph.slug, only=field_map.values()
             )
         super().refresh_from_db(using, fields, from_queryset)
-
-    def __init__(self, *args, **kwargs):
-        super(ResourceInstance, self).__init__(*args, **kwargs)
-        if not self.resourceinstanceid:
-            self.resourceinstanceid = uuid.uuid4()
-
-    class Meta:
-        managed = True
-        db_table = "resource_instances"
-        permissions = (("no_access_to_resourceinstance", "No Access"),)
 
 
 class ResourceInstanceLifecycle(models.Model):
