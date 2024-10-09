@@ -18,9 +18,6 @@ class PythonicModelQuerySet(models.QuerySet):
 
         >>> ResourceInstance.as_model("mymodel", only=["alias1", "alias2"])
 
-        ...although this is a pessimization if you will end up
-        manipulating other node data besides "my_node_alias".
-
         Example:
 
         >>> MyModel = ResourceInstance.as_model("mymodel")
@@ -28,7 +25,7 @@ class PythonicModelQuerySet(models.QuerySet):
         >>> result.first().my_node_alias
         "some tile value"
         """
-        from arches.app.models.models import GraphModel
+        from arches.app.models.models import GraphModel, TileModel
 
         if defer and only and (overlap := set(defer).intersection(set(only))):
             raise ValueError(f"Got intersecting defer/only args: {overlap}")
@@ -76,7 +73,13 @@ class PythonicModelQuerySet(models.QuerySet):
 
         return (
             self.filter(graph=source_graph)
-            .prefetch_related("tilemodel_set")
+            .prefetch_related(
+                "graph__node_set",
+                models.Prefetch(
+                    "tilemodel_set",
+                    queryset=TileModel.objects.order_by("sortorder"),
+                ),
+            )
             .annotate(
                 **node_alias_annotations,
             )
