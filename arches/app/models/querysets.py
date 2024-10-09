@@ -46,6 +46,7 @@ class PythonicModelQuerySet(models.QuerySet):
             raise
 
         node_alias_annotations = {}
+        node_aliases_by_node_id = {}
         for node in source_graph.node_set.all():
             if node.datatype == "semantic":
                 continue
@@ -66,11 +67,21 @@ class PythonicModelQuerySet(models.QuerySet):
                     ordering="tilemodel__sortorder",
                 )
             node_alias_annotations[node.alias] = tile_lookup
+            node_aliases_by_node_id[str(node.pk)] = node.alias
+
+        if not node_alias_annotations:
+            raise ValueError("All fields were excluded.")
 
         return (
             self.filter(graph=source_graph)
             .prefetch_related("tilemodel_set")
             .annotate(
                 **node_alias_annotations,
+            )
+            .annotate(
+                _pythonic_model_fields=models.Value(
+                    node_aliases_by_node_id,
+                    output_field=models.JSONField(),
+                )
             )
         )
