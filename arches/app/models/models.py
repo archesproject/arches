@@ -1,21 +1,9 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
-#
-# Also note: You'll have to insert the output of 'django-admin sqlcustom [app_label]'
-# into your database.
-
-
 import sys
 import json
 import uuid
 import datetime
 import logging
 import traceback
-import django.utils.timezone
 
 from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
@@ -33,9 +21,10 @@ from django.db.models import JSONField
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import RegexValidator, validate_slug
+from django.db import transaction
 from django.db.models import JSONField, Max, Q
 from django.db.models.constraints import UniqueConstraint
-from django.utils import translation
+from django.utils import timezone, translation
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
@@ -1283,7 +1272,39 @@ class ResourceInstance(models.Model):
 
         add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
         add_to_update_fields(kwargs, "graph_publication")
-        super(ResourceInstance, self).save(*args, **kwargs)
+
+        if getattr(self, "_pythonic_model", False):
+            self.save_tiles_for_pythonic_model(*args, **kwargs)
+        else:
+            super().save(*args, **kwargs)
+
+    def clean(self):
+        if getattr(self, "_pythonic_model", False):
+            pass  # run datatype validation on tile data
+
+    def save_tiles_for_pythonic_model(self, *args, **kwargs):
+        with transaction.atomic():
+            # for nodeid, alias in self._pythonic_model_fields.items():
+            #     new_val = getattr(self, alias)
+            # TODO: handle x-list, currently assuming list ~ cardinality N.
+            # if isinstance(new_val, list):
+
+            # for tile_to_update in self._prefetched_objects_cache["tilemodel_set"]:
+
+            super().save(*args, **kwargs)
+            self.refresh_from_db(
+                using=kwargs.get("using", None),
+                fields=kwargs.get("update_fields", None),
+            )
+
+    def refresh_from_db(self, using=None, fields=None, from_queryset=None):
+        if not from_queryset and (
+            field_map := getattr(self, "_pythonic_model_fields", [])
+        ):
+            from_queryset = self.__class__.as_model(
+                self.graph.slug, only=field_map.values()
+            )
+        super().refresh_from_db(using, fields, from_queryset)
 
     def __init__(self, *args, **kwargs):
         super(ResourceInstance, self).__init__(*args, **kwargs)
@@ -1988,7 +2009,7 @@ class WorkflowHistory(models.Model):
     stepdata = JSONField(null=False, default=dict)
     componentdata = JSONField(null=False, default=dict)
     # `auto_now_add` marks the field as non-editable, which prevents the field from being serialized, so updating to use `default` instead
-    created = models.DateTimeField(default=django.utils.timezone.now, null=False)
+    created = models.DateTimeField(default=timezone.now, null=False)
     user = models.ForeignKey(
         db_column="userid",
         null=True,
