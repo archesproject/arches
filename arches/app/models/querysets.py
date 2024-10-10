@@ -23,6 +23,8 @@ class PythonicModelQuerySet(models.QuerySet):
         >>> result = MyModel.filter(my_node_alias="some tile value")
         >>> result.first().my_node_alias
         "some tile value"
+
+        Provisional edits are completely ignored.
         """
         from arches.app.models.models import GraphModel, TileModel
 

@@ -1291,38 +1291,29 @@ class ResourceInstance(models.Model):
             super().save(*args, **kwargs)
 
     def clean(self):
+        """Raises a compound ValidationError with any failing tile values."""
         if getattr(self, "_pythonic_model_fields", False):
-            pass  # run datatype validation on tile data
+            self._update_tiles_from_pythonic_model_values(run_triggers=False)
 
-    def _save_tiles_for_pythonic_model(self, *args, **kwargs):
-        tiles_by_nodegroup_id = self._map_prefetched_tiles_to_nodegroup_ids()
-        for_insert = set()
-        for_update = set()
-        for_delete = set()
+    def _save_tiles_for_pythonic_model(self, index=False, **kwargs):
+        """Raises a compound ValidationError with any failing tile values.
 
-        nodegroups = (
-            NodeGroup.objects.filter(node__graph=self.graph)
-            .distinct()
-            .prefetch_related("node_set")
+        (It's not exactly idiomatic for a Django project to clean()
+        values during a save(), but the "pythonic models" interface
+        is basically a form/serializer, so that's why we're validating.)
+        """
+        to_insert, to_update, to_delete = (
+            self._update_tiles_from_pythonic_model_values()
         )
-        for nodegroup in nodegroups:
-            db_tiles = tiles_by_nodegroup_id[nodegroup.pk]
-            self._update_tiles_from_pythonic_model_values(
-                nodegroup,
-                db_tiles,
-                for_insert=for_insert,
-                for_update=for_update,
-                for_delete=for_delete,
-            )
 
         with transaction.atomic():
             # TODO: indexing, editlog, etc. (use/adapt proxy model methods?)
-            if for_insert:
-                TileModel.objects.bulk_create(for_insert)
-            if for_update:
-                TileModel.objects.bulk_update(for_update, {"data"})
-            if for_delete:
-                TileModel.objects.filter(pk__in=[t.pk for t in for_delete]).delete()
+            if to_insert:
+                TileModel.objects.bulk_create(to_insert)
+            if to_update:
+                TileModel.objects.bulk_update(to_update, {"data"})
+            if to_delete:
+                TileModel.objects.filter(pk__in=[t.pk for t in to_delete]).delete()
 
             super().save(*args, **kwargs)
 
@@ -1338,58 +1329,124 @@ class ResourceInstance(models.Model):
             tiles_by_nodegroup[tile_to_update.nodegroup_id].append(tile_to_update)
         return tiles_by_nodegroup
 
-    def _update_tiles_from_pythonic_model_values(
-        self, nodegroup, db_tiles, for_insert, for_update, for_delete
-    ):
-        working_tiles = []
-        max_tile_length = 0
-        for attribute_name in self._pythonic_model_fields.values():
-            new_val = getattr(self, attribute_name)
-            # TODO: handle x-list, currently assuming list ~ cardinality N.
-            if not isinstance(new_val, list):
-                new_val = [new_val]
-            max_tile_length = max(max_tile_length, len(new_val))
+    def _update_tiles_from_pythonic_model_values(self):
+        """Move values from model instance to prefetched tiles, and validate.
+        Raises ValidationError if new data fails datatype validation (and
+        thus may leave prefetched tiles in a partially consistent state.)
+        """
+        db_tiles_by_nodegroup_id = self._map_prefetched_tiles_to_nodegroup_ids()
+        errors_by_node_alias = defaultdict(list)
+        to_insert = set()
+        to_update = set()
+        to_delete = set()
 
-        for i in range(max(max_tile_length, len(db_tiles))):
-            try:
-                tile = db_tiles[i]
-            except IndexError:
-                tile = TileModel.get_blank_tile_from_nodegroup(
-                    nodegroup,
-                    resourceid=self.pk,
-                    # parenttile?
-                )
-                if db_tiles:
-                    tile.sortorder = max(t.sortorder or 0 for t in working_tiles) + 1
-                for_insert.add(tile)
-            else:
-                for_update.add(tile)
-            working_tiles.append(tile)
+        nodegroups = (
+            NodeGroup.objects.filter(node__graph=self.graph)
+            .distinct()
+            .prefetch_related("node_set")
+        )
+        for nodegroup in nodegroups:
+            node_aliases = [n.alias for n in nodegroup.node_set.all()]
+            db_tiles = db_tiles_by_nodegroup_id[nodegroup.pk]
+            working_tiles = []
+            max_tile_length = 0
+            for attribute_name in self._pythonic_model_fields.values():
+                if attribute_name not in node_aliases:
+                    continue
+                new_val = getattr(self, attribute_name)
+                if nodegroup.cardinality == "1":
+                    new_val = [new_val]
+                max_tile_length = max(max_tile_length, len(new_val))
 
+            for i in range(max(max_tile_length, len(db_tiles))):
+                try:
+                    tile = db_tiles[i]
+                except IndexError:
+                    tile = TileModel.get_blank_tile_from_nodegroup(
+                        nodegroup,
+                        resourceid=self.pk,
+                        # parenttile?
+                    )
+                    if db_tiles:
+                        tile.sortorder = (
+                            max(t.sortorder or 0 for t in working_tiles) + 1
+                        )
+                    to_insert.add(tile)
+                else:
+                    to_update.add(tile)
+                working_tiles.append(tile)
+
+            self._update_tile_values(nodegroup, working_tiles, errors_by_node_alias)
+
+            for tile in working_tiles:
+                # TODO: preserve if child tiles?
+                if not any(tile.data.values()):
+                    if tile._state.adding:
+                        to_insert.remove(tile)
+                    else:
+                        to_update.remove(tile)
+                        to_delete.add(tile)
+
+        if errors_by_node_alias:
+            raise ValidationError(
+                # TODO: Django/DRF minds if this is not an actual field?
+                {
+                    alias: ValidationError("\n".join(e["message"] for e in errors))
+                    for alias, errors in errors_by_node_alias.items()
+                }
+            )
+
+        return to_insert, to_update, to_delete
+
+    def _update_tile_values(self, nodegroup, working_tiles, errors_by_node_alias):
+        from arches.app.datatypes.datatypes import DataTypeFactory
+
+        datatype_factory = DataTypeFactory()
         for node in nodegroup.node_set.all():
             node_id_str = str(node.pk)
             if not (attribute_name := self._pythonic_model_fields.get(node_id_str, "")):
                 continue
 
+            datatype_instance = datatype_factory.get_instance(node.datatype)
             new_val = getattr(self, attribute_name)
             if nodegroup.cardinality == "1":
                 new_val = [new_val]
 
             for tile, inner_val in zip(working_tiles, new_val, strict=False):
-                # skipping validation...
-                # skipping transform_value_for_tile
+                # TODO: move this all somewhere else
+                # 1. transform_value_for_tile()
+                # 2. clean() TODO: swap order with 3?
+                # 3. pre_tile_save()
+                # 4. validate()
+
+                transformed = inner_val
+                if inner_val is not None:
+                    # TODO: do all datatypes treat None the same way?
+                    try:
+                        transformed = datatype_instance.transform_value_for_tile(
+                            inner_val, **node.config
+                        )
+                    except ValueError:
+                        pass  # BooleanDataType
+                    except:  # TODO: fix and remove
+                        pass
+
+                datatype_instance.clean(tile, node_id_str)
+
+                # Does pre_tile_save call transform_value_for_tile and therefore raise?
+                # https://github.com/archesproject/arches/issues/10851
+                # try:
+                datatype_instance.pre_tile_save(tile, node_id_str)
+
+                if errors := datatype_instance.validate(transformed, node=node):
+                    errors_by_node_alias[node.alias].extend(errors)
+
+                # TODO: call tile lifecycle triggers
+                # update data...
                 tile.data[node_id_str] = inner_val
+
             for extra_tile in working_tiles[len(new_val) :]:
                 extra_tile.data[node_id_str] = None
-
-        for tile in working_tiles:
-            # TODO: preserve if child tiles?
-            if not any(tile.data.values()):
-                if tile._state.adding:
-                    for_insert.remove(tile)
-                else:
-                    for_update.remove(tile)
-                    for_delete.add(tile)
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None):
         if not from_queryset and (
