@@ -1285,7 +1285,7 @@ class ResourceInstance(models.Model):
         add_to_update_fields(kwargs, "graph_publication")
 
         if getattr(self, "_pythonic_model_fields", False):
-            self.save_tiles_for_pythonic_model(*args, **kwargs)
+            self._save_tiles_for_pythonic_model(*args, **kwargs)
         else:
             super().save(*args, **kwargs)
 
@@ -1293,43 +1293,26 @@ class ResourceInstance(models.Model):
         if getattr(self, "_pythonic_model_fields", False):
             pass  # run datatype validation on tile data
 
-    def save_tiles_for_pythonic_model(self, *args, **kwargs):
-        from arches.app.models.tile import Tile
+    def _save_tiles_for_pythonic_model(self, *args, **kwargs):
+        tiles_by_nodegroup_id = self._map_prefetched_tiles_to_nodegroup_ids()
+        for_insert = set()
+        for_update = set()
+        for_delete = set()
 
-        tiles_by_node_id = self._map_prefetched_tiles_to_node_ids()
-        for_insert = []
-        for_update = []
-        for_delete = []
-
-        for node in self.graph.node_set.all():
-            node_id_str = str(node.pk)
-            if attribute_name := self._pythonic_model_fields.get(node_id_str, ""):
-                db_tiles = tiles_by_node_id[node_id_str]
-                new_val = getattr(self, attribute_name)
-                # TODO: handle x-list, currently assuming list ~ cardinality N.
-                if not isinstance(new_val, list):
-                    new_val = (new_val,)
-                for i, inner_val in enumerate(new_val):
-                    try:
-                        tile = db_tiles[i]
-                    except IndexError:
-                        # parenttile? use Tile.get_blank_tile() instead?
-                        # Does unnecessary node queries--fix.
-                        tile = Tile.get_blank_tile_from_nodegroup_id(
-                            node.nodegroup_id, resourceid=self.pk
-                        )
-                        if db_tiles:
-                            # TODO: small risk of race condition--fix.
-                            tile.sortorder = max(t.sortorder or 0 for t in db_tiles) + 1
-                        tiles_by_node_id[node_id_str].append(tile)
-                        for_insert.append(tile)
-                    else:
-                        for_update.append(tile)
-                    # skipping validation...
-                    # skipping transform_value_for_tile
-                    tile.data[node_id_str] = inner_val
-
-                for_delete.extend(db_tiles[: len(new_val)])
+        nodegroups = (
+            NodeGroup.objects.filter(node__graph=self.graph)
+            .distinct()
+            .prefetch_related("node_set")
+        )
+        for nodegroup in nodegroups:
+            db_tiles = tiles_by_nodegroup_id[nodegroup.pk]
+            self._update_tiles_from_pythonic_model_values(
+                nodegroup,
+                db_tiles,
+                for_insert=for_insert,
+                for_update=for_update,
+                for_delete=for_delete,
+            )
 
         with transaction.atomic():
             # TODO: indexing, editlog, etc. (use/adapt proxy model methods?)
@@ -1349,12 +1332,66 @@ class ResourceInstance(models.Model):
             fields=kwargs.get("update_fields", None),
         )
 
-    def _map_prefetched_tiles_to_node_ids(self):
-        tiles_by_node = defaultdict(list)
-        for tile_to_update in self._prefetched_objects_cache["tilemodel_set"]:
-            for node_id in tile_to_update.data:
-                tiles_by_node[node_id].append(tile_to_update)
-        return tiles_by_node
+    def _map_prefetched_tiles_to_nodegroup_ids(self):
+        tiles_by_nodegroup = defaultdict(list)
+        for tile_to_update in self.sorted_tiles:
+            tiles_by_nodegroup[tile_to_update.nodegroup_id].append(tile_to_update)
+        return tiles_by_nodegroup
+
+    def _update_tiles_from_pythonic_model_values(
+        self, nodegroup, db_tiles, for_insert, for_update, for_delete
+    ):
+        working_tiles = []  # self.get_working_tiles
+        max_tile_length = 0
+        for attribute_name in self._pythonic_model_fields.values():
+            new_val = getattr(self, attribute_name)
+            # TODO: handle x-list, currently assuming list ~ cardinality N.
+            if not isinstance(new_val, list):
+                new_val = [new_val]
+            max_tile_length = max(max_tile_length, len(new_val))
+
+        for i in range(max(max_tile_length, len(db_tiles))):
+            try:
+                tile = db_tiles[i]
+            except IndexError:
+                tile = TileModel.get_blank_tile_from_nodegroup(
+                    nodegroup,
+                    resourceid=self.pk,
+                    # parenttile?
+                )
+                if db_tiles:
+                    # TODO: small risk of race condition--fix.
+                    tile.sortorder = max(t.sortorder or 0 for t in db_tiles) + 1
+                for_insert.add(tile)
+            else:
+                for_update.add(tile)
+            working_tiles.append(tile)
+
+        for node in nodegroup.node_set.all():
+            node_id_str = str(node.pk)
+            if not (attribute_name := self._pythonic_model_fields.get(node_id_str, "")):
+                continue
+
+            new_val = getattr(self, attribute_name)
+            # TODO: handle x-list, currently assuming list ~ cardinality N.
+            if not isinstance(new_val, list):
+                new_val = [new_val]
+
+            for tile, inner_val in zip(working_tiles, new_val, strict=False):
+                # skipping validation...
+                # skipping transform_value_for_tile
+                tile.data[node_id_str] = inner_val
+            for extra_tile in working_tiles[len(new_val) :]:
+                extra_tile.data[node_id_str] = None
+
+        for tile in working_tiles:
+            # TODO: preserve if child tiles?
+            if not any(tile.data.values()):
+                if tile._state.adding:
+                    for_insert.remove(tile)
+                else:
+                    for_update.remove(tile)
+                    for_delete.add(tile)
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None):
         if not from_queryset and (
@@ -1658,6 +1695,23 @@ class TileModel(models.Model):  # Tile
         return JSONSerializer().handle_model(
             self, fields=fields, exclude=exclude, **kwargs
         )
+
+    @staticmethod
+    def get_blank_tile_from_nodegroup(
+        nodegroup: NodeGroup, resourceid=None, parenttile=None
+    ):
+        tile = TileModel(
+            nodegroup_id=nodegroup.pk,
+            resourceinstance_id=resourceid,
+            parenttile=parenttile,
+            data={},
+        )
+
+        for node in nodegroup.node_set.all():
+            tile.data[str(node.nodeid)] = None
+
+        tile.full_clean()
+        return tile
 
 
 class Value(models.Model):

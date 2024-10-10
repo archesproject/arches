@@ -78,6 +78,7 @@ class PythonicModelQuerySet(models.QuerySet):
                 models.Prefetch(
                     "tilemodel_set",
                     queryset=TileModel.objects.order_by("sortorder"),
+                    to_attr="sorted_tiles",
                 ),
             )
             .annotate(
