@@ -1341,7 +1341,7 @@ class ResourceInstance(models.Model):
     def _update_tiles_from_pythonic_model_values(
         self, nodegroup, db_tiles, for_insert, for_update, for_delete
     ):
-        working_tiles = []  # self.get_working_tiles
+        working_tiles = []
         max_tile_length = 0
         for attribute_name in self._pythonic_model_fields.values():
             new_val = getattr(self, attribute_name)
@@ -1360,8 +1360,7 @@ class ResourceInstance(models.Model):
                     # parenttile?
                 )
                 if db_tiles:
-                    # TODO: small risk of race condition--fix.
-                    tile.sortorder = max(t.sortorder or 0 for t in db_tiles) + 1
+                    tile.sortorder = max(t.sortorder or 0 for t in working_tiles) + 1
                 for_insert.add(tile)
             else:
                 for_update.add(tile)
