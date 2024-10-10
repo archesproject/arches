@@ -46,6 +46,8 @@ class PythonicModelQuerySet(models.QuerySet):
         node_alias_annotations = {}
         node_aliases_by_node_id = {}
         for node in source_graph.node_set.all():
+            if node.datatype == "semantic":
+                continue
             if node.nodegroup is None:
                 continue
             if (defer and node.alias in defer) or (only and node.alias not in only):
