@@ -1,4 +1,5 @@
 import sys
+import itertools
 import json
 import uuid
 import datetime
@@ -1325,7 +1326,6 @@ class ResourceInstance(models.Model):
 
             super().save(*args, **kwargs)
 
-        del self._pythonic_model_fields
         # TODO: add unique constraint for TileModel re: sortorder
         self.refresh_from_db(
             using=kwargs.get("using", None),
@@ -1399,7 +1399,15 @@ class ResourceInstance(models.Model):
             from_queryset = self.__class__.as_model(
                 self.graph.slug, only=field_map.values()
             )
-        super().refresh_from_db(using, fields, from_queryset)
+            super().refresh_from_db(using, fields, from_queryset)
+            # Copy over annotations.
+            refreshed_resource = from_queryset[0]
+            for field in itertools.chain(
+                field_map.values(), ("_pythonic_model_fields", "sorted_tiles")
+            ):
+                setattr(self, field, getattr(refreshed_resource, field))
+        else:
+            super().refresh_from_db(using, fields, from_queryset)
 
 
 class ResourceInstanceLifecycle(models.Model):
