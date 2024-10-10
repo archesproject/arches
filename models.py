@@ -211,6 +211,14 @@ class ListItem(models.Model):
             )
         return data
 
+    def build_tile_value(self):
+        tile_value = {
+            "uri": self.uri or self.generate_uri(),
+            "labels": [label.serialize() for label in self.list_item_values.labels()],
+            "listid": str(self.id),
+        }
+        return tile_value
+
 
 class ListItemValue(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -274,7 +282,7 @@ class ListItemValue(models.Model):
             "valuetype_id": self.valuetype_id,
             "language_id": self.language_id,
             "value": self.value,
-            "list_item_id": self.list_item_id,
+            "list_item_id": str(self.list_item_id),
         }
 
     def delete(self):
@@ -313,7 +321,7 @@ class ListItemImage(models.Model):
     def serialize(self):
         return {
             "id": str(self.id),
-            "list_item_id": self.list_item_id,
+            "list_item_id": str(self.list_item_id),
             "url": self.value.url,
             "metadata": [
                 metadata.serialize() for metadata in self.list_item_image_metadata.all()

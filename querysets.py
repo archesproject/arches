@@ -34,6 +34,9 @@ class ListItemValueQuerySet(models.QuerySet):
     def values_without_images(self):
         return self.exclude(valuetype="image")
 
+    def labels(self):
+        return self.filter(valuetype__category="label")
+
     def images(self):
         return self.filter(valuetype="image")
 
