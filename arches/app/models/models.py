@@ -1410,9 +1410,7 @@ class ResourceInstance(models.Model):
             raise ValidationError(
                 # TODO: Django/DRF minds if this is not an actual field?
                 {
-                    alias: ValidationError(
-                        "\n".join(error["message"] for error in errors)
-                    )
+                    alias: ValidationError("\n".join(e["message"] for e in errors))
                     for alias, errors in errors_by_node_alias.items()
                 }
             )
@@ -1437,13 +1435,11 @@ class ResourceInstance(models.Model):
                 new_val = [new_val]
 
             for tile, inner_val in zip(working_tiles, new_val, strict=False):
+                # TODO: move this all somewhere else
                 # 1. transform_value_for_tile()
                 # 2. clean() TODO: swap order with 3?
                 # 3. pre_tile_save()
                 # 4. validate()
-                # if no errors:
-                # 5. __preSave() / __preDelete()
-                # but be careful if they throw?
 
                 transformed = inner_val
                 if inner_val is not None:
