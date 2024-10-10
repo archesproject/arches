@@ -887,8 +887,8 @@ class Resource(models.ResourceInstance):
             )
             filtered_instances = filtered_instances if user is not None else []
 
-            resourceid_to_permission = resourceid_to not in filtered_instances
-            resourceid_from_permission = resourceid_from not in filtered_instances
+            resourceid_to_permission = str(resourceid_to) not in filtered_instances
+            resourceid_from_permission = str(resourceid_from) not in filtered_instances
 
             if exclusive_set:
                 resourceid_to_permission = not (resourceid_to_permission)
