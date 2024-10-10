@@ -1293,7 +1293,7 @@ class ResourceInstance(models.Model):
     def clean(self):
         """Raises a compound ValidationError with any failing tile values."""
         if getattr(self, "_pythonic_model_fields", False):
-            self._update_tiles_from_pythonic_model_values(run_triggers=False)
+            self._update_tiles_from_pythonic_model_values()
 
     def _save_tiles_for_pythonic_model(self, index=False, **kwargs):
         """Raises a compound ValidationError with any failing tile values.
@@ -1302,12 +1302,30 @@ class ResourceInstance(models.Model):
         values during a save(), but the "pythonic models" interface
         is basically a form/serializer, so that's why we're validating.)
         """
+        from arches.app.models.tile import Tile
+
         to_insert, to_update, to_delete = (
             self._update_tiles_from_pythonic_model_values()
         )
 
+        run_functions = kwargs.get("run_functions", False)
+        if run_functions:
+            # Instantiate proxy models (for now).
+            upsert_proxies = [
+                Tile.objects.get(pk=tile.pk) for tile in to_insert + to_update
+            ]
+            delete_proxies = [Tile.objects.get(pk=tile.pk) for tile in to_delete]
+
         with transaction.atomic():
-            # TODO: indexing, editlog, etc. (use/adapt proxy model methods?)
+            if run_functions:
+                for proxy_instance in upsert_proxies:
+                    proxy_instance.__preSave()
+                for proxy_instance in delete_proxies:
+                    proxy_instance.__preDelete()
+
+            # TODO: more side effects, e.g. indexing, editlog
+            # (use/adapt proxy model methods?)
+            # datatype_post_save_actions?
             if to_insert:
                 TileModel.objects.bulk_create(to_insert)
             if to_update:
@@ -1316,6 +1334,10 @@ class ResourceInstance(models.Model):
                 TileModel.objects.filter(pk__in=[t.pk for t in to_delete]).delete()
 
             super().save(*args, **kwargs)
+            if run_functions:
+                for proxy_instance in upsert_proxies:
+                    proxy_instance.refresh_from_db()
+                    proxy_instance.__postSave()
 
         # TODO: add unique constraint for TileModel re: sortorder
         self.refresh_from_db(
@@ -1376,7 +1398,9 @@ class ResourceInstance(models.Model):
                     to_update.add(tile)
                 working_tiles.append(tile)
 
-            self._update_tile_values(nodegroup, working_tiles, errors_by_node_alias)
+            self._validate_and_patch_from_pythonic_model_values(
+                nodegroup, working_tiles, errors_by_node_alias
+            )
 
             for tile in working_tiles:
                 # TODO: preserve if child tiles?
@@ -1398,7 +1422,9 @@ class ResourceInstance(models.Model):
 
         return to_insert, to_update, to_delete
 
-    def _update_tile_values(self, nodegroup, working_tiles, errors_by_node_alias):
+    def _validate_and_patch_from_pythonic_model_values(
+        self, nodegroup, working_tiles, errors_by_node_alias
+    ):
         from arches.app.datatypes.datatypes import DataTypeFactory
 
         datatype_factory = DataTypeFactory()
@@ -1441,8 +1467,7 @@ class ResourceInstance(models.Model):
                 if errors := datatype_instance.validate(transformed, node=node):
                     errors_by_node_alias[node.alias].extend(errors)
 
-                # TODO: call tile lifecycle triggers
-                # update data...
+                # Patch the validated data into the working tiles.
                 tile.data[node_id_str] = inner_val
 
             for extra_tile in working_tiles[len(new_val) :]:
