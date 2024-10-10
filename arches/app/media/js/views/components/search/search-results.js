@@ -54,7 +54,7 @@ define([
 
                 this.searchFilterVms[componentName](this);
                 this.restoreState();
-                
+
                 this.mapFilter = this.getFilterByType("map-filter-type", false);
                 this.mapFilter.subscribe(mapFilter => {
                     if (mapFilter) {
@@ -124,6 +124,15 @@ define([
 
                 return function () {
                     reportDataLoaded(false);
+                    reportDataLoaded.subscribe((loaded) => {
+                        if (loaded) {
+                            self.details.setupReport(
+                                result._source,
+                                self.bulkResourceReportCache,
+                                self.bulkDisambiguatedResourceInstanceCache,
+                            );
+                        }
+                    });
 
                     if (
                         !self.bulkDisambiguatedResourceInstanceCache()[
@@ -154,16 +163,6 @@ define([
                         reportDataLoaded(true);
                         self.shiftFocus(".resource-report");
                     }
-
-                    reportDataLoaded.subscribe((loaded) => {
-                        if (loaded) {
-                            self.details.setupReport(
-                                result._source,
-                                self.bulkResourceReportCache,
-                                self.bulkDisambiguatedResourceInstanceCache,
-                            );
-                        }
-                    });
 
                     if (self.selectedTab() !== "search-result-details-type") {
                         self.selectedTab("search-result-details-type");
