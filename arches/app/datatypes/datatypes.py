@@ -16,7 +16,8 @@ from datetime import datetime
 from mimetypes import MimeTypes
 
 from django.core.files.images import get_image_dimensions
-from django.db.models import fields
+from django.db.models import fields, Value
+from django.db.models.expressions import CombinedExpression
 
 from arches.app.const import ExtensionType
 from arches.app.datatypes.base import BaseDataType
@@ -2380,6 +2381,17 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
 
     def collects_multiple_values(self):
         return True
+
+    def _get_base_orm_lookup(self, node):
+        return f"data__{node.pk}"  # TODO: UUIDField?
+
+    def _get_orm_array_transform(self, lookup):
+        return CombinedExpression(
+            super()._get_orm_array_transform(lookup),
+            "->>",
+            Value("resourceId"),
+            output_field=fields.UUIDField(),
+        )
 
 
 class NodeValueDataType(BaseDataType):
