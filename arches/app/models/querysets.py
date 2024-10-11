@@ -1,6 +1,8 @@
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models
 
+from arches.app.models.utils import field_names
+
 
 class PythonicModelQuerySet(models.QuerySet):
     def with_unpacked_tiles(self, graph_slug, *, defer=None, only=None):
@@ -26,6 +28,7 @@ class PythonicModelQuerySet(models.QuerySet):
 
         Provisional edits are completely ignored.
         """
+        from arches.app.datatypes.datatypes import DataTypeFactory
         from arches.app.models.models import GraphModel, TileModel
 
         if defer and only and (overlap := set(defer).intersection(set(only))):
@@ -44,6 +47,8 @@ class PythonicModelQuerySet(models.QuerySet):
             e.add_note(f"No graph found with slug: {graph_slug}")
             raise
 
+        invalid_names = field_names(self.model)
+        datatype_factory = DataTypeFactory()
         node_alias_annotations = {}
         node_aliases_by_node_id = {}
         for node in source_graph.node_set.all():
@@ -53,9 +58,10 @@ class PythonicModelQuerySet(models.QuerySet):
                 continue
             if (defer and node.alias in defer) or (only and node.alias not in only):
                 continue
-            # TODO: unwrap with datatype-aware transforms
-            # TODO: don't worry about name collisions for now, e.g. "name"
-            tile_lookup = models.F(f"tilemodel__data__{node.pk}")
+            if node in invalid_names:
+                raise ValueError(f'"{node.alias}" clashes with a model field name.')
+            datatype_instance = datatype_factory.get_instance(node.datatype)
+            tile_lookup = datatype_instance.get_orm_lookup(node)
 
             if node.nodegroup.cardinality == "n":
                 # TODO: May produce duplicates until we add unique constraint
