@@ -1,9 +1,13 @@
-import json, urllib
+import json
+import logging
+import urllib
+
+from django.db.models import F
 from django.urls import reverse
-from arches.app.models import models
-from arches.app.models.system_settings import settings
-from arches.app.search.elasticsearch_dsl_builder import Dsl, Bool, Terms, Exists, Nested
 from django.utils.translation import gettext as _
+
+from arches.app.models import models
+from arches.app.search.elasticsearch_dsl_builder import Dsl, Bool, Terms, Exists, Nested
 import logging
 
 logger = logging.getLogger(__name__)
@@ -532,3 +536,9 @@ class BaseDataType(object):
         a GraphValidationError
         """
         pass
+
+    def get_orm_lookup(self, node, from_resource=True):
+        lookup = f"data__{node.pk}"
+        if from_resource:
+            lookup = "tilemodel__" + lookup
+        return F(lookup)
