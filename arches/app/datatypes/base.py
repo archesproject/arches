@@ -2,7 +2,8 @@ import json
 import logging
 import urllib
 
-from django.db.models import F
+from django.contrib.postgres.expressions import ArraySubquery
+from django.db.models import F, OuterRef
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -538,7 +539,26 @@ class BaseDataType(object):
         pass
 
     def get_orm_lookup(self, node, from_resource=True):
-        lookup = f"data__{node.pk}"
+        base_lookup = self._get_base_orm_lookup(node)
+
+        if node.nodegroup.cardinality == "n":
+            # TODO: May produce duplicates until we add unique constraint
+            # on TileModel.resourceinstance_id, nodegroup_id, sortorder
+            if from_resource:
+                tile_query = models.TileModel.objects.filter(
+                    nodegroup_id=node.nodegroup.pk, resourceinstance_id=OuterRef("pk")
+                )
+            else:
+                tile_query = models.TileModel.objects.filter(
+                    nodegroup_id=node.nodegroup.pk
+                )
+            return ArraySubquery(tile_query.order_by("sortorder").values(base_lookup))
+
         if from_resource:
-            lookup = "tilemodel__" + lookup
+            lookup = "tilemodel__" + base_lookup
+        else:
+            lookup = base_lookup
         return F(lookup)
+
+    def _get_base_orm_lookup(self, node):
+        return f"data__{node.pk}"

@@ -2349,6 +2349,9 @@ class ResourceInstanceDataType(BaseDataType):
         }
         return mapping
 
+    def _get_base_orm_lookup(self, node):
+        return f"data__{node.pk}__0__resourceId"
+
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
     def to_json(self, tile, node):
