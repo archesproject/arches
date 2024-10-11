@@ -1,4 +1,3 @@
-from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models
 
 from arches.app.models.utils import field_names
@@ -58,19 +57,11 @@ class PythonicModelQuerySet(models.QuerySet):
                 continue
             if (defer and node.alias in defer) or (only and node.alias not in only):
                 continue
-            if node in invalid_names:
+            if node.alias in invalid_names:
                 raise ValueError(f'"{node.alias}" clashes with a model field name.')
+
             datatype_instance = datatype_factory.get_instance(node.datatype)
             tile_lookup = datatype_instance.get_orm_lookup(node)
-
-            if node.nodegroup.cardinality == "n":
-                # TODO: May produce duplicates until we add unique constraint
-                # on TileModel.resourceinstance_id, nodegroup_id, sortorder
-                tile_lookup = ArrayAgg(
-                    tile_lookup,
-                    filter=models.Q(tilemodel__nodegroup_id=node.nodegroup.pk),
-                    ordering="tilemodel__sortorder",
-                )
             node_alias_annotations[node.alias] = tile_lookup
             node_aliases_by_node_id[str(node.pk)] = node.alias
 
