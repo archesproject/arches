@@ -9,7 +9,6 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from arches.app.models import models
-from arches.app.models.query_expressions import JsonbArrayElements
 from arches.app.search.elasticsearch_dsl_builder import Dsl, Bool, Terms, Exists, Nested
 import logging
 
@@ -553,12 +552,15 @@ class BaseDataType(object):
                 )
             tile_query = tile_query.order_by("sortorder")
             if self.collects_multiple_values():
-                array_transform = self._get_orm_array_transform(base_lookup)
-                tile_query = tile_query.annotate(
-                    array_transform=array_transform
-                ).values(
-                    "array_transform"  # TODO: name clash or OK?
-                )
+                try:
+                    array_transform = self._get_orm_array_transform(base_lookup)
+                except NotImplementedError:
+                    tile_query = tile_query.values(base_lookup)
+                else:
+                    # TODO: name clash or OK?
+                    tile_query = tile_query.annotate(
+                        array_transform=array_transform
+                    ).values("array_transform")
             else:
                 tile_query = tile_query.values(base_lookup)
             return ArraySubquery(tile_query)
@@ -569,12 +571,15 @@ class BaseDataType(object):
             lookup = base_lookup
 
         if self.collects_multiple_values():
-            return self._get_orm_array_transform(lookup)
-        else:
-            return F(lookup)
+            try:
+                return self._get_orm_array_transform(lookup)
+            except NotImplementedError:
+                pass
+
+        return F(lookup)
 
     def _get_base_orm_lookup(self, node):
         return f"data__{node.pk}"
 
     def _get_orm_array_transform(self, lookup):
-        return JsonbArrayElements(F(lookup))
+        raise NotImplementedError

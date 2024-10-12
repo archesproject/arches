@@ -25,6 +25,7 @@ from arches.app.models import models
 from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.system_settings import settings
 from arches.app.models.fields.i18n import I18n_JSONField, I18n_String
+from arches.app.models.query_expressions import JsonbArrayElements
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
@@ -2387,7 +2388,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
 
     def _get_orm_array_transform(self, lookup):
         return CombinedExpression(
-            super()._get_orm_array_transform(lookup),
+            JsonbArrayElements(super()._get_orm_array_transform(lookup)),
             "->>",
             Value("resourceId"),
             output_field=fields.UUIDField(),
