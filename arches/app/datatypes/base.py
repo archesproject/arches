@@ -543,27 +543,7 @@ class BaseDataType(object):
         base_lookup = self._get_base_orm_lookup(node)
 
         if node.nodegroup.cardinality == "n":
-            # TODO: May produce duplicates until we add unique constraint
-            # on TileModel.resourceinstance_id, nodegroup_id, sortorder
-            tile_query = models.TileModel.objects.filter(nodegroup_id=node.nodegroup.pk)
-            if from_resource:
-                tile_query = tile_query.filter(
-                    resourceinstance_id=OuterRef("resourceinstanceid")
-                )
-            tile_query = tile_query.order_by("sortorder")
-            if self.collects_multiple_values():
-                try:
-                    array_transform = self._get_orm_array_transform(base_lookup)
-                except NotImplementedError:
-                    tile_query = tile_query.values(base_lookup)
-                else:
-                    # TODO: name clash or OK?
-                    tile_query = tile_query.annotate(
-                        array_transform=array_transform
-                    ).values("array_transform")
-            else:
-                tile_query = tile_query.values(base_lookup)
-            return ArraySubquery(tile_query)
+            return self._get_orm_lookup_cardinality_n(node, base_lookup, from_resource)
 
         if from_resource:
             lookup = "tilemodel__" + base_lookup
@@ -577,6 +557,27 @@ class BaseDataType(object):
                 pass
 
         return F(lookup)
+
+    def _get_orm_lookup_cardinality_n(self, node, base_lookup, from_resource=True):
+        # TODO: May produce duplicates until we add unique constraint
+        # on TileModel.resourceinstance_id, nodegroup_id, sortorder
+        tile_query = models.TileModel.objects.filter(nodegroup_id=node.nodegroup.pk)
+        if from_resource:
+            tile_query = tile_query.filter(
+                resourceinstance_id=OuterRef("resourceinstanceid")
+            )
+        tile_query = tile_query.order_by("sortorder")
+        if self.collects_multiple_values():
+            try:
+                as_array = self._get_orm_array_transform(base_lookup)
+            except NotImplementedError:
+                tile_query = tile_query.values(base_lookup)
+            else:
+                # TODO: name clash or OK?
+                tile_query = tile_query.annotate(as_array=as_array).values("as_array")
+        else:
+            tile_query = tile_query.values(base_lookup)
+        return ArraySubquery(tile_query)
 
     def _get_base_orm_lookup(self, node):
         return f"data__{node.pk}"
