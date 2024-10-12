@@ -67,6 +67,9 @@ class PythonicModelQuerySet(models.QuerySet):
 
         if not node_alias_annotations:
             raise ValueError("All fields were excluded.")
+        for given_alias in only or []:
+            if given_alias not in node_alias_annotations:
+                raise ValueError(f'"{given_alias}" is not a valid node alias.')
 
         return (
             self.filter(graph=source_graph)
