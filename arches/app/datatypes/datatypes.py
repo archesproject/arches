@@ -16,8 +16,8 @@ from datetime import datetime
 from mimetypes import MimeTypes
 
 from django.core.files.images import get_image_dimensions
-from django.db.models import fields, Value
-from django.db.models.expressions import CombinedExpression
+from django.db.models import CharField, F, JSONField, Q, Value
+from django.db.models.expressions import Case, CombinedExpression, When
 
 from arches.app.const import ExtensionType
 from arches.app.datatypes.base import BaseDataType
@@ -2388,10 +2388,16 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
 
     def _get_orm_array_transform(self, lookup):
         return CombinedExpression(
-            JsonbArrayElements(super()._get_orm_array_transform(lookup)),
+            JsonbArrayElements(
+                Case(
+                    When(~Q(**{lookup: None}), then=F(lookup)),
+                    default=Value('[{"resourceId": null}]'),
+                    output_field=JSONField(),
+                ),
+            ),
             "->>",
             Value("resourceId"),
-            output_field=fields.UUIDField(),
+            output_field=CharField(),  # TODO: UUIDField?
         )
 
 
