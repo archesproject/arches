@@ -21,7 +21,7 @@ from django.contrib.auth import authenticate
 from django.shortcuts import render
 from django.views.generic import View
 from django.db import transaction, connection
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.http import Http404, HttpResponse
 from django.http.request import QueryDict
 from django.core import management
@@ -1225,16 +1225,17 @@ class Card(APIBase):
             cards = (
                 graph.cardmodel_set.order_by("sortorder")
                 .filter(nodegroup__in=nodegroups)
-                .prefetch_related("cardxnodexwidget_set")
+                .prefetch_related(
+                    Prefetch(
+                        "cardxnodexwidget_set",
+                        queryset=models.CardXNodeXWidget.objects.order_by("sortorder"),
+                    )
+                )
             )
             serialized_cards = JSONSerializer().serializeToPython(cards)
-            cardwidgets = [
-                widget
-                for widget in [
-                    card.cardxnodexwidget_set.order_by("sortorder").all()
-                    for card in cards
-                ]
-            ]
+            cardwidgets = []
+            for card in cards:
+                cardwidgets += card.cardxnodexwidget_set.all()
 
         editable_nodegroup_ids = [
             str(nodegroup.pk) for nodegroup in editable_nodegroups
