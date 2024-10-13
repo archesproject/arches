@@ -701,7 +701,6 @@ class Graph(models.GraphModel):
                         ),
                         language=language,
                     )
-                    published_graph.save()
 
             # edge case for instantiating a serialized_graph that has a resource_instance_lifecycle not already in the system
             if self.resource_instance_lifecycle and not len(
@@ -2375,6 +2374,7 @@ class Graph(models.GraphModel):
                     elif len(published_graph_query) == 1:
                         published_graph = published_graph_query[0]
                         published_graph.serialized_graph = serialized_graph
+                        published_graph.save()
                     else:
                         raise GraphPublicationError(
                             message=_(
@@ -2382,7 +2382,6 @@ class Graph(models.GraphModel):
                             )
                         )
 
-                    published_graph.save()
                     translation.deactivate()
 
     def create_editable_future_graph(self):
@@ -2938,7 +2937,6 @@ class Graph(models.GraphModel):
             publication = models.GraphXPublishedGraph.objects.create(
                 graph=self, notes=notes, user=user
             )
-            publication.save()
 
             self.publication = publication
             self.has_unpublished_changes = False
@@ -2950,15 +2948,13 @@ class Graph(models.GraphModel):
 
                 translation.activate(language=language_tuple[0])
 
-                published_graph = models.PublishedGraph.objects.create(
+                models.PublishedGraph.objects.create(
                     publication=publication,
                     serialized_graph=JSONDeserializer().deserialize(
                         JSONSerializer().serialize(self, force_recalculation=True)
                     ),
                     language=language,
                 )
-
-                published_graph.save()
 
             translation.deactivate()
 
