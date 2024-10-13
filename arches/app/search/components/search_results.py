@@ -144,7 +144,7 @@ class SearchResultsFilter(BaseSearchFilter):
 
 def get_nodegroups_by_datatype_and_perm(request, datatype, permission):
     nodes = []
-    for node in Node.objects.filter(datatype=datatype):
+    for node in Node.objects.filter(datatype=datatype).select_related("nodegroup"):
         if request.user.has_perm(permission, node.nodegroup):
             nodes.append(str(node.nodegroup_id))
     return nodes
