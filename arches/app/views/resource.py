@@ -22,6 +22,7 @@ import uuid
 
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.contrib.auth.models import User, Group
+from django.db.models import Prefetch
 from django.forms.models import model_to_dict
 from django.http import HttpResponseNotFound
 from django.http import Http404
@@ -303,14 +304,17 @@ class ResourceEditorView(MapBaseManagerView):
             cards = (
                 graph.cardmodel_set.order_by("sortorder")
                 .filter(nodegroup__in=nodegroups)
-                .prefetch_related("cardxnodexwidget_set")
+                .prefetch_related(
+                    Prefetch(
+                        "cardxnodexwidget_set",
+                        queryset=models.CardXNodeXWidget.objects.order_by("sortorder"),
+                    )
+                )
             )
             serialized_cards = JSONSerializer().serializeToPython(cards)
             cardwidgets = []
             for card in cards:
-                cardwidgets += list(
-                    card.cardxnodexwidget_set.order_by("sortorder").all()
-                )
+                cardwidgets += card.cardxnodexwidget_set.all()
 
         updated_cardwidgets = add_i18n_to_cardwidget_defaults(cardwidgets)
 
