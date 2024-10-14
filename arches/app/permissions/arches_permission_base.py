@@ -207,7 +207,12 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
 
     @abstractmethod
     def check_resource_instance_permissions(
-        self, user: User, resourceid: str, permission: str
+        self,
+        user: User,
+        resourceid: str,
+        permission: str,
+        *,
+        resource: ResourceInstance | None,
     ): ...
 
     def get_groups_with_permission_for_object(
@@ -292,7 +297,11 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         return nodes.exists()
 
     def user_can_read_resource(
-        self, user: User, resourceid: str | None = None
+        self,
+        user: User,
+        resourceid: str | None = None,
+        *,
+        resource: ResourceInstance | None = None,
     ) -> bool | None:
         """
         Requires that a user be able to read an instance and read a single nodegroup of a resource
@@ -303,7 +312,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                 return True
             if resourceid is not None and resourceid != "":
                 result = self.check_resource_instance_permissions(
-                    user, resourceid, "view_resourceinstance"
+                    user, resourceid, "view_resourceinstance", resource=resource
                 )
                 if result is not None:
                     if result["permitted"] == "unknown":
@@ -340,7 +349,13 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
 
         return list(str(graph) for graph in graphs)
 
-    def user_can_edit_resource(self, user: User, resourceid: str | None = None) -> bool:
+    def user_can_edit_resource(
+        self,
+        user: User,
+        resourceid: str | None = None,
+        *,
+        resource: ResourceInstance | None = None,
+    ) -> bool:
         """
         Requires that a user be able to edit an instance and delete a single nodegroup of a resource
 
@@ -348,9 +363,9 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         if user.is_authenticated:
             if user.is_superuser:
                 return True
-            if resourceid is not None and resourceid != "":
+            if resourceid:
                 result = self.check_resource_instance_permissions(
-                    user, resourceid, "change_resourceinstance"
+                    user, resourceid, "change_resourceinstance", resource=resource
                 )
                 if result is not None:
                     if result["permitted"] == "unknown":
@@ -371,7 +386,11 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         return False
 
     def user_can_delete_resource(
-        self, user: User, resourceid: str | None = None
+        self,
+        user: User,
+        resourceid: str | None = None,
+        *,
+        resource: ResourceInstance | None = None,
     ) -> bool | None:
         """
         Requires that a user be permitted to delete an instance
@@ -380,9 +399,9 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         if user.is_authenticated:
             if user.is_superuser:
                 return True
-            if resourceid is not None and resourceid != "":
+            if resourceid:
                 result = self.check_resource_instance_permissions(
-                    user, resourceid, "delete_resourceinstance"
+                    user, resourceid, "delete_resourceinstance", resource=resource
                 )
                 if result is not None:
                     if result["permitted"] == "unknown":

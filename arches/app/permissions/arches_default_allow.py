@@ -241,7 +241,12 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
             return restricted_ids
 
     def check_resource_instance_permissions(
-        self, user: User, resourceid: str, permission: str
+        self,
+        user: User,
+        resourceid: str | None,
+        permission: str,
+        *,
+        resource: ResourceInstance | None = None,
     ) -> ResourceInstancePermissions:
         """
         Checks if a user has permission to access a resource instance
@@ -251,6 +256,8 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         resourceid -- the id of the resource
         permission -- the permission codename (e.g. 'view_resourceinstance') for which to check
 
+        Optional arguments:
+        resource -- provide an instance to avoid having to fetch it by ID.
         """
         result = ResourceInstancePermissions()
         try:
@@ -259,10 +266,12 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
                     result["permitted"] = False
                     return result
 
-            resource = ResourceInstance.objects.select_related(
-                "resource_instance_lifecycle_state"
-            ).get(resourceinstanceid=resourceid)
-
+            if not resource:
+                resource = ResourceInstance.objects.select_related(
+                    "resource_instance_lifecycle_state"
+                ).get(resourceinstanceid=resourceid)
+            elif resourceid:
+                raise ValueError("resourceid and resource are mutually incompatible")
             result["resource"] = resource
 
             all_perms = self.get_perms(user, resource)
