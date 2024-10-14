@@ -77,7 +77,9 @@ class PermissionFramework(metaclass=ABCMeta):
     def get_users_with_permission_for_object(self, perm, obj): ...
 
     @abstractmethod
-    def check_resource_instance_permissions(self, user, resourceid, permission): ...
+    def check_resource_instance_permissions(
+        self, user, resourceid, permission, *, resource=None
+    ): ...
 
     @abstractmethod
     def get_nodegroups_by_perm(self, user, perms, any_perm=True): ...
@@ -98,13 +100,13 @@ class PermissionFramework(metaclass=ABCMeta):
     def user_has_resource_model_permissions(self, user, perms, resource): ...
 
     @abstractmethod
-    def user_can_read_resource(self, user, resourceid=None): ...
+    def user_can_read_resource(self, user, resourceid=None, *, resource=None): ...
 
     @abstractmethod
-    def user_can_edit_resource(self, user, resourceid=None): ...
+    def user_can_edit_resource(self, user, resourceid=None, *, resource=None): ...
 
     @abstractmethod
-    def user_can_delete_resource(self, user, resourceid=None): ...
+    def user_can_delete_resource(self, user, resourceid=None, *, resource=None): ...
 
     @abstractmethod
     def user_can_read_concepts(self, user): ...
@@ -217,9 +219,9 @@ def get_users_with_permission_for_object(perm, obj):
     return _get_permission_framework().get_users_with_permission_for_object(perm, obj)
 
 
-def check_resource_instance_permissions(user, resourceid, permission):
+def check_resource_instance_permissions(user, resourceid, permission, *, resource=None):
     return _get_permission_framework().check_resource_instance_permissions(
-        user, resourceid, permission
+        user, resourceid, permission, resource=resource
     )
 
 
@@ -309,21 +311,21 @@ def user_has_resource_model_permissions(user, perms, resource):
     )
 
 
-def user_can_read_resource(user, resourceid=None):
+def user_can_read_resource(user, resourceid=None, *, resource=None):
     return _get_permission_framework().user_can_read_resource(
-        user, resourceid=resourceid
+        user, resourceid=resourceid, resource=resource
     )
 
 
-def user_can_edit_resource(user, resourceid=None):
+def user_can_edit_resource(user, resourceid=None, *, resource=None):
     return _get_permission_framework().user_can_edit_resource(
-        user, resourceid=resourceid
+        user, resourceid=resourceid, resource=resource
     )
 
 
-def user_can_delete_resource(user, resourceid=None):
+def user_can_delete_resource(user, resourceid=None, *, resource=None):
     return _get_permission_framework().user_can_delete_resource(
-        user, resourceid=resourceid
+        user, resourceid=resourceid, resource=resource
     )
 
 

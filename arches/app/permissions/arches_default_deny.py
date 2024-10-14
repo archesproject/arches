@@ -106,11 +106,19 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
         return restricted_ids
 
     def check_resource_instance_permissions(
-        self, user: User, resourceid: str, permission: str
+        self,
+        user: User,
+        resourceid: str | None,
+        permission: str,
+        *,
+        resource: ResourceInstance | None = None,
     ) -> ResourceInstancePermissions:
 
         result = ResourceInstancePermissions()
-        resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
+        if not resource:
+            resource = ResourceInstance.objects.get(resourceinstanceid=resourceid)
+        elif resourceid:
+            raise ValueError("resourceid and resource are mutually incompatible")
         if resourceid == settings.SYSTEM_SETTINGS_RESOURCE_ID:
             result["resource"] = resource
             if not user.groups.filter(name="System Administrator").exists():
@@ -295,7 +303,13 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
 
         return result
 
-    def user_can_read_resource(self, user: User, resourceid: str | None = None) -> bool:
+    def user_can_read_resource(
+        self,
+        user: User,
+        resourceid: str | None = None,
+        *,
+        resource: ResourceInstance | None = None,
+    ) -> bool:
         """
         Requires that a user be able to read an instance and read a single nodegroup of a resource
 
@@ -303,9 +317,9 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
         if user.is_authenticated:
             if user.is_superuser:
                 return True
-            if resourceid is not None and resourceid != "":
+            if resourceid:
                 result = self.check_resource_instance_permissions(
-                    user, resourceid, "view_resourceinstance"
+                    user, resourceid, "view_resourceinstance", resource=resource
                 )
                 if result is not None:
                     if result["permitted"] == "unknown":

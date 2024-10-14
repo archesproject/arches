@@ -502,7 +502,24 @@ class Resources(APIBase):
     # }]
 
     def get(self, request, resourceid=None, slug=None, graphid=None):
-        if not user_can_read_resource(user=request.user, resourceid=resourceid):
+        try:
+            resource = (
+                Resource.objects.filter(pk=resourceid)
+                .select_related(
+                    "graph",
+                    "resource_instance_lifecycle_state",
+                )
+                .get()
+            )
+        except Resource.DoesNotExist as dne:
+            logger.error(
+                _("The specified resource '{0}' does not exist. Export failed.").format(
+                    resourceid
+                )
+            )
+            return JSONErrorResponse(message=dne.args[0], status=HTTPStatus.NOT_FOUND)
+
+        if not user_can_read_resource(user=request.user, resource=resource):
             return JSONResponse(status=403)
 
         allowed_formats = ["json", "json-ld", "arches-json"]
@@ -526,8 +543,6 @@ class Resources(APIBase):
 
         if resourceid:
             if format == "json":
-                resource = Resource.objects.get(pk=resourceid)
-
                 version = request.GET.get("v", None)
                 compact = bool(
                     request.GET.get("compact", "true").lower() == "true"
@@ -564,8 +579,7 @@ class Resources(APIBase):
                     }
 
             elif format == "arches-json":
-                out = Resource.objects.get(pk=resourceid)
-
+                out = resource
                 include_tiles = bool(
                     request.GET.get("includetiles", "true").lower() == "true"
                 )  # default True
@@ -574,31 +588,20 @@ class Resources(APIBase):
                     out.load_tiles(user, perm)
 
             elif format == "json-ld":
-                try:
-                    resource = models.ResourceInstance.objects.select_related(
-                        "graph"
-                    ).get(pk=resourceid)
-                    if not resource.graph.ontology_id:
-                        return JSONErrorResponse(
-                            message=_(
-                                "The graph '{0}' does not have an ontology. JSON-LD requires one."
-                            ).format(resource.graph.name),
-                            status=400,
-                        )
-                    exporter = ResourceExporter(format=format)
-                    output = exporter.writer.write_resources(
-                        resourceinstanceids=[resourceid],
-                        indent=indent,
-                        user=request.user,
+                if not resource.graph.ontology_id:
+                    return JSONErrorResponse(
+                        message=_(
+                            "The graph '{0}' does not have an ontology. JSON-LD requires one."
+                        ).format(resource.graph.name),
+                        status=400,
                     )
-                    out = output[0]["outputfile"].getvalue()
-                except models.ResourceInstance.DoesNotExist:
-                    logger.error(
-                        _(
-                            "The specified resource '{0}' does not exist. JSON-LD export failed."
-                        ).format(resourceid)
-                    )
-                    return JSONResponse(status=404)
+                exporter = ResourceExporter(format=format)
+                output = exporter.writer.write_resources(
+                    resourceinstanceids=[resourceid],
+                    indent=indent,
+                    user=request.user,
+                )
+                out = output[0]["outputfile"].getvalue()
 
         else:
             #
@@ -685,7 +688,7 @@ class Resources(APIBase):
             )
 
         if not user_can_edit_resource(user=request.user, resourceid=resourceid):
-            return JSONResponse(status=403)
+            return JSONErrorResponse(status=403)
         else:
             with transaction.atomic():
                 try:
@@ -885,14 +888,14 @@ class Resources(APIBase):
             )
 
     def delete(self, request, resourceid, slug=None, graphid=None):
+        try:
+            resource_instance = Resource.objects.get(pk=resourceid)
+        except Resource.DoesNotExist as dne:
+            return JSONErrorResponse(message=dne.args[0], status=404)
         if user_can_edit_resource(
-            user=request.user, resourceid=resourceid
-        ) and user_can_delete_resource(user=request.user, resourceid=resourceid):
-            try:
-                resource_instance = Resource.objects.get(pk=resourceid)
-                resource_instance.delete()
-            except models.ResourceInstance.DoesNotExist:
-                return JSONResponse(status=404)
+            user=request.user, resource=resource_instance
+        ) and user_can_delete_resource(user=request.user, resource=resource_instance):
+            resource_instance.delete()
         else:
             return JSONResponse(status=500)
 
@@ -1826,9 +1829,13 @@ class InstancePermission(APIBase):
         user = request.user
         result = {}
         resourceinstanceid = request.GET.get("resourceinstanceid")
-        result["read"] = user_can_read_resource(user, resourceinstanceid)
-        result["edit"] = user_can_edit_resource(user, resourceinstanceid)
-        result["delete"] = user_can_delete_resource(user, resourceinstanceid)
+        try:
+            resource = models.ResourceInstance.objects.get(pk=resourceinstanceid)
+        except models.ResourceInstance.DoesNotExist as dne:
+            return JSONErrorResponse(message=dne.args[0], status=HTTPStatus.NOT_FOUND)
+        result["read"] = user_can_read_resource(user, resource=resource)
+        result["edit"] = user_can_edit_resource(user, resource=resource)
+        result["delete"] = user_can_delete_resource(user, resource=resource)
         return JSONResponse(result)
 
 

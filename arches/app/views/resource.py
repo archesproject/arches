@@ -945,9 +945,11 @@ class ResourceDescriptors(View):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
-        resource = Resource.objects.only(
-            "graph_id", "resource_instance_lifecycle_state"
-        ).get(pk=resourceid)
+        resource = (
+            models.ResourceInstance.objects.filter(pk=resourceid)
+            .select_related("resource_instance_lifecycle_state")
+            .get()
+        )
         graph = Graph.objects.get(graphid=resource.graph_id)
         graph_has_different_publication = bool(
             resource.graph_publication_id != graph.publication_id
@@ -985,7 +987,7 @@ class ResourceReportView(MapBaseManagerView):
         )
 
         context["user_can_edit_resource"] = user_can_edit_resource(
-            request.user, resourceid=resourceid
+            request.user, resource=resource
         )
 
         context["resource_instance_lifecycle_state_permits_editing"] = (
