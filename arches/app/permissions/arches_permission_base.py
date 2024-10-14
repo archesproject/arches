@@ -752,7 +752,7 @@ def get_nodegroups_by_perm_for_user_or_group(
         NodeGroup,
     )
 
-    for nodegroup in NodeGroup.objects.all():
+    for nodegroup in NodeGroup.objects.only("nodegroupid").all():
         explicit_perms = checker.get_perms(nodegroup)
 
         if len(explicit_perms):
