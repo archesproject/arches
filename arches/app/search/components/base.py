@@ -112,10 +112,8 @@ class SearchFilterFactory(object):
         return searchview_component_name
 
     def get_searchview_instance(self, **kwargs):
-        default_property = kwargs.get("default_property", None)
-        searchview_component_name = self.get_searchview_name(
-            default_property=default_property
-        )
+        default_type = kwargs.get("default_type", None)
+        searchview_component_name = self.get_searchview_name(default_type=default_type)
         return self.get_filter(searchview_component_name)
 
     def create_search_query_dict(self, key_value_pairs: List[Tuple[str, Any]]):
