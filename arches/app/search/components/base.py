@@ -80,7 +80,7 @@ class SearchFilterFactory(object):
         else:
             return None
 
-    def get_searchview_name(self):
+    def get_searchview_name(self, default_type=None):
         if not self.request:
             searchview_component_name = None
         elif self.request.method == "POST":
@@ -101,8 +101,11 @@ class SearchFilterFactory(object):
 
         return searchview_component_name
 
-    def get_searchview_instance(self):
-        searchview_component_name = self.get_searchview_name()
+    def get_searchview_instance(self, **kwargs):
+        default_property = kwargs.get("default_property", None)
+        searchview_component_name = self.get_searchview_name(
+            default_property=default_property
+        )
         return self.get_filter(searchview_component_name)
 
     def create_search_query_dict(self, key_value_pairs: List[Tuple[str, Any]]):
