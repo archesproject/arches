@@ -81,6 +81,7 @@ class SearchFilterFactory(object):
             return None
 
     def get_searchview_name(self, default_type=None):
+        searchview_component = []
         if not self.request:
             searchview_component_name = None
         elif self.request.method == "POST":
@@ -89,14 +90,23 @@ class SearchFilterFactory(object):
             searchview_component_name = self.request.GET.get("search-view", None)
 
         if not searchview_component_name:
-            # get default search_view component
-            searchview_component = list(
-                filter(
-                    lambda x: x.config.get("default", False)
-                    and x.type == "search-view",
-                    list(self.search_filters.values()),
+            if default_type:  # e.g. "searchViewDefault"
+                searchview_component = list(
+                    filter(
+                        lambda x: x.config.get(default_type, False)
+                        and x.type == "search-view",
+                        list(self.search_filters.values()),
+                    )
                 )
-            )[0]
+            if not default_type or len(searchview_component) == 0:
+                searchview_component = list(
+                    filter(
+                        lambda x: x.config.get("default", False)
+                        and x.type == "search-view",
+                        list(self.search_filters.values()),
+                    )
+                )
+            searchview_component = searchview_component[0]
             searchview_component_name = searchview_component.componentname
 
         return searchview_component_name
