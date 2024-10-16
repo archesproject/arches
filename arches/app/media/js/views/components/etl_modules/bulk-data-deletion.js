@@ -144,21 +144,36 @@ define([
             }
         });
 
+        this.deleteAlert = function() {
+            self.alert(
+                new AlertViewModel(
+                    'ep-alert-red',
+                    "Delete Data",
+                    "This action will delete all data.Are you sure that you want to delete all data?", // Corrected text
+                    function() {
+                        // Cancel callback: you can log or perform any action here
+                        console.log("User canceled deletion.");
+                    },
+                    function() {self.addAllFormData();
+                        params.activeTab("import");
+                        self.submit('delete').then(data => {
+                            //console.log(data.result);
+                        }).fail( function(err) {
+                            self.alert(
+                                new JsonErrorAlertViewModel(
+                                    'ep-alert-red',
+                                    err.responseJSON["data"],
+                                    null,
+                                    function(){}
+                                )
+                            );
+                        });
+                })
+            );
+        };
+
         this.bulkDelete = function() {
-            self.addAllFormData();
-            params.activeTab("import");
-            self.submit('delete').then(data => {
-                //console.log(data.result);
-            }).fail( function(err) {
-                self.alert(
-                    new JsonErrorAlertViewModel(
-                        'ep-alert-red',
-                        err.responseJSON["data"],
-                        null,
-                        function(){}
-                    )
-                );
-            });
+                deleteAlert();
         };
 
         this.submit = function(action) {
