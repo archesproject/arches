@@ -2390,7 +2390,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         return CombinedExpression(
             JsonbArrayElements(
                 Case(
-                    When(~Q(**{lookup: None}), F(lookup)),
+                    When(~Q(**{lookup: None}), then=F(lookup)),
                     default=Value('[{"resourceId": null}]'),
                     output_field=JSONField(),
                 ),
