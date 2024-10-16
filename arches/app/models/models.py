@@ -1308,24 +1308,21 @@ class ResourceInstance(models.Model):
             self._update_tiles_from_pythonic_model_values()
         )
 
-        run_functions = kwargs.get("run_functions", False)
-        if run_functions:
-            # Instantiate proxy models (for now).
-            upsert_proxies = [
-                Tile.objects.get(pk=tile.pk) for tile in to_insert + to_update
-            ]
-            delete_proxies = [Tile.objects.get(pk=tile.pk) for tile in to_delete]
+        # Instantiate proxy models for now, but find a way to expose this
+        # functionality on vanilla models, and in bulk.
+        upsert_proxies = [
+            Tile.objects.get(pk=tile.pk) for tile in to_insert.union(to_update)
+        ]
+        delete_proxies = [Tile.objects.get(pk=tile.pk) for tile in to_delete]
 
         with transaction.atomic():
-            if run_functions:
-                for proxy_instance in upsert_proxies:
-                    proxy_instance.__preSave()
-                for proxy_instance in delete_proxies:
-                    proxy_instance.__preDelete()
+            for proxy_instance in upsert_proxies:
+                proxy_instance._Tile__preSave()
+            for proxy_instance in delete_proxies:
+                proxy_instance._Tile__preDelete()
 
             # TODO: more side effects, e.g. indexing, editlog
             # (use/adapt proxy model methods?)
-            # datatype_post_save_actions?
             if to_insert:
                 TileModel.objects.bulk_create(to_insert)
             if to_update:
@@ -1334,10 +1331,10 @@ class ResourceInstance(models.Model):
                 TileModel.objects.filter(pk__in=[t.pk for t in to_delete]).delete()
 
             super().save(*args, **kwargs)
-            if run_functions:
-                for proxy_instance in upsert_proxies:
-                    proxy_instance.refresh_from_db()
-                    proxy_instance.__postSave()
+
+            for proxy_instance in upsert_proxies:
+                proxy_instance.refresh_from_db()
+                proxy_instance._Tile__postSave()
 
         # TODO: add unique constraint for TileModel re: sortorder
         self.refresh_from_db(
