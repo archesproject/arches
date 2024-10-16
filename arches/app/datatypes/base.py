@@ -3,7 +3,7 @@ import logging
 import urllib
 
 from django.contrib.postgres.expressions import ArraySubquery
-from django.db.models import F, OuterRef
+from django.db.models import OuterRef, Subquery
 from django.db.models.expressions import BaseExpression
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -539,45 +539,30 @@ class BaseDataType(object):
         """
         pass
 
-    def get_orm_lookup(self, node, from_resource=True) -> BaseExpression:
+    def get_orm_lookup(self, node) -> BaseExpression:
+        """Return a tile subquery expression for use in a ResourceInstance QuerySet."""
         base_lookup = self._get_base_orm_lookup(node)
 
+        tile_query = models.TileModel.objects.filter(
+            nodegroup_id=node.nodegroup.pk
+        ).filter(resourceinstance_id=OuterRef("resourceinstanceid"))
         if node.nodegroup.cardinality == "n":
-            return self._get_orm_lookup_cardinality_n(node, base_lookup, from_resource)
+            tile_query = tile_query.order_by("sortorder")
 
-        if from_resource:
-            lookup = "tilemodel__" + base_lookup
-        else:
-            lookup = base_lookup
-
-        if self.collects_multiple_values():
-            try:
-                return self._get_orm_array_transform(lookup)
-            except NotImplementedError:
-                pass
-
-        return F(lookup)
-
-    def _get_orm_lookup_cardinality_n(self, node, base_lookup, from_resource=True):
-        # TODO: May produce duplicates until we add unique constraint
-        # on TileModel.resourceinstance_id, nodegroup_id, sortorder
-        tile_query = models.TileModel.objects.filter(nodegroup_id=node.nodegroup.pk)
-        if from_resource:
-            tile_query = tile_query.filter(
-                resourceinstance_id=OuterRef("resourceinstanceid")
-            )
-        tile_query = tile_query.order_by("sortorder")
         if self.collects_multiple_values():
             try:
                 as_array = self._get_orm_array_transform(base_lookup)
             except NotImplementedError:
                 tile_query = tile_query.values(base_lookup)
             else:
-                # TODO: name clash or OK?
                 tile_query = tile_query.annotate(as_array=as_array).values("as_array")
         else:
             tile_query = tile_query.values(base_lookup)
-        return ArraySubquery(tile_query)
+
+        if node.nodegroup.cardinality == "n":
+            return ArraySubquery(tile_query)
+        else:
+            return Subquery(tile_query)
 
     def _get_base_orm_lookup(self, node):
         return f"data__{node.pk}"
