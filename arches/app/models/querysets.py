@@ -28,7 +28,7 @@ class PythonicModelQuerySet(models.QuerySet):
         Provisional edits are completely ignored.
         """
         from arches.app.datatypes.datatypes import DataTypeFactory
-        from arches.app.models.models import GraphModel, TileModel
+        from arches.app.models.models import GraphModel, NodeGroup, TileModel
 
         if defer and only and (overlap := set(defer).intersection(set(only))):
             raise ValueError(f"Got intersecting defer/only args: {overlap}")
@@ -77,8 +77,12 @@ class PythonicModelQuerySet(models.QuerySet):
                 "graph__node_set",
                 models.Prefetch(
                     "tilemodel_set",
-                    queryset=TileModel.objects.order_by("sortorder"),
-                    to_attr="sorted_tiles",
+                    queryset=TileModel.objects.filter(
+                        nodegroup_id__in=NodeGroup.objects.filter(
+                            node__alias__in=node_alias_annotations
+                        )
+                    ).order_by("sortorder"),
+                    to_attr="_sorted_tiles_for_pythonic_model_fields",
                 ),
             )
             .annotate(
