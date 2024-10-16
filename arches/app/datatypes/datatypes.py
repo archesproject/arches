@@ -2062,14 +2062,14 @@ class ResourceInstanceDataType(BaseDataType):
                                     raise ObjectDoesNotExist()
                         except ObjectDoesNotExist:
                             message = _(
-                                "The related resource with id '{0}' is not in the system.".format(
+                                "The related resource with id '{0}' is not in the system".format(
                                     resourceid
                                 )
                             )
                             errors.append({"type": "ERROR", "message": message})
                 except (ValueError, TypeError):
                     message = _(
-                        "The related resource with id '{0}' is not a valid uuid.".format(
+                        "The related resource with id '{0}' is not a valid uuid".format(
                             str(value)
                         )
                     )
