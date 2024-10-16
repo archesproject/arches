@@ -1344,7 +1344,7 @@ class ResourceInstance(models.Model):
 
     def _map_prefetched_tiles_to_nodegroup_ids(self):
         tiles_by_nodegroup = defaultdict(list)
-        for tile_to_update in self.sorted_tiles:
+        for tile_to_update in self._sorted_tiles_for_pythonic_model_fields:
             tiles_by_nodegroup[tile_to_update.nodegroup_id].append(tile_to_update)
         return tiles_by_nodegroup
 
@@ -1481,7 +1481,8 @@ class ResourceInstance(models.Model):
             # Copy over annotations.
             refreshed_resource = from_queryset[0]
             for field in itertools.chain(
-                field_map.values(), ("_pythonic_model_fields", "sorted_tiles")
+                field_map.values(),
+                ("_pythonic_model_fields", "_sorted_tiles_for_pythonic_model_fields"),
             ):
                 setattr(self, field, getattr(refreshed_resource, field))
         else:
