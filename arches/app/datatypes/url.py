@@ -307,8 +307,12 @@ class URLDataType(BaseDataType):
     def clean(self, tile, nodeid):
         if data := tile.data[nodeid]:
             try:
-                if not any([val.strip() for val in data.values()]):
-                    tile.data[nodeid] = None
+                if not any([data.values()]): 
+                    tile.data[nodeid] = None 
+
+                if not data["url_label"].strip(): 
+                    tile.data[nodeid]["url_label"] = None 
+
             except:
                 pass  # Let self.validate handle malformed data
 
