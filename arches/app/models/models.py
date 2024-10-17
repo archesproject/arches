@@ -716,6 +716,9 @@ class NodeGroup(models.Model):
         null=True,
         on_delete=models.CASCADE,
     )  # Allows nodegroups within nodegroups
+    graph = models.ForeignKey(
+        GraphModel, db_column="graphid", blank=True, null=True, on_delete=models.CASCADE
+    )
 
     def __init__(self, *args, **kwargs):
         super(NodeGroup, self).__init__(*args, **kwargs)
