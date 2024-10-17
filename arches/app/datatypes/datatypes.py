@@ -2238,7 +2238,10 @@ class ResourceInstanceDataType(BaseDataType):
         except TypeError:
             # data should come in as json but python list is accepted as well
             if isinstance(value, list):
-                return [from_instance(instance) for instance in value]
+                if all(isinstance(inner, models.ResourceInstance) for inner in value):
+                    return [from_instance(instance) for instance in value]
+                else:
+                    return value
             if isinstance(value, models.ResourceInstance):
                 return [from_instance(value)]
 
