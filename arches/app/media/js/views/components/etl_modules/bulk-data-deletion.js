@@ -11,8 +11,8 @@ define([
     'bindings/datatable',
     'bindings/dropzone',
     'bindings/resizable-sidepanel',
-], function (ko, koMapping, $, uuid, arches, AlertViewModel, JsonErrorAlertViewModel, bulkDataDeletionTemplate) {
-    const viewModel = function (params) {
+], function(ko, koMapping, $, uuid, arches, AlertViewModel, JsonErrorAlertViewModel, bulkDataDeletionTemplate) {
+    const viewModel = function(params) {
         const self = this;
 
         this.loadDetails = params.load_details;
@@ -55,24 +55,24 @@ define([
                 || (self.selectedNodegroup() && self.activeTab() === "TileDeletion");
         });
 
-        this.getGraphs = function () {
+        this.getGraphs = function() {
             self.loading(true);
-            self.submit('get_graphs').then(function (response) {
+            self.submit('get_graphs').then(function(response) {
                 self.graphs(response.result);
                 self.loading(false);
             });
         };
 
-        this.preview = function () {
+        this.preview = function() {
             self.previewing(true);
             self.showPreview(false);
             this.addAllFormData();
-            self.submit('preview').then(function (response) {
+            self.submit('preview').then(function(response) {
                 self.numberOfResources(response.result.resource);
                 self.numberOfTiles(response.result.tile);
                 self.previewValue(response.result.preview?.map((value) => JSON.stringify(value)));
                 self.showPreview(true);
-            }).fail(function (err) {
+            }).fail(function(err) {
                 self.alert(
                     new JsonErrorAlertViewModel(
                         'ep-alert-red',
@@ -81,26 +81,26 @@ define([
                         function () {}
                     )
                 );
-            }).always(function () {
+            }).always(function() {
                 self.deleteAllFormData();
                 self.previewing(false);
             });
         };
 
-        this.getGraphName = function (graphId) {
+        this.getGraphName = function(graphId) {
             let graph;
             if (self.graphs()) {
-                graph = self.graphs().find(function (graph) {
+                graph = self.graphs().find(function(graph) {
                     return graph.graphid == graphId;
                 });
             }
             return graph?.name;
         };
 
-        this.getNodegroupName = function (nodegroupId) {
+        this.getNodegroupName = function(nodegroupId) {
             let nodegroup;
             if (self.nodegroups()) {
-                nodegroup = self.nodegroups().find(function (nodegroup) {
+                nodegroup = self.nodegroups().find(function(nodegroup) {
                     return nodegroup.nodegroupid == nodegroupId;
                 });
             }
@@ -120,7 +120,7 @@ define([
             if (self.resourceids()) { self.formData.append('resourceids', JSON.stringify(self.resourceids())); }
         };
 
-        this.deleteAllFormData = function() {
+        this.deleteAllFormData = () => {
             self.formData.delete('search_url');
             self.formData.delete('nodegroup_id');
             self.formData.delete('nodegroup_name');
@@ -129,11 +129,11 @@ define([
             self.formData.delete('resourceids');
         };
 
-        this.selectedGraph.subscribe(function (graph) {
+        this.selectedGraph.subscribe(function(graph) {
             if (graph) {
                 self.loading(true);
                 self.formData.append('graphid', graph);
-                self.submit('get_nodegroups').then(function (response) {
+                self.submit('get_nodegroups').then(function(response) {
                     const nodegroups = response.result;
                     self.selectedNodegroup(null);
                     self.nodegroups(nodegroups);
@@ -144,14 +144,14 @@ define([
             }
         });
 
-        this.deleteAlert = function () {
+        this.deleteAlert = function() {
             self.alert(
                 new AlertViewModel(
                     'ep-alert-red',
                     "Delete Data",
-                    "This action will delete all data. Are you sure that you want to delete all data?",
-                    function () {},
-                    function () {
+                    "This action will delete the selected records permanently. Are you sure you want to proceed?",
+                    function() {},
+                    function() {
                         this.addAllFormData();
                         params.activeTab("import");
 
@@ -161,11 +161,11 @@ define([
             );
         };
 
-        this.bulkDelete = function () {
+        this.bulkDelete = function() {
             deleteAlert();
         };
 
-        this.submit = function (action) {
+        this.submit = function(action) {
             self.formData.append('action', action);
             self.formData.append('load_id', self.loadId);
             self.formData.append('module', self.moduleId);
@@ -177,7 +177,7 @@ define([
                 processData: false,
                 contentType: false,
             })
-                .fail(function (err) {
+                .fail(function(err) {
                     // show an error alert if the delete action fails
                     self.alert(
                         new JsonErrorAlertViewModel(
@@ -190,7 +190,7 @@ define([
                 });
         };
 
-        this.init = function () {
+        this.init = function() {
             this.getGraphs();
         };
 
