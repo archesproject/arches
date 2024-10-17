@@ -2233,6 +2233,14 @@ class ResourceInstanceDataType(BaseDataType):
         return terms
 
     def transform_value_for_tile(self, value, **kwargs):
+        def from_instance(instance):
+            nonlocal kwargs
+            return {
+                "resourceId": str(instance.pk),
+                "inverseOntology": kwargs.get("inverseOntology"),
+                "inverseOntologyProperty": kwargs.get("inverseOntologyProperty"),
+            }
+
         try:
             return json.loads(value)
         except ValueError:
@@ -2244,7 +2252,12 @@ class ResourceInstanceDataType(BaseDataType):
         except TypeError:
             # data should come in as json but python list is accepted as well
             if isinstance(value, list):
-                return value
+                if all(isinstance(inner, models.ResourceInstance) for inner in value):
+                    return [from_instance(instance) for instance in value]
+                else:
+                    return value
+            if isinstance(value, models.ResourceInstance):
+                return [from_instance(value)]
 
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)
@@ -2373,6 +2386,11 @@ class ResourceInstanceDataType(BaseDataType):
     def _get_base_orm_lookup(self, node):
         return f"data__{node.pk}__0__resourceId"
 
+    def to_python(self, tile_val):
+        if tile_val is None:
+            return tile_val
+        return models.ResourceInstance.objects.as_resource(tile_val)
+
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
     def to_json(self, tile, node):
@@ -2413,7 +2431,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         return True
 
     def _get_base_orm_lookup(self, node):
-        return f"data__{node.pk}"  # TODO: UUIDField?
+        return f"data__{node.pk}"
 
     def _get_orm_array_transform(self, lookup):
         return CombinedExpression(
@@ -2426,7 +2444,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
             ),
             "->>",
             Value("resourceId"),
-            output_field=CharField(),  # TODO: UUIDField?
+            output_field=CharField(),
         )
 
 

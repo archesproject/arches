@@ -4,7 +4,9 @@ from arches.app.models.utils import field_names
 
 
 class PythonicModelQuerySet(models.QuerySet):
-    def with_unpacked_tiles(self, graph_slug, *, defer=None, only=None):
+    def with_unpacked_tiles(
+        self, graph_slug=None, *, resource=None, defer=None, only=None
+    ):
         """Annotates a ResourceInstance QuerySet with tile data unpacked
         and mapped onto node aliases, e.g.:
 
@@ -32,19 +34,22 @@ class PythonicModelQuerySet(models.QuerySet):
 
         if defer and only and (overlap := set(defer).intersection(set(only))):
             raise ValueError(f"Got intersecting defer/only args: {overlap}")
-        try:
-            source_graph = (
-                GraphModel.objects.filter(
-                    slug=graph_slug,
-                    # TODO: Verify that source_identifier=None is really what I want?
-                    source_identifier=None,
+        if resource:
+            source_graph = resource.graph
+        else:
+            try:
+                source_graph = (
+                    GraphModel.objects.filter(
+                        slug=graph_slug,
+                        # TODO: Verify that source_identifier=None is really what I want?
+                        source_identifier=None,
+                    )
+                    .prefetch_related("node_set")
+                    .get()
                 )
-                .prefetch_related("node_set")
-                .get()
-            )
-        except GraphModel.DoesNotExist as e:
-            e.add_note(f"No graph found with slug: {graph_slug}")
-            raise
+            except GraphModel.DoesNotExist as e:
+                e.add_note(f"No graph found with slug: {graph_slug}")
+                raise
 
         invalid_names = field_names(self.model)
         datatype_factory = DataTypeFactory()
@@ -71,9 +76,12 @@ class PythonicModelQuerySet(models.QuerySet):
             if given_alias not in node_alias_annotations:
                 raise ValueError(f'"{given_alias}" is not a valid node alias.')
 
+        if resource:
+            qs = self.filter(pk=resource.pk)
+        else:
+            qs = self.filter(graph=source_graph)
         return (
-            self.filter(graph=source_graph)
-            .prefetch_related(
+            qs.prefetch_related(
                 "graph__node_set",
                 models.Prefetch(
                     "tilemodel_set",
@@ -95,3 +103,52 @@ class PythonicModelQuerySet(models.QuerySet):
                 )
             )
         )
+
+    def as_resource(self, resource_id):
+        from arches.app.models.models import ResourceInstance
+
+        resource = (
+            ResourceInstance.objects.filter(pk=resource_id)
+            .prefetch_related("graph__node_set")
+            .get()
+        )
+        return self.with_unpacked_tiles(resource=resource).first()
+
+    def _fetch_all(self):
+        """Call datatype to_python() methods when evaluating queryset."""
+        from arches.app.datatypes.datatypes import DataTypeFactory
+
+        super()._fetch_all()
+
+        datatype_factory = DataTypeFactory()
+        datatypes_by_nodeid = {}
+
+        try:
+            first_resource = self._result_cache[0]
+        except IndexError:
+            return
+        for node in first_resource.graph.node_set.all():
+            datatypes_by_nodeid[str(node.pk)] = datatype_factory.get_instance(
+                node.datatype
+            )
+
+        for resource in self._result_cache:
+            if not hasattr(resource, "_pythonic_model_fields"):
+                # On the first fetch, annotations haven't been applied yet.
+                continue
+            for nodeid, alias in resource._pythonic_model_fields.items():
+                tile_val = getattr(resource, alias)
+                if tile_val is None:
+                    continue
+                datatype_instance = datatypes_by_nodeid[nodeid]
+                if not datatype_instance.collects_multiple_values():
+                    tile_val = list(tile_val)
+                python_val = []
+                for inner_tile_val in tile_val:
+                    # TODO: add prefetching/lazy for RI-list?
+                    python_val.append(datatype_instance.to_python(inner_tile_val))
+                if tile_val != python_val:
+                    if datatype_instance.collects_multiple_values():
+                        setattr(resource, alias, python_val)
+                    else:
+                        setattr(resource, alias, python_val[0])

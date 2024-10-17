@@ -569,3 +569,6 @@ class BaseDataType(object):
 
     def _get_orm_array_transform(self, lookup):
         raise NotImplementedError
+
+    def to_python(self, tile_val):
+        return tile_val
