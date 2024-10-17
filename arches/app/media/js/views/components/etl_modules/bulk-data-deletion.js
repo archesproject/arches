@@ -152,17 +152,17 @@ define([
                     "This action will delete the selected records permanently. Are you sure you want to proceed?",
                     function() {},
                     function() {
-                        this.addAllFormData();
+                        self.addAllFormData();
                         params.activeTab("import");
 
                         // perform the delete action if the user confirms
-                        this.submit('delete');
+                        self.submit('delete');
                     })
             );
         };
 
         this.bulkDelete = function() {
-            deleteAlert();
+            self.deleteAlert();
         };
 
         this.submit = function(action) {
