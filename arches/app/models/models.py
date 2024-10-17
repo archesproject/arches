@@ -1438,9 +1438,9 @@ class ResourceInstance(models.Model):
             for tile, inner_val in zip(working_tiles, new_val, strict=False):
                 # TODO: move this all somewhere else
                 # 1. transform_value_for_tile()
-                # 2. clean() TODO: swap order with 3?
-                # 3. pre_tile_save()
-                # 4. validate()
+                # 2. clean()
+                # 3. validate()
+                # 4. pre_tile_save()
 
                 transformed = inner_val
                 if inner_val is not None:
@@ -1454,18 +1454,20 @@ class ResourceInstance(models.Model):
                     except:  # TODO: fix and remove
                         pass
 
-                datatype_instance.clean(tile, node_id_str)
+                # Patch the transformed data into the working tiles.
+                tile.data[node_id_str] = transformed
 
-                # Does pre_tile_save call transform_value_for_tile and therefore raise?
-                # https://github.com/archesproject/arches/issues/10851
-                # try:
-                datatype_instance.pre_tile_save(tile, node_id_str)
+                datatype_instance.clean(tile, node_id_str)
 
                 if errors := datatype_instance.validate(transformed, node=node):
                     errors_by_node_alias[node.alias].extend(errors)
 
-                # Patch the validated data into the working tiles.
-                tile.data[node_id_str] = inner_val
+                # Does pre_tile_save call transform_value_for_tile and therefore raise?
+                # https://github.com/archesproject/arches/issues/10851
+                # try:
+                if transformed:
+                    # TODO: determine None handling
+                    datatype_instance.pre_tile_save(tile, node_id_str)
 
             for extra_tile in working_tiles[len(new_val) :]:
                 extra_tile.data[node_id_str] = None
