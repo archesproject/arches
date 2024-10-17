@@ -5,9 +5,6 @@ import logging
 import uuid
 import pyprind
 import sys
-import django
-
-django.setup()
 
 from datetime import datetime
 from django.db import connection, connections

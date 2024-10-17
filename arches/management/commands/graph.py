@@ -28,6 +28,10 @@ class Command(BaseCommand):
 
     """
 
+    # Silence system checks since this command is the cure for
+    # one of the system checks (arches.E004)
+    requires_system_checks = []
+
     def add_arguments(self, parser):
         parser.add_argument(
             "operation",
