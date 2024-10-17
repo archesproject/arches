@@ -215,7 +215,7 @@ class ListItem(models.Model):
         tile_value = {
             "uri": self.uri or self.generate_uri(),
             "labels": [label.serialize() for label in self.list_item_values.labels()],
-            "listid": str(self.id),
+            "listid": str(self.list_id),
         }
         return tile_value
 

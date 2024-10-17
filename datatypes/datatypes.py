@@ -104,13 +104,15 @@ class ReferenceDataType(BaseDataType):
         labels = []
         requested_language = kwargs.pop("language", None)
         current_language = requested_language or get_language()
-        for item in self.get_tile_data(tile)[str(node.nodeid)]:
-            for label in item["labels"]:
-                if (
-                    label["language_id"] == current_language
-                    and label["valuetype_id"] == "prefLabel"
-                ):
-                    labels.append(label.get("value", ""))
+        node_data = self.get_tile_data(tile)[str(node.nodeid)]
+        if node_data:
+            for item in node_data:
+                for label in item["labels"]:
+                    if (
+                        label["language_id"] == current_language
+                        and label["valuetype_id"] == "prefLabel"
+                    ):
+                        labels.append(label.get("value", ""))
         return ", ".join(labels)
 
     def collects_multiple_values(self):
