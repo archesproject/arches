@@ -808,7 +808,7 @@ class Tile(models.TileModel):
             )
             logger.warning(e)
 
-    def __preDelete(self, request):
+    def __preDelete(self, request=None):
         try:
             for function in self._getFunctionClassInstances():
                 try:
