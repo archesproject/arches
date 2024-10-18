@@ -81,7 +81,9 @@ class SearchView(MapBaseManagerView):
         )
         geocoding_providers = Geocoder.objects.all()
         search_component_factory = SearchFilterFactory(request)
-        searchview_instance = search_component_factory.get_searchview_instance()
+        searchview_instance = search_component_factory.get_searchview_instance(
+            default_type="searchViewDefault"
+        )
         search_components = searchview_instance.get_searchview_filters()
 
         datatypes = DDataType.objects.all()
