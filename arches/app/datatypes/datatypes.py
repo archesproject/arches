@@ -1,4 +1,5 @@
 import copy
+import itertools
 import uuid
 import json
 import decimal
@@ -2371,6 +2372,15 @@ class ResourceInstanceDataType(BaseDataType):
         if tile_val is None:
             return tile_val
         return models.ResourceInstance.objects.as_resource(tile_val)
+
+    def values_match(self, value1, value2):
+        if not isinstance(value1, list) or not isinstance(value2, list):
+            return value1 == value2
+        copy1 = [{**inner_val} for inner_val in value1]
+        copy2 = [{**inner_val} for inner_val in value2]
+        for inner_val in itertools.chain(copy1, copy2):
+            inner_val.pop("resourceXresourceId", None)
+        return copy1 == copy2
 
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
