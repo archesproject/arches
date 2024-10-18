@@ -356,18 +356,22 @@ class ResourceAPITests(ArchesTestCase):
         # ==PUT=============================================================================================
 
         # ==Act : GET confirmation that resource does not exist in database=================================
-        with self.assertRaises(models.ResourceInstance.DoesNotExist) as context:
-            with self.assertLogs("django.request", level="ERROR"):
-                resp_get = self.client.get(
-                    reverse(
-                        "resources",
-                        kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"},
-                    )
-                    + "?format=arches-json"
+        with (
+            self.assertLogs("django.request", level="WARNING"),
+            self.assertLogs("arches.app.views.api", level="ERROR"),
+        ):
+            resp_get = self.client.get(
+                reverse(
+                    "resources",
+                    kwargs={"resourceid": "075957c4-d97f-4986-8d27-c32b6dec8e62"},
                 )
+                + "?format=arches-json"
+            )
         # ==Assert==========================================================================================
-        self.assertTrue(
-            "Resource matching query does not exist." in str(context.exception)
+        self.assertContains(
+            resp_get,
+            "Resource matching query does not exist.",
+            status_code=HTTPStatus.NOT_FOUND,
         )  # Check exception message.
         # ==================================================================================================
 
@@ -488,18 +492,22 @@ class ResourceAPITests(ArchesTestCase):
         # ==================================================================================================
 
         # ==Act : GET confirmation that resource does not exist in database=================================
-        with self.assertRaises(models.ResourceInstance.DoesNotExist) as context_del:
-            with self.assertLogs("django.request", level="ERROR"):
-                resp_get_deleted = self.client.get(
-                    reverse(
-                        "resources",
-                        kwargs={"resourceid": my_resource_resourceinstanceid},
-                    )
-                    + "?format=arches-json"
+        with (
+            self.assertLogs("django.request", level="WARNING"),
+            self.assertLogs("arches.app.views.api", level="ERROR"),
+        ):
+            resp_get_deleted = self.client.get(
+                reverse(
+                    "resources",
+                    kwargs={"resourceid": my_resource_resourceinstanceid},
                 )
+                + "?format=arches-json"
+            )
         # ==Assert==========================================================================================
-        self.assertTrue(
-            "Resource matching query does not exist." in str(context_del.exception)
+        self.assertContains(
+            resp_get_deleted,
+            "Resource matching query does not exist.",
+            status_code=HTTPStatus.NOT_FOUND,
         )  # Check exception message.
         # ==================================================================================================
 
