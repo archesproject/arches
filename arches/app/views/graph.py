@@ -87,22 +87,17 @@ class GraphSettingsView(GraphBaseView):
             graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
         )
 
-        node_models = models.Node.objects.filter(
-            graph__pk__in=[resource_graph.pk for resource_graph in resource_graphs]
-        )
-
-        for res in resource_graphs:
-            try:
-                node_model = node_models.get(graph=res, istopnode=True)
-                resource_data.append(
-                    {
-                        "id": node_model.nodeid,
-                        "graph": res,
-                        "is_relatable": (node_model in relatable_resources),
-                    }
-                )
-            except models.Node.DoesNotExist:
-                pass
+        top_nodes = models.Node.objects.filter(
+            graph__in=resource_graphs, istopnode=True
+        ).select_related("graph")
+        for node_model in top_nodes:
+            resource_data.append(
+                {
+                    "id": node_model.nodeid,
+                    "graph": node_model.graph,
+                    "is_relatable": (node_model in relatable_resources),
+                }
+            )
 
         return JSONResponse(
             {
