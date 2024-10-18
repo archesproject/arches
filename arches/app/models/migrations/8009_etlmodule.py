@@ -176,7 +176,7 @@ add_functions_to_get_nodegroup_tree = """
             (select alias from nodes where nodeid = nodegroup_id) as path,
             cardinality
         FROM
-        (SELECT ng.nodegroupid, ng.parentnodegroupid, alias, name, cardinality, graphid FROM node_groups ng
+        (SELECT ng.nodegroupid, ng.parentnodegroupid, n.alias, n.name, ng.cardinality, n.graphid FROM node_groups ng
         INNER JOIN nodes n ON ng.nodegroupid = n.nodeid
         ORDER by ng.nodegroupid) AS root
         WHERE nodegroupid = nodegroup_id
@@ -190,7 +190,7 @@ add_functions_to_get_nodegroup_tree = """
                 path || ' - ' || parent.alias,
                 parent.cardinality
             FROM
-            (SELECT ng.nodegroupid, ng.parentnodegroupid, alias, name, cardinality, graphid FROM node_groups ng
+            (SELECT ng.nodegroupid, ng.parentnodegroupid, n.alias, n.name, ng.cardinality, n.graphid FROM node_groups ng
             INNER JOIN nodes n ON ng.nodegroupid = n.nodeid
             ORDER by ng.nodegroupid) AS parent
             INNER JOIN nodegroup_tree nt ON nt.nodegroupid = parent.parentnodegroupid
@@ -208,7 +208,7 @@ add_functions_to_get_nodegroup_tree = """
     DECLARE
     _nodegroupid uuid;
     BEGIN
-    FOR _nodegroupid IN select ng.nodegroupid from node_groups ng join nodes n on ng.nodegroupid = nodeid where graphid = graph_id and ng.parentnodegroupid is null
+    FOR _nodegroupid IN select ng.nodegroupid from node_groups ng join nodes n on ng.nodegroupid = nodeid where n.graphid = graph_id and ng.parentnodegroupid is null
     LOOP
         RETURN QUERY SELECT _nodegroupid, * FROM __get_nodegroup_tree(_nodegroupid);
     END LOOP;
