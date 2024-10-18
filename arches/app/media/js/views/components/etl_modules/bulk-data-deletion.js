@@ -147,7 +147,7 @@ define([
         this.deleteAlert = function() {
             self.alert(
                 new AlertViewModel(
-                    'ep-alert-red',
+                    "ep-alert-blue",
                     "Delete Data",
                     "This action will delete the selected records permanently. Are you sure you want to proceed?",
                     function() {},
