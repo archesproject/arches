@@ -979,29 +979,29 @@ class Concepts(APIBase):
 
 class Card(APIBase):
     def get(self, request, resourceid):
+        resource_query = Resource.objects.filter(pk=resourceid).select_related("graph")
         try:
-            resource_instance = Resource.objects.get(pk=resourceid)
+            resource_instance = resource_query.get()
             graph = resource_instance.graph
         except Resource.DoesNotExist:
             graph = models.GraphModel.objects.get(pk=resourceid)
             resourceid = None
             resource_instance = None
-            pass
 
-        nodegroups = []
-        editable_nodegroups = []
+        permitted_nodegroups = []
+        editable_nodegroup_ids: set[str] = set()
         nodes = graph.node_set.all().select_related("nodegroup")
         for node in nodes:
             if node.is_collector:
                 added = False
                 if request.user.has_perm("write_nodegroup", node.nodegroup):
-                    editable_nodegroups.append(node.nodegroup)
-                    nodegroups.append(node.nodegroup)
+                    editable_nodegroup_ids.add(str(node.nodegroup.pk))
+                    permitted_nodegroups.append(node.nodegroup)
                     added = True
                 if not added and request.user.has_perm(
                     "read_nodegroup", node.nodegroup
                 ):
-                    nodegroups.append(node.nodegroup)
+                    permitted_nodegroups.append(node.nodegroup)
 
         user_is_reviewer = user_is_resource_reviewer(request.user)
 
@@ -1018,9 +1018,9 @@ class Card(APIBase):
             ):
                 displayname = _("System Settings")
 
-            tiles = resource_instance.tilemodel_set.order_by("sortorder").filter(
-                nodegroup__in=nodegroups
-            )
+            tiles = resource_instance.tilemodel_set.filter(
+                nodegroup_id__in=[ng.pk for ng in permitted_nodegroups]
+            ).order_by("sortorder")
             provisionaltiles = []
             for tile in tiles:
                 append_tile = True
@@ -1045,7 +1045,7 @@ class Card(APIBase):
                                     # we don't send that tile back to the client.
                                     append_tile = False
                                 else:
-                                    # if the tile has authoritaive data and the current user is not the owner,
+                                    # if the tile has authoritative data and the current user is not the owner,
                                     # we don't send the provisional data of other users back to the client.
                                     tile.provisionaledits = None
                 if append_tile is True:
@@ -1071,7 +1071,7 @@ class Card(APIBase):
         else:
             cards = (
                 graph.cardmodel_set.order_by("sortorder")
-                .filter(nodegroup__in=nodegroups)
+                .filter(nodegroup__in=permitted_nodegroups)
                 .prefetch_related("cardxnodexwidget_set")
             )
             serialized_cards = JSONSerializer().serializeToPython(cards)
@@ -1083,21 +1083,23 @@ class Card(APIBase):
                 ]
             ]
 
-        editable_nodegroup_ids = [
-            str(nodegroup.pk) for nodegroup in editable_nodegroups
-        ]
         for card in serialized_cards:
             card["is_writable"] = False
-            if str(card["nodegroup_id"]) in editable_nodegroup_ids:
+            if card["nodegroup_id"] in editable_nodegroup_ids:
                 card["is_writable"] = True
 
+        permitted_nodes = [
+            node
+            for node in nodes._result_cache
+            if node.nodegroup in permitted_nodegroups
+        ]
         context = {
             "resourceid": resourceid,
             "displayname": displayname,
             "tiles": tiles,
             "cards": serialized_cards,
-            "nodegroups": nodegroups,
-            "nodes": nodes.filter(nodegroup__in=nodegroups),
+            "nodegroups": permitted_nodegroups,
+            "nodes": permitted_nodes,
             "cardwidgets": cardwidgets,
             "datatypes": models.DDataType.objects.all(),
             "userisreviewer": user_is_reviewer,
