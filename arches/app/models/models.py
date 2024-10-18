@@ -1427,8 +1427,7 @@ class ResourceInstance(models.Model):
 
             datatype_instance = datatype_factory.get_instance(node.datatype)
             new_val = getattr(self, attribute_name)
-            # TODO: handle x-list, currently assuming list ~ cardinality N.
-            if not isinstance(new_val, list):
+            if node.nodegroup.cardinality == "1":
                 new_val = [new_val]
 
             for tile, inner_val in zip(working_tiles, new_val, strict=False):
