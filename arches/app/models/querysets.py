@@ -44,7 +44,7 @@ class PythonicModelQuerySet(models.QuerySet):
                         # TODO: Verify that source_identifier=None is really what I want?
                         source_identifier=None,
                     )
-                    .prefetch_related("node_set")
+                    .prefetch_related("node_set__nodegroup")
                     .get()
                 )
             except GraphModel.DoesNotExist as e:
