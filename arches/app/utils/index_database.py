@@ -262,7 +262,7 @@ def index_resources_using_singleprocessing(
                     bar = pyprind.ProgBar(resource_count, bar_char="█", title=title)
                 else:
                     bar = None
-
+            batch_size = batch_size if batch_size > 8 else 8
             for resource in optimize_resource_iteration(
                 resources, chunk_size=batch_size // 8
             ):
