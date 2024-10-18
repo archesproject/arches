@@ -1377,6 +1377,8 @@ class ResourceInstance(models.Model):
                     new_val = [new_val]
                 max_tile_length = max(max_tile_length, len(new_val))
 
+            # TODO: handle saving related objects?
+            original_tile_data_by_tile_id = {}
             for i in range(max(max_tile_length, len(db_tiles))):
                 try:
                     tile = db_tiles[i]
@@ -1393,6 +1395,7 @@ class ResourceInstance(models.Model):
                     to_insert.add(tile)
                 else:
                     to_update.add(tile)
+                    original_tile_data_by_tile_id[tile.pk] = {**tile.data}
                 working_tiles.append(tile)
 
             self._validate_and_patch_from_pythonic_model_values(
@@ -1401,12 +1404,18 @@ class ResourceInstance(models.Model):
 
             for tile in working_tiles:
                 # TODO: preserve if child tiles?
+                # Remove blank tiles.
                 if not any(tile.data.values()):
                     if tile._state.adding:
                         to_insert.remove(tile)
                     else:
                         to_update.remove(tile)
                         to_delete.add(tile)
+                # Skip no-op updates.
+                if (
+                    original_data := original_tile_data_by_tile_id.pop(tile.pk, None)
+                ) and original_data == tile.data:
+                    to_update.remove(tile)
 
         if errors_by_node_alias:
             raise ValidationError(
