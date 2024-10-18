@@ -1293,7 +1293,12 @@ class ResourceInstance(models.Model):
     def clean(self):
         """Raises a compound ValidationError with any failing tile values."""
         if getattr(self, "_pythonic_model_fields", False):
-            self._update_tiles_from_pythonic_model_values()
+            nodegroups = (
+                NodeGroup.objects.filter(node__graph=self.graph)
+                .distinct()
+                .prefetch_related("node_set")
+            )
+            self._update_tiles_from_pythonic_model_values(nodegroups)
 
     def _save_tiles_for_pythonic_model(self, index=False, **kwargs):
         """Raises a compound ValidationError with any failing tile values.
@@ -1302,10 +1307,17 @@ class ResourceInstance(models.Model):
         values during a save(), but the "pythonic models" interface
         is basically a form/serializer, so that's why we're validating.)
         """
+        from arches.app.datatypes.datatypes import DataTypeFactory
         from arches.app.models.tile import Tile
 
-        to_insert, to_update, to_delete = (
-            self._update_tiles_from_pythonic_model_values()
+        datatype_factory = DataTypeFactory()
+        nodegroups = (
+            NodeGroup.objects.filter(node__graph=self.graph)
+            .distinct()
+            .prefetch_related("node_set")
+        )
+        to_insert, to_update, to_delete = self._update_tiles_from_pythonic_model_values(
+            nodegroups
         )
 
         # Instantiate proxy models for now, but find a way to expose this
@@ -1336,6 +1348,14 @@ class ResourceInstance(models.Model):
                 proxy_instance.refresh_from_db()
                 proxy_instance._Tile__postSave()
 
+            for to_update_tile in to_update:
+                for nodegroup in nodegroups:
+                    if to_update_tile.nodegroup_id == nodegroup.pk:
+                        for node in nodegroup.node_set.all():
+                            datatype = datatype_factory.get_instance(node.datatype)
+                            datatype.post_tile_save(to_update_tile, str(node.pk))
+                        break
+
         # TODO: add unique constraint for TileModel re: sortorder
         self.refresh_from_db(
             using=kwargs.get("using", None),
@@ -1348,22 +1368,20 @@ class ResourceInstance(models.Model):
             tiles_by_nodegroup[tile_to_update.nodegroup_id].append(tile_to_update)
         return tiles_by_nodegroup
 
-    def _update_tiles_from_pythonic_model_values(self):
+    def _update_tiles_from_pythonic_model_values(self, nodegroups):
         """Move values from model instance to prefetched tiles, and validate.
         Raises ValidationError if new data fails datatype validation (and
         thus may leave prefetched tiles in a partially consistent state.)
         """
+        from arches.app.datatypes.datatypes import DataTypeFactory
+
+        datatype_factory = DataTypeFactory()
         db_tiles_by_nodegroup_id = self._map_prefetched_tiles_to_nodegroup_ids()
         errors_by_node_alias = defaultdict(list)
         to_insert = set()
         to_update = set()
         to_delete = set()
 
-        nodegroups = (
-            NodeGroup.objects.filter(node__graph=self.graph)
-            .distinct()
-            .prefetch_related("node_set")
-        )
         for nodegroup in nodegroups:
             node_aliases = [n.alias for n in nodegroup.node_set.all()]
             db_tiles = db_tiles_by_nodegroup_id[nodegroup.pk]
@@ -1373,7 +1391,7 @@ class ResourceInstance(models.Model):
                 if attribute_name not in node_aliases:
                     continue
                 new_val = getattr(self, attribute_name)
-                if nodegroup.cardinality == "1":
+                if nodegroup.cardinality == "1" or new_val is None:
                     new_val = [new_val]
                 max_tile_length = max(max_tile_length, len(new_val))
 
@@ -1412,10 +1430,17 @@ class ResourceInstance(models.Model):
                         to_update.remove(tile)
                         to_delete.add(tile)
                 # Skip no-op updates.
-                if (
-                    original_data := original_tile_data_by_tile_id.pop(tile.pk, None)
-                ) and original_data == tile.data:
-                    to_update.remove(tile)
+                if original_data := original_tile_data_by_tile_id.pop(tile.pk, None):
+                    for node in nodegroup.node_set.all():
+                        if node.datatype == "semantic":
+                            continue
+                        old = original_data[str(node.nodeid)]
+                        datatype_instance = datatype_factory.get_instance(node.datatype)
+                        new = tile.data[str(node.nodeid)]
+                        if not datatype_instance.values_match(old, new):
+                            break
+                    else:
+                        to_update.remove(tile)
 
         if errors_by_node_alias:
             raise ValidationError(
