@@ -1427,7 +1427,7 @@ class ResourceInstance(models.Model):
 
             datatype_instance = datatype_factory.get_instance(node.datatype)
             new_val = getattr(self, attribute_name)
-            if node.nodegroup.cardinality == "1":
+            if nodegroup.cardinality == "1":
                 new_val = [new_val]
 
             for tile, inner_val in zip(working_tiles, new_val, strict=False):
