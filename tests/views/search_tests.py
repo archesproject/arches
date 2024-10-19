@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import json
+from http import HTTPStatus
 
 from tests.base_test import ArchesTestCase
 from tests.utils.search_test_utils import sync_es, get_response_json
@@ -847,6 +848,17 @@ class SearchTests(ArchesTestCase):
         with self.assertLogs("django.request", level="WARNING"):
             response_json = get_response_json(self.client, query=query)
         self.assertFalse(response_json["success"])
+
+        # Also test search_home route, not just search_results
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.get(
+                reverse("search_home"), QUERY_STRING="search-view=nonexistent"
+            )
+        self.assertContains(
+            response,
+            "Search view instance not found",
+            status_code=HTTPStatus.NOT_FOUND,
+        )
 
     def test_searchview_searchview_component_from_admin(self):
         request = HttpRequest()
