@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, ref, useTemplateRef, watch } from "vue";
+import { inject, ref, useTemplateRef, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useGettext } from "vue3-gettext";
 
@@ -186,13 +186,13 @@ const expandPathsToFilterResults = (newFilterValue: string) => {
     nextFilterChangeNeedsExpandAll.value = false;
 };
 
-const getInputElement = () => {
+function getInputElement() {
     if (treeComponent.value !== null) {
         return treeComponent.value.$el.ownerDocument.querySelector(
-            'input[data-pc-name="pcfilter"]',
+            'input[data-pc-name="pcfilterinput"]',
         ) as HTMLInputElement;
     }
-};
+}
 
 const restoreFocusToInput = () => {
     // The current implementation of collapsing all nodes when
@@ -216,31 +216,17 @@ const snoopOnFilterValue = () => {
     }
 };
 
-const filterCallbackWrapped = computed(() => {
-    // Access some hidden functionality of the PrimeVue <Tree> to make
-    // filter lookups lazy, that is, making use of the current state of the
-    // label values and the selected language when doing the filtering.
-    // "Hidden", because we need to violate the type of filter-by, which
-    // should be a string. If we abuse it to be something that returns
-    // a 1-element array containing a getter when split() is called on it,
-    // that getter can return the best label to filter against.
-    return {
-        split: () => {
-            return [
-                (node: TreeNode) => {
-                    if (nodeIsList(node)) {
-                        return node.data.name;
-                    }
-                    return getItemLabel(
-                        node.data,
-                        selectedLanguage.value.code,
-                        systemLanguage.code,
-                    ).value;
-                },
-            ];
-        },
-    };
-});
+function lazyLabelLookup(node: TreeNode) {
+    if (nodeIsList(node)) {
+        return node.data.name;
+    } else {
+        return getItemLabel(
+            node.data,
+            selectedLanguage.value.code,
+            systemLanguage.code,
+        ).value;
+    }
+}
 
 // Factored out because of vue-tsc problems inside the pt object
 const ptNodeContent = ({ instance }: TreePassThroughMethodOptions) => {
@@ -271,7 +257,7 @@ const ptNodeContent = ({ instance }: TreePassThroughMethodOptions) => {
         v-model:expanded-keys="expandedKeys"
         :value="tree"
         :filter="true"
-        :filter-by="filterCallbackWrapped as unknown as string"
+        :filter-by="lazyLabelLookup"
         filter-mode="lenient"
         :filter-placeholder="$gettext('Find')"
         :selection-mode="isMultiSelecting ? 'checkbox' : 'single'"
