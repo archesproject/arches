@@ -342,7 +342,7 @@ class BaseDataType(object):
         """
         return tile.data[str(nodeid)]
 
-    def post_tile_save(self, tile, nodeid, request):
+    def post_tile_save(self, tile, nodeid, request=None):
         """
         Called after the tile is saved to the database
 
