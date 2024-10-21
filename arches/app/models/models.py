@@ -1271,7 +1271,20 @@ class ResourceInstance(models.Model):
 
         return creatorid
 
-    def save(self, index=False, **kwargs):
+    def save_edit(self, user=None):
+        """Intended to replace proxy model method eventually."""
+        from arches.app.models.resource import Resource
+
+        edit_type = "update"
+        if self._state.adding:
+            edit_type = "create"
+        # Until save_edit() is a static method, work around it.
+        ephemeral_proxy_instance = Resource()
+        ephemeral_proxy_instance.graphid = self.graph_id
+        ephemeral_proxy_instance.resourceinstanceid = str(self.pk)
+        ephemeral_proxy_instance.save_edit(user=user, edit_type=edit_type)
+
+    def save(self, index=False, user=None, **kwargs):
         try:
             self.graph_publication = self.graph.publication
         except ResourceInstance.graph.RelatedObjectDoesNotExist:
@@ -1287,6 +1300,7 @@ class ResourceInstance(models.Model):
 
         if getattr(self, "_pythonic_model_fields", False):
             self._save_tiles_for_pythonic_model(index=index, **kwargs)
+            self.save_edit(user=user)
         else:
             super().save(**kwargs)
 

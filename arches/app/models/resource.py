@@ -246,7 +246,7 @@ class Resource(models.ResourceInstance):
         if transaction_id is not None:
             edit.transactionid = transaction_id
         edit.edittype = edit_type
-        edit.save()
+        edit.save(force_insert=True)
 
     def save(self, *args, **kwargs):
         """
