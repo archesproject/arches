@@ -148,8 +148,8 @@ define([
             self.alert(
                 new AlertViewModel(
                     "ep-alert-blue",
-                    "Delete Data",
-                    "This action will delete the selected records permanently. Are you sure you want to proceed?",
+                    arches.translations.confirmBulkDelete.title,
+                    arches.translations.confirmBulkDelete.text,
                     function() {},
                     function() {
                         self.addAllFormData();
