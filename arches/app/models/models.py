@@ -628,11 +628,10 @@ class GraphModel(models.Model):
             .select_related("publication")
             .prefetch_related("publication__publishedgraph_set")
         ):
-            languages_with_a_publication = set(
-                graph.publication.publishedgraph_set.values_list(
-                    "language_id", flat=True
-                )
-            )
+            languages_with_a_publication = {
+                published_graph.language_id
+                for published_graph in graph.publication.publishedgraph_set.all()
+            }
             missing_languages = system_languages - languages_with_a_publication
             if missing_languages:
                 errors.append(
