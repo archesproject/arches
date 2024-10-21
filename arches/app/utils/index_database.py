@@ -262,9 +262,9 @@ def index_resources_using_singleprocessing(
                     bar = pyprind.ProgBar(resource_count, bar_char="█", title=title)
                 else:
                     bar = None
-
+            chunk_size = max(batch_size // 8, 8)
             for resource in optimize_resource_iteration(
-                resources, chunk_size=batch_size // 8
+                resources, chunk_size=chunk_size
             ):
                 resource.tiles = resource.prefetched_tiles
                 resource.descriptor_function = resource.graph.descriptor_function
@@ -402,7 +402,7 @@ def index_resources_by_type(
 def _index_resource_batch(resourceids, recalculate_descriptors, quiet=False):
 
     resources = Resource.objects.filter(resourceinstanceid__in=resourceids)
-    batch_size = int(len(resourceids) / 2)
+    batch_size = max(len(resourceids) // 2, 1)
     return index_resources_using_singleprocessing(
         resources=resources,
         batch_size=batch_size,
