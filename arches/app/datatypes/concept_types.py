@@ -433,7 +433,9 @@ class ConceptListDataType(BaseConceptDataType):
 
     def transform_value_for_tile(self, value, **kwargs):
         ret = []
-        for val in csv.reader([value], delimiter=",", quotechar='"'):
+        if not isinstance(value, list):
+            value = [value]
+        for val in csv.reader(value, delimiter=",", quotechar='"'):
             lines = [line for line in val]
             for v in lines:
                 try:
