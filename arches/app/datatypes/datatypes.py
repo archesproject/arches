@@ -2224,8 +2224,8 @@ class ResourceInstanceDataType(BaseDataType):
             nonlocal kwargs
             return {
                 "resourceId": str(instance.pk),
-                "inverseOntology": kwargs.get("inverseOntology"),
-                "inverseOntologyProperty": kwargs.get("inverseOntologyProperty"),
+                "inverseOntology": kwargs.get("inverseOntology", ""),
+                "inverseOntologyProperty": kwargs.get("inverseOntologyProperty", ""),
             }
 
         try:
