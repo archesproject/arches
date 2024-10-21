@@ -1261,7 +1261,7 @@ class FileListDataType(BaseDataType):
         if data:
             return self.compile_json(tile, node, file_details=data[str(node.nodeid)])
 
-    def post_tile_save(self, tile, nodeid, request):
+    def post_tile_save(self, tile, nodeid, request=None):
         if request is not None:
             # this does not get called when saving data from the mobile app
             previously_saved_tile = models.TileModel.objects.filter(pk=tile.tileid)
@@ -2093,7 +2093,7 @@ class ResourceInstanceDataType(BaseDataType):
             for relationship in relationships:
                 relationship["resourceXresourceId"] = str(uuid.uuid4())
 
-    def post_tile_save(self, tile, nodeid, request):
+    def post_tile_save(self, tile, nodeid, request=None):
         ret = False
         sql = """
             SELECT * FROM __arches_create_resource_x_resource_relationships('%s') as t;
