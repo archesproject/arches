@@ -421,9 +421,9 @@ class Resource(models.ResourceInstance):
         se.bulk_index(documents)
         se.bulk_index(term_list)
 
-    def index(self, context=None):
+    def index(self, context=None, fetchTiles=True):
         """
-        Indexes all the nessesary items values of a resource to support search
+        Indexes all the necessary items values of a resource to support search
 
         Keyword Arguments:
         context -- a string such as "copy" to indicate conditions under which a document is indexed
@@ -440,6 +440,7 @@ class Resource(models.ResourceInstance):
                 )
             }
             document, terms = self.get_documents_to_index(
+                fetchTiles=fetchTiles,
                 datatype_factory=datatype_factory,
                 node_datatypes=node_datatypes,
                 context=context,
