@@ -896,6 +896,8 @@ class EDTFDataType(BaseDataType):
         return str(transformed_value.edtf)
 
     def pre_tile_save(self, tile, nodeid):
+        # TODO: This is likely to be duplicative once we clean this up:
+        # https://github.com/archesproject/arches/issues/10851#issuecomment-2427305853
         tile.data[nodeid] = self.transform_value_for_tile(tile.data[nodeid])
 
     def validate(

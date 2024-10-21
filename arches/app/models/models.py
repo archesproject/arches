@@ -1497,23 +1497,16 @@ class ResourceInstance(models.Model):
                 new_val = [new_val]
 
             for tile, inner_val in zip(working_tiles, new_val, strict=False):
-                # TODO: move this all somewhere else
-                # 1. transform_value_for_tile()
-                # 2. clean()
-                # 3. validate()
-                # 4. pre_tile_save()
-
+                # TODO: move this to Tile.full_clean()?
+                # https://github.com/archesproject/arches/issues/10851#issuecomment-2427305853
                 transformed = inner_val
                 if inner_val is not None:
-                    # TODO: do all datatypes treat None the same way?
                     try:
                         transformed = datatype_instance.transform_value_for_tile(
                             inner_val, **node.config
                         )
-                    except ValueError:
-                        pass  # BooleanDataType
-                    except:  # TODO: fix and remove
-                        pass
+                    except ValueError:  # BooleanDataType raises.
+                        pass  # validate() will handle.
 
                 # Patch the transformed data into the working tiles.
                 tile.data[node_id_str] = transformed
@@ -1523,12 +1516,14 @@ class ResourceInstance(models.Model):
                 if errors := datatype_instance.validate(transformed, node=node):
                     errors_by_node_alias[node.alias].extend(errors)
 
-                # Does pre_tile_save call transform_value_for_tile and therefore raise?
-                # https://github.com/archesproject/arches/issues/10851
-                # try:
-                if transformed:
-                    # TODO: determine None handling
+                try:
                     datatype_instance.pre_tile_save(tile, node_id_str)
+                except TypeError:  # GeoJSONDataType raises.
+                    errors_by_node_alias[node.alias].append(
+                        datatype_instance.create_error_message(
+                            tile.data[node_id_str], None, None, None
+                        )
+                    )
 
             for extra_tile in working_tiles[len(new_val) :]:
                 extra_tile.data[node_id_str] = None
