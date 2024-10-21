@@ -1232,6 +1232,9 @@ class ResourceInstance(models.Model):
         if not self.resourceinstanceid:
             self.resourceinstanceid = uuid.uuid4()
 
+    def __repr__(self):
+        return f"<{self.__class__.__qualname__}: {self.name} ({self.pk})>"
+
     @classmethod
     def as_model(cls, *args, **kwargs):
         return cls.objects.with_unpacked_tiles(*args, **kwargs)
