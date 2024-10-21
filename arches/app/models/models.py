@@ -1271,7 +1271,7 @@ class ResourceInstance(models.Model):
 
         return creatorid
 
-    def save(self, *args, **kwargs):
+    def save(self, index=False, **kwargs):
         try:
             self.graph_publication = self.graph.publication
         except ResourceInstance.graph.RelatedObjectDoesNotExist:
@@ -1286,9 +1286,9 @@ class ResourceInstance(models.Model):
         add_to_update_fields(kwargs, "graph_publication")
 
         if getattr(self, "_pythonic_model_fields", False):
-            self._save_tiles_for_pythonic_model(*args, **kwargs)
+            self._save_tiles_for_pythonic_model(index=index, **kwargs)
         else:
-            super().save(*args, **kwargs)
+            super().save(**kwargs)
 
     def clean(self):
         """Raises a compound ValidationError with any failing tile values."""
@@ -1308,6 +1308,7 @@ class ResourceInstance(models.Model):
         is basically a form/serializer, so that's why we're validating.)
         """
         from arches.app.datatypes.datatypes import DataTypeFactory
+        from arches.app.models.resource import Resource
         from arches.app.models.tile import Tile
 
         datatype_factory = DataTypeFactory()
@@ -1342,7 +1343,7 @@ class ResourceInstance(models.Model):
             if to_delete:
                 TileModel.objects.filter(pk__in=[t.pk for t in to_delete]).delete()
 
-            super().save(*args, **kwargs)
+            super().save(**kwargs)
 
             for proxy_instance in upsert_proxies:
                 proxy_instance.refresh_from_db()
@@ -1361,6 +1362,18 @@ class ResourceInstance(models.Model):
             using=kwargs.get("using", None),
             fields=kwargs.get("update_fields", None),
         )
+
+        # Instantiate proxy model for now, but refactor & expose this on vanilla model.
+        if index:
+            node_datatypes = {}
+            for node in self.graph.node_set.all():
+                node_datatypes[str(node.pk)] = node.datatype
+
+            proxy = Resource.objects.get(pk=self.pk)
+            # Stick the data we already have onto the proxy instance.
+            proxy.tiles = self._sorted_tiles_for_pythonic_model_fields
+            proxy.set_node_datatypes(node_datatypes)
+            proxy.index(fetchTiles=False)
 
     def _map_prefetched_tiles_to_nodegroup_ids(self):
         tiles_by_nodegroup = defaultdict(list)
