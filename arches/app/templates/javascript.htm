@@ -152,6 +152,10 @@
             "title": "{% jsescaped_trans _("This resource is based on an unpublished graph.") %}",
             "text": "{% jsescaped_trans _("To continue, please ensure the graph is published.") %}"
         }'
+	confirm-bulk-delete='{
+            "title": "{% jsescaped_trans _("Delete Data") %}",
+            "text": "{% jsescaped_trans _("This action will delete the selected records permanently. Are you sure you want to proceed?") %}"
+	}'
         two-factor-authentication='{% trans "Two-Factor Authentication" as twoFactorAuthentication %} "{{ twoFactorAuthentication|escapejs }}"'
         please-contact-system-administrator='{% trans "Please contact your system administrator for more details." as pleaseContactSystemAdministrator %}  "{{ pleaseContactSystemAdministrator|escapejs }}"'
         hide-null-values='{% trans "Hide Null Values" as hideNullValues %} "{{ hideNullValues|escapejs }}"'
