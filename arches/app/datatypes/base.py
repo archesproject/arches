@@ -549,15 +549,7 @@ class BaseDataType(object):
         if node.nodegroup.cardinality == "n":
             tile_query = tile_query.order_by("sortorder")
 
-        if self.collects_multiple_values():
-            try:
-                as_array = self._get_orm_array_transform(base_lookup)
-            except NotImplementedError:
-                tile_query = tile_query.values(base_lookup)
-            else:
-                tile_query = tile_query.annotate(as_array=as_array).values("as_array")
-        else:
-            tile_query = tile_query.values(base_lookup)
+        tile_query = tile_query.values(base_lookup)
 
         if node.nodegroup.cardinality == "n":
             return ArraySubquery(tile_query)
@@ -566,9 +558,6 @@ class BaseDataType(object):
 
     def _get_base_orm_lookup(self, node):
         return f"data__{node.pk}"
-
-    def _get_orm_array_transform(self, lookup):
-        raise NotImplementedError
 
     def to_python(self, tile_val):
         return tile_val

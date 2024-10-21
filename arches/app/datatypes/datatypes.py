@@ -17,8 +17,6 @@ from datetime import datetime
 from mimetypes import MimeTypes
 
 from django.core.files.images import get_image_dimensions
-from django.db.models import CharField, F, JSONField, Q, Value
-from django.db.models.expressions import Case, CombinedExpression, When
 
 from arches.app.const import ExtensionType
 from arches.app.datatypes.base import BaseDataType
@@ -26,7 +24,6 @@ from arches.app.models import models
 from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.system_settings import settings
 from arches.app.models.fields.i18n import I18n_JSONField, I18n_String
-from arches.app.models.query_expressions import JsonbArrayElements
 from arches.app.utils.date_utils import ExtendedDateFormat
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.permission_backend import user_is_resource_reviewer
@@ -2367,13 +2364,10 @@ class ResourceInstanceDataType(BaseDataType):
         }
         return mapping
 
-    def _get_base_orm_lookup(self, node):
-        return f"data__{node.pk}__0__resourceId"
-
     def to_python(self, tile_val):
         if tile_val is None:
             return tile_val
-        return models.ResourceInstance.objects.as_resource(tile_val)
+        return models.ResourceInstance.objects.as_resource(tile_val[0]["resourceId"])
 
     def values_match(self, value1, value2):
         if not isinstance(value1, list) or not isinstance(value2, list):
@@ -2413,22 +2407,13 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
     def collects_multiple_values(self):
         return True
 
-    def _get_base_orm_lookup(self, node):
-        return f"data__{node.pk}"
-
-    def _get_orm_array_transform(self, lookup):
-        return CombinedExpression(
-            JsonbArrayElements(
-                Case(
-                    When(~Q(**{lookup: None}), then=F(lookup)),
-                    default=Value('[{"resourceId": null}]'),
-                    output_field=JSONField(),
-                ),
-            ),
-            "->>",
-            Value("resourceId"),
-            output_field=CharField(),
-        )
+    def to_python(self, tile_val):
+        if tile_val is None:
+            return tile_val
+        return [
+            models.ResourceInstance.objects.as_resource(inner["resourceId"])
+            for inner in tile_val
+        ]
 
 
 class NodeValueDataType(BaseDataType):
