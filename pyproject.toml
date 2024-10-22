@@ -44,7 +44,7 @@ dependencies = [
     "edtf==4.0.1",
     "elasticsearch>=8.3.1,<9.0.0",
     "filetype==1.2.0",
-    "openpyxl==3.1.2",
+    "openpyxl==3.1.5",
     "pillow>=7.0.0",
     "polib==1.1.1",
     "psycopg2==2.9.10",
