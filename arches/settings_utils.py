@@ -2,7 +2,6 @@ import json
 import os
 import site
 import sys
-from contextlib import contextmanager
 
 from django.apps import apps
 from django.conf import settings
