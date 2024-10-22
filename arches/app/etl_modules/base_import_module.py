@@ -458,7 +458,7 @@ class BaseImportModule:
             return return_with_error(read["data"]["message"])
 
         if written["success"]:
-            return {"success": True, "data": "Succenfully Imported"}
+            return {"success": True, "data": "Successfully Imported"}
         else:
             return return_with_error(written["data"]["message"])
 
