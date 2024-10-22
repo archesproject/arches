@@ -31,6 +31,7 @@ import os
 
 
 class TileExcelTests(TransactionTestCase):
+    serialized_rollback = True
 
     def setUp(self):
         LanguageSynchronizer.synchronize_settings_with_db()
