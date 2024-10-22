@@ -5,7 +5,7 @@ from arches.app.models.utils import field_names
 
 class PythonicModelQuerySet(models.QuerySet):
     def with_unpacked_tiles(
-        self, graph_slug=None, *, resource_id=None, defer=None, only=None
+        self, graph_slug=None, *, resource_ids=None, defer=None, only=None
     ):
         """Annotates a ResourceInstance QuerySet with tile data unpacked
         and mapped onto node aliases, e.g.:
@@ -34,8 +34,8 @@ class PythonicModelQuerySet(models.QuerySet):
 
         if defer and only and (overlap := set(defer).intersection(set(only))):
             raise ValueError(f"Got intersecting defer/only args: {overlap}")
-        if resource_id and not graph_slug:
-            graph_query = GraphModel.objects.filter(resourceinstance=resource_id)
+        if resource_ids and not graph_slug:
+            graph_query = GraphModel.objects.filter(resourceinstance__in=resource_ids)
         else:
             graph_query = GraphModel.objects.filter(
                 slug=graph_slug, source_identifier=None
@@ -71,8 +71,8 @@ class PythonicModelQuerySet(models.QuerySet):
             if given_alias not in node_alias_annotations:
                 raise ValueError(f'"{given_alias}" is not a valid node alias.')
 
-        if resource_id:
-            qs = self.filter(pk=resource_id)
+        if resource_ids:
+            qs = self.filter(pk__in=resource_ids)
         else:
             qs = self.filter(graph=source_graph)
         return (
@@ -98,9 +98,6 @@ class PythonicModelQuerySet(models.QuerySet):
                 )
             )
         )
-
-    def as_resource(self, resource_id):
-        return self.with_unpacked_tiles(resource_id=resource_id).get()
 
     def _fetch_all(self):
         """Call datatype to_python() methods when evaluating queryset."""
