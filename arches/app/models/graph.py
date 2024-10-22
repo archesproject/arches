@@ -2302,14 +2302,10 @@ class Graph(models.GraphModel):
                 .filter(slug=self.slug)
             )
             if (
-                graphs_with_matching_slug.exists()
-                and graphs_with_matching_slug[0].graphid != self.graphid
-            ):
+                first_matching_graph := graphs_with_matching_slug.first()
+            ) and first_matching_graph.graphid != self.graphid:
                 if self.source_identifier_id:
-                    if (
-                        self.source_identifier_id
-                        != graphs_with_matching_slug[0].graphid
-                    ):
+                    if self.source_identifier_id != first_matching_graph.graphid:
                         raise GraphValidationError(
                             _(
                                 "Another resource model already uses the slug '{self.slug}'"
