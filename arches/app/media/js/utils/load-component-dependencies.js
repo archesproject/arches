@@ -7,7 +7,7 @@ define([], function() {
                 if (!ARCHES_APPLICATIONS.length) {  // assumption os running Arches without a project
                     throw new Error()
                 }
-                for (const archesApp of ARCHES_APPLICATIONS) {
+                for (const [i, archesApp] of ARCHES_APPLICATIONS.entries()) {
                     try {
                         require(`${SITE_PACKAGES_DIRECTORY}/${archesApp}/media/js/${componentPath}`);
                         break;
@@ -60,7 +60,12 @@ define([], function() {
                                                             require(`${LINKED_APPLICATION_PATH_8}/media/js/${componentPath}`);
                                                             break;
                                                         }
-                                                        catch { throw new Error(); } // if all attempts fail within the loop, throw error for outer try/catch
+                                                        catch { 
+                                                            if (i === ARCHES_APPLICATIONS.length - 1) {
+                                                                // if all attempts fail within the loop, throw error for outer try/catch 
+                                                                throw new Error(); 
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
