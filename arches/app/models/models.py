@@ -1478,9 +1478,8 @@ class ResourceInstance(models.Model):
 
         if errors_by_node_alias:
             raise ValidationError(
-                # TODO: Django/DRF minds if this is not an actual field?
                 {
-                    alias: ValidationError("\n".join(e["message"] for e in errors))
+                    alias: ValidationError([e["message"] for e in errors])
                     for alias, errors in errors_by_node_alias.items()
                 }
             )
