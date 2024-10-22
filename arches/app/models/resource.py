@@ -332,7 +332,7 @@ class Resource(models.ResourceInstance):
             self.tiles = [
                 tile
                 for tile in self.tiles
-                if tile.nodegroup is not None
+                if tile.nodegroup_id is not None
                 and tile.nodegroup_id in readable_nodegroups
             ]
 

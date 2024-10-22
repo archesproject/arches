@@ -151,7 +151,7 @@ class ETLManagerView(View):
             all_events = (
                 LoadEvent.objects.all()
                 .order_by(("-load_start_time"))
-                .prefetch_related("user", "etl_module")
+                .select_related("user", "etl_module")
             )
             events = Paginator(all_events, item_per_page).page(page).object_list
             total = len(all_events)
