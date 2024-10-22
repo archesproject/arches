@@ -248,7 +248,7 @@ class Resource(models.ResourceInstance):
         edit.edittype = edit_type
         edit.save(force_insert=True)
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         """
         Saves and indexes a single resource
 
@@ -280,10 +280,7 @@ class Resource(models.ResourceInstance):
         else:
             user = request.user
 
-        if not self.principaluser_id and user:
-            self.principaluser_id = user.id
-
-        super(Resource, self).save(*args, **kwargs)
+        super(Resource, self).save(user=user, **kwargs)
 
         if should_update_resource_instance_lifecycle_state:
             self.save_edit(
