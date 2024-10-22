@@ -2364,10 +2364,16 @@ class ResourceInstanceDataType(BaseDataType):
         }
         return mapping
 
+    def _get_base_orm_lookup(self, node):
+        """Immediately unwrap to a single value so that we can depend
+        on datatypes that do not collect multiple values not being a list.
+        """
+        return f"data__{node.pk}__0__resourceId"
+
     def to_python(self, tile_val):
         if tile_val is None:
             return tile_val
-        return models.ResourceInstance.objects.as_resource(tile_val[0]["resourceId"])
+        return models.ResourceInstance.objects.as_resource(tile_val)
 
     def values_match(self, value1, value2):
         if not isinstance(value1, list) or not isinstance(value2, list):
@@ -2406,6 +2412,9 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
 
     def collects_multiple_values(self):
         return True
+
+    def _get_base_orm_lookup(self, node):
+        return f"data__{node.pk}"
 
     def to_python(self, tile_val):
         if tile_val is None:
