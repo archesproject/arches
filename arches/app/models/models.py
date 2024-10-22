@@ -1292,14 +1292,18 @@ class ResourceInstance(models.Model):
             self.graph_publication = self.graph.publication
         except ResourceInstance.graph.RelatedObjectDoesNotExist:
             pass
+        else:
+            add_to_update_fields(kwargs, "graph_publication")
+
+        if not self.principaluser_id and user:
+            self.principaluser = user
+            add_to_update_fields(kwargs, "principaluser")
 
         if not hasattr(self, "resource_instance_lifecycle_state"):
             self.resource_instance_lifecycle_state = (
                 self.get_initial_resource_instance_lifecycle_state()
             )
-
-        add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
-        add_to_update_fields(kwargs, "graph_publication")
+            add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
 
         if getattr(self, "_pythonic_model_fields", False):
             self._save_tiles_for_pythonic_model(index=index, **kwargs)
