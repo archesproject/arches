@@ -3,7 +3,7 @@ from django.db import models
 from arches.app.models.utils import field_names
 
 
-class PythonicModelQuerySet(models.QuerySet):
+class ResourceInstanceQuerySet(models.QuerySet):
     def with_unpacked_tiles(
         self, graph_slug=None, *, resource_ids=None, defer=None, only=None
     ):
