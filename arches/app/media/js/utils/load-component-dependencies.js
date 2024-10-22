@@ -60,8 +60,9 @@ define([], function() {
                                                             require(`${LINKED_APPLICATION_PATH_8}/media/js/${componentPath}`);
                                                             break;
                                                         }
-                                                        catch {
-                                                            if (i === ARCHES_APPLICATIONS.length - 1) { 
+                                                        catch { 
+                                                            if (i === ARCHES_APPLICATIONS.length - 1) {
+                                                                // if all attempts fail within the loop, throw error for outer try/catch 
                                                                 throw new Error(); 
                                                             }
                                                         }
