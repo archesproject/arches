@@ -19,7 +19,7 @@ export default function (
         url = url.replace("{language_code}", languageCode);
     }
 
-    Object.entries(urlParams).forEach((key, value) => {
+    Object.entries(urlParams).forEach(([key, value]) => {
         url = url.replace(new RegExp(`{${key}}`, "g"), value);
     });
 
