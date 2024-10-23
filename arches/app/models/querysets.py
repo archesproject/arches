@@ -71,20 +71,20 @@ class ResourceInstanceQuerySet(models.QuerySet):
         """Annotates a ResourceInstance QuerySet with tile data unpacked
         and mapped onto node aliases, e.g.:
 
-        >>> ResourceInstance.objects.with_tiles("mymodel")
+        >>> ResourceInstance.objects.with_tiles("concept")
 
         With slightly fewer keystrokes:
 
-        >>> ResourceInstance.as_model("mymodel")
+        >>> ResourceInstance.as_model("concept")
 
         Or with defer/only as in the QuerySet interface:
 
-        >>> ResourceInstance.as_model("mymodel", only=["alias1", "alias2"])
+        >>> ResourceInstance.as_model("concept", only=["alias1", "alias2"])
 
         Example:
 
-        >>> MyModel = ResourceInstance.as_model("mymodel")
-        >>> result = MyModel.filter(my_node_alias="some tile value")
+        >>> concepts = ResourceInstance.as_model("concepts")
+        >>> result = concepts.filter(my_node_alias="some tile value")
         >>> result.first().my_node_alias
         "some tile value"
 

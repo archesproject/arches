@@ -2370,11 +2370,6 @@ class ResourceInstanceDataType(BaseDataType):
         """
         return f"data__{node.pk}__0__resourceId"
 
-    def to_python(self, tile_val):
-        if tile_val is None:
-            return tile_val
-        return models.ResourceInstance.objects.with_tiles(resource_ids=[tile_val]).get()
-
     def values_match(self, value1, value2):
         if not isinstance(value1, list) or not isinstance(value2, list):
             return value1 == value2
@@ -2420,9 +2415,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         if tile_val is None:
             return tile_val
         resource_ids = [inner["resourceId"] for inner in tile_val]
-        return list(
-            models.ResourceInstance.objects.with_tiles(resource_ids=resource_ids)
-        )
+        return resource_ids
 
 
 class NodeValueDataType(BaseDataType):
