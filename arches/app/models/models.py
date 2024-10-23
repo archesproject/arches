@@ -11,7 +11,7 @@ from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
-from arches.app.models.querysets import ResourceInstanceQuerySet
+from arches.app.models.querysets import ResourceInstanceQuerySet, TileQuerySet
 from arches.app.models.utils import add_to_update_fields
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils import import_class_from_string
@@ -1237,7 +1237,7 @@ class ResourceInstance(models.Model):
 
     @classmethod
     def as_model(cls, *args, **kwargs):
-        return cls.objects.with_unpacked_tiles(*args, **kwargs)
+        return cls.objects.with_tiles(*args, **kwargs)
 
     def get_initial_resource_instance_lifecycle_state(self, *args, **kwargs):
         try:
@@ -1305,7 +1305,7 @@ class ResourceInstance(models.Model):
             )
             add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
 
-        if getattr(self, "_pythonic_model_fields", False):
+        if getattr(self, "_fetched_nodes", False):
             self._save_tiles_for_pythonic_model(index=index, **kwargs)
             self.save_edit(user=user)
         else:
@@ -1313,7 +1313,7 @@ class ResourceInstance(models.Model):
 
     def clean(self):
         """Raises a compound ValidationError with any failing tile values."""
-        if getattr(self, "_pythonic_model_fields", False):
+        if getattr(self, "_fetched_nodes", False):
             nodegroups = (
                 NodeGroup.objects.filter(node__graph=self.graph)
                 .distinct()
@@ -1392,13 +1392,13 @@ class ResourceInstance(models.Model):
 
             proxy = Resource.objects.get(pk=self.pk)
             # Stick the data we already have onto the proxy instance.
-            proxy.tiles = self._sorted_tiles_for_pythonic_model_fields
+            proxy.tiles = self._sorted_tiles_for_fetched_nodes
             proxy.set_node_datatypes(node_datatypes)
             proxy.index(fetchTiles=False)
 
     def _map_prefetched_tiles_to_nodegroup_ids(self):
         tiles_by_nodegroup = defaultdict(list)
-        for tile_to_update in self._sorted_tiles_for_pythonic_model_fields:
+        for tile_to_update in self._sorted_tiles_for_fetched_nodes:
             tiles_by_nodegroup[tile_to_update.nodegroup_id].append(tile_to_update)
         return tiles_by_nodegroup
 
@@ -1421,7 +1421,7 @@ class ResourceInstance(models.Model):
             db_tiles = db_tiles_by_nodegroup_id[nodegroup.pk]
             working_tiles = []
             max_tile_length = 0
-            for attribute_name in self._pythonic_model_fields.values():
+            for attribute_name in self._fetched_nodes.values():
                 if attribute_name not in node_aliases:
                     continue
                 new_val = getattr(self, attribute_name)
@@ -1494,7 +1494,7 @@ class ResourceInstance(models.Model):
         datatype_factory = DataTypeFactory()
         for node in nodegroup.node_set.all():
             node_id_str = str(node.pk)
-            if not (attribute_name := self._pythonic_model_fields.get(node_id_str, "")):
+            if not (attribute_name := self._fetched_nodes.get(node_id_str, "")):
                 continue
 
             datatype_instance = datatype_factory.get_instance(node.datatype)
@@ -1535,9 +1535,7 @@ class ResourceInstance(models.Model):
                 extra_tile.data[node_id_str] = None
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None):
-        if not from_queryset and (
-            field_map := getattr(self, "_pythonic_model_fields", [])
-        ):
+        if not from_queryset and (field_map := getattr(self, "_fetched_nodes", [])):
             from_queryset = self.__class__.as_model(
                 self.graph.slug, only=field_map.values()
             )
@@ -1546,7 +1544,7 @@ class ResourceInstance(models.Model):
             refreshed_resource = from_queryset[0]
             for field in itertools.chain(
                 field_map.values(),
-                ("_pythonic_model_fields", "_sorted_tiles_for_pythonic_model_fields"),
+                ("_fetched_nodes", "_sorted_tiles_for_fetched_nodes"),
             ):
                 setattr(self, field, getattr(refreshed_resource, field))
         else:
@@ -1806,6 +1804,8 @@ class TileModel(models.Model):  # Tile
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     provisionaledits = JSONField(blank=True, null=True, db_column="provisionaledits")
 
+    objects = TileQuerySet.as_manager()
+
     class Meta:
         managed = True
         db_table = "tiles"
@@ -1815,9 +1815,18 @@ class TileModel(models.Model):  # Tile
         if not self.tileid:
             self.tileid = uuid.uuid4()
 
+    def __repr__(self):
+        return f"<{self.__class__.__qualname__}: {self.nodegroup_alias} ({self.pk})>"
+
     @property
     def nodegroup(self):
         return NodeGroup.objects.filter(pk=self.nodegroup_id).first()
+
+    @property
+    def nodegroup_alias(self):
+        if node_for_nodegroup := Node.objects.filter(pk=self.nodegroup_id).first():
+            return node_for_nodegroup.alias
+        return None
 
     def is_fully_provisional(self):
         return bool(self.provisionaledits and not any(self.data.values()))

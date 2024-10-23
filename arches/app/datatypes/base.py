@@ -539,13 +539,14 @@ class BaseDataType(object):
         """
         pass
 
-    def get_orm_lookup(self, node) -> BaseExpression:
+    def get_orm_lookup(self, node, *, for_resource=True) -> BaseExpression:
         """Return a tile subquery expression for use in a ResourceInstance QuerySet."""
         base_lookup = self._get_base_orm_lookup(node)
 
+        outer_ref = "resourceinstanceid" if for_resource else "resourceinstance_id"
         tile_query = models.TileModel.objects.filter(
             nodegroup_id=node.nodegroup.pk
-        ).filter(resourceinstance_id=OuterRef("resourceinstanceid"))
+        ).filter(resourceinstance_id=OuterRef(outer_ref))
         if node.nodegroup.cardinality == "n":
             tile_query = tile_query.order_by("sortorder")
 
