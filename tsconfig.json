@@ -1,5 +1,5 @@
 {
-  "extends": "./.tsconfig-paths.json",
+  "extends": "./frontend_configuration/tsconfig-paths.json",
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
