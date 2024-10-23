@@ -1,10 +1,7 @@
-import json
 import os
-import site
 import sys
 
 from django.apps import apps
-from django.conf import settings
 from django.contrib.staticfiles.finders import AppDirectoriesFinder
 
 

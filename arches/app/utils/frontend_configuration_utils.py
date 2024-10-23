@@ -2,6 +2,7 @@ import json
 import os
 import re
 import site
+import sys
 
 from django.conf import settings
 from django.urls import get_resolver, URLPattern, URLResolver
@@ -11,10 +12,15 @@ from arches.settings_utils import list_arches_app_names, list_arches_app_paths
 
 
 def generate_frontend_configuration():
-    _generate_frontend_configuration_directory()
-    _generate_urls_json()
-    _generate_webpack_configuration()
-    _generate_tsconfig_paths()
+    try:
+        _generate_frontend_configuration_directory()
+        _generate_urls_json()
+        _generate_webpack_configuration()
+        _generate_tsconfig_paths()
+    except Exception as e:
+        # Ensures error message is shown if error encountered
+        sys.stderr.write(str(e))
+        raise e
 
 
 def _generate_frontend_configuration_directory():
@@ -79,6 +85,10 @@ def _generate_urls_json():
     resolver = get_resolver()
     human_readable_urls = generate_human_readable_urls(resolver.url_patterns)
 
+    # manual additions
+    human_readable_urls["static_url"] = settings.STATIC_URL
+    human_readable_urls["media_url"] = settings.MEDIA_URL
+
     destination_path = os.path.realpath(
         os.path.join(_get_base_path(), "..", "frontend_configuration", "urls.json")
     )
@@ -86,8 +96,11 @@ def _generate_urls_json():
     with open(destination_path, "w") as file:
         json.dump(
             {
-                url_name: human_readable_urls[url_name]
-                for url_name in sorted(human_readable_urls)
+                "_comment": "This is a generated file. Do not edit directly.",
+                **{
+                    url_name: human_readable_urls[url_name]
+                    for url_name in sorted(human_readable_urls)
+                },
             },
             file,
             indent=4,
