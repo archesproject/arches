@@ -3,14 +3,75 @@ from django.db import models
 from arches.app.models.utils import field_names
 
 
+# TODO: figure out best layer for reuse
+def _generate_annotation_maps(nodes, defer, only, invalid_names, for_resource=True):
+    from arches.app.datatypes.datatypes import DataTypeFactory
+
+    if defer and only and (overlap := set(defer).intersection(set(only))):
+        raise ValueError(f"Got intersecting defer/only args: {overlap}")
+    datatype_factory = DataTypeFactory()
+    node_alias_annotations = {}
+    node_aliases_by_node_id = {}
+    for node in nodes:
+        if node.datatype == "semantic":
+            continue
+        if node.nodegroup_id is None:
+            continue
+        if (defer and node.alias in defer) or (only and node.alias not in only):
+            continue
+        if node.alias in invalid_names:
+            raise ValueError(f'"{node.alias}" clashes with a model field name.')
+
+        datatype_instance = datatype_factory.get_instance(node.datatype)
+        tile_lookup = datatype_instance.get_orm_lookup(node, for_resource=for_resource)
+        node_alias_annotations[node.alias] = tile_lookup
+        node_aliases_by_node_id[str(node.pk)] = node.alias
+
+    if not node_alias_annotations:
+        raise ValueError("All fields were excluded.")
+    for given_alias in only or []:
+        if given_alias not in node_alias_annotations:
+            raise ValueError(f'"{given_alias}" is not a valid node alias.')
+
+    return node_alias_annotations, node_aliases_by_node_id
+
+
+class TileQuerySet(models.QuerySet):
+    def with_node_values(self, top_node_alias, *, graph_slug, defer=None, only=None):
+        from arches.app.models.models import Node
+
+        # TODO: avoidable if I already have a node_set?
+        qs = (
+            Node.objects.filter(graph__slug=graph_slug, alias=top_node_alias)
+            .select_related("nodegroup")
+            .prefetch_related("nodegroup__node_set")
+        )
+        # TODO: make deterministic by checking source_identifier
+        # https://github.com/archesproject/arches/issues/11565
+        top_node_for_group = qs.last()
+        node_alias_annotations, node_aliases_by_node_id = _generate_annotation_maps(
+            top_node_for_group.nodegroup.node_set.all(),
+            defer=defer,
+            only=only,
+            invalid_names=field_names(self.model),
+            for_resource=False,
+        )
+        return self.annotate(
+            **node_alias_annotations,
+        ).annotate(
+            _fetched_nodes=models.Value(
+                node_aliases_by_node_id,
+                output_field=models.JSONField(),
+            )
+        )
+
+
 class ResourceInstanceQuerySet(models.QuerySet):
-    def with_unpacked_tiles(
-        self, graph_slug=None, *, resource_ids=None, defer=None, only=None
-    ):
+    def with_tiles(self, graph_slug=None, *, resource_ids=None, defer=None, only=None):
         """Annotates a ResourceInstance QuerySet with tile data unpacked
         and mapped onto node aliases, e.g.:
 
-        >>> ResourceInstance.objects.with_unpacked_tiles("mymodel")
+        >>> ResourceInstance.objects.with_tiles("mymodel")
 
         With slightly fewer keystrokes:
 
@@ -29,11 +90,8 @@ class ResourceInstanceQuerySet(models.QuerySet):
 
         Provisional edits are completely ignored.
         """
-        from arches.app.datatypes.datatypes import DataTypeFactory
         from arches.app.models.models import GraphModel, NodeGroup, TileModel
 
-        if defer and only and (overlap := set(defer).intersection(set(only))):
-            raise ValueError(f"Got intersecting defer/only args: {overlap}")
         if resource_ids and not graph_slug:
             graph_query = GraphModel.objects.filter(resourceinstance__in=resource_ids)
         else:
@@ -46,30 +104,13 @@ class ResourceInstanceQuerySet(models.QuerySet):
             e.add_note(f"No graph found with slug: {graph_slug}")
             raise
 
-        invalid_names = field_names(self.model)
-        datatype_factory = DataTypeFactory()
-        node_alias_annotations = {}
-        node_aliases_by_node_id = {}
-        for node in source_graph.node_set.all():
-            if node.datatype == "semantic":
-                continue
-            if node.nodegroup_id is None:
-                continue
-            if (defer and node.alias in defer) or (only and node.alias not in only):
-                continue
-            if node.alias in invalid_names:
-                raise ValueError(f'"{node.alias}" clashes with a model field name.')
-
-            datatype_instance = datatype_factory.get_instance(node.datatype)
-            tile_lookup = datatype_instance.get_orm_lookup(node)
-            node_alias_annotations[node.alias] = tile_lookup
-            node_aliases_by_node_id[str(node.pk)] = node.alias
-
-        if not node_alias_annotations:
-            raise ValueError("All fields were excluded.")
-        for given_alias in only or []:
-            if given_alias not in node_alias_annotations:
-                raise ValueError(f'"{given_alias}" is not a valid node alias.')
+        node_alias_annotations, node_aliases_by_node_id = _generate_annotation_maps(
+            source_graph.node_set.all(),
+            defer=defer,
+            only=only,
+            invalid_names=field_names(self.model),
+            for_resource=True,
+        )
 
         if resource_ids:
             qs = self.filter(pk__in=resource_ids)
@@ -85,14 +126,14 @@ class ResourceInstanceQuerySet(models.QuerySet):
                             node__alias__in=node_alias_annotations
                         )
                     ).order_by("sortorder"),
-                    to_attr="_sorted_tiles_for_pythonic_model_fields",
+                    to_attr="_sorted_tiles_for_fetched_nodes",
                 ),
             )
             .annotate(
                 **node_alias_annotations,
             )
             .annotate(
-                _pythonic_model_fields=models.Value(
+                _fetched_nodes=models.Value(
                     node_aliases_by_node_id,
                     output_field=models.JSONField(),
                 )
@@ -120,10 +161,10 @@ class ResourceInstanceQuerySet(models.QuerySet):
             nodegroups_by_nodeid[str(node.pk)] = node.nodegroup
 
         for resource in self._result_cache:
-            if not hasattr(resource, "_pythonic_model_fields"):
+            if not hasattr(resource, "_fetched_nodes"):
                 # On the first fetch, annotations haven't been applied yet.
                 continue
-            for nodeid, alias in resource._pythonic_model_fields.items():
+            for nodeid, alias in resource._fetched_nodes.items():
                 python_val = []
                 all_tile_values = getattr(resource, alias)
                 if all_tile_values is None:
