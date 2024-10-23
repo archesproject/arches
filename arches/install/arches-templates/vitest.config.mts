@@ -19,7 +19,7 @@ function generateConfig(): Promise<UserConfigExport> {
             '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
         ];
 
-        const rawData = fs.readFileSync(path.join(__dirname, 'frontend-configuration', 'webpack-metadata.json'), 'utf-8');
+        const rawData = fs.readFileSync(path.join(__dirname, 'frontend_configuration', 'webpack-metadata.json'), 'utf-8');
         const parsedData = JSON.parse(rawData);
 
         const alias: { [key: string]: string } = {
