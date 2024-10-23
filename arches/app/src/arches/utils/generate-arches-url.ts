@@ -1,7 +1,7 @@
 export default function (
     urlName: string,
-    languageCode: string | null = null,
     urlParams = {},
+    languageCode?: string,
 ) {
     // @ts-expect-error  ARCHES_URLS is defined globally
     let url = ARCHES_URLS[urlName];
