@@ -43,7 +43,16 @@ module.exports = () => {
                     }),
                     new StylelintPlugin({
                         files: Path.join('src', '**/*.s?(a|c)ss'),
-                    })
+                    }),
+                    {
+                        apply: (compiler) => {
+                            compiler.hooks.afterCompile.tap('WatchArchesUrlsPlugin', (compilation) => {
+                                compilation.fileDependencies.add(
+                                    Path.resolve(__dirname, APP_ROOT, '..', 'frontend_configuration', 'urls.json')
+                                );
+                            });
+                        },
+                    },
                 ],
             }));
         });
