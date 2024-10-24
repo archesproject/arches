@@ -4,7 +4,7 @@ from arches.app.models.utils import field_names
 
 
 # TODO: figure out best layer for reuse
-def _generate_annotation_maps(nodes, defer, only, invalid_names, for_resource=True):
+def _generate_annotations(nodes, defer, only, invalid_names, for_resource=True):
     from arches.app.datatypes.datatypes import DataTypeFactory
 
     if defer and only and (overlap := set(defer).intersection(set(only))):
@@ -38,26 +38,28 @@ def _generate_annotation_maps(nodes, defer, only, invalid_names, for_resource=Tr
 
 class TileQuerySet(models.QuerySet):
     @staticmethod
-    def _top_node_for_nodegroup(graph_slug, top_node_alias):
+    def _root_node_for_nodegroup(graph_slug, root_node_alias):
         from arches.app.models.models import Node
 
-        # TODO: avoidable if I already have a node_set?
         qs = (
-            Node.objects.filter(graph__slug=graph_slug, alias=top_node_alias)
+            Node.objects.filter(graph__slug=graph_slug, alias=root_node_alias)
             .select_related("nodegroup")
             .prefetch_related("nodegroup__node_set")
+            # Prefetching to a depth of 2 seems like a good trade-off for now.
+            .prefetch_related("nodegroup__nodegroup_set")
+            .prefetch_related("nodegroup__nodegroup_set__nodegroup_set")
         )
         # TODO: make deterministic by checking source_identifier
         # https://github.com/archesproject/arches/issues/11565
         ret = qs.last()
         if ret is None:
-            raise Node.DoesNotExist(f"graph: {graph_slug} node: {top_node_alias}")
+            raise Node.DoesNotExist(f"graph: {graph_slug} node: {root_node_alias}")
         return ret
 
     def with_node_values(self, nodes, *, defer=None, only=None, depth=1):
         from arches.app.models.models import TileModel
 
-        node_alias_annotations, node_aliases_by_node_id = _generate_annotation_maps(
+        node_alias_annotations, node_aliases_by_node_id = _generate_annotations(
             nodes,
             defer=defer,
             only=only,
@@ -89,12 +91,21 @@ class TileQuerySet(models.QuerySet):
             .order_by("sortorder")
         )
 
-    def as_nodegroup(self, top_node_alias, *, graph_slug, defer=None, only=None):
-        node_for_group = self._top_node_for_nodegroup(graph_slug, top_node_alias)
+    def as_nodegroup(self, root_node_alias, *, graph_slug, defer=None, only=None):
+        root_node = self._root_node_for_nodegroup(graph_slug, root_node_alias)
+
+        def accumulate_nodes_below(nodegroup, acc):
+            acc.extend(list(nodegroup.node_set.all()))
+            for child_nodegroup in nodegroup.nodegroup_set.all():
+                accumulate_nodes_below(child_nodegroup, acc)
+
+        branch_nodes = []
+        accumulate_nodes_below(root_node.nodegroup, acc=branch_nodes)
+
         return (
-            self.filter(nodegroup_id=node_for_group.pk)
-            .with_node_values([node_for_group], defer=defer, only=only)
-            .annotate(_nodegroup_alias=models.Value(top_node_alias))
+            self.filter(nodegroup_id=root_node.pk)
+            .with_node_values(branch_nodes, defer=defer, only=only)
+            .annotate(_nodegroup_alias=models.Value(root_node_alias))
         )
 
     def _fetch_all(self):
@@ -169,7 +180,7 @@ class ResourceInstanceQuerySet(models.QuerySet):
             raise
 
         nodes = source_graph.node_set.all()
-        node_alias_annotations, node_aliases_by_node_id = _generate_annotation_maps(
+        node_alias_annotations, node_aliases_by_node_id = _generate_annotations(
             nodes,
             defer=defer,
             only=only,
@@ -192,11 +203,10 @@ class ResourceInstanceQuerySet(models.QuerySet):
                     to_attr="_pythonic_nodegroups",
                 ),
             )
-            # still wanted?
-            # won't work if there are node-for-nodegroups that are data collecting
             .annotate(
                 **node_alias_annotations,
-            ).annotate(
+            )
+            .annotate(
                 _fetched_nodes=models.Value(
                     node_aliases_by_node_id,
                     output_field=models.JSONField(),
@@ -205,7 +215,7 @@ class ResourceInstanceQuerySet(models.QuerySet):
         )
 
     def _prefetch_related_objects(self):
-        """Attach nodegroups to resource instances."""
+        """Attach annotated tiles to resource instances."""
         super()._prefetch_related_objects()
 
         for resource in self._result_cache:
