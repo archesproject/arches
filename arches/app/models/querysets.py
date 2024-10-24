@@ -51,35 +51,74 @@ class TileQuerySet(models.QuerySet):
         # https://github.com/archesproject/arches/issues/11565
         ret = qs.last()
         if ret is None:
-            raise Node.DoesNotExist
+            raise Node.DoesNotExist(f"graph: {graph_slug} node: {top_node_alias}")
         return ret
 
-    def with_node_values(self, top_node_or_alias, *, graph_slug, defer=None, only=None):
-        if isinstance(top_node_or_alias, str):
-            node_for_group = self._top_node_for_nodegroup(graph_slug, top_node_or_alias)
-        else:
-            node_for_group = top_node_or_alias
+    def with_node_values(self, nodes, *, defer=None, only=None):
         node_alias_annotations, node_aliases_by_node_id = _generate_annotation_maps(
-            node_for_group.nodegroup.node_set.all(),
+            nodes,
             defer=defer,
             only=only,
             invalid_names=field_names(self.model),
             for_resource=False,
         )
-        return self.annotate(
-            **node_alias_annotations,
-        ).annotate(
-            _fetched_nodes=models.Value(
-                node_aliases_by_node_id,
-                output_field=models.JSONField(),
+        return (
+            self.prefetch_related(
+                "resourceinstance__graph__node_set",
             )
+            .annotate(
+                **node_alias_annotations,
+            )
+            .annotate(
+                _fetched_nodes=models.Value(
+                    node_aliases_by_node_id,
+                    output_field=models.JSONField(),
+                )
+            )
+            .order_by("sortorder")
         )
 
     def as_nodegroup(self, top_node_alias, *, graph_slug, defer=None, only=None):
         node_for_group = self._top_node_for_nodegroup(graph_slug, top_node_alias)
-        return self.filter(nodegroup_id=node_for_group.pk).with_node_values(
-            node_for_group, graph_slug=graph_slug, defer=defer, only=only
+        return (
+            self.filter(nodegroup_id=node_for_group.pk)
+            .with_node_values([node_for_group], defer=defer, only=only)
+            .annotate(_nodegroup_alias=models.Value(top_node_alias))
         )
+
+    def _fetch_all(self):
+        """Call datatype to_python() methods when materializing the QuerySet."""
+        from arches.app.datatypes.datatypes import DataTypeFactory
+
+        super()._fetch_all()
+
+        datatype_factory = DataTypeFactory()
+        datatypes_by_nodeid = {}
+        nodegroups_by_nodeid = {}
+
+        try:
+            first_tile = self._result_cache[0]
+        except IndexError:
+            return
+        for node in first_tile.resourceinstance.graph.node_set.all():
+            datatypes_by_nodeid[str(node.pk)] = datatype_factory.get_instance(
+                node.datatype
+            )
+            nodegroups_by_nodeid[str(node.pk)] = node.nodegroup
+
+        NOT_PROVIDED = object()
+        for tile in self._result_cache:
+            for nodeid, alias in tile._fetched_nodes.items():
+                tile_val = getattr(tile, alias, NOT_PROVIDED)
+                if tile_val is not NOT_PROVIDED:
+                    datatype_instance = datatypes_by_nodeid[nodeid]
+                    try:
+                        python_val = datatype_instance.to_python(tile_val)
+                    except:
+                        # TODO: some things break because datatype orm lookups
+                        # need to be reoriented around nodegroups (next)
+                        continue
+                    setattr(tile, alias, python_val)
 
 
 class ResourceInstanceQuerySet(models.QuerySet):
@@ -106,7 +145,7 @@ class ResourceInstanceQuerySet(models.QuerySet):
 
         Provisional edits are completely ignored.
         """
-        from arches.app.models.models import GraphModel, NodeGroup, TileModel
+        from arches.app.models.models import GraphModel, TileModel
 
         if resource_ids and not graph_slug:
             graph_query = GraphModel.objects.filter(resourceinstance__in=resource_ids)
@@ -120,8 +159,9 @@ class ResourceInstanceQuerySet(models.QuerySet):
             e.add_note(f"No graph found with slug: {graph_slug}")
             raise
 
+        nodes = source_graph.node_set.all()
         node_alias_annotations, node_aliases_by_node_id = _generate_annotation_maps(
-            source_graph.node_set.all(),
+            nodes,
             defer=defer,
             only=only,
             invalid_names=field_names(self.model),
@@ -135,20 +175,20 @@ class ResourceInstanceQuerySet(models.QuerySet):
         return (
             qs.prefetch_related(
                 "graph__node_set__nodegroup",
+                # TODO: reuse this for child tiles.
                 models.Prefetch(
                     "tilemodel_set",
-                    queryset=TileModel.objects.filter(
-                        nodegroup_id__in=NodeGroup.objects.filter(
-                            node__alias__in=node_alias_annotations
-                        )
-                    ).order_by("sortorder"),
-                    to_attr="_sorted_tiles_for_fetched_nodes",
+                    queryset=TileModel.objects.with_node_values(
+                        nodes, defer=defer, only=only
+                    ),
+                    to_attr="_pythonic_nodegroups",
                 ),
             )
+            # still wanted?
+            # won't work if there are node-for-nodegroups that are data collecting
             .annotate(
                 **node_alias_annotations,
-            )
-            .annotate(
+            ).annotate(
                 _fetched_nodes=models.Value(
                     node_aliases_by_node_id,
                     output_field=models.JSONField(),
@@ -156,44 +196,13 @@ class ResourceInstanceQuerySet(models.QuerySet):
             )
         )
 
-    def _fetch_all(self):
-        """Call datatype to_python() methods when evaluating queryset."""
-        from arches.app.datatypes.datatypes import DataTypeFactory
-
-        super()._fetch_all()
-
-        datatype_factory = DataTypeFactory()
-        datatypes_by_nodeid = {}
-        nodegroups_by_nodeid = {}
-
-        try:
-            first_resource = self._result_cache[0]
-        except IndexError:
-            return
-        for node in first_resource.graph.node_set.all():
-            datatypes_by_nodeid[str(node.pk)] = datatype_factory.get_instance(
-                node.datatype
-            )
-            nodegroups_by_nodeid[str(node.pk)] = node.nodegroup
+    def _prefetch_related_objects(self):
+        """Attach nodegroups to resource instances."""
+        super()._prefetch_related_objects()
 
         for resource in self._result_cache:
-            if not hasattr(resource, "_fetched_nodes"):
-                # On the first fetch, annotations haven't been applied yet.
-                continue
-            for nodeid, alias in resource._fetched_nodes.items():
-                python_val = []
-                all_tile_values = getattr(resource, alias)
-                if all_tile_values is None:
-                    continue
-                datatype_instance = datatypes_by_nodeid[nodeid]
-                nodegroup = nodegroups_by_nodeid[nodeid]
-                if nodegroup.cardinality == "1":
-                    all_tile_values = list(all_tile_values)
-                for inner_tile_val in all_tile_values:
-                    # TODO: add prefetching/lazy for RI-list?
-                    python_val.append(datatype_instance.to_python(inner_tile_val))
-                if all_tile_values != python_val:
-                    if nodegroup.cardinality == "1":
-                        setattr(resource, alias, python_val[0])
-                    else:
-                        setattr(resource, alias, python_val)
+            annotated_tiles = getattr(resource, "_pythonic_nodegroups", [])
+            for annotated_tile in annotated_tiles:
+                # TODO: move responsibility for cardinality N compilation to here.
+                # TODO: remove queries as part of filtering in with_node_values().
+                setattr(resource, annotated_tile.nodegroup_alias, annotated_tile)
