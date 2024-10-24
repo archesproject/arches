@@ -67,7 +67,8 @@ class TileQuerySet(models.QuerySet):
             for_resource=False,
         )
 
-        prefetches = ["resourceinstance__graph__node_set"]
+        # Prefetch sibling nodes.
+        prefetches = ["resourceinstance__graph__node_set__nodegroup__node_set"]
         if depth:
             prefetches.append(
                 models.Prefetch(
@@ -108,37 +109,44 @@ class TileQuerySet(models.QuerySet):
             .annotate(_nodegroup_alias=models.Value(root_node_alias))
         )
 
-    def _fetch_all(self):
-        """Call datatype to_python() methods when materializing the QuerySet."""
+    def _prefetch_related_objects(self):
+        """Call datatype to_python() methods when materializing the QuerySet.
+        Discard annotations that do not pertain to this tile.
+        TODO: determine if having these is useful for shallow filtering,
+        or if we can shave off in some upper layer.
+        """
         from arches.app.datatypes.datatypes import DataTypeFactory
 
-        super()._fetch_all()
+        super()._prefetch_related_objects()
 
         datatype_factory = DataTypeFactory()
-        datatypes_by_nodeid = {}
-
-        try:
-            first_tile = self._result_cache[0]
-        except IndexError:
-            return
-        for node in first_tile.resourceinstance.graph.node_set.all():
-            datatypes_by_nodeid[str(node.pk)] = datatype_factory.get_instance(
-                node.datatype
-            )
-
         NOT_PROVIDED = object()
         for tile in self._result_cache:
+            root_node = None
+            for node in tile.resourceinstance.graph.node_set.all():
+                if node.alias == tile.nodegroup_alias:
+                    root_node = node
+            if not root_node:
+                continue
+
             for nodeid, alias in getattr(tile, "_fetched_nodes", {}).items():
-                tile_val = getattr(tile, alias, NOT_PROVIDED)
-                if tile_val is not NOT_PROVIDED:
-                    datatype_instance = datatypes_by_nodeid[nodeid]
-                    try:
-                        python_val = datatype_instance.to_python(tile_val)
-                    except:
-                        # TODO: some things break because datatype orm lookups
-                        # need to be reoriented around nodegroups (next)
+                # TODO: evaluate for efficiency re: reshaping _fetched_nodes map
+                for node in root_node.nodegroup.node_set.all():
+                    if str(node.pk) != nodeid:
                         continue
-                    setattr(tile, alias, python_val)
+                    # TODO: debug and remove
+                    assert node.nodegroup_id == tile.nodegroup_id
+                    tile_val = getattr(tile, alias, NOT_PROVIDED)
+                    if tile_val is not NOT_PROVIDED:
+                        datatype_instance = datatype_factory.get_instance(node.datatype)
+                        try:
+                            python_val = datatype_instance.to_python(tile_val)
+                        except:
+                            # TODO: some things break because datatype orm lookups
+                            # need to be reoriented around nodegroups (next)
+                            continue
+                        setattr(tile, alias, python_val)
+                    break
 
 
 class ResourceInstanceQuerySet(models.QuerySet):
@@ -215,10 +223,16 @@ class ResourceInstanceQuerySet(models.QuerySet):
         )
 
     def _prefetch_related_objects(self):
-        """Attach annotated tiles to resource instances."""
+        """Attach annotated tiles to resource instances.
+        Discard annotations only used for shallow filtering.
+        """
         super()._prefetch_related_objects()
 
         for resource in self._result_cache:
+            fetched_nodes = getattr(resource, "_fetched_nodes", {})
+            for fetched_alias in fetched_nodes.values():
+                delattr(resource, fetched_alias)
+
             annotated_tiles = getattr(resource, "_pythonic_nodegroups", [])
             for annotated_tile in annotated_tiles:
                 # TODO: move responsibility for cardinality N compilation to here.
