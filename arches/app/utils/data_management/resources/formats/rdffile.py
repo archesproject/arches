@@ -182,7 +182,15 @@ class RdfWriter(Writer):
 
             rng_dt = self.datatype_factory.get_instance(pkg["r_datatype"])
             pkg["d_uri"] = dom_dt.get_rdf_uri(domainnode, pkg["domain_tile_data"], "d")
-            pkg["r_uri"] = rng_dt.get_rdf_uri(rangenode, pkg["range_tile_data"], "r")
+            if rng_dt.collects_multiple_values():
+                # If the range datatype collects multiple values, then there is no get
+                # the RDF URI for the range node as it unused or looked up later.
+                # This saved db queries. re #11572
+                pkg["r_uri"] = None
+            else:
+                pkg["r_uri"] = rng_dt.get_rdf_uri(
+                    rangenode, pkg["range_tile_data"], "r"
+                )
 
             # Concept on a node that is not required, but not present
             # Nothing to do here
@@ -220,7 +228,10 @@ class RdfWriter(Writer):
                 mpkg = pkg.copy()
                 for d in pkg["d_uri"]:
                     mpkg["d_uri"] = d
-                    if type(pkg["r_uri"]) == list:
+                    if (
+                        type(pkg["r_uri"]) == list
+                        and not rng_dt.collects_multiple_values()
+                    ):
                         npkg = mpkg.copy()
                         for r in pkg["r_uri"]:
                             # compute matrix of n * m
@@ -229,7 +240,7 @@ class RdfWriter(Writer):
                     else:
                         # iterate loop on m * 1
                         graph += rng_dt.to_rdf(mpkg, edge)
-            elif type(pkg["r_uri"]) == list:
+            elif type(pkg["r_uri"]) == list and not rng_dt.collects_multiple_values():
                 npkg = pkg.copy()
                 for r in pkg["r_uri"]:
                     # compute matrix of 1 * m
