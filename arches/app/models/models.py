@@ -1838,6 +1838,7 @@ class TileModel(models.Model):  # Tile
         if nodegroup_alias := getattr(self, "_nodegroup_alias", None):
             return nodegroup_alias
         if node_for_nodegroup := Node.objects.filter(pk=self.nodegroup_id).first():
+            self._nodegroup_alias = node_for_nodegroup.alias
             return node_for_nodegroup.alias
         return None
 
