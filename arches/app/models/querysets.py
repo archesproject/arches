@@ -54,7 +54,9 @@ class TileQuerySet(models.QuerySet):
             raise Node.DoesNotExist(f"graph: {graph_slug} node: {top_node_alias}")
         return ret
 
-    def with_node_values(self, nodes, *, defer=None, only=None):
+    def with_node_values(self, nodes, *, defer=None, only=None, depth=1):
+        from arches.app.models.models import TileModel
+
         node_alias_annotations, node_aliases_by_node_id = _generate_annotation_maps(
             nodes,
             defer=defer,
@@ -62,10 +64,19 @@ class TileQuerySet(models.QuerySet):
             invalid_names=field_names(self.model),
             for_resource=False,
         )
-        return (
-            self.prefetch_related(
-                "resourceinstance__graph__node_set",
+
+        prefetches = ["resourceinstance__graph__node_set"]
+        if depth:
+            prefetches.append(
+                models.Prefetch(
+                    "parenttile",
+                    queryset=TileModel.objects.with_node_values(
+                        nodes, defer=defer, only=only, depth=depth - 1
+                    ),
+                )
             )
+        return (
+            self.prefetch_related(*prefetches)
             .annotate(
                 **node_alias_annotations,
             )
@@ -94,7 +105,6 @@ class TileQuerySet(models.QuerySet):
 
         datatype_factory = DataTypeFactory()
         datatypes_by_nodeid = {}
-        nodegroups_by_nodeid = {}
 
         try:
             first_tile = self._result_cache[0]
@@ -104,7 +114,6 @@ class TileQuerySet(models.QuerySet):
             datatypes_by_nodeid[str(node.pk)] = datatype_factory.get_instance(
                 node.datatype
             )
-            nodegroups_by_nodeid[str(node.pk)] = node.nodegroup
 
         NOT_PROVIDED = object()
         for tile in self._result_cache:
@@ -175,7 +184,6 @@ class ResourceInstanceQuerySet(models.QuerySet):
         return (
             qs.prefetch_related(
                 "graph__node_set__nodegroup",
-                # TODO: reuse this for child tiles.
                 models.Prefetch(
                     "tilemodel_set",
                     queryset=TileModel.objects.with_node_values(
@@ -206,3 +214,12 @@ class ResourceInstanceQuerySet(models.QuerySet):
                 # TODO: move responsibility for cardinality N compilation to here.
                 # TODO: remove queries as part of filtering in with_node_values().
                 setattr(resource, annotated_tile.nodegroup_alias, annotated_tile)
+                if (
+                    annotated_tile.parenttile
+                    and annotated_tile.parenttile.nodegroup_alias
+                ):
+                    setattr(
+                        annotated_tile,
+                        annotated_tile.parenttile.nodegroup_alias,
+                        annotated_tile.parenttile,
+                    )
