@@ -1244,6 +1244,9 @@ class ResourceInstance(models.Model):
     def __repr__(self):
         return f"<{self.__class__.__qualname__}: {self.name} ({self.pk})>"
 
+    def __str__(self):
+        return repr(self)
+
     @classmethod
     def as_model(cls, *args, **kwargs):
         return cls.objects.with_tiles(*args, **kwargs)
@@ -1553,7 +1556,12 @@ class ResourceInstance(models.Model):
             refreshed_resource = from_queryset[0]
             for field in itertools.chain(
                 field_map.values(),
-                ("_fetched_nodes", "_sorted_tiles_for_fetched_nodes"),
+                # TODO: move to constant
+                (
+                    "_fetched_nodes",
+                    "_pythonic_nodegroups",
+                    "_sorted_tiles_for_fetched_nodes",
+                ),
             ):
                 setattr(self, field, getattr(refreshed_resource, field))
         else:
@@ -1827,12 +1835,17 @@ class TileModel(models.Model):  # Tile
     def __repr__(self):
         return f"<{self.__class__.__qualname__}: {self.nodegroup_alias} ({self.pk})>"
 
+    def __str__(self):
+        return repr(self)
+
     @property
     def nodegroup(self):
         return NodeGroup.objects.filter(pk=self.nodegroup_id).first()
 
     @property
     def nodegroup_alias(self):
+        if nodegroup_alias := getattr(self, "_nodegroup_alias", None):
+            return nodegroup_alias
         if node_for_nodegroup := Node.objects.filter(pk=self.nodegroup_id).first():
             return node_for_nodegroup.alias
         return None
