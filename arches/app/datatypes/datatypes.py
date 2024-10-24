@@ -2278,15 +2278,18 @@ class ResourceInstanceDataType(BaseDataType):
             if not isinstance(res_insts, list):
                 res_insts = [res_insts]
 
+            ontologyclass_lookup = {}
             for res_inst in res_insts:
                 rangenode = self.get_rdf_uri(None, res_inst)
                 try:
-                    res_inst_obj = models.ResourceInstance.objects.get(
+                    res_inst_graphid = models.ResourceInstance.objects.get(
                         pk=res_inst["resourceId"]
-                    )
-                    r_type = res_inst_obj.graph.node_set.get(
-                        istopnode=True
-                    ).ontologyclass
+                    ).graph_id
+                    try:
+                        r_type = ontologyclass_lookup[res_inst_graphid]
+                    except KeyError:
+                        r_type = models.Node.objects.get(graph=res_inst_graphid, istopnode=True).ontologyclass
+                        ontologyclass_lookup[res_inst_graphid] = r_type
                 except models.ResourceInstance.DoesNotExist:
                     # This should never happen excpet if trying to export when the
                     # referenced resource hasn't been saved to the database yet
