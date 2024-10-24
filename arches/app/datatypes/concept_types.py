@@ -495,9 +495,19 @@ class ConceptListDataType(BaseConceptDataType):
                 c = ConceptValue(str(r))
                 concept_info = edge_info.copy()
                 concept_info["r_uri"] = cdt.get_rdf_uri(None, r)
-                g.add((concept_info["r_uri"], RDF.type, URIRef(edge.rangenode.ontologyclass)))
                 g.add(
-                    (concept_info["d_uri"], URIRef(edge.ontologyproperty), concept_info["r_uri"])
+                    (
+                        concept_info["r_uri"],
+                        RDF.type,
+                        URIRef(edge.rangenode.ontologyclass),
+                    )
+                )
+                g.add(
+                    (
+                        concept_info["d_uri"],
+                        URIRef(edge.ontologyproperty),
+                        concept_info["r_uri"],
+                    )
                 )
                 g.add((concept_info["r_uri"], URIRef(RDFS.label), Literal(c.value)))
         return g
