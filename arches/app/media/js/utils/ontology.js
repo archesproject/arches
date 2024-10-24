@@ -15,7 +15,10 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
             }
             return '';
         },
-
+        isValidURL: function(url) {
+            var urlRegex = /^(http|https):\/\/[^ "]+$/;
+            return urlRegex.test(url);
+        },
         getSelect2ConfigForOntologyProperties: function(value, domain, range, placeholder, allowClear) {
             return {
                 value: value,
@@ -59,6 +62,7 @@ define(['jquery', 'knockout', 'arches'], function($, ko, arches) {
                 initSelection: function(el, callback) {
                     if(!!value()){
                         var data = {id: value(), text: value()};
+                        if (!ontologyUtils.isValidURL(value())) { data.text = ''; }
                         var option = new Option(data.text, data.id, true, true);
                         $(el).append(option);
                         callback([data]);
