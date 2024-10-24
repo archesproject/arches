@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 from django.conf import settings
 
-from arches.settings_utils import generate_frontend_configuration
+from arches.app.utils.frontend_configuration_utils import generate_frontend_configuration
 
 
 class {{ project_name_title_case }}Config(AppConfig):
