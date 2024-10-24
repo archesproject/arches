@@ -37,7 +37,8 @@ def _generate_annotation_maps(nodes, defer, only, invalid_names, for_resource=Tr
 
 
 class TileQuerySet(models.QuerySet):
-    def with_node_values(self, top_node_alias, *, graph_slug, defer=None, only=None):
+    @staticmethod
+    def _top_node_for_nodegroup(graph_slug, top_node_alias):
         from arches.app.models.models import Node
 
         # TODO: avoidable if I already have a node_set?
@@ -48,9 +49,18 @@ class TileQuerySet(models.QuerySet):
         )
         # TODO: make deterministic by checking source_identifier
         # https://github.com/archesproject/arches/issues/11565
-        top_node_for_group = qs.last()
+        ret = qs.last()
+        if ret is None:
+            raise Node.DoesNotExist
+        return ret
+
+    def with_node_values(self, top_node_or_alias, *, graph_slug, defer=None, only=None):
+        if isinstance(top_node_or_alias, str):
+            node_for_group = self._top_node_for_nodegroup(graph_slug, top_node_or_alias)
+        else:
+            node_for_group = top_node_or_alias
         node_alias_annotations, node_aliases_by_node_id = _generate_annotation_maps(
-            top_node_for_group.nodegroup.node_set.all(),
+            node_for_group.nodegroup.node_set.all(),
             defer=defer,
             only=only,
             invalid_names=field_names(self.model),
@@ -63,6 +73,12 @@ class TileQuerySet(models.QuerySet):
                 node_aliases_by_node_id,
                 output_field=models.JSONField(),
             )
+        )
+
+    def as_nodegroup(self, top_node_alias, *, graph_slug, defer=None, only=None):
+        node_for_group = self._top_node_for_nodegroup(graph_slug, top_node_alias)
+        return self.filter(nodegroup_id=node_for_group.pk).with_node_values(
+            node_for_group, graph_slug=graph_slug, defer=defer, only=only
         )
 
 
