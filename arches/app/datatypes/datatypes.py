@@ -2288,7 +2288,9 @@ class ResourceInstanceDataType(BaseDataType):
                     try:
                         r_type = ontologyclass_lookup[res_inst_graphid]
                     except KeyError:
-                        r_type = models.Node.objects.get(graph=res_inst_graphid, istopnode=True).ontologyclass
+                        r_type = models.Node.objects.get(
+                            graph=res_inst_graphid, istopnode=True
+                        ).ontologyclass
                         ontologyclass_lookup[res_inst_graphid] = r_type
                 except models.ResourceInstance.DoesNotExist:
                     # This should never happen excpet if trying to export when the
