@@ -220,7 +220,7 @@ class RdfWriter(Writer):
                 mpkg = pkg.copy()
                 for d in pkg["d_uri"]:
                     mpkg["d_uri"] = d
-                    if type(pkg["r_uri"]) == list:
+                    if type(pkg["r_uri"]) == list and not rng_dt.collects_multiple_values():
                         npkg = mpkg.copy()
                         for r in pkg["r_uri"]:
                             # compute matrix of n * m
@@ -229,7 +229,7 @@ class RdfWriter(Writer):
                     else:
                         # iterate loop on m * 1
                         graph += rng_dt.to_rdf(mpkg, edge)
-            elif type(pkg["r_uri"]) == list:
+            elif type(pkg["r_uri"]) == list and not rng_dt.collects_multiple_values():
                 npkg = pkg.copy()
                 for r in pkg["r_uri"]:
                     # compute matrix of 1 * m

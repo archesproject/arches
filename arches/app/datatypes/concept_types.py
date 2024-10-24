@@ -489,12 +489,17 @@ class ConceptListDataType(BaseConceptDataType):
 
     def to_rdf(self, edge_info, edge):
         g = Graph()
-        c = ConceptDataType()
+        cdt = ConceptDataType()
         if edge_info["range_tile_data"]:
             for r in edge_info["range_tile_data"]:
+                c = ConceptValue(str(r))
                 concept_info = edge_info.copy()
-                concept_info["range_tile_data"] = r
-                g += c.to_rdf(concept_info, edge)
+                concept_info["r_uri"] = cdt.get_rdf_uri(None, r)
+                g.add((concept_info["r_uri"], RDF.type, URIRef(edge.rangenode.ontologyclass)))
+                g.add(
+                    (concept_info["d_uri"], URIRef(edge.ontologyproperty), concept_info["r_uri"])
+                )
+                g.add((concept_info["r_uri"], URIRef(RDFS.label), Literal(c.value)))
         return g
 
     def from_rdf(self, json_ld_node):
