@@ -108,7 +108,7 @@ class TileQuerySet(models.QuerySet):
 
         NOT_PROVIDED = object()
         for tile in self._result_cache:
-            for nodeid, alias in tile._fetched_nodes.items():
+            for nodeid, alias in getattr(tile, "_fetched_nodes", {}).items():
                 tile_val = getattr(tile, alias, NOT_PROVIDED)
                 if tile_val is not NOT_PROVIDED:
                     datatype_instance = datatypes_by_nodeid[nodeid]
