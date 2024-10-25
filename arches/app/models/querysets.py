@@ -3,15 +3,13 @@ from django.db import models
 from arches.app.models.utils import field_names
 
 
-# TODO: figure out best layer for reuse
-def _generate_annotations(nodes, defer, only, invalid_names, for_resource=True):
+def _generate_tile_annotations(nodes, defer, only, invalid_names, outer_ref=None):
     from arches.app.datatypes.datatypes import DataTypeFactory
 
     if defer and only and (overlap := set(defer).intersection(set(only))):
         raise ValueError(f"Got intersecting defer/only args: {overlap}")
     datatype_factory = DataTypeFactory()
     node_alias_annotations = {}
-    node_aliases_by_node_id = {}
     for node in nodes:
         if node.datatype == "semantic":
             continue
@@ -23,9 +21,10 @@ def _generate_annotations(nodes, defer, only, invalid_names, for_resource=True):
             raise ValueError(f'"{node.alias}" clashes with a model field name.')
 
         datatype_instance = datatype_factory.get_instance(node.datatype)
-        tile_lookup = datatype_instance.get_orm_lookup(node, for_resource=for_resource)
-        node_alias_annotations[node.alias] = tile_lookup
-        node_aliases_by_node_id[str(node.pk)] = node.alias
+        tile_values_query = datatype_instance.get_values_query(
+            node, outer_ref=outer_ref
+        )
+        node_alias_annotations[node.alias] = tile_values_query
 
     if not node_alias_annotations:
         raise ValueError("All fields were excluded.")
@@ -33,7 +32,7 @@ def _generate_annotations(nodes, defer, only, invalid_names, for_resource=True):
         if given_alias not in node_alias_annotations:
             raise ValueError(f'"{given_alias}" is not a valid node alias.')
 
-    return node_alias_annotations, node_aliases_by_node_id
+    return node_alias_annotations
 
 
 class TileQuerySet(models.QuerySet):
@@ -46,8 +45,8 @@ class TileQuerySet(models.QuerySet):
             .select_related("nodegroup")
             .prefetch_related("nodegroup__node_set")
             # Prefetching to a depth of 2 seems like a good trade-off for now.
-            .prefetch_related("nodegroup__nodegroup_set")
-            .prefetch_related("nodegroup__nodegroup_set__nodegroup_set")
+            .prefetch_related("nodegroup__children")
+            .prefetch_related("nodegroup__children__children")
         )
         # TODO: make deterministic by checking source_identifier
         # https://github.com/archesproject/arches/issues/11565
@@ -56,48 +55,63 @@ class TileQuerySet(models.QuerySet):
             raise Node.DoesNotExist(f"graph: {graph_slug} node: {root_node_alias}")
         return ret
 
-    def with_node_values(self, nodes, *, defer=None, only=None, depth=1):
-        from arches.app.models.models import TileModel
+    def with_node_values(
+        self, nodes, *, defer=None, only=None, outer_ref=None, depth=1
+    ):
+        # from arches.app.models.models import TileModel
 
-        node_alias_annotations, node_aliases_by_node_id = _generate_annotations(
+        node_alias_annotations = _generate_tile_annotations(
             nodes,
             defer=defer,
             only=only,
             invalid_names=field_names(self.model),
-            for_resource=False,
+            outer_ref=outer_ref,
         )
 
-        # Prefetch sibling nodes.
-        prefetches = ["resourceinstance__graph__node_set__nodegroup__node_set"]
-        if depth:
-            prefetches.append(
-                models.Prefetch(
-                    "parenttile",
-                    queryset=TileModel.objects.with_node_values(
-                        nodes, defer=defer, only=only, depth=depth - 1
-                    ),
-                )
-            )
+        prefetches = []
+        # TODO: debug this.
+        # if depth:
+        #     prefetches.append(
+        #         models.Prefetch(
+        #             "parenttile",
+        #             queryset=TileModel.objects.with_node_values(
+        #                 nodes, defer=defer, only=only, depth=depth - 1
+        #             ),
+        #         )
+        #     )
+
+        self._fetched_nodes = [n for n in nodes if n.alias in node_alias_annotations]
         return (
-            self.prefetch_related(*prefetches)
+            self.filter(data__has_any_keys=[n.pk for n in self._fetched_nodes])
+            .prefetch_related(*prefetches)
             .annotate(
                 **node_alias_annotations,
-            )
-            .annotate(
-                _fetched_nodes=models.Value(
-                    node_aliases_by_node_id,
-                    output_field=models.JSONField(),
-                )
             )
             .order_by("sortorder")
         )
 
     def as_nodegroup(self, root_node_alias, *, graph_slug, defer=None, only=None):
+        """
+        Entry point for filtering arches data by nodegroups (instead of grouping by
+        resource.)
+
+        >>> statements = TileModel.objects.as_nodegroup("statement", graph_slug="concept")
+        >>> results = statements.filter(statement_content__0__en__value__startswith="F")  # todo: make more ergonomic, remove limitation of 0
+        >>> for result in results:
+                print(result.resourceinstance)
+                print("\t", result.statement_content[0]["en"]["value"])  # TODO: unwrap/string viewmodel
+
+        <Concept: x-ray fluorescence (aec56d59-9292-42d6-b18e-1dd260ff446f)>
+            Fluorescence stimulated by x-rays; ...
+        <Concept: vellum (parchment) (34b081cd-6fcc-4e00-9a43-0a8a73745b45)>
+            Fine-quality calf or lamb parchment ...
+        """
+
         root_node = self._root_node_for_nodegroup(graph_slug, root_node_alias)
 
         def accumulate_nodes_below(nodegroup, acc):
             acc.extend(list(nodegroup.node_set.all()))
-            for child_nodegroup in nodegroup.nodegroup_set.all():
+            for child_nodegroup in nodegroup.children.all():
                 accumulate_nodes_below(child_nodegroup, acc)
 
         branch_nodes = []
@@ -105,15 +119,15 @@ class TileQuerySet(models.QuerySet):
 
         return (
             self.filter(nodegroup_id=root_node.pk)
-            .with_node_values(branch_nodes, defer=defer, only=only)
+            .with_node_values(
+                branch_nodes, defer=defer, only=only, outer_ref="resourceinstance_id"
+            )
             .annotate(_nodegroup_alias=models.Value(root_node_alias))
         )
 
     def _prefetch_related_objects(self):
         """Call datatype to_python() methods when materializing the QuerySet.
         Discard annotations that do not pertain to this tile.
-        TODO: determine if having these is useful for shallow filtering,
-        or if we can shave off in some upper layer.
         """
         from arches.app.datatypes.datatypes import DataTypeFactory
 
@@ -122,31 +136,23 @@ class TileQuerySet(models.QuerySet):
         datatype_factory = DataTypeFactory()
         NOT_PROVIDED = object()
         for tile in self._result_cache:
-            root_node = None
-            for node in tile.resourceinstance.graph.node_set.all():
-                if node.alias == tile.nodegroup_alias:
-                    root_node = node
-            if not root_node:
-                continue
-
-            for nodeid, alias in getattr(tile, "_fetched_nodes", {}).items():
-                # TODO: evaluate for efficiency re: reshaping _fetched_nodes map
-                for node in root_node.nodegroup.node_set.all():
-                    if str(node.pk) != nodeid:
-                        continue
-                    # TODO: debug and remove
-                    assert node.nodegroup_id == tile.nodegroup_id
-                    tile_val = getattr(tile, alias, NOT_PROVIDED)
+            for node in self._fetched_nodes:
+                if node.nodegroup_id == tile.nodegroup_id:
+                    tile_val = getattr(tile, node.alias, NOT_PROVIDED)
                     if tile_val is not NOT_PROVIDED:
                         datatype_instance = datatype_factory.get_instance(node.datatype)
-                        try:
-                            python_val = datatype_instance.to_python(tile_val)
-                        except:
-                            # TODO: some things break because datatype orm lookups
-                            # need to be reoriented around nodegroups (next)
-                            continue
-                        setattr(tile, alias, python_val)
+                        # Immediately coalesce [None] (from ArraySubquery) to [].
+                        if tile_val == [None]:
+                            tile_val = []
+                        python_val = datatype_instance.to_python(tile_val)
+                        setattr(tile, node.alias, python_val)
                     break
+
+    def _clone(self):
+        ret = super()._clone()
+        if hasattr(self, "_fetched_nodes"):
+            ret._fetched_nodes = self._fetched_nodes
+        return ret
 
 
 class ResourceInstanceQuerySet(models.QuerySet):
@@ -154,26 +160,45 @@ class ResourceInstanceQuerySet(models.QuerySet):
         """Annotates a ResourceInstance QuerySet with tile data unpacked
         and mapped onto node aliases, e.g.:
 
-        >>> ResourceInstance.objects.with_tiles("concept")
+        >>> concepts = ResourceInstance.objects.with_tiles("concept")
 
         With slightly fewer keystrokes:
 
-        >>> ResourceInstance.as_model("concept")
+        >>> concepts = ResourceInstance.as_model("concept")
 
         Or with defer/only as in the QuerySet interface:
 
-        >>> ResourceInstance.as_model("concept", only=["alias1", "alias2"])
+        >>> partial_concepts = ResourceInstance.as_model("concept", only=["n1", "n2"])
 
         Example:
 
-        >>> concepts = ResourceInstance.as_model("concepts")
-        >>> result = concepts.filter(my_node_alias="some tile value")
-        >>> result.first().my_node_alias
-        "some tile value"
+        >>> from arches.app.models.models import *
+        >>> concepts = ResourceInstance.as_model("concept")
+
+        Django QuerySet methods are available for efficient queries:
+        >>> concepts.count()
+        785
+
+        Filter on any nested node at the top level ("shallow query")
+
+        >>> subset = concepts.filter(statement_content__isnull=False)[:4]
+
+        Access through nodegroup names:
+
+        >>> for concept in subset:
+                print(concept)
+                for stmt in concept.statement:  # TODO: should name with _set (?)
+                    print("\t", stmt)
+                    print("\t\t", stmt.statement_content)
+
+        <Concept: consignment (method of acquisition) (f3fed7aa-eae6-41f6-aa0f-b889d84c0552)>
+            <TileModel: statement (46efcd06-a5e5-43be-8847-d7cd94cbc9cb)>
+                [{'en': {'value': 'Method of acquiring property ...
+        ...
 
         Provisional edits are completely ignored.
         """
-        from arches.app.models.models import GraphModel, TileModel
+        from arches.app.models.models import GraphModel, NodeGroup, TileModel
 
         if resource_ids and not graph_slug:
             graph_query = GraphModel.objects.filter(resourceinstance__in=resource_ids)
@@ -182,62 +207,89 @@ class ResourceInstanceQuerySet(models.QuerySet):
                 slug=graph_slug, source_identifier=None
             )
         try:
-            source_graph = graph_query.prefetch_related("node_set__nodegroup").get()
+            # Prefetch sibling nodes for use in _prefetch_related_objects()
+            source_graph = graph_query.prefetch_related(
+                "node_set__nodegroup__node_set"
+            ).get()
         except GraphModel.DoesNotExist as e:
             e.add_note(f"No graph found with slug: {graph_slug}")
             raise
 
         nodes = source_graph.node_set.all()
-        node_alias_annotations, node_aliases_by_node_id = _generate_annotations(
+        node_alias_annotations = _generate_tile_annotations(
             nodes,
             defer=defer,
             only=only,
             invalid_names=field_names(self.model),
-            for_resource=True,
+            outer_ref="resourceinstanceid",
         )
+        self._fetched_nodes = [n for n in nodes if n.alias in node_alias_annotations]
 
         if resource_ids:
             qs = self.filter(pk__in=resource_ids)
         else:
             qs = self.filter(graph=source_graph)
-        return (
-            qs.prefetch_related(
-                "graph__node_set__nodegroup",
-                models.Prefetch(
-                    "tilemodel_set",
-                    queryset=TileModel.objects.with_node_values(
-                        nodes, defer=defer, only=only
-                    ),
-                    to_attr="_pythonic_nodegroups",
+        return qs.prefetch_related(
+            "graph__node_set__nodegroup",
+            models.Prefetch(
+                "tilemodel_set",
+                queryset=TileModel.objects.with_node_values(
+                    self._fetched_nodes,
+                    defer=defer,
+                    only=only,
+                    outer_ref="resourceinstance_id",
+                ).annotate(
+                    cardinality=NodeGroup.objects.filter(
+                        pk=models.OuterRef("nodegroup_id")
+                    ).values("cardinality")
                 ),
-            )
-            .annotate(
-                **node_alias_annotations,
-            )
-            .annotate(
-                _fetched_nodes=models.Value(
-                    node_aliases_by_node_id,
-                    output_field=models.JSONField(),
-                )
-            )
+                to_attr="_annotated_tiles",
+            ),
+        ).annotate(
+            **node_alias_annotations,
         )
 
     def _prefetch_related_objects(self):
-        """Attach annotated tiles to resource instances.
+        """Attach annotated tiles to resource instances, at the root, by
+        nodegroup alias. TODO: consider building as a nested structure.
         Discard annotations only used for shallow filtering.
         """
         super()._prefetch_related_objects()
 
-        for resource in self._result_cache:
-            fetched_nodes = getattr(resource, "_fetched_nodes", {})
-            for fetched_alias in fetched_nodes.values():
-                delattr(resource, fetched_alias)
+        root_nodes = []
+        for node in self._fetched_nodes:
+            # TODO: less roundabout lookup, see earlier siblings prefetch.
+            root_node = None
+            for sibling_node in node.nodegroup.node_set.all():
+                if sibling_node.pk == node.nodegroup_id:
+                    root_node = sibling_node
+                    break
+            root_nodes.append(root_node)
 
-            annotated_tiles = getattr(resource, "_pythonic_nodegroups", [])
+        for resource in self._result_cache:
+            for node in self._fetched_nodes:
+                delattr(resource, node.alias)
+            for root_node in root_nodes:
+                setattr(
+                    resource,
+                    root_node.alias,
+                    None if root_node.nodegroup.cardinality == "1" else [],
+                )
+            annotated_tiles = getattr(resource, "_annotated_tiles", [])
             for annotated_tile in annotated_tiles:
-                # TODO: move responsibility for cardinality N compilation to here.
-                # TODO: remove queries as part of filtering in with_node_values().
-                setattr(resource, annotated_tile.nodegroup_alias, annotated_tile)
+                for root_node in root_nodes:
+                    if root_node.pk == annotated_tile.nodegroup_id:
+                        ng_alias = root_node.alias
+                        break
+                else:
+                    raise RuntimeError("missing root node for annotated tile")
+
+                if annotated_tile.cardinality == "n":
+                    tile_array = getattr(resource, ng_alias)
+                    tile_array.append(annotated_tile)
+                else:
+                    setattr(resource, ng_alias, annotated_tile)
+
                 if (
                     annotated_tile.parenttile
                     and annotated_tile.parenttile.nodegroup_alias
@@ -247,3 +299,9 @@ class ResourceInstanceQuerySet(models.QuerySet):
                         annotated_tile.parenttile.nodegroup_alias,
                         annotated_tile.parenttile,
                     )
+
+    def _clone(self):
+        ret = super()._clone()
+        if hasattr(self, "_fetched_nodes"):
+            ret._fetched_nodes = self._fetched_nodes
+        return ret

@@ -708,6 +708,8 @@ class NodeGroup(models.Model):
         blank=True,
         null=True,
         on_delete=models.CASCADE,
+        related_name="children",
+        related_query_name="child",
     )  # Allows nodegroups within nodegroups
 
     def __init__(self, *args, **kwargs):
@@ -1242,7 +1244,7 @@ class ResourceInstance(models.Model):
             self.resourceinstanceid = uuid.uuid4()
 
     def __repr__(self):
-        return f"<{self.__class__.__qualname__}: {self.name} ({self.pk})>"
+        return f"<{self.graph.name}: {self.name} ({self.pk})>"
 
     def __str__(self):
         return repr(self)
@@ -1559,7 +1561,7 @@ class ResourceInstance(models.Model):
                 # TODO: move to constant
                 (
                     "_fetched_nodes",
-                    "_pythonic_nodegroups",
+                    "_annotated_tiles",
                     "_sorted_tiles_for_fetched_nodes",
                 ),
             ):
@@ -1815,6 +1817,8 @@ class TileModel(models.Model):  # Tile
         blank=True,
         null=True,
         on_delete=models.CASCADE,
+        related_name="children",
+        related_query_name="child",
     )
     data = JSONField(blank=True, null=True, db_column="tiledata")
     nodegroup_id = models.UUIDField(db_column="nodegroupid", null=True)
@@ -1833,7 +1837,7 @@ class TileModel(models.Model):  # Tile
             self.tileid = uuid.uuid4()
 
     def __repr__(self):
-        return f"<{self.__class__.__qualname__}: {self.nodegroup_alias} ({self.pk})>"
+        return f"<{self.nodegroup_alias} ({self.pk})>"
 
     def __str__(self):
         return repr(self)

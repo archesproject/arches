@@ -539,14 +539,20 @@ class BaseDataType(object):
         """
         pass
 
-    def get_orm_lookup(self, node, *, for_resource=True) -> BaseExpression:
-        """Return a tile subquery expression for use in a ResourceInstance QuerySet."""
+    def get_values_query(self, node, *, outer_ref=None) -> BaseExpression:
+        """Return a tile values query expression for use in a
+        ResourceInstanceQuerySet or TileQuerySet.
+
+        The outer_ref names the resource instance field for use in the
+        subquery. It is spelled slightly differently when annotating
+        a Tile or a ResourceInstance. For resource instances, it's
+        "resourceinstanceid", otherwise "resourceinstance_id".
+        """
         base_lookup = self._get_base_orm_lookup(node)
 
-        outer_ref = "resourceinstanceid" if for_resource else "resourceinstance_id"
-        tile_query = models.TileModel.objects.filter(
-            nodegroup_id=node.nodegroup.pk
-        ).filter(resourceinstance_id=OuterRef(outer_ref))
+        tile_query = models.TileModel.objects.filter(nodegroup_id=node.nodegroup.pk)
+        if outer_ref:
+            tile_query = tile_query.filter(resourceinstance_id=OuterRef(outer_ref))
         if node.nodegroup.cardinality == "n":
             tile_query = tile_query.order_by("sortorder")
 
@@ -554,8 +560,10 @@ class BaseDataType(object):
 
         if node.nodegroup.cardinality == "n":
             return ArraySubquery(tile_query)
-        else:
+        elif outer_ref:
             return Subquery(tile_query)
+        else:
+            return tile_query
 
     def _get_base_orm_lookup(self, node):
         return f"data__{node.pk}"
