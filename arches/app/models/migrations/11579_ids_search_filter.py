@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "'11042_update__arches_staging_to_tile'"),
+        ("models", "11042_update__arches_staging_to_tile"),
     ]
 
     forward = """
