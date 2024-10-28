@@ -373,6 +373,7 @@ INSTALLED_APPS = (
     "guardian",
     "captcha",
     "revproxy",
+    "rest_framework",
     "corsheaders",
     "oauth2_provider",
     "django_celery_results",
@@ -405,6 +406,15 @@ MIDDLEWARE.insert(  # this must resolve to first MIDDLEWARE entry
 MIDDLEWARE.append(  # this must resolve last MIDDLEWARE entry
     "django_hosts.middleware.HostsResponseMiddleware"
 )
+
+# TODO: choose most appropriate default.
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
+    ]
+}
 
 WEBPACK_LOADER = {
     "DEFAULT": {
