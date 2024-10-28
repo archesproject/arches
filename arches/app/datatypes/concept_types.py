@@ -292,17 +292,15 @@ class ConceptDataType(BaseConceptDataType):
             )
             return self.compile_json(tile, node, **value_data)
 
-    def get_rdf_uri(self, node, data, which="r"):
+    def get_rdf_uri(self, node, data, which="r", c=None):
         if not data:
             return None
-        c = ConceptValue(str(data))
+        c = ConceptValue(str(data)) if c is None else c
         assert c.value is not None, "Null or blank concept value"
-        ext_ids = [
-            ident.value
-            for ident in models.Value.objects.all().filter(
-                concept_id__exact=c.conceptid, valuetype__category="identifiers"
-            )
-        ]
+        ext_ids = models.Value.objects.filter(
+            concept_id=c.conceptid, valuetype__category="identifiers"
+        ).values_list("value", flat=True)
+
         for p in settings.PREFERRED_CONCEPT_SCHEMES:
             for id_uri in ext_ids:
                 if str(id_uri).startswith(p):
@@ -489,12 +487,27 @@ class ConceptListDataType(BaseConceptDataType):
 
     def to_rdf(self, edge_info, edge):
         g = Graph()
-        c = ConceptDataType()
+        cdt = ConceptDataType()
         if edge_info["range_tile_data"]:
             for r in edge_info["range_tile_data"]:
+                c = ConceptValue(str(r))
                 concept_info = edge_info.copy()
-                concept_info["range_tile_data"] = r
-                g += c.to_rdf(concept_info, edge)
+                concept_info["r_uri"] = cdt.get_rdf_uri(None, r, c=c)
+                g.add(
+                    (
+                        concept_info["r_uri"],
+                        RDF.type,
+                        URIRef(edge.rangenode.ontologyclass),
+                    )
+                )
+                g.add(
+                    (
+                        concept_info["d_uri"],
+                        URIRef(edge.ontologyproperty),
+                        concept_info["r_uri"],
+                    )
+                )
+                g.add((concept_info["r_uri"], URIRef(RDFS.label), Literal(c.value)))
         return g
 
     def from_rdf(self, json_ld_node):
