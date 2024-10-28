@@ -1319,7 +1319,7 @@ class ResourceInstance(models.Model):
             )
             add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
 
-        if getattr(self, "_fetched_nodes", False):
+        if getattr(self, "_annotated_tiles", False):
             self._save_tiles_for_pythonic_model(index=index, **kwargs)
             self.save_edit(user=user)
         else:
@@ -1327,7 +1327,7 @@ class ResourceInstance(models.Model):
 
     def clean(self):
         """Raises a compound ValidationError with any failing tile values."""
-        if getattr(self, "_fetched_nodes", False):
+        if getattr(self, "_annotated_tiles", False):
             nodegroups = (
                 NodeGroup.objects.filter(node__graph=self.graph)
                 .distinct()

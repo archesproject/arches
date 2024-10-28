@@ -2443,7 +2443,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
     def to_python(self, tile_val):
         if tile_val is None:
             return tile_val
-        resource_ids = [inner["resourceId"] for inner in tile_val]
+        resource_ids = [inner["resourceId"] if inner else None for inner in tile_val]
         return resource_ids
 
 

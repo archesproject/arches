@@ -2,9 +2,6 @@ import json
 import logging
 import urllib
 
-from django.contrib.postgres.expressions import ArraySubquery
-from django.db.models import OuterRef, Subquery
-from django.db.models.expressions import BaseExpression
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -539,33 +536,7 @@ class BaseDataType(object):
         """
         pass
 
-    def get_values_query(self, node, *, outer_ref=None) -> BaseExpression:
-        """Return a tile values query expression for use in a
-        ResourceInstanceQuerySet or TileQuerySet.
-
-        The outer_ref names the resource instance field for use in the
-        subquery. It is spelled slightly differently when annotating
-        a Tile or a ResourceInstance. For resource instances, it's
-        "resourceinstanceid", otherwise "resourceinstance_id".
-        """
-        base_lookup = self._get_base_orm_lookup(node)
-
-        tile_query = models.TileModel.objects.filter(nodegroup_id=node.nodegroup.pk)
-        if outer_ref:
-            tile_query = tile_query.filter(resourceinstance_id=OuterRef(outer_ref))
-        if node.nodegroup.cardinality == "n":
-            tile_query = tile_query.order_by("sortorder")
-
-        tile_query = tile_query.values(base_lookup)
-
-        if node.nodegroup.cardinality == "n":
-            return ArraySubquery(tile_query)
-        elif outer_ref:
-            return Subquery(tile_query)
-        else:
-            return tile_query
-
-    def _get_base_orm_lookup(self, node):
+    def get_base_orm_lookup(self, node):
         return f"data__{node.pk}"
 
     def to_python(self, tile_val):

@@ -1,41 +1,11 @@
-from django.db import models
+from django.contrib.postgres.expressions import ArraySubquery
+from django.db.models import OuterRef, Prefetch, QuerySet, Subquery, Value
+from django.db.models.expressions import BaseExpression
 
 from arches.app.models.utils import field_names
 
 
-def _generate_tile_annotations(nodes, defer, only, invalid_names, outer_ref=None):
-    from arches.app.datatypes.datatypes import DataTypeFactory
-
-    if defer and only and (overlap := set(defer).intersection(set(only))):
-        raise ValueError(f"Got intersecting defer/only args: {overlap}")
-    datatype_factory = DataTypeFactory()
-    node_alias_annotations = {}
-    for node in nodes:
-        if node.datatype == "semantic":
-            continue
-        if node.nodegroup_id is None:
-            continue
-        if (defer and node.alias in defer) or (only and node.alias not in only):
-            continue
-        if node.alias in invalid_names:
-            raise ValueError(f'"{node.alias}" clashes with a model field name.')
-
-        datatype_instance = datatype_factory.get_instance(node.datatype)
-        tile_values_query = datatype_instance.get_values_query(
-            node, outer_ref=outer_ref
-        )
-        node_alias_annotations[node.alias] = tile_values_query
-
-    if not node_alias_annotations:
-        raise ValueError("All fields were excluded.")
-    for given_alias in only or []:
-        if given_alias not in node_alias_annotations:
-            raise ValueError(f'"{given_alias}" is not a valid node alias.')
-
-    return node_alias_annotations
-
-
-class TileQuerySet(models.QuerySet):
+class TileQuerySet(QuerySet):
     @staticmethod
     def _root_node_for_nodegroup(graph_slug, root_node_alias):
         from arches.app.models.models import Node
@@ -48,37 +18,42 @@ class TileQuerySet(models.QuerySet):
             .prefetch_related("nodegroup__children")
             .prefetch_related("nodegroup__children__children")
         )
-        # TODO: make deterministic by checking source_identifier
+        # TODO: get last
         # https://github.com/archesproject/arches/issues/11565
-        ret = qs.last()
+        ret = qs.filter(source_identifier=None).first()
         if ret is None:
             raise Node.DoesNotExist(f"graph: {graph_slug} node: {root_node_alias}")
         return ret
 
     def with_node_values(
-        self, nodes, *, defer=None, only=None, outer_ref=None, depth=1
+        self, nodes, *, defer=None, only=None, lhs=None, outer_ref, depth=1
     ):
-        # from arches.app.models.models import TileModel
+        from arches.app.models.models import TileModel
 
         node_alias_annotations = _generate_tile_annotations(
             nodes,
             defer=defer,
             only=only,
             invalid_names=field_names(self.model),
+            lhs=lhs,
             outer_ref=outer_ref,
         )
 
         prefetches = []
-        # TODO: debug this.
-        # if depth:
-        #     prefetches.append(
-        #         models.Prefetch(
-        #             "parenttile",
-        #             queryset=TileModel.objects.with_node_values(
-        #                 nodes, defer=defer, only=only, depth=depth - 1
-        #             ),
-        #         )
-        #     )
+        if depth:
+            prefetches.append(
+                Prefetch(
+                    "children",
+                    queryset=TileModel.objects.with_node_values(
+                        nodes,
+                        defer=defer,
+                        only=only,
+                        depth=depth - 1,
+                        lhs="parenttile",
+                        outer_ref="tileid",
+                    ),
+                )
+            )
 
         self._fetched_nodes = [n for n in nodes if n.alias in node_alias_annotations]
         return (
@@ -120,14 +95,14 @@ class TileQuerySet(models.QuerySet):
         return (
             self.filter(nodegroup_id=root_node.pk)
             .with_node_values(
-                branch_nodes, defer=defer, only=only, outer_ref="resourceinstance_id"
+                branch_nodes, defer=defer, only=only, lhs="pk", outer_ref="tileid"
             )
-            .annotate(_nodegroup_alias=models.Value(root_node_alias))
+            .annotate(_nodegroup_alias=Value(root_node_alias))
         )
 
     def _prefetch_related_objects(self):
         """Call datatype to_python() methods when materializing the QuerySet.
-        Discard annotations that do not pertain to this tile.
+        Discard annotations that do not pertain to this nodegroup.
         """
         from arches.app.datatypes.datatypes import DataTypeFactory
 
@@ -141,12 +116,10 @@ class TileQuerySet(models.QuerySet):
                     tile_val = getattr(tile, node.alias, NOT_PROVIDED)
                     if tile_val is not NOT_PROVIDED:
                         datatype_instance = datatype_factory.get_instance(node.datatype)
-                        # Immediately coalesce [None] (from ArraySubquery) to [].
-                        if tile_val == [None]:
-                            tile_val = []
                         python_val = datatype_instance.to_python(tile_val)
                         setattr(tile, node.alias, python_val)
-                    break
+                else:
+                    delattr(tile, node.alias)
 
     def _clone(self):
         ret = super()._clone()
@@ -155,7 +128,7 @@ class TileQuerySet(models.QuerySet):
         return ret
 
 
-class ResourceInstanceQuerySet(models.QuerySet):
+class ResourceInstanceQuerySet(QuerySet):
     def with_tiles(self, graph_slug=None, *, resource_ids=None, defer=None, only=None):
         """Annotates a ResourceInstance QuerySet with tile data unpacked
         and mapped onto node aliases, e.g.:
@@ -221,9 +194,11 @@ class ResourceInstanceQuerySet(models.QuerySet):
             defer=defer,
             only=only,
             invalid_names=field_names(self.model),
+            lhs=None,  # TODO: AWKWARD
             outer_ref="resourceinstanceid",
         )
         self._fetched_nodes = [n for n in nodes if n.alias in node_alias_annotations]
+        # TODO: there might be some way to prune unused annotations.
 
         if resource_ids:
             qs = self.filter(pk__in=resource_ids)
@@ -231,16 +206,17 @@ class ResourceInstanceQuerySet(models.QuerySet):
             qs = self.filter(graph=source_graph)
         return qs.prefetch_related(
             "graph__node_set__nodegroup",
-            models.Prefetch(
+            Prefetch(
                 "tilemodel_set",
                 queryset=TileModel.objects.with_node_values(
                     self._fetched_nodes,
                     defer=defer,
                     only=only,
-                    outer_ref="resourceinstance_id",
+                    lhs="pk",
+                    outer_ref="tileid",
                 ).annotate(
                     cardinality=NodeGroup.objects.filter(
-                        pk=models.OuterRef("nodegroup_id")
+                        pk=OuterRef("nodegroup_id")
                     ).values("cardinality")
                 ),
                 to_attr="_annotated_tiles",
@@ -290,18 +266,74 @@ class ResourceInstanceQuerySet(models.QuerySet):
                 else:
                     setattr(resource, ng_alias, annotated_tile)
 
-                if (
-                    annotated_tile.parenttile
-                    and annotated_tile.parenttile.nodegroup_alias
-                ):
-                    setattr(
-                        annotated_tile,
-                        annotated_tile.parenttile.nodegroup_alias,
-                        annotated_tile.parenttile,
-                    )
+                for child_tile in annotated_tile.children.all():
+                    setattr(child_tile, ng_alias, annotated_tile.parenttile)
 
     def _clone(self):
         ret = super()._clone()
         if hasattr(self, "_fetched_nodes"):
             ret._fetched_nodes = self._fetched_nodes
         return ret
+
+
+def _generate_tile_annotations(nodes, *, defer, only, invalid_names, lhs, outer_ref):
+    from arches.app.datatypes.datatypes import DataTypeFactory
+
+    if defer and only and (overlap := set(defer).intersection(set(only))):
+        raise ValueError(f"Got intersecting defer/only args: {overlap}")
+    datatype_factory = DataTypeFactory()
+    node_alias_annotations = {}
+    for node in nodes:
+        if node.datatype == "semantic":
+            continue
+        if node.nodegroup_id is None:
+            continue
+        if (defer and node.alias in defer) or (only and node.alias not in only):
+            continue
+        if node.alias in invalid_names:
+            raise ValueError(f'"{node.alias}" clashes with a model field name.')
+
+        datatype_instance = datatype_factory.get_instance(node.datatype)
+        tile_values_query = _get_values_query(
+            nodegroup=node.nodegroup,
+            base_lookup=datatype_instance.get_base_orm_lookup(node),
+            lhs=lhs,
+            outer_ref=outer_ref,
+        )
+        node_alias_annotations[node.alias] = tile_values_query
+
+    if not node_alias_annotations:
+        raise ValueError("All fields were excluded.")
+    for given_alias in only or []:
+        if given_alias not in node_alias_annotations:
+            raise ValueError(f'"{given_alias}" is not a valid node alias.')
+
+    return node_alias_annotations
+
+
+def _get_values_query(
+    nodegroup, base_lookup, *, lhs=None, outer_ref=None
+) -> BaseExpression:
+    """Return a tile values query expression for use in a
+    ResourceInstanceQuerySet or TileQuerySet.
+    """
+    from arches.app.models.models import TileModel
+
+    # TODO: make this a little less fragile.
+    if lhs is None:
+        tile_query = TileModel.objects.filter(
+            nodegroup_id=nodegroup.pk, resourceinstance_id=OuterRef(outer_ref)
+        )
+    elif lhs and outer_ref:
+        tile_query = TileModel.objects.filter(**{lhs: OuterRef(outer_ref)})
+    else:
+        tile_query = TileModel.objects.filter(nodegroup_id=nodegroup.pk)
+    if nodegroup.cardinality == "n":
+        tile_query = tile_query.order_by("sortorder")
+
+    tile_query = tile_query.values(base_lookup)
+
+    if outer_ref == "tileid":
+        return Subquery(tile_query)
+    else:
+        return ArraySubquery(tile_query)
