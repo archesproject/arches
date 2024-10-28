@@ -302,7 +302,7 @@ def index_resources_by_type(
     Indexes all resources of a given type(s)
 
     Arguments:
-    resource_types -- array of graph ids that represent resource types
+    resource_types -- array of graph ids or graph slugs that represent resource types
 
     Keyword Arguments:
     clear_index -- set to True to remove all the resources of the types passed in from the index before the reindexing operation
@@ -324,31 +324,40 @@ def index_resources_by_type(
 
     for resource_type in resource_types:
         start = datetime.now()
+        try:
+            graph = models.GraphModel.objects.get(
+                graphid=str(uuid.UUID(str(resource_type)))
+            )
+            if graph is None:
+                raise ValueError(f"Graph ID does not exist: {resource_type}")
+        except ValueError:
+            try:
+                graph = models.GraphModel.objects.get(slug=str(resource_type))
+            except:
+                logger.warning(
+                    f"Unable to resolve resource type {resource_type}. Please confirm it is a valid graph ID or slug."
+                )
+                continue
 
-        graph_name = models.GraphModel.objects.get(graphid=str(resource_type)).name
-        logger.info("Indexing resource type '{0}'".format(graph_name))
+        logger.info("Indexing resource type '{0}'".format(graph.name))
 
         if clear_index:
             tq = Query(se=se)
-            cards = models.CardModel.objects.filter(
-                graph_id=str(resource_type)
-            ).select_related("nodegroup")
-            for nodegroup in [card.nodegroup for card in cards]:
-                term = Term(field="nodegroupid", term=str(nodegroup.nodegroupid))
-                tq.add_query(term)
+            for card in graph.cardmodel_set.all():
+                tq.add_query(Term(field="nodegroupid", term=str(card.nodegroup_id)))
             tq.delete(index=TERMS_INDEX, refresh=True)
 
             rq = Query(se=se)
-            term = Term(field="graph_id", term=str(resource_type))
+            term = Term(field="graph_id", term=str(graph.graphid))
             rq.add_query(term)
             rq.delete(index=RESOURCES_INDEX, refresh=True)
 
         if use_multiprocessing:
             resources = [
                 str(rid)
-                for rid in Resource.objects.filter(
-                    graph_id=str(resource_type)
-                ).values_list("resourceinstanceid", flat=True)
+                for rid in Resource.objects.filter(graph_id=graph.graphid).values_list(
+                    "resourceinstanceid", flat=True
+                )
             ]
             index_resources_using_multiprocessing(
                 resourceids=resources,
@@ -363,17 +372,17 @@ def index_resources_by_type(
                 SearchEngineInstance as _se,
             )
 
-            resources = Resource.objects.filter(graph_id=str(resource_type))
+            resources = Resource.objects.filter(graph_id=str(graph.graphid))
             index_resources_using_singleprocessing(
                 resources=resources,
                 batch_size=batch_size,
                 quiet=quiet,
-                title=graph_name,
+                title=graph.name,
                 recalculate_descriptors=recalculate_descriptors,
             )
 
         q = Query(se=se)
-        term = Term(field="graph_id", term=str(resource_type))
+        term = Term(field="graph_id", term=str(graph.graphid))
         q.add_query(term)
         result_summary = {
             "database": len(resources),
@@ -387,7 +396,7 @@ def index_resources_by_type(
         logger.info(
             "Status: {0}, Resource Type: {1}, In Database: {2}, Indexed: {3}, Took: {4} seconds".format(
                 status,
-                graph_name,
+                graph.graphid,
                 result_summary["database"],
                 result_summary["indexed"],
                 (datetime.now() - start).seconds,
