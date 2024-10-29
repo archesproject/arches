@@ -1199,7 +1199,7 @@ class ResourceXResource(models.Model):
 
 
 class ResourceInstance(models.Model):
-    resourceinstanceid = models.UUIDField(primary_key=True)
+    resourceinstanceid = models.UUIDField(primary_key=True, blank=True)
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
     graph_publication = models.ForeignKey(
         GraphXPublishedGraph,
@@ -1803,7 +1803,7 @@ class TileModel(models.Model):  # Tile
 
     """
 
-    tileid = models.UUIDField(primary_key=True)
+    tileid = models.UUIDField(primary_key=True, blank=True)
     resourceinstance = models.ForeignKey(
         ResourceInstance, db_column="resourceinstanceid", on_delete=models.CASCADE
     )
