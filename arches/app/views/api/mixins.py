@@ -3,7 +3,7 @@ from functools import partial
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework.exceptions import NotFound, ValidationError
 
-from arches.app.models.models import ResourceInstance
+from arches.app.models.models import ResourceInstance, TileModel
 from arches.app.utils.permission_backend import (
     user_can_delete_resource,
     user_can_edit_resource,
@@ -16,9 +16,16 @@ class ArchesModelAPIMixin:
         fields = self.serializer_class.Meta.fields
         if fields == "__all__":
             fields = None
-        return ResourceInstance.as_model(
-            self.serializer_class.Meta.graph_slug, only=fields
-        )
+        else:
+            raise NotImplementedError
+        meta = self.serializer_class.Meta
+        if ResourceInstance in meta.model.mro():
+            return meta.model.as_model(meta.graph_slug, only=meta.nodegroups)
+        elif TileModel in meta.model.mro():
+            return meta.model.as_nodegroup(
+                meta.root_node, graph_slug=meta.graph_slug, only=fields
+            )
+        raise NotImplementedError
 
     def get_object(self, user=None, permission_callable=None):
         ret = super().get_object()

@@ -15,7 +15,7 @@ class TileQuerySet(QuerySet):
             nodes,
             defer=defer,
             only=only,
-            invalid_names=field_names(self.model),
+            model=self.model,
             lhs=lhs,
             outer_ref=outer_ref,
         )
@@ -87,9 +87,9 @@ class ResourceInstanceQuerySet(QuerySet):
 
         >>> concepts = ResourceInstance.as_model("concept")
 
-        Or with defer/only as in the QuerySet interface:
+        Or direct certain nodegroups with defer/only as in the QuerySet interface:
 
-        >>> partial_concepts = ResourceInstance.as_model("concept", only=["n1", "n2"])
+        >>> partial_concepts = ResourceInstance.as_model("concept", only=["ng1", "ng2"])
 
         Example:
 
@@ -126,6 +126,7 @@ class ResourceInstanceQuerySet(QuerySet):
             )
         try:
             # Prefetch sibling nodes for use in _prefetch_related_objects()
+            # and _generate_tile_annotations().
             source_graph = graph_query.prefetch_related(
                 "node_set__nodegroup__node_set"
             ).get()
@@ -138,7 +139,7 @@ class ResourceInstanceQuerySet(QuerySet):
             nodes,
             defer=defer,
             only=only,
-            invalid_names=field_names(self.model),
+            model=self.model,
             lhs=None,  # TODO: AWKWARD
             outer_ref="resourceinstanceid",
         )
@@ -155,8 +156,7 @@ class ResourceInstanceQuerySet(QuerySet):
                 "tilemodel_set",
                 queryset=TileModel.objects.with_node_values(
                     self._fetched_nodes,
-                    defer=defer,
-                    only=only,
+                    only=[n.alias for n in self._fetched_nodes],
                     lhs="pk",
                     outer_ref="tileid",
                 ).annotate(
@@ -179,12 +179,9 @@ class ResourceInstanceQuerySet(QuerySet):
 
         root_nodes = []
         for node in self._fetched_nodes:
-            # TODO: less roundabout lookup, see earlier siblings prefetch.
-            root_node = None
-            for sibling_node in node.nodegroup.node_set.all():
-                if sibling_node.pk == node.nodegroup_id:
-                    root_node = sibling_node
-                    break
+            root_node = _find_root_node(
+                node.nodegroup.node_set.all(), node.nodegroup_id
+            )
             root_nodes.append(root_node)
 
         for resource in self._result_cache:
@@ -221,20 +218,34 @@ class ResourceInstanceQuerySet(QuerySet):
         return ret
 
 
-def _generate_tile_annotations(nodes, *, defer, only, invalid_names, lhs, outer_ref):
+def _generate_tile_annotations(nodes, *, defer, only, model, lhs, outer_ref):
     from arches.app.datatypes.datatypes import DataTypeFactory
+    from arches.app.models.models import ResourceInstance, TileModel
 
     if defer and only and (overlap := set(defer).intersection(set(only))):
         raise ValueError(f"Got intersecting defer/only args: {overlap}")
     datatype_factory = DataTypeFactory()
     node_alias_annotations = {}
+    invalid_names = field_names(model)
+    is_resource = True
+    if ResourceInstance in model.mro():
+        is_resource = True
+    elif TileModel in model.mro():
+        is_resource = False
+    else:
+        raise ValueError(model)
     for node in nodes:
         if node.datatype == "semantic":
             continue
         if node.nodegroup_id is None:
             continue
-        if (defer and node.alias in defer) or (only and node.alias not in only):
-            continue
+        if is_resource:
+            root = _find_root_node(node.nodegroup.node_set.all(), node.nodegroup_id)
+            if (defer and root.alias in defer) or (only and root.alias not in only):
+                continue
+        else:
+            if (defer and node.alias in defer) or (only and node.alias not in only):
+                continue
         if node.alias in invalid_names:
             raise ValueError(f'"{node.alias}" clashes with a model field name.')
 
@@ -249,11 +260,19 @@ def _generate_tile_annotations(nodes, *, defer, only, invalid_names, lhs, outer_
 
     if not node_alias_annotations:
         raise ValueError("All fields were excluded.")
-    for given_alias in only or []:
-        if given_alias not in node_alias_annotations:
-            raise ValueError(f'"{given_alias}" is not a valid node alias.')
+    # TODO: also add some safety around bad nodegroups.
+    if not is_resource:
+        for given_alias in only or []:
+            if given_alias not in node_alias_annotations:
+                raise ValueError(f'"{given_alias}" is not a valid node alias.')
 
     return node_alias_annotations
+
+
+def _find_root_node(prefetched_siblings, nodegroup_id):
+    for sibling_node in prefetched_siblings:
+        if sibling_node.pk == nodegroup_id:
+            return sibling_node
 
 
 def _get_values_query(
