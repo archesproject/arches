@@ -1858,10 +1858,10 @@ class TileModel(models.Model):  # Tile
         resource.)
 
         >>> statements = TileModel.as_nodegroup("statement", graph_slug="concept")
-        >>> results = statements.filter(statement_content__0__en__value__startswith="F")  # todo: make more ergonomic, remove limitation of 0
+        >>> results = statements.filter(statement_content__en__value__startswith="F")  # todo: make more ergonomic
         >>> for result in results:
                 print(result.resourceinstance)
-                print("\t", result.statement_content[0]["en"]["value"])  # TODO: unwrap/string viewmodel
+                print("\t", result.statement_content["en"]["value"])  # TODO: unwrap/string viewmodel
 
         <Concept: x-ray fluorescence (aec56d59-9292-42d6-b18e-1dd260ff446f)>
             Fluorescence stimulated by x-rays; ...
