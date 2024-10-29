@@ -172,6 +172,7 @@ class ResourceInstanceQuerySet(QuerySet):
         """Attach annotated tiles to resource instances, at the root, by
         nodegroup alias. TODO: consider building as a nested structure.
         Discard annotations only used for shallow filtering.
+        Memoize fetched root node aliases.
         """
         super()._prefetch_related_objects()
 
@@ -181,6 +182,7 @@ class ResourceInstanceQuerySet(QuerySet):
             root_nodes.append(root_node)
 
         for resource in self._result_cache:
+            resource._fetched_root_nodes = set()
             for node in self._fetched_nodes:
                 delattr(resource, node.alias)
             for root_node in root_nodes:
@@ -189,6 +191,7 @@ class ResourceInstanceQuerySet(QuerySet):
                     root_node.alias,
                     None if root_node.nodegroup.cardinality == "1" else [],
                 )
+                resource._fetched_root_nodes.add(root_node)
             annotated_tiles = getattr(resource, "_annotated_tiles", [])
             for annotated_tile in annotated_tiles:
                 for root_node in root_nodes:

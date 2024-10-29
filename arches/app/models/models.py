@@ -6,6 +6,8 @@ import datetime
 import logging
 import traceback
 from collections import defaultdict
+from itertools import zip_longest
+from operator import itemgetter
 
 from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
@@ -1315,7 +1317,7 @@ class ResourceInstance(models.Model):
             )
             add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
 
-        if getattr(self, "_annotated_tiles", False):
+        if getattr(self, "_fetched_root_nodes", False):
             self._save_tiles_for_pythonic_model(index=index, **kwargs)
             self.save_edit(user=user)
         else:
@@ -1323,13 +1325,8 @@ class ResourceInstance(models.Model):
 
     def clean(self):
         """Raises a compound ValidationError with any failing tile values."""
-        if getattr(self, "_annotated_tiles", False):
-            nodegroups = (
-                NodeGroup.objects.filter(node__graph=self.graph)
-                .distinct()
-                .prefetch_related("node_set")
-            )
-            self._update_tiles_from_pythonic_model_values(nodegroups)
+        if getattr(self, "_fetched_root_nodes", False):
+            self._update_tiles_from_pythonic_model_values()
 
     def _save_tiles_for_pythonic_model(self, index=False, **kwargs):
         """Raises a compound ValidationError with any failing tile values.
@@ -1343,13 +1340,8 @@ class ResourceInstance(models.Model):
         from arches.app.models.tile import Tile
 
         datatype_factory = DataTypeFactory()
-        nodegroups = (
-            NodeGroup.objects.filter(node__graph=self.graph)
-            .distinct()
-            .prefetch_related("node_set")
-        )
-        to_insert, to_update, to_delete = self._update_tiles_from_pythonic_model_values(
-            nodegroups
+        to_insert, to_update, to_delete = (
+            self._update_tiles_from_pythonic_model_values()
         )
 
         # Instantiate proxy models for now, but find a way to expose this
@@ -1381,9 +1373,9 @@ class ResourceInstance(models.Model):
                 proxy_instance._Tile__postSave()
 
             for to_update_tile in to_update:
-                for nodegroup in nodegroups:
-                    if to_update_tile.nodegroup_id == nodegroup.pk:
-                        for node in nodegroup.node_set.all():
+                for root_node in self._fetched_root_nodes:
+                    if to_update_tile.nodegroup_id == root_node.nodegroup_id:
+                        for node in root_node.nodegroup.node_set.all():
                             datatype = datatype_factory.get_instance(node.datatype)
                             datatype.post_tile_save(to_update_tile, str(node.pk))
                         break
@@ -1394,77 +1386,67 @@ class ResourceInstance(models.Model):
             fields=kwargs.get("update_fields", None),
         )
 
-        # Instantiate proxy model for now, but refactor & expose this on vanilla model.
+        # Instantiate proxy model for now, but refactor & expose this on vanilla model
+        proxy_resource = Resource.objects.get(pk=self.pk)
+        proxy_resource.save_descriptors()
         if index:
-            node_datatypes = {}
-            for node in self.graph.node_set.all():
-                node_datatypes[str(node.pk)] = node.datatype
+            proxy_resource.index()
 
-            proxy = Resource.objects.get(pk=self.pk)
-            # Stick the data we already have onto the proxy instance.
-            proxy.tiles = self._sorted_tiles_for_fetched_nodes
-            proxy.set_node_datatypes(node_datatypes)
-            proxy.index(fetchTiles=False)
-
-    def _map_prefetched_tiles_to_nodegroup_ids(self):
-        tiles_by_nodegroup = defaultdict(list)
-        for tile_to_update in self._sorted_tiles_for_fetched_nodes:
-            tiles_by_nodegroup[tile_to_update.nodegroup_id].append(tile_to_update)
-        return tiles_by_nodegroup
-
-    def _update_tiles_from_pythonic_model_values(self, nodegroups):
+    def _update_tiles_from_pythonic_model_values(self):
         """Move values from model instance to prefetched tiles, and validate.
-        Raises ValidationError if new data fails datatype validation (and
-        thus may leave prefetched tiles in a partially consistent state.)
+        Raises ValidationError if new data fails datatype validation.
         """
         from arches.app.datatypes.datatypes import DataTypeFactory
 
         datatype_factory = DataTypeFactory()
-        db_tiles_by_nodegroup_id = self._map_prefetched_tiles_to_nodegroup_ids()
         errors_by_node_alias = defaultdict(list)
         to_insert = set()
         to_update = set()
         to_delete = set()
 
-        for nodegroup in nodegroups:
-            node_aliases = [n.alias for n in nodegroup.node_set.all()]
-            db_tiles = db_tiles_by_nodegroup_id[nodegroup.pk]
-            working_tiles = []
-            max_tile_length = 0
-            for attribute_name in self._fetched_nodes.values():
-                if attribute_name not in node_aliases:
+        NOT_PROVIDED = object()
+        original_tile_data_by_tile_id = {}
+        errors_by_node_alias = {}
+        for root_node in self._fetched_root_nodes:
+            new_tiles = getattr(self, root_node.alias, NOT_PROVIDED)
+            if new_tiles is NOT_PROVIDED:
+                continue
+            if root_node.nodegroup.cardinality == "1":
+                new_tiles = [new_tiles]
+            new_tiles.sort(key=itemgetter("sortorder"))
+            db_tiles = [
+                t for t in self._annotated_tiles if t.nodegroup_alias == root_node.alias
+            ]
+            for db_tile, new_tile in zip_longest(
+                db_tiles, new_tiles, fillvalue=NOT_PROVIDED
+            ):
+                if new_tile is NOT_PROVIDED:
+                    to_delete.add(db_tile)
                     continue
-                new_val = getattr(self, attribute_name)
-                if nodegroup.cardinality == "1" or new_val is None:
-                    new_val = [new_val]
-                max_tile_length = max(max_tile_length, len(new_val))
-
-            # TODO: handle saving related objects?
-            original_tile_data_by_tile_id = {}
-            for i in range(max(max_tile_length, len(db_tiles))):
-                try:
-                    tile = db_tiles[i]
-                except IndexError:
-                    tile = TileModel.get_blank_tile_from_nodegroup(
-                        nodegroup,
+                if db_tile is NOT_PROVIDED:
+                    new_tile_obj = TileModel.get_blank_tile_from_nodegroup(
+                        nodegroup=root_node.nodegroup,
                         resourceid=self.pk,
-                        # parenttile?
+                        # TODO: ensure this deserializes correctly.
+                        parenttile=getattr(new_tile, "parenttile", None),
                     )
+                    new_tile_obj._nodegroup_alias = root_node.nodegroup.alias
                     if db_tiles:
-                        tile.sortorder = (
-                            max(t.sortorder or 0 for t in working_tiles) + 1
-                        )
-                    to_insert.add(tile)
+                        db_tile.sortorder = max(t.sortorder or 0 for t in db_tiles) + 1
+                    new_tile_obj._incoming_tile = new_tile
+                    to_insert.add(new_tile_obj)
                 else:
-                    to_update.add(tile)
-                    original_tile_data_by_tile_id[tile.pk] = {**tile.data}
-                working_tiles.append(tile)
+                    original_tile_data_by_tile_id[db_tile.pk] = {**db_tile.data}
+                    db_tile._incoming_tile = new_tile
+                    to_update.add(db_tile)
 
-            self._validate_and_patch_from_pythonic_model_values(
-                nodegroup, working_tiles, errors_by_node_alias
-            )
+            upserts = to_insert | to_update
+            for tile in upserts:
+                self._validate_and_patch_from_tile_values(
+                    tile, root_node, errors_by_node_alias
+                )
 
-            for tile in working_tiles:
+            for tile in upserts:
                 # TODO: preserve if child tiles?
                 # Remove blank tiles.
                 if not any(tile.data.values()):
@@ -1475,7 +1457,7 @@ class ResourceInstance(models.Model):
                         to_delete.add(tile)
                 # Skip no-op updates.
                 if original_data := original_tile_data_by_tile_id.pop(tile.pk, None):
-                    for node in nodegroup.node_set.all():
+                    for node in root_node.nodegroup.node_set.all():
                         if node.datatype == "semantic":
                             continue
                         old = original_data[str(node.nodeid)]
@@ -1487,6 +1469,7 @@ class ResourceInstance(models.Model):
                         to_update.remove(tile)
 
         if errors_by_node_alias:
+            del self._annotated_tiles
             raise ValidationError(
                 {
                     alias: ValidationError([e["message"] for e in errors])
@@ -1496,70 +1479,63 @@ class ResourceInstance(models.Model):
 
         return to_insert, to_update, to_delete
 
-    def _validate_and_patch_from_pythonic_model_values(
-        self, nodegroup, working_tiles, errors_by_node_alias
+    def _validate_and_patch_from_tile_values(
+        self, tile, root_node, errors_by_node_alias
     ):
+        """Validate data found on ._incoming_data and move it to .data.
+        Update errors_by_node_alias in place."""
         from arches.app.datatypes.datatypes import DataTypeFactory
 
+        NOT_PROVIDED = object()
         datatype_factory = DataTypeFactory()
-        for node in nodegroup.node_set.all():
+        for node in root_node.nodegroup.node_set.all():
             node_id_str = str(node.pk)
-            if not (attribute_name := self._fetched_nodes.get(node_id_str, "")):
+            value_to_validate = tile._incoming_tile.get(node.alias, NOT_PROVIDED)
+            if value_to_validate is NOT_PROVIDED:
                 continue
-
             datatype_instance = datatype_factory.get_instance(node.datatype)
-            new_val = getattr(self, attribute_name)
-            if nodegroup.cardinality == "1":
-                new_val = [new_val]
+            # TODO: move this to Tile.full_clean()?
+            # https://github.com/archesproject/arches/issues/10851#issuecomment-2427305853
+            if value_to_validate is None:
+                tile.data[node_id_str] = None
+                continue
+            try:
+                transformed = datatype_instance.transform_value_for_tile(
+                    value_to_validate, **node.config
+                )
+            except ValueError:  # BooleanDataType raises.
+                # validate() will handle.
+                transformed = value_to_validate
 
-            for tile, inner_val in zip(working_tiles, new_val, strict=False):
-                # TODO: move this to Tile.full_clean()?
-                # https://github.com/archesproject/arches/issues/10851#issuecomment-2427305853
-                transformed = inner_val
-                if inner_val is not None:
-                    try:
-                        transformed = datatype_instance.transform_value_for_tile(
-                            inner_val, **node.config
-                        )
-                    except ValueError:  # BooleanDataType raises.
-                        pass  # validate() will handle.
+            # Patch the transformed data into the working tiles.
+            tile.data[node_id_str] = transformed
 
-                # Patch the transformed data into the working tiles.
-                tile.data[node_id_str] = transformed
+            datatype_instance.clean(tile, node_id_str)
 
-                datatype_instance.clean(tile, node_id_str)
+            if errors := datatype_instance.validate(transformed, node=node):
+                errors_by_node_alias[node.alias].extend(errors)
 
-                if errors := datatype_instance.validate(transformed, node=node):
-                    errors_by_node_alias[node.alias].extend(errors)
-
-                try:
-                    datatype_instance.pre_tile_save(tile, node_id_str)
-                except TypeError:  # GeoJSONDataType raises.
-                    errors_by_node_alias[node.alias].append(
-                        datatype_instance.create_error_message(
-                            tile.data[node_id_str], None, None, None
-                        )
+            try:
+                datatype_instance.pre_tile_save(tile, node_id_str)
+            except TypeError:  # GeoJSONDataType raises.
+                errors_by_node_alias[node.alias].append(
+                    datatype_instance.create_error_message(
+                        tile.data[node_id_str], None, None, None
                     )
-
-            for extra_tile in working_tiles[len(new_val) :]:
-                extra_tile.data[node_id_str] = None
+                )
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None):
-        if not from_queryset and (field_map := getattr(self, "_fetched_nodes", [])):
-            from_queryset = self.__class__.as_model(
-                self.graph.slug, only=field_map.values()
-            )
+        if not from_queryset and (
+            root_nodes := getattr(self, "_fetched_root_nodes", set())
+        ):
+            aliases = [n.alias for n in root_nodes]
+            from_queryset = self.__class__.as_model(self.graph.slug, only=aliases)
             super().refresh_from_db(using, fields, from_queryset)
             # Copy over annotations.
             refreshed_resource = from_queryset[0]
             for field in itertools.chain(
-                field_map.values(),
-                # TODO: move to constant
-                (
-                    "_fetched_nodes",
-                    "_annotated_tiles",
-                    "_sorted_tiles_for_fetched_nodes",
-                ),
+                aliases,
+                ("_fetched_root_nodes", "_annotated_tiles"),
             ):
                 setattr(self, field, getattr(refreshed_resource, field))
         else:

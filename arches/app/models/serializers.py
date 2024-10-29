@@ -36,6 +36,8 @@ class ArchesTileSerializer(serializers.ModelSerializer):
         # "reference"
     }
 
+    tileid = serializers.UUIDField(validators=[])
+
     def get_default_field_names(self, declared_fields, model_info):
         field_names = super().get_default_field_names(declared_fields, model_info)
         try:
