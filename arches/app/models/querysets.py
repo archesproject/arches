@@ -1,30 +1,11 @@
 from django.contrib.postgres.expressions import ArraySubquery
-from django.db.models import OuterRef, Prefetch, QuerySet, Subquery, Value
+from django.db.models import OuterRef, Prefetch, QuerySet, Subquery
 from django.db.models.expressions import BaseExpression
 
 from arches.app.models.utils import field_names
 
 
 class TileQuerySet(QuerySet):
-    @staticmethod
-    def _root_node_for_nodegroup(graph_slug, root_node_alias):
-        from arches.app.models.models import Node
-
-        qs = (
-            Node.objects.filter(graph__slug=graph_slug, alias=root_node_alias)
-            .select_related("nodegroup")
-            .prefetch_related("nodegroup__node_set")
-            # Prefetching to a depth of 2 seems like a good trade-off for now.
-            .prefetch_related("nodegroup__children")
-            .prefetch_related("nodegroup__children__children")
-        )
-        # TODO: get last
-        # https://github.com/archesproject/arches/issues/11565
-        ret = qs.filter(source_identifier=None).first()
-        if ret is None:
-            raise Node.DoesNotExist(f"graph: {graph_slug} node: {root_node_alias}")
-        return ret
-
     def with_node_values(
         self, nodes, *, defer=None, only=None, lhs=None, outer_ref, depth=1
     ):
@@ -65,41 +46,6 @@ class TileQuerySet(QuerySet):
             .order_by("sortorder")
         )
 
-    def as_nodegroup(self, root_node_alias, *, graph_slug, defer=None, only=None):
-        """
-        Entry point for filtering arches data by nodegroups (instead of grouping by
-        resource.)
-
-        >>> statements = TileModel.objects.as_nodegroup("statement", graph_slug="concept")
-        >>> results = statements.filter(statement_content__0__en__value__startswith="F")  # todo: make more ergonomic, remove limitation of 0
-        >>> for result in results:
-                print(result.resourceinstance)
-                print("\t", result.statement_content[0]["en"]["value"])  # TODO: unwrap/string viewmodel
-
-        <Concept: x-ray fluorescence (aec56d59-9292-42d6-b18e-1dd260ff446f)>
-            Fluorescence stimulated by x-rays; ...
-        <Concept: vellum (parchment) (34b081cd-6fcc-4e00-9a43-0a8a73745b45)>
-            Fine-quality calf or lamb parchment ...
-        """
-
-        root_node = self._root_node_for_nodegroup(graph_slug, root_node_alias)
-
-        def accumulate_nodes_below(nodegroup, acc):
-            acc.extend(list(nodegroup.node_set.all()))
-            for child_nodegroup in nodegroup.children.all():
-                accumulate_nodes_below(child_nodegroup, acc)
-
-        branch_nodes = []
-        accumulate_nodes_below(root_node.nodegroup, acc=branch_nodes)
-
-        return (
-            self.filter(nodegroup_id=root_node.pk)
-            .with_node_values(
-                branch_nodes, defer=defer, only=only, lhs="pk", outer_ref="tileid"
-            )
-            .annotate(_nodegroup_alias=Value(root_node_alias))
-        )
-
     def _prefetch_related_objects(self):
         """Call datatype to_python() methods when materializing the QuerySet.
         Discard annotations that do not pertain to this nodegroup.
@@ -129,11 +75,13 @@ class TileQuerySet(QuerySet):
 
 
 class ResourceInstanceQuerySet(QuerySet):
-    def with_tiles(self, graph_slug=None, *, resource_ids=None, defer=None, only=None):
+    def with_nodegroups(
+        self, graph_slug=None, *, resource_ids=None, defer=None, only=None
+    ):
         """Annotates a ResourceInstance QuerySet with tile data unpacked
-        and mapped onto node aliases, e.g.:
+        and mapped onto nodegroup aliases, e.g.:
 
-        >>> concepts = ResourceInstance.objects.with_tiles("concept")
+        >>> concepts = ResourceInstance.objects.with_nodegroups("concept")
 
         With slightly fewer keystrokes:
 
@@ -155,9 +103,6 @@ class ResourceInstanceQuerySet(QuerySet):
         Filter on any nested node at the top level ("shallow query")
 
         >>> subset = concepts.filter(statement_content__isnull=False)[:4]
-
-        Access through nodegroup names:
-
         >>> for concept in subset:
                 print(concept)
                 for stmt in concept.statement:  # TODO: should name with _set (?)

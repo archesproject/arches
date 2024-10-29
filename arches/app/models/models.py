@@ -20,19 +20,15 @@ from django.contrib.gis.db import models
 from django.core import checks
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
-from django.db.models import JSONField
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import RegexValidator, validate_slug
 from django.db import transaction
 from django.db.models import JSONField, Max, Q
+from django.db.models import Value as ORMValue
 from django.db.models.constraints import UniqueConstraint
 from django.utils import timezone, translation
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import User
-from django.contrib.auth.models import Group
-from django.core.validators import validate_slug
-from django.core.exceptions import ValidationError
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -1251,7 +1247,7 @@ class ResourceInstance(models.Model):
 
     @classmethod
     def as_model(cls, *args, **kwargs):
-        return cls.objects.with_tiles(*args, **kwargs)
+        return cls.objects.with_nodegroups(*args, **kwargs)
 
     def get_initial_resource_instance_lifecycle_state(self, *args, **kwargs):
         try:
@@ -1854,6 +1850,61 @@ class TileModel(models.Model):  # Tile
             self._nodegroup_alias = node_for_nodegroup.alias
             return node_for_nodegroup.alias
         return None
+
+    @classmethod
+    def as_nodegroup(cls, root_node_alias, *, graph_slug, defer=None, only=None):
+        """
+        Entry point for filtering arches data by nodegroups (instead of grouping by
+        resource.)
+
+        >>> statements = TileModel.as_nodegroup("statement", graph_slug="concept")
+        >>> results = statements.filter(statement_content__0__en__value__startswith="F")  # todo: make more ergonomic, remove limitation of 0
+        >>> for result in results:
+                print(result.resourceinstance)
+                print("\t", result.statement_content[0]["en"]["value"])  # TODO: unwrap/string viewmodel
+
+        <Concept: x-ray fluorescence (aec56d59-9292-42d6-b18e-1dd260ff446f)>
+            Fluorescence stimulated by x-rays; ...
+        <Concept: vellum (parchment) (34b081cd-6fcc-4e00-9a43-0a8a73745b45)>
+            Fine-quality calf or lamb parchment ...
+        """
+
+        root_node = cls._root_node_for_nodegroup(graph_slug, root_node_alias)
+
+        def accumulate_nodes_below(nodegroup, acc):
+            acc.extend(list(nodegroup.node_set.all()))
+            for child_nodegroup in nodegroup.children.all():
+                accumulate_nodes_below(child_nodegroup, acc)
+
+        branch_nodes = []
+        accumulate_nodes_below(root_node.nodegroup, acc=branch_nodes)
+
+        return (
+            cls.objects.filter(nodegroup_id=root_node.pk)
+            .with_node_values(
+                branch_nodes, defer=defer, only=only, lhs="pk", outer_ref="tileid"
+            )
+            .annotate(_nodegroup_alias=ORMValue(root_node_alias))
+        )
+
+    @staticmethod
+    def _root_node_for_nodegroup(graph_slug, root_node_alias):
+        from arches.app.models.models import Node
+
+        qs = (
+            Node.objects.filter(graph__slug=graph_slug, alias=root_node_alias)
+            .select_related("nodegroup")
+            .prefetch_related("nodegroup__node_set")
+            # Prefetching to a depth of 2 seems like a good trade-off for now.
+            .prefetch_related("nodegroup__children")
+            .prefetch_related("nodegroup__children__children")
+        )
+        # TODO: get last
+        # https://github.com/archesproject/arches/issues/11565
+        ret = qs.filter(source_identifier=None).first()
+        if ret is None:
+            raise Node.DoesNotExist(f"graph: {graph_slug} node: {root_node_alias}")
+        return ret
 
     def is_fully_provisional(self):
         return bool(self.provisionaledits and not any(self.data.values()))
