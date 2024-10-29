@@ -253,6 +253,8 @@ class ConceptDataType(BaseConceptDataType):
         return errors
 
     def transform_value_for_tile(self, value, **kwargs):
+        if isinstance(value, uuid.UUID):
+            return str(value)
         try:
             stripped = value.strip()
             uuid.UUID(stripped)
@@ -425,7 +427,10 @@ class ConceptListDataType(BaseConceptDataType):
         if value is not None:
             validate_concept = DataTypeFactory().get_instance("concept")
             for v in value:
-                val = v.strip()
+                if isinstance(v, uuid.UUID):
+                    val = str(v)
+                else:
+                    val = v.strip()
                 errors += validate_concept.validate(val, row_number)
         return errors
 
@@ -433,6 +438,8 @@ class ConceptListDataType(BaseConceptDataType):
         ret = []
         if not isinstance(value, list):
             value = [value]
+        if all(isinstance(inner, uuid.UUID) for inner in value):
+            return [str(inner) for inner in value]
         for val in csv.reader(value, delimiter=",", quotechar='"'):
             lines = [line for line in val]
             for v in lines:
