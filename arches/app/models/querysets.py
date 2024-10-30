@@ -99,12 +99,14 @@ class ResourceInstanceQuerySet(QuerySet):
         >>> concepts.count()
         785
 
-        Filter on any nested node at the top level ("shallow query")
+        Filter on any nested node at the top level ("shallow query").
+        In this example, statement_content is a cardinality-N node, thus an array.
+        # TODO: should name with _set (?)
 
-        >>> subset = concepts.filter(statement_content__isnull=False)[:4]
+        >>> subset = concepts.filter(statement_content__len__gt=0)[:4]
         >>> for concept in subset:
                 print(concept)
-                for stmt in concept.statement:  # TODO: should name with _set (?)
+                for stmt in concept.statement:
                     print("\t", stmt)
                     print("\t\t", stmt.statement_content)
 
