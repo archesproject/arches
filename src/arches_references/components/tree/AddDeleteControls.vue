@@ -204,12 +204,12 @@ const confirmDelete = () => {
         acceptProps: {
             label: $gettext("Delete"),
             severity: shouldUseContrast() ? CONTRAST : DANGER,
-            outlined: true,
+            style: { fontSize: "small" },
         },
         rejectProps: {
             label: $gettext("Cancel"),
             severity: shouldUseContrast() ? CONTRAST : SECONDARY,
-            outlined: true,
+            style: { fontSize: "small" },
         },
         accept: async () => {
             await deleteSelected().then(fetchListsAndPopulateTree);

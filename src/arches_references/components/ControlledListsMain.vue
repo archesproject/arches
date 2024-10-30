@@ -61,18 +61,21 @@ provide(systemLanguageKey, systemLanguage);
             <MainSplitter />
         </div>
     </div>
-    <Toast />
+    <Toast
+        :pt="{
+            summary: { fontSize: 'medium' },
+            detail: { fontSize: 'small' },
+            messageIcon: {
+                style: { marginTop: 'var(--p-toast-message-icon-margin-top)' },
+            },
+        }"
+    />
     <ConfirmDialog
         :draggable="false"
         :pt="{
-            root: {
-                style: {
-                    fontSize: 'small',
-                },
-            },
             header: {
                 style: {
-                    background: 'var(--p-navigation)',
+                    background: 'var(--p-navigation-header-color)',
                     color: 'white',
                     borderRadius: '1rem',
                     marginBottom: '1rem',
@@ -81,6 +84,7 @@ provide(systemLanguageKey, systemLanguage);
             title: {
                 style: {
                     fontWeight: 800,
+                    fontSize: 'small',
                 },
             },
         }"

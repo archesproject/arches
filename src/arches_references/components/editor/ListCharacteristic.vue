@@ -97,7 +97,7 @@ const cancel = () => {
                 :aria-label="$gettext('Edit')"
                 @click="editing = true"
                 @keyup.enter="editing = true"
-            />
+            ></i>
         </span>
         <span
             v-if="props.editable && editing"
@@ -110,7 +110,7 @@ const cancel = () => {
                 :aria-label="$gettext('Save edit')"
                 @click="save"
                 @keyup.enter="save"
-            />
+            ></i>
             <i
                 role="button"
                 tabindex="0"
@@ -118,7 +118,7 @@ const cancel = () => {
                 :aria-label="$gettext('Cancel edit')"
                 @click="cancel"
                 @keyup.enter="cancel"
-            />
+            ></i>
         </span>
     </div>
 </template>

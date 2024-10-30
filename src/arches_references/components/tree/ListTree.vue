@@ -275,7 +275,11 @@ const ptNodeContent = ({ instance }: TreePassThroughMethodOptions) => {
                     style: { width: '100%', fontSize: 'small' },
                 },
             },
-            filterIcon: { style: { display: 'flex' } },
+            pcFilterIconContainer: {
+                root: {
+                    style: { top: '25%' },
+                },
+            },
             wrapper: {
                 style: {
                     overflowY: 'auto',

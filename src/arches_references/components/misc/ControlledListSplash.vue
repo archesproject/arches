@@ -39,7 +39,7 @@ const { $gettext } = useGettext();
     border: 1px solid #ddd;
     padding: 4rem 3rem;
     background: #f6f6f6;
-    border-radius: 0.5rem;
+    border-radius: var(--p-content-border-radius);
     display: flex;
     flex-direction: column;
     align-items: center;

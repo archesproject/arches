@@ -162,7 +162,7 @@ input {
 }
 
 .edit-controls i {
-    font-size: small;
+    font-size: var(--p-icon-size);
     padding: 0.5rem;
 }
 </style>
