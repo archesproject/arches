@@ -7,12 +7,14 @@ from django.utils.translation import gettext as _
 
 from arches.app.models import models
 from arches.app.search.elasticsearch_dsl_builder import Dsl, Bool, Terms, Exists, Nested
-import logging
 
 logger = logging.getLogger(__name__)
 
 
 class BaseDataType(object):
+    _rest_framework_model_field = None
+    """Django model field if the datatype were to be a real table column."""
+
     def __init__(self, model=None):
         self.datatype_model = model
         self.datatype_name = model.datatype if model else None

@@ -47,13 +47,14 @@ from arches.app.search.elasticsearch_dsl_builder import (
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.search_term import SearchTerm
 from arches.app.search.mappings import RESOURCES_INDEX
+
+from django.contrib.postgres.fields import ArrayField
 from django.core.cache import cache
 from django.core.files import File
-from django.core.files.base import ContentFile
-from django.core.files.storage import FileSystemStorage, default_storage
+from django.core.files.storage import default_storage
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.exceptions import ValidationError
-from django.db import connection, transaction
+from django.db import connection
+from django.db.models import fields
 from django.utils.translation import get_language, gettext as _
 
 from elasticsearch import Elasticsearch
@@ -118,6 +119,8 @@ class DataTypeFactory(object):
 
 
 class StringDataType(BaseDataType):
+    _rest_framework_model_field = fields.CharField(null=True)
+
     def validate(
         self,
         value,
@@ -458,6 +461,8 @@ class StringDataType(BaseDataType):
 
 
 class NumberDataType(BaseDataType):
+    _rest_framework_model_field = fields.FloatField(null=True)
+
     def validate(
         self,
         value,
@@ -588,6 +593,8 @@ class NumberDataType(BaseDataType):
 
 
 class BooleanDataType(BaseDataType):
+    _rest_framework_model_field = fields.BooleanField(null=True)
+
     def validate(
         self,
         value,
@@ -689,6 +696,8 @@ class BooleanDataType(BaseDataType):
 
 
 class DateDataType(BaseDataType):
+    _rest_framework_model_field = fields.DateField(null=True)
+
     def validate(
         self,
         value,
@@ -900,6 +909,8 @@ class DateDataType(BaseDataType):
 
 
 class EDTFDataType(BaseDataType):
+    _rest_framework_model_field = fields.CharField(null=True)
+
     def transform_value_for_tile(self, value, **kwargs):
         transformed_value = ExtendedDateFormat(value)
         if transformed_value.edtf is None:
@@ -1073,6 +1084,8 @@ class EDTFDataType(BaseDataType):
 
 
 class FileListDataType(BaseDataType):
+    _rest_framework_model_field = ArrayField(base_field=fields.CharField(), null=True)
+
     def __init__(self, model=None):
         super(FileListDataType, self).__init__(model=model)
         self.node_lookup = {}
@@ -2029,6 +2042,8 @@ class ResourceInstanceDataType(BaseDataType):
 
     """
 
+    _rest_framework_model_field = fields.UUIDField(null=True)
+
     def validate(
         self,
         value,
@@ -2400,6 +2415,8 @@ class ResourceInstanceDataType(BaseDataType):
 
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
+    _rest_framework_model_field = ArrayField(base_field=fields.UUIDField(), null=True)
+
     def to_json(self, tile, node):
         from arches.app.models.resource import (
             Resource,

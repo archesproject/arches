@@ -1,10 +1,11 @@
+from django.conf import settings
+from django.db.models import fields
 from django.utils.translation import gettext as _
 from rdflib import URIRef, Literal, ConjunctiveGraph as Graph
 from rdflib.namespace import RDF
 
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.core.util import get_value_from_jsonld
-from django.conf import settings
 from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
     Exists,
@@ -18,6 +19,8 @@ from arches.app.search.search_term import SearchTerm
 
 
 class NonLocalizedStringDataType(BaseDataType):
+    _rest_framework_model_field = fields.CharField(null=True)
+
     def validate(
         self,
         value,

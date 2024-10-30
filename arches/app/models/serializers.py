@@ -1,10 +1,9 @@
 from copy import deepcopy
 
-from django.contrib.postgres.fields import ArrayField
-from django.db.models import fields
 from rest_framework import renderers
 from rest_framework import serializers
 
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
@@ -15,27 +14,6 @@ renderers.JSONOpenAPIRenderer.encoder_class = JSONSerializer
 
 
 class ArchesTileSerializer(serializers.ModelSerializer):
-    DATATYPE_FIELD_MAPPING = {
-        "string": fields.CharField(null=True),  # XXX
-        "number": fields.FloatField(null=True),
-        "concept": fields.UUIDField(null=True),
-        "concept-list": ArrayField(base_field=fields.UUIDField(), null=True),
-        "date": fields.CharField(null=True),  # XXX
-        "node-value": fields.CharField(null=True),  # XXX
-        "edtf": fields.CharField(null=True),  # XXX
-        "annotation": fields.CharField(null=True),  # XXX
-        "url": fields.URLField(null=True),
-        "resource-instance": fields.UUIDField(null=True),
-        "resource-instance-list": ArrayField(base_field=fields.UUIDField(), null=True),
-        "boolean": fields.BooleanField(null=True),
-        "domain-value": ArrayField(base_field=fields.UUIDField(), null=True),
-        "domain-value-list": ArrayField(base_field=fields.UUIDField(), null=True),
-        "non-localized-string": fields.CharField(null=True),
-        "geojson-feature-collection": fields.CharField(null=True),  # XXX
-        "file-list": ArrayField(base_field=fields.CharField(), null=True),  # XXX
-        # "reference"
-    }
-
     tileid = serializers.UUIDField(validators=[])
 
     def get_default_field_names(self, declared_fields, model_info):
@@ -76,7 +54,10 @@ class ArchesTileSerializer(serializers.ModelSerializer):
             .select_related()
             .get()
         )
-        model_field = deepcopy(self.DATATYPE_FIELD_MAPPING[node.datatype])
+        datatype = DataTypeFactory().get_instance(node.datatype)
+        model_field = deepcopy(datatype._rest_framework_model_field)
+        if model_field is None:
+            raise NotImplementedError(f"Field missing for datatype: {node.datatype}")
         model_field.model = model_class
         model_field.blank = not node.isrequired
 

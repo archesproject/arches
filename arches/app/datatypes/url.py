@@ -27,6 +27,7 @@ from arches.app.search.search_term import SearchTerm
 from rdflib import ConjunctiveGraph as Graph
 from rdflib import URIRef, Literal, Namespace
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS
+from django.db.models import fields
 from django.utils.translation import gettext as _
 
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
@@ -69,6 +70,8 @@ class URLDataType(BaseDataType):
     """
     URL Datatype to store an optionally labelled hyperlink to a (typically) external resource
     """
+
+    _rest_framework_model_field = fields.URLField(null=True)
 
     URL_REGEX = re.compile(
         r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"

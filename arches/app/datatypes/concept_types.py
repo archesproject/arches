@@ -2,11 +2,14 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 import uuid
 import csv
 import logging
+
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import fields
 from django.utils.translation import gettext as _
-from arches.app.models import models
-from arches.app.models import concept
 from django.core.cache import cache
+
+from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory, get_value_from_jsonld
@@ -32,7 +35,6 @@ from rdflib import ConjunctiveGraph as Graph
 from rdflib.namespace import RDF, RDFS, XSD, DC, DCTERMS, SKOS
 from arches.app.models.concept import ConceptValue
 from arches.app.models.concept import Concept
-from io import StringIO
 
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
@@ -41,6 +43,8 @@ logger = logging.getLogger(__name__)
 
 
 class BaseConceptDataType(BaseDataType):
+    _rest_framework_model_field = fields.UUIDField(null=True)
+
     def __init__(self, model=None):
         super(BaseConceptDataType, self).__init__(model=model)
         self.value_lookup = {}
@@ -411,6 +415,8 @@ class ConceptDataType(BaseConceptDataType):
 
 
 class ConceptListDataType(BaseConceptDataType):
+    _rest_framework_model_field = ArrayField(base_field=fields.UUIDField(), null=True)
+
     def validate(
         self,
         value,
