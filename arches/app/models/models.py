@@ -14,7 +14,7 @@ from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.models.querysets import ResourceInstanceQuerySet, TileQuerySet
-from arches.app.models.utils import add_to_update_fields
+from arches.app.models.utils import add_to_update_fields, field_names
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils import import_class_from_string
 from django.contrib.auth.models import Group, User
@@ -1346,13 +1346,16 @@ class ResourceInstance(models.Model):
 
         # Instantiate proxy models for now, but find a way to expose this
         # functionality on vanilla models, and in bulk.
-        upsert_proxies = [
-            Tile.objects.get(pk=tile.pk) for tile in to_insert.union(to_update)
-        ]
+        upserts = to_insert | to_update
+        upsert_proxies = [Tile.objects.get(pk=tile.pk) for tile in upserts]
         delete_proxies = [Tile.objects.get(pk=tile.pk) for tile in to_delete]
 
         with transaction.atomic():
-            for proxy_instance in upsert_proxies:
+            for proxy_instance, vanilla_instance in zip(
+                upsert_proxies, upserts, strict=True
+            ):
+                for field in field_names(vanilla_instance):
+                    setattr(proxy_instance, field, getattr(vanilla_instance, field))
                 proxy_instance._Tile__preSave()
             for proxy_instance in delete_proxies:
                 proxy_instance._Tile__preDelete()
@@ -1362,22 +1365,22 @@ class ResourceInstance(models.Model):
             if to_insert:
                 TileModel.objects.bulk_create(to_insert)
             if to_update:
-                TileModel.objects.bulk_update(to_update, {"data"})
+                TileModel.objects.bulk_update(to_update, {"data", "parenttile"})
             if to_delete:
                 TileModel.objects.filter(pk__in=[t.pk for t in to_delete]).delete()
 
             super().save(**kwargs)
 
             for proxy_instance in upsert_proxies:
-                proxy_instance.refresh_from_db()
+                # TODO: determine if needed. proxy_instance.refresh_from_db()
                 proxy_instance._Tile__postSave()
 
-            for to_update_tile in to_update:
+            for upsert_tile in upserts:
                 for root_node in self._fetched_root_nodes:
-                    if to_update_tile.nodegroup_id == root_node.nodegroup_id:
+                    if upsert_tile.nodegroup_id == root_node.nodegroup_id:
                         for node in root_node.nodegroup.node_set.all():
                             datatype = datatype_factory.get_instance(node.datatype)
-                            datatype.post_tile_save(to_update_tile, str(node.pk))
+                            datatype.post_tile_save(upsert_tile, str(node.pk))
                         break
 
         # TODO: add unique constraint for TileModel re: sortorder
@@ -1396,9 +1399,6 @@ class ResourceInstance(models.Model):
         """Move values from model instance to prefetched tiles, and validate.
         Raises ValidationError if new data fails datatype validation.
         """
-        from arches.app.datatypes.datatypes import DataTypeFactory
-
-        datatype_factory = DataTypeFactory()
         errors_by_node_alias = defaultdict(list)
         to_insert = set()
         to_update = set()
@@ -1455,18 +1455,10 @@ class ResourceInstance(models.Model):
                     else:
                         to_update.remove(tile)
                         to_delete.add(tile)
-                # Skip no-op updates.
-                if original_data := original_tile_data_by_tile_id.pop(tile.pk, None):
-                    for node in root_node.nodegroup.node_set.all():
-                        if node.datatype == "semantic":
-                            continue
-                        old = original_data[str(node.nodeid)]
-                        datatype_instance = datatype_factory.get_instance(node.datatype)
-                        new = tile.data[str(node.nodeid)]
-                        if not datatype_instance.values_match(old, new):
-                            break
-                    else:
-                        to_update.remove(tile)
+                if (
+                    original_data := original_tile_data_by_tile_id.pop(tile.pk, None)
+                ) and tile._tile_update_is_noop(original_data):
+                    to_update.remove(tile)
 
         if errors_by_node_alias:
             del self._annotated_tiles
@@ -1479,10 +1471,9 @@ class ResourceInstance(models.Model):
 
         return to_insert, to_update, to_delete
 
-    def _validate_and_patch_from_tile_values(
-        self, tile, root_node, errors_by_node_alias
-    ):
-        """Validate data found on ._incoming_data and move it to .data.
+    @staticmethod
+    def _validate_and_patch_from_tile_values(tile, root_node, errors_by_node_alias):
+        """Validate data found on ._incoming_tile and move it to .data.
         Update errors_by_node_alias in place."""
         from arches.app.datatypes.datatypes import DataTypeFactory
 
@@ -1885,7 +1876,7 @@ class TileModel(models.Model):  # Tile
     def is_fully_provisional(self):
         return bool(self.provisionaledits and not any(self.data.values()))
 
-    def save(self, *args, **kwargs):
+    def save(self, index=False, user=None, **kwargs):
         if self.sortorder is None or self.is_fully_provisional():
             for node in Node.objects.filter(nodegroup_id=self.nodegroup_id).exclude(
                 datatype="semantic"
@@ -1902,7 +1893,100 @@ class TileModel(models.Model):  # Tile
         if not self.tileid:
             self.tileid = uuid.uuid4()
             add_to_update_fields(kwargs, "tileid")
-        super(TileModel, self).save(*args, **kwargs)  # Call the "real" save() method.
+
+        # TODO: check user?
+        # TOOD: index side effects?
+
+        if getattr(self, "_root_node", False):
+            self._save_from_pythonic_model_values(**kwargs)
+        else:
+            super().save(**kwargs)
+
+    def _save_from_pythonic_model_values(self, index=False, **kwargs):
+        from arches.app.datatypes.datatypes import DataTypeFactory
+        from arches.app.models.resource import Resource
+        from arches.app.models.tile import Tile
+
+        should_save = self._update_tile_from_pythonic_model_values()
+        if not should_save:
+            return
+
+        # Instantiate a proxy model and sync data to it, to run all side effects.
+        # TODO: expose on vanilla model.
+        proxy = Tile.objects.get(pk=self.pk)
+        for field in field_names(self):
+            setattr(proxy, field, getattr(self, field))
+
+        datatype_factory = DataTypeFactory()
+        with transaction.atomic():
+            proxy._Tile__preSave()
+            super().save(**kwargs)
+            proxy._Tile__postSave()
+            for node in self._root_node.nodegroup.node_set.all():
+                datatype = datatype_factory.get_instance(node.datatype)
+                datatype.post_tile_save(self, str(node.pk))
+
+        # TODO: add unique constraint for TileModel re: sortorder
+        self.refresh_from_db(
+            using=kwargs.get("using", None),
+            fields=kwargs.get("update_fields", None),
+        )
+
+        # TODO: refactor & expose this on vanilla model
+        proxy_resource = Resource.objects.get(pk=self.resourceinstance_id)
+        proxy_resource.save_descriptors()
+        if index:
+            proxy_resource.index()
+
+    def _update_tile_from_pythonic_model_values(self):
+        original_data = {**self.data}
+
+        # TODO: this will look different when moving _validate_and_patch_from_tile_values?
+        self._incoming_tile = {}
+        model_fields = field_names(self)
+        for tile_attr, tile_value in vars(self).items():
+            if tile_attr.startswith("_") or tile_attr in model_fields:
+                continue
+            self._incoming_tile[tile_attr] = tile_value
+
+        errors_by_alias = defaultdict(list)
+        # TODO: move this somewhere else.
+        ResourceInstance._validate_and_patch_from_tile_values(
+            self, self._root_node, errors_by_alias
+        )
+        if not any(self.data.values()):
+            raise ValidationError(_("Tile is blank."))
+        if self._tile_update_is_noop(original_data):
+            return False
+        if errors_by_alias:
+            raise ValidationError(
+                {
+                    alias: ValidationError([e["message"] for e in errors])
+                    for alias, errors in errors_by_alias.items()
+                }
+            )
+        return True
+
+    def _tile_update_is_noop(self, original_data):
+        """Skipping no-op tile saves avoids regenerating RxR rows, at least
+        given the current implementation that doesn't serialize them."""
+        from arches.app.datatypes.datatypes import DataTypeFactory
+
+        # TODO: this currently prevents you from being able to *only*
+        # change parenttile and sortorder, but at least for sortorder
+        # that's probably good. Determine DX here.
+
+        datatype_factory = DataTypeFactory()
+        for node in self._root_node.nodegroup.node_set.all():
+            if node.datatype == "semantic":
+                continue
+            old = original_data[str(node.nodeid)]
+            datatype_instance = datatype_factory.get_instance(node.datatype)
+            new = self.data[str(node.nodeid)]
+            if not datatype_instance.values_match(old, new):
+                return False
+
+        return True
 
     def serialize(self, fields=None, exclude=["nodegroup"], **kwargs):
         return JSONSerializer().handle_model(

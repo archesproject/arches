@@ -57,6 +57,7 @@ class TileQuerySet(QuerySet):
         for tile in self._result_cache:
             for node in self._fetched_nodes:
                 if node.nodegroup_id == tile.nodegroup_id:
+                    tile._root_node = node
                     tile_val = getattr(tile, node.alias, NOT_PROVIDED)
                     if tile_val is not NOT_PROVIDED:
                         datatype_instance = datatype_factory.get_instance(node.datatype)
