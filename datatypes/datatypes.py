@@ -1,5 +1,6 @@
 import uuid
 
+from django.db.models.fields.json import JSONField
 from django.utils.translation import get_language, gettext as _
 
 from arches.app.datatypes.base import BaseDataType
@@ -9,6 +10,8 @@ from arches_references.models import ListItem
 
 
 class ReferenceDataType(BaseDataType):
+    _rest_framework_model_field = JSONField(null=True)
+
     def validate(
         self,
         value,
