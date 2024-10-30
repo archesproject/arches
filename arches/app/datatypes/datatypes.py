@@ -16,8 +16,6 @@ import time
 from datetime import datetime
 from mimetypes import MimeTypes
 
-from django.core.files.images import get_image_dimensions
-
 from arches.app.const import ExtensionType
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models import models
@@ -51,14 +49,13 @@ from arches.app.search.mappings import RESOURCES_INDEX
 from django.contrib.postgres.fields import ArrayField
 from django.core.cache import cache
 from django.core.files import File
+from django.core.files.images import get_image_dimensions
 from django.core.files.storage import default_storage
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import fields
+from django.db.models.fields.json import JSONField
 from django.utils.translation import get_language, gettext as _
-
-from elasticsearch import Elasticsearch
-from elasticsearch.exceptions import NotFoundError
 
 # One benefit of shifting to python3.x would be to use
 # importlib.util.LazyLoader to load rdflib (and other lesser
@@ -119,7 +116,7 @@ class DataTypeFactory(object):
 
 
 class StringDataType(BaseDataType):
-    _rest_framework_model_field = fields.CharField(null=True)
+    _rest_framework_model_field = JSONField(null=True)
 
     def validate(
         self,
