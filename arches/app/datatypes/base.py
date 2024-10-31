@@ -539,6 +539,10 @@ class BaseDataType(object):
         pass
 
     def get_base_orm_lookup(self, node):
+        """This expression gets the tile data for a specific node. It can be
+        overridden to extract something more specific, especially where the
+        node value is JSON and only certain k/v pairs are useful to query.
+        """
         return f"data__{node.pk}"
 
     def to_python(self, tile_val):
