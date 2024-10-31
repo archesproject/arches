@@ -7,6 +7,7 @@ class TileQuerySet(QuerySet):
     def with_node_values(
         self, nodes, *, defer=None, only=None, lhs=None, outer_ref, depth=1
     ):
+        """TileModel.as_nodegroup() is the better entrypoint, see docs there."""
         from arches.app.models.models import TileModel
 
         node_alias_annotations = generate_tile_annotations(
