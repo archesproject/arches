@@ -1293,6 +1293,9 @@ class ResourceInstance(models.Model):
         edit_type = "update"
         if self._state.adding:
             edit_type = "create"
+        else:
+            return  # TODO: should we save an edit log update?
+
         # Until save_edit() is a static method, work around it.
         ephemeral_proxy_instance = Resource()
         ephemeral_proxy_instance.graphid = self.graph_id
