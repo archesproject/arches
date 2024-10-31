@@ -65,6 +65,11 @@ class TileQuerySet(QuerySet):
                         setattr(tile, node.alias, python_val)
                 else:
                     delattr(tile, node.alias)
+            for child_tile in tile.children.all():
+                setattr(child_tile, tile.nodegroup_alias, child_tile.parenttile)
+                children = getattr(tile, child_tile.nodegroup_alias, [])
+                children.append(child_tile)
+                setattr(tile, child_tile.nodegroup_alias, children)
 
     def _clone(self):
         ret = super()._clone()
@@ -101,7 +106,7 @@ class ResourceInstanceQuerySet(QuerySet):
 
         Filter on any nested node at the top level ("shallow query").
         In this example, statement_content is a cardinality-N node, thus an array.
-        # TODO: should name with _set (?)
+        # TODO: should name with `_set`? But then would need to check for clashes.
 
         >>> subset = concepts.filter(statement_content__len__gt=0)[:4]
         >>> for concept in subset:
@@ -115,6 +120,17 @@ class ResourceInstanceQuerySet(QuerySet):
                 [{'en': {'value': 'Method of acquiring property ...
         ...
 
+        Access child and parent tiles by nodegroup aliases:
+
+        >>> has_child = concepts.filter(statement_data_assignment_statement_content__len__gt=0).first()
+        >>> has_child
+        <Concept: <appellative_status_ascribed_name_content> (751614c0-de7a-47d7-8e87-a4d18c7337ff)>
+        >>> has_child.statement_data_assignment_statement
+        <statement_data_assignment_statement (51e1f473-712e-447b-858e-cc7353a084a6)>
+        >>> parent = has_child.statement[0]
+        >>> parent.statement_data_assignment_statement[0].statement is parent
+        True
+
         Provisional edits are completely ignored.
         """
         from arches.app.models.models import GraphModel, NodeGroup, TileModel
@@ -122,6 +138,8 @@ class ResourceInstanceQuerySet(QuerySet):
         if resource_ids and not graph_slug:
             graph_query = GraphModel.objects.filter(resourceinstance__in=resource_ids)
         else:
+            # TODO: get latest graph.
+            # https://github.com/archesproject/arches/issues/11565
             graph_query = GraphModel.objects.filter(
                 slug=graph_slug, source_identifier=None
             )
@@ -207,11 +225,15 @@ class ResourceInstanceQuerySet(QuerySet):
                 if annotated_tile.cardinality == "n":
                     tile_array = getattr(resource, ng_alias)
                     tile_array.append(annotated_tile)
-                else:
+                elif root_node.nodegroup.parentnodegroup_id is None:
                     setattr(resource, ng_alias, annotated_tile)
 
                 for child_tile in annotated_tile.children.all():
-                    setattr(child_tile, ng_alias, annotated_tile.parenttile)
+                    setattr(child_tile, ng_alias, child_tile.parenttile)
+                    children = getattr(annotated_tile, child_tile.nodegroup_alias, [])
+                    if child_tile not in children:
+                        children.append(child_tile)
+                    setattr(annotated_tile, child_tile.nodegroup_alias, children)
 
     def _clone(self):
         ret = super()._clone()
