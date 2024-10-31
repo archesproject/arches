@@ -16,6 +16,8 @@ renderers.JSONOpenAPIRenderer.encoder_class = JSONSerializer
 class ArchesTileSerializer(serializers.ModelSerializer):
     tileid = serializers.UUIDField(validators=[])
 
+    _nodes = Node.objects.none()
+
     def get_default_field_names(self, declared_fields, model_info):
         field_names = super().get_default_field_names(declared_fields, model_info)
         try:
@@ -45,15 +47,21 @@ class ArchesTileSerializer(serializers.ModelSerializer):
 
     def build_unknown_field(self, field_name, model_class):
         graph_slug = self.__class__.Meta.graph_slug
-        node = (
-            Node.objects.filter(
+        if not self._nodes:
+            self._nodes = Node.objects.filter(
                 graph__slug=graph_slug,
+                # TODO: latest
                 graph__source_identifier=None,
-                alias=field_name,
             )
-            .select_related()
-            .get()
-        )
+
+        for node in self._nodes:
+            if node.alias == field_name:
+                break
+        else:
+            raise Node.DoesNotExist(
+                f"Node with alias {field_name} not found in graph {graph_slug}"
+            )
+
         datatype = DataTypeFactory().get_instance(node.datatype)
         model_field = deepcopy(datatype._rest_framework_model_field)
         if model_field is None:
