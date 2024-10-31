@@ -4,6 +4,7 @@ import datetime
 from django.contrib.auth.models import Group, User
 from django.urls import reverse
 from django.test.client import Client
+from django.test.utils import captured_stdout
 
 from arches.app.models.models import WorkflowHistory
 from tests.base_test import ArchesTestCase
@@ -138,7 +139,7 @@ class WorkflowHistoryTests(ArchesTestCase):
 
         # Non-superuser cannot update someone else's workflow.
         self.client.force_login(self.editor)
-        with self.assertLogs("django.request", level="WARNING"):
+        with self.assertLogs("django.request", level="WARNING"), captured_stdout():
             response = self.client.post(
                 reverse(
                     "workflow_history",

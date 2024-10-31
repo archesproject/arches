@@ -23,6 +23,7 @@ from django.db import connection
 from django.contrib.auth.models import User
 from django.db.utils import ProgrammingError
 from django.http import HttpRequest
+from django.test.utils import captured_stdout
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.resource import Resource
@@ -394,7 +395,7 @@ class TileTests(ArchesTestCase):
         }
         second_tile = Tile(second_json)
 
-        with self.assertRaises(ProgrammingError):
+        with self.assertRaises(ProgrammingError), captured_stdout():
             second_tile.save(index=False, request=request)
 
     def test_apply_provisional_edit(self):
