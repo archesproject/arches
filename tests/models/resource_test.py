@@ -352,7 +352,8 @@ class ResourceTests(ArchesTestCase):
         other_resource = Resource(pk=uuid.uuid4())
         with sync_overridden_test_settings_to_arches():
             self.test_resource.delete_index(other_resource.pk)
-        self.assertIn(str(other_resource.pk), str(mock._mock_call_args))
+        # delete_resources() was called with the correct resource id.
+        self.assertEqual(other_resource.pk, mock._mock_call_args[1]["resources"].pk)
 
     def test_publication_restored_on_save(self):
         """

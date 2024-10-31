@@ -1988,7 +1988,9 @@ class TileModel(models.Model):  # Tile
 
         return True
 
-    def serialize(self, fields=None, exclude=["nodegroup"], **kwargs):
+    def serialize(
+        self, fields=None, exclude=("nodegroup", "nodegroup_alias"), **kwargs
+    ):
         return JSONSerializer().handle_model(
             self, fields=fields, exclude=exclude, **kwargs
         )
