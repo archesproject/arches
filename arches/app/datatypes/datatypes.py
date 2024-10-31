@@ -2245,10 +2245,10 @@ class ResourceInstanceDataType(BaseDataType):
         return terms
 
     def transform_value_for_tile(self, value, **kwargs):
-        def from_instance(instance):
+        def from_id_string(uuid_string):
             nonlocal kwargs
             return {
-                "resourceId": str(instance.pk),
+                "resourceId": uuid_string,
                 "inverseOntology": kwargs.get("inverseOntology", ""),
                 "inverseOntologyProperty": kwargs.get("inverseOntologyProperty", ""),
             }
@@ -2265,11 +2265,13 @@ class ResourceInstanceDataType(BaseDataType):
             # data should come in as json but python list is accepted as well
             if isinstance(value, list):
                 if all(isinstance(inner, models.ResourceInstance) for inner in value):
-                    return [from_instance(instance) for instance in value]
+                    return [from_id_string(str(instance.pk)) for instance in value]
+                elif all(isinstance(inner, uuid.UUID) for inner in value):
+                    return [from_id_string(str(uid)) for uid in value]
                 else:
                     return value
             if isinstance(value, models.ResourceInstance):
-                return [from_instance(value)]
+                return [from_id_string(str(value.pk))]
 
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)

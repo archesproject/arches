@@ -39,9 +39,7 @@ class TileQuerySet(QuerySet):
         return (
             self.filter(data__has_any_keys=[n.pk for n in self._fetched_nodes])
             .prefetch_related(*prefetches)
-            .annotate(
-                **node_alias_annotations,
-            )
+            .annotate(**node_alias_annotations)
             .order_by("sortorder")
         )
 
@@ -186,9 +184,7 @@ class ResourceInstanceQuerySet(QuerySet):
                 ),
                 to_attr="_annotated_tiles",
             ),
-        ).annotate(
-            **node_alias_annotations,
-        )
+        ).annotate(**node_alias_annotations)
 
     def _prefetch_related_objects(self):
         """Attach annotated tiles to resource instances, at the root, by
