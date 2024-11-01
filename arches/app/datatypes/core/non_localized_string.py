@@ -19,7 +19,7 @@ from arches.app.search.search_term import SearchTerm
 
 
 class NonLocalizedStringDataType(BaseDataType):
-    _rest_framework_model_field = fields.CharField(null=True)
+    rest_framework_model_field = fields.CharField(null=True)
 
     def validate(
         self,

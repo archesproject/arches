@@ -116,7 +116,7 @@ class DataTypeFactory(object):
 
 
 class StringDataType(BaseDataType):
-    _rest_framework_model_field = JSONField(null=True)
+    rest_framework_model_field = JSONField(null=True)
 
     def validate(
         self,
@@ -458,7 +458,7 @@ class StringDataType(BaseDataType):
 
 
 class NumberDataType(BaseDataType):
-    _rest_framework_model_field = fields.FloatField(null=True)
+    rest_framework_model_field = fields.FloatField(null=True)
 
     def validate(
         self,
@@ -590,7 +590,7 @@ class NumberDataType(BaseDataType):
 
 
 class BooleanDataType(BaseDataType):
-    _rest_framework_model_field = fields.BooleanField(null=True)
+    rest_framework_model_field = fields.BooleanField(null=True)
 
     def validate(
         self,
@@ -693,7 +693,7 @@ class BooleanDataType(BaseDataType):
 
 
 class DateDataType(BaseDataType):
-    _rest_framework_model_field = fields.DateField(null=True)
+    rest_framework_model_field = fields.DateField(null=True)
 
     def validate(
         self,
@@ -906,7 +906,7 @@ class DateDataType(BaseDataType):
 
 
 class EDTFDataType(BaseDataType):
-    _rest_framework_model_field = fields.CharField(null=True)
+    rest_framework_model_field = fields.CharField(null=True)
 
     def transform_value_for_tile(self, value, **kwargs):
         transformed_value = ExtendedDateFormat(value)
@@ -1081,7 +1081,7 @@ class EDTFDataType(BaseDataType):
 
 
 class FileListDataType(BaseDataType):
-    _rest_framework_model_field = ArrayField(base_field=fields.CharField(), null=True)
+    rest_framework_model_field = ArrayField(base_field=fields.CharField(), null=True)
 
     def __init__(self, model=None):
         super(FileListDataType, self).__init__(model=model)
@@ -2039,7 +2039,7 @@ class ResourceInstanceDataType(BaseDataType):
 
     """
 
-    _rest_framework_model_field = fields.UUIDField(null=True)
+    rest_framework_model_field = fields.UUIDField(null=True)
 
     def validate(
         self,
@@ -2412,7 +2412,7 @@ class ResourceInstanceDataType(BaseDataType):
 
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
-    _rest_framework_model_field = ArrayField(base_field=fields.UUIDField(), null=True)
+    rest_framework_model_field = ArrayField(base_field=fields.UUIDField(), null=True)
 
     def to_json(self, tile, node):
         from arches.app.models.resource import (

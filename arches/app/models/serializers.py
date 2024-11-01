@@ -63,7 +63,7 @@ class ArchesTileSerializer(serializers.ModelSerializer):
             )
 
         datatype = DataTypeFactory().get_instance(node.datatype)
-        model_field = deepcopy(datatype._rest_framework_model_field)
+        model_field = deepcopy(datatype.rest_framework_model_field)
         if model_field is None:
             raise NotImplementedError(f"Field missing for datatype: {node.datatype}")
         model_field.model = model_class

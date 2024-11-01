@@ -1412,7 +1412,7 @@ class ResourceInstance(models.Model):
 
         original_tile_data_by_tile_id = {}
         for root_node in self._fetched_root_nodes:
-            self._update_tile_for_single_node(
+            self._update_tile_for_root_node(
                 root_node,
                 original_tile_data_by_tile_id,
                 to_insert,
@@ -1432,7 +1432,7 @@ class ResourceInstance(models.Model):
 
         return to_insert, to_update, to_delete
 
-    def _update_tile_for_single_node(
+    def _update_tile_for_root_node(
         self,
         root_node,
         original_tile_data_by_tile_id,
@@ -1480,9 +1480,8 @@ class ResourceInstance(models.Model):
             self._validate_and_patch_from_tile_values(
                 tile, root_node, errors_by_node_alias
             )
-
-        for tile in upserts:
             # Remove blank tiles.
+            # TODO: also check for unsaved children?
             if not any(tile.data.values()) and not tile.children.count():
                 if tile._state.adding:
                     to_insert.remove(tile)
@@ -1521,7 +1520,7 @@ class ResourceInstance(models.Model):
                 # validate() will handle.
                 transformed = value_to_validate
 
-            # Patch the transformed data into the working tiles.
+            # Patch the transformed data into the tile.data.
             tile.data[node_id_str] = transformed
 
             datatype_instance.clean(tile, node_id_str)
@@ -1836,9 +1835,9 @@ class TileModel(models.Model):  # Tile
     def nodegroup_alias(self):
         if nodegroup_alias := getattr(self, "_nodegroup_alias", None):
             return nodegroup_alias
-        if node_for_nodegroup := Node.objects.filter(pk=self.nodegroup_id).first():
-            self._nodegroup_alias = node_for_nodegroup.alias
-            return node_for_nodegroup.alias
+        if root_node := Node.objects.filter(pk=self.nodegroup_id).first():
+            self._nodegroup_alias = root_node.alias
+            return root_node.alias
         return None
 
     @classmethod
@@ -1859,7 +1858,7 @@ class TileModel(models.Model):  # Tile
             Fine-quality calf or lamb parchment ...
         """
 
-        root_node = cls._root_node_for_nodegroup(graph_slug, root_node_alias)
+        root_node = cls._root_node(graph_slug, root_node_alias)
 
         def accumulate_nodes_below(nodegroup, acc):
             acc.extend(list(nodegroup.node_set.all()))
@@ -1878,7 +1877,7 @@ class TileModel(models.Model):  # Tile
         )
 
     @staticmethod
-    def _root_node_for_nodegroup(graph_slug, root_node_alias):
+    def _root_node(graph_slug, root_node_alias):
         from arches.app.models.models import Node
 
         qs = (
@@ -1920,7 +1919,7 @@ class TileModel(models.Model):  # Tile
         # TODO: check user?
         # TOOD: index side effects?
 
-        if getattr(self, "_root_node", False):
+        if getattr(self, "_fetched_nodes", False):
             self._save_from_pythonic_model_values(**kwargs)
         else:
             super().save(**kwargs)

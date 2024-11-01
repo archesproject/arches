@@ -71,7 +71,7 @@ class URLDataType(BaseDataType):
     URL Datatype to store an optionally labelled hyperlink to a (typically) external resource
     """
 
-    _rest_framework_model_field = fields.URLField(null=True)
+    rest_framework_model_field = fields.URLField(null=True)
 
     URL_REGEX = re.compile(
         r"https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"

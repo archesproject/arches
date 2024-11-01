@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseConceptDataType(BaseDataType):
-    _rest_framework_model_field = fields.UUIDField(null=True)
+    rest_framework_model_field = fields.UUIDField(null=True)
 
     def __init__(self, model=None):
         super(BaseConceptDataType, self).__init__(model=model)
@@ -415,7 +415,7 @@ class ConceptDataType(BaseConceptDataType):
 
 
 class ConceptListDataType(BaseConceptDataType):
-    _rest_framework_model_field = ArrayField(base_field=fields.UUIDField(), null=True)
+    rest_framework_model_field = ArrayField(base_field=fields.UUIDField(), null=True)
 
     def validate(
         self,
