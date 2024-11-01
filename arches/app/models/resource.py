@@ -902,15 +902,18 @@ class Resource(models.ResourceInstance):
                 and str(resourceinstancefrom_graphid) in readable_graphids
             ):
                 try:
-                    if f'{relation["relationshiptype"]}{lang}' not in preflabel_lookup:
-                        preflabel_lookup[f'{relation["relationshiptype"]}{lang}'] = (
-                            get_preflabel_from_valueid(
-                                relation["relationshiptype"], lang
-                            )
+                    if f'{relation["relationshiptype"]}{lang}' in preflabel_lookup:
+                        preflabel = preflabel_lookup[
+                            f'{relation["relationshiptype"]}{lang}'
+                        ]
+                    else:
+                        preflabel = get_preflabel_from_valueid(
+                            relation["relationshiptype"], lang
                         )
-                    preflabel = preflabel_lookup[
-                        f'{relation["relationshiptype"]}{lang}'
-                    ]
+                        preflabel_lookup[f'{relation["relationshiptype"]}{lang}'] = (
+                            preflabel
+                        )
+
                     relation["relationshiptype_label"] = preflabel["value"] or ""
                 except:
                     relation["relationshiptype_label"] = (
