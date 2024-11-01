@@ -805,7 +805,7 @@ class Node(models.Model):
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     fieldname = models.TextField(blank=True, null=True)
     exportable = models.BooleanField(default=False, null=True)
-    alias = models.TextField(blank=True, null=True)
+    alias = models.TextField(blank=True)
     hascustomalias = models.BooleanField(default=False)
     source_identifier = models.ForeignKey(
         "self",
@@ -904,7 +904,14 @@ class Node(models.Model):
         if not self.nodeid:
             self.nodeid = uuid.uuid4()
 
-    def save(self, *args, **kwargs):
+    def clean(self):
+        if not self.alias:
+            Graph.objects.get(pk=self.graph_id).create_node_alias(self)
+
+    def save(self, **kwargs):
+        if not self.alias:
+            self.clean()
+            add_to_update_fields(kwargs, "alias")
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
             add_to_update_fields(kwargs, "source_identifier_id")
