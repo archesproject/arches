@@ -23,6 +23,7 @@ from django.db import connection
 from django.contrib.auth.models import User
 from django.db.utils import ProgrammingError
 from django.http import HttpRequest
+from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.resource import Resource
 from arches.app.models.models import (
@@ -726,10 +727,12 @@ class TileTests(ArchesTestCase):
 
     def test_check_for_missing_nodes(self):
         # Required file list node.
+        graph = Graph.new(name="Test Graph")
         node_group = NodeGroup.objects.get(
             pk=UUID("41111111-0000-0000-0000-000000000000")
         )
         required_file_list_node = Node(
+            graph=graph,
             name="Required file list",
             datatype="file-list",
             nodegroup=node_group,
