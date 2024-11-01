@@ -10,7 +10,7 @@ from arches_references.models import ListItem
 
 
 class ReferenceDataType(BaseDataType):
-    _rest_framework_model_field = JSONField(null=True)
+    rest_framework_model_field = JSONField(null=True)
 
     def validate(
         self,
