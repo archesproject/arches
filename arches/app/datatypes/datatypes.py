@@ -2268,6 +2268,8 @@ class ResourceInstanceDataType(BaseDataType):
                     return [from_id_string(str(instance.pk)) for instance in value]
                 elif all(isinstance(inner, uuid.UUID) for inner in value):
                     return [from_id_string(str(uid)) for uid in value]
+                elif all(isinstance(inner, str) for inner in value):
+                    return [from_id_string(uid) for uid in value]
                 else:
                     return value
             if isinstance(value, models.ResourceInstance):
