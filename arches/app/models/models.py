@@ -911,7 +911,7 @@ class Node(models.Model):
     def save(self, **kwargs):
         if not self.alias:
             self.clean()
-            add_to_update_fields(kwargs, "alias")
+            add_to_update_fields(kwargs, "alias", "hascustomalias")
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
             add_to_update_fields(kwargs, "source_identifier_id")
