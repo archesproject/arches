@@ -54,9 +54,11 @@ class TileQuerySet(QuerySet):
         datatype_factory = DataTypeFactory()
         NOT_PROVIDED = object()
         for tile in self._result_cache:
+            tile._fetched_root_nodes = set()
             for node in self._fetched_nodes:
                 if node.nodegroup_id == tile.nodegroup_id:
                     tile._root_node = node
+                    tile._fetched_root_nodes.add(node)
                     tile_val = getattr(tile, node.alias, NOT_PROVIDED)
                     if tile_val is not NOT_PROVIDED:
                         datatype_instance = datatype_factory.get_instance(node.datatype)

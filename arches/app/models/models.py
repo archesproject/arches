@@ -1935,7 +1935,7 @@ class TileModel(models.Model):  # Tile
         # TODO: check user?
         # TOOD: index side effects?
 
-        if getattr(self, "_fetched_nodes", False):
+        if getattr(self, "_fetched_root_nodes", False):
             self._save_from_pythonic_model_values(**kwargs)
         else:
             super().save(**kwargs)
