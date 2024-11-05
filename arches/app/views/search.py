@@ -337,9 +337,6 @@ def append_instance_permission_filter_dsl(request, search_query_object):
     if request.user.is_superuser is False:
         query: Query = search_query_object.get("query", None)
         if query:
-            inclusions = permission_backend.get_permission_inclusions()
-            for inclusion in inclusions:
-                query.include(inclusion)
             query.add_query(
                 permission_backend.get_permission_search_filter(request.user)
             )
