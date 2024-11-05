@@ -2117,6 +2117,7 @@ class Graph(models.GraphModel):
                     n.alias for n in self.nodes.values() if node.alias != n.alias
                 ]
                 node.alias = self.make_name_unique(row[0], aliases, "_n")
+                node.hascustomalias = False
         return node.alias
 
     def validate(self):

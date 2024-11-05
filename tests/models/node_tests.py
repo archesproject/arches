@@ -19,8 +19,9 @@ class NodeTests(ArchesTestCase):
     def test_empty_custom_alias_regenerated(self):
         """One dubiously empty alias per graph is currently allowed at the
         database level. Ensure it is regenerated via the application."""
-        new_node = Node(graph_id=self.graph.pk, name="Test node")
-        new_node.hascustomalias = True
-        new_node.alias = ""
+        new_node = Node(
+            graph_id=self.graph.pk, name="Test node", alias="", hascustomalias=True
+        )
         new_node.clean()
         self.assertEqual(new_node.alias, "test_node")
+        self.assertIs(new_node.hascustomalias, False)
