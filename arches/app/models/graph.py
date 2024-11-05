@@ -2107,7 +2107,7 @@ class Graph(models.GraphModel):
         Assigns a unique, slugified version of a node's name as that node's alias.
         """
         with connection.cursor() as cursor:
-            if node.hascustomalias:
+            if node.hascustomalias and node.alias:
                 cursor.callproc("__arches_slugify", [node.alias])
                 node.alias = cursor.fetchone()[0]
             else:
