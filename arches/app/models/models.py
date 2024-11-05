@@ -14,7 +14,11 @@ from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.models.querysets import ResourceInstanceQuerySet, TileQuerySet
-from arches.app.models.utils import add_to_update_fields, field_names
+from arches.app.models.utils import (
+    add_to_update_fields,
+    field_names,
+    pop_arches_model_kwargs,
+)
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils import import_class_from_string
 from django.contrib.auth.models import Group, User
@@ -1237,7 +1241,13 @@ class ResourceInstance(models.Model):
         permissions = (("no_access_to_resourceinstance", "No Access"),)
 
     def __init__(self, *args, **kwargs):
-        super(ResourceInstance, self).__init__(*args, **kwargs)
+        arches_model_kwargs, other_kwargs = pop_arches_model_kwargs(
+            kwargs, self._meta.get_fields()
+        )
+        super().__init__(*args, **other_kwargs)
+
+        for kwarg, value in arches_model_kwargs.items():
+            setattr(self, kwarg, value)
         if not self.resourceinstanceid:
             self.resourceinstanceid = uuid.uuid4()
 
@@ -1817,7 +1827,13 @@ class TileModel(models.Model):  # Tile
         db_table = "tiles"
 
     def __init__(self, *args, **kwargs):
-        super(TileModel, self).__init__(*args, **kwargs)
+        arches_model_kwargs, other_kwargs = pop_arches_model_kwargs(
+            kwargs, self._meta.get_fields()
+        )
+        super().__init__(*args, **other_kwargs)
+
+        for kwarg, value in arches_model_kwargs.items():
+            setattr(self, kwarg, value)
         if not self.tileid:
             self.tileid = uuid.uuid4()
 

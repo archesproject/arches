@@ -15,7 +15,7 @@ renderers.JSONOpenAPIRenderer.encoder_class = JSONSerializer
 
 
 class ArchesTileSerializer(serializers.ModelSerializer):
-    tileid = serializers.UUIDField(validators=[])
+    tileid = serializers.UUIDField(validators=[], required=False)
 
     _nodes = Node.objects.none()
 

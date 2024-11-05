@@ -74,6 +74,15 @@ def generate_tile_annotations(nodes, *, defer, only, model, lhs, outer_ref):
     return node_alias_annotations
 
 
+def pop_arches_model_kwargs(kwargs, model_fields):
+    arches_model_data = {}
+    for kwarg, value in kwargs.items():
+        if kwarg not in model_fields:
+            arches_model_data[kwarg] = value
+    without_model_data = {k: v for k, v in kwargs.items() if k not in arches_model_data}
+    return arches_model_data, without_model_data
+
+
 def find_root_node(prefetched_siblings, nodegroup_id):
     for sibling_node in prefetched_siblings:
         if sibling_node.pk == nodegroup_id:
