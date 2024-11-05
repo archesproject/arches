@@ -1,10 +1,11 @@
 from copy import deepcopy
 
+from django.db.models import F
 from rest_framework import renderers
 from rest_framework import serializers
 
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import Node
+from arches.app.models.models import Node, TileModel
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 
@@ -73,10 +74,43 @@ class ArchesTileSerializer(serializers.ModelSerializer):
 
 
 class ArchesModelSerializer(serializers.ModelSerializer):
+    _root_nodes = Node.objects.none()
+
+    def get_fields(self):
+        graph_slug = self.__class__.Meta.graph_slug
+
+        if self.__class__.Meta.nodegroups == "__all__":
+            if not self._root_nodes:
+                self._root_nodes = Node.objects.filter(
+                    graph__slug=graph_slug,
+                    # TODO: latest
+                    graph__source_identifier=None,
+                    nodegroup_id=F("nodeid"),
+                ).select_related("nodegroup")
+            for root in self._root_nodes:
+                if root.alias not in self._declared_fields:
+
+                    class TileSerializer(ArchesTileSerializer):
+                        class Meta:
+                            model = TileModel
+                            graph_slug = self.__class__.Meta.graph_slug
+                            root_node = root.alias
+                            fields = self.__class__.Meta.fields
+
+                    self._declared_fields[root.alias] = TileSerializer(
+                        many=root.nodegroup.cardinality == "n", required=False
+                    )
+
+        return super().get_fields()
+
     def get_default_field_names(self, declared_fields, model_info):
         field_names = super().get_default_field_names(declared_fields, model_info)
         aliases = self.__class__.Meta.fields
         if aliases != "__all__":
             raise NotImplementedError  # TODO...
-        field_names.extend(self.__class__.Meta.nodegroups)
+        nodegroups = self.__class__.Meta.nodegroups
+        if nodegroups == "__all__":
+            field_names.extend(self._root_nodes.values_list("alias", flat=True))
+        else:
+            field_names.extend(self.__class__.Meta.nodegroups)
         return field_names
