@@ -74,6 +74,8 @@ class ArchesTileSerializer(serializers.ModelSerializer):
 
 
 class ArchesModelSerializer(serializers.ModelSerializer):
+    legacyid = serializers.CharField(max_length=255, required=False, allow_null=True)
+
     _root_nodes = Node.objects.none()
 
     def get_fields(self):
