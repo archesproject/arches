@@ -13,6 +13,7 @@ from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.models.functions import UUID4
 from arches.app.models.querysets import ResourceInstanceQuerySet, TileQuerySet
 from arches.app.models.utils import (
     add_to_update_fields,
@@ -1205,7 +1206,9 @@ class ResourceXResource(models.Model):
 
 
 class ResourceInstance(models.Model):
-    resourceinstanceid = models.UUIDField(primary_key=True, blank=True)
+    resourceinstanceid = models.UUIDField(
+        primary_key=True, blank=True, db_default=UUID4()
+    )
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
     graph_publication = models.ForeignKey(
         GraphXPublishedGraph,
@@ -1248,8 +1251,6 @@ class ResourceInstance(models.Model):
 
         for kwarg, value in arches_model_kwargs.items():
             setattr(self, kwarg, value)
-        if not self.resourceinstanceid:
-            self.resourceinstanceid = uuid.uuid4()
 
     def __repr__(self):
         return f"<{self.graph.name}: {self.name} ({self.pk})>"
