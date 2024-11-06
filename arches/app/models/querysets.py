@@ -132,7 +132,7 @@ class ResourceInstanceQuerySet(QuerySet):
         >>> parent.statement_data_assignment_statement[0].statement is parent
         True
 
-        Provisional edits are completely ignored.
+        Provisional edits are completely ignored for the purposes of querying.
         """
         from arches.app.models.models import GraphModel, NodeGroup, TileModel
 

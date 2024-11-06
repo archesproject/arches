@@ -1335,7 +1335,7 @@ class ResourceInstance(models.Model):
             add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
 
         if getattr(self, "_fetched_root_nodes", False):
-            self._save_tiles_for_pythonic_model(index=index, **kwargs)
+            self._save_tiles_for_pythonic_model(user=user, index=index, **kwargs)
             self.save_edit(user=user)
         else:
             super().save(**kwargs)
@@ -1345,7 +1345,7 @@ class ResourceInstance(models.Model):
         if getattr(self, "_fetched_root_nodes", False):
             self._update_tiles_from_pythonic_model_values()
 
-    def _save_tiles_for_pythonic_model(self, index=False, **kwargs):
+    def _save_tiles_for_pythonic_model(self, user=None, index=False, **kwargs):
         """Raises a compound ValidationError with any failing tile values.
 
         It's not exactly idiomatic for a Django project to clean()
@@ -1370,31 +1370,59 @@ class ResourceInstance(models.Model):
         delete_proxies = Tile.objects.filter(pk__in=[tile.pk for tile in to_delete])
 
         with transaction.atomic():
-            for proxy_instance, vanilla_instance in zip(
+            # Interact with the database in bulk as much as possible, but
+            # run certain side effects from Tile.save() one-at-a-time until
+            # proxy model methods can be refactored. Then run in bulk.
+            for upsert_proxy, vanilla_instance in zip(
                 upsert_proxies, upserts, strict=True
             ):
-                for field in field_names(vanilla_instance):
-                    setattr(proxy_instance, field, getattr(vanilla_instance, field))
-                proxy_instance._Tile__preSave()
-            for proxy_instance in delete_proxies:
-                proxy_instance._Tile__preDelete()
+                upsert_proxy._existing_data = upsert_proxy.data
+                upsert_proxy._existing_provisionaledits = upsert_proxy.provisionaledits
 
-            # TODO: determine appropriate effects, e.g. indexing, editlog
-            # (use/adapt proxy model methods?)
+                # Sync proxy instance fields.
+                for field in field_names(vanilla_instance):
+                    setattr(upsert_proxy, field, getattr(vanilla_instance, field))
+
+                # Run tile lifecycle updates on proxy instance.
+                upsert_proxy._Tile__preSave()
+                upsert_proxy.check_for_missing_nodes()
+                upsert_proxy.check_for_constraint_violation()
+                (
+                    oldprovisionalvalue,
+                    newprovisionalvalue,
+                    provisional_edit_log_details,
+                ) = vanilla_instance._apply_provisional_edit(
+                    upsert_proxy,
+                    upsert_proxy._existing_data,
+                    upsert_proxy._existing_provisionaledits,
+                    user=user,
+                )
+                # Remember the values needed for the edit log updates later.
+                upsert_proxy._oldprovisionalvalue = oldprovisionalvalue
+                upsert_proxy._newprovisionalvalue = newprovisionalvalue
+                upsert_proxy._provisional_edit_log_details = (
+                    provisional_edit_log_details
+                )
+                upsert_proxy._existing_data = vanilla_instance.data
+
+            for upsert_proxy in delete_proxies:
+                upsert_proxy._Tile__preDelete()
+
             insert_proxies = TileModel.objects.none()
             if to_insert:
                 inserted = TileModel.objects.bulk_create(to_insert)
-                # Pay the cost of TileModel -> Tile transformation until this is moved.
+                # Pay the cost of a second TileModel -> Tile transform until refactored.
+                update_proxies = upsert_proxies.difference(insert_proxies)
                 insert_proxies = Tile.objects.filter(pk__in=[t.pk for t in inserted])
+                upsert_proxies = update_proxies | insert_proxies
             if to_update:
-                TileModel.objects.bulk_update(to_update, {"data", "parenttile"})
+                TileModel.objects.bulk_update(
+                    to_update, {"data", "parenttile", "provisionaledits"}
+                )
             if to_delete:
                 TileModel.objects.filter(pk__in=[t.pk for t in to_delete]).delete()
 
             super().save(**kwargs)
-
-            for proxy_instance in upsert_proxies.difference(insert_proxies):
-                proxy_instance._Tile__postSave()
 
             for upsert_tile in upserts:
                 for root_node in self._fetched_root_nodes:
@@ -1403,6 +1431,36 @@ class ResourceInstance(models.Model):
                             datatype = datatype_factory.get_instance(node.datatype)
                             datatype.post_tile_save(upsert_tile, str(node.pk))
                         break
+
+            for upsert_proxy in upsert_proxies:
+                upsert_proxy._Tile__postSave()
+
+            # Save edits: could be done in bulk once above side effects are un-proxied.
+            for upsert_proxy in upsert_proxies:
+                if self._state.adding:
+                    upsert_proxy.save_edit(
+                        user=user,
+                        edit_type="tile create",
+                        old_value={},
+                        new_value=upsert_proxy.data,
+                        newprovisionalvalue=upsert_proxy._newprovisionalvalue,
+                        provisional_edit_log_details=upsert_proxy._provisional_edit_log_details,
+                        transaction_id=None,
+                        # TODO: get this information upstream somewhere.
+                        new_resource_created=False,
+                        note=None,
+                    )
+                else:
+                    upsert_proxy.save_edit(
+                        user=user,
+                        edit_type="tile edit",
+                        old_value=upsert_proxy._existing_data,
+                        new_value=upsert_proxy.data,
+                        newprovisionalvalue=upsert_proxy._newprovisionalvalue,
+                        oldprovisionalvalue=upsert_proxy._oldprovisionalvalue,
+                        provisional_edit_log_details=upsert_proxy._provisional_edit_log_details,
+                        transaction_id=None,
+                    )
 
         # Instantiate proxy model for now, but refactor & expose this on vanilla model
         proxy_resource = Resource.objects.get(pk=self.pk)
@@ -1488,7 +1546,7 @@ class ResourceInstance(models.Model):
         upserts = to_insert | to_update
         for tile in upserts:
             self._validate_and_patch_from_tile_values(
-                tile, root_node, errors_by_node_alias
+                tile, root_node=root_node, errors_by_node_alias=errors_by_node_alias
             )
             # Remove blank tiles.
             # TODO: also check for unsaved children?
@@ -1504,7 +1562,7 @@ class ResourceInstance(models.Model):
                 to_update.remove(tile)
 
     @staticmethod
-    def _validate_and_patch_from_tile_values(tile, root_node, errors_by_node_alias):
+    def _validate_and_patch_from_tile_values(tile, *, root_node, errors_by_node_alias):
         """Validate data found on ._incoming_tile and move it to .data.
         Update errors_by_node_alias in place."""
         from arches.app.datatypes.datatypes import DataTypeFactory
@@ -1932,15 +1990,12 @@ class TileModel(models.Model):  # Tile
             self.tileid = uuid.uuid4()
             add_to_update_fields(kwargs, "tileid")
 
-        # TODO: check user?
-        # TOOD: index side effects?
-
         if getattr(self, "_fetched_root_nodes", False):
-            self._save_from_pythonic_model_values(**kwargs)
+            self._save_from_pythonic_model_values(user=user, index=index, **kwargs)
         else:
             super().save(**kwargs)
 
-    def _save_from_pythonic_model_values(self, index=False, **kwargs):
+    def _save_from_pythonic_model_values(self, *, user=None, index=False, **kwargs):
         from arches.app.datatypes.datatypes import DataTypeFactory
         from arches.app.models.resource import Resource
         from arches.app.models.tile import Tile
@@ -1950,21 +2005,62 @@ class TileModel(models.Model):  # Tile
             return
 
         # Instantiate a proxy model and sync data to it, to run all side effects.
+        # Explanation: this is basically Tile.save() but with the serialized
+        # graph and tile fetching skipped. Hence why we might
         # TODO: expose on vanilla model.
         proxy = Tile.objects.get(pk=self.pk)
+        # TODO: handle create.
+        # Capture these to avoid re-querying in _apply_provisional_edit().
+        existing_data = proxy.data
+        existing_provisional_edits = proxy.provisionaledits
         for field in field_names(self):
             setattr(proxy, field, getattr(self, field))
 
         datatype_factory = DataTypeFactory()
         with transaction.atomic():
             proxy._Tile__preSave()
+            proxy.check_for_missing_nodes()
+            proxy.check_for_constraint_violation()
+            oldprovisionalvalue, newprovisionalvalue, provisional_edit_log_details = (
+                self._apply_provisional_edit(
+                    proxy, existing_data, existing_provisional_edits, user=user
+                )
+            )
+
             super().save(**kwargs)
-            proxy._Tile__postSave()
+
             for node in self._root_node.nodegroup.node_set.all():
                 datatype = datatype_factory.get_instance(node.datatype)
                 datatype.post_tile_save(self, str(node.pk))
+            proxy._Tile__postSave()
+
+            if self._state.adding:
+                proxy.save_edit(
+                    user=user,
+                    edit_type="tile create",
+                    old_value={},
+                    new_value=self.data,
+                    newprovisionalvalue=newprovisionalvalue,
+                    provisional_edit_log_details=provisional_edit_log_details,
+                    transaction_id=None,
+                    # TODO: get this information upstream somewhere.
+                    new_resource_created=False,
+                    note=None,
+                )
+            else:
+                proxy.save_edit(
+                    user=user,
+                    edit_type="tile edit",
+                    old_value=existing_data,
+                    new_value=self.data,
+                    newprovisionalvalue=newprovisionalvalue,
+                    oldprovisionalvalue=oldprovisionalvalue,
+                    provisional_edit_log_details=provisional_edit_log_details,
+                    transaction_id=None,
+                )
 
         # TODO: add unique constraint for TileModel re: sortorder
+        # TODO: determine whether this should be skippable, and how.
         self.refresh_from_db(
             using=kwargs.get("using", None),
             fields=kwargs.get("update_fields", None),
@@ -1990,7 +2086,7 @@ class TileModel(models.Model):  # Tile
         errors_by_alias = defaultdict(list)
         # TODO: move this somewhere else.
         ResourceInstance._validate_and_patch_from_tile_values(
-            self, self._root_node, errors_by_alias
+            self, root_node=self._root_node, errors_by_node_alias=errors_by_alias
         )
         if not any(self.data.values()):
             raise ValidationError(_("Tile is blank."))
@@ -2025,6 +2121,53 @@ class TileModel(models.Model):  # Tile
                 return False
 
         return True
+
+    def _apply_provisional_edit(
+        self, proxy, existing_data, existing_provisional_edits, *, user=None
+    ):
+        # TODO: decompose this out of Tile.save() and call *that*.
+        # this section moves the data over from self.data to self.provisionaledits if certain users permissions are in force
+        # then self.data is restored from the previously saved tile data
+        from arches.app.models.tile import Tile
+        from arches.app.utils.permission_backend import user_is_resource_reviewer
+
+        oldprovisionalvalue = None
+        newprovisionalvalue = None
+        provisional_edit_log_details = None
+        creating_new_tile = self._state.adding
+        existing_instance = Tile(
+            data={**existing_data} if existing_data else None,
+            provisional_edits=(
+                {**existing_provisional_edits} if existing_provisional_edits else None
+            ),
+        )
+        existing_instance._state.adding = creating_new_tile
+        if user is not None and not user_is_resource_reviewer(user):
+            if creating_new_tile:
+                # the user has previously edited this tile
+                proxy.apply_provisional_edit(
+                    user, self.data, action="update", existing_model=existing_instance
+                )
+                oldprovisional = proxy.get_provisional_edit(existing_instance, user)
+                if oldprovisional is not None:
+                    oldprovisionalvalue = oldprovisional["value"]
+            else:
+                proxy.apply_provisional_edit(user, data=self.data, action="create")
+
+            newprovisionalvalue = self.data
+            self.provisionaledits = proxy.provisionaledits
+            self.data = existing_data
+            # Also update proxy, which will be used to run further side effects.
+            proxy.provisionaledits = proxy.provisionaledits
+            proxy.data = existing_data
+
+            provisional_edit_log_details = {
+                "user": user,
+                "provisional_editor": user,
+                "action": "create tile" if creating_new_tile else "add edit",
+            }
+
+        return oldprovisionalvalue, newprovisionalvalue, provisional_edit_log_details
 
     def serialize(
         self, fields=None, exclude=("nodegroup", "nodegroup_alias"), **kwargs
