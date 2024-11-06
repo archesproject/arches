@@ -1626,12 +1626,9 @@ class ResourceInstance(models.Model):
             aliases = [n.alias for n in root_nodes]
             from_queryset = self.__class__.as_model(self.graph.slug, only=aliases)
             super().refresh_from_db(using, fields, from_queryset)
-            # Copy over annotations.
+            # Copy over annotations and annotated tiles.
             refreshed_resource = from_queryset[0]
-            for field in itertools.chain(
-                aliases,
-                ("_fetched_root_nodes", "_annotated_tiles"),
-            ):
+            for field in itertools.chain(aliases, ["_annotated_tiles"]):
                 setattr(self, field, getattr(refreshed_resource, field))
         else:
             super().refresh_from_db(using, fields, from_queryset)
@@ -2189,6 +2186,26 @@ class TileModel(models.Model):  # Tile
         return JSONSerializer().handle_model(
             self, fields=fields, exclude=exclude, **kwargs
         )
+
+    def refresh_from_db(self, using=None, fields=None, from_queryset=None):
+        if (
+            not from_queryset
+            and (root_nodes := getattr(self, "_fetched_root_nodes", set()))
+            and self.resourceinstance.graph.slug
+        ):
+            aliases = [n.alias for n in root_nodes]
+            from_queryset = self.__class__.as_nodegroup(
+                root_node_alias=self._root_node.alias,
+                graph_slug=self.resourceinstance.graph.slug,
+                only=aliases,
+            )
+            super().refresh_from_db(using, fields, from_queryset)
+            # Copy over annotations.
+            refreshed_tile = from_queryset[0]
+            for field in aliases:
+                setattr(self, field, getattr(refreshed_tile, field))
+        else:
+            super().refresh_from_db(using, fields, from_queryset)
 
     @staticmethod
     def get_blank_tile_from_nodegroup(
