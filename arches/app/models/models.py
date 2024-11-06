@@ -7,7 +7,7 @@ import logging
 import traceback
 from collections import defaultdict
 from itertools import zip_longest
-from operator import itemgetter
+from operator import attrgetter, itemgetter
 
 from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
@@ -1515,8 +1515,16 @@ class ResourceInstance(models.Model):
         if new_tiles is NOT_PROVIDED:
             return
         if root_node.nodegroup.cardinality == "1":
-            new_tiles = [new_tiles]
-        new_tiles.sort(key=itemgetter("sortorder"))
+            if new_tiles is None:
+                new_tiles = []
+            else:
+                new_tiles = [new_tiles]
+        if all(isinstance(tile, TileModel) for tile in new_tiles):
+            new_tiles.sort(key=attrgetter("sortorder"))
+        else:
+            # TODO: figure out best layer for this and remove if/else.
+            # TODO: nullguard or make not nullable.
+            new_tiles.sort(key=itemgetter("sortorder"))
         db_tiles = [
             t for t in self._annotated_tiles if t.nodegroup_alias == root_node.alias
         ]
@@ -1571,7 +1579,13 @@ class ResourceInstance(models.Model):
         datatype_factory = DataTypeFactory()
         for node in root_node.nodegroup.node_set.all():
             node_id_str = str(node.pk)
-            value_to_validate = tile._incoming_tile.get(node.alias, NOT_PROVIDED)
+            # TODO: remove this switch and deserialize this in DRF.
+            if isinstance(tile._incoming_tile, TileModel):
+                value_to_validate = getattr(
+                    tile._incoming_tile, node.alias, NOT_PROVIDED
+                )
+            else:
+                value_to_validate = tile._incoming_tile.get(node.alias, NOT_PROVIDED)
             if value_to_validate is NOT_PROVIDED:
                 continue
             datatype_instance = datatype_factory.get_instance(node.datatype)
