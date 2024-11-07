@@ -2367,17 +2367,25 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
             nodevalue = self.get_nodevalues(data[str(node.nodeid)])
             items = []
 
+            other_resource_ids: set[uuid.UUID] = set()
             for resourceXresource in nodevalue:
                 try:
-                    resourceid = resourceXresource["resourceId"]
-                    related_resource = Resource.objects.get(pk=resourceid)
-                    displayname = related_resource.displayname()
-                    resourceXresource["display_value"] = displayname
-                    items.append(resourceXresource)
-                except (TypeError, KeyError):
+                    other_resource_ids.add(uuid.UUID(resourceXresource["resourceId"]))
+                except (TypeError, ValueError, KeyError):
                     pass
-                except:
+            other_resources = Resource.objects.filter(pk__in=other_resource_ids)
+            for resourceid in other_resource_ids:
+                for candidate in other_resources:
+                    if candidate.pk == resourceid:
+                        related_resource = candidate
+                        break
+                else:
                     logger.info(f'Resource with id "{resourceid}" not in the system.')
+                    continue
+                displayname = related_resource.displayname()
+                resourceXresource["display_value"] = displayname
+                items.append(resourceXresource)
+
             return self.compile_json(tile, node, instance_details=items)
 
     def collects_multiple_values(self):
