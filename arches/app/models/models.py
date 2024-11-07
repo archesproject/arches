@@ -1874,7 +1874,10 @@ class TileModel(models.Model):  # Tile
 
     tileid = models.UUIDField(primary_key=True, blank=True)
     resourceinstance = models.ForeignKey(
-        ResourceInstance, db_column="resourceinstanceid", on_delete=models.CASCADE
+        ResourceInstance,
+        db_column="resourceinstanceid",
+        on_delete=models.CASCADE,
+        editable=False,
     )
     parenttile = models.ForeignKey(
         "self",

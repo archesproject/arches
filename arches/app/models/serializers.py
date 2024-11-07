@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from django.db.models import F
+from rest_framework import fields
 from rest_framework import renderers
 from rest_framework import serializers
 
@@ -17,7 +18,10 @@ renderers.JSONOpenAPIRenderer.encoder_class = JSONSerializer
 class ArchesTileSerializer(serializers.ModelSerializer):
     tileid = serializers.UUIDField(validators=[], required=False)
 
-    _nodes = Node.objects.none()
+    def __init__(self, instance=None, data=fields.empty, **kwargs):
+        super().__init__(instance, data, **kwargs)
+        self._nodes = Node.objects.none()
+        self._root_node = None
 
     def get_default_field_names(self, declared_fields, model_info):
         field_names = super().get_default_field_names(declared_fields, model_info)
@@ -28,7 +32,7 @@ class ArchesTileSerializer(serializers.ModelSerializer):
         aliases = self.__class__.Meta.fields
         if aliases == "__all__":
             # TODO: latest graph
-            root_node = (
+            self._root_node = (
                 Node.objects.filter(
                     graph__slug=self.__class__.Meta.graph_slug,
                     alias=self.__class__.Meta.root_node,
@@ -39,7 +43,7 @@ class ArchesTileSerializer(serializers.ModelSerializer):
                 .get()
             )
             aliases = (
-                root_node.nodegroup.node_set.exclude(nodegroup=None)
+                self._root_node.nodegroup.node_set.exclude(nodegroup=None)
                 .exclude(datatype="semantic")
                 .values_list("alias", flat=True)
             )
@@ -71,6 +75,14 @@ class ArchesTileSerializer(serializers.ModelSerializer):
         model_field.blank = not node.isrequired
 
         return self.build_standard_field(field_name, model_field)
+
+    def build_relational_field(self, field_name, relation_info):
+        ret = super().build_relational_field(field_name, relation_info)
+        if field_name == "parenttile":
+            ret[1]["queryset"] = ret[1]["queryset"].filter(
+                nodegroup_id=self._root_node.nodegroup.parentnodegroup_id
+            )
+        return ret
 
 
 class ArchesModelSerializer(serializers.ModelSerializer):
