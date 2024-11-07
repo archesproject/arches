@@ -94,17 +94,23 @@ class ArchesModelSerializer(serializers.ModelSerializer):
         graph_slug = self.__class__.Meta.graph_slug
 
         if self.__class__.Meta.nodegroups == "__all__":
-            if not self._root_nodes:
-                self._root_nodes = Node.objects.filter(
-                    graph__slug=graph_slug,
-                    # TODO: latest
-                    graph__source_identifier=None,
-                    nodegroup_id=F("nodeid"),
-                ).select_related("nodegroup")
-            for root in self._root_nodes:
-                if root.alias not in self._declared_fields:
-                    self._make_tile_serializer(root)
-
+            self._root_nodes = Node.objects.filter(
+                graph__slug=graph_slug,
+                # TODO: latest
+                graph__source_identifier=None,
+                nodegroup_id=F("nodeid"),
+            ).select_related("nodegroup")
+        else:
+            self._root_nodes = Node.objects.filter(
+                graph__slug=graph_slug,
+                # TODO: latest
+                graph__source_identifier=None,
+                nodegroup_id=F("nodeid"),
+                node__alias__in=self.__class__.Meta.nodegroups,
+            ).select_related("nodegroup")
+        for root in self._root_nodes:
+            if root.alias not in self._declared_fields:
+                self._make_tile_serializer(root)
         return super().get_fields()
 
     def get_default_field_names(self, declared_fields, model_info):
