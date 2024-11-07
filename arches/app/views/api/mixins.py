@@ -1,7 +1,7 @@
 from functools import partial
 
 from django.core.exceptions import ValidationError as DjangoValidationError
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from arches.app.models.models import ResourceInstance, TileModel
 from arches.app.utils.permission_backend import (
@@ -31,7 +31,8 @@ class ArchesModelAPIMixin:
     def get_object(self, user=None, permission_callable=None):
         ret = super().get_object()
         if permission_callable and not permission_callable(user=user, resource=ret):
-            raise NotFound
+            # Not 404, see https://github.com/archesproject/arches/issues/11563
+            raise PermissionDenied
         ret.save = partial(ret.save, user=user)
         return ret
 
