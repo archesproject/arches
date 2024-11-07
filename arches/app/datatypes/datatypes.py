@@ -2274,6 +2274,8 @@ class ResourceInstanceDataType(BaseDataType):
                         case str():
                             transformed.append(from_id_string(inner))
                         case _:
+                            # TODO: move this to validate?
+                            inner.pop("display_value", None)
                             transformed.append(inner)
                     return transformed
             if isinstance(value, models.ResourceInstance):

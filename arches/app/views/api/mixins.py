@@ -63,7 +63,6 @@ class ArchesModelAPIMixin:
             user=request.user,
             permission_callable=user_can_edit_resource,
         )
-        # TODO: return correct response with updated object.
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
