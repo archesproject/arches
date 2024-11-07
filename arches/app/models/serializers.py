@@ -128,3 +128,11 @@ class ArchesModelSerializer(serializers.ModelSerializer):
         else:
             field_names.extend(self.__class__.Meta.nodegroups)
         return field_names
+
+    def build_relational_field(self, field_name, relation_info):
+        ret = super().build_relational_field(field_name, relation_info)
+        if field_name == "graph":
+            ret[1]["queryset"] = ret[1]["queryset"].filter(
+                graphmodel__slug=self.__class__.Meta.graph_slug
+            )
+        return ret
