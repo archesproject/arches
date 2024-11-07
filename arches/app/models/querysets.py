@@ -25,7 +25,7 @@ class TileQuerySet(QuerySet):
         resource.)
 
         >>> statements = TileModel.as_nodegroup("statement", graph_slug="concept")
-        >>> results = statements.filter(statement_content__en__value__startswith="F")  # TODO: make more ergonomic
+        >>> results = statements.filter(statement_content__any_lang_startswith="F")
         >>> for result in results:
                 print(result.resourceinstance)
                 print("\t", result.statement_content["en"]["value"])  # TODO: unwrap?
