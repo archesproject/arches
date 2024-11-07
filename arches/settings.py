@@ -407,15 +407,6 @@ MIDDLEWARE.append(  # this must resolve last MIDDLEWARE entry
     "django_hosts.middleware.HostsResponseMiddleware"
 )
 
-# TODO: choose most appropriate default.
-REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
-    ]
-}
-
 WEBPACK_LOADER = {
     "DEFAULT": {
         "STATS_FILE": os.path.join(ROOT_DIR, "..", "webpack/webpack-stats.json"),
@@ -612,6 +603,17 @@ DATE_FORMATS = {
 }
 
 API_MAX_PAGE_SIZE = 500
+
+REST_FRAMEWORK = {
+    # TODO: choose most appropriate default.
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": API_MAX_PAGE_SIZE,
+}
 
 UUID_REGEX = (
     "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
