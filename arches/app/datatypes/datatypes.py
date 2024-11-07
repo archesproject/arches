@@ -443,7 +443,7 @@ class StringDataType(BaseDataType):
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
         if data:
-            return self.compile_json(tile, node, **data.get(str(node.nodeid)))
+            return self.compile_json(tile, node, **data.get(str(node.nodeid)) or {})
 
     def pre_structure_tile_data(self, tile, nodeid, **kwargs):
         all_language_codes = {lang.code for lang in kwargs["languages"]}
@@ -2039,7 +2039,7 @@ class ResourceInstanceDataType(BaseDataType):
 
     """
 
-    rest_framework_model_field = fields.UUIDField(null=True)
+    rest_framework_model_field = JSONField(null=True)
 
     def validate(
         self,
@@ -2410,7 +2410,7 @@ class ResourceInstanceDataType(BaseDataType):
     def to_python(self, tile_val):
         if tile_val is None or len(tile_val) != 1:
             return tile_val
-        return tile_val[0]["resourceId"]
+        return tile_val[0]
 
     def values_match(self, value1, value2):
         if not isinstance(value1, list) or not isinstance(value2, list):
@@ -2423,7 +2423,7 @@ class ResourceInstanceDataType(BaseDataType):
 
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
-    rest_framework_model_field = ArrayField(base_field=fields.UUIDField(), null=True)
+    rest_framework_model_field = ArrayField(base_field=JSONField(), null=True)
 
     def to_json(self, tile, node):
         from arches.app.models.resource import (
@@ -2467,12 +2467,6 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         Currently the unpacking into UUID[] is done in to_python(), but this isn't
         useful for querying."""
         return f"data__{node.pk}"
-
-    def to_python(self, tile_val):
-        if tile_val is None:
-            return tile_val
-        resource_ids = [inner["resourceId"] if inner else None for inner in tile_val]
-        return resource_ids
 
 
 class NodeValueDataType(BaseDataType):

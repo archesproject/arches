@@ -1259,11 +1259,26 @@ class ResourceInstance(models.Model):
         return repr(self)
 
     @classmethod
-    def as_model(cls, graph_slug=None, *, resource_ids=None, defer=None, only=None):
+    def as_model(
+        cls,
+        graph_slug=None,
+        *,
+        resource_ids=None,
+        defer=None,
+        only=None,
+        as_representation=False,
+    ):
         """Return a chainable QuerySet for a requested graph's instances,
-        with tile data annotated onto node and nodegroup aliases."""
+        with tile data annotated onto node and nodegroup aliases.
+
+        See `arches.app.models.querysets.ResourceInstanceQuerySet.with_nodegroups`.
+        """
         return cls.objects.with_nodegroups(
-            graph_slug, resource_ids=resource_ids, defer=defer, only=only
+            graph_slug,
+            resource_ids=resource_ids,
+            defer=defer,
+            only=only,
+            as_representation=as_representation,
         )
 
     def get_initial_resource_instance_lifecycle_state(self, *args, **kwargs):
@@ -1929,21 +1944,17 @@ class TileModel(models.Model):  # Tile
         return None
 
     @classmethod
-    def as_nodegroup(cls, root_node_alias, *, graph_slug, defer=None, only=None):
+    def as_nodegroup(
+        cls,
+        root_node_alias,
+        *,
+        graph_slug,
+        defer=None,
+        only=None,
+        as_representation=False,
+    ):
         """
-        Entry point for filtering arches data by nodegroups (instead of grouping by
-        resource.)
-
-        >>> statements = TileModel.as_nodegroup("statement", graph_slug="concept")
-        >>> results = statements.filter(statement_content__en__value__startswith="F")  # TODO: make more ergonomic
-        >>> for result in results:
-                print(result.resourceinstance)
-                print("\t", result.statement_content["en"]["value"])  # TODO: unwrap?
-
-        <Concept: x-ray fluorescence (aec56d59-9292-42d6-b18e-1dd260ff446f)>
-            Fluorescence stimulated by x-rays; ...
-        <Concept: vellum (parchment) (34b081cd-6fcc-4e00-9a43-0a8a73745b45)>
-            Fine-quality calf or lamb parchment ...
+        See `arches.app.models.querysets.TileModelQuerySet.with_tile_values`.
         """
 
         root_node = cls._root_node(graph_slug, root_node_alias)
@@ -1959,7 +1970,12 @@ class TileModel(models.Model):  # Tile
         return (
             cls.objects.filter(nodegroup_id=root_node.pk)
             .with_node_values(
-                branch_nodes, defer=defer, only=only, lhs="pk", outer_ref="tileid"
+                branch_nodes,
+                defer=defer,
+                only=only,
+                lhs="pk",
+                outer_ref="tileid",
+                as_representation=as_representation,
             )
             .annotate(_nodegroup_alias=ORMValue(root_node_alias))
         )

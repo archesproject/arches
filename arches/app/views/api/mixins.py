@@ -21,10 +21,15 @@ class ArchesModelAPIMixin:
         meta = self.serializer_class.Meta
         if ResourceInstance in meta.model.mro():
             only = None if meta.nodegroups == "__all__" else meta.nodegroups
-            return meta.model.as_model(meta.graph_slug, only=only)
+            return meta.model.as_model(
+                meta.graph_slug, only=only, as_representation=True
+            )
         elif TileModel in meta.model.mro():
             return meta.model.as_nodegroup(
-                meta.root_node, graph_slug=meta.graph_slug, only=fields
+                meta.root_node,
+                graph_slug=meta.graph_slug,
+                only=fields,
+                as_representation=True,
             )
         raise NotImplementedError
 

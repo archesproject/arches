@@ -4,11 +4,43 @@ from arches.app.models.utils import find_root_node, generate_tile_annotations
 
 
 class TileQuerySet(QuerySet):
+    def __init__(self, model=None, query=None, using=None, hints=None):
+        super().__init__(model, query, using, hints)
+        self._as_representation = False
+        self._fetched_nodes = []
+
     def with_node_values(
-        self, nodes, *, defer=None, only=None, lhs=None, outer_ref, depth=1
+        self,
+        nodes,
+        *,
+        defer=None,
+        only=None,
+        lhs=None,
+        outer_ref,
+        depth=1,
+        as_representation=False,
     ):
-        """TileModel.as_nodegroup() is the better entrypoint, see docs there."""
+        """
+        Entry point for filtering arches data by nodegroups (instead of grouping by
+        resource.)
+
+        >>> statements = TileModel.as_nodegroup("statement", graph_slug="concept")
+        >>> results = statements.filter(statement_content__en__value__startswith="F")  # TODO: make more ergonomic
+        >>> for result in results:
+                print(result.resourceinstance)
+                print("\t", result.statement_content["en"]["value"])  # TODO: unwrap?
+
+        <Concept: x-ray fluorescence (aec56d59-9292-42d6-b18e-1dd260ff446f)>
+            Fluorescence stimulated by x-rays; ...
+        <Concept: vellum (parchment) (34b081cd-6fcc-4e00-9a43-0a8a73745b45)>
+            Fine-quality calf or lamb parchment ...
+
+        as_representation = True skips calling to_python datatype methods and calls
+        as_json() instead.
+        """
         from arches.app.models.models import TileModel
+
+        self._as_representation = as_representation
 
         node_alias_annotations = generate_tile_annotations(
             nodes,
@@ -48,6 +80,7 @@ class TileQuerySet(QuerySet):
         Discard annotations that do not pertain to this nodegroup.
         """
         from arches.app.datatypes.datatypes import DataTypeFactory
+        from arches.app.models.models import TileModel
 
         super()._prefetch_related_objects()
 
@@ -62,8 +95,14 @@ class TileQuerySet(QuerySet):
                     tile_val = getattr(tile, node.alias, NOT_PROVIDED)
                     if tile_val is not NOT_PROVIDED:
                         datatype_instance = datatype_factory.get_instance(node.datatype)
-                        python_val = datatype_instance.to_python(tile_val)
-                        setattr(tile, node.alias, python_val)
+                        dummy_tile = TileModel(
+                            data={str(node.pk): tile_val},
+                            provisionaledits=tile.provisionaledits,
+                        )
+                        datatype_instance.to_json(dummy_tile, node)
+                        if not self._as_representation:
+                            tile_val = datatype_instance.to_python(tile_val)
+                        setattr(tile, node.alias, tile_val)
                 else:
                     delattr(tile, node.alias)
             for child_tile in tile.children.all():
@@ -74,14 +113,25 @@ class TileQuerySet(QuerySet):
 
     def _clone(self):
         ret = super()._clone()
-        if hasattr(self, "_fetched_nodes"):
-            ret._fetched_nodes = self._fetched_nodes
+        ret._fetched_nodes = self._fetched_nodes
+        ret._as_representation = self._as_representation
         return ret
 
 
 class ResourceInstanceQuerySet(QuerySet):
+    def __init__(self, model=None, query=None, using=None, hints=None):
+        super().__init__(model, query, using, hints)
+        self._as_representation = False
+        self._fetched_nodes = []
+
     def with_nodegroups(
-        self, graph_slug=None, *, resource_ids=None, defer=None, only=None
+        self,
+        graph_slug=None,
+        *,
+        resource_ids=None,
+        defer=None,
+        only=None,
+        as_representation=False,
     ):
         """Annotates a ResourceInstance QuerySet with tile data unpacked
         and mapped onto nodegroup aliases, e.g.:
@@ -133,8 +183,13 @@ class ResourceInstanceQuerySet(QuerySet):
         True
 
         Provisional edits are completely ignored for the purposes of querying.
+
+        as_representation = True skips calling to_python datatype methods and calls
+        as_json() instead.
         """
         from arches.app.models.models import GraphModel, NodeGroup, TileModel
+
+        self._as_representation = as_representation
 
         if resource_ids and not graph_slug:
             graph_query = GraphModel.objects.filter(resourceinstance__in=resource_ids)
@@ -177,6 +232,7 @@ class ResourceInstanceQuerySet(QuerySet):
                     only=[n.alias for n in self._fetched_nodes],
                     lhs="pk",
                     outer_ref="tileid",
+                    as_representation=as_representation,
                 ).annotate(
                     cardinality=NodeGroup.objects.filter(
                         pk=OuterRef("nodegroup_id")
@@ -234,6 +290,6 @@ class ResourceInstanceQuerySet(QuerySet):
 
     def _clone(self):
         ret = super()._clone()
-        if hasattr(self, "_fetched_nodes"):
-            ret._fetched_nodes = self._fetched_nodes
+        ret._fetched_nodes = self._fetched_nodes
+        ret._as_representation = self._as_representation
         return ret
