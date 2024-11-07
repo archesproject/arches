@@ -160,11 +160,9 @@ class ResourceInstanceQuerySet(QuerySet):
             defer=defer,
             only=only,
             model=self.model,
-            lhs=None,  # TODO: AWKWARD
             outer_ref="resourceinstanceid",
         )
         self._fetched_nodes = [n for n in nodes if n.alias in node_alias_annotations]
-        # TODO: there might be some way to prune unused annotations.
 
         if resource_ids:
             qs = self.filter(pk__in=resource_ids)

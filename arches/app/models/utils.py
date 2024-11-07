@@ -23,7 +23,7 @@ def field_names(instance_or_class):
     return {f.name for f in instance_or_class._meta.fields}
 
 
-def generate_tile_annotations(nodes, *, defer, only, model, lhs, outer_ref):
+def generate_tile_annotations(nodes, *, defer, only, model, lhs=None, outer_ref):
     from arches.app.datatypes.datatypes import DataTypeFactory
     from arches.app.models.models import ResourceInstance, TileModel
 
@@ -65,7 +65,6 @@ def generate_tile_annotations(nodes, *, defer, only, model, lhs, outer_ref):
 
     if not node_alias_annotations:
         raise ValueError("All fields were excluded.")
-    # TODO: also add some safety around bad nodegroups.
     if not is_resource:
         for given_alias in only or []:
             if given_alias not in node_alias_annotations:
@@ -89,23 +88,21 @@ def find_root_node(prefetched_siblings, nodegroup_id):
             return sibling_node
 
 
-def get_values_query(
-    nodegroup, base_lookup, *, lhs=None, outer_ref=None
-) -> BaseExpression:
+def get_values_query(*, nodegroup, base_lookup, lhs=None, outer_ref) -> BaseExpression:
     """Return a tile values query expression for use in a
     ResourceInstanceQuerySet or TileQuerySet.
+
+    lhs: the left-hand side (field_name) of the tile query.
+        If absent, the query will be filtered by nodegroup and resourceinstance.
     """
     from arches.app.models.models import TileModel
 
-    # TODO: make this a little less fragile.
-    if lhs is None:
+    if lhs:
+        tile_query = TileModel.objects.filter(**{lhs: OuterRef(outer_ref)})
+    else:
         tile_query = TileModel.objects.filter(
             nodegroup_id=nodegroup.pk, resourceinstance_id=OuterRef(outer_ref)
         )
-    elif lhs and outer_ref:
-        tile_query = TileModel.objects.filter(**{lhs: OuterRef(outer_ref)})
-    else:
-        tile_query = TileModel.objects.filter(nodegroup_id=nodegroup.pk)
     if nodegroup.cardinality == "n":
         tile_query = tile_query.order_by("sortorder")
 
