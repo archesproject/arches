@@ -2407,6 +2407,11 @@ class ResourceInstanceDataType(BaseDataType):
         """Filter down to the resourceId."""
         return f"data__{node.pk}__0__resourceId"
 
+    def to_python(self, tile_val):
+        if tile_val is None or len(tile_val) != 1:
+            return tile_val
+        return tile_val[0]["resourceId"]
+
     def values_match(self, value1, value2):
         if not isinstance(value1, list) or not isinstance(value2, list):
             return value1 == value2
