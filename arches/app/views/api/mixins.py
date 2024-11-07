@@ -63,6 +63,8 @@ class ArchesModelAPIMixin:
             user=request.user,
             permission_callable=user_can_edit_resource,
         )
+        # TODO: returned object is pretty close, but currently lacks
+        # recalculated display_value on RI datatypes.
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
