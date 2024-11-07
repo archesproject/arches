@@ -1305,11 +1305,10 @@ class ResourceInstance(models.Model):
         """Intended to replace proxy model method eventually."""
         from arches.app.models.resource import Resource
 
-        edit_type = "update"
         if self._state.adding:
             edit_type = "create"
         else:
-            return  # TODO: should we save an edit log update?
+            edit_type = "update"
 
         # Until save_edit() is a static method, work around it.
         ephemeral_proxy_instance = Resource()
