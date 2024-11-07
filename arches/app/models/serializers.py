@@ -112,7 +112,9 @@ class ArchesModelSerializer(serializers.ModelSerializer):
                             fields = self.__class__.Meta.fields
 
                     self._declared_fields[root.alias] = TileSerializer(
-                        many=root.nodegroup.cardinality == "n", required=False
+                        many=root.nodegroup.cardinality == "n",
+                        required=False,
+                        allow_null=True,
                     )
 
         return super().get_fields()
