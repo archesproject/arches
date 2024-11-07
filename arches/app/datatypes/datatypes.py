@@ -2264,14 +2264,18 @@ class ResourceInstanceDataType(BaseDataType):
         except TypeError:
             # data should come in as json but python list is accepted as well
             if isinstance(value, list):
-                if all(isinstance(inner, models.ResourceInstance) for inner in value):
-                    return [from_id_string(str(instance.pk)) for instance in value]
-                elif all(isinstance(inner, uuid.UUID) for inner in value):
-                    return [from_id_string(str(uid)) for uid in value]
-                elif all(isinstance(inner, str) for inner in value):
-                    return [from_id_string(uid) for uid in value]
-                else:
-                    return value
+                transformed = []
+                for inner in value:
+                    match inner:
+                        case models.ResourceInstance():
+                            transformed.append(from_id_string(str(inner.pk)))
+                        case uuid.UUID():
+                            transformed.append(from_id_string(str(inner)))
+                        case str():
+                            transformed.append(from_id_string(inner))
+                        case _:
+                            transformed.append(inner)
+                    return transformed
             if isinstance(value, models.ResourceInstance):
                 return [from_id_string(str(value.pk))]
 
