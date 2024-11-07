@@ -103,19 +103,7 @@ class ArchesModelSerializer(serializers.ModelSerializer):
                 ).select_related("nodegroup")
             for root in self._root_nodes:
                 if root.alias not in self._declared_fields:
-
-                    class TileSerializer(ArchesTileSerializer):
-                        class Meta:
-                            model = TileModel
-                            graph_slug = self.__class__.Meta.graph_slug
-                            root_node = root.alias
-                            fields = self.__class__.Meta.fields
-
-                    self._declared_fields[root.alias] = TileSerializer(
-                        many=root.nodegroup.cardinality == "n",
-                        required=False,
-                        allow_null=True,
-                    )
+                    self._make_tile_serializer(root)
 
         return super().get_fields()
 
@@ -138,3 +126,17 @@ class ArchesModelSerializer(serializers.ModelSerializer):
                 graphmodel__slug=self.__class__.Meta.graph_slug
             )
         return ret
+
+    def _make_tile_serializer(self, root):
+        class TileSerializer(ArchesTileSerializer):
+            class Meta:
+                model = TileModel
+                graph_slug = self.__class__.Meta.graph_slug
+                root_node = root.alias
+                fields = self.__class__.Meta.fields
+
+        self._declared_fields[root.alias] = TileSerializer(
+            many=root.nodegroup.cardinality == "n",
+            required=False,
+            allow_null=True,
+        )
