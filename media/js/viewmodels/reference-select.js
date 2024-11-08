@@ -9,7 +9,7 @@ define([
     var ReferenceSelectViewModel = function(params) {
         var self = this;
 
-        params.configKeys = ['placeholder'];
+        params.configKeys = ['placeholder', 'defaultValue'];
         this.multiple = !!ko.unwrap(params.node.config.multiValue);
         this.displayName = ko.observable('');
         this.selectionValue = ko.observable([]); // formatted version of this.value that select2 can use
