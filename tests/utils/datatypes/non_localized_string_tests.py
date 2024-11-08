@@ -51,6 +51,25 @@ class NonLocalizedStringDataTypeTests(TestCase):
         result = nonlocalized_string_dt.to_rdf(edge_info, edge)
         self.assertIsInstance(result, ConjunctiveGraph)
 
+    def test_string_clean_json(self):
+        string = DataTypeFactory().get_instance("non-localized-string")
+        nodeid1 = "72048cb3-adbc-11e6-9ccf-14109fd34195"
+        nodeid2 = "72048cb3-adbc-11e6-9ccf-14109fd34196"
+        resourceinstanceid = "40000000-0000-0000-0000-000000000000"
+
+        json_empty_strings = {
+            "resourceinstance_id": resourceinstanceid,
+            "parenttile_id": "",
+            "nodegroup_id": nodeid1,
+            "tileid": "",
+            "data": {nodeid1: "''", nodeid2: ""},
+        }
+        tile1 = Tile(json_empty_strings)
+        string.clean(tile1, nodeid1)
+        self.assertIsNone(tile1.data[nodeid1])
+        string.clean(tile1, nodeid2)
+        self.assertIsNone(tile1.data[nodeid2])
+
 
 def mock_edge(
     s_id,
