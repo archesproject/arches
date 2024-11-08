@@ -17,10 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import uuid
+from unittest import mock
 
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import Language
+from arches.app.models.models import Language, Node
 from arches.app.models.tile import Tile
 from tests.base_test import ArchesTestCase
 
@@ -246,3 +247,44 @@ class URLDataTypeTests(ArchesTestCase):
         self.assertIsNotNone(tile1.data[nodeid])
         self.assertTrue("url_label" in tile1.data[nodeid])
         self.assertFalse(tile1.data[nodeid]["url_label"])
+
+
+class ResourceInstanceListDataTypeTests(ArchesTestCase):
+    mock_display_value = {"@display_value": "mock display value"}
+
+    @mock.patch(
+        "arches.app.datatypes.base.BaseDataType.compile_json",
+        return_value=mock_display_value,
+    )
+    def test_to_json(self, _mock):
+        ri_list = DataTypeFactory().get_instance("resource-instance-list")
+        node = Node(pk=uuid.uuid4())
+        resource_1_id = uuid.uuid4()
+        resource_2_id = uuid.uuid4()
+        tile = Tile(
+            {
+                "resourceinstance_id": uuid.uuid4(),
+                "nodegroup_id": str(node.pk),
+                "tileid": "",
+                "data": {
+                    str(node.pk): [
+                        {
+                            "resourceId": str(resource_1_id),
+                            "ontologyProperty": "",
+                            "inverseOntologyProperty": "",
+                        },
+                        {
+                            "resourceId": str(resource_2_id),
+                            "ontologyProperty": "",
+                            "inverseOntologyProperty": "",
+                        },
+                    ]
+                },
+            }
+        )
+
+        # TODO: remove mock, fix underlying functionality to not
+        # requery for Resource objects yet again in get_display_value().
+        with self.assertNumQueries(1):
+            json = ri_list.to_json(tile, node)
+        self.assertEqual(json, self.mock_display_value)
