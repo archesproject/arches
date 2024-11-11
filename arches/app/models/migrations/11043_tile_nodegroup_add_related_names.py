@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "11042_update__arches_staging_to_tile"),
+        ("models", "10437_node_alias_not_null"),
     ]
 
     operations = [
