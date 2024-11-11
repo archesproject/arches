@@ -2245,12 +2245,17 @@ class ResourceInstanceDataType(BaseDataType):
         return terms
 
     def transform_value_for_tile(self, value, **kwargs):
-        def from_id_string(uuid_string):
+        def from_id_string(uuid_string, graph_id=None):
             nonlocal kwargs
+            for graph_config in kwargs.get("graphs", []):
+                if graph_id is None or str(graph_id) == graph_config["graphid"]:
+                    break
+            else:
+                graph_config = {"ontologyProperty": {}, "inverseOntologyProperty": {}}
             return {
                 "resourceId": uuid_string,
-                "inverseOntology": kwargs.get("inverseOntology", ""),
-                "inverseOntologyProperty": kwargs.get("inverseOntologyProperty", ""),
+                "ontologyProperty": graph_config["ontologyProperty"],
+                "inverseOntologyProperty": graph_config["inverseOntologyProperty"],
             }
 
         try:
@@ -2268,10 +2273,14 @@ class ResourceInstanceDataType(BaseDataType):
                 for inner in value:
                     match inner:
                         case models.ResourceInstance():
-                            transformed.append(from_id_string(str(inner.pk)))
+                            transformed.append(
+                                from_id_string(str(inner.pk), inner.graph_id)
+                            )
                         case uuid.UUID():
+                            # TODO: handle multiple graph configs, requires db?
                             transformed.append(from_id_string(str(inner)))
                         case str():
+                            # TODO: handle multiple graph configs, requires db?
                             transformed.append(from_id_string(inner))
                         case _:
                             # TODO: move this to validate?
@@ -2279,7 +2288,7 @@ class ResourceInstanceDataType(BaseDataType):
                             transformed.append(inner)
                     return transformed
             if isinstance(value, models.ResourceInstance):
-                return [from_id_string(str(value.pk))]
+                return [from_id_string(str(value.pk), value.graph_id)]
 
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)
