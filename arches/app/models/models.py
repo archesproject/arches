@@ -1992,8 +1992,6 @@ class TileModel(models.Model):  # Tile
             .prefetch_related("nodegroup__children")
             .prefetch_related("nodegroup__children__children")
         )
-        # TODO: get last
-        # https://github.com/archesproject/arches/issues/11565
         ret = qs.filter(source_identifier=None).first()
         if ret is None:
             raise Node.DoesNotExist(f"graph: {graph_slug} node: {root_node_alias}")

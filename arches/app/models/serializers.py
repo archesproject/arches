@@ -31,7 +31,6 @@ class ArchesTileSerializer(serializers.ModelSerializer):
             pass
         aliases = self.__class__.Meta.fields
         if aliases == "__all__":
-            # TODO: latest graph
             self._root_node = (
                 Node.objects.filter(
                     graph__slug=self.__class__.Meta.graph_slug,
@@ -55,7 +54,6 @@ class ArchesTileSerializer(serializers.ModelSerializer):
         if not self._nodes:
             self._nodes = Node.objects.filter(
                 graph__slug=graph_slug,
-                # TODO: latest
                 graph__source_identifier=None,
             )
 
@@ -96,14 +94,12 @@ class ArchesModelSerializer(serializers.ModelSerializer):
         if self.__class__.Meta.nodegroups == "__all__":
             self._root_nodes = Node.objects.filter(
                 graph__slug=graph_slug,
-                # TODO: latest
                 graph__source_identifier=None,
                 nodegroup_id=F("nodeid"),
             ).select_related("nodegroup")
         else:
             self._root_nodes = Node.objects.filter(
                 graph__slug=graph_slug,
-                # TODO: latest
                 graph__source_identifier=None,
                 nodegroup_id=F("nodeid"),
                 node__alias__in=self.__class__.Meta.nodegroups,

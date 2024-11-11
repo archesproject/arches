@@ -194,8 +194,6 @@ class ResourceInstanceQuerySet(QuerySet):
         if resource_ids and not graph_slug:
             graph_query = GraphModel.objects.filter(resourceinstance__in=resource_ids)
         else:
-            # TODO: get latest graph.
-            # https://github.com/archesproject/arches/issues/11565
             graph_query = GraphModel.objects.filter(
                 slug=graph_slug, source_identifier=None
             )
