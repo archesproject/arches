@@ -709,14 +709,26 @@ class Language(models.Model):
 class NodeGroup(models.Model):
     nodegroupid = models.UUIDField(primary_key=True)
     legacygroupid = models.TextField(blank=True, null=True)
-    cardinality = models.TextField(blank=True, default="1")
+    cardinality = models.CharField(
+        max_length=1, blank=True, default="1", choices={"1": "1", "n": "n"}
+    )
     parentnodegroup = models.ForeignKey(
         "self",
         db_column="parentnodegroupid",
         blank=True,
         null=True,
         on_delete=models.CASCADE,
+        related_name="children",
+        related_query_name="child",
     )  # Allows nodegroups within nodegroups
+    grouping_node = models.OneToOneField(
+        "Node",
+        db_column="groupingnodeid",
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
+        related_name="grouping_node_nodegroup",
+    )
 
     def __init__(self, *args, **kwargs):
         super(NodeGroup, self).__init__(*args, **kwargs)
@@ -726,6 +738,13 @@ class NodeGroup(models.Model):
     class Meta:
         managed = True
         db_table = "node_groups"
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(grouping_node=models.F("pk"))
+                | Q(grouping_node__isnull=True),
+                name="grouping_node_matches_pk_or_null",
+            )
+        ]
 
         default_permissions = ()
         permissions = (
@@ -874,15 +893,18 @@ class Node(models.Model):
     def clean(self):
         if not self.alias:
             Graph.objects.get(pk=self.graph_id).create_node_alias(self)
+        if self.pk == self.source_identifier_id:
+            self.source_identifier_id = None
 
     def save(self, **kwargs):
         if not self.alias:
-            self.clean()
             add_to_update_fields(kwargs, "alias")
             add_to_update_fields(kwargs, "hascustomalias")
         if self.pk == self.source_identifier_id:
-            self.source_identifier_id = None
             add_to_update_fields(kwargs, "source_identifier_id")
+
+        self.clean()
+
         super(Node, self).save()
 
     class Meta:
@@ -894,6 +916,10 @@ class Node(models.Model):
             ),
             models.UniqueConstraint(
                 fields=["alias", "graph"], name="unique_alias_graph"
+            ),
+            models.CheckConstraint(
+                condition=Q(istopnode=True) | Q(nodegroup__isnull=False),
+                name="has_nodegroup_or_istopnode",
             ),
         ]
 

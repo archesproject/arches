@@ -732,6 +732,7 @@ class TileTests(ArchesTestCase):
             pk=UUID("41111111-0000-0000-0000-000000000000")
         )
         required_file_list_node = Node(
+            pk=node_group.pk,
             graph=graph,
             name="Required file list",
             datatype="file-list",
@@ -740,6 +741,8 @@ class TileTests(ArchesTestCase):
             istopnode=False,
         )
         required_file_list_node.save()
+        node_group.grouping_node = required_file_list_node
+        node_group.save()
 
         json = {
             "resourceinstance_id": "40000000-0000-0000-0000-000000000000",

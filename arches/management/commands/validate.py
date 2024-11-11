@@ -121,6 +121,11 @@ class Command(BaseCommand):
             fix_action=DELETE_QUERYSET,
         )
         self.check_integrity(
+            check=IntegrityCheck.NODEGROUP_WITHOUT_GROUPING_NODE,  # 1013
+            queryset=models.NodeGroup.objects.filter(node__gt=0, grouping_node=None),
+            fix_action=None,
+        )
+        self.check_integrity(
             check=IntegrityCheck.PUBLICATION_MISSING_FOR_LANGUAGE,  # 1014
             queryset=(
                 models.GraphModel.objects.filter(

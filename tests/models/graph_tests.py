@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 
-from django.contrib.auth.models import User
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
@@ -140,6 +139,10 @@ class GraphTests(ArchesTestCase):
 
         for node in nodes:
             models.Node.objects.create(**node).save()
+
+        models.NodeGroup.objects.filter(
+            pk="20000000-0000-0000-0000-100000000001"
+        ).update(grouping_node_id="20000000-0000-0000-0000-100000000001")
 
         edges_dict = {
             "description": None,
@@ -1354,7 +1357,12 @@ class GraphTests(ArchesTestCase):
 
             # ensures all relevant values are equal between graphs
             for key, value in editable_future_graph_serialized_nodegroup.items():
-                if key not in ["parentnodegroup_id", "nodegroupid", "legacygroupid"]:
+                if key not in [
+                    "parentnodegroup_id",
+                    "nodegroupid",
+                    "grouping_node_id",
+                    "legacygroupid",
+                ]:
                     if type(value) == "dict":
                         self.assertDictEqual(
                             value, updated_source_graph_serialized_nodegroup[key]

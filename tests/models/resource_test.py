@@ -489,6 +489,7 @@ class ResourceTests(ArchesTestCase):
         graph = Graph.new(name="Self-referring descriptor test", is_resource=True)
         nodegroup = models.NodeGroup.objects.create()
         string_node = models.Node.objects.create(
+            pk=nodegroup.pk,
             graph=graph,
             nodegroup=nodegroup,
             name="String Node",
@@ -502,6 +503,8 @@ class ResourceTests(ArchesTestCase):
             datatype="resource-instance",
             istopnode=False,
         )
+        nodegroup.grouping_node = string_node
+        nodegroup.save()
 
         # Configure the primary descriptor to use the string node
         models.FunctionXGraph.objects.create(

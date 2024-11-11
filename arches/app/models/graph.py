@@ -367,6 +367,7 @@ class Graph(models.GraphModel):
                 node.nodegroup = self.get_or_create_nodegroup(
                     nodegroupid=node.nodegroup_id
                 )
+                node.nodegroup.grouping_node_id = node.nodegroup_id
                 if nodegroups is not None and str(node.nodegroup_id) in nodegroups:
                     node.nodegroup.cardinality = nodegroups[str(node.nodegroup_id)][
                         "cardinality"
@@ -1111,7 +1112,9 @@ class Graph(models.GraphModel):
             if is_collector:
                 old_nodegroup_id = node.nodegroup_id
                 node.nodegroup = models.NodeGroup(
-                    pk=node.pk, cardinality=node.nodegroup.cardinality
+                    pk=node.pk,
+                    cardinality=node.nodegroup.cardinality,
+                    grouping_node=node,
                 )
                 if old_nodegroup_id not in nodegroup_map:
                     nodegroup_map[old_nodegroup_id] = node.nodegroup_id
@@ -1284,7 +1287,8 @@ class Graph(models.GraphModel):
             new_node.fieldname = node["fieldname"]
         self.populate_null_nodegroups()
 
-        # new_node will always have a nodegroup id even it if was set to None becuase populate_null_nodegroups
+        # new_node will always have a nodegroup id even if if was set to None
+        # because populate_null_nodegroups
         # will populate the nodegroup id with the parent nodegroup
         # add/remove a card if a nodegroup was added/removed
         if new_node.nodegroup_id != old_node.nodegroup_id:
@@ -1317,7 +1321,7 @@ class Graph(models.GraphModel):
 
     def delete_node(self, node=None):
         """
-        deletes a node and all if it's children from a graph
+        deletes a node and all of its children from a graph
 
         Arguments:
         node -- a node id or Node model to delete from the graph
@@ -2436,6 +2440,7 @@ class Graph(models.GraphModel):
 
                 source_nodegroup.cardinality = nodegroup.cardinality
                 source_nodegroup.legacygroupid = nodegroup.legacygroupid
+                source_nodegroup.grouping_node_id = source_nodegroup.pk
 
                 if nodegroup.parentnodegroup_id:
                     nodegroup_parent_node = models.Node.objects.get(
@@ -2480,7 +2485,7 @@ class Graph(models.GraphModel):
             # graph ( the graph mapped to `self` ); we iterate over the item attributes and map
             # them to source item. If the item does not have a `source_identifier` attribute, it
             # has been newly created; we update the `graph_id` to match the source graph. We are
-            # not saving in this block so updates can accur in any order.
+            # not saving in this block so updates can occur in any order.
             for future_widget in list(editable_future_graph.widgets.values()):
                 source_widget = future_widget.source_identifier
 
@@ -2643,12 +2648,16 @@ class Graph(models.GraphModel):
                             setattr(source_node, key, getattr(future_node, key))
 
                     source_node.nodegroup_id = future_node.nodegroup_id
+                    source_node.nodegroup.grouping_node_id = source_node.nodegroup_id
                     if (
                         future_node_nodegroup_node
                         and future_node_nodegroup_node.source_identifier_id
                     ):
                         source_node.nodegroup_id = (
                             future_node_nodegroup_node.source_identifier_id
+                        )
+                        source_node.nodegroup.grouping_node_id = (
+                            source_node.nodegroup_id
                         )
 
                     self.nodes[source_node.pk] = source_node
@@ -2662,6 +2671,9 @@ class Graph(models.GraphModel):
                     ):
                         future_node.nodegroup_id = (
                             future_node_nodegroup_node.source_identifier_id
+                        )
+                        future_node.nodegroup.grouping_node_id = (
+                            future_node.nodegroup_id
                         )
 
                     del editable_future_graph.nodes[future_node.pk]
