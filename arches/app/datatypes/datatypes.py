@@ -2093,7 +2093,7 @@ class ResourceInstanceDataType(BaseDataType):
                                 )
                             )
                             errors.append({"type": "ERROR", "message": message})
-                except (ValueError, TypeError):
+                except (KeyError, ValueError, TypeError):
                     message = _(
                         "The related resource with id '{0}' is not a valid uuid".format(
                             str(value)
