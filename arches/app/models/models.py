@@ -1647,7 +1647,7 @@ class ResourceInstance(models.Model):
                 )
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None):
-        if not from_queryset and (
+        if from_queryset is None and (
             root_nodes := getattr(self, "_fetched_root_nodes", set())
         ):
             aliases = [n.alias for n in root_nodes]
@@ -2218,7 +2218,7 @@ class TileModel(models.Model):  # Tile
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None):
         if (
-            not from_queryset
+            from_queryset is None
             and (root_nodes := getattr(self, "_fetched_root_nodes", set()))
             and self.resourceinstance.graph.slug
         ):
