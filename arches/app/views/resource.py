@@ -626,6 +626,7 @@ class ResourceEditLogView(BaseManagerView):
             edit_type_lookup = {
                 "create": _("Resource Created"),
                 "delete": _("Resource Deleted"),
+                "update": _("Resource Updated"),
                 "tile delete": _("Tile Deleted"),
                 "tile create": _("Tile Created"),
                 "tile edit": _("Tile Updated"),

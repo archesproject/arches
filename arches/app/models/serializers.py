@@ -130,15 +130,25 @@ class ArchesModelSerializer(serializers.ModelSerializer):
         return ret
 
     def _make_tile_serializer(self, root):
-        class TileSerializer(ArchesTileSerializer):
+        class DynamicTileSerializer(ArchesTileSerializer):
             class Meta:
                 model = TileModel
                 graph_slug = self.__class__.Meta.graph_slug
                 root_node = root.alias
                 fields = self.__class__.Meta.fields
 
-        self._declared_fields[root.alias] = TileSerializer(
+        self._declared_fields[root.alias] = DynamicTileSerializer(
             many=root.nodegroup.cardinality == "n",
             required=False,
             allow_null=True,
         )
+
+    def create(self, validated_data):
+        meta = self.__class__.Meta
+        instance_without_tile_data = super().create(validated_data)
+        instance_from_factory = meta.model.as_model(
+            graph_slug=self.__class__.Meta.graph_slug,
+            only=None if meta.nodegroups == "__all__" else meta.nodegroups,
+        ).get(pk=instance_without_tile_data.pk)
+        # TODO: fullest/hydrated version of tile data not yet appearing?
+        return self.update(instance_from_factory, validated_data)

@@ -1381,7 +1381,9 @@ class ResourceInstance(models.Model):
         # Instantiate proxy models for now, but TODO: expose this
         # functionality on vanilla models, and in bulk.
         upserts = to_insert | to_update
-        upsert_proxies = Tile.objects.filter(pk__in=[tile.pk for tile in upserts])
+        insert_proxies = [Tile(**vars(insert)) for insert in to_insert]
+        update_proxies = Tile.objects.filter(pk__in=[tile.pk for tile in to_update])
+        upsert_proxies = itertools.chain(insert_proxies, update_proxies)
         delete_proxies = Tile.objects.filter(pk__in=[tile.pk for tile in to_delete])
 
         with transaction.atomic():
@@ -1391,6 +1393,7 @@ class ResourceInstance(models.Model):
             for upsert_proxy, vanilla_instance in zip(
                 upsert_proxies, upserts, strict=True
             ):
+                assert upsert_proxy.pk == vanilla_instance.pk
                 upsert_proxy._existing_data = upsert_proxy.data
                 upsert_proxy._existing_provisionaledits = upsert_proxy.provisionaledits
 
@@ -1420,16 +1423,26 @@ class ResourceInstance(models.Model):
                 )
                 upsert_proxy._existing_data = vanilla_instance.data
 
-            for upsert_proxy in delete_proxies:
-                upsert_proxy._Tile__preDelete()
+            for delete_proxy in delete_proxies:
+                delete_proxy._Tile__preDelete()
 
-            insert_proxies = TileModel.objects.none()
             if to_insert:
                 inserted = TileModel.objects.bulk_create(to_insert)
                 # Pay the cost of a second TileModel -> Tile transform until refactored.
-                update_proxies = upsert_proxies.difference(insert_proxies)
-                insert_proxies = Tile.objects.filter(pk__in=[t.pk for t in inserted])
-                upsert_proxies = update_proxies | insert_proxies
+                refreshed_insert_proxies = Tile.objects.filter(
+                    pk__in=[t.pk for t in inserted]
+                )
+                for before, after in zip(
+                    insert_proxies, refreshed_insert_proxies, strict=True
+                ):
+                    assert before.pk == after.pk
+                    after._newprovisionalvalue = before._newprovisionalvalue
+                    after._provisional_edit_log_details = (
+                        before._provisional_edit_log_details
+                    )
+                upsert_proxies = refreshed_insert_proxies | update_proxies
+            else:
+                insert_proxies = TileModel.objects.none()
             if to_update:
                 TileModel.objects.bulk_update(
                     to_update, {"data", "parenttile", "provisionaledits"}
@@ -1451,31 +1464,30 @@ class ResourceInstance(models.Model):
                 upsert_proxy._Tile__postSave()
 
             # Save edits: could be done in bulk once above side effects are un-proxied.
-            for upsert_proxy in upsert_proxies:
-                if self._state.adding:
-                    upsert_proxy.save_edit(
-                        user=user,
-                        edit_type="tile create",
-                        old_value={},
-                        new_value=upsert_proxy.data,
-                        newprovisionalvalue=upsert_proxy._newprovisionalvalue,
-                        provisional_edit_log_details=upsert_proxy._provisional_edit_log_details,
-                        transaction_id=None,
-                        # TODO: get this information upstream somewhere.
-                        new_resource_created=False,
-                        note=None,
-                    )
-                else:
-                    upsert_proxy.save_edit(
-                        user=user,
-                        edit_type="tile edit",
-                        old_value=upsert_proxy._existing_data,
-                        new_value=upsert_proxy.data,
-                        newprovisionalvalue=upsert_proxy._newprovisionalvalue,
-                        oldprovisionalvalue=upsert_proxy._oldprovisionalvalue,
-                        provisional_edit_log_details=upsert_proxy._provisional_edit_log_details,
-                        transaction_id=None,
-                    )
+            for insert_proxy in insert_proxies:
+                insert_proxy.save_edit(
+                    user=user,
+                    edit_type="tile create",
+                    old_value={},
+                    new_value=insert_proxy.data,
+                    newprovisionalvalue=insert_proxy._newprovisionalvalue,
+                    provisional_edit_log_details=insert_proxy._provisional_edit_log_details,
+                    transaction_id=None,
+                    # TODO: get this information upstream somewhere.
+                    new_resource_created=False,
+                    note=None,
+                )
+            for update_proxy in update_proxies:
+                update_proxy.save_edit(
+                    user=user,
+                    edit_type="tile edit",
+                    old_value=update_proxy._existing_data,
+                    new_value=update_proxy.data,
+                    newprovisionalvalue=update_proxy._newprovisionalvalue,
+                    oldprovisionalvalue=update_proxy._oldprovisionalvalue,
+                    provisional_edit_log_details=update_proxy._provisional_edit_log_details,
+                    transaction_id=None,
+                )
 
         # Instantiate proxy model for now, but refactor & expose this on vanilla model
         proxy_resource = Resource.objects.get(pk=self.pk)
@@ -1537,9 +1549,9 @@ class ResourceInstance(models.Model):
         if all(isinstance(tile, TileModel) for tile in new_tiles):
             new_tiles.sort(key=attrgetter("sortorder"))
         else:
-            # TODO: figure out best layer for this and remove if/else.
+            # TODO: figure out best layer for deserializing and remove if/else.
             # TODO: nullguard or make not nullable.
-            new_tiles.sort(key=itemgetter("sortorder"))
+            pass
         db_tiles = [
             t for t in self._annotated_tiles if t.nodegroup_alias == root_node.alias
         ]
