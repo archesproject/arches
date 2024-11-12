@@ -63,8 +63,6 @@ class ArchesModelAPIMixin:
             user=request.user,
             permission_callable=user_can_edit_resource,
         )
-        # TODO: returned object is pretty close, but currently lacks
-        # recalculated display_value on RI datatypes.
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
@@ -95,6 +93,13 @@ class ArchesModelAPIMixin:
         except DjangoValidationError as django_error:
             # TODO: doesn't handle well inner lists, stringifies them
             raise ValidationError(detail=django_error.error_dict) from django_error
+        # The backend hydrates additional data, so make sure to use it.
+        # We could avoid this by only validating data during clean(),
+        # not save(), but we do graph/node queries during each phase.
+        # Having to fight so hard against DRF here is a good encouragement
+        # to separate clean() and save() in a performant way when working on:
+        # https://github.com/archesproject/arches/issues/10851#issuecomment-2427305853
+        serializer._data = self.get_serializer(serializer.instance).data
 
     def perform_create(self, serializer):
         self.validate_tile_data_and_save(serializer)
