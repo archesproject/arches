@@ -254,6 +254,9 @@ class ResourceInstanceQuerySet(QuerySet):
             root_nodes.append(root_node)
 
         for resource in self._result_cache:
+            if not isinstance(resource, self.model):
+                # For a .values() query, we will lack instances.
+                continue
             resource._fetched_root_nodes = set()
             for node in self._fetched_nodes:
                 delattr(resource, node.alias)
