@@ -2434,7 +2434,9 @@ class ResourceInstanceDataType(BaseDataType):
 
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
-    rest_framework_model_field = ArrayField(base_field=JSONField(), null=True)
+    rest_framework_model_field = ArrayField(
+        base_field=ResourceInstanceDataType.rest_framework_model_field, null=True
+    )
 
     def to_json(self, tile, node):
         from arches.app.models.resource import (

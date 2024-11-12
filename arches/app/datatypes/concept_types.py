@@ -415,7 +415,9 @@ class ConceptDataType(BaseConceptDataType):
 
 
 class ConceptListDataType(BaseConceptDataType):
-    rest_framework_model_field = ArrayField(base_field=fields.UUIDField(), null=True)
+    rest_framework_model_field = ArrayField(
+        base_field=BaseConceptDataType.rest_framework_model_field, null=True
+    )
 
     def validate(
         self,
