@@ -1,20 +1,22 @@
-from arches.app.models.fields.i18n import I18n_JSONField
-from arches.app.models.models import (
-    CardXNodeXWidget,
-    GraphModel,
-    Language,
-    Node,
-    Value,
-    Widget,
-)
-from arches.app.models.graph import Graph
-from arches_references.models import List
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from django.db import models, transaction
 from django.db.models.expressions import CombinedExpression
 from django.db.models.fields.json import KT
 from django.db.models.functions import Cast
+from uuid import UUID
+
+from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.models.fields.i18n import I18n_JSONField
+from arches.app.models.graph import Graph
+from arches.app.models.models import (
+    GraphModel,
+    Language,
+    Node,
+    Value,
+    Widget,
+)
+from arches_references.models import List
 
 
 class Command(BaseCommand):
@@ -78,7 +80,7 @@ class Command(BaseCommand):
             "--graph",
             action="store",
             dest="graph",
-            help="The graphid which associated concept nodes will be migrated to use the reference datatype",
+            help="The graphid or slug which associated concept nodes will be migrated to use the reference datatype",
         )
 
     def handle(self, *args, **options):
@@ -110,7 +112,10 @@ class Command(BaseCommand):
                 preferred_sort_language=psl,
             )
         elif options["operation"] == "migrate_concept_nodes_to_reference_datatype":
-            self.migrate_concept_nodes_to_reference_datatype(options["graph"])
+            graph = options["graph"]
+            if not graph or graph is None:
+                raise CommandError("Please provide a graph id or slug")
+            self.migrate_concept_nodes_to_reference_datatype(graph)
 
     def migrate_collections_to_controlled_lists(
         self,
@@ -169,15 +174,23 @@ class Command(BaseCommand):
             result = cursor.fetchone()
             self.stdout.write(result[0])
 
-    def migrate_concept_nodes_to_reference_datatype(self, graph_id):
+    def migrate_concept_nodes_to_reference_datatype(self, graph):
         try:
-            source_graph = GraphModel.objects.get(pk=graph_id)
-        except (GraphModel.DoesNotExist, ValidationError) as e:
+            UUID(graph)
+            query = models.Q(graphid=graph)
+        except ValueError:
+            query = models.Q(slug=graph, source_identifier__isnull=True)
+
+        try:
+            source_graph = GraphModel.objects.get(query)
+        except GraphModel.DoesNotExist as e:
             raise CommandError(e)
+
+        graph_id = source_graph.graphid
 
         nodes = (
             Node.objects.filter(
-                graph_id=source_graph.graphid,
+                graph_id=graph_id,
                 datatype__in=["concept", "concept-list"],
                 is_immutable=False,
             )
@@ -198,12 +211,29 @@ class Command(BaseCommand):
             )
 
         REFERENCE_SELECT_WIDGET = Widget.objects.get(name="reference-select-widget")
+        REFERENCE_FACTORY = DataTypeFactory().get_instance("reference")
         controlled_list_ids = List.objects.all().values_list("id", flat=True)
 
         errors = []
-        with transaction.atomic():
-            for node in nodes:
-                if node.collection_id in controlled_list_ids:
+        # Check that collections have been migrated to controlled lists
+        for node in nodes:
+            if node.collection_id not in controlled_list_ids:
+                errors.append(
+                    {"node_alias": node.alias, "collection_id": node.collection_id}
+                )
+        if errors:
+            self.stderr.write(
+                "The following collections for the associated nodes have not been migrated to controlled lists:"
+            )
+            for error in errors:
+                self.stderr.write(
+                    "Node alias: {0}, Collection ID: {1}".format(
+                        error["node_alias"], error["collection_id"]
+                    )
+                )
+        else:
+            with transaction.atomic():
+                for node in nodes:
                     if node.datatype == "concept":
                         node.config = {
                             "multiValue": False,
@@ -218,32 +248,12 @@ class Command(BaseCommand):
                     node.full_clean()
                     node.save()
 
-                    cross_records = (
-                        node.cardxnodexwidget_set.annotate(
-                            config_without_i18n=Cast(
-                                models.F("config"),
-                                output_field=models.JSONField(),
-                            )
-                        )
-                        .annotate(
-                            without_default=CombinedExpression(
-                                models.F("config_without_i18n"),
-                                "-",
-                                models.Value(
-                                    "defaultValue", output_field=models.CharField()
-                                ),
-                                output_field=models.JSONField(),
-                            )
-                        )
-                        .annotate(
-                            without_default_and_options=CombinedExpression(
-                                models.F("without_default"),
-                                "-",
-                                models.Value(
-                                    "options", output_field=models.CharField()
-                                ),
-                                output_field=I18n_JSONField(),
-                            )
+                    cross_records = node.cardxnodexwidget_set.annotate(
+                        config_without_options=CombinedExpression(
+                            models.F("config"),
+                            "-",
+                            models.Value("options", output_field=models.CharField()),
+                            output_field=I18n_JSONField(),
                         )
                     )
                     for cross_record in cross_records:
@@ -251,27 +261,38 @@ class Command(BaseCommand):
                         cross_record.config = {}
                         cross_record.save()
 
-                        cross_record.config = cross_record.without_default_and_options
+                        # Crosswalk concept version of default values to reference versions
+                        original_default_value = (
+                            cross_record.config_without_options.get(
+                                "defaultValue", None
+                            )
+                        )
+                        if original_default_value:
+                            new_default_value = []
+                            if isinstance(original_default_value, str):
+                                original_default_value = [original_default_value]
+                            for value in original_default_value:
+                                value_rec = Value.objects.get(pk=value)
+                                config = {"controlledList": node.collection_id}
+                                new_value = REFERENCE_FACTORY.transform_value_for_tile(
+                                    value=value_rec.value,
+                                    **config,
+                                )
+                                if isinstance(new_value, list):
+                                    new_default_value.append(new_value[0])
+                                else:
+                                    raise CommandError(
+                                        f"Failed to convert original default value: {value_rec.value} in list: {node.collection_id} for node: {node.name} into a reference datatype instance"
+                                    )
+                            cross_record.config_without_options["defaultValue"] = (
+                                new_default_value
+                            )
+
+                        cross_record.config = cross_record.config_without_options
                         cross_record.widget = REFERENCE_SELECT_WIDGET
                         cross_record.full_clean()
                         cross_record.save()
 
-                elif node.collection_id not in controlled_list_ids:
-                    errors.append(
-                        {"node_alias": node.alias, "collection_id": node.collection_id}
-                    )
-
-        if errors:
-            self.stderr.write(
-                "The following collections for the associated nodes have not been migrated to controlled lists:"
-            )
-            for error in errors:
-                self.stderr.write(
-                    "Node alias: {0}, Collection ID: {1}".format(
-                        error["node_alias"], error["collection_id"]
-                    )
-                )
-        else:
             source_graph = Graph.objects.get(pk=graph_id)
 
             # Refresh the nodes to ensure the changes are reflected in the serialized graph
