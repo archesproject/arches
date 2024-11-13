@@ -43,9 +43,7 @@ from arches.app.utils import permission_backend
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 from arches.app.utils.permission_backend import (
-    assign_perm,
     remove_perm,
-    NotUserNorGroup,
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.exceptions import (
@@ -279,15 +277,6 @@ class Resource(models.ResourceInstance):
                 transaction_id=transaction_id,
                 context=context,
             )
-        try:
-            for perm in (
-                "view_resourceinstance",
-                "change_resourceinstance",
-                "delete_resourceinstance",
-            ):
-                assign_perm(perm, user, self)
-        except NotUserNorGroup:
-            pass
 
         if index is True:
             self.index(context)
@@ -1094,13 +1083,6 @@ class Resource(models.ResourceInstance):
                 "delete_resourceinstance",
             ]:
                 remove_perm(perm, identity, self)
-        self.index()
-
-    def add_permission_to_all(self, permission):
-        groups = list(Group.objects.all())
-        users = [user for user in User.objects.all() if user.is_superuser is False]
-        for identity in groups + users:
-            assign_perm(permission, identity, self)
         self.index()
 
 
