@@ -7,7 +7,7 @@ import logging
 import traceback
 from collections import defaultdict
 from itertools import zip_longest
-from operator import attrgetter, itemgetter
+from operator import attrgetter
 
 from arches.app.const import ExtensionType
 from arches.app.utils.module_importer import get_class_from_modulename
@@ -18,6 +18,7 @@ from arches.app.models.querysets import ResourceInstanceQuerySet, TileQuerySet
 from arches.app.models.utils import (
     add_to_update_fields,
     field_names,
+    find_root_node_from_fetched_root_nodes,
     pop_arches_model_kwargs,
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -2068,8 +2069,8 @@ class TileModel(models.Model):  # Tile
             )
 
             super().save(**kwargs)
-
-            for node in self._root_node.nodegroup.node_set.all():
+            # TODO: address performance.
+            for node in self.nodegroup.node_set.all():
                 datatype = datatype_factory.get_instance(node.datatype)
                 datatype.post_tile_save(self, str(node.pk))
             proxy._Tile__postSave()
@@ -2126,7 +2127,11 @@ class TileModel(models.Model):  # Tile
         errors_by_alias = defaultdict(list)
         # TODO: move this somewhere else.
         ResourceInstance._validate_and_patch_from_tile_values(
-            self, root_node=self._root_node, errors_by_node_alias=errors_by_alias
+            self,
+            root_node=find_root_node_from_fetched_root_nodes(
+                self._fetched_root_nodes, self.nodegroup_id
+            ),
+            errors_by_node_alias=errors_by_alias,
         )
         if not any(self.data.values()):
             raise ValidationError(_("Tile is blank."))
@@ -2151,7 +2156,8 @@ class TileModel(models.Model):  # Tile
         # that's probably good. Determine DX here.
 
         datatype_factory = DataTypeFactory()
-        for node in self._root_node.nodegroup.node_set.all():
+        # TODO: address performance
+        for node in self.nodegroup.node_set.all():
             if node.datatype == "semantic":
                 continue
             old = original_data[str(node.nodeid)]
@@ -2219,12 +2225,15 @@ class TileModel(models.Model):  # Tile
     def refresh_from_db(self, using=None, fields=None, from_queryset=None):
         if (
             from_queryset is None
-            and (root_nodes := getattr(self, "_fetched_root_nodes", set()))
+            and (fetched_nodes := getattr(self, "_fetched_nodes", set()))
             and self.resourceinstance.graph.slug
         ):
-            aliases = [n.alias for n in root_nodes]
+            NOT_PROVIDED = object()
+            aliases = [n.alias for n in fetched_nodes]
             from_queryset = self.__class__.as_nodegroup(
-                root_node_alias=self._root_node.alias,
+                root_node_alias=find_root_node_from_fetched_root_nodes(
+                    self._fetched_root_nodes, self.nodegroup_id
+                ).alias,
                 graph_slug=self.resourceinstance.graph.slug,
                 only=aliases,
             )
@@ -2232,7 +2241,11 @@ class TileModel(models.Model):  # Tile
             # Copy over annotations.
             refreshed_tile = from_queryset[0]
             for field in aliases:
-                setattr(self, field, getattr(refreshed_tile, field))
+                # TODO: why is this if needed?
+                if (
+                    annotation := getattr(refreshed_tile, field, NOT_PROVIDED)
+                ) is not NOT_PROVIDED:
+                    setattr(self, field, annotation)
         else:
             super().refresh_from_db(using, fields, from_queryset)
 

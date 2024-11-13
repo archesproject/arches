@@ -88,6 +88,12 @@ def find_root_node(prefetched_siblings, nodegroup_id):
             return sibling_node
 
 
+def find_root_node_from_fetched_root_nodes(fetched_root_nodes, nodegroup_id):
+    for candidate in fetched_root_nodes:
+        if candidate.pk == nodegroup_id:
+            return candidate
+
+
 def get_values_query(*, nodegroup, base_lookup, lhs=None, outer_ref) -> BaseExpression:
     """Return a tile values query expression for use in a
     ResourceInstanceQuerySet or TileQuerySet.

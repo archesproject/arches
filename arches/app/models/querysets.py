@@ -80,19 +80,22 @@ class TileQuerySet(QuerySet):
         Discard annotations that do not pertain to this nodegroup.
         """
         from arches.app.datatypes.datatypes import DataTypeFactory
-        from arches.app.models.models import TileModel
+        from arches.app.models.models import Node, TileModel
 
         super()._prefetch_related_objects()
 
         datatype_factory = DataTypeFactory()
         NOT_PROVIDED = object()
         for tile in self._result_cache:
+            tile._fetched_nodes = self._fetched_nodes
             tile._fetched_root_nodes = set()
             for node in self._fetched_nodes:
                 if node.nodegroup_id == tile.nodegroup_id:
-                    if node.pk == tile.nodegroup_id:
-                        tile._root_node = node
-                        tile._fetched_root_nodes.add(node)
+                    # Replace with new v8 root/grouping node lookup.
+                    if Node(pk=tile.nodegroup_id) not in tile._fetched_root_nodes:
+                        tile._fetched_root_nodes.add(
+                            Node.objects.get(pk=tile.nodegroup_id)
+                        )
                     tile_val = getattr(tile, node.alias, NOT_PROVIDED)
                     if tile_val is not NOT_PROVIDED:
                         datatype_instance = datatype_factory.get_instance(node.datatype)
