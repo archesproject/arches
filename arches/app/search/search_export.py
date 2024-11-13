@@ -25,6 +25,7 @@ from io import BytesIO
 import re
 from django.contrib.gis.geos import GeometryCollection, GEOSGeometry
 from django.core.files import File
+from django.core.files.storage import default_storage
 from django.utils.translation import gettext as _
 from django.urls import reverse, resolve
 from arches.app.models import models
@@ -321,9 +322,12 @@ class SearchResultsExporter(object):
         search_history_obj = models.SearchExportHistory.objects.get(
             pk=export_info.searchexportid
         )
+        search_history_obj.downloadfile.name = name
         f = BytesIO(zip_stream)
         download = File(f)
-        search_history_obj.downloadfile.save(name, download)
+        storage = default_storage
+        storage.save(search_history_obj.downloadfile.name, download)
+        search_history_obj.save()
         return search_history_obj.searchexportid
 
     def get_node(self, nodeid):

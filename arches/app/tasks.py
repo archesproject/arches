@@ -109,7 +109,7 @@ def export_search_results(self, userid, request_values, format, report_link):
             "name": export_name,
             "email_link": str(settings.PUBLIC_SERVER_ADDRESS).rstrip("/")
             + "/files/"
-            + str(search_history_obj.downloadfile),
+            + str(exportid),
             "username": _user.first_name or _user.username,
         },
     )
