@@ -566,6 +566,12 @@ class NumberDataType(BaseDataType):
         mapping = {"type": "double"}
         return mapping
 
+    def get_search_terms(self, nodevalue, nodeid=None):
+        terms = []
+        if nodevalue:
+            terms.append(SearchTerm(value=nodevalue))
+
+        return terms
 
 class BooleanDataType(BaseDataType):
     def validate(
