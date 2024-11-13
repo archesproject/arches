@@ -517,6 +517,13 @@ class NumberDataType(BaseDataType):
                 "provisional": provisional,
             }
         )
+        document["strings"].append(
+            {
+                "string": str(nodevalue),
+                "nodegroup_id": tile.nodegroup_id,
+                "provisional": provisional,
+            }
+        )
 
     def append_search_filters(self, value, node, query, request):
         try:
