@@ -580,6 +580,7 @@ class NumberDataType(BaseDataType):
 
         return terms
 
+
 class BooleanDataType(BaseDataType):
     def validate(
         self,
