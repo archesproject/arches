@@ -118,6 +118,14 @@ class SearchExportTests(ArchesTestCase):
         result, _ = exporter.export(format="tilecsv", report_link="false")
         self.assertIn(".csv", result[0]["name"])
 
+    def test_write_export_to_zip(self):
+        request = self.factory.get("/search?tiles=True&export=True&format=tilecsv")
+        request.user = self.user
+        exporter = SearchResultsExporter(search_request=request)
+        result, info = exporter.export(format="tilecsv", report_link="false")
+        uuid = exporter.write_export_zipfile(result, info, "test")
+        self.assertIsNotNone(uuid)
+
     # def test_export_to_shp(self):
     #     """Test exporting search results to SHP format"""
     #     request = self.factory.get('/search?tiles=True&export=True&format=shp&compact=True')
