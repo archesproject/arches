@@ -341,6 +341,7 @@ class CommandLineTests(ArchesTestCase):
 
     def test_get_related_resource(self):
         se = SearchEngineFactory().create()
+        user = User.objects.get(username="admin")
         is_related_to_valueid = "ac41d9be-79db-4256-b368-2f4559cfbe55"
         en_preflabel = "is related to"
         person_resourceid = "b6754e7a-7f18-40d1-93fe-61763d37d55e"
@@ -367,6 +368,6 @@ class CommandLineTests(ArchesTestCase):
         ]
         reference_tile.save()
         sync_es(se)
-        ret = reference_resource.get_related_resources()
+        ret = reference_resource.get_related_resources(user=user)
         relationship = ret["resource_relationships"][0]["relationshiptype_label"]
         self.assertEqual(relationship, en_preflabel)
