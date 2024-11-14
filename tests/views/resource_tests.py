@@ -44,7 +44,7 @@ from tests.utils.permission_test_utils import add_users
 
 
 class CommandLineTests(ArchesTestCase):
-    graph_fixtures = ["Data_Type_Model"]
+    graph_fixtures = ["Data_Type_Model", "4564-referenced", "4564-person"]
     data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
     resource_instance_id = "f562c2fa-48d3-4798-a723-10209806c068"
     reference_graphid = "e3d4505e-bfa7-11e9-b4dc-0242ac160002"
@@ -64,19 +64,6 @@ class CommandLineTests(ArchesTestCase):
         for edit in edit_records:
             edit.userid = user.id
             edit.save()
-
-        with open(
-            os.path.join("tests/fixtures/jsonld_base/models/4564-referenced.json"),
-            "r",
-        ) as f:
-            archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile["graph"])
-        with open(
-            os.path.join("tests/fixtures/jsonld_base/models/4564-person.json"),
-            "r",
-        ) as f:
-            archesfile = JSONDeserializer().deserialize(f)
-        ResourceGraphImporter(archesfile["graph"])
 
     def test_resource_instance_permission_assignment(self):
         """
