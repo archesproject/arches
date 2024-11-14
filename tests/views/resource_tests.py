@@ -16,7 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
 from unittest.mock import MagicMock, patch
 from arches.app.views.resource import ResourcePermissionDataView
 from tests.base_test import ArchesTestCase
@@ -26,10 +25,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from tests.utils.search_test_utils import sync_es
 from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.data_management.resource_graphs.importer import (
-    import_graph as ResourceGraphImporter,
-)
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from guardian.shortcuts import (
