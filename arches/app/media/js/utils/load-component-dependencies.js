@@ -3,64 +3,70 @@
 define([], function() {
     return function loadComponentDependencies(componentPaths){
         for (const componentPath of componentPaths) {
-            try {
-                if (!ARCHES_APPLICATIONS.length) {  // assumption os running Arches without a project
-                    throw new Error()
+            let componentLoaded = false;
+
+            for (const archesApp of ARCHES_APPLICATIONS) {
+                try {
+                    require(`${SITE_PACKAGES_DIRECTORY}/${archesApp}/media/js/${componentPath}`);
+                    componentLoaded = true;
+                    break;
                 }
-                for (const archesApp of ARCHES_APPLICATIONS) {
+                catch(e) {
                     try {
-                        require(`${SITE_PACKAGES_DIRECTORY}/${archesApp}/media/js/${componentPath}`);
+                        require(`${LINKED_APPLICATION_PATH_0}/media/js/${componentPath}`);
+                        componentLoaded = true;
                         break;
                     }
-                    // Handle editable installations (with pip install -e).
-                    // Webpack needs string literals, hence arbitrary limit of 9.
-                    // https://github.com/archesproject/arches/issues/11274
-                    catch(e) {
+                    catch {
                         try {
-                            require(`${LINKED_APPLICATION_PATH_0}/media/js/${componentPath}`);
+                            require(`${LINKED_APPLICATION_PATH_1}/media/js/${componentPath}`);
+                            componentLoaded = true;
                             break;
                         }
                         catch {
                             try {
-                                require(`${LINKED_APPLICATION_PATH_1}/media/js/${componentPath}`);
+                                require(`${LINKED_APPLICATION_PATH_2}/media/js/${componentPath}`);
+                                componentLoaded = true;
                                 break;
                             }
                             catch {
                                 try {
-                                    require(`${LINKED_APPLICATION_PATH_2}/media/js/${componentPath}`);
+                                    require(`${LINKED_APPLICATION_PATH_3}/media/js/${componentPath}`);
+                                    componentLoaded = true;
                                     break;
                                 }
                                 catch {
                                     try {
-                                        require(`${LINKED_APPLICATION_PATH_3}/media/js/${componentPath}`);
+                                        require(`${LINKED_APPLICATION_PATH_4}/media/js/${componentPath}`);
+                                        componentLoaded = true;
                                         break;
                                     }
                                     catch {
                                         try {
-                                            require(`${LINKED_APPLICATION_PATH_4}/media/js/${componentPath}`);
+                                            require(`${LINKED_APPLICATION_PATH_5}/media/js/${componentPath}`);
+                                            componentLoaded = true;
                                             break;
                                         }
                                         catch {
                                             try {
-                                                require(`${LINKED_APPLICATION_PATH_5}/media/js/${componentPath}`);
+                                                require(`${LINKED_APPLICATION_PATH_6}/media/js/${componentPath}`);
+                                                componentLoaded = true;
                                                 break;
                                             }
                                             catch {
                                                 try {
-                                                    require(`${LINKED_APPLICATION_PATH_6}/media/js/${componentPath}`);
+                                                    require(`${LINKED_APPLICATION_PATH_7}/media/js/${componentPath}`);
+                                                    componentLoaded = true;
                                                     break;
                                                 }
                                                 catch {
                                                     try {
-                                                        require(`${LINKED_APPLICATION_PATH_7}/media/js/${componentPath}`);
+                                                        require(`${LINKED_APPLICATION_PATH_8}/media/js/${componentPath}`);
+                                                        componentLoaded = true;
                                                         break;
                                                     }
                                                     catch {
-                                                        try {
-                                                            require(`${LINKED_APPLICATION_PATH_8}/media/js/${componentPath}`);
-                                                            break;
-                                                        }
-                                                        catch { throw new Error(); } // if all attempts fail within the loop, throw error for outer try/catch
+                                                        // Component not found in linked paths, continue to next archesApp
                                                     }
                                                 }
                                             }
@@ -72,9 +78,16 @@ define([], function() {
                     }
                 }
             }
-            catch(e) {  // finally, look in Arches core for component
-                require(`${ARCHES_CORE_DIRECTORY}/app/media/js/${componentPath}`);
+
+            if (!componentLoaded) { // Finally, look in Arches core for the component
+                try {
+                    require(`${ARCHES_CORE_DIRECTORY}/app/media/js/${componentPath}`);
+                }
+                catch (e) {
+                    console.error(`Component "${componentPath}" not found in any application or in Arches core.`);
+                }
             }
         }
     };
 });
+

@@ -5,7 +5,7 @@ from PIL import Image
 from django.utils.translation import gettext as _
 from django.views.generic import View
 from django.shortcuts import redirect
-from arches.app.models.models import File, TempFile
+from arches.app.models.models import File, SearchExportHistory, TempFile
 from arches.app.models.system_settings import settings
 from django.core.exceptions import PermissionDenied
 from arches.app.utils.response import JSONResponse
@@ -20,18 +20,28 @@ class FileView(View):
         get_thumbnail = (
             False if request.GET.get("thumbnail", "false") == "false" else True
         )
-        file = File.objects.get(pk=fileid)
-        path = file.path.url
+        is_search_export_history = False
+        try:
+            file = File.objects.get(pk=fileid)
+            path = file.path.url
+        except File.DoesNotExist:
+            file = SearchExportHistory.objects.get(pk=fileid)
+            path = file.downloadfile.url
+            is_search_export_history = True
 
         def get_file():
-            if file.thumbnail_data is None and settings.GENERATE_THUMBNAILS_ON_DEMAND:
+            if (
+                not is_search_export_history
+                and file.thumbnail_data is None
+                and settings.GENERATE_THUMBNAILS_ON_DEMAND
+            ):
                 file.save()  # simply resaving the file will attempt to regenerate the thumbnail
             if get_thumbnail and file.thumbnail_data:
                 return HttpResponse(file.thumbnail_data, content_type="image/png")
             else:
                 return redirect(path)
 
-        if settings.RESTRICT_MEDIA_ACCESS:
+        if settings.RESTRICT_MEDIA_ACCESS and not is_search_export_history:
             permission = request.user.has_perm("read_nodegroup", file.tile.nodegroup)
             permitted = permission is None or permission is True
             if permitted:

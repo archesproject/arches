@@ -43,9 +43,7 @@ from arches.app.utils import permission_backend
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 from arches.app.utils.permission_backend import (
-    assign_perm,
     remove_perm,
-    NotUserNorGroup,
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.exceptions import (
@@ -279,15 +277,6 @@ class Resource(models.ResourceInstance):
                 transaction_id=transaction_id,
                 context=context,
             )
-        try:
-            for perm in (
-                "view_resourceinstance",
-                "change_resourceinstance",
-                "delete_resourceinstance",
-            ):
-                assign_perm(perm, user, self)
-        except NotUserNorGroup:
-            pass
 
         if index is True:
             self.index(context)
@@ -877,16 +866,21 @@ class Resource(models.ResourceInstance):
                 user, ["models.read_nodegroup"]
             )
         )
+        all_resource_ids = set()
+        for relation in resource_relations["relations"]:
+            all_resource_ids.add(str(relation.resourceinstanceidto_id))
+            all_resource_ids.add(str(relation.resourceinstanceidfrom_id))
+        exclusive_set, filtered_instances = get_filtered_instances(
+            user, se, resources=list(all_resource_ids)
+        )
+        filtered_instances = filtered_instances if user is not None else []
+
         for relation in resource_relations["relations"]:
             relation = model_to_dict(relation)
             resourceid_to = relation["resourceinstanceidto"]
             resourceid_from = relation["resourceinstanceidfrom"]
             resourceinstanceto_graphid = relation["resourceinstanceto_graphid"]
             resourceinstancefrom_graphid = relation["resourceinstancefrom_graphid"]
-            exclusive_set, filtered_instances = get_filtered_instances(
-                user, se, resources=[resourceid_from, resourceid_to]
-            )
-            filtered_instances = filtered_instances if user is not None else []
 
             resourceid_to_permission = str(resourceid_to) not in filtered_instances
             resourceid_from_permission = str(resourceid_from) not in filtered_instances
@@ -1099,13 +1093,6 @@ class Resource(models.ResourceInstance):
                 "delete_resourceinstance",
             ]:
                 remove_perm(perm, identity, self)
-        self.index()
-
-    def add_permission_to_all(self, permission):
-        groups = list(Group.objects.all())
-        users = [user for user in User.objects.all() if user.is_superuser is False]
-        for identity in groups + users:
-            assign_perm(permission, identity, self)
         self.index()
 
 
