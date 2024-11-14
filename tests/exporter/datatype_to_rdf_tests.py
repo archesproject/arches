@@ -261,6 +261,31 @@ class RDFExportUnitTests(ArchesTestCase):
             in graph
         )
 
+    def test_rdf_geojson(self):
+        dt = self.DT.get_instance("geojson-feature-collection")
+        edge_info = {}
+        edge_info["range_tile_data"] = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "id": "1",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [13.400257324930152, 52.50578474077699],
+                    },
+                    "properties": {},
+                }
+            ],
+        }
+        edge_info["r_uri"] = URIRef("http://vocab.getty.edu/aat/300047196")
+        edge_info["d_uri"] = URIRef("http://vocab.getty.edu/aat/300047196")
+        edge = Mock()
+        edge.ontologyproperty = CIDOC_NS["P2_has_type"]
+        edge.rangenode.ontologyclass = CIDOC_NS["E55_Type"]
+        graph = dt.to_rdf(edge_info, edge)
+        self.assertTrue("13.400257324930152" in str(graph.serialize()))
+
     def test_rdf_concept_list(self):
         dt = self.DT.get_instance("concept-list")
         concept_list = [

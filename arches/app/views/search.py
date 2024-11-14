@@ -18,13 +18,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import logging
 import os
-from django.contrib.auth import authenticate
+
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
 from django.db import connection
+from django.http import Http404
 from django.shortcuts import render
 from django.utils.translation import gettext as _
-from django.utils.decorators import method_decorator
 from arches.app.models.models import (
     MapMarker,
     GraphModel,
@@ -82,6 +82,8 @@ class SearchView(MapBaseManagerView):
         geocoding_providers = Geocoder.objects.all()
         search_component_factory = SearchFilterFactory(request)
         searchview_instance = search_component_factory.get_searchview_instance()
+        if not searchview_instance:
+            raise Http404(_("Search view instance not found"))
         search_components = searchview_instance.get_searchview_filters()
 
         datatypes = DDataType.objects.all()

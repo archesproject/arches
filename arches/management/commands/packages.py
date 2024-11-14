@@ -73,6 +73,9 @@ class Command(BaseCommand):
 
     """
 
+    # Silence system checks: if run with -db, should always succeed.
+    requires_system_checks = []
+
     def add_arguments(self, parser):
         parser.add_argument(
             "-o",

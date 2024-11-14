@@ -216,6 +216,10 @@
             "title": "{% jsescaped_trans _("This resource is based on an unpublished graph.") %}",
             "text": "{% jsescaped_trans _("To continue, please ensure the graph is published.") %}"
         }'
+        confirm-bulk-delete='{
+                "title": "{% jsescaped_trans _("Delete Data") %}",
+                "text": "{% jsescaped_trans _("This action will delete the selected records permanently. Are you sure you want to proceed?") %}"
+        }'
         active='{% trans "Active" as active %}  "{{ active|escapejs }}"'
         inactive='{% trans "Inactive" as inactive %}  "{{ inactive|escapejs }}"'
         two-factor-authentication='{% trans "Two-Factor Authentication" as twoFactorAuthentication %} "{{ twoFactorAuthentication|escapejs }}"'

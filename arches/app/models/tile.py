@@ -472,14 +472,11 @@ class Tile(models.TileModel):
             self.check_for_missing_nodes()
             self.check_for_constraint_violation()
 
-            creating_new_tile = (
-                models.TileModel.objects.filter(pk=self.tileid).exists() is False
-            )
-            edit_type = "tile create" if (creating_new_tile is True) else "tile edit"
-
-            if creating_new_tile is False:
-                existing_model = models.TileModel.objects.get(pk=self.tileid)
-            else:
+            existing_model = models.TileModel.objects.filter(pk=self.tileid).first()
+            creating_new_tile = existing_model is None
+            edit_type = "tile edit"
+            if creating_new_tile:
+                edit_type = "tile create"
                 self.populate_missing_nodes()
 
             # this section moves the data over from self.data to self.provisionaledits if certain users permissions are in force

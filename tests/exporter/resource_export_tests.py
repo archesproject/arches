@@ -142,4 +142,11 @@ class BusinessDataExportTests(ArchesTestCase):
             json_truth = deep_sort(json.load(f))
 
         self.maxDiff = None
+
+        # removes dynamic value "createdtime" from export to compare with static truth value
+        for resource in json_export["business_data"]["resources"]:
+            instance = resource["resourceinstance"]
+            if "createdtime" in instance:
+                del instance["createdtime"]
+
         self.assertDictEqual(json_export, json_truth)

@@ -26,6 +26,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils import import_class_from_string
 from django.contrib.auth.models import Group, User
 from django.contrib.gis.db import models
+from django.core import checks
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import JSONField
@@ -612,6 +613,39 @@ class GraphModel(models.Model):
 
         super(GraphModel, self).save(*args, **kwargs)
 
+    @classmethod
+    def check(cls, **kwargs):
+        errors = super().check(**kwargs)
+        errors.extend(cls._check_publication_in_every_language())
+        return errors
+
+    @classmethod
+    def _check_publication_in_every_language(cls):
+        errors = []
+        system_languages = {lang[0] for lang in settings.LANGUAGES}
+
+        for graph in (
+            cls.objects.filter(publication__isnull=False)
+            .select_related("publication")
+            .prefetch_related("publication__publishedgraph_set")
+        ):
+            languages_with_a_publication = {
+                published_graph.language_id
+                for published_graph in graph.publication.publishedgraph_set.all()
+            }
+            missing_languages = system_languages - languages_with_a_publication
+            if missing_languages:
+                errors.append(
+                    checks.Error(
+                        "This graph is not published in all enabled languages.",
+                        hint="Run python manage.py graph publish --update",
+                        obj=graph,
+                        id="arches.E004",  # TODO: enum in arches 8
+                    )
+                )
+
+        return errors
+
     def __str__(self):
         return str(self.name)
 
@@ -771,7 +805,7 @@ class Node(models.Model):
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     fieldname = models.TextField(blank=True, null=True)
     exportable = models.BooleanField(default=False, null=True)
-    alias = models.TextField(blank=True, null=True)
+    alias = models.TextField(blank=True)
     hascustomalias = models.BooleanField(default=False)
     source_identifier = models.ForeignKey(
         "self",
@@ -821,21 +855,21 @@ class Node(models.Model):
         )
 
     def get_relatable_resources(self):
-        relatable_resource_ids = [
-            r2r.resourceclassfrom
-            for r2r in Resource2ResourceConstraint.objects.filter(
-                resourceclassto_id=self.nodeid
+        return [
+            (
+                constraint.resourceclassto
+                if constraint.resourceclassfrom_id == self.pk
+                else constraint.resourceclassfrom
             )
-            if r2r.resourceclassfrom is not None
-        ]
-        relatable_resource_ids = relatable_resource_ids + [
-            r2r.resourceclassto
-            for r2r in Resource2ResourceConstraint.objects.filter(
-                resourceclassfrom_id=self.nodeid
+            for constraint in (
+                self.resxres_contstraint_classes_from.filter(
+                    resourceclassto__isnull=False
+                )
+                | self.resxres_contstraint_classes_to.filter(
+                    resourceclassfrom__isnull=False
+                )
             )
-            if r2r.resourceclassto is not None
         ]
-        return relatable_resource_ids
 
     def set_relatable_resources(self, new_ids):
         old_ids = [res.nodeid for res in self.get_relatable_resources()]
@@ -870,7 +904,15 @@ class Node(models.Model):
         if not self.nodeid:
             self.nodeid = uuid.uuid4()
 
-    def save(self, *args, **kwargs):
+    def clean(self):
+        if not self.alias:
+            Graph.objects.get(pk=self.graph_id).create_node_alias(self)
+
+    def save(self, **kwargs):
+        if not self.alias:
+            self.clean()
+            add_to_update_fields(kwargs, "alias")
+            add_to_update_fields(kwargs, "hascustomalias")
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
             add_to_update_fields(kwargs, "source_identifier_id")
@@ -2289,3 +2331,18 @@ class SpatialView(models.Model):
             "attributenodes": self.attributenodes,
             "isactive": self.isactive,
         }
+
+
+# Import proxy models to ensure they are always discovered.
+# For example, if the urls.py module is not imported because a management command
+# skips system checks, the coincidental importing of the Graph(Proxy)Model
+# by certain views will not happen, and Django will never find the proxy models.
+# Long term, we want the module in INSTALLED_APPS (arches.app.models)
+# to contain all the models, usually done by creating arches.app.models.__init__,
+# but there's a circular import between the model and proxy model that subclasses it.
+# The circular import is the same reason these imports are at the bottom of this file.
+# Or can we replace the proxy models by moving functionality to plain model methods?
+from .card import *
+from .graph import *
+from .resource import *
+from .tile import *

@@ -148,6 +148,7 @@ def generate_frontend_configuration():
         frontend_configuration_settings_data = {
             "_comment": "This is a generated file. Do not edit directly.",
             "APP_ROOT": app_root_path,
+            "APP_RELATIVE_PATH": os.path.relpath(app_root_path),
             "ARCHES_APPLICATIONS": arches_app_names,
             "ARCHES_APPLICATIONS_PATHS": path_lookup,
             "SITE_PACKAGES_DIRECTORY": site.getsitepackages()[0],

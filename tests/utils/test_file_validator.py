@@ -116,7 +116,7 @@ class FileValidatorTests(SimpleTestCase):
         self.assertEqual(errors, ["File type is not permitted: DS_Store"])
 
     @patch("filetype.guess", Mock(return_value=None))
-    @patch("arches.app.utils.file_validator.load_workbook", lambda noop: None)
+    @patch("arches.app.utils.file_validator.load_workbook", lambda file, **kwargs: None)
     def test_valid_xlsx(self):
         errors = self.validator.validate_file_type(self.mock_file, extension="xlsx")
         self.assertEqual(errors, [])

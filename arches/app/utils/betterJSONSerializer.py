@@ -228,8 +228,6 @@ class JSONSerializer(object):
                 getattr(instance, property_name), **kwargs
             )
         for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
-            if not getattr(f, "editable", False):
-                continue
             if fields and f.name not in fields:
                 continue
             if exclude and f.name in exclude:

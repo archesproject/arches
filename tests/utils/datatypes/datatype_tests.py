@@ -17,10 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import uuid
+from unittest import mock
 
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import Language
+from arches.app.models.models import Language, Node
 from arches.app.models.tile import Tile
 from tests.base_test import ArchesTestCase
 
@@ -132,34 +133,6 @@ class StringDataTypeTests(ArchesTestCase):
         self.assertIsNotNone(tile2.data[nodeid])
 
 
-class NonLocalizedStringDataTypeTests(ArchesTestCase):
-    def test_string_validate(self):
-        string = DataTypeFactory().get_instance("non-localized-string")
-        some_errors = string.validate(float(1.2))
-        self.assertGreater(len(some_errors), 0)
-        no_errors = string.validate("Hello World")
-        self.assertEqual(len(no_errors), 0)
-
-    def test_string_clean(self):
-        string = DataTypeFactory().get_instance("non-localized-string")
-        nodeid1 = "72048cb3-adbc-11e6-9ccf-14109fd34195"
-        nodeid2 = "72048cb3-adbc-11e6-9ccf-14109fd34196"
-        resourceinstanceid = "40000000-0000-0000-0000-000000000000"
-
-        json_empty_strings = {
-            "resourceinstance_id": resourceinstanceid,
-            "parenttile_id": "",
-            "nodegroup_id": nodeid1,
-            "tileid": "",
-            "data": {nodeid1: "''", nodeid2: ""},
-        }
-        tile1 = Tile(json_empty_strings)
-        string.clean(tile1, nodeid1)
-        self.assertIsNone(tile1.data[nodeid1])
-        string.clean(tile1, nodeid2)
-        self.assertIsNone(tile1.data[nodeid2])
-
-
 class URLDataTypeTests(ArchesTestCase):
     def test_validate(self):
         url = DataTypeFactory().get_instance("url")
@@ -246,3 +219,44 @@ class URLDataTypeTests(ArchesTestCase):
         self.assertIsNotNone(tile1.data[nodeid])
         self.assertTrue("url_label" in tile1.data[nodeid])
         self.assertFalse(tile1.data[nodeid]["url_label"])
+
+
+class ResourceInstanceListDataTypeTests(ArchesTestCase):
+    mock_display_value = {"@display_value": "mock display value"}
+
+    @mock.patch(
+        "arches.app.datatypes.base.BaseDataType.compile_json",
+        return_value=mock_display_value,
+    )
+    def test_to_json(self, _mock):
+        ri_list = DataTypeFactory().get_instance("resource-instance-list")
+        node = Node(pk=uuid.uuid4())
+        resource_1_id = uuid.uuid4()
+        resource_2_id = uuid.uuid4()
+        tile = Tile(
+            {
+                "resourceinstance_id": uuid.uuid4(),
+                "nodegroup_id": str(node.pk),
+                "tileid": "",
+                "data": {
+                    str(node.pk): [
+                        {
+                            "resourceId": str(resource_1_id),
+                            "ontologyProperty": "",
+                            "inverseOntologyProperty": "",
+                        },
+                        {
+                            "resourceId": str(resource_2_id),
+                            "ontologyProperty": "",
+                            "inverseOntologyProperty": "",
+                        },
+                    ]
+                },
+            }
+        )
+
+        # TODO: remove mock, fix underlying functionality to not
+        # requery for Resource objects yet again in get_display_value().
+        with self.assertNumQueries(1):
+            json = ri_list.to_json(tile, node)
+        self.assertEqual(json, self.mock_display_value)

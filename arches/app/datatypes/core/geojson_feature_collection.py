@@ -412,7 +412,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
             data = edge_info["range_tile_data"]
             if data["type"] == "FeatureCollection":
                 for f in data["features"]:
-                    del f["id"]
+                    if "id" in f:
+                        del f["id"]
                     del f["properties"]
             g.add(
                 (

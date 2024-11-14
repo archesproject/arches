@@ -701,7 +701,6 @@ class Graph(models.GraphModel):
                         ),
                         language=language,
                     )
-                    published_graph.save()
 
             # edge case for instantiating a serialized_graph that has a resource_instance_lifecycle not already in the system
             if self.resource_instance_lifecycle and not len(
@@ -2107,7 +2106,7 @@ class Graph(models.GraphModel):
         Assigns a unique, slugified version of a node's name as that node's alias.
         """
         with connection.cursor() as cursor:
-            if node.hascustomalias:
+            if node.hascustomalias and node.alias:
                 cursor.callproc("__arches_slugify", [node.alias])
                 node.alias = cursor.fetchone()[0]
             else:
@@ -2117,6 +2116,7 @@ class Graph(models.GraphModel):
                     n.alias for n in self.nodes.values() if node.alias != n.alias
                 ]
                 node.alias = self.make_name_unique(row[0], aliases, "_n")
+                node.hascustomalias = False
         return node.alias
 
     def validate(self):
@@ -2302,14 +2302,10 @@ class Graph(models.GraphModel):
                 .filter(slug=self.slug)
             )
             if (
-                graphs_with_matching_slug.exists()
-                and graphs_with_matching_slug[0].graphid != self.graphid
-            ):
+                first_matching_graph := graphs_with_matching_slug.first()
+            ) and first_matching_graph.graphid != self.graphid:
                 if self.source_identifier_id:
-                    if (
-                        self.source_identifier_id
-                        != graphs_with_matching_slug[0].graphid
-                    ):
+                    if self.source_identifier_id != first_matching_graph.graphid:
                         raise GraphValidationError(
                             _(
                                 "Another resource model already uses the slug '{self.slug}'"
@@ -2374,6 +2370,7 @@ class Graph(models.GraphModel):
                     elif len(published_graph_query) == 1:
                         published_graph = published_graph_query[0]
                         published_graph.serialized_graph = serialized_graph
+                        published_graph.save()
                     else:
                         raise GraphPublicationError(
                             message=_(
@@ -2381,7 +2378,6 @@ class Graph(models.GraphModel):
                             )
                         )
 
-                    published_graph.save()
                     translation.deactivate()
 
     def create_editable_future_graph(self):
@@ -2937,7 +2933,6 @@ class Graph(models.GraphModel):
             publication = models.GraphXPublishedGraph.objects.create(
                 graph=self, notes=notes, user=user
             )
-            publication.save()
 
             self.publication = publication
             self.has_unpublished_changes = False
@@ -2949,15 +2944,13 @@ class Graph(models.GraphModel):
 
                 translation.activate(language=language_tuple[0])
 
-                published_graph = models.PublishedGraph.objects.create(
+                models.PublishedGraph.objects.create(
                     publication=publication,
                     serialized_graph=JSONDeserializer().deserialize(
                         JSONSerializer().serialize(self, force_recalculation=True)
                     ),
                     language=language,
                 )
-
-                published_graph.save()
 
             translation.deactivate()
 

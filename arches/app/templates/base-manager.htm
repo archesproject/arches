@@ -362,6 +362,7 @@
                         {% endif %}
 
                         {% if show_language_swtich %}
+                        {% csrf_token %}
                         {% get_current_language as LANGUAGE_CODE %}
                         <li aria-label="{% trans 'Choose your language' %}">
                             <div class="lang-switch ep-tools ep-tools-right" style="max-width: none;" data-bind='component: {

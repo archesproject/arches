@@ -596,6 +596,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         if (
             not default_permissions_settings
             or model is None
+            or hasattr(model, "graph_id") is False
             or str(model.graph_id) not in default_permissions_settings
         ):
             return []
@@ -751,7 +752,7 @@ def get_nodegroups_by_perm_for_user_or_group(
         NodeGroup,
     )
 
-    for nodegroup in NodeGroup.objects.all():
+    for nodegroup in NodeGroup.objects.only("nodegroupid").all():
         explicit_perms = checker.get_perms(nodegroup)
 
         if len(explicit_perms):

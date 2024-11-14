@@ -39,14 +39,14 @@ define([
         this.showPreview = ko.observable(false);
         this.previewValue = ko.observable();
 
-        this.activeTab  = ko.observable("TileDeletion");
+        this.activeTab = ko.observable("TileDeletion");
         this.activeTab.subscribe(() => {
             self.selectedGraph(null);
             self.selectedNodegroup(null);
             self.searchUrl(null);
         });
 
-        this.ready = ko.computed(()=>{
+        this.ready = ko.computed(() => {
             self.showPreview(false);
             self.numberOfResources(null);
             self.numberOfTiles(null);
@@ -55,52 +55,52 @@ define([
                 || (self.selectedNodegroup() && self.activeTab() === "TileDeletion");
         });
 
-        this.getGraphs = function(){
+        this.getGraphs = function() {
             self.loading(true);
-            self.submit('get_graphs').then(function(response){
+            self.submit('get_graphs').then(function(response) {
                 self.graphs(response.result);
                 self.loading(false);
             });
         };
 
-        this.preview = function(){
+        this.preview = function() {
             self.previewing(true);
             self.showPreview(false);
             this.addAllFormData();
-            self.submit('preview').then(function(response){
+            self.submit('preview').then(function(response) {
                 self.numberOfResources(response.result.resource);
                 self.numberOfTiles(response.result.tile);
                 self.previewValue(response.result.preview?.map((value) => JSON.stringify(value)));
                 self.showPreview(true);
-            }).fail( function(err) {
+            }).fail(function(err) {
                 self.alert(
                     new JsonErrorAlertViewModel(
                         'ep-alert-red',
                         err.responseJSON["data"],
                         null,
-                        function(){}
+                        function () {}
                     )
                 );
-            }).always( function(){
+            }).always(function() {
                 self.deleteAllFormData();
                 self.previewing(false);
             });
         };
 
-        this.getGraphName = function(graphId){
+        this.getGraphName = function(graphId) {
             let graph;
             if (self.graphs()) {
-                graph = self.graphs().find(function(graph){
+                graph = self.graphs().find(function(graph) {
                     return graph.graphid == graphId;
                 });
             }
             return graph?.name;
         };
 
-        this.getNodegroupName = function(nodegroupId){
+        this.getNodegroupName = function(nodegroupId) {
             let nodegroup;
             if (self.nodegroups()) {
-                nodegroup = self.nodegroups().find(function(nodegroup){
+                nodegroup = self.nodegroups().find(function(nodegroup) {
                     return nodegroup.nodegroupid == nodegroupId;
                 });
             }
@@ -120,7 +120,7 @@ define([
             if (self.resourceids()) { self.formData.append('resourceids', JSON.stringify(self.resourceids())); }
         };
 
-        self.deleteAllFormData = () => {
+        this.deleteAllFormData = () => {
             self.formData.delete('search_url');
             self.formData.delete('nodegroup_id');
             self.formData.delete('nodegroup_name');
@@ -129,11 +129,11 @@ define([
             self.formData.delete('resourceids');
         };
 
-        this.selectedGraph.subscribe(function(graph){
-            if (graph){
+        this.selectedGraph.subscribe(function(graph) {
+            if (graph) {
                 self.loading(true);
                 self.formData.append('graphid', graph);
-                self.submit('get_nodegroups').then(function(response){
+                self.submit('get_nodegroups').then(function(response) {
                     const nodegroups = response.result;
                     self.selectedNodegroup(null);
                     self.nodegroups(nodegroups);
@@ -144,21 +144,25 @@ define([
             }
         });
 
+        this.deleteAlert = function() {
+            self.alert(
+                new AlertViewModel(
+                    "ep-alert-blue",
+                    arches.translations.confirmBulkDelete.title,
+                    arches.translations.confirmBulkDelete.text,
+                    function() {},
+                    function() {
+                        self.addAllFormData();
+                        params.activeTab("import");
+
+                        // perform the delete action if the user confirms
+                        self.submit('delete');
+                    })
+            );
+        };
+
         this.bulkDelete = function() {
-            self.addAllFormData();
-            params.activeTab("import");
-            self.submit('delete').then(data => {
-                //console.log(data.result);
-            }).fail( function(err) {
-                self.alert(
-                    new JsonErrorAlertViewModel(
-                        'ep-alert-red',
-                        err.responseJSON["data"],
-                        null,
-                        function(){}
-                    )
-                );
-            });
+            self.deleteAlert();
         };
 
         this.submit = function(action) {
@@ -172,10 +176,21 @@ define([
                 cache: false,
                 processData: false,
                 contentType: false,
-            });
+            })
+                .fail(function(err) {
+                    // show an error alert if the delete action fails
+                    self.alert(
+                        new JsonErrorAlertViewModel(
+                            'ep-alert-red',
+                            err.responseJSON["data"],
+                            null,
+                            function () {}
+                        )
+                    );
+                });
         };
 
-        this.init = function(){
+        this.init = function() {
             this.getGraphs();
         };
 
@@ -186,4 +201,4 @@ define([
         template: bulkDataDeletionTemplate,
     });
     return viewModel;
-}); 
+});

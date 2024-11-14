@@ -261,7 +261,8 @@ class BranchExcelImporter(BaseImportModule):
             uploaded_file_path = os.path.join(
                 settings.UPLOADED_FILES_DIR, "tmp", self.loadid, file
             )
-            workbook = load_workbook(filename=default_storage.open(uploaded_file_path))
+            opened_file = default_storage.open(uploaded_file_path)
+            workbook = load_workbook(filename=opened_file, read_only=True)
             graphid = self.get_graphid(workbook)
             nodegroup_lookup, nodes = self.get_graph_tree(graphid)
             node_lookup = self.get_node_lookup(nodes)
@@ -272,6 +273,8 @@ class BranchExcelImporter(BaseImportModule):
                         worksheet, cursor, node_lookup, nodegroup_lookup
                     )
                     summary["files"][file]["worksheets"].append(details)
+            opened_file.close()
+
             cursor.execute(
                 """UPDATE load_event SET load_details = %s WHERE loadid = %s""",
                 (json.dumps(summary), self.loadid),
