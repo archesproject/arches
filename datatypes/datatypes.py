@@ -82,6 +82,12 @@ class ReferenceDataType(BaseDataType):
 
     def transform_value_for_tile(self, value, **kwargs):
         list_id = kwargs.get("controlledList")
+        if (
+            isinstance(value, list)
+            and isinstance(value[0], dict)
+            and "value" in value[0]
+        ):
+            value = value[0]["value"]
         if isinstance(value, str):
             found_item = self.lookup_listitem_from_label(value, list_id)
             if found_item:
