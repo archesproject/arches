@@ -175,6 +175,7 @@ class TileExcelImporter(BaseImportModule):
                 raise ValueError(_("All rows must have a valid resource id"))
 
             node_values = cell_values[3:-3]
+            sortorder = cell_values[-3] if cell_values[-3] else 0 
             try:
                 row_count += 1
                 row_details = dict(zip(data_node_lookup[nodegroup_alias], node_values))
@@ -212,7 +213,7 @@ class TileExcelImporter(BaseImportModule):
                         if TileModel.objects.filter(pk=tileid).exists():
                             operation = "update"
                 cursor.execute(
-                    """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation, operation) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                    """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation, operation, sortorder) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                     (
                         row_details["nodegroup_id"],
                         legacyid,
@@ -227,6 +228,7 @@ class TileExcelImporter(BaseImportModule):
                         ),  # source_description
                         passes_validation,
                         operation,
+                        sortorder,
                     ),
                 )
             except KeyError:
