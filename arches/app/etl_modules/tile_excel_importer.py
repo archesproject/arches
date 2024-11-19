@@ -175,7 +175,7 @@ class TileExcelImporter(BaseImportModule):
                 raise ValueError(_("All rows must have a valid resource id"))
 
             node_values = cell_values[3:-3]
-            sortorder = cell_values[-3] if cell_values[-3] else 0 
+            sortorder = cell_values[-3] if cell_values[-3] else 0
             try:
                 row_count += 1
                 row_details = dict(zip(data_node_lookup[nodegroup_alias], node_values))

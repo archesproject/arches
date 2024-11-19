@@ -569,7 +569,7 @@ class ImportSingleCsv(BaseImportModule):
                                 csv_file_name,
                                 "insert",
                                 passes_validation,
-                                0
+                                0,
                             ),
                         )
 

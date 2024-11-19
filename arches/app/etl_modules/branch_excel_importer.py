@@ -222,7 +222,7 @@ class BranchExcelImporter(BaseImportModule):
                             ),  # source_description
                             passes_validation,
                             operation,
-                            sortorder
+                            sortorder,
                         ),
                     )
                 except KeyError:
