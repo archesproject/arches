@@ -81,7 +81,6 @@ class TileExcelImporter(BaseImportModule):
 
     def create_tile_value(
         self,
-        cell_values,
         data_node_lookup,
         node_lookup,
         nodegroup_alias,
@@ -194,7 +193,6 @@ class TileExcelImporter(BaseImportModule):
                 )
                 legacyid, resourceid = self.set_legacy_id(resourceid)
                 tile_value_json, passes_validation = self.create_tile_value(
-                    cell_values,
                     data_node_lookup,
                     node_lookup,
                     nodegroup_alias,
