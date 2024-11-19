@@ -2200,6 +2200,7 @@ class LoadStaging(models.Model):
     legacyid = models.TextField(blank=True, null=True)
     resourceid = models.UUIDField(serialize=False, blank=True, null=True)
     tileid = models.UUIDField(serialize=False, blank=True, null=True)
+    sortorder = models.IntegerField(blank=False, null=False, default=0)
     parenttileid = models.UUIDField(serialize=False, blank=True, null=True)
     passes_validation = models.BooleanField(blank=True, null=True)
     nodegroup_depth = models.IntegerField(default=1)
