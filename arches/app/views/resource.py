@@ -36,7 +36,6 @@ from django.utils import translation
 
 from arches.app.models import models
 from arches.app.models.card import Card
-from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
@@ -957,11 +956,6 @@ class ResourceReportView(MapBaseManagerView):
         if not resource:
             raise Http404(_("Resource not found"))
         graph = resource.graph
-        if not graph.template_id:
-            raise Http404(
-                _("No active report template is available for this resource.")
-            )
-
         graph_has_different_publication = bool(
             resource.graph_publication_id != graph.publication_id
         )

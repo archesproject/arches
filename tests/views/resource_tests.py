@@ -16,6 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import uuid
+
 from unittest.mock import MagicMock, patch
 from arches.app.views.resource import ResourcePermissionDataView
 from tests.base_test import ArchesTestCase
@@ -35,7 +37,7 @@ from tests.utils.permission_test_utils import add_users
 # python manage.py test tests.views.resource_tests --settings="tests.test_settings"
 
 
-class CommandLineTests(ArchesTestCase):
+class ResourceViewTests(ArchesTestCase):
     graph_fixtures = ["Data_Type_Model"]
     data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
     resource_instance_id = "f562c2fa-48d3-4798-a723-10209806c068"
@@ -317,3 +319,11 @@ class CommandLineTests(ArchesTestCase):
         self.assertEqual(view.status_code, 200)
         self.assertEqual(edit.status_code, 200)
         self.assertEqual(delete.status_code, 200)
+
+    def test_resource_report_missing_resource(self):
+        self.client.login(username="sam", password="Test12345!")
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.get(
+                reverse("resource_report", kwargs={"resourceid": str(uuid.uuid4())})
+            )
+        self.assertEqual(response.status_code, 404)
