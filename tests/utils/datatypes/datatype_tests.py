@@ -17,11 +17,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import uuid
-from unittest import mock
+from unittest.mock import patch
+
+from django.conf import settings
 
 from arches.app.datatypes.base import BaseDataType
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import Language, Node
+from arches.app.models.models import (
+    GraphModel,
+    Language,
+    Node,
+    ResourceInstance,
+    ResourceInstanceLifecycle,
+)
 from arches.app.models.tile import Tile
 from tests.base_test import ArchesTestCase
 
@@ -222,31 +230,39 @@ class URLDataTypeTests(ArchesTestCase):
 
 
 class ResourceInstanceListDataTypeTests(ArchesTestCase):
-    mock_display_value = {"@display_value": "mock display value"}
+    def displayname(self, context=None):
+        return str(self.name)
 
-    @mock.patch(
-        "arches.app.datatypes.base.BaseDataType.compile_json",
-        return_value=mock_display_value,
-    )
-    def test_to_json(self, _mock):
+    @patch("arches.app.models.resource.Resource.displayname", displayname)
+    def test_to_json(self):
         ri_list = DataTypeFactory().get_instance("resource-instance-list")
-        node = Node(pk=uuid.uuid4())
-        resource_1_id = uuid.uuid4()
-        resource_2_id = uuid.uuid4()
+
+        dummy_node = Node(pk=uuid.uuid4())
+        graph = GraphModel.objects.create(isresource=True)
+        lifecycle = ResourceInstanceLifecycle.objects.get(
+            pk=settings.DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID
+        )
+        state = lifecycle.resource_instance_lifecycle_states.first()
+        resource1 = ResourceInstance.objects.create(
+            graph=graph, resource_instance_lifecycle_state=state, name="ONE"
+        )
+        resource2 = ResourceInstance.objects.create(
+            graph=graph, resource_instance_lifecycle_state=state, name="TWO"
+        )
         tile = Tile(
             {
                 "resourceinstance_id": uuid.uuid4(),
-                "nodegroup_id": str(node.pk),
+                "nodegroup_id": str(dummy_node.pk),
                 "tileid": "",
                 "data": {
-                    str(node.pk): [
+                    str(dummy_node.pk): [
                         {
-                            "resourceId": str(resource_1_id),
+                            "resourceId": str(resource1.pk),
                             "ontologyProperty": "",
                             "inverseOntologyProperty": "",
                         },
                         {
-                            "resourceId": str(resource_2_id),
+                            "resourceId": str(resource2.pk),
                             "ontologyProperty": "",
                             "inverseOntologyProperty": "",
                         },
@@ -255,8 +271,12 @@ class ResourceInstanceListDataTypeTests(ArchesTestCase):
             }
         )
 
-        # TODO: remove mock, fix underlying functionality to not
-        # requery for Resource objects yet again in get_display_value().
-        with self.assertNumQueries(1):
-            json = ri_list.to_json(tile, node)
-        self.assertEqual(json, self.mock_display_value)
+        # Was 4, is now 3, should be 1-2 after fixing:
+        # https://github.com/archesproject/arches/issues/11632
+        with self.assertNumQueries(3):
+            json = ri_list.to_json(tile, dummy_node)
+        self.assertEqual(json["@display_value"], "ONE, TWO")
+        self.assertEqual(
+            [inner["display_value"] for inner in json["instance_details"]],
+            ["ONE", "TWO"],
+        )

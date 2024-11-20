@@ -2375,7 +2375,6 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
             Resource,
         )  # import here rather than top to avoid circular import
 
-        resourceid = None
         data = self.get_tile_data(tile)
         if data:
             nodevalue = self.get_nodevalues(data[str(node.nodeid)])
@@ -2388,13 +2387,16 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
                 except (TypeError, ValueError, KeyError):
                     pass
             other_resources = Resource.objects.filter(pk__in=other_resource_ids)
-            for resourceid in other_resource_ids:
+            for resourceXresource in nodevalue:
+                tileResourceId = uuid.UUID(resourceXresource["resourceId"])
                 for candidate in other_resources:
-                    if candidate.pk == resourceid:
+                    if candidate.pk == tileResourceId:
                         related_resource = candidate
                         break
                 else:
-                    logger.info(f'Resource with id "{resourceid}" not in the system.')
+                    logger.info(
+                        f'Resource with id "{tileResourceId}" not in the system.'
+                    )
                     continue
                 displayname = related_resource.displayname()
                 resourceXresource["display_value"] = displayname
