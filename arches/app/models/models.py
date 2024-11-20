@@ -1652,7 +1652,11 @@ class ResourceInstance(models.Model):
             root_nodes := getattr(self, "_fetched_root_nodes", set())
         ):
             aliases = [n.alias for n in root_nodes]
-            from_queryset = self.__class__.as_model(self.graph.slug, only=aliases)
+            from_queryset = self.__class__.as_model(
+                self.graph.slug,
+                only=aliases,
+                as_representation=getattr(self, "_as_representation", False),
+            )
             super().refresh_from_db(using, fields, from_queryset)
             # Copy over annotations and annotated tiles.
             refreshed_resource = from_queryset[0]

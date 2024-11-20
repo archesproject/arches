@@ -150,5 +150,5 @@ class ArchesModelSerializer(serializers.ModelSerializer):
             graph_slug=self.__class__.Meta.graph_slug,
             only=None if meta.nodegroups == "__all__" else meta.nodegroups,
         ).get(pk=instance_without_tile_data.pk)
-        # TODO: fullest/hydrated version of tile data not yet appearing?
+        instance_from_factory._as_representation = True
         return self.update(instance_from_factory, validated_data)
