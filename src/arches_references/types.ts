@@ -107,12 +107,3 @@ export interface MoveLabels {
     moveDown: string;
     changeParent: string;
 }
-
-// From PrimeVue, not importable directly
-export interface FileContentProps {
-    files: [];
-    badgeSeverity: string;
-    badgeValue: string;
-    previewWidth: number;
-    templates: null;
-}

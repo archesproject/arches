@@ -1,5 +1,6 @@
 import uuid
 
+from django.db.models.fields.json import JSONField
 from django.utils.translation import get_language, gettext as _
 
 from arches.app.datatypes.base import BaseDataType
@@ -9,6 +10,8 @@ from arches_references.models import ListItem
 
 
 class ReferenceDataType(BaseDataType):
+    rest_framework_model_field = JSONField(null=True)
+
     def validate(
         self,
         value,
@@ -79,6 +82,12 @@ class ReferenceDataType(BaseDataType):
 
     def transform_value_for_tile(self, value, **kwargs):
         list_id = kwargs.get("controlledList")
+        if (
+            isinstance(value, list)
+            and isinstance(value[0], dict)
+            and "value" in value[0]
+        ):
+            value = value[0]["value"]
         if isinstance(value, str):
             found_item = self.lookup_listitem_from_label(value, list_id)
             if found_item:
