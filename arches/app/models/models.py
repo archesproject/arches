@@ -613,39 +613,6 @@ class GraphModel(models.Model):
 
         super(GraphModel, self).save(*args, **kwargs)
 
-    @classmethod
-    def check(cls, **kwargs):
-        errors = super().check(**kwargs)
-        errors.extend(cls._check_publication_in_every_language())
-        return errors
-
-    @classmethod
-    def _check_publication_in_every_language(cls):
-        errors = []
-        system_languages = {lang[0] for lang in settings.LANGUAGES}
-
-        for graph in (
-            cls.objects.filter(publication__isnull=False)
-            .select_related("publication")
-            .prefetch_related("publication__publishedgraph_set")
-        ):
-            languages_with_a_publication = {
-                published_graph.language_id
-                for published_graph in graph.publication.publishedgraph_set.all()
-            }
-            missing_languages = system_languages - languages_with_a_publication
-            if missing_languages:
-                errors.append(
-                    checks.Error(
-                        "This graph is not published in all enabled languages.",
-                        hint="Run python manage.py graph publish --update",
-                        obj=graph,
-                        id="arches.E004",  # TODO: enum in arches 8
-                    )
-                )
-
-        return errors
-
     def __str__(self):
         return str(self.name)
 

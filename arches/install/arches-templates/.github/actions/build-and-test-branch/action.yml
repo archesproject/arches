@@ -33,7 +33,7 @@ runs:
     
     - name: Ensure frontend configuration files exist
       run: |
-          python manage.py check --tag=compatibility
+          python manage.py check
       shell: bash
 
     - name: Install Arches applications
@@ -74,7 +74,7 @@ runs:
 
     - name: Check for missing migrations
       run: |
-        python manage.py makemigrations --check --skip-checks
+        python manage.py makemigrations --check
       shell: bash
 
     - name: Ensure previous Python coverage data is erased

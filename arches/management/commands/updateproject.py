@@ -51,30 +51,3 @@ class Command(BaseCommand):  # pragma: no cover
             os.remove(declarations_test_file_path)
 
         self.stdout.write("Done!")
-
-        # Update certain lines in GitHub Actions workflows.
-        self.stdout.write("Updating GitHub Actions...")
-        action_path = os.path.join(
-            settings.APP_ROOT,
-            "..",
-            ".github",
-            "actions",
-            "build-and-test-branch",
-            "action.yml",
-        )
-        if os.path.exists(action_path):
-            first_find = "python manage.py check\n"
-            first_replace = "python manage.py check --tag=compatibility\n"
-            second_find = "python manage.py makemigrations --check\n"
-            second_replace = "python manage.py makemigrations --check --skip-checks\n"
-            with open(action_path, "r") as f:
-                content = f.readlines()
-            for i, line in enumerate(content):
-                if line.endswith(first_find):
-                    content[i] = line.replace(first_find, first_replace)
-                elif line.endswith(second_find):
-                    content[i] = line.replace(second_find, second_replace)
-            with open(action_path, "w") as f:
-                f.writelines(content)
-
-        self.stdout.write("Done!")
