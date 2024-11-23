@@ -23,14 +23,7 @@ from django.db import connection, transaction
 
 
 class Command(BaseCommand):
-    """
-    Commands for adding arches test users
-
-    """
-
-    # Silence system checks since this command is the cure for
-    # one of the system checks (arches.E004)
-    requires_system_checks = []
+    """Commands for updating graphs."""
 
     def add_arguments(self, parser):
         parser.add_argument(
