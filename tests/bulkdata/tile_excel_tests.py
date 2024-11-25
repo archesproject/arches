@@ -23,6 +23,7 @@ from django.conf import settings
 from django.core.management import call_command
 from django.test import TransactionTestCase
 
+from arches.app.models.models import TileModel
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import (
     import_graph as ResourceGraphImporter,
@@ -57,3 +58,7 @@ class TileExcelTests(TransactionTestCase):
         )
         call_command("etl", "tile-excel-importer", source=excel_file_path, stdout=out)
         self.assertIn("succeeded", out.getvalue())
+
+        new_tiles = TileModel.objects.all()
+        self.assertEqual(new_tiles.count(), 6)
+        self.assertEqual(new_tiles.filter(sortorder=1).count(), 2)
