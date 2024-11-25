@@ -24,6 +24,7 @@ from django.utils.translation import get_language, gettext as _
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.files.base import ContentFile
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.debug import sensitive_variables
 from django.utils import translation
 from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
@@ -1127,6 +1128,7 @@ class Plugins(View):
 
 
 class SearchExport(View):
+    @sensitive_variables("user_cred")
     @method_decorator(
         ratelimit(
             key="header:http-authorization", rate=settings.RATE_LIMIT, block=False
