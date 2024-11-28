@@ -34,6 +34,7 @@ def index(request):
             "main_script": "index",
             "active_page": "Home",
             "app_title": settings.APP_TITLE,
+            "app_name": settings.APP_NAME,
             "copyright_text": settings.COPYRIGHT_TEXT,
             "copyright_year": settings.COPYRIGHT_YEAR,
             "app_version": settings.APP_VERSION,
