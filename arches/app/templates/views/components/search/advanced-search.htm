@@ -112,14 +112,16 @@
                     ><i class="fa fa-times-circle"></i></span>
                 </div>
                 <div class="tools">
-                    <a role="button" class="tree-display-tool" style="width: max-content;color: #777; font-size: 1.2rem;" data-bind="click: function () {searchableGraphs(searchableGraphs().map(graph=>graph.collapsed(false))) },
-                        attr: {
-                            'aria-label': $root.translations.resourceTypeSearchFacets(name),
-                        }"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
-                    <a role="button" class="tree-display-tool" style="width: max-content;color: #777; font-size: 1.2rem; margin-left: 9px;" data-bind="click: function () {searchableGraphs(searchableGraphs().map(graph=>graph.collapsed(true))) },
-                        attr: {
-                            'aria-label': $root.translations.resourceTypeSearchFacets(name),
-                        }"><i class="ion-minus"></i></span>{% trans ' Collapse' %}</a>
+                    <a role="button" class="tree-display-tool" 
+                    style="width: max-content;color: #777; font-size: 1.2rem;"
+                    data-bind="onEnterkeyClick, onSpaceClick,
+                    click: function () {searchableGraphs(searchableGraphs().map(graph=>graph.collapsed(false)))}">
+                    <i class="ion-plus"></i>{% trans ' Expand' %}</a>
+                    <a role="button" class="tree-display-tool"
+                    style="width: max-content;color: #777; font-size: 1.2rem; margin-left: 9px;"
+                    data-bind="onEnterkeyClick, onSpaceClick, 
+                    click: function () {searchableGraphs(searchableGraphs().map(graph=>graph.collapsed(true)))}">
+                    <i class="ion-minus"></i></span>{% trans ' Collapse' %}</a>
                 </div>
             </div>
             <!-- ko foreach: searchableGraphs -->
