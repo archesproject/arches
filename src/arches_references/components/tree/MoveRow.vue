@@ -33,6 +33,7 @@ import type { Language } from "@/arches_vue_utils/types";
 import type {
     ControlledList,
     ControlledListItem,
+    IconLabels,
     MoveLabels,
     RowSetter,
     Selectable,
@@ -55,7 +56,8 @@ const {
     setDisplayedRow: RowSetter;
 };
 
-const { moveLabels, node } = defineProps<{
+const { iconLabels, moveLabels, node } = defineProps<{
+    iconLabels: IconLabels;
     moveLabels: MoveLabels;
     node: TreeNode;
 }>();
@@ -107,6 +109,7 @@ const setMovingItem = (node: TreeNode) => {
             itemAsNode(
                 displayedRow.value as ControlledListItem,
                 selectedLanguage.value,
+                iconLabels,
             ),
         ],
         node.key,
@@ -138,7 +141,9 @@ const addItem = (parent: TreeNode) => {
     nextNewItem.value = newItem;
     newLabelCounter.value += 1;
 
-    parent.children!.push(itemAsNode(newItem, selectedLanguage.value));
+    parent.children!.push(
+        itemAsNode(newItem, selectedLanguage.value, iconLabels),
+    );
 
     expandedKeys.value = {
         ...expandedKeys.value,
@@ -181,7 +186,7 @@ const reorder = async (item: ControlledListItem, up: boolean) => {
     );
     tree.value = [
         ...tree.value.slice(0, oldListIndex),
-        listAsNode(list, selectedLanguage.value),
+        listAsNode(list, selectedLanguage.value, iconLabels),
         ...tree.value.slice(oldListIndex + 1),
     ];
     selectedKeys.value = {

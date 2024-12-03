@@ -41,6 +41,7 @@ import type { Language } from "@/arches_vue_utils/types";
 import type {
     ControlledList,
     ControlledListItem,
+    IconLabels,
     MoveLabels,
     NewControlledListItem,
     NewValue,
@@ -72,8 +73,9 @@ const newListFormValue = defineModel<string>("newListFormValue", {
 });
 const filterValue = defineModel<string>("filterValue", { required: true });
 
-const { isMultiSelecting, node, moveLabels } = defineProps<{
+const { isMultiSelecting, node, iconLabels, moveLabels } = defineProps<{
     isMultiSelecting: boolean;
+    iconLabels: IconLabels;
     moveLabels: MoveLabels;
     node: TreeNode;
 }>();
@@ -226,7 +228,7 @@ const acceptNewItemShortcutEntry = async () => {
 
     parent.children = [
         ...parent.children!.filter((child: TreeNode) => !dataIsNew(child.data)),
-        itemAsNode(newItem, selectedLanguage.value),
+        itemAsNode(newItem, selectedLanguage.value, iconLabels),
     ];
     if (nodeIsList(parent)) {
         parent.data.items.push(newItem);
@@ -266,7 +268,7 @@ const acceptNewListShortcutEntry = async () => {
     }
     tree.value = [
         ...tree.value.filter((cList) => !dataIsNew(cList.data)),
-        listAsNode(newList, selectedLanguage.value),
+        listAsNode(newList, selectedLanguage.value, iconLabels),
     ];
     selectedKeys.value = { [newList.id]: true };
     setDisplayedRow(newList);
@@ -346,6 +348,7 @@ const acceptNewListShortcutEntry = async () => {
                 v-model:moving-item="movingItem"
                 v-model:next-new-item="nextNewItem"
                 :node
+                :icon-labels
                 :move-labels
             />
         </div>

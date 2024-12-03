@@ -3,7 +3,6 @@ import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { displayedRowKey } from "@/arches_references/constants.ts";
-import LetterCircle from "@/arches_references/components/misc/LetterCircle.vue";
 import ListCharacteristic from "@/arches_references/components/editor/ListCharacteristic.vue";
 import ReferenceNodeLink from "@/arches_references/components/editor/ReferenceNodeLink.vue";
 
@@ -20,10 +19,10 @@ const { $gettext } = useGettext();
 <template>
     <template v-if="list">
         <span class="controlled-list-header">
-            <LetterCircle
-                v-if="list"
-                :labelled="list"
-            />
+            <i
+                class="pi pi-folder"
+                :aria-label="$gettext('List')"
+            ></i>
             <h3>{{ list.name }}</h3>
         </span>
         <div>

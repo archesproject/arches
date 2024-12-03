@@ -6,6 +6,7 @@ import type {
     ControlledList,
     ControlledListItem,
     ControlledListItemImageMetadata,
+    IconLabels,
     Selectable,
     Value,
 } from "@/arches_references/types";
@@ -74,26 +75,32 @@ export const findNodeInTree = (
 export const itemAsNode = (
     item: ControlledListItem,
     selectedLanguage: Language,
+    iconLabels: IconLabels,
 ): TreeNode => {
     return {
         key: item.id,
         children: item.children.map((child) =>
-            itemAsNode(child, selectedLanguage),
+            itemAsNode(child, selectedLanguage, iconLabels),
         ),
         data: item,
+        icon: "pi pi-tag",
+        iconLabel: iconLabels.item,
     };
 };
 
 export const listAsNode = (
     list: ControlledList,
     selectedLanguage: Language,
+    iconLabels: IconLabels,
 ): TreeNode => {
     return {
         key: list.id,
         children: list.items.map((item: ControlledListItem) =>
-            itemAsNode(item, selectedLanguage),
+            itemAsNode(item, selectedLanguage, iconLabels),
         ),
         data: list,
+        icon: "pi pi-folder",
+        iconLabel: iconLabels.list,
     };
 };
 

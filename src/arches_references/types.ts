@@ -107,3 +107,8 @@ export interface MoveLabels {
     moveDown: string;
     changeParent: string;
 }
+
+export interface IconLabels {
+    list: string;
+    item: string;
+}

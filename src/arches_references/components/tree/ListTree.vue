@@ -13,7 +13,6 @@ import {
 } from "@/arches_references/constants.ts";
 import { routeNames } from "@/arches_references/routes.ts";
 import { findNodeInTree, nodeIsList } from "@/arches_references/utils.ts";
-import LetterCircle from "@/arches_references/components/misc/LetterCircle.vue";
 import ListTreeControls from "@/arches_references/components/tree/ListTreeControls.vue";
 import TreeRow from "@/arches_references/components/tree/TreeRow.vue";
 
@@ -31,11 +30,16 @@ import type {
 
 const { $gettext } = useGettext();
 
+// Defining these in the parent avoids re-running $gettext in thousands of children.
 const moveLabels = Object.freeze({
     addChild: $gettext("Add child item"),
     moveUp: $gettext("Move item up"),
     moveDown: $gettext("Move item down"),
     changeParent: $gettext("Change item parent"),
+});
+const iconLabels = Object.freeze({
+    list: $gettext("List"),
+    item: $gettext("Item"),
 });
 
 const tree: Ref<TreeNode[]> = ref([]);
@@ -304,9 +308,6 @@ const ptNodeContent = ({ instance }: TreePassThroughMethodOptions) => {
         @node-collapse="nextFilterChangeNeedsExpandAll = true"
         @node-select="updateSelectedAndExpanded"
     >
-        <template #nodeicon="slotProps">
-            <LetterCircle :labelled="slotProps.node.data" />
-        </template>
         <template #default="slotProps">
             <TreeRow
                 v-model:tree="tree"
@@ -319,6 +320,7 @@ const ptNodeContent = ({ instance }: TreePassThroughMethodOptions) => {
                 v-model:new-label-form-value="newLabelFormValue"
                 v-model:new-list-form-value="newListFormValue"
                 v-model:filter-value="filterValue"
+                :icon-labels
                 :move-labels
                 :node="slotProps.node"
                 :is-multi-selecting="isMultiSelecting"

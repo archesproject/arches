@@ -32,9 +32,7 @@ interface FileUploadInternals {
     state: FileUploadState;
 }
 
-const item = inject(
-    itemKey,
-) as Ref<ControlledListItem> as Ref<ControlledListItem>;
+const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const { $gettext } = useGettext();
 const toast = useToast();

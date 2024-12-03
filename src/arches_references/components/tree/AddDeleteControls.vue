@@ -35,6 +35,7 @@ import type { Language } from "@/arches_vue_utils/types";
 import type {
     ControlledList,
     ControlledListItem,
+    IconLabels,
     RowSetter,
     Selectable,
 } from "@/arches_references/types";
@@ -101,6 +102,11 @@ const deleteSelectOptions = [
     },
 ];
 
+const iconLabels: IconLabels = {
+    list: $gettext("List"),
+    item: $gettext("Item"),
+};
+
 const createList = () => {
     const newList: ControlledList = {
         id: newListCounter.value.toString(),
@@ -114,7 +120,7 @@ const createList = () => {
     nextNewList.value = newList;
     newListCounter.value += 1;
 
-    tree.value.push(listAsNode(newList, selectedLanguage.value));
+    tree.value.push(listAsNode(newList, selectedLanguage.value, iconLabels));
 
     selectedKeys.value = { [newList.id]: true };
     setDisplayedRow(newList);
@@ -231,7 +237,9 @@ const fetchListsAndPopulateTree = async () => {
         .then(
             ({ controlled_lists }: { controlled_lists: ControlledList[] }) => {
                 tree.value = controlled_lists
-                    .map((list) => listAsNode(list, selectedLanguage.value))
+                    .map((list) =>
+                        listAsNode(list, selectedLanguage.value, iconLabels),
+                    )
                     .sort(
                         (a, b) =>
                             priorSortedListIds.indexOf(a.key) -
