@@ -31,7 +31,7 @@ const ControlledListsPreset = definePreset(ArchesPreset, {
 
 const ControlledListsTheme = {
     theme: {
-        ...DEFAULT_THEME,
+        ...DEFAULT_THEME.theme,
         preset: ControlledListsPreset,
     },
 };
