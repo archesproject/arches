@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10437_node_alias_not_null"),
+        ("models", "11408_loadstaging_sortorder"),
     ]
 
     operations = [
