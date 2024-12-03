@@ -35,16 +35,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         gtag('config', '{{app_settings.GOOGLE_ANALYTICS_TRACKING_ID}}');
     </script>
     {% endif %}
-    <script>
-        const darkModeToggleState = localStorage.getItem("arches-dark");
-        if (
-            darkModeToggleState === "true" ||
-            (darkModeToggleState === null &&
-                window.matchMedia("(prefers-color-scheme: dark)").matches)
-        ) {
-            document.documentElement.classList.add("arches-dark");
-        }
-    </script>
     <title>
         {% block title %}{% endblock title %}
     </title>
