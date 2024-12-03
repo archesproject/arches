@@ -157,7 +157,7 @@ class GraphManagerViewTests(ArchesTestCase):
             }
             Edge.objects.create(**edges_dict).save()
 
-        graph = Graph.new()
+        graph = Graph.new(is_resource=True)
         graph.ontology_id = "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd"
         graph.root.ontologyclass = "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity"
         graph.name = "TEST GRAPH"

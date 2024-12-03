@@ -1075,6 +1075,7 @@ class Graph(models.GraphModel):
             copy_of_self.root = root_node
             copy_of_self.name = root_node.name
             copy_of_self.isresource = False
+            copy_of_self.resource_instance_lifecycle = None
             copy_of_self.subtitle = ""
             copy_of_self.description = ""
             copy_of_self.author = ""
