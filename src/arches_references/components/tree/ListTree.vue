@@ -231,14 +231,6 @@ function lazyLabelLookup(node: TreeNode) {
         ).value;
     }
 }
-
-// Factored out because of vue-tsc problems inside the pt object
-const ptNodeContent = ({ instance }: TreePassThroughMethodOptions) => {
-    if (instance.$el && instance.node.key === movingItem.value?.key) {
-        instance.$el.classList.add("is-adjusting-parent");
-    }
-    return { style: { height: "4rem" } };
-};
 </script>
 
 <template>
@@ -292,7 +284,15 @@ const ptNodeContent = ({ instance }: TreePassThroughMethodOptions) => {
                 },
             },
             container: { style: { fontSize: '1.4rem' } },
-            nodeContent: ptNodeContent,
+            nodeContent: ({ instance }: TreePassThroughMethodOptions) => {
+                if (instance.$el && instance.node.key === movingItem?.key) {
+                    instance.$el.classList.add('is-adjusting-parent');
+                }
+                return { style: { height: '4rem' } };
+            },
+            nodeIcon: ({ instance }: TreePassThroughMethodOptions) => {
+                return { ariaLabel: instance.node.iconLabel };
+            },
             nodeLabel: {
                 style: {
                     textWrap: 'nowrap',
