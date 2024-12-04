@@ -3,12 +3,12 @@ from psycopg2.extensions import AsIs, QuotedString
 
 
 class JSONPathFilter:
-    """Handle the double-quoting and escaping for JSONPath filters."""
-
     def process_rhs(self, compiler, connection):
         rhs, params = super().process_rhs(compiler, connection)
-        escaped = AsIs(QuotedString(params[0]).getquoted().decode()[1:-1])
-        return rhs, (escaped,)
+        if '"' in params[0]:
+            raise ValueError("Double quotes are not allowed in JSONPath filters.")
+        quoted = AsIs(QuotedString(params[0]).getquoted().decode()[1:-1])
+        return rhs, (quoted,)
 
 
 @JSONField.register_lookup
