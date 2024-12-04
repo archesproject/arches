@@ -38,7 +38,7 @@ const { $gettext } = useGettext();
     margin: 5rem 5rem 2rem 5rem;
     border: 1px solid #ddd;
     padding: 4rem 3rem;
-    background: #f6f6f6;
+    background: var(--p-content-hover-background);
     border-radius: var(--p-content-border-radius);
     display: flex;
     flex-direction: column;
@@ -46,7 +46,6 @@ const { $gettext } = useGettext();
 }
 
 .controlled-list-splash-title {
-    color: #666;
     font-size: 2.8rem;
     margin-bottom: 3rem;
     margin-top: 2.5rem;
@@ -70,7 +69,6 @@ i {
 
 .controlled-list-splash-description {
     font-size: 1.5rem;
-    color: #666;
     font-weight: 500;
 }
 </style>

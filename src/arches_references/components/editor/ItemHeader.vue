@@ -42,7 +42,6 @@ const iconLabel = (item: ControlledListItem) => {
             :href="item.uri"
             rel="noreferrer"
             target="_blank"
-            style="font-size: small; color: blue; text-decoration: underline"
         >
             {{ item.uri }}
         </a>
@@ -67,5 +66,11 @@ h3 {
 .item-type {
     font-size: small;
     font-weight: 200;
+}
+
+a {
+    font-size: small;
+    color: var(--p-text-color);
+    text-decoration: underline;
 }
 </style>

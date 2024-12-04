@@ -277,7 +277,7 @@ const ptNodeContent = ({ instance }: TreePassThroughMethodOptions) => {
             },
             pcFilterIconContainer: {
                 root: {
-                    style: { top: '25%' },
+                    style: { display: 'flex' },
                 },
             },
             wrapper: {

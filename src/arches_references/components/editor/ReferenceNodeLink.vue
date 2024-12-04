@@ -19,7 +19,7 @@ const { $gettext } = useGettext();
         }}<a
             :href="arches.urls.graph_designer(node.graph_id)"
             target="_blank"
-            style="text-decoration: underline"
+            style="text-decoration: underline; color: var(--p-content-color)"
         >
             <i
                 class="fa fa-reply"
@@ -40,7 +40,7 @@ const { $gettext } = useGettext();
     text-align: center;
     border-radius: var(--p-content-border-radius);
     height: 3rem;
-    background: var(--p-gray-200);
+    background: var(--p-content-hover-background);
     text-wrap: nowrap;
 }
 </style>
