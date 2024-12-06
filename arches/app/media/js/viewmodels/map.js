@@ -345,10 +345,17 @@ define([
                 var id = data.resourceinstanceid;
                 const userid = ko.unwrap(self.userid);
                 data.showFilterByFeatureButton = !!params.search;
-                data.showEditButton = false;
                 data.sendFeatureToMapFilter = mapPopupProvider.sendFeatureToMapFilter.bind(mapPopupProvider);
                 data.showFilterByFeature = mapPopupProvider.showFilterByFeature.bind(mapPopupProvider);
                 const descriptionProperties = ['displayname', 'graph_name', 'map_popup', 'geometries'];
+                const setEditButtonVisibility = function(data)
+                {
+                    const isFeatureEditable = self.canEdit &&
+                    ko.unwrap(data.permissions)?.users_without_edit_perm?.includes(userid) === false ||
+                    ko.unwrap(data.permissions)?.principal_user?.includes(userid) ||
+                    ko.unwrap(data.permissions)?.users_edit?.includes(userid);
+                    data.showEditButton(isFeatureEditable);
+                }
                 if (id) {
                     if (!self.resourceLookup[id]){
                         data = _.defaults(data, {
@@ -358,21 +365,16 @@ define([
                             'map_popup': '',
                             'geometries': [],
                             'feature': feature,
+                            'showEditButton': ko.observable(false)
                         });
+
                         if (data.permissions) {
                             try {
                                 data.permissions = JSON.parse(ko.unwrap(data.permissions));
                             } catch (err) {
                                 data.permissions = koMapping.toJS(ko.unwrap(data.permissions));
                             }
-
-                            const hasInstanceEditPermission = data.permissions.users_without_edit_perm?.includes(userid) === false || 
-                                data.permissions.principal_user?.includes(userid) || 
-                                data.permissions.users_edit?.includes(userid);
-
-                            if (self.canEdit && hasInstanceEditPermission) {
-                                data.showEditButton = true;
-                            }
+                            setEditButtonVisibility(data);
                         }
                         descriptionProperties.forEach(prop => data[prop] = ko.observable(data[prop]));
                         data.reportURL = arches.urls.resource_report;
@@ -381,6 +383,8 @@ define([
                         $.get(arches.urls.resource_descriptors + id, function(data) {
                             data.loading = false;
                             descriptionProperties.forEach(prop => self.resourceLookup[id][prop](data[prop]));
+                            self.resourceLookup[id].permissions = data["permissions"];
+                            setEditButtonVisibility(self.resourceLookup[id]);
                         });
                     }
                     self.resourceLookup[id].feature = feature;
