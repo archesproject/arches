@@ -726,7 +726,8 @@ class NodeGroup(models.Model):
         db_column="groupingnodeid",
         blank=True,
         null=True,
-        on_delete=models.PROTECT,
+        # models.RESTRICT might be better, but revisit after future graph refactor.
+        on_delete=models.SET_NULL,
         related_name="grouping_node_nodegroup",
     )
 

@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 db_column="groupingnodeid",
                 null=True,
-                on_delete=django.db.models.deletion.PROTECT,
+                on_delete=django.db.models.deletion.SET_NULL,
                 related_name="grouping_node_nodegroup",
                 to="models.node",
             ),
