@@ -1,4 +1,4 @@
-require([
+define([
     'jquery',
     'underscore',
     'knockout',
@@ -11,7 +11,7 @@ require([
     'bindings/hover',
     'bindings/chosen',
     'utils/set-csrf-token',
-], function($, _, ko, arches, graphManagerData, BaseManager, AlertViewModel, JsonErrorAlertViewModel) {   
+], function($, _, ko, arches, graphManagerData, BaseManager, AlertViewModel, JsonErrorAlertViewModel) {
     var GraphView = BaseManager.extend({
         /**
         * Initializes an instance of BaseManager, optionally using a passed in view
@@ -74,9 +74,9 @@ require([
                 };
                 graph.deleteGraph = function() {
                     self.viewModel.alert(new AlertViewModel(
-                        'ep-alert-red', 
-                        arches.translations.confirmGraphDelete.title, 
-                        arches.translations.confirmGraphDelete.text, 
+                        'ep-alert-red',
+                        arches.translations.confirmGraphDelete.title,
+                        arches.translations.confirmGraphDelete.text,
                         function() {
                             return;
                         }, function(){
@@ -98,9 +98,9 @@ require([
                 };
                 graph.deleteInstances = function() {
                     self.viewModel.alert(new AlertViewModel(
-                        'ep-alert-red', 
-                        arches.translations.confirmAllResourceDelete.title, 
-                        arches.translations.confirmAllResourceDelete.text, 
+                        'ep-alert-red',
+                        arches.translations.confirmAllResourceDelete.title,
+                        arches.translations.confirmAllResourceDelete.text,
                         function() {
                             return;
                         }, function(){
@@ -143,14 +143,14 @@ require([
                         resources = self.viewModel.graphs();
                     }
 
-                    return resources.reduce((acc, resource) => { 
+                    return resources.reduce((acc, resource) => {
                         if (!resource.source_identifier_id) {
                             const editableFutureGraph = resources.find(graph => graph.source_identifier_id === resource.graphid);
-                            
+
                             if (editableFutureGraph) {
                                 resource['has_unpublished_changes'] = editableFutureGraph['has_unpublished_changes'];
                             }
-                            
+
                             acc.push(resource);
                         }
                         return acc;
@@ -166,6 +166,7 @@ require([
                     var formData = new FormData();
                     formData.append("importedGraph", e.target.files[0]);
 
+                    self.viewModel.loading(true);
                     $.ajax({
                         type: "POST",
                         url: 'import/',
