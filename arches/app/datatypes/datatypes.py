@@ -2286,7 +2286,7 @@ class ResourceInstanceDataType(BaseDataType):
                             # TODO: move this to validate?
                             inner.pop("display_value", None)
                             transformed.append(inner)
-                    return transformed
+                return transformed
             if isinstance(value, models.ResourceInstance):
                 return [from_id_string(str(value.pk), value.graph_id)]
 
