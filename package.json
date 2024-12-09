@@ -27,7 +27,7 @@
         "@mapbox/geojson-extent": "~1.0.1",
         "@mapbox/geojsonhint": "^3.3.0",
         "@mapbox/mapbox-gl-draw": "^1.4.3",
-        "@mapbox/mapbox-gl-geocoder": "^4.4.0",
+        "@mapbox/mapbox-gl-geocoder": "^5.0.3",
         "@primevue/themes": "4.1.0",
         "@tmcw/togeojson": "^4.3.0",
         "@turf/turf": "^6.5.0",
