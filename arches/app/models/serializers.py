@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from django.db.models import F
+from rest_framework.exceptions import ValidationError
 from rest_framework import fields
 from rest_framework import renderers
 from rest_framework import serializers
@@ -82,6 +83,13 @@ class ArchesTileSerializer(serializers.ModelSerializer):
             )
         return ret
 
+    def validate(self, data):
+        if hasattr(self, "initial_data") and (
+            unknown_keys := set(self.initial_data) - set(self.fields)
+        ):
+            raise ValidationError({unknown_keys.pop(): "Unexpected field"})
+        return data
+
 
 class ArchesModelSerializer(serializers.ModelSerializer):
     legacyid = serializers.CharField(max_length=255, required=False, allow_null=True)
@@ -142,6 +150,13 @@ class ArchesModelSerializer(serializers.ModelSerializer):
             required=False,
             allow_null=True,
         )
+
+    def validate(self, data):
+        if hasattr(self, "initial_data") and (
+            unknown_keys := set(self.initial_data) - set(self.fields)
+        ):
+            raise ValidationError({unknown_keys.pop(): "Unexpected field"})
+        return data
 
     def create(self, validated_data):
         meta = self.__class__.Meta
