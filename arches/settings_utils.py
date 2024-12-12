@@ -1,8 +1,8 @@
 import json
 import os
+from pathlib import Path
 import site
 import sys
-from contextlib import contextmanager
 
 from django.apps import apps
 from django.conf import settings
@@ -107,7 +107,7 @@ def build_templates_config(
 
         # forces Arches-level overrides of generic Django templates
         directories.append(
-            os.path.join(os.path.realpath(settings.ROOT_DIR), "app", "templates")
+            os.path.join(Path(__file__).resolve().parent, "app", "templates")
         )
 
         return [
