@@ -106,7 +106,9 @@ def build_templates_config(
             directories.append(os.path.join(app_root, "templates"))
 
         # forces Arches-level overrides of generic Django templates
-        directories.append(os.path.join(os.path.realpath(settings.ROOT_DIR), "app", "templates"))
+        directories.append(
+            os.path.join(os.path.realpath(settings.ROOT_DIR), "app", "templates")
+        )
 
         return [
             {
