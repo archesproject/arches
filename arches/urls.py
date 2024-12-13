@@ -736,7 +736,7 @@ urlpatterns = [
 
 # This must be included in core to keep webpack happy, but cannot be appended when running a project.
 # See https://github.com/archesproject/arches/pull/10754
-if settings.APP_NAME == "Arches":
+if settings.ROOT_URLCONF == __name__:
     if settings.SHOW_LANGUAGE_SWITCH is True:
         urlpatterns = i18n_patterns(*urlpatterns)
 
