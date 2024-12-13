@@ -52,7 +52,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <link rel="stylesheet" type="text/css" href="{% webpack_static 'plugins/slick/accessible-slick-theme.min.css' %}">
         {% render_bundle 'css/index' 'css' %}
         {% render_bundle 'css/index-slider' 'css' %}
-        
+
         {% if app_settings.ACCESSIBILITY_MODE %}
             {% render_bundle 'css/accessibility' 'css' %}
         {% endif %}
@@ -80,7 +80,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <img class="navbar-brand-v5-icon" src="{% webpack_static 'img/landing/Arches_logo_white.png' %}" alt="{% trans 'Arches Logo' %}">
                         </div>
                         <div class="application-name">
-                            <h1>{% blocktrans %}Arches | {{version}}{% endblocktrans %}</h1>
+                            <h1>{% blocktrans %}{{app_name}} | {{version}}{% endblocktrans %}</h1>
                         </div>
                     </div>
                 </div>
@@ -168,7 +168,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="slide-img-container">
                         <img src="{% webpack_static 'img/landing/landing-primary.jpg' %}" alt="" aria-describedby="slide1-attribution">
                         <div class="slide-caption">
-                            <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
+                            <h2>{% blocktrans %}{{app_name}} {{version}}{% endblocktrans %}</h2>
                             <p>{% trans "A web and mobile platform for" %}</p>
                             <p>{% trans "managing your most important resource information" %}</p>
                         </div>
@@ -177,7 +177,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="slide-img-container">
                         <img src="{% webpack_static 'img/landing/bhutan_tigersnest_lr.jpg' %}" alt="" aria-describedby="slide2-attribution">
                         <div class="slide-caption">
-                            <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
+                            <h2>{% blocktrans %}{{app_name}} {{version}}{% endblocktrans %}</h2>
                             <p>{% trans "A web and mobile platform for" %}</p>
                             <p>{% trans "managing your most important resource information" %}</p>
                         </div>
@@ -186,7 +186,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="slide-img-container">
                         <img src="{% webpack_static 'img/landing/potala_palace.jpg' %}" alt="" aria-describedby="slide3-attribution">
                         <div class="slide-caption">
-                            <h2>{% blocktrans %}Arches {{version}}{% endblocktrans %}</h2>
+                            <h2>{% blocktrans %}{{app_name}} {{version}}{% endblocktrans %}</h2>
                             <p>{% trans "A web and mobile platform for" %}</p>
                             <p>{% trans "managing your most important resource information" %}</p>
                         </div>
@@ -484,7 +484,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         ], function ($, ko) {
             $(document).ready(function () {
                 App.init();
-                
+
                 var contentSections = $('.app-info-block'),
                     navigationItems = $('#cd-vertical-nav a');
 
