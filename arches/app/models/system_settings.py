@@ -22,9 +22,6 @@ from django.core.exceptions import ImproperlyConfigured
 from arches.app.models import models
 
 
-tiles_loaded = False
-
-
 class SystemSettings(LazySettings):
     """
     This class can be used just like you would use settings.py
@@ -36,12 +33,15 @@ class SystemSettings(LazySettings):
         settings.SEARCH_ITEMS_PER_PAGE
 
         # will list all settings
-        print(settings)
+        print settings
 
     """
 
     SYSTEM_SETTINGS_RESOURCE_MODEL_ID = "ff623370-fa12-11e6-b98b-6c4008b05c4c"
     RESOURCE_INSTANCE_ID = "a106c400-260c-11e7-a604-14109fd34195"
+
+    def __init__(self, *args, **kwargs):
+        super(SystemSettings, self).__init__(*args, **kwargs)
 
     def __str__(self):
         ret = []
@@ -53,21 +53,24 @@ class SystemSettings(LazySettings):
 
     def __getattr__(self, name):
         """
-        Defer loading of system settings tiles until first access.
-        An effort toward avoiding module-level queries, which are discouraged:
-        https://docs.djangoproject.com/stable/ref/applications/#troubleshooting
-        """
-        global tiles_loaded
-        if not tiles_loaded:
-            # Optimistically set this True to avoid concurrent queries.
-            tiles_loaded = True
-            try:
-                self.update_from_db()
-            except ImportError:
-                # Circular imports. Try again later.
-                tiles_loaded = False
+        By default get settings from this class which is initially populated from the settings.py filter
+        If a setting is requested that isn't found, assume it's saved in the database and try and retrieve it from there
+        by calling update_from_db first which populates this class with any settings from the database
 
-        return super().__getattr__(name)
+        What this means is that update_from_db will only be called once a setting is requested that isn't initially in the settings.py file
+        Only then will settings from the database be applied (and potentially overwrite settings found in settings.py)
+
+        """
+
+        try:
+            return super(SystemSettings, self).__getattr__(name)
+        except ImproperlyConfigured:
+            raise
+        except:
+            self.update_from_db()
+            return super(SystemSettings, self).__getattr__(
+                name
+            )  # getattr(self, name, True)
 
     def setting_exists(self, name):
         """
