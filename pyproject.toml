@@ -7,7 +7,7 @@ dynamic = ["version"]
 name = "arches"
 readme = "README.md"
 authors = [
-    {name = "archesproject.org"}
+    {name = "Arches Project"}
 ]
 license = {text = "GNU AGPL3"}
 requires-python = ">=3.10"
