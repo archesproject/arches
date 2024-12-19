@@ -164,7 +164,10 @@ def generate_frontend_configuration():
             "WEBPACK_DEVELOPMENT_SERVER_PORT": settings.WEBPACK_DEVELOPMENT_SERVER_PORT,
         }
 
-        if settings.APP_NAME == "Arches":
+        if str(Path(app_root_path).parent) == root_dir_path:
+            # Running core arches directly without a project, e.g.:
+            # app_root_path: arches/app
+            # root_dir_path: arches
             base_path = root_dir_path
         else:
             base_path = app_root_path
