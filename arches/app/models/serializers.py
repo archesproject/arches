@@ -156,6 +156,8 @@ class ArchesModelSerializer(serializers.ModelSerializer):
             unknown_keys := set(self.initial_data) - set(self.fields)
         ):
             raise ValidationError({unknown_keys.pop(): "Unexpected field"})
+        if not data.get("graph_id"):
+            data["graph_id"] = self.fields["graph"].queryset.first().pk
         return data
 
     def create(self, validated_data):
