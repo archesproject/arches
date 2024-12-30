@@ -20,4 +20,24 @@ class Migration(migrations.Migration):
             name="tileid",
             field=models.UUIDField(blank=True, primary_key=True, serialize=False),
         ),
+        migrations.AlterField(
+            model_name="resourceinstance",
+            name="graph",
+            field=models.ForeignKey(
+                blank=True,
+                db_column="graphid",
+                on_delete=models.deletion.CASCADE,
+                to="models.graphmodel",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="resourceinstance",
+            name="resource_instance_lifecycle_state",
+            field=models.ForeignKey(
+                blank=True,
+                on_delete=models.deletion.PROTECT,
+                related_name="resource_instances",
+                to="models.resourceinstancelifecyclestate",
+            ),
+        ),
     ]

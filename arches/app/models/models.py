@@ -25,7 +25,6 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils import import_class_from_string
 from django.contrib.auth.models import Group, User
 from django.contrib.gis.db import models
-from django.core import checks
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.core.exceptions import ValidationError
@@ -1210,7 +1209,9 @@ class ResourceInstance(models.Model):
     resourceinstanceid = models.UUIDField(
         primary_key=True, blank=True, db_default=UUID4()
     )
-    graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
+    graph = models.ForeignKey(
+        GraphModel, db_column="graphid", blank=True, on_delete=models.CASCADE
+    )
     graph_publication = models.ForeignKey(
         GraphXPublishedGraph,
         null=True,
@@ -1222,6 +1223,7 @@ class ResourceInstance(models.Model):
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
     resource_instance_lifecycle_state = models.ForeignKey(
+        blank=True,
         on_delete=models.PROTECT,
         to="models.ResourceInstanceLifecycleState",
         related_name="resource_instances",
