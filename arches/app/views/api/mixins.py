@@ -1,4 +1,5 @@
 from functools import partial
+from itertools import chain
 
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -91,8 +92,9 @@ class ArchesModelAPIMixin:
         try:
             serializer.save()
         except DjangoValidationError as django_error:
-            # TODO: doesn't handle well inner lists, stringifies them
-            raise ValidationError(detail=django_error.error_dict) from django_error
+            raise ValidationError(
+                detail=self.flatten_validation_errors(django_error)
+            ) from django_error
         # The backend hydrates additional data, so make sure to use it.
         # We could avoid this by only validating data during clean(),
         # not save(), but we do graph/node queries during each phase.
@@ -106,3 +108,18 @@ class ArchesModelAPIMixin:
 
     def perform_update(self, serializer):
         self.validate_tile_data_and_save(serializer)
+
+    @staticmethod
+    def flatten_validation_errors(error):
+        """DRF's ValidationError doesn't really handle nesting, so unpack
+        one level."""
+        if hasattr(error, "error_dict"):
+            return {
+                k: (
+                    list(chain.from_iterable(inner.messages for inner in v))
+                    if all(isinstance(inner, DjangoValidationError) for inner in v)
+                    else v
+                )
+                for k, v in error.error_dict.items()
+            }
+        return error
