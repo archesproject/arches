@@ -367,7 +367,6 @@ class Graph(models.GraphModel):
                 node.nodegroup = self.get_or_create_nodegroup(
                     nodegroupid=node.nodegroup_id
                 )
-                node.nodegroup.grouping_node_id = node.nodegroup_id
                 if nodegroups is not None and str(node.nodegroup_id) in nodegroups:
                     node.nodegroup.cardinality = nodegroups[str(node.nodegroup_id)][
                         "cardinality"
@@ -1847,7 +1846,7 @@ class Graph(models.GraphModel):
         try:
             return models.NodeGroup.objects.get(pk=nodegroupid)
         except models.NodeGroup.DoesNotExist:
-            return models.NodeGroup(pk=nodegroupid)
+            return models.NodeGroup(pk=nodegroupid, grouping_node_id=nodegroupid)
 
     def get_root_nodegroup(self):
         """
