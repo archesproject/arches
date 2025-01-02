@@ -292,10 +292,11 @@ class ConceptDataType(BaseConceptDataType):
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
         if data:
-            val = data[str(node.nodeid)]
-            value_data = JSONSerializer().serializeToPython(
-                self.get_value(uuid.UUID(val))
-            )
+            value_data = {}
+            if val := data[str(node.nodeid)]:
+                value_data = JSONSerializer().serializeToPython(
+                    self.get_value(uuid.UUID(val))
+                )
             return self.compile_json(tile, node, **value_data)
 
     def get_rdf_uri(self, node, data, which="r", c=None):
