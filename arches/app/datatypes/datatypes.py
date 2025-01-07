@@ -751,10 +751,11 @@ class DateDataType(BaseDataType):
                 else:
                     v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
             # The .astimezone() function throws an error on Windows for dates before 1970
-            try:
-                v = v.astimezone()
-            except:
-                v = self.backup_astimezone(v)
+            if isinstance(v, datetime):
+                try:
+                    v = v.astimezone()
+                except:
+                    v = self.backup_astimezone(v)
             value = v.isoformat(timespec="milliseconds")
         return value
 
