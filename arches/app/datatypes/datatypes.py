@@ -742,11 +742,14 @@ class DateDataType(BaseDataType):
                 type(value) == str and len(value) < 4 and value.startswith("-") is False
             ):  # a year before 1000 but not BCE
                 value = value.zfill(4)
-            valid_date_format, valid = self.get_valid_date_format(value)
-            if valid:
-                v = datetime.strptime(value, valid_date_format)
+            if isinstance(value, datetime):
+                v = value
             else:
-                v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+                valid_date_format, valid = self.get_valid_date_format(value)
+                if valid:
+                    v = datetime.strptime(value, valid_date_format)
+                else:
+                    v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
             # The .astimezone() function throws an error on Windows for dates before 1970
             try:
                 v = v.astimezone()
