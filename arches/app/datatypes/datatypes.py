@@ -756,7 +756,9 @@ class DateDataType(BaseDataType):
                     v = v.astimezone()
                 except:
                     v = self.backup_astimezone(v)
-            value = v.isoformat(timespec="milliseconds")
+                value = v.isoformat(timespec="milliseconds")
+            elif isinstance(v, date):
+                value = v.isoformat()
         return value
 
     def backup_astimezone(self, dt):
