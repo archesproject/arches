@@ -102,14 +102,15 @@ class MapBaseManagerView(BaseManagerView):
     def get_context_data(self, **kwargs):
         context = super(MapBaseManagerView, self).get_context_data(**kwargs)
         datatype_factory = DataTypeFactory()
-        geom_datatypes = [
-            d.pk for d in models.DDataType.objects.filter(isgeometric=True)
-        ]
-        geom_nodes = models.Node.objects.filter(
-            graph__isresource=True,
-            graph__is_active=True,
-            datatype__in=geom_datatypes,
-        ).exclude(graph__graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        geom_nodes = (
+            models.Node.objects.filter(
+                graph__isresource=True,
+                graph__is_active=True,
+                datatype__in=models.DDataType.objects.filter(isgeometric=True),
+            )
+            .exclude(graph__graphid=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            .select_related("nodegroup")
+        )
         resource_layers = []
         resource_sources = []
         for node in geom_nodes:

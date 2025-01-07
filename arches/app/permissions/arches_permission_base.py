@@ -337,15 +337,11 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         Returns list of graph ids that the user has specified permissions on
         """
         nodegroups = self.get_nodegroups_by_perm(user, perms)
-        graphs = (
-            Node.objects.values("graph_id")
-            .filter(
-                Q(nodegroup__in=nodegroups)
-                & ~Q(graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                & Q(graph__isresource=True)
-            )
-            .values_list("graph_id", flat=True)
-        )
+        graphs = Node.objects.filter(
+            Q(nodegroup__in=nodegroups)
+            & ~Q(graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            & Q(graph__isresource=True)
+        ).values_list("graph_id", flat=True)
 
         return list(str(graph) for graph in graphs)
 
