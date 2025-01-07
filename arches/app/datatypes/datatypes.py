@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 import ast
 import time
-from datetime import datetime
+from datetime import date, datetime
 from mimetypes import MimeTypes
 
 from arches.app.const import ExtensionType
@@ -742,7 +742,7 @@ class DateDataType(BaseDataType):
                 type(value) == str and len(value) < 4 and value.startswith("-") is False
             ):  # a year before 1000 but not BCE
                 value = value.zfill(4)
-            if isinstance(value, datetime):
+            if isinstance(value, (date, datetime)):
                 v = value
             else:
                 valid_date_format, valid = self.get_valid_date_format(value)
