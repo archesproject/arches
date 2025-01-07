@@ -31,7 +31,7 @@ from guardian.exceptions import WrongAppError
 import guardian.shortcuts as gsc
 
 import inspect
-from arches.app.models.models import Node, NodeGroup, TileModel
+from arches.app.models.models import GraphModel, Node, NodeGroup, TileModel
 from django.db.models import Q
 from arches.app.models.system_settings import settings
 from arches.app.models.models import ResourceInstance, MapLayer
@@ -337,11 +337,11 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         Returns list of graph ids that the user has specified permissions on
         """
         nodegroups = self.get_nodegroups_by_perm(user, perms)
-        graphs = Node.objects.filter(
-            Q(nodegroup__in=nodegroups)
-            & ~Q(graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-            & Q(graph__isresource=True)
-        ).values_list("graph_id", flat=True)
+        graphs = (
+            GraphModel.objects.filter(node__nodegroup__in=nodegroups, isresource=True)
+            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            .values_list("pk", flat=True)
+        )
 
         return list(str(graph) for graph in graphs)
 
