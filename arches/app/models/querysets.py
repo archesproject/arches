@@ -19,6 +19,7 @@ class TileQuerySet(QuerySet):
         outer_ref,
         depth=1,
         as_representation=False,
+        allow_empty=False,
     ):
         """
         Entry point for filtering arches data by nodegroups (instead of grouping by
@@ -37,6 +38,10 @@ class TileQuerySet(QuerySet):
 
         as_representation = True skips calling to_python datatype methods and calls
         as_json() instead.
+
+        allow_empty = True includes tiles with no data, e.g. in some creation
+        workflows involving creating a blank tile before fetching the richer
+        version from this factory.
         """
         from arches.app.models.models import TileModel
 
@@ -63,14 +68,19 @@ class TileQuerySet(QuerySet):
                         depth=depth - 1,
                         lhs="parenttile",
                         outer_ref="tileid",
+                        allow_empty=allow_empty,
                     ),
                 )
             )
 
         self._fetched_nodes = [n for n in nodes if n.alias in node_alias_annotations]
+
+        qs = self
+        if not allow_empty:
+            qs = self.filter(data__has_any_keys=[n.pk for n in self._fetched_nodes])
+
         return (
-            self.filter(data__has_any_keys=[n.pk for n in self._fetched_nodes])
-            .prefetch_related(*prefetches)
+            qs.prefetch_related(*prefetches)
             .annotate(**node_alias_annotations)
             .order_by("sortorder")
         )

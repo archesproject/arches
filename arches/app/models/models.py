@@ -1968,9 +1968,10 @@ class TileModel(models.Model):  # Tile
         defer=None,
         only=None,
         as_representation=False,
+        allow_empty=False,
     ):
         """
-        See `arches.app.models.querysets.TileModelQuerySet.with_tile_values`.
+        See `arches.app.models.querysets.TileQuerySet.with_node_values`.
         """
 
         root_node = cls._root_node(graph_slug, root_node_alias)
@@ -1992,6 +1993,7 @@ class TileModel(models.Model):  # Tile
                 lhs="pk",
                 outer_ref="tileid",
                 as_representation=as_representation,
+                allow_empty=allow_empty,
             )
             .annotate(_nodegroup_alias=ORMValue(root_node_alias))
         )
@@ -2118,6 +2120,8 @@ class TileModel(models.Model):  # Tile
             proxy_resource.index()
 
     def _update_tile_from_pythonic_model_values(self):
+        if not self.data:
+            self.data = Tile.get_blank_tile_from_nodegroup_id(self.nodegroup_id).data
         original_data = {**self.data}
 
         self._incoming_tile = {}

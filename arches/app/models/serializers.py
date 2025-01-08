@@ -93,6 +93,20 @@ class ArchesTileSerializer(serializers.ModelSerializer):
             raise ValidationError({unknown_keys.pop(): "Unexpected field"})
         return data
 
+    def create(self, validated_data):
+        meta = self.__class__.Meta
+        qs = meta.model.as_nodegroup(
+            meta.root_node,
+            graph_slug=meta.graph_slug,
+            only=None if meta.fields == "__all__" else meta.fields,
+            as_representation=True,
+            allow_empty=True,
+        )
+        validated_data["nodegroup_id"] = qs.first()._fetched_nodes[0].nodegroup_id
+        blank_tile = super().create(validated_data)
+        tile_from_factory = qs.get(pk=blank_tile.pk)
+        return self.update(tile_from_factory, validated_data)
+
 
 class ArchesModelSerializer(serializers.ModelSerializer):
     legacyid = serializers.CharField(max_length=255, required=False, allow_null=True)
