@@ -2647,16 +2647,12 @@ class Graph(models.GraphModel):
                             setattr(source_node, key, getattr(future_node, key))
 
                     source_node.nodegroup_id = future_node.nodegroup_id
-                    source_node.nodegroup.grouping_node_id = source_node.nodegroup_id
                     if (
                         future_node_nodegroup_node
                         and future_node_nodegroup_node.source_identifier_id
                     ):
                         source_node.nodegroup_id = (
                             future_node_nodegroup_node.source_identifier_id
-                        )
-                        source_node.nodegroup.grouping_node_id = (
-                            source_node.nodegroup_id
                         )
 
                     self.nodes[source_node.pk] = source_node
@@ -2670,9 +2666,6 @@ class Graph(models.GraphModel):
                     ):
                         future_node.nodegroup_id = (
                             future_node_nodegroup_node.source_identifier_id
-                        )
-                        future_node.nodegroup.grouping_node_id = (
-                            future_node.nodegroup_id
                         )
 
                     del editable_future_graph.nodes[future_node.pk]
