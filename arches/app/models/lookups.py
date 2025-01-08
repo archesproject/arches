@@ -18,7 +18,7 @@ class AnyLanguageEquals(JSONPathFilter, Lookup):
     def as_sql(self, compiler, connection):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = lhs_params + rhs_params
+        params = (*lhs_params, *rhs_params)
         return "%s @? '$.*.value ? (@ == \"%s\")'" % (lhs, rhs), params
 
 
@@ -29,7 +29,7 @@ class AnyLanguageContains(JSONPathFilter, Lookup):
     def as_sql(self, compiler, connection):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = lhs_params + rhs_params
+        params = (*lhs_params, *rhs_params)
         return "%s @? '$.*.value ? (@ like_regex \"%s\")'" % (lhs, rhs), params
 
 
@@ -40,7 +40,7 @@ class AnyLanguageIContains(JSONPathFilter, Lookup):
     def as_sql(self, compiler, connection):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = lhs_params + rhs_params
+        params = (*lhs_params, *rhs_params)
         return '%s @? \'$.*.value ? (@ like_regex "%s" flag "i")\'' % (lhs, rhs), params
 
 
@@ -51,5 +51,5 @@ class AnyLanguageStartsWith(JSONPathFilter, Lookup):
     def as_sql(self, compiler, connection):
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = lhs_params + rhs_params
+        params = (*lhs_params, *rhs_params)
         return "%s @? '$.*.value ? (@ starts with \"%s\")'" % (lhs, rhs), params
