@@ -93,13 +93,6 @@ class ArchesTileSerializer(serializers.ModelSerializer):
             raise ValidationError({unknown_keys.pop(): "Unexpected field"})
         return data
 
-    # def create(self, validated_data):
-    #     # TODO: we probably want a queryset method to do one-shot
-    #     # creates with tile data
-    #     blank_tile = super().create(validated_data)
-    #     tile_from_factory = self.get_queryset().get(pk=blank_tile.pk)
-    #     return self.update(tile_from_factory, validated_data)
-
 
 class ArchesModelSerializer(serializers.ModelSerializer):
     legacyid = serializers.CharField(max_length=255, required=False, allow_null=True)
