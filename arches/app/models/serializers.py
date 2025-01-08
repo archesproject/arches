@@ -7,7 +7,7 @@ from rest_framework import renderers
 from rest_framework import serializers
 
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import Node, TileModel
+from arches.app.models.models import Node, ResourceInstance, TileModel
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 
@@ -18,6 +18,9 @@ renderers.JSONOpenAPIRenderer.encoder_class = JSONSerializer
 
 class ArchesTileSerializer(serializers.ModelSerializer):
     tileid = serializers.UUIDField(validators=[], required=False)
+    resourceinstance = serializers.PrimaryKeyRelatedField(
+        queryset=ResourceInstance.objects.all(), html_cutoff=10
+    )
 
     def __init__(self, instance=None, data=fields.empty, **kwargs):
         super().__init__(instance, data, **kwargs)
@@ -89,6 +92,13 @@ class ArchesTileSerializer(serializers.ModelSerializer):
         ):
             raise ValidationError({unknown_keys.pop(): "Unexpected field"})
         return data
+
+    # def create(self, validated_data):
+    #     # TODO: we probably want a queryset method to do one-shot
+    #     # creates with tile data
+    #     blank_tile = super().create(validated_data)
+    #     tile_from_factory = self.get_queryset().get(pk=blank_tile.pk)
+    #     return self.update(tile_from_factory, validated_data)
 
 
 class ArchesModelSerializer(serializers.ModelSerializer):
@@ -162,6 +172,8 @@ class ArchesModelSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         meta = self.__class__.Meta
+        # TODO: we probably want a queryset method to do one-shot
+        # creates with tile data
         instance_without_tile_data = super().create(validated_data)
         instance_from_factory = meta.model.as_model(
             graph_slug=self.__class__.Meta.graph_slug,
