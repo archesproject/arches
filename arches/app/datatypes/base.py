@@ -2,6 +2,7 @@ import json
 import logging
 import urllib
 
+from django.db.models.fields.json import JSONField
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseDataType(object):
-    rest_framework_model_field = None
+    rest_framework_model_field = JSONField(null=True)
     """Django model field if the datatype were to be a real table column."""
 
     def __init__(self, model=None):

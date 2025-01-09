@@ -2140,8 +2140,8 @@ class TileModel(models.Model):  # Tile
             ),
             errors_by_node_alias=errors_by_alias,
         )
-        if not any(self.data.values()):
-            raise ValidationError(_("Tile is blank."))
+        # if not any(self.data.values()):
+        #     raise ValidationError(_("Tile is blank."))
         if self._tile_update_is_noop(original_data):
             return False
         if errors_by_alias:
