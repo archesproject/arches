@@ -102,7 +102,8 @@ class ArchesTileSerializer(serializers.ModelSerializer):
             as_representation=True,
             allow_empty=True,
         )
-        validated_data["nodegroup_id"] = qs.first()._fetched_nodes[0].nodegroup_id
+        qs.first()
+        validated_data["nodegroup_id"] = qs._fetched_nodes[0].nodegroup_id
         blank_tile = super().create(validated_data)
         tile_from_factory = qs.get(pk=blank_tile.pk)
         return self.update(tile_from_factory, validated_data)
