@@ -1276,6 +1276,22 @@ class ResourceInstance(models.Model):
         User, on_delete=models.SET_NULL, blank=True, null=True
     )
 
+    class Meta:
+        managed = True
+        db_table = "resource_instances"
+        permissions = (("no_access_to_resourceinstance", "No Access"),)
+
+    def __init__(self, *args, **kwargs):
+        super(ResourceInstance, self).__init__(*args, **kwargs)
+        if not self.resourceinstanceid:
+            self.resourceinstanceid = uuid.uuid4()
+
+    def __repr__(self):
+        return f"<{self.graph.name}: {self.name} ({self.pk})>"
+
+    def __str__(self):
+        return repr(self)
+
     def get_instance_creator_and_edit_permissions(self, user=None):
         creatorid = None
         can_edit = None
@@ -1317,16 +1333,6 @@ class ResourceInstance(models.Model):
         add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
         add_to_update_fields(kwargs, "graph_publication")
         super(ResourceInstance, self).save(**kwargs)
-
-    def __init__(self, *args, **kwargs):
-        super(ResourceInstance, self).__init__(*args, **kwargs)
-        if not self.resourceinstanceid:
-            self.resourceinstanceid = uuid.uuid4()
-
-    class Meta:
-        managed = True
-        db_table = "resource_instances"
-        permissions = (("no_access_to_resourceinstance", "No Access"),)
 
 
 class ResourceInstanceLifecycle(models.Model):
@@ -1590,6 +1596,15 @@ class TileModel(models.Model):  # Tile
         super(TileModel, self).__init__(*args, **kwargs)
         if not self.tileid:
             self.tileid = uuid.uuid4()
+
+    def __repr__(self):
+        alias = None
+        if self.nodegroup and self.nodegroup.grouping_node:
+            alias = self.nodegroup.grouping_node.alias
+        return f"<{alias} ({self.pk})>"
+
+    def __str__(self):
+        return repr(self)
 
     @property
     def nodegroup(self):

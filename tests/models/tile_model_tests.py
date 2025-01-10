@@ -16,7 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-from uuid import UUID
+from uuid import UUID, uuid4
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from tests.base_test import ArchesTestCase
 from django.db import connection
@@ -73,6 +73,33 @@ class TileTests(ArchesTestCase):
 
         with connection.cursor() as cursor:
             cursor.execute(sql)
+
+    def test_repr(self):
+        tileid = uuid4()
+        nodegroupid = "99999999-0000-0000-0000-000000000001"
+        tile = TileModel.objects.create(
+            pk=tileid,
+            resourceinstance_id="40000000-0000-0000-0000-000000000000",
+            nodegroup_id=nodegroupid,
+        )
+
+        self.assertEqual(f"{tile!r}", f"<None ({tileid})>")
+
+        # Roundabout way of creating the grouping node given incomplete setup.
+        grouping_node = Node.objects.create(
+            pk=nodegroupid,
+            graph=tile.resourceinstance.graph,
+            nodegroup_id=nodegroupid,
+            alias="Statement",
+            datatype="semantic",
+            istopnode=False,
+        )
+        nodegroup = grouping_node.nodegroup
+        nodegroup.grouping_node = grouping_node
+        nodegroup.save()
+        tile.refresh_from_db()
+
+        self.assertEqual(f"{tile!r}", f"<Statement ({tileid})>")
 
     def test_load_from_python_dict(self):
         """
