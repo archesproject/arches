@@ -435,7 +435,7 @@ class Tile(models.TileModel):
             datatype = self.datatype_factory.get_instance(node.datatype)
             datatype.post_tile_save(self, nodeid, request)
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         request = kwargs.pop("request", None)
         index = kwargs.pop("index", True)
         user = kwargs.pop("user", None)
@@ -509,7 +509,7 @@ class Tile(models.TileModel):
             if user is not None:
                 self.validate([], request=request)
 
-            super(Tile, self).save(*args, **kwargs)
+            super(Tile, self).save(**kwargs)
             # We have to save the edit log record after calling save so that the
             # resource's displayname changes are avaliable
             user = {} if user is None else user
@@ -543,7 +543,6 @@ class Tile(models.TileModel):
                 tile.resourceinstance = self.resourceinstance
                 tile.parenttile = self
                 tile.save(
-                    *args,
                     request=request,
                     resource_creation=resource_creation,
                     index=False,

@@ -248,7 +248,7 @@ class Resource(models.ResourceInstance):
         edit.edittype = edit_type
         edit.save()
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         """
         Saves and indexes a single resource
 
@@ -282,8 +282,10 @@ class Resource(models.ResourceInstance):
 
         if not self.principaluser_id and user:
             self.principaluser_id = user.id
+            # TODO: this is not updating update_fields in kwargs
+            # Fix when adding user argument to Resource.save().
 
-        super(Resource, self).save(*args, **kwargs)
+        super(Resource, self).save(**kwargs)
 
         if should_update_resource_instance_lifecycle_state:
             self.save_edit(
@@ -423,7 +425,7 @@ class Resource(models.ResourceInstance):
 
     def index(self, context=None):
         """
-        Indexes all the nessesary items values of a resource to support search
+        Indexes all the necessary items values of a resource to support search
 
         Keyword Arguments:
         context -- a string such as "copy" to indicate conditions under which a document is indexed
