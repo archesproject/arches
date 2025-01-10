@@ -1833,6 +1833,8 @@ class Graph(models.GraphModel):
         """
         get a nodegroup from an id by first looking through the nodes and cards associated with this graph.
         if not found then get the nodegroup instance from the database, otherwise return a new instance of a nodegroup
+        This is also the method responsible for setting the grouping_node_id
+        on the nodegroup when the first (collector) node is created.
 
         Keyword Arguments
 
@@ -1840,13 +1842,19 @@ class Graph(models.GraphModel):
         nodegroups_list -- list of nodegroups from which to filter
         """
 
+        found = None
         for nodegroup in nodegroups_list or self.get_nodegroups():
             if str(nodegroup.nodegroupid) == str(nodegroupid):
-                return nodegroup
-        try:
-            return models.NodeGroup.objects.get(pk=nodegroupid)
-        except models.NodeGroup.DoesNotExist:
-            return models.NodeGroup(pk=nodegroupid, grouping_node_id=nodegroupid)
+                found = nodegroup
+                break
+        else:
+            try:
+                found = models.NodeGroup.objects.get(pk=nodegroupid)
+            except models.NodeGroup.DoesNotExist:
+                found = models.NodeGroup(pk=nodegroupid, grouping_node_id=nodegroupid)
+
+        found.grouping_node_id = found.nodegroupid
+        return found
 
     def get_root_nodegroup(self):
         """
