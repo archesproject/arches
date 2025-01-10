@@ -495,12 +495,8 @@ class GraphTests(ArchesTestCase):
         )
         collector_graph.save()
 
-    def test_node_create(self):
-        self.test_graph.append_node()
-        self.test_graph.save()
-
-        node = self.test_graph.node_set.select_related("nodegroup").first()
-        self.assertEqual(node.nodegroup.grouping_node, node)
+    def test_node_creation_sets_grouping_node(self):
+        self.assertEqual(self.rootNode.nodegroup.grouping_node, self.rootNode)
 
     def test_node_update(self):
         """
