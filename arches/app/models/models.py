@@ -1582,6 +1582,8 @@ class TileModel(models.Model):  # Tile
         blank=True,
         null=True,
         on_delete=models.CASCADE,
+        related_name="children",
+        related_query_name="child",
     )
     data = JSONField(blank=True, null=True, db_column="tiledata")
     nodegroup_id = models.UUIDField(db_column="nodegroupid", null=True)
