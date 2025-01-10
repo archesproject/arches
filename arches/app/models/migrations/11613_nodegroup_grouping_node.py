@@ -20,16 +20,16 @@ class Migration(migrations.Migration):
         PublishedGraph = apps.get_model("models", "PublishedGraph")
         published_graphs = PublishedGraph.objects.all()
         for published_graph in published_graphs:
-            for node_dict in published_graph.serialized_graph["nodes"]:
-                node_dict["grouping_node_id"] = node_dict["nodegroup_id"]
+            for nodegroup_dict in published_graph.serialized_graph["nodegroups"]:
+                nodegroup_dict["grouping_node_id"] = nodegroup_dict["nodegroupid"]
         PublishedGraph.objects.bulk_update(published_graphs, ["serialized_graph"])
 
     def remove_grouping_node(apps, schema_editor):
         PublishedGraph = apps.get_model("models", "PublishedGraph")
         published_graphs = PublishedGraph.objects.all()
         for published_graph in published_graphs:
-            for node_dict in published_graph.serialized_graph["nodegroups"]:
-                node_dict.pop("grouping_node_id", None)
+            for nodegroup_dict in published_graph.serialized_graph["nodegroups"]:
+                nodegroup_dict.pop("grouping_node_id", None)
         PublishedGraph.objects.bulk_update(published_graphs, ["serialized_graph"])
 
     operations = [
