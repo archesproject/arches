@@ -1585,7 +1585,7 @@ class TileModel(models.Model):  # Tile
         related_name="children",
         related_query_name="child",
     )
-    data = JSONField(blank=True, null=True, db_column="tiledata")
+    data = JSONField(blank=True, default=dict, db_column="tiledata")
     nodegroup_id = models.UUIDField(db_column="nodegroupid", null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     provisionaledits = JSONField(blank=True, null=True, db_column="provisionaledits")
