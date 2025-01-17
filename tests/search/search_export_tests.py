@@ -14,7 +14,7 @@ from arches.app.utils.skos import SKOSReader
 
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
-from django.urls import reverse
+from django.urls import get_script_prefix, reverse, set_script_prefix
 
 from arches.app.views.api import SearchExport
 from tests.base_test import ArchesTestCase
@@ -226,6 +226,16 @@ class SearchExportTests(ArchesTestCase):
         response = SearchExport().get(request)
         self.assertEqual(request.user.username, "anonymous")
         self.assertEqual(response.status_code, HTTPStatus.UNAUTHORIZED)
+
+    def test_script_prefix(self):
+        prefix = get_script_prefix()
+        set_script_prefix("/nginx")
+        self.addCleanup(set_script_prefix, prefix)
+
+        request = self.factory.get("/search?tiles=True&export=True&format=tilecsv")
+        request.user = self.user
+        exporter = SearchResultsExporter(search_request=request)
+        exporter.export(format="tilecsv", report_link="false")
 
 
 def is_valid_uuid(value, version=4):
