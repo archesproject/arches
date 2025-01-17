@@ -1,15 +1,15 @@
+from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import (
-    Node,
-    DDataType,
-    GraphModel,
     CardModel,
     CardXNodeXWidget,
+    DDataType,
+    GraphModel,
+    Node,
 )
 from arches.app.models.system_settings import settings
-from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Nested
 from arches.app.search.components.base import BaseSearchFilter
+from arches.app.search.elasticsearch_dsl_builder import Bool
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
 
 details = {
     "searchcomponentid": "",
@@ -61,11 +61,9 @@ class AdvancedSearch(BaseSearchFilter):
                             datatype.append_search_filters(
                                 val, node, tile_query, self.request
                             )
-            nested_query = Nested(path="tiles", query=tile_query)
             if advanced_filter["op"] == "or" and index != 0:
                 grouped_query = Bool()
                 grouped_queries.append(grouped_query)
-            grouped_query.must(nested_query)
             grouped_query.must(null_query)
         for grouped_query in grouped_queries:
             advanced_query.should(grouped_query)
