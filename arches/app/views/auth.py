@@ -206,13 +206,8 @@ class SignupView(View):
         confirmation_message = ""
 
         if not settings.ENABLE_USER_SIGNUP:
-            raise (
-                Exception(
-                    _(
-                        "User signup has been disabled. Please contact your administrator."
-                    )
-                )
-            )
+            msg = _("User signup has been disabled. Please contact your administrator.")
+            raise Exception(msg)
 
         return render(
             request,
@@ -239,13 +234,8 @@ class SignupView(View):
         form = ArchesUserCreationForm(postdata, enable_captcha=settings.ENABLE_CAPTCHA)
 
         if not settings.ENABLE_USER_SIGNUP:
-            raise (
-                Exception(
-                    _(
-                        "User signup has been disabled. Please contact your administrator."
-                    )
-                )
-            )
+            msg = _("User signup has been disabled. Please contact your administrator.")
+            raise Exception(msg)
 
         if form.is_valid():
             AES = AESCipher(settings.SECRET_KEY)
@@ -319,13 +309,8 @@ class SignupView(View):
 class ConfirmSignupView(View):
     def get(self, request):
         if not settings.ENABLE_USER_SIGNUP:
-            raise (
-                Exception(
-                    _(
-                        "User signup has been disabled. Please contact your administrator."
-                    )
-                )
-            )
+            msg = _("User signup has been disabled. Please contact your administrator.")
+            raise Exception(msg)
 
         link = request.GET.get("link", None)
         AES = AESCipher(settings.SECRET_KEY)
