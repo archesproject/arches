@@ -223,8 +223,10 @@ class SignupView(View):
         )
 
     @method_decorator(
-        sensitive_variables(),
-        sensitive_post_parameters(),
+        (
+            sensitive_variables(),
+            sensitive_post_parameters(),
+        )
     )
     def post(self, request):
         showform = True
