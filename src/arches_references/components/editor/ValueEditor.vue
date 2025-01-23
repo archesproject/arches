@@ -352,7 +352,7 @@ const focusInput = () => {
             </Column>
             <Column
                 :row-editor="true"
-                style="width: 5%; min-width: 6rem; text-align: center"
+                style="width: 5%; text-align: center; white-space: nowrap"
                 :pt="{
                     headerCell: { ariaLabel: $gettext('Row edit controls') },
                 }"

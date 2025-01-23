@@ -32,9 +32,9 @@ const panel = computed(() => {
 </script>
 
 <template>
-    <Splitter style="height: 100%">
+    <Splitter style="height: 100%; overflow: hidden">
         <SplitterPanel
-            :size="34"
+            :size="30"
             :min-size="25"
             style="display: flex; flex-direction: column"
         >
@@ -46,12 +46,12 @@ const panel = computed(() => {
             </Suspense>
         </SplitterPanel>
         <SplitterPanel
-            :size="66"
+            :size="70"
             :min-size="25"
             :style="{
                 margin: '1rem 0rem 4rem 1rem',
                 overflowY: 'auto',
-                paddingRight: '4rem',
+                paddingRight: '2rem',
             }"
         >
             <component

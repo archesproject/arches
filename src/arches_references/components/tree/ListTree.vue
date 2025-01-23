@@ -271,11 +271,6 @@ function lazyLabelLookup(node: TreeNode) {
                     style: { width: '100%', fontSize: 'small' },
                 },
             },
-            pcFilterIconContainer: {
-                root: {
-                    style: { display: 'flex' },
-                },
-            },
             wrapper: {
                 style: {
                     overflowY: 'auto',

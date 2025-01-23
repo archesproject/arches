@@ -16,14 +16,18 @@ import { shouldUseContrast } from "@/arches_references/utils.ts";
 import type { Ref } from "vue";
 import type { Language } from "@/arches_vue_utils/types";
 
-const { $gettext } = useGettext();
-
-const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
-
 const { expandAll, collapseAll } = defineProps<{
     expandAll: () => void;
     collapseAll: () => void;
 }>();
+
+let selectedLanguage: Ref<Language> | undefined;
+if (arches.languages) {
+    // arches-lingo reuses this component without this provided.
+    selectedLanguage = inject(selectedLanguageKey);
+}
+
+const { $gettext } = useGettext();
 </script>
 
 <template>
@@ -44,7 +48,10 @@ const { expandAll, collapseAll } = defineProps<{
             :label="$gettext('Collapse all')"
             @click="collapseAll"
         />
-        <div style="display: flex; flex-grow: 1; justify-content: flex-end">
+        <div
+            v-if="arches.languages"
+            class="language-select"
+        >
             <span
                 id="languageSelectLabel"
                 style="
@@ -77,5 +84,11 @@ const { expandAll, collapseAll } = defineProps<{
 .secondary-button {
     height: 3rem;
     margin: 0.5rem;
+}
+
+.language-select {
+    display: flex;
+    flex-grow: 1;
+    justify-content: flex-end;
 }
 </style>

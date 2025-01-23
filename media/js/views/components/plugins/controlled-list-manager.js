@@ -16,7 +16,7 @@ const router = createRouter({
 
 const ControlledListsPreset = definePreset(ArchesPreset, {
     semantic: {
-        iconSize: 'small',
+        iconSize: '1.2rem',
     },
     components: {
         button: {
