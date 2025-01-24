@@ -770,7 +770,7 @@ class Resource(models.ResourceInstance):
         user=None,
         resourceinstance_graphid=None,
         graphs=None,
-        includeRRCount=True,
+        include_rr_count=True,
     ):
         """
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
@@ -929,7 +929,7 @@ class Resource(models.ResourceInstance):
             if related_resources:
                 for resource in related_resources["docs"]:
                     if resource["found"]:
-                        if includeRRCount:
+                        if include_rr_count:
                             rel_count = get_relations(
                                 resourceinstanceid=resource["_id"],
                                 start=0,
