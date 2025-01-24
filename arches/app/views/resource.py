@@ -1008,7 +1008,7 @@ class RelatedResourcesView(BaseManagerView):
 
         return ret
 
-    def get(self, request, resourceid=None):
+    def get(self, request, resourceid=None, includeRRCount=True):
         ret = {}
 
         if self.action == "get_candidates":
@@ -1055,6 +1055,7 @@ class RelatedResourcesView(BaseManagerView):
                     user=request.user,
                     resourceinstance_graphid=resourceinstance_graphid,
                     graphs=self.graphs,
+                    includeRRCount=includeRRCount
                 )
 
                 ret = self.paginate_related_resources(
@@ -1066,6 +1067,7 @@ class RelatedResourcesView(BaseManagerView):
                     user=request.user,
                     resourceinstance_graphid=resourceinstance_graphid,
                     graphs=self.graphs,
+                    includeRRCount=includeRRCount
                 )
 
         return JSONResponse(ret)

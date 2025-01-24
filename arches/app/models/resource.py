@@ -770,6 +770,7 @@ class Resource(models.ResourceInstance):
         user=None,
         resourceinstance_graphid=None,
         graphs=None,
+        includeRRCount=True
     ):
         """
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
@@ -928,13 +929,14 @@ class Resource(models.ResourceInstance):
             if related_resources:
                 for resource in related_resources["docs"]:
                     if resource["found"]:
-                        rel_count = get_relations(
-                            resourceinstanceid=resource["_id"],
-                            start=0,
-                            limit=0,
-                            count_only=True,
-                        )
-                        resource["_source"]["total_relations"] = rel_count
+                        if includeRRCount:
+                            rel_count = get_relations(
+                                resourceinstanceid=resource["_id"],
+                                start=0,
+                                limit=0,
+                                count_only=True,
+                            )
+                            resource["_source"]["total_relations"] = rel_count
                         for descriptor_type in ("displaydescription", "displayname"):
                             descriptor = get_localized_descriptor(
                                 resource, descriptor_type
