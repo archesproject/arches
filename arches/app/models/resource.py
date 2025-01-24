@@ -770,7 +770,7 @@ class Resource(models.ResourceInstance):
         user=None,
         resourceinstance_graphid=None,
         graphs=None,
-        includeRRCount=True
+        includeRRCount=True,
     ):
         """
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
