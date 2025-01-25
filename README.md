@@ -12,7 +12,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 8.0.0 release notes](https://github.com/archesproject/arches/blob/dev/8.0.x/releases/8.0.0.md)
+[Version 7.6.6 release notes](https://github.com/archesproject/arches/blob/dev/7.6.x/releases/7.6.6.md)
 
 #### Quick Install
 
@@ -64,6 +64,7 @@ Our general release cycle will typically be a functional release (either major i
 The following a general plan for the Arches project. Be aware this plan is tentative and subject to change.
 
 ## 8.0 - Release date: June 15, 2025
+- Activity stream enhancements
 - Support for editing and publishing graphs without having to remove resource instances
 - Support for viewing and restoring previous graph publications
 - Support for configuring currently published graphs
