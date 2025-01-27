@@ -261,11 +261,6 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         """
         result = ResourceInstancePermissions()
         try:
-            if resourceid == settings.SYSTEM_SETTINGS_RESOURCE_ID:
-                if not user.groups.filter(name="System Administrator").exists():
-                    result["permitted"] = False
-                    return result
-
             if not resource:
                 resource = ResourceInstance.objects.select_related(
                     "resource_instance_lifecycle_state"
@@ -273,6 +268,11 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
             elif resourceid:
                 raise ValueError("resourceid and resource are mutually incompatible")
             result["resource"] = resource
+
+            if str(resource.pk) == settings.SYSTEM_SETTINGS_RESOURCE_ID:
+                if not user.groups.filter(name="System Administrator").exists():
+                    result["permitted"] = False
+                    return result
 
             all_perms = self.get_perms(user, resource)
 
