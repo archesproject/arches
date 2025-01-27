@@ -26,7 +26,7 @@ class InstancePermissionsAPITest(TestCase):
         )
         cls.graph.save(validate=False)
 
-    def test_get(self):
+    def test_get_with_anonymous_user(self):
         resource = ResourceInstance.objects.create(graph=self.graph)
         with CaptureQueriesContext(connection) as queries:
             response = self.client.get(
@@ -38,7 +38,7 @@ class InstancePermissionsAPITest(TestCase):
         ]
         self.assertEqual(len(resource_selects), 1, list(queries))
         self.assertEqual(
-            response.content.decode(), '{"delete": false, "edit": false, "read": false}'
+            response.content.decode(), '{"delete": true, "edit": true, "read": true}'
         )
 
     def test_get_with_resource_editor_role(self):
