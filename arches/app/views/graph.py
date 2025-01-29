@@ -22,6 +22,9 @@ from slugify import slugify
 import uuid
 import logging
 from dateutil import tz
+from http import HTTPStatus
+from io import BytesIO
+
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.db.models import F, Func, Q
@@ -56,8 +59,6 @@ from arches.app.utils.permission_backend import (
     get_group_perms,
     get_user_perms,
 )
-from io import BytesIO
-
 
 logger = logging.getLogger(__name__)
 
@@ -583,16 +584,34 @@ class GraphDataView(View):
                     json = request.body
                     if json is not None:
                         data = JSONDeserializer().deserialize(json)
+                        incoming_node_data = data.get("nodes", [])
+                        ordered_node_ids = []
+                        graph_ids = set()
+                        for json_node in incoming_node_data:
+                            ordered_node_ids.append(json_node["nodeid"])
+                            graph_ids.add(json_node["graph_id"])
+                        if len(graph_ids) != 1:
+                            return JSONErrorResponse(
+                                _("Error"),
+                                _("Nodes must be from the same graph."),
+                            )
+                        try:
+                            graph = Graph.objects.get(graphid=next(iter(graph_ids)))
+                        except Graph.DoesNotExist:
+                            return JSONErrorResponse(status=HTTPStatus.DoesNotExist)
 
-                        if "nodes" in data and len(data["nodes"]) > 0:
-                            sortorder = 0
-                            with transaction.atomic():
-                                for node in data["nodes"]:
-                                    no = models.Node.objects.get(pk=node["nodeid"])
-                                    no.sortorder = sortorder
-                                    no.save()
-                                    sortorder = sortorder + 1
-                            ret = data
+                        for graph_node_id, graph_node_object in graph.nodes.items():
+                            try:
+                                idx = ordered_node_ids.index(str(graph_node_id))
+                            except ValueError:
+                                continue  # might be semantic node
+                            graph_node_object.sortorder = idx
+                            incoming_node_data[idx]["sortorder"] = idx
+
+                        models.Node.objects.bulk_update(
+                            graph.nodes.values(), ["sortorder"]
+                        )
+                        ret = data
 
             return JSONResponse(ret, force_recalculation=True)
         except GraphValidationError as e:
