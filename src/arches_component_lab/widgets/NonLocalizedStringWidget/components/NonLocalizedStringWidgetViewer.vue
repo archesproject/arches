@@ -1,6 +1,9 @@
 <script setup lang="ts">
+const props = defineProps<{
+    value: string | undefined;
+}>();
 </script>
 
 <template>
-    <h2>NonLocalizedStringWidgetViewer</h2>
+    <span>{{ props.value }}</span>
 </template>
