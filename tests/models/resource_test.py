@@ -492,24 +492,48 @@ class ResourceTests(ArchesTestCase):
     def test_resource_instance_tile_update(self):
         user = User.objects.get(username="admin")
         graph_a = Graph.new(name="Graph A", is_resource=True)
-        node_group_a = models.NodeGroup.objects.create()
-        resource_instance_node = models.Node.objects.create(
+        node_group_a = models.NodeGroup()
+        node_group_a.save()
+        resource_instance_node = models.Node(
             graph=graph_a,
             nodegroup=node_group_a,
             name="Resource Node",
             datatype="resource-instance-list",
             istopnode=False,
         )
+        resource_instance_node.save()
+        graph_a.add_node(resource_instance_node)
+        graph_a.add_edge(
+            {
+                "domainnode_id": graph_a.root.pk,
+                "rangenode_id": resource_instance_node.pk,
+                "ontologyproperty": None,
+            }
+        )
+        graph_a.save()
+        graph_a.refresh_from_database()
         graph_a.publish(user=user)
         graph_b = Graph.new(name="Graph B", is_resource=True)
-        node_group_b = models.NodeGroup.objects.create()
-        string_node = models.Node.objects.create(
+        node_group_b = models.NodeGroup()
+        node_group_b.save()
+        string_node = models.Node(
             graph=graph_b,
             nodegroup=node_group_b,
             name="String Node",
             datatype="non-localized-string",
             istopnode=False,
         )
+        string_node.save()
+        graph_b.add_node(string_node)
+        graph_b.add_edge(
+            {
+                "domainnode_id": graph_b.root.pk,
+                "rangenode_id": string_node.pk,
+                "ontologyproperty": None,
+            }
+        )
+        graph_b.save()
+        graph_b.refresh_from_database()
         graph_b.publish(user=user)
 
         resource_b_1 = models.ResourceInstance.objects.create(graph=graph_b)
