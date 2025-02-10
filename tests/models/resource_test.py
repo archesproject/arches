@@ -490,6 +490,7 @@ class ResourceTests(ArchesTestCase):
         self.assertEqual(r.displayname(), "test value ")
 
     def test_resource_instance_tile_update(self):
+        user = User.objects.get(username="admin")
         graph_a = Graph.new(name="Graph A", is_resource=True)
         node_group_a = models.NodeGroup.objects.create()
         resource_instance_node = models.Node.objects.create(
@@ -499,6 +500,7 @@ class ResourceTests(ArchesTestCase):
             datatype="resource-instance-list",
             istopnode=False,
         )
+        graph_a.publish(user=user)
         graph_b = Graph.new(name="Graph B", is_resource=True)
         node_group_b = models.NodeGroup.objects.create()
         string_node = models.Node.objects.create(
@@ -508,6 +510,7 @@ class ResourceTests(ArchesTestCase):
             datatype="non-localized-string",
             istopnode=False,
         )
+        graph_b.publish(user=user)
 
         resource_b_1 = models.ResourceInstance.objects.create(graph=graph_b)
         tile_b_1 = Tile.get_blank_tile(
