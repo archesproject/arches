@@ -354,3 +354,20 @@ class CommandLineTests(ArchesTestCase):
         ret = reference_resource.get_related_resources(user=user)
         relationship = ret["resource_relationships"][0]["relationshiptype_label"]
         self.assertEqual(relationship, en_preflabel)
+
+    def test_resource_report_good(self):
+        self.client.login(username="admin", password="admin")
+        url = reverse(
+            "resource_report", kwargs={"resourceid": self.resource_instance_id}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_resource_report_bad(self):
+        self.client.login(username="admin", password="admin")
+        ResourceInstance.objects.delete(resourceinstanceid=self.resource_instance_id)
+        url = reverse(
+            "resource_report", kwargs={"resourceid": self.resource_instance_id}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
