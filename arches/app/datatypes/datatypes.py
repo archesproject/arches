@@ -2099,20 +2099,22 @@ class ResourceInstanceDataType(BaseDataType):
         """ % (
             tile.pk
         )
-        delete_sql = """
-            DELETE FROM resource_x_resource WHERE tileid = '%s' AND resourcexid NOT IN (%s);
-            """ % (
-            tile.pk,
-            ",".join(
-                [
-                    "'%s'" % relationship["resourceXresourceId"]
-                    for relationship in tile.data[nodeid]
-                ]
-            ),
-        )
+        if tile.data[nodeid] and len(tile.data[nodeid]) > 0:
+            delete_sql = """
+                DELETE FROM resource_x_resource WHERE tileid = '%s' AND resourcexid NOT IN (%s);
+                """ % (
+                tile.pk,
+                ",".join(
+                    [
+                        "'%s'" % relationship["resourceXresourceId"]
+                        for relationship in tile.data[nodeid]
+                    ]
+                ),
+            )
 
         with connection.cursor() as cursor:
-            cursor.execute(delete_sql)
+            if tile.data[nodeid] and len(tile.data[nodeid]) > 0:
+                cursor.execute(delete_sql)
             cursor.execute(create_sql)
             ret = cursor.fetchone()
         return ret
