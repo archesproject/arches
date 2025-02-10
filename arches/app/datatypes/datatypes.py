@@ -2094,14 +2094,26 @@ class ResourceInstanceDataType(BaseDataType):
 
     def post_tile_save(self, tile, nodeid, request):
         ret = False
-        sql = """
+        create_sql = """
             SELECT * FROM __arches_create_resource_x_resource_relationships('%s') as t;
         """ % (
             tile.pk
         )
+        delete_sql = """
+            DELETE FROM resource_x_resource WHERE tileid = '%s' AND resourcexid NOT IN (%s);
+            """ % (
+            tile.pk,
+            ",".join(
+                [
+                    "'%s'" % relationship["resourceXresourceId"]
+                    for relationship in tile.data[nodeid]
+                ]
+            ),
+        )
 
         with connection.cursor() as cursor:
-            cursor.execute(sql)
+            cursor.execute(delete_sql)
+            cursor.execute(create_sql)
             ret = cursor.fetchone()
         return ret
 
