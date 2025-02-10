@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed } from "vue";
 
 import InputText from "primevue/inputtext";
 
@@ -8,17 +8,7 @@ const props = defineProps<{
 }>();
 
 const rawValue = ref(props.initialValue);
-const initialValue = ref(props.initialValue);
-
-const isDirty = computed(() => rawValue.value !== initialValue.value);
-
-watch(
-    () => props.initialValue,
-    (newVal) => {
-        rawValue.value = newVal;
-        initialValue.value = newVal;
-    },
-);
+const isDirty = computed(() => rawValue.value !== props.initialValue);
 
 defineExpose({
     rawValue,

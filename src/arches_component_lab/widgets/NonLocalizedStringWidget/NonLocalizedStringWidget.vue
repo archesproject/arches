@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { useTemplateRef } from "vue";
+
 import NonLocalizedStringWidgetEditor from "@/arches_component_lab/widgets/NonLocalizedStringWidget/components/NonLocalizedStringWidgetEditor.vue";
 import NonLocalizedStringWidgetViewer from "@/arches_component_lab/widgets/NonLocalizedStringWidget/components/NonLocalizedStringWidgetViewer.vue";
 
@@ -14,7 +15,12 @@ const props = defineProps<{
     mode: WidgetMode;
 }>();
 
-const childRef = ref();
+interface ChildComponentInterface {
+    rawValue: boolean;
+    isDirty: boolean;
+}
+
+const childRef = useTemplateRef<ChildComponentInterface>("childRef");
 
 defineExpose({
     get rawValue() {
