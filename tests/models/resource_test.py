@@ -488,3 +488,61 @@ class ResourceTests(ArchesTestCase):
 
         # Until 7.4, a RecursionError was caught after this value was repeated many times.
         self.assertEqual(r.displayname(), "test value ")
+
+    def test_resource_instance_tile_update(self):
+        graph_a = Graph.new(name="Graph A", is_resource=True)
+        node_group_a = models.NodeGroup.objects.create()
+        resource_instance_node = models.Node.objects.create(
+            graph=graph_a,
+            nodegroup=node_group_a,
+            name="Resource Node",
+            datatype="resource-instance-list",
+            istopnode=False,
+        )
+        graph_b = Graph.new(name="Graph B", is_resource=True)
+        node_group_b = models.NodeGroup.objects.create()
+        string_node = models.Node.objects.create(
+            graph=graph_b,
+            nodegroup=node_group_b,
+            name="String Node",
+            datatype="non-localized-string",
+            istopnode=False,
+        )
+
+        resource_b_1 = models.ResourceInstance.objects.create(graph=graph_b)
+        tile_b_1 = Tile.get_blank_tile(
+            str(string_node.pk), resourceid=str(resource_b_1.pk)
+        )
+        tile_b_1.data[str(string_node.pk)] = "Test Value"
+        tile_b_1.save()
+
+        resource_b_2 = models.ResourceInstance.objects.create(graph=graph_b)
+        tile_b_2 = Tile.get_blank_tile(
+            str(string_node.pk), resourceid=str(resource_b_2.pk)
+        )
+        tile_b_2.data[str(string_node.pk)] = "Test Value"
+        tile_b_2.save()
+
+        resource_a = models.ResourceInstance.objects.create(graph=graph_a)
+        tile_a = Tile.get_blank_tile(str(resource_a.pk), resourceid=str(resource_a.pk))
+        tile_a.data[str(resource_instance_node.pk)] = [
+            {
+                "resourceId": str(resource_b_1.pk),
+                "ontologyProperty": "",
+                "inverseOntologyProperty": "",
+            },
+            {
+                "resourceId": str(resource_b_2.pk),
+                "ontologyProperty": "",
+                "inverseOntologyProperty": "",
+            },
+        ]
+        tile_a.save()
+        relations = models.ResourceXResource.objects.filter(tileid=tile_a.pk)
+        original_count = relations.count()
+        self.assertEqual(original_count, 2)
+        tile_a.data[str(resource_instance_node.pk)].pop()
+        tile_a.save()
+        relations_revised = models.ResourceXResource.objects.filter(tileid=tile_a.pk)
+        revised_count = relations_revised.count()
+        self.assertEqual(revised_count, 1)
