@@ -365,7 +365,8 @@ class CommandLineTests(ArchesTestCase):
 
     def test_resource_report_bad(self):
         self.client.login(username="admin", password="admin")
-        ResourceInstance.objects.delete(resourceinstanceid=self.resource_instance_id)
+        resource = Resource.objects.get(resourceinstanceid=self.resource_instance_id)
+        resource.delete()
         url = reverse(
             "resource_report", kwargs={"resourceid": self.resource_instance_id}
         )
