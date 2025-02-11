@@ -8,7 +8,6 @@ const props = defineProps<{
     configuration: any;
 }>();
 
-// Datepicker returns date object, which needs to be parsed to post back
 const internalValue = ref(props.initialValue);
 
 const rawValue = computed(() => parseDate(internalValue.value));
