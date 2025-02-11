@@ -1,16 +1,61 @@
 import uuid
+from dataclasses import asdict, dataclass
 
 from django.db.models.fields.json import JSONField
 from django.utils.translation import get_language, gettext as _
 
 from arches.app.datatypes.base import BaseDataType
+from arches.app.models.models import Node
 from arches.app.models.graph import GraphValidationError
 
 from arches_references.models import ListItem
 
 
+@dataclass(kw_only=True)
+class ReferenceLabel:
+    id: uuid.UUID
+    value: str
+    language_id: str
+    valuetype_id: str
+    list_item_id: uuid.UUID
+
+
+@dataclass(kw_only=True)
+class Reference:
+    uri: str
+    labels: list[ReferenceLabel]
+    list_id: uuid.UUID
+
+
 class ReferenceDataType(BaseDataType):
     rest_framework_model_field = JSONField(null=True)
+
+    def to_python(self, value):
+        if value is None:
+            return None
+        if not value:
+            raise ValueError(_("Reference datatype value cannot be empty"))
+
+        references = []
+        for reference in value:
+            incoming_args = {**reference}
+            if labels := incoming_args.get("labels"):
+                incoming_args["labels"] = [
+                    ReferenceLabel(**label) for label in incoming_args["labels"]
+                ]
+            elif labels == []:
+                incoming_args.pop("labels")
+            references.append(Reference(**incoming_args))
+
+        return references
+
+    def serialize(self, value):
+        if isinstance(value, list):
+            return [
+                asdict(reference) if isinstance(reference, Reference) else {**reference}
+                for reference in value
+            ]
+        return value
 
     def validate(
         self,
@@ -22,66 +67,60 @@ class ReferenceDataType(BaseDataType):
         strict=False,
         **kwargs,
     ):
-        errors = []
-        title = _("Invalid Reference Datatype Value")
-        if value is None:
-            return errors
+        try:
+            parsed = self.to_python(value)
+            self.validate_pref_labels(parsed)
+            self.validate_multivalue(parsed, node, nodeid)
+        except Exception as e:
+            return [self.transform_exception(e)]
+        return []
 
-        if type(value) == list and len(value):
-            for reference in value:
-                if "uri" in reference and len(reference["uri"]):
-                    pass
-                else:
-                    errors.append(
-                        {
-                            "type": "ERROR",
-                            "message": _(
-                                "Reference objects require a 'uri' property and corresponding value"
-                            ),
-                            "title": title,
-                        }
-                    )
-                if "labels" in reference:
-                    pref_label_languages = []
-                    for label in reference["labels"]:
-                        if not all(
-                            key in label
-                            for key in ("id", "value", "language_id", "valuetype_id")
-                        ):
-                            errors.append(
-                                {
-                                    "type": "ERROR",
-                                    "message": _(
-                                        "Reference labels require properties: id(uuid), value(string), language_id(e.g. 'en'), and valuetype_id(e.g. 'prefLabel')"
-                                    ),
-                                    "title": title,
-                                }
-                            )
-                        if label["valuetype_id"] == "prefLabel":
-                            pref_label_languages.append(label["language_id"])
+    def validate_pref_labels(self, references: list[Reference]):
+        for reference in references:
+            pref_label_languages = [
+                label.language_id
+                for label in reference.labels
+                if label.valuetype_id == "prefLabel"
+            ]
+            if len(set(pref_label_languages)) < len(pref_label_languages):
+                msg = _("A reference can have only one prefLabel per language")
+                raise ValueError(msg)
 
-                    if len(set(pref_label_languages)) < len(pref_label_languages):
-                        errors.append(
-                            {
-                                "type": "ERROR",
-                                "message": _(
-                                    "A reference can have only one prefLabel per language"
-                                ),
-                                "title": title,
-                            }
-                        )
-        else:
-            errors.append(
-                {
-                    "type": "ERROR",
-                    "message": _("Reference value must be a list of reference objects"),
-                    "title": title,
-                }
-            )
-        return errors
+    def validate_multivalue(self, parsed, node, nodeid):
+        if not node:
+            if not nodeid:
+                raise ValueError
+            try:
+                node = Node.objects.get(nodeid=nodeid)
+            except Node.DoesNotExist:
+                return
+        if not node.config.get("multiValue") and len(parsed) > 1:
+            raise ValueError(_("This node does not allow multiple references."))
+
+    @staticmethod
+    def transform_exception(e):
+        message = _("Unknown error")
+        if isinstance(e, TypeError) and e.args:
+            # Localize the error raised by the dataclass constructor.
+            if "__init__() missing" in e.args[0]:
+                message = _(
+                    "Missing required value(s): {}".format(e.args[0].split(": ")[-1])
+                )
+            elif "unexpected keyword argument" in e.args[0]:
+                message = _(
+                    "Unexpected value: {}".format(e.args[0].split("argument ")[-1])
+                )
+        elif isinstance(e, ValueError) and e.args:
+            message = e.args[0]
+        return {
+            "type": "ERROR",
+            "message": message,
+            "title": _("Invalid Reference Datatype Value"),
+        }
 
     def transform_value_for_tile(self, value, **kwargs):
         list_id = kwargs.get("controlledList")
+        value = self.serialize(value)
         if (
             isinstance(value, list)
             and isinstance(value[0], dict)

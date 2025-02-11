@@ -51,7 +51,7 @@ define([
                     const newItem = selection.map(uri => {
                         return {
                             "labels": NAME_LOOKUP[uri].labels,
-                            "listid": NAME_LOOKUP[uri]["listid"],
+                            "list_id": NAME_LOOKUP[uri]["list_id"],
                             "uri": uri
                         };
                     });
@@ -90,7 +90,7 @@ define([
                 processResults: function(data) {
                     const items = data.items; 
                     items.forEach(item => {
-                        item["listid"] = item.id;
+                        item["list_id"] = item.id;
                         item.id = item.uri;
                         item.disabled = item.guide;
                         item.labels = item.values.filter(val => self.isLabel(val));
@@ -111,7 +111,7 @@ define([
 
                 if (item.uri) {
                     const text = self.getPrefLabel(item.labels) || arches.translations.searching + '...';
-                    NAME_LOOKUP[item.uri] = {"prefLabel": text, "labels": item.labels, "listid": item.list_id};
+                    NAME_LOOKUP[item.uri] = {"prefLabel": text, "labels": item.labels, "list_id": item.list_id};
                     return indentation + text;
                 }
             },
@@ -132,7 +132,7 @@ define([
                         NAME_LOOKUP[value.uri] = {
                                 "prefLabel": self.getPrefLabel(value.labels),
                                 "labels": value.labels,
-                                "listid": value.listid 
+                                "list_id": value.list_id,
                             };
                     });
        
