@@ -1,25 +1,65 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-
 import InputText from "primevue/inputtext";
+import Message from "primevue/message";
+
+import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
 
 const props = defineProps<{
     initialValue: string | undefined;
+    configuration: {
+        nodeAlias: string;
+        graphSlug: string;
+    };
 }>();
 
-const rawValue = ref(props.initialValue);
-const isDirty = computed(() => rawValue.value !== props.initialValue);
+let timeout: ReturnType<typeof setTimeout>;
 
-defineExpose({
-    rawValue,
-    isDirty,
-});
+function resolver(e: FormFieldResolverOptions) {
+    return new Promise((resolve) => {
+        if (timeout) clearTimeout(timeout);
+
+        timeout = setTimeout(() => {
+            resolve(validate(e));
+        }, 500);
+    });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function validate(e: FormFieldResolverOptions) {
+    // API call to validate the input
+    // if (true) {
+    //     return {};
+    // } else {
+    //     return {
+    //         errors: [
+    //             { message: "This is an error message" },
+    //             { message: "This is also an error message" },
+    //         ],
+    //     };
+    // }
+}
 </script>
 
 <template>
-    <InputText
-        v-model="rawValue"
-        type="text"
-        :fluid="true"
-    />
+    <FormField
+        v-slot="$field"
+        :name="props.configuration.nodeAlias"
+        :initial-value="props.initialValue"
+        :resolver="resolver"
+    >
+        <InputText
+            type="text"
+            :fluid="true"
+        />
+        <template v-if="$field?.errors">
+            <Message
+                v-for="error in $field.errors"
+                :key="error.message"
+                severity="error"
+                size="small"
+            >
+                {{ error.message }}
+            </Message>
+        </template>
+    </FormField>
 </template>
