@@ -51,15 +51,13 @@ function validate(e: FormFieldResolverOptions) {
             type="text"
             :fluid="true"
         />
-        <template v-if="$field?.errors">
-            <Message
-                v-for="error in $field.errors"
-                :key="error.message"
-                severity="error"
-                size="small"
-            >
-                {{ error.message }}
-            </Message>
-        </template>
+        <Message
+            v-for="error in $field.errors"
+            :key="error.message"
+            severity="error"
+            size="small"
+        >
+            {{ error.message }}
+        </Message>
     </FormField>
 </template>
