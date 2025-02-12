@@ -1,46 +1,33 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
-#
-# Also note: You'll have to insert the output of 'django-admin sqlcustom [app_label]'
-# into your database.
-
-
-import sys
-import json
-import uuid
 import datetime
+import json
 import logging
+import sys
 import traceback
-import django.utils.timezone
+import uuid
 
-from arches.app.const import ExtensionType
-from arches.app.utils.module_importer import get_class_from_modulename
-from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
-from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
-from arches.app.models.utils import add_to_update_fields
-from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.utils import import_class_from_string
+import django.utils.timezone
 from django.contrib.auth.models import Group, User
 from django.contrib.gis.db import models
-from django.core import checks
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import ProgrammingError, connection
-from django.db.models import JSONField
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import RegexValidator, validate_slug
-from django.db.models import JSONField, Max, Q
+from django.db import ProgrammingError, connection
+from django.db.models import Case, F, JSONField, Max, Q, Value, When
 from django.db.models.constraints import UniqueConstraint
+from django.db.models.expressions import CombinedExpression
+from django.db.models.functions import Concat
 from django.utils import translation
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import User
-from django.contrib.auth.models import Group
-from django.core.validators import validate_slug
-from django.core.exceptions import ValidationError
+
+from arches.app.const import ExtensionType
+from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.models.functions import UUID4
+from arches.app.models.mixins import SaveSupportsBlindOverwriteMixin
+from arches.app.models.utils import add_to_update_fields
+from arches.app.utils import import_class_from_string
+from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.module_importer import get_class_from_modulename
+from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
 # so make sure the only settings we use in this file are ones that are static (fixed at run time)
@@ -59,8 +46,8 @@ class BulkIndexQueue(models.Model):
         db_table = "bulk_index_queue"
 
 
-class CardModel(models.Model):
-    cardid = models.UUIDField(primary_key=True)
+class CardModel(SaveSupportsBlindOverwriteMixin, models.Model):
+    cardid = models.UUIDField(primary_key=True, default=uuid.uuid4, db_default=UUID4())
     name = I18n_TextField(blank=True, null=True)
     description = I18n_TextField(blank=True, null=True)
     instructions = I18n_TextField(blank=True, null=True)
@@ -94,8 +81,6 @@ class CardModel(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(CardModel, self).__init__(*args, **kwargs)
-        if not self.cardid:
-            self.cardid = uuid.uuid4()
         if isinstance(self.cardid, str):
             self.cardid = uuid.UUID(self.cardid)
 
@@ -110,41 +95,37 @@ class CardModel(models.Model):
         db_table = "cards"
 
 
-class ConstraintModel(models.Model):
-    constraintid = models.UUIDField(primary_key=True)
+class ConstraintModel(SaveSupportsBlindOverwriteMixin, models.Model):
+    constraintid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     uniquetoallinstances = models.BooleanField(default=False)
     card = models.ForeignKey("CardModel", db_column="cardid", on_delete=models.CASCADE)
     nodes = models.ManyToManyField(to="Node", through="ConstraintXNode")
-
-    def __init__(self, *args, **kwargs):
-        super(ConstraintModel, self).__init__(*args, **kwargs)
-        if not self.constraintid:
-            self.constraintid = uuid.uuid4()
 
     class Meta:
         managed = True
         db_table = "card_constraints"
 
 
-class ConstraintXNode(models.Model):
-    id = models.UUIDField(primary_key=True, serialize=False)
+class ConstraintXNode(SaveSupportsBlindOverwriteMixin, models.Model):
+    id = models.UUIDField(
+        primary_key=True, serialize=False, default=uuid.uuid4, db_default=UUID4()
+    )
     constraint = models.ForeignKey(
         "ConstraintModel", on_delete=models.CASCADE, db_column="constraintid"
     )
     node = models.ForeignKey("Node", on_delete=models.CASCADE, db_column="nodeid")
-
-    def __init__(self, *args, **kwargs):
-        super(ConstraintXNode, self).__init__(*args, **kwargs)
-        if not self.id:
-            self.id = uuid.uuid4()
 
     class Meta:
         managed = True
         db_table = "constraints_x_nodes"
 
 
-class CardComponent(models.Model):
-    componentid = models.UUIDField(primary_key=True)
+class CardComponent(SaveSupportsBlindOverwriteMixin, models.Model):
+    componentid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     component = models.TextField()
@@ -156,18 +137,13 @@ class CardComponent(models.Model):
         json_string = json.dumps(self.defaultconfig)
         return json_string
 
-    def __init__(self, *args, **kwargs):
-        super(CardComponent, self).__init__(*args, **kwargs)
-        if not self.componentid:
-            self.componentid = uuid.uuid4()
-
     class Meta:
         managed = True
         db_table = "card_components"
 
 
-class CardXNodeXWidget(models.Model):
-    id = models.UUIDField(primary_key=True)
+class CardXNodeXWidget(SaveSupportsBlindOverwriteMixin, models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, db_default=UUID4())
     node = models.ForeignKey("Node", db_column="nodeid", on_delete=models.CASCADE)
     card = models.ForeignKey("CardModel", db_column="cardid", on_delete=models.CASCADE)
     widget = models.ForeignKey("Widget", db_column="widgetid", on_delete=models.CASCADE)
@@ -183,11 +159,6 @@ class CardXNodeXWidget(models.Model):
         on_delete=models.CASCADE,
     )
 
-    def __init__(self, *args, **kwargs):
-        super(CardXNodeXWidget, self).__init__(*args, **kwargs)
-        if not self.id:
-            self.id = uuid.uuid4()
-
     def save(self, **kwargs):
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
@@ -200,17 +171,14 @@ class CardXNodeXWidget(models.Model):
         unique_together = (("node", "card", "widget"),)
 
 
-class Concept(models.Model):
-    conceptid = models.UUIDField(primary_key=True)
+class Concept(SaveSupportsBlindOverwriteMixin, models.Model):
+    conceptid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     nodetype = models.ForeignKey(
         "DNodeType", db_column="nodetype", on_delete=models.CASCADE
     )
     legacyoid = models.TextField(unique=True)
-
-    def __init__(self, *args, **kwargs):
-        super(Concept, self).__init__(*args, **kwargs)
-        if not self.conceptid:
-            self.conceptid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -273,8 +241,8 @@ class DValueType(models.Model):
         db_table = "d_value_types"
 
 
-class Edge(models.Model):
-    edgeid = models.UUIDField(primary_key=True)
+class Edge(SaveSupportsBlindOverwriteMixin, models.Model):
+    edgeid = models.UUIDField(primary_key=True, default=uuid.uuid4, db_default=UUID4())
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     ontologyproperty = models.TextField(blank=True, null=True)
@@ -307,8 +275,6 @@ class Edge(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(Edge, self).__init__(*args, **kwargs)
-        if not self.edgeid:
-            self.edgeid = uuid.uuid4()
         if isinstance(self.edgeid, str):
             self.edgeid = uuid.UUID(self.edgeid)
 
@@ -324,8 +290,10 @@ class Edge(models.Model):
         unique_together = (("rangenode", "domainnode"),)
 
 
-class EditLog(models.Model):
-    editlogid = models.UUIDField(primary_key=True)
+class EditLog(SaveSupportsBlindOverwriteMixin, models.Model):
+    editlogid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     transactionid = models.UUIDField(default=uuid.uuid1)
     resourcedisplayname = models.TextField(blank=True, null=True)
     resourceclassid = models.TextField(blank=True, null=True)
@@ -352,11 +320,6 @@ class EditLog(models.Model):
     provisional_edittype = models.TextField(blank=True, null=True)
     note = models.TextField(blank=True, null=True)
 
-    def __init__(self, *args, **kwargs):
-        super(EditLog, self).__init__(*args, **kwargs)
-        if not self.editlogid:
-            self.editlogid = uuid.uuid4()
-
     class Meta:
         managed = True
         db_table = "edit_log"
@@ -366,8 +329,10 @@ class EditLog(models.Model):
         ]
 
 
-class ExternalOauthToken(models.Model):
-    token_id = models.UUIDField(primary_key=True, serialize=False, unique=True)
+class ExternalOauthToken(SaveSupportsBlindOverwriteMixin, models.Model):
+    token_id = models.UUIDField(
+        primary_key=True, serialize=False, default=uuid.uuid4, db_default=UUID4()
+    )
     user = models.ForeignKey(
         db_column="userid",
         null=False,
@@ -381,37 +346,26 @@ class ExternalOauthToken(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    def __init__(self, *args, **kwargs):
-        super(ExternalOauthToken, self).__init__(*args, **kwargs)
-        if not self.token_id:
-            self.token_id = uuid.uuid4()
-
     class Meta:
         managed = True
         db_table = "external_oauth_tokens"
 
 
-class ResourceRevisionLog(models.Model):
-    logid = models.UUIDField(primary_key=True)
+class ResourceRevisionLog(SaveSupportsBlindOverwriteMixin, models.Model):
+    logid = models.UUIDField(primary_key=True, default=uuid.uuid4, db_default=UUID4())
     resourceid = models.UUIDField(default=uuid.uuid1)
-    revisionid = models.TextField(
-        null=False
-    )  # not a ForeignKey so we can track deletions
+    # not a ForeignKey so we can track deletions
+    revisionid = models.TextField(null=False)
     synctimestamp = models.DateTimeField(auto_now_add=True, null=False)
     action = models.TextField(blank=True, null=True)
-
-    def __init__(self, *args, **kwargs):
-        super(ResourceRevisionLog, self).__init__(*args, **kwargs)
-        if not self.logid:
-            self.logid = uuid.uuid4()
 
     class Meta:
         managed = True
         db_table = "resource_revision_log"
 
 
-class File(models.Model):
-    fileid = models.UUIDField(primary_key=True)
+class File(SaveSupportsBlindOverwriteMixin, models.Model):
+    fileid = models.UUIDField(primary_key=True, default=uuid.uuid4, db_default=UUID4())
     path = models.FileField(
         upload_to=import_class_from_string(settings.FILENAME_GENERATOR)
     )
@@ -420,14 +374,9 @@ class File(models.Model):
     )
     thumbnail_data = models.BinaryField(null=True)
 
-    def __init__(self, *args, **kwargs):
-        super(File, self).__init__(*args, **kwargs)
-        if not self.fileid:
-            self.fileid = uuid.uuid4()
-
     def save(self, **kwargs):
         self.make_thumbnail(kwargs)
-        super(File, self).save(**kwargs)
+        super().save(**kwargs)
 
     def make_thumbnail(self, kwargs_from_save_call, force=False):
         try:
@@ -445,24 +394,21 @@ class File(models.Model):
         db_table = "files"
 
 
-class TempFile(models.Model):
-    fileid = models.UUIDField(primary_key=True)
+class TempFile(SaveSupportsBlindOverwriteMixin, models.Model):
+    fileid = models.UUIDField(primary_key=True, default=uuid.uuid4, db_default=UUID4())
     path = models.FileField(upload_to="archestemp")
     created = models.DateTimeField(auto_now_add=True)
     source = models.TextField()
-
-    def __init__(self, *args, **kwargs):
-        super(TempFile, self).__init__(*args, **kwargs)
-        if not self.fileid:
-            self.fileid = uuid.uuid4()
 
     class Meta:
         managed = True
         db_table = "files_temporary"
 
 
-class Function(models.Model):
-    functionid = models.UUIDField(primary_key=True)
+class Function(SaveSupportsBlindOverwriteMixin, models.Model):
+    functionid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     name = models.TextField(blank=True, null=True)
     functiontype = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
@@ -470,11 +416,6 @@ class Function(models.Model):
     modulename = models.TextField(blank=True, null=True)
     classname = models.TextField(blank=True, null=True)
     component = models.TextField(blank=True, null=True)
-
-    def __init__(self, *args, **kwargs):
-        super(Function, self).__init__(*args, **kwargs)
-        if not self.functionid:
-            self.functionid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -491,8 +432,10 @@ class Function(models.Model):
         )
 
 
-class FunctionXGraph(models.Model):
-    id = models.UUIDField(primary_key=True, serialize=False)
+class FunctionXGraph(SaveSupportsBlindOverwriteMixin, models.Model):
+    id = models.UUIDField(
+        primary_key=True, serialize=False, default=uuid.uuid4, db_default=UUID4()
+    )
     function = models.ForeignKey(
         "Function", on_delete=models.CASCADE, db_column="functionid"
     )
@@ -501,19 +444,14 @@ class FunctionXGraph(models.Model):
     )
     config = JSONField(blank=True, null=True)
 
-    def __init__(self, *args, **kwargs):
-        super(FunctionXGraph, self).__init__(*args, **kwargs)
-        if not self.id:
-            self.id = uuid.uuid4()
-
     class Meta:
         managed = True
         db_table = "functions_x_graphs"
         unique_together = ("function", "graph")
 
 
-class GraphModel(models.Model):
-    graphid = models.UUIDField(primary_key=True)
+class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
+    graphid = models.UUIDField(primary_key=True, default=uuid.uuid4, db_default=UUID4())
     name = I18n_TextField(blank=True, null=True)
     description = I18n_TextField(blank=True, null=True)
     deploymentfile = models.TextField(blank=True, null=True)
@@ -616,11 +554,6 @@ class GraphModel(models.Model):
     def __str__(self):
         return str(self.name)
 
-    def __init__(self, *args, **kwargs):
-        super(GraphModel, self).__init__(*args, **kwargs)
-        if not self.graphid:
-            self.graphid = uuid.uuid4()
-
     class Meta:
         managed = True
         db_table = "graphs"
@@ -706,8 +639,10 @@ class Language(models.Model):
         db_table = "languages"
 
 
-class NodeGroup(models.Model):
-    nodegroupid = models.UUIDField(primary_key=True)
+class NodeGroup(SaveSupportsBlindOverwriteMixin, models.Model):
+    nodegroupid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     legacygroupid = models.TextField(blank=True, null=True)
     cardinality = models.CharField(
         max_length=1, blank=True, default="1", choices={"1": "1", "n": "n"}
@@ -731,11 +666,6 @@ class NodeGroup(models.Model):
         related_name="grouping_node_nodegroup",
     )
 
-    def __init__(self, *args, **kwargs):
-        super(NodeGroup, self).__init__(*args, **kwargs)
-        if not self.nodegroupid:
-            self.nodegroupid = uuid.uuid4()
-
     class Meta:
         managed = True
         db_table = "node_groups"
@@ -756,20 +686,13 @@ class NodeGroup(models.Model):
         )
 
 
-class Node(models.Model):
+class Node(SaveSupportsBlindOverwriteMixin, models.Model):
     """
     Name is unique across all resources because it ties a node to values within tiles. Recommend prepending resource class to node name.
 
     """
 
-    def __init__(self, *args, **kwargs):
-        super(Node, self).__init__(*args, **kwargs)
-        if not self.id:
-            self.id = uuid.uuid4()
-        if isinstance(self.id, str):
-            self.id = uuid.UUID(self.id)
-
-    nodeid = models.UUIDField(primary_key=True)
+    nodeid = models.UUIDField(primary_key=True, default=uuid.uuid4, db_default=UUID4())
     name = models.TextField()
     description = models.TextField(blank=True, null=True)
     istopnode = models.BooleanField()
@@ -888,8 +811,8 @@ class Node(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(Node, self).__init__(*args, **kwargs)
-        if not self.nodeid:
-            self.nodeid = uuid.uuid4()
+        if isinstance(self.nodeid, str):
+            self.nodeid = uuid.UUID(self.nodeid)
 
     def clean(self):
         if not self.alias:
@@ -925,8 +848,10 @@ class Node(models.Model):
         ]
 
 
-class Ontology(models.Model):
-    ontologyid = models.UUIDField(primary_key=True)
+class Ontology(SaveSupportsBlindOverwriteMixin, models.Model):
+    ontologyid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     name = models.TextField()
     version = models.TextField()
     path = models.TextField(null=True, blank=True)
@@ -940,17 +865,12 @@ class Ontology(models.Model):
         on_delete=models.CASCADE,
     )
 
-    def __init__(self, *args, **kwargs):
-        super(Ontology, self).__init__(*args, **kwargs)
-        if not self.ontologyid:
-            self.ontologyid = uuid.uuid4()
-
     class Meta:
         managed = True
         db_table = "ontologies"
 
 
-class OntologyClass(models.Model):
+class OntologyClass(SaveSupportsBlindOverwriteMixin, models.Model):
     """
     the target JSONField has this schema:
 
@@ -987,7 +907,9 @@ class OntologyClass(models.Model):
 
     """
 
-    ontologyclassid = models.UUIDField(primary_key=True)
+    ontologyclassid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     source = models.TextField()
     target = JSONField(null=True)
     ontology = models.ForeignKey(
@@ -996,11 +918,6 @@ class OntologyClass(models.Model):
         related_name="ontologyclasses",
         on_delete=models.CASCADE,
     )
-
-    def __init__(self, *args, **kwargs):
-        super(OntologyClass, self).__init__(*args, **kwargs)
-        if not self.ontologyclassid:
-            self.ontologyclassid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1043,7 +960,7 @@ class PublishedGraphEdit(models.Model):
         db_table = "published_graph_edits"
 
 
-class Relation(models.Model):
+class Relation(SaveSupportsBlindOverwriteMixin, models.Model):
     conceptfrom = models.ForeignKey(
         Concept,
         db_column="conceptidfrom",
@@ -1059,21 +976,47 @@ class Relation(models.Model):
     relationtype = models.ForeignKey(
         DRelationType, db_column="relationtype", on_delete=models.CASCADE
     )
-    relationid = models.UUIDField(primary_key=True)
-
-    def __init__(self, *args, **kwargs):
-        super(Relation, self).__init__(*args, **kwargs)
-        if not self.relationid:
-            self.relationid = uuid.uuid4()
+    relationid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
 
     class Meta:
         managed = True
         db_table = "relations"
-        unique_together = (("conceptfrom", "conceptto", "relationtype"),)
+        constraints = [
+            models.UniqueConstraint(
+                Case(
+                    When(
+                        CombinedExpression(
+                            F("conceptfrom"),
+                            "<",
+                            F("conceptto"),
+                            output_field=models.BooleanField(),
+                        ),
+                        then=Concat(
+                            F("conceptfrom"),
+                            Value(","),
+                            F("conceptto"),
+                            output_field=models.TextField(),
+                        ),
+                    ),
+                    default=Concat(
+                        F("conceptto"),
+                        Value(","),
+                        F("conceptfrom"),
+                        output_field=models.TextField(),
+                    ),
+                ),
+                "relationtype",
+                name="unique_relation_bidirectional",
+            ),
+        ]
 
 
-class ReportTemplate(models.Model):
-    templateid = models.UUIDField(primary_key=True)
+class ReportTemplate(SaveSupportsBlindOverwriteMixin, models.Model):
+    templateid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     preload_resource_data = models.BooleanField(default=True)
     name = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
@@ -1086,18 +1029,15 @@ class ReportTemplate(models.Model):
         json_string = json.dumps(self.defaultconfig)
         return json_string
 
-    def __init__(self, *args, **kwargs):
-        super(ReportTemplate, self).__init__(*args, **kwargs)
-        if not self.templateid:
-            self.templateid = uuid.uuid4()
-
     class Meta:
         managed = True
         db_table = "report_templates"
 
 
-class Resource2ResourceConstraint(models.Model):
-    resource2resourceid = models.UUIDField(primary_key=True)
+class Resource2ResourceConstraint(SaveSupportsBlindOverwriteMixin, models.Model):
+    resource2resourceid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     resourceclassfrom = models.ForeignKey(
         Node,
         db_column="resourceclassfrom",
@@ -1115,18 +1055,15 @@ class Resource2ResourceConstraint(models.Model):
         on_delete=models.SET_NULL,
     )
 
-    def __init__(self, *args, **kwargs):
-        super(Resource2ResourceConstraint, self).__init__(*args, **kwargs)
-        if not self.resource2resourceid:
-            self.resource2resourceid = uuid.uuid4()
-
     class Meta:
         managed = True
         db_table = "resource_2_resource_constraints"
 
 
-class ResourceXResource(models.Model):
-    resourcexid = models.UUIDField(primary_key=True)
+class ResourceXResource(SaveSupportsBlindOverwriteMixin, models.Model):
+    resourcexid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     resourceinstanceidfrom = models.ForeignKey(
         "ResourceInstance",
         db_column="resourceinstanceidfrom",
@@ -1225,18 +1162,15 @@ class ResourceXResource(models.Model):
 
         super(ResourceXResource, self).save(**kwargs)
 
-    def __init__(self, *args, **kwargs):
-        super(ResourceXResource, self).__init__(*args, **kwargs)
-        if not self.resourcexid:
-            self.resourcexid = uuid.uuid4()
-
     class Meta:
         managed = True
         db_table = "resource_x_resource"
 
 
-class ResourceInstance(models.Model):
-    resourceinstanceid = models.UUIDField(primary_key=True, blank=True)
+class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
+    resourceinstanceid = models.UUIDField(
+        primary_key=True, blank=True, default=uuid.uuid4, db_default=UUID4()
+    )
     graph = models.ForeignKey(
         GraphModel, blank=True, db_column="graphid", on_delete=models.CASCADE
     )
@@ -1280,11 +1214,6 @@ class ResourceInstance(models.Model):
         managed = True
         db_table = "resource_instances"
         permissions = (("no_access_to_resourceinstance", "No Access"),)
-
-    def __init__(self, *args, **kwargs):
-        super(ResourceInstance, self).__init__(*args, **kwargs)
-        if not self.resourceinstanceid:
-            self.resourceinstanceid = uuid.uuid4()
 
     def __repr__(self):
         return f"<{self.graph.name}: {self.name} ({self.pk})>"
@@ -1457,8 +1386,10 @@ class ResourceInstanceLifecycleStateToXRef(models.Model):
         managed = True
 
 
-class SearchComponent(models.Model):
-    searchcomponentid = models.UUIDField(primary_key=True)
+class SearchComponent(SaveSupportsBlindOverwriteMixin, models.Model):
+    searchcomponentid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     name = models.TextField()
     icon = models.TextField(default=None)
     modulename = models.TextField(blank=True, null=True)
@@ -1470,11 +1401,6 @@ class SearchComponent(models.Model):
 
     def __str__(self):
         return self.name
-
-    def __init__(self, *args, **kwargs):
-        super(SearchComponent, self).__init__(*args, **kwargs)
-        if not self.searchcomponentid:
-            self.searchcomponentid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1489,8 +1415,10 @@ class SearchComponent(models.Model):
         return JSONSerializer().serialize(self)
 
 
-class SearchExportHistory(models.Model):
-    searchexportid = models.UUIDField(primary_key=True)
+class SearchExportHistory(SaveSupportsBlindOverwriteMixin, models.Model):
+    searchexportid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     exporttime = models.DateTimeField(auto_now_add=True)
     numberofinstances = models.IntegerField()
@@ -1499,17 +1427,12 @@ class SearchExportHistory(models.Model):
         upload_to="export_deliverables", blank=True, null=True
     )
 
-    def __init__(self, *args, **kwargs):
-        super(SearchExportHistory, self).__init__(*args, **kwargs)
-        if not self.searchexportid:
-            self.searchexportid = uuid.uuid4()
-
     class Meta:
         managed = True
         db_table = "search_export_history"
 
 
-class TileModel(models.Model):  # Tile
+class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
     """
     the data JSONField has this schema:
 
@@ -1572,7 +1495,9 @@ class TileModel(models.Model):  # Tile
 
     """
 
-    tileid = models.UUIDField(primary_key=True, blank=True)
+    tileid = models.UUIDField(
+        primary_key=True, blank=True, default=uuid.uuid4, db_default=UUID4()
+    )
     resourceinstance = models.ForeignKey(
         ResourceInstance, db_column="resourceinstanceid", on_delete=models.CASCADE
     )
@@ -1593,11 +1518,6 @@ class TileModel(models.Model):  # Tile
     class Meta:
         managed = True
         db_table = "tiles"
-
-    def __init__(self, *args, **kwargs):
-        super(TileModel, self).__init__(*args, **kwargs)
-        if not self.tileid:
-            self.tileid = uuid.uuid4()
 
     def __repr__(self):
         return f"<{self.find_nodegroup_alias()} ({self.pk})>"
@@ -1663,8 +1583,8 @@ class TileModel(models.Model):  # Tile
             raise TileCardinalityError(message) from error
 
 
-class Value(models.Model):
-    valueid = models.UUIDField(primary_key=True)
+class Value(SaveSupportsBlindOverwriteMixin, models.Model):
+    valueid = models.UUIDField(primary_key=True, default=uuid.uuid4, db_default=UUID4())
     concept = models.ForeignKey(
         "Concept", db_column="conceptid", on_delete=models.CASCADE
     )
@@ -1681,18 +1601,13 @@ class Value(models.Model):
         on_delete=models.CASCADE,
     )
 
-    def __init__(self, *args, **kwargs):
-        super(Value, self).__init__(*args, **kwargs)
-        if not self.valueid:
-            self.valueid = uuid.uuid4()
-
     class Meta:
         managed = True
         db_table = "values"
 
 
-class FileValue(models.Model):
-    valueid = models.UUIDField(primary_key=True)
+class FileValue(SaveSupportsBlindOverwriteMixin, models.Model):
+    valueid = models.UUIDField(primary_key=True, default=uuid.uuid4, db_default=UUID4())
     concept = models.ForeignKey(
         "Concept", db_column="conceptid", on_delete=models.CASCADE
     )
@@ -1709,11 +1624,6 @@ class FileValue(models.Model):
         on_delete=models.CASCADE,
     )
 
-    def __init__(self, *args, **kwargs):
-        super(FileValue, self).__init__(*args, **kwargs)
-        if not self.valueid:
-            self.valueid = uuid.uuid4()
-
     class Meta:
         managed = False
         db_table = "values"
@@ -1729,8 +1639,10 @@ class FileValue(models.Model):
         return ""
 
 
-class Widget(models.Model):
-    widgetid = models.UUIDField(primary_key=True)
+class Widget(SaveSupportsBlindOverwriteMixin, models.Model):
+    widgetid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     name = models.TextField(unique=True)
     component = models.TextField(unique=True)
     defaultconfig = JSONField(blank=True, null=True, db_column="defaultconfig")
@@ -1745,29 +1657,21 @@ class Widget(models.Model):
     def __str__(self):
         return self.name
 
-    def __init__(self, *args, **kwargs):
-        super(Widget, self).__init__(*args, **kwargs)
-        if not self.widgetid:
-            self.widgetid = uuid.uuid4()
-
     class Meta:
         managed = True
         db_table = "widgets"
 
 
-class Geocoder(models.Model):
-    geocoderid = models.UUIDField(primary_key=True)
+class Geocoder(SaveSupportsBlindOverwriteMixin, models.Model):
+    geocoderid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     name = models.TextField(unique=True)
     component = models.TextField(unique=True)
     api_key = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name
-
-    def __init__(self, *args, **kwargs):
-        super(Geocoder, self).__init__(*args, **kwargs)
-        if not self.geocoderid:
-            self.geocoderid = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1791,8 +1695,10 @@ class MapSource(models.Model):
         db_table = "map_sources"
 
 
-class MapLayer(models.Model):
-    maplayerid = models.UUIDField(primary_key=True)
+class MapLayer(SaveSupportsBlindOverwriteMixin, models.Model):
+    maplayerid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     name = models.TextField(unique=True)
     layerdefinitions = JSONField(blank=True, null=True, db_column="layerdefinitions")
     isoverlay = models.BooleanField(default=False)
@@ -1815,11 +1721,6 @@ class MapLayer(models.Model):
     def __str__(self):
         return self.name
 
-    def __init__(self, *args, **kwargs):
-        super(MapLayer, self).__init__(*args, **kwargs)
-        if not self.maplayerid:
-            self.maplayerid = uuid.uuid4()
-
     class Meta:
         managed = True
         ordering = ("sortorder", "name")
@@ -1833,17 +1734,14 @@ class MapLayer(models.Model):
         )
 
 
-class GraphXMapping(models.Model):
-    id = models.UUIDField(primary_key=True, serialize=False)
+class GraphXMapping(SaveSupportsBlindOverwriteMixin, models.Model):
+    id = models.UUIDField(
+        primary_key=True, serialize=False, default=uuid.uuid4, db_default=UUID4()
+    )
     graph = models.ForeignKey(
         "GraphModel", db_column="graphid", on_delete=models.CASCADE
     )
     mapping = JSONField(blank=True, null=False)
-
-    def __init__(self, *args, **kwargs):
-        super(GraphXMapping, self).__init__(*args, **kwargs)
-        if not self.id:
-            self.id = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -1854,14 +1752,6 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone = models.CharField(max_length=16, blank=True)
     encrypted_mfa_hash = models.CharField(max_length=128, null=True, blank=True)
-
-    def is_reviewer(self):
-        """DEPRECATED Use new pattern:
-
-        from arches.app.utils.permission_backend import user_is_resource_reviewer
-        is_reviewer = user_is_resource_reviewer(user)
-        """
-        pass
 
     @property
     def viewable_nodegroups(self):
@@ -1901,8 +1791,10 @@ class UserProfile(models.Model):
         db_table = "user_profile"
 
 
-class UserXTask(models.Model):
-    id = models.UUIDField(primary_key=True, serialize=False)
+class UserXTask(SaveSupportsBlindOverwriteMixin, models.Model):
+    id = models.UUIDField(
+        primary_key=True, serialize=False, default=uuid.uuid4, db_default=UUID4()
+    )
     taskid = models.UUIDField(serialize=False, blank=True, null=True)
     status = models.TextField(null=True, default="PENDING")
     datestart = models.DateTimeField(blank=True, null=True)
@@ -1910,45 +1802,39 @@ class UserXTask(models.Model):
     name = models.TextField(blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    def __init__(self, *args, **kwargs):
-        super(UserXTask, self).__init__(*args, **kwargs)
-        if not self.id:
-            self.id = uuid.uuid4()
-
     class Meta:
         managed = True
         db_table = "user_x_tasks"
 
 
-class NotificationType(models.Model):
+class NotificationType(SaveSupportsBlindOverwriteMixin, models.Model):
     """
     Creates a 'type' of notification that would be associated with a specific trigger, e.g. Search Export Complete or Package Load Complete
     Must be created manually using Django ORM or SQL.
     """
 
-    typeid = models.UUIDField(primary_key=True, serialize=False)
+    typeid = models.UUIDField(
+        primary_key=True, serialize=False, default=uuid.uuid4, db_default=UUID4()
+    )
     name = models.TextField(blank=True, null=True)
     emailtemplate = models.TextField(blank=True, null=True)
     emailnotify = models.BooleanField(default=False)
     webnotify = models.BooleanField(default=False)
-
-    def __init__(self, *args, **kwargs):
-        super(NotificationType, self).__init__(*args, **kwargs)
-        if not self.typeid:
-            self.typeid = uuid.uuid4()
 
     class Meta:
         managed = True
         db_table = "notification_types"
 
 
-class Notification(models.Model):
+class Notification(SaveSupportsBlindOverwriteMixin, models.Model):
     """
     A Notification instance that may optionally have a NotificationType. Can spawn N UserXNotification instances
     Must be created manually using Django ORM.
     """
 
-    id = models.UUIDField(primary_key=True, serialize=False)
+    id = models.UUIDField(
+        primary_key=True, serialize=False, default=uuid.uuid4, db_default=UUID4()
+    )
     created = models.DateTimeField(auto_now_add=True)
     # created.editable = True
     message = models.TextField(blank=True, null=True)
@@ -1956,17 +1842,12 @@ class Notification(models.Model):
     # TODO: Ideally validate context against a list of keys from NotificationType
     notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE, null=True)
 
-    def __init__(self, *args, **kwargs):
-        super(Notification, self).__init__(*args, **kwargs)
-        if not self.id:
-            self.id = uuid.uuid4()
-
     class Meta:
         managed = True
         db_table = "notifications"
 
 
-class UserXNotification(models.Model):
+class UserXNotification(SaveSupportsBlindOverwriteMixin, models.Model):
     """
     A UserXNotification instance depends on an existing Notification instance and a User.
     If its Notification instance has a NotificationType, this Type can be overriden for this particular User with a UserXNotificationType.
@@ -1975,22 +1856,19 @@ class UserXNotification(models.Model):
     Property 'isread' refers to either webnotify or emailnotify, not both, behaves differently.
     """
 
-    id = models.UUIDField(primary_key=True, serialize=False)
+    id = models.UUIDField(
+        primary_key=True, serialize=False, default=uuid.uuid4, db_default=UUID4()
+    )
     notif = models.ForeignKey(Notification, on_delete=models.CASCADE)
     isread = models.BooleanField(default=False)
     recipient = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    def __init__(self, *args, **kwargs):
-        super(UserXNotification, self).__init__(*args, **kwargs)
-        if not self.id:
-            self.id = uuid.uuid4()
 
     class Meta:
         managed = True
         db_table = "user_x_notifications"
 
 
-class UserXNotificationType(models.Model):
+class UserXNotificationType(SaveSupportsBlindOverwriteMixin, models.Model):
     """
     A UserXNotificationType instance only exists as an override of an existing NotificationType and is user-specific and
     notification-settings-specific (e.g. emailnotify, webnotify, etc.)
@@ -1999,16 +1877,11 @@ class UserXNotificationType(models.Model):
     UserXNotificationTypes are automatically queried and applied as filters in get() requests for UserXNotifications in views/notifications
     """
 
-    id = models.UUIDField(primary_key=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, db_default=UUID4())
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     notiftype = models.ForeignKey(NotificationType, on_delete=models.CASCADE)
     emailnotify = models.BooleanField(default=False)
     webnotify = models.BooleanField(default=False)
-
-    def __init__(self, *args, **kwargs):
-        super(UserXNotificationType, self).__init__(*args, **kwargs)
-        if not self.id:
-            self.id = uuid.uuid4()
 
     class Meta:
         managed = True
@@ -2031,8 +1904,10 @@ class MapMarker(models.Model):
         db_table = "map_markers"
 
 
-class Plugin(models.Model):
-    pluginid = models.UUIDField(primary_key=True)
+class Plugin(SaveSupportsBlindOverwriteMixin, models.Model):
+    pluginid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, db_default=UUID4()
+    )
     name = I18n_TextField(null=True, blank=True)
     icon = models.TextField(default=None)
     component = models.TextField()
@@ -2041,11 +1916,6 @@ class Plugin(models.Model):
     slug = models.TextField(validators=[validate_slug], unique=True, null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=None)
     helptemplate = models.TextField(blank=True, null=True)
-
-    def __init__(self, *args, **kwargs):
-        super(Plugin, self).__init__(*args, **kwargs)
-        if not self.pluginid:
-            self.pluginid = uuid.uuid4()
 
     def __str__(self):
         return str(self.name)
@@ -2152,11 +2022,6 @@ class VwAnnotation(models.Model):
     node = models.ForeignKey(Node, on_delete=models.DO_NOTHING, db_column="nodeid")
     feature = JSONField()
     canvas = models.TextField()
-
-    def __init__(self, *args, **kwargs):
-        super(VwAnnotation, self).__init__(*args, **kwargs)
-        if not self.feature_id:
-            self.feature_id = uuid.uuid4()
 
     class Meta:
         managed = False
