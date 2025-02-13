@@ -6,7 +6,7 @@ from django.db.models.functions import Cast
 
 class ListQuerySet(models.QuerySet):
     def annotate_node_fields(self, **kwargs):
-        from arches_references.models import NodeProxy
+        from arches_controlled_lists.models import NodeProxy
 
         qs = self
         for annotation_name, node_field in kwargs.items():

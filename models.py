@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 
 from arches.app.models.models import DValueType, Language, Node
 from arches.app.models.utils import field_names
-from arches_references.querysets import (
+from arches_controlled_lists.querysets import (
     ListQuerySet,
     ListItemImageManager,
     ListItemValueQuerySet,
@@ -316,7 +316,7 @@ class ListItemImage(models.Model):
 
     class Meta:
         managed = False
-        db_table = "arches_references_listitemvalue"
+        db_table = "arches_controlled_lists_listitemvalue"
 
     def serialize(self):
         return {

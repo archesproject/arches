@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("arches_references", "0001_initial"),
+        ("arches_controlled_lists", "0001_initial"),
         ("guardian", "0002_generic_permissions_index"),
     ]
 
@@ -81,30 +81,30 @@ class Migration(migrations.Migration):
 
                 -- If overwrite flag is provided, completely recreate the list/items/values
                 if overwrite then
-                    delete from arches_references_listitemvalue
+                    delete from arches_controlled_lists_listitemvalue
                     where list_item_id in (
                         select id
-                        from arches_references_listitem
+                        from arches_controlled_lists_listitem
                         where list_id in (
                             select id
-                            from arches_references_list
+                            from arches_controlled_lists_list
                             where name = any(collection_names)
                         )
                     );
 
-                    delete from arches_references_listitem
+                    delete from arches_controlled_lists_listitem
                     where list_id in (
                         select id
-                        from arches_references_list
+                        from arches_controlled_lists_list
                         where name = any(collection_names)
                     );
 
-                    delete from arches_references_list
+                    delete from arches_controlled_lists_list
                     where name = any(collection_names);
                 end if;
 
                 -- Migrate Collection -> Controlled List
-                insert into arches_references_list (
+                insert into arches_controlled_lists_list (
                     id,
                     name,
                     dynamic,
@@ -182,7 +182,7 @@ class Migration(migrations.Migration):
                     with filtered_collection_hierarchy as (
                         select * 
                         from temp_collection_hierarchy
-                        where root_list in (select id from arches_references_list where name = collection)
+                        where root_list in (select id from arches_controlled_lists_list where name = collection)
                     ),
                     -- Rank prefLabels by user provided language, 
                     -- if no prefLabel in that language exists for a concept, fall back on next prefLabel ordered by languageid
@@ -214,7 +214,7 @@ class Migration(migrations.Migration):
                             depth
                         from ranked_prefLabels rpl
                         where language_rank = 1 and
-                            root_list in (select id from arches_references_list where name = collection)
+                            root_list in (select id from arches_controlled_lists_list where name = collection)
                     )
                     insert into temp_list_items_and_values (
                         list_item_id,
@@ -265,7 +265,7 @@ class Migration(migrations.Migration):
                             list_id,
                             parent_id,
                             TRUE as existing_item
-                        from arches_references_listitem
+                        from arches_controlled_lists_listitem
                         ) as t
                 )
                 update temp_list_items_and_values t
@@ -315,7 +315,7 @@ class Migration(migrations.Migration):
                 set listitemvalue_id = uuid_generate_v4()
                 where rownumber > 1;
                 
-                insert into arches_references_listitem (
+                insert into arches_controlled_lists_listitem (
                     id,
                     uri,
                     sortorder,
@@ -333,7 +333,7 @@ class Migration(migrations.Migration):
                 from temp_list_items_and_values;
 
                 -- Migrate concept values -> controlled list item values
-                insert into arches_references_listitemvalue (
+                insert into arches_controlled_lists_listitemvalue (
                     id,
                     value,
                     list_item_id,

@@ -1,5 +1,5 @@
 """
-Django settings for arches_references project.
+Django settings for arches_controlled_lists project.
 """
 
 import inspect
@@ -14,7 +14,7 @@ try:
 except ImportError:
     pass
 
-APP_NAME = "arches_references"
+APP_NAME = "arches_controlled_lists"
 APP_VERSION = semantic_version.Version(major=0, minor=0, patch=0)
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
@@ -24,10 +24,10 @@ WEBPACK_LOADER = {
     },
 }
 
-DATATYPE_LOCATIONS.append("arches_references.datatypes")
-FUNCTION_LOCATIONS.append("arches_references.functions")
-ETL_MODULE_LOCATIONS.append("arches_references.etl_modules")
-SEARCH_COMPONENT_LOCATIONS.append("arches_references.search_components")
+DATATYPE_LOCATIONS.append("arches_controlled_lists.datatypes")
+FUNCTION_LOCATIONS.append("arches_controlled_lists.functions")
+ETL_MODULE_LOCATIONS.append("arches_controlled_lists.etl_modules")
+SEARCH_COMPONENT_LOCATIONS.append("arches_controlled_lists.search_components")
 
 LOCALE_PATHS.insert(0, os.path.join(APP_ROOT, "locale"))
 
@@ -57,7 +57,7 @@ SECRET_KEY = "bd!p6hwb+k#uk3ub*^fi%1ib@vhox+@oulghd8oh+#e38lj+x="
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ROOT_URLCONF = "arches_references.urls"
+ROOT_URLCONF = "arches_controlled_lists.urls"
 
 # Modify this line as needed for your project to connect to elasticsearch with a password that you generate
 ELASTICSEARCH_CONNECTION_OPTIONS = {
@@ -79,11 +79,11 @@ ELASTICSEARCH_CONNECTION_OPTIONS = {
 # Or Kibana: https://www.elastic.co/guide/en/kibana/current/api-keys.html
 
 # a prefix to append to all elasticsearch indexes, note: must be lower case
-ELASTICSEARCH_PREFIX = "arches_references"
+ELASTICSEARCH_PREFIX = "arches_controlled_lists"
 
 ELASTICSEARCH_CUSTOM_INDEXES = []
 # [{
-#     'module': 'arches_references.search_indexes.sample_index.SampleIndex',
+#     'module': 'arches_controlled_lists.search_indexes.sample_index.SampleIndex',
 #     'name': 'my_new_custom_index', <-- follow ES index naming rules
 #     'should_update_asynchronously': False  <-- denotes if asynchronously updating the index would affect custom functionality within the project.
 # }]
@@ -107,7 +107,7 @@ DATABASES = {
         "CONN_MAX_AGE": 0,
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "HOST": "localhost",
-        "NAME": "arches_references",
+        "NAME": "arches_controlled_lists",
         "OPTIONS": {},
         "PASSWORD": "postgis",
         "PORT": "5432",
@@ -130,7 +130,7 @@ INSTALLED_APPS = (
     "django.contrib.staticfiles",
     "django.contrib.gis",
     "django_hosts",
-    "arches_references",
+    "arches_controlled_lists",
     "arches",
     "arches.app.models",
     "arches.management",
@@ -148,8 +148,8 @@ INSTALLED_APPS = (
 # take precedence over core arches templates in arches/app/templates.
 INSTALLED_APPS += ("arches.app",)
 
-ROOT_HOSTCONF = "arches_references.hosts"
-DEFAULT_HOST = "arches_references"
+ROOT_HOSTCONF = "arches_controlled_lists.hosts"
+DEFAULT_HOST = "arches_controlled_lists"
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -188,7 +188,7 @@ ALLOWED_HOSTS = []
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(
     APP_ROOT, "system_settings", "System_Settings.json"
 )
-WSGI_APPLICATION = "arches_references.wsgi.application"
+WSGI_APPLICATION = "arches_controlled_lists.wsgi.application"
 
 # URL that handles the media served from MEDIA_ROOT, used for managing stored files.
 # It must end in a slash if set to a non-empty value.
@@ -252,7 +252,7 @@ RATE_LIMIT = "5/m"
 DATA_UPLOAD_MAX_MEMORY_SIZE = 15728640
 
 # Unique session cookie ensures that logins are treated separately for each app
-SESSION_COOKIE_NAME = "arches_references"
+SESSION_COOKIE_NAME = "arches_controlled_lists"
 
 # For more info on configuring your cache: https://docs.djangoproject.com/en/2.2/topics/cache/
 CACHES = {

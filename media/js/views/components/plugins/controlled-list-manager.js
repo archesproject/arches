@@ -2,8 +2,8 @@ import ko from 'knockout';
 
 import { definePreset } from '@primevue/themes';
 import { ArchesPreset, DEFAULT_THEME } from '@/arches/themes/default.ts';
-import { routes } from '@/arches_references/routes.ts';
-import ControlledListManager from '@/arches_references/plugins/ControlledListManager.vue';
+import { routes } from '@/arches_controlled_lists/routes.ts';
+import ControlledListManager from '@/arches_controlled_lists/plugins/ControlledListManager.vue';
 import createVueApplication from 'utils/create-vue-application';
 import ControlledListManagerTemplate from 'templates/views/components/plugins/controlled-list-manager.htm';
 

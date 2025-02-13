@@ -16,7 +16,7 @@ from arches.app.models.models import (
     Value,
     Widget,
 )
-from arches_references.models import List
+from arches_controlled_lists.models import List
 
 
 class Command(BaseCommand):

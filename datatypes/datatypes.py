@@ -8,7 +8,7 @@ from arches.app.datatypes.base import BaseDataType
 from arches.app.models.models import Node
 from arches.app.models.graph import GraphValidationError
 
-from arches_references.models import ListItem
+from arches_controlled_lists.models import ListItem
 
 
 @dataclass(kw_only=True)

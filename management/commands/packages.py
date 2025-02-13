@@ -4,7 +4,7 @@ import openpyxl
 from arches.management.commands.packages import Command as PackagesCommand
 from arches.app.models.system_settings import settings
 from arches.app.models import models
-from arches_references.models import List, ListItem, ListItemValue
+from arches_controlled_lists.models import List, ListItem, ListItemValue
 from django.db import transaction
 
 

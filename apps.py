@@ -4,9 +4,9 @@ from django.conf import settings
 from arches.settings_utils import generate_frontend_configuration
 
 
-class ArchesReferencesConfig(AppConfig):
-    name = "arches_references"
-    verbose_name = "Arches References"
+class ArchesControlledListsConfig(AppConfig):
+    name = "arches_controlled_lists"
+    verbose_name = "Arches Controlled Lists"
     is_arches_application = True
 
     def ready(self):

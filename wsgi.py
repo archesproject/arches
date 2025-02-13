@@ -28,7 +28,7 @@ if path not in sys.path:
 # reverting back to the old style of setting the DJANGO_SETTINGS_MODULE env variable
 # refer to the following blog post under the heading "Leaking of process environment variables."
 # http://blog.dscpl.com.au/2012/10/requests-running-in-wrong-django.html
-os.environ["DJANGO_SETTINGS_MODULE"] = "arches_references.settings"
+os.environ["DJANGO_SETTINGS_MODULE"] = "arches_controlled_lists.settings"
 
 from django.core.wsgi import get_wsgi_application
 
