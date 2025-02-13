@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useTemplateRef } from "vue";
-
 import DateWidgetEditor from "@/arches_component_lab/widgets/DateWidget/components/DateWidgetEditor.vue";
 import DateWidgetViewer from "@/arches_component_lab/widgets/DateWidget/components/DateWidgetViewer.vue";
 
@@ -9,28 +7,14 @@ import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
     configuration: {
-        label: string;
         dateFormat: string;
+        graphSlug: string;
+        label: string;
+        nodeAlias: string;
     };
-    initialValue: any | undefined;
+    initialValue: Date | undefined;
     mode: WidgetMode;
 }>();
-
-interface ChildComponentInterface {
-    rawValue: any;
-    isDirty: boolean;
-}
-
-const childRef = useTemplateRef<ChildComponentInterface>("childRef");
-
-defineExpose({
-    get rawValue() {
-        return childRef.value?.rawValue;
-    },
-    get isDirty() {
-        return childRef.value?.isDirty;
-    },
-});
 </script>
 
 <template>
@@ -38,14 +22,12 @@ defineExpose({
 
     <DateWidgetEditor
         v-if="props.mode === EDIT"
-        ref="childRef"
         :initial-value="props.initialValue"
         :configuration="props.configuration"
     />
     <DateWidgetViewer
         v-else-if="props.mode === VIEW"
-        ref="childRef"
-        :initial-value="props.initialValue"
+        :value="props.initialValue"
         :configuration="props.configuration"
     />
 </template>
