@@ -16,3 +16,39 @@ export const fetchLists = async (
         throw new Error((error as Error).message || response.statusText);
     }
 };
+
+export const fetchRelatableResources = async (
+    graphSlug: string,
+    nodeAlias: string,
+    page: number,
+) => {
+    const response = await fetch(
+        `${arches.urls.api_relatable_resources(
+            graphSlug,
+            nodeAlias,
+        )}?page=${page}`,
+    );
+
+    const parsed = await response.json();
+    if (!response.ok) throw new Error(parsed.message || response.statusText);
+    return parsed;
+};
+
+export const fetchWidgetConfiguration = async (
+    graphSlug: string,
+    nodeAlias: string,
+) => {
+    const response = await fetch(
+        arches.urls.api_widget_configuration(graphSlug, nodeAlias),
+    );
+
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
+    }
+};
