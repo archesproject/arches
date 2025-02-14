@@ -1,5 +1,24 @@
 import arches from "arches";
 
+export const fetchWidgetConfiguration = async (
+    graphSlug: string,
+    nodeAlias: string,
+) => {
+    const response = await fetch(
+        arches.urls.api_widget_configuration(graphSlug, nodeAlias),
+    );
+
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
+    }
+};
+
 export const fetchLists = async (
     nodeAliases: string[] | undefined = undefined,
 ) => {
