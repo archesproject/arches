@@ -1,0 +1,12 @@
+{% extends "arches_urls.htm" %}
+
+{% load static %}
+{% load l10n %}
+{% load i18n %}
+
+{% block arches_urls %}
+{{ block.super }}
+<div class="arches-urls"
+    api_widget_configuration='(graph_slug, node_alias) => { return "{% url "api-widget-configuration" "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa" "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb" %}".replace("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", graph_slug).replace("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb", node_alias)}'
+></div>
+{% endblock arches_urls %}

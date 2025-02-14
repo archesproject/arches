@@ -3,8 +3,14 @@ from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 from django.urls import include, path
 
+from arches_component_lab.views.api.widgets import WidgetConfigurationView
+
 urlpatterns = [
-    # project-level urls
+    path(
+        "arches-component-lab/api/widget-configuration/<slug:graph_slug>/<slug:node_alias>",
+        WidgetConfigurationView.as_view(),
+        name="api-widget-configuration",
+    ),
 ]
 
 # Ensure Arches core urls are superseded by project-level urls
