@@ -75,7 +75,9 @@ class ReferenceDataType(BaseDataType):
             return [self.transform_exception(e)]
         return []
 
-    def validate_pref_labels(self, references: list[Reference]):
+    def validate_pref_labels(self, references: list[Reference] | None):
+        if not references:
+            return
         for reference in references:
             pref_label_languages = [
                 label.language_id
@@ -87,6 +89,8 @@ class ReferenceDataType(BaseDataType):
                 raise ValueError(msg)
 
     def validate_multivalue(self, parsed, node, nodeid):
+        if not parsed:
+            return
         if not node:
             if not nodeid:
                 raise ValueError
