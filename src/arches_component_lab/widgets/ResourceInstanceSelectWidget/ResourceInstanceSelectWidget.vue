@@ -5,7 +5,10 @@ import ResourceInstanceSelectWidgetEditor from "@/arches_component_lab/widgets/R
 import ResourceInstanceSelectWidgetViewer from "@/arches_component_lab/widgets/ResourceInstanceSelectWidget/components/ResourceInstanceSelectWidgetViewer.vue";
 import { fetchWidgetConfiguration } from "@/arches_component_lab/widgets/api.ts";
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
-import type { ResourceInstanceReference, WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type {
+    ResourceInstanceReference,
+    WidgetMode,
+} from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
     mode?: WidgetMode;
@@ -25,13 +28,16 @@ interface ChildComponentInterface {
 }
 
 onMounted(async () => {
-    const widgetConfig = await fetchWidgetConfiguration(props.configuration.graphSlug, props.configuration.nodeAlias);
+    const widgetConfig = await fetchWidgetConfiguration(
+        props.configuration.graphSlug,
+        props.configuration.nodeAlias,
+    );
 
     childConfiguration.value = {
         ...props.configuration,
-        ...widgetConfig
-    }
-});;
+        ...widgetConfig,
+    };
+});
 
 const childRef = useTemplateRef<ChildComponentInterface>("childRef");
 
@@ -49,14 +55,14 @@ defineExpose({
     <div v-if="childConfiguration">
         <label>{{ childConfiguration?.label }}</label>
         <div v-if="mode === EDIT">
-            <ResourceInstanceSelectWidgetEditor        
+            <ResourceInstanceSelectWidgetEditor
                 ref="childRef"
                 :initial-value="initialValue"
                 :configuration="childConfiguration"
             />
         </div>
         <div v-if="mode === VIEW">
-            <ResourceInstanceSelectWidgetViewer       
+            <ResourceInstanceSelectWidgetViewer
                 ref="childRef"
                 :initial-value="initialValue"
                 :configuration="childConfiguration"

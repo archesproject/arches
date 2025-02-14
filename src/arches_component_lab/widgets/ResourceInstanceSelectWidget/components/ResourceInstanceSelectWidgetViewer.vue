@@ -9,7 +9,9 @@ const props = defineProps<{
 </script>
 <template>
     <span>
-        <a :href="`${arches.urls.resource_editor}${props.initialValue?.[0].resourceId}`">
+        <a
+            :href="`${arches.urls.resource_editor}${props.initialValue?.[0].resourceId}`"
+        >
             {{ props.initialValue?.[0].display_value }}
         </a>
     </span>

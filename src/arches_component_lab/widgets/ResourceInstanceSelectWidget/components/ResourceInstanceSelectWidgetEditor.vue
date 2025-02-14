@@ -7,7 +7,12 @@ import Select from "primevue/select";
 import { useGettext } from "vue3-gettext";
 import { fetchRelatableResources } from "@/arches_component_lab/widgets/api.ts";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
-import type { GraphInfo, NewResourceInstance, ResourceInstanceReference, ResourceInstanceResult } from "@/arches_component_lab/widgets/types.ts";
+import type {
+    GraphInfo,
+    NewResourceInstance,
+    ResourceInstanceReference,
+    ResourceInstanceResult,
+} from "@/arches_component_lab/widgets/types.ts";
 
 const showNewResource = ref(false);
 const message = ref<MessageData | undefined>();
@@ -21,14 +26,14 @@ const props = defineProps<{
         ptAriaLabeledBy?: string;
         itemHeight?: number;
         resultsPerPage?: number;
-    }
+    };
 }>();
 
 const itemHeight = 38;
 const resultsPerPage = 25;
 
 interface MessageData {
-    severity: 'successs' | 'info' | 'warn' | 'error';
+    severity: "successs" | "info" | "warn" | "error";
     detail: string;
 }
 
@@ -41,16 +46,16 @@ const rawSelectedResources = computed({
         return rawValue.value;
     },
     set(value) {
-        rawValue.value = options.value.find(option => option.resourceId == value)?.resourceId
-    }
-}
-);
+        rawValue.value = options.value.find(
+            (option) => option.resourceId == value,
+        )?.resourceId;
+    },
+});
 
 defineExpose({
     rawValue,
     isDirty,
 });
-
 
 const options = ref<ResourceInstanceReference[]>([]);
 const newElements = ref<NewResourceInstance[]>([]);
@@ -81,7 +86,7 @@ watch(options, (resourceResults) => {
 });
 
 onMounted(() => {
-    console.log('here i am')
+    console.log("here i am");
     fetchData(1);
 });
 
@@ -124,7 +129,7 @@ async function fetchData(page: number) {
             message.value = {
                 detail: `Failed to fetch data.  ${error instanceof Error ? error.message : undefined}`,
                 severity: "error",
-            }
+            };
 
             options.value = [];
             resourceResultsPage.value = 1;
@@ -163,7 +168,7 @@ function toggleSelectAll() {
     this.selectAll = true;
 }
 </script>
-<template>  
+<template>
     <Select
         v-model="rawSelectedResources"
         :show-toggle-all="options?.length > 1"
@@ -230,7 +235,11 @@ function toggleSelectAll() {
             },
         }"
     ></Dialog>
-    <Message v-if="message" :severity="message.severity">{{ message.detail }}</Message>
+    <Message
+        v-if="message"
+        :severity="message.severity"
+        >{{ message.detail }}</Message
+    >
 </template>
 <style lang="css" scoped>
 .relationship-footer-btn {
