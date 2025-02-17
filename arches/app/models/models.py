@@ -99,11 +99,11 @@ class CardModel(models.Model):
         if isinstance(self.cardid, str):
             self.cardid = uuid.UUID(self.cardid)
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
             add_to_update_fields(kwargs, "source_identifier_id")
-        super(CardModel, self).save()
+        super(CardModel, self).save(**kwargs)
 
     class Meta:
         managed = True
@@ -188,11 +188,11 @@ class CardXNodeXWidget(models.Model):
         if not self.id:
             self.id = uuid.uuid4()
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
             add_to_update_fields(kwargs, "source_identifier_id")
-        super(CardXNodeXWidget, self).save()
+        super(CardXNodeXWidget, self).save(**kwargs)
 
     class Meta:
         managed = True
@@ -312,11 +312,11 @@ class Edge(models.Model):
         if isinstance(self.edgeid, str):
             self.edgeid = uuid.UUID(self.edgeid)
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         if self.pk == self.source_identifier_id:
             self.source_identifier_id = None
             add_to_update_fields(kwargs, "source_identifier_id")
-        super(Edge, self).save()
+        super(Edge, self).save(**kwargs)
 
     class Meta:
         managed = True
@@ -425,9 +425,9 @@ class File(models.Model):
         if not self.fileid:
             self.fileid = uuid.uuid4()
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         self.make_thumbnail(kwargs)
-        super(File, self).save(*args, **kwargs)
+        super(File, self).save(**kwargs)
 
     def make_thumbnail(self, kwargs_from_save_call, force=False):
         try:
@@ -600,7 +600,7 @@ class GraphModel(models.Model):
 
         return graph
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         if (
             self.isresource
             and not self.source_identifier
@@ -611,7 +611,7 @@ class GraphModel(models.Model):
             )
             add_to_update_fields(kwargs, "resource_instance_lifecycle_id")
 
-        super(GraphModel, self).save(*args, **kwargs)
+        super(GraphModel, self).save(**kwargs)
 
     def __str__(self):
         return str(self.name)
@@ -709,14 +709,27 @@ class Language(models.Model):
 class NodeGroup(models.Model):
     nodegroupid = models.UUIDField(primary_key=True)
     legacygroupid = models.TextField(blank=True, null=True)
-    cardinality = models.TextField(blank=True, default="1")
+    cardinality = models.CharField(
+        max_length=1, blank=True, default="1", choices={"1": "1", "n": "n"}
+    )
     parentnodegroup = models.ForeignKey(
         "self",
         db_column="parentnodegroupid",
         blank=True,
         null=True,
         on_delete=models.CASCADE,
+        related_name="children",
+        related_query_name="child",
     )  # Allows nodegroups within nodegroups
+    grouping_node = models.OneToOneField(
+        "Node",
+        db_column="groupingnodeid",
+        blank=True,
+        null=True,
+        # models.RESTRICT might be better, but revisit after future graph refactor.
+        on_delete=models.SET_NULL,
+        related_name="grouping_node_nodegroup",
+    )
 
     def __init__(self, *args, **kwargs):
         super(NodeGroup, self).__init__(*args, **kwargs)
@@ -726,6 +739,13 @@ class NodeGroup(models.Model):
     class Meta:
         managed = True
         db_table = "node_groups"
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(grouping_node=models.F("pk"))
+                | Q(grouping_node__isnull=True),
+                name="grouping_node_matches_pk_or_null",
+            )
+        ]
 
         default_permissions = ()
         permissions = (
@@ -874,16 +894,19 @@ class Node(models.Model):
     def clean(self):
         if not self.alias:
             Graph.objects.get(pk=self.graph_id).create_node_alias(self)
+        if self.pk == self.source_identifier_id:
+            self.source_identifier_id = None
 
     def save(self, **kwargs):
         if not self.alias:
-            self.clean()
             add_to_update_fields(kwargs, "alias")
             add_to_update_fields(kwargs, "hascustomalias")
         if self.pk == self.source_identifier_id:
-            self.source_identifier_id = None
             add_to_update_fields(kwargs, "source_identifier_id")
-        super(Node, self).save()
+
+        self.clean()
+
+        super(Node, self).save(**kwargs)
 
     class Meta:
         managed = True
@@ -894,6 +917,10 @@ class Node(models.Model):
             ),
             models.UniqueConstraint(
                 fields=["alias", "graph"], name="unique_alias_graph"
+            ),
+            models.CheckConstraint(
+                condition=Q(istopnode=True) | Q(nodegroup__isnull=False),
+                name="has_nodegroup_or_istopnode",
             ),
         ]
 
@@ -1178,7 +1205,7 @@ class ResourceXResource(models.Model):
 
         super(ResourceXResource, self).delete()
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         # during package/csv load the ResourceInstance models are not always available
         try:
             self.resourceinstancefrom_graphid = self.resourceinstanceidfrom.graph
@@ -1196,7 +1223,7 @@ class ResourceXResource(models.Model):
         self.modified = datetime.datetime.now()
         add_to_update_fields(kwargs, "modified")
 
-        super(ResourceXResource, self).save(*args, **kwargs)
+        super(ResourceXResource, self).save(**kwargs)
 
     def __init__(self, *args, **kwargs):
         super(ResourceXResource, self).__init__(*args, **kwargs)
@@ -1209,8 +1236,10 @@ class ResourceXResource(models.Model):
 
 
 class ResourceInstance(models.Model):
-    resourceinstanceid = models.UUIDField(primary_key=True)
-    graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
+    resourceinstanceid = models.UUIDField(primary_key=True, blank=True)
+    graph = models.ForeignKey(
+        GraphModel, blank=True, db_column="graphid", on_delete=models.CASCADE
+    )
     graph_publication = models.ForeignKey(
         GraphXPublishedGraph,
         null=True,
@@ -1222,6 +1251,7 @@ class ResourceInstance(models.Model):
     legacyid = models.TextField(blank=True, unique=True, null=True)
     createdtime = models.DateTimeField(auto_now_add=True)
     resource_instance_lifecycle_state = models.ForeignKey(
+        blank=True,
         on_delete=models.PROTECT,
         to="models.ResourceInstanceLifecycleState",
         related_name="resource_instances",
@@ -1245,6 +1275,22 @@ class ResourceInstance(models.Model):
     principaluser = models.ForeignKey(
         User, on_delete=models.SET_NULL, blank=True, null=True
     )
+
+    class Meta:
+        managed = True
+        db_table = "resource_instances"
+        permissions = (("no_access_to_resourceinstance", "No Access"),)
+
+    def __init__(self, *args, **kwargs):
+        super(ResourceInstance, self).__init__(*args, **kwargs)
+        if not self.resourceinstanceid:
+            self.resourceinstanceid = uuid.uuid4()
+
+    def __repr__(self):
+        return f"<{self.graph.name}: {self.name} ({self.pk})>"
+
+    def __str__(self):
+        return repr(self)
 
     def get_instance_creator_and_edit_permissions(self, user=None):
         creatorid = None
@@ -1273,7 +1319,7 @@ class ResourceInstance(models.Model):
 
         return creatorid
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         try:
             self.graph_publication = self.graph.publication
         except ResourceInstance.graph.RelatedObjectDoesNotExist:
@@ -1286,17 +1332,7 @@ class ResourceInstance(models.Model):
 
         add_to_update_fields(kwargs, "resource_instance_lifecycle_state")
         add_to_update_fields(kwargs, "graph_publication")
-        super(ResourceInstance, self).save(*args, **kwargs)
-
-    def __init__(self, *args, **kwargs):
-        super(ResourceInstance, self).__init__(*args, **kwargs)
-        if not self.resourceinstanceid:
-            self.resourceinstanceid = uuid.uuid4()
-
-    class Meta:
-        managed = True
-        db_table = "resource_instances"
-        permissions = (("no_access_to_resourceinstance", "No Access"),)
+        super(ResourceInstance, self).save(**kwargs)
 
 
 class ResourceInstanceLifecycle(models.Model):
@@ -1536,7 +1572,7 @@ class TileModel(models.Model):  # Tile
 
     """
 
-    tileid = models.UUIDField(primary_key=True)
+    tileid = models.UUIDField(primary_key=True, blank=True)
     resourceinstance = models.ForeignKey(
         ResourceInstance, db_column="resourceinstanceid", on_delete=models.CASCADE
     )
@@ -1546,8 +1582,10 @@ class TileModel(models.Model):  # Tile
         blank=True,
         null=True,
         on_delete=models.CASCADE,
+        related_name="children",
+        related_query_name="child",
     )
-    data = JSONField(blank=True, null=True, db_column="tiledata")
+    data = JSONField(blank=True, default=dict, db_column="tiledata")
     nodegroup_id = models.UUIDField(db_column="nodegroupid", null=True)
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     provisionaledits = JSONField(blank=True, null=True, db_column="provisionaledits")
@@ -1561,6 +1599,15 @@ class TileModel(models.Model):  # Tile
         if not self.tileid:
             self.tileid = uuid.uuid4()
 
+    def __repr__(self):
+        alias = None
+        if self.nodegroup and self.nodegroup.grouping_node:
+            alias = self.nodegroup.grouping_node.alias
+        return f"<{alias} ({self.pk})>"
+
+    def __str__(self):
+        return repr(self)
+
     @property
     def nodegroup(self):
         return NodeGroup.objects.filter(pk=self.nodegroup_id).first()
@@ -1568,7 +1615,7 @@ class TileModel(models.Model):  # Tile
     def is_fully_provisional(self):
         return bool(self.provisionaledits and not any(self.data.values()))
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         if self.sortorder is None or self.is_fully_provisional():
             for node in Node.objects.filter(nodegroup_id=self.nodegroup_id).exclude(
                 datatype="semantic"
@@ -1576,16 +1623,19 @@ class TileModel(models.Model):  # Tile
                 if not str(node.pk) in self.data:
                     self.data[str(node.pk)] = None
 
-            sortorder_max = TileModel.objects.filter(
-                nodegroup_id=self.nodegroup_id,
-                resourceinstance_id=self.resourceinstance_id,
-            ).aggregate(Max("sortorder"))["sortorder__max"]
-            self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
+            self.set_next_sort_order()
             add_to_update_fields(kwargs, "sortorder")
         if not self.tileid:
             self.tileid = uuid.uuid4()
             add_to_update_fields(kwargs, "tileid")
-        super(TileModel, self).save(*args, **kwargs)  # Call the "real" save() method.
+        super(TileModel, self).save(**kwargs)  # Call the "real" save() method.
+
+    def set_next_sort_order(self):
+        sortorder_max = self.__class__.objects.filter(
+            nodegroup_id=self.nodegroup_id,
+            resourceinstance_id=self.resourceinstance_id,
+        ).aggregate(Max("sortorder"))["sortorder__max"]
+        self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
 
     def serialize(self, fields=None, exclude=["nodegroup"], **kwargs):
         return JSONSerializer().handle_model(

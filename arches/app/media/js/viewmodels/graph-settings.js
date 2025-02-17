@@ -91,6 +91,7 @@ define([
             $.ajax({
                 type: "POST",
                 url: arches.urls.graph_settings(self.graph.graphid()),
+                contentType: 'application/json',
                 data: self.jsonData()})
                 .done(function(response) {
                     self.jsonCache(self.jsonData());

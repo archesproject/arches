@@ -352,7 +352,8 @@ class ResourceTests(ArchesTestCase):
         other_resource = Resource(pk=uuid.uuid4())
         with sync_overridden_test_settings_to_arches():
             self.test_resource.delete_index(other_resource.pk)
-        self.assertIn(str(other_resource.pk), str(mock._mock_call_args))
+        # delete_resources() was called with the correct resource id.
+        self.assertEqual(other_resource.pk, mock._mock_call_args[1]["resources"].pk)
 
     def test_publication_restored_on_save(self):
         """
@@ -391,7 +392,7 @@ class ResourceTests(ArchesTestCase):
         test_resource = Resource(graph_id=self.search_model_graphid)
         test_resource.save(user=user)
         perms = set(get_perms(user, test_resource))
-        self.assertEqual(
+        self.assertNotEqual(
             perms,
             {
                 "view_resourceinstance",
@@ -399,6 +400,7 @@ class ResourceTests(ArchesTestCase):
                 "delete_resourceinstance",
             },
         )
+        self.assertEqual(test_resource.principaluser, user)
 
     def test_provisional_user_can_delete_own_resource(self):
         """
@@ -489,6 +491,7 @@ class ResourceTests(ArchesTestCase):
         graph = Graph.new(name="Self-referring descriptor test", is_resource=True)
         nodegroup = models.NodeGroup.objects.create()
         string_node = models.Node.objects.create(
+            pk=nodegroup.pk,
             graph=graph,
             nodegroup=nodegroup,
             name="String Node",
@@ -502,6 +505,8 @@ class ResourceTests(ArchesTestCase):
             datatype="resource-instance",
             istopnode=False,
         )
+        nodegroup.grouping_node = string_node
+        nodegroup.save()
 
         # Configure the primary descriptor to use the string node
         models.FunctionXGraph.objects.create(

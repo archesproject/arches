@@ -72,7 +72,7 @@
                     data-bind="
                         visible: graphTree.showIds(), 
                         clipboard: {
-                            value: node.nodeid, 
+                            value: graphTree.getNodeIdentifier(node),
                             tooltip: true, 
                             beforeCopiedText: graphTree.translations.copyNodeIdToClipboard, 
                             afterCopiedText: graphTree.translations.copiedNodeIdToClipboard

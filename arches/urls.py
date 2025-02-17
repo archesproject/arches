@@ -781,12 +781,16 @@ urlpatterns = [
         api.SpatialView.as_view(),
         name="spatialview_api",
     ),
-    re_path("^api", api.API404.as_view(), name="api_404"),
 ]
+
+handler400 = "arches.app.views.main.custom_400"
+handler403 = "arches.app.views.main.custom_403"
+handler404 = "arches.app.views.main.custom_404"
+handler500 = "arches.app.views.main.custom_500"
 
 # This must be included in core to keep webpack happy, but cannot be appended when running a project.
 # See https://github.com/archesproject/arches/pull/10754
-if settings.APP_NAME == "Arches":
+if settings.ROOT_URLCONF == __name__:
     if settings.SHOW_LANGUAGE_SWITCH is True:
         urlpatterns = i18n_patterns(*urlpatterns)
 

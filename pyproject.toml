@@ -7,7 +7,7 @@ dynamic = ["version"]
 name = "arches"
 readme = "README.md"
 authors = [
-    {name = "Farallon Geographics, Inc", email = "dev@fargeo.com"}
+    {name = "Arches Project"}
 ]
 license = {text = "GNU AGPL3"}
 requires-python = ">=3.11"

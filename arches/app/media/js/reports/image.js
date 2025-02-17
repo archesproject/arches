@@ -42,7 +42,7 @@ define([
                 if (imgs.length === 0) {
                     imgs = [{
                         src: arches.urls.media + 'img/photo_missing.png',
-                        alt: ''
+                        alt: arches.translations.imageNotAvailable,
                     }];
                 }
                 return imgs;

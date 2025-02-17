@@ -1,5 +1,6 @@
 import uuid
 import datetime
+from http import HTTPStatus
 
 from django.contrib.auth.models import Group, User
 from django.urls import reverse
@@ -83,8 +84,9 @@ class WorkflowHistoryTests(ArchesTestCase):
                 )
             )
 
-        self.assertEqual(response.status_code, 403)
-        self.assertIn(b"Forbidden", response.content)
+        self.assertContains(
+            response, "Permission Denied", status_code=HTTPStatus.FORBIDDEN
+        )
 
         self.client.force_login(self.admin)
         response = self.client.get(
@@ -93,8 +95,7 @@ class WorkflowHistoryTests(ArchesTestCase):
             )
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b"sample name", response.content)
+        self.assertContains(response, "sample name", status_code=HTTPStatus.OK)
 
     def test_post_workflow_history(self):
         """Partial updates of componentdata and stepdata are allowed."""
@@ -148,8 +149,9 @@ class WorkflowHistoryTests(ArchesTestCase):
                 content_type="application/json",
             )
 
-        self.assertEqual(response.status_code, 403)
-        self.assertIn(b"Forbidden", response.content)
+        self.assertContains(
+            response, "Permission Denied", status_code=HTTPStatus.FORBIDDEN
+        )
 
         self.client.force_login(self.admin)
         response = self.client.post(

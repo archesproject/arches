@@ -27,6 +27,8 @@ define([
         this.downloadPending = ko.observable(false);
         this.hasResourceTypeFilter = ko.observable(!!sharedStateObject.query()['resource-type-filter']);
         this.exportSystemValues = ko.observable(false);
+        this.copyGeojsonText = ko.observable("");
+        this.showCopyText = ko.observable(false);
 
         this.query.subscribe(function(val) {
             if (val['resource-type-filter']) {
@@ -63,6 +65,14 @@ define([
                 return null;
             }
         });
+
+        this.copyGeojsonUrlText = function(){
+            self.copyGeojsonText("Geojson url copied to clipboard.")
+            self.showCopyText(true);
+            window.setTimeout(function(){
+                self.showCopyText(false);
+            }, 6000);
+        };
 
         this.getExportData = function(){
             var payload = ko.unwrap(this.query);

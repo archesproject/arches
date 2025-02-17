@@ -26,7 +26,7 @@ from tests.base_test import ArchesTestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
-from django.test.utils import captured_stdout
+from django.test.utils import captured_stdout, override_settings
 from unittest.mock import patch, MagicMock
 
 from arches.app.views.api import APIBase
@@ -120,11 +120,14 @@ class ResourceAPITests(ArchesTestCase):
             response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.1")
 
-    def test_api_404(self):
+    @override_settings(DEBUG=False)
+    def test_api_404_returns_json(self):
         with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.get(reverse("api_404"))
-        self.assertEqual(
-            set(json.loads(response.content)), {"message", "status", "success", "title"}
+            response = self.client.get("/api/doesnotexist")
+        self.assertContains(
+            response,
+            "Not Found",
+            status_code=HTTPStatus.NOT_FOUND,
         )
 
     def test_api_resources_archesjson(self):

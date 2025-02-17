@@ -310,7 +310,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         if user.is_authenticated:
             if user.is_superuser:
                 return True
-            if resourceid is not None and resourceid != "":
+            if resourceid or resource:
                 result = self.check_resource_instance_permissions(
                     user, resourceid, "view_resourceinstance", resource=resource
                 )
@@ -363,7 +363,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         if user.is_authenticated:
             if user.is_superuser:
                 return True
-            if resourceid:
+            if resourceid or resource:
                 result = self.check_resource_instance_permissions(
                     user, resourceid, "change_resourceinstance", resource=resource
                 )
@@ -399,7 +399,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         if user.is_authenticated:
             if user.is_superuser:
                 return True
-            if resourceid:
+            if resourceid or resource:
                 result = self.check_resource_instance_permissions(
                     user, resourceid, "delete_resourceinstance", resource=resource
                 )
@@ -643,6 +643,9 @@ class PermissionBackend(ObjectPermissionBackend):  # type: ignore
                         "Passed perm has app label of '%s' and "
                         "given obj has '%s'" % (app_label, obj._meta.app_label)
                     )
+
+            if user_obj.is_superuser:
+                return True
 
             obj_checker: ObjectPermissionChecker = CachedObjectPermissionChecker(
                 user_obj, obj

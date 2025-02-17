@@ -65,7 +65,7 @@ define([
                             var newOption = new Option(data.text, data.id, false, false);
                             // Append it to the select
                             $(el).append(newOption);
-                        } 
+                        }
                     });
                     // maintain the current selection after adding new dropdown options
                     $(el).val(currentSelection).trigger('change');
@@ -92,13 +92,13 @@ define([
 
             $(document).ready(function() {
                 $(el).selectWoo(select2Config);
-                
+
                 if (value) {
                     value.extend({ rateLimit: 100 });
                     // initialize the dropdown with the value
                     $(el).val(value());
-                    $(el).trigger('change.select2'); 
-    
+                    $(el).trigger('change.select2');
+
                     // update the dropdown if something else changes the value
                     const valueSubscription = value.subscribe(function(newVal) {
                         //console.log(newVal);
@@ -119,21 +119,18 @@ define([
                 },300);
             });
 
-            
+
             $(el).on("change", function(e) {
                 let val = $(el).val();
-                if (val === "") {
-                    val = null;
-                }
                 value(val);
             });
-            
+
             $(el).on("select2:opening", function() {
                 if (select2Config.clickBubble) {
                     $(el).parent().trigger('click');
                 }
             });
-            
+
             if (typeof select2Config.onSelect === 'function') {
                 $(el).on("select2:selecting", function(e) {
                     select2Config.onSelect(e.params.args.data);

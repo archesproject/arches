@@ -23,6 +23,10 @@ from arches.app.views.resource import ResourcePermissionDataView
 from tests.base_test import ArchesTestCase
 from django.urls import reverse
 from arches.app.models.models import EditLog, ResourceInstance
+from arches.app.models.resource import Resource
+from arches.app.models.tile import Tile
+from tests.utils.search_test_utils import sync_es
+from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
@@ -38,9 +42,12 @@ from tests.utils.permission_test_utils import add_users
 
 
 class ResourceViewTests(ArchesTestCase):
-    graph_fixtures = ["Data_Type_Model"]
+    graph_fixtures = ["Data_Type_Model", "4564-referenced", "4564-person"]
     data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
     resource_instance_id = "f562c2fa-48d3-4798-a723-10209806c068"
+    reference_graphid = "e3d4505e-bfa7-11e9-b4dc-0242ac160002"
+    reference_nodeid = "fc3c8080-bfa7-11e9-b4dc-0242ac160002"
+    person_graphid = "0c6269e8-bfa8-11e9-bd39-0242ac160002"
 
     @classmethod
     def setUpTestData(cls):
@@ -327,3 +334,36 @@ class ResourceViewTests(ArchesTestCase):
                 reverse("resource_report", kwargs={"resourceid": str(uuid.uuid4())})
             )
         self.assertEqual(response.status_code, 404)
+
+    def test_get_related_resource(self):
+        se = SearchEngineFactory().create()
+        user = User.objects.get(username="admin")
+        is_related_to_valueid = "ac41d9be-79db-4256-b368-2f4559cfbe55"
+        en_preflabel = "is related to"
+        person_resourceid = "b6754e7a-7f18-40d1-93fe-61763d37d55e"
+        person_resource = Resource(
+            graph_id=self.person_graphid, resourceinstanceid=person_resourceid
+        )
+        person_resource.save()
+
+        reference_resourceid = "380b8364-50e6-4f5b-af08-0ea3ab56a406"
+        reference_resource = Resource(
+            graph_id=self.reference_graphid, resourceinstanceid=reference_resourceid
+        )
+        reference_resource.save()
+        reference_tile = Tile.get_blank_tile(
+            self.reference_nodeid, reference_resourceid
+        )
+        reference_tile.data[self.reference_nodeid] = [
+            {
+                "resourceName": "",
+                "ontologyProperty": is_related_to_valueid,
+                "inverseOntologyProperty": is_related_to_valueid,
+                "resourceId": person_resourceid,
+            }
+        ]
+        reference_tile.save()
+        sync_es(se)
+        ret = reference_resource.get_related_resources(user=user)
+        relationship = ret["resource_relationships"][0]["relationshiptype_label"]
+        self.assertEqual(relationship, en_preflabel)
