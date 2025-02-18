@@ -87,9 +87,7 @@ async function fetchData(page: number) {
 }
 
 async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
-    if (isLoading.value) {
-        return;
-    }
+    if (isLoading.value) { return; }
 
     if (
         // if we have already fetched all the resources
@@ -129,7 +127,7 @@ function resolver(e: FormFieldResolverOptions) {
         }, 500);
     });
 }
-
+ 
 function validate(e: FormFieldResolverOptions) {
     console.log("validate", e);
     // API call to validate the input
