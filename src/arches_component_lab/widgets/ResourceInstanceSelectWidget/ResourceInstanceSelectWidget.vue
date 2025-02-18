@@ -1,72 +1,61 @@
 <script setup lang="ts">
-import { onMounted, ref, useTemplateRef } from "vue";
+import { onMounted, ref } from "vue";
+
+import ProgressSpinner from "primevue/progressspinner";
 
 import ResourceInstanceSelectWidgetEditor from "@/arches_component_lab/widgets/ResourceInstanceSelectWidget/components/ResourceInstanceSelectWidgetEditor.vue";
 import ResourceInstanceSelectWidgetViewer from "@/arches_component_lab/widgets/ResourceInstanceSelectWidget/components/ResourceInstanceSelectWidgetViewer.vue";
+
 import { fetchWidgetConfiguration } from "@/arches_component_lab/widgets/api.ts";
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+
 import type {
     ResourceInstanceReference,
     WidgetMode,
 } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
-    mode?: WidgetMode;
-    initialValue?: ResourceInstanceReference[];
-    configuration: {
-        nodeAlias: string;
-        graphSlug: string;
-        createNew?: boolean; // option to create a new resource - only used in EDIT; default false/undefined
-    };
+    mode: WidgetMode;
+    initialValue: ResourceInstanceReference[];
+    nodeAlias: string;
+    graphSlug: string;
 }>();
 
-const childConfiguration = ref();
-
-interface ChildComponentInterface {
-    rawValue: any;
-    isDirty: boolean;
-}
+const isLoading = ref(true);
+const configuration = ref();
 
 onMounted(async () => {
-    const widgetConfig = await fetchWidgetConfiguration(
-        props.configuration.graphSlug,
-        props.configuration.nodeAlias,
+    configuration.value = await fetchWidgetConfiguration(
+        props.graphSlug,
+        props.nodeAlias,
     );
 
-    childConfiguration.value = {
-        ...props.configuration,
-        ...widgetConfig,
-    };
-});
-
-const childRef = useTemplateRef<ChildComponentInterface>("childRef");
-
-defineExpose({
-    get rawValue() {
-        return childRef.value?.rawValue;
-    },
-    get isDirty() {
-        return childRef.value?.isDirty;
-    },
+    isLoading.value = false;
 });
 </script>
 
 <template>
-    <div v-if="childConfiguration">
-        <label>{{ childConfiguration?.label }}</label>
+    <ProgressSpinner
+        v-if="isLoading"
+        style="width: 2em; height: 2em"
+    />
+
+    <template v-else>
+        <label>{{ configuration.label }}</label>
+
         <div v-if="mode === EDIT">
             <ResourceInstanceSelectWidgetEditor
-                ref="childRef"
                 :initial-value="initialValue"
-                :configuration="childConfiguration"
+                :configuration="configuration"
+                :node-alias="props.nodeAlias"
+                :graph-slug="props.graphSlug"
             />
         </div>
         <div v-if="mode === VIEW">
             <ResourceInstanceSelectWidgetViewer
-                ref="childRef"
                 :initial-value="initialValue"
-                :configuration="childConfiguration"
+                :configuration="configuration"
             />
         </div>
-    </div>
+    </template>
 </template>

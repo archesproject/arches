@@ -1,256 +1,209 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, toRef, watch } from "vue";
-import Button from "primevue/button";
-import Dialog from "primevue/dialog";
-import Message from "primevue/message";
-import Select from "primevue/select";
+import { computed, ref, useTemplateRef, watch } from "vue";
+
 import { useGettext } from "vue3-gettext";
+
+import { FormField } from "@primevue/forms";
+import Message from "primevue/message";
+// import Select from "primevue/select";
+import MultiSelect from "primevue/multiselect";
+
 import { fetchRelatableResources } from "@/arches_component_lab/widgets/api.ts";
+
+import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 import type {
-    GraphInfo,
-    NewResourceInstance,
     ResourceInstanceReference,
     ResourceInstanceResult,
 } from "@/arches_component_lab/widgets/types.ts";
 
-const showNewResource = ref(false);
-const message = ref<MessageData | undefined>();
-const { $gettext } = useGettext();
 const props = defineProps<{
-    initialValue?: ResourceInstanceReference[];
-    configuration?: {
-        graphSlug: string;
-        nodeAlias: string;
-        createNew?: boolean; // option to create a new resource; default false/undefined
-        ptAriaLabeledBy?: string;
-        itemHeight?: number;
-        resultsPerPage?: number;
-    };
+    initialValue: ResourceInstanceReference[];
+    graphSlug: string;
+    nodeAlias: string;
 }>();
 
-const itemHeight = 38;
-const resultsPerPage = 25;
+const { $gettext } = useGettext();
 
-interface MessageData {
-    severity: "successs" | "info" | "warn" | "error";
-    detail: string;
-}
+const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidget config
 
-const rawValue = ref(props.initialValue?.[0]?.resourceId);
-
-const isDirty = computed(() => rawValue.value !== props.initialValue);
-
-const rawSelectedResources = computed({
-    get() {
-        return rawValue.value;
-    },
-    set(value) {
-        rawValue.value = options.value.find(
-            (option) => option.resourceId == value,
-        )?.resourceId;
-    },
-});
-
-defineExpose({
-    rawValue,
-    isDirty,
-});
-
-const options = ref<ResourceInstanceReference[]>([]);
-const newElements = ref<NewResourceInstance[]>([]);
+const options = ref<ResourceInstanceReference[]>(props.initialValue);
 const isLoading = ref(false);
-const isLoadingAdditionalResults = ref(false);
-const computedResourceResultsHeight = ref("");
-const resourceResultsPage = ref(1);
-const resourceResultsTotalCount = ref(resultsPerPage);
-watch(options, (resourceResults) => {
-    if (resourceResults?.length) {
-        const rootFontSize = parseFloat(
-            getComputedStyle(document.documentElement).fontSize,
-        );
-        const itemHeightInRem = itemHeight / rootFontSize; // Convert to rem based on the root font size
-        const computedHeightInRem = resourceResults.length * itemHeightInRem;
+const resourceResultsPage = ref(0);
+const resourceResultsTotalCount = ref(0);
+const fetchError = ref<string | null>(null);
 
-        const viewHeightInPixels = window.innerHeight * 0.6;
-        const viewHeightInRem = viewHeightInPixels / rootFontSize; // Convert 60vh to rem
+const formFieldRef = useTemplateRef("formFieldRef");
 
-        if (computedHeightInRem > viewHeightInRem) {
-            computedResourceResultsHeight.value = "60vh";
-        } else {
-            computedResourceResultsHeight.value = `${computedHeightInRem}rem`;
+// this watcher is necessary to be able to format the value of the form field when the date picker is updated
+watch(
+    // @ts-expect-error - This is a bug in the PrimeVue types
+    () => formFieldRef.value?.field?.states?.value,
+    (newVal) => {
+        if (
+            newVal.length &&
+            newVal.every((item: string | object) => typeof item === "string")
+        ) {
+            // @ts-expect-error - This is a bug in the PrimeVue types
+            formFieldRef.value!.field.states.value = options.value.filter(
+                (option) => newVal?.includes(option.resourceId),
+            );
         }
-    } else {
-        computedResourceResultsHeight.value = "2.25rem";
-    }
-});
+    },
+);
 
-onMounted(() => {
-    console.log("here i am");
-    fetchData(1);
-});
+const resourceResultsCurrentCount = computed(() => options.value.length);
 
 async function fetchData(page: number) {
-    if (props.configuration) {
-        try {
-            const resourceData = await fetchRelatableResources(
-                props.configuration.graphSlug,
-                props.configuration.nodeAlias,
-                page,
-            );
-            const references = resourceData.data.map(
-                (
-                    resourceRecord: ResourceInstanceResult,
-                ): ResourceInstanceReference => ({
-                    display_value: resourceRecord.display_value,
-                    resourceId: resourceRecord.resourceinstanceid,
-                    ontologyProperty: "",
-                    inverseOntologyProperty: "",
-                }),
-            );
+    try {
+        isLoading.value = true;
 
-            if (page === 1) {
-                options.value = references;
-                newElements.value = resourceData.graphs.map(
-                    (graphInfo: GraphInfo): NewResourceInstance => ({
-                        displayValue: $gettext("Add a new %{graphName}", {
-                            graphName: graphInfo.name,
-                        }),
-                        graphId: graphInfo.graphid,
-                    }),
-                );
-            } else {
-                options.value = [...options.value, ...references];
-            }
+        const resourceData = await fetchRelatableResources(
+            props.graphSlug,
+            props.nodeAlias,
+            page,
+        );
 
-            resourceResultsPage.value = resourceData.current_page;
-            resourceResultsTotalCount.value = resourceData.total_results;
-        } catch (error) {
-            message.value = {
-                detail: `Failed to fetch data.  ${error instanceof Error ? error.message : undefined}`,
-                severity: "error",
-            };
+        const references = resourceData.data.map(
+            (
+                resourceRecord: ResourceInstanceResult,
+            ): ResourceInstanceReference => ({
+                display_value: resourceRecord.display_value,
+                resourceId: resourceRecord.resourceinstanceid,
+                ontologyProperty: "",
+                inverseOntologyProperty: "",
+            }),
+        );
 
-            options.value = [];
-            resourceResultsPage.value = 1;
-            resourceResultsTotalCount.value = 0;
-        } finally {
-            isLoading.value = false;
-            isLoadingAdditionalResults.value = false;
-        }
+        options.value = [...options.value, ...references];
+
+        resourceResultsPage.value = resourceData.current_page;
+        resourceResultsTotalCount.value = resourceData.total_results;
+    } catch (error) {
+        fetchError.value = (error as Error).message;
+    } finally {
+        isLoading.value = false;
     }
 }
 
-async function onLazyLoadResources(event: VirtualScrollerLazyEvent) {
-    if (
-        event.last >= resourceResultsPage.value * resultsPerPage &&
-        event.last <= resourceResultsTotalCount.value
-    ) {
-        isLoadingAdditionalResults.value = true;
-        const page = resourceResultsPage.value + 1;
-        fetchData(page);
-    }
-}
-
-function createNewResource(graphId: string) {
-    showNewResource.value = true;
-    console.log(graphId);
-}
-
-function toggleSelectAll() {
-    // check all selected then remove all selected items
-    if (this.$refs.selectAll.allSelected) {
-        this.selectedItems = [];
+async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
+    if (isLoading.value) {
         return;
     }
 
-    // else add all items
-    this.selectAll = true;
-}
-</script>
-<template>
-    <Select
-        v-model="rawSelectedResources"
-        :show-toggle-all="options?.length > 1"
-        :options
-        option-label="display_value"
-        option-value="resourceId"
-        class="resource-instance-relationships-selector"
-        :virtual-scroller-options="{
-            itemSize: itemHeight,
-            lazy: true,
-            onLazyLoad: onLazyLoadResources,
-            scrollHeight: computedResourceResultsHeight,
-            style: {
-                minHeight: computedResourceResultsHeight,
-                maxHeight: computedResourceResultsHeight,
-            },
-        }"
-        :pt="{
-            emptyMessage: { style: { fontFamily: 'sans-serif' } },
-            option: { style: { fontFamily: 'sans-serif' } },
-            overlay: { style: { fontFamily: 'sans-serif' } },
-        }"
-        :loading="isLoading && !isLoadingAdditionalResults"
-        :placeholder="$gettext('Select Resources')"
-    >
-        <template #header>
-            <div
-                v-if="options.length > 1"
-                class="select-all"
-                @click="toggleSelectAll"
-            >
-                {{ $gettext("Select All Items") }}
-            </div>
-        </template>
-        <template #footer>
-            <div v-if="props?.configuration?.createNew">
-                <div
-                    v-for="element in newElements"
-                    :key="`new-${element.graphId}`"
-                >
-                    <Button
-                        class="relationship-footer-btn"
-                        :label="element.displayValue"
-                        severity="secondary"
-                        variant="text"
-                        @click="() => createNewResource(element.graphId)"
-                    />
-                </div>
-            </div>
-        </template>
-    </Select>
-    <Dialog
-        v-model:visible="showNewResource"
-        :header="$gettext('New Resource')"
-        :dismissable-mask="true"
-        :close-on-escape="true"
-        :modal="true"
-        :pt="{
-            root: {
-                style: {
-                    borderRadius: '0',
-                    fontFamily: 'sans-serif',
-                },
-            },
-        }"
-    ></Dialog>
-    <Message
-        v-if="message"
-        :severity="message.severity"
-        >{{ message.detail }}</Message
-    >
-</template>
-<style lang="css" scoped>
-.relationship-footer-btn {
-    width: 100%;
-    border-radius: unset;
-    justify-content: flex-start;
+    if (
+        // if we have already fetched all the resources
+        resourceResultsTotalCount.value > 0 &&
+        resourceResultsCurrentCount.value >= resourceResultsTotalCount.value
+    ) {
+        return;
+    }
+
+    if (
+        // if the user has NOT scrolled to the end of the list
+        event &&
+        event.last < resourceResultsCurrentCount.value - 1
+    ) {
+        return;
+    }
+
+    if (
+        // if the dropdown is opened and we already have data
+        !event &&
+        resourceResultsCurrentCount.value > 0
+    ) {
+        return;
+    }
+
+    await fetchData((resourceResultsPage.value || 0) + 1);
 }
 
-.select-all {
-    position: absolute;
-    top: 0.6rem;
-    left: 2.7rem;
+let timeout: ReturnType<typeof setTimeout>;
+
+function resolver(e: FormFieldResolverOptions) {
+    return new Promise((resolve) => {
+        if (timeout) clearTimeout(timeout);
+
+        timeout = setTimeout(() => {
+            resolve(validate(e));
+        }, 500);
+    });
+}
+
+ 
+function validate(e: FormFieldResolverOptions) {
+    console.log("validate", e);
+    // API call to validate the input
+    // if (true) {
+    //     return {};
+    // } else {
+    //     return {
+    //         errors: [
+    //             { message: "This is an error message" },
+    //             { message: "This is also an error message" },
+    //         ],
+    //     };
+    // }
+}
+</script>
+
+<template>
+    <Message
+        v-if="fetchError"
+        severity="error"
+    >
+        {{ fetchError }}
+    </Message>
+    <FormField
+        v-else
+        ref="formFieldRef"
+        v-slot="$field"
+        :name="props.nodeAlias"
+        :initial-value="
+            props.initialValue.map((resource) => resource.resourceId)
+        "
+        :resolver="resolver"
+    >
+        <MultiSelect
+            class="resource-instance-multiselect-widget"
+            display="chip"
+            option-label="display_value"
+            option-value="resourceId"
+            :fluid="true"
+            :loading="isLoading"
+            :options
+            :placeholder="$gettext('Select Resources')"
+            :virtual-scroller-options="{
+                itemSize: itemSize,
+                lazy: true,
+                loading: isLoading,
+                onLazyLoad: onLazyLoadResources,
+            }"
+            @before-show="onLazyLoadResources"
+        />
+        <Message
+            v-for="error in $field.errors"
+            :key="error.message"
+            severity="error"
+            size="small"
+        >
+            {{ error.message }}
+        </Message>
+    </FormField>
+</template>
+<style>
+.resource-instance-multiselect-widget .p-multiselect-label {
+    visibility: visible !important;
+    display: grid !important;
+}
+
+.resource-instance-multiselect-widget .p-multiselect-chip {
+    display: grid !important;
+    grid-template-columns: 1fr auto;
+}
+
+.resource-instance-multiselect-widget .p-chip-label {
+    max-width: min-content;
+    white-space: normal;
 }
 </style>
