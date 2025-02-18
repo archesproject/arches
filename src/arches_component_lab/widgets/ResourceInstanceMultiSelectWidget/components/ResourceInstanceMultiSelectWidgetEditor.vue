@@ -130,7 +130,6 @@ function resolver(e: FormFieldResolverOptions) {
     });
 }
 
- 
 function validate(e: FormFieldResolverOptions) {
     console.log("validate", e);
     // API call to validate the input
