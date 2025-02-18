@@ -21,11 +21,9 @@ import uuid
 from arches.app.models.graph import Graph
 from arches.app.models.models import (
     CardXNodeXWidget,
-    NodeGroup,
     DDataType,
     Widget,
     ReportTemplate,
-    Function,
     Ontology,
     OntologyClass,
     GraphXPublishedGraph,
@@ -176,8 +174,16 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                         card_x_node_x_widget["config"] = check_default_configs(
                             default_config, card_x_node_x_widget_config
                         )
-                        cardxnodexwidget = CardXNodeXWidget.objects.update_or_create(
-                            **card_x_node_x_widget
+                        CardXNodeXWidget.objects.update_or_create(
+                            # Only check the combination of unique fields.
+                            # The fact that this started failing suggests
+                            # the serialization in check_default_configs()
+                            # is producing something subtly different than
+                            # the database value.
+                            card_id=card_x_node_x_widget["card_id"],
+                            node_id=card_x_node_x_widget["node_id"],
+                            widget_id=card_x_node_x_widget["widget_id"],
+                            defaults=card_x_node_x_widget,
                         )
 
                 with transaction.atomic():

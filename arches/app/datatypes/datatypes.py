@@ -1824,7 +1824,7 @@ class DomainDataType(BaseDomainDataType):
         This snippet will be used in a SQL UPDATE statement.
         """
 
-        sql = i18n_json_field.attname
+        sql = i18n_json_field.attname or "'{}'::jsonb"
         for prop, value in i18n_json_field.raw_value.items():
             escaped_value = json.dumps(value).replace("%", "%%").replace("'", "''")
             if prop == "options":
