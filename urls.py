@@ -8,9 +8,9 @@ from arches_component_lab.views.api.widgets import WidgetConfigurationView
 
 urlpatterns = [
     path(
-        "arches-component-lab/api/widget-configuration/<slug:graph>/<slug:node_alias>/relatable-resources",
+        "arches-component-lab/api/relatable-resources/<slug:graph>/<slug:node_alias>",
         RelatableResourcesView.as_view(),
-        name="api-node-relatable-resources",
+        name="api-relatable-resources",
     ),
     path(
         "arches-component-lab/api/widget-configuration/<slug:graph_slug>/<slug:node_alias>",

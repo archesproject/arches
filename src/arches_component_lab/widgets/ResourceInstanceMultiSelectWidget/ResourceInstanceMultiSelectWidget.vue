@@ -3,8 +3,8 @@ import { onMounted, ref } from "vue";
 
 import ProgressSpinner from "primevue/progressspinner";
 
-import ResourceInstanceSelectWidgetEditor from "@/arches_component_lab/widgets/ResourceInstanceSelectWidget/components/ResourceInstanceSelectWidgetEditor.vue";
-import ResourceInstanceSelectWidgetViewer from "@/arches_component_lab/widgets/ResourceInstanceSelectWidget/components/ResourceInstanceSelectWidgetViewer.vue";
+import ResourceInstanceMultiSelectWidgetEditor from "@/arches_component_lab/widgets/ResourceInstanceMultiSelectWidget/components/ResourceInstanceMultiSelectWidgetEditor.vue";
+import ResourceInstanceMultiSelectWidgetViewer from "@/arches_component_lab/widgets/ResourceInstanceMultiSelectWidget/components/ResourceInstanceMultiSelectWidgetViewer.vue";
 
 import { fetchWidgetConfiguration } from "@/arches_component_lab/widgets/api.ts";
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
@@ -44,7 +44,7 @@ onMounted(async () => {
         <label>{{ configuration.label }}</label>
 
         <div v-if="mode === EDIT">
-            <ResourceInstanceSelectWidgetEditor
+            <ResourceInstanceMultiSelectWidgetEditor
                 :initial-value="initialValue"
                 :configuration="configuration"
                 :node-alias="props.nodeAlias"
@@ -52,7 +52,7 @@ onMounted(async () => {
             />
         </div>
         <div v-if="mode === VIEW">
-            <ResourceInstanceSelectWidgetViewer
+            <ResourceInstanceMultiSelectWidgetViewer
                 :initial-value="initialValue"
                 :configuration="configuration"
             />
