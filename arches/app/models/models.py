@@ -294,7 +294,7 @@ class EditLog(SaveSupportsBlindOverwriteMixin, models.Model):
     editlogid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, db_default=UUID4()
     )
-    transactionid = models.UUIDField(default=uuid.uuid1)
+    transactionid = models.UUIDField(default=uuid.uuid4)
     resourcedisplayname = models.TextField(blank=True, null=True)
     resourceclassid = models.TextField(blank=True, null=True)
     resourceinstanceid = models.TextField(blank=True, null=True)
@@ -353,7 +353,7 @@ class ExternalOauthToken(SaveSupportsBlindOverwriteMixin, models.Model):
 
 class ResourceRevisionLog(SaveSupportsBlindOverwriteMixin, models.Model):
     logid = models.UUIDField(primary_key=True, default=uuid.uuid4, db_default=UUID4())
-    resourceid = models.UUIDField(default=uuid.uuid1)
+    resourceid = models.UUIDField(default=uuid.uuid4)
     # not a ForeignKey so we can track deletions
     revisionid = models.TextField(null=False)
     synctimestamp = models.DateTimeField(auto_now_add=True, null=False)
@@ -580,7 +580,7 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
 
 class GraphXPublishedGraph(models.Model):
     publicationid = models.UUIDField(
-        primary_key=True, serialize=False, default=uuid.uuid1
+        primary_key=True, serialize=False, default=uuid.uuid4
     )
     notes = models.TextField(blank=True, null=True)
     graph = models.ForeignKey(GraphModel, db_column="graphid", on_delete=models.CASCADE)
@@ -947,7 +947,7 @@ class PublishedGraph(models.Model):
 
 
 class PublishedGraphEdit(models.Model):
-    edit_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid1)
+    edit_id = models.UUIDField(primary_key=True, serialize=False, default=uuid.uuid4)
     edit_time = models.DateTimeField(default=datetime.datetime.now, null=False)
     publication = models.ForeignKey(
         GraphXPublishedGraph, db_column="publicationid", on_delete=models.CASCADE
@@ -2043,7 +2043,7 @@ class GeoJSONGeometry(models.Model):
 
 
 class ETLModule(models.Model):
-    etlmoduleid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    etlmoduleid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.TextField()
     icon = models.TextField()
     etl_type = models.TextField()
@@ -2142,7 +2142,7 @@ class LoadErrors(models.Model):
 
 
 class SpatialView(models.Model):
-    spatialviewid = models.UUIDField(primary_key=True, default=uuid.uuid1)
+    spatialviewid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     schema = models.TextField(default="public")
     slug = models.TextField(
         validators=[
