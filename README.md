@@ -69,15 +69,14 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 - Support for viewing and restoring previous graph publications
 - Support for configuring currently published graphs
 - Support for search through resource relationships
-- Persistent uris for resource instance and tile data
-- Implementation resource lifecycles
-- Bulk Data Manager CLI interface
-- Migration to MapLibre
+- Functions for Generating URIs as data identifiers
+- Implementation of resource lifecycles
 - Django 5.2 support
 - Python 3.11 becomes minimum Python version
+- RDM officially deprecated in favor of controlled lists
 
 ## 8.0 - Supported Applications
-- Arches References
+- Arches Controlled Lists, June 15, 2025
 - Arches Lingo
 
 ## 9.0 - Release date: Sept 15, 2027
