@@ -75,7 +75,7 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 
 ## 8.0 - Supported Applications
 - Arches Controlled Lists, June 15, 2025
-- Arches Lingo, June 15, 2025 beta - August 15, v1.0 
+- Arches Lingo, beta version released June 15, 2025 beta. Final 1.0 released August 15,2025 
 
 ## 9.0 - Release date: Sept 15, 2027
 - Full migration to Vue
