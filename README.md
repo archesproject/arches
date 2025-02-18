@@ -12,7 +12,7 @@ Issue reports are encouraged! [Please read this article](http://polite.technolog
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 8.0.0 release notes](https://github.com/archesproject/arches/blob/dev/8.0.x/releases/8.0.0.md)
+[Version 7.6.6 release notes](https://github.com/archesproject/arches/blob/dev/7.6.x/releases/7.6.6.md)
 
 #### Quick Install
 
@@ -64,11 +64,9 @@ Our general release cycle will typically be a functional release (either major i
 The following a general plan for the Arches project. Be aware this plan is tentative and subject to change.
 
 ## 8.0 - Release date: June 15, 2025
-- Activity stream enhancements
 - Support for editing and publishing graphs without having to remove resource instances
 - Support for viewing and restoring previous graph publications
 - Support for configuring currently published graphs
-- Support for search through resource relationships
 - Functions for Generating URIs as data identifiers
 - Implementation of resource lifecycles
 - Django 5.2 support
@@ -77,7 +75,7 @@ The following a general plan for the Arches project. Be aware this plan is tenta
 
 ## 8.0 - Supported Applications
 - Arches Controlled Lists, June 15, 2025
-- Arches Lingo
+- Arches Lingo, June 15, 2025 beta - August 15, v1.0 
 
 ## 9.0 - Release date: Sept 15, 2027
 - Full migration to Vue
