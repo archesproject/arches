@@ -1,5 +1,6 @@
 import json
 
+from django.utils import translation
 from django.views.generic import View
 
 from arches.app.models import models
@@ -8,6 +9,8 @@ from arches.app.utils.response import JSONResponse
 
 class WidgetConfigurationView(View):
     def get(self, request, graph_slug, node_alias):
+        user_language = translation.get_language()
+
         node = models.Node.objects.get(
             graph__slug=graph_slug, alias=node_alias, source_identifier_id__isnull=True
         )
@@ -32,5 +35,16 @@ class WidgetConfigurationView(View):
                 **node_config,
                 **card_x_node_x_widget_config,
             }
+
+        if "i18n_properties" in response and isinstance(
+            response["i18n_properties"], list
+        ):
+            for prop in response["i18n_properties"]:
+                if (
+                    prop in response
+                    and isinstance(response[prop], dict)
+                    and user_language in response[prop]
+                ):
+                    response[prop] = response[prop][user_language]
 
         return JSONResponse(response)
