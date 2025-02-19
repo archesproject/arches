@@ -3,9 +3,15 @@ from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 from django.urls import include, path
 
+from arches_component_lab.views.api.relatable_resources import RelatableResourcesView
 from arches_component_lab.views.api.widgets import WidgetConfigurationView
 
 urlpatterns = [
+    path(
+        "arches-component-lab/api/relatable-resources/<slug:graph>/<slug:node_alias>",
+        RelatableResourcesView.as_view(),
+        name="api-relatable-resources",
+    ),
     path(
         "arches-component-lab/api/widget-configuration/<slug:graph_slug>/<slug:node_alias>",
         WidgetConfigurationView.as_view(),
