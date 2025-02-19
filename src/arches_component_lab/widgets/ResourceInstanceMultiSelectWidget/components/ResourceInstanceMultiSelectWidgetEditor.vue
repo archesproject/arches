@@ -5,7 +5,6 @@ import { useGettext } from "vue3-gettext";
 
 import { FormField } from "@primevue/forms";
 import Message from "primevue/message";
-// import Select from "primevue/select";
 import MultiSelect from "primevue/multiselect";
 
 import { fetchRelatableResources } from "@/arches_component_lab/widgets/api.ts";
@@ -54,7 +53,7 @@ watch(
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
-async function fetchData(page: number) {
+async function getOptions(page: number) {
     try {
         isLoading.value = true;
 
@@ -87,7 +86,9 @@ async function fetchData(page: number) {
 }
 
 async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
-    if (isLoading.value) { return; }
+    if (isLoading.value) {
+        return;
+    }
 
     if (
         // if we have already fetched all the resources
@@ -113,7 +114,7 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
         return;
     }
 
-    await fetchData((resourceResultsPage.value || 0) + 1);
+    await getOptions((resourceResultsPage.value || 0) + 1);
 }
 
 let timeout: ReturnType<typeof setTimeout>;
@@ -127,7 +128,7 @@ function resolver(e: FormFieldResolverOptions) {
         }, 500);
     });
 }
- 
+
 function validate(e: FormFieldResolverOptions) {
     console.log("validate", e);
     // API call to validate the input
