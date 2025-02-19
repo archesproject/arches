@@ -1,71 +1,86 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { ref, useTemplateRef, watch } from "vue";
 
+import { FormField } from "@primevue/forms";
+import Message from "primevue/message";
 import Select from "primevue/select";
 
 import { fetchLists } from "@/arches_component_lab/widgets/api.ts";
 
+import type { FormFieldResolverOptions } from "@primevue/forms";
+
 const props = defineProps<{
     initialValue: any;
     configuration: any;
+    nodeAlias: string;
+    graphSlug: string;
 }>();
 
-const rawValue = ref(props.initialValue[0].uri);
-const isDirty = computed(() => rawValue.value !== props.initialValue[0].uri);
+const options = ref<any>(props.initialValue);
+const isLoading = ref(false);
+const optionsError = ref<string | null>(null);
 
-const options = ref([]);
+const formFieldRef = useTemplateRef("formFieldRef");
 
-defineExpose({
-    rawValue,
-    isDirty,
-});
+// this watcher is necessary to be able to format the value of the form field when the date picker is updated
+watch(
+    () => formFieldRef.value?.field?.states?.value,
+    (newVal) => {
+        if (typeof newVal === 'string') {
+            formFieldRef.value!.field.states.value = [options.value.find(
+                (option: any) => option.uri === newVal,
+            )];
+        }
+    },
+);
 
-onMounted(async () => {
-    options.value = await getOptions();
-});
-
-// THE API THIS FUNCTION INTERACTS WITH SHOULD BE UPDATED
-// TO PROVIDE THE MOST SIMPLE LIST OF CONTROLLED LIST OPTIONS
 async function getOptions() {
-    let fetchedLists;
+    isLoading.value = true;
+
     try {
-        fetchedLists = await fetchLists([props.configuration.nodeAlias]);
+        const fetchedLists = await fetchLists([props.nodeAlias]);
+
+        options.value = fetchedLists.controlled_lists[0].items.map((item: any) => ({
+            list_id: item.list_id,
+            uri: item.uri,
+            labels: item.values,
+        }));
     } catch (error) {
-        // NO TOAST! INSTEAD RENDER ERROR MESSAGE COMPONENT
-        // NO GETTEXT! SHOULD JUST RENDER SERVER RESPONSE
-        // toast.add({
-        //     severity: "error",
-        //     summary: $gettext("Error"),
-        //     detail:
-        //         error instanceof Error
-        //             ? error.message
-        //             : $gettext("Could not fetch the controlled list options"),
-        // });
-        // return [];
+        optionsError.value = (error as Error).message;
+    } finally {
+        isLoading.value = false;
     }
-
-    console.log(fetchedLists);
-    const controlledList = fetchedLists.controlled_lists[0];
-
-    return controlledList.items.map((item) => ({
-        list_id: item.list_id,
-        uri: item.uri,
-        labels: item.values,
-    }));
 }
 
-function extractURI(item: ControlledListItem[]): string | string[] {
-    if (item && !props.multiValue) {
-        return item[0]?.uri;
-    } else if (item && props.multiValue) {
-        return item.map((item) => item.uri);
-    } else {
-        return [];
-    }
+let timeout: ReturnType<typeof setTimeout>;
+
+function resolver(e: FormFieldResolverOptions) {
+    return new Promise((resolve) => {
+        if (timeout) clearTimeout(timeout);
+
+        timeout = setTimeout(() => {
+            resolve(validate(e));
+        }, 500);
+    });
+}
+ 
+function validate(e: FormFieldResolverOptions) {
+    console.log("validate", e);
+    // API call to validate the input
+    // if (true) {
+    //     return {};
+    // } else {
+    //     return {
+    //         errors: [
+    //             { message: "This is an error message" },
+    //             { message: "This is also an error message" },
+    //         ],
+    //     };
+    // }
 }
 
 // THIS SHOULD NOT EXIST, THE API SHOULD RETURN A MORE SIMPLIFIED RESPONSE
-function getOptionLabels(item: ControlledListItem): string {
+function getOptionLabels(item: any): string {
     const prefLabels = item.labels.filter(
         (label) => label.valuetype_id === "prefLabel",
     );
@@ -76,12 +91,38 @@ function getOptionLabels(item: ControlledListItem): string {
 </script>
 
 <template>
-    <Select
-        v-model="rawValue"
-        style="display: flex"
-        option-value="uri"
-        :options="options"
-        :option-label="getOptionLabels"
-        :placeholder="configuration.placeholder"
-    />
+    <Message
+        v-if="optionsError"
+        severity="error"
+    >
+        {{ optionsError }}
+    </Message>
+    <FormField
+        v-else
+        ref="formFieldRef"
+        v-slot="$field"
+        :name="props.nodeAlias"
+        :resolver="resolver"
+        :initial-value="props.initialValue[0].uri"
+    >
+        <Select
+            style="display: flex"
+            option-value="uri"
+            :fluid="true"
+            :loading="isLoading"
+            :options="options"
+            :option-label="getOptionLabels"
+            :placeholder="configuration.placeholder"
+            :show-clear="true"
+            @before-show="getOptions"
+        />
+        <Message
+            v-for="error in $field.errors"
+            :key="error.message"
+            severity="error"
+            size="small"
+        >
+            {{ error.message }}
+        </Message>
+    </FormField>
 </template>
