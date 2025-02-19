@@ -6,10 +6,9 @@ import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
 
 const props = defineProps<{
     initialValue: string | undefined;
-    configuration: {
-        nodeAlias: string;
-        graphSlug: string;
-    };
+    nodeAlias: string;
+    graphSlug: string;
+    configuration: any;
 }>();
 
 let timeout: ReturnType<typeof setTimeout>;
@@ -43,7 +42,7 @@ function validate(e: FormFieldResolverOptions) {
 <template>
     <FormField
         v-slot="$field"
-        :name="props.configuration.nodeAlias"
+        :name="props.nodeAlias"
         :initial-value="props.initialValue"
         :resolver="resolver"
     >

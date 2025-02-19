@@ -1,0 +1,13 @@
+{% extends "arches_urls.htm" %}
+
+{% load static %}
+{% load l10n %}
+{% load i18n %}
+
+{% block arches_urls %}
+{{ block.super }}
+<div class="arches-urls"
+    api_relatable_resources='(graph_slug, node_alias) => {return "{% url "api-relatable-resources" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", node_alias)}'
+    api_widget_configuration='(graph_slug, node_alias) => {return "{% url "api-widget-configuration" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", node_alias)}'
+></div>
+{% endblock arches_urls %}
