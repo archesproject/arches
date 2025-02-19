@@ -25,10 +25,9 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth.models import User
 from django.db import transaction
-from django.forms.widgets import PasswordInput, TextInput
 from django.utils.translation import gettext as _
 from arches.app.models import models
-from captcha.fields import ReCaptchaField
+from django_recaptcha.fields import ReCaptchaField
 import logging
 
 
