@@ -20,7 +20,6 @@ import uuid
 from django.db import transaction
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
-from django.forms import ModelForm
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
@@ -324,9 +323,3 @@ class Card(models.CardModel):
             ret.pop("widgets", None)
 
         return ret
-
-
-class CardXNodeXWidgetForm(ModelForm):
-    class Meta:
-        model = models.CardXNodeXWidget
-        fields = "__all__"
