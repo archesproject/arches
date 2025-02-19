@@ -12433,6 +12433,10 @@ a.filter-tools:hover {
         display: none;
     }
 
+    * {
+        overflow: visible !important;
+    }
+
     #content-container {
         padding: 0 !important;
     }
