@@ -94,7 +94,10 @@
                 <div class="workbench-card-sidepanel-border"></div>
                 <div class="workbench-card-sidepanel-body">
                 <div class="overlays-listing-container" data-bind="sortable: {
-                    data: overlays
+                    data: overlays,
+                    as: 'overlay',
+                    beforeMove: beforeMove,
+                    afterMove: reorderOverlays
                 }">
                     <div class="overlay-listing" data-bind="css: {'active-overlay': onMap}">
                         <div class="overlay-name" tabindex="0" role="switch" data-bind="

@@ -7,7 +7,8 @@ define([
     'utils/map-popup-provider',
     'utils/map-configurator',
     'utils/aria',
-    'templates/views/components/map-popup.htm'
+    'templates/views/components/map-popup.htm',
+    'bindings/sortable'
 ], function($, _, arches, ko, koMapping, mapPopupProvider, mapConfigurator, ariaUtils) {
     const viewModel = function(params) {
         var self = this;
@@ -477,6 +478,34 @@ define([
                     self.popup = undefined;
                 });
             });
+        };
+
+        this.beforeMove = function(e) {
+            e.cancelDrop = (e.sourceParent!==e.targetParent);
+        },
+
+        this.reorderOverlays = function(e) {
+            const map_order = ko.observableArray(e.sourceParent())
+            var new_order = []
+            for (let i = 0; i < map_order().length; i++) {
+                const element = map_order()[i];
+                if (!(element.is_resource_layer)) {
+                    // filter out the resource layers for now
+                    new_order.push({
+                        "maplayerid": element.maplayerid,
+                        "sortorder": i,
+                        "is_resource_layer": element.is_resource_layer,
+                    })
+                }
+            };
+
+            $.ajax({
+                type: "PUT",
+                data: JSON.stringify({
+                    map_order: new_order
+                }),
+                url: arches.urls.reorder_overlays,
+            })
         };
 
         this.setupMap = function(map) {

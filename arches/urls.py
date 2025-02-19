@@ -781,6 +781,11 @@ urlpatterns = [
         api.SpatialView.as_view(),
         name="spatialview_api",
     ),
+    re_path(
+        r"^reorder_overlays",
+        map.OverlayOrderView.as_view(),
+        name="reorder_overlays",
+    ),
 ]
 
 handler400 = "arches.app.views.main.custom_400"

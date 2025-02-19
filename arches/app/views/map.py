@@ -163,3 +163,21 @@ class TileserverProxyView(ProxyView):
         if settings.TILESERVER_URL is None:
             raise Http404(_("Tileserver proxy not configured"))
         return headers
+
+
+@method_decorator(group_required("Resource Editor"), name="dispatch")
+class OverlayOrderView(BaseManagerView):
+    def put(self, request):
+        json = request.body
+        data = JSONDeserializer().deserialize(json)
+        map_layers = models.MapLayer.objects.all()
+
+        for layer in data["map_order"]:
+            try:
+                db_layer = map_layers.get(maplayerid=layer["maplayerid"])
+                db_layer.sortorder = layer["sortorder"]
+                db_layer.save()
+            except models.MapLayer.DoesNotExist:
+                pass  # will be resource overlay
+
+        return JSONResponse(data)
