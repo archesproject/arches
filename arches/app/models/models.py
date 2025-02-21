@@ -1663,7 +1663,7 @@ class TileModel(models.Model):  # Tile
         from arches.app.models.tile import TileCardinalityError
 
         if error.args and "excess_tiles" in error.args[0]:
-            message = _("Tile Cardinality Error")
+            message = error.args[0].split("\nCONTEXT")[0]
             if nodegroup_alias:
                 message = {nodegroup_alias: message}
             raise TileCardinalityError(message) from error
