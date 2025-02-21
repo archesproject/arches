@@ -795,30 +795,18 @@ class Tile(models.TileModel):
         context -- string e.g. "copy" indicating conditions under which a resource is saved and how functions should behave.
         """
 
-        try:
-            for function in self._getFunctionClassInstances():
-                try:
-                    function.save(self, request, context=context)
-                except NotImplementedError:
-                    pass
-        except TypeError as e:
-            logger.warning(
-                _("No associated functions or other TypeError raised by a function")
-            )
-            logger.warning(e)
+        for function in self._getFunctionClassInstances():
+            try:
+                function.save(self, request, context=context)
+            except NotImplementedError:
+                pass
 
     def __preDelete(self, request=None):
-        try:
-            for function in self._getFunctionClassInstances():
-                try:
-                    function.delete(self, request)
-                except NotImplementedError:
-                    pass
-        except TypeError as e:
-            logger.warning(
-                _("No associated functions or other TypeError raised by a function")
-            )
-            logger.warning(e)
+        for function in self._getFunctionClassInstances():
+            try:
+                function.delete(self, request)
+            except NotImplementedError:
+                pass
 
     def __postSave(self, request=None, context=None):
         """
@@ -827,17 +815,11 @@ class Tile(models.TileModel):
         context -- string e.g. "copy" indicating conditions under which a resource is saved and how functions should behave.
         """
 
-        try:
-            for function in self._getFunctionClassInstances():
-                try:
-                    function.post_save(self, request, context=context)
-                except NotImplementedError:
-                    pass
-        except TypeError as e:
-            logger.warning(
-                _("No associated functions or other TypeError raised by a function")
-            )
-            logger.warning(e)
+        for function in self._getFunctionClassInstances():
+            try:
+                function.post_save(self, request, context=context)
+            except NotImplementedError:
+                pass
 
     def _getFunctionClassInstances(self):
         ret = []
