@@ -21,10 +21,9 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from tests.base_test import ArchesTestCase
 from django.db import connection
 from django.contrib.auth.models import User
-from django.db.utils import ProgrammingError
 from django.http import HttpRequest
 from arches.app.models.graph import Graph
-from arches.app.models.tile import Tile, TileValidationError
+from arches.app.models.tile import Tile, TileCardinalityError, TileValidationError
 from arches.app.models.resource import Resource
 from arches.app.models.models import (
     CardModel,
@@ -387,7 +386,7 @@ class TileTests(ArchesTestCase):
     def test_tile_cardinality(self):
         """
         Tests that the tile is not saved if the cardinality is violated
-        by testin to save a tile with the same values as existing one
+        by testing to save a tile with the same values as an existing one.
 
         """
 
@@ -421,7 +420,7 @@ class TileTests(ArchesTestCase):
         }
         second_tile = Tile(second_json)
 
-        with self.assertRaises(ProgrammingError):
+        with self.assertRaises(TileCardinalityError):
             second_tile.save(index=False, request=request)
 
     def test_apply_provisional_edit(self):

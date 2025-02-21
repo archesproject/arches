@@ -28,7 +28,7 @@ from django.contrib.auth.models import Group, User
 from django.contrib.gis.db import models
 from django.core import checks
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import connection
+from django.db import ProgrammingError, connection
 from django.db.models import JSONField
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
@@ -1612,6 +1612,14 @@ class TileModel(models.Model):  # Tile
     def nodegroup(self):
         return NodeGroup.objects.filter(pk=self.nodegroup_id).first()
 
+    @property
+    def nodegroup_alias(self):
+        return (
+            NodeGroup.objects.filter(pk=self.nodegroup_id)
+            .values_list("grouping_node__alias", flat=True)
+            .first()
+        )
+
     def is_fully_provisional(self):
         return bool(self.provisionaledits and not any(self.data.values()))
 
@@ -1628,7 +1636,14 @@ class TileModel(models.Model):  # Tile
         if not self.tileid:
             self.tileid = uuid.uuid4()
             add_to_update_fields(kwargs, "tileid")
-        super(TileModel, self).save(**kwargs)  # Call the "real" save() method.
+
+        # Query for this first instead of during a transaction rollback.
+        nodegroup_alias = self.nodegroup_alias
+        try:
+            super(TileModel, self).save(**kwargs)  # Call the "real" save() method.
+        except ProgrammingError as error:
+            self._handle_programming_error(error, nodegroup_alias)
+            raise
 
     def set_next_sort_order(self):
         sortorder_max = self.__class__.objects.filter(
@@ -1637,10 +1652,21 @@ class TileModel(models.Model):  # Tile
         ).aggregate(Max("sortorder"))["sortorder__max"]
         self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
 
-    def serialize(self, fields=None, exclude=["nodegroup"], **kwargs):
+    def serialize(
+        self, fields=None, exclude=["nodegroup", "nodegroup_alias"], **kwargs
+    ):
         return JSONSerializer().handle_model(
             self, fields=fields, exclude=exclude, **kwargs
         )
+
+    def _handle_programming_error(error, nodegroup_alias=None):
+        from arches.app.models.tile import TileCardinalityError
+
+        if error.args and "excess_tiles" in error.args[0]:
+            message = _("Tile Cardinality Error")
+            if nodegroup_alias:
+                message = {nodegroup_alias: message}
+            raise TileCardinalityError(message) from error
 
 
 class Value(models.Model):
