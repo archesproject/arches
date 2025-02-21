@@ -1512,6 +1512,15 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
     )
     data = JSONField(blank=True, default=dict, db_column="tiledata")
     nodegroup_id = models.UUIDField(db_column="nodegroupid", null=True)
+    nodegroup = models.ForeignObject(
+        NodeGroup,
+        null=True,
+        on_delete=models.DO_NOTHING,
+        related_name="tiles",
+        related_query_name="tile",
+        from_fields=["nodegroup_id"],
+        to_fields=["nodegroupid"],
+    )
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     provisionaledits = JSONField(blank=True, null=True, db_column="provisionaledits")
 
@@ -1525,16 +1534,9 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
     def __str__(self):
         return repr(self)
 
-    @property
-    def nodegroup(self):
-        return NodeGroup.objects.filter(pk=self.nodegroup_id).first()
-
     def find_nodegroup_alias(self):
-        return (
-            NodeGroup.objects.filter(pk=self.nodegroup_id)
-            .values_list("grouping_node__alias", flat=True)
-            .first()
-        )
+        if self.nodegroup and self.nodegroup.grouping_node:
+            return self.nodegroup.grouping_node.alias
 
     def is_fully_provisional(self):
         return bool(self.provisionaledits and not any(self.data.values()))
@@ -1568,7 +1570,7 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
         ).aggregate(Max("sortorder"))["sortorder__max"]
         self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
 
-    def serialize(self, fields=None, exclude=["nodegroup"], **kwargs):
+    def serialize(self, fields=None, exclude=None, **kwargs):
         return JSONSerializer().handle_model(
             self, fields=fields, exclude=exclude, **kwargs
         )
