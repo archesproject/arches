@@ -1659,7 +1659,7 @@ class TileModel(models.Model):  # Tile
             self, fields=fields, exclude=exclude, **kwargs
         )
 
-    def _handle_programming_error(error, nodegroup_alias=None):
+    def _handle_programming_error(self, error, nodegroup_alias=None):
         from arches.app.models.tile import TileCardinalityError
 
         if error.args and "excess_tiles" in error.args[0]:
