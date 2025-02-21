@@ -1600,10 +1600,7 @@ class TileModel(models.Model):  # Tile
             self.tileid = uuid.uuid4()
 
     def __repr__(self):
-        alias = None
-        if self.nodegroup and self.nodegroup.grouping_node:
-            alias = self.nodegroup.grouping_node.alias
-        return f"<{alias} ({self.pk})>"
+        return f"<{self.nodegroup_alias} ({self.pk})>"
 
     def __str__(self):
         return repr(self)
