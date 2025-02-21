@@ -1600,7 +1600,7 @@ class TileModel(models.Model):  # Tile
             self.tileid = uuid.uuid4()
 
     def __repr__(self):
-        return f"<{self.nodegroup_alias} ({self.pk})>"
+        return f"<{self.find_nodegroup_alias()} ({self.pk})>"
 
     def __str__(self):
         return repr(self)
@@ -1609,8 +1609,7 @@ class TileModel(models.Model):  # Tile
     def nodegroup(self):
         return NodeGroup.objects.filter(pk=self.nodegroup_id).first()
 
-    @property
-    def nodegroup_alias(self):
+    def find_nodegroup_alias(self):
         return (
             NodeGroup.objects.filter(pk=self.nodegroup_id)
             .values_list("grouping_node__alias", flat=True)
@@ -1635,7 +1634,7 @@ class TileModel(models.Model):  # Tile
             add_to_update_fields(kwargs, "tileid")
 
         # Query for this first instead of during a transaction rollback.
-        nodegroup_alias = self.nodegroup_alias
+        nodegroup_alias = self.find_nodegroup_alias()
         try:
             super(TileModel, self).save(**kwargs)  # Call the "real" save() method.
         except ProgrammingError as error:
@@ -1649,9 +1648,7 @@ class TileModel(models.Model):  # Tile
         ).aggregate(Max("sortorder"))["sortorder__max"]
         self.sortorder = sortorder_max + 1 if sortorder_max is not None else 0
 
-    def serialize(
-        self, fields=None, exclude=["nodegroup", "nodegroup_alias"], **kwargs
-    ):
+    def serialize(self, fields=None, exclude=["nodegroup"], **kwargs):
         return JSONSerializer().handle_model(
             self, fields=fields, exclude=exclude, **kwargs
         )
