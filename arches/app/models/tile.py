@@ -884,6 +884,8 @@ class TileValidationError(ValidationError):
         self.code = code
 
     def __str__(self):
+        if hasattr(self, "messages"):
+            return repr(self.messages)
         return repr(self.message)
 
 
