@@ -21,6 +21,7 @@ from django.utils.translation import gettext_lazy as _
 
 from arches.app.const import ExtensionType
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
+from arches.app.models.fields.foreign import GhostableForeignObject
 from arches.app.models.functions import UUID4
 from arches.app.models.mixins import SaveSupportsBlindOverwriteMixin
 from arches.app.models.utils import add_to_update_fields
@@ -1512,7 +1513,7 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
     )
     data = JSONField(blank=True, default=dict, db_column="tiledata")
     nodegroup_id = models.UUIDField(db_column="nodegroupid", null=True)
-    nodegroup = models.ForeignObject(
+    nodegroup = GhostableForeignObject(
         NodeGroup,
         null=True,
         on_delete=models.DO_NOTHING,

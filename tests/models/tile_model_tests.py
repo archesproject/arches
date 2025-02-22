@@ -124,6 +124,17 @@ class TileTests(ArchesTestCase):
         refreshed = TileModel.objects.get(pk=sample_tile.pk)
         self.assertEqual(refreshed.nodegroup, other_nodegroup)
 
+    def test_assign_nonexistent_nodegroup(self):
+        sample_tile = self.create_tile()
+        nonexistent_id = uuid4()
+        sample_tile.nodegroup_id = nonexistent_id
+        sample_tile.save()
+        refreshed = TileModel.objects.get(pk=sample_tile.pk)
+        self.assertEqual(refreshed.nodegroup_id, nonexistent_id)
+        # Does not raise thanks to GhostableForeignObject.
+        self.assertIsNone(refreshed.nodegroup)
+        self.assertEqual(refreshed.serialize()["nodegroup_id"], str(nonexistent_id))
+
     def test_load_from_python_dict(self):
         """
         Test that we can initialize a Tile object from a Python dictionary
