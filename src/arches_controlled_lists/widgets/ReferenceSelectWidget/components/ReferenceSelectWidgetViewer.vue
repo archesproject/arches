@@ -1,6 +1,22 @@
 <script setup lang="ts">
-// TODO
+import type { ControlledListItem } from "@/arches_controlled_lists/types.ts";
+
+defineProps<{
+    value: ControlledListItem[] | undefined;
+    configuration: any;
+}>();
 </script>
+
 <template>
-    <!-- TODO -->
+    <template v-if="value">
+        <span
+            v-for="controlledListItem in value"
+            :key="controlledListItem.list_id"
+        >
+            {{ controlledListItem.labels[0].value }}
+        </span>
+    </template>
+    <span v-else>
+        <span>{{ $gettext("None") }}</span>
+    </span>
 </template>

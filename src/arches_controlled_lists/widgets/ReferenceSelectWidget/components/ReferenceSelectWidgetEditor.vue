@@ -8,15 +8,16 @@ import Select from "primevue/select";
 import { fetchLists } from "@/arches_component_lab/widgets/api.ts";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
+import type { ControlledListItem } from "@/arches_controlled_lists/types";
 
 const props = defineProps<{
-    initialValue: any;
+    initialValue: ControlledListItem[] | undefined;
     configuration: any;
     nodeAlias: string;
     graphSlug: string;
 }>();
 
-const options = ref<any>(props.initialValue);
+const options = ref<any>(props.initialValue || []);
 const isLoading = ref(false);
 const optionsError = ref<string | null>(null);
 
@@ -26,10 +27,10 @@ const formFieldRef = useTemplateRef("formFieldRef");
 watch(
     () => formFieldRef.value?.field?.states?.value,
     (newVal) => {
-        if (typeof newVal === 'string') {
-            formFieldRef.value!.field.states.value = [options.value.find(
-                (option: any) => option.uri === newVal,
-            )];
+        if (typeof newVal === "string") {
+            formFieldRef.value!.field.states.value = [
+                options.value.find((option: any) => option.uri === newVal),
+            ];
         }
     },
 );
@@ -40,11 +41,13 @@ async function getOptions() {
     try {
         const fetchedLists = await fetchLists([props.nodeAlias]);
 
-        options.value = fetchedLists.controlled_lists[0].items.map((item: any) => ({
-            list_id: item.list_id,
-            uri: item.uri,
-            labels: item.values,
-        }));
+        options.value = fetchedLists.controlled_lists[0].items.map(
+            (item: any) => ({
+                list_id: item.list_id,
+                uri: item.uri,
+                labels: item.values,
+            }),
+        );
     } catch (error) {
         optionsError.value = (error as Error).message;
     } finally {
@@ -63,7 +66,7 @@ function resolver(e: FormFieldResolverOptions) {
         }, 500);
     });
 }
- 
+
 function validate(e: FormFieldResolverOptions) {
     console.log("validate", e);
     // API call to validate the input
@@ -103,7 +106,7 @@ function getOptionLabels(item: any): string {
         v-slot="$field"
         :name="props.nodeAlias"
         :resolver="resolver"
-        :initial-value="props.initialValue[0].uri"
+        :initial-value="props.initialValue && props.initialValue[0].uri"
     >
         <Select
             style="display: flex"
