@@ -16,6 +16,7 @@ const props = defineProps<{
     nodeAlias: string;
     initialValue: string | undefined;
     mode: WidgetMode;
+    hideLabel?: boolean;
 }>();
 
 const isLoading = ref(true);
@@ -37,7 +38,7 @@ onMounted(async () => {
         style="width: 2em; height: 2em"
     />
     <template v-else>
-        <label>{{ configuration.label }}</label>
+        <label v-if="!props.hideLabel">{{ configuration.label }}</label>
 
         <NonLocalizedStringWidgetEditor
             v-if="props.mode === EDIT"

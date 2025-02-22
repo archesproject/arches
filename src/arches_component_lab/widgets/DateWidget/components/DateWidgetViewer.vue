@@ -2,7 +2,7 @@
 import DatePicker from "primevue/datepicker";
 
 const props = defineProps<{
-    value: Date | undefined;
+    value: string | undefined;
     configuration: {
         dateFormat: string;
         graphSlug: string;

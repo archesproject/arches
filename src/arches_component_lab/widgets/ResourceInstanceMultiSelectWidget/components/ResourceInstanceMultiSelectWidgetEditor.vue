@@ -17,7 +17,7 @@ import type {
 } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
-    initialValue: ResourceInstanceReference[];
+    initialValue: ResourceInstanceReference[] | undefined;
     graphSlug: string;
     nodeAlias: string;
 }>();
@@ -26,7 +26,7 @@ const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidget config
 
-const options = ref<ResourceInstanceReference[]>(props.initialValue);
+const options = ref<ResourceInstanceReference[]>(props.initialValue || []);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
@@ -158,7 +158,7 @@ function validate(e: FormFieldResolverOptions) {
         v-slot="$field"
         :name="props.nodeAlias"
         :initial-value="
-            props.initialValue.map((resource) => resource.resourceId)
+            props.initialValue?.map((resource) => resource.resourceId)
         "
         :resolver="resolver"
     >

@@ -9,7 +9,7 @@ import { FormField } from "@primevue/forms";
 import type { FormFieldResolverOptions } from "@primevue/forms";
 
 const props = defineProps<{
-    initialValue: Date | undefined;
+    initialValue: string | undefined;
     graphSlug: string;
     nodeAlias: string;
     configuration: {
