@@ -8,8 +8,7 @@ define([
     'utils/map-configurator',
     'utils/aria',
     'templates/views/components/map-popup.htm',
-    'bindings/sortable',
-    'bindings/key-events-click'
+    'bindings/sortable'
 ], function($, _, arches, ko, koMapping, mapPopupProvider, mapConfigurator, ariaUtils) {
     const viewModel = function(params) {
         var self = this;
