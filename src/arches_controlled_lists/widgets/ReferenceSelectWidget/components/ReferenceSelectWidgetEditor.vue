@@ -5,7 +5,7 @@ import { FormField } from "@primevue/forms";
 import Message from "primevue/message";
 import Select from "primevue/select";
 
-import { fetchLists } from "@/arches_controlled_lists/widgets/api.ts";
+import { fetchWidgetOptions } from "@/arches_controlled_lists/widgets/api.ts";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { ControlledListItem } from "@/arches_controlled_lists/types";
@@ -46,7 +46,10 @@ watch(
 async function getOptions() {
     isLoading.value = true;
     try {
-        const fetchedLists = await fetchLists(props.graphSlug, props.nodeAlias);
+        const fetchedLists = await fetchWidgetOptions(
+            props.graphSlug,
+            props.nodeAlias,
+        );
         options.value = fetchedLists.map((item: any) => ({
             list_id: item.list_id,
             uri: item.uri,

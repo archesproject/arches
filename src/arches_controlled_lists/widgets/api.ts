@@ -1,6 +1,9 @@
 import arches from "arches";
 
-export const fetchLists = async (graphSlug: string, nodeAlias: string) => {
+export const fetchWidgetOptions = async (
+    graphSlug: string,
+    nodeAlias: string,
+) => {
     const params = new URLSearchParams();
     params.append("graph_slug", graphSlug);
     params.append("node_alias", nodeAlias);

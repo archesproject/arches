@@ -25,6 +25,19 @@ function getToken() {
     return token;
 }
 
+export const fetchLists = async () => {
+    const response = await fetch(arches.urls.controlled_lists);
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
+    }
+};
+
 export const createList = async (name: string) => {
     const response = await fetch(arches.urls.controlled_list_add, {
         method: "POST",
