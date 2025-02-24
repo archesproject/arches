@@ -372,3 +372,28 @@ class ListItemImageMetadataView(APIBase):
         if not count:
             return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
+
+
+class ListOptionsView(APIBase):
+    def get(self, request):
+        node_alias = request.GET.get("node_alias")
+        graph_slug = request.GET.get("graph_slug")
+        try:
+            list_query = (
+                List.objects.annotate_node_fields(
+                    node_alias="alias",
+                    graph_slug="graph__slug",
+                )
+                .order_by("name")
+                .prefetch_related(*_prefetch_terms(request))
+            )
+            list_items = list_query.get(
+                node_alias__overlap=[node_alias], graph_slug__overlap=[graph_slug]
+            ).list_items.all()
+
+        except List.DoesNotExist:
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
+
+        flat = str_to_bool(request.GET.get("flat", "false"))
+        serialized = [item.serialize(flat=flat) for item in list_items]
+        return JSONResponse(serialized)

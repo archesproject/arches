@@ -5,7 +5,7 @@ import { FormField } from "@primevue/forms";
 import Message from "primevue/message";
 import Select from "primevue/select";
 
-import { fetchLists } from "@/arches_component_lab/widgets/api.ts";
+import { fetchLists } from "@/arches_controlled_lists/widgets/api.ts";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { ControlledListItem } from "@/arches_controlled_lists/types";
@@ -27,7 +27,7 @@ const optionsError = ref<string | null>(null);
 
 const formFieldRef = useTemplateRef("formFieldRef");
 
-// this watcher is necessary to be able to format the value of the form field when the date picker is updated
+// this watcher is necessary to be able to format the value of the form field when the dropdown is updated
 watch(
     // @ts-expect-error - This is a bug in the PrimeVue types
     () => formFieldRef.value?.field?.states?.value,
@@ -45,17 +45,13 @@ watch(
 
 async function getOptions() {
     isLoading.value = true;
-
     try {
-        const fetchedLists = await fetchLists([props.nodeAlias]);
-
-        options.value = fetchedLists.controlled_lists[0].items.map(
-            (item: ControlledListItem) => ({
-                list_id: item.list_id,
-                uri: item.uri,
-                labels: item.values,
-            }),
-        );
+        const fetchedLists = await fetchLists(props.graphSlug, props.nodeAlias);
+        options.value = fetchedLists.map((item: any) => ({
+            list_id: item.list_id,
+            uri: item.uri,
+            labels: item.values,
+        }));
     } catch (error) {
         optionsError.value = (error as Error).message;
     } finally {

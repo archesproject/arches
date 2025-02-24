@@ -10,6 +10,7 @@ from arches_controlled_lists.views import (
     ListItemImageView,
     ListItemImageMetadataView,
     ListItemValueView,
+    ListOptionsView,
 )
 
 urlpatterns = [
@@ -59,6 +60,11 @@ urlpatterns = [
         "api/controlled_list_item_image_metadata",
         ListItemImageMetadataView.as_view(),
         name="controlled_list_item_image_metadata_add",
+    ),
+    path(
+        "api/controlled_list_options",
+        ListOptionsView.as_view(),
+        name="controlled_list_options",
     ),
 ]
 
