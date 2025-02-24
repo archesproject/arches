@@ -532,7 +532,9 @@ define([
                         newIndex++
                     }
                     if (newIndex != -1 && newIndex != self.overlays().length) {
-                        self.overlays.splice(newIndex, 0, self.overlays.splice(index, 1)[0]);
+                        var newArr = self.overlays()
+                        newArr.splice(newIndex, 0, newArr.splice(index, 1)[0]);
+                        self.overlays(newArr);
                     }
                 }
             }
