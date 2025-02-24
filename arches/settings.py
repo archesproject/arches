@@ -455,7 +455,12 @@ LOGGING = {
             "handlers": ["file", "console"],
             "level": "WARNING",
             "propagate": True,
-        }
+        },
+        "django.request": {
+            "handlers": ["file", "console"],
+            "level": "WARNING",
+            "propagate": True,
+        },
     },
 }
 
