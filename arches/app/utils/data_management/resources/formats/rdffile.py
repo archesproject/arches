@@ -110,7 +110,9 @@ class RdfWriter(Writer):
             nodegroup = node.nodegroup
 
             def getchildedges(node):
-                for edge in models.Edge.objects.filter(domainnode=node):
+                for edge in models.Edge.objects.filter(domainnode=node).select_related(
+                    "rangenode__nodegroup"
+                ):
                     if nodegroup == edge.rangenode.nodegroup:
                         edges.append(edge)
                         getchildedges(edge.rangenode)
@@ -125,7 +127,11 @@ class RdfWriter(Writer):
                     "subgraphs": {},
                     "nodedatatypes": {},
                 }
-                graph = models.GraphModel.objects.get(pk=graphid)
+                graph = (
+                    models.GraphModel.objects.filter(pk=graphid)
+                    .prefetch_related("node_set__nodegroup")
+                    .get()
+                )
                 nodegroups = set()
                 for node in graph.node_set.all():
                     graph_cache[graphid]["nodedatatypes"][
@@ -144,7 +150,9 @@ class RdfWriter(Writer):
                         "parentnode_nodegroup": None,
                     }
                     graph_cache[graphid]["subgraphs"][nodegroup]["inedge"] = (
-                        models.Edge.objects.get(rangenode_id=nodegroup.pk)
+                        models.Edge.objects.filter(rangenode_id=nodegroup.pk)
+                        .select_related("domainnode__nodegroup")
+                        .get()
                     )
                     graph_cache[graphid]["subgraphs"][nodegroup][
                         "parentnode_nodegroup"
@@ -153,7 +161,9 @@ class RdfWriter(Writer):
                     ].domainnode.nodegroup
                     graph_cache[graphid]["subgraphs"][nodegroup]["edges"] = (
                         get_nodegroup_edges_by_collector_node(
-                            models.Node.objects.get(pk=nodegroup.pk)
+                            models.Node.objects.filter(pk=nodegroup.pk)
+                            .select_related("nodegroup")
+                            .get()
                         )
                     )
 
