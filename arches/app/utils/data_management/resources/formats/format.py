@@ -15,6 +15,7 @@ from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import MultiPoint
 from django.contrib.gis.geos import MultiPolygon
 from django.contrib.gis.geos import MultiLineString
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection, transaction
 from django.utils.translation import gettext as _
 
