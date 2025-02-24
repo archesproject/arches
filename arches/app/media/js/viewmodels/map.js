@@ -8,7 +8,8 @@ define([
     'utils/map-configurator',
     'utils/aria',
     'templates/views/components/map-popup.htm',
-    'bindings/sortable'
+    'bindings/sortable',
+    'bindings/key-events-click'
 ], function($, _, arches, ko, koMapping, mapPopupProvider, mapConfigurator, ariaUtils) {
     const viewModel = function(params) {
         var self = this;
@@ -480,33 +481,75 @@ define([
             });
         };
 
-        this.beforeMove = function(e) {
-            e.cancelDrop = (e.sourceParent!==e.targetParent);
-        },
-
-        this.reorderOverlays = function(e) {
-            const map_order = ko.observableArray(e.sourceParent())
-            var new_order = []
-            for (let i = 0; i < map_order().length; i++) {
-                const element = map_order()[i];
+        this.createNewOverlayOrder = function (currentOrder) {
+            var newOrder = []
+            for (let i = 0; i < currentOrder().length; i++) {
+                const element = currentOrder()[i];
                 if (!(element.is_resource_layer)) {
                     // filter out the resource layers for now
-                    new_order.push({
+                    newOrder.push({
                         "maplayerid": element.maplayerid,
                         "sortorder": i,
                         "is_resource_layer": element.is_resource_layer,
                     })
                 }
-            };
-
-            $.ajax({
-                type: "PUT",
-                data: JSON.stringify({
-                    map_order: new_order
-                }),
-                url: arches.urls.reorder_overlays,
-            })
+            }
+            return newOrder;
         };
+
+        this.sendNewOverlayOrder = function(newOrder) {
+            if (newOrder) {
+                $.ajax({
+                    type: "PUT",
+                    data: JSON.stringify({
+                        map_order: newOrder
+                    }),
+                    url: arches.urls.reorder_overlays,
+                })
+            }
+        };
+
+        this.beforeMove = function(e) {
+            e.cancelDrop = (e.sourceParent!==e.targetParent);
+        };
+
+        this.reorderOverlays = function(e) {
+            const mapOrder = ko.observableArray(e.sourceParent());
+            const newOrder = self.createNewOverlayOrder(mapOrder);
+            self.sendNewOverlayOrder(newOrder)
+        };
+
+        this.keyDownHandler = function (context, e) {
+            // reorder list in the front-end by only using keyboard inputs
+            var li = $(this);
+            var moveOverlays = function (direction) {
+                if (self.overlays().includes(li[0])) {
+                    var index = self.overlays().indexOf(li[0]);
+                    var newIndex = index
+                    if (direction == "up") {
+                        newIndex--
+                    } else if (direction == "down") {
+                        newIndex++
+                    }
+                    self.overlays.splice(newIndex, 0, self.overlays.splice(index, 1)[0]);
+                }
+            }
+
+            if (e.ctrlKey) {
+                switch (e.which) {
+                    case 38:
+                        moveOverlays("up");
+                        newOrder = self.createNewOverlayOrder(self.overlays)
+                        self.sendNewOverlayOrder(newOrder)
+                        break;
+                    case 40:
+                        moveOverlays("down");
+                        newOrder = self.createNewOverlayOrder(self.overlays)
+                        self.sendNewOverlayOrder(newOrder)
+                        break;
+                }
+            }
+        }
 
         this.setupMap = function(map) {
             map.on('load', function() {
