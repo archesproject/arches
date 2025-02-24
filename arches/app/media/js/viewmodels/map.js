@@ -531,7 +531,9 @@ define([
                     } else if (direction == "down") {
                         newIndex++
                     }
-                    self.overlays.splice(newIndex, 0, self.overlays.splice(index, 1)[0]);
+                    if (newIndex != -1 && newIndex != self.overlays().length) {
+                        self.overlays.splice(newIndex, 0, self.overlays.splice(index, 1)[0]);
+                    }
                 }
             }
 
