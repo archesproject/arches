@@ -372,22 +372,15 @@ class ListOptionsView(APIBase):
     def get(self, request):
         node_alias = request.GET.get("node_alias")
         graph_slug = request.GET.get("graph_slug")
-        try:
-            list_query = (
-                List.objects.annotate_node_fields(
-                    node_alias="alias",
-                    graph_slug="graph__slug",
-                )
-                .order_by("name")
-                .prefetch_related(*_prefetch_terms(request))
+
+        controlled_list_id = (
+            NodeProxy.objects.filter(
+                alias=node_alias, graph__slug=graph_slug, source_identifier=None
             )
-            list_items = list_query.get(
-                node_alias__overlap=[node_alias], graph_slug__overlap=[graph_slug]
-            ).list_items.all()
+            .with_controlled_lists()
+            .values("controlled_list_id")[:1]
+        )
 
-        except List.DoesNotExist:
-            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
-
-        flat = str_to_bool(request.GET.get("flat", "false"))
-        serialized = [item.serialize(flat=flat) for item in list_items]
+        list_items = ListItem.objects.filter(list_id=controlled_list_id)
+        serialized = [item.build_select_option() for item in list_items]
         return JSONResponse(serialized)
