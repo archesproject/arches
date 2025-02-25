@@ -189,7 +189,7 @@ function validate(e: FormFieldResolverOptions) {
         </Message>
     </FormField>
 </template>
-<style>
+<style scoped>
 .resource-instance-multiselect-widget .p-multiselect-label {
     visibility: visible !important;
     display: grid !important;
@@ -203,5 +203,18 @@ function validate(e: FormFieldResolverOptions) {
 .resource-instance-multiselect-widget .p-chip-label {
     max-width: min-content;
     white-space: normal;
+}
+</style>
+
+<!-- 
+    This is a workaround for the checkboxes in the PrimeVue MultiSelect component 
+    setting the FormField value to true/false instead of the selected options.
+-->
+<style>
+.p-multiselect-overlay .p-checkbox {
+    pointer-events: none;
+}
+.p-multiselect-overlay .p-multiselect-header .p-checkbox {
+    pointer-events: all;
 }
 </style>
