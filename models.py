@@ -7,10 +7,12 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models, transaction
 from django.db.models import Deferrable, Q
+from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
 from arches.app.models.models import DValueType, Language, Node
 from arches.app.models.utils import field_names
+from arches.app.utils.i18n import rank_label
 from arches_controlled_lists.querysets import (
     ListQuerySet,
     ListItemImageManager,
@@ -210,6 +212,24 @@ class ListItem(models.Model):
             "list_id": str(self.list_id),
         }
         return tile_value
+
+    def build_select_option(self):
+        labels = self.list_item_values.labels()
+        ranked_labels = sorted(
+            labels,
+            key=lambda label: rank_label(
+                kind=label.valuetype_id,
+                source_lang=label.language_id,
+                target_lang=translation.get_language(),
+            ),
+            reverse=True,
+        )
+        return {
+            "uri": self.uri,
+            "list_item_id": str(self.id),
+            "value": [label.serialize() for label in self.list_item_values.labels()],
+            "display_value": ranked_labels[0].value,
+        }
 
 
 class ListItemValue(models.Model):
