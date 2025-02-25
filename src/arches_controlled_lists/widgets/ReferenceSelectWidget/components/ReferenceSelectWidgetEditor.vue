@@ -48,12 +48,7 @@ async function getOptions() {
             props.graphSlug,
             props.nodeAlias,
         );
-        options.value = fetchedLists.map((item: any) => ({
-            list_id: item.list_id,
-            uri: item.uri,
-            labels: item.values,
-            display_value: item.display_value,
-        }));
+        options.value = fetchedLists;
     } catch (error) {
         optionsError.value = (error as Error).message;
     } finally {
