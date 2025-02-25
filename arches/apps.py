@@ -32,17 +32,22 @@ if settings.FILE_TYPE_CHECKING not in (None, "lenient", "strict"):
 
 
 ### SYSTEM CHECKS ###
+supported_by_django_ratelimit = (
+    "django.core.cache.backends.memcached.PyLibMCCache",
+    "django.core.cache.backends.memcached.PyMemcacheCache",
+    "django.core.cache.backends.redis.RedisCache",
+)
+
+
 @register(Tags.security)
 def check_cache_backend_for_production(app_configs, **kwargs):
     errors = []
     your_cache = settings.CACHES["default"]["BACKEND"]
-    if (
-        not settings.DEBUG
-        and your_cache == "django.core.cache.backends.dummy.DummyCache"
-    ):
+    if not settings.DEBUG and your_cache not in supported_by_django_ratelimit:
         errors.append(
             Error(
-                "Using dummy cache in production",
+                "Cache backend does not support rate-limiting",
+                hint=f"Your cache: {your_cache}\n\tSupported caches: {supported_by_django_ratelimit}",
                 obj=settings.APP_NAME,
                 id="arches.E001",
             )
@@ -53,11 +58,6 @@ def check_cache_backend_for_production(app_configs, **kwargs):
 @register(Tags.security)
 def check_cache_backend(app_configs, **kwargs):
     errors = []
-    supported_by_django_ratelimit = (
-        "django.core.cache.backends.memcached.PyLibMCCache",
-        "django.core.cache.backends.memcached.PyMemcacheCache",
-        "django.core.cache.backends.redis.RedisCache",
-    )
     your_cache = settings.CACHES["default"]["BACKEND"]
     if your_cache not in supported_by_django_ratelimit:
         errors.append(
