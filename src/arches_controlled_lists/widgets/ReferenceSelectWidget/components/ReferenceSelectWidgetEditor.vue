@@ -8,20 +8,18 @@ import Select from "primevue/select";
 import { fetchWidgetOptions } from "@/arches_controlled_lists/widgets/api.ts";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
-import type { ControlledListItem } from "@/arches_controlled_lists/types";
+import type { ReferenceOptionValue } from "@/arches_controlled_lists/widgets/types";
 
 const props = defineProps<{
-    initialValue: ControlledListItem[] | null | undefined;
-    widgetData: {
-        config: {
-            placeholder: string;
-        };
+    initialValue: ReferenceOptionValue[] | undefined;
+    configuration: {
+        placeholder: string;
     };
     nodeAlias: string;
     graphSlug: string;
 }>();
 
-const options = ref<ControlledListItem[]>(props.initialValue || []);
+const options = ref<ReferenceOptionValue[]>(props.initialValue || []);
 const isLoading = ref(false);
 const optionsError = ref<string | null>(null);
 
@@ -36,7 +34,7 @@ watch(
             // @ts-expect-error - This is a bug in the PrimeVue types
             formFieldRef.value!.field.states.value = [
                 options.value.find(
-                    (option: ControlledListItem) => option.uri === newVal,
+                    (option: ReferenceOptionValue) => option.uri === newVal,
                 ),
             ];
         }
@@ -54,6 +52,7 @@ async function getOptions() {
             list_id: item.list_id,
             uri: item.uri,
             labels: item.values,
+            display_value: item.display_value,
         }));
     } catch (error) {
         optionsError.value = (error as Error).message;
@@ -89,18 +88,6 @@ function validate(e: FormFieldResolverOptions) {
     //     };
     // }
 }
-
-// THIS SHOULD NOT EXIST, THE API SHOULD RETURN A MORE SIMPLIFIED RESPONSE
-function getOptionLabels(item: {
-    labels: [{ valuetype_id: string; language_id: string; value: string }];
-}): string {
-    const prefLabels = item.labels.filter(
-        (label) => label.valuetype_id === "prefLabel",
-    );
-    const optionLabel =
-        prefLabels.find((label) => label.language_id === "en") || prefLabels[0];
-    return optionLabel?.value ?? "";
-}
 </script>
 
 <template>
@@ -124,8 +111,8 @@ function getOptionLabels(item: {
             :fluid="true"
             :loading="isLoading"
             :options="options"
-            :option-label="getOptionLabels"
-            :placeholder="props.widgetData.config.placeholder"
+            :option-label="displayValue"
+            :placeholder="configuration.placeholder"
             :show-clear="true"
             @before-show="getOptions"
         />
