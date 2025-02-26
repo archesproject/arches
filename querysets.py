@@ -24,6 +24,19 @@ class ListQuerySet(models.QuerySet):
         return qs
 
 
+class ListItemQuerySet(models.QuerySet):
+    def with_list_item_labels(self):
+        from arches_controlled_lists.models import ListItemValue
+
+        return self.prefetch_related(
+            models.Prefetch(
+                "list_item_values",
+                ListItemValue.objects.labels(),
+                to_attr="list_item_labels",
+            )
+        )
+
+
 class ListItemValueQuerySet(models.QuerySet):
     def values_without_images(self):
         return self.exclude(valuetype="image")

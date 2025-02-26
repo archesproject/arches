@@ -15,6 +15,7 @@ from arches.app.models.utils import field_names
 from arches.app.utils.i18n import rank_label
 from arches_controlled_lists.querysets import (
     ListQuerySet,
+    ListItemQuerySet,
     ListItemImageManager,
     ListItemValueQuerySet,
     NodeQuerySet,
@@ -131,6 +132,8 @@ class ListItem(models.Model):
     )
     guide = models.BooleanField(default=False)
 
+    objects = ListItemQuerySet.as_manager()
+
     class Meta:
         constraints = [
             # Sort order concerns the list as a whole, not subsets
@@ -214,7 +217,7 @@ class ListItem(models.Model):
         return tile_value
 
     def build_select_option(self):
-        labels = self.list_item_values.labels()
+        labels = getattr(self, "list_item_labels", self.list_item_values.labels())
         ranked_labels = sorted(
             labels,
             key=lambda label: rank_label(
