@@ -1,10 +1,24 @@
 import type { Value } from "@/arches_controlled_lists/types.ts";
+import type { TreeNode } from "primevue/treenode";
 
 export type WidgetMode = "edit" | "view";
 
-export interface ReferenceOptionValue {
+export interface ControlledListItemTileValue {
+    list_id: string;
     uri: string;
-    list_item_id: string;
     values: Value[];
-    display_value: string;
+}
+
+export interface ReferenceSelectFetchedOption {
+    list_item_id: string;
+    uri: string;
+    list_item_values: Value[];
+    display_label: string;
+    sort_order: number;
+    children: ReferenceSelectFetchedOption[];
+}
+
+export interface ReferenceSelectTreeNode extends TreeNode {
+    uri: string;
+    values: Value[];
 }

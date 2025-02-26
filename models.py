@@ -224,12 +224,19 @@ class ListItem(models.Model):
             ),
             reverse=True,
         )
-        return {
-            "uri": self.uri,
+        data = {
+            # "list_id": str(self.list_id),
             "list_item_id": str(self.id),
-            "value": [label.serialize() for label in self.list_item_values.labels()],
-            "display_value": ranked_labels[0].value,
+            "uri": self.uri,
+            "list_item_values": [label.serialize() for label in labels],
+            "display_label": ranked_labels[0].value,
+            "sortorder": self.sortorder,
         }
+        data["children"] = sorted(
+            [child.build_select_option() for child in self.children.all()],
+            key=lambda d: d["sortorder"],
+        )
+        return data
 
 
 class ListItemValue(models.Model):

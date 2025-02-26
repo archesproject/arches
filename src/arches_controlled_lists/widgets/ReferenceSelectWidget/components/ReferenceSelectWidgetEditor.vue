@@ -3,15 +3,19 @@ import { ref, useTemplateRef, watch } from "vue";
 
 import { FormField } from "@primevue/forms";
 import Message from "primevue/message";
-import Select from "primevue/select";
+import TreeSelect from "primevue/treeselect";
 
 import { fetchWidgetOptions } from "@/arches_controlled_lists/widgets/api.ts";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
-import type { ReferenceOptionValue } from "@/arches_controlled_lists/widgets/types";
+import type {
+    ControlledListItemTileValue,
+    ReferenceSelectTreeNode,
+    ReferenceSelectFetchedOption,
+} from "@/arches_controlled_lists/widgets/types";
 
 const props = defineProps<{
-    initialValue: ReferenceOptionValue[] | undefined;
+    initialValue: ControlledListItemTileValue[] | undefined;
     configuration: {
         placeholder: string;
     };
@@ -41,6 +45,18 @@ watch(
     },
 );
 
+function optionAsNode(
+    item: ReferenceSelectFetchedOption,
+): ReferenceSelectTreeNode {
+    return {
+        key: item.list_item_id,
+        uri: item.uri,
+        label: item.display_label,
+        values: item.list_item_values,
+        children: item.children.map((child) => optionAsNode(child)),
+    };
+}
+
 async function getOptions() {
     isLoading.value = true;
     try {
@@ -48,7 +64,9 @@ async function getOptions() {
             props.graphSlug,
             props.nodeAlias,
         );
-        options.value = fetchedLists;
+        options.value = fetchedLists.map((item: ReferenceSelectFetchedOption) =>
+            optionAsNode(item),
+        );
     } catch (error) {
         optionsError.value = (error as Error).message;
     } finally {
@@ -100,13 +118,12 @@ function validate(e: FormFieldResolverOptions) {
         :resolver="resolver"
         :initial-value="props.initialValue && props.initialValue[0].uri"
     >
-        <Select
+        <TreeSelect
             style="display: flex"
             option-value="uri"
             :fluid="true"
             :loading="isLoading"
             :options="options"
-            :option-label="displayValue"
             :placeholder="configuration.placeholder"
             :show-clear="true"
             @before-show="getOptions"
