@@ -3,7 +3,7 @@ import type { ControlledListItem } from "@/arches_controlled_lists/types.ts";
 
 defineProps<{
     value: ControlledListItem[] | undefined;
-    configuration: any;
+    configuration: unknown;
 }>();
 </script>
 
@@ -13,7 +13,10 @@ defineProps<{
             v-for="controlledListItem in value"
             :key="controlledListItem.list_id"
         >
-            {{ controlledListItem.labels[0].value }}
+            {{
+                // @ts-expect-error
+                controlledListItem.labels[0].value
+            }}
         </span>
     </template>
     <span v-else>

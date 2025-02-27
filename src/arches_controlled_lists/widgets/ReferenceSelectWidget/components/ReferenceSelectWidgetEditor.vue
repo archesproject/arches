@@ -12,12 +12,14 @@ import type { ControlledListItem } from "@/arches_controlled_lists/types";
 
 const props = defineProps<{
     initialValue: ControlledListItem[] | undefined;
-    configuration: any;
+    configuration: {
+        placeholder: string;
+    };
     nodeAlias: string;
     graphSlug: string;
 }>();
 
-const options = ref<any>(props.initialValue || []);
+const options = ref<ControlledListItem[]>(props.initialValue || []);
 const isLoading = ref(false);
 const optionsError = ref<string | null>(null);
 
@@ -25,11 +27,15 @@ const formFieldRef = useTemplateRef("formFieldRef");
 
 // this watcher is necessary to be able to format the value of the form field when the date picker is updated
 watch(
+    // @ts-expect-error - This is a bug in the PrimeVue types
     () => formFieldRef.value?.field?.states?.value,
     (newVal) => {
         if (typeof newVal === "string") {
+            // @ts-expect-error - This is a bug in the PrimeVue types
             formFieldRef.value!.field.states.value = [
-                options.value.find((option: any) => option.uri === newVal),
+                options.value.find(
+                    (option: ControlledListItem) => option.uri === newVal,
+                ),
             ];
         }
     },
@@ -42,7 +48,7 @@ async function getOptions() {
         const fetchedLists = await fetchLists([props.nodeAlias]);
 
         options.value = fetchedLists.controlled_lists[0].items.map(
-            (item: any) => ({
+            (item: ControlledListItem) => ({
                 list_id: item.list_id,
                 uri: item.uri,
                 labels: item.values,
@@ -83,7 +89,9 @@ function validate(e: FormFieldResolverOptions) {
 }
 
 // THIS SHOULD NOT EXIST, THE API SHOULD RETURN A MORE SIMPLIFIED RESPONSE
-function getOptionLabels(item: any): string {
+function getOptionLabels(item: {
+    labels: [{ valuetype_id: string; language_id: string; value: string }];
+}): string {
     const prefLabels = item.labels.filter(
         (label) => label.valuetype_id === "prefLabel",
     );
