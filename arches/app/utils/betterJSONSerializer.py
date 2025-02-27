@@ -114,7 +114,7 @@ class JSONSerializer(object):
             or isinstance(object, tuple)
             or isinstance(object, set)
         ):
-            return self.handle_list(object)
+            return self.handle_list(object, **kwargs)
         elif isinstance(object, Model):
             if hasattr(object, "serialize"):
                 serialize_function = getattr(object, "serialize")
@@ -187,15 +187,15 @@ class JSONSerializer(object):
 
         return obj
 
-    def handle_list(self, l):
+    def handle_list(self, l, **kwargs):
         """Called to handle a list"""
         arr = []
         for item in l:
-            arr.append(self.handle_object(item))
+            arr.append(self.handle_object(item, **kwargs))
 
         return arr
 
-    # a slighty modified version of django.forms.models.model_to_dict
+    # a slightly modified version of django.forms.models.model_to_dict
     def handle_model(self, instance, **kwargs):
         """
         Returns a dict containing the data in ``instance``.
