@@ -8,7 +8,7 @@ const props = defineProps<{
     initialValue: string | undefined;
     nodeAlias: string;
     graphSlug: string;
-    configuration: any;
+    configuration: unknown;
 }>();
 
 let timeout: ReturnType<typeof setTimeout>;
@@ -23,8 +23,8 @@ function resolver(e: FormFieldResolverOptions) {
     });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function validate(e: FormFieldResolverOptions) {
+    console.log("validate", e);
     // API call to validate the input
     // if (true) {
     //     return {};

@@ -16,7 +16,7 @@ import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 const props = defineProps<{
     graphSlug: string;
     nodeAlias: string;
-    initialValue: Date | undefined;
+    initialValue: string | undefined;
     mode: WidgetMode;
 }>();
 
@@ -52,14 +52,20 @@ onMounted(async () => {
 
         <DateWidgetEditor
             v-if="props.mode === EDIT"
-            :initial-value="dayjs(props.initialValue).toDate()"
+            :initial-value="
+                props.initialValue &&
+                dayjs(props.initialValue).toDate().toString()
+            "
             :graph-slug="props.graphSlug"
             :node-alias="props.nodeAlias"
             :configuration="configuration"
         />
         <DateWidgetViewer
             v-else-if="props.mode === VIEW"
-            :value="dayjs(props.initialValue).toDate()"
+            :value="
+                props.initialValue &&
+                dayjs(props.initialValue).toDate().toString()
+            "
             :configuration="configuration"
         />
     </template>

@@ -16,7 +16,7 @@ import type {
 
 const props = defineProps<{
     mode: WidgetMode;
-    initialValue: ResourceInstanceReference[];
+    initialValue: ResourceInstanceReference[] | undefined;
     nodeAlias: string;
     graphSlug: string;
 }>();
@@ -53,7 +53,7 @@ onMounted(async () => {
         </div>
         <div v-if="mode === VIEW">
             <ResourceInstanceMultiSelectWidgetViewer
-                :initial-value="initialValue"
+                :value="initialValue"
                 :configuration="configuration"
             />
         </div>

@@ -3,16 +3,19 @@ import arches from "arches";
 import type { ResourceInstanceReference } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
-    initialValue?: ResourceInstanceReference[];
-    configuration: any;
+    value?: ResourceInstanceReference[] | undefined;
+    configuration: unknown;
 }>();
 </script>
 <template>
-    <span>
+    <div
+        v-for="resourceInstance in props.value"
+        :key="resourceInstance.resourceId"
+    >
         <a
-            :href="`${arches.urls.resource_editor}${props.initialValue?.[0].resourceId}`"
+            :href="`${arches.urls.resource_editor}${resourceInstance.resourceId}`"
         >
-            {{ props.initialValue?.[0].display_value }}
+            {{ resourceInstance.display_value }}
         </a>
-    </span>
+    </div>
 </template>
