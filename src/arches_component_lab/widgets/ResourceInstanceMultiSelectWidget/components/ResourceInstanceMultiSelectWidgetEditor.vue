@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef, watch } from "vue";
-
 import { useGettext } from "vue3-gettext";
-
 import { FormField } from "@primevue/forms";
+import Button from "primevue/button";
 import Message from "primevue/message";
 import MultiSelect, { type MultiSelectFilterEvent } from "primevue/multiselect";
 
@@ -157,6 +156,13 @@ function validate(e: FormFieldResolverOptions) {
     //     };
     // }
 }
+
+function getOption(value: string): ResourceInstanceReference | undefined {
+    const option = options.value.find(
+        (option) => option.resourceId == value,
+    )
+    return option;
+}
 </script>
 
 <template>
@@ -171,9 +177,8 @@ function validate(e: FormFieldResolverOptions) {
         ref="formFieldRef"
         v-slot="$field"
         :name="props.nodeAlias"
-        :initial-value="
-            props.initialValue?.map((resource) => resource.resourceId)
-        "
+        :initial-value="props.initialValue.map((resource) => resource.resourceId)
+            "
         :resolver="resolver"
     >
         <MultiSelect
@@ -193,6 +198,7 @@ function validate(e: FormFieldResolverOptions) {
                 lazy: true,
                 loading: isLoading,
                 onLazyLoad: onLazyLoadResources,
+                resizeDelay: 200
             }"
             @before-show="getOptions(1)"
             @filter="onFilter"
@@ -208,19 +214,50 @@ function validate(e: FormFieldResolverOptions) {
     </FormField>
 </template>
 <style scoped>
-.resource-instance-multiselect-widget .p-multiselect-label {
-    visibility: visible !important;
-    display: grid !important;
+:deep(.resource-instance-multiselect-widget .p-multiselect-label) {
+    visibility: visible;
+    display: grid;
+    min-width: 0;
+    min-height: 0;
 }
 
 .resource-instance-multiselect-widget .p-multiselect-chip {
-    display: grid !important;
-    grid-template-columns: 1fr auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    min-width: 0;
+    min-height: 0;
 }
 
-.resource-instance-multiselect-widget .p-chip-label {
-    max-width: min-content;
-    white-space: normal;
+a.p-chip-link:visited {
+    color: var(--view-link-color);
+}
+
+.resource-instance-multiselect-widget .p-multiselect-chip .pi {
+    margin: 0 0.5rem;
+}
+
+.p-chip {
+    overflow: hidden;
+    min-width: 0;
+    min-height: 0;
+}
+
+.p-multiselect-chip .p-chip-button {
+    text-decoration: none;
+}
+
+.p-multiselect-option span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.p-chip-label {
+    overflow: hidden;
+    word-wrap: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
+    max-width: 100%;
 }
 </style>
 
@@ -232,6 +269,7 @@ function validate(e: FormFieldResolverOptions) {
 .p-multiselect-overlay .p-checkbox {
     pointer-events: none;
 }
+
 .p-multiselect-overlay .p-multiselect-header .p-checkbox {
     pointer-events: all;
 }
