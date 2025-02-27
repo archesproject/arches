@@ -8,11 +8,14 @@ const props = defineProps<{
 }>();
 </script>
 <template>
-    <span>
+    <div
+        v-for="resourceInstance in props.value"
+        :key="resourceInstance.resourceId"
+    >
         <a
-            :href="`${arches.urls.resource_editor}${props.value?.[0].resourceId}`"
+            :href="`${arches.urls.resource_editor}${resourceInstance.resourceId}`"
         >
-            {{ props.value?.[0].display_value }}
+            {{ resourceInstance.display_value }}
         </a>
-    </span>
+    </div>
 </template>
