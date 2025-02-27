@@ -3,8 +3,8 @@ import arches from "arches";
 import type { ResourceInstanceReference } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
-    value?: ResourceInstanceReference[];
-    configuration: any;
+    value?: ResourceInstanceReference[] | undefined;
+    configuration: unknown;
 }>();
 </script>
 <template>
