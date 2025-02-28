@@ -31,7 +31,7 @@ const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidget config
 
-const options = ref<ResourceInstanceReference[]>(props.initialValue || []);
+const options = ref<ResourceInstanceReference[]>([]);
 const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
@@ -64,6 +64,8 @@ watch(
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
+onMounted(async () => { await getOptions(1) });
+
 function clearOptions() {
     options.value = props.initialValue || [];
 }
@@ -82,7 +84,9 @@ async function getOptions(page: number, filterTerm?: string) {
             props.nodeAlias,
             page,
             filterTerm,
+            props.initialValue
         );
+        console.log(resourceData);
 
         const references = resourceData.data.map(
             (
@@ -184,9 +188,8 @@ function getOption(value: string): ResourceInstanceReference | undefined {
         ref="formFieldRef"
         v-slot="$field"
         :name="props.nodeAlias"
-        :initial-value="
-            props.initialValue?.map((resource) => resource.resourceId)
-        "
+        :initial-value="props.initialValue?.map((resource) => resource.resourceId)
+            "
         :resolver="resolver"
     >
         <MultiSelect
@@ -213,7 +216,7 @@ function getOption(value: string): ResourceInstanceReference | undefined {
         >
             <template
                 #chip="//@ts-expect-error - This is a bug in the PrimeVue types
-                { value, removeCallback }"
+                    { value, removeCallback }"
             >
                 <div class="p-multiselect-chip">
                     <span class="p-chip-label">
@@ -226,6 +229,7 @@ function getOption(value: string): ResourceInstanceReference | undefined {
                         variant="text"
                         as="a"
                         class="p-chip-button"
+                        @click.stop="() => { }"
                     ></Button>
                     <Button
                         icon="pi pi-times-circle"
