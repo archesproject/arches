@@ -51,10 +51,7 @@ onMounted(async () => {
             />
         </div>
         <div v-if="mode === VIEW">
-            <ReferenceSelectWidgetViewer
-                :value="initialValue"
-                :configuration="configuration"
-            />
+            <ReferenceSelectWidgetViewer :value="initialValue" />
         </div>
     </template>
 </template>

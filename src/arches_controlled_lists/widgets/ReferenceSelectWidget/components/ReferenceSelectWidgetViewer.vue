@@ -3,7 +3,6 @@ import type { ControlledListItem } from "@/arches_controlled_lists/types.ts";
 
 defineProps<{
     value: ControlledListItem[] | undefined;
-    configuration: unknown;
 }>();
 </script>
 
