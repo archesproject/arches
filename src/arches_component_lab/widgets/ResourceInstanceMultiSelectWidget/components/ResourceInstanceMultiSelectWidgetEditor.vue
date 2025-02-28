@@ -53,7 +53,7 @@ watch(
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
-async function getOptions(page: number) {
+async function getOptions(page: number, searchTerm: string) {
     try {
         isLoading.value = true;
 
@@ -61,6 +61,7 @@ async function getOptions(page: number) {
             props.graphSlug,
             props.nodeAlias,
             page,
+            searchTerm || "",
         );
 
         const references = resourceData.data.map(
@@ -73,8 +74,11 @@ async function getOptions(page: number) {
                 inverseOntologyProperty: "",
             }),
         );
-
-        options.value = [...options.value, ...references];
+        if (page === 1) {
+            options.value = references;
+        } else {
+            options.value = [...options.value, ...references];
+        }
 
         resourceResultsPage.value = resourceData.current_page;
         resourceResultsTotalCount.value = resourceData.total_results;
@@ -83,6 +87,10 @@ async function getOptions(page: number) {
     } finally {
         isLoading.value = false;
     }
+}
+
+function refreshOptions() {
+    options.value = [];
 }
 
 async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
@@ -129,6 +137,13 @@ function resolver(e: FormFieldResolverOptions) {
     });
 }
 
+function onFiltered(
+    event: Event,
+) {
+    refreshOptions();
+    getOptions(1, event.value);
+}
+
 function validate(e: FormFieldResolverOptions) {
     console.log("validate", e);
     // API call to validate the input
@@ -167,6 +182,7 @@ function validate(e: FormFieldResolverOptions) {
             display="chip"
             option-label="display_value"
             option-value="resourceId"
+            :filter="true"
             :fluid="true"
             :loading="isLoading"
             :options
@@ -178,6 +194,7 @@ function validate(e: FormFieldResolverOptions) {
                 onLazyLoad: onLazyLoadResources,
             }"
             @before-show="onLazyLoadResources"
+            @filter="onFiltered"
         />
         <Message
             v-for="error in $field.errors"

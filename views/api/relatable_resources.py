@@ -18,6 +18,7 @@ class RelatableResourcesView(View):
             graph__publication__isnull=False,
         )
         page_number = request.GET.get("page", 1)
+        term = request.GET.get("term", None)
         items_per_page = request.GET.get("items", 25)
 
         config = JSONDeserializer().deserialize(node.config.value)
@@ -30,6 +31,10 @@ class RelatableResourcesView(View):
         resources = ResourceInstance.objects.filter(graph_id__in=graphs).order_by(
             "descriptors__{}__name".format(get_language())
         )
+        if term:
+            resources = resources.filter(
+                descriptors__en__name__icontains=term
+            )
 
         paginator = Paginator(resources, items_per_page)
         page_object = paginator.get_page(page_number)
