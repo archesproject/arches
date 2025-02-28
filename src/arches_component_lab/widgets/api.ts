@@ -40,13 +40,15 @@ export const fetchRelatableResources = async (
     graphSlug: string,
     nodeAlias: string,
     page: number,
-    searchTerm: string,
+    filterTerm?: string,
 ) => {
     const params = new URLSearchParams();
-    params.append("page", page.toString())
-    if (searchTerm) {
-        params.append("term", searchTerm)
-    };
+
+    params.append("page", page.toString());
+    if (filterTerm) {
+        params.append("filter_term", filterTerm);
+    }
+
     const response = await fetch(
         `${arches.urls.api_relatable_resources(
             graphSlug,

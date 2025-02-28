@@ -18,7 +18,7 @@ class RelatableResourcesView(View):
             graph__publication__isnull=False,
         )
         page_number = request.GET.get("page", 1)
-        term = request.GET.get("term", None)
+        filter_term = request.GET.get("filter_term", None)
         items_per_page = request.GET.get("items", 25)
         language = get_language()
 
@@ -32,9 +32,11 @@ class RelatableResourcesView(View):
         resources = ResourceInstance.objects.filter(graph_id__in=graphs).order_by(
             "descriptors__{}__name".format(language)
         )
-        query_string = 'descriptors__{}__name__icontains'.format(language)
-        if term:
-            resources = resources.filter(**{query_string: term})
+
+        query_string = "descriptors__{}__name__icontains".format(language)
+
+        if filter_term:
+            resources = resources.filter(**{query_string: filter_term})
 
         paginator = Paginator(resources, items_per_page)
         page_object = paginator.get_page(page_number)
