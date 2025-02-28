@@ -52,10 +52,7 @@ onMounted(async () => {
             />
         </div>
         <div v-if="mode === VIEW">
-            <ResourceInstanceMultiSelectWidgetViewer
-                :value="initialValue"
-                :configuration="configuration"
-            />
+            <ResourceInstanceMultiSelectWidgetViewer :value="initialValue" />
         </div>
     </template>
 </template>
