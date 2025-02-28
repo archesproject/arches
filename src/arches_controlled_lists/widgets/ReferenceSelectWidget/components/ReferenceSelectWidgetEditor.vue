@@ -61,16 +61,17 @@ async function getOptions() {
     }
 }
 
-let timeout: ReturnType<typeof setTimeout>;
+// let timeout: ReturnType<typeof setTimeout>;
 
 function resolver(e: FormFieldResolverOptions) {
-    return new Promise((resolve) => {
-        if (timeout) clearTimeout(timeout);
+    validate(e);
+    // return new Promise((resolve) => {
+    //     if (timeout) clearTimeout(timeout);
 
-        timeout = setTimeout(() => {
-            resolve(validate(e));
-        }, 500);
-    });
+    //     timeout = setTimeout(() => {
+    //         resolve(validate(e));
+    //     }, 500);
+    // });
 }
 
 function validate(e: FormFieldResolverOptions) {
