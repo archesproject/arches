@@ -38,20 +38,21 @@ watch(
     },
 );
 
-let timeout: ReturnType<typeof setTimeout>;
+// let timeout: ReturnType<typeof setTimeout>;
 
 function resolver(e: FormFieldResolverOptions) {
-    return new Promise((resolve) => {
-        if (timeout) clearTimeout(timeout);
+    validate(e);
+    // return new Promise((resolve) => {
+    //     if (timeout) clearTimeout(timeout);
 
-        timeout = setTimeout(() => {
-            resolve(validate(e));
-        }, 500);
-    });
+    //     timeout = setTimeout(() => {
+    //         resolve(validate(e));
+    //     }, 500);
+    // });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function validate(e: FormFieldResolverOptions) {
+    console.log("validate", e);
     // API call to validate the input
     // if (true) {
     //     return {};
