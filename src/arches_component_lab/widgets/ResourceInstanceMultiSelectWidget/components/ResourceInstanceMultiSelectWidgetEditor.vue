@@ -5,7 +5,7 @@ import { useGettext } from "vue3-gettext";
 
 import { FormField } from "@primevue/forms";
 import Message from "primevue/message";
-import MultiSelect from "primevue/multiselect";
+import MultiSelect, { type MultiSelectFilterEvent } from "primevue/multiselect";
 
 import { fetchRelatableResources } from "@/arches_component_lab/widgets/api.ts";
 
@@ -40,12 +40,15 @@ watch(
     () => formFieldRef.value?.field?.states?.value,
     (newVal) => {
         if (
+            Array.isArray(newVal) &&
             newVal.length &&
             newVal.every((item: string | object) => typeof item === "string")
         ) {
             // @ts-expect-error - This is a bug in the PrimeVue types
             formFieldRef.value!.field.states.value = options.value.filter(
-                (option) => newVal?.includes(option.resourceId),
+                (option) => {
+                    return newVal?.includes(option.resourceId);
+                },
             );
         }
     },
@@ -53,7 +56,16 @@ watch(
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
-async function getOptions(page: number) {
+function clearOptions() {
+    options.value = props.initialValue || [];
+}
+
+function onFilter(event: MultiSelectFilterEvent) {
+    clearOptions();
+    getOptions(1, event.value);
+}
+
+async function getOptions(page: number, filterTerm?: string) {
     try {
         isLoading.value = true;
 
@@ -61,6 +73,7 @@ async function getOptions(page: number) {
             props.graphSlug,
             props.nodeAlias,
             page,
+            filterTerm,
         );
 
         const references = resourceData.data.map(
@@ -168,17 +181,22 @@ function validate(e: FormFieldResolverOptions) {
             display="chip"
             option-label="display_value"
             option-value="resourceId"
+            :filter="true"
+            :filter-placeholder="$gettext('Filter Resources')"
             :fluid="true"
             :loading="isLoading"
             :options
             :placeholder="$gettext('Select Resources')"
+            :reset-filter-on-hide="true"
             :virtual-scroller-options="{
                 itemSize: itemSize,
                 lazy: true,
                 loading: isLoading,
                 onLazyLoad: onLazyLoadResources,
             }"
-            @before-show="onLazyLoadResources"
+            @before-show="getOptions(1)"
+            @hide="clearOptions"
+            @filter="onFilter"
         />
         <Message
             v-for="error in $field.errors"
