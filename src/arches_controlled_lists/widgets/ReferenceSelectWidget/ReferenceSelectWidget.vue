@@ -12,13 +12,18 @@ import { EDIT, VIEW } from "@/arches_controlled_lists/widgets/constants.ts";
 import type { WidgetMode } from "@/arches_controlled_lists/widgets/types.ts";
 import type { ControlledListItem } from "@/arches_controlled_lists/types.ts";
 
-const props = defineProps<{
-    mode: WidgetMode;
-    initialValue: ControlledListItem[] | undefined;
-    nodeAlias: string;
-    graphSlug: string;
-    hideLabel?: boolean;
-}>();
+const props = withDefaults(
+    defineProps<{
+        mode: WidgetMode;
+        initialValue: ControlledListItem[] | undefined;
+        nodeAlias: string;
+        graphSlug: string;
+        showLabel?: boolean;
+    }>(),
+    {
+        showLabel: true,
+    },
+);
 
 const isLoading = ref(true);
 const configuration = ref();
@@ -40,7 +45,7 @@ onMounted(async () => {
     />
 
     <template v-else>
-        <label v-if="!hideLabel">{{ configuration.label }}</label>
+        <label v-if="props.showLabel">{{ configuration.label }}</label>
 
         <div v-if="mode === EDIT">
             <ReferenceSelectWidgetEditor
