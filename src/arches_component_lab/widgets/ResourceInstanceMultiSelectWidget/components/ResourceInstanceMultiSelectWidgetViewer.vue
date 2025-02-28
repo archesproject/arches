@@ -4,7 +4,6 @@ import type { ResourceInstanceReference } from "@/arches_component_lab/widgets/t
 
 const props = defineProps<{
     value?: ResourceInstanceReference[] | undefined;
-    configuration: unknown;
 }>();
 </script>
 <template>

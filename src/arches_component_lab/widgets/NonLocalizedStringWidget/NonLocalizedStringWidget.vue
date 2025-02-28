@@ -11,13 +11,18 @@ import { fetchWidgetConfiguration } from "@/arches_component_lab/widgets/api.ts"
 
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const props = defineProps<{
-    graphSlug: string;
-    nodeAlias: string;
-    initialValue: string | undefined;
-    mode: WidgetMode;
-    hideLabel?: boolean;
-}>();
+const props = withDefaults(
+    defineProps<{
+        mode: WidgetMode;
+        initialValue: string | undefined;
+        nodeAlias: string;
+        graphSlug: string;
+        showLabel?: boolean;
+    }>(),
+    {
+        showLabel: true,
+    },
+);
 
 const isLoading = ref(true);
 const configuration = ref();
@@ -38,7 +43,7 @@ onMounted(async () => {
         style="width: 2em; height: 2em"
     />
     <template v-else>
-        <label v-if="!props.hideLabel">{{ configuration.label }}</label>
+        <label v-if="props.showLabel">{{ configuration.label }}</label>
 
         <NonLocalizedStringWidgetEditor
             v-if="props.mode === EDIT"
