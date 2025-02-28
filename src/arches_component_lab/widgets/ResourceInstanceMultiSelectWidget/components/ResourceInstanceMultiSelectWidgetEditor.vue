@@ -195,7 +195,6 @@ function validate(e: FormFieldResolverOptions) {
                 onLazyLoad: onLazyLoadResources,
             }"
             @before-show="getOptions(1)"
-            @hide="clearOptions"
             @filter="onFilter"
         />
         <Message
