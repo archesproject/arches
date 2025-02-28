@@ -665,8 +665,11 @@ class Command(BaseCommand):
 
     @staticmethod
     def update_resource_geojson_geometries():
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM refresh_geojson_geometries();")
+        if not connection.in_atomic_block:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT * FROM refresh_geojson_geometries();")
+        else:
+            print("WARNING: Not refreshing geometries - transaction active")
 
     def load_package(
         self,
