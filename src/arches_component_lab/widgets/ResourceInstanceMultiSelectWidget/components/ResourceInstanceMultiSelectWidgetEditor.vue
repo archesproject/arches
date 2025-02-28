@@ -40,7 +40,7 @@ watch(
     () => formFieldRef.value?.field?.states?.value,
     (newVal) => {
         if (
-            newVal.length &&
+            newVal && newVal.length &&
             newVal.every((item: string | object) => typeof item === "string")
         ) {
             // @ts-expect-error - This is a bug in the PrimeVue types
@@ -53,7 +53,7 @@ watch(
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
-async function getOptions(page: number, searchTerm: string) {
+async function getOptions(page: number, searchTerm: string = "") {
     try {
         isLoading.value = true;
 
@@ -61,7 +61,7 @@ async function getOptions(page: number, searchTerm: string) {
             props.graphSlug,
             props.nodeAlias,
             page,
-            searchTerm || "",
+            searchTerm,
         );
 
         const references = resourceData.data.map(
@@ -87,10 +87,6 @@ async function getOptions(page: number, searchTerm: string) {
     } finally {
         isLoading.value = false;
     }
-}
-
-function refreshOptions() {
-    options.value = [];
 }
 
 async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
@@ -138,10 +134,9 @@ function resolver(e: FormFieldResolverOptions) {
     // });
 }
 
-function onFiltered(
+function filterOptions(
     event: Event,
 ) {
-    refreshOptions();
     getOptions(1, event.value);
 }
 
@@ -195,7 +190,7 @@ function validate(e: FormFieldResolverOptions) {
                 onLazyLoad: onLazyLoadResources,
             }"
             @before-show="onLazyLoadResources"
-            @filter="onFiltered"
+            @filter="filterOptions"
         />
         <Message
             v-for="error in $field.errors"
