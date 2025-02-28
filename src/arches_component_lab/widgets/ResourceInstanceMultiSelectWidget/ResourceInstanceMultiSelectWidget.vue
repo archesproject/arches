@@ -14,12 +14,18 @@ import type {
     WidgetMode,
 } from "@/arches_component_lab/widgets/types.ts";
 
-const props = defineProps<{
-    mode: WidgetMode;
-    initialValue: ResourceInstanceReference[] | undefined;
-    nodeAlias: string;
-    graphSlug: string;
-}>();
+const props = withDefaults(
+    defineProps<{
+        mode: WidgetMode;
+        initialValue: ResourceInstanceReference[] | undefined;
+        nodeAlias: string;
+        graphSlug: string;
+        showLabel?: boolean;
+    }>(),
+    {
+        showLabel: true,
+    },
+);
 
 const isLoading = ref(true);
 const configuration = ref();
@@ -41,7 +47,7 @@ onMounted(async () => {
     />
 
     <template v-else>
-        <label>{{ configuration.label }}</label>
+        <label v-if="props.showLabel">{{ configuration.label }}</label>
 
         <div v-if="mode === EDIT">
             <ResourceInstanceMultiSelectWidgetEditor

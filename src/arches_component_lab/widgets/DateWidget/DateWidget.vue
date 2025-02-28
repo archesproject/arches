@@ -13,12 +13,18 @@ import { convertISO8601DatetimeFormatToPrimevueDatetimeFormat } from "@/arches_c
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
-const props = defineProps<{
-    graphSlug: string;
-    nodeAlias: string;
-    initialValue: string | undefined;
-    mode: WidgetMode;
-}>();
+const props = withDefaults(
+    defineProps<{
+        mode: WidgetMode;
+        initialValue: string | undefined;
+        nodeAlias: string;
+        graphSlug: string;
+        showLabel?: boolean;
+    }>(),
+    {
+        showLabel: true,
+    },
+);
 
 const isLoading = ref(true);
 const configuration = ref();
@@ -48,7 +54,7 @@ onMounted(async () => {
     />
 
     <template v-else>
-        <label>{{ configuration.label }}</label>
+        <label v-if="props.showLabel">{{ configuration.label }}</label>
 
         <DateWidgetEditor
             v-if="props.mode === EDIT"
