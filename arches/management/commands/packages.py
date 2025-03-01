@@ -862,7 +862,7 @@ class Command(BaseCommand):
             collection_data = []
             for file_type in file_types:
                 collection_data.extend(
-                glob.glob(
+                    glob.glob(
                         os.path.join(
                             package_dir, "reference_data", "collections", file_type
                         )
