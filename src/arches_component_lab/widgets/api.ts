@@ -19,6 +19,25 @@ export const fetchWidgetConfiguration = async (
     }
 };
 
+export const fetchNodeConfiguration = async (
+    graphSlug: string,
+    nodeAlias: string,
+) => {
+    const response = await fetch(
+        arches.urls.api_node_configuration(graphSlug, nodeAlias),
+    );
+
+    try {
+        const parsed = await response.json();
+        if (response.ok) {
+            return parsed;
+        }
+        throw new Error(parsed.message);
+    } catch (error) {
+        throw new Error((error as Error).message || response.statusText);
+    }
+};
+
 export const fetchLists = async (
     nodeAliases: string[] | undefined = undefined,
 ) => {
