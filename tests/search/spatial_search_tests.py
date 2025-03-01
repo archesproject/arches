@@ -180,5 +180,11 @@ class SpatialSearchTests(ArchesTestCase):
                 ],
             }
             query = {"map-filter": spatial_filter}
-            response_json = get_response_json(self.client, query=query)
+            with (
+                self.assertLogs(
+                    "arches.app.search.components.standard_search_view", level="ERROR"
+                ),
+                self.assertLogs("django.request", level="ERROR"),
+            ):
+                response_json = get_response_json(self.client, query=query)
             self.assertFalse(response_json["success"])
