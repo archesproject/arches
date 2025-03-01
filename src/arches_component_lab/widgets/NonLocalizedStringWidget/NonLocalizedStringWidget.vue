@@ -7,7 +7,7 @@ import NonLocalizedStringWidgetEditor from "@/arches_component_lab/widgets/NonLo
 import NonLocalizedStringWidgetViewer from "@/arches_component_lab/widgets/NonLocalizedStringWidget/components/NonLocalizedStringWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
-import { fetchWidgetConfiguration } from "@/arches_component_lab/widgets/api.ts";
+import { fetchWidgetConfiguration, fetchNodeConfiguration } from "@/arches_component_lab/widgets/api.ts";
 
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
@@ -28,10 +28,20 @@ const isLoading = ref(true);
 const configuration = ref();
 
 onMounted(async () => {
-    configuration.value = await fetchWidgetConfiguration(
+    const widgetConfiguration = await fetchWidgetConfiguration(
         props.graphSlug,
         props.nodeAlias,
     );
+
+    const nodeConfiguration = await fetchNodeConfiguration(
+        props.graphSlug,
+        props.nodeAlias,
+    );
+
+    configuration.value = {
+        ...nodeConfiguration,
+        ...widgetConfiguration,
+    };
 
     isLoading.value = false;
 });

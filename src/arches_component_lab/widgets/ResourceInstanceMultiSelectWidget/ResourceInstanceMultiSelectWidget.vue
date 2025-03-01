@@ -6,7 +6,7 @@ import ProgressSpinner from "primevue/progressspinner";
 import ResourceInstanceMultiSelectWidgetEditor from "@/arches_component_lab/widgets/ResourceInstanceMultiSelectWidget/components/ResourceInstanceMultiSelectWidgetEditor.vue";
 import ResourceInstanceMultiSelectWidgetViewer from "@/arches_component_lab/widgets/ResourceInstanceMultiSelectWidget/components/ResourceInstanceMultiSelectWidgetViewer.vue";
 
-import { fetchWidgetConfiguration } from "@/arches_component_lab/widgets/api.ts";
+import { fetchWidgetConfiguration, fetchNodeConfiguration } from "@/arches_component_lab/widgets/api.ts";
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type {
@@ -31,10 +31,20 @@ const isLoading = ref(true);
 const configuration = ref();
 
 onMounted(async () => {
-    configuration.value = await fetchWidgetConfiguration(
+    const widgetConfiguration = await fetchWidgetConfiguration(
         props.graphSlug,
         props.nodeAlias,
     );
+
+    const nodeConfiguration = await fetchNodeConfiguration(
+        props.graphSlug,
+        props.nodeAlias,
+    );
+
+    configuration.value = {
+        ...nodeConfiguration,
+        ...widgetConfiguration,
+    };
 
     isLoading.value = false;
 });
