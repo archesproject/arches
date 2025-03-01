@@ -669,7 +669,7 @@ class Command(BaseCommand):
             with connection.cursor() as cursor:
                 cursor.execute("SELECT * FROM refresh_geojson_geometries();")
         else:
-            print("WARNING: Not refreshing geometries - transaction active")
+            self.stdout.write("WARNING: Not refreshing geometries - transaction active")
 
     def load_package(
         self,
@@ -862,7 +862,7 @@ class Command(BaseCommand):
             collection_data = []
             for file_type in file_types:
                 collection_data.extend(
-                    glob.glob(
+                glob.glob(
                         os.path.join(
                             package_dir, "reference_data", "collections", file_type
                         )

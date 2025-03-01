@@ -145,9 +145,6 @@ class ArchesTestCase(TestCase):
 
         with (
             captured_stdout(),
-            mock.patch(
-                "arches.management.commands.packages.Command.update_resource_geojson_geometries"
-            ),
         ):
             management.call_command(
                 "packages",
