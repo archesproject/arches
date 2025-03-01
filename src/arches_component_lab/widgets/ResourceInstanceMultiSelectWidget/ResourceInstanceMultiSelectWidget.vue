@@ -28,6 +28,7 @@ const props = withDefaults(
 );
 
 const isLoading = ref(true);
+const isRequired = ref(false);
 const configuration = ref();
 
 onMounted(async () => {
@@ -58,6 +59,7 @@ onMounted(async () => {
 
     <template v-else>
         <label v-if="props.showLabel">{{ configuration.label }}</label>
+        <span v-if="configuration.isRequired">*</span>
 
         <div v-if="mode === EDIT">
             <ResourceInstanceMultiSelectWidgetEditor

@@ -54,6 +54,7 @@ onMounted(async () => {
     />
     <template v-else>
         <label v-if="props.showLabel">{{ configuration.label }}</label>
+        <span v-if="configuration.isRequired">*</span>
 
         <NonLocalizedStringWidgetEditor
             v-if="props.mode === EDIT"
