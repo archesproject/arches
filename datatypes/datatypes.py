@@ -1,7 +1,6 @@
 import uuid
 from dataclasses import asdict, dataclass
 
-from django.db.models.fields.json import JSONField
 from django.utils.translation import get_language, gettext as _
 
 from arches.app.datatypes.base import BaseDataType
@@ -28,8 +27,6 @@ class Reference:
 
 
 class ReferenceDataType(BaseDataType):
-    rest_framework_model_field = JSONField(null=True)
-
     def to_python(self, value):
         if value is None:
             return None
