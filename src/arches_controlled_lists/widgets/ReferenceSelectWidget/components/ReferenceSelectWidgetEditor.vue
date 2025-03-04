@@ -23,7 +23,7 @@ const props = defineProps<{
     graphSlug: string;
 }>();
 
-const options = ref<ReferenceOptionValue[]>(props.initialValue || []);
+const options = ref<ReferenceSelectTreeNode[]>();
 const isLoading = ref(false);
 const optionsError = ref<string | null>(null);
 
@@ -37,8 +37,8 @@ watch(
         if (typeof newVal === "string") {
             // @ts-expect-error - This is a bug in the PrimeVue types
             formFieldRef.value!.field.states.value = [
-                options.value.find(
-                    (option: ReferenceOptionValue) => option.uri === newVal,
+                options.value?.find(
+                    (option: ReferenceSelectTreeNode) => option.uri === newVal,
                 ),
             ];
         }

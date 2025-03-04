@@ -228,7 +228,6 @@ class ListItem(models.Model):
             reverse=True,
         )
         data = {
-            # "list_id": str(self.list_id),
             "list_item_id": str(self.id),
             "uri": self.uri,
             "list_item_values": [label.serialize() for label in labels],
