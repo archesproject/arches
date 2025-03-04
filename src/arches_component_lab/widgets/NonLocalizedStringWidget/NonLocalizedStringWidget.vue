@@ -7,7 +7,10 @@ import NonLocalizedStringWidgetEditor from "@/arches_component_lab/widgets/NonLo
 import NonLocalizedStringWidgetViewer from "@/arches_component_lab/widgets/NonLocalizedStringWidget/components/NonLocalizedStringWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
-import { fetchWidgetConfiguration, fetchNodeConfiguration } from "@/arches_component_lab/widgets/api.ts";
+import {
+    fetchWidgetConfiguration,
+    fetchNodeConfiguration,
+} from "@/arches_component_lab/widgets/api.ts";
 
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 

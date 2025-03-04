@@ -6,7 +6,10 @@ import ProgressSpinner from "primevue/progressspinner";
 import ResourceInstanceMultiSelectWidgetEditor from "@/arches_component_lab/widgets/ResourceInstanceMultiSelectWidget/components/ResourceInstanceMultiSelectWidgetEditor.vue";
 import ResourceInstanceMultiSelectWidgetViewer from "@/arches_component_lab/widgets/ResourceInstanceMultiSelectWidget/components/ResourceInstanceMultiSelectWidgetViewer.vue";
 
-import { fetchWidgetConfiguration, fetchNodeConfiguration } from "@/arches_component_lab/widgets/api.ts";
+import {
+    fetchWidgetConfiguration,
+    fetchNodeConfiguration,
+} from "@/arches_component_lab/widgets/api.ts";
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type {

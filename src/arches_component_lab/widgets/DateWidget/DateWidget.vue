@@ -7,7 +7,10 @@ import ProgressSpinner from "primevue/progressspinner";
 import DateWidgetEditor from "@/arches_component_lab/widgets/DateWidget/components/DateWidgetEditor.vue";
 import DateWidgetViewer from "@/arches_component_lab/widgets/DateWidget/components/DateWidgetViewer.vue";
 
-import { fetchWidgetConfiguration, fetchNodeConfiguration } from "@/arches_component_lab/widgets/api.ts";
+import {
+    fetchWidgetConfiguration,
+    fetchNodeConfiguration,
+} from "@/arches_component_lab/widgets/api.ts";
 import { convertISO8601DatetimeFormatToPrimevueDatetimeFormat } from "@/arches_component_lab/widgets/utils.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
