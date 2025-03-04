@@ -363,12 +363,14 @@ class CommandLineTests(ArchesTestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-    def test_resource_report_bad(self):
+    def test_resource_report_for_missing_resource(self):
         self.client.login(username="admin", password="admin")
         resource = Resource.objects.get(resourceinstanceid=self.resource_instance_id)
         resource.delete()
-        url = reverse(
-            "resource_report", kwargs={"resourceid": self.resource_instance_id}
-        )
-        response = self.client.get(url)
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.get(
+                reverse(
+                    "resource_report", kwargs={"resourceid": self.resource_instance_id}
+                )
+            )
         self.assertEqual(response.status_code, 404)
