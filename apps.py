@@ -6,6 +6,7 @@ from arches.settings_utils import generate_frontend_configuration
 
 class ArchesQuerysetsConfig(AppConfig):
     name = "arches_querysets"
+    verbose_name = "Arches Querysets"
     is_arches_application = True
 
     def ready(self):
