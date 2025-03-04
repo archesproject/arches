@@ -136,7 +136,7 @@ class SearchTests(ArchesTestCase):
         count_after = se.count(index="bulk")
         self.assertEqual(count_after, 1001)
 
-    def test_search_terms(self):
+    def test_search_terms_unpermitted_user(self):
         """
         Test finding a resource by a term
 
@@ -173,7 +173,7 @@ class SearchTests(ArchesTestCase):
             result = json.loads(response.content)
         except json.decoder.JSONDecodeError:
             print("Failed to parse search result")
-        self.assertTrue("terms" in result and len(result["terms"]) == 1)
+        self.assertTrue("terms" in result and len(result["terms"]) == 0)
 
     def test_adv_search_on_non_null_geom_node(self):
         geojson_nodeid = "be25bdf0-c8bf-11ed-a172-0242ac130009"
