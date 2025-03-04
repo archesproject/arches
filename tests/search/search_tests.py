@@ -180,7 +180,7 @@ class SearchTests(ArchesTestCase):
         Test search terms method with a permitted user
 
         """
-        admin_user = User.objects.get(username="admin", password="admin")
+        admin_user = User.objects.get(username="admin")
         nodeid = "c9b37b7c-17b3-11eb-a708-acde48001122"
         tileid = "bebffbea-daf6-414e-80c2-530ec88d2705"
         resourceinstanceid = "745f5e4a-d645-4c50-bafc-c677ea95f060"
