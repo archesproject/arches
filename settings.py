@@ -135,7 +135,7 @@ INSTALLED_APPS = (
     "arches.app.models",
     "arches.management",
     "guardian",
-    "captcha",
+    # "captcha",  restore after dropping 7.6 support
     "revproxy",
     "corsheaders",
     "oauth2_provider",
