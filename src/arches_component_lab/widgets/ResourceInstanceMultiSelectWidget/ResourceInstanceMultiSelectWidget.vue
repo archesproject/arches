@@ -28,7 +28,6 @@ const props = withDefaults(
 );
 
 const isLoading = ref(true);
-const isRequired = ref(false);
 const configuration = ref();
 
 onMounted(async () => {
