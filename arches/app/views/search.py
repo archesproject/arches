@@ -157,6 +157,9 @@ def search_terms(request):
     for index in ["terms", "concepts"]:
         query = Query(se, start=0, limit=0)
         boolquery = Bool()
+        boolquery.filter(
+            Terms(field="nodegroupid", terms=[str(ng) for ng in permitted_nodegroups])
+        )
 
         if lang != "*":
             boolquery.must(Term(field="language", term=lang))
