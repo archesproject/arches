@@ -245,7 +245,7 @@ def search_terms(request):
                                     "nodegroupid": ng["key"],
                                 }
                             )
-                            i = i + 1
+                            i += 1
 
     return JSONResponse(ret)
 
