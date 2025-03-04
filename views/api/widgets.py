@@ -6,11 +6,10 @@ from django.views.generic import View
 from arches.app.models import models
 from arches.app.utils.response import JSONResponse
 
+
 def update_i18n_properties(response):
     user_language = translation.get_language()
-    if "i18n_properties" in response and isinstance(
-        response["i18n_properties"], list
-    ):
+    if "i18n_properties" in response and isinstance(response["i18n_properties"], list):
         for prop in response["i18n_properties"]:
             if (
                 prop in response
@@ -34,6 +33,7 @@ class WidgetConfigurationView(View):
         response = update_i18n_properties(card_x_node_x_widget_config)
 
         return JSONResponse(response)
+
 
 class NodeConfigurationView(View):
     def get(self, request, graph_slug, node_alias):
