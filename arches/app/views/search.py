@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import logging
 import os
-import uuid
 
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.cache import cache
@@ -158,7 +157,10 @@ def search_terms(request):
         query = Query(se, start=0, limit=0)
         boolquery = Bool()
         boolquery.filter(
-            Terms(field="nodegroupid", terms=[str(ng) for ng in permitted_nodegroups])
+            Terms(
+                field="tiles.nodegroup_id",
+                terms=[str(ng) for ng in permitted_nodegroups],
+            )
         )
 
         if lang != "*":
@@ -236,19 +238,18 @@ def search_terms(request):
                         i = i + 1
                 else:
                     for ng in result["nodegroupid"]["buckets"]:
-                        if uuid.UUID(ng["key"]) in permitted_nodegroups:
-                            ret[index].append(
-                                {
-                                    "type": "term",
-                                    "context": "",
-                                    "context_label": get_resource_model_label(ng),
-                                    "id": i,
-                                    "text": result["key"],
-                                    "value": result["key"],
-                                    "nodegroupid": ng["key"],
-                                }
-                            )
-                            i += 1
+                        ret[index].append(
+                            {
+                                "type": "term",
+                                "context": "",
+                                "context_label": get_resource_model_label(ng),
+                                "id": i,
+                                "text": result["key"],
+                                "value": result["key"],
+                                "nodegroupid": ng["key"],
+                            }
+                        )
+                        i += 1
 
     return JSONResponse(ret)
 
