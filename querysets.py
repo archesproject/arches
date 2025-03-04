@@ -126,16 +126,34 @@ class TileQuerySet(models.QuerySet):
                 if node.nodegroup_id == tile.nodegroup_id:
                     tile_val = getattr(tile, node.alias, NOT_PROVIDED)
                     if tile_val is not NOT_PROVIDED:
+                        # TOOD: move, once dust settles.
                         datatype_instance = datatype_factory.get_instance(node.datatype)
                         dummy_tile = TileModel(
                             data={str(node.pk): tile_val},
                             provisionaledits=tile.provisionaledits,
                         )
-                        datatype_instance.to_json(dummy_tile, node)
+                        try:
+                            datatype_instance.to_json(dummy_tile, node)
+                        except TypeError:  # StringDataType workaround.
+                            dummy_tile.data[str(node.pk)] = {}
+                            datatype_instance.to_json(dummy_tile, node)
                         if self._as_representation:
-                            instance_val = datatype_instance.to_representation(tile_val)
+                            if repr_fn := getattr(
+                                datatype_instance, "to_representation", None
+                            ):
+                                instance_val = repr_fn(tile_val)
+                            else:
+                                instance_val = tile_val
                         else:
-                            instance_val = datatype_instance.to_python(tile_val)
+                            if py_fn := getattr(datatype_instance, "to_python", None):
+                                instance_val = py_fn(tile_val)
+                            elif node.datatype == "resource-instance":
+                                # TODO: move, once dust settles.
+                                if tile_val is None or len(tile_val) != 1:
+                                    return tile_val
+                                return tile_val[0]
+                            else:
+                                instance_val = tile_val
                         setattr(tile, node.alias, instance_val)
                 else:
                     delattr(tile, node.alias)
@@ -343,7 +361,8 @@ class ResourceInstanceQuerySet(models.QuerySet):
                 if annotated_tile.parenttile_id:
                     setattr(
                         annotated_tile,
-                        annotated_tile.parenttile.nodegroup_alias,
+                        # TODO: improve performance, just getting the bones in.
+                        annotated_tile.parenttile.nodegroup.grouping_node.alias,
                         annotated_tile.parenttile,
                     )
 
