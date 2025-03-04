@@ -1,8 +1,11 @@
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
-from arches_querysets.permissions import Guest, ResourceEditor
-from arches_querysets.serializers import ArchesResourceSerializer, ArchesTileSerializer
-from arches_querysets.views.api.mixins import ArchesModelAPIMixin
+from arches_querysets.rest_framework.permissions import Guest, ResourceEditor
+from arches_querysets.rest_framework.serializers import (
+    ArchesResourceSerializer,
+    ArchesTileSerializer,
+)
+from arches_querysets.rest_framework.view_mixins import ArchesModelAPIMixin
 
 
 class ArchesResourceListCreateView(ArchesModelAPIMixin, ListCreateAPIView):
