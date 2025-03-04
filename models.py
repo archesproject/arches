@@ -1,5 +1,6 @@
 from arches.app.models.models import ResourceInstance, TileModel
 
+from arches_querysets.lookups import *
 from arches_querysets.querysets import ResourceInstanceQuerySet, TileQuerySet
 
 
