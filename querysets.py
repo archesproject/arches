@@ -3,7 +3,8 @@ from django.utils.translation import gettext as _
 
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import GraphModel, NodeGroup, TileModel
-from arches.app.models.utils import (
+
+from arches_querysets.utils.models import (
     generate_tile_annotations,
     filter_nodes_by_highest_parent,
 )
