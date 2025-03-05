@@ -12,13 +12,14 @@ const props = defineProps<{
     initialValue: string | undefined;
     graphSlug: string;
     nodeAlias: string;
-    configuration: {
-        dateFormat: string;
-        label: string;
-        datePickerDisplayConfiguration: {
+    widgetData: {
+        config: {
             dateFormat: string;
-            shouldShowTime: boolean;
-        };
+            datePickerDisplayConfiguration: {
+                dateFormat: string;
+                shouldShowTime: boolean;
+            }
+        }
     };
 }>();
 
@@ -32,7 +33,7 @@ watch(
         if (newVal !== oldVal) {
             // @ts-expect-error - This is a bug in the PrimeVue types
             formFieldRef.value!.field.states.value = dayjs(newVal).format(
-                props.configuration.dateFormat,
+                props.widgetData.config.dateFormat,
             );
         }
     },
@@ -78,16 +79,16 @@ function validate(e: FormFieldResolverOptions) {
         <DatePicker
             icon-display="input"
             :date-format="
-                props.configuration.datePickerDisplayConfiguration.dateFormat
+                props.widgetData.config.datePickerDisplayConfiguration.dateFormat
             "
             :fluid="true"
             :show-icon="true"
             :show-time="
-                props.configuration.datePickerDisplayConfiguration
+                props.widgetData.config.datePickerDisplayConfiguration
                     .shouldShowTime
             "
             :show-seconds="
-                props.configuration.datePickerDisplayConfiguration
+                props.widgetData.config.datePickerDisplayConfiguration
                     .shouldShowTime
             "
             @keydown.enter.prevent

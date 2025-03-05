@@ -78,7 +78,7 @@ onMounted(async () => {
             "
             :graph-slug="props.graphSlug"
             :node-alias="props.nodeAlias"
-            :configuration="widgetData.config"
+            :widget-data="widgetData"
         />
         <DateWidgetViewer
             v-else-if="props.mode === VIEW"
@@ -86,7 +86,7 @@ onMounted(async () => {
                 props.initialValue &&
                 dayjs(props.initialValue).toDate().toString()
             "
-            :configuration="widgetData.config"
+            :widget-data="widgetData"
         />
     </template>
     <Message
