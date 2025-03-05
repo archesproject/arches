@@ -32,7 +32,11 @@ class WidgetDataView(View):
             node__source_identifier_id__isnull=True,
         ).first()
 
-        response = update_i18n_properties(JSONDeserializer().deserialize(JSONSerializer().serialize(card_x_node_x_widget)))
+        response = update_i18n_properties(
+            JSONDeserializer().deserialize(
+                JSONSerializer().serialize(card_x_node_x_widget)
+            )
+        )
 
         return JSONResponse(response)
 
@@ -43,6 +47,8 @@ class NodeDataView(View):
             graph__slug=graph_slug, alias=node_alias, source_identifier_id__isnull=True
         )
 
-        response = update_i18n_properties(JSONDeserializer().deserialize(JSONSerializer().serialize(node)))
+        response = update_i18n_properties(
+            JSONDeserializer().deserialize(JSONSerializer().serialize(node))
+        )
 
         return JSONResponse(response)
