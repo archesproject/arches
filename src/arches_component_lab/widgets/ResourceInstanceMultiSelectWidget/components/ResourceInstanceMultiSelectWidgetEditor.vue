@@ -212,7 +212,7 @@ function getOption(value: string): ResourceInstanceReference | undefined {
             @filter="onFilter"
         >
             <template
-                #chip="//@ts-expect-error - - This is a bug in the PrimeVue types
+                #chip="//@ts-expect-error - This is a bug in the PrimeVue types
                 { value, removeCallback }"
             >
                 <div class="p-multiselect-chip">
