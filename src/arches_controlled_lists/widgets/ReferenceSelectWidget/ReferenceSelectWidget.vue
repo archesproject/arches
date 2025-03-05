@@ -6,7 +6,10 @@ import ProgressSpinner from "primevue/progressspinner";
 import ReferenceSelectWidgetEditor from "@/arches_controlled_lists/widgets/ReferenceSelectWidget/components/ReferenceSelectWidgetEditor.vue";
 import ReferenceSelectWidgetViewer from "@/arches_controlled_lists/widgets/ReferenceSelectWidget/components/ReferenceSelectWidgetViewer.vue";
 
-import { fetchWidgetConfiguration } from "@/arches_component_lab/widgets/api.ts";
+import {
+    fetchWidgetData,
+    fetchNodeData,
+} from "@/arches_component_lab/widgets/api.ts";
 import { EDIT, VIEW } from "@/arches_controlled_lists/widgets/constants.ts";
 
 import type { WidgetMode } from "@/arches_controlled_lists/widgets/types.ts";
@@ -26,13 +29,12 @@ const props = withDefaults(
 );
 
 const isLoading = ref(true);
-const configuration = ref();
+const nodeData = ref();
+const widgetData = ref();
 
 onMounted(async () => {
-    configuration.value = await fetchWidgetConfiguration(
-        props.graphSlug,
-        props.nodeAlias,
-    );
+    widgetData.value = await fetchWidgetData(props.graphSlug, props.nodeAlias);
+    nodeData.value = await fetchNodeData(props.graphSlug, props.nodeAlias);
 
     isLoading.value = false;
 });
@@ -45,12 +47,15 @@ onMounted(async () => {
     />
 
     <template v-else>
-        <label v-if="props.showLabel">{{ configuration.label }}</label>
+        <label v-if="props.showLabel">
+            <span>{{ widgetData.label }}</span>
+            <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
+        </label>
 
         <div v-if="mode === EDIT">
             <ReferenceSelectWidgetEditor
                 :initial-value="initialValue"
-                :configuration="configuration"
+                :widget-data="widgetData"
                 :node-alias="props.nodeAlias"
                 :graph-slug="props.graphSlug"
             />
