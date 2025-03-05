@@ -235,31 +235,28 @@ def search_terms(request):
                             )
                         i = i + 1
                 else:
-                    ret[index].append(
-                        {
-                            "type": "term",
-                            "context": "",
-                            "context_label": get_resource_model_label(result),
-                            "id": i,
-                            "text": result["key"],
-                            "value": result["key"],
-                            "nodegroupid": result["nodegroupid"]["buckets"][0]["key"],
-                        }
-                    )
-                    i = i + 1
+                    for ng in result["nodegroupid"]["buckets"]:
+                        ret[index].append(
+                            {
+                                "type": "term",
+                                "context": "",
+                                "context_label": get_resource_model_label(ng),
+                                "id": i,
+                                "text": result["key"],
+                                "value": result["key"],
+                                "nodegroupid": ng["key"],
+                            }
+                        )
+                        i += 1
 
     return JSONResponse(ret)
 
 
-def get_resource_model_label(result):
-    if len(result["nodegroupid"]["buckets"]) > 0:
-        for nodegroup in result["nodegroupid"]["buckets"]:
-            nodegroup_id = nodegroup["key"]
-            node = Node.objects.get(nodeid=nodegroup_id)
-            graph = node.graph
-        return "{0} - {1}".format(graph.name, node.name)
-    else:
-        return ""
+def get_resource_model_label(nodegroup):
+    nodegroup_id = nodegroup["key"]
+    node = Node.objects.get(nodeid=nodegroup_id)
+    graph = node.graph
+    return "{0} - {1}".format(graph.name, node.name)
 
 
 @group_required("Resource Exporter")
