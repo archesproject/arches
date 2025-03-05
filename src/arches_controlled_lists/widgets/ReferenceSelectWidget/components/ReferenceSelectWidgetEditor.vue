@@ -50,10 +50,10 @@ function optionAsNode(
 ): ReferenceSelectTreeNode {
     return {
         key: item.list_item_id,
-        uri: item.uri,
         label: item.display_label,
-        values: item.list_item_values,
+        sort_order: item.sort_order,
         children: item.children.map((child) => optionAsNode(child)),
+        data: item,
     };
 }
 

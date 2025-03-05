@@ -11,14 +11,15 @@ export interface ControlledListItemTileValue {
 
 export interface ReferenceSelectFetchedOption {
     list_item_id: string;
-    uri: string;
-    list_item_values: Value[];
     display_label: string;
     sort_order: number;
     children: ReferenceSelectFetchedOption[];
 }
 
 export interface ReferenceSelectTreeNode extends TreeNode {
-    uri: string;
-    values: Value[];
+    key: string;
+    label: string;
+    sort_order: number;
+    children: ReferenceSelectTreeNode[];
+    data: ReferenceSelectFetchedOption;
 }
