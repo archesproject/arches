@@ -1,6 +1,6 @@
 import arches from "arches";
 
-export const fetchWidgetConfiguration = async (
+export const fetchWidget = async (
     graphSlug: string,
     nodeAlias: string,
 ) => {
@@ -19,7 +19,7 @@ export const fetchWidgetConfiguration = async (
     }
 };
 
-export const fetchNodeConfiguration = async (
+export const fetchNode = async (
     graphSlug: string,
     nodeAlias: string,
 ) => {

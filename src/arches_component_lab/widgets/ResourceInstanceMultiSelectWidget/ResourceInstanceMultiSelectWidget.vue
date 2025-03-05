@@ -7,8 +7,8 @@ import ResourceInstanceMultiSelectWidgetEditor from "@/arches_component_lab/widg
 import ResourceInstanceMultiSelectWidgetViewer from "@/arches_component_lab/widgets/ResourceInstanceMultiSelectWidget/components/ResourceInstanceMultiSelectWidgetViewer.vue";
 
 import {
-    fetchWidgetConfiguration,
-    fetchNodeConfiguration,
+    fetchWidget,
+    fetchNode,
 } from "@/arches_component_lab/widgets/api.ts";
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
@@ -31,23 +31,18 @@ const props = withDefaults(
 );
 
 const isLoading = ref(true);
-const configuration = ref();
+const nodeRef = ref();
+const widgetRef = ref();
 
 onMounted(async () => {
-    const widgetConfiguration = await fetchWidgetConfiguration(
+    widgetRef.value = await fetchWidget(
         props.graphSlug,
         props.nodeAlias,
     );
-
-    const nodeConfiguration = await fetchNodeConfiguration(
+    nodeRef.value = await fetchNode(
         props.graphSlug,
         props.nodeAlias,
     );
-
-    configuration.value = {
-        ...nodeConfiguration,
-        ...widgetConfiguration,
-    };
 
     isLoading.value = false;
 });
@@ -61,14 +56,14 @@ onMounted(async () => {
 
     <template v-else>
         <label v-if="props.showLabel">
-            <span>{{ configuration.label }}</span>
-            <span v-if="configuration.isrequired && props.mode === EDIT">*</span>
+            <span>{{ widgetRef.label }}</span>
+            <span v-if="nodeRef.isrequired && props.mode === EDIT">*</span>
         </label>
 
         <div v-if="mode === EDIT">
             <ResourceInstanceMultiSelectWidgetEditor
                 :initial-value="initialValue"
-                :configuration="configuration"
+                :configuration="widgetRef.config"
                 :node-alias="props.nodeAlias"
                 :graph-slug="props.graphSlug"
             />

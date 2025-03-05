@@ -8,8 +8,8 @@ import DateWidgetEditor from "@/arches_component_lab/widgets/DateWidget/componen
 import DateWidgetViewer from "@/arches_component_lab/widgets/DateWidget/components/DateWidgetViewer.vue";
 
 import {
-    fetchWidgetConfiguration,
-    fetchNodeConfiguration,
+    fetchWidget,
+    fetchNode,
 } from "@/arches_component_lab/widgets/api.ts";
 import { convertISO8601DatetimeFormatToPrimevueDatetimeFormat } from "@/arches_component_lab/widgets/utils.ts";
 
@@ -30,27 +30,23 @@ const props = withDefaults(
 );
 
 const isLoading = ref(true);
-const configuration = ref();
+const nodeRef = ref();
+const widgetRef = ref();
 
 onMounted(async () => {
-    const widgetConfiguration = await fetchWidgetConfiguration(
+    nodeRef.value = await fetchNode(
         props.graphSlug,
         props.nodeAlias,
     );
 
-    const nodeConfiguration = await fetchNodeConfiguration(
+    const widget = await fetchWidget(
         props.graphSlug,
         props.nodeAlias,
     );
-
-    configuration.value = {
-        ...widgetConfiguration,
-        ...nodeConfiguration,
-        datePickerDisplayConfiguration:
-            convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
-                widgetConfiguration.dateFormat,
-            ),
-    };
+    widget.config.datePickerDisplayConfiguration = convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
+        widget.config.dateFormat,
+    );
+    widgetRef.value = widget;
 
     isLoading.value = false;
 });
@@ -64,8 +60,8 @@ onMounted(async () => {
 
     <template v-else>
         <label v-if="props.showLabel">
-            <span>{{ configuration.label }}</span>
-            <span v-if="configuration.isrequired && props.mode === EDIT">*</span>
+            <span>{{ widgetRef.label }}</span>
+            <span v-if="nodeRef.isrequired && props.mode === EDIT">*</span>
         </label>
 
         <DateWidgetEditor
@@ -76,7 +72,7 @@ onMounted(async () => {
             "
             :graph-slug="props.graphSlug"
             :node-alias="props.nodeAlias"
-            :configuration="configuration"
+            :configuration="widgetRef.config"
         />
         <DateWidgetViewer
             v-else-if="props.mode === VIEW"
