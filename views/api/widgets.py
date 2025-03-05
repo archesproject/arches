@@ -1,6 +1,6 @@
 import json
 
-from django.forms.models import model_to_dict
+from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
 from django.utils import translation
 from django.views.generic import View
 
@@ -10,7 +10,7 @@ from arches.app.utils.response import JSONResponse
 
 def update_i18n_properties(response):
     user_language = translation.get_language()
-    config = json.loads(response["config"].value)
+    config = response["config"]
 
     if "i18n_properties" in config and isinstance(config["i18n_properties"], list):
         for prop in config["i18n_properties"]:
@@ -32,7 +32,7 @@ class WidgetDataView(View):
             node__source_identifier_id__isnull=True,
         ).first()
 
-        response = update_i18n_properties(model_to_dict(card_x_node_x_widget))
+        response = update_i18n_properties(JSONDeserializer().deserialize(JSONSerializer().serialize(card_x_node_x_widget)))
 
         return JSONResponse(response)
 
@@ -43,6 +43,6 @@ class NodeDataView(View):
             graph__slug=graph_slug, alias=node_alias, source_identifier_id__isnull=True
         )
 
-        response = update_i18n_properties(model_to_dict(node))
+        response = update_i18n_properties(JSONDeserializer().deserialize(JSONSerializer().serialize(node)))
 
         return JSONResponse(response)
