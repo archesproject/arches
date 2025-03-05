@@ -8,7 +8,10 @@ import ProgressSpinner from "primevue/progressspinner";
 import DateWidgetEditor from "@/arches_component_lab/widgets/DateWidget/components/DateWidgetEditor.vue";
 import DateWidgetViewer from "@/arches_component_lab/widgets/DateWidget/components/DateWidgetViewer.vue";
 
-import { fetchWidgetConfiguration } from "@/arches_component_lab/widgets/api.ts";
+import {
+    fetchWidgetData,
+    fetchNodeData,
+} from "@/arches_component_lab/widgets/api.ts";
 import { convertISO8601DatetimeFormatToPrimevueDatetimeFormat } from "@/arches_component_lab/widgets/utils.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
@@ -28,23 +31,20 @@ const props = withDefaults(
 );
 
 const isLoading = ref(true);
-const configuration = ref();
+const nodeData = ref();
+const widgetData = ref();
 const configurationError = ref();
 
 onMounted(async () => {
     try {
-        const widgetConfiguration = await fetchWidgetConfiguration(
-            props.graphSlug,
-            props.nodeAlias,
-        );
+        nodeData.value = await fetchNodeData(props.graphSlug, props.nodeAlias);
 
-        configuration.value = {
-            ...widgetConfiguration,
-            datePickerDisplayConfiguration:
-                convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
-                    widgetConfiguration.dateFormat,
-                ),
-        };
+        const widget = await fetchWidgetData(props.graphSlug, props.nodeAlias);
+        widget.config.datePickerDisplayConfiguration =
+            convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
+                widget.config.dateFormat,
+            );
+        widgetData.value = widget;
     } catch (error) {
         configurationError.value = error;
     } finally {
@@ -60,7 +60,10 @@ onMounted(async () => {
     />
 
     <template v-else>
-        <label v-if="props.showLabel">{{ configuration.label }}</label>
+        <label v-if="props.showLabel">
+            <span>{{ widgetData.label }}</span>
+            <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
+        </label>
 
         <DateWidgetEditor
             v-if="props.mode === EDIT"
@@ -70,7 +73,7 @@ onMounted(async () => {
             "
             :graph-slug="props.graphSlug"
             :node-alias="props.nodeAlias"
-            :configuration="configuration"
+            :widget-data="widgetData"
         />
         <DateWidgetViewer
             v-else-if="props.mode === VIEW"
@@ -78,7 +81,7 @@ onMounted(async () => {
                 props.initialValue &&
                 dayjs(props.initialValue).toDate().toString()
             "
-            :configuration="configuration"
+            :widget-data="widgetData"
         />
     </template>
     <Message

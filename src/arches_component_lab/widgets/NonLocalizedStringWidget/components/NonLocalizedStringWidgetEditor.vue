@@ -8,7 +8,6 @@ const props = defineProps<{
     initialValue: string | undefined;
     nodeAlias: string;
     graphSlug: string;
-    configuration: unknown;
 }>();
 
 // let timeout: ReturnType<typeof setTimeout>;

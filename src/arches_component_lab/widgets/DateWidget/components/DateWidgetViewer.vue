@@ -3,11 +3,10 @@ import DatePicker from "primevue/datepicker";
 
 const props = defineProps<{
     value: string | Date | undefined;
-    configuration: {
-        dateFormat: string;
-        graphSlug: string;
-        label: string;
-        nodeAlias: string;
+    widgetData: {
+        config: {
+            dateFormat: string;
+        };
     };
 }>();
 </script>
@@ -15,7 +14,7 @@ const props = defineProps<{
 <template>
     <DatePicker
         v-model="props.value as Date"
-        :date-format="configuration.dateFormat"
+        :date-format="widgetData.config.dateFormat"
         :disabled="true"
         :fluid="true"
     />

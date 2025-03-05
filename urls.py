@@ -4,7 +4,10 @@ from django.conf.urls.i18n import i18n_patterns
 from django.urls import include, path
 
 from arches_component_lab.views.api.relatable_resources import RelatableResourcesView
-from arches_component_lab.views.api.widgets import WidgetConfigurationView
+from arches_component_lab.views.api.widgets import (
+    WidgetDataView,
+    NodeDataView,
+)
 
 urlpatterns = [
     path(
@@ -13,9 +16,14 @@ urlpatterns = [
         name="api-relatable-resources",
     ),
     path(
-        "arches-component-lab/api/widget-configuration/<slug:graph_slug>/<slug:node_alias>",
-        WidgetConfigurationView.as_view(),
-        name="api-widget-configuration",
+        "arches-component-lab/api/widget-data/<slug:graph_slug>/<slug:node_alias>",
+        WidgetDataView.as_view(),
+        name="api-widget-data",
+    ),
+    path(
+        "arches-component-lab/api/node-data/<slug:graph_slug>/<slug:node_alias>",
+        NodeDataView.as_view(),
+        name="api-node-data",
     ),
 ]
 
