@@ -80,7 +80,7 @@ onMounted(async () => {
                 props.initialValue &&
                 dayjs(props.initialValue).toDate().toString()
             "
-            :configuration="configuration"
+            :configuration="widgetRef.config"
         />
     </template>
 </template>
