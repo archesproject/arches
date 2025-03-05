@@ -61,7 +61,6 @@ onMounted(async () => {
             :initial-value="initialValue"
             :graph-slug="props.graphSlug"
             :node-alias="props.nodeAlias"
-            :configuration="widgetData.config"
         />
         <NonLocalizedStringWidgetViewer
             v-else-if="props.mode === VIEW"
