@@ -4,10 +4,45 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-    """There must be an initial migration for the proxy models to work."""
+    initial = True
 
     dependencies = [
         ("models", "11499_add_editlog_resourceinstance_idx"),  # last 7.6 migration
     ]
 
-    operations = []
+    operations = [
+        migrations.CreateModel(
+            name="GraphWithPrefetching",
+            fields=[],
+            options={
+                "db_table": "graphs",
+                "proxy": True,
+                "indexes": [],
+                "constraints": [],
+            },
+            bases=("models.graphmodel",),
+        ),
+        migrations.CreateModel(
+            name="SemanticResource",
+            fields=[],
+            options={
+                "db_table": "resource_instances",
+                "permissions": (("no_access_to_resourceinstance", "No Access"),),
+                "proxy": True,
+                "indexes": [],
+                "constraints": [],
+            },
+            bases=("models.resourceinstance",),
+        ),
+        migrations.CreateModel(
+            name="SemanticTile",
+            fields=[],
+            options={
+                "db_table": "tiles",
+                "proxy": True,
+                "indexes": [],
+                "constraints": [],
+            },
+            bases=("models.tilemodel",),
+        ),
+    ]
