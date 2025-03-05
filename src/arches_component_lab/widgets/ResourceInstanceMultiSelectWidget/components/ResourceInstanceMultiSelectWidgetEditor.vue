@@ -1,16 +1,21 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef, watch } from "vue";
 
-import { useGettext } from "vue3-gettext";
+import arches from "arches";
 
+import { useGettext } from "vue3-gettext";
 import { FormField } from "@primevue/forms";
+
+import Button from "primevue/button";
 import Message from "primevue/message";
-import MultiSelect, { type MultiSelectFilterEvent } from "primevue/multiselect";
+import MultiSelect from "primevue/multiselect";
 
 import { fetchRelatableResources } from "@/arches_component_lab/widgets/api.ts";
 
+import type { MultiSelectFilterEvent } from "primevue/multiselect";
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
+
 import type {
     ResourceInstanceReference,
     ResourceInstanceResult,
@@ -39,8 +44,11 @@ watch(
     // @ts-expect-error - This is a bug in the PrimeVue types
     () => formFieldRef.value?.field?.states?.value,
     (newVal) => {
+        if (!Array.isArray(newVal)) {
+            newVal = [newVal];
+        }
+
         if (
-            Array.isArray(newVal) &&
             newVal.length &&
             newVal.every((item: string | object) => typeof item === "string")
         ) {
@@ -157,6 +165,11 @@ function validate(e: FormFieldResolverOptions) {
     //     };
     // }
 }
+
+function getOption(value: string): ResourceInstanceReference | undefined {
+    const option = options.value.find((option) => option.resourceId == value);
+    return option;
+}
 </script>
 
 <template>
@@ -193,10 +206,36 @@ function validate(e: FormFieldResolverOptions) {
                 lazy: true,
                 loading: isLoading,
                 onLazyLoad: onLazyLoadResources,
+                resizeDelay: 200,
             }"
             @before-show="getOptions(1)"
             @filter="onFilter"
-        />
+        >
+            <template
+                #chip="//@ts-expect-error - This is a bug in the PrimeVue types
+                { value, removeCallback }"
+            >
+                <div class="p-multiselect-chip">
+                    <span class="p-chip-label">
+                        {{ getOption(value)?.display_value }}
+                    </span>
+                    <Button
+                        icon="pi pi-pen-to-square"
+                        :href="`${arches.urls.resource_editor}${value}`"
+                        target="_blank"
+                        variant="text"
+                        as="a"
+                        class="p-chip-button"
+                    ></Button>
+                    <Button
+                        icon="pi pi-times-circle"
+                        variant="text"
+                        class="p-chip-button"
+                        @click.stop="(e) => removeCallback(e, value)"
+                    ></Button>
+                </div>
+            </template>
+        </MultiSelect>
         <Message
             v-for="error in $field.errors"
             :key="error.message"
@@ -208,19 +247,46 @@ function validate(e: FormFieldResolverOptions) {
     </FormField>
 </template>
 <style scoped>
-.resource-instance-multiselect-widget .p-multiselect-label {
-    visibility: visible !important;
-    display: grid !important;
+:deep(.resource-instance-multiselect-widget .p-multiselect-label) {
+    visibility: visible;
+    display: grid;
+    min-width: 0;
+    min-height: 0;
 }
 
-.resource-instance-multiselect-widget .p-multiselect-chip {
-    display: grid !important;
-    grid-template-columns: 1fr auto;
+:deep(.resource-instance-multiselect-widget .p-multiselect-chip) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    min-width: 0;
+    min-height: 0;
 }
 
-.resource-instance-multiselect-widget .p-chip-label {
-    max-width: min-content;
-    white-space: normal;
+:deep(.resource-instance-multiselect-widget .p-multiselect-chip .pi) {
+    margin: 0 0.5rem;
+}
+
+:deep(.p-chip) {
+    overflow: hidden;
+    min-width: 0;
+    min-height: 0;
+}
+
+:deep(.p-multiselect-chip .p-chip-button) {
+    text-decoration: none;
+}
+
+:deep(.p-multiselect-option span) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+:deep(.p-chip-label) {
+    overflow: hidden;
+    word-wrap: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
+    max-width: 100%;
 }
 </style>
 
@@ -232,6 +298,7 @@ function validate(e: FormFieldResolverOptions) {
 .p-multiselect-overlay .p-checkbox {
     pointer-events: none;
 }
+
 .p-multiselect-overlay .p-multiselect-header .p-checkbox {
     pointer-events: all;
 }
