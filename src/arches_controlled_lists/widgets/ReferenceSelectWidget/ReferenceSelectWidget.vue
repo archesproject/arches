@@ -8,7 +8,7 @@ import ReferenceSelectWidgetViewer from "@/arches_controlled_lists/widgets/Refer
 
 import {
     fetchWidgetData,
-    fetchNodeData
+    fetchNodeData,
 } from "@/arches_component_lab/widgets/api.ts";
 import { EDIT, VIEW } from "@/arches_controlled_lists/widgets/constants.ts";
 
@@ -33,14 +33,8 @@ const nodeData = ref();
 const widgetData = ref();
 
 onMounted(async () => {
-    widgetData.value = await fetchWidgetData(
-        props.graphSlug,
-        props.nodeAlias,
-    );
-    nodeData.value = await fetchNodeData(
-        props.graphSlug,
-        props.nodeAlias,
-    );
+    widgetData.value = await fetchWidgetData(props.graphSlug, props.nodeAlias);
+    nodeData.value = await fetchNodeData(props.graphSlug, props.nodeAlias);
 
     isLoading.value = false;
 });
@@ -61,7 +55,7 @@ onMounted(async () => {
         <div v-if="mode === EDIT">
             <ReferenceSelectWidgetEditor
                 :initial-value="initialValue"
-                :configuration="widgetData.config"
+                :widget-data="widgetData"
                 :node-alias="props.nodeAlias"
                 :graph-slug="props.graphSlug"
             />
