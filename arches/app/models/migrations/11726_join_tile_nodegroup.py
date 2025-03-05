@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "11725_make_tiledata_not_nullable"),
+        ("models", "10959_update_uuid_defaults_to_v4"),
     ]
 
     operations = [
