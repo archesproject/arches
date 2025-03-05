@@ -24,7 +24,7 @@ def update_i18n_properties(response):
     return response
 
 
-class WidgetConfigurationView(View):
+class WidgetDataView(View):
     def get(self, request, graph_slug, node_alias):
         card_x_node_x_widget = models.CardXNodeXWidget.objects.filter(
             node__graph__slug=graph_slug,
@@ -37,7 +37,7 @@ class WidgetConfigurationView(View):
         return JSONResponse(response)
 
 
-class NodeConfigurationView(View):
+class NodeDataView(View):
     def get(self, request, graph_slug, node_alias):
         node = models.Node.objects.get(
             graph__slug=graph_slug, alias=node_alias, source_identifier_id__isnull=True

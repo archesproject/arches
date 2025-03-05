@@ -8,8 +8,8 @@ import NonLocalizedStringWidgetViewer from "@/arches_component_lab/widgets/NonLo
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import {
-    fetchWidget,
-    fetchNode,
+    fetchWidgetData,
+    fetchNodeData,
 } from "@/arches_component_lab/widgets/api.ts";
 
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
@@ -28,15 +28,15 @@ const props = withDefaults(
 );
 
 const isLoading = ref(true);
-const nodeRef = ref();
-const widgetRef = ref();
+const nodeData = ref();
+const widgetData = ref();
 
 onMounted(async () => {
-    widgetRef.value = await fetchWidget(
+    widgetData.value = await fetchWidgetData(
         props.graphSlug,
         props.nodeAlias,
     );
-    nodeRef.value = await fetchNode(
+    nodeData.value = await fetchNodeData(
         props.graphSlug,
         props.nodeAlias,
     );
@@ -52,8 +52,8 @@ onMounted(async () => {
     />
     <template v-else>
         <label v-if="props.showLabel">
-            <span>{{ widgetRef.label }}</span>
-            <span v-if="nodeRef.isrequired && props.mode === EDIT">*</span>
+            <span>{{ widgetData.label }}</span>
+            <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
         </label>
 
         <NonLocalizedStringWidgetEditor
@@ -61,7 +61,7 @@ onMounted(async () => {
             :initial-value="initialValue"
             :graph-slug="props.graphSlug"
             :node-alias="props.nodeAlias"
-            :configuration="widgetRef.config"
+            :configuration="widgetData.config"
         />
         <NonLocalizedStringWidgetViewer
             v-else-if="props.mode === VIEW"

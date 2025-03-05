@@ -7,8 +7,8 @@ import ResourceInstanceMultiSelectWidgetEditor from "@/arches_component_lab/widg
 import ResourceInstanceMultiSelectWidgetViewer from "@/arches_component_lab/widgets/ResourceInstanceMultiSelectWidget/components/ResourceInstanceMultiSelectWidgetViewer.vue";
 
 import {
-    fetchWidget,
-    fetchNode,
+    fetchWidgetData,
+    fetchNodeData,
 } from "@/arches_component_lab/widgets/api.ts";
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
@@ -31,15 +31,15 @@ const props = withDefaults(
 );
 
 const isLoading = ref(true);
-const nodeRef = ref();
-const widgetRef = ref();
+const nodeData = ref();
+const widgetData = ref();
 
 onMounted(async () => {
-    widgetRef.value = await fetchWidget(
+    widgetData.value = await fetchWidgetData(
         props.graphSlug,
         props.nodeAlias,
     );
-    nodeRef.value = await fetchNode(
+    nodeData.value = await fetchNodeData(
         props.graphSlug,
         props.nodeAlias,
     );
@@ -56,14 +56,14 @@ onMounted(async () => {
 
     <template v-else>
         <label v-if="props.showLabel">
-            <span>{{ widgetRef.label }}</span>
-            <span v-if="nodeRef.isrequired && props.mode === EDIT">*</span>
+            <span>{{ widgetData.label }}</span>
+            <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
         </label>
 
         <div v-if="mode === EDIT">
             <ResourceInstanceMultiSelectWidgetEditor
                 :initial-value="initialValue"
-                :configuration="widgetRef.config"
+                :configuration="widgetData.config"
                 :node-alias="props.nodeAlias"
                 :graph-slug="props.graphSlug"
             />

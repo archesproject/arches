@@ -8,7 +8,7 @@
 {{ block.super }}
 <div class="arches-urls"
     api_relatable_resources='(graph_slug, node_alias) => {return "{% url "api-relatable-resources" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", node_alias)}'
-    api_widget_configuration='(graph_slug, node_alias) => {return "{% url "api-widget-configuration" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", node_alias)}'
-    api_node_configuration='(graph_slug, node_alias) => {return "{% url "api-node-configuration" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", node_alias)}'
+    api_widget_data='(graph_slug, node_alias) => {return "{% url "api-widget-data" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", node_alias)}'
+    api_node_data='(graph_slug, node_alias) => {return "{% url "api-node-data" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", node_alias)}'
 ></div>
 {% endblock arches_urls %}

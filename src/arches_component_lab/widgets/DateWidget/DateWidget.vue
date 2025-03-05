@@ -8,8 +8,8 @@ import DateWidgetEditor from "@/arches_component_lab/widgets/DateWidget/componen
 import DateWidgetViewer from "@/arches_component_lab/widgets/DateWidget/components/DateWidgetViewer.vue";
 
 import {
-    fetchWidget,
-    fetchNode,
+    fetchWidgetData,
+    fetchNodeData,
 } from "@/arches_component_lab/widgets/api.ts";
 import { convertISO8601DatetimeFormatToPrimevueDatetimeFormat } from "@/arches_component_lab/widgets/utils.ts";
 
@@ -30,23 +30,23 @@ const props = withDefaults(
 );
 
 const isLoading = ref(true);
-const nodeRef = ref();
-const widgetRef = ref();
+const nodeData = ref();
+const widgetData = ref();
 
 onMounted(async () => {
-    nodeRef.value = await fetchNode(
+    nodeData.value = await fetchNodeData(
         props.graphSlug,
         props.nodeAlias,
     );
 
-    const widget = await fetchWidget(
+    const widget = await fetchWidgetData(
         props.graphSlug,
         props.nodeAlias,
     );
     widget.config.datePickerDisplayConfiguration = convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
         widget.config.dateFormat,
     );
-    widgetRef.value = widget;
+    widgetData.value = widget;
 
     isLoading.value = false;
 });
@@ -60,8 +60,8 @@ onMounted(async () => {
 
     <template v-else>
         <label v-if="props.showLabel">
-            <span>{{ widgetRef.label }}</span>
-            <span v-if="nodeRef.isrequired && props.mode === EDIT">*</span>
+            <span>{{ widgetData.label }}</span>
+            <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
         </label>
 
         <DateWidgetEditor
@@ -72,7 +72,7 @@ onMounted(async () => {
             "
             :graph-slug="props.graphSlug"
             :node-alias="props.nodeAlias"
-            :configuration="widgetRef.config"
+            :configuration="widgetData.config"
         />
         <DateWidgetViewer
             v-else-if="props.mode === VIEW"
@@ -80,7 +80,7 @@ onMounted(async () => {
                 props.initialValue &&
                 dayjs(props.initialValue).toDate().toString()
             "
-            :configuration="widgetRef.config"
+            :configuration="widgetData.config"
         />
     </template>
 </template>
