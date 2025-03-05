@@ -148,6 +148,7 @@ def search_terms(request):
     se = SearchEngineFactory().create()
     searchString = request.GET.get("q", "")
     user_is_reviewer = user_is_resource_reviewer(request.user)
+    permitted_nodegroups = get_permitted_nodegroups(request.user)
 
     i = 0
     ret = {}
@@ -180,6 +181,11 @@ def search_terms(request):
 
         if user_is_reviewer is False and index == "terms":
             boolquery.filter(Terms(field="provisional", terms=["false"]))
+            boolquery.filter(
+                Terms(
+                    field="nodegroup_id", terms=[str(ng) for ng in permitted_nodegroups]
+                )
+            )
 
         query.add_query(boolquery)
         base_agg = Aggregation(
@@ -205,6 +211,8 @@ def search_terms(request):
         query.add_aggregation(base_agg)
 
         ret[index] = []
+        if len(permitted_nodegroups) == 0:
+            continue
         results = query.search(index=index)
         if results is not None:
             for result in results["aggregations"]["value_agg"]["buckets"]:
