@@ -204,7 +204,11 @@ function getOption(value: string): ResourceInstanceReference | undefined {
             @before-show="getOptions(1)"
             @filter="onFilter"
         >
-            <template #chip="{ value, removeCallback }">
+            <!-- ts-ignore added until 4.3.1 because removecallback is not added in types -->
+            <template
+                #chip="//@ts-ignore
+                { value, removeCallback }"
+            >
                 <div class="p-multiselect-chip">
                     <span class="p-chip-label">{{
                         getOption(value)?.display_value
@@ -224,6 +228,7 @@ function getOption(value: string): ResourceInstanceReference | undefined {
                         class="p-chip-button"
                         @click.stop="
                             (e) => {
+                                //@ts-ignore
                                 removeCallback(e, value);
                             }
                         "
