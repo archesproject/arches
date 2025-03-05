@@ -37,18 +37,13 @@ const configurationError = ref();
 
 onMounted(async () => {
     try {
-        nodeData.value = await fetchNodeData(
-            props.graphSlug,
-            props.nodeAlias,
-        );
+        nodeData.value = await fetchNodeData(props.graphSlug, props.nodeAlias);
 
-        const widget = await fetchWidgetData(
-            props.graphSlug,
-            props.nodeAlias,
-        );
-        widget.config.datePickerDisplayConfiguration = convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
-            widget.config.dateFormat,
-        );
+        const widget = await fetchWidgetData(props.graphSlug, props.nodeAlias);
+        widget.config.datePickerDisplayConfiguration =
+            convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
+                widget.config.dateFormat,
+            );
         widgetData.value = widget;
     } catch (error) {
         configurationError.value = error;

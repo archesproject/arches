@@ -18,8 +18,8 @@ const props = defineProps<{
             datePickerDisplayConfiguration: {
                 dateFormat: string;
                 shouldShowTime: boolean;
-            }
-        }
+            };
+        };
     };
 }>();
 
@@ -79,7 +79,8 @@ function validate(e: FormFieldResolverOptions) {
         <DatePicker
             icon-display="input"
             :date-format="
-                props.widgetData.config.datePickerDisplayConfiguration.dateFormat
+                props.widgetData.config.datePickerDisplayConfiguration
+                    .dateFormat
             "
             :fluid="true"
             :show-icon="true"

@@ -1,9 +1,6 @@
 import arches from "arches";
 
-export const fetchWidgetData = async (
-    graphSlug: string,
-    nodeAlias: string,
-) => {
+export const fetchWidgetData = async (graphSlug: string, nodeAlias: string) => {
     const response = await fetch(
         arches.urls.api_widget_data(graphSlug, nodeAlias),
     );
@@ -19,10 +16,7 @@ export const fetchWidgetData = async (
     }
 };
 
-export const fetchNodeData = async (
-    graphSlug: string,
-    nodeAlias: string,
-) => {
+export const fetchNodeData = async (graphSlug: string, nodeAlias: string) => {
     const response = await fetch(
         arches.urls.api_node_data(graphSlug, nodeAlias),
     );

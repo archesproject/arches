@@ -6,7 +6,7 @@ const props = defineProps<{
     widgetData: {
         config: {
             dateFormat: string;
-        }
+        };
     };
 }>();
 </script>
