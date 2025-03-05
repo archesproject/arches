@@ -33,7 +33,7 @@ const itemSize = 36; // in future iteration this should be declared in the CardX
 
 const options = ref<ResourceInstanceReference[]>([]);
 const isLoading = ref(false);
-const resourceResultsPage = ref(0);
+const resourceResultsPage = ref(1);
 const resourceResultsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
@@ -64,7 +64,9 @@ watch(
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
-onMounted(async () => { await getOptions(1) });
+onMounted(async () => {
+    await getOptions(1);
+});
 
 function clearOptions() {
     options.value = props.initialValue || [];
@@ -84,7 +86,7 @@ async function getOptions(page: number, filterTerm?: string) {
             props.nodeAlias,
             page,
             filterTerm,
-            props.initialValue
+            props.initialValue,
         );
         console.log(resourceData);
 
@@ -188,8 +190,9 @@ function getOption(value: string): ResourceInstanceReference | undefined {
         ref="formFieldRef"
         v-slot="$field"
         :name="props.nodeAlias"
-        :initial-value="props.initialValue?.map((resource) => resource.resourceId)
-            "
+        :initial-value="
+            props.initialValue?.map((resource) => resource.resourceId)
+        "
         :resolver="resolver"
     >
         <MultiSelect
@@ -211,7 +214,6 @@ function getOption(value: string): ResourceInstanceReference | undefined {
                 onLazyLoad: onLazyLoadResources,
                 resizeDelay: 200,
             }"
-            @before-show="getOptions(1)"
             @filter="onFilter"
         >
             <template
@@ -229,7 +231,7 @@ function getOption(value: string): ResourceInstanceReference | undefined {
                         variant="text"
                         as="a"
                         class="p-chip-button"
-                        @click.stop="() => { }"
+                        @click.stop="() => {}"
                     ></Button>
                     <Button
                         icon="pi pi-times-circle"
