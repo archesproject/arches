@@ -63,7 +63,6 @@ onMounted(async () => {
         <div v-if="mode === EDIT">
             <ResourceInstanceMultiSelectWidgetEditor
                 :initial-value="initialValue"
-                :configuration="widgetData.config"
                 :node-alias="props.nodeAlias"
                 :graph-slug="props.graphSlug"
             />
