@@ -7,6 +7,7 @@ from arches import __version__ as arches_version
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node, NodeGroup, TileModel
 
+from arches_querysets.utils import datatype_transforms
 from arches_querysets.utils.models import (
     generate_tile_annotations,
     filter_nodes_by_highest_parent,
@@ -162,11 +163,17 @@ class TileQuerySet(models.QuerySet):
                             data={str(node.pk): tile_val},
                             provisionaledits=tile.provisionaledits,
                         )
+                        if to_json_fn := getattr(
+                            datatype_transforms, f"{node.datatype}_to_json", None
+                        ):
+                            to_json_fn = partial(to_json_fn, datatype_instance)
+                        else:
+                            to_json_fn = datatype_instance.to_json
                         try:
-                            datatype_instance.to_json(dummy_tile, node)
+                            to_json_fn(dummy_tile, node)
                         except TypeError:  # StringDataType workaround.
                             dummy_tile.data[str(node.pk)] = {}
-                            datatype_instance.to_json(dummy_tile, node)
+                            to_json_fn(dummy_tile, node)
                         if self._as_representation:
                             if repr_fn := getattr(
                                 datatype_instance, "to_representation", None
