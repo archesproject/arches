@@ -2,6 +2,7 @@
 import dayjs from "dayjs";
 import { onMounted, ref } from "vue";
 
+import Message from "primevue/message";
 import ProgressSpinner from "primevue/progressspinner";
 
 import DateWidgetEditor from "@/arches_component_lab/widgets/DateWidget/components/DateWidgetEditor.vue";
@@ -28,22 +29,27 @@ const props = withDefaults(
 
 const isLoading = ref(true);
 const configuration = ref();
+const configurationError = ref();
 
 onMounted(async () => {
-    const widgetConfiguration = await fetchWidgetConfiguration(
-        props.graphSlug,
-        props.nodeAlias,
-    );
+    try {
+        const widgetConfiguration = await fetchWidgetConfiguration(
+            props.graphSlug,
+            props.nodeAlias,
+        );
 
-    configuration.value = {
-        ...widgetConfiguration,
-        datePickerDisplayConfiguration:
-            convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
-                widgetConfiguration.dateFormat,
-            ),
-    };
-
-    isLoading.value = false;
+        configuration.value = {
+            ...widgetConfiguration,
+            datePickerDisplayConfiguration:
+                convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
+                    widgetConfiguration.dateFormat,
+                ),
+        };
+    } catch (error) {
+        configurationError.value = error;
+    } finally {
+        isLoading.value = false;
+    }
 });
 </script>
 
@@ -75,4 +81,11 @@ onMounted(async () => {
             :configuration="configuration"
         />
     </template>
+    <Message
+        v-if="configurationError"
+        severity="error"
+        size="small"
+    >
+        {{ configurationError.message }}
+    </Message>
 </template>
