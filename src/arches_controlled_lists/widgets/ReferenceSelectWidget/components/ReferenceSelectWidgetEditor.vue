@@ -12,8 +12,10 @@ import type { ControlledListItem } from "@/arches_controlled_lists/types";
 
 const props = defineProps<{
     initialValue: ControlledListItem[] | undefined;
-    configuration: {
-        placeholder: string;
+    widgetData: {
+        config: {
+            palceholder: string
+        }
     };
     nodeAlias: string;
     graphSlug: string;
@@ -124,7 +126,7 @@ function getOptionLabels(item: {
             :loading="isLoading"
             :options="options"
             :option-label="getOptionLabels"
-            :placeholder="configuration.placeholder"
+            :placeholder="widgetData.config.placeholder"
             :show-clear="true"
             @before-show="getOptions"
         />
