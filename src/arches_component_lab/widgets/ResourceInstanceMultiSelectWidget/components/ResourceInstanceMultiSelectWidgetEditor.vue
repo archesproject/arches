@@ -1,17 +1,21 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef, watch } from "vue";
-import { useGettext } from "vue3-gettext";
-import { FormField } from "@primevue/forms";
-import Button from "primevue/button";
-import Message from "primevue/message";
-import MultiSelect, { type MultiSelectFilterEvent } from "primevue/multiselect";
-
-import { fetchRelatableResources } from "@/arches_component_lab/widgets/api.ts";
 
 import arches from "arches";
 
+import { useGettext } from "vue3-gettext";
+import { FormField } from "@primevue/forms";
+
+import Button from "primevue/button";
+import Message from "primevue/message";
+import MultiSelect from "primevue/multiselect";
+
+import { fetchRelatableResources } from "@/arches_component_lab/widgets/api.ts";
+
+import type { MultiSelectFilterEvent } from "primevue/multiselect";
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
+
 import type {
     ResourceInstanceReference,
     ResourceInstanceResult,
@@ -40,8 +44,11 @@ watch(
     // @ts-expect-error - This is a bug in the PrimeVue types
     () => formFieldRef.value?.field?.states?.value,
     (newVal) => {
+        if (!Array.isArray(newVal)) {
+            newVal = [newVal];
+        }
+
         if (
-            Array.isArray(newVal) &&
             newVal.length &&
             newVal.every((item: string | object) => typeof item === "string")
         ) {
@@ -204,15 +211,14 @@ function getOption(value: string): ResourceInstanceReference | undefined {
             @before-show="getOptions(1)"
             @filter="onFilter"
         >
-            <!-- ts-ignore added until 4.3.1 because removecallback is not added in types -->
             <template
-                #chip="//@ts-ignore
+                #chip="//@ts-expect-error - - This is a bug in the PrimeVue types
                 { value, removeCallback }"
             >
                 <div class="p-multiselect-chip">
-                    <span class="p-chip-label">{{
-                        getOption(value)?.display_value
-                    }}</span>
+                    <span class="p-chip-label">
+                        {{ getOption(value)?.display_value }}
+                    </span>
                     <Button
                         icon="pi pi-pen-to-square"
                         :href="`${arches.urls.resource_editor}${value}`"
@@ -220,18 +226,12 @@ function getOption(value: string): ResourceInstanceReference | undefined {
                         variant="text"
                         as="a"
                         class="p-chip-button"
-                        @click.stop="() => {}"
                     ></Button>
                     <Button
                         icon="pi pi-times-circle"
                         variant="text"
                         class="p-chip-button"
-                        @click.stop="
-                            (e) => {
-                                //@ts-ignore
-                                removeCallback(e, value);
-                            }
-                        "
+                        @click.stop="(e) => removeCallback(e, value)"
                     ></Button>
                 </div>
             </template>
