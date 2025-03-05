@@ -63,8 +63,10 @@ onMounted(async () => {
     />
 
     <template v-else>
-        <label v-if="props.showLabel">{{ configuration.label }}</label>
-        <span v-if="configuration.isrequired && props.mode === EDIT">*</span>
+        <label v-if="props.showLabel">
+            <span>{{ configuration.label }}</span>
+            <span v-if="configuration.isrequired && props.mode === EDIT">*</span>
+        </label>
 
         <DateWidgetEditor
             v-if="props.mode === EDIT"
