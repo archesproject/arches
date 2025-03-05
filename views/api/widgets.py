@@ -20,7 +20,7 @@ def update_i18n_properties(response):
                 and user_language in config[prop]
             ):
                 config[prop] = config[prop][user_language]
-    response["config"] = json.dumps(config)
+    response["config"] = config
     return response
 
 
