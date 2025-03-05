@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 
+import Message from "primevue/message";
 import ProgressSpinner from "primevue/progressspinner";
 
 import NonLocalizedStringWidgetEditor from "@/arches_component_lab/widgets/NonLocalizedStringWidget/components/NonLocalizedStringWidgetEditor.vue";
@@ -30,18 +31,23 @@ const props = withDefaults(
 const isLoading = ref(true);
 const nodeData = ref();
 const widgetData = ref();
+const configurationError = ref();
 
 onMounted(async () => {
-    widgetData.value = await fetchWidgetData(
-        props.graphSlug,
-        props.nodeAlias,
-    );
-    nodeData.value = await fetchNodeData(
-        props.graphSlug,
-        props.nodeAlias,
-    );
-
-    isLoading.value = false;
+    try {
+        widgetData.value = await fetchWidgetData(
+            props.graphSlug,
+            props.nodeAlias,
+        );
+        nodeData.value = await fetchNodeData(
+            props.graphSlug,
+            props.nodeAlias,
+        );
+    } catch (error) {
+        configurationError.value = error;
+    } finally {
+        isLoading.value = false;
+    }
 });
 </script>
 
@@ -67,4 +73,11 @@ onMounted(async () => {
             :value="props.initialValue"
         />
     </template>
+    <Message
+        v-if="configurationError"
+        severity="error"
+        size="small"
+    >
+        {{ configurationError.message }}
+    </Message>
 </template>
