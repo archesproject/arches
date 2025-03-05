@@ -178,6 +178,7 @@ class SearchTests(ArchesTestCase):
     def test_search_terms_permitted_user(self):
         """
         Test search terms method with a permitted user
+
         """
         admin_user = User.objects.get(username="admin")
         nodeid = "c9b37b7c-17b3-11eb-a708-acde48001122"
@@ -200,6 +201,8 @@ class SearchTests(ArchesTestCase):
         new_tile.save(index=False)
         new_tile.index()
         self.sync_es()
+        # wait a moment for ES to finish indexing
+        time.sleep(1)
         request = HttpRequest()
         request.method = "GET"
         request.GET.__setitem__("lang", "en")
