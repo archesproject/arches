@@ -13,6 +13,7 @@ from rest_framework import renderers
 from rest_framework import serializers
 from rest_framework.fields import empty
 
+from arches import __version__ as arches_version
 from arches.app.models.fields.i18n import I18n_JSON, I18n_String
 from arches.app.models.models import Node
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -67,17 +68,30 @@ class NodeFetcherMixin:
         return self._graph_nodes
 
     def find_graph_nodes(self):
+        if arches_version >= "8":
+            return (
+                Node.objects.filter(
+                    graph__slug=self.graph_slug,
+                    graph__source_identifier=None,
+                    nodegroup__isnull=False,
+                )
+                .select_related("nodegroup")
+                .prefetch_related(
+                    "nodegroup__node_set",
+                    "nodegroup__children",
+                    "nodegroup__children__grouping_node",
+                    "cardxnodexwidget_set",
+                )
+            )
         return (
             Node.objects.filter(
                 graph__slug=self.graph_slug,
-                graph__source_identifier=None,
                 nodegroup__isnull=False,
             )
             .select_related("nodegroup")
             .prefetch_related(
                 "nodegroup__node_set",
-                "nodegroup__children",
-                "nodegroup__children__grouping_node",
+                "nodegroup__nodegroup_set",
                 "cardxnodexwidget_set",
             )
         )
@@ -154,7 +168,12 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         # __all__ now includes one level of child nodegroups.
         # TODO: do all, or allow specifying a branch origin.
         if self.__class__.Meta.fields == "__all__":
-            for child_nodegroup in self._root_node.nodegroup.children.all():
+            child_attr = (
+                self._root_node.nodegroup.children
+                if arches_version >= "8"
+                else self._root_node.nodegroup.nodegroup_set
+            )
+            for child_nodegroup in child_attr.all():
                 child_nodegroup_alias = child_nodegroup.grouping_node.alias
                 self._child_nodegroup_aliases.append(child_nodegroup_alias)
 
@@ -325,7 +344,7 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
     def build_relational_field(self, field_name, relation_info):
         ret = super().build_relational_field(field_name, relation_info)
-        if field_name == "graph":
+        if arches_version > "8" and field_name == "graph":
             ret[1]["queryset"] = ret[1]["queryset"].filter(
                 graphmodel__slug=self.graph_slug
             )

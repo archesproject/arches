@@ -2,6 +2,7 @@ from django.contrib.postgres.expressions import ArraySubquery
 from django.db.models import F, OuterRef
 from django.db.models.expressions import BaseExpression
 
+from arches import __version__ as arches_version
 from arches.app.models.models import ResourceInstance, TileModel
 from arches.app.models.utils import field_names
 
@@ -21,7 +22,7 @@ def generate_tile_annotations(nodes, *, defer, only, model):
             continue
         if node.nodegroup_id is None:
             continue
-        if node.source_identifier_id:
+        if getattr(node, "source_identifier_id", None):
             continue
         if (defer and node.alias in defer) or (only and node.alias not in only):
             continue
@@ -71,7 +72,11 @@ def get_nodegroups_here_and_below(start_nodegroup):
     def accumulate(nodegroup):
         nonlocal accumulator
         accumulator.append(nodegroup)
-        for child_nodegroup in nodegroup.children.all():
+        if arches_version >= "8":
+            children_attr = nodegroup.children
+        else:
+            children_attr = nodegroup.nodegroup_set
+        for child_nodegroup in children_attr.all():
             accumulate(child_nodegroup)
 
     accumulate(start_nodegroup)

@@ -1,4 +1,5 @@
 import logging
+import sys
 from collections import defaultdict
 from functools import partial
 from itertools import chain, zip_longest
@@ -9,7 +10,14 @@ from django.db import ProgrammingError, models, transaction
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 
-from arches.app.models.models import Node, NodeGroup, ResourceInstance, TileModel
+from arches import __version__ as arches_version
+from arches.app.models.models import (
+    GraphModel,
+    Node,
+    NodeGroup,
+    ResourceInstance,
+    TileModel,
+)
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.utils import field_names
@@ -361,11 +369,21 @@ class SemanticResource(ResourceInstance):
                 # TODO: this is a symptom this should be refactored.
                 continue
             # Not object-oriented because tile.nodegroup is a property.
-            children = (
-                NodeGroup.objects.filter(parentnodegroup_id=tile.nodegroup_id)
-                .select_related("grouping_node__nodegroup")
-                .prefetch_related("grouping_node__nodegroup__node_set")
-            )
+            if arches_version >= "8":
+                children = (
+                    NodeGroup.objects.filter(parentnodegroup_id=tile.nodegroup_id)
+                    .select_related("grouping_node__nodegroup")
+                    .prefetch_related("grouping_node__nodegroup__node_set")
+                )
+            else:
+                children = tile.nodegroup.nodegroup_set.all()
+                grouping_node = (
+                    Node.objects.filter(pk=tile.nodegroup.pk)
+                    .prefetch_related("node_set")
+                    .get()
+                )
+                for child_nodegroup in children:
+                    child_nodegroup.grouping_node = grouping_node
             for child_nodegroup in children:
                 self._update_tile_for_grouping_node(
                     grouping_node=child_nodegroup.grouping_node,
@@ -392,7 +410,9 @@ class SemanticResource(ResourceInstance):
                 and not any(
                     getattr(tile._incoming_tile, child_tile_alias, None)
                     for child_tile_alias in grouping_node.nodegroup.children.values_list(
-                        "grouping_node__alias", flat=True
+                        # TODO: 7.6 compat
+                        "grouping_node__alias",
+                        flat=True,
                     )
                 )
             ):
@@ -529,6 +549,12 @@ class SemanticTile(TileModel):
             self._nodegroup_alias = self.find_nodegroup_alias()
         return self._nodegroup_alias
 
+    def find_nodegroup_alias(self):
+        try:
+            return super().find_nodegroup_alias()
+        except:
+            return Node.objects.filter(pk=self.nodegroup_id).get().alias
+
     @classmethod
     def as_nodegroup(
         cls,
@@ -564,20 +590,30 @@ class SemanticTile(TileModel):
 
     @staticmethod
     def _root_node(graph_slug, root_node_alias):
-        qs = (
-            Node.objects.filter(graph__slug=graph_slug, alias=root_node_alias)
-            .select_related("nodegroup__grouping_node__nodegroup")
-            .prefetch_related(
-                "nodegroup__node_set",
-                "nodegroup__children",
-                "nodegroup__children__grouping_node",
-                "nodegroup__children__node_set",
-                "nodegroup__children__children",
-                "nodegroup__children__children__grouping_node",
-                "nodegroup__children__children__node_set",
+        qs = Node.objects.filter(graph__slug=graph_slug, alias=root_node_alias)
+        if arches_version >= "8":
+            qs = (
+                qs.filter(source_identifier=None)
+                .select_related("nodegroup__grouping_node__nodegroup")
+                .prefetch_related(
+                    "nodegroup__node_set",
+                    "nodegroup__children",
+                    "nodegroup__children__grouping_node",
+                    "nodegroup__children__node_set",
+                    "nodegroup__children__children",
+                    "nodegroup__children__children__grouping_node",
+                    "nodegroup__children__children__node_set",
+                )
             )
-        )
-        ret = qs.filter(source_identifier=None).first()
+        else:
+            qs = qs.select_related("nodegroup").prefetch_related(
+                "nodegroup__node_set",
+                "nodegroup__nodegroup_set",
+                "nodegroup__nodegroup_set__node_set",
+                "nodegroup__nodegroup_set__nodegroup_set",
+                "nodegroup__nodegroup_set__nodegroup_set__node_set",
+            )
+        ret = qs.first()
         if ret is None:
             raise Node.DoesNotExist(f"graph: {graph_slug} node: {root_node_alias}")
         return ret
@@ -813,3 +849,77 @@ class SemanticTile(TileModel):
             }
 
         return oldprovisionalvalue, newprovisionalvalue, provisional_edit_log_details
+
+
+class GraphWithPrefetching(GraphModel):
+    @classmethod
+    def prepare_for_annotations(cls, graph_slug=None, *, resource_ids=None):
+        if resource_ids and not graph_slug:
+            graph_query = cls.objects.filter(resourceinstance__in=resource_ids)
+        elif graph_slug:
+            if arches_version >= "8":
+                graph_query = GraphModel.objects.filter(
+                    slug=graph_slug, source_identifier=None
+                )
+            else:
+                graph_query = cls.objects.filter(slug=graph_slug)
+        else:
+            raise ValueError("graph_slug or resource_ids must be provided")
+        try:
+            # Prefetch sibling nodes for use in _prefetch_related_objects()
+            # and generate_tile_annotations().
+
+            if arches_version >= "8":
+                prefetches = [
+                    "node_set__nodegroup__children",
+                    "node_set__nodegroup__children__node_set",
+                    "node_set__nodegroup__children__children",
+                    "node_set__nodegroup__children__children__node_set",
+                    "node_set__nodegroup__children__children__children",
+                    "node_set__nodegroup__children__children__children__node_set",
+                    "node_set__nodegroup__children__children__children__children",
+                    "node_set__nodegroup__children__children__children__children__node_set",
+                    "node_set__nodegroup__node_set",
+                    # TODO: seal grouping_node.nodegroup
+                    "node_set__nodegroup__grouping_node__nodegroup",
+                    "node_set__nodegroup__children__grouping_node",
+                    "node_set__cardxnodexwidget_set",
+                ]
+            else:
+                prefetches = [
+                    "node_set__nodegroup__nodegroup_set",
+                    "node_set__nodegroup__nodegroup_set__node_set",
+                    "node_set__nodegroup__nodegroup_set__nodegroup_set",
+                    "node_set__nodegroup__nodegroup_set__nodegroup_set__node_set",
+                    "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set",
+                    "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__node_set",
+                    "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__nodegroup_set",
+                    "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__nodegroup_set__node_set",
+                    "node_set__nodegroup__node_set",
+                    "node_set__cardxnodexwidget_set",
+                ]
+            graph = graph_query.prefetch_related(*prefetches).get()
+        except cls.DoesNotExist as e:
+            if sys.version_info >= (3, 11):
+                e.add_note(f"No graph found with slug: {graph_slug}")
+            raise
+
+        if arches_version < "8":
+            # 7.6: simulate .grouping_node attribute
+            grouping_node_map = {}
+            for node in graph.node_set.all():
+                if node.nodegroup_id == node.pk:
+                    grouping_node_map[node.pk] = node
+            for node in graph.node_set.all():
+                if nodegroup := node.nodegroup:
+                    nodegroup.grouping_node = grouping_node_map.get(nodegroup.pk)
+                    for child_nodegroup in nodegroup.nodegroup_set.all():
+                        child_nodegroup.grouping_node = grouping_node_map.get(
+                            child_nodegroup.pk
+                        )
+
+        return graph
+
+    class Meta:
+        proxy = True
+        db_table = "graphs"

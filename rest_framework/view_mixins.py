@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.metadata import SimpleMetadata
 
+from arches import __version__ as arches_version
 from arches.app.models.models import ResourceInstance, TileModel
 from arches.app.utils.permission_backend import (
     user_can_delete_resource,
@@ -78,7 +79,10 @@ class ArchesModelAPIMixin:
         ret = super().get_object()
         options = self.serializer_class.Meta
         if issubclass(options.model, ResourceInstance):
-            permission_kwargs = {"user": user, "resource": ret}
+            if arches_version >= "8":
+                permission_kwargs = {"user": user, "resource": ret}
+            else:
+                permission_kwargs = {"user": user, "resourceid": ret.pk}
         else:
             permission_kwargs = {"user": user, "resourceid": ret.resourceinstance_id}
         if permission_callable and not permission_callable(**permission_kwargs):
