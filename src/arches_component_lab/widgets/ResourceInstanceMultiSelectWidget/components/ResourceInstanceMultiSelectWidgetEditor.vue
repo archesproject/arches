@@ -8,6 +8,8 @@ import MultiSelect, { type MultiSelectFilterEvent } from "primevue/multiselect";
 
 import { fetchRelatableResources } from "@/arches_component_lab/widgets/api.ts";
 
+import arches from "arches";
+
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { VirtualScrollerLazyEvent } from "primevue/virtualscroller";
 import type {
@@ -158,9 +160,7 @@ function validate(e: FormFieldResolverOptions) {
 }
 
 function getOption(value: string): ResourceInstanceReference | undefined {
-    const option = options.value.find(
-        (option) => option.resourceId == value,
-    )
+    const option = options.value.find((option) => option.resourceId == value);
     return option;
 }
 </script>
@@ -177,8 +177,9 @@ function getOption(value: string): ResourceInstanceReference | undefined {
         ref="formFieldRef"
         v-slot="$field"
         :name="props.nodeAlias"
-        :initial-value="props.initialValue.map((resource) => resource.resourceId)
-            "
+        :initial-value="
+            props.initialValue?.map((resource) => resource.resourceId)
+        "
         :resolver="resolver"
     >
         <MultiSelect
@@ -198,11 +199,38 @@ function getOption(value: string): ResourceInstanceReference | undefined {
                 lazy: true,
                 loading: isLoading,
                 onLazyLoad: onLazyLoadResources,
-                resizeDelay: 200
+                resizeDelay: 200,
             }"
             @before-show="getOptions(1)"
             @filter="onFilter"
-        />
+        >
+            <template #chip="{ value, removeCallback }">
+                <div class="p-multiselect-chip">
+                    <span class="p-chip-label">{{
+                        getOption(value)?.display_value
+                    }}</span>
+                    <Button
+                        icon="pi pi-pen-to-square"
+                        :href="`${arches.urls.resource_editor}${value}`"
+                        target="_blank"
+                        variant="text"
+                        as="a"
+                        class="p-chip-button"
+                        @click.stop="() => {}"
+                    ></Button>
+                    <Button
+                        icon="pi pi-times-circle"
+                        variant="text"
+                        class="p-chip-button"
+                        @click.stop="
+                            (e) => {
+                                removeCallback(e, value);
+                            }
+                        "
+                    ></Button>
+                </div>
+            </template>
+        </MultiSelect>
         <Message
             v-for="error in $field.errors"
             :key="error.message"
@@ -221,7 +249,7 @@ function getOption(value: string): ResourceInstanceReference | undefined {
     min-height: 0;
 }
 
-.resource-instance-multiselect-widget .p-multiselect-chip {
+:deep(.resource-instance-multiselect-widget .p-multiselect-chip) {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
@@ -229,30 +257,26 @@ function getOption(value: string): ResourceInstanceReference | undefined {
     min-height: 0;
 }
 
-a.p-chip-link:visited {
-    color: var(--view-link-color);
-}
-
-.resource-instance-multiselect-widget .p-multiselect-chip .pi {
+:deep(.resource-instance-multiselect-widget .p-multiselect-chip .pi) {
     margin: 0 0.5rem;
 }
 
-.p-chip {
+:deep(.p-chip) {
     overflow: hidden;
     min-width: 0;
     min-height: 0;
 }
 
-.p-multiselect-chip .p-chip-button {
+:deep(.p-multiselect-chip .p-chip-button) {
     text-decoration: none;
 }
 
-.p-multiselect-option span {
+:deep(.p-multiselect-option span) {
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.p-chip-label {
+:deep(.p-chip-label) {
     overflow: hidden;
     word-wrap: nowrap;
     text-overflow: ellipsis;
