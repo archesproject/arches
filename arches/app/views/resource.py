@@ -930,7 +930,10 @@ class ResourceDescriptors(View):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
-        resource = Resource.objects.only("graph_id").get(pk=resourceid)
+        try:
+            resource = Resource.objects.only("graph_id").get(pk=resourceid)
+        except Resource.DoesNotExist:
+            raise Http404(_("Resource does not exist"))
         graph = Graph.objects.get(graphid=resource.graph_id)
 
         try:
