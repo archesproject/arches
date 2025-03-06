@@ -1537,6 +1537,7 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
     def find_nodegroup_alias(self):
         if self.nodegroup and self.nodegroup.grouping_node:
             return self.nodegroup.grouping_node.alias
+        return None
 
     def is_fully_provisional(self):
         return bool(self.provisionaledits and not any(self.data.values()))
