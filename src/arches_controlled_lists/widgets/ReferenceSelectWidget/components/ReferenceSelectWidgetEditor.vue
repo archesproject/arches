@@ -11,7 +11,7 @@ import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { ControlledListItem } from "@/arches_controlled_lists/types";
 
 const props = defineProps<{
-    initialValue: ControlledListItem[] | undefined;
+    initialValue: ControlledListItem[] | null | undefined;
     widgetData: {
         config: {
             placeholder: string;
