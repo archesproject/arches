@@ -5,7 +5,7 @@ import Message from "primevue/message";
 import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
 
 const props = defineProps<{
-    initialValue: string | undefined;
+    initialValue: string | null | undefined;
     nodeAlias: string;
     graphSlug: string;
 }>();
