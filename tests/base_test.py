@@ -17,7 +17,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
-from unittest import mock
 from pathlib import Path
 
 from django.db import connection
@@ -144,12 +143,7 @@ class ArchesTestCase(TestCase):
         )
         test_package_path = Path(test_settings.REFERENCE_DATA_FIXTURE_LOCATION).parent
 
-        with (
-            captured_stdout(),
-            mock.patch(
-                "arches.management.commands.packages.Command.update_resource_geojson_geometries"
-            ),
-        ):
+        with captured_stdout():
             management.call_command(
                 "packages",
                 [
