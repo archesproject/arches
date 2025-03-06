@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import transaction
-from django.db.models import fields
+from django.db.models import fields, F
 from django.db.models.fields.json import JSONField
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
@@ -61,8 +61,8 @@ class NodeFetcherMixin:
     @property
     def graph_nodes(self):
         if not self._graph_nodes:
-            if self.instance and hasattr(self.instance, "_fetched_graph"):
-                self._graph_nodes = self.instance._fetched_graph.node_set.all()
+            if self.instance and hasattr(self.instance, "_fetched_graph_nodes"):
+                self._graph_nodes = self.instance._fetched_graph_nodes
             else:
                 self._graph_nodes = self.find_graph_nodes()
         return self._graph_nodes
@@ -155,6 +155,15 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     def enrich_resource_instance_queryset(manager, graph_slug):
         return manager.with_nodegroups(graph_slug)
 
+    @staticmethod
+    @lru_cache(maxsize=1)
+    def get_nodegroup_aliases():
+        # TODO: uncache this.
+        return {
+            node.pk: node.alias
+            for node in Node.objects.filter(pk=F("nodegroup_id")).only("alias")
+        }
+
     def get_fields(self):
         nodegroup_alias = self.Meta.root_node or self.context.get("nodegroup_alias")
         for node in self.graph_nodes:
@@ -165,6 +174,9 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             raise RuntimeError("missing root node")
         field_map = super().get_fields()
 
+        if arches_version < "8":
+            nodegroup_aliases = self.get_nodegroup_aliases()
+
         # __all__ now includes one level of child nodegroups.
         # TODO: do all, or allow specifying a branch origin.
         if self.__class__.Meta.fields == "__all__":
@@ -174,7 +186,10 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                 else self._root_node.nodegroup.nodegroup_set
             )
             for child_nodegroup in child_attr.all():
-                child_nodegroup_alias = child_nodegroup.grouping_node.alias
+                if arches_version >= "8":
+                    child_nodegroup_alias = child_nodegroup.grouping_node.alias
+                else:
+                    child_nodegroup_alias = nodegroup_aliases[child_nodegroup.pk]
                 self._child_nodegroup_aliases.append(child_nodegroup_alias)
 
                 if child_nodegroup_alias not in field_map:

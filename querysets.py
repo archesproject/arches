@@ -14,7 +14,37 @@ from arches_querysets.utils.models import (
 )
 
 
-class TileQuerySet(models.QuerySet):
+class SemanticTileManager(models.Manager):
+    # This magic number doesn't actually cause queries beyond actual depth:
+    # https://forum.djangoproject.com/t/prefetching-relations-to-arbitrary-depth/39328
+    def get_queryset(self, depth=5):
+        qs = super().get_queryset().select_related("nodegroup")
+        if arches_version >= "8":
+            qs = qs.select_related("nodegroup__grouping_node").prefetch_related(
+                "children__nodegroup__grouping_node",
+                "children__children__nodegroup__grouping_node",
+                "children__children__children__nodegroup__grouping_node",
+                "children__children__children__children__nodegroup__grouping_node",
+            )
+        else:
+            # Annotate nodegroup_alias on Arches 7.6.
+            qs = qs.annotate(
+                _nodegroup_alias=Node.objects.filter(
+                    pk=models.F("nodegroup_id"),
+                    nodegroup__tilemodel=models.OuterRef("tileid"),
+                ).values("alias")[:1]
+            )
+            if depth:
+                qs = qs.prefetch_related(
+                    models.Prefetch(
+                        "tilemodel_set",
+                        queryset=self.get_queryset(depth=depth - 1),
+                    ),
+                )
+        return qs
+
+
+class SemanticTileQuerySet(models.QuerySet):
     def __init__(self, model=None, query=None, using=None, hints=None):
         super().__init__(model, query, using, hints)
         self._as_representation = False
@@ -58,7 +88,6 @@ class TileQuerySet(models.QuerySet):
 
         self._as_representation = as_representation
 
-        # TODO: 7.6 compat
         deferred_node_aliases = {
             n.alias
             for n in nodes
@@ -99,15 +128,10 @@ class TileQuerySet(models.QuerySet):
         else:
             child_nodegroup_aliases = None
         if depth < max_depth:
-            tile_field = next(
-                field
-                for field in SemanticTile._meta.fields
-                if field.name == "parenttile"
-            )
             prefetches.append(
                 models.Prefetch(
                     "__".join(
-                        ["children" if tile_field._related_name else "tilemodel_set"]
+                        ["children" if arches_version >= "8" else "tilemodel_set"]
                         * depth
                     ),
                     queryset=SemanticTile.objects.with_node_values(
@@ -129,13 +153,10 @@ class TileQuerySet(models.QuerySet):
             qs = qs.filter(data__has_any_keys=[n.pk for n in self._fetched_nodes])
 
         return (
-            qs.prefetch_related(*prefetches)
+            # Clear competing prefetches from base manager. TODO: what's best?
+            qs.prefetch_related(None)
+            .prefetch_related(*prefetches)
             .annotate(**node_alias_annotations)
-            .annotate(
-                cardinality=NodeGroup.objects.filter(
-                    pk=models.OuterRef("nodegroup_id")
-                ).values("cardinality")
-            )
             .order_by("sortorder")
         )
 
@@ -199,20 +220,19 @@ class TileQuerySet(models.QuerySet):
             else:
                 child_tiles = getattr(tile, "tilemodel_set")
             for child_tile in child_tiles.all():
-                setattr(child_tile, tile.nodegroup_alias, child_tile.parenttile)
-                if arches_version >= "8":
-                    child_nodegroup_alias = child_tile.nodegroup_alias
-                else:
-                    child_nodegroup_alias = (
-                        child_tile.nodegroup.node_set.filter(pk=child_tile.nodegroup.pk)
-                        .get()
-                        .alias
-                    )
+                setattr(child_tile, tile.find_nodegroup_alias(), child_tile.parenttile)
+                try:
+                    child_nodegroup_alias = child_tile.find_nodegroup_alias()
+                except:
+                    child_nodegroup_alias = Node.objects.get(
+                        pk=child_tile.nodegroup_id
+                    ).alias
                 children = getattr(tile, child_nodegroup_alias, [])
-                children.append(child_tile)
-                if not (cardinality := getattr(child_tile, "cardinality", None)):
-                    cardinality = child_tile.nodegroup.cardinality
-                if cardinality == "1":
+                try:
+                    children.append(child_tile)
+                except:
+                    print(children)
+                if child_tile.nodegroup.cardinality == "1":
                     setattr(tile, child_nodegroup_alias, children[0])
                 else:
                     setattr(tile, child_nodegroup_alias, children)
@@ -229,7 +249,7 @@ class ResourceInstanceQuerySet(models.QuerySet):
         super().__init__(model, query, using, hints)
         self._as_representation = False
         self._fetched_nodes = []
-        self._fetched_graph = None
+        self._fetched_graph_nodes = []  # todo: dedupe
 
     def with_nodegroups(
         self,
@@ -302,26 +322,31 @@ class ResourceInstanceQuerySet(models.QuerySet):
         source_graph = GraphWithPrefetching.prepare_for_annotations(
             graph_slug, resource_ids=resource_ids
         )
-        graph_nodes = source_graph.node_set.all()
+        self._fetched_graph_nodes = source_graph.node_set.all()
         deferred_node_aliases = {
-            n.alias for n in filter_nodes_by_highest_parent(graph_nodes, defer or [])
+            n.alias
+            for n in filter_nodes_by_highest_parent(
+                self._fetched_graph_nodes, defer or []
+            )
         }
         only_node_aliases = {
-            n.alias for n in filter_nodes_by_highest_parent(graph_nodes, only or [])
+            n.alias
+            for n in filter_nodes_by_highest_parent(
+                self._fetched_graph_nodes, only or []
+            )
         }
         node_alias_annotations = generate_tile_annotations(
-            graph_nodes,
+            self._fetched_graph_nodes,
             defer=deferred_node_aliases,
             only=only_node_aliases,
             model=self.model,
         )
         self._fetched_nodes = [
             node
-            for node in graph_nodes
+            for node in self._fetched_graph_nodes
             if node.alias in node_alias_annotations
             and not getattr(node, "source_identifier_id", None)
         ]
-        self._fetched_graph = source_graph
 
         if resource_ids:
             qs = self.filter(pk__in=resource_ids)
@@ -346,10 +371,10 @@ class ResourceInstanceQuerySet(models.QuerySet):
         """
         super()._prefetch_related_objects()
 
-        root_nodes = set()
+        root_nodes = {}
         for node in self._fetched_nodes:
             root_node = node.nodegroup.grouping_node
-            root_nodes.add(root_node)
+            root_nodes[root_node.pk] = root_node
 
         for resource in self._result_cache:
             if not isinstance(resource, self.model):
@@ -357,10 +382,10 @@ class ResourceInstanceQuerySet(models.QuerySet):
                 continue
             # TODO: fix misnomer, since it's not just root nodes.
             resource._fetched_root_nodes = set()
-            resource._fetched_graph = self._fetched_graph
+            resource._fetched_graph_nodes = self._fetched_graph_nodes
             for node in self._fetched_nodes:
                 delattr(resource, node.alias)
-            for root_node in root_nodes:
+            for root_node in root_nodes.values():
                 setattr(
                     resource,
                     root_node.alias,
@@ -369,14 +394,14 @@ class ResourceInstanceQuerySet(models.QuerySet):
                 resource._fetched_root_nodes.add(root_node)
             annotated_tiles = getattr(resource, "_annotated_tiles", [])
             for annotated_tile in annotated_tiles:
-                for root_node in root_nodes:
+                for root_node in root_nodes.values():
                     if root_node.pk == annotated_tile.nodegroup_id:
                         ng_alias = root_node.alias
                         break
                 else:
                     raise RuntimeError("missing root node for annotated tile")
 
-                if annotated_tile.cardinality == "n":
+                if annotated_tile.nodegroup.cardinality == "n":
                     tile_array = getattr(resource, ng_alias)
                     tile_array.append(annotated_tile)
                 else:
@@ -384,26 +409,28 @@ class ResourceInstanceQuerySet(models.QuerySet):
 
                 # Attach parent to this child.
                 if annotated_tile.parenttile_id:
-                    # TODO: improve performance: just getting the bones in.
-                    parent_nodegroup = annotated_tile.parenttile.nodegroup
-                    if arches_version >= "8":
-                        nodegroup_alias = parent_nodegroup.grouping_node.alias
-                    else:
-                        nodegroup_alias = (
-                            parent_nodegroup.node_set.filter(pk=parent_nodegroup.pk)
-                            .get()
-                            .alias
+                    try:
+                        parent_nodegroup_alias = (
+                            annotated_tile.parenttile.find_nodegroup_alias()
                         )
-                    setattr(annotated_tile, nodegroup_alias, annotated_tile.parenttile)
+                    except:
+                        parent_nodegroup_alias = root_nodes[
+                            annotated_tile.parenttile.nodegroup_id
+                        ].alias
+                    setattr(
+                        annotated_tile,
+                        parent_nodegroup_alias,
+                        annotated_tile.parenttile,
+                    )
 
             # Final pruning.
-            for node in root_nodes:
+            for node in root_nodes.values():
                 if node.nodegroup.parentnodegroup_id:
                     delattr(resource, node.alias)
 
     def _clone(self):
         clone = super()._clone()
         clone._fetched_nodes = self._fetched_nodes
-        clone._fetched_graph = self._fetched_graph
+        clone._fetched_graph_nodes = self._fetched_graph_nodes
         clone._as_representation = self._as_representation
         return clone

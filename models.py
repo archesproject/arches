@@ -14,7 +14,6 @@ from arches import __version__ as arches_version
 from arches.app.models.models import (
     GraphModel,
     Node,
-    NodeGroup,
     ResourceInstance,
     TileModel,
 )
@@ -24,7 +23,11 @@ from arches.app.models.utils import field_names
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 
 from arches_querysets.lookups import *
-from arches_querysets.querysets import ResourceInstanceQuerySet, TileQuerySet
+from arches_querysets.querysets import (
+    ResourceInstanceQuerySet,
+    SemanticTileManager,
+    SemanticTileQuerySet,
+)
 from arches_querysets.utils import datatype_transforms
 from arches_querysets.utils.models import (
     field_attnames,
@@ -322,7 +325,9 @@ class SemanticResource(ResourceInstance):
                 for tile in new_tiles
             ]
         db_tiles = [
-            t for t in self._annotated_tiles if t.nodegroup_alias == grouping_node.alias
+            t
+            for t in self._annotated_tiles
+            if t.find_nodegroup_alias() == grouping_node.alias
         ]
         if not db_tiles:
             next_sort_order = 0
@@ -365,18 +370,11 @@ class SemanticResource(ResourceInstance):
 
         nodes = grouping_node.nodegroup.node_set.all()
         for tile in to_insert | to_update:
-            if tile.nodegroup.pk != grouping_node.pk:
+            if tile.nodegroup_id != grouping_node.pk:
                 # TODO: this is a symptom this should be refactored.
                 continue
-            # Not object-oriented because tile.nodegroup is a property.
-            if arches_version >= "8":
-                children = (
-                    NodeGroup.objects.filter(parentnodegroup_id=tile.nodegroup_id)
-                    .select_related("grouping_node__nodegroup")
-                    .prefetch_related("grouping_node__nodegroup__node_set")
-                )
-            else:
-                children = tile.nodegroup.nodegroup_set.all()
+            children = tile.nodegroup.nodegroup_set.all()
+            if arches_version < "8":
                 grouping_node = (
                     Node.objects.filter(pk=tile.nodegroup.pk)
                     .prefetch_related("node_set")
@@ -529,7 +527,7 @@ class SemanticResource(ResourceInstance):
 
 
 class SemanticTile(TileModel):
-    objects = TileQuerySet.as_manager()
+    objects = SemanticTileManager.from_queryset(SemanticTileQuerySet)()
 
     class Meta:
         proxy = True
@@ -543,17 +541,13 @@ class SemanticTile(TileModel):
         for kwarg, value in arches_model_kwargs.items():
             setattr(self, kwarg, value)
 
-    @property
-    def nodegroup_alias(self):
-        if not getattr(self, "_nodegroup_alias", None):
-            self._nodegroup_alias = self.find_nodegroup_alias()
-        return self._nodegroup_alias
-
     def find_nodegroup_alias(self):
-        try:
-            return super().find_nodegroup_alias()
-        except:
-            return Node.objects.filter(pk=self.nodegroup_id).get().alias
+        # SemanticTileManager provides grouping_node on 7.6
+        if self.nodegroup and hasattr(self.nodegroup, "grouping_node"):
+            return self.nodegroup.grouping_node.alias
+        if not getattr(self, "_nodegroup_alias", None):
+            self._nodegroup_alias = Node.objects.get(pk=self.nodegroup_id).alias
+        return self._nodegroup_alias
 
     @classmethod
     def as_nodegroup(
@@ -613,6 +607,7 @@ class SemanticTile(TileModel):
                 "nodegroup__nodegroup_set__nodegroup_set",
                 "nodegroup__nodegroup_set__nodegroup_set__node_set",
             )
+
         ret = qs.first()
         if ret is None:
             raise Node.DoesNotExist(f"graph: {graph_slug} node: {root_node_alias}")
@@ -621,7 +616,7 @@ class SemanticTile(TileModel):
     def save(self, index=False, user=None, **kwargs):
         if not hasattr(self, "_fetched_nodes"):
             return super().save(**kwargs)
-        nodegroup_alias = self.nodegroup_alias
+        nodegroup_alias = self.find_nodegroup_alias()
         try:
             with transaction.atomic():
                 # update_fields=set() will abort the save, but at least calling
