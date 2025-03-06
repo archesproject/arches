@@ -18,7 +18,7 @@ import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 const props = withDefaults(
     defineProps<{
         mode: WidgetMode;
-        initialValue: string | undefined;
+        initialValue: string | null | undefined;
         nodeAlias: string;
         graphSlug: string;
         showLabel?: boolean;

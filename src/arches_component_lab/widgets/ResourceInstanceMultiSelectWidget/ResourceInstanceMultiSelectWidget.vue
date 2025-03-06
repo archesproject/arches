@@ -21,7 +21,7 @@ import type {
 const props = withDefaults(
     defineProps<{
         mode: WidgetMode;
-        initialValue: ResourceInstanceReference[] | undefined;
+        initialValue: ResourceInstanceReference[] | null | undefined;
         nodeAlias: string;
         graphSlug: string;
         showLabel?: boolean;
