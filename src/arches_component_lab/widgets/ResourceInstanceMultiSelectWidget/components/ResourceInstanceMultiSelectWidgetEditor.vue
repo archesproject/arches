@@ -101,7 +101,11 @@ async function getOptions(page: number, filterTerm?: string) {
             }),
         );
 
-        options.value = [...options.value, ...references];
+        if (resourceData.current_page == 1) {
+            options.value = references;
+        } else {
+            options.value = [...options.value, ...references];
+        }
 
         resourceResultsPage.value = resourceData.current_page;
         resourceResultsTotalCount.value = resourceData.total_results;
@@ -215,6 +219,7 @@ function getOption(value: string): ResourceInstanceReference | undefined {
                 resizeDelay: 200,
             }"
             @filter="onFilter"
+            @before-show="getOptions(1)"
         >
             <template
                 #chip="//@ts-expect-error - This is a bug in the PrimeVue types

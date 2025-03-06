@@ -1,5 +1,6 @@
 import arches from "arches";
-import type { ResourceInstanceReference } from "./types";
+
+import type { ResourceInstanceReference } from "@/arches_component_lab/widgets/types.ts";
 
 export const fetchWidgetData = async (graphSlug: string, nodeAlias: string) => {
     const response = await fetch(

@@ -7,7 +7,7 @@ from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 
 from arches.app.utils.decorators import user_can_read_resource
-from django.db.models import Value, Case, When, IntegerField
+from django.db.models import Value, Case, When, Q
 
 
 class RelatableResourcesView(View):
@@ -40,7 +40,10 @@ class RelatableResourcesView(View):
         query_string = "descriptors__{}__name__icontains".format(language)
 
         if filter_term:
-            resources = resources.filter(**{query_string: filter_term})
+            resources = resources.filter(
+                Q(**{query_string: filter_term})
+                | Q(resourceinstanceid__in=initial_values)
+            )
 
         paginator = Paginator(
             resources.order_by(
