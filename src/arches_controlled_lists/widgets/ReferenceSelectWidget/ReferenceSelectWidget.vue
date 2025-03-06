@@ -18,7 +18,7 @@ import type { ControlledListItem } from "@/arches_controlled_lists/types.ts";
 const props = withDefaults(
     defineProps<{
         mode: WidgetMode;
-        initialValue: ControlledListItem[] | undefined;
+        initialValue: ControlledListItem[] | null | undefined;
         nodeAlias: string;
         graphSlug: string;
         showLabel?: boolean;
