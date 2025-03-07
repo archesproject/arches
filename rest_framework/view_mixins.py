@@ -67,13 +67,16 @@ class ArchesModelAPIMixin:
                 as_representation=True,
             )
         if issubclass(options.model, TileModel):
-            return options.model.as_nodegroup(
+            qs = options.model.as_nodegroup(
                 self.nodegroup_alias,
                 graph_slug=self.graph_slug,
-                resource_ids=resource_ids,
                 only=fields,
                 as_representation=True,
             )
+            if resource_ids:
+                return qs.filter(resourceinstance__in=resource_ids)
+            return qs
+
         raise NotImplementedError
 
     def get_serializer_context(self):
