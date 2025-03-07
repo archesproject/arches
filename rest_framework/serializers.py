@@ -114,8 +114,8 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     datatype_field_map = {
         "string": JSONField(null=True),
         "number": fields.FloatField(null=True),
-        "concept": fields.UUIDField(null=True),
-        "concept-list": ArrayField(base_field=fields.UUIDField(null=True), null=True),
+        "concept": JSONField(null=True),
+        "concept-list": JSONField(null=True),
         "date": fields.DateField(null=True),
         "node-value": fields.CharField(null=True),  # XXX
         "edtf": fields.CharField(null=True),  # XXX

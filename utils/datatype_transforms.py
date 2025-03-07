@@ -38,7 +38,7 @@ def resource_instance_list_to_json(self, tile, node):
             if rxr.resourceinstanceidto_id == uuid.UUID(inner_val["resourceId"]):
                 display_val = rxr.resourceinstanceidto.descriptors[lang]["name"]
                 copy["display_value"] = display_val
-            break
+                break
         ret.append(copy)
 
     return ret
