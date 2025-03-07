@@ -456,24 +456,29 @@ class SemanticResource(ResourceInstance):
             # TODO: pre_structure_tile_data()?
             # TODO: move this to Tile.full_clean()?
             # https://github.com/archesproject/arches/issues/10851#issuecomment-2427305853
+            snake_case_datatype = node.datatype.replace("-", "_")
             if transform_fn := getattr(
-                datatype_transforms, f"{node.datatype}_transform_value_for_tile", None
+                datatype_transforms,
+                f"{snake_case_datatype}_transform_value_for_tile",
+                None,
             ):
                 transform_fn = partial(transform_fn, datatype_instance)
             else:
                 transform_fn = datatype_instance.transform_value_for_tile
-            if clean_fn := getattr(datatype_transforms, f"{node.datatype}_clean", None):
+            if clean_fn := getattr(
+                datatype_transforms, f"{snake_case_datatype}_clean", None
+            ):
                 clean_fn = partial(clean_fn, datatype_instance)
             else:
                 clean_fn = datatype_instance.clean
             if validate_fn := getattr(
-                datatype_transforms, f"{node.datatype}_validate", None
+                datatype_transforms, f"{snake_case_datatype}_validate", None
             ):
                 validate_fn = partial(validate_fn, datatype_instance)
             else:
                 validate_fn = datatype_instance.validate
             if pre_tile_save_fn := getattr(
-                datatype_transforms, f"{node.datatype}_pre_tile_save", None
+                datatype_transforms, f"{snake_case_datatype}_pre_tile_save", None
             ):
                 pre_tile_save_fn = partial(pre_tile_save_fn, datatype_instance)
             else:
