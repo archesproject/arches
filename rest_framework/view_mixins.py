@@ -48,6 +48,10 @@ class ArchesModelAPIMixin:
             fields = None
         else:
             fields = options.fields
+        if resource_ids := self.request.query_params.get("resource_ids"):
+            resource_ids = resource_ids.split(",")
+        else:
+            resource_ids = None
         if issubclass(options.model, ResourceInstance):
             if options.nodegroups == "__all__":
                 if self.nodegroup_alias:
@@ -57,12 +61,16 @@ class ArchesModelAPIMixin:
             else:
                 only = options.nodegroups
             return options.model.as_model(
-                self.graph_slug, only=only, as_representation=True
+                self.graph_slug,
+                only=only,
+                resource_ids=resource_ids,
+                as_representation=True,
             )
         if issubclass(options.model, TileModel):
             return options.model.as_nodegroup(
                 self.nodegroup_alias,
                 graph_slug=self.graph_slug,
+                resource_ids=resource_ids,
                 only=fields,
                 as_representation=True,
             )
