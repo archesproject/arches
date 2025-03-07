@@ -196,7 +196,7 @@ class SemanticTileQuerySet(models.QuerySet):
                                 datatype_instance, "to_representation", None
                             ):  # not bothering with overrides for now.
                                 instance_val = repr_fn(tile_val)
-                            elif node.datatype in {
+                            elif tile_val and node.datatype in {
                                 "resource-instance",
                                 "resource-instance-list",
                                 "concept",
