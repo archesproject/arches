@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef, watch } from "vue";
+import { ref, toRef, useTemplateRef, watch } from "vue";
 
 import { FormField } from "@primevue/forms";
 import Message from "primevue/message";
@@ -9,19 +9,31 @@ import { fetchWidgetOptions } from "@/arches_controlled_lists/widgets/api.ts";
 
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type {
-    ControlledListItemTileValue,
     ReferenceSelectTreeNode,
     ReferenceSelectFetchedOption,
 } from "@/arches_controlled_lists/widgets/types";
 
 const props = defineProps<{
-    initialValue: ControlledListItemTileValue[] | undefined;
+    initialValue: ReferenceSelectFetchedOption[] | undefined;
     configuration: {
         placeholder: string;
+        controlledList: string;
+        multiValue: boolean;
     };
     nodeAlias: string;
     graphSlug: string;
 }>();
+
+function extractInitialValue (initialValue: ReferenceSelectFetchedOption | undefined) {
+    if (!initialValue) {return {}}
+    return {[initialValue?.list_item_id]: true};
+}
+
+const initialValue = toRef(
+    props.configuration.multiValue ? 
+        props.initialValue?.map((reference) => extractInitialValue(reference)) :
+        extractInitialValue(props.initialValue ? props.initialValue[0] : undefined)
+);
 
 const options = ref<ReferenceSelectTreeNode[]>();
 const isLoading = ref(false);
@@ -48,13 +60,20 @@ watch(
 function optionAsNode(
     item: ReferenceSelectFetchedOption,
 ): ReferenceSelectTreeNode {
+    if (!item) {return {} as ReferenceSelectTreeNode;}
     return {
         key: item.list_item_id,
         label: item.display_label,
         sort_order: item.sort_order,
-        children: item.children.map((child) => optionAsNode(child)),
+        children: item.children?.map((child) => optionAsNode(child)),
         data: item,
     };
+}
+
+function optionsAsNodes(
+    items: ReferenceSelectFetchedOption[],
+): ReferenceSelectTreeNode[] {
+    return items.map((item) => optionAsNode(item));
 }
 
 async function getOptions() {
@@ -64,9 +83,7 @@ async function getOptions() {
             props.graphSlug,
             props.nodeAlias,
         );
-        options.value = fetchedLists.map((item: ReferenceSelectFetchedOption) =>
-            optionAsNode(item),
-        );
+        options.value = optionsAsNodes(fetchedLists);
     } catch (error) {
         optionsError.value = (error as Error).message;
     } finally {
@@ -116,15 +133,16 @@ function validate(e: FormFieldResolverOptions) {
         v-slot="$field"
         :name="props.nodeAlias"
         :resolver="resolver"
-        :initial-value="props.initialValue && props.initialValue[0].uri"
+        :initial-value="initialValue"
     >
         <TreeSelect
             style="display: flex"
-            option-value="uri"
+            option-value="list_item_id"
             :fluid="true"
             :loading="isLoading"
             :options="options"
             :placeholder="configuration.placeholder"
+            :selectionMode="configuration.multiValue ? 'multiple' : 'single'"
             :show-clear="true"
             @before-show="getOptions"
         />

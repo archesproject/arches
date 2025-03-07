@@ -13,12 +13,12 @@ import {
 import { EDIT, VIEW } from "@/arches_controlled_lists/widgets/constants.ts";
 
 import type { WidgetMode } from "@/arches_controlled_lists/widgets/types.ts";
-import type { ControlledListItem } from "@/arches_controlled_lists/types.ts";
+import type { ReferenceSelectFetchedOption } from "@/arches_controlled_lists/widgets/types";
 
 const props = withDefaults(
     defineProps<{
         mode: WidgetMode;
-        initialValue: ControlledListItem[] | null | undefined;
+        initialValue: ReferenceSelectFetchedOption[] | undefined;
         nodeAlias: string;
         graphSlug: string;
         showLabel?: boolean;
@@ -33,7 +33,10 @@ const nodeData = ref();
 const widgetData = ref();
 
 onMounted(async () => {
-    widgetData.value = await fetchWidgetData(props.graphSlug, props.nodeAlias);
+    widgetData.value = await fetchWidgetData(
+        props.graphSlug,
+        props.nodeAlias,
+    );
     nodeData.value = await fetchNodeData(props.graphSlug, props.nodeAlias);
 
     isLoading.value = false;
@@ -55,7 +58,7 @@ onMounted(async () => {
         <div v-if="mode === EDIT">
             <ReferenceSelectWidgetEditor
                 :initial-value="initialValue"
-                :widget-data="widgetData"
+                :configuration="{ ...widgetData.config, ...nodeData.config }"
                 :node-alias="props.nodeAlias"
                 :graph-slug="props.graphSlug"
             />

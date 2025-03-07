@@ -1,20 +1,19 @@
 <script setup lang="ts">
-import type { ControlledListItem } from "@/arches_controlled_lists/types.ts";
+import type { ReferenceSelectTreeNode } from "@/arches_controlled_lists/widgets/types";
 
 defineProps<{
-    value: ControlledListItem[] | null | undefined;
+    value: ReferenceSelectTreeNode[] | undefined;
 }>();
 </script>
 
 <template>
     <template v-if="value">
         <span
-            v-for="controlledListItem in value"
-            :key="controlledListItem.list_id"
+            v-for="referenceItem in value"
+            :key="referenceItem.list_item_id"
         >
             {{
-                // @ts-expect-error
-                controlledListItem.labels[0].value
+                referenceItem.display_label
             }}
         </span>
     </template>

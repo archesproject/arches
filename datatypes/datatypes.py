@@ -58,7 +58,7 @@ class ReferenceDataType(BaseDataType):
         return [
             {
                 "list_item_id": reference.labels[0].list_item_id,
-                "display_value": self.best_label(reference.labels).value,
+                "display_label": self.best_label(reference.labels).value,
             }
             for reference in references
         ]
