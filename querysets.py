@@ -5,7 +5,7 @@ from django.utils.translation import gettext as _
 
 from arches import __version__ as arches_version
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import Node, NodeGroup, TileModel
+from arches.app.models.models import Node
 
 from arches_querysets.utils import datatype_transforms
 from arches_querysets.utils.models import (
@@ -76,9 +76,9 @@ class SemanticTileQuerySet(models.QuerySet):
         <Concept: vellum (parchment) (34b081cd-6fcc-4e00-9a43-0a8a73745b45)>
             Fine-quality calf or lamb parchment ...
 
-        as_representation = True skips calling to_python() datatype methods and calls
-        to_representation() instead (rather than to_json() just to ensure we are
-        getting optimum performance and not yoking this feature to older use cases.)
+        as_representation:
+            - True: calls to_representation() / to_json() datatype methods
+            - False: calls to_python() datatype methods
 
         allow_empty = True includes tiles with no data, e.g. in some creation
         workflows involving creating a blank tile before fetching the richer
@@ -165,51 +165,69 @@ class SemanticTileQuerySet(models.QuerySet):
         Discard annotations that do not pertain to this nodegroup.
         Memoize fetched nodes.
         """
+        from arches_querysets.models import SemanticResource
+
         super()._prefetch_related_objects()
 
         datatype_factory = DataTypeFactory()
         NOT_PROVIDED = object()
+        enriched_resource = None
+
         for tile in self._result_cache:
             if not isinstance(tile, self.model):
                 # For a .values() query, we will lack instances.
                 continue
+            if not enriched_resource:
+                # One prefetch per tile depth. Later look into improving.
+                enriched_resource = (
+                    SemanticResource.objects.filter(pk=tile.resourceinstance_id)
+                    .with_related_resource_display_names()
+                    .get()
+                )
+            tile._enriched_resource = enriched_resource
             tile._fetched_nodes = self._fetched_nodes
             for node in self._fetched_nodes:
                 if node.nodegroup_id == tile.nodegroup_id:
                     tile_val = getattr(tile, node.alias, NOT_PROVIDED)
                     if tile_val is not NOT_PROVIDED:
-                        # TOOD: move, once dust settles.
                         datatype_instance = datatype_factory.get_instance(node.datatype)
-                        dummy_tile = TileModel(
-                            data={str(node.pk): tile_val},
-                            provisionaledits=tile.provisionaledits,
-                        )
-                        if to_json_fn := getattr(
-                            datatype_transforms, f"{node.datatype}_to_json", None
-                        ):
-                            to_json_fn = partial(to_json_fn, datatype_instance)
-                        else:
-                            to_json_fn = datatype_instance.to_json
-                        try:
-                            to_json_fn(dummy_tile, node)
-                        except TypeError:  # StringDataType workaround.
-                            dummy_tile.data[str(node.pk)] = {}
-                            to_json_fn(dummy_tile, node)
                         if self._as_representation:
                             if repr_fn := getattr(
                                 datatype_instance, "to_representation", None
-                            ):
+                            ):  # not bothering with overrides for now.
                                 instance_val = repr_fn(tile_val)
                             else:
-                                instance_val = tile_val
+                                if to_json_fn := getattr(
+                                    datatype_transforms,
+                                    f"{node.datatype.replace("-", "_")}_to_json",
+                                    None,
+                                ):
+                                    to_json_fn = partial(to_json_fn, datatype_instance)
+                                else:
+                                    to_json_fn = datatype_instance.to_json
+                                try:
+                                    to_json_result = to_json_fn(tile, node)
+                                except TypeError:  # StringDataType workaround.
+                                    tile.data[str(node.pk)] = {}
+                                    to_json_result = to_json_fn(tile, node)
+                                if node.datatype in {
+                                    "resource-instance",
+                                    "resource-instance-list",
+                                    "concept",
+                                    "concept-list",
+                                }:
+                                    # Use the to_json() result. TODO: Standardize?
+                                    instance_val = to_json_result
+                                else:
+                                    instance_val = tile.data[str(node.pk)]
                         else:
                             if py_fn := getattr(datatype_instance, "to_python", None):
                                 instance_val = py_fn(tile_val)
                             elif node.datatype == "resource-instance":
                                 # TODO: move, once dust settles.
                                 if tile_val is None or len(tile_val) != 1:
-                                    return tile_val
-                                return tile_val[0]
+                                    instance_val = tile_val
+                                instance_val = tile_val[0]
                             else:
                                 instance_val = tile_val
                         setattr(tile, node.alias, instance_val)
@@ -228,10 +246,7 @@ class SemanticTileQuerySet(models.QuerySet):
                         pk=child_tile.nodegroup_id
                     ).alias
                 children = getattr(tile, child_nodegroup_alias, [])
-                try:
-                    children.append(child_tile)
-                except:
-                    print(children)
+                children.append(child_tile)
                 if child_tile.nodegroup.cardinality == "1":
                     setattr(tile, child_nodegroup_alias, children[0])
                 else:
@@ -362,6 +377,12 @@ class ResourceInstanceQuerySet(models.QuerySet):
                 to_attr="_annotated_tiles",
             ),
         ).annotate(**node_alias_annotations)
+
+    def with_related_resource_display_names(self):
+        # Future: consider exposing nodegroups param.
+        return self.prefetch_related(
+            "resxres_resource_instance_ids_from__resourceinstanceidto"
+        )
 
     def _prefetch_related_objects(self):
         """

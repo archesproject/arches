@@ -12,10 +12,36 @@ import uuid
 from datetime import date, datetime
 
 from django.conf import settings
+from django.utils.translation import get_language
 
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+
+
+def resource_instance_to_json(self, tile, node):
+    return resource_instance_list_to_json(self, tile, node)
+
+
+def resource_instance_list_to_json(self, tile, node):
+    data = self.get_tile_data(tile)
+    if not data:
+        return []
+    ret = []
+
+    for inner_val in data.get(str(node.nodeid)):
+        if not inner_val:
+            continue
+        copy = {**inner_val}
+        lang = get_language()
+        for rxr in tile._enriched_resource.resxres_resource_instance_ids_from.all():
+            if rxr.resourceinstanceidto_id == uuid.UUID(inner_val["resourceId"]):
+                display_val = rxr.resourceinstanceidto.descriptors[lang]["name"]
+                copy["display_value"] = display_val
+            break
+        ret.append(copy)
+
+    return ret
 
 
 def concept_transform_value_for_tile(self, value, **kwargs):

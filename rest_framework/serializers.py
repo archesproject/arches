@@ -152,11 +152,6 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
     @staticmethod
     @lru_cache(maxsize=1)
-    def enrich_resource_instance_queryset(manager, graph_slug):
-        return manager.with_nodegroups(graph_slug)
-
-    @staticmethod
-    @lru_cache(maxsize=1)
     def get_nodegroup_aliases():
         # TODO: uncache this.
         return {
