@@ -30,7 +30,7 @@ class Reference:
 class ReferenceDataType(BaseDataType):
     def to_python(self, value) -> list[Reference]:
         if value is None:
-            return None
+            return []
         if not value:
             raise ValueError(_("Reference datatype value cannot be empty"))
 
@@ -57,8 +57,6 @@ class ReferenceDataType(BaseDataType):
 
     def to_representation(self, value):
         references = self.to_python(value)
-        if references is None:
-            return None
         return [
             {
                 "list_item_id": reference.labels[0].list_item_id,
