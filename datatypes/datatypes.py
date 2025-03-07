@@ -113,7 +113,9 @@ class ReferenceDataType(BaseDataType):
                 msg = _("A reference can have only one prefLabel per language")
                 raise ValueError(msg)
 
-    def validate_list_item_consistency(self, references: list[Reference]):
+    def validate_list_item_consistency(self, references: list[Reference] | None):
+        if references is None:
+            return None
         for reference in references:
             list_item_ids = {ref.list_item_id for ref in reference.labels}
             if len(list_item_ids) != 1:
