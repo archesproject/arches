@@ -196,7 +196,13 @@ class SemanticTileQuerySet(models.QuerySet):
                                 datatype_instance, "to_representation", None
                             ):  # not bothering with overrides for now.
                                 instance_val = repr_fn(tile_val)
-                            else:
+                            elif node.datatype in {
+                                "resource-instance",
+                                "resource-instance-list",
+                                "concept",
+                                "concept-list",
+                            }:
+                                # Some datatypes have safe to_json() methods.
                                 if to_json_fn := getattr(
                                     datatype_transforms,
                                     f"{node.datatype.replace("-", "_")}_to_json",
@@ -210,16 +216,9 @@ class SemanticTileQuerySet(models.QuerySet):
                                 except TypeError:  # StringDataType workaround.
                                     tile.data[str(node.pk)] = {}
                                     to_json_result = to_json_fn(tile, node)
-                                if node.datatype in {
-                                    "resource-instance",
-                                    "resource-instance-list",
-                                    "concept",
-                                    "concept-list",
-                                }:
-                                    # Use the to_json() result. TODO: Standardize?
-                                    instance_val = to_json_result
-                                else:
-                                    instance_val = tile.data[str(node.pk)]
+                                instance_val = to_json_result
+                            else:
+                                instance_val = tile_val
                         else:
                             if py_fn := getattr(datatype_instance, "to_python", None):
                                 instance_val = py_fn(tile_val)
