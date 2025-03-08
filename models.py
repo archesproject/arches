@@ -24,7 +24,7 @@ from arches.app.utils.permission_backend import user_is_resource_reviewer
 
 from arches_querysets.lookups import *
 from arches_querysets.querysets import (
-    ResourceInstanceQuerySet,
+    SemanticResourceQuerySet,
     SemanticTileManager,
     SemanticTileQuerySet,
 )
@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 
 
 class SemanticResource(ResourceInstance):
-    objects = ResourceInstanceQuerySet.as_manager()
+    objects = SemanticResourceQuerySet.as_manager()
 
     class Meta:
         proxy = True
@@ -578,7 +578,6 @@ class SemanticTile(TileModel):
             cls.objects.filter(nodegroup_id=root_node.pk)
             .with_node_values(
                 branch_nodes,
-                root_node=root_node,
                 defer=defer,
                 only=[root_node.alias],  # determine whether to expose
                 as_representation=as_representation,
@@ -852,6 +851,10 @@ class SemanticTile(TileModel):
 
 
 class GraphWithPrefetching(GraphModel):
+    class Meta:
+        proxy = True
+        db_table = "graphs"
+
     @classmethod
     def prepare_for_annotations(cls, graph_slug=None, *, resource_ids=None):
         if resource_ids and not graph_slug:
@@ -919,7 +922,3 @@ class GraphWithPrefetching(GraphModel):
                         )
 
         return graph
-
-    class Meta:
-        proxy = True
-        db_table = "graphs"

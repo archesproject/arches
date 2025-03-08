@@ -15,17 +15,10 @@ from arches_querysets.utils.models import (
 
 
 class SemanticTileManager(models.Manager):
-    # This magic number doesn't actually cause queries beyond actual depth:
-    # https://forum.djangoproject.com/t/prefetching-relations-to-arbitrary-depth/39328
-    def get_queryset(self, depth=5):
-        qs = super().get_queryset().select_related("nodegroup")
+    def get_queryset(self, depth=0):
+        qs = super().get_queryset().select_related("nodegroup", "parenttile")
         if arches_version >= "8":
-            qs = qs.select_related("nodegroup__grouping_node").prefetch_related(
-                "children__nodegroup__grouping_node",
-                "children__children__nodegroup__grouping_node",
-                "children__children__children__nodegroup__grouping_node",
-                "children__children__children__children__nodegroup__grouping_node",
-            )
+            qs = qs.select_related("nodegroup__grouping_node")
         else:
             # Annotate nodegroup_alias on Arches 7.6.
             qs = qs.annotate(
@@ -34,13 +27,16 @@ class SemanticTileManager(models.Manager):
                     nodegroup__tilemodel=models.OuterRef("tileid"),
                 ).values("alias")[:1]
             )
-            if depth:
-                qs = qs.prefetch_related(
-                    models.Prefetch(
-                        "tilemodel_set",
-                        queryset=self.get_queryset(depth=depth - 1),
-                    ),
+        # This magic number doesn't cause queries beyond actual depth:
+        # https://forum.djangoproject.com/t/prefetching-relations-to-arbitrary-depth/39328
+        if depth < 20:
+            qs = qs.prefetch_related(
+                models.Prefetch(
+                    "children" if arches_version >= "8" else "tilemodel_set",
+                    queryset=self.get_queryset(depth=depth + 1),
+                    to_attr="_annotated_tiles",
                 )
+            )
         return qs
 
 
@@ -54,10 +50,8 @@ class SemanticTileQuerySet(models.QuerySet):
         self,
         nodes,
         *,
-        root_node=None,
         defer=None,
         only=None,
-        depth=1,
         as_representation=False,
         allow_empty=False,
     ):
@@ -84,8 +78,6 @@ class SemanticTileQuerySet(models.QuerySet):
         workflows involving creating a blank tile before fetching the richer
         version from this factory.
         """
-        from arches_querysets.models import SemanticTile
-
         self._as_representation = as_representation
 
         deferred_node_aliases = {
@@ -105,46 +97,6 @@ class SemanticTileQuerySet(models.QuerySet):
             model=self.model,
         )
 
-        max_depth = 5
-        prefetches = []
-        if root_node:
-            child_attr = (
-                root_node.nodegroup.children
-                if arches_version >= "8"
-                else root_node.nodegroup.nodegroup_set.annotate(
-                    grouping_node_alias=Node.objects.filter(
-                        pk=models.OuterRef("nodegroupid")
-                    ).values("alias")
-                )
-            )
-            child_nodegroup_aliases = {
-                (
-                    child.grouping_node.alias
-                    if arches_version >= "8"
-                    else child.grouping_node_alias
-                )
-                for child in child_attr.all()
-            }
-        else:
-            child_nodegroup_aliases = None
-        if depth < max_depth:
-            prefetches.append(
-                models.Prefetch(
-                    "__".join(
-                        ["children" if arches_version >= "8" else "tilemodel_set"]
-                        * depth
-                    ),
-                    queryset=SemanticTile.objects.with_node_values(
-                        nodes,
-                        root_node=root_node,
-                        defer=defer,
-                        only=child_nodegroup_aliases,
-                        depth=depth + 1,
-                        allow_empty=allow_empty,
-                    ),
-                )
-            )
-
         self._fetched_nodes = [n for n in nodes if n.alias in node_alias_annotations]
 
         qs = self
@@ -152,13 +104,7 @@ class SemanticTileQuerySet(models.QuerySet):
         if not allow_empty:
             qs = qs.filter(data__has_any_keys=[n.pk for n in self._fetched_nodes])
 
-        return (
-            # Clear competing prefetches from base manager. TODO: what's best?
-            qs.prefetch_related(None)
-            .prefetch_related(*prefetches)
-            .annotate(**node_alias_annotations)
-            .order_by("sortorder")
-        )
+        return qs.annotate(**node_alias_annotations).order_by("sortorder")
 
     def _prefetch_related_objects(self):
         """Call datatype to_python() methods when materializing the QuerySet.
@@ -233,10 +179,10 @@ class SemanticTileQuerySet(models.QuerySet):
                 else:
                     delattr(tile, node.alias)
             if arches_version >= "8":
-                child_tiles = getattr(tile, "children")
+                fallback = getattr(tile, "children")
             else:
-                child_tiles = getattr(tile, "tilemodel_set")
-            for child_tile in child_tiles.all():
+                fallback = getattr(tile, "tilemodel_set")
+            for child_tile in getattr(tile, "_annotated_tiles", fallback.all()):
                 setattr(child_tile, tile.find_nodegroup_alias(), child_tile.parenttile)
                 try:
                     child_nodegroup_alias = child_tile.find_nodegroup_alias()
@@ -258,7 +204,7 @@ class SemanticTileQuerySet(models.QuerySet):
         return clone
 
 
-class ResourceInstanceQuerySet(models.QuerySet):
+class SemanticResourceQuerySet(models.QuerySet):
     def __init__(self, model=None, query=None, using=None, hints=None):
         super().__init__(model, query, using, hints)
         self._as_representation = False
@@ -372,7 +318,7 @@ class ResourceInstanceQuerySet(models.QuerySet):
                 queryset=SemanticTile.objects.with_node_values(
                     self._fetched_nodes,
                     as_representation=as_representation,
-                ).select_related("parenttile"),
+                ),
                 to_attr="_annotated_tiles",
             ),
         ).annotate(**node_alias_annotations)
@@ -429,14 +375,9 @@ class ResourceInstanceQuerySet(models.QuerySet):
 
                 # Attach parent to this child.
                 if annotated_tile.parenttile_id:
-                    try:
-                        parent_nodegroup_alias = (
-                            annotated_tile.parenttile.find_nodegroup_alias()
-                        )
-                    except:
-                        parent_nodegroup_alias = root_nodes[
-                            annotated_tile.parenttile.nodegroup_id
-                        ].alias
+                    parent_nodegroup_alias = root_nodes[
+                        annotated_tile.parenttile.nodegroup_id
+                    ].alias
                     setattr(
                         annotated_tile,
                         parent_nodegroup_alias,
