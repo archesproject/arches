@@ -1,19 +1,12 @@
-# -*- coding: utf-8 -*-
-
-
+import codecs
 import os
 import uuid
-import codecs
-import django.contrib.gis.db.models.fields
-from django.core import management
+
 from django.contrib.postgres.fields import JSONField
 from django.db import migrations, models
-from arches.db.migration_operations.extras import (
-    CreateExtension,
-    CreateAutoPopulateUUIDField,
-    CreateFunction,
-)
+
 from arches.app.models.system_settings import settings
+from arches.db.migration_operations.extras import CreateExtension, CreateFunction
 
 
 def get_sql_string_from_file(pathtofile):
@@ -106,6 +99,14 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
     admin_user.groups.add(mobile_project_admin_group)
     admin_user.groups.add(crowdsource_editor_group)
     admin_user.groups.add(guest_group)
+
+
+# For historical purposes only.
+# UUID4 exists in arches.app.models.functions for general use.
+class UUID1(models.Func):
+    function = "uuid_generate_v1"
+    arity = 0
+    output_field = models.UUIDField()
 
 
 class Migration(migrations.Migration):
@@ -201,7 +202,9 @@ class Migration(migrations.Migration):
                 (
                     "graphid",
                     models.UUIDField(
-                        default=uuid.uuid1, serialize=False, primary_key=True
+                        db_default=UUID1(),
+                        serialize=False,
+                        primary_key=True,
                     ),
                 ),
                 ("name", models.TextField(null=True, blank=True)),
@@ -237,7 +240,9 @@ class Migration(migrations.Migration):
                 (
                     "cardid",
                     models.UUIDField(
-                        default=uuid.uuid1, serialize=False, primary_key=True
+                        db_default=UUID1(),
+                        serialize=False,
+                        primary_key=True,
                     ),
                 ),
                 ("name", models.TextField(null=True, blank=True)),
@@ -295,7 +300,9 @@ class Migration(migrations.Migration):
                 (
                     "conceptid",
                     models.UUIDField(
-                        default=uuid.uuid1, primary_key=True, serialize=False
+                        db_default=UUID1(),
+                        primary_key=True,
+                        serialize=False,
                     ),
                 ),
                 ("legacyoid", models.TextField(unique=True)),
@@ -380,7 +387,9 @@ class Migration(migrations.Migration):
                 (
                     "edgeid",
                     models.UUIDField(
-                        default=uuid.uuid1, primary_key=True, serialize=False
+                        db_default=UUID1(),
+                        primary_key=True,
+                        serialize=False,
                     ),
                 ),
                 ("name", models.TextField(blank=True, null=True)),
@@ -408,7 +417,9 @@ class Migration(migrations.Migration):
                 (
                     "editlogid",
                     models.UUIDField(
-                        default=uuid.uuid1, serialize=False, primary_key=True
+                        db_default=UUID1(),
+                        serialize=False,
+                        primary_key=True,
                     ),
                 ),
                 ("resourceclassid", models.TextField(null=True, blank=True)),
@@ -452,7 +463,9 @@ class Migration(migrations.Migration):
                 (
                     "formid",
                     models.UUIDField(
-                        default=uuid.uuid1, primary_key=True, serialize=False
+                        db_default=UUID1(),
+                        primary_key=True,
+                        serialize=False,
                     ),
                 ),
                 ("title", models.TextField(blank=True, null=True)),
@@ -571,7 +584,9 @@ class Migration(migrations.Migration):
                 (
                     "nodeid",
                     models.UUIDField(
-                        default=uuid.uuid1, primary_key=True, serialize=False
+                        db_default=UUID1(),
+                        primary_key=True,
+                        serialize=False,
                     ),
                 ),
                 ("name", models.TextField()),
@@ -602,7 +617,9 @@ class Migration(migrations.Migration):
                 (
                     "nodegroupid",
                     models.UUIDField(
-                        default=uuid.uuid1, primary_key=True, serialize=False
+                        db_default=UUID1(),
+                        primary_key=True,
+                        serialize=False,
                     ),
                 ),
                 ("legacygroupid", models.TextField(blank=True, null=True)),
@@ -684,7 +701,9 @@ class Migration(migrations.Migration):
                 (
                     "relationid",
                     models.UUIDField(
-                        default=uuid.uuid1, primary_key=True, serialize=False
+                        db_default=UUID1(),
+                        primary_key=True,
+                        serialize=False,
                     ),
                 ),
                 (
@@ -786,7 +805,9 @@ class Migration(migrations.Migration):
                 (
                     "resource2resourceid",
                     models.UUIDField(
-                        default=uuid.uuid1, primary_key=True, serialize=False
+                        db_default=UUID1(),
+                        primary_key=True,
+                        serialize=False,
                     ),
                 ),
                 (
@@ -823,7 +844,9 @@ class Migration(migrations.Migration):
                 (
                     "resourceinstanceid",
                     models.UUIDField(
-                        default=uuid.uuid1, primary_key=True, serialize=False
+                        db_default=UUID1(),
+                        primary_key=True,
+                        serialize=False,
                     ),
                 ),
                 ("legacyid", models.TextField(blank=True, unique=True, null=True)),
@@ -866,7 +889,9 @@ class Migration(migrations.Migration):
                 (
                     "tileid",
                     models.UUIDField(
-                        default=uuid.uuid1, primary_key=True, serialize=False
+                        db_default=UUID1(),
+                        primary_key=True,
+                        serialize=False,
                     ),
                 ),
                 ("data", JSONField(blank=True, db_column="tiledata", null=True)),
@@ -909,7 +934,9 @@ class Migration(migrations.Migration):
                 (
                     "valueid",
                     models.UUIDField(
-                        default=uuid.uuid1, primary_key=True, serialize=False
+                        db_default=UUID1(),
+                        primary_key=True,
+                        serialize=False,
                     ),
                 ),
                 ("value", models.TextField()),
@@ -951,7 +978,9 @@ class Migration(migrations.Migration):
                 (
                     "widgetid",
                     models.UUIDField(
-                        default=uuid.uuid1, primary_key=True, serialize=False
+                        db_default=UUID1(),
+                        primary_key=True,
+                        serialize=False,
                     ),
                 ),
                 ("name", models.TextField()),
@@ -1224,22 +1253,6 @@ class Migration(migrations.Migration):
             name="functionxgraph",
             unique_together={("function", "graph")},
         ),
-        CreateAutoPopulateUUIDField("graphs", ["graphid"]),
-        CreateAutoPopulateUUIDField("cards", ["cardid"]),
-        CreateAutoPopulateUUIDField("concepts", ["conceptid"]),
-        CreateAutoPopulateUUIDField("edges", ["edgeid"]),
-        CreateAutoPopulateUUIDField("edit_log", ["editlogid"]),
-        CreateAutoPopulateUUIDField("forms", ["formid"]),
-        CreateAutoPopulateUUIDField("node_groups", ["nodegroupid"]),
-        CreateAutoPopulateUUIDField("nodes", ["nodeid"]),
-        CreateAutoPopulateUUIDField("relations", ["relationid"]),
-        CreateAutoPopulateUUIDField(
-            "resource_2_resource_constraints", ["resource2resourceid"]
-        ),
-        CreateAutoPopulateUUIDField("resource_instances", ["resourceinstanceid"]),
-        CreateAutoPopulateUUIDField("tiles", ["tileid"]),
-        CreateAutoPopulateUUIDField("values", ["valueid"]),
-        CreateAutoPopulateUUIDField("widgets", ["widgetid"]),
         migrations.RunSQL(
             """
                 ALTER TABLE nodes ADD CONSTRAINT nodes_ddatatypes_fk FOREIGN KEY (datatype)

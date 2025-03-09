@@ -795,30 +795,18 @@ class Tile(models.TileModel):
         context -- string e.g. "copy" indicating conditions under which a resource is saved and how functions should behave.
         """
 
-        try:
-            for function in self._getFunctionClassInstances():
-                try:
-                    function.save(self, request, context=context)
-                except NotImplementedError:
-                    pass
-        except TypeError as e:
-            logger.warning(
-                _("No associated functions or other TypeError raised by a function")
-            )
-            logger.warning(e)
+        for function in self._getFunctionClassInstances():
+            try:
+                function.save(self, request, context=context)
+            except NotImplementedError:
+                pass
 
     def __preDelete(self, request=None):
-        try:
-            for function in self._getFunctionClassInstances():
-                try:
-                    function.delete(self, request)
-                except NotImplementedError:
-                    pass
-        except TypeError as e:
-            logger.warning(
-                _("No associated functions or other TypeError raised by a function")
-            )
-            logger.warning(e)
+        for function in self._getFunctionClassInstances():
+            try:
+                function.delete(self, request)
+            except NotImplementedError:
+                pass
 
     def __postSave(self, request=None, context=None):
         """
@@ -827,27 +815,20 @@ class Tile(models.TileModel):
         context -- string e.g. "copy" indicating conditions under which a resource is saved and how functions should behave.
         """
 
-        try:
-            for function in self._getFunctionClassInstances():
-                try:
-                    function.post_save(self, request, context=context)
-                except NotImplementedError:
-                    pass
-        except TypeError as e:
-            logger.warning(
-                _("No associated functions or other TypeError raised by a function")
-            )
-            logger.warning(e)
+        for function in self._getFunctionClassInstances():
+            try:
+                function.post_save(self, request, context=context)
+            except NotImplementedError:
+                pass
 
     def _getFunctionClassInstances(self):
         ret = []
-        resource = models.ResourceInstance.objects.get(pk=self.resourceinstance_id)
         functionXgraphs = models.FunctionXGraph.objects.filter(
-            Q(graph_id=resource.graph_id),
+            Q(graph_id=self.resourceinstance.graph_id),
             Q(config__contains={"triggering_nodegroups": [str(self.nodegroup_id)]})
             | Q(config__triggering_nodegroups__exact=[]),
             ~Q(function__functiontype="primarydescriptors"),
-        )
+        ).select_related("function")
         for functionXgraph in functionXgraphs:
             func = functionXgraph.function.get_class_module()(
                 functionXgraph.config, self.nodegroup_id
@@ -877,17 +858,19 @@ class Tile(models.TileModel):
         return ret
 
 
-class TileValidationError(Exception):
+class TileValidationError(ValidationError):
     def __init__(self, message, code=None):
+        super().__init__(message)
         self.title = _("Tile Validation Error")
-        self.message = message
         self.code = code
 
     def __str__(self):
+        if hasattr(self, "messages"):
+            return repr(self.messages)
         return repr(self.message)
 
 
 class TileCardinalityError(TileValidationError):
     def __init__(self, message, code=None):
-        super(TileCardinalityError, self).__init__(message, code)
+        super().__init__(message, code)
         self.title = _("Tile Cardinality Error")

@@ -19,18 +19,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from uuid import UUID, uuid4
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from tests.base_test import ArchesTestCase
-from django.db import connection
 from django.contrib.auth.models import User
-from django.db.utils import ProgrammingError
 from django.http import HttpRequest
 from arches.app.models.graph import Graph
-from arches.app.models.tile import Tile, TileValidationError
+from arches.app.models.tile import Tile, TileCardinalityError, TileValidationError
 from arches.app.models.resource import Resource
 from arches.app.models.models import (
     CardModel,
     CardXNodeXWidget,
     Node,
     NodeGroup,
+    ResourceInstance,
     ResourceXResource,
     TileModel,
     Widget,
@@ -51,30 +50,27 @@ class TileTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        sql = """
-        INSERT INTO public.resource_instances(resourceinstanceid, legacyid, graphid, createdtime, resource_instance_lifecycle_state_id)
-            VALUES ('40000000-0000-0000-0000-000000000000', '40000000-0000-0000-0000-000000000000', '2f7f8e40-adbc-11e6-ac7f-14109fd34195', '1/1/2000', '4e2a6b8e-2489-4377-9c9f-29cfbd3e76c8');
+        ResourceInstance.objects.create(
+            pk="40000000-0000-0000-0000-000000000000",
+            legacyid="40000000-0000-0000-0000-000000000000",
+            graph_id="2f7f8e40-adbc-11e6-ac7f-14109fd34195",
+            createdtime="1/1/2000",
+            resource_instance_lifecycle_state_id="4e2a6b8e-2489-4377-9c9f-29cfbd3e76c8",
+        )
+        nodegroups = [
+            NodeGroup(pk=pk, cardinality="n")
+            for pk in [
+                "99999999-0000-0000-0000-000000000001",
+                "32999999-0000-0000-0000-000000000000",
+                "19999999-0000-0000-0000-000000000000",
+                "21111111-0000-0000-0000-000000000000",
+                "41111111-0000-0000-0000-000000000000",
+            ]
+        ]
+        nodegroups = NodeGroup.objects.bulk_create(nodegroups)
 
-        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
-            VALUES ('99999999-0000-0000-0000-000000000001', '', 'n');
-
-        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
-            VALUES ('32999999-0000-0000-0000-000000000000', '', 'n');
-
-        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
-            VALUES ('19999999-0000-0000-0000-000000000000', '', 'n');
-
-        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
-            VALUES ('21111111-0000-0000-0000-000000000000', '', 'n');
-
-        INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
-            VALUES ('41111111-0000-0000-0000-000000000000', '', 'n');
-        """
-
-        with connection.cursor() as cursor:
-            cursor.execute(sql)
-
-    def test_repr(self):
+    def create_tile(self):
+        """Can't do this in setUpTestData given count assertions in other tests."""
         tileid = uuid4()
         nodegroupid = "99999999-0000-0000-0000-000000000001"
         tile = TileModel.objects.create(
@@ -82,10 +78,6 @@ class TileTests(ArchesTestCase):
             resourceinstance_id="40000000-0000-0000-0000-000000000000",
             nodegroup_id=nodegroupid,
         )
-
-        self.assertEqual(f"{tile!r}", f"<None ({tileid})>")
-
-        # Roundabout way of creating the grouping node given incomplete setup.
         grouping_node = Node.objects.create(
             pk=nodegroupid,
             graph=tile.resourceinstance.graph,
@@ -97,9 +89,40 @@ class TileTests(ArchesTestCase):
         nodegroup = grouping_node.nodegroup
         nodegroup.grouping_node = grouping_node
         nodegroup.save()
-        tile.refresh_from_db()
+        return TileModel.objects.get(pk=tile.pk)
 
-        self.assertEqual(f"{tile!r}", f"<Statement ({tileid})>")
+    def test_tile_repr(self):
+        sample_tile = self.create_tile()
+        self.assertEqual(f"{sample_tile!r}", f"<Statement ({sample_tile.pk})>")
+
+    def test_tile_repr_no_nodegroup(self):
+        sample_tile = self.create_tile()
+        sample_tile.nodegroup = None
+        self.assertEqual(f"{sample_tile!r}", f"<None ({sample_tile.pk})>")
+
+    def test_nodegroup_lookups(self):
+        sample_tile = self.create_tile()
+        query = TileModel.objects.filter(pk=sample_tile.pk).select_related(
+            "nodegroup__grouping_node"
+        )
+        with self.assertNumQueries(1):
+            query[0].nodegroup.grouping_node.alias
+
+        self.assertSequenceEqual(
+            TileModel.objects.filter(nodegroup__grouping_node__alias="Statement").all(),
+            [sample_tile],
+        )
+
+    def test_nodegroup_assignment(self):
+        """Django's ForeignObject is only recently public, so add coverage."""
+        sample_tile = self.create_tile()
+        other_nodegroup = NodeGroup.objects.get(
+            pk="41111111-0000-0000-0000-000000000000"
+        )
+        sample_tile.nodegroup = other_nodegroup
+        sample_tile.save()
+        refreshed = TileModel.objects.get(pk=sample_tile.pk)
+        self.assertEqual(refreshed.nodegroup, other_nodegroup)
 
     def test_load_from_python_dict(self):
         """
@@ -387,7 +410,7 @@ class TileTests(ArchesTestCase):
     def test_tile_cardinality(self):
         """
         Tests that the tile is not saved if the cardinality is violated
-        by testin to save a tile with the same values as existing one
+        by testing to save a tile with the same values as an existing one.
 
         """
 
@@ -421,7 +444,7 @@ class TileTests(ArchesTestCase):
         }
         second_tile = Tile(second_json)
 
-        with self.assertRaises(ProgrammingError):
+        with self.assertRaises(TileCardinalityError):
             second_tile.save(index=False, request=request)
 
     def test_apply_provisional_edit(self):

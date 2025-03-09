@@ -390,7 +390,7 @@ class ResourceEditorView(MapBaseManagerView):
         context["nav"]["title"] = ""
         context["nav"]["menu"] = nav_menu
 
-        if resourceid not in (None, ""):
+        if resourceid not in (None, "", settings.SYSTEM_SETTINGS_RESOURCE_ID):
             context["nav"]["report_view"] = True
 
         if resourceid == settings.RESOURCE_INSTANCE_ID:
