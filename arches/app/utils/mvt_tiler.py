@@ -60,9 +60,8 @@ class MVTTiler:
                     else "resourceinstanceid not in %s"
                 )
                 if len(resource_ids) == 0:
-                    resource_ids.append(
-                        "10000000-0000-0000-0000-000000000001"
-                    )  # This must have a uuid that will never be a resource id.
+                    # This must have a uuid that will never be a resource id.
+                    resource_ids = ["10000000-0000-0000-0000-000000000001"]
                 resource_ids = tuple(resource_ids)
 
                 if int(zoom) <= int(config["clusterMaxZoom"]):
