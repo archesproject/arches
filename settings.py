@@ -138,7 +138,6 @@ INSTALLED_APPS = (
     "arches.app.models",
     "arches.management",
     "guardian",
-    "django_recaptcha",
     "revproxy",
     "rest_framework",
     "corsheaders",
