@@ -92,7 +92,7 @@ class SemanticResource(ResourceInstance):
         ephemeral_proxy_instance.save_edit(user=user, edit_type=edit_type)
 
     def save(self, index=False, user=None, **kwargs):
-        if not hasattr(self, "_fetched_root_nodes"):
+        if not hasattr(self, "_fetched_grouping_nodes"):
             return super().save(**kwargs)
         with transaction.atomic():
             # update_fields=set() will abort the save, but at least calling
@@ -209,9 +209,9 @@ class SemanticResource(ResourceInstance):
             super().save(**kwargs)
 
             for upsert_tile in upserts:
-                for root_node in self._fetched_root_nodes:
-                    if upsert_tile.nodegroup_id == root_node.nodegroup_id:
-                        for node in root_node.nodegroup.node_set.all():
+                for grouping_node in self._fetched_grouping_nodes:
+                    if upsert_tile.nodegroup_id == grouping_node.nodegroup_id:
+                        for node in grouping_node.nodegroup.node_set.all():
                             datatype = datatype_factory.get_instance(node.datatype)
                             datatype.post_tile_save(
                                 upsert_tile, str(node.pk), request=dummy_request
@@ -269,9 +269,9 @@ class SemanticResource(ResourceInstance):
         to_delete = set()
 
         original_tile_data_by_tile_id = {}
-        for root_node in self._fetched_root_nodes:
+        for grouping_node in self._fetched_grouping_nodes:
             self._update_tile_for_grouping_node(
-                root_node,
+                grouping_node,
                 self,
                 original_tile_data_by_tile_id,
                 to_insert,
@@ -514,9 +514,9 @@ class SemanticResource(ResourceInstance):
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None):
         if from_queryset is None and (
-            root_nodes := getattr(self, "_fetched_root_nodes", set())
+            grouping_nodes := getattr(self, "_fetched_grouping_nodes", set())
         ):
-            aliases = [n.alias for n in root_nodes]
+            aliases = [n.alias for n in grouping_nodes]
             from_queryset = self.__class__.as_model(
                 self.graph.slug,
                 only=aliases,
@@ -804,7 +804,7 @@ class SemanticTile(TileModel):
         resource = SemanticResource.as_model(
             graph_slug, only=only, resource_ids=[self.resourceinstance_id]
         ).get()
-        for grouping_node in resource._fetched_root_nodes:
+        for grouping_node in resource._fetched_grouping_nodes:
             for node in grouping_node.nodegroup.node_set.all():
                 setattr(self, node.alias, self.data.get(str(node.pk)))
         self.resourceinstance = resource

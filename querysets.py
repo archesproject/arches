@@ -338,36 +338,29 @@ class SemanticResourceQuerySet(models.QuerySet):
         """
         super()._prefetch_related_objects()
 
-        root_nodes = {}
+        grouping_nodes = {}
         for node in self._fetched_nodes:
-            root_node = node.nodegroup.grouping_node
-            root_nodes[root_node.pk] = root_node
+            grouping_node = node.nodegroup.grouping_node
+            grouping_nodes[grouping_node.pk] = grouping_node
 
         for resource in self._result_cache:
             if not isinstance(resource, self.model):
                 # For a .values() query, we will lack instances.
                 continue
-            # TODO: fix misnomer, since it's not just root nodes.
-            resource._fetched_root_nodes = set()
+            resource._fetched_grouping_nodes = set()
             resource._fetched_graph_nodes = self._fetched_graph_nodes
             for node in self._fetched_nodes:
                 delattr(resource, node.alias)
-            for root_node in root_nodes.values():
+            for grouping_node in grouping_nodes.values():
                 setattr(
                     resource,
-                    root_node.alias,
-                    None if root_node.nodegroup.cardinality == "1" else [],
+                    grouping_node.alias,
+                    None if grouping_node.nodegroup.cardinality == "1" else [],
                 )
-                resource._fetched_root_nodes.add(root_node)
+                resource._fetched_grouping_nodes.add(grouping_node)
             annotated_tiles = getattr(resource, "_annotated_tiles", [])
             for annotated_tile in annotated_tiles:
-                for root_node in root_nodes.values():
-                    if root_node.pk == annotated_tile.nodegroup_id:
-                        ng_alias = root_node.alias
-                        break
-                else:
-                    raise RuntimeError("missing root node for annotated tile")
-
+                ng_alias = grouping_nodes[annotated_tile.nodegroup_id].alias
                 if annotated_tile.nodegroup.cardinality == "n":
                     tile_array = getattr(resource, ng_alias)
                     tile_array.append(annotated_tile)
@@ -376,7 +369,7 @@ class SemanticResourceQuerySet(models.QuerySet):
 
                 # Attach parent to this child.
                 if annotated_tile.parenttile_id:
-                    parent_nodegroup_alias = root_nodes[
+                    parent_nodegroup_alias = grouping_nodes[
                         annotated_tile.parenttile.nodegroup_id
                     ].alias
                     setattr(
@@ -386,7 +379,7 @@ class SemanticResourceQuerySet(models.QuerySet):
                     )
 
             # Final pruning.
-            for node in root_nodes.values():
+            for node in grouping_nodes.values():
                 if node.nodegroup.parentnodegroup_id:
                     delattr(resource, node.alias)
 
