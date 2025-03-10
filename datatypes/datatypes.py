@@ -29,10 +29,8 @@ class Reference:
 
 class ReferenceDataType(BaseDataType):
     def to_python(self, value) -> list[Reference]:
-        if value is None:
-            return []
         if not value:
-            raise ValueError(_("Reference datatype value cannot be empty"))
+            return []
 
         references = []
         for reference in value:
