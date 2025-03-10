@@ -33,10 +33,7 @@ const nodeData = ref();
 const widgetData = ref();
 
 onMounted(async () => {
-    widgetData.value = await fetchWidgetData(
-        props.graphSlug,
-        props.nodeAlias,
-    );
+    widgetData.value = await fetchWidgetData(props.graphSlug, props.nodeAlias);
     nodeData.value = await fetchNodeData(props.graphSlug, props.nodeAlias);
 
     isLoading.value = false;
