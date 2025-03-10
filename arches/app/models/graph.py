@@ -2863,7 +2863,9 @@ class Graph(models.GraphModel):
             ]
         ).delete()
 
+        nodegroups_to_update_again = []
         for serialized_nodegroup in serialized_graph["nodegroups"]:
+            grouping_node_id = serialized_nodegroup["grouping_node_id"]
             for key, value in serialized_nodegroup.items():
                 try:
                     serialized_nodegroup[key] = uuid.UUID(value)
@@ -2871,7 +2873,11 @@ class Graph(models.GraphModel):
                     pass
 
             nodegroup = models.NodeGroup(**serialized_nodegroup)
+            # Delay the grouping node update until nodes have been recreated.
+            nodegroup.grouping_node = None
             nodegroup.save()
+            nodegroup.grouping_node_id = grouping_node_id
+            nodegroups_to_update_again.append(nodegroup)
 
         for serialized_node in serialized_graph["nodes"]:
             for key, value in serialized_node.items():
@@ -2885,6 +2891,10 @@ class Graph(models.GraphModel):
 
             node = models.Node(**serialized_node)
             node.save()
+
+        models.NodeGroup.objects.bulk_update(
+            nodegroups_to_update_again, ["grouping_node_id"]
+        )
 
         for serialized_edge in serialized_graph["edges"]:
             for key, value in serialized_edge.items():

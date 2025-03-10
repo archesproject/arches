@@ -17,6 +17,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import uuid
+from copy import deepcopy
+from unittest import mock
+
+from django.conf import settings
 
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
@@ -1430,6 +1434,48 @@ class GraphTests(ArchesTestCase):
             models.Node.objects.get(pk=child_node_source_identifier)
 
         self.assertEqual(len(updated_source_graph.nodes), 2)
+
+    def test_restore_state_from_serialized_graph_after_node_deletion(self):
+        source_graph = Graph.new(name="TEST RESOURCE")
+        source_graph.append_branch(
+            "http://www.ics.forth.gr/isl/CRMdig/L54_is_same-as",
+            graphid=self.NODE_NODETYPE_GRAPHID,
+        )
+        source_graph.save()
+        self.assertEqual(len(source_graph.nodes), 3)
+
+        editable_future_graph = source_graph.create_editable_future_graph()
+        source_graph.publish()
+        original_publication = models.PublishedGraph.objects.get(
+            publication=source_graph.publication, language=settings.LANGUAGE_CODE
+        )
+
+        # Delete a node, and republish.
+        child_node = [node for node in editable_future_graph.nodes.values()][-1]
+        editable_future_graph.delete_node(child_node)
+        updated_source_graph = source_graph.update_from_editable_future_graph()
+        updated_source_graph.publish()
+        serialized_graph = original_publication.serialized_graph
+        updated_source_graph = Graph.objects.get(pk=source_graph.pk)
+
+        # Attempt to restore.
+        serialized_graph_copy = deepcopy(serialized_graph)
+        # This save fails in real life but not under test for some reason
+        # (need to set this up in a TransactionTestCase?). Workaround:
+        # mock save() to query for grouping node. Before fix, it would raise
+        # models.Node.DoesNotExist. Then try again.
+        try:
+            with mock.patch(
+                "arches.app.models.models.NodeGroup.save", lambda x: x.grouping_node
+            ):
+                updated_source_graph.restore_state_from_serialized_graph(
+                    {**serialized_graph_copy}
+                )
+        except models.NodeGroup.DoesNotExist:
+            pass
+        updated_source_graph.restore_state_from_serialized_graph(serialized_graph)
+
+        self.assertEqual(len(updated_source_graph.nodes), 3)
 
     def test_add_resource_instance_lifecycle(self):
         resource_instance_lifecycle = {
