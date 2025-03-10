@@ -149,9 +149,10 @@ class SemanticTileQuerySet(models.QuerySet):
                                 "concept-list",
                             }:
                                 # Some datatypes have safe to_json() methods.
+                                snake_case_datatype = node.datatype.replace("-", "_")
                                 if to_json_fn := getattr(
                                     datatype_transforms,
-                                    f"{node.datatype.replace("-", "_")}_to_json",
+                                    f"{snake_case_datatype}_to_json",
                                     None,
                                 ):
                                     to_json_fn = partial(to_json_fn, datatype_instance)
