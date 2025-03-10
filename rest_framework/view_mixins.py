@@ -31,7 +31,7 @@ class MetadataWithWidgetConfig(SimpleMetadata):
 class ArchesModelAPIMixin:
     metadata_class = MetadataWithWidgetConfig
 
-    def dispatch(self, *args, **kwargs):
+    def setup(self, request, *args, **kwargs):
         options = self.serializer_class.Meta
         self.graph_slug = options.graph_slug or kwargs.get("graph")
         # Future: accept list via GET query param
@@ -40,7 +40,14 @@ class ArchesModelAPIMixin:
         if issubclass(options.model, TileModel):
             self.nodegroup_alias = options.root_node or self.nodegroup_alias
 
-        return super().dispatch(*args, **kwargs)
+        if resource_ids := request.GET.get("resource_ids"):
+            self.resource_ids = resource_ids.split(",")
+        elif issubclass(options.model, ResourceInstance) and (pk := kwargs.get("pk")):
+            self.resource_ids = [pk]
+        else:
+            self.resource_ids = None
+
+        return super().setup(request, *args, **kwargs)
 
     def get_queryset(self):
         options = self.serializer_class.Meta
@@ -48,10 +55,7 @@ class ArchesModelAPIMixin:
             fields = None
         else:
             fields = options.fields
-        if resource_ids := self.request.query_params.get("resource_ids"):
-            resource_ids = resource_ids.split(",")
-        else:
-            resource_ids = None
+
         if issubclass(options.model, ResourceInstance):
             if options.nodegroups == "__all__":
                 if self.nodegroup_alias:
@@ -63,7 +67,7 @@ class ArchesModelAPIMixin:
             return options.model.as_model(
                 self.graph_slug,
                 only=only,
-                resource_ids=resource_ids,
+                resource_ids=self.resource_ids,
                 as_representation=True,
             )
         if issubclass(options.model, TileModel):
@@ -73,8 +77,8 @@ class ArchesModelAPIMixin:
                 only=fields,
                 as_representation=True,
             )
-            if resource_ids:
-                return qs.filter(resourceinstance__in=resource_ids)
+            if self.resource_ids:
+                return qs.filter(resourceinstance__in=self.resource_ids)
             return qs
 
         raise NotImplementedError
@@ -88,6 +92,9 @@ class ArchesModelAPIMixin:
 
     def get_object(self, user=None, permission_callable=None):
         ret = super().get_object()
+        if not self.graph_slug:
+            # Resource results for heterogenous graphs are not supported.
+            self.graph_slug = ret.graph.slug
         options = self.serializer_class.Meta
         if issubclass(options.model, ResourceInstance):
             if arches_version >= "8":
