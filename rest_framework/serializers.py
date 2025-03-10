@@ -133,7 +133,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         "non-localized-string": fields.CharField(null=True),
         "geojson-feature-collection": fields.CharField(null=True),  # XXX
         "file-list": ArrayField(base_field=JSONField(null=True), null=True),
-        "reference": JSONField(null=True),
+        "reference": ArrayField(base_field=JSONField(null=True), null=True),
     }
 
     class Meta:
