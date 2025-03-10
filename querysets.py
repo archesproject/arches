@@ -59,7 +59,7 @@ class SemanticTileQuerySet(models.QuerySet):
         Entry point for filtering arches data by nodegroups (instead of grouping by
         resource.)
 
-        >>> statements = TileModel.as_nodegroup("statement", graph_slug="concept")
+        >>> statements = SemanticTile.as_nodegroup("statement", graph_slug="concept")
         >>> results = statements.filter(statement_content__any_lang_startswith="F")
         >>> for result in results:
                 print(result.resourceinstance)
@@ -223,23 +223,18 @@ class SemanticResourceQuerySet(models.QuerySet):
         only=None,
         as_representation=False,
     ):
-        """Annotates a ResourceInstance QuerySet with tile data unpacked
+        """Annotates a SemanticResourceQuerySet with tile data unpacked
         and mapped onto nodegroup aliases, e.g.:
 
-        >>> concepts = ResourceInstance.objects.with_nodegroups("concept")
+        >>> concepts = SemanticResource.objects.with_nodegroups("concept")
 
         With slightly fewer keystrokes:
 
-        >>> concepts = ResourceInstance.as_model("concept")
+        >>> concepts = SemanticResource.as_model("concept")
 
         Or direct certain nodegroups with defer/only as in the QuerySet interface:
 
-        >>> partial_concepts = ResourceInstance.as_model("concept", only=["ng1", "ng2"])
-
-        Example:
-
-        >>> from arches.app.models.models import *
-        >>> concepts = ResourceInstance.as_model("concept")
+        >>> partial_concepts = SemanticResource.as_model("concept", only=["ng1", "ng2"])
 
         Django QuerySet methods are available for efficient queries:
         >>> concepts.count()
@@ -275,8 +270,7 @@ class SemanticResourceQuerySet(models.QuerySet):
         Provisional edits are completely ignored for the purposes of querying.
 
         as_representation = True skips calling to_python() datatype methods and calls
-        to_representation() instead (rather than to_json() just to ensure we are
-        getting optimum performance and not yoking this feature to older use cases.)
+        to_representation() / to_json() depending on the datatype.
         """
         from arches_querysets.models import GraphWithPrefetching, SemanticTile
 
