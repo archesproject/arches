@@ -373,8 +373,10 @@ class SemanticResource(ResourceInstance):
             if tile.nodegroup_id != grouping_node.pk:
                 # TODO: this is a symptom this should be refactored.
                 continue
-            children = tile.nodegroup.nodegroup_set.all()
-            if arches_version < "8":
+            if arches_version >= "8":
+                children = tile.nodegroup.children.all()
+            else:
+                children = tile.nodegroup.nodegroup_set.all()
                 grouping_node = (
                     Node.objects.filter(pk=tile.nodegroup.pk)
                     .prefetch_related("node_set")
