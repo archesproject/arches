@@ -562,6 +562,7 @@ class SemanticTile(TileModel):
         root_node_alias,  # TODO: remove
         *,
         graph_slug,
+        resource_ids=None,
         defer=None,
         only=None,
         as_representation=False,
@@ -576,17 +577,17 @@ class SemanticTile(TileModel):
         for nodegroup in get_nodegroups_here_and_below(root_node.nodegroup):
             branch_nodes.extend(list(nodegroup.node_set.all()))
 
-        return (
-            cls.objects.filter(nodegroup_id=root_node.pk)
-            .with_node_values(
-                branch_nodes,
-                defer=defer,
-                only=[root_node.alias],  # determine whether to expose
-                as_representation=as_representation,
-                allow_empty=allow_empty,
-            )
-            .annotate(_nodegroup_alias=models.Value(root_node_alias))
-        )
+        qs = cls.objects.filter(nodegroup_id=root_node.pk)
+        if resource_ids:
+            qs = qs.filter(resourceinstance_id__in=resource_ids)
+
+        return qs.with_node_values(
+            branch_nodes,
+            defer=defer,
+            only=[root_node.alias],  # determine whether to expose
+            as_representation=as_representation,
+            allow_empty=allow_empty,
+        ).annotate(_nodegroup_alias=models.Value(root_node_alias))
 
     @staticmethod
     def _root_node(graph_slug, root_node_alias):
