@@ -11,7 +11,7 @@ export interface ControlledListItemTileValue {
 
 export interface ReferenceSelectFetchedOption {
     list_item_id: string;
-    display_label: string;
+    display_value: string;
     sort_order: number;
     children: ReferenceSelectFetchedOption[];
 }

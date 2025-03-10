@@ -63,7 +63,7 @@ function optionAsNode(
     if (!item) {return {} as ReferenceSelectTreeNode;}
     return {
         key: item.list_item_id,
-        label: item.display_label,
+        label: item.display_value,
         sort_order: item.sort_order,
         children: item.children?.map((child) => optionAsNode(child)),
         data: item,

@@ -231,7 +231,7 @@ class ListItem(models.Model):
             "list_item_id": str(self.id),
             "uri": self.uri,
             "list_item_values": [label.serialize() for label in labels],
-            "display_label": ranked_labels[0].value,
+            "display_value": ranked_labels[0].value,
             "sortorder": self.sortorder,
         }
         data["children"] = sorted(

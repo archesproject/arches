@@ -12,9 +12,7 @@ defineProps<{
             v-for="referenceItem in value"
             :key="referenceItem.list_item_id"
         >
-            {{
-                referenceItem.display_label
-            }}
+            {{ referenceItem.display_value }}
         </span>
     </template>
     <span v-else>
