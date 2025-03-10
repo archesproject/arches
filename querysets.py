@@ -9,7 +9,7 @@ from arches.app.models.models import Node
 
 from arches_querysets.utils import datatype_transforms
 from arches_querysets.utils.models import (
-    generate_tile_annotations,
+    generate_node_alias_expressions,
     filter_nodes_by_highest_parent,
 )
 
@@ -90,7 +90,7 @@ class SemanticTileQuerySet(models.QuerySet):
             for n in nodes
             if getattr(n.nodegroup, "nodegroup_alias", None) in (only or [])
         }
-        node_alias_annotations = generate_tile_annotations(
+        node_alias_annotations = generate_node_alias_expressions(
             nodes,
             defer=deferred_node_aliases,
             only=only_node_aliases,
@@ -104,6 +104,7 @@ class SemanticTileQuerySet(models.QuerySet):
         if not allow_empty:
             qs = qs.filter(data__has_any_keys=[n.pk for n in self._fetched_nodes])
 
+        # TODO: some of these can just be aliases.
         return qs.annotate(**node_alias_annotations).order_by("sortorder")
 
     def _prefetch_related_objects(self):
@@ -178,6 +179,7 @@ class SemanticTileQuerySet(models.QuerySet):
                                 instance_val = tile_val
                         setattr(tile, node.alias, instance_val)
                 else:
+                    # This will be unnecessary once tiles do less annotating.
                     delattr(tile, node.alias)
             if arches_version >= "8":
                 fallback = getattr(tile, "children")
@@ -296,7 +298,7 @@ class SemanticResourceQuerySet(models.QuerySet):
                 self._fetched_graph_nodes, only or []
             )
         }
-        node_alias_annotations = generate_tile_annotations(
+        node_sql_aliases = generate_node_alias_expressions(
             self._fetched_graph_nodes,
             defer=deferred_node_aliases,
             only=only_node_aliases,
@@ -305,7 +307,7 @@ class SemanticResourceQuerySet(models.QuerySet):
         self._fetched_nodes = [
             node
             for node in self._fetched_graph_nodes
-            if node.alias in node_alias_annotations
+            if node.alias in node_sql_aliases
             and not getattr(node, "source_identifier_id", None)
         ]
 
@@ -322,7 +324,7 @@ class SemanticResourceQuerySet(models.QuerySet):
                 ),
                 to_attr="_annotated_tiles",
             ),
-        ).annotate(**node_alias_annotations)
+        ).alias(**node_sql_aliases)
 
     def with_related_resource_display_names(self):
         # Future: consider exposing nodegroups param.
@@ -333,8 +335,7 @@ class SemanticResourceQuerySet(models.QuerySet):
     def _prefetch_related_objects(self):
         """
         Attach annotated tiles to resource instances in a nested structure.
-        Discard annotations only used for shallow filtering.
-        Memoize fetched root node aliases (and graph source nodes).
+        Memoize fetched grouping node aliases (and graph source nodes).
         """
         super()._prefetch_related_objects()
 
@@ -349,15 +350,14 @@ class SemanticResourceQuerySet(models.QuerySet):
                 continue
             resource._fetched_grouping_nodes = set()
             resource._fetched_graph_nodes = self._fetched_graph_nodes
-            for node in self._fetched_nodes:
-                delattr(resource, node.alias)
+
+            # Prepare resource annotations.
             for grouping_node in grouping_nodes.values():
-                setattr(
-                    resource,
-                    grouping_node.alias,
-                    None if grouping_node.nodegroup.cardinality == "1" else [],
-                )
+                default = None if grouping_node.nodegroup.cardinality == "1" else []
+                setattr(resource, grouping_node.alias, default)
                 resource._fetched_grouping_nodes.add(grouping_node)
+
+            # Fill resource annotations.
             annotated_tiles = getattr(resource, "_annotated_tiles", [])
             for annotated_tile in annotated_tiles:
                 ng_alias = grouping_nodes[annotated_tile.nodegroup_id].alias
@@ -369,19 +369,9 @@ class SemanticResourceQuerySet(models.QuerySet):
 
                 # Attach parent to this child.
                 if annotated_tile.parenttile_id:
-                    parent_nodegroup_alias = grouping_nodes[
-                        annotated_tile.parenttile.nodegroup_id
-                    ].alias
-                    setattr(
-                        annotated_tile,
-                        parent_nodegroup_alias,
-                        annotated_tile.parenttile,
-                    )
-
-            # Final pruning.
-            for node in grouping_nodes.values():
-                if node.nodegroup.parentnodegroup_id:
-                    delattr(resource, node.alias)
+                    parent_ng_pk = annotated_tile.parenttile.nodegroup_id
+                    parent_ng_alias = grouping_nodes[parent_ng_pk].alias
+                    setattr(annotated_tile, parent_ng_alias, annotated_tile.parenttile)
 
     def _clone(self):
         clone = super()._clone()

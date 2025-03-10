@@ -873,7 +873,7 @@ class GraphWithPrefetching(GraphModel):
             raise ValueError("graph_slug or resource_ids must be provided")
         try:
             # Prefetch sibling nodes for use in _prefetch_related_objects()
-            # and generate_tile_annotations().
+            # and generate_node_alias_expressions().
 
             if arches_version >= "8":
                 prefetches = [

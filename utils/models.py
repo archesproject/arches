@@ -11,10 +11,10 @@ def field_attnames(instance_or_class):
     return {f.attname for f in instance_or_class._meta.fields}
 
 
-def generate_tile_annotations(nodes, *, defer, only, model):
+def generate_node_alias_expressions(nodes, *, defer, only, model):
     if defer and only and (overlap := defer.intersection(only)):
         raise ValueError(f"Got intersecting defer/only nodes: {overlap}")
-    node_alias_annotations = {}
+    alias_expressions = {}
     invalid_names = field_names(model)
 
     for node in nodes:
@@ -38,12 +38,12 @@ def generate_tile_annotations(nodes, *, defer, only, model):
             tile_values_query = F(f"data__{node.pk}")
         else:
             raise ValueError
-        node_alias_annotations[node.alias] = tile_values_query
+        alias_expressions[node.alias] = tile_values_query
 
-    if not node_alias_annotations:
+    if not alias_expressions:
         raise ValueError("All fields were excluded.")
 
-    return node_alias_annotations
+    return alias_expressions
 
 
 def pop_arches_model_kwargs(kwargs, model_fields):
