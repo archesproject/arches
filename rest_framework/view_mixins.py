@@ -19,6 +19,7 @@ class MetadataWithWidgetConfig(SimpleMetadata):
     def get_field_info(self, field):
         return {
             **super().get_field_info(field),
+            "key": field.style.get("alias"),
             "initial": (
                 None if field.initial is field.default_empty_html else field.initial
             ),

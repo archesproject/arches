@@ -43,6 +43,7 @@ def _make_tile_serializer(
         required=False,
         allow_null=True,
         graph_nodes=graph_nodes,
+        style={"alias": nodegroup_alias},
     )
     return ret
 
@@ -257,6 +258,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             pass
         ret[1]["label"] = label.serialize()
         ret[1]["style"] = {
+            "alias": node.alias,
             "visible": visible,
             "widget_config": config,
             "datatype": node.datatype,
