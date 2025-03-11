@@ -2759,6 +2759,7 @@ class Graph(models.GraphModel):
         Adds a corresponding entry to the GraphXPublishedGraph table,
         and creates a PublishedGraph entry for every active language
         """
+        self.refresh_from_database()
         self.publication = None
 
         with transaction.atomic():
