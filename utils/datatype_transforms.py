@@ -7,6 +7,7 @@ pre_structure_tile_data()?
 """
 
 import ast
+import copy
 import json
 import uuid
 from datetime import date, datetime
@@ -17,6 +18,7 @@ from django.utils.translation import get_language
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.app.utils.i18n import rank_label
 
 
 def resource_instance_to_json(self, tile, node):
@@ -100,6 +102,25 @@ def concept_list_to_json(self, tile, node):
             new_val = self.get_value(uuid.UUID(val))
             new_values.append(new_val)
     return self.compile_json(tile, node, concept_details=new_values)
+
+
+def file_list_to_representation(self, value):
+    """Resolve localized string metadata to a single language value."""
+    final_value = copy.deepcopy(value)
+    for file_data in final_value:
+        for key, val in file_data.items():
+            if not isinstance(val, dict):
+                continue
+            lang_val_pairs = [(lang, lang_val) for lang, lang_val in val.items()]
+            if not lang_val_pairs:
+                continue
+            ranked = sorted(
+                lang_val_pairs,
+                key=lambda pair: rank_label(source_lang=pair[0]),
+                reverse=True,
+            )
+            file_data[key] = ranked[0][1].get("value")
+    return final_value
 
 
 def string_to_json(self, tile, node):

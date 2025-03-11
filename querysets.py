@@ -116,7 +116,6 @@ class SemanticTileQuerySet(models.QuerySet):
 
         super()._prefetch_related_objects()
 
-        datatype_factory = DataTypeFactory()
         NOT_PROVIDED = object()
         enriched_resource = None
 
@@ -137,46 +136,9 @@ class SemanticTileQuerySet(models.QuerySet):
                 if node.nodegroup_id == tile.nodegroup_id:
                     tile_val = getattr(tile, node.alias, NOT_PROVIDED)
                     if tile_val is not NOT_PROVIDED:
-                        datatype_instance = datatype_factory.get_instance(node.datatype)
-                        if self._as_representation:
-                            if repr_fn := getattr(
-                                datatype_instance, "to_representation", None
-                            ):  # not bothering with overrides for now.
-                                instance_val = repr_fn(tile_val)
-                            elif tile_val and node.datatype in {
-                                "resource-instance",
-                                "resource-instance-list",
-                                "concept",
-                                "concept-list",
-                            }:
-                                # Some datatypes have safe to_json() methods.
-                                snake_case_datatype = node.datatype.replace("-", "_")
-                                if to_json_fn := getattr(
-                                    datatype_transforms,
-                                    f"{snake_case_datatype}_to_json",
-                                    None,
-                                ):
-                                    to_json_fn = partial(to_json_fn, datatype_instance)
-                                else:
-                                    to_json_fn = datatype_instance.to_json
-                                try:
-                                    to_json_result = to_json_fn(tile, node)
-                                except TypeError:  # StringDataType workaround.
-                                    tile.data[str(node.pk)] = {}
-                                    to_json_result = to_json_fn(tile, node)
-                                instance_val = to_json_result
-                            else:
-                                instance_val = tile_val
-                        else:
-                            if py_fn := getattr(datatype_instance, "to_python", None):
-                                instance_val = py_fn(tile_val)
-                            elif node.datatype == "resource-instance":
-                                # TODO: move, once dust settles.
-                                if tile_val is None or len(tile_val) != 1:
-                                    instance_val = tile_val
-                                instance_val = tile_val[0]
-                            else:
-                                instance_val = tile_val
+                        instance_val = self._get_node_value_for_python_annotation(
+                            tile, node, tile_val
+                        )
                         setattr(tile, node.alias, instance_val)
                 else:
                     # This will be unnecessary once tiles do less annotating.
@@ -205,6 +167,55 @@ class SemanticTileQuerySet(models.QuerySet):
         clone._fetched_nodes = self._fetched_nodes
         clone._as_representation = self._as_representation
         return clone
+
+    def _get_node_value_for_python_annotation(self, tile, node, tile_val):
+        datatype_instance = DataTypeFactory().get_instance(node.datatype)
+
+        if self._as_representation:
+            snake_case_datatype = node.datatype.replace("-", "_")
+            if repr_fn := getattr(
+                datatype_transforms,
+                f"{snake_case_datatype}_to_representation",
+                None,
+            ):
+                instance_val = repr_fn(datatype_instance, tile_val)
+            elif repr_fn := getattr(datatype_instance, "to_representation", None):
+                instance_val = repr_fn(tile_val)
+            elif tile_val and node.datatype in {
+                # Some datatypes have to_json() methods that fit our purpose.
+                "resource-instance",
+                "resource-instance-list",
+                "concept",
+                "concept-list",
+            }:
+                if to_json_fn := getattr(
+                    datatype_transforms,
+                    f"{snake_case_datatype}_to_json",
+                    None,
+                ):
+                    to_json_fn = partial(to_json_fn, datatype_instance)
+                else:
+                    to_json_fn = datatype_instance.to_json
+                try:
+                    to_json_result = to_json_fn(tile, node)
+                except TypeError:  # StringDataType workaround.
+                    tile.data[str(node.pk)] = {}
+                    to_json_result = to_json_fn(tile, node)
+                instance_val = to_json_result
+            else:
+                instance_val = tile_val
+        else:
+            if py_fn := getattr(datatype_instance, "to_python", None):
+                instance_val = py_fn(tile_val)
+            elif node.datatype == "resource-instance":
+                # TODO: move, once dust settles.
+                if tile_val is None or len(tile_val) != 1:
+                    instance_val = tile_val
+                instance_val = tile_val[0]
+            else:
+                instance_val = tile_val
+
+        return instance_val
 
 
 class SemanticResourceQuerySet(models.QuerySet):
