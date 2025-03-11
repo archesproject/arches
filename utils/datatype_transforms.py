@@ -1,9 +1,6 @@
 """
 Module to hold improved versions of datatype methods
 until we can verify correctness/desirability & upstream the changes.
-
-For instance, some of this might have been alleviated by calling
-pre_structure_tile_data()?
 """
 
 import ast
@@ -104,11 +101,32 @@ def concept_list_to_json(self, tile, node):
     return self.compile_json(tile, node, concept_details=new_values)
 
 
+def file_list_transform_value_for_tile(self, value, *, languages, **kwargs):
+    if not value:
+        return value
+    final_value = copy.deepcopy(value)
+    for file_info in final_value:
+        for key, val in file_info.items():
+            if key not in {"altText", "attribution", "description", "title"}:
+                continue
+            original_val = val
+            if not isinstance(original_val, dict):
+                file_info[key] = {}
+            for lang in languages:
+                if lang.code not in file_info[key]:
+                    file_info[key][lang.code] = {
+                        "value": original_val if lang.code == get_language() else "",
+                        "direction": lang.default_direction,
+                    }
+
+    return final_value
+
+
 def file_list_to_representation(self, value):
     """Resolve localized string metadata to a single language value."""
     final_value = copy.deepcopy(value)
-    for file_data in final_value:
-        for key, val in file_data.items():
+    for file_info in final_value:
+        for key, val in file_info.items():
             if not isinstance(val, dict):
                 continue
             lang_val_pairs = [(lang, lang_val) for lang, lang_val in val.items()]
@@ -119,7 +137,7 @@ def file_list_to_representation(self, value):
                 key=lambda pair: rank_label(source_lang=pair[0]),
                 reverse=True,
             )
-            file_data[key] = ranked[0][1].get("value")
+            file_info[key] = ranked[0][1].get("value")
     return final_value
 
 

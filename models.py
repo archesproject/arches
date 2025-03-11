@@ -13,6 +13,7 @@ from django.utils.translation import gettext as _
 from arches import __version__ as arches_version
 from arches.app.models.models import (
     GraphModel,
+    Language,
     Node,
     ResourceInstance,
     TileModel,
@@ -369,6 +370,7 @@ class SemanticResource(ResourceInstance):
                 to_update.add(db_tile)
 
         nodes = grouping_node.nodegroup.node_set.all()
+        languages = Language.objects.all()
         for tile in to_insert | to_update:
             if tile.nodegroup_id != grouping_node.pk:
                 # TODO: this is a symptom this should be refactored.
@@ -395,7 +397,10 @@ class SemanticResource(ResourceInstance):
                     errors_by_node_alias=errors_by_node_alias,
                 )
             self._validate_and_patch_from_tile_values(
-                tile, nodes=nodes, errors_by_node_alias=errors_by_node_alias
+                tile,
+                nodes=nodes,
+                languages=languages,
+                errors_by_node_alias=errors_by_node_alias,
             )
 
         for tile in to_insert | to_update:
@@ -433,7 +438,9 @@ class SemanticResource(ResourceInstance):
                 to_update.remove(tile)
 
     @staticmethod
-    def _validate_and_patch_from_tile_values(tile, *, nodes, errors_by_node_alias):
+    def _validate_and_patch_from_tile_values(
+        tile, *, nodes, languages, errors_by_node_alias
+    ):
         """Validate data found on ._incoming_tile and move it to .data.
         Update errors_by_node_alias in place."""
         from arches.app.datatypes.datatypes import DataTypeFactory
@@ -490,12 +497,16 @@ class SemanticResource(ResourceInstance):
                 tile.data[node_id_str] = None
                 continue
             try:
-                transformed = transform_fn(value_to_validate, **node.config)
+                transformed = transform_fn(
+                    value_to_validate, languages=languages, **node.config
+                )
             except ValueError:  # BooleanDataType raises.
                 # validate() will handle.
                 transformed = value_to_validate
 
             # Patch the transformed data into the tile.data.
+            # TODO: for localized string and file-list, we need to merge
+            # the localized strings rather than overwrite.
             tile.data[node_id_str] = transformed
 
             clean_fn(tile, node_id_str)
@@ -742,6 +753,7 @@ class SemanticTile(TileModel):
         SemanticResource._validate_and_patch_from_tile_values(
             self,
             nodes=self.nodegroup.node_set.all(),
+            languages=Language.objects.all(),
             errors_by_node_alias=errors_by_alias,
         )
         if not any(self.data.values()):
