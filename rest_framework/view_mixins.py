@@ -26,6 +26,7 @@ class MetadataWithWidgetConfig(SimpleMetadata):
             "visible": field.style.get("visible", False),
             "datatype": field.style.get("datatype", None),
             "widget_config": field.style.get("widget_config", {}),
+            "sortorder": field.style.get("sortorder", 0),
         }
 
 

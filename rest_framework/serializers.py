@@ -241,10 +241,12 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             label = cross.label
             visible = cross.visible
             config = cross.config
+            sortorder = cross.sortorder or 0
         except (IndexError, ObjectDoesNotExist, MultipleObjectsReturned):
             label = I18n_String()
             visible = False
             config = I18n_JSON()
+            sortorder = 0
 
         ret = self.build_standard_field(field_name, model_field)
         ret[1]["required"] = node.isrequired
@@ -262,6 +264,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             "visible": visible,
             "widget_config": config,
             "datatype": node.datatype,
+            "sortorder": sortorder,
         }
 
         return ret
@@ -320,14 +323,15 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         field_map = super().get_fields()
         self._root_node_aliases = []
         options = self.__class__.Meta
+        if options.nodegroups == "__all__":
+            only = self.context.get("nodegroup_alias")
+        else:
+            only = options.nodegroups
 
+        # Create serializers for top-level nodegroups.
         for node in self.graph_nodes:
             if not node.nodegroup_id or node.nodegroup.parentnodegroup_id:
                 continue
-            if options.nodegroups == "__all__":
-                only = self.context.get("nodegroup_alias")
-            else:
-                only = options.nodegroups
             if only and node.nodegroup.grouping_node.alias not in only:
                 continue
             if node.pk == node.nodegroup.pk:
