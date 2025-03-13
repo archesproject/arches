@@ -21,8 +21,8 @@ from django.utils.translation import gettext_lazy as _
 
 from arches.app.const import ExtensionType
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
-from arches.app.models.functions import UUID4
 from arches.app.models.mixins import SaveSupportsBlindOverwriteMixin
+from arches.app.models.query_expressions import UUID4
 from arches.app.models.utils import add_to_update_fields
 from arches.app.utils import import_class_from_string
 from arches.app.utils.betterJSONSerializer import JSONSerializer
