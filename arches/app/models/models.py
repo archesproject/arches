@@ -2177,7 +2177,7 @@ class SpatialView(models.Model):
         validators=[
             RegexValidator(
                 regex=r"^[a-zA-Z_]([a-zA-Z0-9_]+)$",
-                message="Slug must contain only letters, numbers and hyphens, but not begin with a number.",
+                message="Slug must contain only letters, numbers and underscores, but not begin with a number.",
                 code="nomatch",
             )
         ],
