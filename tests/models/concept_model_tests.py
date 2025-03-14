@@ -354,7 +354,6 @@ class ConceptModelTests(ArchesTestCase):
         ]
         subconcept3.save()
 
-        # Ajout des relations
         parent.add_relation(subconcept1, "narrower")
         parent.add_relation(subconcept2, "narrower")
         parent.add_relation(subconcept3, "narrower")
