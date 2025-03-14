@@ -292,3 +292,97 @@ class ConceptModelTests(ArchesTestCase):
         self.assertEqual(pl.type, "prefLabel")
         self.assertEqual(pl.value, "bier" or "beer")
         self.assertEqual(pl.language, "nl" or "es-SP")
+
+    def test_sort_subconcepts_with_special_floats(self):
+        """
+        Test sorting subconcepts with special float-like values
+        """
+
+        parent = Concept()
+        parent.nodetype = "Concept"
+        parent.values = [
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "Parent concept",
+                    "language": "en",
+                }
+            )
+        ]
+        parent.save()
+
+        subconcept1 = Concept()
+        subconcept1.nodetype = "Concept"
+        subconcept1.values = [
+            ConceptValue(
+                {
+                    "type": "sortorder",
+                    "category": "label",
+                    "value": "infinity",  # infinity -> inf
+                    "language": "en",
+                }
+            )
+        ]
+        subconcept1.save()
+
+        subconcept2 = Concept()
+        subconcept2.nodetype = "Concept"
+        subconcept2.values = [
+            ConceptValue(
+                {
+                    "type": "sortorder",
+                    "category": "label",
+                    "value": "nan",
+                    "language": "en",
+                }
+            )
+        ]
+        subconcept2.save()
+
+        subconcept3 = Concept()
+        subconcept3.nodetype = "Concept"
+        subconcept3.values = [
+            ConceptValue(
+                {
+                    "type": "sortorder",
+                    "category": "label",
+                    "value": "1e1000",  # inf
+                    "language": "en",
+                }
+            )
+        ]
+        subconcept3.save()
+
+        # Ajout des relations
+        parent.add_relation(subconcept1, "narrower")
+        parent.add_relation(subconcept2, "narrower")
+        parent.add_relation(subconcept3, "narrower")
+        parent.save()
+
+        try:
+            concept = Concept().get(
+                id=parent.id,
+                include_subconcepts=True,
+                lang="en",
+            )
+        except TypeError:
+            self.fail(
+                "Sorting subconcepts with special float-like values raised TypeError"
+            )
+
+        finally:
+            self.assertEqual(
+                str(concept.subconcepts[0].get_sortkey("en")), "inf"
+            )  # 1e1000 -> inf
+            self.assertEqual(
+                str(concept.subconcepts[1].get_sortkey("en")), "nan"
+            )  # "nan" -> nan
+            self.assertEqual(
+                str(concept.subconcepts[2].get_sortkey("en")), "inf"
+            )  # "infinity" -> nan
+
+            subconcept1.delete(delete_self=True)
+            subconcept2.delete(delete_self=True)
+            subconcept3.delete(delete_self=True)
+            parent.delete(delete_self=True)
