@@ -2191,7 +2191,10 @@ class SpatialView(models.Model):
         Node,
         on_delete=models.CASCADE,
         db_column="geometrynodeid",
-        limit_choices_to={"datatype": "geojson-feature-collection"},
+        limit_choices_to={
+            "datatype": "geojson-feature-collection",
+            "source_identifier__isnull": True,
+        },
         null=False,
     )
     ismixedgeometrytypes = models.BooleanField(default=False)
