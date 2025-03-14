@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "11570_harden_editable_future_graphs"),
+        ("models", "11571_alter_spatialview_slug"),
     ]
 
     operations = [
