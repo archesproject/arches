@@ -36,6 +36,7 @@ from psycopg2.extensions import AsIs
 
 import logging
 
+
 logger = logging.getLogger(__name__)
 
 CORE_CONCEPTS = (
