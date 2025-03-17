@@ -6,16 +6,20 @@ until we can verify correctness/desirability & upstream the changes.
 import ast
 import copy
 import json
+import logging
 import uuid
 from datetime import date, datetime
 
 from django.conf import settings
-from django.utils.translation import get_language
+from django.utils.translation import get_language, gettext as _
 
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.i18n import rank_label
+
+
+logger = logging.getLogger(__name__)
 
 
 def resource_instance_to_json(self, tile, node):
@@ -35,6 +39,13 @@ def resource_instance_list_to_json(self, tile, node):
         lang = get_language()
         for rxr in tile._enriched_resource.resxres_resource_instance_ids_from.all():
             if rxr.resourceinstanceidto_id == uuid.UUID(inner_val["resourceId"]):
+                if not rxr.resourceinstanceidto:
+                    logger.warning(
+                        "Missing ResourceXResource target: ",
+                        rxr.resourceinstanceidto_id,
+                    )
+                    copy["display_value"] = _("Missing")
+                    break
                 display_val = rxr.resourceinstanceidto.descriptors[lang]["name"]
                 copy["display_value"] = display_val
                 break
