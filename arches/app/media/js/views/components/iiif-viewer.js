@@ -24,7 +24,7 @@ define([
             return val;
         };
 
-         
+
         this.map = ko.observable();
         this.manifest = ko.observable(params.manifest);
         this.editManifest = ko.observable(!params.manifest);
@@ -41,6 +41,7 @@ define([
         this.canvasLabel = ko.observable();
         this.zoomToCanvas = !(params.zoom && params.center);
         this.annotationNodes = ko.observableArray();
+        this.annotationCounts = ko.observable({});
         this.compareMode = ko.observable(false);
         this.primaryCanvas = ko.observable();
         this.canvasObject = ko.observable();
@@ -123,7 +124,7 @@ define([
                 if(sideBySideControl && sideBySideControl?._map){
                     map.removeControl(sideBySideControl);
                 }
-    
+
                 self.secondaryCanvas(undefined);
                 self.secondaryLabel(undefined);
                 self.showImageModifiers(false);
@@ -171,6 +172,39 @@ define([
 
                         }
                     };
+
+                    const preloadAllAnnotations = async function() {
+                        const counts = {};
+                        self.annotationCounts(counts);
+                        const canvases = self.canvases();
+
+                        if (canvases && canvases.length > 0) {
+                            for (const canvas of canvases) {
+                                const canvasId = self.getCanvasService(canvas);
+                                if (canvasId) {
+                                    const annotationsUrl = arches.urls.iiifannotations + '?canvas=' + canvasId + '&nodeid=' + node.nodeid;
+                                    if(!cachedAnnotations[annotationsUrl]){
+                                        try {
+                                            const response = await window.fetch(annotationsUrl);
+                                            const jsonResponse = await response.json();
+                                            cachedAnnotations[annotationsUrl] = jsonResponse;
+
+                                            if (!counts[canvasId]) counts[canvasId] = 0;
+                                            counts[canvasId] = jsonResponse.features.length;
+                                        } catch (error) {
+                                            console.error('Error loading annotations for canvas:', canvasId, error);
+                                        }
+                                    } else {
+                                        if (!counts[canvasId]) counts[canvasId] = 0;
+                                        counts[canvasId] = cachedAnnotations[annotationsUrl].features.length;
+                                    }
+                                }
+                            }
+                            self.annotationCounts(counts);
+                        }
+                    };
+
+                    self.manifestData.subscribe(preloadAllAnnotations);
                     self.canvas.subscribe(updateAnnotations);
                     updateAnnotations();
                     return {
@@ -178,10 +212,16 @@ define([
                         icon: node.icon,
                         active: ko.observable(false),
                         opacity: ko.observable(100),
-                        annotations: annotations
+                        annotations: annotations,
+                        preloadAllAnnotations: preloadAllAnnotations
                     };
                 })
             );
+            if (self.manifestData()) {
+                self.annotationNodes().forEach(node => {
+                    if (node.preloadAllAnnotations) node.preloadAllAnnotations();
+                });
+            }
         };
 
         window.fetch(arches.urls.iiifannotationnodes)
@@ -385,7 +425,7 @@ define([
                 if(item.loading){
                     return "";
                 }
-                return $(`<div class="image"><img src="${item.thumbnail}" height="50"/></div><div class="title">${item.label}</div>`); 
+                return $(`<div class="image"><img src="${item.thumbnail}" height="50"/></div><div class="title">${item.label}</div>`);
             },
             templateSelection: function(item) {
                 return item?.label;
@@ -401,7 +441,7 @@ define([
             ...splitSelectConfig,
             value: this.canvas
         };
-        
+
         this.imageToolConfig = {
             ...splitSelectConfig,
             value: this.imageToolSelector
@@ -447,7 +487,7 @@ define([
         if (!params.manifest) params.expandGallery = true;
         this.expandGallery = ko.observable(params.expandGallery);
         this.expandGallery.subscribe(function(expandGallery) {
-            if (expandGallery) { 
+            if (expandGallery) {
                 self.compareMode(false);
                 self.showGallery(true);
             }
@@ -546,7 +586,7 @@ define([
         const loadComparison = () => {
             const map = self.map();
             if(map && canvasLayer.getContainer() && secondaryCanvasLayer?.getContainer() /*self.primaryLayerLoaded && self.secondaryLayerLoaded*/){
-                // remove the control if it's been added to the map already  
+                // remove the control if it's been added to the map already
                 if(self.zoomToCanvas){
                     zoomToBounds(map, canvasLayer);
                     //map.fitBounds(canvasLayer.getBounds())
@@ -586,7 +626,7 @@ define([
                 if (canvas) {
                     const layerInfoUrl = canvas + '/info.json';
                     canvasLayer = getLayer(layerInfoUrl, layers);
-    
+
                     if(!canvasLayer){
                         canvasLayer = L.tileLayer.iiif(layerInfoUrl, {
                             fitBounds: false,
@@ -655,7 +695,7 @@ define([
                     secondaryLayers.push(secondaryCanvasLayer);
                 }
                 secondaryCanvasLayer.addTo(map);
-                
+
                 updateCanvasLayerFilter();
             }
         };
@@ -678,7 +718,6 @@ define([
         };
 
         this.selectCanvas = function(canvas) {
-            
             const service = self.getCanvasService(canvas);
 
             if (service && self.selectPrimaryPanel()) {
@@ -725,7 +764,7 @@ define([
                             self.secondaryCanvas(service);
                             self.secondaryCanvasObject(canvas);
                         }
-                    }    
+                    }
                 }
                 self.updateCanvas = true;
                 self.origManifestName = self.getManifestDataValue(manifestData, 'label', true);
@@ -749,8 +788,9 @@ define([
             if (abortFetchManifest) abortFetchManifest.abort();
         };
 
-        this.getAnnotationCount = function() {
-            return 0;
+        this.getAnnotationCount = function(canvasId) {
+            const counts = self.annotationCounts();
+            return counts && counts[canvasId] ? counts[canvasId] : 0;
         };
     };
     ko.components.register('iiif-viewer', {
