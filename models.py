@@ -474,6 +474,13 @@ class SemanticResource(ResourceInstance):
                 transform_fn = partial(transform_fn, datatype_instance)
             else:
                 transform_fn = datatype_instance.transform_value_for_tile
+            if merge_fn := getattr(
+                datatype_transforms,
+                f"{snake_case_datatype}_merge_tile_value",
+                None,
+            ):
+                merge_fn = partial(merge_fn, datatype_instance)
+            # no else: this hook only exists in arches-querysets (for now)
             if clean_fn := getattr(
                 datatype_transforms, f"{snake_case_datatype}_clean", None
             ):
@@ -504,10 +511,12 @@ class SemanticResource(ResourceInstance):
                 # validate() will handle.
                 transformed = value_to_validate
 
-            # Patch the transformed data into the tile.data.
-            # TODO: for localized string and file-list, we need to merge
-            # the localized strings rather than overwrite.
-            tile.data[node_id_str] = transformed
+            # Merge the transformed data into the tile.data.
+            # We just overwrite the old value unless a dataype has another idea.
+            if merge_fn:
+                merge_fn(tile, node_id_str, transformed)
+            else:
+                tile.data[node_id_str] = transformed
 
             clean_fn(tile, node_id_str)
 

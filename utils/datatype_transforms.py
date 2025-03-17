@@ -113,6 +113,7 @@ def concept_list_to_json(self, tile, node):
 def file_list_transform_value_for_tile(self, value, *, languages, **kwargs):
     if not value:
         return value
+    # TODO: this should probably delegate more to self.transform_value_for_tile()
     final_value = copy.deepcopy(value)
     for file_info in final_value:
         for key, val in file_info.items():
@@ -129,6 +130,21 @@ def file_list_transform_value_for_tile(self, value, *, languages, **kwargs):
                     }
 
     return final_value
+
+
+def file_list_merge_tile_value(self, tile, node_id_str, transformed) -> None:
+    if not (existing_tile_value := tile.data.get(node_id_str)):
+        tile.data[node_id_str] = transformed
+        return
+    for file_info in transformed:
+        for key, val in file_info.items():
+            if key not in {"altText", "attribution", "description", "title"}:
+                continue
+            for existing_file_info in existing_tile_value:
+                if existing_file_info.get("file_id") == file_info.get("file_id"):
+                    file_info[key] = existing_file_info[key] | val
+                break
+    tile.data[node_id_str] = transformed
 
 
 def file_list_to_representation(self, value):
@@ -154,6 +170,10 @@ def string_to_json(self, tile, node):
     data = self.get_tile_data(tile)
     if data:
         return self.compile_json(tile, node, **data.get(str(node.nodeid)) or {})
+
+
+def string_merge_tile_value(self, tile, node_id_str, transformed) -> None:
+    tile.data[node_id_str] = tile.data.get(node_id_str, {}) | transformed
 
 
 def string_to_representation(self, value):
