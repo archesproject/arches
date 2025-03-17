@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { ReferenceSelectTreeNode } from "@/arches_controlled_lists/widgets/types";
+import type { ReferenceSelectFetchedOption } from "@/arches_controlled_lists/widgets/types";
 
 defineProps<{
-    value: ReferenceSelectTreeNode[] | undefined;
+    value: ReferenceSelectFetchedOption[] | undefined;
 }>();
 </script>
 
