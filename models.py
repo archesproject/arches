@@ -135,6 +135,7 @@ class ListItem(models.Model):
     objects = ListItemQuerySet.as_manager()
 
     class Meta:
+        ordering = ["sortorder"]
         constraints = [
             # Sort order concerns the list as a whole, not subsets
             # of the hierarchy.
@@ -202,10 +203,9 @@ class ListItem(models.Model):
             "depth": depth_map[self.id],
         }
         if not flat:
-            data["children"] = sorted(
-                [child.serialize(depth_map, flat) for child in self.children.all()],
-                key=lambda d: d["sortorder"],
-            )
+            data["children"] = [
+                child.serialize(depth_map, flat) for child in self.children.all()
+            ]
         return data
 
     def build_tile_value(self):
@@ -234,10 +234,9 @@ class ListItem(models.Model):
             "display_value": ranked_labels[0].value,
             "sortorder": self.sortorder,
         }
-        data["children"] = sorted(
-            [child.build_select_option() for child in self.children.all()],
-            key=lambda d: d["sortorder"],
-        )
+        data["children"] = [
+            child.build_select_option() for child in self.children.all()
+        ]
         return data
 
 
