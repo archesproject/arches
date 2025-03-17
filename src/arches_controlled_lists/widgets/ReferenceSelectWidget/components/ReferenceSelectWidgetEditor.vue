@@ -7,7 +7,9 @@ import TreeSelect from "primevue/treeselect";
 
 import { fetchWidgetOptions } from "@/arches_controlled_lists/widgets/api.ts";
 
+import type { Ref } from "vue";
 import type { FormFieldResolverOptions } from "@primevue/forms";
+import type { TreeExpandedKeys } from "primevue/tree";
 import type {
     ReferenceSelectTreeNode,
     ReferenceSelectFetchedOption,
@@ -56,6 +58,7 @@ watch(
 const options = ref<ReferenceSelectTreeNode[]>();
 const isLoading = ref(false);
 const optionsError = ref<string | null>(null);
+const expandedKeys: Ref<TreeExpandedKeys> = ref({});
 
 const initialVal = toRef(
     props.configuration.multiValue
@@ -77,6 +80,10 @@ function extractInitialValue(
 function optionAsNode(
     item: ReferenceSelectFetchedOption,
 ): ReferenceSelectTreeNode {
+    expandedKeys.value = {
+        ...expandedKeys.value,
+        [item.list_item_id]: true,
+    };
     return {
         key: item.list_item_id,
         label: item.display_value,
@@ -158,6 +165,7 @@ function validate(e: FormFieldResolverOptions) {
             :fluid="true"
             :loading="isLoading"
             :options="options"
+            :expanded-keys="expandedKeys"
             :placeholder="configuration.placeholder"
             :selection-mode="configuration.multiValue ? 'multiple' : 'single'"
             :show-clear="true"
