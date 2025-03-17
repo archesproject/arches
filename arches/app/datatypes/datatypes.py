@@ -2235,7 +2235,17 @@ class ResourceInstanceDataType(BaseDataType):
 
     def transform_value_for_tile(self, value, **kwargs):
         try:
-            return json.loads(value)
+            new_values=json.loads(value)
+            if isinstance(new_values, list):
+                                    
+                for new_value in new_values:
+                    new_value['resourceXresourceId']=uuid.uuid4()
+            else:
+                try:
+                    new_values['resourceXresourceId']=uuid.uuid4()
+                except:
+                    return json.loads(value)
+            return new_values
         except ValueError:
             # do this if json (invalid) is formatted with single quotes, re #6390
             try:

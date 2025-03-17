@@ -6,12 +6,59 @@
 <!-- ko ifnot: loading() -->
 <!-- ko ifnot: fileAdded() -->
 <div data-bind="dropzone: dropzoneOptions" class="file-select loader-select" style="height: 100%; width: 100%; margin-top: 65px; background: white">
-    <div>
+    <div data-bind="visible: downloadMode()">
+        <div class="manifest-manager-main-menu-circle loader-button">
+            <span><i style="color: #000" class="fa fa-file-text-o r-select-icon"></i></span>
+        </div> 
+        <h3>
+            <p>download csv</p>
+        </h3>
+        <h2>
+            <span data-bind="text: $root.translations.downloadTemplates"></span>
+        </h2>
+        <h4>
+            <span data-bind="text: $root.translations.selectAResourceModel"></span>
+        </h4>
+        <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
+            <div style="width: 250px; display:flex; flex-direction: column;">
+                <div>
+                    <!-- ko if: templates().length -->
+                    <select style="display:inline-block;" data-bind="select2Query: {
+                        select2Config: {
+                            clickBubble: true,
+                            disabled: false,
+                            data: templates(),
+                            value: selectedTemplate,
+                            allowClear: true,
+                            multiple: false,
+                            placeholder: $root.translations.selectTemplate
+                        }}">
+                    </select>
+                    <!--/ko-->
+                </div>
+            </div>
+            <!-- ko if: selectedTemplate() -->
+            <button style="border-top: 1px solid #c4c4c4; margin: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-download" data-bind="click: downloadTemplate" >
+                <span data-bind="text: $root.translations.download"></span>
+            </button>
+            <!-- /ko -->
+            <div style="margin-top: 15px;">
+                <button class="btn btn-primary btn-labeled btn-lg fa fa-cloud-upload" data-bind="click: toggleDownloadMode">
+                    <span data-bind="text: $root.translations.uploadZipFile"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div data-bind="visible: !downloadMode()" >
         <div class="manifest-manager-main-menu-circle loader-button">
             <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
         </div> 
-        <h2>
+        <h3>
             <span data-bind="text: $root.translations.uploadCsvZipFile"></span>
+        </h3>
+        <h2>
+            <span data-bind="text: $root.translations.downloadTemplates"></span>
         </h2>
         <h4>
             <span data-bind="text: $root.translations.dropzoneFileUploadCaption"></span>
@@ -35,6 +82,11 @@
             <h5 class="rr-splash-description">
                 <span data-bind="text: $root.translations.etlFileUploadMessage"></span>
             </h5>
+            <div style="margin-top: 15px;">
+                <button class="btn btn-primary btn-labeled btn-lg fa fa-download" data-bind="click: toggleDownloadMode">
+                    <span data-bind="text: $root.translations.downloadTemplates"></span>
+                </button>
+            </div>
         </div>
     </div>
 </div>

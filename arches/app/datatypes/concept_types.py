@@ -9,6 +9,7 @@ from arches.app.models import concept
 from django.core.cache import cache
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
+from arches.app.models.models import Value
 from arches.app.datatypes.datatypes import DataTypeFactory, get_value_from_jsonld
 from arches.app.models.concept import (
     get_preflabel_from_valueid,
@@ -50,10 +51,20 @@ class BaseConceptDataType(BaseDataType):
     def lookup_label(self, label, collectionid):
         ret = label
         collection_values = self.collection_lookup[collectionid]
+        
         for concept in collection_values:
             if concept[1] in (label, label.strip()):
                 ret = concept[2]
-        return ret
+        
+        try:
+            uuid.UUID(str(ret))
+            return ret
+        except:
+            try:
+                valueid = Value.objects.get(value=ret).valueid
+                return str(valueid)
+            except:
+                return ret
 
     def lookup_labelid_from_label(self, value, config):
         if "rdmCollection" in config:

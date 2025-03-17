@@ -23,7 +23,6 @@ from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
 
-
 class ImportSingleCsv(BaseImportModule):
     def __init__(self, request=None, loadid=None, params=None):
         self.loadid = request.POST.get("load_id") if request else loadid
@@ -57,6 +56,59 @@ class ImportSingleCsv(BaseImportModule):
         self.datatype_factory = DataTypeFactory()
         self.node_lookup = {}
         self.blank_tile_lookup = {}
+    
+    def ChildResult(self, cursor, sql_child, nodeid, header):
+        cursor.execute(sql_child, [nodeid, nodeid])
+
+        # Fetch the results
+        Result = cursor.fetchall()
+        for childInfo in Result:
+            header.append(str(childInfo[0]))
+        return header
+
+    def Childparent(self, cursor, sql_childparent, sql_child, nodeid, header):
+        cursor.execute(sql_childparent, [nodeid])
+
+        # Fetch the results
+        Result = cursor.fetchall()
+
+        for nodegroup in Result:
+
+            header= self.ChildResult(cursor, sql_child, str(nodegroup[0]), header)
+            header= self.Childparent(cursor, sql_childparent, sql_child, str(nodegroup[0]), header)
+        return header
+
+    def csvlabel(self, request):
+        graphid = request.POST.get('id', None)
+        with connection.cursor() as cursor:
+            try:
+                sql_query = """select n.datatype, n.alias, n.nodegroupid from nodes n inner join node_groups ng ON n.nodeid=ng.nodegroupid
+                    where ng.parentnodegroupid is NULL and n.graphid=%s ORDER BY n.nodegroupid ASC"""
+                sql_child = """SELECT alias FROM public.nodes where nodegroupid=%s and nodeid!=%s ORDER BY alias ASC;"""
+                sql_childparent = """select nodegroupid from node_groups where parentnodegroupid=%s """
+                cursor.execute(sql_query, [graphid])
+                result = cursor.fetchall()
+                header=[]
+                for info in result:
+                    datatype=info[0]
+                    name=info[1]
+                    nodegroupid=str(info[2])
+                    
+                    if datatype!='semantic':
+                        header.append(name)
+                    header = self.ChildResult(cursor, sql_child, nodegroupid, header)
+                    header = self.Childparent(cursor, sql_childparent, sql_child, nodegroupid, header)
+                output = io.StringIO()
+                writer = csv.writer(output)
+                writer.writerow(header)
+                writer.writerow(['None'] * len(header))
+                csv_content = output.getvalue()
+                return{
+                    "success": True,
+                    'data': csv_content
+                }
+            except Exception as e:
+                print(e)
 
     def get_graphs(self, request):
         graph_name_i18n = "name__" + settings.LANGUAGE_CODE
@@ -82,14 +134,13 @@ class ImportSingleCsv(BaseImportModule):
 
         graphid = request.POST.get("graphid")
         nodes = (
-            Node.objects.filter(graph_id=graphid)
-            .exclude(datatype__in=["semantic"])
-            .order_by(Lower("name"))
+            Node.objects.filter(graph_id=graphid).exclude(datatype__in=["semantic"]).order_by(Lower("name"))
         )
+
         filteredNodes = []
         for node in nodes:
-            if is_top_nodegroup(node.nodegroup_id):
-                filteredNodes.append(node)
+            # if is_top_nodegroup(node.nodegroup_id):
+            filteredNodes.append(node)
         return {"success": True, "data": filteredNodes}
 
     def get_node_lookup(self, graphid):
@@ -226,15 +277,19 @@ class ImportSingleCsv(BaseImportModule):
         graphid = request.POST.get("graphid")
         has_headers = request.POST.get("hasHeaders")
         fieldnames = request.POST.get("fieldnames")
+        
         if type(fieldnames) != list:
             fieldnames = fieldnames.split(",")
+        
+        fieldnames[1]='_label (en)'
         csv_mapping = request.POST.get("fieldMapping")
+        
         if csv_mapping and type(csv_mapping) == str:
             csv_mapping = json.loads(csv_mapping)
+        
         csv_file_name = request.POST.get("csvFileName")
         column_names = [fieldname for fieldname in fieldnames if fieldname != ""]
         id_label = "resourceid"
-
         error_message = None
         if len(column_names) == 0:
             error_message = _("No valid node is selected")
@@ -252,7 +307,6 @@ class ImportSingleCsv(BaseImportModule):
         csv_file_path = os.path.join(temp_dir, csv_file_name)
         csv_size = default_storage.size(csv_file_path)  # file size in byte
         use_celery_threshold = self.config.get("celeryByteSizeLimit", 500)
-
         if self.mode != "cli" and csv_size > use_celery_threshold:
             response = self.run_load_task_async(request, self.loadid)
         else:
@@ -280,7 +334,6 @@ class ImportSingleCsv(BaseImportModule):
         csv_file_name,
         id_label,
     ):
-
         self.populate_staging_table(
             loadid,
             graphid,
@@ -292,6 +345,7 @@ class ImportSingleCsv(BaseImportModule):
         )
 
         validation = self.validate(loadid)
+        
         if len(validation["data"]) == 0:
             with connection.cursor() as cursor:
                 cursor.execute(
@@ -327,7 +381,7 @@ class ImportSingleCsv(BaseImportModule):
             csv_mapping = json.loads(csv_mapping)
         csv_file_name = request.POST.get("csvFileName")
         id_label = "resourceid"
-
+        
         load_task = tasks.load_single_csv.apply_async(
             (
                 self.userid,
@@ -373,6 +427,38 @@ class ImportSingleCsv(BaseImportModule):
         message = "load event created"
         return {"success": True, "data": message}
 
+    def insert_loadstaging(self,cursor,tile_data,nodegroup,legacyid, resourceid,tileid, loadid, csv_file_name, passes_validation):
+        tile_value_json = JSONSerializer().serialize(tile_data)
+        node_depth = 0
+
+        cursor.execute(
+            """
+            INSERT INTO load_staging (
+                nodegroupid,
+                legacyid,
+                resourceid,
+                tileid,
+                value,
+                loadid,
+                nodegroup_depth,
+                source_description,
+                operation,
+                passes_validation
+            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+            (
+                nodegroup,
+                legacyid,
+                resourceid,
+                tileid,
+                tile_value_json,
+                loadid,
+                node_depth,
+                csv_file_name,
+                "insert",
+                passes_validation,
+            ),
+        )
+
     def populate_staging_table(
         self,
         loadid,
@@ -390,10 +476,9 @@ class ImportSingleCsv(BaseImportModule):
             reader = csv.reader(
                 text_wrapper
             )  # if there is a duplicate field, DictReader will not work
-
+            
             if has_headers:
                 next(reader)
-
             with connection.cursor() as cursor:
                 for row in reader:
                     if id_label in fieldnames:
@@ -405,173 +490,230 @@ class ImportSingleCsv(BaseImportModule):
                             resourceid = uuid.uuid4()
                             legacyid = row[id_index]
                     else:
-                        resourceid = uuid.uuid4()
-                        legacyid = None
+                        if row[0] !='None':
+                            resourceid = row[0]
+                            legacyid = None
+                        else:
+                            resourceid = uuid.uuid4()
+                            legacyid = None
 
                     dict_by_nodegroup = {}
-
+                    transformed_value=None
                     for i in range(len(fieldnames)):
-                        if fieldnames[i] != "" and fieldnames[i] != id_label:
-                            current_node = self.get_node_lookup(graphid).get(
-                                alias=fieldnames[i]
-                            )
-                            nodegroupid = str(current_node.nodegroup_id)
-                            node = str(current_node.nodeid)
-                            datatype = (
-                                self.node_lookup[graphid].get(nodeid=node).datatype
-                            )
-                            datatype_instance = self.datatype_factory.get_instance(
-                                datatype
-                            )
-                            source_value = row[i]
-                            config = current_node.config
-                            config["nodeid"] = node
-                            config["path"] = temp_dir
+                        if row[i] != 'None':
+                            
+                            if fieldnames[i] != "" and fieldnames[i] != id_label:
+                                
+                                current_node = self.get_node_lookup(graphid).get(
+                                    alias=fieldnames[i]
+                                )
+                                nodegroupid = str(current_node.nodegroup_id)
+                                node = str(current_node.nodeid)
+                                datatype = (
+                                    self.node_lookup[graphid].get(nodeid=node).datatype
+                                )
+                                datatype_instance = self.datatype_factory.get_instance(
+                                    datatype
+                                )
+                                source_value = row[i]
+                                config = current_node.config
+                                config["nodeid"] = node
+                                config["path"] = temp_dir
 
-                            if source_value:
-                                if datatype == "string":
-                                    try:
-                                        code = csv_mapping[i]["language"]["code"]
-                                        direction = csv_mapping[i]["language"][
-                                            "default_direction"
-                                        ]
-                                        transformed_value = {
-                                            code: {
-                                                "value": row[i],
-                                                "direction": direction,
-                                            }
-                                        }
-                                    except:
-                                        transformed_value = source_value
-                                    value = (
-                                        datatype_instance.transform_value_for_tile(
-                                            transformed_value, **config
+                                if source_value:
+                                    if (datatype == "string" or datatype=='transformed_value') :
+                                        
+                                        
+                                        try:
+                                            
+                                            code = csv_mapping[i]["language"]["code"]
+                                            direction = csv_mapping[i]["language"][
+                                                "default_direction"
+                                            ]
+
+                                            # if row[i] !="None":
+                                            transformed_value = {
+                                                code: {
+                                                    "value": row[i],
+                                                    "direction": direction,
+                                                }
+                                            } 
+                                        except:
+
+                                            transformed_value = source_value
+                                        
+                                        value = (
+                                            datatype_instance.transform_value_for_tile(
+                                                transformed_value, **config
+                                            )
+                                            if transformed_value
+                                            else None
                                         )
-                                        if transformed_value
-                                        else None
-                                    )
-                                    errors = datatype_instance.validate(
-                                        value, nodeid=node
-                                    )
-                                else:
-                                    value, errors = self.prepare_data_for_loading(
-                                        datatype_instance, source_value, config
-                                    )
-
-                                valid = True if len(errors) == 0 else False
-                                error_message = ""
-                                for error in errors:
-                                    error_message = (
-                                        "{0}|{1}".format(
-                                            error_message, error["message"]
+                                        
+                                        errors = datatype_instance.validate(
+                                            value, nodeid=node
                                         )
-                                        if error_message != ""
-                                        else error["message"]
-                                    )
-                                    cursor.execute(
-                                        """
-                                        INSERT INTO load_errors (type, value, source, error, message, datatype, loadid, nodeid)
-                                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                                        (
-                                            "node",
-                                            source_value,
-                                            csv_file_name,
-                                            error["title"],
-                                            error["message"],
-                                            datatype,
-                                            loadid,
-                                            node,
-                                        ),
-                                    )
+                                    else:
+                                        value, errors = self.prepare_data_for_loading(
+                                            datatype_instance, source_value, config
+                                        )
 
-                                if nodegroupid in dict_by_nodegroup:
-                                    dict_by_nodegroup[nodegroupid].append(
-                                        {
-                                            node: {
-                                                "value": value,
-                                                "valid": valid,
-                                                "source": source_value,
-                                                "notes": error_message,
-                                                "datatype": datatype,
-                                            }
-                                        }
-                                    )
-                                else:
-                                    dict_by_nodegroup[nodegroupid] = [
-                                        {
-                                            node: {
-                                                "value": value,
-                                                "valid": valid,
-                                                "source": source_value,
-                                                "notes": error_message,
-                                                "datatype": datatype,
-                                            }
-                                        }
-                                    ]
-
+                                    valid = True if len(errors) == 0 else False
+                                    error_message = ""
+                                    for error in errors:
+                                        error_message = (
+                                            "{0}|{1}".format(
+                                                error_message, error["message"]
+                                            )
+                                            if error_message != ""
+                                            else error["message"]
+                                        )
+                                        cursor.execute(
+                                            """
+                                            INSERT INTO load_errors (type, value, source, error, message, datatype, loadid, nodeid)
+                                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
+                                            (
+                                                "node",
+                                                source_value,
+                                                csv_file_name,
+                                                error["title"],
+                                                error["message"],
+                                                datatype,
+                                                loadid,
+                                                node,
+                                            ),
+                                        )
+                                        
+                                    if value is not None :
+                                        if nodegroupid in dict_by_nodegroup:
+                                            dict_by_nodegroup[nodegroupid].append(
+                                                {
+                                                    node: {
+                                                        "value": value,
+                                                        "valid": valid,
+                                                        "source": source_value,
+                                                        "notes": error_message,
+                                                        "datatype": datatype,
+                                                    }
+                                                }
+                                            )
+                                        else:
+                                            dict_by_nodegroup[nodegroupid] = [
+                                                {
+                                                    node: {
+                                                        "value": value,
+                                                        "valid": valid,
+                                                        "source": source_value,
+                                                        "notes": error_message,
+                                                        "datatype": datatype,
+                                                    }
+                                                }
+                                            ]
+                    tilesid=[]
+                    nodegroupsid=[]
                     for nodegroup in dict_by_nodegroup:
+
                         tile_data = self.get_blank_tile_lookup(nodegroup)
                         passes_validation = True
                         for key in tile_data:
                             tile_data[key] = None
                         for node in dict_by_nodegroup[nodegroup]:
+                            
                             for key in node:
+                                
                                 if tile_data[key]:
-                                    if tile_data[key]["datatype"] == "string":
-                                        tile_data[key]["value"].update(
-                                            node[key]["value"]
-                                        )
-                                        tile_data[key]["source"] += (
-                                            " | " + node[key]["source"]
-                                        )
-                                        tile_data[key]["notes"] = " | ".join(
-                                            [
-                                                tile_data[key]["notes"],
-                                                node[key]["notes"],
-                                            ]
-                                        )
-                                        tile_data[key]["valid"] = (
-                                            tile_data[key]["valid"]
-                                            and node[key]["valid"]
-                                        )
+                                    tileid = uuid.uuid4()
+                                    tilesid.append(tileid)
+                                    nodegroupsid.append(nodegroup)
+
+                                    self.insert_loadstaging(cursor,tile_data,nodegroup,legacyid, resourceid,tileid, loadid, csv_file_name, passes_validation)
+                                    for other_key in tile_data:
+                                        tile_data[other_key] = None
+                                    tile_data[key] = node[key]
                                 else:
                                     tile_data[key] = node[key]
+                                    
                                 if node[key]["valid"] is False:
                                     passes_validation = False
-
                         tileid = uuid.uuid4()
-                        tile_value_json = JSONSerializer().serialize(tile_data)
-                        node_depth = 0
+                        tilesid.append(tileid)
+                        nodegroupsid.append(nodegroup)
+                        self.insert_loadstaging(cursor,tile_data,nodegroup,legacyid, resourceid,tileid, loadid, csv_file_name, passes_validation)
+                list_j=[]
+                for i, nodeid in enumerate(nodegroupsid):
+                    parents = NodeGroup.objects.get(nodegroupid=str(nodeid)).parentnodegroup
+                    
+                    if parents is not None:
+                        indices = [index for index, value in enumerate(nodegroupsid) if value == str(parents.nodegroupid)]
+                        if str(parents.nodegroupid) in list_j and len(indices)>1:
+                            
+                            try:
+                                number=list_j.count(str(parents.nodegroupid))
+                                list_j.append(str(parents.nodegroupid))
+                                cursor.execute(
+                                    """update load_staging set parenttileid=%s where tileid=%s and nodegroupid=%s;""",
+                                    (tilesid[indices[number]], tilesid[i], nodeid),
+                                )
+                            except:
+                                for errorNodegroup in dict_by_nodegroup[nodeid]:
+                                    
+                                    for errorKey in errorNodegroup:
+                                        message_new="Haven't define the nodeparent of nodechild "+ Node.objects.get(nodeid=errorKey).alias
+                                        titles="Missing nodeparent"
+                                        
+                                        cursor.execute(
+                                                    """
+                                                    INSERT INTO load_errors (type, source, error, message, loadid, nodeid)
+                                                    VALUES (%s,%s,%s,%s,%s,%s)""",
+                                                    (
+                                                        "node",
+                                                        csv_file_name,
+                                                        titles,
+                                                        message_new,
+                                                        loadid,
+                                                        errorKey,
+                                                    ),
+                                                )
+                                        cursor.execute(
+                                            """update load_staging set passes_validation=false where tileid=%s and nodegroupid=%s;""",
+                                            (tilesid[i], nodeid),
+                                        )
+                        else:
+                            try:
 
-                        cursor.execute(
-                            """
-                            INSERT INTO load_staging (
-                                nodegroupid,
-                                legacyid,
-                                resourceid,
-                                tileid,
-                                value,
-                                loadid,
-                                nodegroup_depth,
-                                source_description,
-                                operation,
-                                passes_validation,
-                                sortorder
-                            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-                            (
-                                nodegroup,
-                                legacyid,
-                                resourceid,
-                                tileid,
-                                tile_value_json,
-                                loadid,
-                                node_depth,
-                                csv_file_name,
-                                "insert",
-                                passes_validation,
-                                0,
-                            ),
-                        )
+                                j = nodegroupsid.index(str(parents.nodegroupid))
+                                list_j.append(str(parents.nodegroupid))
+
+                                cursor.execute(
+                                    """update load_staging set parenttileid=%s where tileid=%s and nodegroupid=%s;""",
+                                    (tilesid[j], tilesid[i], nodeid),
+                                )
+                            except:
+                                
+                                for errorNodegroup in dict_by_nodegroup[nodeid]:
+                                    
+                                    for errorKey in errorNodegroup:
+                                        message_new="Haven't define the nodeparent of nodechild "+ Node.objects.get(nodeid=errorKey).alias
+                                        titles="Missing nodeparent"
+                                        
+                                        cursor.execute(
+                                                    """
+                                                    INSERT INTO load_errors (type, source, error, message, loadid, nodeid)
+                                                    VALUES (%s,%s,%s,%s,%s,%s)""",
+                                                    (
+                                                        "node",
+                                                        csv_file_name,
+                                                        titles,
+                                                        message_new,
+                                                        loadid,
+                                                        errorKey,
+                                                    ),
+                                                )
+                                        cursor.execute(
+                                            """update load_staging set passes_validation=false where tileid=%s and nodegroupid=%s;""",
+                                            (tilesid[i], nodeid),
+                                        )
+
 
                 cursor.execute(
                     """CALL __arches_check_tile_cardinality_violation_for_load(%s)""",
