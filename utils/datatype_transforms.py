@@ -40,10 +40,8 @@ def resource_instance_list_to_json(self, tile, node):
         for rxr in tile._enriched_resource.resxres_resource_instance_ids_from.all():
             if rxr.resourceinstanceidto_id == uuid.UUID(inner_val["resourceId"]):
                 if not rxr.resourceinstanceidto:
-                    logger.warning(
-                        "Missing ResourceXResource target: ",
-                        str(rxr.resourceinstanceidto_id),
-                    )
+                    msg = f"Missing ResourceXResource target: {rxr.resourceinstanceidto_id}"
+                    logger.warning(msg)
                     copy["display_value"] = _("Missing")
                     break
                 display_val = rxr.resourceinstanceidto.descriptors[lang]["name"]
