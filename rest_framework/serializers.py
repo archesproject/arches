@@ -27,7 +27,7 @@ renderers.JSONOpenAPIRenderer.encoder_class = JSONSerializer
 
 
 def _make_tile_serializer(
-    *, nodegroup_alias, cardinality, slug, graph_nodes, nodes="__all__"
+    *, nodegroup_alias, cardinality, sortorder, slug, graph_nodes, nodes="__all__"
 ):
     class DynamicTileSerializer(ArchesTileSerializer):
         class Meta:
@@ -43,7 +43,7 @@ def _make_tile_serializer(
         required=False,
         allow_null=True,
         graph_nodes=graph_nodes,
-        style={"alias": nodegroup_alias},
+        style={"alias": nodegroup_alias, "sortorder": sortorder},
     )
     return ret
 
@@ -194,6 +194,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                         cardinality=child_nodegroup.cardinality,
                         slug=self.graph_slug,
                         graph_nodes=self.graph_nodes,
+                        sortorder=child_nodegroup.cardmodel_set.first().sortorder,
                     )
 
         return field_map
@@ -230,6 +231,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                     nodegroup_alias=node.alias,
                     cardinality=node.nodegroup.cardinality,
                     graph_nodes=self.graph_nodes,
+                    sortorder=node.nodegroup.cardmodel_set.first().sortorder,
                 )
             else:
                 msg = _("Field missing for datatype: {}").format(node.datatype)
@@ -343,6 +345,7 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                         nodegroup_alias=node.alias,
                         cardinality=node.nodegroup.cardinality,
                         graph_nodes=self.graph_nodes,
+                        sortorder=node.nodegroup.cardmodel_set.first().sortorder,
                     )
 
         return field_map
