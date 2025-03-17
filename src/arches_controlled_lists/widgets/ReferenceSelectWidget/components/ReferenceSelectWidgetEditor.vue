@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, toRef, useTemplateRef, watch } from "vue";
+import { onMounted, ref, toRef, useTemplateRef, watch } from "vue";
 
 import { FormField } from "@primevue/forms";
 import Message from "primevue/message";
@@ -142,6 +142,10 @@ function validate(e: FormFieldResolverOptions) {
     //     };
     // }
 }
+
+onMounted(() => {
+    options.value = optionsAsNodes(props.initialValue ? props.initialValue : []);
+});
 </script>
 
 <template>
