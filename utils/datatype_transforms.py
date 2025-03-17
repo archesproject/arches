@@ -156,6 +156,21 @@ def string_to_json(self, tile, node):
         return self.compile_json(tile, node, **data.get(str(node.nodeid)) or {})
 
 
+def string_to_representation(self, value):
+    """Resolve localized string metadata to a single language value."""
+    if not value or not isinstance(value, dict):
+        return ""
+    lang_val_pairs = [(lang, obj["value"]) for lang, obj in value.items()]
+    if not lang_val_pairs:
+        return
+    ranked = sorted(
+        lang_val_pairs,
+        key=lambda pair: rank_label(source_lang=pair[0]),
+        reverse=True,
+    )
+    return ranked[0][1]
+
+
 def date_transform_value_for_tile(self, value, **kwargs):
     value = None if value == "" else value
     if value is not None:
