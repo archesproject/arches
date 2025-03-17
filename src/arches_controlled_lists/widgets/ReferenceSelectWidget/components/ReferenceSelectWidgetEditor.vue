@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, toRef, useTemplateRef } from "vue";
+import { ref, toRef, useTemplateRef, watch } from "vue";
 
 import { FormField } from "@primevue/forms";
 import Message from "primevue/message";
@@ -26,6 +26,37 @@ const props = defineProps<{
 
 const formFieldRef = useTemplateRef("formFieldRef");
 
+// this watcher is necessary to be able to format the value of the form field when the dropdown is updated
+watch(
+    // @ts-expect-error - This is a bug in the PrimeVue types
+    () => formFieldRef.value?.field?.states?.value,
+    (newVal) => {
+        // PrimeVue's v-model for TreeSelect is an obj with the selected items as keys with True as value:
+        // {"list_item_id_1": true, "list_item_id_2": true}
+        if (newVal && typeof newVal === "object") {
+            const selectedItemKeys = Object.entries(newVal).reduce<string[]>(
+                (keys, [key, value]) => {
+                    if (value === true) keys.push(key);
+                    return keys;
+                },
+                [],
+            );
+
+            if (selectedItemKeys.length && !("key" in selectedItemKeys)) {
+                // @ts-expect-error - This is a bug in the PrimeVue types
+                formFieldRef.value!.field.states.value = selectedItemKeys;
+            }
+        } else {
+            // @ts-expect-error - This is a bug in the PrimeVue types
+            formFieldRef.value!.field.states.value = [];
+        }
+    },
+);
+
+const options = ref<ReferenceSelectTreeNode[]>();
+const isLoading = ref(false);
+const optionsError = ref<string | null>(null);
+
 const initialVal = toRef(
     props.configuration.multiValue
         ? props.initialValue?.map((reference) => extractInitialValue(reference))
@@ -34,30 +65,22 @@ const initialVal = toRef(
           ),
 );
 
-const options = ref<ReferenceSelectTreeNode[]>();
-const isLoading = ref(false);
-const optionsError = ref<string | null>(null);
-
 function extractInitialValue(
     initialValue: ReferenceSelectFetchedOption | undefined,
 ) {
     if (!initialValue) {
-        return {};
+        return undefined;
     }
     return { [initialValue?.list_item_id]: true };
 }
 
 function optionAsNode(
-    item: ReferenceSelectFetchedOption | undefined,
+    item: ReferenceSelectFetchedOption,
 ): ReferenceSelectTreeNode {
-    if (!item) {
-        return {} as ReferenceSelectTreeNode;
-    }
     return {
         key: item.list_item_id,
         label: item.display_value,
-        sort_order: item.sort_order,
-        children: item.children?.map((child) => optionAsNode(child)),
+        children: item.children?.map(optionAsNode),
         data: item,
     };
 }
@@ -65,7 +88,9 @@ function optionAsNode(
 function optionsAsNodes(
     items: ReferenceSelectFetchedOption[],
 ): ReferenceSelectTreeNode[] {
-    return items.map((item) => optionAsNode(item));
+    return items
+        .filter((item): item is ReferenceSelectFetchedOption => !!item)
+        .map(optionAsNode);
 }
 
 async function getOptions() {
@@ -75,7 +100,7 @@ async function getOptions() {
             props.graphSlug,
             props.nodeAlias,
         );
-        options.value = optionsAsNodes(fetchedLists);
+        options.value = fetchedLists ? optionsAsNodes(fetchedLists) : [];
     } catch (error) {
         optionsError.value = (error as Error).message;
     } finally {

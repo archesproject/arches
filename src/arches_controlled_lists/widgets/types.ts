@@ -19,7 +19,6 @@ export interface ReferenceSelectFetchedOption {
 export interface ReferenceSelectTreeNode extends TreeNode {
     key: string;
     label: string;
-    sort_order: number;
     children: ReferenceSelectTreeNode[];
     data: ReferenceSelectFetchedOption;
 }
