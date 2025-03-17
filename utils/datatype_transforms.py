@@ -42,7 +42,7 @@ def resource_instance_list_to_json(self, tile, node):
                 if not rxr.resourceinstanceidto:
                     logger.warning(
                         "Missing ResourceXResource target: ",
-                        rxr.resourceinstanceidto_id,
+                        str(rxr.resourceinstanceidto_id),
                     )
                     copy["display_value"] = _("Missing")
                     break
