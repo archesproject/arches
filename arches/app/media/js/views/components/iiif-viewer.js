@@ -64,6 +64,7 @@ define([
         const layers = [];
         const secondaryLayers = [];
         const cachedAnnotations = {};
+        const pendingRequests = [];
         this.origCanvasLabel = ko.observable();
 
         this.selectPrimaryPanel.subscribe((value) => {
@@ -174,33 +175,46 @@ define([
                     };
 
                     const preloadAllAnnotations = async function() {
-                        const counts = {};
-                        self.annotationCounts(counts);
+                        const annoCounts = {};
                         const canvases = self.canvases();
-
                         if (canvases && canvases.length > 0) {
                             for (const canvas of canvases) {
                                 const canvasId = self.getCanvasService(canvas);
                                 if (canvasId) {
                                     const annotationsUrl = arches.urls.iiifannotations + '?canvas=' + canvasId + '&nodeid=' + node.nodeid;
-                                    if(!cachedAnnotations[annotationsUrl]){
-                                        try {
-                                            const response = await window.fetch(annotationsUrl);
-                                            const jsonResponse = await response.json();
-                                            cachedAnnotations[annotationsUrl] = jsonResponse;
 
-                                            if (!counts[canvasId]) counts[canvasId] = 0;
-                                            counts[canvasId] = jsonResponse.features.length;
-                                        } catch (error) {
-                                            console.error('Error loading annotations for canvas:', canvasId, error);
-                                        }
+                                    if (!cachedAnnotations[annotationsUrl]) {
+                                        const fetchPromise = window.fetch(annotationsUrl)
+                                            .then(response => {
+                                                if (!response.ok) {
+                                                    throw new Error(`Failed to fetch annotations: ${response.status}`);
+                                                }
+                                                return response.json();
+                                            })
+                                            .then(jsonResponse => {
+                                                cachedAnnotations[annotationsUrl] = jsonResponse;
+                                                annoCounts[canvasId] = jsonResponse.features.length;
+                                            })
+                                            .catch(error => {
+                                                console.error('Error loading annotations for canvas:', canvasId, error);
+                                                annoCounts[canvasId] = 0;
+                                            });
+
+                                        pendingRequests.push(fetchPromise);
                                     } else {
-                                        if (!counts[canvasId]) counts[canvasId] = 0;
-                                        counts[canvasId] = cachedAnnotations[annotationsUrl].features.length;
+                                        annoCounts[canvasId] = cachedAnnotations[annotationsUrl].features.length;
                                     }
                                 }
                             }
-                            self.annotationCounts(counts);
+
+                            if (pendingRequests.length > 0) {
+                                try {
+                                    await Promise.all(pendingRequests);
+                                } catch (error) {
+                                    console.error('Error in batch annotation loading:', error);
+                                }
+                            }
+                            self.annotationCounts(annoCounts);
                         }
                     };
 
