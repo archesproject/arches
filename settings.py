@@ -240,6 +240,11 @@ LOGGING = {
             "level": "WARNING",
             "propagate": True,
         },
+        "arches_querysets": {
+            "handlers": ["file", "console"],
+            "level": "WARNING",
+            "propagate": True,
+        },
         "django.request": {
             "handlers": ["file", "console"],
             "level": "WARNING",
