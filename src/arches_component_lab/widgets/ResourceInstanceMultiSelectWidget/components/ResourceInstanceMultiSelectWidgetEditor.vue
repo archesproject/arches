@@ -33,7 +33,7 @@ const itemSize = 36; // in future iteration this should be declared in the CardX
 
 const options = ref<ResourceInstanceReference[]>([]);
 const isLoading = ref(false);
-const resourceResultsPage = ref(1);
+const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
@@ -88,7 +88,6 @@ async function getOptions(page: number, filterTerm?: string) {
             filterTerm,
             props.initialValue,
         );
-        console.log(resourceData);
 
         const references = resourceData.data.map(
             (
