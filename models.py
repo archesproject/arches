@@ -641,7 +641,7 @@ class SemanticTile(TileModel):
         return ret
 
     def save(self, index=False, user=None, **kwargs):
-        if not hasattr(self, "_fetched_nodes"):
+        if not hasattr(self, "_queried_nodes"):
             return super().save(**kwargs)
         nodegroup_alias = self.find_nodegroup_alias()
         try:

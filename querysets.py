@@ -44,7 +44,7 @@ class SemanticTileQuerySet(models.QuerySet):
     def __init__(self, model=None, query=None, using=None, hints=None):
         super().__init__(model, query, using, hints)
         self._as_representation = False
-        self._fetched_nodes = []
+        self._queried_nodes = []
 
     def with_node_values(
         self,
@@ -97,12 +97,12 @@ class SemanticTileQuerySet(models.QuerySet):
             model=self.model,
         )
 
-        self._fetched_nodes = [n for n in nodes if n.alias in node_alias_annotations]
+        self._queried_nodes = [n for n in nodes if n.alias in node_alias_annotations]
 
         qs = self
         qs = qs.filter(nodegroup_id__in={n.nodegroup_id for n in nodes})
         if not allow_empty:
-            qs = qs.filter(data__has_any_keys=[n.pk for n in self._fetched_nodes])
+            qs = qs.filter(data__has_any_keys=[n.pk for n in self._queried_nodes])
 
         # TODO: some of these can just be aliases.
         return qs.annotate(**node_alias_annotations).order_by("sortorder")
@@ -131,8 +131,8 @@ class SemanticTileQuerySet(models.QuerySet):
                     .get()
                 )
             tile._enriched_resource = enriched_resource
-            tile._fetched_nodes = self._fetched_nodes
-            for node in self._fetched_nodes:
+            tile._queried_nodes = self._queried_nodes
+            for node in self._queried_nodes:
                 if node.nodegroup_id == tile.nodegroup_id:
                     tile_val = getattr(tile, node.alias, NOT_PROVIDED)
                     if tile_val is not NOT_PROVIDED:
@@ -164,7 +164,7 @@ class SemanticTileQuerySet(models.QuerySet):
 
     def _clone(self):
         clone = super()._clone()
-        clone._fetched_nodes = self._fetched_nodes
+        clone._queried_nodes = self._queried_nodes
         clone._as_representation = self._as_representation
         return clone
 
@@ -222,7 +222,7 @@ class SemanticResourceQuerySet(models.QuerySet):
     def __init__(self, model=None, query=None, using=None, hints=None):
         super().__init__(model, query, using, hints)
         self._as_representation = False
-        self._fetched_nodes = []
+        self._queried_nodes = []
         self._fetched_graph_nodes = []  # todo: dedupe
 
     def with_nodegroups(
@@ -309,7 +309,7 @@ class SemanticResourceQuerySet(models.QuerySet):
             only=only_node_aliases,
             model=self.model,
         )
-        self._fetched_nodes = [
+        self._queried_nodes = [
             node
             for node in self._fetched_graph_nodes
             if node.alias in node_sql_aliases
@@ -324,7 +324,7 @@ class SemanticResourceQuerySet(models.QuerySet):
             models.Prefetch(
                 "tilemodel_set",
                 queryset=SemanticTile.objects.with_node_values(
-                    self._fetched_nodes,
+                    self._queried_nodes,
                     as_representation=as_representation,
                 ),
                 to_attr="_annotated_tiles",
@@ -345,7 +345,7 @@ class SemanticResourceQuerySet(models.QuerySet):
         super()._prefetch_related_objects()
 
         grouping_nodes = {}
-        for node in self._fetched_nodes:
+        for node in self._queried_nodes:
             grouping_node = node.nodegroup.grouping_node
             grouping_nodes[grouping_node.pk] = grouping_node
 
@@ -380,7 +380,7 @@ class SemanticResourceQuerySet(models.QuerySet):
 
     def _clone(self):
         clone = super()._clone()
-        clone._fetched_nodes = self._fetched_nodes
+        clone._queried_nodes = self._queried_nodes
         clone._fetched_graph_nodes = self._fetched_graph_nodes
         clone._as_representation = self._as_representation
         return clone
