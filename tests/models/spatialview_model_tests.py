@@ -283,6 +283,13 @@ class SpatialViewTests(ArchesTestCase):
 
         spatialview.delete()
 
+    def test_spatial_view_without_geometrynode(self):
+        spatialview = self.generate_valid_spatiatview()
+        spatialview.geometrynode = None
+        with self.assertRaises(Exception):
+            spatialview.full_clean()
+            spatialview.save()
+
 
 class SpatialViewTriggerTests(TransactionTestCase):
 
