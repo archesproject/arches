@@ -288,10 +288,6 @@ class SpatialViewTests(ArchesTestCase):
         spatialview.geometrynode = None
         with self.assertRaises(Exception):
             spatialview.full_clean()
-            spatialview.save()
-
-        with self.assertRaises(SpatialView.DoesNotExist):
-            fetched_spatialview = SpatialView.objects.get(pk=spatialview.spatialviewid)
 
 
 class SpatialViewTriggerTests(TransactionTestCase):
