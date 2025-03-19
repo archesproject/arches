@@ -290,6 +290,9 @@ class SpatialViewTests(ArchesTestCase):
             spatialview.full_clean()
             spatialview.save()
 
+        with self.assertRaises(SpatialView.DoesNotExist):
+            fetched_spatialview = SpatialView.objects.get(pk=spatialview.spatialviewid)
+
 
 class SpatialViewTriggerTests(TransactionTestCase):
 
