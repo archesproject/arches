@@ -48,6 +48,7 @@ class GraphTests(ArchesTestCase):
             "iconclass": "fa fa-circle",
             "isresource": False,
             "name": "Node",
+            "slug": "node",
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
             "subtitle": "Represents a single node in a graph.",
             "version": "v1",
@@ -80,6 +81,7 @@ class GraphTests(ArchesTestCase):
             "iconclass": "fa fa-angle-double-down",
             "isresource": False,
             "name": "Node/Node Type",
+            "slug": "node_node_type",
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
             "subtitle": "Represents a node and node type pairing",
             "version": "v1",
@@ -159,6 +161,7 @@ class GraphTests(ArchesTestCase):
 
         graph = Graph.new()
         graph.name = "TEST GRAPH"
+        graph.slug = "test_graph"
         graph.subtitle = "ARCHES TEST GRAPH"
         graph.author = "Arches"
         graph.description = "ARCHES TEST GRAPH"
@@ -206,6 +209,7 @@ class GraphTests(ArchesTestCase):
 
         graph_obj = {
             "name": "TEST GRAPH",
+            "slug": "test_graph",
             "subtitle": "ARCHES TEST GRAPH",
             "author": "Arches",
             "description": "ARCHES TEST GRAPH",
@@ -1299,6 +1303,7 @@ class EditableFutureGraphTests(ArchesTestCase):
             "iconclass": "fa fa-circle",
             "isresource": False,
             "name": "Node",
+            "slug": "node",
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
             "subtitle": "Represents a single node in a graph.",
             "version": "v1",
@@ -1331,6 +1336,7 @@ class EditableFutureGraphTests(ArchesTestCase):
             "iconclass": "fa fa-angle-double-down",
             "isresource": False,
             "name": "Node/Node Type",
+            "slug": "node_node_type",
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
             "subtitle": "Represents a node and node type pairing",
             "version": "v1",
