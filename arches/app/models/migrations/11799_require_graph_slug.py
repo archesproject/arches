@@ -3,7 +3,7 @@
 import django.core.validators
 import re
 from django.db import migrations, models
-
+import slugify from slugify
 
 class Migration(migrations.Migration):
 
@@ -11,16 +11,17 @@ class Migration(migrations.Migration):
         ("models", "11857_spatial_view_source_identifier_filter"),
     ]
 
-    forward_sql = """
-        UPDATE graphs
-        SET slug = __arches_slugify(name ->> 'en')
-        WHERE slug IS NULL OR slug = '';
-    """
+    def add_missing_graph_slug(apps, schema_editor):
+        Graph = apps.get_model("models", "GraphModel")
+        graphs_missing_slug = Graph.objects.filter(slug__isnull=True)
+        for graph in graphs_missing_slug:
+            graph.slug = slugify(str(graph.name), separator="_")
+            graph.save()
 
     operations = [
-        migrations.RunSQL(
-            forward_sql,
-            migrations.RunSQL.noop,
+        migrations.RunPython(
+            add_missing_graph_slug,
+            migrations.RunPython.noop,
         ),
         migrations.AlterField(
             model_name="graphmodel",
