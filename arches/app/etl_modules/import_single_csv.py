@@ -13,15 +13,16 @@ from django.db import connection
 from django.db.models.functions import Lower
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
-from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import ETLModule, GraphModel, Node, NodeGroup
+from arches_provenance.datatypes.datatypes import DataTypeFactory
+from arches.app.models.models import ETLModule, GraphModel, Node, NodeGroup, LoadStaging
 from arches.app.models.system_settings import settings
-import arches.app.tasks as tasks
+import arches_provenance.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.file_validator import FileValidator
 from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
+from collections import Counter
 
 class ImportSingleCsv(BaseImportModule):
     def __init__(self, request=None, loadid=None, params=None):
@@ -57,16 +58,15 @@ class ImportSingleCsv(BaseImportModule):
         self.node_lookup = {}
         self.blank_tile_lookup = {}
     
-    def ChildResult(self, cursor, sql_child, nodeid, header):
+    def Child_result(self, cursor, sql_child, nodeid, header):
         cursor.execute(sql_child, [nodeid, nodeid])
 
         # Fetch the results
-        Result = cursor.fetchall()
-        for childInfo in Result:
+        result_child = cursor.fetchall()
+        for childInfo in result_child:
             header.append(str(childInfo[0]))
-        return header
 
-    def Childparent(self, cursor, sql_childparent, sql_child, nodeid, header):
+    def Child_parent(self, cursor, sql_childparent, sql_child, nodeid, header):
         cursor.execute(sql_childparent, [nodeid])
 
         # Fetch the results
@@ -74,11 +74,11 @@ class ImportSingleCsv(BaseImportModule):
 
         for nodegroup in Result:
 
-            header= self.ChildResult(cursor, sql_child, str(nodegroup[0]), header)
-            header= self.Childparent(cursor, sql_childparent, sql_child, str(nodegroup[0]), header)
-        return header
+            self.Child_result(cursor, sql_child, str(nodegroup[0]), header)
+            self.Child_parent(cursor, sql_childparent, sql_child, str(nodegroup[0]), header)
+        
 
-    def csvlabel(self, request):
+    def csv_label(self, request):
         graphid = request.POST.get('id', None)
         with connection.cursor() as cursor:
             try:
@@ -96,8 +96,8 @@ class ImportSingleCsv(BaseImportModule):
                     
                     if datatype!='semantic':
                         header.append(name)
-                    header = self.ChildResult(cursor, sql_child, nodegroupid, header)
-                    header = self.Childparent(cursor, sql_childparent, sql_child, nodegroupid, header)
+                    self.Child_result(cursor, sql_child, nodegroupid, header)
+                    self.Child_parent(cursor, sql_childparent, sql_child, nodegroupid, header)
                 output = io.StringIO()
                 writer = csv.writer(output)
                 writer.writerow(header)

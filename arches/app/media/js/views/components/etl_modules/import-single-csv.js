@@ -67,6 +67,7 @@ define([
             let highestScore = 0;
             if (!!self.headers()) {
                 const header = stringUtils.normalizeText(self.headers()[i]);
+                console.log("qqqqqqaaa333 ",header)
                 if (header == 'resourceid')
                     return null;
                 self.nodes().forEach(function(node) {
@@ -135,7 +136,7 @@ define([
                     "X-CSRFToken": getCookie("csrftoken")
                 }
             });
-            self.submit('csvlabel').then(data => {
+            self.submit('csv_label').then(data => {
                 console.log(data.result)
                 const csvData = data.result;
                 const blob = new Blob([csvData], { type: 'text/csv' });
@@ -264,6 +265,7 @@ define([
                         label: arches.translations.idColumnSelection,
                     });
                     self.nodes(nodes);
+                    console.log("wwww ", self.nodes())
                     self.loading(false);
                 });
             }
