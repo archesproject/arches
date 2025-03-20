@@ -2241,10 +2241,8 @@ class ResourceInstanceDataType(BaseDataType):
                 for new_value in new_values:
                     new_value['resourceXresourceId']=uuid.uuid4()
             else:
-                try:
-                    new_values['resourceXresourceId']=uuid.uuid4()
-                except:
-                    return json.loads(value)
+                
+                new_values['resourceXresourceId']=uuid.uuid4()
             return new_values
         except ValueError:
             # do this if json (invalid) is formatted with single quotes, re #6390
