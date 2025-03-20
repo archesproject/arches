@@ -869,6 +869,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E33_Linguistic_Object",
                 "sortorder": 0
             },
+            "slug": "import_test_document",
             "subtitle": "",
             "template_id": "50000000-0000-0000-0000-000000000001",
             "version": ""
