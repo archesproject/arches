@@ -27,7 +27,6 @@ class Migration(migrations.Migration):
             model_name="graphmodel",
             name="slug",
             field=models.TextField(
-                unique=True,
                 validators=[
                     django.core.validators.RegexValidator(
                         re.compile("^[-a-zA-Z0-9_]+\\Z"),

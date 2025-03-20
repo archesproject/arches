@@ -481,7 +481,7 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
         on_delete=models.SET_DEFAULT,
     )
     config = JSONField(db_column="config", default=dict)
-    slug = models.TextField(validators=[validate_slug], unique=True)
+    slug = models.TextField(validators=[validate_slug])
     publication = models.ForeignKey(
         "GraphXPublishedGraph",
         db_column="publicationid",
