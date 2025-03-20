@@ -5,6 +5,7 @@ import re
 from django.db import migrations, models
 from slugify import slugify
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
