@@ -319,6 +319,8 @@ define([
                                     result._source.graph_id,
                                 ),
                                 point: point,
+                                report_url:arches.urls.resource_report+result._source.resourceinstanceid,
+                                edit_url:arches.urls.resource_editor+result._source.resourceinstanceid,
                                 mapLinkClicked: function () {
                                     self.selectedResourceId(
                                         result._source.resourceinstanceid,
