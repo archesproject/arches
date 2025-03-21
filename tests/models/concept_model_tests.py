@@ -16,6 +16,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from django.db.models import Q
+
 from tests import test_settings
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
@@ -295,7 +297,10 @@ class ConceptModelTests(ArchesTestCase):
 
     def test_sort_subconcepts_with_special_floats(self):
         """
-        Test sorting subconcepts with special float-like values
+        This test checks the behavior of Concept.get() when sorting sub-concepts with special float values or string
+        values, in order to avoid a TypeError. In this case, alphabetical sorting is used instead of natural sorting of
+        natural_keys() method.
+        The problematic values are: infinity, nan, 1e1000, ...
         """
 
         parent = Concept()
@@ -317,7 +322,7 @@ class ConceptModelTests(ArchesTestCase):
         subconcept1.values = [
             ConceptValue(
                 {
-                    "type": "sortorder",
+                    "type": "prefLabel",
                     "category": "label",
                     "value": "infinity",  # infinity -> inf
                     "language": "en",
@@ -331,9 +336,9 @@ class ConceptModelTests(ArchesTestCase):
         subconcept2.values = [
             ConceptValue(
                 {
-                    "type": "sortorder",
+                    "type": "prefLabel",
                     "category": "label",
-                    "value": "nan",
+                    "value": "nan",  # nan
                     "language": "en",
                 }
             )
@@ -345,7 +350,7 @@ class ConceptModelTests(ArchesTestCase):
         subconcept3.values = [
             ConceptValue(
                 {
-                    "type": "sortorder",
+                    "type": "prefLabel",
                     "category": "label",
                     "value": "1e1000",  # inf
                     "language": "en",
@@ -354,34 +359,82 @@ class ConceptModelTests(ArchesTestCase):
         ]
         subconcept3.save()
 
+        subconcept4 = Concept()
+        subconcept4.nodetype = "Concept"
+        subconcept4.values = [
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "Beer",
+                    "language": "en",
+                }
+            )
+        ]
+        subconcept4.save()
+
+        subconcept5 = Concept()
+        subconcept5.nodetype = "Concept"
+        subconcept5.values = [
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "Pizza",
+                    "language": "en",
+                }
+            )
+        ]
+        subconcept5.save()
+
+        subconcept6 = Concept()
+        subconcept6.nodetype = "Concept"
+        subconcept6.values = [
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "kung-fu",
+                    "language": "en",
+                }
+            )
+        ]
+        subconcept6.save()
+
+        subconcept7 = Concept()
+        subconcept7.nodetype = "Concept"
+        subconcept7.values = [
+            ConceptValue(
+                {
+                    "type": "prefLabel",
+                    "category": "label",
+                    "value": "2",
+                    "language": "en",
+                }
+            )
+        ]
+        subconcept7.save()
+
         parent.add_relation(subconcept1, "narrower")
         parent.add_relation(subconcept2, "narrower")
         parent.add_relation(subconcept3, "narrower")
+        parent.add_relation(subconcept4, "narrower")
+        parent.add_relation(subconcept5, "narrower")
+        parent.add_relation(subconcept6, "narrower")
+        parent.add_relation(subconcept7, "narrower")
         parent.save()
 
-        try:
-            concept = Concept().get(
-                id=parent.id,
-                include_subconcepts=True,
-                lang="en",
-            )
-        except TypeError:
-            self.fail(
-                "Sorting subconcepts with special float-like values raised TypeError"
-            )
+        get_concept = Concept().get(
+            id=parent.id,
+            include_subconcepts=True,
+            lang="en",
+            pathway_filter=Q(relationtype="narrower"),
+        )
 
-        finally:
-            self.assertEqual(
-                str(concept.subconcepts[0].get_sortkey("en")), "inf"
-            )  # 1e1000 -> inf
-            self.assertEqual(
-                str(concept.subconcepts[1].get_sortkey("en")), "nan"
-            )  # "nan" -> nan
-            self.assertEqual(
-                str(concept.subconcepts[2].get_sortkey("en")), "inf"
-            )  # "infinity" -> nan
-
-            subconcept1.delete(delete_self=True)
-            subconcept2.delete(delete_self=True)
-            subconcept3.delete(delete_self=True)
-            parent.delete(delete_self=True)
+        self.assertEqual(str(get_concept.subconcepts[0].get_sortkey("en")), "1e1000")
+        self.assertEqual(str(get_concept.subconcepts[1].get_sortkey("en")), "2")
+        self.assertEqual(str(get_concept.subconcepts[2].get_sortkey("en")), "Beer")
+        self.assertEqual(str(get_concept.subconcepts[3].get_sortkey("en")), "Pizza")
+        self.assertEqual(str(get_concept.subconcepts[4].get_sortkey("en")), "infinity")
+        self.assertEqual(str(get_concept.subconcepts[5].get_sortkey("en")), "kung-fu")
+        self.assertEqual(str(get_concept.subconcepts[6].get_sortkey("en")), "nan")
