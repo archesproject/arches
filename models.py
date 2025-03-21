@@ -1,9 +1,7 @@
 import logging
 import sys
 from collections import defaultdict
-from functools import partial
-from itertools import chain, zip_longest
-from operator import attrgetter
+from itertools import chain
 
 from django.core.exceptions import ValidationError
 from django.db import ProgrammingError, models, transaction
@@ -23,22 +21,20 @@ from arches.app.models.tile import Tile, TileValidationError
 from arches.app.models.utils import field_names
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 
+from arches_querysets.bulk_operations.tiles import BulkTileOperation
 from arches_querysets.lookups import *
 from arches_querysets.querysets import (
     SemanticResourceQuerySet,
     SemanticTileManager,
     SemanticTileQuerySet,
 )
-from arches_querysets.utils import datatype_transforms
 from arches_querysets.utils.models import (
-    field_attnames,
     get_nodegroups_here_and_below,
     pop_arches_model_kwargs,
 )
 
 
 logger = logging.getLogger(__name__)
-NOT_PROVIDED = object()
 
 
 class AliasedData:
@@ -106,15 +102,20 @@ class SemanticResource(ResourceInstance):
             # update_fields=set() will abort the save, but at least calling
             # into save() will run a sanity check on unsaved relations.
             super().save(update_fields=set())
-            self._save_tiles_for_pythonic_model(user=user, index=index, **kwargs)
+            self._save_aliased_data(user=user, index=index, **kwargs)
             # TODO: document that this is not compatible with signals.
             self.save_edit(user=user)
 
     def clean(self):
         """Raises a compound ValidationError with any failing tile values."""
-        self._update_tiles_from_pythonic_model_values()
+        # Might be able to remove graph_nodes if we can just deal with grouping_node.
+        bulk_operation = BulkTileOperation(entry=self, resource=self)
+        bulk_operation.validate()
 
-    def _save_tiles_for_pythonic_model(self, user=None, index=False, **kwargs):
+    def save_without_related_objects(self, **kwargs):
+        return super().save(**kwargs)
+
+    def _save_aliased_data(self, user=None, index=False, **kwargs):
         """Raises a compound ValidationError with any failing tile values.
 
         It's not exactly idiomatic for a Django project to clean()
@@ -123,137 +124,13 @@ class SemanticResource(ResourceInstance):
             - the node values are phantom fields.
             - we have other entry points besides DRF.
         """
-        from arches.app.datatypes.datatypes import DataTypeFactory
-
-        dummy_request = HttpRequest()
-        dummy_request.user = user
-        datatype_factory = DataTypeFactory()
-        to_insert, to_update, to_delete = (
-            self._update_tiles_from_pythonic_model_values()
+        bulk_operation = BulkTileOperation(
+            entry=self,
+            resource=self,
+            user=user,
+            save_kwargs=kwargs,
         )
-
-        # Instantiate proxy models for now, but TODO: expose this
-        # functionality on vanilla models, and in bulk.
-        upserts = to_insert | to_update
-        insert_proxies = [
-            # TODO: make readable.
-            Tile(
-                **(pop_arches_model_kwargs(vars(insert), self._meta.get_fields())[1]),
-            )
-            for insert in to_insert
-        ]
-        update_proxies = Tile.objects.filter(pk__in=[tile.pk for tile in to_update])
-        upsert_proxies = chain(insert_proxies, update_proxies)
-        delete_proxies = Tile.objects.filter(pk__in=[tile.pk for tile in to_delete])
-
-        with transaction.atomic():
-            # Interact with the database in bulk as much as possible, but
-            # run certain side effects from Tile.save() one-at-a-time until
-            # proxy model methods can be refactored. Then run in bulk.
-            for upsert_proxy, vanilla_instance in zip(
-                sorted(upsert_proxies, key=attrgetter("pk")),
-                sorted(upserts, key=attrgetter("pk")),
-                strict=True,
-            ):
-                assert upsert_proxy.pk == vanilla_instance.pk
-                upsert_proxy._existing_data = upsert_proxy.data
-                upsert_proxy._existing_provisionaledits = upsert_proxy.provisionaledits
-
-                # Sync proxy instance fields.
-                for field in field_attnames(vanilla_instance):
-                    setattr(upsert_proxy, field, getattr(vanilla_instance, field))
-
-                # Run tile lifecycle updates on proxy instance.
-                upsert_proxy._Tile__preSave()
-                upsert_proxy.check_for_missing_nodes()
-                upsert_proxy.check_for_constraint_violation()
-                (
-                    oldprovisionalvalue,
-                    newprovisionalvalue,
-                    provisional_edit_log_details,
-                ) = vanilla_instance._apply_provisional_edit(
-                    upsert_proxy,
-                    upsert_proxy._existing_data,
-                    upsert_proxy._existing_provisionaledits,
-                    user=user,
-                )
-                # Remember the values needed for the edit log updates later.
-                upsert_proxy._oldprovisionalvalue = oldprovisionalvalue
-                upsert_proxy._newprovisionalvalue = newprovisionalvalue
-                upsert_proxy._provisional_edit_log_details = (
-                    provisional_edit_log_details
-                )
-                upsert_proxy._existing_data = vanilla_instance.data
-
-            for delete_proxy in delete_proxies:
-                delete_proxy._Tile__preDelete(request=dummy_request)
-
-            if to_insert:
-                inserted = TileModel.objects.bulk_create(to_insert)
-                # Pay the cost of a second TileModel -> Tile transform until refactored.
-                refreshed_insert_proxies = Tile.objects.filter(
-                    pk__in=[t.pk for t in inserted]
-                )
-                for before, after in zip(
-                    insert_proxies, refreshed_insert_proxies, strict=True
-                ):
-                    assert before.pk == after.pk
-                    after._newprovisionalvalue = before._newprovisionalvalue
-                    after._provisional_edit_log_details = (
-                        before._provisional_edit_log_details
-                    )
-                upsert_proxies = refreshed_insert_proxies | update_proxies
-            else:
-                insert_proxies = TileModel.objects.none()
-            if to_update:
-                TileModel.objects.bulk_update(
-                    to_update, {"data", "parenttile", "provisionaledits"}
-                )
-            if to_delete:
-                TileModel.objects.filter(pk__in=[t.pk for t in to_delete]).delete()
-
-            super().save(**kwargs)
-
-            for upsert_tile in upserts:
-                for grouping_node in self._fetched_graph_nodes:
-                    if grouping_node.pk != grouping_node.nodegroup_id:
-                        continue  # not a grouping node
-                    if upsert_tile.nodegroup_id == grouping_node.nodegroup_id:
-                        for node in grouping_node.nodegroup.node_set.all():
-                            datatype = datatype_factory.get_instance(node.datatype)
-                            datatype.post_tile_save(
-                                upsert_tile, str(node.pk), request=dummy_request
-                            )
-                        break
-
-            for upsert_proxy in upsert_proxies:
-                upsert_proxy._Tile__postSave()
-
-            # Save edits: could be done in bulk once above side effects are un-proxied.
-            for insert_proxy in insert_proxies:
-                insert_proxy.save_edit(
-                    user=user,
-                    edit_type="tile create",
-                    old_value={},
-                    new_value=insert_proxy.data,
-                    newprovisionalvalue=insert_proxy._newprovisionalvalue,
-                    provisional_edit_log_details=insert_proxy._provisional_edit_log_details,
-                    transaction_id=None,
-                    # TODO: get this information upstream somewhere.
-                    new_resource_created=False,
-                    note=None,
-                )
-            for update_proxy in update_proxies:
-                update_proxy.save_edit(
-                    user=user,
-                    edit_type="tile edit",
-                    old_value=update_proxy._existing_data,
-                    new_value=update_proxy.data,
-                    newprovisionalvalue=update_proxy._newprovisionalvalue,
-                    oldprovisionalvalue=update_proxy._oldprovisionalvalue,
-                    provisional_edit_log_details=update_proxy._provisional_edit_log_details,
-                    transaction_id=None,
-                )
+        bulk_operation.run()
 
         self.refresh_from_db(
             using=kwargs.get("using", None),
@@ -265,285 +142,6 @@ class SemanticResource(ResourceInstance):
         proxy_resource.save_descriptors()
         if index:
             proxy_resource.index()
-
-    def _update_tiles_from_pythonic_model_values(self):
-        """Move values from model instance to prefetched tiles, and validate.
-        Raises ValidationError if new data fails datatype validation.
-        """
-        # TODO: put all this state in a helper dataclass to ease passing it around.
-        errors_by_node_alias = defaultdict(list)
-        to_insert = set()
-        to_update = set()
-        to_delete = set()
-
-        original_tile_data_by_tile_id = {}
-        for grouping_node in self._fetched_graph_nodes:
-            if grouping_node.pk != grouping_node.nodegroup_id:
-                continue  # not a grouping node
-            self._update_tile_for_grouping_node(
-                grouping_node,
-                self,
-                original_tile_data_by_tile_id,
-                to_insert,
-                to_update,
-                to_delete,
-                errors_by_node_alias,
-            )
-
-        if errors_by_node_alias:
-            del self._annotated_tiles
-            raise ValidationError(
-                {
-                    alias: ValidationError([e["message"] for e in errors])
-                    for alias, errors in errors_by_node_alias.items()
-                }
-            )
-
-        return to_insert, to_update, to_delete
-
-    def _update_tile_for_grouping_node(
-        self,
-        grouping_node,
-        container,
-        original_tile_data_by_tile_id,
-        to_insert,
-        to_update,
-        to_delete,
-        errors_by_node_alias,
-    ):
-        # TODO: Find something more clean than this double if/else.
-        if isinstance(container, dict):
-            aliased_data = container.get("aliased_data")
-        else:
-            aliased_data = container.aliased_data
-        if isinstance(aliased_data, dict):
-            new_tiles = aliased_data.get(grouping_node.alias, NOT_PROVIDED)
-        else:
-            new_tiles = getattr(aliased_data, grouping_node.alias, NOT_PROVIDED)
-        if new_tiles is NOT_PROVIDED:
-            return
-        if grouping_node.nodegroup.cardinality == "1":
-            if new_tiles is None:
-                new_tiles = []
-            else:
-                new_tiles = [new_tiles]
-        if all(isinstance(tile, TileModel) for tile in new_tiles):
-            new_tiles.sort(key=attrgetter("sortorder"))
-        else:
-            # DRF doesn't provide nested writable fields by default.
-            # TODO: probably move this to the serializers.
-            parent_tile = container if isinstance(container, TileModel) else None
-            new_tiles = [
-                SemanticTile(**{**tile, "parenttile": parent_tile})
-                for tile in new_tiles
-            ]
-        db_tiles = [
-            t
-            for t in self._annotated_tiles
-            if t.find_nodegroup_alias() == grouping_node.alias
-        ]
-        if not db_tiles:
-            next_sort_order = 0
-        else:
-            next_sort_order = max(t.sortorder or 0 for t in db_tiles) + 1
-        for db_tile, new_tile in zip_longest(
-            db_tiles, new_tiles, fillvalue=NOT_PROVIDED
-        ):
-            if new_tile is NOT_PROVIDED:
-                to_delete.add(db_tile)
-                continue
-            if db_tile is NOT_PROVIDED:
-                new_tile.nodegroup_id = grouping_node.nodegroup_id
-                new_tile.resourceinstance_id = self.pk
-                new_tile.sortorder = next_sort_order
-                next_sort_order += 1
-                for node in grouping_node.nodegroup.node_set.all():
-                    new_tile.data[str(node.pk)] = None
-
-                parent_tile = new_tile.parenttile
-                exclude = None
-                if parent_tile:
-                    if (
-                        parent_tile.nodegroup_id
-                        != grouping_node.nodegroup.parentnodegroup_id
-                    ):
-                        raise ValueError(
-                            _("Wrong nodegroup for parent tile: {}".format(parent_tile))
-                        )
-                    if parent_tile._state.adding:
-                        exclude = {"parenttile"}
-
-                new_tile._incoming_tile = new_tile
-                new_tile.full_clean(exclude=exclude)
-                to_insert.add(new_tile)
-            else:
-                original_tile_data_by_tile_id[db_tile.pk] = {**db_tile.data}
-                db_tile._incoming_tile = new_tile
-                to_update.add(db_tile)
-
-        nodes = grouping_node.nodegroup.node_set.all()
-        languages = Language.objects.all()
-        for tile in to_insert | to_update:
-            if tile.nodegroup_id != grouping_node.pk:
-                # TODO: this is a symptom this should be refactored.
-                continue
-            if arches_version >= "8":
-                children = tile.nodegroup.children.all()
-            else:
-                children = tile.nodegroup.nodegroup_set.all()
-                grouping_node = (
-                    Node.objects.filter(pk=tile.nodegroup.pk)
-                    .prefetch_related("node_set")
-                    .get()
-                )
-                for child_nodegroup in children:
-                    child_nodegroup.grouping_node = grouping_node
-            for child_nodegroup in children:
-                self._update_tile_for_grouping_node(
-                    grouping_node=child_nodegroup.grouping_node,
-                    container=tile._incoming_tile,
-                    original_tile_data_by_tile_id=original_tile_data_by_tile_id,
-                    to_insert=to_insert,
-                    to_update=to_update,
-                    to_delete=to_delete,
-                    errors_by_node_alias=errors_by_node_alias,
-                )
-            self._validate_and_patch_from_tile_values(
-                tile,
-                nodes=nodes,
-                languages=languages,
-                errors_by_node_alias=errors_by_node_alias,
-            )
-
-        for tile in to_insert | to_update:
-            if tile.nodegroup.pk != grouping_node.pk:
-                # TODO: this is a symptom this should be refactored.
-                continue
-            # Remove blank tiles if they have no children.
-            if (
-                not any(tile.data.values())
-                and not tile.children.exists()
-                # Check unsaved children.
-                and not any(
-                    getattr(tile._incoming_tile, child_tile_alias, None)
-                    for child_tile_alias in grouping_node.nodegroup.children.values_list(
-                        # TODO: 7.6 compat
-                        "grouping_node__alias",
-                        flat=True,
-                    )
-                )
-            ):
-                if tile._state.adding:
-                    to_insert.remove(tile)
-                else:
-                    to_update.remove(tile)
-                    to_delete.add(tile)
-
-        for tile in to_insert | to_update:
-            if tile.nodegroup.pk != grouping_node.pk:
-                # TODO: this is a symptom this should be refactored.
-                continue
-            # Remove no-op upserts.
-            if (
-                original_data := original_tile_data_by_tile_id.pop(tile.pk, None)
-            ) and tile._tile_update_is_noop(original_data):
-                to_update.remove(tile)
-
-    @staticmethod
-    def _validate_and_patch_from_tile_values(
-        tile, *, nodes, languages, errors_by_node_alias
-    ):
-        """Validate data found on ._incoming_tile and move it to .data.
-        Update errors_by_node_alias in place."""
-        from arches.app.datatypes.datatypes import DataTypeFactory
-
-        datatype_factory = DataTypeFactory()
-        for node in nodes:
-            node_id_str = str(node.pk)
-            # TODO: move this somewhere else?
-            if isinstance(tile._incoming_tile, SemanticTile):
-                value_to_validate = getattr(
-                    tile._incoming_tile.aliased_data, node.alias, NOT_PROVIDED
-                )
-            else:
-                value_to_validate = tile._incoming_tile.aliased_data.get(
-                    node.alias, NOT_PROVIDED
-                )
-            if value_to_validate is NOT_PROVIDED:
-                continue
-
-            # This ugly section provides hooks to patch in better datatype methods.
-            # It won't live forever.
-            datatype_instance = datatype_factory.get_instance(node.datatype)
-            # TODO: pre_structure_tile_data()?
-            # TODO: move this to Tile.full_clean()?
-            # https://github.com/archesproject/arches/issues/10851#issuecomment-2427305853
-            snake_case_datatype = node.datatype.replace("-", "_")
-            if transform_fn := getattr(
-                datatype_transforms,
-                f"{snake_case_datatype}_transform_value_for_tile",
-                None,
-            ):
-                transform_fn = partial(transform_fn, datatype_instance)
-            else:
-                transform_fn = datatype_instance.transform_value_for_tile
-            if merge_fn := getattr(
-                datatype_transforms,
-                f"{snake_case_datatype}_merge_tile_value",
-                None,
-            ):
-                merge_fn = partial(merge_fn, datatype_instance)
-            # no else: this hook only exists in arches-querysets (for now)
-            if clean_fn := getattr(
-                datatype_transforms, f"{snake_case_datatype}_clean", None
-            ):
-                clean_fn = partial(clean_fn, datatype_instance)
-            else:
-                clean_fn = datatype_instance.clean
-            if validate_fn := getattr(
-                datatype_transforms, f"{snake_case_datatype}_validate", None
-            ):
-                validate_fn = partial(validate_fn, datatype_instance)
-            else:
-                validate_fn = datatype_instance.validate
-            if pre_tile_save_fn := getattr(
-                datatype_transforms, f"{snake_case_datatype}_pre_tile_save", None
-            ):
-                pre_tile_save_fn = partial(pre_tile_save_fn, datatype_instance)
-            else:
-                pre_tile_save_fn = datatype_instance.pre_tile_save
-
-            if value_to_validate is None:
-                tile.data[node_id_str] = None
-                continue
-            try:
-                transformed = transform_fn(
-                    value_to_validate, languages=languages, **node.config
-                )
-            except ValueError:  # BooleanDataType raises.
-                # validate() will handle.
-                transformed = value_to_validate
-
-            # Merge the transformed data into the tile.data.
-            # We just overwrite the old value unless a dataype has another idea.
-            if merge_fn:
-                merge_fn(tile, node_id_str, transformed)
-            else:
-                tile.data[node_id_str] = transformed
-
-            clean_fn(tile, node_id_str)
-
-            if errors := validate_fn(transformed, node=node):
-                errors_by_node_alias[node.alias].extend(errors)
-
-            try:
-                pre_tile_save_fn(tile, node_id_str)
-            except TypeError:  # GeoJSONDataType raises.
-                errors_by_node_alias[node.alias].append(
-                    datatype_instance.create_error_message(
-                        tile.data[node_id_str], None, None, None
-                    )
-                )
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None):
         if from_queryset is None and (
@@ -661,7 +259,7 @@ class SemanticTile(TileModel):
                 super().save(update_fields=set())
                 if self.sortorder is None or self.is_fully_provisional():
                     self.set_next_sort_order()
-                self._save_from_pythonic_model_values(user=user, index=index, **kwargs)
+                self._save_aliased_data(user=user, index=index, **kwargs)
                 # TODO: document that this is not compatible with signals.
         except ProgrammingError as e:
             if e.args and "excess_tiles" in e.args[0]:
@@ -669,7 +267,7 @@ class SemanticTile(TileModel):
                 raise ValidationError({nodegroup_alias: msg}) from e
             raise
 
-    def _save_from_pythonic_model_values(self, *, user=None, index=False, **kwargs):
+    def _save_aliased_data(self, *, user=None, index=False, **kwargs):
         tile_data_changed = self._update_tile_from_pythonic_model_values()
         if not tile_data_changed:
             # TODO: double-check whether some user guard makes sense here.
