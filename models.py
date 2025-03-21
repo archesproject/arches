@@ -38,6 +38,16 @@ from arches_querysets.utils.models import (
 
 
 logger = logging.getLogger(__name__)
+NOT_PROVIDED = object()
+
+
+class AliasedData:
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    def __repr__(self):
+        return f"<AliasedData: {vars(self)}>"
 
 
 class SemanticResource(ResourceInstance):
@@ -53,8 +63,7 @@ class SemanticResource(ResourceInstance):
             kwargs, self._meta.get_fields()
         )
         super().__init__(*args, **other_kwargs)
-        for kwarg, value in arches_model_kwargs.items():
-            setattr(self, kwarg, value)
+        self.aliased_data = AliasedData(**arches_model_kwargs)
 
     @classmethod
     def as_model(
@@ -93,8 +102,6 @@ class SemanticResource(ResourceInstance):
         ephemeral_proxy_instance.save_edit(user=user, edit_type=edit_type)
 
     def save(self, index=False, user=None, **kwargs):
-        if not hasattr(self, "_fetched_grouping_nodes"):
-            return super().save(**kwargs)
         with transaction.atomic():
             # update_fields=set() will abort the save, but at least calling
             # into save() will run a sanity check on unsaved relations.
@@ -144,13 +151,11 @@ class SemanticResource(ResourceInstance):
             # run certain side effects from Tile.save() one-at-a-time until
             # proxy model methods can be refactored. Then run in bulk.
             for upsert_proxy, vanilla_instance in zip(
-                upsert_proxies, upserts, strict=True
+                sorted(upsert_proxies, key=attrgetter("pk")),
+                sorted(upserts, key=attrgetter("pk")),
+                strict=True,
             ):
-                if upsert_proxy.pk != vanilla_instance.pk:
-                    upsert_proxy.pk = vanilla_instance.pk
-                    logger.warning(
-                        "DEBUG next week. Recent dev/8.0.x changes? Might be a gift."
-                    )
+                assert upsert_proxy.pk == vanilla_instance.pk
                 upsert_proxy._existing_data = upsert_proxy.data
                 upsert_proxy._existing_provisionaledits = upsert_proxy.provisionaledits
 
@@ -210,7 +215,9 @@ class SemanticResource(ResourceInstance):
             super().save(**kwargs)
 
             for upsert_tile in upserts:
-                for grouping_node in self._fetched_grouping_nodes:
+                for grouping_node in self._fetched_graph_nodes:
+                    if grouping_node.pk != grouping_node.nodegroup_id:
+                        continue  # not a grouping node
                     if upsert_tile.nodegroup_id == grouping_node.nodegroup_id:
                         for node in grouping_node.nodegroup.node_set.all():
                             datatype = datatype_factory.get_instance(node.datatype)
@@ -270,7 +277,9 @@ class SemanticResource(ResourceInstance):
         to_delete = set()
 
         original_tile_data_by_tile_id = {}
-        for grouping_node in self._fetched_grouping_nodes:
+        for grouping_node in self._fetched_graph_nodes:
+            if grouping_node.pk != grouping_node.nodegroup_id:
+                continue  # not a grouping node
             self._update_tile_for_grouping_node(
                 grouping_node,
                 self,
@@ -302,12 +311,15 @@ class SemanticResource(ResourceInstance):
         to_delete,
         errors_by_node_alias,
     ):
-        NOT_PROVIDED = object()
-
+        # TODO: Find something more clean than this double if/else.
         if isinstance(container, dict):
-            new_tiles = container.get(grouping_node.alias, NOT_PROVIDED)
+            aliased_data = container.get("aliased_data")
         else:
-            new_tiles = getattr(container, grouping_node.alias, NOT_PROVIDED)
+            aliased_data = container.aliased_data
+        if isinstance(aliased_data, dict):
+            new_tiles = aliased_data.get(grouping_node.alias, NOT_PROVIDED)
+        else:
+            new_tiles = getattr(aliased_data, grouping_node.alias, NOT_PROVIDED)
         if new_tiles is NOT_PROVIDED:
             return
         if grouping_node.nodegroup.cardinality == "1":
@@ -445,17 +457,18 @@ class SemanticResource(ResourceInstance):
         Update errors_by_node_alias in place."""
         from arches.app.datatypes.datatypes import DataTypeFactory
 
-        NOT_PROVIDED = object()
         datatype_factory = DataTypeFactory()
         for node in nodes:
             node_id_str = str(node.pk)
-            # TODO: remove this switch and deserialize this in DRF.
-            if isinstance(tile._incoming_tile, TileModel):
+            # TODO: move this somewhere else?
+            if isinstance(tile._incoming_tile, SemanticTile):
                 value_to_validate = getattr(
-                    tile._incoming_tile, node.alias, NOT_PROVIDED
+                    tile._incoming_tile.aliased_data, node.alias, NOT_PROVIDED
                 )
             else:
-                value_to_validate = tile._incoming_tile.get(node.alias, NOT_PROVIDED)
+                value_to_validate = tile._incoming_tile.aliased_data.get(
+                    node.alias, NOT_PROVIDED
+                )
             if value_to_validate is NOT_PROVIDED:
                 continue
 
@@ -534,9 +547,9 @@ class SemanticResource(ResourceInstance):
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None):
         if from_queryset is None and (
-            grouping_nodes := getattr(self, "_fetched_grouping_nodes", set())
+            queried_nodes := getattr(self, "_queried_nodes", set())
         ):
-            aliases = [n.alias for n in grouping_nodes]
+            aliases = [n.alias for n in queried_nodes if n.nodegroup.pk == n.pk]
             from_queryset = self.__class__.as_model(
                 self.graph.slug,
                 only=aliases,
@@ -565,8 +578,9 @@ class SemanticTile(TileModel):
             kwargs, self._meta.get_fields()
         )
         super().__init__(*args, **other_kwargs)
-        for kwarg, value in arches_model_kwargs.items():
-            setattr(self, kwarg, value)
+        self.aliased_data = arches_model_kwargs.pop(
+            "aliased_data", None
+        ) or AliasedData(**arches_model_kwargs)
 
     def find_nodegroup_alias(self):
         # SemanticTileManager provides grouping_node on 7.6
@@ -588,9 +602,7 @@ class SemanticTile(TileModel):
         as_representation=False,
         allow_empty=False,
     ):
-        """
-        See `arches.app.models.querysets.TileQuerySet.with_node_values`.
-        """
+        """See `arches.app.models.querysets.TileQuerySet.with_node_values`."""
 
         root_node = cls._root_node(graph_slug, root_node_alias)
         branch_nodes = []
@@ -604,7 +616,7 @@ class SemanticTile(TileModel):
         return qs.with_node_values(
             branch_nodes,
             defer=defer,
-            only=[root_node.alias],  # determine whether to expose
+            only=[branch_node.alias for branch_node in branch_nodes],
             as_representation=as_representation,
             allow_empty=allow_empty,
         ).annotate(_nodegroup_alias=models.Value(root_node_alias))
@@ -641,8 +653,6 @@ class SemanticTile(TileModel):
         return ret
 
     def save(self, index=False, user=None, **kwargs):
-        if not hasattr(self, "_queried_nodes"):
-            return super().save(**kwargs)
         nodegroup_alias = self.find_nodegroup_alias()
         try:
             with transaction.atomic():
@@ -748,12 +758,14 @@ class SemanticTile(TileModel):
             self.data = Tile.get_blank_tile_from_nodegroup_id(self.nodegroup_id).data
         original_data = {**self.data}
 
-        self._incoming_tile = {}
-        model_fields = field_names(self)
-        for tile_attr, tile_value in vars(self).items():
-            if tile_attr.startswith("_") or tile_attr in model_fields:
-                continue
-            self._incoming_tile[tile_attr] = tile_value
+        filtered_attrs = {
+            k: v
+            for k, v in vars(self).items()
+            if k not in field_names(self) and not k.startswith("_")
+        }
+        self._incoming_tile = SemanticTile(
+            aliased_data=filtered_attrs.get("aliased_data")
+        )
 
         errors_by_alias = defaultdict(list)
         if not self.nodegroup:
@@ -825,9 +837,11 @@ class SemanticTile(TileModel):
         resource = SemanticResource.as_model(
             graph_slug, only=only, resource_ids=[self.resourceinstance_id]
         ).get()
-        for grouping_node in resource._fetched_grouping_nodes:
+        for grouping_node in resource._fetched_graph_nodes:
+            if grouping_node.pk != grouping_node.nodegroup_id:
+                continue  # not a grouping node
             for node in grouping_node.nodegroup.node_set.all():
-                setattr(self, node.alias, self.data.get(str(node.pk)))
+                setattr(self.aliased_data, node.alias, self.data.get(str(node.pk)))
         self.resourceinstance = resource
 
     def _apply_provisional_edit(

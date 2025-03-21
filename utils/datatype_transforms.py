@@ -173,7 +173,7 @@ def string_to_json(self, tile, node):
 
 
 def string_merge_tile_value(self, tile, node_id_str, transformed) -> None:
-    tile.data[node_id_str] = tile.data.get(node_id_str, {}) | transformed
+    tile.data[node_id_str] = (tile.data.get(node_id_str) or {}) | transformed
 
 
 def string_to_representation(self, value):

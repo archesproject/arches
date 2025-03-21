@@ -26,6 +26,7 @@ def generate_node_alias_expressions(nodes, *, defer, only, model):
             continue
         if (defer and node.alias in defer) or (only and node.alias not in only):
             continue
+        # TODO: solution here, either bump to aliased_data or rewrite as JSON
         if node.alias in invalid_names:
             raise ValueError(f'"{node.alias}" clashes with a model field name.')
 

@@ -15,7 +15,7 @@ from arches_querysets.utils.models import (
 
 
 class SemanticTileManager(models.Manager):
-    def get_queryset(self, depth=0):
+    def get_queryset(self):
         qs = super().get_queryset().select_related("nodegroup", "parenttile")
         if arches_version >= "8":
             qs = qs.select_related("nodegroup__grouping_node")
@@ -26,16 +26,6 @@ class SemanticTileManager(models.Manager):
                     pk=models.F("nodegroup_id"),
                     nodegroup__tilemodel=models.OuterRef("tileid"),
                 ).values("alias")[:1]
-            )
-        # This magic number doesn't cause queries beyond actual depth:
-        # https://forum.djangoproject.com/t/prefetching-relations-to-arbitrary-depth/39328
-        if depth < 20:
-            qs = qs.prefetch_related(
-                models.Prefetch(
-                    "children" if arches_version >= "8" else "tilemodel_set",
-                    queryset=self.get_queryset(depth=depth + 1),
-                    to_attr="_annotated_tiles",
-                )
             )
         return qs
 
@@ -54,12 +44,14 @@ class SemanticTileQuerySet(models.QuerySet):
         only=None,
         as_representation=False,
         allow_empty=False,
+        depth=20,
     ):
         """
         Entry point for filtering arches data by nodegroups (instead of grouping by
         resource.)
 
         >>> statements = SemanticTile.as_nodegroup("statement", graph_slug="concept")
+        # TODO: show this with some test node that's actually a localized string.
         >>> results = statements.filter(statement_content__any_lang_startswith="F")
         >>> for result in results:
                 print(result.resourceinstance)
@@ -104,6 +96,25 @@ class SemanticTileQuerySet(models.QuerySet):
         if not allow_empty:
             qs = qs.filter(data__has_any_keys=[n.pk for n in self._queried_nodes])
 
+        # Future: see various solutions mentioned here for avoiding
+        # "magic number" depth traversal (but the magic number is harmless,
+        # causes no additional queries beyond actual depth):
+        # https://forum.djangoproject.com/t/prefetching-relations-to-arbitrary-depth/39328
+        if depth:
+            qs = qs.prefetch_related(
+                models.Prefetch(
+                    "children" if arches_version >= "8" else "tilemodel_set",
+                    queryset=self.model.objects.get_queryset().with_node_values(
+                        nodes=nodes,
+                        defer=defer,
+                        only=only,
+                        as_representation=as_representation,
+                        allow_empty=allow_empty,
+                        depth=depth - 1,
+                    ),
+                )
+            )
+
         # TODO: some of these can just be aliases.
         return qs.annotate(**node_alias_annotations).order_by("sortorder")
 
@@ -111,6 +122,7 @@ class SemanticTileQuerySet(models.QuerySet):
         """Call datatype to_python() methods when materializing the QuerySet.
         Discard annotations that do not pertain to this nodegroup.
         Memoize fetched nodes.
+        Attach child tiles to parent tiles and vice versa.
         """
         from arches_querysets.models import SemanticResource
 
@@ -134,33 +146,37 @@ class SemanticTileQuerySet(models.QuerySet):
             tile._queried_nodes = self._queried_nodes
             for node in self._queried_nodes:
                 if node.nodegroup_id == tile.nodegroup_id:
+                    # This is on the tile itself (ORM annotation).
                     tile_val = getattr(tile, node.alias, NOT_PROVIDED)
                     if tile_val is not NOT_PROVIDED:
                         instance_val = self._get_node_value_for_python_annotation(
                             tile, node, tile_val
                         )
-                        setattr(tile, node.alias, instance_val)
-                else:
-                    # This will be unnecessary once tiles do less annotating.
-                    delattr(tile, node.alias)
+                        setattr(tile.aliased_data, node.alias, instance_val)
             if arches_version >= "8":
                 fallback = getattr(tile, "children")
             else:
                 fallback = getattr(tile, "tilemodel_set")
             for child_tile in getattr(tile, "_annotated_tiles", fallback.all()):
-                setattr(child_tile, tile.find_nodegroup_alias(), child_tile.parenttile)
+                setattr(
+                    child_tile.aliased_data,
+                    tile.find_nodegroup_alias(),
+                    child_tile.parenttile,
+                )
                 try:
                     child_nodegroup_alias = child_tile.find_nodegroup_alias()
                 except:
                     child_nodegroup_alias = Node.objects.get(
                         pk=child_tile.nodegroup_id
                     ).alias
-                children = getattr(tile, child_nodegroup_alias, [])
+                children = getattr(tile.aliased_data, child_nodegroup_alias, [])
                 children.append(child_tile)
                 if child_tile.nodegroup.cardinality == "1":
-                    setattr(tile, child_nodegroup_alias, children[0])
+                    setattr(tile.aliased_data, child_nodegroup_alias, children[0])
                 else:
-                    setattr(tile, child_nodegroup_alias, children)
+                    setattr(tile.aliased_data, child_nodegroup_alias, children)
+                # Attach parent to this child.
+                setattr(child_tile.aliased_data, tile.find_nodegroup_alias(), tile)
 
     def _clone(self):
         clone = super()._clone()
@@ -253,22 +269,22 @@ class SemanticResourceQuerySet(models.QuerySet):
 
         Filter on any nested node at the top level ("shallow query").
         In this example, statement_content is a cardinality-N node, thus an array.
-        # TODO: should name with `_set`? But then would need to check for clashes.
 
         >>> subset = concepts.filter(statement_content__len__gt=0)[:4]
         >>> for concept in subset:
                 print(concept)
-                for stmt in concept.statement:
+                for stmt in concept.aliased_data.statement:
                     print("\t", stmt)
-                    print("\t\t", stmt.statement_content)
+                    print("\t\t", stmt.aliased_data.statement_content)
 
         <Concept: consignment (method of acquisition) (f3fed7aa-eae6-41f6-aa0f-b889d84c0552)>
             <TileModel: statement (46efcd06-a5e5-43be-8847-d7cd94cbc9cb)>
-                [{'en': {'value': 'Method of acquiring property ...
+                'Individual objects or works. Most works ...
         ...
 
         Access child and parent tiles by nodegroup aliases:
 
+        # TODO: replace this example.
         >>> has_child = concepts.filter(statement_data_assignment_statement_content__len__gt=0).first()
         >>> has_child
         <Concept: <appellative_status_ascribed_name_content> (751614c0-de7a-47d7-8e87-a4d18c7337ff)>
@@ -339,7 +355,8 @@ class SemanticResourceQuerySet(models.QuerySet):
 
     def _prefetch_related_objects(self):
         """
-        Attach annotated tiles to resource instances in a nested structure.
+        Attach top-level tiles to resource instances.
+        Attach resource instances to all fetched tiles.
         Memoize fetched grouping node aliases (and graph source nodes).
         """
         super()._prefetch_related_objects()
@@ -353,30 +370,27 @@ class SemanticResourceQuerySet(models.QuerySet):
             if not isinstance(resource, self.model):
                 # For a .values() query, we will lack instances.
                 continue
-            resource._fetched_grouping_nodes = set()
             resource._fetched_graph_nodes = self._fetched_graph_nodes
+            resource._queried_nodes = self._queried_nodes
 
             # Prepare resource annotations.
+            # TODO: this might move to a method on AliasedData.
             for grouping_node in grouping_nodes.values():
                 default = None if grouping_node.nodegroup.cardinality == "1" else []
-                setattr(resource, grouping_node.alias, default)
-                resource._fetched_grouping_nodes.add(grouping_node)
+                setattr(resource.aliased_data, grouping_node.alias, default)
 
-            # Fill resource annotations.
+            # Fill aliased data with top nodegroup data.
             annotated_tiles = getattr(resource, "_annotated_tiles", [])
             for annotated_tile in annotated_tiles:
+                annotated_tile._enriched_resource = resource
+                if annotated_tile.nodegroup.parentnodegroup_id:
+                    continue
                 ng_alias = grouping_nodes[annotated_tile.nodegroup_id].alias
                 if annotated_tile.nodegroup.cardinality == "n":
-                    tile_array = getattr(resource, ng_alias)
+                    tile_array = getattr(resource.aliased_data, ng_alias)
                     tile_array.append(annotated_tile)
                 else:
-                    setattr(resource, ng_alias, annotated_tile)
-
-                # Attach parent to this child.
-                if annotated_tile.parenttile_id:
-                    parent_ng_pk = annotated_tile.parenttile.nodegroup_id
-                    parent_ng_alias = grouping_nodes[parent_ng_pk].alias
-                    setattr(annotated_tile, parent_ng_alias, annotated_tile.parenttile)
+                    setattr(resource.aliased_data, ng_alias, annotated_tile)
 
     def _clone(self):
         clone = super()._clone()
