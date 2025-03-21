@@ -137,6 +137,7 @@ class SemanticTileQuerySet(models.QuerySet):
                 continue
             if not enriched_resource:
                 # One prefetch per tile depth. Later look into improving.
+                # TODO: move -- this only makes sense for tiles for a single resource.
                 enriched_resource = (
                     SemanticResource.objects.filter(pk=tile.resourceinstance_id)
                     .with_related_resource_display_names()

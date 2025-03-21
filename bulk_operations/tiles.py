@@ -5,7 +5,6 @@ from operator import attrgetter
 
 from django.core.exceptions import ValidationError
 from django.db import ProgrammingError, transaction
-from django.db import models
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 
@@ -15,32 +14,70 @@ from arches.app.models.models import Language, Node, TileModel
 from arches.app.models.tile import Tile, TileValidationError
 
 from arches_querysets.utils import datatype_transforms
-from arches_querysets.utils.models import field_attnames, pop_arches_model_kwargs
+from arches_querysets.utils.models import (
+    field_attnames,
+    get_nodegroups_here_and_below,
+    pop_arches_model_kwargs,
+)
 
 
 NOT_PROVIDED = object()
 
 
 class BulkTileOperation:
-    def __init__(self, entry, resource, user=None, save_kwargs=None):
+    def __init__(self, entry, user=None, save_kwargs=None):
         self.to_insert = set()
         self.to_update = set()
         self.to_delete = set()
         self.errors_by_node_alias = defaultdict(list)
-        self.entry = entry
+        self.entry = entry  # resource or tile
         self.user = user
         self.datatype_factory = DataTypeFactory()
         self.dummy_request = HttpRequest()
         self.dummy_request.user = user
         self.save_kwargs = save_kwargs or {}
-        self.resource = resource
-        if arches_version < "8":
-            self.grouping_nodes = {
-                node.alias: node
-                for node in resource.graph.node_set.filter(
-                    nodegroup__groupingnode=models.F("pk")
-                )
-            }
+
+        if isinstance(entry, TileModel):
+            self.resourceid = self.entry.resourceinstance_id
+            self.nodegroups = get_nodegroups_here_and_below(self.entry.nodegroup)
+            existing_tiles = entry.__class__.objects.filter(
+                resourceinstance_id=self.resourceid,
+                nodegroup_id__in=[ng.pk for ng in self.nodegroups],
+            ).order_by("sortorder")
+        else:
+            self.resourceid = self.entry.pk
+            self.nodegroups = []  # not necessary to populate.
+            existing_tiles = self.entry._annotated_tiles
+
+        self.grouping_nodes_by_nodegroup_id = self._get_grouping_node_lookup()
+        self.existing_tiles_by_nodegroup_alias = defaultdict(list)
+        for tile in existing_tiles:
+            self.existing_tiles_by_nodegroup_alias[tile.find_nodegroup_alias()].append(
+                tile
+            )
+
+    def _get_grouping_node_lookup(self):
+        from arches_querysets.models import SemanticResource, SemanticTile
+
+        lookup = {}
+        if isinstance(self.entry, SemanticResource):
+            for node in self.entry._fetched_graph_nodes:
+                if node.pk == node.nodegroup_id:
+                    lookup[node.pk] = node
+        elif isinstance(self.entry, SemanticTile):
+            # TODO: look into whether this is repetitive.
+            for nodegroup in self.nodegroups:
+                if arches_version >= "8":
+                    lookup[nodegroup.pk] = nodegroup.grouping_node
+                else:
+                    for node in nodegroup.node_set.all():
+                        if node.pk == node.nodegroup_id:
+                            lookup[node.pk] = node
+                            break
+        else:
+            raise TypeError
+
+        return lookup
 
     def run(self):
         self.validate()
@@ -62,10 +99,7 @@ class BulkTileOperation:
         Raises ValidationError if new data fails datatype validation.
         """
         original_tile_data_by_tile_id = {}
-        # TODO: Replace with version switch to get grouping_node (profile)
-        for grouping_node in self.resource._fetched_graph_nodes:
-            if grouping_node.pk != grouping_node.nodegroup_id:
-                continue  # not a grouping node
+        for grouping_node in self.grouping_nodes_by_nodegroup_id.values():
             self._update_tile_for_grouping_node(
                 grouping_node,
                 self.entry,
@@ -114,24 +148,20 @@ class BulkTileOperation:
                 SemanticTile(**{**tile, "parenttile": parent_tile})
                 for tile in new_tiles
             ]
-        db_tiles = [
-            t
-            for t in self.resource._annotated_tiles
-            if t.find_nodegroup_alias() == grouping_node.alias
-        ]
-        if not db_tiles:
+        existing_tiles = self.existing_tiles_by_nodegroup_alias[grouping_node.alias]
+        if not existing_tiles:
             next_sort_order = 0
         else:
-            next_sort_order = max(t.sortorder or 0 for t in db_tiles) + 1
-        for db_tile, new_tile in zip_longest(
-            db_tiles, new_tiles, fillvalue=NOT_PROVIDED
+            next_sort_order = max(t.sortorder or 0 for t in existing_tiles) + 1
+        for existing_tile, new_tile in zip_longest(
+            existing_tiles, new_tiles, fillvalue=NOT_PROVIDED
         ):
             if new_tile is NOT_PROVIDED:
-                self.to_delete.add(db_tile)
+                self.to_delete.add(existing_tile)
                 continue
-            if db_tile is NOT_PROVIDED:
+            if existing_tile is NOT_PROVIDED:
                 new_tile.nodegroup_id = grouping_node.nodegroup_id
-                new_tile.resourceinstance_id = self.resource.pk
+                new_tile.resourceinstance_id = self.resourceid
                 new_tile.sortorder = next_sort_order
                 next_sort_order += 1
                 for node in grouping_node.nodegroup.node_set.all():
@@ -154,9 +184,9 @@ class BulkTileOperation:
                 new_tile.full_clean(exclude=exclude)
                 self.to_insert.add(new_tile)
             else:
-                original_tile_data_by_tile_id[db_tile.pk] = {**db_tile.data}
-                db_tile._incoming_tile = new_tile
-                self.to_update.add(db_tile)
+                original_tile_data_by_tile_id[existing_tile.pk] = {**existing_tile.data}
+                existing_tile._incoming_tile = new_tile
+                self.to_update.add(existing_tile)
 
         nodes = grouping_node.nodegroup.node_set.all()
         languages = Language.objects.all()
@@ -402,19 +432,20 @@ class BulkTileOperation:
             if self.to_delete:
                 TileModel.objects.filter(pk__in=[t.pk for t in self.to_delete]).delete()
 
-            self.resource.save_without_related_objects(**self.save_kwargs)
+            self.entry.save_without_related_objects(**self.save_kwargs)
 
             for upsert_tile in upserts:
-                for grouping_node in self.resource._fetched_graph_nodes:
-                    if grouping_node.pk != grouping_node.nodegroup_id:
-                        continue  # not a grouping node
-                    if upsert_tile.nodegroup_id == grouping_node.nodegroup_id:
-                        for node in grouping_node.nodegroup.node_set.all():
-                            datatype = self.datatype_factory.get_instance(node.datatype)
-                            datatype.post_tile_save(
-                                upsert_tile, str(node.pk), request=self.dummy_request
-                            )
-                        break
+                if arches_version < "8":
+                    grouping_node = self.grouping_nodes_by_nodegroup_id[
+                        upsert_tile.nodegroup_id
+                    ]
+                else:
+                    grouping_node = upsert_tile.nodegroup.grouping_node
+                for node in grouping_node.nodegroup.node_set.all():
+                    datatype = self.datatype_factory.get_instance(node.datatype)
+                    datatype.post_tile_save(
+                        upsert_tile, str(node.pk), request=self.dummy_request
+                    )
 
             for upsert_proxy in upsert_proxies:
                 upsert_proxy._Tile__postSave()

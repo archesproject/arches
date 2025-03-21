@@ -1,24 +1,19 @@
 import logging
 import sys
-from collections import defaultdict
 from itertools import chain
 
-from django.core.exceptions import ValidationError
-from django.db import ProgrammingError, models, transaction
-from django.http import HttpRequest
+from django.db import models, transaction
 from django.utils.translation import gettext as _
 
 from arches import __version__ as arches_version
 from arches.app.models.models import (
     GraphModel,
-    Language,
     Node,
     ResourceInstance,
     TileModel,
 )
 from arches.app.models.resource import Resource
-from arches.app.models.tile import Tile, TileValidationError
-from arches.app.models.utils import field_names
+from arches.app.models.tile import Tile
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 
 from arches_querysets.bulk_operations.tiles import BulkTileOperation
@@ -103,7 +98,6 @@ class SemanticResource(ResourceInstance):
             # into save() will run a sanity check on unsaved relations.
             super().save(update_fields=set())
             self._save_aliased_data(user=user, index=index, **kwargs)
-            # TODO: document that this is not compatible with signals.
             self.save_edit(user=user)
 
     def clean(self):
@@ -124,12 +118,7 @@ class SemanticResource(ResourceInstance):
             - the node values are phantom fields.
             - we have other entry points besides DRF.
         """
-        bulk_operation = BulkTileOperation(
-            entry=self,
-            resource=self,
-            user=user,
-            save_kwargs=kwargs,
-        )
+        bulk_operation = BulkTileOperation(entry=self, user=user, save_kwargs=kwargs)
         bulk_operation.run()
 
         self.refresh_from_db(
@@ -251,91 +240,20 @@ class SemanticTile(TileModel):
         return ret
 
     def save(self, index=False, user=None, **kwargs):
-        nodegroup_alias = self.find_nodegroup_alias()
-        try:
-            with transaction.atomic():
-                # update_fields=set() will abort the save, but at least calling
-                # into save() will run a sanity check on unsaved relations.
-                super().save(update_fields=set())
-                if self.sortorder is None or self.is_fully_provisional():
-                    self.set_next_sort_order()
-                self._save_aliased_data(user=user, index=index, **kwargs)
-                # TODO: document that this is not compatible with signals.
-        except ProgrammingError as e:
-            if e.args and "excess_tiles" in e.args[0]:
-                msg = _("Tile Cardinality Error")
-                raise ValidationError({nodegroup_alias: msg}) from e
-            raise
+        with transaction.atomic():
+            # update_fields=set() will abort the save, but at least calling
+            # into save() will run a sanity check on unsaved relations.
+            super().save(update_fields=set())
+            if self.sortorder is None or self.is_fully_provisional():
+                self.set_next_sort_order()
+            self._save_aliased_data(user=user, index=index, **kwargs)
+
+    def save_without_related_objects(self, **kwargs):
+        return super().save(**kwargs)
 
     def _save_aliased_data(self, *, user=None, index=False, **kwargs):
-        tile_data_changed = self._update_tile_from_pythonic_model_values()
-        if not tile_data_changed:
-            # TODO: double-check whether some user guard makes sense here.
-            # And whether indexing or functions need to run.
-            return super().save(**kwargs)
-
-        # Instantiate a proxy model and sync data to it, to run all side effects.
-        # Explanation: this is basically Tile.save() but with the serialized
-        # graph and tile fetching skipped. Hence why we might
-        # TODO: expose on vanilla model.
-        proxy = Tile.objects.get(pk=self.pk)
-        proxy.parenttile = self.parenttile
-        proxy.sortorder = self.sortorder
-        # TODO: handle create.
-        # Capture these to avoid re-querying in _apply_provisional_edit().
-        existing_data = proxy.data
-        existing_provisional_edits = proxy.provisionaledits
-        for field in vars(self):
-            setattr(proxy, field, getattr(self, field))
-
-        # Some functions expect to always drill into request.user
-        # https://github.com/archesproject/arches/issues/8471
-        dummy_request = HttpRequest()
-        dummy_request.user = user
-        with transaction.atomic():
-            try:
-                proxy._Tile__preSave(request=dummy_request)
-                proxy.check_for_missing_nodes()
-                proxy.check_for_constraint_violation()
-            except TileValidationError as tve:
-                raise ValidationError(tve.message) from tve
-            oldprovisionalvalue, newprovisionalvalue, provisional_edit_log_details = (
-                self._apply_provisional_edit(
-                    proxy, existing_data, existing_provisional_edits, user=user
-                )
-            )
-
-            super().save(**kwargs)
-            # TODO: address performance.
-            for node in self.nodegroup.node_set.all():
-                datatype = proxy.datatype_factory.get_instance(node.datatype)
-                datatype.post_tile_save(self, str(node.pk), request=dummy_request)
-            proxy._Tile__postSave(request=dummy_request)
-
-            if self._state.adding:
-                proxy.save_edit(
-                    user=user,
-                    edit_type="tile create",
-                    old_value={},
-                    new_value=self.data,
-                    newprovisionalvalue=newprovisionalvalue,
-                    provisional_edit_log_details=provisional_edit_log_details,
-                    transaction_id=None,
-                    # TODO: get this information upstream somewhere.
-                    new_resource_created=False,
-                    note=None,
-                )
-            else:
-                proxy.save_edit(
-                    user=user,
-                    edit_type="tile edit",
-                    old_value=existing_data,
-                    new_value=self.data,
-                    newprovisionalvalue=newprovisionalvalue,
-                    oldprovisionalvalue=oldprovisionalvalue,
-                    provisional_edit_log_details=provisional_edit_log_details,
-                    transaction_id=None,
-                )
+        bulk_operation = BulkTileOperation(entry=self, user=user, save_kwargs=kwargs)
+        bulk_operation.run()
 
         # TODO: add unique constraint for TileModel re: sortorder
         # TODO: determine whether this should be skippable, and how.
@@ -350,43 +268,6 @@ class SemanticTile(TileModel):
         proxy_resource.save_descriptors()
         if index:
             proxy_resource.index()
-
-    def _update_tile_from_pythonic_model_values(self):
-        if not self.data:
-            self.data = Tile.get_blank_tile_from_nodegroup_id(self.nodegroup_id).data
-        original_data = {**self.data}
-
-        filtered_attrs = {
-            k: v
-            for k, v in vars(self).items()
-            if k not in field_names(self) and not k.startswith("_")
-        }
-        self._incoming_tile = SemanticTile(
-            aliased_data=filtered_attrs.get("aliased_data")
-        )
-
-        errors_by_alias = defaultdict(list)
-        if not self.nodegroup:
-            raise ValueError
-        # TODO: Move. This shouldn't emit resource edit log entries.
-        SemanticResource._validate_and_patch_from_tile_values(
-            self,
-            nodes=self.nodegroup.node_set.all(),
-            languages=Language.objects.all(),
-            errors_by_node_alias=errors_by_alias,
-        )
-        if not any(self.data.values()):
-            raise ValidationError(_("Tile is blank."))
-        if self._tile_update_is_noop(original_data):
-            return False
-        if errors_by_alias:
-            raise ValidationError(
-                {
-                    alias: ValidationError([e["message"] for e in errors])
-                    for alias, errors in errors_by_alias.items()
-                }
-            )
-        return True
 
     def _tile_update_is_noop(self, original_data):
         """Skipping no-op tile saves avoids regenerating RxR rows, at least
