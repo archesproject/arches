@@ -630,6 +630,7 @@ class ResourceTests(ArchesTestCase):
         r1.descriptor_function = None
         r2.descriptor_function = None
 
+        serialized_graph = None  # stored off during test
         for test_name, resources in (
             ("array", [r1, r2]),
             ("queryset", Resource.objects.filter(pk__in=[r1.pk, r2.pk])),
@@ -660,6 +661,29 @@ class ResourceTests(ArchesTestCase):
                     if q["sql"].endswith('FROM "auth_user"') and "guardian" not in q
                 ]
                 self.assertEqual(len(non_guardian_user_selects), 1)
+
+            # Try again with providing the serialized graph up front.
+            for resource in resources:
+                if resource.serialized_graph:
+                    serialized_graph = resource.serialized_graph
+                resource.serialized_graph = None
+
+            with (
+                self.subTest(iterable=test_name),
+                CaptureQueriesContext(connection) as queries,
+            ):
+                index_resources_using_singleprocessing(
+                    resources,
+                    recalculate_descriptors=True,
+                    quiet=True,
+                    serialized_graph=serialized_graph,
+                )
+                published_graph_selects = [
+                    q
+                    for q in queries
+                    if q["sql"].startswith('SELECT "published_graphs"."id"')
+                ]
+                self.assertEqual(len(published_graph_selects), 0)
 
     def test_self_referring_resource_instance_descriptor(self):
         # Create a nodegroup with a string node and a resource-instance node.
