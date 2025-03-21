@@ -4226,6 +4226,7 @@ div.dropdown-menu.open {
     flex-direction: column;
     width: 100%;
     height: calc(100vh - 50px);
+    max-width: calc(100vw - 50px);
     position: relative;
 }
 
@@ -5178,6 +5179,7 @@ div.card-grid-item.selected {
     background: #fff;
     border-bottom: 1px solid #ddd;
     z-index: 3000;
+    max-width: calc(100vw - 50px);
 }
 
 .ep-menu {
@@ -5202,6 +5204,12 @@ div.card-grid-item.selected {
     float: right;
     list-style-type: none;
     margin-bottom: 0;
+}
+
+.ep-toolbar .top-left-nav {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
 }
 
 .editor-tools {
@@ -5580,6 +5588,8 @@ div.card-grid-item.selected {
     font-size: 1.6rem;
     padding: 5px;
     align-items: center;
+    display: inline-block;
+    text-overflow: ellipsis;
 }
 
 .ep-graph-title-icon {

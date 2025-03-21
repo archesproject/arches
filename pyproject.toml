@@ -47,7 +47,7 @@ dependencies = [
     "openpyxl==3.1.2",
     "pillow>=7.0.0",
     "polib==1.1.1",
-    "psycopg2==2.9.9",
+    "psycopg2==2.9.10",
     "pycryptodome<4.0.0,>=3.3.1",
     "pyjwt>=2.0.0,<3",
     "pyjwt[crypto]",
