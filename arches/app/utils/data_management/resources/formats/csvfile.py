@@ -423,9 +423,8 @@ class TileCsvWriter(Writer):
         csvs_for_export = []
 
         tiles = self.group_tiles(
-            self.tiles.order_by(
-                "nodegroup_id"
-            ).values(),  # TODO: refactor to avoid going to the db again
+            # TODO: refactor to avoid going to the db again
+            self.tiles.order_by("nodegroup_id", "sortorder").values(),
             "nodegroup_id",
         )
         semantic_nodes = [

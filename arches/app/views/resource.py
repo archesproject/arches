@@ -300,16 +300,9 @@ class ResourceEditorView(MapBaseManagerView):
                 ]
             ]
         else:
-            cards = (
-                graph.cardmodel_set.order_by("sortorder")
-                .filter(nodegroup__in=nodegroups)
-                .prefetch_related(
-                    Prefetch(
-                        "cardxnodexwidget_set",
-                        queryset=models.CardXNodeXWidget.objects.order_by("sortorder"),
-                    )
-                )
-            )
+            cards = graph.cardmodel_set.filter(
+                nodegroup__in=nodegroups
+            ).prefetch_related("cardxnodexwidget_set")
             serialized_cards = JSONSerializer().serializeToPython(cards)
             cardwidgets = []
             for card in cards:

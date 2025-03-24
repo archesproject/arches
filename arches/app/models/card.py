@@ -32,6 +32,7 @@ class Card(models.CardModel):
 
     class Meta:
         proxy = True
+        ordering = ["sortorder"]
 
     def update_constraints(self, constraints):
         def add_nodeconstraints(nodeids, constraint_model):

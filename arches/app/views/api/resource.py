@@ -787,7 +787,6 @@ class BulkResourceReport(APIBase):
                     graph_id__in=graph_ids_with_templates_that_preload_resource_data
                 )
                 .select_related("nodegroup")
-                .order_by("sortorder")
             )
 
             perm = "read_nodegroup"
@@ -814,10 +813,7 @@ class BulkResourceReport(APIBase):
 
             cardwidgets = [
                 widget
-                for widgets in [
-                    card.cardxnodexwidget_set.order_by("sortorder").all()
-                    for card in graph_cards
-                ]
+                for widgets in [card.cardxnodexwidget_set.all() for card in graph_cards]
                 for widget in widgets
             ]
 

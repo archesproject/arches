@@ -84,7 +84,7 @@ class PluginView(MapBaseManagerView):
 
         if plugin.componentname == "etl-manager":
             template_paths = []
-            for etl_module in models.ETLModule.objects.order_by("helpsortorder"):
+            for etl_module in models.ETLModule.objects.all():
                 if etl_module.helptemplate:
                     template_paths.append(etl_module.helptemplate)
             if len(template_paths) > 0:
