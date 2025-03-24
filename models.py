@@ -200,10 +200,16 @@ class SemanticTile(TileModel):
         if resource_ids:
             qs = qs.filter(resourceinstance_id__in=resource_ids)
 
+        filtered_only = [
+            branch_node.alias
+            for branch_node in branch_nodes
+            if not only or branch_node.alias in only
+        ]
+
         return qs.with_node_values(
             branch_nodes,
             defer=defer,
-            only=[branch_node.alias for branch_node in branch_nodes],
+            only=filtered_only,
             as_representation=as_representation,
             allow_empty=allow_empty,
         ).annotate(_nodegroup_alias=models.Value(root_node_alias))
