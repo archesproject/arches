@@ -97,3 +97,17 @@ def filter_nodes_by_highest_parent(nodes, aliases):
             filtered_nodes |= set(nodegroup.node_set.all())
 
     return filtered_nodes
+
+
+def get_recursive_prefetches(lookup_str, *, recursive_part, depth):
+    """
+    Future: see various solutions mentioned here for avoiding
+    "magic number" depth traversal (but the magic number is harmless,
+    causes no additional queries beyond actual depth):
+    https://forum.djangoproject.com/t/prefetching-relations-to-arbitrary-depth/39328
+    """
+    prefetches = []
+    for i in range(1, depth + 1):
+        recursive_lookup = "__".join([recursive_part] * i)
+        prefetches.append(lookup_str.replace(recursive_part, recursive_lookup))
+    return prefetches

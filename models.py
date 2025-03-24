@@ -24,6 +24,7 @@ from arches_querysets.querysets import (
     SemanticTileQuerySet,
 )
 from arches_querysets.utils.models import (
+    get_recursive_prefetches,
     get_nodegroups_here_and_below,
     pop_arches_model_kwargs,
 )
@@ -377,23 +378,27 @@ class GraphWithPrefetching(GraphModel):
                     "node_set__nodegroup__node_set",
                     "node_set__nodegroup__node_set__cardxnodexwidget_set",
                     "node_set__nodegroup__cardmodel_set",
-                    "node_set__nodegroup__children",
-                    "node_set__nodegroup__children__node_set",
-                    "node_set__nodegroup__children__node_set__cardxnodexwidget_set",
-                    "node_set__nodegroup__children__cardmodel_set",
-                    "node_set__nodegroup__children__children",
-                    "node_set__nodegroup__children__children__node_set",
-                    "node_set__nodegroup__children__children__node_set__cardxnodexwidget_set",
-                    "node_set__nodegroup__children__children__cardmodel_set",
-                    "node_set__nodegroup__children__children__children",
-                    "node_set__nodegroup__children__children__children__node_set",
-                    "node_set__nodegroup__children__children__children__node_set__cardxnodexwidget_set",
-                    "node_set__nodegroup__children__children__children__cardmodel_set",
-                    "node_set__nodegroup__children__children__children__children",
-                    "node_set__nodegroup__children__children__children__children__node_set",
-                    "node_set__nodegroup__children__children__children__children__node_set__cardxnodexwidget_set",
-                    "node_set__nodegroup__children__children__children__chidlren__cardmodel_set",
-                    # TODO: seal grouping_node.nodegroup
+                    *get_recursive_prefetches(
+                        "node_set__nodegroup__children",
+                        depth=12,
+                        recursive_part="children",
+                    ),
+                    *get_recursive_prefetches(
+                        "node_set__nodegroup__children__node_set",
+                        depth=12,
+                        recursive_part="children",
+                    ),
+                    *get_recursive_prefetches(
+                        "node_set__nodegroup__children__node_set__cardxnodexwidget_set",
+                        depth=12,
+                        recursive_part="children",
+                    ),
+                    *get_recursive_prefetches(
+                        "node_set__nodegroup__children__cardmodel_set",
+                        depth=12,
+                        recursive_part="children",
+                    ),
+                    # TODO: determine if these last two are still used?
                     "node_set__nodegroup__grouping_node__nodegroup",
                     "node_set__nodegroup__children__grouping_node",
                 ]
@@ -403,22 +408,26 @@ class GraphWithPrefetching(GraphModel):
                     "node_set__nodegroup__node_set",
                     "node_set__nodegroup__node_set__cardxnodexwidget_set",
                     "node_set__nodegroup__cardmodel_set",
-                    "node_set__nodegroup__nodegroup_set",
-                    "node_set__nodegroup__nodegroup_set__node_set",
-                    "node_set__nodegroup__nodegroup_set__node_set__cardxnodexwidget_set",
-                    "node_set__nodegroup__nodegroup_set__cardmodel_set",
-                    "node_set__nodegroup__nodegroup_set__nodegroup_set",
-                    "node_set__nodegroup__nodegroup_set__nodegroup_set__node_set",
-                    "node_set__nodegroup__nodegroup_set__nodegroup_set__node_set__cardxnodexwidget_set",
-                    "node_set__nodegroup__nodegroup_set__nodegroup_set__cardmodel_set",
-                    "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set",
-                    "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__node_set",
-                    "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__node_set__cardxnodexwidget_set",
-                    "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__cardmodel_set",
-                    "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__nodegroup_set",
-                    "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__nodegroup_set__node_set",
-                    "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__nodegroup_set__node_set__cardxnodexwidget_set",
-                    "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__nodegroup_set__cardmodel_set",
+                    *get_recursive_prefetches(
+                        "node_set__nodegroup__nodegroup_set",
+                        depth=12,
+                        recursive_part="nodegroup_set",
+                    ),
+                    *get_recursive_prefetches(
+                        "node_set__nodegroup__nodegroup_set__node_set",
+                        depth=12,
+                        recursive_part="nodegroup_set",
+                    ),
+                    *get_recursive_prefetches(
+                        "node_set__nodegroup__nodegroup_set__cardmodel_set",
+                        depth=12,
+                        recursive_part="nodegroup_set",
+                    ),
+                    *get_recursive_prefetches(
+                        "node_set__nodegroup__nodegroup_set__node_set__cardxnodexwidget_set",
+                        depth=12,
+                        recursive_part="nodegroup_set",
+                    ),
                 ]
             graph = graph_query.prefetch_related(*prefetches).get()
         except cls.DoesNotExist as e:
