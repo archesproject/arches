@@ -89,6 +89,7 @@ class ArchesModelAPIMixin:
         return {
             **super().get_serializer_context(),
             "graph_slug": self.graph_slug,
+            "graph_nodes": getattr(self, "graph_nodes", None),
             "nodegroup_alias": self.nodegroup_alias,
         }
 
@@ -109,6 +110,7 @@ class ArchesModelAPIMixin:
             # Not 404, see https://github.com/archesproject/arches/issues/11563
             raise PermissionDenied
         ret.save = partial(ret.save, user=user)
+        self.graph_nodes = ret._fetched_graph_nodes
         return ret
 
     def create(self, request, *args, **kwargs):

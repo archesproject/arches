@@ -180,7 +180,7 @@ class SemanticTile(TileModel):
     @classmethod
     def as_nodegroup(
         cls,
-        root_node_alias,  # TODO: remove
+        entry_node_alias,
         *,
         graph_slug,
         resource_ids=None,
@@ -191,59 +191,35 @@ class SemanticTile(TileModel):
     ):
         """See `arches.app.models.querysets.TileQuerySet.with_node_values`."""
 
-        root_node = cls._root_node(graph_slug, root_node_alias)
-        branch_nodes = []
-        for nodegroup in get_nodegroups_here_and_below(root_node.nodegroup):
-            branch_nodes.extend(list(nodegroup.node_set.all()))
+        source_graph = GraphWithPrefetching.prepare_for_annotations(graph_slug)
+        for node in source_graph.node_set.all():
+            if node.alias == entry_node_alias:
+                entry_node = node
+                break
+        else:
+            raise Node.DoesNotExist(f"graph: {graph_slug} node: {entry_node_alias}")
 
-        qs = cls.objects.filter(nodegroup_id=root_node.pk)
+        entry_node_and_nodes_below = []
+        for nodegroup in get_nodegroups_here_and_below(entry_node.nodegroup):
+            entry_node_and_nodes_below.extend(list(nodegroup.node_set.all()))
+
+        qs = cls.objects.filter(nodegroup_id=entry_node.pk)
         if resource_ids:
             qs = qs.filter(resourceinstance_id__in=resource_ids)
 
         filtered_only = [
             branch_node.alias
-            for branch_node in branch_nodes
+            for branch_node in entry_node_and_nodes_below
             if not only or branch_node.alias in only
         ]
 
         return qs.with_node_values(
-            branch_nodes,
+            entry_node_and_nodes_below,
             defer=defer,
             only=filtered_only,
             as_representation=as_representation,
             allow_empty=allow_empty,
-        ).annotate(_nodegroup_alias=models.Value(root_node_alias))
-
-    @staticmethod
-    def _root_node(graph_slug, root_node_alias):
-        qs = Node.objects.filter(graph__slug=graph_slug, alias=root_node_alias)
-        if arches_version >= "8":
-            qs = (
-                qs.filter(source_identifier=None)
-                .select_related("nodegroup__grouping_node__nodegroup")
-                .prefetch_related(
-                    "nodegroup__node_set",
-                    "nodegroup__children",
-                    "nodegroup__children__grouping_node",
-                    "nodegroup__children__node_set",
-                    "nodegroup__children__children",
-                    "nodegroup__children__children__grouping_node",
-                    "nodegroup__children__children__node_set",
-                )
-            )
-        else:
-            qs = qs.select_related("nodegroup").prefetch_related(
-                "nodegroup__node_set",
-                "nodegroup__nodegroup_set",
-                "nodegroup__nodegroup_set__node_set",
-                "nodegroup__nodegroup_set__nodegroup_set",
-                "nodegroup__nodegroup_set__nodegroup_set__node_set",
-            )
-
-        ret = qs.first()
-        if ret is None:
-            raise Node.DoesNotExist(f"graph: {graph_slug} node: {root_node_alias}")
-        return ret
+        ).annotate(_nodegroup_alias=models.Value(entry_node_alias))
 
     def save(self, index=False, user=None, **kwargs):
         with transaction.atomic():
@@ -380,6 +356,8 @@ class GraphWithPrefetching(GraphModel):
 
     @classmethod
     def prepare_for_annotations(cls, graph_slug=None, *, resource_ids=None):
+        """Return a graph with necessary prefetches for _prefetch_related_objects()
+        and the rest_framework client."""
         if resource_ids and not graph_slug:
             graph_query = cls.objects.filter(resourceinstance__in=resource_ids)
         elif graph_slug:
@@ -392,37 +370,55 @@ class GraphWithPrefetching(GraphModel):
         else:
             raise ValueError("graph_slug or resource_ids must be provided")
         try:
-            # Prefetch sibling nodes for use in _prefetch_related_objects()
-            # and generate_node_alias_expressions().
-
             if arches_version >= "8":
+                # TODO: util for 12 depth
                 prefetches = [
+                    "node_set__cardxnodexwidget_set",
+                    "node_set__nodegroup__node_set",
+                    "node_set__nodegroup__node_set__cardxnodexwidget_set",
+                    "node_set__nodegroup__cardmodel_set",
                     "node_set__nodegroup__children",
                     "node_set__nodegroup__children__node_set",
+                    "node_set__nodegroup__children__node_set__cardxnodexwidget_set",
+                    "node_set__nodegroup__children__cardmodel_set",
                     "node_set__nodegroup__children__children",
                     "node_set__nodegroup__children__children__node_set",
+                    "node_set__nodegroup__children__children__node_set__cardxnodexwidget_set",
+                    "node_set__nodegroup__children__children__cardmodel_set",
                     "node_set__nodegroup__children__children__children",
                     "node_set__nodegroup__children__children__children__node_set",
+                    "node_set__nodegroup__children__children__children__node_set__cardxnodexwidget_set",
+                    "node_set__nodegroup__children__children__children__cardmodel_set",
                     "node_set__nodegroup__children__children__children__children",
                     "node_set__nodegroup__children__children__children__children__node_set",
-                    "node_set__nodegroup__node_set",
+                    "node_set__nodegroup__children__children__children__children__node_set__cardxnodexwidget_set",
+                    "node_set__nodegroup__children__children__children__chidlren__cardmodel_set",
                     # TODO: seal grouping_node.nodegroup
                     "node_set__nodegroup__grouping_node__nodegroup",
                     "node_set__nodegroup__children__grouping_node",
-                    "node_set__cardxnodexwidget_set",
                 ]
             else:
                 prefetches = [
+                    "node_set__cardxnodexwidget_set",
+                    "node_set__nodegroup__node_set",
+                    "node_set__nodegroup__node_set__cardxnodexwidget_set",
+                    "node_set__nodegroup__cardmodel_set",
                     "node_set__nodegroup__nodegroup_set",
                     "node_set__nodegroup__nodegroup_set__node_set",
+                    "node_set__nodegroup__nodegroup_set__node_set__cardxnodexwidget_set",
+                    "node_set__nodegroup__nodegroup_set__cardmodel_set",
                     "node_set__nodegroup__nodegroup_set__nodegroup_set",
                     "node_set__nodegroup__nodegroup_set__nodegroup_set__node_set",
+                    "node_set__nodegroup__nodegroup_set__nodegroup_set__node_set__cardxnodexwidget_set",
+                    "node_set__nodegroup__nodegroup_set__nodegroup_set__cardmodel_set",
                     "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set",
                     "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__node_set",
+                    "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__node_set__cardxnodexwidget_set",
+                    "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__cardmodel_set",
                     "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__nodegroup_set",
                     "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__nodegroup_set__node_set",
-                    "node_set__nodegroup__node_set",
-                    "node_set__cardxnodexwidget_set",
+                    "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__nodegroup_set__node_set__cardxnodexwidget_set",
+                    "node_set__nodegroup__nodegroup_set__nodegroup_set__nodegroup_set__nodegroup_set__cardmodel_set",
                 ]
             graph = graph_query.prefetch_related(*prefetches).get()
         except cls.DoesNotExist as e:

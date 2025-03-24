@@ -35,6 +35,7 @@ class SemanticTileQuerySet(models.QuerySet):
         super().__init__(model, query, using, hints)
         self._as_representation = False
         self._queried_nodes = []
+        self._fetched_graph_nodes = []
 
     def with_node_values(
         self,
@@ -89,6 +90,7 @@ class SemanticTileQuerySet(models.QuerySet):
             model=self.model,
         )
 
+        self._fetched_graph_nodes = nodes  # (partial) graph below entry point
         self._queried_nodes = [n for n in nodes if n.alias in node_alias_annotations]
 
         qs = self
@@ -145,6 +147,7 @@ class SemanticTileQuerySet(models.QuerySet):
                 )
             tile._enriched_resource = enriched_resource
             tile._queried_nodes = self._queried_nodes
+            tile._fetched_graph_nodes = self._fetched_graph_nodes
             for node in self._queried_nodes:
                 if node.nodegroup_id == tile.nodegroup_id:
                     # This is on the tile itself (ORM annotation).
@@ -182,6 +185,7 @@ class SemanticTileQuerySet(models.QuerySet):
     def _clone(self):
         clone = super()._clone()
         clone._queried_nodes = self._queried_nodes
+        clone._fetched_graph_nodes = self._fetched_graph_nodes
         clone._as_representation = self._as_representation
         return clone
 
@@ -240,7 +244,7 @@ class SemanticResourceQuerySet(models.QuerySet):
         super().__init__(model, query, using, hints)
         self._as_representation = False
         self._queried_nodes = []
-        self._fetched_graph_nodes = []  # todo: dedupe
+        self._fetched_graph_nodes = []
 
     def with_nodegroups(
         self,

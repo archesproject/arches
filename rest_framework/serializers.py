@@ -75,13 +75,13 @@ class NodeFetcherMixin:
     @property
     def graph_nodes(self):
         if not self._graph_nodes:
-            if self.instance and hasattr(self.instance, "_fetched_graph_nodes"):
-                self._graph_nodes = self.instance._fetched_graph_nodes
-            else:
-                self._graph_nodes = self.find_graph_nodes()
+            self._graph_nodes = (
+                self.context.get("graph_nodes") or self.find_graph_nodes()
+            )
         return self._graph_nodes
 
     def find_graph_nodes(self):
+        # This should really only be used when using drf-spectacular.
         if arches_version >= "8":
             return (
                 Node.objects.filter(
@@ -122,6 +122,11 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
         self._graph_nodes = []
         self._root_node_aliases = []
 
+    def __deepcopy__(self, memo):
+        ret = super().__deepcopy__(memo)
+        ret._graph_nodes = self._graph_nodes
+        return ret
+
     def get_fields(self):
         field_map = super().get_fields()
         self._root_node_aliases = []
@@ -133,20 +138,27 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
 
         # Create serializers for top-level nodegroups.
         for node in self.graph_nodes:
-            if not node.nodegroup_id or node.nodegroup.parentnodegroup_id:
+            if (
+                not node.nodegroup_id
+                or node.nodegroup.parentnodegroup_id
+                or not node.alias
+            ):
                 continue
             if only and node.nodegroup.grouping_node.alias not in only:
                 continue
             if node.pk == node.nodegroup.pk:
                 self._root_node_aliases.append(node.alias)
                 if node.alias not in field_map:
+                    sortorder = 0
+                    if node.nodegroup.cardmodel_set.all():
+                        sortorder = node.nodegroup.cardmodel_set.all()[0].sortorder
                     # TODO: check "fields" option in Meta for node level control.
                     field_map[node.alias] = _make_tile_serializer(
                         slug=self.graph_slug,
                         nodegroup_alias=node.alias,
                         cardinality=node.nodegroup.cardinality,
                         graph_nodes=self.graph_nodes,
-                        sortorder=node.nodegroup.cardmodel_set.first().sortorder,
+                        sortorder=sortorder,
                     )
 
         return field_map
@@ -203,6 +215,11 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         super().__init__(instance, data, **kwargs)
         self._child_nodegroup_aliases = []
 
+    def __deepcopy__(self, memo):
+        ret = super().__deepcopy__(memo)
+        ret._graph_nodes = self._graph_nodes
+        return ret
+
     @staticmethod
     @lru_cache(maxsize=1)
     def get_nodegroup_aliases():
@@ -214,7 +231,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
     def get_fields(self):
         nodegroup_alias = (
-            # 1. From __init__(), e.g. TileAliasedDataSerializer
+            # 1. From __init__()
             getattr(self, "_root_node", None)
             # 2. From Meta options
             or self.Meta.root_node
@@ -235,12 +252,12 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         # __all__ now includes one level of child nodegroups.
         # TODO: do all, or allow specifying a branch origin.
         if self.__class__.Meta.fields == "__all__":
-            child_attr = (
+            child_query = (
                 self._root_node.nodegroup.children
                 if arches_version >= "8"
                 else self._root_node.nodegroup.nodegroup_set
             )
-            for child_nodegroup in child_attr.all():
+            for child_nodegroup in child_query.all():
                 if arches_version >= "8":
                     child_nodegroup_alias = child_nodegroup.grouping_node.alias
                 else:
@@ -248,12 +265,15 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                 self._child_nodegroup_aliases.append(child_nodegroup_alias)
 
                 if child_nodegroup_alias not in field_map:
+                    sortorder = 0
+                    if child_nodegroup.cardmodel_set.all():
+                        sortorder = child_nodegroup.cardmodel_set.all()[0].sortorder
                     field_map[child_nodegroup_alias] = _make_tile_serializer(
                         nodegroup_alias=child_nodegroup_alias,
                         cardinality=child_nodegroup.cardinality,
                         slug=self.graph_slug,
                         graph_nodes=self.graph_nodes,
-                        sortorder=child_nodegroup.cardmodel_set.first().sortorder,
+                        sortorder=sortorder,
                     )
 
         return field_map
@@ -280,12 +300,15 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         model_field = deepcopy(self.datatype_field_map[node.datatype])
         if model_field is None:
             if node.nodegroup.grouping_node == node:
+                sortorder = 0
+                if node.nodegroup.cardmodel_set.all():
+                    sortorder = node.nodegroup.cardmodel_set.all()[0].sortorder
                 model_field = _make_tile_serializer(
                     slug=self.graph_slug,
                     nodegroup_alias=node.alias,
                     cardinality=node.nodegroup.cardinality,
                     graph_nodes=self.graph_nodes,
-                    sortorder=node.nodegroup.cardmodel_set.first().sortorder,
+                    sortorder=sortorder,
                 )
             else:
                 msg = _("Field missing for datatype: {}").format(node.datatype)
