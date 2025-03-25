@@ -717,6 +717,7 @@ class DateDataType(BaseDataType):
         try:
             value = value.astimezone()
         except:
+            # The .astimezone function throws an error on Windows for dates before 1970
             value = self.backup_astimezone(value)
         return value.isoformat(timespec="milliseconds")
 
