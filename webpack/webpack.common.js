@@ -272,7 +272,6 @@ module.exports = () => {
             output: {
                 path: Path.resolve(__dirname, APP_ROOT, 'media', 'build'),
                 publicPath: STATIC_URL,
-                libraryTarget: 'amd-require',
                 clean: true,
                 assetModuleFilename: 'img/[hash][ext][query]',
             },

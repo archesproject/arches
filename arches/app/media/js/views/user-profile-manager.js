@@ -1,151 +1,113 @@
-define([
-    'jquery',
-    'underscore',
-    'knockout',
-    'knockout-mapping',
-    'arches',
-    'viewmodels/alert',
-    'views/base-manager',
-    'views/profile-manager-data',
-    'utils/set-csrf-token',
-    'bindings/key-events-click',
-], function($, _, ko, koMapping, arches, AlertViewModel, BaseManagerView, data) {
+import $ from 'jquery';
+import _ from 'underscore';
+import ko from 'knockout';
+import koMapping from 'knockout-mapping';
+import arches from 'arches';
+import BaseManagerView from 'views/base-manager';
+import data from 'views/profile-manager-data';
 
-    var UserProfileManager = BaseManagerView.extend({
-        initialize: function(options) {
-            var self = this;
-            self.viewModel.showChangePasswordForm = ko.observable(false);
-            self.viewModel.showEditUserForm = ko.observable(!!data.error_count);
+class UserProfileManager extends BaseManagerView {
+    constructor(options) {
+        options = options || {};
+        options.viewModel = options.viewModel || {};
 
-            self.viewModel.validationErrors = ko.observableArray();
-            self.viewModel.invalidPassword = ko.observable();
-            self.viewModel.mismatchedPasswords = ko.observable();
-            self.viewModel.changePasswordSuccess = ko.observable();
-            self.viewModel.notifTypeObservables = ko.observableArray();
+        options.viewModel.showChangePasswordForm = ko.observable(false);
+        options.viewModel.showEditUserForm = ko.observable(!!data.error_count);
+        options.viewModel.validationErrors = ko.observableArray();
+        options.viewModel.invalidPassword = ko.observable();
+        options.viewModel.mismatchedPasswords = ko.observable();
+        options.viewModel.changePasswordSuccess = ko.observable();
+        options.viewModel.notifTypeObservables = ko.observableArray();
 
-            self.viewModel.isTwoFactorAuthenticationEnabled = data.two_factor_authentication_settings['ENABLE_TWO_FACTOR_AUTHENTICATION'];
-            self.viewModel.isTwoFactorAuthenticationForced = data.two_factor_authentication_settings['FORCE_TWO_FACTOR_AUTHENTICATION'];
-            self.viewModel.hasUserEnabledTwoFactorAuthentication = ko.observable(data.two_factor_authentication_settings['user_has_enabled_two_factor_authentication']);
+        options.viewModel.isTwoFactorAuthenticationEnabled =
+            data.two_factor_authentication_settings['ENABLE_TWO_FACTOR_AUTHENTICATION'];
+        options.viewModel.isTwoFactorAuthenticationForced =
+            data.two_factor_authentication_settings['FORCE_TWO_FACTOR_AUTHENTICATION'];
+        options.viewModel.hasUserEnabledTwoFactorAuthentication = ko.observable(
+            data.two_factor_authentication_settings['user_has_enabled_two_factor_authentication']
+        );
 
-            self.viewModel.toggleChangePasswordForm = function() {
-                this.showChangePasswordForm(!this.showChangePasswordForm());
-                if (this.showChangePasswordForm()) {
-                    self.viewModel.validationErrors([]);
-                    self.viewModel.invalidPassword('');
-                    self.viewModel.mismatchedPasswords('');
-                    self.viewModel.changePasswordSuccess('');
-                }
-            };
-            self.viewModel.toggleEditUserForm = function() {
-                this.showEditUserForm(!this.showEditUserForm());
-            };
+        options.viewModel.toggleChangePasswordForm = function () {
+            this.showChangePasswordForm(!this.showChangePasswordForm());
+            if (this.showChangePasswordForm()) {
+                this.validationErrors([]);
+                this.invalidPassword('');
+                this.mismatchedPasswords('');
+                this.changePasswordSuccess('');
+            }
+        };
 
-            self.viewModel.getNotifTypes = function() {
-                self.viewModel.notifTypeObservables.removeAll();
-                $.ajax({
-                    url: arches.urls.get_notification_types,
-                    method: "GET"
-                }).done(function(data) {
-                    var koType;
-                    data.types.forEach(function(type) {
-                        koType = ko.mapping.fromJS(type);
-                        self.viewModel.notifTypeObservables.push(koType);
-                    });
+        options.viewModel.toggleEditUserForm = function () {
+            this.showEditUserForm(!this.showEditUserForm());
+        };
+
+        options.viewModel.getNotifTypes = function () {
+            const vm = this;
+            vm.notifTypeObservables.removeAll();
+            $.ajax({
+                url: arches.urls.get_notification_types,
+                method: 'GET'
+            }).done((data) => {
+                data.types.forEach((type) => {
+                    const koType = koMapping.fromJS(type);
+                    vm.notifTypeObservables.push(koType);
                 });
-            };
-            self.viewModel.getNotifTypes();
+            });
+        };
 
-            self.viewModel.updateNotifTypes = function() {
-                var modified;
-                var updatedTypes = self.viewModel.notifTypeObservables().map(function(type) {
-                    modified = ko.mapping.toJS(type);
-                    delete modified._state;
-                    return modified;
-                });
-                $.ajax({
-                    url: arches.urls.update_notification_types,
-                    method: "POST",
-                    data: {"types": JSON.stringify(updatedTypes)}
-                });
-            };
+        options.viewModel.updateNotifTypes = function () {
+            const vm = this;
+            const updatedTypes = vm.notifTypeObservables().map(function (type) {
+                const modified = koMapping.toJS(type);
+                delete modified._state;
+                return modified;
+            });
+            $.ajax({
+                url: arches.urls.update_notification_types,
+                method: 'POST',
+                data: { types: JSON.stringify(updatedTypes) }
+            });
+        };
 
-            self.jsonNotifTypes = ko.computed(function() {
-                return ko.mapping.toJS(self.viewModel.notifTypeObservables);
-            }).extend({ throttle: 100 });
-            self.jsonNotifTypes.subscribe(function(val) {
-                if(val && !self.viewModel.loading() && self.viewModel.notifTypeObservables().length > 0) {
-                    self.viewModel.updateNotifTypes();
+        options.viewModel.credentials = koMapping.fromJS({
+            old_password: '',
+            new_password: '',
+            new_password2: ''
+        });
+
+        options.viewModel.changePassword = function () {
+            const vm = this;
+            const payload = koMapping.toJS(vm.credentials);
+            $.ajax({
+                url: arches.urls.change_password,
+                method: 'POST',
+                data: payload
+            }).done(function (data) {
+                vm.invalidPassword(data.invalid_password);
+                vm.mismatchedPasswords(data.mismatched);
+                vm.validationErrors(data.password_validations);
+                if (data.success) {
+                    vm.changePasswordSuccess(data.success);
+                    vm.toggleChangePasswordForm();
                 }
             });
+        };
 
-            self.viewModel.credentials = koMapping.fromJS({
-                old_password: '',
-                new_password: '',
-                new_password2: ''
-            });
+        options.viewModel.alertTwoFactorAuthenticationChange = function (userEmail) {
+        };
 
-            self.viewModel.changePassword = function() {
-                var payload = koMapping.toJS(self.viewModel.credentials);
-                $.ajax({
-                    url: arches.urls.change_password,
-                    method: "POST",
-                    data: payload,
-                }).done(function(data) {
-                    self.viewModel.invalidPassword(data.invalid_password);
-                    self.viewModel.mismatchedPasswords(data.mismatched);
-                    self.viewModel.validationErrors(data.password_validations);
-                    if (data.success) {
-                        self.viewModel.changePasswordSuccess(data.success);
-                        self.viewModel.toggleChangePasswordForm();
-                    }
-                });
-            };
+        super(options);
 
-            self.viewModel.alertTwoFactorAuthenticationChange = function(userEmail) {
-                var sendTwoFactorAuthenticationEmail = function() {
-                    $.ajax({
-                        url: arches.urls.two_factor_authentication_reset,
-                        method: "POST",
-                        data: {
-                            email: userEmail
-                        }
-                    })
-                        .done(function() {
-                            self.viewModel.alert(
-                                new AlertViewModel(
-                                    'ep-alert-blue',
-                                    arches.translations.twoFactorAuthenticationEmailSuccess.title,
-                                    arches.translations.twoFactorAuthenticationEmailSuccess.text,
-                                    null,
-                                    function(){}
-                                )
-                            );
-                        })
-                        .fail(function(e) {
-                            self.viewModel.alert(
-                                new AlertViewModel(
-                                    'ep-alert-red',
-                                    e.statusText,
-                                    e.responseText,
-                                )
-                            );
-                        });
-                };
+        const vm = this.viewModel;
+        vm.jsonNotifTypes = ko.computed(function () {
+            return koMapping.toJS(vm.notifTypeObservables);
+        }).extend({ throttle: 100 });
+        vm.jsonNotifTypes.subscribe(function (val) {
+            if (val && !vm.loading() && vm.notifTypeObservables().length > 0) {
+                vm.updateNotifTypes();
+            }
+        });
+    }
+}
 
-                self.viewModel.alert(
-                    new AlertViewModel(
-                        'ep-alert-blue',
-                        arches.translations.confirmSendTwoFactorAuthenticationEmail.title,
-                        arches.translations.confirmSendTwoFactorAuthenticationEmail.text,
-                        function(){},
-                        sendTwoFactorAuthenticationEmail,
-                    )
-                );
-            };
-
-            BaseManagerView.prototype.initialize.call(this, options);
-        }
-    });
-    return new UserProfileManager();
-
-});
+export default new UserProfileManager();
