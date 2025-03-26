@@ -350,7 +350,7 @@ class SemanticResourceQuerySet(models.QuerySet):
                 ),
                 to_attr="_annotated_tiles",
             ),
-        ).alias(**node_sql_aliases)
+        ).annotate(**node_sql_aliases)
 
     def with_related_resource_display_names(self):
         # Future: consider exposing nodegroups param.
