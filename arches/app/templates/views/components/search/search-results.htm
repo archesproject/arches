@@ -28,7 +28,7 @@
                     data-bind="css: {'i18n-alt': $parent.alternativelanguage, 'principal-user': isPrincipal}"
                 >
                     <a class="search-candidate-title"
-                        data-bind="attr: { href: report_url, 'aria-label': $root.translations.viewResourceReport(displayname) },
+                        data-bind="attr: { href: reportUrl, 'aria-label': $root.translations.viewResourceReport(displayname) },
                                 click: $parent.viewReport.bind($parent), onEnterkeyClick, onSpaceClick">
                         <i class="search-listing-icon" data-bind="css: iconclass"></i>
                         <span data-bind="text: displayname"></span>
@@ -67,7 +67,7 @@
 
                 <!--ko if: canEdit || isPrincipal -->
                 <a class="search-candidate-link" data-bind="onEnterkeyClick, onSpaceClick, click: $parent.editResource.bind($parent),
-                attr: {href: edit_url, 'aria-label': $root.translations.editResource(displayname)},
+                attr: {href: editUrl, 'aria-label': $root.translations.editResource(displayname)},
                 ">
                     <i class="ion-ios-refresh-empty"></i>
                     <span data-bind="text: $root.translations.edit"></span>
