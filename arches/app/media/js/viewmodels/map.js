@@ -491,18 +491,18 @@ define([
 
         this.keyDownHandler = function (context, e) {
             // reorder list in the front-end by only using keyboard inputs
-            var li = $(this);
-            var moveOverlays = function (direction) {
-                if (self.overlays().includes(li[0])) {
-                    var index = self.overlays().indexOf(li[0]);
-                    var newIndex = index
+            const li = this
+            const moveOverlays = function (direction) {
+                if (self.overlays().includes(li)) {
+                    const index = self.overlays().indexOf(li);
+                    let newIndex = index
                     if (direction == "up") {
                         newIndex--
                     } else if (direction == "down") {
                         newIndex++
                     }
                     if (newIndex != -1 && newIndex != self.overlays().length) {
-                        var newArr = self.overlays()
+                        const newArr = self.overlays()
                         newArr.splice(newIndex, 0, newArr.splice(index, 1)[0]);
                         self.overlays(newArr);
                     }
