@@ -99,7 +99,8 @@
                         beforeMove: beforeMove,
                         afterMove: reorderOverlays
                     }">
-                        <div class="overlay-listing" tabindex="0" role="option" data-bind="css: {'active-overlay': onMap}, event: {keyup: $parent.keyDownHandler}">                        <div class="overlay-name" tabindex="0" role="switch" data-bind="
+                        <div class="overlay-listing" tabindex="0" role="option" data-bind="css: {'active-overlay': onMap}, event: {keyup: $parent.keyDownHandler}">
+                            <div class="overlay-name" tabindex="0" role="switch" data-bind="
                             click: function() {
                                 onMap(!onMap());
                                 updateParent($parent);
