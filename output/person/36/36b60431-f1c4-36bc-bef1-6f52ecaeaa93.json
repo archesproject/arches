@@ -1,0 +1,54 @@
+{
+    "@context": "https://linked.art/ns/v1/linked-art.json",
+    "id": "urn:uuid:36b60431-f1c4-36bc-bef1-6f52ecaeaa93",
+    "type": "Person",
+    "_label": "TER MEULEN, FRANS PIETER",
+    "identified_by": [
+        {
+            "type": "Name",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300404670",
+                    "type": "Type",
+                    "_label": "Primary Name"
+                }
+            ],
+            "content": "TER MEULEN, FRANS PIETER"
+        },
+        {
+            "type": "Name",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300266386",
+                    "type": "Type",
+                    "_label": "Personal Name"
+                }
+            ],
+            "content": "Ter Meulen",
+            "referred_to_by": [
+                {
+                    "id": "urn:uuid:5dff44b0-1929-3999-9737-cde66db6a7c8",
+                    "type": "LinguisticObject",
+                    "_label": "Goupil Stock Book 11, Page 208, Row 14"
+                }
+            ]
+        }
+    ],
+    "referred_to_by": [
+        {
+            "id": "urn:uuid:5dff44b0-1929-3999-9737-cde66db6a7c8",
+            "type": "LinguisticObject",
+            "_label": "Goupil Stock Book 11, Page 208, Row 14"
+        },
+        {
+            "id": "urn:uuid:75e8a92d-3df2-38cf-858f-94925f4edd47",
+            "type": "LinguisticObject",
+            "_label": "STAR Goupil Database"
+        }
+    ],
+    "exact_match": [
+        {
+            "id": "http://vocab.getty.edu/ulan/500031179"
+        }
+    ]
+}

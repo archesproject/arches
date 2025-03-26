@@ -1,0 +1,166 @@
+{
+    "@context": "https://linked.art/ns/v1/linked-art.json",
+    "id": "urn:uuid:c888dd61-aba0-3d26-9791-a4a2c613de09",
+    "type": "Activity",
+    "_label": "Goupil Inventorying of Stock Number G-1",
+    "classified_as": [
+        {
+            "id": "http://vocab.getty.edu/aat/300055863",
+            "type": "Type",
+            "_label": "Provenance Activity"
+        }
+    ],
+    "identified_by": [
+        {
+            "type": "Name",
+            "content": "Goupil Inventorying of Stock Number G-1"
+        }
+    ],
+    "referred_to_by": [
+        {
+            "id": "urn:uuid:3effe3d0-4a6a-39a0-8c4f-d0940147de49",
+            "type": "LinguisticObject",
+            "_label": "Goupil Stock Book 2, Page 1, Row 2"
+        },
+        {
+            "type": "LinguisticObject",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300027200",
+                    "type": "Type",
+                    "_label": "Note",
+                    "classified_as": [
+                        {
+                            "id": "http://vocab.getty.edu/aat/300418049",
+                            "type": "Type",
+                            "_label": "Brief Text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "LinguisticObject",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300027200",
+                    "type": "Type",
+                    "_label": "Note"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:75e8a92d-3df2-38cf-858f-94925f4edd47",
+            "type": "LinguisticObject",
+            "_label": "STAR Goupil Database"
+        }
+    ],
+    "part": [
+        {
+            "id": "urn:uuid:b046cd3e-d3b4-3ede-a2e9-f0aaa5b8e7e5",
+            "type": "Encounter",
+            "_label": "Goupil Inventorying of Stock Number G-1",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300077506",
+                    "type": "Type",
+                    "_label": "Inventorying"
+                }
+            ],
+            "identified_by": [
+                {
+                    "type": "Name",
+                    "content": "Goupil Inventorying of Stock Number G-1"
+                }
+            ],
+            "carried_out_by": [
+                {
+                    "id": "urn:uuid:7f070021-c467-38c5-ba2d-ca1339e3901e",
+                    "type": "Group",
+                    "_label": "Goupil et Cie."
+                }
+            ],
+            "encountered": [
+                {
+                    "id": "urn:uuid:824d85a7-b38b-3574-b0ef-84fff22c7c6f",
+                    "type": "HumanMadeObject",
+                    "_label": "Vue de ville Woudrichem"
+                }
+            ]
+        },
+        {
+            "type": "AttributeAssignment",
+            "_label": "Evaluated worth of Stock Number G-1",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300054622",
+                    "type": "Type",
+                    "_label": "Appraising"
+                }
+            ],
+            "carried_out_by": [
+                {
+                    "id": "urn:uuid:7f070021-c467-38c5-ba2d-ca1339e3901e",
+                    "type": "Group",
+                    "_label": "Goupil et Cie."
+                }
+            ],
+            "assigned_property": "dimension",
+            "assigned": [
+                {
+                    "type": "MonetaryAmount",
+                    "_label": "537.00 francs",
+                    "classified_as": [
+                        {
+                            "id": "http://vocab.getty.edu/aat/300412096",
+                            "type": "Type",
+                            "_label": "Valuation"
+                        }
+                    ],
+                    "value": 537.0,
+                    "referred_to_by": [
+                        {
+                            "type": "LinguisticObject",
+                            "classified_as": [
+                                {
+                                    "id": "http://vocab.getty.edu/aat/300027200",
+                                    "type": "Type",
+                                    "_label": "Note"
+                                }
+                            ],
+                            "content": "SOE"
+                        },
+                        {
+                            "type": "LinguisticObject",
+                            "classified_as": [
+                                {
+                                    "id": "http://vocab.getty.edu/aat/300027200",
+                                    "type": "Type",
+                                    "_label": "Note"
+                                }
+                            ],
+                            "content": "cadre compris"
+                        }
+                    ],
+                    "currency": {
+                        "id": "http://vocab.getty.edu/aat/300412016",
+                        "type": "Currency",
+                        "_label": "French Francs"
+                    }
+                }
+            ],
+            "assigned_to": {
+                "id": "urn:uuid:824d85a7-b38b-3574-b0ef-84fff22c7c6f",
+                "type": "HumanMadeObject",
+                "_label": "Vue de ville Woudrichem"
+            }
+        }
+    ],
+    "before": [
+        {
+            "id": "urn:uuid:83198c35-2964-3735-a082-e3d6e44e4bfa",
+            "type": "Activity",
+            "_label": "Goupil Sale of Stock Number G-1 (1863-05-04)"
+        }
+    ]
+}

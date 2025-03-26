@@ -1,0 +1,121 @@
+{
+    "@context": "https://linked.art/ns/v1/linked-art.json",
+    "id": "urn:uuid:83198c35-2964-3735-a082-e3d6e44e4bfa",
+    "type": "Activity",
+    "_label": "Goupil Sale of Stock Number G-1 (1863-05-04)",
+    "classified_as": [
+        {
+            "id": "http://vocab.getty.edu/aat/300055863",
+            "type": "Type",
+            "_label": "Provenance Activity"
+        }
+    ],
+    "identified_by": [
+        {
+            "type": "Name",
+            "content": "Goupil Sale of Stock Number G-1 (1863-05-04)"
+        }
+    ],
+    "referred_to_by": [
+        {
+            "id": "urn:uuid:3effe3d0-4a6a-39a0-8c4f-d0940147de49",
+            "type": "LinguisticObject",
+            "_label": "Goupil Stock Book 2, Page 1, Row 2"
+        },
+        {
+            "type": "LinguisticObject",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300027200",
+                    "type": "Type",
+                    "_label": "Note",
+                    "classified_as": [
+                        {
+                            "id": "http://vocab.getty.edu/aat/300418049",
+                            "type": "Type",
+                            "_label": "Brief Text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "LinguisticObject",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300027200",
+                    "type": "Type",
+                    "_label": "Note"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:75e8a92d-3df2-38cf-858f-94925f4edd47",
+            "type": "LinguisticObject",
+            "_label": "STAR Goupil Database"
+        }
+    ],
+    "took_place_at": [
+        {
+            "id": "urn:uuid:ae5038cb-1cfd-3ef6-ae92-08f53a6a81f0",
+            "type": "Place",
+            "_label": "Succursale de La Haye"
+        }
+    ],
+    "part": [
+        {
+            "id": "urn:uuid:e8b03ff2-be64-3d5b-9896-d482ecf49119",
+            "type": "Payment",
+            "_label": "Payment for Stock Number G-1 (1863-05-04)",
+            "paid_amount": {
+                "type": "MonetaryAmount",
+                "_label": "645.00 francs",
+                "value": 645.0,
+                "currency": {
+                    "id": "http://vocab.getty.edu/aat/300412016",
+                    "type": "Currency",
+                    "_label": "French Francs"
+                }
+            },
+            "paid_to": [
+                {
+                    "id": "urn:uuid:7f070021-c467-38c5-ba2d-ca1339e3901e",
+                    "type": "Group",
+                    "_label": "Goupil et Cie."
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:159a3d9e-570b-3e8a-abc8-a7b77a396829",
+            "type": "Acquisition",
+            "_label": "Goupil Sale of Stock Number G-1 (1863-05-04)",
+            "identified_by": [
+                {
+                    "type": "Name",
+                    "content": "Goupil Sale of Stock Number G-1 (1863-05-04)"
+                }
+            ],
+            "transferred_title_of": [
+                {
+                    "id": "urn:uuid:824d85a7-b38b-3574-b0ef-84fff22c7c6f",
+                    "type": "HumanMadeObject",
+                    "_label": "Vue de ville Woudrichem"
+                }
+            ],
+            "transferred_title_from": [
+                {
+                    "id": "urn:uuid:7f070021-c467-38c5-ba2d-ca1339e3901e",
+                    "type": "Group",
+                    "_label": "Goupil et Cie."
+                }
+            ]
+        }
+    ],
+    "after": [
+        {
+            "id": "urn:uuid:c888dd61-aba0-3d26-9791-a4a2c613de09",
+            "type": "Activity",
+            "_label": "Goupil Inventorying of Stock Number G-1"
+        }
+    ]
+}

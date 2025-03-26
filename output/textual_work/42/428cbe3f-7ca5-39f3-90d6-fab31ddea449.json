@@ -1,0 +1,175 @@
+{
+  "@context":"https:\/\/linked.art\/ns\/v1\/linked-art.json",
+  "id":"urn:uuid:428cbe3f-7ca5-39f3-90d6-fab31ddea449",
+  "type":"LinguisticObject",
+  "_label":"Sale recorded in catalog: D-A200 Lot 0177 (1790-04-13) (record number 941658)",
+  "classified_as":[
+    {
+      "id":"http:\/\/vocab.getty.edu\/aat\/300026068",
+      "type":"Type",
+      "_label":"Auction Catalog",
+      "classified_as":[
+        {
+          "id":"http:\/\/vocab.getty.edu\/aat\/300435443",
+          "type":"Type",
+          "_label":"Type of Work"
+        }
+      ]
+    },
+    {
+      "id":"http:\/\/vocab.getty.edu\/aat\/300438434",
+      "type":"Type",
+      "_label":"Entry",
+      "classified_as":[
+        {
+          "id":"http:\/\/vocab.getty.edu\/aat\/300444970",
+          "type":"Type",
+          "_label":"Form"
+        }
+      ]
+    }
+  ],
+  "identified_by":[
+    {
+      "type":"Name",
+      "content":"Record of sale D-A200 Lot 0177 (1790-04-13)"
+    },
+    {
+      "type":"Identifier",
+      "content":"GERMANSALES-5410",
+      "assigned_by":[
+        {
+          "id":"urn:uuid:483e1422-85ff-367f-9d03-f64062f239e1",
+          "type":"AttributeAssignment",
+          "carried_out_by":[
+            {
+              "id":"urn:uuid:d0e7dd29-144c-38c1-b45c-e5ea4e1855e8",
+              "type":"Group",
+              "_label":"Getty Provenance Index"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "referred_to_by":[
+    {
+      "id":"http:\/\/lod.example.org\/museum\/LinguisticObject\/0177",
+      "type":"LinguisticObject",
+      "classified_as":[
+        {
+          "id":"http:\/\/vocab.getty.edu\/aat\/300027200",
+          "type":"Type",
+          "_label":"Note",
+          "classified_as":[
+            {
+              "id":"http:\/\/vocab.getty.edu\/aat\/300418049",
+              "type":"Type",
+              "_label":"Brief Text"
+            }
+          ]
+        }
+      ],
+      "content":"Die Lose 176 und 177 wurden zusammen katalogisiert."
+    },
+    {
+      "type":"LinguisticObject",
+      "_label":"Transaction type for sales record",
+      "classified_as":[
+        {
+          "id":"http:\/\/vocab.getty.edu\/aat\/300438433",
+          "type":"Type",
+          "_label":"Property Status Statement",
+          "classified_as":[
+            {
+              "id":"http:\/\/vocab.getty.edu\/aat\/300418049",
+              "type":"Type",
+              "_label":"Brief Text"
+            }
+          ]
+        }
+      ],
+      "content":"Verkauft"
+    },
+    {
+      "id":"urn:uuid:c4d4d35a-b61b-305b-9da9-aa368a1bebed",
+      "type":"LinguisticObject",
+      "_label":"STAR Sales GERMAN Contents Database"
+    }
+  ],
+  "about":[
+    {
+      "id":"http:\/\/vocab.getty.edu\/aat\/300417642",
+      "type":"Type",
+      "_label":"Purchase"
+    },
+    {
+      "id":"urn:uuid:1ca6ec17-958f-3803-b022-9356d2955ced",
+      "type":"HumanMadeObject",
+      "_label":"Gemälde: “Zwey Opferungen mit vielen Figuren. Auf Holz.”"
+    }
+  ],
+  "part_of":[
+    {
+      "id":"urn:uuid:c2ff7dff-3a53-380e-81a7-9548e2568949",
+      "type":"LinguisticObject",
+      "_label":"Sale Catalog D-A200"
+    }
+  ],
+  "features_are_also_found_on":[
+    {
+      "type":"LinguisticObject",
+      "classified_as":[
+        {
+          "id":"http:\/\/vocab.getty.edu\/aat\/300404333",
+          "type":"Type",
+          "_label":"Transcription",
+          "classified_as":[
+            {
+              "id":"http:\/\/vocab.getty.edu\/aat\/300418049",
+              "type":"Type",
+              "_label":"Brief Text"
+            }
+          ]
+        }
+      ],
+      "content":"pi_record_no: 941658\ncatalog_number: D-A200\nsale_code: 1790\/04\/13HBLIE\nlot_number: 0177\npg: \nlot_sale_year: 1790\nlot_sale_month: 04\nlot_sale_day: 13\nlot_sale_mod: \nexpert_auth_1: \nexpert_ulan_1: \nexpert_auth_2: \nexpert_ulan_2: \nexpert_auth_3: \nexpert_ulan_3: \nexpert_auth_4: \nexpert_ulan_4: \ncommissaire_pr_1: \ncomm_ulan_1: \ncommissaire_pr_2: \ncomm_ulan_2: \ncommissaire_pr_3: \ncomm_ulan_3: \ncommissaire_pr_4: \ncomm_ulan_4: \nauction_house_1: Lienau (Heinrich Christian)\nhouse_ulan_1: \nauction_house_2: Schoen (Johann Hinrich)\nhouse_ulan_2: \nauction_house_3: \nhouse_ulan_3: \nauction_house_4: \nhouse_ulan_4: \ntitle: Zwey Opferungen mit vielen Figuren. Auf Holz.\ntitle_translation: \ntitle_modifier: DIESES LOS: Eine Opferung mit vielen Figuren\nartist_name_1: J. de Wett\nartist_info_1: \nart_authority_1: WET, JACOB WILLEMSZ. DE\nnationality_1: Dutch\nattrib_mod_1: \nattrib_mod_auth_1: \nartist_ulan_1: 500023088\nartist_name_2: \nartist_info_2: \nart_authority_2: \nnationality_2: \nattrib_mod_2: \nattrib_mod_auth_2: \nartist_ulan_2: 0\nartist_name_3: \nartist_info_3: \nart_authority_3: \nnationality_3: \nattrib_mod_3: \nattrib_mod_auth_3: \nartist_ulan_3: 0\nartist_name_4: \nartist_info_4: \nart_authority_4: \nnationality_4: \nattrib_mod_4: \nattrib_mod_auth_4: \nartist_ulan_4: 0\nartist_name_5: \nartist_info_5: \nart_authority_5: \nnationality_5: \nattrib_mod_5: \nattrib_mod_auth_5: \nartist_ulan_5: 0\nhand_note_1: \nhand_note_so_1: \nhand_note_2: \nhand_note_so_2: \nhand_note_3: \nhand_note_so_3: \nhand_note_4: \nhand_note_so_4: \nhand_note_5: \nhand_note_so_5: \nhand_note_6: \nhand_note_so_6: \nhand_note_7: \nhand_note_so_7: \nobject_type: Gemälde\nmaterials: auf Holz\ndimensions: Hoch 24 Zoll, breit 36 Zoll\nformatted_dimens: h 24, w 36\nformat: \ngenre: \nsubject: \ninscription: \nsell_name_1: \nsell_name_so_1: \nsell_name_ques_1: \nsell_mod_1: \nsell_auth_name_1: \nsell_auth_nameq_1: \nsell_auth_mod_1: \nsell_auth_mod_a_1: \nsell_ulan_1: \nsell_name_2: \nsell_name_so_2: \nsell_name_ques_2: \nsell_mod_2: \nsell_auth_name_2: \nsell_auth_nameq_2: \nsell_auth_mod_2: \nsell_auth_mod_a_2: \nsell_ulan_2: \nsell_name_3: \nsell_name_so_3: \nsell_name_ques_3: \nsell_mod_3: \nsell_auth_name_3: \nsell_auth_nameq_3: \nsell_auth_mod_3: \nsell_auth_mod_a_3: \nsell_ulan_3: \nsell_name_4: \nsell_name_so_4: \nsell_name_ques_4: \nsell_mod_4: \nsell_auth_name_4: \nsell_auth_nameq_4: \nsell_auth_mod_4: \nsell_auth_mod_a_4: \nsell_ulan_4: \nsell_name_5: \nsell_name_so_5: \nsell_name_ques_5: \nsell_mod_5: \nsell_auth_name_5: \nsell_auth_nameq_5: \nsell_auth_mod_5: \nsell_auth_mod_a_5: \nsell_ulan_5: \nsell_name_6: \nsell_name_so_6: \nsell_name_ques_6: \nsell_mod_6: \nsell_auth_name_6: \nsell_auth_nameq_6: \nsell_auth_mod_6: \nsell_auth_mod_a_6: \nsell_ulan_6: \nsell_name_7: \nsell_name_so_7: \nsell_name_ques_7: \nsell_mod_7: \nsell_auth_name_7: \nsell_auth_nameq_7: \nsell_auth_mod_7: \nsell_auth_mod_a_7: \nsell_ulan_7: \ntransaction: Verkauft\ntransaction_so: \ntransaction_cite: \nprice_amount_1: 7.8\nprice_currency_1: M\nprice_note_1: für die Lose 176 & 177\nprice_source_1: \nprice_citation_1: \nprice_amount_2: \nprice_currency_2: \nprice_note_2: \nprice_source_2: \nprice_citation_2: \nprice_amount_3: \nprice_currency_3: \nprice_note_3: \nprice_source_3: \nprice_citation_3: \nest_price: \nest_price_curr: \nest_price_desc: \nest_price_so: \nstart_price: \nstart_price_curr: \nstart_price_desc: \nstart_price_so: \nask_price: \nask_price_curr: \nask_price_desc: \nask_price_so: \nbuy_name_1: Bertheau\nbuy_name_so_1: \nbuy_name_ques_1: \nbuy_name_cite_1: \nbuy_mod_1: \nbuy_auth_name_1: Bertheau, François Didier\nbuy_auth_nameq_1: \nbuy_auth_mod_1: \nbuy_auth_mod_a_1: \nbuy_ulan_1: 500439709\nbuy_name_2: \nbuy_name_so_2: \nbuy_name_ques_2: \nbuy_name_cite_2: \nbuy_mod_2: \nbuy_auth_name_2: \nbuy_auth_nameq_2: \nbuy_auth_mod_2: \nbuy_auth_mod_a_2: \nbuy_ulan_2: \nbuy_name_3: \nbuy_name_so_3: \nbuy_name_ques_3: \nbuy_name_cite_3: \nbuy_mod_3: \nbuy_auth_name_3: \nbuy_auth_nameq_3: \nbuy_auth_mod_3: \nbuy_auth_mod_a_3: \nbuy_ulan_3: \nbuy_name_4: \nbuy_name_so_4: \nbuy_name_ques_4: \nbuy_name_cite_4: \nbuy_mod_4: \nbuy_auth_name_4: \nbuy_auth_nameq_4: \nbuy_auth_mod_4: \nbuy_auth_mod_a_4: \nbuy_ulan_4: \nprev_owner_1: \nprev_own_ques_1: \nprev_own_so_1: \nprev_own_auth_1: \nprev_own_auth_d_1: \nprev_own_auth_e_1: \nprev_own_auth_p_1: \nprev_own_auth_l_1: \nprev_own_auth_q_1: \nprev_own_ulan_1: \nprev_owner_2: \nprev_own_ques_2: \nprev_own_so_2: \nprev_own_auth_2: \nprev_own_auth_d_2: \nprev_own_auth_e_2: \nprev_own_auth_p_2: \nprev_own_auth_l_2: \nprev_own_auth_q_2: \nprev_own_ulan_2: \nprev_owner_3: \nprev_own_ques_3: \nprev_own_so_3: \nprev_own_auth_3: \nprev_own_auth_d_3: \nprev_own_auth_e_3: \nprev_own_auth_p_3: \nprev_own_auth_l_3: \nprev_own_auth_q_3: \nprev_own_ulan_3: \nprev_owner_4: \nprev_own_ques_4: \nprev_own_so_4: \nprev_own_auth_4: \nprev_own_auth_d_4: \nprev_own_auth_e_4: \nprev_own_auth_p_4: \nprev_own_auth_l_4: \nprev_own_auth_q_4: \nprev_own_ulan_4: \nprev_owner_5: \nprev_own_ques_5: \nprev_own_so_5: \nprev_own_auth_5: \nprev_own_auth_d_5: \nprev_own_auth_e_5: \nprev_own_auth_p_5: \nprev_own_auth_l_5: \nprev_own_auth_q_5: \nprev_own_ulan_5: \nprev_owner_6: \nprev_own_ques_6: \nprev_own_so_6: \nprev_own_auth_6: \nprev_own_auth_d_6: \nprev_own_auth_e_6: \nprev_own_auth_p_6: \nprev_own_auth_l_6: \nprev_own_auth_q_6: \nprev_own_ulan_6: \nprev_owner_7: \nprev_own_ques_7: \nprev_own_so_7: \nprev_own_auth_7: \nprev_own_auth_d_7: \nprev_own_auth_e_7: \nprev_own_auth_p_7: \nprev_own_auth_l_7: \nprev_own_auth_q_7: \nprev_own_ulan_7: \nprev_owner_8: \nprev_own_ques_8: \nprev_own_so_8: \nprev_own_auth_8: \nprev_own_auth_d_8: \nprev_own_auth_e_8: \nprev_own_auth_p_8: \nprev_own_auth_l_8: \nprev_own_auth_q_8: \nprev_own_ulan_8: \nprev_owner_9: \nprev_own_ques_9: \nprev_own_so_9: \nprev_own_auth_9: \nprev_own_auth_d_9: \nprev_own_auth_e_9: \nprev_own_auth_p_9: \nprev_own_auth_l_9: \nprev_own_auth_q_9: \nprev_own_ulan_9: \nprev_sale_year_1: \nprev_sale_mo_1: \nprev_sale_day_1: \nprev_sale_loc_1: \nprev_sale_lot_1: \nprev_sale_ques_1: \nprev_sale_cat_1: \nprev_sale_year_2: \nprev_sale_mo_2: \nprev_sale_day_2: \nprev_sale_loc_2: \nprev_sale_lot_2: \nprev_sale_ques_2: \nprev_sale_cat_2: \nprev_sale_year_3: \nprev_sale_mo_3: \nprev_sale_day_3: \nprev_sale_loc_3: \nprev_sale_lot_3: \nprev_sale_ques_3: \nprev_sale_cat_3: \nprev_sale_year_4: \nprev_sale_mo_4: \nprev_sale_day_4: \nprev_sale_loc_4: \nprev_sale_lot_4: \nprev_sale_ques_4: \nprev_sale_cat_4: \nprev_sale_year_5: \nprev_sale_mo_5: \nprev_sale_day_5: \nprev_sale_loc_5: \nprev_sale_lot_5: \nprev_sale_ques_5: \nprev_sale_cat_5: \nprev_sale_year_6: \nprev_sale_mo_6: \nprev_sale_day_6: \nprev_sale_loc_6: \nprev_sale_lot_6: \nprev_sale_ques_6: \nprev_sale_cat_6: \nprev_sale_year_7: \nprev_sale_mo_7: \nprev_sale_day_7: \nprev_sale_loc_7: \nprev_sale_lot_7: \nprev_sale_ques_7: \nprev_sale_cat_7: \npost_sale_year_1: \npost_sale_mo_1: \npost_sale_day_1: \npost_sale_loc_1: \npost_sale_lot_1: \npost_sale_q_1: \npost_sale_cat_1: \npost_sale_year_2: \npost_sale_mo_2: \npost_sale_day_2: \npost_sale_loc_2: \npost_sale_lot_2: \npost_sale_q_2: \npost_sale_cat_2: \npost_sale_year_3: \npost_sale_mo_3: \npost_sale_day_3: \npost_sale_loc_3: \npost_sale_lot_3: \npost_sale_q_3: \npost_sale_cat_3: \npost_sale_year_4: \npost_sale_mo_4: \npost_sale_day_4: \npost_sale_loc_4: \npost_sale_lot_4: \npost_sale_q_4: \npost_sale_cat_4: \npost_sale_year_5: \npost_sale_mo_5: \npost_sale_day_5: \npost_sale_loc_5: \npost_sale_lot_5: \npost_sale_q_5: \npost_sale_cat_5: \npost_sale_year_6: \npost_sale_mo_6: \npost_sale_day_6: \npost_sale_loc_6: \npost_sale_lot_6: \npost_sale_q_6: \npost_sale_cat_6: \npost_sale_year_7: \npost_sale_mo_7: \npost_sale_day_7: \npost_sale_loc_7: \npost_sale_lot_7: \npost_sale_q_7: \npost_sale_cat_7: \npost_sale_year_8: \npost_sale_mo_8: \npost_sale_day_8: \npost_sale_loc_8: \npost_sale_lot_8: \npost_sale_q_8: \npost_sale_cat_8: \npost_sale_year_9: \npost_sale_mo_9: \npost_sale_day_9: \npost_sale_loc_9: \npost_sale_lot_9: \npost_sale_q_9: \npost_sale_cat_9: \npost_own_1: \npost_own_q_1: \npost_own_so_1: \npost_own_auth_1: \npost_own_auth_d_1: \npost_own_auth_e_1: \npost_own_auth_p_1: \npost_own_auth_l_1: \npost_own_auth_q_1: \npost_own_ulan_1: \npost_own_2: \npost_own_q_2: \npost_own_so_2: \npost_own_auth_2: \npost_own_auth_d_2: \npost_own_auth_e_2: \npost_own_auth_p_2: \npost_own_auth_l_2: \npost_own_auth_q_2: \npost_own_ulan_2: \npost_own_3: \npost_own_q_3: \npost_own_so_3: \npost_own_auth_3: \npost_own_auth_d_3: \npost_own_auth_e_3: \npost_own_auth_p_3: \npost_own_auth_l_3: \npost_own_auth_q_3: \npost_own_ulan_3: \npost_own_4: \npost_own_q_4: \npost_own_so_4: \npost_own_auth_4: \npost_own_auth_d_4: \npost_own_auth_e_4: \npost_own_auth_p_4: \npost_own_auth_l_4: \npost_own_auth_q_4: \npost_own_ulan_4: \npost_own_5: \npost_own_q_5: \npost_own_so_5: \npost_own_auth_5: \npost_own_auth_d_5: \npost_own_auth_e_5: \npost_own_auth_p_5: \npost_own_auth_l_5: \npost_own_auth_q_5: \npost_own_ulan_5: \npost_own_6: \npost_own_q_6: \npost_own_so_6: \npost_own_auth_6: \npost_own_auth_d_6: \npost_own_auth_e_6: \npost_own_auth_p_6: \npost_own_auth_l_6: \npost_own_auth_q_6: \npost_own_ulan_6: \npres_loc_geog_1: \npres_loc_inst_1: \npres_loc_insq_1: \npres_loc_insi_1: \npres_loc_acc_1: \npres_loc_accq_1: \npres_loc_note_1: \npres_loc_geog_2: \npres_loc_inst_2: \npres_loc_insq_2: \npres_loc_insi_2: \npres_loc_acc_2: \npres_loc_accq_2: \npres_loc_note_2: \nppg: \nlot_notes: Die Lose 176 und 177 wurden zusammen katalogisiert.\npersistent_puid: GERMANSALES-5410\nfile_segment: \nflag: \n",
+      "identified_by":[
+        {
+          "type":"Identifier",
+          "content":"941658",
+          "assigned_by":[
+            {
+              "id":"urn:uuid:483e1422-85ff-367f-9d03-f64062f239e1",
+              "type":"AttributeAssignment",
+              "carried_out_by":[
+                {
+                  "id":"urn:uuid:d0e7dd29-144c-38c1-b45c-e5ea4e1855e8",
+                  "type":"Group",
+                  "_label":"Getty Provenance Index"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "created_by":{
+        "type":"Creation",
+        "classified_as":[
+          {
+            "id":"http:\/\/vocab.getty.edu\/aat\/300440752",
+            "type":"Type",
+            "_label":"Transcription Process"
+          }
+        ],
+        "carried_out_by":[
+          {
+            "id":"urn:uuid:d0e7dd29-144c-38c1-b45c-e5ea4e1855e8",
+            "type":"Group",
+            "_label":"Getty Provenance Index"
+          }
+        ]
+      }
+    }
+  ]
+}

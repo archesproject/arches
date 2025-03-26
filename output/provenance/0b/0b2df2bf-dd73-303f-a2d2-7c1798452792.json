@@ -1,0 +1,149 @@
+{
+    "@context": "https://linked.art/ns/v1/linked-art.json",
+    "id": "urn:uuid:0b2df2bf-dd73-303f-a2d2-7c1798452792",
+    "type": "Activity",
+    "_label": "Goupil Sale of Stock Number G-27640 (1887-06-07)",
+    "classified_as": [
+        {
+            "id": "http://vocab.getty.edu/aat/300055863",
+            "type": "Type",
+            "_label": "Provenance Activity"
+        }
+    ],
+    "identified_by": [
+        {
+            "type": "Name",
+            "content": "Goupil Sale of Stock Number G-27640 (1887-06-07)"
+        }
+    ],
+    "referred_to_by": [
+        {
+            "id": "urn:uuid:5dff44b0-1929-3999-9737-cde66db6a7c8",
+            "type": "LinguisticObject",
+            "_label": "Goupil Stock Book 11, Page 208, Row 14"
+        },
+        {
+            "type": "LinguisticObject",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300027200",
+                    "type": "Type",
+                    "_label": "Note",
+                    "classified_as": [
+                        {
+                            "id": "http://vocab.getty.edu/aat/300418049",
+                            "type": "Type",
+                            "_label": "Brief Text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "LinguisticObject",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300027200",
+                    "type": "Type",
+                    "_label": "Note"
+                }
+            ]
+        },
+        {
+            "type": "LinguisticObject",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300027200",
+                    "type": "Type",
+                    "_label": "Note"
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:75e8a92d-3df2-38cf-858f-94925f4edd47",
+            "type": "LinguisticObject",
+            "_label": "STAR Goupil Database"
+        }
+    ],
+    "timespan": {
+        "type": "TimeSpan",
+        "_label": "1887-05-26",
+        "identified_by": [
+            {
+                "type": "Name",
+                "content": "1887-05-26"
+            }
+        ],
+        "begin_of_the_begin": "1887-05-26T00:00:00Z",
+        "end_of_the_end": "1887-05-27T00:00:00Z"
+    },
+    "part": [
+        {
+            "id": "urn:uuid:730bc00d-e5ee-3d47-b779-3b8dff624140",
+            "type": "Payment",
+            "_label": "Payment for Stock Number G-27640 (1887-06-07)",
+            "paid_amount": {
+                "type": "MonetaryAmount",
+                "_label": "551.25 francs",
+                "value": 551.25,
+                "referred_to_by": [
+                    {
+                        "type": "LinguisticObject",
+                        "classified_as": [
+                            {
+                                "id": "http://vocab.getty.edu/aat/300027200",
+                                "type": "Type",
+                                "_label": "Note"
+                            }
+                        ],
+                        "content": "AAP.RA"
+                    }
+                ],
+                "currency": {
+                    "id": "http://vocab.getty.edu/aat/300412016",
+                    "type": "Currency",
+                    "_label": "French Francs"
+                }
+            },
+            "paid_to": [
+                {
+                    "id": "urn:uuid:7f070021-c467-38c5-ba2d-ca1339e3901e",
+                    "type": "Group",
+                    "_label": "Goupil et Cie."
+                }
+            ]
+        },
+        {
+            "id": "urn:uuid:91a67916-cb19-37be-829d-c053eeb146bd",
+            "type": "Acquisition",
+            "_label": "Goupil Sale of Stock Number G-27640 (1887-06-07)",
+            "identified_by": [
+                {
+                    "type": "Name",
+                    "content": "Goupil Sale of Stock Number G-27640 (1887-06-07)"
+                }
+            ],
+            "transferred_title_of": [
+                {
+                    "id": "urn:uuid:1175c4a5-e161-33dc-9b8f-54027d224538",
+                    "type": "HumanMadeObject",
+                    "_label": "Coucher de soleil"
+                }
+            ],
+            "transferred_title_from": [
+                {
+                    "id": "urn:uuid:7f070021-c467-38c5-ba2d-ca1339e3901e",
+                    "type": "Group",
+                    "_label": "Goupil et Cie."
+                }
+            ]
+        }
+    ],
+    "after": [
+        {
+            "id": "urn:uuid:a0f11f4a-4e1e-390c-934f-bc192b29e4d3",
+            "type": "Activity",
+            "_label": "Goupil Purchase of Stock Number G-27640 (1887-05-26)"
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "@context": "https://linked.art/ns/v1/linked-art.json",
+    "id": "urn:uuid:417a8e8b-2e44-335f-abf2-7590cad7068a",
+    "type": "Place",
+    "_label": "Hague, The",
+    "classified_as": [
+        {
+            "id": "http://vocab.getty.edu/aat/300008347",
+            "type": "Type",
+            "_label": "inhabited places"
+        }
+    ],
+    "identified_by": [
+        {
+            "type": "Name",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300404670",
+                    "type": "Type",
+                    "_label": "Primary Name"
+                }
+            ],
+            "content": "Hague, The"
+        }
+    ],
+    "defined_by": "{\"type\": \"FeatureCollection\", \"features\": [{\"type\": \"Feature\", \"geometry\": {\"type\": \"Point\", \"coordinates\": [4.3, 52.083333]}, \"properties\": {\"name\": \"Hague, The\"}}]}",
+    "referred_to_by": [
+        {
+            "id": "http://www.getty.edu/vow/TGNFullDisplay?find=&place=&nation=&subjectid=7006810",
+            "type": "DigitalObject",
+            "_label": "http://www.getty.edu/vow/TGNFullDisplay?find=&place=&nation=&subjectid=7006810"
+        },
+        {
+            "id": "urn:uuid:75e8a92d-3df2-38cf-858f-94925f4edd47",
+            "type": "LinguisticObject",
+            "_label": "STAR Goupil Database"
+        }
+    ],
+    "part_of": [
+        {
+            "id": "urn:uuid:50381f5d-ecfc-3c87-9cb8-a8a7baabf884",
+            "type": "Place",
+            "_label": "South Holland"
+        }
+    ],
+    "exact_match": [
+        {
+            "id": "http://vocab.getty.edu/tgn/7006810"
+        }
+    ]
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+>
+  <skos:ConceptScheme rdf:about="https://0.0.0.0:8009/1d20ed6c-b049-4957-821f-901e33edae31">
+    <dcterms:identifier xml:lang="en">{"id": "85558919-de23-4ee6-b328-d321fd742ea5", "value": "https://localhost:8000/1d20ed6c-b049-4957-821f-901e33edae31"}</dcterms:identifier>
+    <skos:hasTopConcept>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/48e3cb94-3bf9-4240-8ca0-0de5fee2847e">
+        <skos:narrower rdf:resource="https://0.0.0.0:8009/f810510b-89d1-4798-84c0-cbcfeee15714"/>
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/1d20ed6c-b049-4957-821f-901e33edae31"/>
+        <dcterms:identifier xml:lang="en">{"id": "fac0570a-709c-4705-bb33-1a482b877518", "value": "https://dev-pir-arches-app.aws.getty.edu/48e3cb94-3bf9-4240-8ca0-0de5fee2847e"}</dcterms:identifier>
+        <skos:prefLabel xml:lang="en">{"id": "4333051d-32bd-4410-bf58-d9b4f69ad755", "value": "PSCP Concepts"}</skos:prefLabel>
+        <skos:narrower rdf:resource="https://0.0.0.0:8009/4908e3dc-cc22-4b17-b172-e874ea20cb5b"/>
+      </skos:Concept>
+    </skos:hasTopConcept>
+    <dcterms:title xml:lang="en">{"id": "a9ef011d-2899-453f-a9d2-654ce555bf7b", "value": "PSCP Entries"}</dcterms:title>
+  </skos:ConceptScheme>
+  <skos:Concept rdf:about="https://0.0.0.0:8009/4908e3dc-cc22-4b17-b172-e874ea20cb5b">
+    <dcterms:identifier xml:lang="en">{"id": "1d6fa8e6-d792-4d4f-9c8a-83d63c5878f9", "value": "https://localhost:8000/4908e3dc-cc22-4b17-b172-e874ea20cb5b"}</dcterms:identifier>
+    <skos:inScheme rdf:resource="https://0.0.0.0:8009/1d20ed6c-b049-4957-821f-901e33edae31"/>
+    <skos:prefLabel xml:lang="en">{"id": "5d385592-bb8b-4f5c-b42d-b7d48e8df8a5", "value": "Identifiers"}</skos:prefLabel>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/c0c27c02-9a7f-4c83-90e6-6223526e98e4">
+        <skos:prefLabel xml:lang="en">{"id": "6e151508-4b65-43ac-b78a-b7189e893279", "value": "STAR Identifier"}</skos:prefLabel>
+        <dcterms:identifier xml:lang="en">{"id": "c6fd5dfc-581b-4806-9cf9-23fdd89a8911", "value": "https://data.getty.edu/local/thesaurus/star-identifier"}</dcterms:identifier>
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/1d20ed6c-b049-4957-821f-901e33edae31"/>
+      </skos:Concept>
+    </skos:narrower>
+  </skos:Concept>
+  <skos:Concept rdf:about="https://0.0.0.0:8009/50af8c0f-50f2-48c9-a3be-d207a82fb0b9">
+    <skos:prefLabel xml:lang="en">{"id": "d6a09d40-87c1-4ebb-afa6-9fb72c968961", "value": "unknown"}</skos:prefLabel>
+    <dcterms:identifier xml:lang="en">{"id": "29ef3fd0-4bd7-4060-b093-20e3c201d49f", "value": "https://data.getty.edu/local/thesaurus/unknown"}</dcterms:identifier>
+    <skos:inScheme rdf:resource="https://0.0.0.0:8009/1d20ed6c-b049-4957-821f-901e33edae31"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="https://0.0.0.0:8009/f810510b-89d1-4798-84c0-cbcfeee15714">
+    <skos:inScheme rdf:resource="https://0.0.0.0:8009/1d20ed6c-b049-4957-821f-901e33edae31"/>
+    <skos:narrower rdf:resource="https://0.0.0.0:8009/50af8c0f-50f2-48c9-a3be-d207a82fb0b9"/>
+    <skos:prefLabel xml:lang="en">{"id": "6a1aba58-22ed-4ea8-918b-27646c07e126", "value": "Epistemological State Types"}</skos:prefLabel>
+    <dcterms:identifier xml:lang="en">{"id": "4b48a608-b32a-4216-b15b-6e2747078522", "value": "https://localhost:8000/f810510b-89d1-4798-84c0-cbcfeee15714"}</dcterms:identifier>
+  </skos:Concept>
+</rdf:RDF>

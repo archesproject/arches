@@ -1,0 +1,143 @@
+{
+    "@context": "https://linked.art/ns/v1/linked-art.json",
+    "id": "urn:uuid:824d85a7-b38b-3574-b0ef-84fff22c7c6f",
+    "type": "HumanMadeObject",
+    "_label": "Vue de ville Woudrichem",
+    "classified_as": [
+        {
+            "id": "http://vocab.getty.edu/aat/300033618",
+            "type": "Type",
+            "_label": "Painting",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300435443",
+                    "type": "Type",
+                    "_label": "Type of Work"
+                }
+            ]
+        }
+    ],
+    "identified_by": [
+        {
+            "type": "Identifier",
+            "content": "g-object-1",
+            "assigned_by": [
+                {
+                    "type": "AttributeAssignment",
+                    "carried_out_by": [
+                        {
+                            "id": "urn:uuid:3aad89df-4d09-383b-bd44-f9481f928e77",
+                            "type": "Group",
+                            "_label": "Getty Research Institute"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Identifier",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300412177",
+                    "type": "Type",
+                    "_label": "Stock Number"
+                }
+            ],
+            "content": "1",
+            "assigned_by": [
+                {
+                    "type": "AttributeAssignment",
+                    "carried_out_by": [
+                        {
+                            "id": "urn:uuid:7f070021-c467-38c5-ba2d-ca1339e3901e",
+                            "type": "Group",
+                            "_label": "Goupil et Cie."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Name",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300417193",
+                    "type": "Type",
+                    "_label": "Title"
+                }
+            ],
+            "content": "Vue de ville Woudrichem",
+            "referred_to_by": [
+                {
+                    "id": "urn:uuid:3effe3d0-4a6a-39a0-8c4f-d0940147de49",
+                    "type": "LinguisticObject",
+                    "_label": "Goupil Stock Book 2, Page 1, Row 2"
+                }
+            ]
+        }
+    ],
+    "referred_to_by": [
+        {
+            "id": "urn:uuid:3effe3d0-4a6a-39a0-8c4f-d0940147de49",
+            "type": "LinguisticObject",
+            "_label": "Goupil Stock Book 2, Page 1, Row 2"
+        },
+        {
+            "id": "urn:uuid:75e8a92d-3df2-38cf-858f-94925f4edd47",
+            "type": "LinguisticObject",
+            "_label": "STAR Goupil Database"
+        }
+    ],
+    "shows": [
+        {
+            "id": "urn:uuid:e2d65796-3f5b-382e-9e7d-6e4278f52619",
+            "type": "VisualItem",
+            "_label": "Visual Work of \u201cVue de ville Woudrichem\u201d"
+        }
+    ],
+    "produced_by": {
+        "type": "Production",
+        "_label": "Production event for Vue de ville Woudrichem",
+        "attributed_by": [
+            {
+                "id": "http://lod.example.org/museum/AttributeAssignment/WEISSENBRUCH, JOHANNESWEISSENBRUCH, JOHANNES",
+                "type": "AttributeAssignment",
+                "carried_out_by": [
+                    {
+                        "id": "urn:uuid:7f070021-c467-38c5-ba2d-ca1339e3901e",
+                        "type": "Group",
+                        "_label": "Goupil et Cie."
+                    }
+                ],
+                "used_specific_object": [
+                    {
+                        "id": "urn:uuid:3effe3d0-4a6a-39a0-8c4f-d0940147de49",
+                        "type": "LinguisticObject",
+                        "_label": "Goupil Stock Book 2, Page 1, Row 2"
+                    }
+                ],
+                "assigned_property": "carried_out_by",
+                "assigned": [
+                    {
+                        "id": "urn:uuid:2b004f19-ff72-3571-982b-93b189c36e46",
+                        "type": "Person",
+                        "_label": "WEISSENBRUCH, JOHANNES"
+                    }
+                ]
+            }
+        ],
+        "part": [
+            {
+                "type": "Production",
+                "_label": "Production sub-event for WEISSENBRUCH, JOHANNES",
+                "carried_out_by": [
+                    {
+                        "id": "urn:uuid:2b004f19-ff72-3571-982b-93b189c36e46",
+                        "type": "Person",
+                        "_label": "WEISSENBRUCH, JOHANNES"
+                    }
+                ]
+            }
+        ]
+    }
+}

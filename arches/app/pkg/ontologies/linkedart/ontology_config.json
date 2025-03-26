@@ -1,0 +1,10 @@
+{
+  "base": "cidoc.xml",
+  "base_name": "Linked Art (2020-03-01)",
+  "extensions": [
+      "linkedart.xml",
+      "linkedart_crm_enhancements.xml"
+  ],
+  "base_version": "6.2.7",
+  "base_id": "0b1f5462-faa7-11e9-8f09-3af9d3b32b71"
+}

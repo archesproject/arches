@@ -1,0 +1,466 @@
+{
+  "@context": "https://linked.art/ns/v1/linked-art.json",
+  "id": "urn:uuid:00178824-436e-3cac-8d17-9b8a8dcec4ec",
+  "type": "Person",
+  "_label": "Douglas, William Lewis",
+  "classified_as": [
+    {
+      "id": "http://vocab.getty.edu/aat/300107956",
+      "type": "Type",
+      "_label": "American",
+      "classified_as": [
+        {
+          "id": "http://vocab.getty.edu/aat/300379842",
+          "type": "Type",
+          "_label": "Nationality"
+        }
+      ]
+    },
+    {
+      "id": "http://vocab.getty.edu/aat/300025234",
+      "type": "Type",
+      "_label": "Collector",
+      "classified_as": [
+        {
+          "id": "http://vocab.getty.edu/aat/300263369",
+          "type": "Type",
+          "_label": "Occupation"
+        }
+      ]
+    }
+  ],
+  "identified_by": [
+    {
+      "type": "Identifier",
+      "content": "47084",
+      "assigned_by": [
+        {
+          "id": "urn:uuid:483e1422-85ff-367f-9d03-f64062f239e1",
+          "type": "AttributeAssignment",
+          "carried_out_by": [
+            {
+              "id": "urn:uuid:d0e7dd29-144c-38c1-b45c-e5ea4e1855e8",
+              "type": "Group",
+              "_label": "Getty Provenance Index"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Name",
+      "classified_as": [
+        {
+          "id": "http://vocab.getty.edu/aat/300404670",
+          "type": "Type",
+          "_label": "Primary Name"
+        }
+      ],
+      "content": "Douglas, William Lewis"
+    },
+    {
+      "type": "Name",
+      "classified_as": [
+        {
+          "id": "http://vocab.getty.edu/aat/300266386",
+          "type": "Type",
+          "_label": "Personal Name"
+        }
+      ],
+      "content": "W.L. Douglas",
+      "referred_to_by": [
+        {
+          "id": "urn:uuid:c2a39453-95cf-3995-8668-82037625d7ba",
+          "type": "LinguisticObject",
+          "_label": "Knoedler Stock Book 5, Page 103, Row 12"
+        },
+        {
+          "id": "urn:uuid:9644f53e-cdfd-30e5-aaac-612062d0b49f",
+          "type": "LinguisticObject",
+          "_label": "Knoedler Stock Book 5, Page 139, Row 55"
+        },
+        {
+          "id": "urn:uuid:d84d960e-3663-37a2-b601-5b658c63be7a",
+          "type": "LinguisticObject",
+          "_label": "Knoedler Stock Book 5, Page 154, Row 36"
+        },
+        {
+          "id": "urn:uuid:8a96d228-2da3-3be7-8b63-879dd3702671",
+          "type": "LinguisticObject",
+          "_label": "Knoedler Stock Book 5, Page 43, Row 5"
+        },
+        {
+          "id": "urn:uuid:8d76dd94-22ac-32bd-829a-0e9e75fa934f",
+          "type": "LinguisticObject",
+          "_label": "Knoedler Stock Book 5, Page 85, Row 48"
+        },
+        {
+          "id": "urn:uuid:dffa2c7b-bd0c-3436-a9d7-dd26aa8f52e7",
+          "type": "LinguisticObject",
+          "_label": "Knoedler Stock Book 5, Page 93, Row 14"
+        }
+      ]
+    }
+  ],
+  "referred_to_by": [
+    {
+      "id": "urn:uuid:dd39a617-d786-36fc-bdf9-f60445983f19",
+      "type": "LinguisticObject",
+      "_label": "Entry recorded in PSCP PEOPLE dataset for Douglas, William Lewis"
+    },
+    {
+      "type": "LinguisticObject",
+      "classified_as": [
+        {
+          "id": "http://vocab.getty.edu/aat/300026497",
+          "type": "Type",
+          "_label": "Bibliography Statement",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300418049",
+              "type": "Type",
+              "_label": "Brief Text"
+            }
+          ]
+        }
+      ],
+      "content": "wiki"
+    },
+    {
+      "type": "LinguisticObject",
+      "classified_as": [
+        {
+          "id": "http://vocab.getty.edu/aat/300404764",
+          "type": "Type",
+          "_label": "Source Statement",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300418049",
+              "type": "Type",
+              "_label": "Brief Text"
+            }
+          ]
+        }
+      ],
+      "content": "Knoedler"
+    },
+    {
+      "type": "LinguisticObject",
+      "classified_as": [
+        {
+          "id": "http://vocab.getty.edu/aat/300435422",
+          "type": "Type",
+          "_label": "Biography Statement",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300418049",
+              "type": "Type",
+              "_label": "Brief Text"
+            }
+          ]
+        },
+        {
+          "id": "http://vocab.getty.edu/aat/300444972",
+          "type": "Type",
+          "_label": "private (general concept)",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300444971",
+              "type": "Type",
+              "_label": "Function (general concept)"
+            }
+          ]
+        }
+      ],
+      "content": "U.S. businessman and politician from Massachusetts. He served as the 42nd Governor of Massachusetts from 1905 until 1906. He also founded and oversaw the growth of the W. L. Douglas Shoe Company, a highly successful Brockton, Massachusetts business that became one of the world's largest shoe manufacturers. He also opened the first nationwide chain of shoe stores devoted to selling the company's products."
+    },
+    {
+      "id": "urn:uuid:312aef48-fe99-3575-a209-5b1e5669064c",
+      "type": "LinguisticObject",
+      "_label": "STAR Person Authority Database"
+    },
+    {
+      "id": "urn:uuid:c2a39453-95cf-3995-8668-82037625d7ba",
+      "type": "LinguisticObject",
+      "_label": "Knoedler Stock Book 5, Page 103, Row 12"
+    },
+    {
+      "id": "urn:uuid:9644f53e-cdfd-30e5-aaac-612062d0b49f",
+      "type": "LinguisticObject",
+      "_label": "Knoedler Stock Book 5, Page 139, Row 55"
+    },
+    {
+      "id": "urn:uuid:d84d960e-3663-37a2-b601-5b658c63be7a",
+      "type": "LinguisticObject",
+      "_label": "Knoedler Stock Book 5, Page 154, Row 36"
+    },
+    {
+      "id": "urn:uuid:8a96d228-2da3-3be7-8b63-879dd3702671",
+      "type": "LinguisticObject",
+      "_label": "Knoedler Stock Book 5, Page 43, Row 5"
+    },
+    {
+      "id": "urn:uuid:8d76dd94-22ac-32bd-829a-0e9e75fa934f",
+      "type": "LinguisticObject",
+      "_label": "Knoedler Stock Book 5, Page 85, Row 48"
+    },
+    {
+      "id": "urn:uuid:dffa2c7b-bd0c-3436-a9d7-dd26aa8f52e7",
+      "type": "LinguisticObject",
+      "_label": "Knoedler Stock Book 5, Page 93, Row 14"
+    },
+    {
+      "id": "urn:uuid:c5feae26-2eb0-353d-a089-133f6f5b6b7a",
+      "type": "LinguisticObject",
+      "_label": "STAR Knoedler Database"
+    }
+  ],
+  "born": {
+    "id": "urn:uuid:43d9c148-9ae0-4eed-b37d-6ee4ee42198d",
+    "type": "Birth",
+    "_label": "Birth of Douglas, William Lewis",
+    "timespan": {
+      "type": "TimeSpan",
+      "_label": "1845",
+      "identified_by": [
+        {
+          "type": "Name",
+          "content": "1845"
+        }
+      ],
+      "begin_of_the_begin": "1845-01-01T00:00:00Z",
+      "end_of_the_end": "1846-01-01T00:00:00Z"
+    }
+  },
+  "died": {
+    "id": "urn:uuid:5aaedf9a-87df-42e5-9ab3-8a33851ef71c",
+    "type": "Death",
+    "_label": "Death of Douglas, William Lewis",
+    "timespan": {
+      "type": "TimeSpan",
+      "_label": "1924",
+      "identified_by": [
+        {
+          "type": "Name",
+          "content": "1924"
+        }
+      ],
+      "begin_of_the_begin": "1924-01-01T00:00:00Z",
+      "end_of_the_end": "1925-01-01T00:00:00Z"
+    }
+  },
+  "carried_out": [
+    {
+      "type": "Activity",
+      "_label": "Sojourn activity",
+      "classified_as": [
+        {
+          "id": "http://vocab.getty.edu/aat/300393179",
+          "type": "Type",
+          "_label": "Residing",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300393211",
+              "type": "Type",
+              "_label": "Location"
+            }
+          ]
+        }
+      ],
+      "referred_to_by": [
+        {
+          "type": "LinguisticObject",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300027200",
+              "type": "Type",
+              "_label": "Note",
+              "classified_as": [
+                {
+                  "id": "http://vocab.getty.edu/aat/300418049",
+                  "type": "Type",
+                  "_label": "Brief Text"
+                }
+              ]
+            }
+          ],
+          "content": "from Sales Book 8, 1900-1907, p.177"
+        }
+      ],
+      "took_place_at": [
+        {
+          "id": "urn:uuid:da383769-b73b-3795-b401-3a6506a92295",
+          "type": "Place",
+          "_label": "263 Henry St Brooklyn, Brooklyn, NY, USA"
+        }
+      ]
+    },
+    {
+      "type": "Activity",
+      "_label": "Sojourn activity",
+      "classified_as": [
+        {
+          "id": "http://vocab.getty.edu/aat/300393179",
+          "type": "Type",
+          "_label": "Residing",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300393211",
+              "type": "Type",
+              "_label": "Location"
+            }
+          ]
+        }
+      ],
+      "referred_to_by": [
+        {
+          "type": "LinguisticObject",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300027200",
+              "type": "Type",
+              "_label": "Note",
+              "classified_as": [
+                {
+                  "id": "http://vocab.getty.edu/aat/300418049",
+                  "type": "Type",
+                  "_label": "Brief Text"
+                }
+              ]
+            }
+          ],
+          "content": "from Sales Book 9, 1907-1912, f.79"
+        }
+      ],
+      "took_place_at": [
+        {
+          "id": "urn:uuid:3639605b-5569-3a61-b401-0728a26f6250",
+          "type": "Place",
+          "_label": "306 W Elm St Brockton, Brockton, MA, USA"
+        }
+      ]
+    },
+    {
+      "type": "Activity",
+      "_label": "Professional activity of Douglas, William Lewis",
+      "classified_as": [
+        {
+          "id": "http://vocab.getty.edu/aat/300077121",
+          "type": "Type",
+          "_label": "Collecting",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300263369",
+              "type": "Type",
+              "_label": "Occupation"
+            }
+          ]
+        }
+      ],
+      "timespan": {
+        "type": "TimeSpan",
+        "_label": "1903",
+        "identified_by": [
+          {
+            "type": "Name",
+            "content": "1903"
+          }
+        ],
+        "begin_of_the_begin": "1903-01-01T00:00:00Z",
+        "end_of_the_end": "1904-01-01T00:00:00Z"
+      }
+    },
+    {
+      "type": "Activity",
+      "_label": "Professional activity of Douglas, William Lewis",
+      "classified_as": [
+        {
+          "id": "http://vocab.getty.edu/aat/300077121",
+          "type": "Type",
+          "_label": "Collecting"
+        }
+      ],
+      "timespan": {
+        "type": "TimeSpan",
+        "_label": "1903",
+        "identified_by": [
+          {
+            "type": "Name",
+            "content": "1903"
+          }
+        ],
+        "begin_of_the_begin": "1903-01-01T00:00:00Z",
+        "end_of_the_end": "1904-01-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "urn:uuid:75586f4b-69c1-38e9-94c1-c880e5c71dea",
+      "type": "Activity",
+      "classified_as": [
+        {
+          "id": "http://vocab.getty.edu/aat/300393179",
+          "type": "Type",
+          "_label": "Residing",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300393211",
+              "type": "Type",
+              "_label": "Location Activity or State"
+            }
+          ]
+        }
+      ],
+      "referred_to_by": [
+        {
+          "id": "urn:uuid:c2a39453-95cf-3995-8668-82037625d7ba",
+          "type": "LinguisticObject",
+          "_label": "Knoedler Stock Book 5, Page 103, Row 12"
+        }
+      ],
+      "took_place_at": [
+        {
+          "id": "urn:uuid:620f71f0-5f01-3e5d-b3a1-8006aba7fe80",
+          "type": "Place",
+          "_label": "Brockton"
+        }
+      ]
+    },
+    {
+      "id": "urn:uuid:b9c3accc-331c-38e5-9ec7-4f71b86e1cb2",
+      "type": "Activity",
+      "classified_as": [
+        {
+          "id": "http://vocab.getty.edu/aat/300393179",
+          "type": "Type",
+          "_label": "Residing",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300393211",
+              "type": "Type",
+              "_label": "Location Activity or State"
+            }
+          ]
+        }
+      ],
+      "referred_to_by": [
+        {
+          "id": "urn:uuid:d84d960e-3663-37a2-b601-5b658c63be7a",
+          "type": "LinguisticObject",
+          "_label": "Knoedler Stock Book 5, Page 154, Row 36"
+        }
+      ],
+      "took_place_at": [
+        {
+          "id": "urn:uuid:db2444a1-8768-3878-a7a7-23d70a5bdbc1",
+          "type": "Place",
+          "_label": "Brooklyn"
+        }
+      ]
+    }
+  ],
+  "exact_match": [
+    {
+      "id": "http://vocab.getty.edu/ulan/500443463"
+    }
+  ]
+}

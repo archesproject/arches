@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+>
+  <skos:Concept rdf:about="https://0.0.0.0:8009/102e67bd-45e0-4f5a-82b2-5ea680aa9219">
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/906cd39e-81d5-461c-80f2-7353923514e9">
+        <skos:prefLabel xml:lang="en">{"id": "5c8822d5-45ae-4146-a3b4-7ce77462f470", "value": "member_of"}</skos:prefLabel>
+        <dcterms:identifier xml:lang="en">{"id": "db35fafa-d8ed-4bbd-b953-121379a1f5da", "value": "https://linked.art/ns/terms/member_of"}</dcterms:identifier>
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/2c74bf02-14a4-4163-b502-98c2620f6ef4">
+        <dcterms:identifier xml:lang="en">{"id": "2bc7f05a-6f8c-4863-a67e-6e5262adeb45", "value": "https://linked.art/ns/terms/paid_to"}</dcterms:identifier>
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+        <skos:prefLabel xml:lang="en-us">{"id": "5d4c4261-fdd2-4135-97a5-cb29328592cf", "value": "paid_to"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+    <dcterms:identifier xml:lang="en">{"id": "fa3e8f22-c77d-4366-9953-142985916d1b", "value": "http://localhost:8000/102e67bd-45e0-4f5a-82b2-5ea680aa9219"}</dcterms:identifier>
+    <skos:inScheme>
+      <skos:ConceptScheme rdf:about="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7">
+        <dcterms:identifier xml:lang="en">{"id": "41900725-7625-4b7b-b42c-89740aa39734", "value": "http://localhost:8000/49facd02-536c-441d-93e5-b221bec1bbb7"}</dcterms:identifier>
+        <dcterms:title xml:lang="en-us">{"id": "4ea2790d-f324-4e19-bbce-3482b2594f8c", "value": "Ontology Properties"}</dcterms:title>
+        <skos:hasTopConcept rdf:resource="https://0.0.0.0:8009/102e67bd-45e0-4f5a-82b2-5ea680aa9219"/>
+        <skos:hasTopConcept rdf:resource="https://0.0.0.0:8009/78774105-804b-4adc-8380-6d7ea3d780c8"/>
+      </skos:ConceptScheme>
+    </skos:inScheme>
+    <skos:prefLabel xml:lang="en-us">{"id": "97a13935-bde9-4d34-a110-05c39ab2ba78", "value": "Non-CRM Property"}</skos:prefLabel>
+  </skos:Concept>
+  <skos:Concept rdf:about="https://0.0.0.0:8009/c87b2067-2f74-4d6f-9a37-885dfc0a93e6">
+    <skos:prefLabel xml:lang="en">{"id": "8f08f950-f68e-4a0d-83f4-0ee5140f69e4", "value": "P2_has_type"}</skos:prefLabel>
+    <dcterms:identifier xml:lang="en">{"id": "a0a9e5bb-5954-4e7a-b0bd-1a9adad02a0b", "value": "http://www.cidoc-crm.org/cidoc-crm/P2_has_type"}</dcterms:identifier>
+    <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+  </skos:Concept>
+  <skos:Concept rdf:about="https://0.0.0.0:8009/78774105-804b-4adc-8380-6d7ea3d780c8">
+    <skos:narrower rdf:resource="https://0.0.0.0:8009/c87b2067-2f74-4d6f-9a37-885dfc0a93e6"/>
+    <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/8073b51a-5398-4864-bcd8-f0492ea3b35c">
+        <dcterms:identifier xml:lang="en">{"id": "a8f2c5e7-4c0c-4728-9f41-62655b61a9b6", "value": "http://www.cidoc-crm.org/cidoc-crm/P90_has_value"}</dcterms:identifier>
+        <skos:prefLabel xml:lang="en">{"id": "fd21d5e7-4956-4b63-ab8f-b65788990a58", "value": "P90_has_value"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/713cbfbb-bd5e-4007-9919-cd4163ac4f74">
+        <skos:prefLabel xml:lang="en">{"id": "129976ed-2efd-479f-a758-30df67ac5146", "value": "had_specific_purpose"}</skos:prefLabel>
+        <dcterms:identifier xml:lang="en">{"id": "7aca4efe-4fdd-43f8-8f47-4e4f845ff653", "value": "http://www.cidoc-crm.org/cidoc-crm/P20_had_specific_purpose"}</dcterms:identifier>
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/20a3dd31-2042-4957-b46a-22490ce7023d">
+        <skos:prefLabel xml:lang="en">{"id": "64bc1685-1603-47e0-84fd-70eb51f723c4", "value": "P2i is type of"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+        <dcterms:identifier xml:lang="en">{"id": "3ec604b9-a79e-4631-8259-56368ae976ec", "value": "http://www.cidoc-crm.org/cidoc-crm/P2i_is_type_of"}</dcterms:identifier>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/02b8df10-df02-42f9-8689-f7648cd3f38d">
+        <dcterms:identifier xml:lang="en">{"id": "ae3821cf-35ba-4141-8e78-e1b15dfc61b0", "value": "http://www.cidoc-crm.org/cidoc-crm/P23_transferred_title_from"}</dcterms:identifier>
+        <skos:prefLabel xml:lang="en-us">{"id": "7948ab06-ba63-4ee6-a53a-e39b7f7fb00f", "value": "transferred_title_from"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/65e47366-9d5c-4de9-b263-2ea166edaa19">
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+        <dcterms:identifier xml:lang="en">{"id": "c8431253-369b-4604-8c4e-3aa9d46c1f97", "value": "https://linked.art/ns/terms/paid_from"}</dcterms:identifier>
+        <skos:prefLabel xml:lang="en">{"id": "4f0dada1-eae5-4ff5-ad57-52d4be67be94", "value": "paid_from"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/9c9cae8a-6dd1-48f3-b15b-1351c3507fe4">
+        <skos:prefLabel xml:lang="en-us">{"id": "58a94431-8ec8-4658-b8f1-85277f1c92f3", "value": "carried_out_by"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+        <dcterms:identifier xml:lang="en">{"id": "f04a87da-57bc-4eb9-aedb-a3a789aeff7c", "value": "http://www.cidoc-crm.org/cidoc-crm/P14_carried_out_by"}</dcterms:identifier>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/2f82a4fe-c2c0-49b4-9779-d6a92a7f020d">
+        <dcterms:identifier xml:lang="en">{"id": "e71b02a8-f9b8-4367-b8ae-f238280fb7ce", "value": "http://www.cidoc-crm.org/cidoc-crm/P29_custody_received_by"}</dcterms:identifier>
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+        <skos:prefLabel xml:lang="en">{"id": "90205e6d-6f51-4733-b9e2-f1cec6637610", "value": "P29_custody_received_by"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/e889c251-7dcf-4f22-af19-50fabd43fc29">
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+        <skos:scopeNote xml:lang="en-us">{"id": "4040e426-db8d-4ad5-b27a-2158a5e8488b", "value": "P9 consists of"}</skos:scopeNote>
+        <skos:prefLabel xml:lang="en-us">{"id": "74806df3-9085-4bbd-bbc4-108dd3e1b4cd", "value": "part (event)"}</skos:prefLabel>
+        <dcterms:identifier xml:lang="en">{"id": "e98cbfdb-4fb6-4647-81ed-acb562e9435b", "value": "http://www.cidoc-crm.org/cidoc-crm/P9_consists_of"}</dcterms:identifier>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/cbb48757-3b71-41ae-b9be-389435bfad65">
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+        <dcterms:identifier xml:lang="en">{"id": "1c977c86-894c-427c-9280-762be36b2199", "value": "http://www.cidoc-crm.org/cidoc-crm/P43_has_dimension"}</dcterms:identifier>
+        <skos:prefLabel xml:lang="en">{"id": "edc04af6-eef8-4364-98c3-85a74e0f640e", "value": "has_dimension"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+    <dcterms:identifier xml:lang="en">{"id": "abd3d732-978d-4ef0-abf2-14b08aed9dd9", "value": "http://localhost:8000/78774105-804b-4adc-8380-6d7ea3d780c8"}</dcterms:identifier>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/ed81ccf1-4bdf-4520-b1ba-2bf73e4b1af3">
+        <skos:prefLabel xml:lang="en">{"id": "8e188177-792f-4986-96d8-b8f728faefe1", "value": "P28_custody_surrendered_by"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+        <dcterms:identifier xml:lang="en">{"id": "4e6a2cb0-7f04-4c27-b3ff-5adfdcf22ef8", "value": "http://www.cidoc-crm.org/cidoc-crm/P28_custody_surrendered_by"}</dcterms:identifier>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/ab72a3c7-7ec4-4800-8127-a8403030ebc5">
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+        <skos:prefLabel xml:lang="en">{"id": "551ccf6f-2bac-4c62-9627-c5bd12bea4ce", "value": "transferred_title_to"}</skos:prefLabel>
+        <dcterms:identifier xml:lang="en">{"id": "5d421658-a539-4c31-9ee9-31187b8efa7d", "value": "http://www.cidoc-crm.org/cidoc-crm/P22_transferred_title_to"}</dcterms:identifier>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:prefLabel xml:lang="en-us">{"id": "9d101b21-bc16-4213-af62-a77558b8c832", "value": "CRM Property"}</skos:prefLabel>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/38043a0f-814a-4f03-9c23-bcfdfcf21db2">
+        <skos:prefLabel xml:lang="en">{"id": "4d8f2742-e987-46a0-828a-5045147602a7", "value": "transferred_custody_of"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+        <dcterms:identifier xml:lang="en">{"id": "478618e0-f49c-4802-8040-5f5fc13b8a17", "value": "http://www.cidoc-crm.org/cidoc-crm/P30_transferred_custody_of"}</dcterms:identifier>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/13dd8c09-4b43-4dba-b71c-5affc8d0c051">
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+        <dcterms:identifier xml:lang="en">{"id": "0be1a7ac-2313-4841-934e-fe1f859bad12", "value": "http://www.cidoc-crm.org/cidoc-crm/P1i_identifies"}</dcterms:identifier>
+        <skos:prefLabel xml:lang="en">{"id": "49eeb245-74ca-4e62-b82b-749e1bb087b0", "value": "P1i_identifies"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/e51d4c12-b227-4df6-b187-3b0e96e72f0e">
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+        <skos:prefLabel xml:lang="en-us">{"id": "548a1803-de9f-4303-b470-678164fa47e5", "value": "influenced_by"}</skos:prefLabel>
+        <dcterms:identifier xml:lang="en">{"id": "ec105947-a85e-40bd-a72c-cd7e12222f1f", "value": "http://www.cidoc-crm.org/cidoc-crm/P15_was_influenced_by"}</dcterms:identifier>
+      </skos:Concept>
+    </skos:narrower>
+    <skos:narrower>
+      <skos:Concept rdf:about="https://0.0.0.0:8009/6021d28d-f437-4f6e-bc3b-dd80f2d24783">
+        <skos:inScheme rdf:resource="https://0.0.0.0:8009/49facd02-536c-441d-93e5-b221bec1bbb7"/>
+        <dcterms:identifier xml:lang="en">{"id": "9a7d5533-261d-433e-a248-9aab3fa70283", "value": "http://www.cidoc-crm.org/cidoc-crm/P52_has_current_owner"}</dcterms:identifier>
+        <skos:prefLabel xml:lang="en">{"id": "76af5fc6-56f1-4ab3-a659-02218efcf1fd", "value": "has_current_owner"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:narrower>
+  </skos:Concept>
+</rdf:RDF>

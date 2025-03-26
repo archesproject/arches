@@ -1,0 +1,77 @@
+{
+    "@context": "https://linked.art/ns/v1/linked-art.json",
+    "id": "urn:uuid:41197165-5a40-31c7-ac35-6980bbb52dd2",
+    "type": "HumanMadeObject",
+    "_label": "Goupil Stock Book 2",
+    "classified_as": [
+        {
+            "id": "http://vocab.getty.edu/aat/300028051",
+            "type": "Type",
+            "_label": "Book",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300435443",
+                    "type": "Type",
+                    "_label": "Type of Work"
+                }
+            ]
+        }
+    ],
+    "identified_by": [
+        {
+            "type": "Identifier",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300445021",
+                    "type": "Type",
+                    "_label": "Book Numbers"
+                }
+            ],
+            "content": "2",
+            "assigned_by": [
+                {
+                    "type": "AttributeAssignment",
+                    "carried_out_by": [
+                        {
+                            "id": "urn:uuid:7f070021-c467-38c5-ba2d-ca1339e3901e",
+                            "type": "Group",
+                            "_label": "Goupil et Cie."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Name",
+            "classified_as": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300417193",
+                    "type": "Type",
+                    "_label": "Title"
+                }
+            ],
+            "content": "Goupil Stock Book 2",
+            "language": [
+                {
+                    "id": "http://vocab.getty.edu/aat/300388277",
+                    "type": "Language",
+                    "_label": "English"
+                }
+            ]
+        }
+    ],
+    "carries": [
+        {
+            "id": "urn:uuid:254e9080-9ee3-3956-8782-92ed6ec201fb",
+            "type": "LinguisticObject",
+            "_label": "Goupil Stock Book 2"
+        }
+    ],
+    "referred_to_by": [
+        {
+            "id": "urn:uuid:75e8a92d-3df2-38cf-858f-94925f4edd47",
+            "type": "LinguisticObject",
+            "_label": "STAR Goupil Database"
+        }
+    ]
+}
