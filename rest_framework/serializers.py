@@ -426,6 +426,12 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
 class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     aliased_data = ResourceAliasedDataSerializer(required=False, allow_null=False)
+    # Until dropping support for Arches 7.6, we need to explicitly set read_only=True
+    principaluser = serializers.PrimaryKeyRelatedField(
+        allow_null=True,
+        required=False,
+        read_only=True,
+    )
 
     class Meta:
         model = SemanticResource
