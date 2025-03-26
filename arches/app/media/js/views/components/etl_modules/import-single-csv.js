@@ -48,7 +48,7 @@ define([
             return "unique_id_" + self.uniqueId;
         });
         this.templates = ko.observableArray(
-            arches.resources.map(resource => ({text: resource.name, id: resource.graphid}))
+            arches.resources.map(resource => ({name: resource.name, id: resource.graphid}))
         );
 
         this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
@@ -67,9 +67,8 @@ define([
             let highestScore = 0;
             if (!!self.headers()) {
                 const header = stringUtils.normalizeText(self.headers()[i]);
-                console.log("qqqqqqaaa333 ",header)
                 if (header == 'resourceid')
-                    return null;
+                    return 'resourceid';
                 self.nodes().forEach(function(node) {
                     
                     if (node.name) {
@@ -120,41 +119,62 @@ define([
             return decodeURIComponent(xsrfCookies[0].split('=')[1]);
         }
 
-        this.downloadTemplate = async() => {
+        this.downloadTemplate = async () => {
             const url = arches.urls.etl_manager;
             const formData = new window.FormData();
+            
+            // Prepare form data
             self.formData.delete("id");
             self.formData.delete("format");
             self.formData.append("id", ko.unwrap(this.selectedTemplate));
             self.formData.append("format", "csv");
-            const response = await window.fetch(url, {
-                method: 'POST',
-                body: self.formData,
-                credentials: 'same-origin',
-                headers: {
-                    "Accept": "application/json",
-                    "X-CSRFToken": getCookie("csrftoken")
-                }
-            });
-            self.submit('csv_label').then(data => {
-                console.log(data.result)
+            
+            try {
+                // Perform the fetch request
+                const response = await window.fetch(url, {
+                    method: 'POST',
+                    body: self.formData,
+                    credentials: 'same-origin',
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                });
+        
+                // If necessary, you can process the response here
+        
+                // Submit and handle the CSV data
+                const data = await self.submit('csv_label');
                 const csvData = data.result;
+                
                 const blob = new Blob([csvData], { type: 'text/csv' });
                 const urlObject = window.URL.createObjectURL(blob);
                 const a = window.document.createElement('a');
+                
+                // Trigger download
                 window.document.body.appendChild(a);
                 a.href = urlObject;
-                a.download = `${this.templates().filter(x => x.id == this.selectedTemplate())[0].text}.csv`;
+                
+                // Find the selected template and assign it to the download name
+                const selectedTemplate = this.templates().find(x => x.id == this.selectedTemplate());
+                if (selectedTemplate) {
+                    a.download = `${selectedTemplate.name}.csv`;
+                } else {
+                    a.download = "defaultTemplate.csv"; // Fallback download name
+                }
+        
                 a.click();
+        
+                // Clean up the object URL
                 setTimeout(() => {
                     window.URL.revokeObjectURL(urlObject);
                     window.document.body.removeChild(a);
                 }, 0);
+        
+            } catch (error) {
+                console.error(error);
+            } finally {
                 this.loading(false);
-                
-            })
-            
-            this.loading(false);
+            }
         };
 
         this.createTableConfig = function(col) {
@@ -265,7 +285,6 @@ define([
                         label: arches.translations.idColumnSelection,
                     });
                     self.nodes(nodes);
-                    console.log("wwww ", self.nodes())
                     self.loading(false);
                 });
             }
