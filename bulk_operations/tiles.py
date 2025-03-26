@@ -10,7 +10,7 @@ from django.utils.translation import gettext as _
 
 from arches import __version__ as arches_version
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import Language, Node, TileModel
+from arches.app.models.models import Language, Node, TileModel, ResourceInstance
 from arches.app.models.tile import Tile, TileValidationError
 
 from arches_querysets.utils import datatype_transforms
@@ -132,7 +132,14 @@ class BulkTileOperation:
         else:
             new_tiles = getattr(aliased_data, grouping_node.alias, NOT_PROVIDED)
         if new_tiles is NOT_PROVIDED:
-            return
+            # Is this grouping node the entry point?
+            if (
+                isinstance(self.entry, SemanticTile)
+                and self.entry.nodegroup_id == grouping_node.pk
+            ):
+                new_tiles = [container]
+            else:
+                return
         if grouping_node.nodegroup.cardinality == "1":
             if new_tiles is None:
                 new_tiles = []
@@ -432,7 +439,10 @@ class BulkTileOperation:
             if self.to_delete:
                 TileModel.objects.filter(pk__in=[t.pk for t in self.to_delete]).delete()
 
-            self.entry.save_without_related_objects(**self.save_kwargs)
+            if isinstance(self.entry, ResourceInstance):
+                self.entry.save_without_related_objects(**self.save_kwargs)
+            else:
+                self.entry.dummy_save(**self.save_kwargs)
 
             for upsert_tile in upserts:
                 if arches_version < "8":

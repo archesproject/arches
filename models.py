@@ -234,6 +234,11 @@ class SemanticTile(TileModel):
     def save_without_related_objects(self, **kwargs):
         return super().save(**kwargs)
 
+    def dummy_save(self, **kwargs):
+        """Don't save this tile, but run any other side effects."""
+        save_kwargs = {**kwargs, "update_fields": set()}
+        return super().save(**save_kwargs)
+
     def _save_aliased_data(self, *, user=None, index=False, **kwargs):
         bulk_operation = BulkTileOperation(entry=self, user=user, save_kwargs=kwargs)
         bulk_operation.run()
