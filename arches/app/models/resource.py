@@ -22,7 +22,7 @@ from time import time
 from uuid import UUID
 from types import SimpleNamespace
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist
@@ -822,7 +822,6 @@ class Resource(models.ResourceInstance):
             start,
             limit,
             resourceinstance_graphid=None,
-            count_only=False,
         ):
             final_query = Q(resourceinstanceidfrom_id=resourceinstanceid) | Q(
                 resourceinstanceidto_id=resourceinstanceid
@@ -836,9 +835,6 @@ class Resource(models.ResourceInstance):
                     resourceinstancefrom_graphid_id=resourceinstance_graphid
                 ) & Q(resourceinstanceto_graphid_id=str(self.graph_id))
                 final_query = final_query & (to_graph_id_filter | from_graph_id_filter)
-
-            if count_only:
-                return models.ResourceXResource.objects.filter(final_query).count()
 
             return (
                 {  # resourceinstance_graphid = "00000000-886a-374a-94a5-984f10715e3a"
@@ -927,16 +923,31 @@ class Resource(models.ResourceInstance):
         if len(instanceids) > 0:
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
+                related_resource_ids = [
+                    resource["_id"]
+                    for resource in related_resources["docs"]
+                    if resource["found"]
+                ]
+                count_query = (
+                    models.ResourceInstance.objects.filter(pk__in=related_resource_ids)
+                    .annotate(
+                        total_relations=(
+                            Count("resxres_resource_instance_ids_from")
+                            + Count("resxres_resource_instance_ids_to")
+                        )
+                    )
+                    .only("pk")
+                )
+                total_relations_by_resource_id = {
+                    obj.pk: obj.total_relations for obj in count_query.iterator()
+                }
+
                 for resource in related_resources["docs"]:
                     if resource["found"]:
                         if include_rr_count:
-                            rel_count = get_relations(
-                                resourceinstanceid=resource["_id"],
-                                start=0,
-                                limit=0,
-                                count_only=True,
+                            resource["_source"]["total_relations"] = (
+                                total_relations_by_resource_id[UUID(resource["_id"])]
                             )
-                            resource["_source"]["total_relations"] = rel_count
                         for descriptor_type in ("displaydescription", "displayname"):
                             descriptor = get_localized_descriptor(
                                 resource, descriptor_type
