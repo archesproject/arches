@@ -488,3 +488,18 @@ class ResourceTests(ArchesTestCase):
 
         # Until 7.4, a RecursionError was caught after this value was repeated many times.
         self.assertEqual(r.displayname(), "test value ")
+
+    @patch("django.contrib.auth.models.User.has_perm")
+    def test_user_can_see_edit_history_if_resource_editor(self, mock_has_perm):
+        user = User.objects.create_user(
+            username="john", email="john@archesproject.org", password="Test12345!"
+        )
+        user.save()
+        group = Group.objects.get(name="Resource Editor")
+        group.user_set.add(user)
+
+        self.client.login(username="john", password="Test12345!")
+        self.client.get(reverse("resource_edit_log", args=[self.test_resource.pk]))
+        mock_has_perm.assert_any_call(
+            "read_nodegroup", self.test_resource.tiles[0].nodegroup
+        )

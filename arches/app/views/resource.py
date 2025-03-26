@@ -653,13 +653,11 @@ class ResourceEditLogView(BaseManagerView):
             permitted_edits = []
             nodegroup_ids_from_edits = [
                 uuid.UUID(nodegroupid) if nodegroupid else nodegroupid
-                for nodegroupid in edits.values_list('nodegroupid', flat=True)
+                for nodegroupid in edits.values_list("nodegroupid", flat=True)
             ]
-            nodegroups_for_edits = (
-                models.NodeGroup.objects
-                .filter(pk__in=nodegroup_ids_from_edits)
-                .in_bulk()
-            )
+            nodegroups_for_edits = models.NodeGroup.objects.filter(
+                pk__in=nodegroup_ids_from_edits
+            ).in_bulk()
             for edit in edits:
                 if edit.nodegroupid is not None:
                     edit_nodegroup = nodegroups_for_edits[uuid.UUID(edit.nodegroupid)]
