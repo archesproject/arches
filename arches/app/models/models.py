@@ -2236,6 +2236,14 @@ class SpatialView(models.Model):
                 "One or more attributenodes do not belong to the graph of the geometry node"
             )
 
+        # check if any attribute nodes are geojson-feature-collection
+        if "geojson-feature-collection" in [
+            graph_nodes.datatype for graph_nodes in found_graph_nodes
+        ]:
+            raise ValidationError(
+                "One or more attributenodes have a geojson-feature-collection datatype"
+            )
+
         # language must be be a valid language code belonging to the current publication
         published_graphs = graph.publication.publishedgraph_set.all()
         if self.language_id not in [
