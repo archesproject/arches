@@ -898,7 +898,9 @@ class Resource(models.ResourceInstance):
 
         # Fetch pref labels for relationship types in bulk.
         relationship_types = {
-            relation["relationshiptype"] for relation in permitted_relation_dicts
+            relation["relationshiptype"]
+            for relation in permitted_relation_dicts
+            if relation["relationshiptype"]
         }
         relationship_type_values = (
             models.Value.objects.filter(
