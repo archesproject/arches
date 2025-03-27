@@ -896,12 +896,12 @@ class Resource(models.ResourceInstance):
                 ret["total"]["value"] -= 1
 
         # Fetch pref labels in bulk.
-        values_from_relations = {
+        valueids_from_relations = {
             relation["relationshiptype"] for relation in permitted_relation_dicts
         }
         values = (
             models.Value.objects.filter(
-                value__in=values_from_relations,
+                pk__in=valueids_from_relations,
             )
             .select_related("concept")
             .prefetch_related(
@@ -915,8 +915,8 @@ class Resource(models.ResourceInstance):
             )
         )
         preflabel_lookup = {
-            value.value: (
-                value.concept.pref_labels_in_lang[0]
+            str(value.pk): (
+                value.concept.pref_labels_in_lang[0].value
                 if value.concept.pref_labels_in_lang
                 else ""
             )

@@ -20,7 +20,7 @@ from unittest.mock import MagicMock, patch
 from arches.app.views.resource import ResourcePermissionDataView
 from tests.base_test import ArchesTestCase
 from django.urls import reverse
-from arches.app.models.models import EditLog, ResourceInstance
+from arches.app.models.models import Concept, EditLog, ResourceInstance, Value
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from tests.utils.search_test_utils import sync_es
@@ -351,7 +351,7 @@ class CommandLineTests(ArchesTestCase):
         ]
         reference_tile.save()
         sync_es(se)
-        ret = reference_resource.get_related_resources(user=user)
+        ret = reference_resource.get_related_resources(user=user, lang="en")
         relationship = ret["resource_relationships"][0]["relationshiptype_label"]
         self.assertEqual(relationship, en_preflabel)
 
