@@ -713,6 +713,14 @@ class DateDataType(BaseDataType):
                     pass
         return valid_date_format, valid
 
+    def set_timezone(self, value):
+        try:
+            value = value.astimezone()
+        except:
+            # The .astimezone function throws an error on Windows for dates before 1970
+            value = self.backup_astimezone(value)
+        return value.isoformat(timespec="milliseconds")
+
     def transform_value_for_tile(self, value, **kwargs):
         value = None if value == "" else value
         if value is not None:
@@ -722,18 +730,14 @@ class DateDataType(BaseDataType):
                 type(value) == str and len(value) < 4 and value.startswith("-") is False
             ):  # a year before 1000 but not BCE
                 value = value.zfill(4)
-            valid_date_format, valid = self.get_valid_date_format(value)
-            if valid:
-                v = datetime.strptime(value, valid_date_format)
-            else:
-                v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
-            # The .astimezone() function throws an error on Windows for dates before 1970
-            try:
-                v = v.astimezone()
-            except:
-                v = self.backup_astimezone(v)
-            value = v.isoformat(timespec="milliseconds")
-        return value
+            if type(value) == str:
+                valid_date_format, valid = self.get_valid_date_format(value)
+                if valid:
+                    value = datetime.strptime(value, valid_date_format)
+                else:
+                    value = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+
+        return self.set_timezone(value)
 
     def backup_astimezone(self, dt):
         def same_calendar(year):
