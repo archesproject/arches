@@ -22,7 +22,7 @@ from time import time
 from uuid import UUID
 from types import SimpleNamespace
 from django.db import transaction
-from django.db.models import Count, Q
+from django.db.models import Count, Prefetch, Q
 from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist
@@ -31,7 +31,6 @@ from django.utils.translation import get_language
 from arches.app.models import models
 from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
-from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.system_settings import settings
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import TERMS_INDEX, RESOURCES_INDEX
@@ -856,7 +855,6 @@ class Resource(models.ResourceInstance):
 
         ret["total"] = {"value": resource_relations["total"]}
         instanceids = set()
-        preflabel_lookup = dict()
 
         readable_graphids = set(
             permission_backend.get_resource_types_by_perm(
@@ -871,6 +869,7 @@ class Resource(models.ResourceInstance):
             user, se, resources=list(all_resource_ids)
         )
         filtered_instances = filtered_instances if user is not None else []
+        permitted_relation_dicts = []
 
         for relation in resource_relations["relations"]:
             relation = model_to_dict(relation)
@@ -892,30 +891,42 @@ class Resource(models.ResourceInstance):
                 and str(resourceinstanceto_graphid) in readable_graphids
                 and str(resourceinstancefrom_graphid) in readable_graphids
             ):
-                try:
-                    if f'{relation["relationshiptype"]}{lang}' in preflabel_lookup:
-                        preflabel = preflabel_lookup[
-                            f'{relation["relationshiptype"]}{lang}'
-                        ]
-                    else:
-                        preflabel = get_preflabel_from_valueid(
-                            relation["relationshiptype"], lang
-                        )
-                        preflabel_lookup[f'{relation["relationshiptype"]}{lang}'] = (
-                            preflabel
-                        )
-
-                    relation["relationshiptype_label"] = preflabel["value"] or ""
-                except:
-                    relation["relationshiptype_label"] = (
-                        relation["relationshiptype"] or ""
-                    )
-
-                ret["resource_relationships"].append(relation)
-                instanceids.add(str(resourceid_to))
-                instanceids.add(str(resourceid_from))
+                permitted_relation_dicts.append(relation)
             else:
                 ret["total"]["value"] -= 1
+
+        # Fetch pref labels in bulk.
+        values_from_relations = {
+            relation["relationshiptype"] for relation in permitted_relation_dicts
+        }
+        values = models.Value.objects.filter(
+            value__in=values_from_relations,
+        ).prefetch_related(
+            Prefetch(
+                "concept__value_set",
+                queryset=models.Value.objects.filter(
+                    valuetype="prefLabel", language=lang
+                ),
+                to_attr="pref_labels_in_lang",
+            ),
+        )
+        preflabel_lookup = {
+            value.value: (
+                value.concept.pref_labels_in_lang[0]
+                if value.concept.pref_labels_in_lang
+                else ""
+            )
+            for value in values
+        }
+
+        for relation in permitted_relation_dicts:
+            relation["relationshiptype_label"] = preflabel_lookup.get(
+                relation["relationshiptype"], relation["relationshiptype"] or ""
+            )
+
+            ret["resource_relationships"].append(relation)
+            instanceids.add(str(resourceid_to))
+            instanceids.add(str(resourceid_from))
 
         if str(self.resourceinstanceid) in instanceids:
             instanceids.remove(str(self.resourceinstanceid))
