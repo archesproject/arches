@@ -289,6 +289,14 @@ class SpatialViewTests(ArchesTestCase):
         with self.assertRaises(Exception):
             spatialview.full_clean()
 
+    def test_spatial_with_geometrynode_in_attributenodes(self):
+        spatialview = self.generate_valid_spatiatview()
+        spatialview.attributenodes.append(
+            {"nodeid": self.spatialview_geometrynode_id, "description": "Geometry Node"}
+        )
+        with self.assertRaises(Exception):
+            spatialview.full_clean()
+
 
 class SpatialViewTriggerTests(TransactionTestCase):
 
