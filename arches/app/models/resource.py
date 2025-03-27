@@ -899,16 +899,20 @@ class Resource(models.ResourceInstance):
         values_from_relations = {
             relation["relationshiptype"] for relation in permitted_relation_dicts
         }
-        values = models.Value.objects.filter(
-            value__in=values_from_relations,
-        ).prefetch_related(
-            Prefetch(
-                "concept__value_set",
-                queryset=models.Value.objects.filter(
-                    valuetype="prefLabel", language=lang
+        values = (
+            models.Value.objects.filter(
+                value__in=values_from_relations,
+            )
+            .select_related("concept")
+            .prefetch_related(
+                Prefetch(
+                    "concept__value_set",
+                    queryset=models.Value.objects.filter(
+                        valuetype="prefLabel", language=lang
+                    ),
+                    to_attr="pref_labels_in_lang",
                 ),
-                to_attr="pref_labels_in_lang",
-            ),
+            )
         )
         preflabel_lookup = {
             value.value: (
