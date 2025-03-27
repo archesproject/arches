@@ -351,7 +351,7 @@ class CommandLineTests(ArchesTestCase):
         ]
         reference_tile.save()
         sync_es(se)
-        ret = reference_resource.get_related_resources(user=user, lang="en")
+        ret = reference_resource.get_related_resources(user=user)
         relationship = ret["resource_relationships"][0]["relationshiptype_label"]
         self.assertEqual(relationship, en_preflabel)
 

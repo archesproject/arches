@@ -22,7 +22,7 @@ from time import time
 from uuid import UUID
 from types import SimpleNamespace
 from django.db import transaction
-from django.db.models import Count, Prefetch, Q
+from django.db.models import Count, Q
 from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist
@@ -39,6 +39,7 @@ from arches.app.search.es_mapping_modifier import EsMappingModifierFactory
 from arches.app.tasks import index_resource
 from arches.app.utils import import_class_from_string, task_management
 from arches.app.utils import permission_backend
+from arches.app.utils.i18n import rank_label
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 from arches.app.utils.permission_backend import (
@@ -904,20 +905,20 @@ class Resource(models.ResourceInstance):
                 pk__in=valueids_from_relations,
             )
             .select_related("concept")
-            .prefetch_related(
-                Prefetch(
-                    "concept__value_set",
-                    queryset=models.Value.objects.filter(
-                        valuetype="prefLabel", language=lang
-                    ),
-                    to_attr="pref_labels_in_lang",
-                ),
-            )
+            .prefetch_related("concept__value_set")
         )
         preflabel_lookup = {
             str(value.pk): (
-                value.concept.pref_labels_in_lang[0].value
-                if value.concept.pref_labels_in_lang
+                sorted(
+                    value.concept.value_set.all(),
+                    key=lambda label: rank_label(
+                        kind=label.valuetype_id,
+                        source_lang=label.language_id,
+                        target_lang=lang,
+                    ),
+                    reverse=True,
+                )[0].value
+                if value.concept.value_set.all()
                 else ""
             )
             for value in values
