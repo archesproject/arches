@@ -932,8 +932,8 @@ class Resource(models.ResourceInstance):
                     models.ResourceInstance.objects.filter(pk__in=related_resource_ids)
                     .annotate(
                         total_relations=(
-                            Count("resxres_resource_instance_ids_from")
-                            + Count("resxres_resource_instance_ids_to")
+                            Count("resxres_resource_instance_ids_from", distinct=True)
+                            + Count("resxres_resource_instance_ids_to", distinct=True)
                         )
                     )
                     .only("pk")
