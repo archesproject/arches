@@ -660,7 +660,9 @@ class ResourceEditLogView(BaseManagerView):
             ).in_bulk()
             for edit in edits:
                 if edit.nodegroupid is not None:
-                    edit_nodegroup = nodegroups_for_edits[uuid.UUID(edit.nodegroupid)]
+                    edit_nodegroup = nodegroups_for_edits.get(
+                        uuid.UUID(edit.nodegroupid)
+                    )
                     if request.user.has_perm("read_nodegroup", edit_nodegroup):
                         if edit.newvalue is not None:
                             self.getEditConceptValue(edit.newvalue)
