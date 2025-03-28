@@ -22,7 +22,7 @@ from time import time
 from uuid import UUID
 from types import SimpleNamespace
 from django.db import transaction
-from django.db.models import Count, Q
+from django.db.models import Count, Prefetch, Q
 from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist
@@ -907,7 +907,14 @@ class Resource(models.ResourceInstance):
                 value__in=relationship_types,
             )
             .select_related("concept")
-            .prefetch_related("concept__value_set")
+            .prefetch_related(
+                Prefetch(
+                    "concept__value_set",
+                    # Begin with an order, so that if rank_label()
+                    # produces ties, we still have a deterministic result.
+                    queryset=models.Value.objects.order_by("pk"),
+                ),
+            )
         )
         preflabel_lookup = {
             str(rel_type.pk): (
