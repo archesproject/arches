@@ -1,3 +1,4 @@
+import uuid
 from collections import defaultdict
 from functools import partial
 from itertools import chain, zip_longest
@@ -36,6 +37,7 @@ class BulkTileOperation:
         self.dummy_request = HttpRequest()
         self.dummy_request.user = user
         self.save_kwargs = save_kwargs or {}
+        self.transaction_id = uuid.uuid4()
 
         if isinstance(entry, TileModel):
             self.resourceid = self.entry.resourceinstance_id
@@ -469,7 +471,7 @@ class BulkTileOperation:
                     new_value=insert_proxy.data,
                     newprovisionalvalue=insert_proxy._newprovisionalvalue,
                     provisional_edit_log_details=insert_proxy._provisional_edit_log_details,
-                    transaction_id=None,
+                    transaction_id=self.transaction_id,
                     # TODO: get this information upstream somewhere.
                     new_resource_created=False,
                     note=None,
@@ -483,7 +485,7 @@ class BulkTileOperation:
                     newprovisionalvalue=update_proxy._newprovisionalvalue,
                     oldprovisionalvalue=update_proxy._oldprovisionalvalue,
                     provisional_edit_log_details=update_proxy._provisional_edit_log_details,
-                    transaction_id=None,
+                    transaction_id=self.transaction_id,
                 )
             for delete_proxy in delete_proxies:
                 delete_proxy.save_edit(
@@ -491,5 +493,5 @@ class BulkTileOperation:
                     edit_type="tile delete",
                     old_value=update_proxy._existing_data,
                     provisional_edit_log_details=None,
-                    transaction_id=None,
+                    transaction_id=self.transaction_id,
                 )

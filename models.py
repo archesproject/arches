@@ -80,18 +80,20 @@ class SemanticResource(ResourceInstance):
             as_representation=as_representation,
         )
 
-    def save_edit(self, user=None):
+    def save_edit(self, user=None, transaction_id=None):
         """Intended to replace proxy model method eventually."""
         if self._state.adding:
             edit_type = "create"
         else:
-            edit_type = "update"
+            return
 
         # Until save_edit() is a static method, work around it.
         ephemeral_proxy_instance = Resource()
         ephemeral_proxy_instance.graphid = self.graph_id
         ephemeral_proxy_instance.resourceinstanceid = str(self.pk)
-        ephemeral_proxy_instance.save_edit(user=user, edit_type=edit_type)
+        ephemeral_proxy_instance.save_edit(
+            user=user, edit_type=edit_type, transaction_id=transaction_id
+        )
 
     def save(self, index=False, user=None, **kwargs):
         with transaction.atomic():
@@ -99,7 +101,6 @@ class SemanticResource(ResourceInstance):
             # into save() will run a sanity check on unsaved relations.
             super().save(update_fields=set())
             self._save_aliased_data(user=user, index=index, **kwargs)
-            self.save_edit(user=user)
 
     def clean(self):
         """Raises a compound ValidationError with any failing tile values."""
@@ -132,6 +133,8 @@ class SemanticResource(ResourceInstance):
         proxy_resource.save_descriptors()
         if index:
             proxy_resource.index()
+
+        self.save_edit(user=user, transaction_id=bulk_operation.transaction_id)
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None):
         if from_queryset is None and (
