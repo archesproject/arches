@@ -37,7 +37,7 @@ from pyld.jsonld import compact, JsonLdError
 from django.db.models.base import Deferred
 from django.utils import translation
 from guardian.models import GroupObjectPermission, UserObjectPermission
-
+from slugify import slugify
 
 logger = logging.getLogger(__name__)
 
@@ -291,9 +291,41 @@ class Graph(models.GraphModel):
         self.populate_null_nodegroups()
 
     @staticmethod
-    def new(name="", is_resource=False, author=""):
+    def new(name="", slug="", is_resource=False, author=""):
+        def make_name_unique(name, names_to_check, suffix_delimiter="_"):
+            """
+            Makes a name unique among a list of names
+
+            Arguments:
+            name -- the name to check and modfiy to make unique in the list of "names_to_check"
+            names_to_check -- a list of names that "name" should be unique among
+            """
+
+            i = 1
+            temp_node_name = name
+            while temp_node_name in names_to_check:
+                temp_node_name = "{0}{1}{2}".format(name, suffix_delimiter, i)
+                i += 1
+            return temp_node_name
+        def get_slug(name, is_resource):
+            if name:
+                slug = slugify(name, separator="_")
+            else:
+                if is_resource:
+                    slug = "new_resource_model"
+                else:
+                    # what do we do if it is branch?
+                    # the graph designer for branch does not have a slug entry
+                    slug = "new_branch"
+            existing_slugs = models.GraphModel.objects.all().values_list("slug", flat=True)
+            slug = make_name_unique(slug, existing_slugs, "_")
+
+            return slug
+
         newid = uuid.uuid1()
         nodegroup = None
+        if not slug:
+            slug = get_slug(name, is_resource)
         graph_model = models.GraphModel.objects.create(
             name=name,
             subtitle="",
@@ -303,7 +335,7 @@ class Graph(models.GraphModel):
             isresource=is_resource,
             iconclass="",
             ontology=None,
-            slug=None,
+            slug=slug,
         )
         if not is_resource:
             nodegroup = models.NodeGroup.objects.create(pk=newid)
@@ -2371,7 +2403,7 @@ class Graph(models.GraphModel):
                 _("The json-ld context you supplied wasn't formatted correctly."), 1006
             )
 
-        if self.slug is not None:
+        if self.slug:
             graphs_with_matching_slug = (
                 models.GraphModel.objects.exclude(slug__isnull=True)
                 .exclude(source_identifier__isnull=False)
@@ -2390,6 +2422,10 @@ class Graph(models.GraphModel):
                         ).format(slug=self.slug),
                         1007,
                     )
+        else:
+            raise GraphValidationError(
+                _("You must supply a slug for your graph."), 1005
+            )
 
     def update_published_graphs(self, user=None, notes=None):
         """
