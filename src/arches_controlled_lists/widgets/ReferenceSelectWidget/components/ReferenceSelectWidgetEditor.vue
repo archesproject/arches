@@ -21,6 +21,7 @@ const props = defineProps<{
         placeholder: string;
         controlledList: string;
         multiValue: boolean;
+        defaultValue: ReferenceSelectFetchedOption[] | undefined;
     };
     nodeAlias: string;
     graphSlug: string;
@@ -61,20 +62,32 @@ const optionsError = ref<string | null>(null);
 const expandedKeys: Ref<TreeExpandedKeys> = ref({});
 
 const initialVal = toRef(
-    props.configuration.multiValue
-        ? props.initialValue?.map((reference) => extractInitialValue(reference))
-        : extractInitialValue(
-              props.initialValue ? props.initialValue[0] : undefined,
-          ),
+    extractInitialOrDefaultValue(
+        props.configuration.multiValue,
+        props.initialValue,
+        props.configuration.defaultValue,
+    ),
 );
 
-function extractInitialValue(
-    initialValue: ReferenceSelectFetchedOption | undefined,
+function extractInitialOrDefaultValue(
+    multiVal: boolean,
+    initialVal: ReferenceSelectFetchedOption[] | undefined,
+    defaultVal: ReferenceSelectFetchedOption[] | undefined,
 ) {
-    if (!initialValue) {
+    return multiVal
+        ? initialVal
+            ? initialVal?.map((reference) => formatValForPrimevue(reference))
+            : defaultVal?.map((reference) => formatValForPrimevue(reference))
+        : initialVal
+          ? formatValForPrimevue(initialVal ? initialVal[0] : undefined)
+          : formatValForPrimevue(defaultVal ? defaultVal[0] : undefined);
+}
+
+function formatValForPrimevue(val: ReferenceSelectFetchedOption | undefined) {
+    if (!val) {
         return undefined;
     }
-    return { [initialValue?.list_item_id]: true };
+    return { [val?.list_item_id]: true };
 }
 
 function optionAsNode(
@@ -144,7 +157,14 @@ function validate(e: FormFieldResolverOptions) {
 }
 
 onMounted(() => {
-    options.value = optionsAsNodes(props.initialValue ? props.initialValue : []);
+    options.value = [
+        ...optionsAsNodes(props.initialValue ? props.initialValue : []),
+        ...optionsAsNodes(
+            props.configuration.defaultValue
+                ? props.configuration.defaultValue
+                : [],
+        ),
+    ];
 });
 </script>
 
