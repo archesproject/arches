@@ -264,7 +264,11 @@ class GraphDesignerView(GraphBaseView):
 
         if not settings.OVERRIDE_RESOURCE_MODEL_LOCK:
             restricted_nodegroups = models.NodeGroup.objects.filter(
-                Exists(models.TileModel.objects.filter(nodegroup=OuterRef("pk")))
+                Exists(models.TileModel.objects.filter(nodegroup=OuterRef("pk"))),
+                pk__in=[
+                    nodegroup_dict["nodegroupid"]
+                    for nodegroup_dict in serialized_graph["nodegroups"]
+                ],
             )
         else:
             restricted_nodegroups = models.NodeGroup.objects.none()
