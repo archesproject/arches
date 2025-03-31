@@ -325,7 +325,6 @@ class CommandLineTests(ArchesTestCase):
     def test_get_related_resource(self):
         se = SearchEngineFactory().create()
         user = User.objects.get(username="admin")
-        is_related_to_valueid = "ac41d9be-79db-4256-b368-2f4559cfbe55"
         en_preflabel = "is related to"
         person_resourceid = "b6754e7a-7f18-40d1-93fe-61763d37d55e"
         person_resource = Resource(
@@ -344,8 +343,8 @@ class CommandLineTests(ArchesTestCase):
         reference_tile.data[self.reference_nodeid] = [
             {
                 "resourceName": "",
-                "ontologyProperty": is_related_to_valueid,
-                "inverseOntologyProperty": is_related_to_valueid,
+                "ontologyProperty": en_preflabel,
+                "inverseOntologyProperty": en_preflabel,
                 "resourceId": person_resourceid,
             }
         ]
