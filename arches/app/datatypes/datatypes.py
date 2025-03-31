@@ -12,7 +12,7 @@ import os
 from pathlib import Path
 import ast
 import time
-from datetime import datetime
+from datetime import date, datetime
 from mimetypes import MimeTypes
 
 from django.core.files.images import get_image_dimensions
@@ -735,6 +735,8 @@ class DateDataType(BaseDataType):
                     value = datetime.strptime(value, valid_date_format)
                 else:
                     value = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+            if isinstance(value, date):
+                value = datetime(value.year, value.month, value.day)
 
         return self.set_timezone(value)
 
