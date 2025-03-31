@@ -11,10 +11,11 @@ from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import connection
 from django.db.models.functions import Lower
+from django.db.models import Subquery
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import ETLModule, GraphModel, Node, NodeGroup
+from arches.app.models.models import ETLModule, GraphModel, Node, NodeGroup, LoadStaging, TileModel
 from arches.app.models.system_settings import settings
 import arches.app.tasks as tasks
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -354,6 +355,15 @@ class ImportSingleCsv(BaseImportModule):
                 )
             self.loadid = loadid  # currently redundant, but be certain
             response = save_to_tiles(userid, loadid)
+            subquery = LoadStaging.objects.filter(load_event=loadid).values('resourceid')[:1]
+            tiles_data = TileModel.objects.filter(resourceinstance=Subquery(subquery)).values('nodegroup', 'parenttile', 'tileid')
+            listNodegroupParent=[]
+            
+            for row in tiles_data:
+                
+                count = listNodegroupParent.count([row['nodegroup'],str(row['parenttile'])])
+                TileModel.objects.filter(tileid=str(row['tileid'])).update(sortorder=count)
+                listNodegroupParent.append([row['nodegroup'], str(row['parenttile'])])
             with connection.cursor() as cursor:
                 cursor.execute(
                     """CALL __arches_update_resource_x_resource_with_graphids();"""
