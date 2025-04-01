@@ -36,6 +36,7 @@ class SemanticTileQuerySet(models.QuerySet):
         self._as_representation = False
         self._queried_nodes = []
         self._fetched_graph_nodes = []
+        self._entry_node = None
 
     def with_node_values(
         self,
@@ -46,6 +47,7 @@ class SemanticTileQuerySet(models.QuerySet):
         as_representation=False,
         allow_empty=False,
         depth=20,
+        entry_node=None,
     ):
         """
         Entry point for filtering arches data by nodegroups (instead of grouping by
@@ -92,6 +94,7 @@ class SemanticTileQuerySet(models.QuerySet):
 
         self._fetched_graph_nodes = nodes  # (partial) graph below entry point
         self._queried_nodes = [n for n in nodes if n.alias in node_alias_annotations]
+        self._entry_node = entry_node
 
         qs = self
         qs = qs.filter(nodegroup_id__in={n.nodegroup_id for n in nodes})
@@ -186,6 +189,7 @@ class SemanticTileQuerySet(models.QuerySet):
         clone = super()._clone()
         clone._queried_nodes = self._queried_nodes
         clone._fetched_graph_nodes = self._fetched_graph_nodes
+        clone._entry_node = self._entry_node
         clone._as_representation = self._as_representation
         return clone
 

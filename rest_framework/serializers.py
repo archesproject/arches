@@ -110,6 +110,10 @@ class NodeFetcherMixin:
             )
         )
 
+    @property
+    def nodegroup_alias(self):
+        return self.context.get("nodegroup_alias")
+
 
 class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
     class Meta:
@@ -390,7 +394,6 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     def __init__(self, instance=None, data=empty, **kwargs):
         self._graph_nodes = kwargs.pop("graph_nodes", [])
         super().__init__(instance, data, **kwargs)
-        self._root_node = None
         self._child_nodegroup_aliases = []
 
     def get_default_field_names(self, declared_fields, model_info):
@@ -404,13 +407,13 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     def create(self, validated_data):
         options = self.__class__.Meta
         qs = options.model.as_nodegroup(
-            self._root_node.alias,
+            self.nodegroup_alias,
             graph_slug=self.graph_slug,
             only=None if options.fields == "__all__" else options.fields,
             as_representation=True,
             allow_empty=True,
         )
-        validated_data["nodegroup_id"] = self._root_node.nodegroup_id
+        validated_data["nodegroup_id"] = qs._entry_node.nodegroup_id
         if validated_data.get("sortorder") is None:
             # Use a dummy instance to avoid save() and signals.
             dummy_instance = options.model(**validated_data)

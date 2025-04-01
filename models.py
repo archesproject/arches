@@ -223,7 +223,9 @@ class SemanticTile(TileModel):
             only=filtered_only,
             as_representation=as_representation,
             allow_empty=allow_empty,
+            entry_node=entry_node,
         ).annotate(_nodegroup_alias=models.Value(entry_node_alias))
+        # TODO: determine if this annotation still needed / remove
 
     def save(self, index=False, user=None, **kwargs):
         with transaction.atomic():

@@ -49,8 +49,12 @@ def generate_node_alias_expressions(nodes, *, defer, only, model):
 
 def pop_arches_model_kwargs(kwargs, model_fields):
     arches_model_data = {}
+    # Combine these sets to get both "nodegroup" and "nodegroup_id"
+    model_field_names = {f.name for f in model_fields} | {
+        getattr(f, "attname", None) for f in model_fields
+    }
     for kwarg, value in kwargs.items():
-        if kwarg not in model_fields:
+        if kwarg not in model_field_names:
             arches_model_data[kwarg] = value
     without_model_data = {k: v for k, v in kwargs.items() if k not in arches_model_data}
     return arches_model_data, without_model_data

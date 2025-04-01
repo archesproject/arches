@@ -145,7 +145,8 @@ class BulkTileOperation:
         if grouping_node.nodegroup.cardinality == "1":
             if new_tiles is None:
                 new_tiles = []
-            else:
+            elif not isinstance(new_tiles, list):
+                # TODO: ensure this line is even reachable now.
                 new_tiles = [new_tiles]
         if all(isinstance(tile, TileModel) for tile in new_tiles):
             new_tiles.sort(key=attrgetter("sortorder"))
@@ -359,7 +360,7 @@ class BulkTileOperation:
         insert_proxies = [
             # TODO: make readable.
             Tile(
-                **(pop_arches_model_kwargs(vars(insert), self._meta.get_fields())[1]),
+                **(pop_arches_model_kwargs(vars(insert), Tile._meta.get_fields())[1]),
             )
             for insert in self.to_insert
         ]
