@@ -62,10 +62,8 @@ provide(systemLanguageKey, systemLanguage);
     </div>
     <Toast
         :pt="{
-            summary: { fontSize: 'medium' },
-            detail: { fontSize: 'small' },
             messageIcon: {
-                style: { marginTop: 'var(--p-toast-message-icon-margin-top)' },
+                style: { marginTop: 'var(--p-toast-text-gap)' },
             },
         }"
     />

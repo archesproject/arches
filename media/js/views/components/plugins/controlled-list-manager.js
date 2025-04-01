@@ -26,6 +26,10 @@ const ControlledListsPreset = definePreset(ArchesPreset, {
                 },
             },
         },
+        toast: {
+            summary: { fontSize: '1.5rem' },
+            detail: { fontSize: '1.25rem' },
+        },
     },
 });
 
