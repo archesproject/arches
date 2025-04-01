@@ -226,6 +226,22 @@ class ReferenceDataType(BaseDataType):
                         labels.append(label.get("value", ""))
         return ", ".join(labels)
 
+    def build_dropdown_option(self, default_tile_value):
+        """
+        Expects tile representation of reference datatype:
+        [{"uri": "", "labels": [{"id": "uuid", "value": "label", "language_id": "en", "valuetype_id": "prefLabel", "list_item_id": "uuid"}], "list_id": "uuid"}]
+        """
+        list_item_ids = []
+        if default_tile_value:
+            for default_val in default_tile_value:
+                list_item_ids.append(default_val["labels"][0]["list_item_id"])
+        else:
+            return None
+        items = ListItem.objects.filter(id__in=list_item_ids)
+        transformed_items = [item.build_select_option() for item in items]
+
+        return transformed_items
+
     def collects_multiple_values(self):
         return True
 
