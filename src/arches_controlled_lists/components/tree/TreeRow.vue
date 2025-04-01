@@ -34,7 +34,7 @@ import {
 } from "@/arches_controlled_lists/utils.ts";
 import MoveRow from "@/arches_controlled_lists/components/tree/MoveRow.vue";
 
-import type { Ref } from "vue";
+import type { ComponentPublicInstance, Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree";
 import type { TreeNode } from "primevue/treenode";
 import type { Language } from "@/arches_vue_utils/types";
@@ -86,8 +86,8 @@ const { setDisplayedRow }: { setDisplayedRow: RowSetter } =
 const awaitingMove = ref(false);
 // Workaround for autofocusing the new list/label input boxes
 // https://github.com/primefaces/primevue/issues/2397
-const newListInput = useTemplateRef("newListInput");
-const newLabelInput = useTemplateRef("newLabelInput");
+const newListInput = useTemplateRef<ComponentPublicInstance>("newListInput");
+const newLabelInput = useTemplateRef<ComponentPublicInstance>("newLabelInput");
 watch(newLabelInput, () => {
     if (newLabelInput.value) {
         newLabelInput.value.$el.focus();

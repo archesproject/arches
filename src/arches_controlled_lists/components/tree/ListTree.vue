@@ -16,7 +16,7 @@ import { findNodeInTree, nodeIsList } from "@/arches_controlled_lists/utils.ts";
 import ListTreeControls from "@/arches_controlled_lists/components/tree/ListTreeControls.vue";
 import TreeRow from "@/arches_controlled_lists/components/tree/TreeRow.vue";
 
-import type { Ref } from "vue";
+import type { ComponentPublicInstance, Ref } from "vue";
 import type { RouteLocationNormalizedLoadedGeneric } from "vue-router";
 import type { TreePassThroughMethodOptions } from "primevue/tree";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree";
@@ -49,7 +49,7 @@ const movingItem: Ref<TreeNode | undefined> = ref();
 const isMultiSelecting = ref(false);
 const refetcher = ref(0);
 const filterValue = ref("");
-const treeComponent = useTemplateRef("treeComponent");
+const treeComponent = useTemplateRef<ComponentPublicInstance>("treeComponent");
 
 // For next new item's pref label (input textbox)
 const newLabelFormValue = ref("");
