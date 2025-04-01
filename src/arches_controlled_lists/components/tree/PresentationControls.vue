@@ -84,6 +84,7 @@ const { $gettext } = useGettext();
 .secondary-button {
     height: 3rem;
     margin: 0.5rem;
+    font-size: smaller;
 }
 
 .language-select {

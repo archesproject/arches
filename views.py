@@ -6,7 +6,6 @@ from django.db import transaction
 from django.db.models import Max
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
-from django.views.generic import View
 
 from arches.app.models.utils import field_names
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
@@ -28,32 +27,23 @@ from arches_controlled_lists.models import (
 def _prefetch_terms(request):
     """Children at arbitrary depth will still be returned, but tell
     the ORM to prefetch a certain depth to mitigate N+1 queries after."""
-    find_children = not str_to_bool(request.GET.get("flat", "false"))
+    flat = str_to_bool(request.GET.get("flat", "false"))
 
     # Raising the prefetch depth will only save queries, never cause more.
     # Might add slight python overhead? ~12-14 is enough for Getty AAT.
-    prefetch_depth = 14
+    # https://forum.djangoproject.com/t/prefetching-relations-to-arbitrary-depth/39328
+    prefetch_depth = 1 if flat else 14
 
     terms = []
     for i in range(prefetch_depth):
-        if i == 0:
-            terms.extend(
-                [
-                    "list_items",
-                    "list_items__list_item_values",
-                    "list_items__list_item_images",
-                    "list_items__list_item_images__list_item_image_metadata",
-                ]
-            )
-        elif find_children:
-            terms.extend(
-                [
-                    f"list_items{'__children' * i}",
-                    f"list_items{'__children' * i}__list_item_values",
-                    f"list_items{'__children' * i}__list_item_images",
-                    f"list_items{'__children' * i}__list_item_images__list_item_image_metadata",
-                ]
-            )
+        terms.extend(
+            [
+                f"list_items{'__children' * i}",
+                f"list_items{'__children' * i}__list_item_values",
+                f"list_items{'__children' * i}__list_item_images",
+                f"list_items{'__children' * i}__list_item_images__list_item_image_metadata",
+            ]
+        )
     return terms
 
 
