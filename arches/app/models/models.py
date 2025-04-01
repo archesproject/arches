@@ -21,8 +21,8 @@ from django.utils.translation import gettext_lazy as _
 
 from arches.app.const import ExtensionType
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
-from arches.app.models.functions import UUID4
 from arches.app.models.mixins import SaveSupportsBlindOverwriteMixin
+from arches.app.models.query_expressions import UUID4
 from arches.app.models.utils import add_to_update_fields
 from arches.app.utils import import_class_from_string
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -2191,7 +2191,10 @@ class SpatialView(models.Model):
         Node,
         on_delete=models.CASCADE,
         db_column="geometrynodeid",
-        limit_choices_to={"datatype": "geojson-feature-collection"},
+        limit_choices_to={
+            "datatype": "geojson-feature-collection",
+            "source_identifier__isnull": True,
+        },
         null=False,
     )
     ismixedgeometrytypes = models.BooleanField(default=False)
@@ -2218,7 +2221,10 @@ class SpatialView(models.Model):
         """
         Validate the spatial view before saving it to the database as the database triggers have proved hard to test.
         """
+        if not self.geometrynode_id:
+            return
         graph = self.geometrynode.graph
+
         try:
             node_ids = set(node["nodeid"] for node in self.attributenodes)
         except (KeyError, TypeError):
@@ -2228,6 +2234,14 @@ class SpatialView(models.Model):
         if len(node_ids) != found_graph_nodes.count():
             raise ValidationError(
                 "One or more attributenodes do not belong to the graph of the geometry node"
+            )
+
+        # check if any attribute nodes are geojson-feature-collection
+        if "geojson-feature-collection" in [
+            graph_nodes.datatype for graph_nodes in found_graph_nodes
+        ]:
+            raise ValidationError(
+                "One or more attributenodes have a geojson-feature-collection datatype"
             )
 
         # language must be be a valid language code belonging to the current publication

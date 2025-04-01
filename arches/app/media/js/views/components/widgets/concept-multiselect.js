@@ -1,26 +1,25 @@
-define([
-    'knockout',
-    'viewmodels/concept-select',
-    'templates/views/components/widgets/concept-select.htm',
-    'bindings/select2-query',
-], function(ko, ConceptSelectViewModel, conceptMultiselectTemplate) {
-    const viewModel = function(params) {
-        params.multiple = true;
-        params.configKeys = ['defaultValue'];
+import ko from 'knockout';
+import ConceptSelectViewModel from 'viewmodels/concept-select';
+import conceptMultiselectTemplate from 'templates/views/components/widgets/concept-select.htm';
+import 'bindings/select2-query';
 
-         
-        ConceptSelectViewModel.apply(this, [params]);
 
-        var defaultValue = ko.unwrap(this.defaultValue);
-        var self = this;
+const viewModel = function(params) {
+    params.multiple = true;
+    params.configKeys = ['defaultValue'];
 
-        if (self.configForm){
-            self.select2Config.value = self.defaultValue;
-        }
-    };
+        
+    ConceptSelectViewModel.apply(this, [params]);
 
-    return ko.components.register('concept-multiselect-widget', {
-        viewModel: viewModel,
-        template: conceptMultiselectTemplate,
-    });
+    var defaultValue = ko.unwrap(this.defaultValue);
+    var self = this;
+
+    if (self.configForm){
+        self.select2Config.value = self.defaultValue;
+    }
+};
+
+export default ko.components.register('concept-multiselect-widget', {
+    viewModel: viewModel,
+    template: conceptMultiselectTemplate,
 });

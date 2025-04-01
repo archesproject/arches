@@ -18,6 +18,10 @@ class Command(BaseCommand):  # pragma: no cover
             "This operation will upgrade your project to version 8.0\n"
             "This will replace the following files in your project:\n"
             "  - .github/workflows/main.yml\n"
+            "  - webpack/webpack-utils/build-filepath-lookup.js\n"
+            "  - webpack/webpack.common.js\n"
+            "  - webpack/webpack.config.dev.js\n"
+            "  - webpack/webpack.config.prod.js\n"
             "Continue? "
         )
 
@@ -27,6 +31,21 @@ class Command(BaseCommand):  # pragma: no cover
             self.stdout.write("Operation aborted.")
 
     def update_to_v8(self):
+        # Updates webpack config files
+        if os.path.isdir(os.path.join(settings.APP_ROOT, "..", "webpack")):
+            self.stdout.write("Removing previous webpack directory...")
+            shutil.rmtree(
+                os.path.join(settings.APP_ROOT, "..", "webpack"), ignore_errors=True
+            )
+            self.stdout.write("Done!")
+
+        self.stdout.write("Creating updated webpack directory at project root...")
+        shutil.copytree(
+            os.path.join(settings.ROOT_DIR, "install", "arches-templates", "webpack"),
+            os.path.join(settings.APP_ROOT, "..", "webpack"),
+        )
+        self.stdout.write("Done!")
+
         # Updates github workflows
         self.stdout.write("Copying .github/workflows/main.yml directory to project...")
 

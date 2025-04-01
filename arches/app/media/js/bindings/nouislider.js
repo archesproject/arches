@@ -1,41 +1,40 @@
-define([
-    'jquery',
-    'knockout',
-    'noUiSlider'
-], function($, ko, noUiSlider) {
-    ko.bindingHandlers.noUiSlider = {
-        init: function(element, valueAccessor) {
-            var options = ko.unwrap(valueAccessor());
-            var values = [];
-            var sliding = false;
-            var updateValues = function() {
-                if (!sliding) {
-                    slider.set(values.map(function(value) {
-                        return value();
-                    }));
-                }
-            };
+import ko from 'knockout';
+import noUiSlider from 'nouislider';
 
-            var keys = ['start', 'end'];
-            keys.forEach(function(key) {
-                var value = options[key];
-                if (ko.isObservable(value)) {
-                    value.subscribe(updateValues);
-                    values.push(value);
-                    options[key] = value();
-                }
+ko.bindingHandlers.noUiSlider = {
+    init: function(element, valueAccessor) {
+        var options = ko.unwrap(valueAccessor());
+        var values = [];
+        var sliding = false;
+        var updateValues = function() {
+            if (!sliding) {
+                slider.set(values.map(function(value) {
+                    return value();
+                }));
+            }
+        };
+
+        var keys = ['start', 'end'];
+        keys.forEach(function(key) {
+            var value = options[key];
+            if (ko.isObservable(value)) {
+                value.subscribe(updateValues);
+                values.push(value);
+                options[key] = value();
+            }
+        });
+
+        var slider = noUiSlider.create(element, options);
+
+        element.noUiSlider.on('slide', function(newValues) {
+            sliding = true;
+            values.forEach(function(value, i) {
+                value(newValues[i]);
             });
+            sliding = false;
+        });
+    }
+};
+ko.bindingHandlers.noUiSlider.init = ko.bindingHandlers.noUiSlider.init.bind(ko.bindingHandlers.noUiSlider);
 
-            var slider = noUiSlider.create(element, options);
-
-            element.noUiSlider.on('slide', function(newValues) {
-                sliding = true;
-                values.forEach(function(value, i) {
-                    value(newValues[i]);
-                });
-                sliding = false;
-            });
-        }
-    };
-    return ko.bindingHandlers.noUiSlider;
-});
+export default ko.bindingHandlers.noUiSlider;

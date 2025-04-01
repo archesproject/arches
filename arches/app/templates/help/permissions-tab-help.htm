@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 <!-- this html is included in help-panel-base.htm -->
 <div class="ep-help-content">
     <div>
@@ -34,22 +35,6 @@
             <span class="ep-help-table-header">{% trans "Non-Authenticated Users" %}</span>
             <p>{% blocktrans %}You may notice that by default Arches comes with a "Guest" group, as well as user named "anonymous" who is a member of that group. <strong>Any non-authenticated user is treated as the "anonymous" user.</strong> This means that all permissions applied to the Guest group will be given to anyone who views the website without logging in.{% endblocktrans %}</p>
             
-        </div>
-    </div>
-    
-            <!-- NEED TO UPDATE THE GIF BELOW
-            <div class="col-xs-6">
-                <p><a href="{{ STATIC_URL }}img/help/node-manager.png" target="_blank"><img src="{{ STATIC_URL }}img/help/node-manager.png" style="border: 2px solid #eee"></img></a></p>
-            </div>
-            <p>
-				<a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "add a node and branch to new graph - click to view" %}</a>
-				<span class="ep-help-img-link">
-					<a href="{{ STATIC_URL }}img/help/add-node-to-branch.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
-					</a>
-				</span>
-				<img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/add-node-to-branch.gif"></img>
-			</p>
-            -->
         </div>
     </div>
 </div>

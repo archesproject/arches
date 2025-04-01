@@ -9,19 +9,15 @@ from django.conf import settings
 from django.contrib.staticfiles.finders import AppDirectoriesFinder
 
 
-class ArchesApplicationsStaticFilesFinder(AppDirectoriesFinder):
-    source_dir = "media"
-
-
-class CoreArchesStaticFilesFinderBuildDirectory(AppDirectoriesFinder):
+class StaticFilesFinderBuildDirectory(AppDirectoriesFinder):
     source_dir = os.path.join("app", "media", "build")
 
 
-class CoreArchesStaticFilesFinderMediaRoot(AppDirectoriesFinder):
+class StaticFilesFinderMediaRoot(AppDirectoriesFinder):
     source_dir = os.path.join("app", "media")
 
 
-class CoreArchesStaticFilesFinderNodeModules(AppDirectoriesFinder):
+class StaticFilesFinderNodeModules(AppDirectoriesFinder):
     source_dir = os.path.normpath(os.path.join("..", "node_modules"))
 
 

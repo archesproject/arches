@@ -2,6 +2,7 @@
 {% load static %}
 {% load template_tags %}
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 
 {% block body %}
 
@@ -42,7 +43,7 @@
                     'aria-expanded': navExpanded().toString()
                 }
             ">
-                <img src="{{ STATIC_URL }}img/arches_logo_light.png" class="brand-icon" alt="">
+                <img src="{% webpack_static 'img/landing/arches_logo_light.png' %}" class="brand-icon" alt="">
                 <div class="brand-title">
                     <h1 class="brand-text" style="margin-top: 15px;">{{ app_name }}</h1>
                 </div>
