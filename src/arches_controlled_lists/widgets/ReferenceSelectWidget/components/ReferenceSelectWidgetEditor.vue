@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, toRef, useTemplateRef, watch } from "vue";
+import { onMounted, ref, toRef } from "vue";
 
 import { FormField } from "@primevue/forms";
 import Message from "primevue/message";
@@ -101,8 +101,8 @@ async function getOptions() {
 
 // let timeout: ReturnType<typeof setTimeout>;
 
-function resolver({ values }: FormFieldResolverOptions) {
-    validate(values);
+function resolver({ value }: FormFieldResolverOptions) {
+    validate(value);
     // return new Promise((resolve) => {
     //     if (timeout) clearTimeout(timeout);
 
@@ -112,8 +112,8 @@ function resolver({ values }: FormFieldResolverOptions) {
     // });
     const nodeAlias = props.nodeAlias;
     let selectedItemKeys: string[] = [];
-    if (values) {
-        selectedItemKeys = Object.entries(values).reduce<string[]>(
+    if (value) {
+        selectedItemKeys = Object.entries(value).reduce<string[]>(
             (keys, [key, val]) => {
                 if (val === true) keys.push(key);
                 return keys;
