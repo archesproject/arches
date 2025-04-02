@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from django.db import models, transaction
 from django.db.models.expressions import CombinedExpression
@@ -6,6 +5,7 @@ from django.db.models.fields.json import KT
 from django.db.models.functions import Cast
 from uuid import UUID
 
+from arches import __version__ as arches_version
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.fields.i18n import I18n_JSONField
 from arches.app.models.graph import Graph
@@ -179,7 +179,10 @@ class Command(BaseCommand):
             UUID(graph)
             query = models.Q(graphid=graph)
         except ValueError:
-            query = models.Q(slug=graph, source_identifier__isnull=True)
+            if arches_version >= "8":
+                query = models.Q(slug=graph, source_identifier__isnull=True)
+            else:
+                query = models.Q(slug=graph)
 
         try:
             source_graph = GraphModel.objects.get(query)
@@ -299,7 +302,8 @@ class Command(BaseCommand):
             for node in source_graph.nodes.values():
                 node.refresh_from_db()
 
-            source_graph.create_editable_future_graph()
+            if arches_version >= "8":
+                source_graph.create_draft_graph()
             source_graph.publish(
                 notes="Migrated concept/concept-list nodes to reference datatype"
             )
