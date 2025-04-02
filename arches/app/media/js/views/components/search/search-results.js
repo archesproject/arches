@@ -56,6 +56,22 @@ define([
                 this.restoreState();
 
                 this.mapFilter = this.getFilterByType("map-filter-type", false);
+                //Check if exist the map filter
+                if (this.mapFilter !== null){
+                    this.mapFilter.subscribe(mapFilter => {
+                        if (mapFilter) {
+                            this.mapFilter = mapFilter;
+                        }
+                    }, this);
+                    this.selectedTab.subscribe(function (tab) {
+                        if (tab === "map-filter-type") {
+                            if (ko.unwrap(this.mapFilter.map)) {
+                                this.mapFilter.map().resize();
+                            }
+                        }
+                    }, this);
+                }
+                
                 this.mapFilter.subscribe(mapFilter => {
                     if (mapFilter) {
                         this.mapFilter = mapFilter;
