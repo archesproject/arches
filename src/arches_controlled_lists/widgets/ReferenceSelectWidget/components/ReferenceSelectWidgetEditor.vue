@@ -27,35 +27,6 @@ const props = defineProps<{
     graphSlug: string;
 }>();
 
-const formFieldRef = useTemplateRef("formFieldRef");
-
-// this watcher is necessary to be able to format the value of the form field when the dropdown is updated
-watch(
-    // @ts-expect-error - This is a bug in the PrimeVue types
-    () => formFieldRef.value?.field?.states?.value,
-    (newVal) => {
-        // PrimeVue's v-model for TreeSelect is an obj with the selected items as keys with True as value:
-        // {"list_item_id_1": true, "list_item_id_2": true}
-        if (newVal && typeof newVal === "object") {
-            const selectedItemKeys = Object.entries(newVal).reduce<string[]>(
-                (keys, [key, value]) => {
-                    if (value === true) keys.push(key);
-                    return keys;
-                },
-                [],
-            );
-
-            if (selectedItemKeys.length && !("key" in selectedItemKeys)) {
-                // @ts-expect-error - This is a bug in the PrimeVue types
-                formFieldRef.value!.field.states.value = selectedItemKeys;
-            }
-        } else {
-            // @ts-expect-error - This is a bug in the PrimeVue types
-            formFieldRef.value!.field.states.value = [];
-        }
-    },
-);
-
 const options = ref<ReferenceSelectTreeNode[]>();
 const isLoading = ref(false);
 const optionsError = ref<string | null>(null);
@@ -130,8 +101,8 @@ async function getOptions() {
 
 // let timeout: ReturnType<typeof setTimeout>;
 
-function resolver(e: FormFieldResolverOptions) {
-    validate(e);
+function resolver({ values }: FormFieldResolverOptions) {
+    validate(values);
     // return new Promise((resolve) => {
     //     if (timeout) clearTimeout(timeout);
 
@@ -139,6 +110,20 @@ function resolver(e: FormFieldResolverOptions) {
     //         resolve(validate(e));
     //     }, 500);
     // });
+    const nodeAlias = props.nodeAlias;
+    let selectedItemKeys: string[] = [];
+    if (values) {
+        selectedItemKeys = Object.entries(values).reduce<string[]>(
+            (keys, [key, val]) => {
+                if (val === true) keys.push(key);
+                return keys;
+            },
+            [],
+        );
+    }
+    return {
+        values: { [nodeAlias]: selectedItemKeys },
+    };
 }
 
 function validate(e: FormFieldResolverOptions) {
@@ -177,7 +162,6 @@ onMounted(() => {
     </Message>
     <FormField
         v-else
-        ref="formFieldRef"
         v-slot="$field"
         :name="props.nodeAlias"
         :resolver="resolver"
