@@ -3,8 +3,6 @@ import $ from 'jquery';
 import arches from 'arches';
 import WidgetViewModel from 'viewmodels/widget';
 
-
-export const NAME_LOOKUP = {};
 var ConceptSelectViewModel = function(params) {
     var self = this;
 
