@@ -222,7 +222,8 @@ var ResourceInstanceSelectViewModel = function(params) {
                         if(!val.iconClass) {
                             Object.defineProperty(val, 'iconClass', {value: ko.observable()});
                         }
-                        resourceUtils.lookupResourceInstanceData(ko.unwrap(val.resourceId))
+                        const resourceLookup = {}
+                        resourceUtils.lookupResourceInstanceData(ko.unwrap(val.resourceId, resourceLookup))
                             .then(function(resourceInstance) {
                                 if (resourceInstance) {
                                     names.push(resourceInstance["_source"].displayname);
@@ -523,7 +524,8 @@ var ResourceInstanceSelectViewModel = function(params) {
                         resourceId = ko.unwrap(val.resourceId);
                     }
 
-                    var resourceInstance = resourceUtils.lookupResourceInstanceData(resourceId).then(
+                    const resourceLookup = {};
+                    var resourceInstance = resourceUtils.lookupResourceInstanceData(resourceId, resourceLookup).then(
                         function(resourceInstance) { return resourceInstance; }
                     );
 

@@ -1,5 +1,4 @@
 import arches from 'arches';
-import resourceLookup from 'viewmodels/map'
 
 const resourceUtils = {
     /**
@@ -8,7 +7,7 @@ const resourceUtils = {
      * @param  {resourceid} the id of the Resource Instance
      * @return {object}
      */
-    lookupResourceInstanceData: function(resourceid, usecache=true) {
+    lookupResourceInstanceData: function(resourceid, resourceLookup, usecache=true) {
         if (resourceLookup[resourceid] && usecache) {
             return Promise.resolve(resourceLookup[resourceid]);
         } else {
