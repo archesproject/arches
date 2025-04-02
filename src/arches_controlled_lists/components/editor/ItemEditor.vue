@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, provide } from "vue";
+import { inject, provide, useTemplateRef, watch } from "vue";
 
 import ItemHeader from "@/arches_controlled_lists/components/editor/ItemHeader.vue";
 import ItemImages from "@/arches_controlled_lists/components/editor/ItemImages.vue";
@@ -17,20 +17,56 @@ import {
 import type { Ref } from "vue";
 import type { ControlledListItem } from "@/arches_controlled_lists/types";
 
+const prefLabelEditor = useTemplateRef("prefLabelEditor");
+const altLabelEditor = useTemplateRef("altLabelEditor");
+const noteEditor = useTemplateRef("noteEditor");
+const uriEditor = useTemplateRef("uriEditor");
+const imageEditor = useTemplateRef("imageEditor");
+
 const { displayedRow: item } = inject(displayedRowKey) as unknown as {
     displayedRow: Ref<ControlledListItem>;
 };
 provide(itemKey, item);
+
+const isEditing = inject("isEditing") as Ref<boolean>;
+
+watch(
+    [
+        () => prefLabelEditor.value?.isEditing,
+        () => altLabelEditor.value?.isEditing,
+        () => noteEditor.value?.isEditing,
+        () => uriEditor.value?.isEditing,
+        () => imageEditor.value?.isEditing,
+    ],
+    () => {
+        isEditing.value =
+            prefLabelEditor.value?.isEditing ||
+            altLabelEditor.value?.isEditing ||
+            noteEditor.value?.isEditing ||
+            uriEditor.value?.isEditing ||
+            imageEditor.value?.isEditing ||
+            false;
+    },
+);
 </script>
 
 <template>
     <template v-if="item">
         <ItemHeader />
-        <ValueEditor :value-type="PREF_LABEL" />
-        <ValueEditor :value-type="ALT_LABEL" />
+        <ValueEditor
+            ref="prefLabelEditor"
+            :value-type="PREF_LABEL"
+        />
+        <ValueEditor
+            ref="altLabelEditor"
+            :value-type="ALT_LABEL"
+        />
         <ItemType />
-        <ValueEditor :value-category="NOTE" />
-        <ItemURI />
-        <ItemImages />
+        <ValueEditor
+            ref="noteEditor"
+            :value-category="NOTE"
+        />
+        <ItemURI ref="uriEditor" />
+        <ItemImages ref="imageEditor" />
     </template>
 </template>

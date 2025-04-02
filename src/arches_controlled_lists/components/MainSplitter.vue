@@ -10,7 +10,7 @@ import { routeNames } from "@/arches_controlled_lists/routes.ts";
 import { dataIsList } from "@/arches_controlled_lists/utils.ts";
 import ControlledListSplash from "@/arches_controlled_lists/components/misc/ControlledListSplash.vue";
 import ItemEditor from "@/arches_controlled_lists/components/editor/ItemEditor.vue";
-import ListCharacteristics from "@/arches_controlled_lists/components/editor/ListCharacteristics.vue";
+import ListEditor from "@/arches_controlled_lists/components/editor/ListEditor.vue";
 import ListTree from "@/arches_controlled_lists/components/tree/ListTree.vue";
 
 import type { Ref } from "vue";
@@ -25,7 +25,7 @@ const panel = computed(() => {
         return ControlledListSplash;
     }
     if (dataIsList(displayedRow.value)) {
-        return ListCharacteristics;
+        return ListEditor;
     }
     return ItemEditor;
 });
@@ -56,6 +56,7 @@ const panel = computed(() => {
         >
             <component
                 :is="panel"
+                ref="editor"
                 :key="displayedRow?.id ?? routeNames.splash"
             />
         </SplitterPanel>

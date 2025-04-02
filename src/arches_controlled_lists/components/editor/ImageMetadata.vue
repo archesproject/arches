@@ -73,6 +73,14 @@ const labeledChoices: LabeledChoice[] = [
     },
 ];
 
+const isEditing = computed(() => {
+    return editingRows.value.length > 0;
+});
+
+const inputSelector = computed(() => {
+    return `[data-p-index="${rowIndexToFocus.value}"]`;
+});
+
 const metadataLabel = (metadataType: string) => {
     return labeledChoices.find((choice) => choice.type === metadataType)!.label;
 };
@@ -109,6 +117,7 @@ const saveMetadata = async (event: DataTableRowEditInitEvent) => {
 const issueDeleteMetadata = async (
     metadata: ControlledListItemImageMetadata,
 ) => {
+    makeRowUneditable(metadata.id);
     if (dataIsNew(metadata)) {
         removeImageMetadata(metadata);
         return;
@@ -216,9 +225,11 @@ const setRowFocus = (event: DataTableRowEditInitEvent) => {
     rowIndexToFocus.value = event.index;
 };
 
-const inputSelector = computed(() => {
-    return `[data-p-index="${rowIndexToFocus.value}"]`;
-});
+const makeRowUneditable = (metadataId: string) => {
+    editingRows.value = [
+        ...editingRows.value.filter((metadatum) => metadatum.id !== metadataId),
+    ];
+};
 
 const focusInput = () => {
     // The editor (pencil) button from the DataTable (elsewhere on page)
@@ -235,6 +246,8 @@ const focusInput = () => {
         rowIndexToFocus.value = -1;
     }, 25);
 };
+
+defineExpose({ isEditing });
 </script>
 
 <template>
@@ -247,6 +260,7 @@ const focusInput = () => {
             edit-mode="row"
             striped-rows
             :style="{ fontSize: 'small' }"
+            @row-edit-cancel="(event) => makeRowUneditable(event.data.id)"
             @row-edit-init="setRowFocus"
             @row-edit-save="saveMetadata"
         >

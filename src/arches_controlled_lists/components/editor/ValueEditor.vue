@@ -117,6 +117,10 @@ const headings: Ref<{ heading: string; subheading: string }> = computed(() => {
     }
 });
 
+const isEditing = computed(() => {
+    return editingRows.value.length > 0;
+});
+
 const values = computed(() => {
     if (!item.value) {
         return [];
@@ -167,6 +171,7 @@ const saveValue = async (event: DataTableRowEditInitEvent) => {
 };
 
 const issueDeleteValue = async (value: Value) => {
+    makeRowUneditable(value.id);
     if (dataIsNew(value)) {
         removeItemValue(value);
         return;
@@ -211,6 +216,12 @@ const setRowFocus = (event: DataTableRowEditInitEvent) => {
     rowIndexToFocus.value = event.index;
 };
 
+const makeRowUneditable = (valueId: string) => {
+    editingRows.value = [
+        ...editingRows.value.filter((value) => value.id !== valueId),
+    ];
+};
+
 const makeValueEditable = (clickedValue: Value, index: number) => {
     if (!editingRows.value.includes(clickedValue)) {
         editingRows.value = [...editingRows.value, clickedValue];
@@ -244,6 +255,8 @@ const focusInput = () => {
         rowIndexToFocus.value = -1;
     }, 25);
 };
+
+defineExpose({ isEditing });
 </script>
 
 <template>
@@ -262,6 +275,7 @@ const focusInput = () => {
             striped-rows
             scrollable
             :style="{ fontSize: 'small' }"
+            @row-edit-cancel="(event) => makeRowUneditable(event.data.id)"
             @row-edit-init="setRowFocus"
             @row-edit-save="saveValue"
         >

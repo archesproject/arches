@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import arches from "arches";
 import Cookies from "js-cookie";
-import { inject } from "vue";
+import { computed, inject, useTemplateRef } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import FileUpload from "primevue/fileupload";
@@ -32,10 +32,20 @@ interface FileUploadInternals {
     state: FileUploadState;
 }
 
-const item = inject(itemKey) as Ref<ControlledListItem>;
-
 const { $gettext } = useGettext();
 const toast = useToast();
+
+const item = inject(itemKey) as Ref<ControlledListItem>;
+const editors = useTemplateRef("editors");
+
+const isEditing = computed(() => {
+    return (
+        Boolean(editors.value) &&
+        (editors.value as unknown as (typeof ImageEditor)[]).some(
+            (editor) => editor.isEditing,
+        )
+    );
+});
 
 const addHeader = (event: FileUploadBeforeSendEvent) => {
     const token = Cookies.get("csrftoken");
@@ -62,6 +72,8 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
         detail: JSON.parse(event?.xhr?.responseText ?? "{}").message,
     });
 };
+
+defineExpose({ isEditing });
 </script>
 
 <template>
@@ -99,6 +111,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
         <div class="images">
             <ImageEditor
                 v-for="image in item.images"
+                ref="editors"
                 :key="image.id"
                 :image="image"
             />

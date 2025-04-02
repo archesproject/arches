@@ -1,19 +1,27 @@
 <script setup lang="ts">
 import arches from "arches";
 import { provide, ref } from "vue";
+import { useGettext } from "vue3-gettext";
 import { useRouter } from "vue-router";
 
+import { useConfirm } from "primevue/useconfirm";
 import ConfirmDialog from "primevue/confirmdialog";
 import Toast from "primevue/toast";
 
 import {
+    CONTRAST,
+    DANGER,
+    SECONDARY,
     ENGLISH,
     displayedRowKey,
     selectedLanguageKey,
     systemLanguageKey,
 } from "@/arches_controlled_lists/constants.ts";
 import { routeNames } from "@/arches_controlled_lists/routes.ts";
-import { dataIsList } from "@/arches_controlled_lists/utils.ts";
+import {
+    dataIsList,
+    shouldUseContrast,
+} from "@/arches_controlled_lists/utils.ts";
 
 import ListHeader from "@/arches_controlled_lists/components/misc/ListHeader.vue";
 import MainSplitter from "@/arches_controlled_lists/components/MainSplitter.vue";
@@ -23,9 +31,21 @@ import type { Language } from "@/arches_vue_utils/types";
 import type { Selectable } from "@/arches_controlled_lists/types";
 
 const router = useRouter();
+const confirm = useConfirm();
+const { $gettext } = useGettext();
 
+const isEditing = ref(false);
 const displayedRow: Ref<Selectable | null> = ref(null);
+
 const setDisplayedRow = (val: Selectable | null) => {
+    if (val && isEditing.value) {
+        confirmLeave(val);
+    } else {
+        finishSettingDisplayedRow(val);
+    }
+};
+
+const finishSettingDisplayedRow = (val: Selectable | null) => {
     displayedRow.value = val;
     if (val === null) {
         router.push({ name: routeNames.splash });
@@ -40,8 +60,34 @@ const setDisplayedRow = (val: Selectable | null) => {
         router.push({ name: routeNames.item, params: { id: val.id } });
     }
 };
+
+const confirmLeave = (row: Selectable) => {
+    confirm.require({
+        message: $gettext(
+            "You have unsaved changes. Are you sure you want to leave?",
+        ),
+        header: $gettext("Unsaved changes"),
+        icon: "fa fa-exclamation-triangle",
+        acceptProps: {
+            label: $gettext("Exit without saving"),
+            severity: shouldUseContrast() ? CONTRAST : DANGER,
+            style: { fontSize: "small" },
+        },
+        rejectProps: {
+            label: $gettext("Go back"),
+            severity: shouldUseContrast() ? CONTRAST : SECONDARY,
+            style: { fontSize: "small" },
+        },
+        accept: () => {
+            isEditing.value = false;
+            finishSettingDisplayedRow(row);
+        },
+    });
+};
+
 // @ts-expect-error vue-tsc doesn't like arbitrary properties here
 provide(displayedRowKey, { displayedRow, setDisplayedRow });
+provide("isEditing", isEditing);
 
 const selectedLanguage: Ref<Language> = ref(
     (arches.languages as Language[]).find(

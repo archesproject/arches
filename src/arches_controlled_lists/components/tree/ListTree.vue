@@ -136,7 +136,6 @@ const updateSelectedAndExpanded = (node: TreeNode) => {
     if (isMultiSelecting.value || movingItem.value?.key) {
         return;
     }
-
     setDisplayedRow(node.data);
     expandedKeys.value = {
         ...expandedKeys.value,

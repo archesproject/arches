@@ -24,9 +24,9 @@ const { displayedRow: list } = inject(displayedRowKey) as unknown as {
     displayedRow: Ref<ControlledList>;
 };
 
-const editing = ref(false);
+const isEditing = ref(false);
 const disabled = computed(() => {
-    return !props.editable || !editing.value;
+    return !props.editable || !isEditing.value;
 });
 
 const formValue = ref("");
@@ -46,7 +46,7 @@ const toast = useToast();
 const { $gettext } = useGettext();
 
 const save = async () => {
-    editing.value = false;
+    isEditing.value = false;
     const originalValue = list.value.name;
     list.value.name = formValue.value.trim();
     try {
@@ -63,9 +63,11 @@ const save = async () => {
 };
 
 const cancel = () => {
-    editing.value = false;
+    isEditing.value = false;
     formValue.value = list.value.name;
 };
+
+defineExpose({ isEditing });
 </script>
 
 <template>
@@ -87,7 +89,7 @@ const cancel = () => {
             @keyup.enter="save"
         />
         <span
-            v-if="props.editable && !editing"
+            v-if="props.editable && !isEditing"
             class="edit-controls"
         >
             <i
@@ -95,12 +97,12 @@ const cancel = () => {
                 tabindex="0"
                 class="fa fa-pencil"
                 :aria-label="$gettext('Edit')"
-                @click="editing = true"
-                @keyup.enter="editing = true"
+                @click="isEditing = true"
+                @keyup.enter="isEditing = true"
             ></i>
         </span>
         <span
-            v-if="props.editable && editing"
+            v-if="props.editable && isEditing"
             class="edit-controls"
         >
             <i
