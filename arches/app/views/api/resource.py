@@ -787,6 +787,7 @@ class BulkResourceReport(APIBase):
                     graph_id__in=graph_ids_with_templates_that_preload_resource_data
                 )
                 .select_related("nodegroup")
+                .prefetch_related("cardxnodexwidget_set")
             )
 
             perm = "read_nodegroup"
