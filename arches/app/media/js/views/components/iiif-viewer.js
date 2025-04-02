@@ -162,62 +162,66 @@ var IIIFViewerViewmodel = function(params) {
 
                             const jsonResponse = await response.json();
                             cachedAnnotations[annotationsUrl] = jsonResponse;
-                            
-                            annotation.features.forEach(function(feature) {
-                                feature.properties.graphName = node['graph_name'];
-                            });
                         }
-                    };
-                    const preloadAllAnnotations = async function() {
-                        const counts = {};
-                        self.annotationCounts(counts);
-                        const canvases = self.canvases();
+                        const annotation = cachedAnnotations[annotationsUrl];
+                        
+                        annotation.features.forEach(function(feature) {
+                            feature.properties.graphName = node['graph_name'];
+                        });
+                        annotations(annotation.features);
+                        
+                    }
+                };
+                
+                const preloadAllAnnotations = async function() {
+                    const counts = {};
+                    self.annotationCounts(counts);
+                    const canvases = self.canvases();
+                    
+                    if (canvases && canvases.length > 0) {
+                        for (const canvas of canvases) {
+                            const canvasId = self.getCanvasService(canvas);
+                            if (canvasId) {
+                                const annotationsUrl = arches.urls.iiifannotations + '?canvas=' + canvasId + '&nodeid=' + node.nodeid;
+                                if(!cachedAnnotations[annotationsUrl]){
+                                    try {
+                                        const response = await window.fetch(annotationsUrl);
+                                        const jsonResponse = await response.json();
+                                        cachedAnnotations[annotationsUrl] = jsonResponse;
 
-                        if (canvases && canvases.length > 0) {
-                            for (const canvas of canvases) {
-                                const canvasId = self.getCanvasService(canvas);
-                                if (canvasId) {
-                                    const annotationsUrl = arches.urls.iiifannotations + '?canvas=' + canvasId + '&nodeid=' + node.nodeid;
-                                    if(!cachedAnnotations[annotationsUrl]){
-                                        try {
-                                            const response = await window.fetch(annotationsUrl);
-                                            const jsonResponse = await response.json();
-                                            cachedAnnotations[annotationsUrl] = jsonResponse;
-
-                                            if (!counts[canvasId]) counts[canvasId] = 0;
-                                            counts[canvasId] = jsonResponse.features.length;
-                                        } catch (error) {
-                                            console.error('Error loading annotations for canvas:', canvasId, error);
-                                        }
-                                    } else {
                                         if (!counts[canvasId]) counts[canvasId] = 0;
-                                        counts[canvasId] = cachedAnnotations[annotationsUrl].features.length;
+                                        counts[canvasId] = jsonResponse.features.length;
+                                    } catch (error) {
+                                        console.error('Error loading annotations for canvas:', canvasId, error);
                                     }
+                                } else {
+                                    if (!counts[canvasId]) counts[canvasId] = 0;
+                                    counts[canvasId] = cachedAnnotations[annotationsUrl].features.length;
                                 }
                             }
-                            self.annotationCounts(counts);
                         }
-                    };
+                        self.annotationCounts(counts);
+                    }
+                };
 
-                    self.manifestData.subscribe(preloadAllAnnotations);
-                    self.canvas.subscribe(updateAnnotations);
-                    updateAnnotations();
-                    return {
-                        name: node['graph_name'] + ' - ' + node.name,
-                        icon: node.icon,
-                        active: ko.observable(false),
-                        opacity: ko.observable(100),
-                        annotations: annotations,
-                        preloadAllAnnotations: preloadAllAnnotations
-                    };
-                })
-            );
-            if (self.manifestData()) {
-                self.annotationNodes().forEach(node => {
-                    if (node.preloadAllAnnotations) node.preloadAllAnnotations();
-                });
-            }
-        };
+                self.manifestData.subscribe(preloadAllAnnotations);
+                self.canvas.subscribe(updateAnnotations);
+                updateAnnotations();
+                return {
+                    name: node['graph_name'] + ' - ' + node.name,
+                    icon: node.icon,
+                    active: ko.observable(false),
+                    opacity: ko.observable(100),
+                    annotations: annotations,
+                    preloadAllAnnotations: preloadAllAnnotations
+                };
+            })
+        );
+        if (self.manifestData()) {
+            self.annotationNodes().forEach(node => {
+                if (node.preloadAllAnnotations) node.preloadAllAnnotations();
+            });
+        }
     };
 
     window.fetch(arches.urls.iiifannotationnodes)
