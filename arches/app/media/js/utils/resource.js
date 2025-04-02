@@ -1,4 +1,5 @@
 import arches from 'arches';
+import resourceLookup from 'viewmodels/map'
 
 const resourceUtils = {
     /**

@@ -11,6 +11,7 @@ import MapboxGl from 'mapbox-gl';
 import MapboxGeocoder from 'mapbox-gl-geocoder';
 
 
+export const resourceLookup = {};
 const viewModel = function (params) {
     var self = this;
 
@@ -340,7 +341,6 @@ const viewModel = function (params) {
         return false;
     };
 
-    this.resourceLookup = {};
     this.getPopupData = function (features) {
         const popupFeatures = features.map(feature => {
             var data = feature.properties;
