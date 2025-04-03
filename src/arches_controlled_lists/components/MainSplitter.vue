@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject } from "vue";
+import { inject } from "vue";
 
 import ProgressSpinner from "primevue/progressspinner";
 import Splitter from "primevue/splitter";
@@ -19,16 +19,6 @@ import type { ControlledList } from "@/arches_controlled_lists/types";
 const { displayedRow } = inject(displayedRowKey) as unknown as {
     displayedRow: Ref<ControlledList>;
 };
-
-const panel = computed(() => {
-    if (!displayedRow.value) {
-        return ControlledListSplash;
-    }
-    if (dataIsList(displayedRow.value)) {
-        return ListEditor;
-    }
-    return ItemEditor;
-});
 </script>
 
 <template>
@@ -54,10 +44,17 @@ const panel = computed(() => {
                 paddingRight: '2rem',
             }"
         >
-            <component
-                :is="panel"
-                ref="editor"
-                :key="displayedRow?.id ?? routeNames.splash"
+            <ControlledListSplash
+                v-if="!displayedRow"
+                :key="routeNames.splash"
+            />
+            <ListEditor
+                v-else-if="dataIsList(displayedRow)"
+                :key="displayedRow.id ?? routeNames.list"
+            />
+            <ItemEditor
+                v-else
+                :key="displayedRow.id ?? routeNames.item"
             />
         </SplitterPanel>
     </Splitter>
