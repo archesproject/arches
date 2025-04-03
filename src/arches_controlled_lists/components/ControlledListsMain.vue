@@ -36,6 +36,7 @@ const { $gettext } = useGettext();
 
 const isEditing = ref(false);
 const displayedRow: Ref<Selectable | null> = ref(null);
+const lastFocusedElement = ref<HTMLElement | null>(null);
 
 const setDisplayedRow = (val: Selectable | null) => {
     if (val && isEditing.value) {
@@ -82,6 +83,16 @@ const confirmLeave = (row: Selectable) => {
             isEditing.value = false;
             finishSettingDisplayedRow(row);
         },
+        reject: () => {
+            setTimeout(
+                () =>
+                    lastFocusedElement.value &&
+                    // @ts-expect-error focusVisible not yet in typeshed
+
+                    lastFocusedElement.value.focus({ focusVisible: true }),
+                25,
+            );
+        },
     });
 };
 
@@ -97,13 +108,26 @@ const selectedLanguage: Ref<Language> = ref(
 provide(selectedLanguageKey, selectedLanguage);
 const systemLanguage = ENGLISH; // TODO: get from settings
 provide(systemLanguageKey, systemLanguage);
+
+function memoizeLastActiveInput(event: FocusEvent) {
+    if (!event.target) {
+        return;
+    }
+    const element = event.target as HTMLElement;
+    if (
+        ["INPUT", "TEXTAREA"].includes(element.tagName) &&
+        !element.classList.contains("p-tree-filter-input")
+    ) {
+        lastFocusedElement.value = element;
+    }
+}
 </script>
 
 <template>
     <div style="height: 100vh; padding-bottom: 2.5rem">
         <div class="list-editor-container">
             <ListHeader />
-            <MainSplitter />
+            <MainSplitter @focusout="memoizeLastActiveInput" />
         </div>
     </div>
     <Toast
