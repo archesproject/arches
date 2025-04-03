@@ -24,6 +24,7 @@ import {
     itemKey,
 } from "@/arches_controlled_lists/constants.ts";
 import {
+    commandeerFocusFromDataTable,
     dataIsNew,
     languageNameFromCode,
     shouldUseContrast,
@@ -232,19 +233,12 @@ const makeRowUneditable = (metadataId: string) => {
 };
 
 const focusInput = () => {
-    // The editor (pencil) button from the DataTable (elsewhere on page)
-    // immediately hogs focus with a setTimeout of 1,
-    // so we'll get in line behind it to set focus to the input.
-    // This should be reported/clarified with PrimeVue with a MWE.
-    setTimeout(() => {
-        if (rowIndexToFocus.value !== -1) {
-            const rowEl = editorDiv.value!.querySelector(inputSelector.value);
-            const inputEl = rowEl!.children[1].children[0];
-            // @ts-expect-error focusVisible not yet in typeshed
-            (inputEl as HTMLInputElement).focus({ focusVisible: true });
-        }
+    if (rowIndexToFocus.value !== -1) {
+        const rowEl = editorDiv.value!.querySelector(inputSelector.value);
+        const inputEl = rowEl!.children[1].children[0] as HTMLInputElement;
+        commandeerFocusFromDataTable(inputEl);
         rowIndexToFocus.value = -1;
-    }, 25);
+    }
 };
 
 defineExpose({ isEditing });

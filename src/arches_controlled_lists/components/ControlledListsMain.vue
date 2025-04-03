@@ -19,6 +19,7 @@ import {
 } from "@/arches_controlled_lists/constants.ts";
 import { routeNames } from "@/arches_controlled_lists/routes.ts";
 import {
+    commandeerFocusFromDataTable,
     dataIsList,
     shouldUseContrast,
 } from "@/arches_controlled_lists/utils.ts";
@@ -83,16 +84,9 @@ const confirmLeave = (row: Selectable) => {
             isEditing.value = false;
             finishSettingDisplayedRow(row);
         },
-        reject: () => {
-            setTimeout(
-                () =>
-                    lastFocusedElement.value &&
-                    // @ts-expect-error focusVisible not yet in typeshed
-
-                    lastFocusedElement.value.focus({ focusVisible: true }),
-                25,
-            );
-        },
+        reject: () =>
+            lastFocusedElement.value &&
+            commandeerFocusFromDataTable(lastFocusedElement.value),
     });
 };
 
