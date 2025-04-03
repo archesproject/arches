@@ -23,7 +23,7 @@ from time import time
 from uuid import UUID
 from types import SimpleNamespace
 from django.db import transaction
-from django.db.models import Count, Prefetch, Q
+from django.db.models import Count, F, Prefetch, Q
 from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
@@ -1023,9 +1023,9 @@ class Resource(models.ResourceInstance):
                     )
                     .values("resourceinstanceidto")
                     .annotate(to_count=Count("resourceinstanceidto"))
-                    # ORDER BY is necessary for "pipelined" GROUP BY, see
+                    # ORDER BY NULLS LAST is necessary for "pipelined" GROUP BY, see
                     # https://use-the-index-luke.com/sql/sorting-grouping/indexed-group-by
-                    .order_by("resourceinstanceidto")
+                    .order_by(F("resourceinstanceidto").asc(nulls_last=True))
                 )
                 from_counts = (
                     models.ResourceXResource.objects.filter(
@@ -1033,7 +1033,7 @@ class Resource(models.ResourceInstance):
                     )
                     .values("resourceinstanceidfrom")
                     .annotate(from_count=Count("resourceinstanceidfrom"))
-                    .order_by("resourceinstanceidfrom")
+                    .order_by(F("resourceinstanceidfrom").asc(nulls_last=True))
                 )
 
                 total_relations_by_resource_id: dict[UUID:int] = defaultdict(int)
