@@ -179,13 +179,15 @@ def search_terms(request):
             Match(field="displayname.value", query=searchString, fuzziness=2, boost=2)
         )
 
-        if user_is_reviewer is False and index == "terms":
-            boolquery.filter(Terms(field="provisional", terms=["false"]))
+        if index == "terms":
             boolquery.filter(
                 Terms(
-                    field="nodegroup_id", terms=[str(ng) for ng in permitted_nodegroups]
+                    field="nodegroupid", terms=[str(ng) for ng in permitted_nodegroups]
                 )
             )
+
+            if user_is_reviewer is False:
+                boolquery.filter(Terms(field="provisional", terms=["false"]))
 
         query.add_query(boolquery)
         base_agg = Aggregation(
