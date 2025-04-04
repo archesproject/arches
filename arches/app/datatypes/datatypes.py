@@ -2249,7 +2249,7 @@ class ResourceInstanceDataType(BaseDataType):
                 )
 
                 match value["op"]:
-                    case "in_list_any":
+                    case "" | "in_list_any":
                         query.should(match_q)
                     case "in_list_all":
                         query.must(match_q)
@@ -2261,7 +2261,7 @@ class ResourceInstanceDataType(BaseDataType):
         try:
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
-            elif value["op"] != "" and value["op"]:
+            else:
                 self.append_in_list_search_filters(value, node, query)
         except KeyError as e:
             pass
