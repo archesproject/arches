@@ -33,5 +33,3 @@ def make_name_unique(name, names_to_check, suffix_delimiter="_"):
         temp_node_name = "{0}{1}{2}".format(name, suffix_delimiter, i)
         i += 1
     return temp_node_name
-
-
