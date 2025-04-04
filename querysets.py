@@ -10,17 +10,11 @@ class ListQuerySet(models.QuerySet):
 
         qs = self
         for annotation_name, node_field in kwargs.items():
-            # TODO: when dropping support for 7.x replace with simplified:
-            # .filter(
-            #     controlled_list_id=models.OuterRef("id"),
-            #     source_identifier=None,
-            # )
-            reffed_by_list = models.Q(controlled_list_id=models.OuterRef("id"))
-            if hasattr(NodeProxy, "source_identifier"):
-                reffed_by_list &= models.Q(source_identifier=None)
             subquery = ArraySubquery(
                 NodeProxy.objects.with_controlled_lists()
-                .filter(reffed_by_list)
+                .filter(
+                    controlled_list_id=models.OuterRef("id"), source_identifier=None
+                )
                 .select_related("graph" if node_field.startswith("graph__") else None)
                 .order_by("pk")
                 .values(node_field)

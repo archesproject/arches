@@ -74,17 +74,9 @@ class List(models.Model):
                 if permitted_nodegroups is None or nodegroup_id in permitted_nodegroups
             ]
         else:
-            # TODO: when dropping support for 7.x replace with simplified:
-            # nodes_using_list = NodeProxy.objects.with_controlled_lists().filter(
-            #     controlled_list_id=self.pk, source_identifier=None
-            # )
-            reffed_by_list = Q(controlled_list_id=self.pk)
-            if hasattr(NodeProxy, "source_identifier"):
-                reffed_by_list &= Q(source_identifier=None)
             nodes_using_list = NodeProxy.objects.with_controlled_lists().filter(
-                reffed_by_list
+                controlled_list_id=self.pk, source_identifier=None
             )
-
             filtered_nodes = [
                 node
                 for node in nodes_using_list
