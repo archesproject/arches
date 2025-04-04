@@ -78,6 +78,7 @@ class ArchesModelAPIMixin:
                 graph_slug=self.graph_slug,
                 only=fields,
                 as_representation=True,
+                resource_ids=self.resource_ids,
             )
             if self.resource_ids:
                 return qs.filter(resourceinstance__in=self.resource_ids)
@@ -95,17 +96,19 @@ class ArchesModelAPIMixin:
 
     def get_object(self, user=None, permission_callable=None):
         ret = super().get_object()
-        if not self.graph_slug:
-            # Resource results for heterogenous graphs are not supported.
-            self.graph_slug = ret.graph.slug
         options = self.serializer_class.Meta
         if issubclass(options.model, ResourceInstance):
             if arches_version >= "8":
                 permission_kwargs = {"user": user, "resource": ret}
             else:
                 permission_kwargs = {"user": user, "resourceid": ret.pk}
+            if not self.graph_slug:
+                # Resource results for heterogenous graphs are not supported.
+                self.graph_slug = ret.graph.slug
         else:
             permission_kwargs = {"user": user, "resourceid": ret.resourceinstance_id}
+            if not self.graph_slug:
+                self.graph_slug = ret.resourceinstance.graph.slug
         if permission_callable and not permission_callable(**permission_kwargs):
             # Not 404, see https://github.com/archesproject/arches/issues/11563
             raise PermissionDenied

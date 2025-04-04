@@ -195,7 +195,9 @@ class SemanticTile(TileModel):
     ):
         """See `arches.app.models.querysets.TileQuerySet.with_node_values`."""
 
-        source_graph = GraphWithPrefetching.prepare_for_annotations(graph_slug)
+        source_graph = GraphWithPrefetching.prepare_for_annotations(
+            graph_slug, resource_ids=resource_ids
+        )
         for node in source_graph.node_set.all():
             if node.alias == entry_node_alias:
                 entry_node = node
@@ -382,7 +384,6 @@ class GraphWithPrefetching(GraphModel):
             raise ValueError("graph_slug or resource_ids must be provided")
         try:
             if arches_version >= "8":
-                # TODO: util for 12 depth
                 prefetches = [
                     "node_set__cardxnodexwidget_set",
                     "node_set__nodegroup__node_set",
