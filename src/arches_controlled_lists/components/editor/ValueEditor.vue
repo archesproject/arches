@@ -316,6 +316,7 @@ defineExpose({ isEditing });
                                 onUpdated: focusInput,
                             },
                         }"
+                        :style="{ fontSize: 'small' }"
                     />
                     <InputText
                         v-else
