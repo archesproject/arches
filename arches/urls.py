@@ -546,11 +546,6 @@ urlpatterns = [
         name="get_graph_models_api",
     ),
     re_path(
-        r"^graph_has_unpublished_changes/(?P<graph_id>%s)$" % (uuid_regex),
-        api.GraphHasUnpublishedChanges.as_view(),
-        name="graph_has_unpublished_changes_api",
-    ),
-    re_path(
         r"^graph_is_active/(?P<graph_id>%s)$" % (uuid_regex),
         api.GraphIsActive.as_view(),
         name="graph_is_active_api",

@@ -82,7 +82,6 @@
                     data-placement="auto" 
                     data-container="body"
                 ></i>
-                <!--ko if: graphTree.restrictedNodegroups.includes(node.nodeGroupId()) === false -->
                 <i 
                     class="jstree-node-action-icon fa fa-plus-circle" 
                     role="presentation" 
@@ -101,7 +100,6 @@
                     data-container="body" 
                     data-original-title="{% trans "Add Branch" %}"
                 ></i>
-                <!-- /ko -->
             <!-- /ko -->
 
             <!-- ko if: graph.attributes.isresource && !graph.attributes.source_identifier_id && !node.istopnode -->
@@ -119,7 +117,7 @@
             ></i>
             <!-- /ko -->
 
-            <!-- ko if: !node.istopnode && graphTree.restrictedNodegroups.includes(node.nodeGroupId()) === false -->
+            <!-- ko if: !node.istopnode -->
                 <!-- ko if: graph.attributes.source_identifier_id && ( !node.is_immutable || node.is_immutable && node.isCollector() ) -->
                 <i 
                     class="jstree-node-action-icon fa fa-trash" 
@@ -148,6 +146,3 @@
         <!-- /ko -->
     </li>
 </template>
-
-<script src="{% webpack_static 'node_modules/underscore/underscore-min.js' %}"></script>
-

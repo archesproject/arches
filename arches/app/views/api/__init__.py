@@ -411,23 +411,6 @@ class Graphs(APIBase):
             return JSONResponse(JSONSerializer().serializeToPython(graphs))
 
 
-class GraphHasUnpublishedChanges(APIBase):
-    def get(self, request, graph_id=None):
-        graph = models.GraphModel.objects.get(pk=graph_id)
-        return JSONResponse(graph.has_unpublished_changes)
-
-    def post(self, request, graph_id=None):
-        has_unpublished_changes = bool(
-            request.POST.get("has_unpublished_changes") == "true"
-        )
-        graph = models.GraphModel.objects.filter(
-            pk=graph_id
-        )  # need filter here for `update` to work
-        graph.update(has_unpublished_changes=has_unpublished_changes)
-
-        return JSONResponse({"has_unpublished_changes": has_unpublished_changes})
-
-
 class GraphIsActive(APIBase):
     def get(self, request, graph_id=None):
         graph = Graph.objects.get(pk=graph_id)
@@ -446,25 +429,23 @@ class GraphIsActive(APIBase):
 
                 if graph.source_identifier:
                     source_graph = graph.source_identifier
-                    editable_future_graph = graph
+                    draft_graph = graph
                 else:
                     source_graph = graph
-                    editable_future_graph = Graph.objects.get(
-                        source_identifier_id=graph_id
-                    )
+                    draft_graph = Graph.objects.get(source_identifier_id=graph_id)
 
                 if source_graph.is_active != is_active:
                     source_graph.is_active = is_active
                     source_graph.save()
 
-                if editable_future_graph.is_active != is_active:
-                    editable_future_graph.is_active = is_active
-                    editable_future_graph.save()
+                if draft_graph.is_active != is_active:
+                    draft_graph.is_active = is_active
+                    draft_graph.save()
 
             return JSONResponse(
                 {
                     "is_source_graph_active": source_graph.is_active,
-                    "is_editable_future_graph_active": editable_future_graph.is_active,
+                    "is_draft_graph_active": draft_graph.is_active,
                 }
             )
         except:

@@ -1,15 +1,15 @@
-define(['require'], function(require) {
-    function removeTrailingCommaFromObject(string) {
-        return string.replace(/,\s*}*$/, "}");
-    }
+function removeTrailingCommaFromObject(string) {
+    return string.replace(/,\s*}*$/, "}");
+}
 
-    try {        
-        const graphBaseDataHTML = document.querySelector('#graphBaseData');
-        const graphBaseData = graphBaseDataHTML.getAttribute('graphBaseData');
-        const graphBaseDataJSON = JSON.parse(removeTrailingCommaFromObject(graphBaseData));
+let graphBaseDataJSON;
+try {        
+    const graphBaseDataHTML = document.querySelector('#graphBaseData');
+    const graphBaseData = graphBaseDataHTML.getAttribute('graphBaseData');
     
-        return graphBaseDataJSON;
-    } catch (error) {
-        console.error(error);
-    }
-});
+    graphBaseDataJSON = JSON.parse(removeTrailingCommaFromObject(graphBaseData));
+} catch (error) {
+    console.error(error);
+}
+
+export default graphBaseDataJSON;

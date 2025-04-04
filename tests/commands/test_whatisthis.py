@@ -14,7 +14,7 @@ class WhatIsThisTests(ArchesTestCase):
     arbitrary_uuid = uuid.uuid4()
 
     def test_match(self):
-        g = Graph.new()
+        g = Graph.objects.create_graph()
         out = StringIO()
         call_command("whatisthis", str(g.pk), stdout=out)
         self.assertIn("This UUID is the primary key for 1 object:", out.getvalue())

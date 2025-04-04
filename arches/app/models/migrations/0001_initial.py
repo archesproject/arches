@@ -102,7 +102,7 @@ def make_permissions(apps, schema_editor, with_create_permissions=True):
 
 
 # For historical purposes only.
-# UUID4 exists in arches.app.models.functions for general use.
+# UUID4 exists in arches.app.models.query_expressions for general use.
 class UUID1(models.Func):
     function = "uuid_generate_v1"
     arity = 0

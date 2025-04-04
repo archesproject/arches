@@ -35,10 +35,10 @@ function buildFilepathLookup(path, staticUrlPrefix) {
         const extensionReplacementRegex = new RegExp(`\\.${extension}$`);
 
         if (extension === 'js') {
-            lookup[file.replace(path,'').replace(/\\/g, '/').replace(extensionReplacementRegex,'').replace(/^\//,'')] = {"import": file, "filename": `${prefix}/[name].${extension}`};
+            lookup[file.replace(path,'').replace(/\\/g, '/').replace(extensionReplacementRegex,'').replace(/^\//,'')] = {"import": file, "filename": `${prefix}/[name].[contenthash].${extension}`};
         }
         else if (extension === 'css' || extension === 'scss') {
-            lookup[Path.join('css', file.replace(path,'')).replace(/\\/g, '/').replace(extensionReplacementRegex,'').replace(/^\//,'')] = { 'import': file };
+            lookup[Path.join('css', file.replace(path,'')).replace(/\\/g, '/').replace(extensionReplacementRegex,'').replace(/^\//,'')] = {'import': file, "filename": `${prefix}/[name].[contenthash].${extension}`};
         }
         else {
             // staticUrl used for images

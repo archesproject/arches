@@ -222,13 +222,24 @@ class Concept(object):
                         subconcept.relationshiptype = relation.relationtype_id
                         self.subconcepts.append(subconcept)
 
-                    self.subconcepts = sorted(
-                        self.subconcepts,
-                        key=lambda concept: self.natural_keys(
-                            concept.get_sortkey(lang)
-                        ),
-                        reverse=False,
-                    )
+                    try:
+                        self.subconcepts = sorted(
+                            self.subconcepts,
+                            key=lambda concept: self.natural_keys(
+                                concept.get_sortkey(lang)
+                            ),
+                            reverse=False,
+                        )
+                    except TypeError:
+                        self.subconcepts = sorted(
+                            self.subconcepts,
+                            key=lambda concept: [
+                                str(k)
+                                for k in self.natural_keys(concept.get_sortkey(lang))
+                            ],
+                            reverse=False,
+                        )
+
                     # self.subconcepts = sorted(self.subconcepts, key=methodcaller(
                     #     'get_sortkey', lang=lang), reverse=False)
 

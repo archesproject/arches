@@ -1,20 +1,19 @@
-define([
-    'knockout',
-    'views/base-manager',
-    'views/plugin-data',
-    'plugins'
-], function(ko, BaseManagerView, data) {
-    if (!data.config) data.config = {};
-    
-    data.config.loading = ko.observable(false);
-    data.config.alert = ko.observable(null);
-    data.config.plugin = data;
+import ko from 'knockout';
+import BaseManagerView from 'views/base-manager';
+import data from 'views/plugin-data';
+import 'plugins';
 
-    return new BaseManagerView({
-        viewModel: {
-            loading: data.config.loading,
-            alert: data.config.alert,
-            plugin: data
-        }
-    });
+
+if (!data.config) data.config = {};
+
+data.config.loading = ko.observable(false);
+data.config.alert = ko.observable(null);
+data.config.plugin = data;
+
+export default new BaseManagerView({
+    viewModel: {
+        loading: data.config.loading,
+        alert: data.config.alert,
+        plugin: data
+    }
 });

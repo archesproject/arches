@@ -21,8 +21,8 @@ from django.utils.translation import gettext_lazy as _
 
 from arches.app.const import ExtensionType
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
-from arches.app.models.functions import UUID4
 from arches.app.models.mixins import SaveSupportsBlindOverwriteMixin
+from arches.app.models.query_expressions import UUID4
 from arches.app.models.utils import add_to_update_fields
 from arches.app.utils import import_class_from_string
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -523,31 +523,176 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
         else:
             return True
 
-    def get_published_graph(self, language=None, raise_if_missing=False):
+    def should_use_published_graph(self):
+        return bool(
+            self.publication_id
+            and not self.source_identifier_id
+            and not self.has_unpublished_changes
+        )
+
+    def get_published_graph(self, language=None):
+        if not self.publication_id:
+            return None
+
         if not language:
             language = translation.get_language()
 
-        try:
-            graph = PublishedGraph.objects.get(
-                publication=self.publication, language=language
-            )
-        except PublishedGraph.DoesNotExist:
-            if raise_if_missing:
-                raise
-            graph = None
+        for published_graph in self.publication.publishedgraph_set.all():
+            if published_graph.language_id == language:
+                return published_graph
 
-        return graph
+        return None
+
+    def get_cards(self, force_recalculation=False):
+        if self.should_use_published_graph() and not force_recalculation:
+            published_graph = self.get_published_graph()
+
+            card_slugs = []
+            for card_dict in published_graph.serialized_graph["cards"]:
+                card_slug = {}
+
+                for key, value in card_dict.items():
+                    # filter out keys from the serialized_graph that would cause an error on instantiation
+                    if key not in ["constraints", "is_editable"]:
+                        if isinstance(value, str):
+                            try:
+                                value = uuid.UUID(value)
+                            except ValueError:
+                                pass
+                        card_slug[key] = value
+
+                card_slugs.append(card_slug)
+
+            return [models.CardModel(**card_slug) for card_slug in card_slugs]
+        else:
+            return self.cardmodel_set.all()
+
+    def get_nodegroups(self, force_recalculation=False):
+        if self.should_use_published_graph() and not force_recalculation:
+            published_graph = self.get_published_graph()
+
+            nodegroup_slugs = []
+            for nodegroup_dict in published_graph.serialized_graph["nodegroups"]:
+                nodegroup_slug = {}
+
+                for key, value in nodegroup_dict.items():
+                    if isinstance(value, str):
+                        try:
+                            value = uuid.UUID(value)
+                        except ValueError:
+                            pass
+                    nodegroup_slug[key] = value
+
+                nodegroup_slugs.append(nodegroup_slug)
+
+            return [
+                models.NodeGroup(**nodegroup_dict) for nodegroup_dict in nodegroup_slugs
+            ]
+        else:
+            return list(
+                {node.nodegroup for node in self.node_set.all() if node.is_collector}
+            )
+
+    def get_nodes(self, force_recalculation=False):
+        if self.should_use_published_graph() and not force_recalculation:
+            published_graph = self.get_published_graph()
+
+            node_slugs = []
+            for node_dict in published_graph.serialized_graph["nodes"]:
+                node_slug = {}
+
+                for key, value in node_dict.items():
+                    # filter out keys from the serialized_graph that would cause an error on instantiation
+                    if key not in ["is_collector", "parentproperty"]:
+                        if isinstance(value, str):
+                            try:
+                                value = uuid.UUID(value)
+                            except ValueError:
+                                pass
+                        node_slug[key] = value
+
+                node_slugs.append(node_slug)
+
+            return [models.Node(**node_slug) for node_slug in node_slugs]
+        else:
+            return self.node_set.all()
+
+    def get_edges(self, force_recalculation=False):
+        if self.should_use_published_graph() and not force_recalculation:
+            published_graph = self.get_published_graph()
+
+            edge_slugs = []
+            for edge_dict in published_graph.serialized_graph["edges"]:
+                edge_slug = {}
+
+                for key, value in edge_dict.items():
+                    if isinstance(value, str):
+                        try:
+                            value = uuid.UUID(value)
+                        except ValueError:
+                            pass
+                    edge_slug[key] = value
+
+                edge_slugs.append(edge_slug)
+
+            return [models.Edge(**edge_dict) for edge_dict in edge_slugs]
+        else:
+            return self.edge_set.all()
+
+    def get_card_x_node_x_widgets(self, force_recalculation=False):
+        if self.should_use_published_graph() and not force_recalculation:
+            published_graph = self.get_published_graph()
+
+            cards_x_nodes_x_widgets_slugs = []
+
+            try:
+                serialized_cards_x_nodes_x_widgets = published_graph.serialized_graph[
+                    "cards_x_nodes_x_widgets"
+                ]
+            except KeyError:
+                # Handle import of legacy (v7.6 and previous) graphs
+                serialized_cards_x_nodes_x_widgets = published_graph.serialized_graph[
+                    "widgets"
+                ]
+
+            for cards_x_nodes_x_widgets_dict in serialized_cards_x_nodes_x_widgets:
+                cards_x_nodes_x_widgets_slug = {}
+
+                for key, value in cards_x_nodes_x_widgets_dict.items():
+                    if isinstance(value, str):
+                        try:
+                            value = uuid.UUID(value)
+                        except ValueError:
+                            pass
+                    cards_x_nodes_x_widgets_slug[key] = value
+
+                cards_x_nodes_x_widgets_slugs.append(cards_x_nodes_x_widgets_slug)
+
+            return [
+                models.CardXNodeXWidget(**cards_x_nodes_x_widgets_dict)
+                for cards_x_nodes_x_widgets_dict in cards_x_nodes_x_widgets_slugs
+            ]
+        else:
+            return [
+                card_x_node_x_widget
+                for card in self.cardmodel_set.all()
+                for card_x_node_x_widget in card.cardxnodexwidget_set.all()
+            ]
 
     def save(self, **kwargs):
         if (
             self.isresource
-            and not self.source_identifier
+            and not self.source_identifier_id
             and not self.resource_instance_lifecycle
         ):
             self.resource_instance_lifecycle_id = (
                 settings.DEFAULT_RESOURCE_INSTANCE_LIFECYCLE_ID
             )
             add_to_update_fields(kwargs, "resource_instance_lifecycle_id")
+
+        if self.has_unpublished_changes is not False:
+            self.has_unpublished_changes = True
+            add_to_update_fields(kwargs, "has_unpublished_changes")
 
         super(GraphModel, self).save(**kwargs)
 
@@ -1233,7 +1378,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
     # Note that this is intended to bypass normal permissions logic, so a resource type must
     # prevent a user who created the resource from editing it, by updating principaluserid logic.
     principaluser = models.ForeignKey(
-        User, on_delete=models.SET_NULL, blank=True, null=True
+        User, on_delete=models.SET_NULL, blank=True, null=True, editable=False
     )
 
     class Meta:
@@ -2234,6 +2379,14 @@ class SpatialView(models.Model):
         if len(node_ids) != found_graph_nodes.count():
             raise ValidationError(
                 "One or more attributenodes do not belong to the graph of the geometry node"
+            )
+
+        # check if any attribute nodes are geojson-feature-collection
+        if "geojson-feature-collection" in [
+            graph_nodes.datatype for graph_nodes in found_graph_nodes
+        ]:
+            raise ValidationError(
+                "One or more attributenodes have a geojson-feature-collection datatype"
             )
 
         # language must be be a valid language code belonging to the current publication

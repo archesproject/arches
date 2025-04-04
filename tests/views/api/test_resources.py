@@ -52,8 +52,8 @@ class ResourceAPITests(ArchesTestCase):
         ) as f:
             json = JSONDeserializer().deserialize(f)
             cls.unique_graph = Graph(json["graph"][0])
-            cls.unique_graph.publish(user=None)
             cls.unique_graph.save()
+            cls.unique_graph.publish(user=None)
 
         with open(
             os.path.join("tests/fixtures/resource_graphs/ambiguous_graph_shape.json"),
@@ -61,8 +61,8 @@ class ResourceAPITests(ArchesTestCase):
         ) as f:
             json = JSONDeserializer().deserialize(f)
             cls.ambiguous_graph = Graph(json["graph"][0])
-            cls.ambiguous_graph.publish(user=None)
             cls.ambiguous_graph.save()
+            cls.ambiguous_graph.publish(user=None)
 
         with open(
             os.path.join("tests/fixtures/resource_graphs/phase_type_assignment.json"),
@@ -70,8 +70,8 @@ class ResourceAPITests(ArchesTestCase):
         ) as f:
             json = JSONDeserializer().deserialize(f)
             cls.phase_type_assignment_graph = Graph(json["graph"][0])
-            cls.phase_type_assignment_graph.publish(user=None)
             cls.phase_type_assignment_graph.save()
+            cls.phase_type_assignment_graph.publish(user=None)
 
         cls.data_type_graph = Graph.objects.get(pk=cls.data_type_graphid)
         cls.test_prj_user = models.ResourceInstance.objects.filter(
@@ -530,11 +530,9 @@ class ResourceAPITests(ArchesTestCase):
         zeroth_card = self.data_type_graph.cardmodel_set.get(sortorder=0)
         zeroth_card.sortorder = None
         zeroth_card.save()
-        # Refreshes ORM card cache (.cardmodel_set)
-        self.data_type_graph.refresh_from_db()
-        # Clears proxy model cache (.cards), which reads from .cardmodel_set
-        self.data_type_graph.refresh_from_database()
+
         self.data_type_graph.publish()
+
         self.test_prj_user.graph_publication = self.data_type_graph.publication
         self.test_prj_user.save()
 

@@ -197,7 +197,7 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                     try:
                         Graph.objects.get(source_identifier_id=graph.graphid)
                     except Graph.DoesNotExist:
-                        graph.create_editable_future_graph()
+                        graph.create_draft_graph()
 
                     if publication_data:
                         GraphXPublishedGraph.objects.update_or_create(
@@ -212,9 +212,13 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                             },
                         )
 
-                        graph.refresh_from_database()
                         graph.publication_id = publication_data["publicationid"]
-                        graph.save()
+                        graph.has_unpublished_changes = False
+
+                        Graph.objects.filter(pk=graph.pk).update(
+                            has_unpublished_changes=graph.has_unpublished_changes,
+                            publication_id=graph.publication_id,
+                        )
 
                         for language_tuple in settings.LANGUAGES:
                             language = Language.objects.get(code=language_tuple[0])

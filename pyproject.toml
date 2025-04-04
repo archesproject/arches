@@ -29,9 +29,9 @@ classifiers = [
 ]
 dependencies = [
     "arcgis2geojson==2.0.0",
-    "celery==5.4.0",
+    "celery==5.5.0",
     "defusedxml==0.7.1",
-    "Django>=5.2b1,<6.0.0",
+    "Django>=5.2,<6.0.0",
     "django-celery-results==2.5.1",
     "django-cors-headers==4.7.0",
     "django-guardian==2.4.0",
@@ -64,7 +64,6 @@ dependencies = [
     "requests[security]>=2.31.0",
     "semantic-version==2.10.0",
     "SPARQLWrapper==1.8.5",
-    "tzdata==2023.3",
     "urllib3<2",
 ]
 
@@ -96,7 +95,6 @@ exclude = ["*.tests", "*.tests.*", "tests.*", "tests"]
 namespaces = false
 
 [tool.black]
-target-version = ['py310']
 include = '\.pyi?$'
 exclude = '''
 /(

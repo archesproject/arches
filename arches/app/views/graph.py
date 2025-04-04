@@ -145,6 +145,7 @@ class GraphSettingsView(GraphBaseView):
         )
         node.name = graph.name
         graph.root.name = node.name
+
         if node.ontologyclass:
             graph.root.ontologyclass = node.ontologyclass
 
@@ -156,12 +157,8 @@ class GraphSettingsView(GraphBaseView):
             nodegroup_ids_to_serialized_nodegroups[
                 serialized_nodegroup["nodegroupid"]
             ] = serialized_nodegroup
-
         try:
             with transaction.atomic():
-                graph.save()
-                node.save()
-
                 for nodegroup in models.NodeGroup.objects.filter(
                     nodegroupid__in=nodegroup_ids_to_serialized_nodegroups.keys()
                 ):
@@ -169,6 +166,10 @@ class GraphSettingsView(GraphBaseView):
                         str(nodegroup.nodegroupid)
                     ]["cardinality"]
                     nodegroup.save()
+
+                node.save()
+                graph.save()
+                graph.refresh_from_database()
 
             return JSONResponse(
                 {
@@ -242,24 +243,20 @@ class GraphDesignerView(GraphBaseView):
             )
 
             query_dict = request.GET.copy()
-            query_dict["has_been_redirected_from_editable_future_graph"] = True
+            query_dict["has_been_redirected_from_draft_graph"] = True
             query_string = query_dict.urlencode()
 
             return redirect("{}?{}".format(url, query_string))
 
-        self.editable_future_graph = None
-
-        editable_future_graph_query = Graph.objects.filter(source_identifier_id=graphid)
-        if len(editable_future_graph_query):
-            self.editable_future_graph = editable_future_graph_query[0]
+        self.draft_graph = Graph.objects.filter(source_identifier_id=graphid).first()
 
         if bool(request.GET.get("should_show_source_graph", "false").lower() == "true"):
             self.graph = self.source_graph
         else:
-            self.graph = self.editable_future_graph
+            self.graph = self.draft_graph
 
         serialized_graph = JSONDeserializer().deserialize(
-            JSONSerializer().serialize(self.graph, force_recalculation=True)
+            JSONSerializer().serialize(self.graph)
         )
         primary_descriptor_functions = models.FunctionXGraph.objects.filter(
             graph=self.graph
@@ -319,7 +316,6 @@ class GraphDesignerView(GraphBaseView):
             primary_descriptor_function=primary_descriptor_function,
             geocoding_providers=models.Geocoder.objects.all(),
             report_templates=models.ReportTemplate.objects.all(),
-            restricted_nodegroups=[],
             ontologies=JSONSerializer().serialize(
                 models.Ontology.objects.filter(parentontology=None),
                 exclude=["version", "path"],
@@ -372,13 +368,9 @@ class GraphDesignerView(GraphBaseView):
             else {}
         )
 
-        context["editable_future_graph_id"] = (
-            self.editable_future_graph.pk if self.editable_future_graph else None
-        )
-        context["has_been_redirected_from_editable_future_graph"] = bool(
-            request.GET.get(
-                "has_been_redirected_from_editable_future_graph", "false"
-            ).lower()
+        context["draft_graph_id"] = self.draft_graph.pk if self.draft_graph else None
+        context["has_been_redirected_from_draft_graph"] = bool(
+            request.GET.get("has_been_redirected_from_draft_graph", "false").lower()
             == "true"
         )
         context["nav"]["menu"] = True
@@ -475,13 +467,15 @@ class GraphDataView(View):
                 data = JSONDeserializer().deserialize(request.body)
 
                 if self.action == "new_graph":
-                    isresource = data["isresource"] if "isresource" in data else False
-                    name = _("New Resource Model") if isresource else _("New Branch")
-                    author = request.user.first_name + " " + request.user.last_name
-                    ret = Graph.new(name=name, is_resource=isresource, author=author)
-                    ret.save()
-                    ret.create_editable_future_graph()
-                    ret.publish()
+                    is_resource = data["isresource"] if "isresource" in data else False
+
+                    ret = Graph.objects.create_graph(
+                        name=(
+                            _("New Resource Model") if is_resource else _("New Branch")
+                        ),
+                        user=request.user,
+                        is_resource=is_resource,
+                    )
 
                 elif self.action == "update_node":
                     old_node_data = graph.nodes.get(uuid.UUID(data["nodeid"]))
@@ -514,6 +508,7 @@ class GraphDataView(View):
                         graph.save(nodeid=data["nodeid"])
                     else:
                         graph.save()
+
                     ret = JSONSerializer().serializeToPython(
                         graph, force_recalculation=True
                     )
@@ -524,21 +519,20 @@ class GraphDataView(View):
                     nodeid = uuid.UUID(str(data.get("nodeid")))
                     node = graph.nodes[nodeid]
                     node.config = data["config"]
-                    ret = graph
                     node.save()
 
+                    ret = graph
+
                 elif self.action == "append_branch":
-                    ret = graph.append_branch(
+                    graph.append_branch(
                         data["property"],
                         nodeid=data["nodeid"],
                         graphid=data["graphid"],
-                        return_appended_graph=data.get("return_appended_graph", False),
+                        return_appended_graph=True,
                     )
-                    ret = ret.serialize()
-                    ret["nodegroups"] = graph.get_nodegroups()
-                    ret["cards"] = graph.get_cards()
-                    ret["widgets"] = graph.get_widgets()
                     graph.save()
+
+                    ret = graph
 
                 elif self.action == "append_node":
                     ret = graph.append_node(nodeid=data["nodeid"])
@@ -557,7 +551,7 @@ class GraphDataView(View):
 
                     clone_data["copy"].save()
 
-                    clone_data["copy"].create_editable_future_graph()
+                    clone_data["copy"].create_draft_graph()
                     clone_data["copy"].publish()
 
                     ret = {"success": True, "graphid": clone_data["copy"].pk}
@@ -572,9 +566,8 @@ class GraphDataView(View):
                     ret.publication = None
 
                     ret.save()
-
-                    ret.create_editable_future_graph()
                     ret.publish()
+                    ret.create_draft_graph()
 
                     ret.copy_functions(
                         graph, [clone_data["nodes"], clone_data["nodegroups"]]
@@ -676,17 +669,17 @@ class GraphPublicationView(View):
 
         if graph.source_identifier:
             source_graph = Graph.objects.get(pk=graph.source_identifier_id)
-            editable_future_graph = graph
+            draft_graph = graph
         else:
             source_graph = graph
-            editable_future_graph = None
+            draft_graph = None
 
         if self.action == "publish":
             try:
                 data = JSONDeserializer().deserialize(request.body)
 
-                updated_graph = source_graph.update_from_editable_future_graph(
-                    editable_future_graph=editable_future_graph
+                updated_graph = source_graph.update_from_draft_graph(
+                    draft_graph=draft_graph
                 )
                 updated_graph.publish(notes=data.get("notes"), user=request.user)
 
@@ -707,7 +700,7 @@ class GraphPublicationView(View):
 
         elif self.action == "revert":
             try:
-                source_graph.revert()
+                source_graph.create_draft_graph()
                 return JSONResponse(
                     {
                         "title": _("Success!"),
@@ -731,6 +724,7 @@ class GraphPublicationView(View):
                 source_graph.update_published_graphs(
                     notes=data.get("notes"), user=request.user
                 )
+                source_graph.create_draft_graph()
 
                 return JSONResponse(
                     {

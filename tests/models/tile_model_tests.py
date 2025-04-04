@@ -777,7 +777,7 @@ class TileTests(ArchesTestCase):
 
     def test_check_for_missing_nodes(self):
         # Required file list node.
-        graph = Graph.new(name="Test Graph")
+        graph = Graph.objects.create_graph(name="Test Graph")
         node_group = NodeGroup.objects.get(
             pk=UUID("41111111-0000-0000-0000-000000000000")
         )
