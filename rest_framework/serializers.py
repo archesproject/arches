@@ -189,7 +189,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         "node-value": fields.CharField(null=True),  # XXX
         "edtf": fields.CharField(null=True),  # XXX
         "annotation": fields.CharField(null=True),  # XXX
-        "url": fields.URLField(null=True),
+        "url": JSONField(null=True),  # XXX
         "resource-instance": JSONField(null=True),
         "resource-instance-list": ArrayField(
             base_field=JSONField(null=True), null=True
