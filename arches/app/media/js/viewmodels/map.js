@@ -251,7 +251,10 @@ const viewModel = function (params) {
             var startVal = layer.paint ? layer.paint[opacityType + '-opacity'] : null;
 
             if (startVal) {
-                if (parseFloat(startVal)) {
+                if (parseFloat(startVal) && parseFloat(layer.paint[opacityType + '-opacity'])) { // verify startVal and opacity can be numbers
+                    layer.paint[opacityType + '-opacity'] = startVal * opacityVal;
+                } 
+                else if (parseFloat(startVal)) {
                     layer.paint[opacityType + '-opacity'].base = startVal * opacityVal;
                 } else {
                     layer.paint[opacityType + '-opacity'] = JSON.parse(JSON.stringify(startVal));
