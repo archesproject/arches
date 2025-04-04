@@ -22,12 +22,14 @@ import uuid
 
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
+from arches.app.models.models import NodeGroup
 from arches.app.search.elasticsearch_dsl_builder import (
     Match,
     Query,
 )
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
+from arches.app.utils.permission_backend import assign_perm, remove_perm
 from arches.app.views.search import search_terms, search_results
 from django.http import HttpRequest
 from django.contrib.auth.models import User
@@ -86,6 +88,7 @@ class SearchTests(ArchesTestCase):
             se.index_data(index="test", body=y, idfield="id", refresh=True)
 
         self.sync_es(se)
+        time.sleep(2)
 
         query = Query(se, start=0, limit=100)
         match = Match(field="type", query="altLabel")
@@ -141,12 +144,16 @@ class SearchTests(ArchesTestCase):
         Test search_terms method with an unpermitted user
 
         """
+        se = SearchEngineFactory().create()
+        admin_user = User.objects.get(username="admin")
         nodeid = "c9b37b7c-17b3-11eb-a708-acde48001122"
+        nodegroup = NodeGroup.objects.get(pk=nodeid)
         tileid = "bebffbea-daf6-414e-80c2-530ec88d2705"
         resourceinstanceid = "745f5e4a-d645-4c50-bafc-c677ea95f060"
         resource = Resource(uuid.UUID(resourceinstanceid))
         resource.graph_id = "c9b37a14-17b3-11eb-a708-acde48001122"
-        resource.save(user=self.tester, transaction_id=uuid.uuid4())
+        resource.save(user=admin_user, transaction_id=uuid.uuid4())
+        assign_perm("no_access_to_nodegroup", self.tester, nodegroup)
         tile_data = {}
         tile_data[nodeid] = {
             "en": {"value": "Etiwanda Avenue Street Trees", "direction": "ltr"}
@@ -158,7 +165,7 @@ class SearchTests(ArchesTestCase):
             nodegroup_id=nodeid,
         )
         new_tile.save()
-        self.sync_es()
+        self.sync_es(se)
         # wait a moment for ES to finish indexing
         time.sleep(1)
         request = HttpRequest()
@@ -174,6 +181,10 @@ class SearchTests(ArchesTestCase):
         except json.decoder.JSONDecodeError:
             print("Failed to parse search result")
         self.assertTrue("terms" in result and len(result["terms"]) == 0)
+        remove_perm("no_access_to_nodegroup", self.tester, nodegroup)
+        new_tile.delete()
+        resource.delete()
+        self.sync_es(se)
 
     def test_search_terms_permitted_user(self):
         """
