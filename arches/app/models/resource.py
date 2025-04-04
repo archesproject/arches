@@ -988,7 +988,9 @@ class Resource(models.ResourceInstance):
                     if resource["found"]:
                         if include_rr_count:
                             resource["_source"]["total_relations"] = {
-                                "value": total_relations_by_resource_id[UUID(resource["_id"])]
+                                "value": total_relations_by_resource_id[
+                                    UUID(resource["_id"])
+                                ]
                             }
                         for descriptor_type in ("displaydescription", "displayname"):
                             descriptor = get_localized_descriptor(
