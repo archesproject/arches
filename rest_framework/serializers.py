@@ -327,7 +327,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             sortorder = cross.sortorder or 0
         except (IndexError, ObjectDoesNotExist, MultipleObjectsReturned):
             label = I18n_String()
-            visible = False
+            visible = True
             config = I18n_JSON()
             sortorder = 0
 
