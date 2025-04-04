@@ -2265,15 +2265,14 @@ class ResourceInstanceDataType(BaseDataType):
                 self.append_in_list_search_filters(value, node, query, match_any=True)
             elif value["op"] == "in_list_all":
                 self.append_in_list_search_filters(value, node, query, match_any=False)
-            elif value["val"] != "" and value["val"] != []:
+            elif value["val"] != "" and value["val"] != [] and "!" in value["op"]:
                 # search_query = Match(field="tiles.data.%s.resourceId" % (str(node.pk)), type="phrase", query=value["val"])
                 search_query = Terms(
                     field="tiles.data.%s.resourceId.keyword" % (str(node.pk)),
                     terms=value["val"],
                 )
-                if "!" in value["op"]:
-                    query.must_not(search_query)
-                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
+                query.must_not(search_query)
+                query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
         except KeyError as e:
             pass
 
