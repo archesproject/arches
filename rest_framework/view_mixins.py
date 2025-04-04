@@ -71,6 +71,7 @@ class ArchesModelAPIMixin:
                 only=only,
                 resource_ids=self.resource_ids,
                 as_representation=True,
+                # TODO: resource-level nodegroup permissions
             )
         if issubclass(options.model, TileModel):
             qs = options.model.as_nodegroup(
@@ -79,6 +80,7 @@ class ArchesModelAPIMixin:
                 only=fields,
                 as_representation=True,
                 resource_ids=self.resource_ids,
+                user=self.request.user,
             )
             if self.resource_ids:
                 return qs.filter(resourceinstance__in=self.resource_ids)
@@ -95,6 +97,7 @@ class ArchesModelAPIMixin:
         }
 
     def get_object(self, user=None, permission_callable=None):
+        # TODO: discloses existence?
         ret = super().get_object()
         options = self.serializer_class.Meta
         if issubclass(options.model, ResourceInstance):

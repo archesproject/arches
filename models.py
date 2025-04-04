@@ -192,6 +192,7 @@ class SemanticTile(TileModel):
         only=None,
         as_representation=False,
         allow_empty=False,
+        user=None,
     ):
         """See `arches.app.models.querysets.TileQuerySet.with_node_values`."""
 
@@ -206,7 +207,7 @@ class SemanticTile(TileModel):
             raise Node.DoesNotExist(f"graph: {graph_slug} node: {entry_node_alias}")
 
         entry_node_and_nodes_below = []
-        for nodegroup in get_nodegroups_here_and_below(entry_node.nodegroup):
+        for nodegroup in get_nodegroups_here_and_below(entry_node.nodegroup, user):
             entry_node_and_nodes_below.extend(list(nodegroup.node_set.all()))
 
         qs = cls.objects.filter(nodegroup_id=entry_node.pk)

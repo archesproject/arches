@@ -412,6 +412,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             only=None if options.fields == "__all__" else options.fields,
             as_representation=True,
             allow_empty=True,
+            user=self.context.get("request").user,
         )
         validated_data["nodegroup_id"] = qs._entry_node.nodegroup_id
         if validated_data.get("sortorder") is None:

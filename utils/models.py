@@ -5,6 +5,7 @@ from django.db.models.expressions import BaseExpression
 from arches import __version__ as arches_version
 from arches.app.models.models import ResourceInstance, TileModel
 from arches.app.models.utils import field_names
+from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
 
 def field_attnames(instance_or_class):
@@ -71,11 +72,18 @@ def get_tile_values_for_resource(*, nodegroup, base_lookup) -> BaseExpression:
     return ArraySubquery(tile_query)
 
 
-def get_nodegroups_here_and_below(start_nodegroup):
+def get_nodegroups_here_and_below(start_nodegroup, user=None):
     accumulator = []
+    if user:
+        permitted_nodegroups = get_nodegroups_by_perm(user, "models.read_nodegroup")
 
     def accumulate(nodegroup):
         nonlocal accumulator
+        nonlocal permitted_nodegroups
+        nonlocal user
+        if user and nodegroup.pk not in permitted_nodegroups:
+            return
+
         accumulator.append(nodegroup)
         if arches_version >= "8":
             children_attr = nodegroup.children
