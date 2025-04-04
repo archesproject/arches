@@ -6,7 +6,6 @@ import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 
 import { displayedRowKey } from "@/arches_controlled_lists/constants.ts";
-import { routeNames } from "@/arches_controlled_lists/routes.ts";
 import { dataIsList } from "@/arches_controlled_lists/utils.ts";
 import ControlledListSplash from "@/arches_controlled_lists/components/misc/ControlledListSplash.vue";
 import ItemEditor from "@/arches_controlled_lists/components/editor/ItemEditor.vue";
@@ -44,18 +43,9 @@ const { displayedRow } = inject(displayedRowKey) as unknown as {
                 paddingRight: '2rem',
             }"
         >
-            <ControlledListSplash
-                v-if="!displayedRow"
-                :key="routeNames.splash"
-            />
-            <ListEditor
-                v-else-if="dataIsList(displayedRow)"
-                :key="displayedRow.id ?? routeNames.list"
-            />
-            <ItemEditor
-                v-else
-                :key="displayedRow.id ?? routeNames.item"
-            />
+            <ControlledListSplash v-if="!displayedRow" />
+            <ListEditor v-else-if="dataIsList(displayedRow)" />
+            <ItemEditor v-else />
         </SplitterPanel>
     </Splitter>
 </template>
