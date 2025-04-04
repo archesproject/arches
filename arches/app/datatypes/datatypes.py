@@ -2238,7 +2238,7 @@ class ResourceInstanceDataType(BaseDataType):
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)
 
-    def append_in_list_search_filters(self, value, node, query, match_any=True):
+    def append_in_list_search_filters(self, value, node, query):
         values_list = value.get("val", [])
         if values_list:
             field_name = f"tiles.data.{str(node.pk)}"
@@ -2248,12 +2248,12 @@ class ResourceInstanceDataType(BaseDataType):
                     term=val,
                 )
 
-                match match_any:
-                    case True:
+                match value["op"]:
+                    case "in_list_any":
                         query.should(match_q)
-                    case False:
+                    case "in_list_all":
                         query.must(match_q)
-                    case None:
+                    case "in_list_none":
                         query.must_not(match_q)
             query.filter(Exists(field=field_name))
 
@@ -2261,12 +2261,8 @@ class ResourceInstanceDataType(BaseDataType):
         try:
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
-            elif value["op"] == "in_list_any":
-                self.append_in_list_search_filters(value, node, query, match_any=True)
-            elif value["op"] == "in_list_all":
-                self.append_in_list_search_filters(value, node, query, match_any=False)
-            elif value["op"] == "in_list_none":
-                self.append_in_list_search_filters(value, node, query, match_any=None)
+            elif value["op"] != "" and value["op"]:
+                self.append_in_list_search_filters(value, node, query)
         except KeyError as e:
             pass
 
