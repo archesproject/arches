@@ -211,9 +211,7 @@ function getOption(value: string): ResourceInstanceReference | undefined {
             @before-show="getOptions(1)"
             @filter="onFilter"
         >
-            <template
-                #chip="{ value, removeCallback }"
-            >
+            <template #chip="{ value, removeCallback }">
                 <div class="p-multiselect-chip">
                     <span class="p-chip-label">
                         {{ getOption(value)?.display_value }}
