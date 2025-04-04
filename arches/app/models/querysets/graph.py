@@ -1,6 +1,9 @@
+from slugify import slugify
 import uuid
 from django.utils.translation import gettext as _
 from django.db import models
+from arches.app.models.models import GraphModel
+from arches.app.models.utils import make_name_unique
 
 
 class GraphQuerySet(models.QuerySet):
@@ -9,7 +12,20 @@ class GraphQuerySet(models.QuerySet):
             "Use create_graph() to create new Graph instances with proper business logic."
         )
 
-    def create_graph(self, name="", user=None, is_resource=False):
+    def get_slug(self, name, is_resource):
+        if name:
+            slug = slugify(name, separator="_")
+        else:
+            if is_resource:
+                slug = "new_resource_model"
+            else:
+                slug = "new_branch"
+        existing_slugs = GraphModel.objects.all().values_list("slug", flat=True)
+        slug = make_name_unique(slug, existing_slugs, "_")
+
+        return slug
+
+    def create_graph(self, name="", slug=None, user=None, is_resource=False):
         from arches.app.models import models as arches_models
 
         """
@@ -17,6 +33,9 @@ class GraphQuerySet(models.QuerySet):
         """
         new_id = uuid.uuid4()
         nodegroup = None
+
+        if not slug:
+            slug = self.get_slug(name, is_resource)
 
         graph_model = arches_models.GraphModel(
             name=name,
@@ -31,7 +50,7 @@ class GraphQuerySet(models.QuerySet):
             isresource=is_resource,
             iconclass="",
             ontology=None,
-            slug=None,
+            slug=slug,
         )
         graph_model.save()  # to access side-effects declared in save method
 
