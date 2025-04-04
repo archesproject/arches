@@ -9,7 +9,7 @@ from slugify import slugify
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "11857_spatial_view_source_identifier_filter"),
+        ("models", "11882_principal_user_read_only"),
     ]
 
     def add_missing_graph_slug(apps, schema_editor):
