@@ -2253,7 +2253,7 @@ class ResourceInstanceDataType(BaseDataType):
                         query.should(match_q)
                     case "in_list_all":
                         query.must(match_q)
-                    case "in_list_none":
+                    case "!" | "in_list_none":
                         query.must_not(match_q)
             query.filter(Exists(field=field_name))
 
