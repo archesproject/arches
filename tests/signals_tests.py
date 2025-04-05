@@ -64,6 +64,7 @@ class GraphHasUnpublishedChangesSignalTests(ArchesTestCase):
             "iconclass": "fa fa-angle-double-down",
             "isresource": False,
             "name": "Node/Node Type",
+            "slug": "node_type",
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
             "subtitle": "Represents a node and node type pairing",
             "version": "v1",
