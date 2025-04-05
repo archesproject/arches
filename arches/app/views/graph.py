@@ -548,7 +548,9 @@ class GraphDataView(View):
 
                 elif self.action == "export_branch":
                     clone_data = graph.copy(root=data)
-                    clone_data["copy"].slug = self.get_slug(clone_data["name"], False)
+                    clone_data["copy"].slug = self.get_slug(
+                        str(clone_data["copy"].name), False
+                    )
                     clone_data["copy"].publication = None
 
                     clone_data["copy"].save()
@@ -565,7 +567,7 @@ class GraphDataView(View):
                     clone_data = graph.copy()
                     ret = clone_data["copy"]
                     ret.slug = self.get_slug(
-                        clone_data["name"], clone_data["is_resource"]
+                        str(clone_data["copy"].name), clone_data["copy"].isresource
                     )
                     ret.publication = None
 
