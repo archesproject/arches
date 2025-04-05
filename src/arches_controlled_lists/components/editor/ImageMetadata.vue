@@ -226,11 +226,11 @@ const setRowFocus = (event: DataTableRowEditInitEvent) => {
     rowIndexToFocus.value = event.index;
 };
 
-const makeRowUneditable = (metadataId: string) => {
+function makeRowUneditable(metadataId: string) {
     editingRows.value = [
         ...editingRows.value.filter((metadatum) => metadatum.id !== metadataId),
     ];
-};
+}
 
 const focusInput = () => {
     if (rowIndexToFocus.value !== -1) {
