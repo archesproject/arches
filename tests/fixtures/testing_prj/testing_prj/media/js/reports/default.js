@@ -7,7 +7,7 @@ export default ko.components.register('default-report', {
     viewModel: function(params) {
         params.configKeys = [];
         
-        ReportViewModel.apply(this, [params]);
+        ReportViewModel.default.apply(this, [params]);
     },
     template: defaultReportTemplate,
 });
