@@ -659,6 +659,7 @@
             "user_id": null
         },
       "name": "Source",
+      "slug": "source",
       "cards_x_nodes_x_widgets": [],
       "cards": [
         {

@@ -910,6 +910,7 @@
             "is_editable": true,
             "isresource": true,
             "name": "Target",
+            "slug": "target",
             "nodegroups": [
                 {
                     "cardinality": "n",
