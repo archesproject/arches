@@ -158,6 +158,7 @@ class GraphManagerViewTests(ArchesTestCase):
     def create_test_graph(cls):
         test_graph = Graph.objects.create_graph()
         test_graph.name = "TEST GRAPH"
+        test_graph.slug = "test_graph"
         test_graph.subtitle = "ARCHES TEST GRAPH"
         test_graph.author = "Arches"
         test_graph.description = "ARCHES TEST GRAPH"
