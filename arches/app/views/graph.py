@@ -564,7 +564,9 @@ class GraphDataView(View):
 
                     clone_data = graph.copy()
                     ret = clone_data["copy"]
-                    ret.slug = self.get_slug(clone_data["name"], clone_data["is_resource"])
+                    ret.slug = self.get_slug(
+                        clone_data["name"], clone_data["is_resource"]
+                    )
                     ret.publication = None
 
                     ret.save()
@@ -674,6 +676,7 @@ class GraphDataView(View):
         slug = make_name_unique(slug, existing_slugs, "_")
 
         return slug
+
 
 class GraphPublicationView(View):
     action = None
