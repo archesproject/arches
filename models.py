@@ -97,10 +97,10 @@ class SemanticResource(ResourceInstance):
 
     def save(self, index=False, user=None, **kwargs):
         with transaction.atomic():
-            # update_fields=set() will abort the save, but at least calling
-            # into save() will run a sanity check on unsaved relations.
-            super().save(update_fields=set())
-            self._save_aliased_data(user=user, index=index, **kwargs)
+            if getattr(self, "_annotated_tiles", None):
+                self._save_aliased_data(user=user, index=index, **kwargs)
+            else:
+                super().save(**kwargs)
 
     def clean(self):
         """Raises a compound ValidationError with any failing tile values."""
