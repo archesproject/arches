@@ -232,9 +232,6 @@ class SemanticTile(TileModel):
 
     def save(self, index=False, user=None, **kwargs):
         with transaction.atomic():
-            # update_fields=set() will abort the save, but at least calling
-            # into save() will run a sanity check on unsaved relations.
-            super().save(update_fields=set())
             if self.sortorder is None or self.is_fully_provisional():
                 self.set_next_sort_order()
             self._save_aliased_data(user=user, index=index, **kwargs)
@@ -244,6 +241,7 @@ class SemanticTile(TileModel):
 
     def dummy_save(self, **kwargs):
         """Don't save this tile, but run any other side effects."""
+        # update_fields=set() will abort the save.
         save_kwargs = {**kwargs, "update_fields": set()}
         return super().save(**save_kwargs)
 
