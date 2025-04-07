@@ -438,3 +438,61 @@ class SearchTests(ArchesTestCase):
         results = search_results(request=request)
         results = JSONDeserializer().deserialize(results.content)["results"]["hits"]
         self.assertEqual(1, len(results["hits"]))
+
+    def test_adv_search_on_resource_instance_node_in_list_all(self):
+        ri_dt_nodeid = "7f4406d0-c8c1-11ed-a172-0242ac130009"
+        graphid = "d71a8f56-987f-4fd1-87b5-538378740f15"
+        cardinality_graphid = "2f7f8e40-adbc-11e6-ac7f-14109fd34195"
+        user = User.objects.get(username="admin")
+        new_cardinality_resource_1 = Resource(graph_id=cardinality_graphid)
+        new_cardinality_resource_1.save(user=self.tester, transaction_id=uuid.uuid4())
+        new_cardinality_resource_2 = Resource(graph_id=cardinality_graphid)
+        new_cardinality_resource_2.save(user=self.tester, transaction_id=uuid.uuid4())
+        new_resource = Resource(graph_id=graphid)
+        new_resource.save(user=user, transaction_id=uuid.uuid4())
+        new_ri_tile = Tile.get_blank_tile(
+            ri_dt_nodeid, resourceid=str(new_resource.resourceinstance_id)
+        )
+        new_ri_tile.data[ri_dt_nodeid] = [
+            {
+                "resourceId": str(new_cardinality_resource_1.resourceinstance_id),
+                "ontologyProperty": "",
+                "inverseOntologyProperty": "",
+                "resourceXresourceId": str(uuid.uuid4()),
+            },
+            {
+                "resourceId": str(new_cardinality_resource_2.resourceinstance_id),
+                "ontologyProperty": "",
+                "inverseOntologyProperty": "",
+                "resourceXresourceId": str(uuid.uuid4()),
+            },
+        ]
+        new_ri_tile.save(index=False)
+        new_ri_tile.index()
+        self.sync_es()
+        time.sleep(1)
+        # test search for non-null resource list
+        request = HttpRequest()
+        request.method = "GET"
+        request.GET.__setitem__("paging-filter", "1")
+        request.GET.__setitem__(
+            "advanced-search",
+            json.dumps(
+                [
+                    {
+                        "op": "and",
+                        ri_dt_nodeid: {
+                            "op": "in_list_all",
+                            "val": [
+                                str(new_cardinality_resource_1.resourceinstance_id),
+                                str(new_cardinality_resource_2.resourceinstance_id),
+                            ],
+                        },
+                    }
+                ]
+            ),
+        )
+        request.user = user
+        results = search_results(request=request)
+        results = JSONDeserializer().deserialize(results.content)["results"]["hits"]
+        self.assertEqual(2, len(results["hits"]))
