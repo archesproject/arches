@@ -445,7 +445,7 @@ class SearchTests(ArchesTestCase):
         graphid = "d71a8f56-987f-4fd1-87b5-538378740f15"
         cardinality_graphid = "2f7f8e40-adbc-11e6-ac7f-14109fd34195"
         user = User.objects.get(username="admin")
-        graph = Graph.objects.filter(
+        graph = Graph.objects.get(
             graphid=cardinality_graphid,
         )
         graph.publish(user=user)
