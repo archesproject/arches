@@ -409,7 +409,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         qs = options.model.as_nodegroup(
             self.nodegroup_alias,
             graph_slug=self.graph_slug,
-            only=None if options.fields == "__all__" else options.fields,
+            only=None,
             as_representation=True,
             allow_empty=True,
             user=self.context.get("request").user,
@@ -470,7 +470,7 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             instance_without_tile_data = super().create(validated_data)
             instance_from_factory = options.model.as_model(
                 graph_slug=self.graph_slug,
-                only=self.fields,
+                only=None,
             ).get(pk=instance_without_tile_data.pk)
             instance_from_factory._as_representation = True
             updated = self.update(instance_from_factory, validated_data)
