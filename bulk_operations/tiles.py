@@ -438,7 +438,8 @@ class BulkTileOperation:
                 insert_proxies = TileModel.objects.none()
             if self.to_update:
                 TileModel.objects.bulk_update(
-                    self.to_update, {"data", "parenttile", "provisionaledits"}
+                    self.to_update,
+                    {"data", "parenttile", "provisionaledits", "sortorder"},
                 )
             if self.to_delete:
                 TileModel.objects.filter(pk__in=[t.pk for t in self.to_delete]).delete()
