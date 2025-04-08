@@ -17,10 +17,12 @@ import type {
 
 const props = defineProps<{
     initialValue: ReferenceSelectFetchedOption[] | undefined;
-    configuration: {
-        placeholder: string;
-        controlledList: string;
+    nodeConfig: {
         multiValue: boolean;
+        controlledList: string;
+    };
+    widgetConfig: {
+        placeholder: string;
         defaultValue: ReferenceSelectFetchedOption[] | undefined;
     };
     nodeAlias: string;
@@ -34,9 +36,9 @@ const expandedKeys: Ref<TreeExpandedKeys> = ref({});
 
 const initialVal = toRef(
     extractInitialOrDefaultValue(
-        props.configuration.multiValue,
+        props.nodeConfig.multiValue,
         props.initialValue,
-        props.configuration.defaultValue,
+        props.widgetConfig.defaultValue,
     ),
 );
 
@@ -45,13 +47,25 @@ function extractInitialOrDefaultValue(
     initialVal: ReferenceSelectFetchedOption[] | undefined,
     defaultVal: ReferenceSelectFetchedOption[] | undefined,
 ) {
-    return multiVal
-        ? initialVal
-            ? initialVal?.map((reference) => formatValForPrimevue(reference))
-            : defaultVal?.map((reference) => formatValForPrimevue(reference))
-        : initialVal
-          ? formatValForPrimevue(initialVal ? initialVal[0] : undefined)
-          : formatValForPrimevue(defaultVal ? defaultVal[0] : undefined);
+    let extractedVals: object | undefined = undefined;
+    if (multiVal) {
+        if (initialVal) {
+            extractedVals = initialVal?.map((reference) =>
+                formatValForPrimevue(reference),
+            );
+        } else if (defaultVal) {
+            extractedVals = defaultVal?.map((reference) =>
+                formatValForPrimevue(reference),
+            );
+        }
+    } else {
+        if (initialVal && initialVal.length > 0) {
+            extractedVals = formatValForPrimevue(initialVal[0]);
+        } else if (defaultVal && defaultVal.length > 0) {
+            extractedVals = formatValForPrimevue(defaultVal[0]);
+        }
+    }
+    return extractedVals;
 }
 
 function formatValForPrimevue(val: ReferenceSelectFetchedOption | undefined) {
@@ -79,9 +93,10 @@ function optionAsNode(
 function optionsAsNodes(
     items: ReferenceSelectFetchedOption[],
 ): ReferenceSelectTreeNode[] {
-    return items
-        .filter((item): item is ReferenceSelectFetchedOption => !!item)
-        .map(optionAsNode);
+    if (items.length > 0) {
+        return items.map(optionAsNode);
+    }
+    return [];
 }
 
 async function getOptions() {
@@ -102,7 +117,6 @@ async function getOptions() {
 // let timeout: ReturnType<typeof setTimeout>;
 
 function resolver({ value }: FormFieldResolverOptions) {
-    validate(value);
     // return new Promise((resolve) => {
     //     if (timeout) clearTimeout(timeout);
 
@@ -121,6 +135,7 @@ function resolver({ value }: FormFieldResolverOptions) {
             [],
         );
     }
+    validate(selectedItemKeys);
     return {
         values: { [nodeAlias]: selectedItemKeys },
     };
@@ -142,13 +157,10 @@ function validate(e: FormFieldResolverOptions) {
 }
 
 onMounted(() => {
+    const defaultVal = props.widgetConfig.defaultValue;
     options.value = [
         ...optionsAsNodes(props.initialValue ? props.initialValue : []),
-        ...optionsAsNodes(
-            props.configuration.defaultValue
-                ? props.configuration.defaultValue
-                : [],
-        ),
+        ...optionsAsNodes(defaultVal ? defaultVal : []),
     ];
 });
 </script>
@@ -174,8 +186,8 @@ onMounted(() => {
             :loading="isLoading"
             :options="options"
             :expanded-keys="expandedKeys"
-            :placeholder="configuration.placeholder"
-            :selection-mode="configuration.multiValue ? 'multiple' : 'single'"
+            :placeholder="widgetConfig.placeholder"
+            :selection-mode="nodeConfig.multiValue ? 'multiple' : 'single'"
             :show-clear="true"
             @before-show="getOptions"
         />

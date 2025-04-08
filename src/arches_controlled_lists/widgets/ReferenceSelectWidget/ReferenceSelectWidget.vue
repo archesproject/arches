@@ -55,7 +55,8 @@ onMounted(async () => {
         <div v-if="mode === EDIT">
             <ReferenceSelectWidgetEditor
                 :initial-value="initialValue"
-                :configuration="{ ...widgetData.config, ...nodeData.config }"
+                :node-config="nodeData.config"
+                :widget-config="widgetData.config"
                 :node-alias="props.nodeAlias"
                 :graph-slug="props.graphSlug"
             />
