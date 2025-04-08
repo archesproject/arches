@@ -149,6 +149,9 @@ function resolver(e: FormFieldResolverOptions) {
     //         resolve(validate(e));
     //     }, 500);
     // });
+    return {
+        values: { [props.nodeAlias]: e.values },
+    };
 }
 
 function validate(e: FormFieldResolverOptions) {
