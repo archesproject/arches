@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "{{ project_name }}"
 readme = "README.md"
 authors = []
-license = {text = "GNU AGPL3"}
+license = "AGPL-3.0-or-later"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python",
@@ -20,7 +20,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Information Technology",
-    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
 ]
 requires-python = ">=3.11"
 dependencies = [
