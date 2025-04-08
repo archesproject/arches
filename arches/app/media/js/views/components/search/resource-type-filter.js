@@ -17,7 +17,7 @@ const viewModel = BaseFilter.extend({
         if (response.ok) {
             const data = await response.json();
             data.resources.forEach(function (res) {
-                if (res.is_active === true && res.source_identifier_id === null) {
+                if (res.is_active === true && !res.source_identifier_id) {
                     self.resourceModels.push(res);
                 }
             });
