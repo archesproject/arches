@@ -39,7 +39,7 @@ var BaseManager = PageView.extend({
         });
         options.viewModel.resources = ko.computed(function() {
             return  ko.utils.arrayFilter(options.viewModel.allGraphs(), function(graph) {
-                return graph.isresource;
+                return graph.isresource && !graph.source_identifier_id;
             });
         });
         options.viewModel.createableResources = ko.observableArray(data.createableResources.filter(currentGraph => currentGraph.source_identifier_id === null)); 
