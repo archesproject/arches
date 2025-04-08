@@ -1,6 +1,8 @@
-from django.contrib.postgres.fields import ArrayField
-from django.db.models import JSONField, Lookup
+from django.contrib.postgres.fields.array import ArrayExact
+from django.db.models import Lookup
 from psycopg2.extensions import AsIs, QuotedString
+
+from arches_querysets.fields import Cardinality1Field, CardinalityNField
 
 
 class JSONPathFilter:
@@ -12,10 +14,7 @@ class JSONPathFilter:
         return rhs, (quoted,)
 
 
-## JSONField lookups (Cardinality 1)
-
-
-@JSONField.register_lookup
+@Cardinality1Field.register_lookup
 class AnyLanguageEquals(JSONPathFilter, Lookup):
     lookup_name = "any_lang"
 
@@ -26,7 +25,7 @@ class AnyLanguageEquals(JSONPathFilter, Lookup):
         return "%s @? '$.*.value ? (@ == \"%s\")'" % (lhs, rhs), params
 
 
-@JSONField.register_lookup
+@Cardinality1Field.register_lookup
 class AnyLanguageContains(JSONPathFilter, Lookup):
     lookup_name = "any_lang_contains"
 
@@ -37,7 +36,7 @@ class AnyLanguageContains(JSONPathFilter, Lookup):
         return "%s @? '$.*.value ? (@ like_regex \"%s\")'" % (lhs, rhs), params
 
 
-@JSONField.register_lookup
+@Cardinality1Field.register_lookup
 class AnyLanguageIContains(JSONPathFilter, Lookup):
     lookup_name = "any_lang_icontains"
 
@@ -48,7 +47,14 @@ class AnyLanguageIContains(JSONPathFilter, Lookup):
         return '%s @? \'$.*.value ? (@ like_regex "%s" flag "i")\'' % (lhs, rhs), params
 
 
-@JSONField.register_lookup
+@CardinalityNField.register_lookup
+class Exact(JSONPathFilter, ArrayExact):
+    def process_rhs(self, compiler, connection):
+        rhs, params = super().process_rhs(compiler, connection)
+        return rhs, [f'"{param}"' for param in params]
+
+
+@CardinalityNField.register_lookup
 class AnyLanguageStartsWith(JSONPathFilter, Lookup):
     lookup_name = "any_lang_startswith"
 
@@ -59,10 +65,7 @@ class AnyLanguageStartsWith(JSONPathFilter, Lookup):
         return "%s @? '$.*.value ? (@ starts with \"%s\")'" % (lhs, rhs), params
 
 
-## ArrayField lookups (Cardinality N)
-
-
-@ArrayField.register_lookup
+@CardinalityNField.register_lookup
 class ArrayAnyLanguageEquals(JSONPathFilter, Lookup):
     lookup_name = "any_lang"
 
@@ -73,7 +76,7 @@ class ArrayAnyLanguageEquals(JSONPathFilter, Lookup):
         return "TO_JSONB(%s) @? '$[*].*.value ? (@ == \"%s\")'" % (lhs, rhs), params
 
 
-@ArrayField.register_lookup
+@CardinalityNField.register_lookup
 class ArrayAnyLanguageContains(JSONPathFilter, Lookup):
     lookup_name = "any_lang_contains"
 
@@ -87,7 +90,7 @@ class ArrayAnyLanguageContains(JSONPathFilter, Lookup):
         )
 
 
-@ArrayField.register_lookup
+@CardinalityNField.register_lookup
 class ArrayAnyLanguageIContains(JSONPathFilter, Lookup):
     lookup_name = "any_lang_icontains"
 
@@ -102,7 +105,7 @@ class ArrayAnyLanguageIContains(JSONPathFilter, Lookup):
         )
 
 
-@ArrayField.register_lookup
+@CardinalityNField.register_lookup
 class ArrayAnyLanguageStartsWith(JSONPathFilter, Lookup):
     lookup_name = "any_lang_startswith"
 
