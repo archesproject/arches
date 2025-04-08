@@ -1222,3 +1222,63 @@ class GraphTests(ArchesTestCase):
         branch.publish(user=admin)
 
         graph.append_branch("http://www.nasa.gov/", graphid=self.NODE_NODETYPE_GRAPHID)
+
+    def test_geometry_config_persists_after_unpublishing_graph(self):
+
+        models.GraphModel.objects.create(
+            **{
+                "name": "Test Graph",
+                "graphid": "49a7eea8-2e2b-48e3-8b6e-650f25ec2954",
+                "isresource": True,
+            }
+        )
+
+        models.Node.objects.create(
+            **{
+                "name": "Top Node",
+                "graph_id": "49a7eea8-2e2b-48e3-8b6e-650f25ec2954",
+                "datatype": "semantic",
+                "istopnode": True,
+                "nodeid": "c1257d42-9275-40df-835e-5b99eee818fa",
+            }
+        )
+
+        models.Node.objects.create(
+            **{
+                "name": "GeoJSON Node",
+                "graph_id": "49a7eea8-2e2b-48e3-8b6e-650f25ec2954",
+                "datatype": "geojson-feature-collection",
+                "istopnode": False,
+                "config": {
+                    "fillColor": "rgba(130, 130, 130, 0.7)",
+                },
+                "nodeid": "88677159-dccf-4629-9210-f6a2a7463552",
+            }
+        )
+
+        models.Edge.objects.create(
+            **{
+                "domainnode_id": "c1257d42-9275-40df-835e-5b99eee818fa",
+                "edgeid": "16a8ec0d-7d8c-422a-aa33-fac1ac3a07b0",
+                "graph_id": "49a7eea8-2e2b-48e3-8b6e-650f25ec2954",
+                "rangenode_id": "88677159-dccf-4629-9210-f6a2a7463552",
+            }
+        )
+
+        graph = Graph.objects.get(pk="49a7eea8-2e2b-48e3-8b6e-650f25ec2954")
+        admin = User.objects.get(username="admin")
+        graph.publish(user=admin)
+
+        node = models.Node.objects.get(pk="88677159-dccf-4629-9210-f6a2a7463552")
+        node.config["fillColor"] = "rgba(200, 130, 130, 0.7)"
+        node.save()
+
+        graph.unpublish()
+
+        graph_from_db = Graph.objects.get(pk="49a7eea8-2e2b-48e3-8b6e-650f25ec2954")
+        self.assertEqual(
+            graph_from_db.nodes[
+                uuid.UUID("88677159-dccf-4629-9210-f6a2a7463552")
+            ].config["fillColor"],
+            "rgba(200, 130, 130, 0.7)",
+        )

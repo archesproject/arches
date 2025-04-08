@@ -93,11 +93,14 @@
                 </div>
                 <div class="workbench-card-sidepanel-border"></div>
                 <div class="workbench-card-sidepanel-body">
-                <div class="overlays-listing-container" data-bind="sortable: {
-                    data: overlays
-                }">
-                    <div class="overlay-listing" data-bind="css: {'active-overlay': onMap}">
-                        <div class="overlay-name" tabindex="0" role="switch" data-bind="
+                    <div class="overlays-listing-container" data-bind="sortable: {
+                        data: overlays,
+                        as: 'overlay',
+                        beforeMove: beforeMove,
+                        afterMove: reorderOverlays
+                    }">
+                        <div class="overlay-listing" tabindex="0" role="option" data-bind="css: {'active-overlay': onMap}, event: {keyup: $parent.keyDownHandler}">
+                            <div class="overlay-name" tabindex="0" role="switch" data-bind="
                             click: function() {
                                 onMap(!onMap());
                                 updateParent($parent);
