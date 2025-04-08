@@ -75,7 +75,7 @@ class BaseDataType(object):
         """
         return value
 
-    def transform_value_from_tile(self, value, **kwargs):
+    def transform_value_for_frontend(self, value, **kwargs):
         """
         Transform db value to simpler representation for use on the front-end
         """
