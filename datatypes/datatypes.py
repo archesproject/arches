@@ -226,14 +226,64 @@ class ReferenceDataType(BaseDataType):
                         labels.append(label.get("value", ""))
         return ", ".join(labels)
 
-    def transform_value_from_tile(self, default_tile_value):
+    def transform_value_for_frontend(self, value):
         """
         Expects tile representation of reference datatype:
-        [{"uri": "", "labels": [{"id": "uuid", "value": "label", "language_id": "en", "valuetype_id": "prefLabel", "list_item_id": "uuid"}], "list_id": "uuid"}]
+        [
+            {
+                "uri": "",
+                "labels": [
+                    {
+                        "id": "uuid",
+                        "value": "label",
+                        "language_id": "en",
+                        "valuetype_id": "prefLabel",
+                        "list_item_id": "uuid"
+                    }
+                ],
+                "list_id": "uuid"
+            }
+        ]
+        Returns list item transformed for use in dropdown pickers:
+        [
+            {
+                "list_item_id": "uuid",
+                "uri": "",
+                "list_item_values": [
+                    {
+                        "id": "uuid",
+                        "value": "Parent",
+                        "language_id": "en",
+                        "valuetype_id": "prefLabel",
+                        "list_item_id": "uuid"
+                    }
+                ],
+                "display_value": "",
+                "sortorder": 0,
+                "children": [
+                    {
+                        "list_item_id": "uuid",
+                        "uri": "",
+                        "list_item_values": [
+                            {
+                                "id": "uuid",
+                                "value": "Child",
+                                "language_id": "en",
+                                "valuetype_id": "prefLabel",
+                                "list_item_id": "uuid"
+                            }
+                        ],
+                        "display_value": "",
+                        "sortorder": 0,
+                        "children": []
+                    }
+                ]
+            }
+        ]
         """
         list_item_ids = []
-        if default_tile_value:
-            for default_val in default_tile_value:
+        if value:
+            for default_val in value:
                 list_item_ids.append(default_val["labels"][0]["list_item_id"])
         else:
             return None
