@@ -511,7 +511,7 @@ class BulkTileOperation:
                 delete_proxy.save_edit(
                     user=self.user,
                     edit_type="tile delete",
-                    old_value=update_proxy._existing_data,
+                    old_value=delete_proxy.data,
                     provisional_edit_log_details=None,
                     transaction_id=self.transaction_id,
                 )
