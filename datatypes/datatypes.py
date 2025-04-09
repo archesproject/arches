@@ -1,5 +1,6 @@
 import uuid
 from dataclasses import asdict, dataclass
+from typing import Iterable, Mapping
 
 from django.utils.translation import get_language, gettext as _
 
@@ -28,9 +29,9 @@ class Reference:
 
 
 class ReferenceDataType(BaseDataType):
-    def to_python(self, value) -> list[Reference]:
+    def to_python(self, value: Iterable[Mapping] | None) -> list[Reference] | None:
         if not value:
-            return []
+            return None
 
         references = []
         for reference in value:
@@ -43,18 +44,20 @@ class ReferenceDataType(BaseDataType):
                 incoming_args.pop("labels")
             references.append(Reference(**incoming_args))
 
-        return references
+        return references or None
 
     def serialize(self, value):
-        if isinstance(value, list):
-            return [
-                asdict(reference) if isinstance(reference, Reference) else {**reference}
-                for reference in value
-            ]
-        return value
+        if value is None:
+            return None
+        return [
+            asdict(reference) if isinstance(reference, Reference) else {**reference}
+            for reference in value
+        ]
 
     def to_representation(self, value):
         references = self.to_python(value)
+        if not references:
+            return None
         return [
             {
                 "list_item_id": reference.labels[0].list_item_id,
@@ -110,15 +113,15 @@ class ReferenceDataType(BaseDataType):
                 raise ValueError(msg)
 
     def validate_list_item_consistency(self, references: list[Reference] | None):
-        if references is None:
-            return None
+        if not references:
+            return
         for reference in references:
             list_item_ids = {ref.list_item_id for ref in reference.labels}
             if len(list_item_ids) != 1:
                 msg = _("Found multiple list items among labels: {reference}")
                 raise ValueError(msg)
 
-    def validate_multivalue(self, parsed, node, nodeid):
+    def validate_multivalue(self, parsed: list[Reference] | None, node, nodeid):
         if not parsed:
             return
         if not node:
@@ -197,6 +200,8 @@ class ReferenceDataType(BaseDataType):
         return final_tile_values
 
     def lookup_listitem_from_label(self, value, list_id):
+        if not value or not list_id:
+            return None
         return (
             ListItem.objects.filter(list_id=list_id, list_item_values__value=value)
             .order_by("sortorder")
