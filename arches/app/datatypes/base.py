@@ -75,7 +75,7 @@ class BaseDataType(object):
         """
         return value
 
-    def transform_value_for_frontend(self, value, **kwargs):
+    def transform_default_value(self, value, **kwargs):
         """
         Transform db value to simpler representation for use on the front-end
         """

@@ -56,10 +56,10 @@ class BaseDataTypeTests(ArchesTestCase):
 
         self.assertEqual(base.get_tile_data(tile_holding_only_none), tile_data)
 
-    def test_transform_value_for_frontend(self):
+    def test_transform_default_value(self):
         base = BaseDataType()
         value = "test values should be the same"
-        self.assertEqual(base.transform_value_for_frontend(value), value)
+        self.assertEqual(base.transform_default_value(value), value)
 
 
 class BooleanDataTypeTests(ArchesTestCase):
