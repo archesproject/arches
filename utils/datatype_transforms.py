@@ -8,9 +8,7 @@ import copy
 import json
 import logging
 import uuid
-from datetime import date, datetime
 
-from django.conf import settings
 from django.utils.translation import get_language, gettext as _
 
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -189,35 +187,6 @@ def string_to_representation(self, value):
         reverse=True,
     )
     return ranked[0][1]
-
-
-def date_transform_value_for_tile(self, value, **kwargs):
-    value = None if value == "" else value
-    if value is not None:
-        if type(value) == list:
-            value = value[0]
-        elif (
-            type(value) == str and len(value) < 4 and value.startswith("-") is False
-        ):  # a year before 1000 but not BCE
-            value = value.zfill(4)
-    if isinstance(value, (date, datetime)):
-        v = value
-    else:
-        valid_date_format, valid = self.get_valid_date_format(value)
-        if valid:
-            v = datetime.strptime(value, valid_date_format)
-        else:
-            v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
-    # The .astimezone() function throws an error on Windows for dates before 1970
-    if isinstance(v, datetime):
-        try:
-            v = v.astimezone()
-        except:
-            v = self.backup_astimezone(v)
-        value = v.isoformat(timespec="milliseconds")
-    elif isinstance(v, date):
-        value = v.isoformat()
-    return value
 
 
 def resource_instance_transform_value_for_tile(self, value, **kwargs):
