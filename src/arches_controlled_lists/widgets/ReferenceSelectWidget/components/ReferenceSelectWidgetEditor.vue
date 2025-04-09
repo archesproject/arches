@@ -116,7 +116,7 @@ async function getOptions() {
 
 // let timeout: ReturnType<typeof setTimeout>;
 
-function resolver({ value }: FormFieldResolverOptions) {
+function resolver(options: FormFieldResolverOptions) {
     // return new Promise((resolve) => {
     //     if (timeout) clearTimeout(timeout);
 
@@ -125,9 +125,8 @@ function resolver({ value }: FormFieldResolverOptions) {
     //     }, 500);
     // });
     const nodeAlias = props.nodeAlias;
-    let selectedItemKeys: string[] = [];
-    if (value) {
-        selectedItemKeys = Object.entries(value).reduce<string[]>(
+    if (options.value) {
+        options.value = Object.entries(options.value).reduce<string[]>(
             (keys, [key, val]) => {
                 if (val === true) keys.push(key);
                 return keys;
@@ -135,9 +134,9 @@ function resolver({ value }: FormFieldResolverOptions) {
             [],
         );
     }
-    validate(selectedItemKeys);
+    validate(options);
     return {
-        values: { [nodeAlias]: selectedItemKeys },
+        values: { [nodeAlias]: options.value }, //, errors
     };
 }
 
