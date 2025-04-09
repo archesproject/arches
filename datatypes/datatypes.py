@@ -191,8 +191,8 @@ class ReferenceDataType(BaseDataType):
                         )
                     else:
                         found_item = ListItem.objects.filter(pk=list_item_id).first()
-                case dict():
-                    final_tile_values.append(single_value)
+                case _:
+                    raise TypeError
 
             if found_item:
                 final_tile_values.append(found_item.build_tile_value())
