@@ -1,7 +1,7 @@
 import uuid
 from collections import defaultdict
 from functools import partial
-from itertools import chain, zip_longest
+from itertools import chain
 from operator import attrgetter
 
 from django.core.exceptions import ValidationError
@@ -122,6 +122,7 @@ class BulkTileOperation:
         grouping_node,
         container,
         original_tile_data_by_tile_id,
+        delete_siblings=False,
     ):
         from arches_querysets.models import SemanticTile
 
@@ -164,11 +165,10 @@ class BulkTileOperation:
             next_sort_order = 0
         else:
             next_sort_order = max(t.sortorder or 0 for t in existing_tiles) + 1
-        for existing_tile, new_tile in zip_longest(
-            existing_tiles, new_tiles, fillvalue=NOT_PROVIDED
-        ):
+        for existing_tile, new_tile in self._pair_tiles(existing_tiles, new_tiles):
             if new_tile is NOT_PROVIDED:
-                self.to_delete.add(existing_tile)
+                if delete_siblings:
+                    self.to_delete.add(existing_tile)
                 continue
             if existing_tile is NOT_PROVIDED:
                 new_tile.nodegroup_id = grouping_node.nodegroup_id
@@ -221,6 +221,7 @@ class BulkTileOperation:
                     grouping_node=child_nodegroup.grouping_node,
                     container=tile._incoming_tile,
                     original_tile_data_by_tile_id=original_tile_data_by_tile_id,
+                    delete_siblings=True,
                 )
             self._validate_and_patch_from_tile_values(
                 tile,
@@ -261,6 +262,22 @@ class BulkTileOperation:
                 original_data := original_tile_data_by_tile_id.pop(tile.pk, None)
             ) and tile._tile_update_is_noop(original_data):
                 self.to_update.remove(tile)
+
+    def _pair_tiles(self, existing_tiles, new_tiles):
+        pairs = []
+        matched_new_tiles = []
+        for existing_tile in existing_tiles:
+            for tile in new_tiles:
+                if existing_tile.pk == tile.pk:
+                    pairs.append((existing_tile, tile))
+                    matched_new_tiles.append(tile)
+                    break
+            else:
+                pairs.append((existing_tile, NOT_PROVIDED))
+        for new_tile in new_tiles:
+            if new_tile not in matched_new_tiles:
+                pairs.append((NOT_PROVIDED, new_tile))
+        return pairs
 
     def _validate_and_patch_from_tile_values(self, tile, *, nodes, languages):
         """Validate data found on ._incoming_tile and move it to .data.
@@ -334,7 +351,7 @@ class BulkTileOperation:
                 transformed = value_to_validate
 
             # Merge the transformed data into the tile.data.
-            # We just overwrite the old value unless a dataype has another idea.
+            # We just overwrite the old value unless a datatype has another idea.
             if merge_fn:
                 merge_fn(tile, node_id_str, transformed)
             else:
@@ -394,7 +411,7 @@ class BulkTileOperation:
                 # https://github.com/archesproject/arches/issues/8471
                 try:
                     upsert_proxy._Tile__preSave(request=self.dummy_request)
-                    upsert_proxy.check_for_missing_nodes()
+                    upsert_proxy.check_for_missing_nodes()  # also runs clean()
                     upsert_proxy.check_for_constraint_violation()
                 except TileValidationError as tve:
                     raise ValidationError(tve.message) from tve

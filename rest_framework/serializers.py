@@ -424,6 +424,8 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         with transaction.atomic():
             blank_tile = super().create(validated_data)
             tile_from_factory = qs.get(pk=blank_tile.pk)
+            # Until we have one-shot creates, provide a hint for the edit log.
+            tile_from_factory._state.adding = True
             updated = self.update(tile_from_factory, validated_data)
         return updated
 
