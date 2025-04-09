@@ -231,7 +231,7 @@ class ReferenceDataType(BaseDataType):
                         labels.append(label.get("value", ""))
         return ", ".join(labels)
 
-    def transform_value_for_frontend(self, value):
+    def transform_default_value(self, value):
         """
         Expects tile representation of reference datatype:
         [
