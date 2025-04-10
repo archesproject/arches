@@ -196,14 +196,19 @@ def resource_instance_transform_value_for_tile(self, value, **kwargs):
             if graph_id is None or str(graph_id) == graph_config["graphid"]:
                 break
         else:
-            graph_config = {"ontologyProperty": {}, "inverseOntologyProperty": {}}
+            graph_config = {}
         return {
             "resourceId": uuid_string,
-            "ontologyProperty": graph_config["ontologyProperty"],
-            "inverseOntologyProperty": graph_config["inverseOntologyProperty"],
+            "ontologyProperty": graph_config.get("ontologyProperty", None),
+            "inverseOntologyProperty": graph_config.get(
+                "inverseOntologyProperty", None
+            ),
         }
 
     try:
+        if isinstance(value, str):
+            value = [value]
+            raise TypeError
         return json.loads(value)
     except ValueError:
         # do this if json (invalid) is formatted with single quotes, re #6390
@@ -212,7 +217,6 @@ def resource_instance_transform_value_for_tile(self, value, **kwargs):
         except:
             return value
     except TypeError:
-        # data should come in as json but python list is accepted as well
         if isinstance(value, list):
             transformed = []
             for inner in value:
