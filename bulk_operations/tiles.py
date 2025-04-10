@@ -238,29 +238,30 @@ class BulkTileOperation:
                 languages=languages,
             )
 
-        for tile in self.to_insert | self.to_update:
-            if tile.nodegroup.pk != grouping_node.pk:
-                # TODO: this is a symptom this should be refactored.
-                continue
-            # Remove blank tiles if they have no children.
-            if (
-                not any(tile.data.values())
-                and not tile.children.exists()
-                # Check unsaved children.
-                and not any(
-                    getattr(tile._incoming_tile, child_tile_alias, None)
-                    for child_tile_alias in grouping_node.nodegroup.children.values_list(
-                        # TODO: 7.6 compat
-                        "grouping_node__alias",
-                        flat=True,
-                    )
-                )
-            ):
-                if tile._state.adding:
-                    self.to_insert.remove(tile)
-                else:
-                    self.to_update.remove(tile)
-                    self.to_delete.add(tile)
+        # https://github.com/archesproject/arches-querysets/issues/11
+        # for tile in self.to_insert | self.to_update:
+        #     if tile.nodegroup.pk != grouping_node.pk:
+        #         # TODO: this is a symptom this should be refactored.
+        #         continue
+        #     # Remove blank tiles if they have no children.
+        #     if (
+        #         not any(tile.data.values())
+        #         and not tile.children.exists()
+        #         # Check unsaved children.
+        #         and not any(
+        #             getattr(tile._incoming_tile, child_tile_alias, None)
+        #             for child_tile_alias in grouping_node.nodegroup.children.values_list(
+        #                 # TODO: 7.6 compat
+        #                 "grouping_node__alias",
+        #                 flat=True,
+        #             )
+        #         )
+        #     ):
+        #         if tile._state.adding:
+        #             self.to_insert.remove(tile)
+        #         else:
+        #             self.to_update.remove(tile)
+        #             self.to_delete.add(tile)
 
         for tile in self.to_insert | self.to_update:
             if tile.nodegroup.pk != grouping_node.pk:
