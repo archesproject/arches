@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import datetime
 import uuid
 from collections import defaultdict
+from typing import Iterable
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -218,6 +221,23 @@ class ListItem(models.Model):
 
     def build_select_option(self):
         labels = getattr(self, "list_item_labels", self.list_item_values.labels())
+        best_label = self.best_label_from_set(labels)
+        data = {
+            "list_item_id": str(self.id),
+            "uri": self.uri,
+            "list_item_values": [label.serialize() for label in labels],
+            "display_value": best_label,
+            "sortorder": self.sortorder,
+        }
+        data["children"] = [
+            child.build_select_option() for child in self.children.all()
+        ]
+        return data
+
+    @staticmethod
+    def best_label_from_set(
+        labels: Iterable["ListItemValue" | "ReferenceLabel"],
+    ) -> str | None:
         ranked_labels = sorted(
             labels,
             key=lambda label: rank_label(
@@ -227,17 +247,12 @@ class ListItem(models.Model):
             ),
             reverse=True,
         )
-        data = {
-            "list_item_id": str(self.id),
-            "uri": self.uri,
-            "list_item_values": [label.serialize() for label in labels],
-            "display_value": ranked_labels[0].value,
-            "sortorder": self.sortorder,
-        }
-        data["children"] = [
-            child.build_select_option() for child in self.children.all()
-        ]
-        return data
+        if not ranked_labels:
+            return None
+        return ranked_labels[0].value
+
+    def best_label(self):
+        return self.best_label_from_set(self.list_item_values.labels())
 
 
 class ListItemValue(models.Model):
@@ -400,3 +415,6 @@ class NodeProxy(Node):
 
     class Meta:
         proxy = True
+
+
+from arches_controlled_lists.datatypes.datatypes import ReferenceLabel

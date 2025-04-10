@@ -7,7 +7,6 @@ from django.utils.translation import get_language, gettext as _
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models.models import Node
 from arches.app.models.graph import GraphValidationError
-from arches.app.utils.i18n import rank_label
 
 from arches_controlled_lists.models import ListItem
 
@@ -61,24 +60,10 @@ class ReferenceDataType(BaseDataType):
         return [
             {
                 "list_item_id": reference.labels[0].list_item_id,
-                "display_value": self.best_label(reference.labels).value,
+                "display_value": ListItem.best_label_from_set(reference.labels),
             }
             for reference in references
         ]
-
-    def best_label(self, labels: list[ReferenceLabel]):
-        if not labels:
-            return None
-        ranked_labels = sorted(
-            labels,
-            key=lambda label: rank_label(
-                kind=label.valuetype_id,
-                source_lang=label.language_id,
-                target_lang=get_language(),
-            ),
-            reverse=True,
-        )
-        return ranked_labels[0]
 
     def validate(
         self,
