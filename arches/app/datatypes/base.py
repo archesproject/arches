@@ -75,9 +75,11 @@ class BaseDataType(object):
         """
         return value
 
-    def transform_default_value(self, value, **kwargs):
+    def get_interchange_value(self, value, **kwargs):
         """
-        Transform db value to simpler representation for use on the front-end
+        Transforms values for use in api's that will provide data for programmatic use on the frontend.
+        The interchange value is a shape that is more useful on the frontend than the node value shape.
+        The return value can be more or less complex than the value passed in, depending on the datatype.
         """
         return value
 
