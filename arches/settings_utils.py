@@ -151,7 +151,7 @@ def generate_frontend_configuration():
         arches_app_names = list_arches_app_names()
         arches_app_paths = list_arches_app_paths()
         path_lookup = dict(zip(arches_app_names, arches_app_paths, strict=True))
-        
+
         site_packages_paths = site.getsitepackages()
         site_packages_dir = None
         for path in site_packages_paths:
@@ -161,7 +161,7 @@ def generate_frontend_configuration():
 
         if not site_packages_dir and site_packages_paths:
             site_packages_dir = site_packages_paths[0]
-        
+
         frontend_configuration_settings_data = {
             "_comment": "This is a generated file. Do not edit directly.",
             "APP_ROOT": app_root_path,
