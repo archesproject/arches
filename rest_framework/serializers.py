@@ -422,12 +422,8 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             dummy_instance.set_next_sort_order()
             validated_data["sortorder"] = dummy_instance.sortorder
         with transaction.atomic():
-            blank_tile = super().create(validated_data)
-            tile_from_factory = qs.get(pk=blank_tile.pk)
-            # Until we have one-shot creates, provide a hint for the edit log.
-            tile_from_factory._state.adding = True
-            updated = self.update(tile_from_factory, validated_data)
-        return updated
+            created = super().create(validated_data)
+        return created
 
 
 class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
