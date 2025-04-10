@@ -236,7 +236,8 @@ class SemanticTileQuerySet(models.QuerySet):
                 # TODO: move, once dust settles.
                 if tile_val is None or len(tile_val) != 1:
                     instance_val = tile_val
-                instance_val = tile_val[0]
+                else:
+                    instance_val = tile_val[0]
             else:
                 instance_val = tile_val
 
