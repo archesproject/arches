@@ -102,11 +102,21 @@ class BulkTileOperation:
         Raises ValidationError if new data fails datatype validation.
         """
         original_tile_data_by_tile_id = {}
-        self._update_tile_for_grouping_node(
-            self.entry.nodegroup.grouping_node,
-            self.entry,
-            original_tile_data_by_tile_id,
-        )
+        if isinstance(self.entry, TileModel):
+            self._update_tile_for_grouping_node(
+                self.entry.nodegroup.grouping_node,
+                self.entry,
+                original_tile_data_by_tile_id,
+            )
+        else:
+            for grouping_node in self.grouping_nodes_by_nodegroup_id.values():
+                if grouping_node.nodegroup.parentnodegroup:
+                    continue
+                self._update_tile_for_grouping_node(
+                    grouping_node,
+                    self.entry,
+                    original_tile_data_by_tile_id,
+                )
 
         if self.errors_by_node_alias:
             raise ValidationError(

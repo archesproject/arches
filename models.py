@@ -97,10 +97,7 @@ class SemanticResource(ResourceInstance):
 
     def save(self, index=False, user=None, **kwargs):
         with transaction.atomic():
-            if getattr(self, "_annotated_tiles", None):
-                self._save_aliased_data(user=user, index=index, **kwargs)
-            else:
-                super().save(**kwargs)
+            self._save_aliased_data(user=user, index=index, **kwargs)
 
     def clean(self):
         """Raises a compound ValidationError with any failing tile values."""
@@ -137,24 +134,13 @@ class SemanticResource(ResourceInstance):
         self.save_edit(user=user, transaction_id=bulk_operation.transaction_id)
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None):
-        if from_queryset is None and (
-            queried_nodes := getattr(self, "_queried_nodes", set())
-        ):
-            aliases = [n.alias for n in queried_nodes if n.nodegroup.pk == n.pk]
+        if from_queryset is None:
             from_queryset = self.__class__.as_model(
                 self.graph.slug,
-                only=aliases,
+                # TODO: only=queried_nodes
                 as_representation=getattr(self, "_as_representation", False),
             ).filter(pk=self.pk)
-            super().refresh_from_db(using, fields, from_queryset)
-            # Copy over annotations and annotated tiles.
-            refreshed_resource = from_queryset[0]
-            for field in {*aliases, "_annotated_tiles"}.intersection(
-                vars(refreshed_resource)
-            ):
-                setattr(self, field, getattr(refreshed_resource, field))
-        else:
-            super().refresh_from_db(using, fields, from_queryset)
+        super().refresh_from_db(using, fields, from_queryset)
 
 
 class SemanticTile(TileModel):

@@ -465,7 +465,11 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         # TODO: we probably want a queryset method to do one-shot
         # creates with tile data
         with transaction.atomic():
-            instance_without_tile_data = super().create(validated_data)
+            without_tile_data = validated_data.copy()
+            without_tile_data.pop("aliased_data", None)
+            # TODO: decide on "blank" interface.
+            instance_without_tile_data = options.model.mro()[1](**without_tile_data)
+            instance_without_tile_data.save()
             instance_from_factory = options.model.as_model(
                 graph_slug=self.graph_slug,
                 only=None,
