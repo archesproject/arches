@@ -24,7 +24,7 @@ var IIIFViewerViewmodel = function(params) {
         return val;
     };
 
-        
+
     this.map = ko.observable();
     this.manifest = ko.observable(params.manifest);
     this.editManifest = ko.observable(!params.manifest);
@@ -164,42 +164,40 @@ var IIIFViewerViewmodel = function(params) {
                             cachedAnnotations[annotationsUrl] = jsonResponse;
                         }
                         const annotation = cachedAnnotations[annotationsUrl];
-                        
+
                         annotation.features.forEach(function(feature) {
                             feature.properties.graphName = node['graph_name'];
                         });
                         annotations(annotation.features);
-                        
+
                     }
                 };
-                
+
                 const preloadAllAnnotations = async function() {
-                    const counts = {};
-                    self.annotationCounts(counts);
+                    const counts = self.annotationCounts() || {};
                     const canvases = self.canvases();
-                    
+
                     if (canvases && canvases.length > 0) {
-                        for (const canvas of canvases) {
+                        const fetchPromises = canvases.map(async canvas => {
                             const canvasId = self.getCanvasService(canvas);
-                            if (canvasId) {
+                            if (canvas && canvasId) {
                                 const annotationsUrl = arches.urls.iiifannotations + '?canvas=' + canvasId + '&nodeid=' + node.nodeid;
-                                if(!cachedAnnotations[annotationsUrl]){
-                                    try {
+                                try {
+                                    if (!cachedAnnotations[annotationsUrl]) {
                                         const response = await window.fetch(annotationsUrl);
                                         const jsonResponse = await response.json();
                                         cachedAnnotations[annotationsUrl] = jsonResponse;
-
-                                        if (!counts[canvasId]) counts[canvasId] = 0;
-                                        counts[canvasId] = jsonResponse.features.length;
-                                    } catch (error) {
-                                        console.error('Error loading annotations for canvas:', canvasId, error);
                                     }
-                                } else {
-                                    if (!counts[canvasId]) counts[canvasId] = 0;
-                                    counts[canvasId] = cachedAnnotations[annotationsUrl].features.length;
+                                    if (!counts[canvasId]) {
+                                        counts[canvasId] = 0;
+                                    }
+                                    counts[canvasId] += cachedAnnotations[annotationsUrl].features.length;
+                                } catch (error) {
+                                    console.error('Error loading annotations for canvas:', canvasId, error);
                                 }
                             }
-                        }
+                        });
+                        await Promise.all(fetchPromises);
                         self.annotationCounts(counts);
                     }
                 };
@@ -207,21 +205,16 @@ var IIIFViewerViewmodel = function(params) {
                 self.manifestData.subscribe(preloadAllAnnotations);
                 self.canvas.subscribe(updateAnnotations);
                 updateAnnotations();
+                preloadAllAnnotations();
                 return {
                     name: node['graph_name'] + ' - ' + node.name,
                     icon: node.icon,
                     active: ko.observable(false),
                     opacity: ko.observable(100),
-                    annotations: annotations,
-                    preloadAllAnnotations: preloadAllAnnotations
+                    annotations: annotations
                 };
             })
         );
-        if (self.manifestData()) {
-            self.annotationNodes().forEach(node => {
-                if (node.preloadAllAnnotations) node.preloadAllAnnotations();
-            });
-        }
     };
 
     window.fetch(arches.urls.iiifannotationnodes)
@@ -425,7 +418,7 @@ var IIIFViewerViewmodel = function(params) {
             if(item.loading){
                 return "";
             }
-            return $(`<div class="image"><img src="${item.thumbnail}" height="50"/></div><div class="title">${item.label}</div>`); 
+            return $(`<div class="image"><img src="${item.thumbnail}" height="50"/></div><div class="title">${item.label}</div>`);
         },
         templateSelection: function(item) {
             return item?.label;
@@ -441,7 +434,7 @@ var IIIFViewerViewmodel = function(params) {
         ...splitSelectConfig,
         value: this.canvas
     };
-    
+
     this.imageToolConfig = {
         ...splitSelectConfig,
         value: this.imageToolSelector
@@ -487,7 +480,7 @@ var IIIFViewerViewmodel = function(params) {
     if (!params.manifest) params.expandGallery = true;
     this.expandGallery = ko.observable(params.expandGallery);
     this.expandGallery.subscribe(function(expandGallery) {
-        if (expandGallery) { 
+        if (expandGallery) {
             self.compareMode(false);
             self.showGallery(true);
         }
@@ -586,7 +579,7 @@ var IIIFViewerViewmodel = function(params) {
     const loadComparison = () => {
         const map = self.map();
         if(map && canvasLayer.getContainer() && secondaryCanvasLayer?.getContainer() /*self.primaryLayerLoaded && self.secondaryLayerLoaded*/){
-            // remove the control if it's been added to the map already  
+            // remove the control if it's been added to the map already
             if(self.zoomToCanvas){
                 zoomToBounds(map, canvasLayer);
                 //map.fitBounds(canvasLayer.getBounds())
@@ -695,7 +688,7 @@ var IIIFViewerViewmodel = function(params) {
                 secondaryLayers.push(secondaryCanvasLayer);
             }
             secondaryCanvasLayer.addTo(map);
-            
+
             updateCanvasLayerFilter();
         }
     };
@@ -718,7 +711,7 @@ var IIIFViewerViewmodel = function(params) {
     };
 
     this.selectCanvas = function(canvas) {
-        
+
         const service = self.getCanvasService(canvas);
 
         if (service && self.selectPrimaryPanel()) {
@@ -765,7 +758,7 @@ var IIIFViewerViewmodel = function(params) {
                         self.secondaryCanvas(service);
                         self.secondaryCanvasObject(canvas);
                     }
-                }    
+                }
             }
             self.updateCanvas = true;
             self.origManifestName = self.getManifestDataValue(manifestData, 'label', true);
@@ -792,7 +785,7 @@ var IIIFViewerViewmodel = function(params) {
     this.getAnnotationCount = function(canvasId) {
         const counts = self.annotationCounts();
         return counts && counts[canvasId] ? counts[canvasId] : 0;
-        };
+    };
 };
 ko.components.register('iiif-viewer', {
     viewModel: IIIFViewerViewmodel,
