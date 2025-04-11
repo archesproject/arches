@@ -7,6 +7,7 @@ import Button from "primevue/button";
 
 import { ALT_LABEL, PREF_LABEL } from "@/arches_vue_utils/constants.ts";
 import {
+    isEditingKey,
     itemKey,
     CONTRAST,
     NOTE_CHOICES,
@@ -21,6 +22,7 @@ import type { Ref } from "vue";
 import type { Language } from "@/arches_vue_utils/types";
 import type {
     ControlledListItem,
+    IsEditingRefAndSetter,
     Value,
     ValueType,
 } from "@/arches_controlled_lists/types";
@@ -30,6 +32,7 @@ const { valueType, makeNewValueEditable } = defineProps<{
     makeNewValueEditable: (newValue: Value, index: number) => void;
 }>();
 const item = inject(itemKey) as Ref<ControlledListItem>;
+const { isEditing } = inject(isEditingKey) as IsEditingRefAndSetter;
 
 const { $gettext } = useGettext();
 
@@ -104,6 +107,7 @@ const addValue = () => {
         icon="fa fa-plus-circle"
         :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
         :label="buttonLabel"
+        :disabled="isEditing"
         @click="addValue"
     />
 </template>

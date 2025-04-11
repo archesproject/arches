@@ -17,6 +17,7 @@ import {
     ERROR,
     NOTE,
     NOTE_CHOICES,
+    isEditingKey,
     itemKey,
 } from "@/arches_controlled_lists/constants.ts";
 import {
@@ -31,6 +32,7 @@ import type { DataTableRowEditInitEvent } from "primevue/datatable";
 import type { Language } from "@/arches_vue_utils/types";
 import type {
     ControlledListItem,
+    IsEditingRefAndSetter,
     Value,
     ValueCategory,
     ValueType,
@@ -45,6 +47,9 @@ const rowIndexToFocus = ref(-1);
 const editorDiv = useTemplateRef("editorDiv");
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
+const { isEditing, setIsEditing } = inject(
+    isEditingKey,
+) as IsEditingRefAndSetter;
 
 const toast = useToast();
 const { $gettext } = useGettext();
@@ -118,10 +123,6 @@ const headings: Ref<{ heading: string; subheading: string }> = computed(() => {
     }
 });
 
-const isEditing = computed(() => {
-    return editingRows.value.length > 0;
-});
-
 const values = computed(() => {
     if (!item.value) {
         return [];
@@ -141,7 +142,12 @@ const values = computed(() => {
     );
 });
 
+const cursorClass = computed(() => {
+    return isEditing.value ? "text" : "pointer";
+});
+
 const saveValue = async (event: DataTableRowEditInitEvent) => {
+    setIsEditing(editingRows.value.length > 0);
     // normalize new value numbers to null
     const normalizedNewData: Value = {
         ...event.newData,
@@ -214,6 +220,10 @@ const updateItemValue = (updatedValue: Value) => {
 };
 
 const setRowFocus = (event: DataTableRowEditInitEvent) => {
+    if (isEditing.value) {
+        return;
+    }
+    setIsEditing(true);
     rowIndexToFocus.value = event.index;
 };
 
@@ -221,9 +231,14 @@ function makeRowUneditable(valueId: string) {
     editingRows.value = [
         ...editingRows.value.filter((value) => value.id !== valueId),
     ];
+    setIsEditing(editingRows.value.length > 0);
 }
 
 const makeValueEditable = (clickedValue: Value, index: number) => {
+    if (isEditing.value) {
+        return;
+    }
+    setIsEditing(true);
     if (!editingRows.value.includes(clickedValue)) {
         editingRows.value = [...editingRows.value, clickedValue];
     }
@@ -250,8 +265,6 @@ const focusInput = () => {
         rowIndexToFocus.value = -1;
     }
 };
-
-defineExpose({ isEditing });
 </script>
 
 <template>
@@ -433,7 +446,7 @@ p {
 }
 
 .full-width-pointer {
-    cursor: pointer;
+    cursor: v-bind(cursorClass);
     display: flex;
     width: 100%;
 }

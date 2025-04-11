@@ -48,8 +48,6 @@ const bestAlternativeText = computed(() => {
             .value
     );
 });
-
-defineExpose({ isEditing: metadataEditor.value?.isEditing });
 </script>
 
 <template>

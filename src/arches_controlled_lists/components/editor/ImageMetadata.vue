@@ -21,6 +21,7 @@ import {
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
     METADATA_CHOICES,
+    isEditingKey,
     itemKey,
 } from "@/arches_controlled_lists/constants.ts";
 import {
@@ -38,6 +39,7 @@ import type {
     ControlledListItem,
     ControlledListItemImage,
     ControlledListItemImageMetadata,
+    IsEditingRefAndSetter,
     LabeledChoice,
     NewOrExistingControlledListItemImageMetadata,
 } from "@/arches_controlled_lists/types";
@@ -50,6 +52,9 @@ const metadataValueHeader = $gettext("Value");
 const languageHeader = $gettext("Language");
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
+const { isEditing, setIsEditing } = inject(
+    isEditingKey,
+) as IsEditingRefAndSetter;
 const { image } = defineProps<{ image: ControlledListItemImage }>();
 const editingRows = ref<NewOrExistingControlledListItemImageMetadata[]>([]);
 const rowIndexToFocus = ref(-1);
@@ -74,8 +79,8 @@ const labeledChoices: LabeledChoice[] = [
     },
 ];
 
-const isEditing = computed(() => {
-    return editingRows.value.length > 0;
+const cursorClass = computed(() => {
+    return isEditing.value ? "text" : "pointer";
 });
 
 const inputSelector = computed(() => {
@@ -87,6 +92,7 @@ const metadataLabel = (metadataType: string) => {
 };
 
 const saveMetadata = async (event: DataTableRowEditInitEvent) => {
+    setIsEditing(editingRows.value.length > 0);
     // normalize new metadata numbers to null
     const normalizedNewData: NewOrExistingControlledListItemImageMetadata = {
         ...event.newData,
@@ -186,6 +192,7 @@ const updateImageMetadata = (
 };
 
 const issueDeleteImage = async () => {
+    setIsEditing(false);
     try {
         await deleteImage(image);
     } catch (error) {
@@ -211,6 +218,10 @@ const makeMetadataEditable = (
     clickedMetadata: NewOrExistingControlledListItemImageMetadata,
     index: number,
 ) => {
+    if (isEditing.value) {
+        return;
+    }
+    setIsEditing(true);
     if (!editingRows.value.includes(clickedMetadata)) {
         editingRows.value = [...editingRows.value, clickedMetadata];
     }
@@ -223,6 +234,10 @@ const makeMetadataEditable = (
 };
 
 const setRowFocus = (event: DataTableRowEditInitEvent) => {
+    if (isEditing.value) {
+        return;
+    }
+    setIsEditing(true);
     rowIndexToFocus.value = event.index;
 };
 
@@ -230,9 +245,11 @@ function makeRowUneditable(metadataId: string) {
     editingRows.value = [
         ...editingRows.value.filter((metadatum) => metadatum.id !== metadataId),
     ];
+    setIsEditing(editingRows.value.length > 0);
 }
 
 const focusInput = () => {
+    setIsEditing(true);
     if (rowIndexToFocus.value !== -1) {
         const rowEl = editorDiv.value!.querySelector(inputSelector.value);
         const inputEl = rowEl!.children[1].children[0] as HTMLInputElement;
@@ -240,8 +257,6 @@ const focusInput = () => {
         rowIndexToFocus.value = -1;
     }
 };
-
-defineExpose({ isEditing });
 </script>
 
 <template>
@@ -393,7 +408,7 @@ defineExpose({ isEditing });
 
 <style scoped>
 .full-width-pointer {
-    cursor: pointer;
+    cursor: v-bind(cursorClass);
     display: flex;
     width: 100%;
 }

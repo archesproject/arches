@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, useTemplateRef, watch } from "vue";
+import { inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { displayedRowKey } from "@/arches_controlled_lists/constants.ts";
@@ -14,19 +14,6 @@ const { displayedRow: list } = inject(displayedRowKey) as unknown as {
 };
 
 const { $gettext } = useGettext();
-const isEditing = inject("isEditing") as Ref<boolean>;
-const nameEditor = useTemplateRef("nameEditor");
-const dynamicEditor = useTemplateRef("dynamicEditor");
-
-watch(
-    [() => nameEditor.value?.isEditing, () => dynamicEditor.value?.isEditing],
-    () => {
-        isEditing.value =
-            nameEditor.value?.isEditing ||
-            dynamicEditor.value?.isEditing ||
-            false;
-    },
-);
 </script>
 
 <template>
@@ -40,12 +27,10 @@ watch(
         </span>
         <div>
             <ListCharacteristic
-                ref="nameEditor"
                 :editable="true"
                 :label="$gettext('Name')"
             />
             <ListCharacteristic
-                ref="dynamicEditor"
                 :editable="false"
                 :label="$gettext('Dynamic')"
                 :style="{ width: '4rem' }"

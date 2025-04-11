@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import arches from "arches";
 import Cookies from "js-cookie";
-import { computed, inject, useTemplateRef } from "vue";
+import { inject, useTemplateRef } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import FileUpload from "primevue/fileupload";
@@ -38,15 +38,6 @@ const toast = useToast();
 const item = inject(itemKey) as Ref<ControlledListItem>;
 const editors = useTemplateRef("editors");
 
-const isEditing = computed(() => {
-    return (
-        Boolean(editors.value) &&
-        (editors.value as unknown as (typeof ImageEditor)[]).some(
-            (editor) => editor.isEditing,
-        )
-    );
-});
-
 const addHeader = (event: FileUploadBeforeSendEvent) => {
     const token = Cookies.get("csrftoken");
     if (token) {
@@ -72,8 +63,6 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
         detail: JSON.parse(event?.xhr?.responseText ?? "{}").message,
     });
 };
-
-defineExpose({ isEditing });
 </script>
 
 <template>

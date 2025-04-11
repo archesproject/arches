@@ -1,3 +1,5 @@
+import type { Ref } from "vue";
+
 export interface Value {
     id: string;
     valuetype_id: string;
@@ -112,3 +114,24 @@ export interface IconLabels {
     list: string;
     item: string;
 }
+
+// For force-casting injection types (to type-narrow undefined)
+type DisplayedRowRef = Ref<
+    ControlledList | ControlledListItem | NewControlledListItem | null
+>;
+type DisplayedRowSetter = (
+    DisplayedRowRef:
+        | ControlledList
+        | ControlledListItem
+        | NewControlledListItem
+        | null,
+) => void;
+export type DisplayedRowRefAndSetter = {
+    displayedRow: DisplayedRowRef;
+    setDisplayedRow: DisplayedRowSetter;
+};
+
+export type IsEditingRefAndSetter = {
+    isEditing: Ref<boolean>;
+    setIsEditing: (editing: boolean) => void;
+};

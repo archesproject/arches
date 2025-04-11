@@ -14,6 +14,7 @@ import {
     SECONDARY,
     ENGLISH,
     displayedRowKey,
+    isEditingKey,
     selectedLanguageKey,
     systemLanguageKey,
 } from "@/arches_controlled_lists/constants.ts";
@@ -46,6 +47,10 @@ const setDisplayedRow = (val: Selectable | null) => {
         finishSettingDisplayedRow(val);
     }
 };
+
+function setIsEditing(val: boolean) {
+    isEditing.value = val;
+}
 
 const finishSettingDisplayedRow = (val: Selectable | null) => {
     displayedRow.value = val;
@@ -90,10 +95,8 @@ const confirmLeave = (row: Selectable) => {
     });
 };
 
-// @ts-expect-error vue-tsc doesn't like arbitrary properties here
 provide(displayedRowKey, { displayedRow, setDisplayedRow });
-provide("isEditing", isEditing);
-
+provide(isEditingKey, { isEditing, setIsEditing });
 const selectedLanguage: Ref<Language> = ref(
     (arches.languages as Language[]).find(
         (lang) => lang.code === arches.activeLanguage,

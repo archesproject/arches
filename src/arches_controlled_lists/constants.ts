@@ -1,17 +1,17 @@
 import type { InjectionKey, Ref } from "vue";
 import type { Language } from "@/arches_vue_utils/types";
 import type {
-    ControlledList,
     ControlledListItem,
+    DisplayedRowRefAndSetter,
+    IsEditingRefAndSetter,
 } from "@/arches_controlled_lists/types";
 
 // Injection keys
-type DisplayedRowRef = Ref<ControlledList | ControlledListItem | null>;
-export const displayedRowKey = Symbol() as InjectionKey<DisplayedRowRef>;
-type ItemRef = Ref<ControlledListItem>;
-export const itemKey = Symbol() as InjectionKey<ItemRef>;
-type LanguageRef = Ref<Language>;
-export const selectedLanguageKey = Symbol() as InjectionKey<LanguageRef>;
+export const displayedRowKey =
+    Symbol() as InjectionKey<DisplayedRowRefAndSetter>;
+export const isEditingKey = Symbol() as InjectionKey<IsEditingRefAndSetter>;
+export const itemKey = Symbol() as InjectionKey<Ref<ControlledListItem>>;
+export const selectedLanguageKey = Symbol() as InjectionKey<Ref<Language>>;
 export const systemLanguageKey = Symbol() as InjectionKey<Language>;
 
 // Constants

@@ -10,11 +10,15 @@ import {
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
     displayedRowKey,
+    isEditingKey,
 } from "@/arches_controlled_lists/constants.ts";
 import { vFocus } from "@/arches_controlled_lists/utils.ts";
 
 import type { Ref } from "vue";
-import type { ControlledList } from "@/arches_controlled_lists/types";
+import type {
+    ControlledList,
+    IsEditingRefAndSetter,
+} from "@/arches_controlled_lists/types";
 
 const props = defineProps<{
     editable: boolean;
@@ -23,8 +27,10 @@ const props = defineProps<{
 const { displayedRow: list } = inject(displayedRowKey) as unknown as {
     displayedRow: Ref<ControlledList>;
 };
+const { isEditing, setIsEditing } = inject(
+    isEditingKey,
+) as IsEditingRefAndSetter;
 
-const isEditing = ref(false);
 const disabled = computed(() => {
     return !props.editable || !isEditing.value;
 });
@@ -66,8 +72,6 @@ const cancel = () => {
     isEditing.value = false;
     formValue.value = list.value.name;
 };
-
-defineExpose({ isEditing });
 </script>
 
 <template>
@@ -78,7 +82,7 @@ defineExpose({ isEditing });
             v-if="!props.editable"
             style="font-size: small"
         >
-            False
+            {{ $gettext("False") }}
         </span>
         <InputText
             v-else
@@ -97,8 +101,8 @@ defineExpose({ isEditing });
                 tabindex="0"
                 class="fa fa-pencil"
                 :aria-label="$gettext('Edit')"
-                @click="isEditing = true"
-                @keyup.enter="isEditing = true"
+                @click="setIsEditing(true)"
+                @keyup.enter="setIsEditing(true)"
             ></i>
         </span>
         <span
