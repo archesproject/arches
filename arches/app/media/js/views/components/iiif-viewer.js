@@ -159,7 +159,6 @@ var IIIFViewerViewmodel = function(params) {
 
                 const updateAnnotations = async function() {
                     const canvas = self.canvas();
-                    console.log("hello")
                     if (canvas) {
                         const annotationsUrl = arches.urls.iiifannotations + '?canvas=' + canvas + '&nodeid=' + node.nodeid;
                         try {
