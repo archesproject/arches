@@ -21,9 +21,11 @@ import {
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
     METADATA_CHOICES,
+    isEditingKey,
     itemKey,
 } from "@/arches_controlled_lists/constants.ts";
 import {
+    commandeerFocusFromDataTable,
     dataIsNew,
     languageNameFromCode,
     shouldUseContrast,
@@ -37,6 +39,7 @@ import type {
     ControlledListItem,
     ControlledListItemImage,
     ControlledListItemImageMetadata,
+    IsEditingRefAndSetter,
     LabeledChoice,
     NewOrExistingControlledListItemImageMetadata,
 } from "@/arches_controlled_lists/types";
@@ -49,6 +52,9 @@ const metadataValueHeader = $gettext("Value");
 const languageHeader = $gettext("Language");
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
+const { isEditing, setIsEditing } = inject(
+    isEditingKey,
+) as IsEditingRefAndSetter;
 const { image } = defineProps<{ image: ControlledListItemImage }>();
 const editingRows = ref<NewOrExistingControlledListItemImageMetadata[]>([]);
 const rowIndexToFocus = ref(-1);
@@ -73,11 +79,20 @@ const labeledChoices: LabeledChoice[] = [
     },
 ];
 
+const cursorClass = computed(() => {
+    return isEditing.value ? "text" : "pointer";
+});
+
+const inputSelector = computed(() => {
+    return `[data-p-index="${rowIndexToFocus.value}"]`;
+});
+
 const metadataLabel = (metadataType: string) => {
     return labeledChoices.find((choice) => choice.type === metadataType)!.label;
 };
 
 const saveMetadata = async (event: DataTableRowEditInitEvent) => {
+    setIsEditing(editingRows.value.length > 0);
     // normalize new metadata numbers to null
     const normalizedNewData: NewOrExistingControlledListItemImageMetadata = {
         ...event.newData,
@@ -109,6 +124,7 @@ const saveMetadata = async (event: DataTableRowEditInitEvent) => {
 const issueDeleteMetadata = async (
     metadata: ControlledListItemImageMetadata,
 ) => {
+    makeRowUneditable(metadata.id);
     if (dataIsNew(metadata)) {
         removeImageMetadata(metadata);
         return;
@@ -176,6 +192,7 @@ const updateImageMetadata = (
 };
 
 const issueDeleteImage = async () => {
+    setIsEditing(false);
     try {
         await deleteImage(image);
     } catch (error) {
@@ -201,6 +218,10 @@ const makeMetadataEditable = (
     clickedMetadata: NewOrExistingControlledListItemImageMetadata,
     index: number,
 ) => {
+    if (isEditing.value) {
+        return;
+    }
+    setIsEditing(true);
     if (!editingRows.value.includes(clickedMetadata)) {
         editingRows.value = [...editingRows.value, clickedMetadata];
     }
@@ -213,27 +234,28 @@ const makeMetadataEditable = (
 };
 
 const setRowFocus = (event: DataTableRowEditInitEvent) => {
+    if (isEditing.value) {
+        return;
+    }
+    setIsEditing(true);
     rowIndexToFocus.value = event.index;
 };
 
-const inputSelector = computed(() => {
-    return `[data-p-index="${rowIndexToFocus.value}"]`;
-});
+function makeRowUneditable(metadataId: string) {
+    editingRows.value = [
+        ...editingRows.value.filter((metadatum) => metadatum.id !== metadataId),
+    ];
+    setIsEditing(editingRows.value.length > 0);
+}
 
 const focusInput = () => {
-    // The editor (pencil) button from the DataTable (elsewhere on page)
-    // immediately hogs focus with a setTimeout of 1,
-    // so we'll get in line behind it to set focus to the input.
-    // This should be reported/clarified with PrimeVue with a MWE.
-    setTimeout(() => {
-        if (rowIndexToFocus.value !== -1) {
-            const rowEl = editorDiv.value!.querySelector(inputSelector.value);
-            const inputEl = rowEl!.children[1].children[0];
-            // @ts-expect-error focusVisible not yet in typeshed
-            (inputEl as HTMLInputElement).focus({ focusVisible: true });
-        }
+    setIsEditing(true);
+    if (rowIndexToFocus.value !== -1) {
+        const rowEl = editorDiv.value!.querySelector(inputSelector.value);
+        const inputEl = rowEl!.children[1].children[0] as HTMLInputElement;
+        commandeerFocusFromDataTable(inputEl);
         rowIndexToFocus.value = -1;
-    }, 25);
+    }
 };
 </script>
 
@@ -247,6 +269,7 @@ const focusInput = () => {
             edit-mode="row"
             striped-rows
             :style="{ fontSize: 'small' }"
+            @row-edit-cancel="(event) => makeRowUneditable(event.data.id)"
             @row-edit-init="setRowFocus"
             @row-edit-save="saveMetadata"
         >
@@ -385,7 +408,7 @@ const focusInput = () => {
 
 <style scoped>
 .full-width-pointer {
-    cursor: pointer;
+    cursor: v-bind(cursorClass);
     display: flex;
     width: 100%;
 }

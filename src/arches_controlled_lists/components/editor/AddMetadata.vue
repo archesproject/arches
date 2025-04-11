@@ -6,6 +6,7 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 
 import {
+    isEditingKey,
     itemKey,
     CONTRAST,
     PRIMARY,
@@ -20,6 +21,7 @@ import type {
     ControlledListItem,
     ControlledListItemImage,
     ControlledListItemImageMetadata,
+    IsEditingRefAndSetter,
     LabeledChoice,
 } from "@/arches_controlled_lists/types";
 
@@ -32,6 +34,7 @@ const { labeledChoices, image, makeMetadataEditable } = defineProps<{
     ) => void;
 }>();
 const item = inject(itemKey) as Ref<ControlledListItem>;
+const { isEditing } = inject(isEditingKey) as IsEditingRefAndSetter;
 
 const { $gettext } = useGettext();
 
@@ -76,6 +79,7 @@ const addMetadata = () => {
         icon="fa fa-plus-circle"
         :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
         :label="$gettext('Add metadata')"
+        :disabled="isEditing"
         @click="addMetadata"
     />
 </template>

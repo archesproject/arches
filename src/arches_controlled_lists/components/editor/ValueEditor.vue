@@ -17,9 +17,11 @@ import {
     ERROR,
     NOTE,
     NOTE_CHOICES,
+    isEditingKey,
     itemKey,
 } from "@/arches_controlled_lists/constants.ts";
 import {
+    commandeerFocusFromDataTable,
     dataIsNew,
     languageNameFromCode,
 } from "@/arches_controlled_lists/utils.ts";
@@ -30,6 +32,7 @@ import type { DataTableRowEditInitEvent } from "primevue/datatable";
 import type { Language } from "@/arches_vue_utils/types";
 import type {
     ControlledListItem,
+    IsEditingRefAndSetter,
     Value,
     ValueCategory,
     ValueType,
@@ -44,6 +47,9 @@ const rowIndexToFocus = ref(-1);
 const editorDiv = useTemplateRef("editorDiv");
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
+const { isEditing, setIsEditing } = inject(
+    isEditingKey,
+) as IsEditingRefAndSetter;
 
 const toast = useToast();
 const { $gettext } = useGettext();
@@ -136,7 +142,12 @@ const values = computed(() => {
     );
 });
 
+const cursorClass = computed(() => {
+    return isEditing.value ? "text" : "pointer";
+});
+
 const saveValue = async (event: DataTableRowEditInitEvent) => {
+    setIsEditing(editingRows.value.length > 0);
     // normalize new value numbers to null
     const normalizedNewData: Value = {
         ...event.newData,
@@ -167,6 +178,7 @@ const saveValue = async (event: DataTableRowEditInitEvent) => {
 };
 
 const issueDeleteValue = async (value: Value) => {
+    makeRowUneditable(value.id);
     if (dataIsNew(value)) {
         removeItemValue(value);
         return;
@@ -208,10 +220,25 @@ const updateItemValue = (updatedValue: Value) => {
 };
 
 const setRowFocus = (event: DataTableRowEditInitEvent) => {
+    if (isEditing.value) {
+        return;
+    }
+    setIsEditing(true);
     rowIndexToFocus.value = event.index;
 };
 
+function makeRowUneditable(valueId: string) {
+    editingRows.value = [
+        ...editingRows.value.filter((value) => value.id !== valueId),
+    ];
+    setIsEditing(editingRows.value.length > 0);
+}
+
 const makeValueEditable = (clickedValue: Value, index: number) => {
+    if (isEditing.value) {
+        return;
+    }
+    setIsEditing(true);
     if (!editingRows.value.includes(clickedValue)) {
         editingRows.value = [...editingRows.value, clickedValue];
     }
@@ -228,21 +255,15 @@ const inputSelector = computed(() => {
 });
 
 const focusInput = () => {
-    // The editor (pencil) button from the DataTable (elsewhere on page)
-    // immediately hogs focus with a setTimeout of 1,
-    // so we'll get in line behind it to set focus to the input.
-    // This should be reported/clarified with PrimeVue with a MWE.
-    setTimeout(() => {
+    if (rowIndexToFocus.value !== -1) {
         // Note editor uses the second column.
         const indexOfInputCol = valueCategory ? 1 : 0;
-        if (rowIndexToFocus.value !== -1) {
-            const rowEl = editorDiv.value!.querySelector(inputSelector.value);
-            const inputEl = rowEl!.children[indexOfInputCol].children[0];
-            // @ts-expect-error focusVisible not yet in typeshed
-            (inputEl as HTMLInputElement).focus({ focusVisible: true });
-        }
+        const rowEl = editorDiv.value!.querySelector(inputSelector.value);
+        const inputEl = rowEl!.children[indexOfInputCol]
+            .children[0] as HTMLInputElement;
+        commandeerFocusFromDataTable(inputEl);
         rowIndexToFocus.value = -1;
-    }, 25);
+    }
 };
 </script>
 
@@ -262,6 +283,7 @@ const focusInput = () => {
             striped-rows
             scrollable
             :style="{ fontSize: 'small' }"
+            @row-edit-cancel="(event) => makeRowUneditable(event.data.id)"
             @row-edit-init="setRowFocus"
             @row-edit-save="saveValue"
         >
@@ -307,6 +329,7 @@ const focusInput = () => {
                                 onUpdated: focusInput,
                             },
                         }"
+                        :style="{ fontSize: 'small' }"
                     />
                     <InputText
                         v-else
@@ -423,7 +446,7 @@ p {
 }
 
 .full-width-pointer {
-    cursor: pointer;
+    cursor: v-bind(cursorClass);
     display: flex;
     width: 100%;
 }

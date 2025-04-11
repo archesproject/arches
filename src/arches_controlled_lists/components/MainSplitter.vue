@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { computed, inject } from "vue";
+import { inject } from "vue";
 
 import ProgressSpinner from "primevue/progressspinner";
 import Splitter from "primevue/splitter";
 import SplitterPanel from "primevue/splitterpanel";
 
 import { displayedRowKey } from "@/arches_controlled_lists/constants.ts";
-import { routeNames } from "@/arches_controlled_lists/routes.ts";
 import { dataIsList } from "@/arches_controlled_lists/utils.ts";
 import ControlledListSplash from "@/arches_controlled_lists/components/misc/ControlledListSplash.vue";
 import ItemEditor from "@/arches_controlled_lists/components/editor/ItemEditor.vue";
-import ListCharacteristics from "@/arches_controlled_lists/components/editor/ListCharacteristics.vue";
+import ListEditor from "@/arches_controlled_lists/components/editor/ListEditor.vue";
 import ListTree from "@/arches_controlled_lists/components/tree/ListTree.vue";
 
 import type { Ref } from "vue";
@@ -19,16 +18,6 @@ import type { ControlledList } from "@/arches_controlled_lists/types";
 const { displayedRow } = inject(displayedRowKey) as unknown as {
     displayedRow: Ref<ControlledList>;
 };
-
-const panel = computed(() => {
-    if (!displayedRow.value) {
-        return ControlledListSplash;
-    }
-    if (dataIsList(displayedRow.value)) {
-        return ListCharacteristics;
-    }
-    return ItemEditor;
-});
 </script>
 
 <template>
@@ -54,10 +43,9 @@ const panel = computed(() => {
                 paddingRight: '2rem',
             }"
         >
-            <component
-                :is="panel"
-                :key="displayedRow?.id ?? routeNames.splash"
-            />
+            <ControlledListSplash v-if="!displayedRow" />
+            <ListEditor v-else-if="dataIsList(displayedRow)" />
+            <ItemEditor v-else />
         </SplitterPanel>
     </Splitter>
 </template>

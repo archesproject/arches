@@ -10,8 +10,8 @@ import ControlledListManagerTemplate from 'templates/views/components/plugins/co
 import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes,
+    history: createWebHistory(),
+    routes,
 });
 
 const ControlledListsPreset = definePreset(ArchesPreset, {
@@ -25,6 +25,10 @@ const ControlledListsPreset = definePreset(ArchesPreset, {
                     fontWeight: 600,
                 },
             },
+        },
+        toast: {
+            summary: { fontSize: '1.5rem' },
+            detail: { fontSize: '1.25rem' },
         },
     },
 });

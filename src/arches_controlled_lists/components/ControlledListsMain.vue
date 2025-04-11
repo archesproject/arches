@@ -1,19 +1,29 @@
 <script setup lang="ts">
 import arches from "arches";
 import { provide, ref } from "vue";
+import { useGettext } from "vue3-gettext";
 import { useRouter } from "vue-router";
 
+import { useConfirm } from "primevue/useconfirm";
 import ConfirmDialog from "primevue/confirmdialog";
 import Toast from "primevue/toast";
 
 import {
+    CONTRAST,
+    DANGER,
+    SECONDARY,
     ENGLISH,
     displayedRowKey,
+    isEditingKey,
     selectedLanguageKey,
     systemLanguageKey,
 } from "@/arches_controlled_lists/constants.ts";
 import { routeNames } from "@/arches_controlled_lists/routes.ts";
-import { dataIsList } from "@/arches_controlled_lists/utils.ts";
+import {
+    commandeerFocusFromDataTable,
+    dataIsList,
+    shouldUseContrast,
+} from "@/arches_controlled_lists/utils.ts";
 
 import ListHeader from "@/arches_controlled_lists/components/misc/ListHeader.vue";
 import MainSplitter from "@/arches_controlled_lists/components/MainSplitter.vue";
@@ -23,9 +33,26 @@ import type { Language } from "@/arches_vue_utils/types";
 import type { Selectable } from "@/arches_controlled_lists/types";
 
 const router = useRouter();
+const confirm = useConfirm();
+const { $gettext } = useGettext();
 
+const isEditing = ref(false);
 const displayedRow: Ref<Selectable | null> = ref(null);
+const lastFocusedElement = ref<HTMLElement | null>(null);
+
 const setDisplayedRow = (val: Selectable | null) => {
+    if (val && isEditing.value) {
+        confirmLeave(val);
+    } else {
+        finishSettingDisplayedRow(val);
+    }
+};
+
+function setIsEditing(val: boolean) {
+    isEditing.value = val;
+}
+
+const finishSettingDisplayedRow = (val: Selectable | null) => {
     displayedRow.value = val;
     if (val === null) {
         router.push({ name: routeNames.splash });
@@ -40,9 +67,36 @@ const setDisplayedRow = (val: Selectable | null) => {
         router.push({ name: routeNames.item, params: { id: val.id } });
     }
 };
-// @ts-expect-error vue-tsc doesn't like arbitrary properties here
-provide(displayedRowKey, { displayedRow, setDisplayedRow });
 
+const confirmLeave = (row: Selectable) => {
+    confirm.require({
+        message: $gettext(
+            "You have unsaved changes. Are you sure you want to leave?",
+        ),
+        header: $gettext("Unsaved changes"),
+        icon: "fa fa-exclamation-triangle",
+        acceptProps: {
+            label: $gettext("Exit without saving"),
+            severity: shouldUseContrast() ? CONTRAST : DANGER,
+            style: { fontSize: "small" },
+        },
+        rejectProps: {
+            label: $gettext("Go back"),
+            severity: shouldUseContrast() ? CONTRAST : SECONDARY,
+            style: { fontSize: "small" },
+        },
+        accept: () => {
+            isEditing.value = false;
+            finishSettingDisplayedRow(row);
+        },
+        reject: () =>
+            lastFocusedElement.value &&
+            commandeerFocusFromDataTable(lastFocusedElement.value),
+    });
+};
+
+provide(displayedRowKey, { displayedRow, setDisplayedRow });
+provide(isEditingKey, { isEditing, setIsEditing });
 const selectedLanguage: Ref<Language> = ref(
     (arches.languages as Language[]).find(
         (lang) => lang.code === arches.activeLanguage,
@@ -51,21 +105,32 @@ const selectedLanguage: Ref<Language> = ref(
 provide(selectedLanguageKey, selectedLanguage);
 const systemLanguage = ENGLISH; // TODO: get from settings
 provide(systemLanguageKey, systemLanguage);
+
+function memoizeLastActiveInput(event: FocusEvent) {
+    if (!event.target) {
+        return;
+    }
+    const element = event.target as HTMLElement;
+    if (
+        ["INPUT", "TEXTAREA"].includes(element.tagName) &&
+        !element.classList.contains("p-tree-filter-input")
+    ) {
+        lastFocusedElement.value = element;
+    }
+}
 </script>
 
 <template>
     <div style="height: 100vh; padding-bottom: 2.5rem">
         <div class="list-editor-container">
             <ListHeader />
-            <MainSplitter />
+            <MainSplitter @focusout="memoizeLastActiveInput" />
         </div>
     </div>
     <Toast
         :pt="{
-            summary: { fontSize: 'medium' },
-            detail: { fontSize: 'small' },
             messageIcon: {
-                style: { marginTop: 'var(--p-toast-message-icon-margin-top)' },
+                style: { marginTop: 'var(--p-toast-text-gap)' },
             },
         }"
     />

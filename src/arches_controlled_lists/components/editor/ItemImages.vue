@@ -32,10 +32,10 @@ interface FileUploadInternals {
     state: FileUploadState;
 }
 
-const item = inject(itemKey) as Ref<ControlledListItem>;
-
 const { $gettext } = useGettext();
 const toast = useToast();
+
+const item = inject(itemKey) as Ref<ControlledListItem>;
 
 const addHeader = (event: FileUploadBeforeSendEvent) => {
     const token = Cookies.get("csrftoken");

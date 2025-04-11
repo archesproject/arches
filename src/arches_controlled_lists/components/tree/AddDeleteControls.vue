@@ -140,6 +140,13 @@ const toDelete = computed(() => {
         .map(([k]) => k);
 });
 
+function parseSingleDetail(error: unknown) {
+    if (!(error instanceof Error)) {
+        return undefined;
+    }
+    return error.message.split("\n").slice(0)[0];
+}
+
 const deleteSelected = async () => {
     if (!selectedKeys.value) {
         return;
@@ -161,32 +168,24 @@ const deleteSelected = async () => {
         try {
             anyDeleted = await deleteItems(itemIdsToDelete);
         } catch (error) {
-            if (error instanceof Error) {
-                error.message.split("|").forEach((detail: string) => {
-                    toast.add({
-                        severity: ERROR,
-                        life: DEFAULT_ERROR_TOAST_LIFE,
-                        summary: $gettext("Item deletion failed"),
-                        detail,
-                    });
-                });
-            }
+            toast.add({
+                severity: ERROR,
+                life: DEFAULT_ERROR_TOAST_LIFE,
+                summary: $gettext("Item deletion failed"),
+                detail: parseSingleDetail(error),
+            });
         }
     }
     if (listIdsToDelete.length) {
         try {
             anyDeleted = (await deleteLists(listIdsToDelete)) || anyDeleted;
         } catch (error) {
-            if (error instanceof Error) {
-                error.message.split("|").forEach((detail) => {
-                    toast.add({
-                        severity: ERROR,
-                        life: DEFAULT_ERROR_TOAST_LIFE,
-                        summary: $gettext("List deletion failed"),
-                        detail,
-                    });
-                });
-            }
+            toast.add({
+                severity: ERROR,
+                life: DEFAULT_ERROR_TOAST_LIFE,
+                summary: $gettext("List deletion failed"),
+                detail: parseSingleDetail(error),
+            });
         }
     }
     if (anyDeleted) {

@@ -233,21 +233,20 @@ export const reorderItems = (
     recalculateSortOrderRecursive(list, list.items);
 };
 
-// Directives
-export const vFocus = {
+export const commandeerFocusFromDataTable = (element: HTMLElement) => {
     /*
     The editor (pencil) button from the DataTable hogs focus with a
     setTimeout of 1, so we'll queue behind it to set focus to the input.
     This should be reported/clarified with PrimeVue with a MWE.
     */
-    mounted: (el: HTMLInputElement) => {
-        // @ts-expect-error focusVisible not yet in typeshed
-        setTimeout(() => el && el.focus({ focusVisible: true }), 5);
-    },
-    updated: (el: HTMLInputElement) => {
-        // @ts-expect-error focusVisible not yet in typeshed
-        setTimeout(() => el && el.focus({ focusVisible: true }), 5);
-    },
+    // @ts-expect-error focusVisible not yet in typeshed
+    setTimeout(() => element && element.focus({ focusVisible: true }), 10);
+};
+
+// Directives
+export const vFocus = {
+    mounted: commandeerFocusFromDataTable,
+    updated: commandeerFocusFromDataTable,
 };
 
 export const shouldUseContrast = () => {

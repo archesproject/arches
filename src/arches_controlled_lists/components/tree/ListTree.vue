@@ -5,12 +5,7 @@ import { useGettext } from "vue3-gettext";
 
 import Tree from "primevue/tree";
 
-import { getItemLabel } from "@/arches_vue_utils/utils.ts";
-import {
-    displayedRowKey,
-    selectedLanguageKey,
-    systemLanguageKey,
-} from "@/arches_controlled_lists/constants.ts";
+import { displayedRowKey } from "@/arches_controlled_lists/constants.ts";
 import { routeNames } from "@/arches_controlled_lists/routes.ts";
 import { findNodeInTree, nodeIsList } from "@/arches_controlled_lists/utils.ts";
 import ListTreeControls from "@/arches_controlled_lists/components/tree/ListTreeControls.vue";
@@ -21,11 +16,11 @@ import type { RouteLocationNormalizedLoadedGeneric } from "vue-router";
 import type { TreePassThroughMethodOptions } from "primevue/tree";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree";
 import type { TreeNode } from "primevue/treenode";
-import type { Language } from "@/arches_vue_utils/types";
 import type {
     ControlledList,
     ControlledListItem,
     RowSetter,
+    Value,
 } from "@/arches_controlled_lists/types";
 
 const { $gettext } = useGettext();
@@ -61,8 +56,6 @@ const rerenderTree = ref(0);
 const nextFilterChangeNeedsExpandAll = ref(false);
 const expandedKeysSnapshotBeforeSearch = ref<TreeExpandedKeys>({});
 
-const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
-const systemLanguage = inject(systemLanguageKey) as Language;
 const { setDisplayedRow } = inject(displayedRowKey) as unknown as {
     setDisplayedRow: RowSetter;
 };
@@ -143,7 +136,6 @@ const updateSelectedAndExpanded = (node: TreeNode) => {
     if (isMultiSelecting.value || movingItem.value?.key) {
         return;
     }
-
     setDisplayedRow(node.data);
     expandedKeys.value = {
         ...expandedKeys.value,
@@ -224,11 +216,7 @@ function lazyLabelLookup(node: TreeNode) {
     if (nodeIsList(node)) {
         return node.data.name;
     } else {
-        return getItemLabel(
-            node.data,
-            selectedLanguage.value.code,
-            systemLanguage.code,
-        ).value;
+        return node.data.values.map((val: Value) => val.value);
     }
 }
 </script>

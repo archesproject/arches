@@ -340,7 +340,7 @@ class ListItemImageMetadata(models.Model):
         to_field="code",
         on_delete=models.PROTECT,
     )
-    metadata_type = models.CharField(max_length=5, choices=MetadataChoices.choices)
+    metadata_type = models.CharField(max_length=5, choices=MetadataChoices)
     value = models.CharField(max_length=2048)
 
     class Meta:

@@ -1,14 +1,12 @@
-import os, sys
-import logging
+import os
+import sys
+
 import openpyxl
-from arches.management.commands.packages import Command as PackagesCommand
-from arches.app.models.system_settings import settings
-from arches.app.models import models
-from arches_controlled_lists.models import List, ListItem, ListItemValue
 from django.db import transaction
 
-
-logger = logging.getLogger(__name__)
+from arches.management.commands.packages import Command as PackagesCommand
+from arches.app.models import models
+from arches_controlled_lists.models import List, ListItem, ListItemValue
 
 
 class Command(PackagesCommand):
@@ -151,8 +149,6 @@ class Command(PackagesCommand):
         self.export_model_to_sheet(wb, ListItem)
         self.export_model_to_sheet(wb, ListItemValue)
 
-        # if data_dest == ".":
-        #     data_dest = os.path.dirname(settings.SYSTEM_SETTINGS_LOCAL_PATH)
         if data_dest != "" and data_dest != ".":
             wb.save(os.path.join(data_dest, file_name))
             self.stdout.write(f"Data exported successfully to {file_name}")

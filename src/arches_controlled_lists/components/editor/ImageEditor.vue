@@ -42,11 +42,8 @@ const bestAlternativeText = computed(() => {
             )
             .find((altText) => altText.language_id === arches.activeLanguage)
             ?.value ||
-        getItemLabel(
-            item.value,
-            arches.activeLanguage.code,
-            systemLanguage.code,
-        ).value
+        getItemLabel(item.value, arches.activeLanguage, systemLanguage.code)
+            .value
     );
 });
 </script>

@@ -10,11 +10,15 @@ import {
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
     displayedRowKey,
+    isEditingKey,
 } from "@/arches_controlled_lists/constants.ts";
 import { vFocus } from "@/arches_controlled_lists/utils.ts";
 
 import type { Ref } from "vue";
-import type { ControlledList } from "@/arches_controlled_lists/types";
+import type {
+    ControlledList,
+    IsEditingRefAndSetter,
+} from "@/arches_controlled_lists/types";
 
 const props = defineProps<{
     editable: boolean;
@@ -23,10 +27,12 @@ const props = defineProps<{
 const { displayedRow: list } = inject(displayedRowKey) as unknown as {
     displayedRow: Ref<ControlledList>;
 };
+const { isEditing, setIsEditing } = inject(
+    isEditingKey,
+) as IsEditingRefAndSetter;
 
-const editing = ref(false);
 const disabled = computed(() => {
-    return !props.editable || !editing.value;
+    return !props.editable || !isEditing.value;
 });
 
 const formValue = ref("");
@@ -46,9 +52,9 @@ const toast = useToast();
 const { $gettext } = useGettext();
 
 const save = async () => {
-    editing.value = false;
+    isEditing.value = false;
     const originalValue = list.value.name;
-    list.value.name = formValue.value.trim();
+    list.value.name = formValue.value.trim() || originalValue;
     try {
         await patchList(list.value!, field);
     } catch (error) {
@@ -63,7 +69,7 @@ const save = async () => {
 };
 
 const cancel = () => {
-    editing.value = false;
+    isEditing.value = false;
     formValue.value = list.value.name;
 };
 </script>
@@ -76,7 +82,7 @@ const cancel = () => {
             v-if="!props.editable"
             style="font-size: small"
         >
-            False
+            {{ $gettext("False") }}
         </span>
         <InputText
             v-else
@@ -87,7 +93,7 @@ const cancel = () => {
             @keyup.enter="save"
         />
         <span
-            v-if="props.editable && !editing"
+            v-if="props.editable && !isEditing"
             class="edit-controls"
         >
             <i
@@ -95,12 +101,12 @@ const cancel = () => {
                 tabindex="0"
                 class="fa fa-pencil"
                 :aria-label="$gettext('Edit')"
-                @click="editing = true"
-                @keyup.enter="editing = true"
+                @click="setIsEditing(true)"
+                @keyup.enter="setIsEditing(true)"
             ></i>
         </span>
         <span
-            v-if="props.editable && editing"
+            v-if="props.editable && isEditing"
             class="edit-controls"
         >
             <i

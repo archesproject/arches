@@ -9,16 +9,23 @@ import { patchItem } from "@/arches_controlled_lists/api.ts";
 import {
     DEFAULT_ERROR_TOAST_LIFE,
     ERROR,
+    isEditingKey,
     itemKey,
 } from "@/arches_controlled_lists/constants.ts";
 import { vFocus } from "@/arches_controlled_lists/utils.ts";
 
 import type { Ref } from "vue";
-import type { ControlledListItem } from "@/arches_controlled_lists/types";
+import type {
+    ControlledListItem,
+    IsEditingRefAndSetter,
+} from "@/arches_controlled_lists/types";
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
+const { isEditing, setIsEditing } = inject(
+    isEditingKey,
+) as IsEditingRefAndSetter;
 
-const editing = ref(false);
+const isEditingUri = ref(false);
 const formValue = ref("");
 
 const inputValue = computed({
@@ -35,7 +42,8 @@ const { $gettext } = useGettext();
 const uri = "uri";
 
 const save = async () => {
-    editing.value = false;
+    setIsEditing(false);
+    isEditingUri.value = false;
     const originalValue = item.value.uri;
     item.value.uri = formValue.value;
 
@@ -52,10 +60,18 @@ const save = async () => {
     }
 };
 
-const cancel = () => {
-    editing.value = false;
+function cancel() {
+    setIsEditing(false);
+    isEditingUri.value = false;
     formValue.value = item.value.uri;
-};
+}
+
+function tryEdit() {
+    if (!isEditing.value) {
+        isEditing.value = true;
+        isEditingUri.value = true;
+    }
+}
 </script>
 
 <template>
@@ -73,13 +89,13 @@ const cancel = () => {
                 v-model="inputValue"
                 v-focus
                 type="text"
-                :disabled="!editing"
+                :disabled="!isEditing || !isEditingUri"
                 :aria-label="$gettext('Enter a URI')"
                 :placeholder="$gettext('Enter a URI')"
                 @keyup.enter="save"
             />
             <span
-                v-if="!editing"
+                v-if="!isEditingUri"
                 class="edit-controls"
             >
                 <i
@@ -87,12 +103,12 @@ const cancel = () => {
                     tabindex="0"
                     class="fa fa-pencil"
                     :aria-label="$gettext('Edit')"
-                    @click="editing = true"
-                    @keyup.enter="editing = true"
+                    @click="tryEdit"
+                    @keyup.enter="tryEdit"
                 />
             </span>
             <span
-                v-if="editing"
+                v-if="isEditingUri"
                 class="edit-controls"
             >
                 <i
