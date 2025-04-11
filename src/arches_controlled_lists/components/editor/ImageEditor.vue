@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import arches from "arches";
-import { computed, inject, useTemplateRef } from "vue";
+import { computed, inject } from "vue";
 
 import { getItemLabel } from "@/arches_vue_utils/utils.ts";
 import {
@@ -16,8 +16,6 @@ import type {
     ControlledListItem,
     ControlledListItemImage,
 } from "@/arches_controlled_lists/types";
-
-const metadataEditor = useTemplateRef("metadataEditor");
 
 const item = inject(itemKey) as Ref<ControlledListItem>;
 const systemLanguage = inject(systemLanguageKey) as Language;
@@ -58,9 +56,6 @@ const bestAlternativeText = computed(() => {
             :alt="bestAlternativeText"
             width="200"
         />
-        <ImageMetadata
-            ref="metadataEditor"
-            :image="image"
-        />
+        <ImageMetadata :image="image" />
     </div>
 </template>
