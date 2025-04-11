@@ -325,7 +325,6 @@ class CommandLineTests(ArchesTestCase):
     def test_get_related_resource(self):
         se = SearchEngineFactory().create()
         user = User.objects.get(username="admin")
-        is_related_to_valueid = "ac41d9be-79db-4256-b368-2f4559cfbe55"
         en_preflabel = "is related to"
         person_resourceid = "b6754e7a-7f18-40d1-93fe-61763d37d55e"
         person_resource = Resource(
@@ -344,8 +343,8 @@ class CommandLineTests(ArchesTestCase):
         reference_tile.data[self.reference_nodeid] = [
             {
                 "resourceName": "",
-                "ontologyProperty": is_related_to_valueid,
-                "inverseOntologyProperty": is_related_to_valueid,
+                "ontologyProperty": en_preflabel,
+                "inverseOntologyProperty": en_preflabel,
                 "resourceId": person_resourceid,
             }
         ]
@@ -354,3 +353,23 @@ class CommandLineTests(ArchesTestCase):
         ret = reference_resource.get_related_resources(user=user)
         relationship = ret["resource_relationships"][0]["relationshiptype_label"]
         self.assertEqual(relationship, en_preflabel)
+
+    def test_resource_report_good(self):
+        self.client.login(username="admin", password="admin")
+        url = reverse(
+            "resource_report", kwargs={"resourceid": self.resource_instance_id}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_resource_report_for_missing_resource(self):
+        self.client.login(username="admin", password="admin")
+        resource = Resource.objects.get(resourceinstanceid=self.resource_instance_id)
+        resource.delete()
+        with self.assertLogs("django.request", level="WARNING"):
+            response = self.client.get(
+                reverse(
+                    "resource_report", kwargs={"resourceid": self.resource_instance_id}
+                )
+            )
+        self.assertEqual(response.status_code, 404)
