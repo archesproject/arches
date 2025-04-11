@@ -51,7 +51,7 @@ function resolver(e: FormFieldResolverOptions) {
     //     }, 500);
     // });
     return {
-        values: { [props.nodeAlias]: e.values },
+        values: { [props.nodeAlias]: e.value },
     };
 }
 
