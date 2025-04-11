@@ -54,7 +54,7 @@ const { $gettext } = useGettext();
 const save = async () => {
     isEditing.value = false;
     const originalValue = list.value.name;
-    list.value.name = formValue.value.trim();
+    list.value.name = formValue.value.trim() || originalValue;
     try {
         await patchList(list.value!, field);
     } catch (error) {
