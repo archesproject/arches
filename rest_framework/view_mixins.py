@@ -171,13 +171,10 @@ class ArchesModelAPIMixin:
         except DjangoValidationError as django_error:
             flattened_errors = self.flatten_validation_errors(django_error)
             raise ValidationError(flattened_errors) from django_error
-        # The backend hydrates additional data, so make sure to use it.
-        # We could avoid this by only validating data during clean(),
-        # not save(), but we do graph/node queries during each phase.
-        # Having to fight so hard against DRF here is a good encouragement
-        # to separate clean() and save() in a performant way when working on:
-        # https://github.com/archesproject/arches/issues/10851#issuecomment-2427305853
-        serializer._data = self.get_serializer(serializer.instance).data
+        # Include the data that was shuffled during validation with the response.
+        # There are some more details to capture here like minted tile ids:
+        # https://github.com/archesproject/arches-querysets/issues/10
+        serializer._data = serializer.data | serializer.validated_data
 
     def perform_create(self, serializer):
         self.validate_tile_data_and_save(serializer)
