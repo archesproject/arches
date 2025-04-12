@@ -28,8 +28,8 @@ def make_name_unique(name, names_to_check, suffix_delimiter="_"):
     """
 
     i = 1
-    temp_node_name = name
-    while temp_node_name in names_to_check:
-        temp_node_name = "{0}{1}{2}".format(name, suffix_delimiter, i)
+    temp_name = name
+    while temp_name in names_to_check:
+        temp_name = "{0}{1}{2}".format(name, suffix_delimiter, i)
         i += 1
-    return temp_node_name
+    return temp_name
