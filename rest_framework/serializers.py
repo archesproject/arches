@@ -178,6 +178,16 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
             field_names.extend(options.nodegroups)
         return field_names
 
+    def to_internal_value(self, data):
+        return AliasedData(**data)
+
+    def validate(self, attrs):
+        if hasattr(self, "initial_data") and (
+            unknown_keys := set(self.initial_data) - set(self.fields)
+        ):
+            raise ValidationError({unknown_keys.pop(): "Unexpected field"})
+        return attrs
+
 
 class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     datatype_field_map = {
@@ -451,11 +461,6 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return ret
 
     def validate(self, attrs):
-        if hasattr(self, "initial_data") and (
-            unknown_keys := set(self.initial_data) - set(self.fields)
-        ):
-            raise ValidationError({unknown_keys.pop(): "Unexpected field"})
-        # TODO: this probably doesn't belong here or needed anymore.
         if "graph" in self.fields and not attrs.get("graph_id"):
             attrs["graph_id"] = self.fields["graph"].queryset.first().pk
         return attrs
