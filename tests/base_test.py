@@ -62,7 +62,6 @@ class ArchesTestCase(TestCase):
     def __init__(self, *args, **kwargs):
         super(ArchesTestCase, self).__init__(*args, **kwargs)
         if settings.DEFAULT_BOUNDS is None:
-            management.call_command("migrate")
             if not Graph.objects.filter(pk=SYSTEM_SETINGS_GRAPH_ID).exists():
                 with open(
                     os.path.join(

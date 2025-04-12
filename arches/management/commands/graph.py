@@ -92,6 +92,12 @@ class Command(BaseCommand):
 
         with transaction.atomic():
             for graph in self.graphs:
+                if graph.source_identifier_id:
+                    print(
+                        "Graph %s already has a draft_graph. Skipping..." % graph.name
+                    )
+                    continue
+
                 print("\nCreating draft_graph for %s..." % graph.name)
                 graph.create_draft_graph()
 

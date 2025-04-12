@@ -38,6 +38,30 @@ from tests.base_test import ArchesTestCase
 # python manage.py test tests.utils.datatypes.datatype_tests --settings="tests.test_settings"
 
 
+class BaseDataTypeTests(ArchesTestCase):
+    def test_get_tile_data_only_none(self):
+        base = BaseDataType()
+        node_id = str(uuid.uuid4())
+        resourceinstance_id = str(uuid.uuid4())
+        tile_data = {node_id: None}
+        tile_holding_only_none = Tile(
+            {
+                "resourceinstance_id": resourceinstance_id,
+                "parenttile_id": "",
+                "nodegroup_id": node_id,
+                "tileid": "",
+                "data": tile_data,
+            }
+        )
+
+        self.assertEqual(base.get_tile_data(tile_holding_only_none), tile_data)
+
+    def test_get_interchange_value(self):
+        base = BaseDataType()
+        value = "test values should be the same"
+        self.assertEqual(base.get_interchange_value(value), value)
+
+
 class BooleanDataTypeTests(ArchesTestCase):
     def test_validate(self):
         boolean = DataTypeFactory().get_instance("boolean")
@@ -66,25 +90,6 @@ class BooleanDataTypeTests(ArchesTestCase):
 
         with self.assertRaises(ValueError):
             boolean.transform_value_for_tile(None)
-
-
-class BaseDataTypeTests(ArchesTestCase):
-    def test_get_tile_data_only_none(self):
-        base = BaseDataType()
-        node_id = str(uuid.uuid4())
-        resourceinstance_id = str(uuid.uuid4())
-        tile_data = {node_id: None}
-        tile_holding_only_none = Tile(
-            {
-                "resourceinstance_id": resourceinstance_id,
-                "parenttile_id": "",
-                "nodegroup_id": node_id,
-                "tileid": "",
-                "data": tile_data,
-            }
-        )
-
-        self.assertEqual(base.get_tile_data(tile_holding_only_none), tile_data)
 
 
 class StringDataTypeTests(ArchesTestCase):

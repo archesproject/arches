@@ -16,10 +16,10 @@ const viewModel = BaseFilter.extend({
         const response = await fetch(arches.urls.api_search_component_data + componentName);
         if (response.ok) {
             const data = await response.json();
-            data.resources.forEach(function(res) {
-                //if (res.isactive === true) { // TODO: Uncomment once active flag is re-added to graph model
-                self.resourceModels.push(res);
-                //}
+            data.resources.forEach(function (res) {
+                if (res.is_active === true && !res.source_identifier_id) {
+                    self.resourceModels.push(res);
+                }
             });
             self.resourceModels.sort(function(a,b) {
                 return a.name.toLowerCase().localeCompare(b.name.toLowerCase());

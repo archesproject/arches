@@ -124,12 +124,19 @@ var GraphView = BaseManager.extend({
 
         this.viewModel.showResources = ko.observable(window.location.hash!=='#branches');
 
+        var resources = ko.utils.arrayFilter(self.viewModel.resources(), function(resource) {
+            return !resource.source_identifier_id;
+        });
+        var graphs = ko.utils.arrayFilter(self.viewModel.graphs(), function(graph) {
+            return !graph.source_identifier_id;
+        });
+
         _.defaults(this.viewModel, {
             arches: arches,
             groupedGraphs: ko.observable({
                 groups: [
-                    { name: 'Resource Models', items: self.viewModel.resources() },
-                    { name: 'Branches', items: self.viewModel.graphs() }
+                    { name: 'Resource Models', items: resources },
+                    { name: 'Branches', items: graphs }
                 ]
             }),
             graphId: ko.observable(null),

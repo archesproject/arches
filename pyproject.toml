@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools>=77", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,7 +9,7 @@ readme = "README.md"
 authors = [
     {name = "Arches Project"}
 ]
-license = {text = "GNU AGPL3"}
+license = "AGPL-3.0-or-later"
 requires-python = ">=3.11"
 description = "Arches is an open-source, web-based, geospatial information system for cultural heritage inventory and management."
 keywords = ["django", "arches", "cultural heritage"]
@@ -25,7 +25,6 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Framework :: Django",
     "Framework :: Django :: 5.2",
-    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
 ]
 dependencies = [
     "arcgis2geojson==2.0.0",
@@ -79,7 +78,6 @@ dev = [
 
 [project.scripts]
 arches-admin = "arches.install.arches_admin:main"
-arches-project = "arches.install.arches_project:main"
 
 [project.urls]
 Homepage = "https://archesproject.org/"

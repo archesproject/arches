@@ -17,3 +17,7 @@ webpack-stats.json
 CACHE
 .tsconfig-paths.json
 .frontend-configuration-settings.json
+
+# Packaging
+build/
+dist/

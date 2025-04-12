@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
-from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.views import LoginView, LogoutView
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from django.views.decorators.debug import sensitive_variables, sensitive_post_parameters
