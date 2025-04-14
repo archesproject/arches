@@ -2,7 +2,6 @@ import ko from 'knockout';
 import arches from 'arches';
 import Cookies from 'js-cookie';
 import referenceDatatypeTemplate from 'templates/views/components/datatypes/reference.htm';
-import simpleSwitch from 'views/components/simple-switch';
 
 const viewModel = function(params) {
     const self = this;
