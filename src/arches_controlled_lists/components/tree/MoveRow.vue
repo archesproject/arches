@@ -282,17 +282,27 @@ const vRefocusDownArrow = {
 
 <style scoped>
 .p-button {
-    height: 2rem;
+    height: 2.5rem;
+    width: 2.5rem;
+    padding: .5rem;
+    border-radius: 2px;
+    border: 1px solid steelblue;
 }
 
 .add-child-button {
-    width: 2rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.33rem;
     border-radius: 50%;
+}
+
+.move-buttons .p-button-icon-only {
+    font-size: 1.33rem;
 }
 
 .move-buttons {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.25rem;
     padding-right: 0.5rem;
 }
 
