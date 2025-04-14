@@ -19,8 +19,12 @@ class SortResults(BaseSearchFilter):
     def append_dsl(self, search_query_object, **kwargs):
 
         query_string = kwargs["querystring"]
-        sort_order = query_string["sort_order"]
-        sort_by = query_string["sort_by"]
+        try:
+            sort_order = query_string["sort_order"]
+            sort_by = query_string["sort_by"]
+        except TypeError:  # sort order is a string e.g. 'asc'
+            sort_order = query_string
+            sort_by = "resource_name"
 
         if sort_by == "resource_name":
             sort_field = "displayname.value"
