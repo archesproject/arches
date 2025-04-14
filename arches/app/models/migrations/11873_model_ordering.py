@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "11857_spatial_view_source_identifier_filter"),
+        ("models", "11579_ids_search_filter"),
     ]
 
     operations = [
