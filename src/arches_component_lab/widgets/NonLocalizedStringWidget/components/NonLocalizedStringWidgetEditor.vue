@@ -10,17 +10,9 @@ const props = defineProps<{
     graphSlug: string;
 }>();
 
-// let timeout: ReturnType<typeof setTimeout>;
-
 function resolver(e: FormFieldResolverOptions) {
     validate(e);
-    // return new Promise((resolve) => {
-    //     if (timeout) clearTimeout(timeout);
 
-    //     timeout = setTimeout(() => {
-    //         resolve(validate(e));
-    //     }, 500);
-    // });
     return {
         values: { [props.nodeAlias]: e.value },
     };
@@ -28,17 +20,6 @@ function resolver(e: FormFieldResolverOptions) {
 
 function validate(e: FormFieldResolverOptions) {
     console.log("validate", e);
-    // API call to validate the input
-    // if (true) {
-    //     return {};
-    // } else {
-    //     return {
-    //         errors: [
-    //             { message: "This is an error message" },
-    //             { message: "This is also an error message" },
-    //         ],
-    //     };
-    // }
 }
 </script>
 

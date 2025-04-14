@@ -77,7 +77,7 @@ onMounted(async () => {
         />
         <DateWidgetViewer
             v-else-if="props.mode === VIEW"
-            :value="
+            :initial-value="
                 props.initialValue &&
                 dayjs(props.initialValue).toDate().toString()
             "

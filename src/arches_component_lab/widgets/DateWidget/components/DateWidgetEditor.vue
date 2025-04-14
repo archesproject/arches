@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useTemplateRef, watch } from "vue";
 import dayjs from "dayjs";
 
 import DatePicker from "primevue/datepicker";
@@ -23,51 +22,20 @@ const props = defineProps<{
     };
 }>();
 
-const formFieldRef = useTemplateRef("formFieldRef");
-
-// this watcher is necessary to be able to format the value of the form field when the date picker is updated
-watch(
-    // @ts-expect-error - This is a bug in the PrimeVue types
-    () => formFieldRef.value?.field?.states?.value,
-    (newVal, oldVal) => {
-        if (newVal !== oldVal) {
-            // @ts-expect-error - This is a bug in the PrimeVue types
-            formFieldRef.value!.field.states.value = dayjs(newVal).format(
-                props.widgetData.config.dateFormat,
-            );
-        }
-    },
-);
-
-// let timeout: ReturnType<typeof setTimeout>;
-
 function resolver(e: FormFieldResolverOptions) {
     validate(e);
-    // return new Promise((resolve) => {
-    //     if (timeout) clearTimeout(timeout);
 
-    //     timeout = setTimeout(() => {
-    //         resolve(validate(e));
-    //     }, 500);
-    // });
     return {
-        values: { [props.nodeAlias]: e.value },
+        values: {
+            [props.nodeAlias]: dayjs(e.value).format(
+                props.widgetData.config.dateFormat,
+            ),
+        },
     };
 }
 
 function validate(e: FormFieldResolverOptions) {
     console.log("validate", e);
-    // API call to validate the input
-    // if (true) {
-    //     return {};
-    // } else {
-    //     return {
-    //         errors: [
-    //             { message: "This is an error message" },
-    //             { message: "This is also an error message" },
-    //         ],
-    //     };
-    // }
 }
 </script>
 
