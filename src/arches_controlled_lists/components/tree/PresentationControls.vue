@@ -31,56 +31,61 @@ const { $gettext } = useGettext();
 </script>
 
 <template>
-    <div style="text-align: center; display: flex; width: 100%">
-        <Button
-            :severity="shouldUseContrast() ? CONTRAST : SECONDARY"
-            class="secondary-button"
-            type="button"
-            icon="fa fa-plus"
-            :label="$gettext('Expand all')"
-            @click="expandAll"
-        />
-        <Button
-            :severity="shouldUseContrast() ? CONTRAST : SECONDARY"
-            class="secondary-button"
-            type="button"
-            icon="fa fa-minus"
-            :label="$gettext('Collapse all')"
-            @click="collapseAll"
-        />
-        <div
-            v-if="arches.languages"
-            class="language-select"
-        >
-            <span
-                id="languageSelectLabel"
-                style="
-                    align-self: center;
-                    margin-right: 0.25rem;
-                    font-size: smaller;
-                "
-            >
-                {{ $gettext("Show labels in:") }}
-            </span>
-            <Select
-                v-model="selectedLanguage"
-                aria-labelledby="languageSelectLabel"
-                :options="arches.languages"
-                :option-label="
-                    (lang: Language) => `${lang.name} (${lang.code})`
-                "
-                :placeholder="$gettext('Language')"
-                :pt="{
-                    root: { class: 'secondary-button' },
-                    label: { style: { alignSelf: 'center' } },
-                    optionLabel: { style: { fontSize: 'small' } },
-                }"
+    <div class="tree-controls-container">
+        <div class="container-title">
+            Tree controls
+        </div>
+        <div style="text-align: center; display: flex; width: 100%">
+            <Button
+                :severity="shouldUseContrast() ? CONTRAST : SECONDARY"
+                class="secondary-button"
+                type="button"
+                icon="fa fa-plus"
+                :label="$gettext('Expand all')"
+                @click="expandAll"
             />
+            <Button
+                :severity="shouldUseContrast() ? CONTRAST : SECONDARY"
+                class="secondary-button"
+                type="button"
+                icon="fa fa-minus"
+                :label="$gettext('Collapse all')"
+                @click="collapseAll"
+            />
+            <div
+                v-if="arches.languages"
+                class="language-select"
+            >
+                <Select
+                    v-model="selectedLanguage"
+                    aria-labelledby="languageSelectLabel"
+                    :options="arches.languages"
+                    :option-label="
+                        (lang: Language) => `${lang.name} (${lang.code})`
+                    "
+                    :placeholder="$gettext('Language')"
+                    :pt="{
+                        root: { class: 'secondary-button' },
+                        label: { style: { alignSelf: 'center' } },
+                        optionLabel: { style: { fontSize: 'small' } },
+                    }"
+                />
+            </div>
         </div>
     </div>
 </template>
 
 <style scoped>
+.tree-controls-container {
+    padding: 0 0 .5rem 0;
+    background: #fafafa;
+    border-bottom: 1px solid #ddd;
+}
+
+.container-title {
+    padding: 0.75rem 0 0 1.25rem;
+}
+
 .secondary-button {
     height: 3rem;
     margin: 0.5rem;

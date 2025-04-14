@@ -294,6 +294,7 @@ const vRefocusDownArrow = {
     height: 2.5rem;
     font-size: 1.33rem;
     border-radius: 50%;
+    padding-top: 5px;
 }
 
 .move-buttons .p-button-icon-only {
