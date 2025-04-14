@@ -31,8 +31,8 @@ class SemanticTileManager(models.Manager):
 
 
 class SemanticTileQuerySet(models.QuerySet):
-    def __init__(self, model=None, query=None, using=None, hints=None):
-        super().__init__(model, query, using, hints)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._as_representation = False
         self._queried_nodes = []
         self._fetched_graph_nodes = []
@@ -123,7 +123,7 @@ class SemanticTileQuerySet(models.QuerySet):
         # TODO: some of these can just be aliases.
         return qs.annotate(**node_alias_annotations).order_by("sortorder")
 
-    def _prefetch_related_objects(self):
+    def _fetch_all(self):
         """Call datatype to_python() methods when materializing the QuerySet.
         Discard annotations that do not pertain to this nodegroup.
         Memoize fetched nodes.
@@ -131,18 +131,19 @@ class SemanticTileQuerySet(models.QuerySet):
         """
         from arches_querysets.models import SemanticResource
 
-        super()._prefetch_related_objects()
+        super()._fetch_all()
 
         NOT_PROVIDED = object()
         enriched_resource = None
+        checked_for_values_query = False
 
         for tile in self._result_cache:
-            if not isinstance(tile, self.model):
-                # For a .values() query, we will lack instances.
-                continue
+            if not checked_for_values_query:
+                if not isinstance(tile, self.model):
+                    return
+                checked_for_values_query = True
             if not enriched_resource:
-                # One prefetch per tile depth. Later look into improving.
-                # TODO: move -- this only makes sense for tiles for a single resource.
+                # TODO: add guard: this only makes sense for tiles for a single resource.
                 enriched_resource = (
                     SemanticResource.objects.filter(pk=tile.resourceinstance_id)
                     .with_related_resource_display_names()
@@ -170,22 +171,18 @@ class SemanticTileQuerySet(models.QuerySet):
                     tile.find_nodegroup_alias(),
                     child_tile.parenttile,
                 )
-                try:
-                    child_nodegroup_alias = child_tile.find_nodegroup_alias()
-                except:
-                    child_nodegroup_alias = Node.objects.get(
-                        pk=child_tile.nodegroup_id
-                    ).alias
-                children = getattr(tile.aliased_data, child_nodegroup_alias, [])
-                children.append(child_tile)
+                child_nodegroup_alias = child_tile.find_nodegroup_alias()
                 if child_tile.nodegroup.cardinality == "1":
-                    setattr(tile.aliased_data, child_nodegroup_alias, children[0])
+                    setattr(tile.aliased_data, child_nodegroup_alias, child_tile)
                 else:
+                    children = getattr(tile.aliased_data, child_nodegroup_alias, [])
+                    children.append(child_tile)
                     setattr(tile.aliased_data, child_nodegroup_alias, children)
                 # Attach parent to this child.
                 setattr(child_tile.aliased_data, tile.find_nodegroup_alias(), tile)
 
     def _clone(self):
+        """Persist private attributes through the life of the QuerySet."""
         clone = super()._clone()
         clone._queried_nodes = self._queried_nodes
         clone._fetched_graph_nodes = self._fetched_graph_nodes
@@ -245,8 +242,8 @@ class SemanticTileQuerySet(models.QuerySet):
 
 
 class SemanticResourceQuerySet(models.QuerySet):
-    def __init__(self, model=None, query=None, using=None, hints=None):
-        super().__init__(model, query, using, hints)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._as_representation = False
         self._queried_nodes = []
         self._fetched_graph_nodes = []
@@ -363,13 +360,13 @@ class SemanticResourceQuerySet(models.QuerySet):
             "resxres_resource_instance_ids_from__resourceinstanceidto"
         )
 
-    def _prefetch_related_objects(self):
+    def _fetch_all(self):
         """
         Attach top-level tiles to resource instances.
         Attach resource instances to all fetched tiles.
         Memoize fetched grouping node aliases (and graph source nodes).
         """
-        super()._prefetch_related_objects()
+        super()._fetch_all()
 
         grouping_nodes = {}
         for node in self._queried_nodes:
@@ -403,6 +400,7 @@ class SemanticResourceQuerySet(models.QuerySet):
                     setattr(resource.aliased_data, ng_alias, annotated_tile)
 
     def _clone(self):
+        """Persist private attributes through the life of the QuerySet."""
         clone = super()._clone()
         clone._queried_nodes = self._queried_nodes
         clone._fetched_graph_nodes = self._fetched_graph_nodes
