@@ -117,4 +117,12 @@ class Migration(migrations.Migration):
                 to="models.tilemodel",
             ),
         ),
+        migrations.RemoveField(
+            model_name="resourcexresource",
+            name="datestarted",
+        ),
+        migrations.RemoveField(
+            model_name="resourcexresource",
+            name="dateended",
+        ),
     ]
