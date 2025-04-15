@@ -566,7 +566,8 @@ class GraphDataView(View):
                     clone_data = graph.copy()
                     ret = clone_data["copy"]
                     ret.slug = Graph.objects.generate_slug(
-                        str(clone_data["copy"].slug) or "cloned_model", clone_data["copy"].isresource
+                        str(clone_data["copy"].slug) or "cloned_model",
+                        clone_data["copy"].isresource,
                     )
                     ret.publication = None
 

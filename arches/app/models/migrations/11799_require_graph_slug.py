@@ -7,7 +7,6 @@ from django.db import migrations, models
 from arches.app.models.utils import make_name_unique
 
 
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -18,7 +17,7 @@ class Migration(migrations.Migration):
         Graph = apps.get_model("models", "Graph")
         graphs_missing_slug = Graph.objects.filter(slug__isnull=True)
         for graph in graphs_missing_slug:
-            existing_graph_slugs = Graph.objects.all().values_list('slug', flat=True)
+            existing_graph_slugs = Graph.objects.all().values_list("slug", flat=True)
             slug = slugify(str(graph.name) or "new_graph", separator="_")
             graph.slug = make_name_unique(slug, existing_graph_slugs)
             graph.save()
