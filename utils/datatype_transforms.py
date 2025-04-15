@@ -124,8 +124,12 @@ def concept_list_to_json(self, tile, node):
 def file_list_transform_value_for_tile(self, value, *, languages, **kwargs):
     if not value:
         return value
-    # TODO: this should probably delegate more to self.transform_value_for_tile()
-    final_value = copy.deepcopy(value)
+
+    stringified_list = ",".join([file_info.get("name") for file_info in value])
+    final_value = self.transform_value_for_tile(
+        stringified_list, languages=languages, **kwargs
+    )
+
     for file_info in final_value:
         for key, val in file_info.items():
             if key not in {"altText", "attribution", "description", "title"}:
@@ -177,10 +181,6 @@ def file_list_to_representation(self, value):
             )
             file_info[key] = ranked[0][1].get("value")
     return final_value
-
-
-def file_list_post_tile_save(self, tile, nodeid, request):
-    self.post_tile_save(tile, nodeid, request)
 
 
 def string_to_json(self, tile, node):

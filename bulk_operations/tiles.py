@@ -347,12 +347,6 @@ class BulkTileOperation:
                 pre_tile_save_fn = partial(pre_tile_save_fn, datatype_instance)
             else:
                 pre_tile_save_fn = datatype_instance.pre_tile_save
-            if post_tile_save_fn := getattr(
-                datatype_transforms, f"{snake_case_datatype}_post_tile_save", None
-            ):
-                post_tile_save_fn = partial(post_tile_save_fn, datatype_instance)
-            else:
-                post_tile_save_fn = datatype_instance.post_tile_save
 
             if value_to_validate is None:
                 tile.data[node_id_str] = None
@@ -385,8 +379,6 @@ class BulkTileOperation:
                         tile.data[node_id_str], None, None, None
                     )
                 )
-
-            post_tile_save_fn(tile, node_id_str, self.request)
 
     def _persist(self):
         # Instantiate proxy models for now, but TODO: expose this
