@@ -19,22 +19,22 @@ class Migration(migrations.Migration):
         migrations.RenameField(
             model_name="resourcexresource",
             old_name="resourceinstanceidfrom",
-            new_name="resourceinstancefrom",
+            new_name="from_resource",
         ),
         migrations.RenameField(
             model_name="resourcexresource",
             old_name="resourceinstancefrom_graphid",
-            new_name="resourceinstancefrom_graph",
+            new_name="from_resource_graph",
         ),
         migrations.RenameField(
             model_name="resourcexresource",
             old_name="resourceinstanceidto",
-            new_name="resourceinstanceto",
+            new_name="to_resource",
         ),
         migrations.RenameField(
             model_name="resourcexresource",
             old_name="resourceinstanceto_graphid",
-            new_name="resourceinstanceto_graph",
+            new_name="to_resource_graph",
         ),
         migrations.RenameField(
             model_name="resourcexresource",
@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name="resourcexresource",
-            name="resourceinstancefrom",
+            name="from_resource",
             field=models.ForeignKey(
                 blank=True,
                 db_column="resourceinstanceidfrom",
@@ -68,7 +68,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name="resourcexresource",
-            name="resourceinstancefrom_graph",
+            name="from_resource_graph",
             field=models.ForeignKey(
                 blank=True,
                 db_column="resourceinstancefrom_graphid",
@@ -81,7 +81,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name="resourcexresource",
-            name="resourceinstanceto",
+            name="to_resource",
             field=models.ForeignKey(
                 blank=True,
                 db_column="resourceinstanceidto",
@@ -94,7 +94,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name="resourcexresource",
-            name="resourceinstanceto_graph",
+            name="to_resource_graph",
             field=models.ForeignKey(
                 blank=True,
                 db_column="resourceinstanceto_graphid",
