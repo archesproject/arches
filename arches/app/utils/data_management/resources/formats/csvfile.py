@@ -305,13 +305,13 @@ class CsvWriter(Writer):
             dest = StringIO()
             csv_header = [
                 "resourcexid",
-                "resourceinstanceidfrom",
-                "resourceinstanceidto",
+                "resourceinstancefrom",
+                "resourceinstanceto",
                 "relationshiptype",
-                "resourceinstancefrom_graphid",
-                "resourceinstanceto_graphid",
-                "nodeid",
-                "tileid",
+                "resourceinstancefrom_graph",
+                "resourceinstanceto_graph",
+                "node",
+                "tile",
                 "datestarted",
                 "dateended",
                 "notes",
@@ -322,9 +322,9 @@ class CsvWriter(Writer):
             relations_file.append({"name": csv_name, "outputfile": dest})
 
             relations = ResourceXResource.objects.filter(
-                Q(resourceinstanceidfrom__in=resourceids)
-                | Q(resourceinstanceidto__in=resourceids),
-                tileid__isnull=True,
+                Q(resourceinstancefrom__in=resourceids)
+                | Q(resourceinstanceto__in=resourceids),
+                tile__isnull=True,
             ).values(*csv_header)
             for relation in relations:
                 relation["datestarted"] = (

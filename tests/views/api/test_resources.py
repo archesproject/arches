@@ -87,10 +87,10 @@ class ResourceAPITests(ArchesTestCase):
         new_phase_type_instance.index()
 
         relation = models.ResourceXResource(
-            resourceinstancefrom_graphid_id=cls.data_type_graphid,
-            resourceinstanceto_graphid_id=cls.phase_type_graphid,
-            resourceinstanceidfrom_id=cls.test_prj_user.pk,
-            resourceinstanceidto_id=cls.phase_type_instance_resourceid,
+            resourceinstancefrom_graph_id=cls.data_type_graphid,
+            resourceinstanceto_graph_id=cls.phase_type_graphid,
+            resourceinstancefrom_id=cls.test_prj_user.pk,
+            resourceinstanceto_id=cls.phase_type_instance_resourceid,
         )
         relation.save()
 

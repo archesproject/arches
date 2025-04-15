@@ -552,10 +552,10 @@ class ResourceTests(ArchesTestCase):
             sortorder=0,
         )
         models.ResourceXResource.objects.create(
-            nodeid=resource_instance_node,
-            resourceinstanceidfrom=resource,
-            resourceinstanceidto=resource,
-            tileid=tile,
+            node=resource_instance_node,
+            resourceinstancefrom=resource,
+            resourceinstanceto=resource,
+            tile=tile,
         )
         r = Resource.objects.get(pk=resource.pk)
         r.save_descriptors()

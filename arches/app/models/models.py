@@ -1305,29 +1305,29 @@ class ResourceXResource(SaveSupportsBlindOverwriteMixin, models.Model):
     def delete(self, *args, **kwargs):
         # update the resource-instance tile by removing any references to a deleted resource
         deletedResourceId = kwargs.pop("deletedResourceId", None)
-        if deletedResourceId and self.tileid and self.nodeid:
+        if deletedResourceId and self.tile and self.node:
             newTileData = []
-            data = self.tileid.data[str(self.nodeid_id)]
+            data = self.tile.data[str(self.node)]
             if type(data) != list:
                 data = [data]
             for relatedresourceItem in data:
                 if relatedresourceItem:
                     if relatedresourceItem["resourceId"] != str(deletedResourceId):
                         newTileData.append(relatedresourceItem)
-            self.tileid.data[str(self.nodeid_id)] = newTileData
-            self.tileid.save()
+            self.tile.data[str(self.node)] = newTileData
+            self.tile.save()
 
         super(ResourceXResource, self).delete()
 
     def save(self, **kwargs):
         # during package/csv load the ResourceInstance models are not always available
         try:
-            self.resourceinstancefrom_graphid = self.resourceinstanceidfrom.graph
+            self.resourceinstancefrom_graph = self.resourceinstancefrom.graph
         except:
             pass
 
         try:
-            self.resourceinstanceto_graphid = self.resourceinstanceidto.graph
+            self.resourceinstanceto_graph = self.resourceinstanceto.graph
         except:
             pass
 

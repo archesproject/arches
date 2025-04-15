@@ -1189,8 +1189,8 @@ class RelatedResourcesView(BaseManagerView):
             )
             if permitted is True:
                 rr = models.ResourceXResource(
-                    resourceinstanceidfrom=Resource(root_resourceinstanceid[0]),
-                    resourceinstanceidto=Resource(instanceid),
+                    resourceinstancefrom=Resource(root_resourceinstanceid[0]),
+                    resourceinstanceto=Resource(instanceid),
                     notes=notes,
                     relationshiptype=relationshiptype,
                     datestarted=datefrom,
