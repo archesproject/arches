@@ -141,38 +141,38 @@ class Reader(object):
                 return newresourceinstanceid
 
             from_resource = validate_resourceinstanceid(
-                relation["fromresource"], "fromresource"
+                relation["from_resource"], "from_resource"
             )
             to_resource = validate_resourceinstanceid(
-                relation["toresource"], "toresource"
+                relation["to_resource"], "to_resource"
             )
             if from_resource is not None and to_resource is not None:
                 if (
-                    "fromresource_graph" not in relation
-                    or relation["fromresource_graph"] == ""
-                    or relation["fromresource_graph"] == "None"
+                    "from_resource_graph" not in relation
+                    or relation["from_resource_graph"] == ""
+                    or relation["from_resource_graph"] == "None"
                 ):
                     try:
-                        relation["fromresource_graph"] = (
+                        relation["from_resource_graph"] = (
                             models.ResourceInstance.objects.get(
                                 resourceinstanceid=from_resource
                             ).graph_id
                         )
                     except ObjectDoesNotExist:
-                        relation["fromresource_graph"] = None
+                        relation["from_resource_graph"] = None
                 if (
-                    "toresource_graph" not in relation
-                    or relation["toresource_graph"] == ""
-                    or relation["toresource_graph"] == "None"
+                    "to_resource_graph" not in relation
+                    or relation["to_resource_graph"] == ""
+                    or relation["to_resource_graph"] == "None"
                 ):
                     try:
-                        relation["toresource_graph"] = (
+                        relation["to_resource_graph"] = (
                             models.ResourceInstance.objects.get(
                                 resourceinstanceid=to_resource
                             ).graph_id
                         )
                     except ObjectDoesNotExist:
-                        relation["toresource_graph"] = None
+                        relation["to_resource_graph"] = None
                 if (
                     "node" not in relation
                     or relation["node"] == ""
@@ -188,8 +188,8 @@ class Reader(object):
                 relation = ResourceXResource(
                     from_resource=Resource(from_resource),
                     to_resource=Resource(to_resource),
-                    from_resource_graph_id=relation["fromresource_graph"],
-                    to_resource_graph_id=relation["toresource_graph"],
+                    from_resource_graph_id=relation["from_resource_graph"],
+                    to_resource_graph_id=relation["to_resource_graph"],
                     relationshiptype=str(relation["relationshiptype"]),
                     nodeid=relation["nodeid"],
                     tileid=relation["tileid"],
