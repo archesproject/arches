@@ -96,33 +96,35 @@ class ArchesModelAPIMixin:
             "nodegroup_alias": self.nodegroup_alias,
         }
 
-    def get_object(self, user=None, permission_callable=None):
+    def get_object(self, permission_callable=None):
         # TODO: discloses existence?
         ret = super().get_object()
         options = self.serializer_class.Meta
         if issubclass(options.model, ResourceInstance):
             if arches_version >= "8":
-                permission_kwargs = {"user": user, "resource": ret}
+                permission_kwargs = {"user": self.request.user, "resource": ret}
             else:
-                permission_kwargs = {"user": user, "resourceid": ret.pk}
+                permission_kwargs = {"user": self.request.user, "resourceid": ret.pk}
             if not self.graph_slug:
                 # Resource results for heterogenous graphs are not supported.
                 self.graph_slug = ret.graph.slug
         else:
-            permission_kwargs = {"user": user, "resourceid": ret.resourceinstance_id}
+            permission_kwargs = {
+                "user": self.request.user,
+                "resourceid": ret.resourceinstance_id,
+            }
             if not self.graph_slug:
                 self.graph_slug = ret.resourceinstance.graph.slug
         if permission_callable and not permission_callable(**permission_kwargs):
             # Not 404, see https://github.com/archesproject/arches/issues/11563
             raise PermissionDenied
-        ret.save = partial(ret.save, user=user, request=self.request)
+        ret.save = partial(ret.save, request=self.request)
         self.graph_nodes = ret._fetched_graph_nodes
         return ret
 
     def create(self, request, *args, **kwargs):
         self.get_object = partial(
             self.get_object,
-            user=request.user,
             permission_callable=user_can_edit_resource,
         )
         return super().create(request, *args, **kwargs)
@@ -130,7 +132,6 @@ class ArchesModelAPIMixin:
     def retrieve(self, request, *args, **kwargs):
         self.get_object = partial(
             self.get_object,
-            user=request.user,
             permission_callable=user_can_read_resource,
         )
         return super().retrieve(request, *args, **kwargs)
@@ -138,7 +139,6 @@ class ArchesModelAPIMixin:
     def update(self, request, *args, **kwargs):
         self.get_object = partial(
             self.get_object,
-            user=request.user,
             permission_callable=user_can_edit_resource,
         )
         return super().update(request, *args, **kwargs)
@@ -146,7 +146,6 @@ class ArchesModelAPIMixin:
     def destroy(self, request, *args, **kwargs):
         self.get_object = partial(
             self.get_object,
-            user=request.user,
             permission_callable=user_can_delete_resource,
         )
         return super().destroy(request, *args, **kwargs)

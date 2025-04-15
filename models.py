@@ -95,14 +95,14 @@ class SemanticResource(ResourceInstance):
             user=user, edit_type=edit_type, transaction_id=transaction_id
         )
 
-    def save(self, *, user=None, request=None, index=False, **kwargs):
+    def save(self, *, request=None, index=False, **kwargs):
         with transaction.atomic():
-            self._save_aliased_data(user=user, request=request, index=index, **kwargs)
+            self._save_aliased_data(request=request, index=index, **kwargs)
 
     def save_without_related_objects(self, **kwargs):
         return super().save(**kwargs)
 
-    def _save_aliased_data(self, *, user=None, request=None, index=False, **kwargs):
+    def _save_aliased_data(self, *, request=None, index=False, **kwargs):
         """Raises a compound ValidationError with any failing tile values.
 
         It's not exactly idiomatic for a Django project to clean()
@@ -112,7 +112,7 @@ class SemanticResource(ResourceInstance):
             - we have other entry points besides DRF.
         """
         bulk_operation = BulkTileOperation(
-            entry=self, user=user, request=request, save_kwargs=kwargs
+            entry=self, request=request, save_kwargs=kwargs
         )
         bulk_operation.run()
 
@@ -127,7 +127,10 @@ class SemanticResource(ResourceInstance):
         if index:
             proxy_resource.index()
 
-        self.save_edit(user=user, transaction_id=bulk_operation.transaction_id)
+        if request:
+            self.save_edit(
+                user=request.user, transaction_id=bulk_operation.transaction_id
+            )
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None):
         if from_queryset is None:
@@ -212,11 +215,11 @@ class SemanticTile(TileModel):
         ).annotate(_nodegroup_alias=models.Value(entry_node_alias))
         # TODO: determine if this annotation still needed / remove
 
-    def save(self, *, user=None, request=None, index=False, **kwargs):
+    def save(self, *, request=None, index=False, **kwargs):
         with transaction.atomic():
             if self.sortorder is None or self.is_fully_provisional():
                 self.set_next_sort_order()
-            self._save_aliased_data(user=user, request=request, index=index, **kwargs)
+            self._save_aliased_data(request=request, index=index, **kwargs)
 
     def save_without_related_objects(self, **kwargs):
         return super().save(**kwargs)
@@ -227,9 +230,9 @@ class SemanticTile(TileModel):
         save_kwargs = {**kwargs, "update_fields": set()}
         return super().save(**save_kwargs)
 
-    def _save_aliased_data(self, *, user=None, request=None, index=False, **kwargs):
+    def _save_aliased_data(self, *, request=None, index=False, **kwargs):
         bulk_operation = BulkTileOperation(
-            entry=self, user=user, request=request, save_kwargs=kwargs
+            entry=self, request=request, save_kwargs=kwargs
         )
         bulk_operation.run()
 

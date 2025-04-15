@@ -26,18 +26,16 @@ NOT_PROVIDED = object()
 
 
 class BulkTileOperation:
-    def __init__(self, entry, user=None, request=None, save_kwargs=None):
+    def __init__(self, *, entry, request=None, save_kwargs=None):
         self.to_insert = set()
         self.to_update = set()
         self.to_delete = set()
         self.errors_by_node_alias = defaultdict(list)
         self.entry = entry  # resource or tile
-        self.user = user
         self.datatype_factory = DataTypeFactory()
         self.request = request
         if not self.request:
             self.request = HttpRequest()
-            self.request.user = user
         self.save_kwargs = save_kwargs or {}
         self.transaction_id = uuid.uuid4()
 
@@ -435,7 +433,7 @@ class BulkTileOperation:
                     upsert_proxy,
                     upsert_proxy._existing_data,
                     upsert_proxy._existing_provisionaledits,
-                    user=self.user,
+                    user=getattr(self.request, "user", None),
                 )
                 # Remember the values needed for the edit log updates later.
                 upsert_proxy._oldprovisionalvalue = oldprovisionalvalue
@@ -497,7 +495,7 @@ class BulkTileOperation:
             # Save edits: could be done in bulk once above side effects are un-proxied.
             for insert_proxy in insert_proxies:
                 insert_proxy.save_edit(
-                    user=self.user,
+                    user=getattr(self.request, "user", None),
                     edit_type="tile create",
                     old_value={},
                     new_value=insert_proxy.data,
@@ -510,7 +508,7 @@ class BulkTileOperation:
                 )
             for update_proxy in update_proxies:
                 update_proxy.save_edit(
-                    user=self.user,
+                    user=getattr(self.request, "user", None),
                     edit_type="tile edit",
                     old_value=update_proxy._existing_data,
                     new_value=update_proxy.data,
@@ -521,7 +519,7 @@ class BulkTileOperation:
                 )
             for delete_proxy in delete_proxies:
                 delete_proxy.save_edit(
-                    user=self.user,
+                    user=getattr(self.request, "user", None),
                     edit_type="tile delete",
                     old_value=delete_proxy.data,
                     provisional_edit_log_details=None,
