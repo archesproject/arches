@@ -2256,7 +2256,7 @@ class ResourceInstanceDataType(BaseDataType):
             field_name = f"tiles.data.{node.pk}"
             for val in values_list:
                 match_q = Term(
-                    field="tiles.data.%s.resourceId.keyword" % (str(node.pk)),
+                    field=f"tiles.data.{node.pk}.resourceId.keyword",
                     term=val,
                 )
 
