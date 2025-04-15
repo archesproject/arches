@@ -2,7 +2,7 @@ from django.contrib.postgres.fields.array import ArrayExact
 from django.db.models import Lookup
 from psycopg2.extensions import AsIs, QuotedString
 
-from arches_querysets.fields import Cardinality1Field, CardinalityNField
+from arches_querysets.fields import CardinalityNField
 
 
 class JSONPathFilter:
@@ -12,39 +12,6 @@ class JSONPathFilter:
             raise ValueError("Double quotes are not allowed in JSONPath filters.")
         quoted = AsIs(QuotedString(params[0]).getquoted().decode()[1:-1])
         return rhs, (quoted,)
-
-
-@Cardinality1Field.register_lookup
-class AnyLanguageEquals(JSONPathFilter, Lookup):
-    lookup_name = "any_lang"
-
-    def as_sql(self, compiler, connection):
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = (*lhs_params, *rhs_params)
-        return "%s @? '$.*.value ? (@ == \"%s\")'" % (lhs, rhs), params
-
-
-@Cardinality1Field.register_lookup
-class AnyLanguageContains(JSONPathFilter, Lookup):
-    lookup_name = "any_lang_contains"
-
-    def as_sql(self, compiler, connection):
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = (*lhs_params, *rhs_params)
-        return "%s @? '$.*.value ? (@ like_regex \"%s\")'" % (lhs, rhs), params
-
-
-@Cardinality1Field.register_lookup
-class AnyLanguageIContains(JSONPathFilter, Lookup):
-    lookup_name = "any_lang_icontains"
-
-    def as_sql(self, compiler, connection):
-        lhs, lhs_params = self.process_lhs(compiler, connection)
-        rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = (*lhs_params, *rhs_params)
-        return '%s @? \'$.*.value ? (@ like_regex "%s" flag "i")\'' % (lhs, rhs), params
 
 
 @CardinalityNField.register_lookup

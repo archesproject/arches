@@ -1,6 +1,6 @@
 from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.postgres.fields import ArrayField
-from django.db.models import F, OuterRef, Subquery
+from django.db.models import F, OuterRef
 from django.db.models.fields.json import JSONField
 
 from arches import __version__ as arches_version
@@ -8,7 +8,7 @@ from arches.app.models.models import ResourceInstance, TileModel
 from arches.app.models.utils import field_names
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
-from arches_querysets.fields import Cardinality1Field, CardinalityNField
+from arches_querysets.fields import CardinalityNField
 
 
 def field_attnames(instance_or_class):
@@ -64,19 +64,20 @@ def pop_arches_model_kwargs(kwargs, model_fields):
     return arches_model_data, without_model_data
 
 
-def get_tile_values_for_resource(*, nodegroup, base_lookup) -> Subquery:
+def get_tile_values_for_resource(*, nodegroup, base_lookup) -> ArraySubquery:
     """Return a tile values query expression for use in a ResourceInstanceQuerySet."""
-    tile_query = TileModel.objects.filter(
-        nodegroup_id=nodegroup.pk, resourceinstance_id=OuterRef("resourceinstanceid")
-    ).values(base_lookup)
-    if nodegroup.cardinality == "n":
-        tile_query = tile_query.order_by("sortorder")
-        return ArraySubquery(
-            tile_query,
-            output_field=CardinalityNField(base_field=ArrayField(JSONField())),
+    tile_query = (
+        TileModel.objects.filter(
+            nodegroup_id=nodegroup.pk,
+            resourceinstance_id=OuterRef("resourceinstanceid"),
         )
-    else:
-        return Subquery(tile_query, output_field=Cardinality1Field())
+        .values(base_lookup)
+        .order_by("parenttile", "sortorder")
+    )
+    return ArraySubquery(
+        tile_query,
+        output_field=CardinalityNField(base_field=ArrayField(JSONField())),
+    )
 
 
 def get_nodegroups_here_and_below(start_nodegroup, user=None):
