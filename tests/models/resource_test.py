@@ -553,8 +553,8 @@ class ResourceTests(ArchesTestCase):
         )
         models.ResourceXResource.objects.create(
             node=resource_instance_node,
-            resourceinstancefrom=resource,
-            resourceinstanceto=resource,
+            from_resource=resource,
+            to_resource=resource,
             tile=tile,
         )
         r = Resource.objects.get(pk=resource.pk)
