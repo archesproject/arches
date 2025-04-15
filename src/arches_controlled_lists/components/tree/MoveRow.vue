@@ -226,7 +226,6 @@ const vRefocusDownArrow = {
         v-if="selectedKeys && node.key in selectedKeys"
         v-tooltip="moveLabels.addChild"
         type="button"
-        raised
         class="add-child-button"
         icon="fa fa-plus"
         :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
@@ -243,7 +242,6 @@ const vRefocusDownArrow = {
             v-refocus-up-arrow
             v-tooltip="moveLabels.moveUp"
             type="button"
-            raised
             class="reorder-button"
             icon="fa fa-caret-up"
             :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
@@ -257,7 +255,6 @@ const vRefocusDownArrow = {
             v-refocus-down-arrow
             v-tooltip="moveLabels.moveDown"
             type="button"
-            raised
             class="reorder-button"
             icon="fa fa-caret-down"
             :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
@@ -270,7 +267,6 @@ const vRefocusDownArrow = {
             v-if="!node.data.name && selectedKeys && node.key in selectedKeys"
             v-tooltip="moveLabels.changeParent"
             type="button"
-            raised
             icon="fa fa-arrows-alt"
             :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
             :aria-label="moveLabels.changeParent"

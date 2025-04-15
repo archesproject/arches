@@ -263,14 +263,15 @@ await fetchListsAndPopulateTree();
     <div class="controls-container">
         <div>
             <h2 class="controls-header">
-                Lists Manager
+                {{
+                    $gettext("Lists Manager")
+                }}
             </h2>
         </div>
         <div class="button-controls-container">
             <Button
                 class="list-button"
                 :label="$gettext('Add New List')"
-                raised
                 :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
                 @click="createList"
             />
@@ -278,7 +279,6 @@ await fetchListsAndPopulateTree();
                 class="list-button"
                 :label="$gettext('Delete')"
                 :menu-button-props="{ 'aria-label': $gettext('Delete multiple') }"
-                raised
                 :disabled="!toDelete.length"
                 :severity="shouldUseContrast() ? CONTRAST : DANGER"
                 :model="deleteSelectOptions"
@@ -300,10 +300,14 @@ await fetchListsAndPopulateTree();
 }
 
 .controls-header {
-    padding: 0 .5rem;
-    margin: 1rem 0 .5rem 0;
+    padding: 0 0.75rem;
+    margin: 1rem 0 .5rem 1.0rem;
     font-size: 1.75rem;
     font-weight: 400;
+}
+
+.button-controls-container {
+    padding: 0 1.0rem;
 }
 
 .list-button {

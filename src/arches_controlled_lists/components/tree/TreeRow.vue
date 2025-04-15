@@ -318,7 +318,6 @@ const acceptNewListShortcutEntry = async () => {
                 v-else-if="showMoveHereButton(node.key)"
                 class="move-target"
                 type="button"
-                raised
                 :severity="shouldUseContrast() ? CONTRAST : SECONDARY"
                 :label="
                     $gettext(
@@ -373,4 +372,5 @@ const acceptNewListShortcutEntry = async () => {
     height: 3rem;
     font-size: inherit;
 }
+
 </style>
