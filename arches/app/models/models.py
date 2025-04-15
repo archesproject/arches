@@ -1297,8 +1297,6 @@ class ResourceXResource(SaveSupportsBlindOverwriteMixin, models.Model):
         related_name="resxres",
         on_delete=models.CASCADE,
     )
-    datestarted = models.DateField(blank=True, null=True)
-    dateended = models.DateField(blank=True, null=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
 
