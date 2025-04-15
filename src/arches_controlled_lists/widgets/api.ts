@@ -1,11 +1,15 @@
 import arches from "arches";
 
-export const fetchLists = async (
-    nodeAliases: string[] | undefined = undefined,
+export const fetchWidgetOptions = async (
+    graphSlug: string,
+    nodeAlias: string,
 ) => {
     const params = new URLSearchParams();
-    nodeAliases?.forEach((alias) => params.append("node_alias", alias));
-    const response = await fetch(`${arches.urls.controlled_lists}?${params}`);
+    params.append("graph_slug", graphSlug);
+    params.append("node_alias", nodeAlias);
+    const response = await fetch(
+        `${arches.urls.controlled_list_options}?${params}`,
+    );
     try {
         const parsed = await response.json();
         if (response.ok) {

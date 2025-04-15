@@ -1,22 +1,31 @@
+from __future__ import annotations
+
 import datetime
 import uuid
 from collections import defaultdict
+from typing import Iterable, TYPE_CHECKING
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models, transaction
 from django.db.models import Deferrable, Q
+from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
 from arches.app.models.models import DValueType, Language, Node
 from arches.app.models.utils import field_names
+from arches.app.utils.i18n import rank_label
 from arches_controlled_lists.querysets import (
     ListQuerySet,
+    ListItemQuerySet,
     ListItemImageManager,
     ListItemValueQuerySet,
     NodeQuerySet,
 )
+
+if TYPE_CHECKING:
+    from arches_controlled_lists.datatypes.datatypes import ReferenceLabel
 
 
 class List(models.Model):
@@ -129,7 +138,10 @@ class ListItem(models.Model):
     )
     guide = models.BooleanField(default=False)
 
+    objects = ListItemQuerySet.as_manager()
+
     class Meta:
+        ordering = ["sortorder"]
         constraints = [
             # Sort order concerns the list as a whole, not subsets
             # of the hierarchy.
@@ -197,10 +209,9 @@ class ListItem(models.Model):
             "depth": depth_map[self.id],
         }
         if not flat:
-            data["children"] = sorted(
-                [child.serialize(depth_map, flat) for child in self.children.all()],
-                key=lambda d: d["sortorder"],
-            )
+            data["children"] = [
+                child.serialize(depth_map, flat) for child in self.children.all()
+            ]
         return data
 
     def build_tile_value(self):
@@ -210,6 +221,41 @@ class ListItem(models.Model):
             "list_id": str(self.list_id),
         }
         return tile_value
+
+    def build_select_option(self):
+        labels = getattr(self, "list_item_labels", self.list_item_values.labels())
+        best_label = self.find_best_label_from_set(labels)
+        data = {
+            "list_item_id": str(self.id),
+            "uri": self.uri,
+            "list_item_values": [label.serialize() for label in labels],
+            "display_value": best_label,
+            "sortorder": self.sortorder,
+        }
+        data["children"] = [
+            child.build_select_option() for child in self.children.all()
+        ]
+        return data
+
+    @staticmethod
+    def find_best_label_from_set(
+        labels: Iterable["ListItemValue" | ReferenceLabel],
+    ) -> str | None:
+        ranked_labels = sorted(
+            labels,
+            key=lambda label: rank_label(
+                kind=label.valuetype_id,
+                source_lang=label.language_id,
+                target_lang=translation.get_language(),
+            ),
+            reverse=True,
+        )
+        if not ranked_labels:
+            return None
+        return ranked_labels[0].value
+
+    def find_best_label(self):
+        return self.find_best_label_from_set(self.list_item_values.labels())
 
 
 class ListItemValue(models.Model):

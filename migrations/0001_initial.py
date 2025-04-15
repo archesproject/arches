@@ -219,6 +219,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
+            options={"ordering": ["sortorder"]},
         ),
         migrations.CreateModel(
             name="ListItemImageMetadata",
