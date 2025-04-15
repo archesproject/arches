@@ -305,11 +305,11 @@ class CsvWriter(Writer):
             dest = StringIO()
             csv_header = [
                 "resourcexid",
-                "fromresource",
-                "toresource",
+                "from_resource",
+                "to_resource",
                 "relationshiptype",
-                "fromresource_graph",
-                "toresource_graph",
+                "from_resource_graph",
+                "to_resource_graph",
                 "node",
                 "tile",
                 "notes",
