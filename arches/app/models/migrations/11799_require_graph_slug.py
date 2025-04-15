@@ -10,7 +10,7 @@ from arches.app.models.utils import make_name_unique
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "11882_principal_user_read_only"),
+        ("models", "11842_userpreferences"),
     ]
 
     def add_missing_graph_slug(apps, schema_editor):
