@@ -2253,7 +2253,7 @@ class ResourceInstanceDataType(BaseDataType):
     def append_in_list_search_filters(self, value, node, query):
         values_list = value.get("val", [])
         if values_list:
-            field_name = f"tiles.data.{str(node.pk)}"
+            field_name = f"tiles.data.{node.pk}"
             for val in values_list:
                 match_q = Term(
                     field="tiles.data.%s.resourceId.keyword" % (str(node.pk)),
