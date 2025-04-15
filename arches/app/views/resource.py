@@ -1141,7 +1141,6 @@ class RelatedResourcesView(BaseManagerView):
 
     def post(self, request, resourceid=None):
         lang = request.GET.get("lang", request.LANGUAGE_CODE)
-        se = SearchEngineFactory().create()
         res = dict(request.POST)
         relationshiptype = res["relationship_properties[relationshiptype]"][0]
         notes = res["relationship_properties[notes]"][0]
