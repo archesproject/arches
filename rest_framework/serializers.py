@@ -363,10 +363,10 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return AliasedData(**attrs)
 
     def validate(self, attrs):
-        # if hasattr(self, "initial_data") and (
-        #     unknown_keys := set(self.initial_data) - set(self.fields)
-        # ):
-        #     raise ValidationError({unknown_keys.pop(): "Unexpected field"})
+        if hasattr(self, "initial_data") and (
+            unknown_keys := set(self.initial_data) - set(self.fields)
+        ):
+            raise ValidationError({unknown_keys.pop(): "Unexpected field"})
 
         if validate_method := getattr(self, f"validate_{self._root_node.alias}", None):
             attrs = validate_method(attrs)
