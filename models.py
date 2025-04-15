@@ -239,7 +239,7 @@ class ListItem(models.Model):
 
     @staticmethod
     def find_best_label_from_set(
-        labels: Iterable["ListItemValue" | "ReferenceLabel"],
+        labels: Iterable["ListItemValue" | ReferenceLabel],
     ) -> str | None:
         ranked_labels = sorted(
             labels,
