@@ -115,7 +115,7 @@ class ArchesModelAPIMixin:
         if permission_callable and not permission_callable(**permission_kwargs):
             # Not 404, see https://github.com/archesproject/arches/issues/11563
             raise PermissionDenied
-        ret.save = partial(ret.save, user=user)
+        ret.save = partial(ret.save, user=user, request=self.request)
         self.graph_nodes = ret._fetched_graph_nodes
         return ret
 

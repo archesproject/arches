@@ -26,7 +26,7 @@ NOT_PROVIDED = object()
 
 
 class BulkTileOperation:
-    def __init__(self, entry, user=None, save_kwargs=None):
+    def __init__(self, entry, user=None, request=None, save_kwargs=None):
         self.to_insert = set()
         self.to_update = set()
         self.to_delete = set()
@@ -34,8 +34,7 @@ class BulkTileOperation:
         self.entry = entry  # resource or tile
         self.user = user
         self.datatype_factory = DataTypeFactory()
-        self.dummy_request = HttpRequest()
-        self.dummy_request.user = user
+        self.request = save_kwargs.pop("request")
         self.save_kwargs = save_kwargs or {}
         self.transaction_id = uuid.uuid4()
 
@@ -348,6 +347,12 @@ class BulkTileOperation:
                 pre_tile_save_fn = partial(pre_tile_save_fn, datatype_instance)
             else:
                 pre_tile_save_fn = datatype_instance.pre_tile_save
+            if post_tile_save_fn := getattr(
+                datatype_transforms, f"{snake_case_datatype}_post_tile_save", None
+            ):
+                post_tile_save_fn = partial(post_tile_save_fn, datatype_instance)
+            else:
+                post_tile_save_fn = datatype_instance.post_tile_save
 
             if value_to_validate is None:
                 tile.data[node_id_str] = None
@@ -380,6 +385,8 @@ class BulkTileOperation:
                         tile.data[node_id_str], None, None, None
                     )
                 )
+
+            post_tile_save_fn(tile, node_id_str, self.request)
 
     def _persist(self):
         # Instantiate proxy models for now, but TODO: expose this
@@ -420,7 +427,7 @@ class BulkTileOperation:
                 # Some functions expect to always drill into request.user
                 # https://github.com/archesproject/arches/issues/8471
                 try:
-                    upsert_proxy._Tile__preSave(request=self.dummy_request)
+                    upsert_proxy._Tile__preSave(request=self.request)
                     upsert_proxy.check_for_missing_nodes()  # also runs clean()
                     upsert_proxy.check_for_constraint_violation()
                 except TileValidationError as tve:
@@ -444,7 +451,7 @@ class BulkTileOperation:
                 upsert_proxy._existing_data = vanilla_instance.data
 
             for delete_proxy in delete_proxies:
-                delete_proxy._Tile__preDelete(request=self.dummy_request)
+                delete_proxy._Tile__preDelete(request=self.request)
 
             if self.to_insert:
                 inserted = TileModel.objects.bulk_create(self.to_insert)
@@ -486,7 +493,7 @@ class BulkTileOperation:
                 for node in grouping_node.nodegroup.node_set.all():
                     datatype = self.datatype_factory.get_instance(node.datatype)
                     datatype.post_tile_save(
-                        upsert_tile, str(node.pk), request=self.dummy_request
+                        upsert_tile, str(node.pk), request=self.request
                     )
 
             for upsert_proxy in upsert_proxies:

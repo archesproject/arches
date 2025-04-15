@@ -179,6 +179,10 @@ def file_list_to_representation(self, value):
     return final_value
 
 
+def file_list_post_tile_save(self, tile, nodeid, request):
+    self.post_tile_save(tile, nodeid, request)
+
+
 def string_to_json(self, tile, node):
     data = self.get_tile_data(tile)
     if data:
