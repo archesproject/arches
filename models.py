@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 from collections import defaultdict
-from typing import Iterable
+from typing import Iterable, TYPE_CHECKING
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -23,6 +23,9 @@ from arches_controlled_lists.querysets import (
     ListItemValueQuerySet,
     NodeQuerySet,
 )
+
+if TYPE_CHECKING:
+    from arches_controlled_lists.datatypes.datatypes import ReferenceLabel
 
 
 class List(models.Model):
@@ -221,7 +224,7 @@ class ListItem(models.Model):
 
     def build_select_option(self):
         labels = getattr(self, "list_item_labels", self.list_item_values.labels())
-        best_label = self.best_label_from_set(labels)
+        best_label = self.find_best_label_from_set(labels)
         data = {
             "list_item_id": str(self.id),
             "uri": self.uri,
@@ -235,7 +238,7 @@ class ListItem(models.Model):
         return data
 
     @staticmethod
-    def best_label_from_set(
+    def find_best_label_from_set(
         labels: Iterable["ListItemValue" | "ReferenceLabel"],
     ) -> str | None:
         ranked_labels = sorted(
@@ -251,8 +254,8 @@ class ListItem(models.Model):
             return None
         return ranked_labels[0].value
 
-    def best_label(self):
-        return self.best_label_from_set(self.list_item_values.labels())
+    def find_best_label(self):
+        return self.find_best_label_from_set(self.list_item_values.labels())
 
 
 class ListItemValue(models.Model):
@@ -415,6 +418,3 @@ class NodeProxy(Node):
 
     class Meta:
         proxy = True
-
-
-from arches_controlled_lists.datatypes.datatypes import ReferenceLabel

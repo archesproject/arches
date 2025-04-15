@@ -42,6 +42,14 @@ const initialVal = toRef(
     ),
 );
 
+onMounted(() => {
+    const defaultVal = props.widgetConfig.defaultValue;
+    options.value = [
+        ...optionsAsNodes(props.initialValue ? props.initialValue : []),
+        ...optionsAsNodes(defaultVal ? defaultVal : []),
+    ];
+});
+
 function extractInitialOrDefaultValue(
     multiVal: boolean,
     initialVal: ReferenceSelectFetchedOption[] | undefined,
@@ -134,9 +142,10 @@ function resolver(options: FormFieldResolverOptions) {
             [],
         );
     }
-    validate(options);
+    const { errors } = validate(options);
     return {
-        values: { [nodeAlias]: options.value }, //, errors
+        errors,
+        values: { [nodeAlias]: options.value },
     };
 }
 
@@ -153,15 +162,8 @@ function validate(e: FormFieldResolverOptions) {
     //         ],
     //     };
     // }
+    return { errors: [] };
 }
-
-onMounted(() => {
-    const defaultVal = props.widgetConfig.defaultValue;
-    options.value = [
-        ...optionsAsNodes(props.initialValue ? props.initialValue : []),
-        ...optionsAsNodes(defaultVal ? defaultVal : []),
-    ];
-});
 </script>
 
 <template>
