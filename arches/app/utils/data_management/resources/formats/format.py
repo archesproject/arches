@@ -140,13 +140,13 @@ class Reader(object):
 
                 return newresourceinstanceid
 
-            resourceinstancefrom = validate_resourceinstanceid(
+            from_resource = validate_resourceinstanceid(
                 relation["fromresource"], "fromresource"
             )
-            resourceinstanceto = validate_resourceinstanceid(
+            to_resource = validate_resourceinstanceid(
                 relation["toresource"], "toresource"
             )
-            if resourceinstancefrom is not None and resourceinstanceto is not None:
+            if from_resource is not None and to_resource is not None:
                 if (
                     "fromresource_graph" not in relation
                     or relation["fromresource_graph"] == ""
@@ -155,7 +155,7 @@ class Reader(object):
                     try:
                         relation["fromresource_graph"] = (
                             models.ResourceInstance.objects.get(
-                                resourceinstanceid=resourceinstancefrom
+                                resourceinstanceid=from_resource
                             ).graph_id
                         )
                     except ObjectDoesNotExist:
@@ -168,7 +168,7 @@ class Reader(object):
                     try:
                         relation["toresource_graph"] = (
                             models.ResourceInstance.objects.get(
-                                resourceinstanceid=resourceinstanceto
+                                resourceinstanceid=to_resource
                             ).graph_id
                         )
                     except ObjectDoesNotExist:
@@ -186,12 +186,10 @@ class Reader(object):
                 ):
                     relation["tile"] = None
                 relation = ResourceXResource(
-                    resourceinstancefrom=Resource(resourceinstancefrom),
-                    resourceinstanceto=Resource(resourceinstanceto),
-                    resourceinstancefrom_graph_id=relation[
-                        "resourceinstancefrom_graph"
-                    ],
-                    resourceinstanceto_graph_id=relation["resourceinstanceto_graph"],
+                    from_resource=Resource(from_resource),
+                    to_resource=Resource(to_resource),
+                    from_resource_graph_id=relation["fromresource_graph"],
+                    to_resource_graph_id=relation["toresource_graph"],
                     relationshiptype=str(relation["relationshiptype"]),
                     nodeid=relation["nodeid"],
                     tileid=relation["tileid"],
