@@ -2,10 +2,14 @@
 import DatePicker from "primevue/datepicker";
 
 const props = defineProps<{
-    value: string | null | undefined;
+    initialValue: string | null | undefined;
     widgetData: {
         config: {
             dateFormat: string;
+            datePickerDisplayConfiguration: {
+                dateFormat: string;
+                shouldShowTime: boolean;
+            };
         };
     };
 }>();
@@ -13,12 +17,19 @@ const props = defineProps<{
 
 <template>
     <DatePicker
-        v-model="
-            /* This compensates for a bug in PrimeVue types */
-            props.value as unknown as Date
-        "
-        :date-format="widgetData.config.dateFormat"
+        v-model="props.initialValue as unknown as Date"
         :disabled="true"
+        :date-format="
+            props.widgetData.config.datePickerDisplayConfiguration.dateFormat
+        "
         :fluid="true"
+        :show-time="
+            props.widgetData.config.datePickerDisplayConfiguration
+                .shouldShowTime
+        "
+        :show-seconds="
+            props.widgetData.config.datePickerDisplayConfiguration
+                .shouldShowTime
+        "
     />
 </template>
