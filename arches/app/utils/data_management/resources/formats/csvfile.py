@@ -312,8 +312,6 @@ class CsvWriter(Writer):
                 "toresource_graph",
                 "node",
                 "tile",
-                "datestarted",
-                "dateended",
                 "notes",
             ]
             csvwriter = csv.DictWriter(dest, delimiter=",", fieldnames=csv_header)
@@ -326,14 +324,6 @@ class CsvWriter(Writer):
                 tile__isnull=True,
             ).values(*csv_header)
             for relation in relations:
-                relation["datestarted"] = (
-                    relation["datestarted"]
-                    if relation["datestarted"] is not None
-                    else ""
-                )
-                relation["dateended"] = (
-                    relation["dateended"] if relation["dateended"] is not None else ""
-                )
                 relation["notes"] = (
                     relation["notes"] if relation["notes"] is not None else ""
                 )
