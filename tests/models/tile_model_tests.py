@@ -662,16 +662,12 @@ class TileTests(ArchesTestCase):
                     "node_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
                     "notes": "",
                     "relationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
-                    "resourceinstancefrom_graph_id": UUID(
+                    "from_resource_graph_id": UUID(
                         "c35fe0a1-df30-11e8-b280-a4d18cec433a"
                     ),
-                    "resourceinstancefrom_id": UUID(
-                        "654bb228-37e7-4beb-b0f9-b59b61b53577"
-                    ),
-                    "resourceinstanceto_id": UUID(
-                        "e72844fc-7bc0-4851-89ca-5bb1c6b3ba22"
-                    ),
-                    "resourceinstanceto_graph_id": UUID(
+                    "from_resource_id": UUID("654bb228-37e7-4beb-b0f9-b59b61b53577"),
+                    "to_resource_id": UUID("e72844fc-7bc0-4851-89ca-5bb1c6b3ba22"),
+                    "to_resource_graph_id": UUID(
                         "c35fe0a1-df30-11e8-b280-a4d18cec433a"
                     ),
                     "tile_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
@@ -685,13 +681,11 @@ class TileTests(ArchesTestCase):
                     "node_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
                     "notes": "",
                     "relationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P10_falls_within",
-                    "resourceinstancefrom_graph_id": UUID(
+                    "from_resource_graph_id": UUID(
                         "c35fe0a1-df30-11e8-b280-a4d18cec433a"
                     ),
-                    "resourceinstanceto_id": UUID(
-                        "92b2db6a-d13f-4cc7-aec7-e4caf91b45f8"
-                    ),
-                    "resourceinstanceto_graph_id": UUID(
+                    "to_resource_id": UUID("92b2db6a-d13f-4cc7-aec7-e4caf91b45f8"),
+                    "to_resource_graph_id": UUID(
                         "c35fe0a1-df30-11e8-b280-a4d18cec433a"
                     ),
                     "tile_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
@@ -739,11 +733,9 @@ class TileTests(ArchesTestCase):
             "node_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
             "notes": "",
             "relationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
-            "resourceinstancefrom_graph_id": UUID(
-                "c35fe0a1-df30-11e8-b280-a4d18cec433a"
-            ),
-            "resourceinstanceto_id": UUID("85b2db6a-d13f-4cc7-aec7-e4caf91b45f7"),
-            "resourceinstanceto_graph_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
+            "from_resource_graph_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
+            "to_resource_id": UUID("85b2db6a-d13f-4cc7-aec7-e4caf91b45f7"),
+            "to_resource_graph_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
             "tile_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
         }
         self.assertTrue(all(item in ri_dict.items() for item in expected.items()))
