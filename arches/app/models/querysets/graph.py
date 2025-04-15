@@ -12,7 +12,7 @@ class GraphQuerySet(models.QuerySet):
             "Use create_graph() to create new Graph instances with proper business logic."
         )
 
-    def get_slug(self, name, is_resource):
+    def generate_slug(self, name, is_resource):
         if name:
             slug = slugify(name, separator="_")
         else:
@@ -20,12 +20,12 @@ class GraphQuerySet(models.QuerySet):
                 slug = "new_resource_model"
             else:
                 slug = "new_branch"
-        existing_slugs = GraphModel.objects.all().values_list("slug", flat=True)
+        existing_slugs = self.values_list("slug", flat=True)
         slug = make_name_unique(slug, existing_slugs, "_")
 
         return slug
 
-    def create_graph(self, name="", slug=None, user=None, is_resource=False):
+    def create_graph(self, name="", *, slug=None, user=None, is_resource=False):
         from arches.app.models import models as arches_models
 
         """
@@ -35,7 +35,7 @@ class GraphQuerySet(models.QuerySet):
         nodegroup = None
 
         if not slug:
-            slug = self.get_slug(name, is_resource)
+            slug = self.generate_slug(name, is_resource)
 
         graph_model = arches_models.GraphModel(
             name=name,

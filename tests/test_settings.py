@@ -22,6 +22,14 @@ from arches.settings import *
 
 from django.utils.translation import gettext_lazy as _
 
+
+def get_optional_env_variable(var_name, default=None) -> str:
+    try:
+        return os.environ[var_name]
+    except KeyError:
+        return default
+
+
 PACKAGE_NAME = "arches"
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 APP_ROOT = ""
@@ -94,9 +102,17 @@ ENABLE_TWO_FACTOR_AUTHENTICATION = False
 FORCE_TWO_FACTOR_AUTHENTICATION = False
 
 DATATYPE_LOCATIONS.append("tests.fixtures.datatypes")
-ELASTICSEARCH_HOSTS = [
-    {"scheme": "http", "host": "localhost", "port": ELASTICSEARCH_HTTP_PORT}
-]
+ELASTICSEARCH_CONNECTION_OPTIONS = {
+    "request_timeout": 30,
+    "verify_certs": False,
+    "ca_certs": "/Users/njk/projects/elasticsearch-8.10.4/config/certs/http_ca.crt",
+    "basic_auth": ("elastic", "Bu0-_Kp8dt8xzDHOSIaJ"),
+}
+ES_PROTOCOL = get_optional_env_variable("ARCHES_ESPROTOCOL", "https")
+ES_HOST = get_optional_env_variable("ARCHES_ESHOST", "localhost")
+ES_PORT = int(get_optional_env_variable("ARCHES_ESPORT", "9200"))
+ELASTICSEARCH_HOSTS = [{"scheme": ES_PROTOCOL, "host": ES_HOST, "port": ES_PORT}]
+
 LANGUAGES = [
     ("de", _("German")),
     ("en", _("English")),

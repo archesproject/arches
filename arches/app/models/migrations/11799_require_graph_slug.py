@@ -2,8 +2,10 @@
 
 import django.core.validators
 import re
-from django.db import migrations, models
 from slugify import slugify
+from django.db import migrations, models
+from arches.app.models.utils import make_name_unique
+
 
 
 class Migration(migrations.Migration):
@@ -13,10 +15,12 @@ class Migration(migrations.Migration):
     ]
 
     def add_missing_graph_slug(apps, schema_editor):
-        Graph = apps.get_model("models", "GraphModel")
+        Graph = apps.get_model("models", "Graph")
         graphs_missing_slug = Graph.objects.filter(slug__isnull=True)
         for graph in graphs_missing_slug:
-            graph.slug = slugify(str(graph.name), separator="_")
+            existing_graph_slugs = Graph.objects.all().values_list('slug', flat=True)
+            slug = slugify(str(graph.name) or "new_graph", separator="_")
+            graph.slug = make_name_unique(slug, existing_graph_slugs)
             graph.save()
 
     operations = [

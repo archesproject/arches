@@ -42,7 +42,6 @@ from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.models.card import Card
 from arches.app.models.fields.i18n import I18n_String
 from arches.app.models.system_settings import settings
-from arches.app.models.utils import make_name_unique
 from arches.app.utils.data_management.resource_graphs.exporter import (
     get_graphs_for_export,
     create_mapping_configuration_file,
@@ -548,8 +547,8 @@ class GraphDataView(View):
 
                 elif self.action == "export_branch":
                     clone_data = graph.copy(root=data)
-                    clone_data["copy"].slug = self.get_slug(
-                        str(clone_data["copy"].name), False
+                    clone_data["copy"].slug = self.generate_slug(
+                        str(clone_data["copy"].slug) or "exported_branch", False
                     )
                     clone_data["copy"].publication = None
 
@@ -566,8 +565,8 @@ class GraphDataView(View):
 
                     clone_data = graph.copy()
                     ret = clone_data["copy"]
-                    ret.slug = self.get_slug(
-                        str(clone_data["copy"].name), clone_data["copy"].isresource
+                    ret.slug = Graph.objects.generate_slug(
+                        str(clone_data["copy"].slug) or "cloned_model", clone_data["copy"].isresource
                     )
                     ret.publication = None
 
@@ -665,19 +664,6 @@ class GraphDataView(View):
                 if not file_type.startswith("image/"):
                     return False
         return True
-
-    def get_slug(self, name, is_resource):
-        if name:
-            slug = slugify(name, separator="_")
-        else:
-            if is_resource:
-                slug = "cloned_model"
-            else:
-                slug = "exported_branch"
-        existing_slugs = models.GraphModel.objects.all().values_list("slug", flat=True)
-        slug = make_name_unique(slug, existing_slugs, "_")
-
-        return slug
 
 
 class GraphPublicationView(View):

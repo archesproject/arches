@@ -23,7 +23,7 @@ def make_name_unique(name, names_to_check, suffix_delimiter="_"):
     Makes a name unique among a list of names
 
     Arguments:
-    name -- the name to check and modfiy to make unique in the list of "names_to_check"
+    name -- the name to check and modify to make unique in the list of "names_to_check"
     names_to_check -- a list of names that "name" should be unique among
     """
 

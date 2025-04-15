@@ -2256,7 +2256,7 @@ class Graph(models.GraphModel):
                     )
         else:
             raise GraphValidationError(
-                _("You must supply a slug for your graph."), 1005
+                _("You must supply a slug for your graph."), 1015
             )
 
     def update_published_graphs(self, user=None, notes=None):
