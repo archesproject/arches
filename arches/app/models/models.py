@@ -1322,12 +1322,12 @@ class ResourceXResource(SaveSupportsBlindOverwriteMixin, models.Model):
     def save(self, **kwargs):
         # during package/csv load the ResourceInstance models are not always available
         try:
-            self.resourceinstancefrom_graph = self.resourceinstancefrom.graph
+            self.from_resource_graph = self.from_resource.graph
         except:
             pass
 
         try:
-            self.resourceinstanceto_graph = self.resourceinstanceto.graph
+            self.to_resource_graph = self.to_resource.graph
         except:
             pass
 
