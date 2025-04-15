@@ -1241,39 +1241,39 @@ class ResourceXResource(SaveSupportsBlindOverwriteMixin, models.Model):
     resourcexid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, db_default=UUID4()
     )
-    resourceinstanceidfrom = models.ForeignKey(
+    resourceinstancefrom = models.ForeignKey(
         "ResourceInstance",
         db_column="resourceinstanceidfrom",
         blank=True,
         null=True,
-        related_name="resxres_resource_instance_ids_from",
+        related_name="resxres_from",
         on_delete=models.CASCADE,
         db_constraint=False,
     )
-    resourceinstancefrom_graphid = models.ForeignKey(
+    resourceinstancefrom_graph = models.ForeignKey(
         "GraphModel",
         db_column="resourceinstancefrom_graphid",
         blank=True,
         null=True,
-        related_name="resxres_resource_instance_fom_graph_id",
+        related_name="resxres_from",
         on_delete=models.CASCADE,
         db_constraint=False,
     )
-    resourceinstanceidto = models.ForeignKey(
+    resourceinstanceto = models.ForeignKey(
         "ResourceInstance",
         db_column="resourceinstanceidto",
         blank=True,
         null=True,
-        related_name="resxres_resource_instance_ids_to",
+        related_name="resxres_to",
         on_delete=models.CASCADE,
         db_constraint=False,
     )
-    resourceinstanceto_graphid = models.ForeignKey(
+    resourceinstanceto_graph = models.ForeignKey(
         "GraphModel",
         db_column="resourceinstanceto_graphid",
         blank=True,
         null=True,
-        related_name="resxres_resource_instance_to_graph_id",
+        related_name="resxres_to",
         on_delete=models.CASCADE,
         db_constraint=False,
     )
@@ -1281,20 +1281,20 @@ class ResourceXResource(SaveSupportsBlindOverwriteMixin, models.Model):
     notes = models.TextField(blank=True, null=True)
     relationshiptype = models.TextField(blank=True, null=True)
     inverserelationshiptype = models.TextField(blank=True, null=True)
-    tileid = models.ForeignKey(
+    tile = models.ForeignKey(
         "TileModel",
         db_column="tileid",
         blank=True,
         null=True,
-        related_name="resxres_tile_id",
+        related_name="resxres",
         on_delete=models.CASCADE,
     )
-    nodeid = models.ForeignKey(
+    node = models.ForeignKey(
         "Node",
         db_column="nodeid",
         blank=True,
         null=True,
-        related_name="resxres_node_id",
+        related_name="resxres",
         on_delete=models.CASCADE,
     )
     datestarted = models.DateField(blank=True, null=True)
