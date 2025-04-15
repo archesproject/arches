@@ -17,9 +17,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import json
+import os
 import time
 import uuid
 
+from arches.app.models.graph import Graph
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.search.elasticsearch_dsl_builder import (
@@ -30,6 +32,9 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.views.search import search_terms, search_results
 from django.http import HttpRequest
+from arches.app.utils.data_management.resource_graphs.importer import (
+    import_graph as ResourceGraphImporter,
+)
 from django.contrib.auth.models import User
 from django.test.utils import captured_stdout
 from tests.base_test import ArchesTestCase
@@ -86,6 +91,7 @@ class SearchTests(ArchesTestCase):
             se.index_data(index="test", body=y, idfield="id", refresh=True)
 
         self.sync_es(se)
+        time.sleep(1)
 
         query = Query(se, start=0, limit=100)
         match = Match(field="type", query="altLabel")
@@ -438,3 +444,123 @@ class SearchTests(ArchesTestCase):
         results = search_results(request=request)
         results = JSONDeserializer().deserialize(results.content)["results"]["hits"]
         self.assertEqual(1, len(results["hits"]))
+
+    def test_adv_search_on_resource_instance_node_in_list_all(self):
+        with open(
+            os.path.join("tests/fixtures/resource_graphs/Cardinality Test Model.json"),
+            "r",
+        ) as f:
+            archesfile = JSONDeserializer().deserialize(f)
+        ResourceGraphImporter(archesfile["graph"])
+        ri_dt_nodeid = "7f4406d0-c8c1-11ed-a172-0242ac130009"
+        graphid = "d71a8f56-987f-4fd1-87b5-538378740f15"
+        cardinality_graphid = "2f7f8e40-adbc-11e6-ac7f-14109fd34195"
+        user = User.objects.get(username="admin")
+        graph = Graph.objects.get(
+            graphid=cardinality_graphid,
+        )
+        graph.publish(user=user)
+        new_cardinality_resource_1 = Resource(graph_id=cardinality_graphid)
+        new_cardinality_resource_1.save(
+            user=self.tester, transaction_id=uuid.uuid4(), index=False
+        )
+        new_cardinality_resource_1.index()
+        new_cardinality_resource_2 = Resource(graph_id=cardinality_graphid)
+        new_cardinality_resource_2.save(
+            user=self.tester, transaction_id=uuid.uuid4(), index=False
+        )
+        new_cardinality_resource_2.index()
+        new_resource_1 = Resource(graph_id=graphid)
+        new_resource_1.save(user=user, transaction_id=uuid.uuid4(), index=False)
+        new_resource_1.index()
+        new_resource_2 = Resource(graph_id=graphid)
+        new_resource_2.save(user=user, transaction_id=uuid.uuid4(), index=False)
+        new_resource_2.index()
+        new_ri_tile_1 = Tile.get_blank_tile(
+            ri_dt_nodeid, resourceid=str(new_resource_1.resourceinstanceid)
+        )
+        # print("PRINT")
+        # print(new_cardinality_resource_1.resourceinstanceid)
+        new_ri_tile_1.data[ri_dt_nodeid] = [
+            {
+                "resourceId": str(new_cardinality_resource_1.resourceinstanceid),
+                "ontologyProperty": "",
+                "inverseOntologyProperty": "",
+                "resourceXresourceId": str(uuid.uuid4()),
+            },
+            {
+                "resourceId": str(new_cardinality_resource_2.resourceinstanceid),
+                "ontologyProperty": "",
+                "inverseOntologyProperty": "",
+                "resourceXresourceId": str(uuid.uuid4()),
+            },
+        ]
+        new_ri_tile_1.save(index=False)
+        new_ri_tile_1.index()
+        new_ri_tile_2 = Tile.get_blank_tile(
+            ri_dt_nodeid, resourceid=str(new_resource_2.resourceinstanceid)
+        )
+        new_ri_tile_2.data[ri_dt_nodeid] = [
+            {
+                "resourceId": str(new_cardinality_resource_1.resourceinstanceid),
+                "ontologyProperty": "",
+                "inverseOntologyProperty": "",
+                "resourceXresourceId": str(uuid.uuid4()),
+            },
+        ]
+        new_ri_tile_2.save(index=False)
+        new_ri_tile_2.index()
+
+        self.sync_es()
+        time.sleep(2)
+        # test search for non-null resource list
+        request_1 = HttpRequest()
+        request_1.method = "GET"
+        request_1.GET.__setitem__("paging-filter", "1")
+        request_1.GET.__setitem__(
+            "advanced-search",
+            json.dumps(
+                [
+                    {
+                        "op": "and",
+                        ri_dt_nodeid: {
+                            "op": "in_list_all",
+                            "val": [
+                                str(new_cardinality_resource_1.resourceinstanceid),
+                                str(new_cardinality_resource_2.resourceinstanceid),
+                            ],
+                        },
+                    }
+                ]
+            ),
+        )
+        request_1.user = user
+        results = search_results(request=request_1)
+        results = JSONDeserializer().deserialize(results.content)["results"]["hits"]
+        self.assertEqual(1, len(results["hits"]))
+
+        # test for in_list_any
+        request_2 = HttpRequest()
+        request_2.method = "GET"
+        request_2.GET.__setitem__("paging-filter", "1")
+        request_2.GET.__setitem__(
+            "advanced-search",
+            json.dumps(
+                [
+                    {
+                        "op": "and",
+                        ri_dt_nodeid: {
+                            "op": "in_list_any",
+                            "val": [
+                                str(new_cardinality_resource_1.resourceinstanceid),
+                                str(new_cardinality_resource_2.resourceinstanceid),
+                            ],
+                        },
+                    }
+                ]
+            ),
+        )
+        request_2.user = user
+        results = search_results(request=request_2)
+        results = JSONDeserializer().deserialize(results.content)["results"]["hits"]
+        self.assertEqual(2, len(results["hits"]))
