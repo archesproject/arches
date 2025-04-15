@@ -315,6 +315,19 @@ await fetchListsAndPopulateTree();
     font-size: 1.33rem;
     font-weight: 500;
     min-width: 150px;
+    border-radius: 2px 0 0 2px;
+}
+
+:deep(.p-splitbutton-button) {
+    border-radius: 2px 0 0 2px;
+}
+
+:deep(.p-splitbutton-dropdown) {
+    border-radius: 0 2px 2px 0;
+}
+
+:deep(.p-tieredmenu) {
+    border-radius: 2px;
 }
 
 </style>

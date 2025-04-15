@@ -320,5 +320,8 @@ function lazyLabelLookup(node: TreeNode) {
 :deep(.p-tree-filter-input) {
     height: 3.5rem;
     font-size: 1.4rem;
+    border-radius: 2px;
 }
+
+
 </style>
