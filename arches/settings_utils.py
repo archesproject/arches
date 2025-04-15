@@ -1,27 +1,23 @@
 import json
 import os
+from pathlib import Path
 import site
 import sys
-from contextlib import contextmanager
 
 from django.apps import apps
 from django.conf import settings
 from django.contrib.staticfiles.finders import AppDirectoriesFinder
 
 
-class ArchesApplicationsStaticFilesFinder(AppDirectoriesFinder):
-    source_dir = "media"
-
-
-class CoreArchesStaticFilesFinderBuildDirectory(AppDirectoriesFinder):
+class StaticFilesFinderBuildDirectory(AppDirectoriesFinder):
     source_dir = os.path.join("app", "media", "build")
 
 
-class CoreArchesStaticFilesFinderMediaRoot(AppDirectoriesFinder):
+class StaticFilesFinderMediaRoot(AppDirectoriesFinder):
     source_dir = os.path.join("app", "media")
 
 
-class CoreArchesStaticFilesFinderNodeModules(AppDirectoriesFinder):
+class StaticFilesFinderNodeModules(AppDirectoriesFinder):
     source_dir = os.path.normpath(os.path.join("..", "node_modules"))
 
 
@@ -35,7 +31,7 @@ def list_arches_app_names():
 
 def list_arches_app_paths():
     return [
-        config.module.__path__[0]
+        os.path.realpath(config.module.__path__[0])
         for config in apps.get_app_configs()
         if getattr(config, "is_arches_application", False)
     ]
@@ -96,12 +92,19 @@ def build_templates_config(
     """
     directories = []
     try:
+        # allows for manual additions to template overrides
         if additional_directories:
             for additional_directory in additional_directories:
                 directories.append(additional_directory)
 
+        # allows for application-level overrides of generic Django templates
         if app_root:
             directories.append(os.path.join(app_root, "templates"))
+
+        # forces Arches-level overrides of generic Django templates
+        # directories.append(
+        #     os.path.join(Path(__file__).resolve().parent, "app", "templates")
+        # )
 
         return [
             {
@@ -158,7 +161,10 @@ def generate_frontend_configuration():
             "WEBPACK_DEVELOPMENT_SERVER_PORT": settings.WEBPACK_DEVELOPMENT_SERVER_PORT,
         }
 
-        if settings.APP_NAME == "Arches":
+        if str(Path(app_root_path).parent) == root_dir_path:
+            # Running core arches directly without a project, e.g.:
+            # app_root_path: arches/app
+            # root_dir_path: arches
             base_path = root_dir_path
         else:
             base_path = app_root_path

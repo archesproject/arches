@@ -17,22 +17,26 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
+import json
 from unittest.mock import Mock
 from tests.base_test import ArchesTestCase
 from rdflib import Namespace
-from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
+from uuid import uuid4
+from itertools import cycle
+from datetime import datetime
 
+from django.core.validators import URLValidator
+
+from arches.app.utils.activity_stream_jsonld import ActivityStreamCollection
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import (
     import_graph as ResourceGraphImporter,
 )
-from arches.app.models.models import ResourceInstance
 from arches.app.utils.skos import SKOSReader
-from uuid import uuid4
-from itertools import cycle
-from datetime import datetime
-import json
 from arches.app.models.models import ResourceInstance, GraphModel
+
+# these tests can be run from the command line via
+# python manage.py test tests.utils.activitystream --settings="tests.test_settings"
 
 ARCHES_NS = Namespace("https://arches.getty.edu/")
 CIDOC_NS = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
@@ -164,3 +168,4 @@ class ActivityStreamCollectionTests(ArchesTestCase):
         )
         obj = collection_page.to_obj()
         self.assertIn("id", obj["orderedItems"][0]["object"])
+        self.assertIsNone(URLValidator()(obj["orderedItems"][0]["object"]["id"]))

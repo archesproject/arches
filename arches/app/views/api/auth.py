@@ -1,9 +1,10 @@
 from http import HTTPStatus
 
-from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.views import LoginView, LogoutView
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
+from django.views.decorators.debug import sensitive_variables, sensitive_post_parameters
 from django_ratelimit.decorators import ratelimit
 
 from arches.app.models.system_settings import settings
@@ -18,7 +19,11 @@ class Login(LoginView, APIBase):
     http_method_names = ["post"]
 
     @method_decorator(
-        ratelimit(key="post:username", rate=settings.RATE_LIMIT, block=False)
+        (
+            sensitive_variables(),
+            sensitive_post_parameters(),
+            ratelimit(key="post:username", rate=settings.RATE_LIMIT, block=False),
+        )
     )
     def post(self, request):
         if getattr(request, "limited", False):

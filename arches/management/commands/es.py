@@ -30,7 +30,6 @@ from arches.app.search.mappings import (
     delete_concepts_index,
     prepare_search_index,
     delete_search_index,
-    delete_resource_relations_index,
 )
 import arches.app.utils.index_database as index_database_util
 
@@ -325,7 +324,6 @@ class Command(BaseCommand):
             delete_terms_index()
             delete_concepts_index()
             delete_search_index()
-            delete_resource_relations_index()
 
             # remove custom indexes
             for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:

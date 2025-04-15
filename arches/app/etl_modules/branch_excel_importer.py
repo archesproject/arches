@@ -205,8 +205,9 @@ class BranchExcelImporter(BaseImportModule):
                     tile_value_json, passes_validation = self.create_tile_value(
                         cell_values, data_node_lookup, node_lookup, row_details, cursor
                     )
+                    sortorder = 0
                     cursor.execute(
-                        """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation, operation) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                        """INSERT INTO load_staging (nodegroupid, legacyid, resourceid, tileid, parenttileid, value, loadid, nodegroup_depth, source_description, passes_validation, operation, sortorder) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                         (
                             row_details["nodegroup_id"],
                             legacyid,
@@ -221,6 +222,7 @@ class BranchExcelImporter(BaseImportModule):
                             ),  # source_description
                             passes_validation,
                             operation,
+                            sortorder,
                         ),
                     )
                 except KeyError:

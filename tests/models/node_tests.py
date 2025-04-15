@@ -9,7 +9,8 @@ from tests.base_test import ArchesTestCase
 class NodeTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.graph = Graph.new(name="Node Tests Graph")
+        super().setUpTestData()
+        cls.graph = Graph.objects.create_graph(name="Node Tests Graph")
 
     def test_missing_alias_supplied(self):
         new_node = Node(graph_id=self.graph.pk)

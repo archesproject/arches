@@ -26,7 +26,7 @@ from tests.base_test import ArchesTestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
-from django.test.utils import captured_stdout
+from django.test.utils import captured_stdout, override_settings
 from unittest.mock import patch, MagicMock
 
 from arches.app.views.api import APIBase
@@ -52,8 +52,8 @@ class ResourceAPITests(ArchesTestCase):
         ) as f:
             json = JSONDeserializer().deserialize(f)
             cls.unique_graph = Graph(json["graph"][0])
-            cls.unique_graph.publish(user=None)
             cls.unique_graph.save()
+            cls.unique_graph.publish(user=None)
 
         with open(
             os.path.join("tests/fixtures/resource_graphs/ambiguous_graph_shape.json"),
@@ -61,8 +61,8 @@ class ResourceAPITests(ArchesTestCase):
         ) as f:
             json = JSONDeserializer().deserialize(f)
             cls.ambiguous_graph = Graph(json["graph"][0])
-            cls.ambiguous_graph.publish(user=None)
             cls.ambiguous_graph.save()
+            cls.ambiguous_graph.publish(user=None)
 
         with open(
             os.path.join("tests/fixtures/resource_graphs/phase_type_assignment.json"),
@@ -70,8 +70,8 @@ class ResourceAPITests(ArchesTestCase):
         ) as f:
             json = JSONDeserializer().deserialize(f)
             cls.phase_type_assignment_graph = Graph(json["graph"][0])
-            cls.phase_type_assignment_graph.publish(user=None)
             cls.phase_type_assignment_graph.save()
+            cls.phase_type_assignment_graph.publish(user=None)
 
         cls.data_type_graph = Graph.objects.get(pk=cls.data_type_graphid)
         cls.test_prj_user = models.ResourceInstance.objects.filter(
@@ -120,11 +120,14 @@ class ResourceAPITests(ArchesTestCase):
             response = view(request)
         self.assertEqual(request.GET.get("ver"), "2.1")
 
-    def test_api_404(self):
+    @override_settings(DEBUG=False)
+    def test_api_404_returns_json(self):
         with self.assertLogs("django.request", level="WARNING"):
-            response = self.client.get(reverse("api_404"))
-        self.assertEqual(
-            set(json.loads(response.content)), {"message", "status", "success", "title"}
+            response = self.client.get("/api/doesnotexist")
+        self.assertContains(
+            response,
+            "Not Found",
+            status_code=HTTPStatus.NOT_FOUND,
         )
 
     def test_api_resources_archesjson(self):
@@ -527,11 +530,9 @@ class ResourceAPITests(ArchesTestCase):
         zeroth_card = self.data_type_graph.cardmodel_set.get(sortorder=0)
         zeroth_card.sortorder = None
         zeroth_card.save()
-        # Refreshes ORM card cache (.cardmodel_set)
-        self.data_type_graph.refresh_from_db()
-        # Clears proxy model cache (.cards), which reads from .cardmodel_set
-        self.data_type_graph.refresh_from_database()
+
         self.data_type_graph.publish()
+
         self.test_prj_user.graph_publication = self.data_type_graph.publication
         self.test_prj_user.save()
 

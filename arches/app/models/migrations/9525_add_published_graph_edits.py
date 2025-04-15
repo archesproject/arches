@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         ("models", "9511_update_tile_nodegroup_reference"),
     ]
 
-    def delete_editable_future_graphs(apps, schema_editor):
+    def delete_draft_graphs(apps, schema_editor):
         with connection.cursor() as cursor:
             cursor.execute("ALTER TABLE graphs DISABLE TRIGGER ALL;")
 
@@ -40,8 +40,8 @@ class Migration(migrations.Migration):
 
             cursor.execute("ALTER TABLE graphs ENABLE TRIGGER ALL;")
 
-    def create_editable_future_graphs(apps, schema_editor):
-        # the `create_editable_future_graph` function is not available when importing `Graph` via `apps.get_model()`
+    def create_draft_graphs(apps, schema_editor):
+        # the `create_draft_graph` function is not available when importing `Graph` via `apps.get_model()`
         pass
 
     operations = [
@@ -115,7 +115,5 @@ class Migration(migrations.Migration):
                 ],
             ),
         ),
-        migrations.RunPython(
-            create_editable_future_graphs, delete_editable_future_graphs
-        ),
+        migrations.RunPython(create_draft_graphs, delete_draft_graphs),
     ]

@@ -14,11 +14,10 @@ class WhatIsThisTests(ArchesTestCase):
     arbitrary_uuid = uuid.uuid4()
 
     def test_match(self):
-        g = Graph.new()
+        g = Graph.objects.create_graph()
         out = StringIO()
         call_command("whatisthis", str(g.pk), stdout=out)
-        # Produces hits on graph and node
-        self.assertIn("This UUID is the primary key for 2 objects:", out.getvalue())
+        self.assertIn("This UUID is the primary key for 1 object:", out.getvalue())
 
     def test_no_match(self):
         out = StringIO()

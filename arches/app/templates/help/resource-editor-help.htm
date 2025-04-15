@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 <!-- this html is included in help-panel-base.htm -->
 <div class="ep-help-content">
     <div>
@@ -15,10 +16,10 @@
                 <p>
                     <a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "basic card data enty - click to view" %}</a>
                     <span class="ep-help-img-link">
-                        <a href="{{ STATIC_URL }}img/help/edit-resource-simple-card.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+                        <a href="{% webpack_static 'img/help/edit-resource-simple-card.gif' %}" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
                         </a>
                     </span>
-                    <img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/edit-resource-simple-card.gif"></img>
+                    <img class="reloadable-img ep-help-topic-content" src="{% webpack_static 'img/help/edit-resource-simple-card.gif' %}"></img>
                 </p>
             </div>
             <p>{% blocktrans %}Once you have saved data for a resource, you can see a full summary by selecting the top card. This is the resource report.{% endblocktrans %}</p>
@@ -28,10 +29,10 @@
                 <p>
                     <a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "nested card data enty - click to view" %}</a>
                     <span class="ep-help-img-link">
-                        <a href="{{ STATIC_URL }}img/help/edit-resource-nested-card.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+                        <a href="{% webpack_static 'img/help/edit-resource-nested-card.gif' %}" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
                         </a>
                     </span>
-                    <img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/edit-resource-nested-card.gif"></img>
+                    <img class="reloadable-img ep-help-topic-content" src="{% webpack_static 'img/help/edit-resource-nested-card.gif' %}"></img>
                 </p>
             </div>
             
@@ -50,10 +51,10 @@
                 <p>
                     <a href="javascript:void(0)" class="ep-help-topic-toggle">{% trans "create resource relation - click to view" %}</a>
                     <span class="ep-help-img-link">
-                        <a href="{{ STATIC_URL }}img/help/create-resource-relation.gif" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+                        <a href="{% webpack_static 'img/help/create-resource-relation.gif' %}" target="_blank">{% trans "open in new tab" %}&nbsp;&nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
                         </a>
                     </span>
-                    <img class="reloadable-img ep-help-topic-content" src="{{ STATIC_URL }}img/help/create-resource-relation.gif"></img>
+                    <img class="reloadable-img ep-help-topic-content" src="{% webpack_static 'img/help/create-resource-relation.gif' %}"></img>
                 </p>
             </div>
         </div>

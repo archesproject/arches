@@ -21,11 +21,9 @@ import uuid
 from arches.app.models.graph import Graph
 from arches.app.models.models import (
     CardXNodeXWidget,
-    NodeGroup,
     DDataType,
     Widget,
     ReportTemplate,
-    Function,
     Ontology,
     OntologyClass,
     GraphXPublishedGraph,
@@ -176,20 +174,30 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                         card_x_node_x_widget["config"] = check_default_configs(
                             default_config, card_x_node_x_widget_config
                         )
-                        cardxnodexwidget = CardXNodeXWidget.objects.update_or_create(
-                            **card_x_node_x_widget
+                        CardXNodeXWidget.objects.update_or_create(
+                            # Only check the combination of unique fields.
+                            # Comparing the entire object against the database
+                            # may fail because the incoming json may differ
+                            # slightly from the database representation, e.g.
+                            # 'width': '100%' -> 'width': '100%%' in db (escaped)
+                            # or 'placeholder': 'Enter text'
+                            # -> 'placeholder': {'en': 'Enter text'} in db
+                            card_id=card_x_node_x_widget["card_id"],
+                            node_id=card_x_node_x_widget["node_id"],
+                            widget_id=card_x_node_x_widget["widget_id"],
+                            defaults=card_x_node_x_widget,
                         )
 
                 with transaction.atomic():
                     # saves graph publication with serialized graph
                     graph = Graph.objects.get(
-                        pk=graph.graphid
+                        pk=graph.graphid, source_identifier_id__isnull=True
                     )  # retrieve graph using the ORM to ensure strings are I18n_Strings
 
                     try:
                         Graph.objects.get(source_identifier_id=graph.graphid)
                     except Graph.DoesNotExist:
-                        graph.create_editable_future_graph()
+                        graph.create_draft_graph()
 
                     if publication_data:
                         GraphXPublishedGraph.objects.update_or_create(
@@ -204,9 +212,13 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
                             },
                         )
 
-                        graph.refresh_from_database()
                         graph.publication_id = publication_data["publicationid"]
-                        graph.save()
+                        graph.has_unpublished_changes = False
+
+                        Graph.objects.filter(pk=graph.pk).update(
+                            has_unpublished_changes=graph.has_unpublished_changes,
+                            publication_id=graph.publication_id,
+                        )
 
                         for language_tuple in settings.LANGUAGES:
                             language = Language.objects.get(code=language_tuple[0])

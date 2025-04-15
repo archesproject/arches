@@ -15,7 +15,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from unittest.mock import MagicMock, Mock, patch
 
-from django.test import override_settings
 from arches.app.models.resource import Resource
 from tests.permissions.base_permissions_framework_test import (
     ArchesPermissionFrameworkTestCase,

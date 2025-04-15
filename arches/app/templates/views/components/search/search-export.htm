@@ -99,10 +99,11 @@
                 <!-- ko if: format() === 'geojson' && hasResourceTypeFilter -->
                 <div data-bind="clipboard: {value: geojsonUrl, tooltip: false}">
                     <div style="padding: 5px 0px"><textarea style="width: 300px;" data-bind="value: geojsonUrl"></textarea></div>
-                    <button class="btn btn-shim btn-labeled btn-sm fa fa-clipboard btn-primary">
+                    <button class="btn btn-shim btn-labeled btn-sm fa fa-clipboard btn-primary" data-bind="click: copyGeojsonUrlText">
                         <span data-bind="text: $root.translations.copyToClipboard"></span>
                     </button>
                 </div>
+                <div class="copy-geojson-url-message" data-bind="text: copyGeojsonText, fadeVisible: showCopyText, delay:0, fade: 600, attr: {'aria-live': 'polite'}"></div>
                 <!-- /ko -->
                 <!-- /ko -->
             </div>

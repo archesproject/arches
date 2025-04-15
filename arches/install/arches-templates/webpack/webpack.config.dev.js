@@ -12,10 +12,7 @@ module.exports = () => {
         commonWebpackConfigPromise().then(commonWebpackConfig => {
             resolve(merge(commonWebpackConfig, {
                 mode: 'development',
-                // devtool: 'inline-source-map',
-                output: {
-                    chunkFilename: Path.join('js', '[name].chunk.js'),
-                },
+                devtool: 'inline-source-map',
                 devServer: {
                     historyApiFallback: true,
                     client: {
@@ -25,7 +22,6 @@ module.exports = () => {
                     host: '0.0.0.0',
                     devMiddleware: {
                         index: true,
-                        publicPath: commonWebpackConfig.STATIC_URL,
                         writeToDisk: true,
                     },
                     port: commonWebpackConfig.WEBPACK_DEVELOPMENT_SERVER_PORT,

@@ -136,6 +136,7 @@ class ArchesProjectCommand(TemplateCommand):
             "pyproject.toml",
             ".pre-commit-config.yaml",
             ".github/workflows/main.yml",
+            "MANIFEST.in",
         ]:  # relative to app root directory
             file = open(os.path.join(path_to_project, relative_file_path), "r")
             file_data = file.read()

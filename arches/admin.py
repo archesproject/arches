@@ -42,6 +42,7 @@ admin.site.register(
         models.Language,
         models.NodeGroup,
         models.SpatialView,
+        models.UserPreference,
     ]
 )
 

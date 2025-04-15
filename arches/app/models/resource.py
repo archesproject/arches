@@ -22,7 +22,7 @@ from time import time
 from uuid import UUID
 from types import SimpleNamespace
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Count, Prefetch, Q
 from django.contrib.auth.models import User, Group
 from django.forms.models import model_to_dict
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
@@ -31,8 +31,8 @@ from django.utils.translation import get_language
 from arches.app.models import models
 from arches.app.models.models import EditLog
 from arches.app.models.models import TileModel
-from arches.app.models.concept import get_preflabel_from_valueid
 from arches.app.models.system_settings import settings
+from arches.app.models.utils import add_to_update_fields
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 from arches.app.search.mappings import TERMS_INDEX, RESOURCES_INDEX
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Terms, Nested
@@ -40,12 +40,12 @@ from arches.app.search.es_mapping_modifier import EsMappingModifierFactory
 from arches.app.tasks import index_resource
 from arches.app.utils import import_class_from_string, task_management
 from arches.app.utils import permission_backend
+from arches.app.utils.i18n import rank_label
 from arches.app.utils.label_based_graph import LabelBasedGraph
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 from arches.app.utils.permission_backend import (
     assign_perm,
     remove_perm,
-    NotUserNorGroup,
 )
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.exceptions import (
@@ -248,7 +248,7 @@ class Resource(models.ResourceInstance):
         edit.edittype = edit_type
         edit.save()
 
-    def save(self, *args, **kwargs):
+    def save(self, **kwargs):
         """
         Saves and indexes a single resource
 
@@ -282,8 +282,9 @@ class Resource(models.ResourceInstance):
 
         if not self.principaluser_id and user:
             self.principaluser_id = user.id
+            add_to_update_fields(kwargs, "principaluser_id")
 
-        super(Resource, self).save(*args, **kwargs)
+        super(Resource, self).save(**kwargs)
 
         if should_update_resource_instance_lifecycle_state:
             self.save_edit(
@@ -307,15 +308,6 @@ class Resource(models.ResourceInstance):
                 transaction_id=transaction_id,
                 context=context,
             )
-        try:
-            for perm in (
-                "view_resourceinstance",
-                "change_resourceinstance",
-                "delete_resourceinstance",
-            ):
-                assign_perm(perm, user, self)
-        except NotUserNorGroup:
-            pass
 
         if index is True:
             self.index(context)
@@ -423,7 +415,7 @@ class Resource(models.ResourceInstance):
 
     def index(self, context=None):
         """
-        Indexes all the nessesary items values of a resource to support search
+        Indexes all the necessary items values of a resource to support search
 
         Keyword Arguments:
         context -- a string such as "copy" to indicate conditions under which a document is indexed
@@ -508,6 +500,17 @@ class Resource(models.ResourceInstance):
         document["displayname"] = []
         document["displaydescription"] = []
         document["map_popup"] = []
+        document["date_created"] = self.createdtime
+        try:
+            document["date_last_edited"] = (
+                models.EditLog.objects.filter(
+                    resourceinstanceid=self.resourceinstanceid, timestamp__isnull=False
+                )
+                .latest("timestamp")
+                .timestamp
+            )
+        except ObjectDoesNotExist:
+            document["date_last_edited"] = None
         for lang in settings.LANGUAGES:
             if context is None:
                 context = {}
@@ -818,6 +821,7 @@ class Resource(models.ResourceInstance):
         user=None,
         resourceinstance_graphid=None,
         graphs=None,
+        include_rr_count=True,
     ):
         """
         Returns an object that lists the related resources, the relationship types, and a reference to the current resource
@@ -870,7 +874,6 @@ class Resource(models.ResourceInstance):
             start,
             limit,
             resourceinstance_graphid=None,
-            count_only=False,
         ):
             final_query = Q(resourceinstanceidfrom_id=resourceinstanceid) | Q(
                 resourceinstanceidto_id=resourceinstanceid
@@ -884,9 +887,6 @@ class Resource(models.ResourceInstance):
                     resourceinstancefrom_graphid_id=resourceinstance_graphid
                 ) & Q(resourceinstanceto_graphid_id=str(self.graph_id))
                 final_query = final_query & (to_graph_id_filter | from_graph_id_filter)
-
-            if count_only:
-                return models.ResourceXResource.objects.filter(final_query).count()
 
             return (
                 {  # resourceinstance_graphid = "00000000-886a-374a-94a5-984f10715e3a"
@@ -922,6 +922,7 @@ class Resource(models.ResourceInstance):
             user, se, resources=list(all_resource_ids)
         )
         filtered_instances = filtered_instances if user is not None else []
+        permitted_relation_dicts = []
 
         for relation in resource_relations["relations"]:
             relation = model_to_dict(relation)
@@ -943,21 +944,55 @@ class Resource(models.ResourceInstance):
                 and str(resourceinstanceto_graphid) in readable_graphids
                 and str(resourceinstancefrom_graphid) in readable_graphids
             ):
-                try:
-                    preflabel = get_preflabel_from_valueid(
-                        relation["relationshiptype"], lang
-                    )
-                    relation["relationshiptype_label"] = preflabel["value"] or ""
-                except:
-                    relation["relationshiptype_label"] = (
-                        relation["relationshiptype"] or ""
-                    )
-
-                ret["resource_relationships"].append(relation)
-                instanceids.add(str(resourceid_to))
-                instanceids.add(str(resourceid_from))
+                permitted_relation_dicts.append(relation)
             else:
                 ret["total"]["value"] -= 1
+
+        # Fetch pref labels for relationship types in bulk.
+        relationship_types = {
+            relation["relationshiptype"]
+            for relation in permitted_relation_dicts
+            if relation["relationshiptype"]
+        }
+        relationship_type_values = (
+            models.Value.objects.filter(
+                value__in=relationship_types,
+            )
+            .select_related("concept")
+            .prefetch_related(
+                Prefetch(
+                    "concept__value_set",
+                    # Begin with an order, so that if rank_label()
+                    # produces ties, we still have a deterministic result.
+                    queryset=models.Value.objects.order_by("pk"),
+                ),
+            )
+        )
+        preflabel_lookup = {
+            str(rel_type.pk): (
+                sorted(
+                    rel_type.concept.value_set.all(),
+                    key=lambda label: rank_label(
+                        kind=label.valuetype_id,
+                        source_lang=label.language_id,
+                        target_lang=lang,
+                    ),
+                    reverse=True,
+                )[0].value
+                if rel_type.concept.value_set.all()
+                else ""
+            )
+            for rel_type in relationship_type_values
+        }
+
+        for relation in permitted_relation_dicts:
+            relation["relationshiptype_label"] = preflabel_lookup.get(
+                relation["relationshiptype"], relation["relationshiptype"] or ""
+            )
+
+            ret["resource_relationships"].append(relation)
+            instanceids.add(str(resourceid_to))
+            instanceids.add(str(resourceid_from))
 
         if str(self.resourceinstanceid) in instanceids:
             instanceids.remove(str(self.resourceinstanceid))
@@ -965,15 +1000,31 @@ class Resource(models.ResourceInstance):
         if len(instanceids) > 0:
             related_resources = se.search(index=RESOURCES_INDEX, id=list(instanceids))
             if related_resources:
+                related_resource_ids = [
+                    resource["_id"]
+                    for resource in related_resources["docs"]
+                    if resource["found"]
+                ]
+                count_query = (
+                    models.ResourceInstance.objects.filter(pk__in=related_resource_ids)
+                    .annotate(
+                        total_relations=(
+                            Count("resxres_resource_instance_ids_from", distinct=True)
+                            + Count("resxres_resource_instance_ids_to", distinct=True)
+                        )
+                    )
+                    .only("pk")
+                )
+                total_relations_by_resource_id = {
+                    obj.pk: obj.total_relations for obj in count_query.iterator()
+                }
+
                 for resource in related_resources["docs"]:
                     if resource["found"]:
-                        rel_count = get_relations(
-                            resourceinstanceid=resource["_id"],
-                            start=0,
-                            limit=0,
-                            count_only=True,
-                        )
-                        resource["_source"]["total_relations"] = rel_count
+                        if include_rr_count:
+                            resource["_source"]["total_relations"] = (
+                                total_relations_by_resource_id[UUID(resource["_id"])]
+                            )
                         for descriptor_type in ("displaydescription", "displayname"):
                             descriptor = get_localized_descriptor(
                                 resource, descriptor_type

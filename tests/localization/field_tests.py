@@ -458,23 +458,17 @@ class I18nJSONFieldBulkUpdateTests(ArchesTestCase):
             dt.defaultconfig = new_configs[i]
             for_bulk_update.append(dt)
 
-        with self.assertRaises(NotImplementedError):
-            DDataType.objects.bulk_update(for_bulk_update, fields=["defaultconfig"])
+        DDataType.objects.bulk_update(for_bulk_update, fields=["defaultconfig"])
 
-        # If the above starts failing, it's likely the underlying Django
-        # regression was fixed.
-        # https://code.djangoproject.com/ticket/35167
-
-        # In that case, remove the with statement, de-indent the bulk_update,
-        # and comment the following code back in:
-
-        # for i, obj in enumerate(for_bulk_update):
-        #     new_config_as_string = str(new_configs[i])
-        #     with self.subTest(new_config=new_config_as_string):
-        #         obj.refresh_from_db()
-        #         self.assertEqual(str(obj.defaultconfig), new_config_as_string)
-
-        # Also consider removing the code at the top of I18n_JSON._parse()
+        for i, obj in enumerate(for_bulk_update):
+            # None is transformed to {"en": ""}.
+            new_config_as_string = str(new_configs[i] or {"en": ""})
+            with self.subTest(new_config=new_config_as_string):
+                obj.refresh_from_db()
+                self.assertEqual(
+                    str(obj.defaultconfig.raw_value).replace("'", '"'),
+                    new_config_as_string.replace("'", '"'),
+                )
 
 
 class AsSqlTests(ArchesTestCase):
@@ -483,5 +477,5 @@ class AsSqlTests(ArchesTestCase):
         domain_value = I18n_JSON({"en": "it's a bird"})
 
         # Apostrophe in "it's" is doubly-escaped so it doesn't close the string
-        expected = "jsonb_set(None, array['en'], '\"it''s a bird\"')"
+        expected = "jsonb_set('{}'::jsonb, array['en'], '\"it''s a bird\"')"
         self.assertEqual(datatype.i18n_as_sql(domain_value, None, None), expected)

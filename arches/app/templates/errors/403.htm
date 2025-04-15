@@ -1,0 +1,29 @@
+{% extends "errors/error_base.htm" %}
+{% load i18n %}
+{% load static %}
+
+{% block body %}
+<div style="text-align: center">
+	<!--===================================================-->
+	<div class="cls-header">
+	    <div class="cls-brand">
+	        <a class="box-inline" href="/index.html">
+	            <span class="brand-title"><h4>{% trans "Arches" %}</h4></span>
+	        </a>
+	    </div>
+	</div>
+
+	<!-- CONTENT -->
+	<!--===================================================-->
+	<div class="cls-content">
+	    <h1 class="error-code text-primary">{% trans "Oops!" %}</h1>
+	    <p class="h3 text-uppercase">{% trans "Access Denied" %}</p>
+	    <div class="pad-btm">
+	        {% trans "You don't have permission to access this resource." %}"
+	    </div>
+
+	    <hr class="new-section-sm bord-no">
+	    <div class="pad-top"><a class="btn-link" href="/index.html">{% trans "Back to Homepage" %}</a></div>
+	</div>
+</div>
+{% endblock body %}

@@ -77,7 +77,7 @@ INSTALLED_APPS = (
     "arches.app.models",
     "arches.management",
     "guardian",
-    "captcha",
+    "django_recaptcha",
     "revproxy",
     "corsheaders",
     "oauth2_provider",
@@ -162,7 +162,7 @@ ENABLE_CAPTCHA = False
 NOCAPTCHA = True
 # RECAPTCHA_PROXY = 'http://127.0.0.1:8000'
 if DEBUG is True:
-    SILENCED_SYSTEM_CHECKS += ["captcha.recaptcha_test_key_error"]
+    SILENCED_SYSTEM_CHECKS += ["django_recaptcha.recaptcha_test_key_error"]
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_USE_TLS = True

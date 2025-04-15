@@ -36,9 +36,6 @@ class Command(BaseCommand):
     during development.
     """
 
-    # Silence system checks: this command should always succeed.
-    requires_system_checks = []
-
     def add_arguments(self, parser):
 
         parser.add_argument(
@@ -221,8 +218,8 @@ To create it, use:
         # setup initial Elasticsearch indexes
         management.call_command("es", operation="setup_indexes")
 
-        management.call_command("migrate")
         management.call_command("createcachetable")
+        management.call_command("migrate")
 
         # import system settings graph and any saved system settings data
         settings_graph = os.path.join(

@@ -15,6 +15,7 @@ from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import MultiPoint
 from django.contrib.gis.geos import MultiPolygon
 from django.contrib.gis.geos import MultiLineString
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection, transaction
 from django.utils.translation import gettext as _
 
@@ -320,13 +321,17 @@ class Writer(object):
             filters = {"resourceinstance__graph_id": graph_id}
             if user:
                 filters["nodegroup_id__in"] = permitted_nodegroups
-            self.tiles = models.TileModel.objects.filter(**filters)
+            self.tiles = models.TileModel.objects.filter(**filters).select_related(
+                "parenttile", "nodegroup"
+            )
             self.graph_id = graph_id
         else:
             filters = {"resourceinstance_id__in": resourceinstanceids}
             if user:
                 filters["nodegroup_id__in"] = permitted_nodegroups
-            self.tiles = models.TileModel.objects.filter(**filters)
+            self.tiles = models.TileModel.objects.filter(**filters).select_related(
+                "parenttile", "nodegroup"
+            )
             try:
                 self.graph_id = self.tiles[0].resourceinstance.graph_id
             except:

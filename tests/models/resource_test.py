@@ -352,7 +352,8 @@ class ResourceTests(ArchesTestCase):
         other_resource = Resource(pk=uuid.uuid4())
         with sync_overridden_test_settings_to_arches():
             self.test_resource.delete_index(other_resource.pk)
-        self.assertIn(str(other_resource.pk), str(mock._mock_call_args))
+        # delete_resources() was called with the correct resource id.
+        self.assertEqual(other_resource.pk, mock._mock_call_args[1]["resources"].pk)
 
     def test_publication_restored_on_save(self):
         """
@@ -391,7 +392,7 @@ class ResourceTests(ArchesTestCase):
         test_resource = Resource(graph_id=self.search_model_graphid)
         test_resource.save(user=user)
         perms = set(get_perms(user, test_resource))
-        self.assertEqual(
+        self.assertNotEqual(
             perms,
             {
                 "view_resourceinstance",
@@ -399,6 +400,7 @@ class ResourceTests(ArchesTestCase):
                 "delete_resourceinstance",
             },
         )
+        self.assertEqual(test_resource.principaluser, user)
 
     def test_provisional_user_can_delete_own_resource(self):
         """
@@ -486,9 +488,12 @@ class ResourceTests(ArchesTestCase):
 
     def test_self_referring_resource_instance_descriptor(self):
         # Create a nodegroup with a string node and a resource-instance node.
-        graph = Graph.new(name="Self-referring descriptor test", is_resource=True)
+        graph = Graph.objects.create_graph(
+            name="Self-referring descriptor test", is_resource=True
+        )
         nodegroup = models.NodeGroup.objects.create()
         string_node = models.Node.objects.create(
+            pk=nodegroup.pk,
             graph=graph,
             nodegroup=nodegroup,
             name="String Node",
@@ -502,6 +507,8 @@ class ResourceTests(ArchesTestCase):
             datatype="resource-instance",
             istopnode=False,
         )
+        nodegroup.grouping_node = string_node
+        nodegroup.save()
 
         # Configure the primary descriptor to use the string node
         models.FunctionXGraph.objects.create(
@@ -555,3 +562,18 @@ class ResourceTests(ArchesTestCase):
 
         # Until 7.4, a RecursionError was caught after this value was repeated many times.
         self.assertEqual(r.displayname(), "test value ")
+
+    @patch("django.contrib.auth.models.User.has_perm")
+    def test_user_can_see_edit_history_if_resource_editor(self, mock_has_perm):
+        user = User.objects.create_user(
+            username="john", email="john@archesproject.org", password="Test12345!"
+        )
+        user.save()
+        group = Group.objects.get(name="Resource Editor")
+        group.user_set.add(user)
+
+        self.client.login(username="john", password="Test12345!")
+        self.client.get(reverse("resource_edit_log", args=[self.test_resource.pk]))
+        mock_has_perm.assert_any_call(
+            "read_nodegroup", self.test_resource.tiles[0].nodegroup
+        )

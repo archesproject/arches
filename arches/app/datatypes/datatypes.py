@@ -12,7 +12,7 @@ import os
 from pathlib import Path
 import ast
 import time
-from datetime import datetime
+from datetime import date, datetime
 from mimetypes import MimeTypes
 
 from django.core.files.images import get_image_dimensions
@@ -523,6 +523,13 @@ class NumberDataType(BaseDataType):
                 "provisional": provisional,
             }
         )
+        document["strings"].append(
+            {
+                "string": str(nodevalue),
+                "nodegroup_id": tile.nodegroup_id,
+                "provisional": provisional,
+            }
+        )
 
     def append_search_filters(self, value, node, query, request):
         try:
@@ -571,6 +578,13 @@ class NumberDataType(BaseDataType):
     def default_es_mapping(self):
         mapping = {"type": "double"}
         return mapping
+
+    def get_search_terms(self, nodevalue, nodeid=None):
+        terms = []
+        if nodevalue:
+            terms.append(SearchTerm(value=nodevalue))
+
+        return terms
 
 
 class BooleanDataType(BaseDataType):
@@ -713,39 +727,42 @@ class DateDataType(BaseDataType):
                     pass
         return valid_date_format, valid
 
+    def set_timezone(self, value):
+        try:
+            value = value.astimezone()
+        except:
+            # The .astimezone function throws an error on Windows for dates before 1970
+            value = self.backup_astimezone(value)
+        return value.isoformat(timespec="milliseconds")
+
     def transform_value_for_tile(self, value, **kwargs):
         value = None if value == "" else value
         if value is not None:
-            if type(value) == list:
+            if isinstance(value, list):
                 value = value[0]
-            elif (
-                type(value) == str and len(value) < 4 and value.startswith("-") is False
-            ):  # a year before 1000 but not BCE
-                value = value.zfill(4)
-            valid_date_format, valid = self.get_valid_date_format(value)
-            if valid:
-                v = datetime.strptime(value, valid_date_format)
-            else:
-                v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
-            # The .astimezone() function throws an error on Windows for dates before 1970
-            try:
-                v = v.astimezone()
-            except:
-                v = self.backup_astimezone(v)
-            value = v.isoformat(timespec="milliseconds")
-        return value
+            if isinstance(value, str):
+                if len(value) < 4 and not value.startswith("-"):
+                    # a year before 1000 but not BCE
+                    value = value.zfill(4)
+                valid_date_format, valid = self.get_valid_date_format(value)
+                if valid:
+                    value = datetime.strptime(value, valid_date_format)
+                else:
+                    value = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+            if isinstance(value, date):
+                value = datetime(value.year, value.month, value.day)
+
+        return self.set_timezone(value)
 
     def backup_astimezone(self, dt):
         def same_calendar(year):
             new_year = 1971
             while not is_same_calendar(year, new_year):
                 new_year += 1
-                if (
-                    new_year > 2020
-                ):  # should never happen but don't want a infinite loop
-                    raise Exception(
-                        "Backup timezone conversion failed: no matching year found"
-                    )
+                # should never happen but don't want a infinite loop
+                if new_year > 2020:  # pragma: no cover
+                    msg = "Backup timezone conversion failed: no matching year found"
+                    raise Exception(msg)
             return new_year
 
         def is_same_calendar(year1, year2):
@@ -1810,7 +1827,7 @@ class DomainDataType(BaseDomainDataType):
         This snippet will be used in a SQL UPDATE statement.
         """
 
-        sql = i18n_json_field.attname
+        sql = i18n_json_field.attname or "'{}'::jsonb"
         for prop, value in i18n_json_field.raw_value.items():
             escaped_value = json.dumps(value).replace("%", "%%").replace("'", "''")
             if prop == "options":
@@ -2361,7 +2378,6 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
             Resource,
         )  # import here rather than top to avoid circular import
 
-        resourceid = None
         data = self.get_tile_data(tile)
         if data:
             nodevalue = self.get_nodevalues(data[str(node.nodeid)])
@@ -2374,13 +2390,16 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
                 except (TypeError, ValueError, KeyError):
                     pass
             other_resources = Resource.objects.filter(pk__in=other_resource_ids)
-            for resourceid in other_resource_ids:
+            for resourceXresource in nodevalue:
+                tileResourceId = uuid.UUID(resourceXresource["resourceId"])
                 for candidate in other_resources:
-                    if candidate.pk == resourceid:
+                    if candidate.pk == tileResourceId:
                         related_resource = candidate
                         break
                 else:
-                    logger.info(f'Resource with id "{resourceid}" not in the system.')
+                    logger.info(
+                        f'Resource with id "{tileResourceId}" not in the system.'
+                    )
                     continue
                 displayname = related_resource.displayname()
                 resourceXresource["display_value"] = displayname

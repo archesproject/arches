@@ -5,39 +5,36 @@
 <article class="main-search-container content-panel flexrow" data-bind="click:function() { sharedStateObject.menuActive(false); }, visible: true", style="display:none;" aria-label="{% trans 'Search page contents' %}">
         <section class="flex search-results-panel" aria-label="{% trans 'Search results' %}">
             <div class="search-attribute-widget">
-                <div class="search-dropdown" data-bind="component: {
-                    name: 'term-filter',
-                    params: sharedStateObject
-                }"></div>
-
-                <!-- Inline Filters (for QA and Resource Type) -->
-                <div class="search-inline-filters">
-                        <div class="qa-filter" data-bind="visible: sharedStateObject.userIsReviewer() !== false,
-                        component: {
-                            name: 'provisional-filter',
-                            params: sharedStateObject
-                        }"></div>
-                    <div class="resource-filter" data-bind="component: {
-                        name: 'resource-type-filter',
+                <div class="search-filter-tools-container">
+                    <div data-bind="component: {
+                        name: 'term-filter',
                         params: sharedStateObject
                     }"></div>
+                    <div class="search-inline-filters-row">
+                        <button class="btn-sm btn btn-mint btn-labeled clear-filter search-btn" data-bind="click: function() {clearQuery();}"><span>{% trans "Clear Filters" %}</span></button>
+                        <div class="search-inline-filters-btns">
+                            <div class="qa-filter" data-bind="visible: sharedStateObject.userIsReviewer() !== false,
+                                component: {
+                                    name: 'provisional-filter',
+                                    params: sharedStateObject
+                                }">
+                            </div>
+                            <div class="resource-filter" data-bind="component: {
+                                name: 'resource-type-filter',
+                                params: sharedStateObject
+                            }">
+                        </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="search-tools-container">
-                <div class="search-tools-item">
-                    <!-- Result Count and ordering Block -->
+                <div class="search-sort-tools-container">
                     <div class="search-count-container">
                         <p class="search-title" aria-live="assertive" data-bind="text: $root.translations.shownTotalSearchResults(hits(), total())"></p>
                     </div>
-                </div>
-                <div class="search-tools-item">
-                    <div class="search-controls-container">
-                        <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {clearQuery();}"><span>{% trans "Clear Filters" %}</span></button>
-                        <div data-bind="component: {
-                            name: 'sort-results',
-                            params: sharedStateObject
-                        }"></div>
-                    </div>
+                    <div data-bind="component: {
+                        name: 'sort-results',
+                        params: sharedStateObject
+                    }"></div>
                 </div>
             </div>
 

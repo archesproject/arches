@@ -26,6 +26,7 @@ from django.db.utils import IntegrityError
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
 from arches.app.models.card import Card
+from arches.app.models.querysets.graph import GraphQuerySet
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.bulk_data_deletion import BulkDataDeletion
@@ -47,6 +48,8 @@ class Graph(models.GraphModel):
     Used for mapping complete resource graph objects to and from the database
 
     """
+
+    objects = GraphQuerySet.as_manager()
 
     class Meta:
         proxy = True
@@ -78,7 +81,6 @@ class Graph(models.GraphModel):
         self._card_constraints = []
         self._constraints_x_nodes = []
         self.temp_node_name = _("New Node")
-        self.serialized_graph = None
 
         if args:
             if isinstance(args[0], dict):
@@ -98,7 +100,7 @@ class Graph(models.GraphModel):
                         setattr(self, key, value)
 
                 try:
-                    self.update_permissions(args[0])
+                    self.update_permissions_from_serialized_graph(args[0])
                 except (
                     AttributeError
                 ):  # AttributeError happens if attempting to update permissions on a non-existent NodeGroup
@@ -151,111 +153,33 @@ class Graph(models.GraphModel):
                         args[0]["resource_instance_lifecycle"]
                     )
             else:
-                if len(args) == 1 and (
-                    isinstance(args[0], str) or isinstance(args[0], uuid.UUID)
-                ):
-                    for key, value in models.GraphModel.objects.get(
-                        pk=args[0]
-                    ).__dict__.items():
-                        setattr(self, key, value)
+                self.cards = {card.pk: card for card in super().get_cards()}
 
-                has_deferred_args = False
-                for arg in args:
-                    if type(arg) == Deferred:
-                        has_deferred_args = True
+                self.nodes = {node.pk: node for node in super().get_nodes()}
+                for node in self.nodes.values():
+                    if node.istopnode:
+                        self.root = node
 
-                #  accessing the graph publication while deferring args results in a recursive loop
-                if (
-                    self.publication
-                    and not self.source_identifier_id
-                    and not self.has_unpublished_changes
-                    and not has_deferred_args
-                ):
-                    self.serialized_graph = (
-                        self.serialize()
-                    )  # reads from graph_publication table and returns serialized graph as dict
+                self.edges = {edge.pk: edge for edge in super().get_edges()}
+                # This resolves a tricky pointer issue with `append_branch`
+                # and possibly other functions as well. This block should
+                # be deleted when possible.
+                for edge in self.edges.values():
+                    edge.domainnode = self.nodes[edge.domainnode_id]
+                    edge.rangenode = self.nodes[edge.rangenode_id]
 
-                    node_slugs = []
-                    for node_dict in self.serialized_graph["nodes"]:
-                        node_slug = {}
-
-                        for key, value in node_dict.items():
-                            # filter out keys from the serialized_graph that would cause an error on instantiation
-                            if key not in ["is_collector", "parentproperty"]:
-                                if isinstance(value, str):
-                                    try:
-                                        value = uuid.UUID(value)
-                                    except ValueError:
-                                        pass
-                                node_slug[key] = value
-
-                        node_slugs.append(node_slug)
-
-                    card_slugs = []
-                    for card_dict in self.serialized_graph["cards"]:
-                        card_slug = {}
-
-                        for key, value in card_dict.items():
-                            # filter out keys from the serialized_graph that would cause an error on instantiation
-                            if key not in ["constraints", "is_editable"]:
-                                if isinstance(value, str):
-                                    try:
-                                        value = uuid.UUID(value)
-                                    except ValueError:
-                                        pass
-                                card_slug[key] = value
-
-                        card_slugs.append(card_slug)
-
-                    edge_slugs = []
-                    for edge_dict in self.serialized_graph["edges"]:
-                        edge_slug = {}
-
-                        for key, value in edge_dict.items():
-                            if isinstance(value, str):
-                                try:
-                                    value = uuid.UUID(value)
-                                except ValueError:
-                                    pass
-                            edge_slug[key] = value
-
-                        edge_slugs.append(edge_slug)
-
-                    nodes = [models.Node(**node_slug) for node_slug in node_slugs]
-                    edges = [models.Edge(**edge_dict) for edge_dict in edge_slugs]
-                    cards = [models.CardModel(**card_slug) for card_slug in card_slugs]
-                else:
-                    nodes = self.node_set.all()
-                    edges = self.edge_set.all()
-                    cards = self.cardmodel_set.all()
-
-                edge_lookup = {
-                    edge["edgeid"]: edge
-                    for edge in json.loads(JSONSerializer().serialize(edges))
+                self.widgets = {
+                    card_x_node_x_widget.pk: card_x_node_x_widget
+                    for card_x_node_x_widget in super().get_card_x_node_x_widgets()
                 }
-                for card in cards:
-                    widgets = list(card.cardxnodexwidget_set.all())
-                    for widget in widgets:
-                        self.widgets[widget.pk] = widget
-                node_lookup = {}
-                for node in nodes:
-                    self.add_node(node)
-                    node_lookup[str(node.nodeid)] = node
-                for edge in edges:
-                    edge_dict = edge_lookup[str(edge.edgeid)]
-                    edge.domainnode = node_lookup[edge_dict["domainnode_id"]]
-                    edge.rangenode = node_lookup[edge_dict["rangenode_id"]]
-                    self.add_edge(edge)
-                for card in cards:
-                    self.add_card(card)
-
-                self.populate_null_nodegroups()
 
     def refresh_from_database(self):
         """
         Updates card, edge, and node data from the database, bypassing the
         cached version of the graph
         """
+        self.refresh_from_db()
+
         self.nodes = {}
         self.edges = {}
         self.cards = {}
@@ -289,41 +213,6 @@ class Graph(models.GraphModel):
             self.add_card(card)
 
         self.populate_null_nodegroups()
-
-    @staticmethod
-    def new(name="", is_resource=False, author=""):
-        newid = uuid.uuid1()
-        nodegroup = None
-        graph_model = models.GraphModel.objects.create(
-            name=name,
-            subtitle="",
-            author=author,
-            description="",
-            version="",
-            isresource=is_resource,
-            iconclass="",
-            ontology=None,
-            slug=None,
-        )
-        if not is_resource:
-            nodegroup = models.NodeGroup.objects.create(pk=newid)
-            models.CardModel.objects.create(
-                nodegroup=nodegroup, name=name, graph=graph_model
-            )
-        root = models.Node.objects.create(
-            pk=newid,
-            name=_("Top Node"),
-            description="",
-            istopnode=True,
-            ontologyclass=None,
-            datatype="semantic",
-            nodegroup=nodegroup,
-            graph=graph_model,
-        )
-
-        graph = Graph.objects.get(pk=graph_model.graphid)
-
-        return graph
 
     def add_node(self, node, nodegroups=None):
         """
@@ -390,7 +279,9 @@ class Graph(models.GraphModel):
             node.pk = uuid.UUID(node.pk)
         if node.istopnode:
             self.root = node
+
         self.nodes[node.pk] = node
+        self.has_unpublished_changes = True
 
         return node
 
@@ -421,6 +312,9 @@ class Graph(models.GraphModel):
         if self.ontology is None:
             edge.ontologyproperty = None
         self.edges[edge.pk] = edge
+
+        self.has_unpublished_changes = True
+
         return edge
 
     def add_card_contraint(self, constraint, card):
@@ -434,6 +328,8 @@ class Graph(models.GraphModel):
         for nodeid in constraint.get("nodes", []):
             constraint_x_node = {"constraint": constraint_model, "node": nodeid}
             self._constraints_x_nodes.append(constraint_x_node)
+
+        self.has_unpublished_changes = True
 
     def add_card(self, card):
         """
@@ -474,6 +370,7 @@ class Graph(models.GraphModel):
             card.pk = uuid.uuid1()
 
         self.cards[card.pk] = card
+        self.has_unpublished_changes = True
 
         return card
 
@@ -492,6 +389,7 @@ class Graph(models.GraphModel):
         function.graph = self
 
         self._functions.append(function)
+        self.has_unpublished_changes = True
 
         return function
 
@@ -554,20 +452,9 @@ class Graph(models.GraphModel):
                 resource_instance_lifecycle_states, bulk=False
             )
 
-    def _compare(self, obj1, obj2, additional_excepted_keys=[]):
-        excluded_keys = ["_state"] + additional_excepted_keys
-        d1, d2 = obj1.__dict__, obj2.__dict__
-        old, new = {}, {}
-        for k, v in list(d1.items()):
-            if k in excluded_keys:
-                continue
-            try:
-                if v != d2[k]:
-                    old.update({k: v})
-                    new.update({k: d2[k]})
-            except KeyError:
-                old.update({k: v})
-        return old, new
+        self.has_unpublished_changes = True
+
+        return self.resource_instance_lifecycle
 
     def update_es_node_mapping(self, node, datatype_factory, se):
         if self.isresource:
@@ -594,13 +481,15 @@ class Graph(models.GraphModel):
         validate -- True to validate the graph before saving, defaults to True
 
         """
-
         if validate:
             self.validate()
 
         with transaction.atomic():
             super(Graph, self).save()
-            for nodegroup in self.get_nodegroups(force_recalculation=True):
+
+            has_unpublished_changes = self.has_unpublished_changes
+
+            for nodegroup in self.get_nodegroups():
                 nodegroup.save()
 
             se = SearchEngineFactory().create()
@@ -694,7 +583,7 @@ class Graph(models.GraphModel):
 
                     translation.activate(language=language_tuple[0])
 
-                    published_graph = models.PublishedGraph.objects.create(
+                    models.PublishedGraph.objects.create(
                         publication=self.publication,
                         serialized_graph=JSONDeserializer().deserialize(
                             JSONSerializer().serialize(self, force_recalculation=True)
@@ -721,19 +610,32 @@ class Graph(models.GraphModel):
                 nodegroup.delete()
             self._nodegroups_to_delete = []
 
+            # becuase of signals listeners on related graph entities,
+            # `has_unpublished_changes` must be updated manually after
+            # all related entities have updated.
+            self.has_unpublished_changes = has_unpublished_changes
+            super().save()
+
         return self
 
     def delete(self):
+        self.delete_associated_entities()
+        super(Graph, self).delete()
+
+        return self
+
+    def delete_associated_entities(self):
+        """
+        Deletes all associated cards, cards_x_nodes_x_widgets, edges, nodes, and nodegroups
+        """
         with transaction.atomic():
             try:
-                editable_future_graph = Graph.objects.get(
-                    source_identifier_id=self.graphid
-                )
-                editable_future_graph.delete()
+                draft_graph = Graph.objects.get(source_identifier_id=self.graphid)
+                draft_graph.delete()
             except Graph.DoesNotExist:
-                pass  # no editable future graph to delete
+                pass  # no draft_graph to delete
 
-            for nodegroup in self.get_nodegroups():
+            for nodegroup in self.get_nodegroups(force_recalculation=True):
                 nodegroup.delete()
 
             for edge in self.edges.values():
@@ -748,7 +650,9 @@ class Graph(models.GraphModel):
             for widget in self.widgets.values():
                 widget.delete()
 
-        super(Graph, self).delete()
+        self.has_unpublished_changes = True
+
+        return self
 
     def delete_instances(self, userid=None, verbose=False):
         """
@@ -824,6 +728,7 @@ class Graph(models.GraphModel):
 
         traverse_tree(tree)
 
+        self.has_unpublished_changes = True
         return tree
 
     def append_branch(
@@ -850,7 +755,7 @@ class Graph(models.GraphModel):
 
         """
 
-        branch_graph = Graph(graphid)
+        branch_graph = Graph.objects.get(pk=graphid)
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
 
         if skip_validation or self.can_append(branch_graph, nodeToAppendTo):
@@ -898,6 +803,8 @@ class Graph(models.GraphModel):
 
             if self.ontology is None:
                 branch_copy.clear_ontology_references()
+
+            self.has_unpublished_changes = True
 
             if return_appended_graph:
                 return self
@@ -983,6 +890,7 @@ class Graph(models.GraphModel):
                 raise GraphValidationError(
                     _("Ontology rules don't allow this node to be appended")
                 )
+
         return {"node": newNode, "edge": newEdge, "card": card, "nodegroup": nodegroup}
 
     def clear_ontology_references(self):
@@ -998,6 +906,7 @@ class Graph(models.GraphModel):
             edge.ontologyproperty = None
 
         self.ontology = None
+        self.has_unpublished_changes = True
 
     def replace_config_ids(self, config, maps=[]):
         """
@@ -1075,6 +984,7 @@ class Graph(models.GraphModel):
             copy_of_self.root = root_node
             copy_of_self.name = root_node.name
             copy_of_self.isresource = False
+            copy_of_self.resource_instance_lifecycle = None
             copy_of_self.subtitle = ""
             copy_of_self.description = ""
             copy_of_self.author = ""
@@ -1110,7 +1020,9 @@ class Graph(models.GraphModel):
             if is_collector:
                 old_nodegroup_id = node.nodegroup_id
                 node.nodegroup = models.NodeGroup(
-                    pk=node.pk, cardinality=node.nodegroup.cardinality
+                    pk=node.pk,
+                    cardinality=node.nodegroup.cardinality,
+                    grouping_node=node,
                 )
                 if old_nodegroup_id not in nodegroup_map:
                     nodegroup_map[old_nodegroup_id] = node.nodegroup_id
@@ -1210,7 +1122,7 @@ class Graph(models.GraphModel):
         nodegroup = None
         node = self.nodes[uuid.UUID(str(nodeid))]
 
-        graph_dict = self.serialized_graph or self.serialize()
+        graph_dict = self.serialize()
         graph_dict["nodes"] = []
         graph_dict["edges"] = []
         graph_dict["cards"] = []
@@ -1248,6 +1160,7 @@ class Graph(models.GraphModel):
                     edge.domainnode = self.nodes[uuid.UUID(str(newparentnodeid))]
                     ret["edges"].append(edge)
 
+            self.has_unpublished_changes = True
             self.populate_null_nodegroups()
             return ret
 
@@ -1283,7 +1196,8 @@ class Graph(models.GraphModel):
             new_node.fieldname = node["fieldname"]
         self.populate_null_nodegroups()
 
-        # new_node will always have a nodegroup id even it if was set to None becuase populate_null_nodegroups
+        # new_node will always have a nodegroup id even if if was set to None
+        # because populate_null_nodegroups
         # will populate the nodegroup id with the parent nodegroup
         # add/remove a card if a nodegroup was added/removed
         if new_node.nodegroup_id != old_node.nodegroup_id:
@@ -1312,11 +1226,13 @@ class Graph(models.GraphModel):
         except ObjectDoesNotExist:
             pass
 
+        self.has_unpublished_changes = True
+
         return {"card": new_card, "node": new_node}
 
     def delete_node(self, node=None):
         """
-        deletes a node and all if it's children from a graph
+        deletes a node and all of its children from a graph
 
         Arguments:
         node -- a node id or Node model to delete from the graph
@@ -1332,9 +1248,6 @@ class Graph(models.GraphModel):
             nodegroups = []
 
             tree = self.get_tree(root=node)
-            tile_count = models.TileModel.objects.filter(
-                nodegroup_id=node.nodegroup_id
-            ).count()
 
             def traverse_tree(tree):
                 nodes.append(tree["node"])
@@ -1350,6 +1263,11 @@ class Graph(models.GraphModel):
                 [nodegroup.delete() for nodegroup in nodegroups]
                 [edge.delete() for edge in edges]
                 [node.delete() for node in nodes]
+
+        self.has_unpublished_changes = True
+        super().save()
+
+        return self
 
     def can_append(self, graphToAppend, nodeToAppendTo):
         """
@@ -1658,16 +1576,8 @@ class Graph(models.GraphModel):
         get the nodegroups associated with this graph
 
         """
-        if (
-            self.serialized_graph
-            and not self.source_identifier_id
-            and not force_recalculation
-        ):
-            nodegroups = self.serialized_graph["nodegroups"]
-            for nodegroup in nodegroups:
-                if isinstance(nodegroup["nodegroupid"], str):
-                    nodegroup["nodegroupid"] = uuid.UUID(nodegroup["nodegroupid"])
-            return [models.NodeGroup(**nodegroup_dict) for nodegroup_dict in nodegroups]
+        if self.should_use_published_graph() and not force_recalculation:
+            return super().get_nodegroups()
         else:
             nodegroups = set()
             for node in self.nodes.values():
@@ -1680,56 +1590,111 @@ class Graph(models.GraphModel):
                     pass
             return list(nodegroups)
 
-    def update_permissions(self, serialized_graph):
+    def update_permissions_from_serialized_graph(self, serialized_graph):
         if (
             "user_permissions" in serialized_graph
             or "group_permissions" in serialized_graph
         ):
-            graph_from_database_query = Graph.objects.filter(pk=self.pk)
-            graph_from_database = None
+            graph_from_database = Graph.objects.filter(pk=self.pk).first()
 
-            if len(graph_from_database_query):
-                graph_from_database = graph_from_database_query[0]
-
-            if "user_permissions" in serialized_graph:
-                # first, delete all existing user permissions for graph
-                if graph_from_database:
+            if graph_from_database:
+                # update user permissions
+                if "user_permissions" in serialized_graph:
+                    # first, delete all existing user permissions for graph
                     user_permissions = graph_from_database.get_user_permissions(
                         force_recalculation=True
-                    )  # may not need force_recacluation
+                    )
+
+                    user_permission_ids_to_delete = []
                     for user_permission_list in user_permissions.values():
                         for user_permission in user_permission_list:
-                            user_permission.delete()
+                            user_permission_ids_to_delete.append(user_permission.pk)
 
-                # then, create permissions from serialized permissions
-                for serialized_user_permission_list in serialized_graph[
-                    "user_permissions"
-                ].values():
-                    for serialized_user_permission in serialized_user_permission_list:
-                        updated_user_permission = UserObjectPermission(
-                            **serialized_user_permission
+                    if user_permission_ids_to_delete:
+                        UserObjectPermission.objects.filter(
+                            pk__in=user_permission_ids_to_delete
+                        ).delete()
+
+                    # then, create permissions from serialized permissions
+                    user_permissions = []
+                    for user_permission_list in serialized_graph[
+                        "user_permissions"
+                    ].values():
+                        user_permissions.extend(user_permission_list)
+
+                    user_permission_nodegroups = models.NodeGroup.objects.filter(
+                        pk__in={
+                            user_permission["object_pk"]
+                            for user_permission in user_permissions
+                        }
+                    )
+                    user_permission_nodegroup_id_to_nodegroup = {
+                        nodegroup.pk: nodegroup
+                        for nodegroup in user_permission_nodegroups
+                    }
+
+                    user_permissions_to_create = []
+                    for user_permission in user_permissions:
+                        user_permission["content_object"] = (
+                            user_permission_nodegroup_id_to_nodegroup[
+                                user_permission["object_pk"]
+                            ]
                         )
-                        updated_user_permission.save()
+                        user_permissions_to_create.append(
+                            UserObjectPermission(**user_permission)
+                        )
 
-            if "group_permissions" in serialized_graph:
-                # first, delete all existing group permissions for graph
-                if graph_from_database:
+                    UserObjectPermission.objects.bulk_create(user_permissions_to_create)
+
+                # update group permissions
+                if "group_permissions" in serialized_graph:
+                    # first, delete all existing group permissions for graph
                     group_permissions = graph_from_database.get_group_permissions(
                         force_recalculation=True
-                    )  # may not need force_recacluation
+                    )
+
+                    group_permission_ids_to_delete = []
                     for group_permission_list in group_permissions.values():
                         for group_permission in group_permission_list:
-                            group_permission.delete()
+                            group_permission_ids_to_delete.append(group_permission.pk)
 
-                # then, create permissions from serialized permissions
-                for serialized_group_permission_list in serialized_graph[
-                    "group_permissions"
-                ].values():
-                    for serialized_group_permission in serialized_group_permission_list:
-                        updated_group_permission = GroupObjectPermission(
-                            **serialized_group_permission
+                    if group_permission_ids_to_delete:
+                        GroupObjectPermission.objects.filter(
+                            pk__in=group_permission_ids_to_delete
+                        ).delete()
+
+                    # then, create permissions from serialized permissions
+                    group_permissions = []
+                    for group_permission_list in serialized_graph[
+                        "group_permissions"
+                    ].values():
+                        group_permissions.extend(group_permission_list)
+
+                    group_permission_nodegroups = models.NodeGroup.objects.filter(
+                        pk__in={
+                            group_permission["object_pk"]
+                            for group_permission in group_permissions
+                        }
+                    )
+                    group_permission_nodegroup_id_to_nodegroup = {
+                        nodegroup.pk: nodegroup
+                        for nodegroup in group_permission_nodegroups
+                    }
+
+                    group_permissions_to_create = []
+                    for group_permission in group_permissions:
+                        group_permission["content_object"] = (
+                            group_permission_nodegroup_id_to_nodegroup[
+                                group_permission["object_pk"]
+                            ]
                         )
-                        updated_group_permission.save()
+                        user_permissions_to_create.append(
+                            GroupObjectPermission(**group_permission)
+                        )
+
+                    GroupObjectPermission.objects.bulk_create(
+                        group_permissions_to_create
+                    )
 
     def get_user_permissions(self, force_recalculation=False):
         """
@@ -1740,12 +1705,10 @@ class Graph(models.GraphModel):
             ...
         },
         """
-        if (
-            self.serialized_graph
-            and not self.source_identifier_id
-            and not force_recalculation
-        ):
-            user_permissions = self.serialized_graph["user_permissions"]
+        if self.should_use_published_graph() and not force_recalculation:
+            published_graph = self.get_published_graph()
+            user_permissions = published_graph.serialized_graph["user_permissions"]
+
             return {
                 nodegroup_id: [
                     UserObjectPermission(**serialized_user_permission)
@@ -1787,12 +1750,10 @@ class Graph(models.GraphModel):
             ...
         },
         """
-        if (
-            self.serialized_graph
-            and not self.source_identifier_id
-            and not force_recalculation
-        ):
-            group_permissions = self.serialized_graph["group_permissions"]
+        if self.should_use_published_graph() and not force_recalculation:
+            published_graph = self.get_published_graph()
+            group_permissions = published_graph.serialized_graph["group_permissions"]
+
             return {
                 nodegroup_id: [
                     GroupObjectPermission(**serialized_group_permission)
@@ -1829,6 +1790,8 @@ class Graph(models.GraphModel):
         """
         get a nodegroup from an id by first looking through the nodes and cards associated with this graph.
         if not found then get the nodegroup instance from the database, otherwise return a new instance of a nodegroup
+        This is also the method responsible for setting the grouping_node_id
+        on the nodegroup when the first (collector) node is created.
 
         Keyword Arguments
 
@@ -1836,13 +1799,19 @@ class Graph(models.GraphModel):
         nodegroups_list -- list of nodegroups from which to filter
         """
 
+        found = None
         for nodegroup in nodegroups_list or self.get_nodegroups():
             if str(nodegroup.nodegroupid) == str(nodegroupid):
-                return nodegroup
-        try:
-            return models.NodeGroup.objects.get(pk=nodegroupid)
-        except models.NodeGroup.DoesNotExist:
-            return models.NodeGroup(pk=nodegroupid)
+                found = nodegroup
+                break
+        else:
+            try:
+                found = models.NodeGroup.objects.get(pk=nodegroupid)
+            except models.NodeGroup.DoesNotExist:
+                found = models.NodeGroup(pk=nodegroupid, grouping_node_id=nodegroupid)
+
+        found.grouping_node_id = found.nodegroupid
+        return found
 
     def get_root_nodegroup(self):
         """
@@ -1864,11 +1833,13 @@ class Graph(models.GraphModel):
             if card.nodegroup.parentnodegroup is None:
                 return card
 
-    def get_cards(self, use_raw_i18n_json=False):
+    def get_cards(self, use_raw_i18n_json=False, force_recalculation=False):
         """
         get the card data (if any) associated with this graph
 
         """
+        if self.should_use_published_graph() and not force_recalculation:
+            return super().get_cards()
 
         cards = []
         for card in self.cards.values():
@@ -1907,12 +1878,8 @@ class Graph(models.GraphModel):
         get the widget data (if any) associated with this graph
 
         """
-        if (
-            self.serialized_graph
-            and not self.source_identifier_id
-            and not force_recalculation
-        ):
-            return self.serialized_graph["cards_x_nodes_x_widgets"]
+        if self.should_use_published_graph() and not force_recalculation:
+            return super().get_card_x_node_x_widgets()
         else:
             widgets = []
             if self.widgets:
@@ -1940,31 +1907,17 @@ class Graph(models.GraphModel):
 
         """
         exclude = [] if exclude is None else exclude
-        if (
-            self.publication
-            and not self.source_identifier_id
-            and not force_recalculation
-        ):
-            try:
-                published_graph = self.get_published_graph()
-                serialized_graph = published_graph.serialized_graph
-                for key in exclude:
-                    if (
-                        serialized_graph.get(key) is not None
-                    ):  # explicit None comparison so falsey values will still return
-                        serialized_graph[key] = None
+        if self.should_use_published_graph() and not force_recalculation:
+            published_graph = self.get_published_graph()
+            serialized_graph = published_graph.serialized_graph
 
-                return serialized_graph
-            except:
-                self.refresh_from_database()
-                return self.serialize(
-                    fields=fields,
-                    exclude=exclude,
-                    force_recalculation=True,
-                    use_raw_i18n_json=use_raw_i18n_json,
-                    **kwargs,
-                )
+            for key in exclude:
+                if (
+                    serialized_graph.get(key) is not None
+                ):  # explicit None comparison so falsey values will still return
+                    serialized_graph[key] = None
 
+            return serialized_graph
         else:
             ret = JSONSerializer().handle_model(
                 self,
@@ -1983,7 +1936,10 @@ class Graph(models.GraphModel):
                 ret.pop("relatable_resource_model_ids", None)
 
             if "cards" not in exclude:
-                cards = self.get_cards(use_raw_i18n_json=use_raw_i18n_json)
+                cards = self.get_cards(
+                    use_raw_i18n_json=use_raw_i18n_json,
+                    force_recalculation=force_recalculation,
+                )
                 ret["cards"] = sorted(
                     cards, key=lambda k: (k["sortorder"] or 0, k["cardid"] or 0)
                 )
@@ -2127,7 +2083,7 @@ class Graph(models.GraphModel):
             - A node group can only have child node groups if the node group only contains semantic nodes
             - If graph has an ontology, nodes must have classes and edges must have properties that are ontologically valid
             - If the graph has no ontology, nodes and edges should have null values for ontology class and property respectively
-            - The graph has a slug that unique only to it and its editable_future_graph
+            - The graph has a slug that unique only to it and its draft_graph
         """
         # validates that the top node of a resource graph is semantic and a collector
         if self.isresource is True:
@@ -2301,22 +2257,17 @@ class Graph(models.GraphModel):
                 .exclude(source_identifier__isnull=False)
                 .filter(slug=self.slug)
             )
-            if (
-                first_matching_graph := graphs_with_matching_slug.first()
-            ) and first_matching_graph.graphid != self.graphid:
-                if self.source_identifier_id:
-                    if self.source_identifier_id != first_matching_graph.graphid:
-                        raise GraphValidationError(
-                            _(
-                                "Another resource model already uses the slug '{self.slug}'"
-                            ).format(**locals()),
-                            1007,
-                        )
-                else:
+            if (first_matching_graph := graphs_with_matching_slug.first()) and str(
+                first_matching_graph.graphid
+            ) != str(self.graphid):
+                if (
+                    not self.source_identifier_id
+                    or self.source_identifier_id != first_matching_graph.graphid
+                ):
                     raise GraphValidationError(
                         _(
-                            "Another resource model already uses the slug '{self.slug}'"
-                        ).format(**locals()),
+                            "Another resource model already uses the slug '{slug}'"
+                        ).format(slug=self.slug),
                         1007,
                     )
 
@@ -2325,7 +2276,7 @@ class Graph(models.GraphModel):
         Changes information in in GraphPublication models without creating
         a new entry in graphs_x_published_graphs table
         """
-        if self.source_identifier:  # don't update future graphs
+        if self.source_identifier_id:  # don't update future graphs
             raise Exception(
                 "Cannot update graphs with a source_identifier. Please apply updates to the source graph."
             )
@@ -2337,8 +2288,7 @@ class Graph(models.GraphModel):
 
                 if self.has_unpublished_changes:
                     self.has_unpublished_changes = False
-                    self.save()
-                    self.create_editable_future_graph()
+                    super().save()
 
                 published_graph_edit = models.PublishedGraphEdit.objects.create(
                     publication=self.publication, user=user, notes=notes
@@ -2380,9 +2330,11 @@ class Graph(models.GraphModel):
 
                     translation.deactivate()
 
-    def create_editable_future_graph(self):
+            return self
+
+    def create_draft_graph(self):
         """
-        Creates an additional entry in the Graphs table that represents an editable version of the current graph
+        Creates an additional entry in the Graphs table that represents an draft version of the current graph
         """
         with transaction.atomic():
             LanguageSynchronizer.synchronize_settings_with_db(
@@ -2390,544 +2342,298 @@ class Graph(models.GraphModel):
             )
 
             try:
-                previous_editable_future_graph = Graph.objects.get(
+                previous_draft_graph = Graph.objects.get(
                     source_identifier_id=self.graphid
                 )
-                previous_editable_future_graph.delete()
+                previous_draft_graph.delete()
             except Graph.DoesNotExist:
                 pass
 
             graph_copy = self.copy(set_source=True)
 
-            editable_future_graph = graph_copy["copy"]
-            editable_future_graph.source_identifier_id = self.graphid
-            editable_future_graph.resource_instance_lifecycle = None
-            editable_future_graph.has_unpublished_changes = False
+            draft_graph = graph_copy["copy"]
+            draft_graph.source_identifier_id = self.graphid
 
-            editable_future_graph.root.set_relatable_resources(
+            # draft_graphs do not interact with `Resource` objects
+            draft_graph.resource_instance_lifecycle = None
+
+            # draft_graphs are never published, so on creation
+            # `has_unpublished_changes` should never be true, regardless
+            # of the state of the source_graph.
+            draft_graph.has_unpublished_changes = False
+
+            draft_graph.root.set_relatable_resources(
                 [node.pk for node in self.root.get_relatable_resources()]
             )
 
-            editable_future_graph.save(validate=False)
+            draft_graph.save(validate=False)
 
-            return editable_future_graph
+            return draft_graph
 
-    def update_from_editable_future_graph(self):
+    def update_from_draft_graph(self, draft_graph):
         """
-        Updates the graph with any changes made to the editable future graph,
-        removes the editable future graph and related resources, then creates
-        an editable future graph from the updated graph.
+        Updates the graph with any changes made to the draft_graph,
+        deletes the draft_graph and related entities, then creates
+        a new draft_graph from the updated graph.
         """
-        try:
-            editable_future_graph = Graph.objects.get(source_identifier_id=self.pk)
-        except:
-            raise Exception(_("No identifiable future Graph"))
+        serialized_source_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(self)
+        )
+        serialized_draft_graph = JSONDeserializer().deserialize(
+            JSONSerializer().serialize(draft_graph)
+        )
 
-        def _update_source_nodegroup_hierarchy(nodegroup):
-            if not nodegroup:
-                return None
+        node_id_to_node_source_identifier_id = {
+            node["nodeid"]: node["source_identifier_id"]
+            for node in serialized_draft_graph["nodes"]
+            if node["source_identifier_id"]
+        }
 
-            node = models.Node.objects.get(pk=nodegroup.pk)
-            if node.source_identifier_id:
-                source_nodegroup = models.NodeGroup.objects.get(
-                    pk=node.source_identifier_id
-                )
+        card_id_to_card_source_identifier_id = {
+            card["cardid"]: card["source_identifier_id"]
+            for card in serialized_draft_graph["cards"]
+            if card["source_identifier_id"]
+        }
 
-                source_nodegroup.cardinality = nodegroup.cardinality
-                source_nodegroup.legacygroupid = nodegroup.legacygroupid
-
-                if nodegroup.parentnodegroup_id:
-                    nodegroup_parent_node = models.Node.objects.get(
-                        pk=nodegroup.parentnodegroup_id
-                    )
-
-                    if nodegroup_parent_node.source_identifier_id:
-                        source_nodegroup.parentnodegroup_id = (
-                            nodegroup_parent_node.source_identifier_id
-                        )
-
-                source_nodegroup.save()
-
-            if nodegroup.parentnodegroup:
-                _update_source_nodegroup_hierarchy(nodegroup=nodegroup.parentnodegroup)
-
-        with transaction.atomic():
-            self.root.set_relatable_resources(
-                [
-                    node.pk
-                    for node in editable_future_graph.root.get_relatable_resources()
+        # update cards_x_nodes_x_widgets
+        for serialized_card_x_node_x_widget in serialized_draft_graph[
+            "cards_x_nodes_x_widgets"
+        ]:
+            if serialized_card_x_node_x_widget["source_identifier_id"]:
+                serialized_card_x_node_x_widget["id"] = serialized_card_x_node_x_widget[
+                    "source_identifier_id"
                 ]
+                serialized_card_x_node_x_widget["source_identifier_id"] = None
+
+            updated_card_id = card_id_to_card_source_identifier_id.get(
+                serialized_card_x_node_x_widget["card_id"]
             )
+            if updated_card_id:
+                serialized_card_x_node_x_widget["card_id"] = updated_card_id
 
-            previous_card_ids = [str(card.pk) for card in self.cards.values()]
-            previous_node_ids = [str(node.pk) for node in self.nodes.values()]
-            previous_edge_ids = [str(edge.pk) for edge in self.edges.values()]
-            previous_widget_ids = [str(widget.pk) for widget in self.widgets.values()]
-            previous_nodegroup_ids = [
-                str(nodegroup.pk)
-                for nodegroup in self.get_nodegroups(force_recalculation=True)
+            updated_node_id = node_id_to_node_source_identifier_id.get(
+                serialized_card_x_node_x_widget["node_id"]
+            )
+            if updated_node_id:
+                serialized_card_x_node_x_widget["node_id"] = updated_node_id
+
+        # update cards
+        for serialized_card in serialized_draft_graph["cards"]:
+            if serialized_card["source_identifier_id"]:
+                serialized_card["cardid"] = serialized_card["source_identifier_id"]
+                serialized_card["source_identifier_id"] = None
+
+            source_nodegroup_id = node_id_to_node_source_identifier_id.get(
+                serialized_card["nodegroup_id"]
+            )
+            if source_nodegroup_id:
+                serialized_card["nodegroup_id"] = source_nodegroup_id
+
+            serialized_card["graph_id"] = serialized_source_graph["graphid"]
+
+        # update nodes
+        for serialized_node in serialized_draft_graph["nodes"]:
+            if serialized_node["source_identifier_id"]:
+                serialized_node["nodeid"] = serialized_node["source_identifier_id"]
+                serialized_node["source_identifier_id"] = None
+
+            updated_nodegroup_id = node_id_to_node_source_identifier_id.get(
+                serialized_node["nodegroup_id"]
+            )
+            if updated_nodegroup_id:
+                serialized_node["nodegroup_id"] = updated_nodegroup_id
+
+            serialized_node["graph_id"] = serialized_source_graph["graphid"]
+
+        # update nodegroups
+        for serialized_nodegroup in serialized_draft_graph["nodegroups"]:
+            updated_nodegroup_id = node_id_to_node_source_identifier_id.get(
+                serialized_nodegroup["nodegroupid"]
+            )
+            if updated_nodegroup_id:
+                serialized_nodegroup["nodegroupid"] = updated_nodegroup_id
+
+            updated_parent_nodegroup_id = node_id_to_node_source_identifier_id.get(
+                serialized_nodegroup["parentnodegroup_id"]
+            )
+            if updated_nodegroup_id:
+                serialized_nodegroup["parentnodegroup_id"] = updated_parent_nodegroup_id
+
+            updated_grouping_node_id = node_id_to_node_source_identifier_id.get(
+                serialized_nodegroup["grouping_node_id"]
+            )
+            if updated_grouping_node_id:
+                serialized_nodegroup["grouping_node_id"] = updated_grouping_node_id
+
+        # update edges
+        for serialized_edge in serialized_draft_graph["edges"]:
+            if serialized_edge["source_identifier_id"]:
+                serialized_edge["edgeid"] = serialized_edge["source_identifier_id"]
+                serialized_edge["source_identifier_id"] = None
+
+            source_domain_node_id = node_id_to_node_source_identifier_id.get(
+                serialized_edge["domainnode_id"]
+            )
+            if source_domain_node_id:
+                serialized_edge["domainnode_id"] = source_domain_node_id
+
+            source_range_node_id = node_id_to_node_source_identifier_id.get(
+                serialized_edge["rangenode_id"]
+            )
+            if source_range_node_id:
+                serialized_edge["rangenode_id"] = source_range_node_id
+
+            serialized_edge["graph_id"] = serialized_source_graph["graphid"]
+
+        # update root node
+        serialized_draft_graph["root"]["graph_id"] = serialized_source_graph["graphid"]
+        serialized_draft_graph["root"]["nodeid"] = serialized_draft_graph["root"][
+            "source_identifier_id"
+        ]
+        serialized_draft_graph["root"]["source_identifier_id"] = None
+
+        # update graph data
+        serialized_draft_graph["graphid"] = serialized_source_graph["graphid"]
+        serialized_draft_graph["resource_instance_lifecycle_id"] = (
+            serialized_source_graph["resource_instance_lifecycle_id"]
+        )
+        serialized_draft_graph["source_identifier_id"] = None
+
+        # update permissions
+        serialized_draft_graph["group_permissions"] = {
+            key: value
+            for key, value in serialized_source_graph["group_permissions"].items()
+            if key in node_id_to_node_source_identifier_id.values()
+        }
+        serialized_draft_graph["user_permissions"] = {
+            key: value
+            for key, value in serialized_source_graph["user_permissions"].items()
+            if key in node_id_to_node_source_identifier_id.values()
+        }
+
+        serialized_draft_graph["relatable_resource_model_ids"] = [
+            (
+                serialized_source_graph["graphid"]
+                if relatable_resource_model_id == serialized_draft_graph["graphid"]
+                else relatable_resource_model_id
+            )
+            for relatable_resource_model_id in serialized_draft_graph[
+                "relatable_resource_model_ids"
             ]
+        ]
 
-            self.cards = {}
-            self.nodes = {}
-            self.edges = {}
-            self.widgets = {}
-
-            # BEGIN update related models
-            # Iterates over cards, nodes, and edges of the editable_future_graph. If the item
-            # has a `source_identifier` attribute, it represents an item related to the source
-            # graph ( the graph mapped to `self` ); we iterate over the item attributes and map
-            # them to source item. If the item does not have a `source_identifier` attribute, it
-            # has been newly created; we update the `graph_id` to match the source graph. We are
-            # not saving in this block so updates can accur in any order.
-            for future_widget in list(editable_future_graph.widgets.values()):
-                source_widget = future_widget.source_identifier
-
-                if future_widget.source_identifier_id:
-                    for key in vars(source_widget).keys():
-                        if key not in [
-                            "_state",
-                            "id",
-                            "node_id",
-                            "card_id",
-                            "source_identifier_id",
-                        ]:
-                            setattr(source_widget, key, getattr(future_widget, key))
-
-                    if future_widget.card.source_identifier_id:
-                        source_widget.card_id = future_widget.card.source_identifier_id
-                    if future_widget.node.source_identifier_id:
-                        source_widget.node_id = future_widget.node.source_identifier_id
-
-                    self.widgets[source_widget.pk] = source_widget
-                else:  # newly-created widget
-                    future_widget.source_identifier_id = None
-
-                    if future_widget.card.source_identifier_id:
-                        future_widget.card_id = future_widget.card.source_identifier_id
-                    if future_widget.node.source_identifier_id:
-                        future_widget.node_id = future_widget.node.source_identifier_id
-
-                    del editable_future_graph.widgets[future_widget.pk]
-                    self.widgets[future_widget.pk] = future_widget
-
-            for future_card in list(editable_future_graph.cards.values()):
-                future_card_nodegroup_node = models.Node.objects.get(
-                    pk=future_card.nodegroup.pk
-                )
-
-                if future_card.source_identifier:
-                    source_card = future_card.source_identifier
-
-                    for key in vars(source_card).keys():
-                        if key not in [
-                            "graph_id",
-                            "cardid",
-                            "nodegroup_id",
-                            "source_identifier_id",
-                        ]:
-                            if (
-                                key == "config"
-                                and str(future_card.component_id)
-                                == "2f9054d8-de57-45cd-8a9c-58bbb1619030"
-                            ):  # grouping card
-                                grouped_card_ids = []
-                                for grouped_card_id in future_card.config[
-                                    "groupedCardIds"
-                                ]:
-                                    grouped_card = Card.objects.get(pk=grouped_card_id)
-                                    grouped_card_ids.append(
-                                        str(grouped_card.source_identifier_id)
-                                    )
-
-                                source_card.config["groupedCardIds"] = grouped_card_ids
-
-                                sorted_widget_ids = []
-                                for node_id in future_card.config["sortedWidgetIds"]:
-                                    sorted_widget = models.Node.objects.get(pk=node_id)
-                                    sorted_widget_ids.append(
-                                        str(sorted_widget.source_identifier_id)
-                                    )
-
-                                source_card.config["sortedWidgetIds"] = (
-                                    sorted_widget_ids
-                                )
-                            else:
-                                setattr(source_card, key, getattr(future_card, key))
-
-                    source_card.nodegroup_id = future_card_nodegroup_node.nodegroup_id
-                    if future_card_nodegroup_node.source_identifier_id:
-                        source_card.nodegroup_id = (
-                            future_card_nodegroup_node.source_identifier_id
-                        )
-
-                    self.cards[source_card.pk] = source_card
-                else:  # newly-created card
-                    future_card.graph_id = self.pk
-                    future_card.source_identifier_id = None
-
-                    future_card.nodegroup_id = future_card_nodegroup_node.nodegroup_id
-                    if future_card_nodegroup_node.source_identifier_id:
-                        future_card.nodegroup_id = (
-                            future_card_nodegroup_node.source_identifier_id
-                        )
-
-                    del editable_future_graph.cards[future_card.pk]
-                    self.cards[future_card.pk] = future_card
-
-                _update_source_nodegroup_hierarchy(future_card.nodegroup)
-
-            for future_edge in list(editable_future_graph.edges.values()):
-                if future_edge.source_identifier_id:
-                    source_edge = future_edge.source_identifier
-
-                    for key in vars(source_edge).keys():
-                        if key not in [
-                            "domainnode_id",
-                            "edgeid",
-                            "graph_id",
-                            "rangenode_id",
-                            "source_identifier_id",
-                        ]:
-                            setattr(source_edge, key, getattr(future_edge, key))
-
-                    source_edge.domainnode_id = future_edge.domainnode_id
-                    if future_edge.domainnode.source_identifier:
-                        source_edge.domainnode_id = (
-                            future_edge.domainnode.source_identifier.pk
-                        )
-
-                    source_edge.rangenode_id = future_edge.rangenode_id
-                    if future_edge.rangenode.source_identifier:
-                        source_edge.rangenode_id = (
-                            future_edge.rangenode.source_identifier.pk
-                        )
-
-                    self.edges[source_edge.pk] = source_edge
-                else:  # newly-created edge
-                    future_edge.graph_id = self.pk
-                    future_edge.source_identfier_id = None
-
-                    if future_edge.domainnode.source_identifier_id:
-                        future_edge.domainnode_id = (
-                            future_edge.domainnode.source_identifier_id
-                        )
-
-                    if future_edge.rangenode.source_identifier_id:
-                        future_edge.rangenode_id = (
-                            future_edge.rangenode.source_identifier_id
-                        )
-
-                    del editable_future_graph.edges[future_edge.pk]
-                    self.edges[future_edge.pk] = future_edge
-
-            for future_node in list(editable_future_graph.nodes.values()):
-                future_node_nodegroup_node = (
-                    models.Node.objects.get(pk=future_node.nodegroup.pk)
-                    if future_node.nodegroup
-                    else None
-                )
-
-                if future_node.source_identifier:
-                    source_node = future_node.source_identifier
-
-                    for key in vars(source_node).keys():
-                        if key not in [
-                            "graph_id",
-                            "nodeid",
-                            "nodegroup_id",
-                            "source_identifier_id",
-                            "is_collector",
-                        ]:
-                            setattr(source_node, key, getattr(future_node, key))
-
-                    source_node.nodegroup_id = future_node.nodegroup_id
-                    if (
-                        future_node_nodegroup_node
-                        and future_node_nodegroup_node.source_identifier_id
-                    ):
-                        source_node.nodegroup_id = (
-                            future_node_nodegroup_node.source_identifier_id
-                        )
-
-                    self.nodes[source_node.pk] = source_node
-                else:  # newly-created node
-                    future_node.graph_id = self.pk
-                    future_node.source_identifier_id = None
-
-                    if (
-                        future_node_nodegroup_node
-                        and future_node_nodegroup_node.source_identifier_id
-                    ):
-                        future_node.nodegroup_id = (
-                            future_node_nodegroup_node.source_identifier_id
-                        )
-
-                    del editable_future_graph.nodes[future_node.pk]
-                    self.nodes[future_node.pk] = future_node
-
-                _update_source_nodegroup_hierarchy(future_node.nodegroup)
-            # END update related models
-
-            # BEGIN copy attrs from editable_future_graph to source_graph
-            for key, value in vars(editable_future_graph).items():
-                if key not in [
-                    "_state",
-                    "graphid",
-                    "cards",
-                    "nodes",
-                    "edges",
-                    "widgets",
-                    "root",
-                    "source_identifier",
-                    "source_identifier_id",
-                    "resource_instance_lifecycle",
-                    "resource_instance_lifecycle_id",
-                    "publication_id",
-                    "_nodegroups_to_delete",
-                    "_functions",
-                    "_card_constraints",
-                    "_constraints_x_nodes",
-                    "serialized_graph",
-                ]:
-                    setattr(self, key, value)
-
-            self.root = self.nodes[self.root.pk]
-            # END copy attrs from editable_future_graph to source_graph
-
-            # BEGIN delete superflous models
-            # Compares UUIDs between models related to the source graph and models related to
-            # the editable_future_graph. If the item related to the source graph exists, but the item
-            # related to the editable_future_graph does not exist, the item related to the source graph
-            # should be deleted.
-            updated_card_ids = [
-                str(card.source_identifier_id)
-                for card in editable_future_graph.cards.values()
-            ]
-            updated_node_ids = [
-                str(node.source_identifier_id)
-                for node in editable_future_graph.nodes.values()
-            ]
-            updated_edge_ids = [
-                str(edge.source_identifier_id)
-                for edge in editable_future_graph.edges.values()
-            ]
-            updated_widget_ids = [
-                str(widget.pk) for widget in editable_future_graph.widgets.values()
-            ]
-
-            updated_node_ids.append(str(self.root.pk))
-
-            for previous_widget_id in previous_widget_ids:
-                if previous_widget_id not in updated_widget_ids:
-                    try:
-                        widget = models.CardXNodeXWidget.objects.get(
-                            pk=previous_widget_id
-                        )
-                        widget.delete()
-                    except ObjectDoesNotExist:  # already deleted
-                        pass
-
-            for previous_card_id in previous_card_ids:
-                if previous_card_id not in updated_card_ids:
-                    try:
-                        card = models.CardModel.objects.get(pk=previous_card_id)
-                        card.delete()
-                    except ObjectDoesNotExist:  # already deleted
-                        pass
-
-            for previous_node_id in previous_node_ids:
-                if previous_node_id not in updated_node_ids:
-                    try:
-                        node = models.Node.objects.get(pk=previous_node_id)
-                        node.delete()
-                    except ObjectDoesNotExist:  # already deleted
-                        pass
-
-            for previous_edge_id in previous_edge_ids:
-                if previous_edge_id not in updated_edge_ids:
-                    try:
-                        edge = models.Edge.objects.get(pk=previous_edge_id)
-                        edge.delete()
-                    except ObjectDoesNotExist:  # already deleted
-                        pass
-
-            for previous_nodegroup_id in previous_nodegroup_ids:
-                try:
-                    node = models.Node.objects.get(pk=previous_nodegroup_id)
-                except (
-                    ObjectDoesNotExist
-                ):  # node has been moved, therefore empty Nodegroup
-                    nodegroup = models.NodeGroup.objects.get(pk=previous_nodegroup_id)
-                    nodegroup.delete()
-            # END delete superflous models
-
-            # BEGIN save related models
-            # save order is _very_ important!
-            for widget in editable_future_graph.widgets.values():
-                widget.delete()
-            for widget in self.widgets.values():
-                try:
-                    widget_from_database = models.CardXNodeXWidget.objects.get(
-                        card_id=widget.card_id,
-                        node_id=widget.node_id,
-                        widget_id=widget.widget_id,
-                    )
-                    widget_from_database.delete()
-                except models.CardXNodeXWidget.DoesNotExist:
-                    pass
-
-                widget.save()
-
-            for card in editable_future_graph.cards.values():
-                card.delete()
-            for card in self.cards.values():
-                card.save()
-
-            for edge in editable_future_graph.edges.values():
-                edge.delete()
-            for edge in self.edges.values():
-                edge.save()
-
-            for node in editable_future_graph.nodes.values():
-                node.delete()
-            for node in self.nodes.values():
-                node.save()
-            # END save related models
-
-            self.save(validate=False)
-
-            # This ensures essential objects that have been re-assigned to the `source_graph`
-            # are NOT deleted via waterfall deletion when the `editable_future_graph` is deleted.
-            editable_future_graph.cards = {}
-            editable_future_graph.nodes = {}
-            editable_future_graph.edges = {}
-            editable_future_graph.widgets = {}
-
-            editable_future_graph.delete()
-
-            graph_from_database = type(self).objects.get(
-                pk=self.pk
-            )  # returns an updated copy of self
-            graph_from_database.create_editable_future_graph()
-
-            return graph_from_database
-
-    def revert(self):
-        """
-        Reverts a Graph's editable_future_graph to represent the source,
-        discarding all changes
-        """
-        self.has_unpublished_changes = False
-        self.save()
-
-        self.create_editable_future_graph()
+        return self.restore_state_from_serialized_graph(serialized_draft_graph)
 
     def restore_state_from_serialized_graph(self, serialized_graph):
         """
         Restores a Graph's state from a serialized graph, and creates a
-        new editable_future_graph
+        new draft_graph
         """
-        models.NodeGroup.objects.filter(
-            pk__in=[
-                nodegroup.pk
-                for nodegroup in self.get_nodegroups(force_recalculation=True)
-            ]
-        ).delete()
-        models.Node.objects.filter(
-            pk__in=[node.pk for node in self.nodes.values()]
-        ).delete()
-        models.Edge.objects.filter(
-            pk__in=[edge.pk for edge in self.edges.values()]
-        ).delete()
-        models.CardModel.objects.filter(
-            pk__in=[card.pk for card in self.cards.values()]
-        ).delete()
-        models.CardXNodeXWidget.objects.filter(
-            pk__in=[
-                card_x_node_x_widget.pk
-                for card_x_node_x_widget in self.widgets.values()
-            ]
-        ).delete()
+        with transaction.atomic():
+            draft_graph = Graph.objects.filter(source_identifier_id=self.pk).first()
+            if draft_graph:
+                draft_graph.delete()
 
-        for serialized_nodegroup in serialized_graph["nodegroups"]:
-            for key, value in serialized_nodegroup.items():
-                try:
-                    serialized_nodegroup[key] = uuid.UUID(value)
-                except:
-                    pass
+            self.delete_associated_entities()
 
-            nodegroup = models.NodeGroup(**serialized_nodegroup)
-            nodegroup.save()
+            for serialized_nodegroup in serialized_graph["nodegroups"]:
+                for key, value in serialized_nodegroup.items():
+                    try:
+                        serialized_nodegroup[key] = uuid.UUID(value)
+                    except:
+                        pass
 
-        for serialized_node in serialized_graph["nodes"]:
-            for key, value in serialized_node.items():
-                try:
-                    serialized_node[key] = uuid.UUID(value)
-                except:
-                    pass
+                nodegroup = models.NodeGroup(**serialized_nodegroup)
+                nodegroup.save()
 
-            del serialized_node["is_collector"]
-            del serialized_node["parentproperty"]
+            for serialized_node in serialized_graph["nodes"]:
+                for key, value in serialized_node.items():
+                    try:
+                        serialized_node[key] = uuid.UUID(value)
+                    except:
+                        pass
 
-            node = models.Node(**serialized_node)
-            node.save()
+                del serialized_node["is_collector"]
+                del serialized_node["parentproperty"]
 
-        for serialized_edge in serialized_graph["edges"]:
-            for key, value in serialized_edge.items():
-                try:
-                    serialized_edge[key] = uuid.UUID(value)
-                except:
-                    pass
+                node = models.Node(**serialized_node)
+                node.save()
 
-            edge = models.Edge(**serialized_edge)
-            edge.save()
+            for serialized_edge in serialized_graph["edges"]:
+                for key, value in serialized_edge.items():
+                    try:
+                        serialized_edge[key] = uuid.UUID(value)
+                    except:
+                        pass
 
-        for serialized_card in serialized_graph["cards"]:
-            for key, value in serialized_card.items():
-                try:
-                    serialized_card[key] = uuid.UUID(value)
-                except:
-                    pass
+                edge = models.Edge(**serialized_edge)
+                edge.save()
 
-            del serialized_card["constraints"]
+            for serialized_card in serialized_graph["cards"]:
+                for key, value in serialized_card.items():
+                    try:
+                        serialized_card[key] = uuid.UUID(value)
+                    except:
+                        pass
 
-            if "is_editable" in serialized_card:
-                del serialized_card["is_editable"]
+                del serialized_card["constraints"]
 
-            card = Card(**serialized_card)
-            card.save()
+                if "is_editable" in serialized_card:
+                    del serialized_card["is_editable"]
 
-        widget_dict = {}
-        for serialized_widget in serialized_graph.get(
-            "widgets", serialized_graph.get("cards_x_nodes_x_widgets")
-        ):
-            for key, value in serialized_widget.items():
-                try:
-                    serialized_widget[key] = uuid.UUID(value)
-                except:
-                    pass
+                card = Card(**serialized_card)
+                card.save()
 
-            updated_widget = models.CardXNodeXWidget(**serialized_widget)
-            updated_widget.save()
+            widget_dict = {}
+            for serialized_widget in serialized_graph.get(
+                "widgets", serialized_graph.get("cards_x_nodes_x_widgets")
+            ):
+                for key, value in serialized_widget.items():
+                    try:
+                        serialized_widget[key] = uuid.UUID(value)
+                    except:
+                        pass
 
-            widget_dict[updated_widget.pk] = updated_widget
+                updated_widget = models.CardXNodeXWidget(**serialized_widget)
+                updated_widget.save()
 
-        updated_graph = Graph(serialized_graph)
-        updated_graph.widgets = widget_dict
-        updated_graph.is_active = self.is_active
+                widget_dict[updated_widget.pk] = updated_widget
 
-        updated_graph.save()
-        updated_graph.create_editable_future_graph()
+            updated_graph = Graph(serialized_graph)
+            updated_graph.widgets = widget_dict
+            updated_graph.is_active = self.is_active
 
-        return Graph.objects.get(pk=updated_graph.pk)
+            updated_graph.update_permissions_from_serialized_graph(serialized_graph)
+
+            relatable_resource_model_nodes = models.Node.objects.filter(
+                graph_id__in=serialized_graph["relatable_resource_model_ids"],
+                istopnode=True,
+            )
+            updated_graph.root.set_relatable_resources(
+                list(
+                    {
+                        node.source_identifier.pk if node.source_identifier else node.pk
+                        for node in relatable_resource_model_nodes
+                    }
+                )
+            )
+
+            updated_graph.has_unpublished_changes = False
+            updated_graph.save(validate=False)
+
+            updated_graph.create_draft_graph()
+
+            return Graph.objects.get(pk=updated_graph.pk)
 
     def publish(self, user=None, notes=None):
         """
         Adds a corresponding entry to the GraphXPublishedGraph table,
         and creates a PublishedGraph entry for every active language
         """
-        self.publication = None
+        if self.source_identifier_id:
+            raise RuntimeError("Publishing a draft_graph is prohibited.")
+
+        self.refresh_from_database()
 
         with transaction.atomic():
             publication = models.GraphXPublishedGraph.objects.create(
@@ -2937,7 +2643,7 @@ class Graph(models.GraphModel):
             self.publication = publication
             self.has_unpublished_changes = False
 
-            self.save(validate=False)
+            super().save()  # avoids side-effects from `Graph.save`
 
             for language_tuple in settings.LANGUAGES:
                 language = models.Language.objects.get(code=language_tuple[0])

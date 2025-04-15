@@ -5,7 +5,6 @@ from arches.app.utils import import_class_from_string
 from django.utils.translation import gettext_lazy as _
 from django.db.migrations.serializer import BaseSerializer, Serializer
 from django.db.models import JSONField
-from django.db.models.functions.comparison import Cast
 from django.db.models.sql import Query
 from django.db.models.sql.compiler import SQLInsertCompiler
 from django.db.models.sql.where import NothingNode
@@ -58,7 +57,7 @@ class I18n_String(NothingNode):
         """
         The "as_sql" method of this class is called by Django when the sql statement
         for each field in a model instance is being generated.
-        If we're inserting a new value then we can just set the localzed column to the json object.
+        If we're inserting a new value then we can just set the localized column to the json object.
         If we're updating a value for a specific language, then use the postgres "jsonb_set" command to do that
         https://www.postgresql.org/docs/9.5/functions-json.html
         """
@@ -223,9 +222,11 @@ class I18n_TextField(JSONField):
         return I18n_String(value, attname=self.attname, use_nulls=self.use_nulls)
 
     def get_db_prep_save(self, value, connection):
-        """Override to avoid the optimization from Django 4.2 that
-        immediately returns `value` if it is None."""
-        return self.get_db_prep_value(value, connection)
+        if isinstance(value, (str, I18n_String)) or value is None:
+            return self.get_prep_value(value)
+        # ORM expressions should go through super().get_db_prep_save().
+        # Plain dicts don't need transforming either.
+        return super().get_db_prep_save(value, connection)
 
 
 class I18n_JSON(NothingNode):
@@ -242,19 +243,6 @@ class I18n_JSON(NothingNode):
     def _parse(self, value, lang, use_nulls):
         ret = {}
 
-        if isinstance(value, Cast):
-            # Django 4.2 regression: bulk_update() sends Cast expressions
-            # https://code.djangoproject.com/ticket/35167
-            values = set(
-                case.result.value for case in value.source_expressions[0].cases
-            )
-            value = list(values)[0]
-            if len(values) > 1:
-                # Prevent silent data loss.
-                raise NotImplementedError(
-                    "Heterogenous values provided to I18n_JSON field bulk_update():\n"
-                    f"{tuple(str(v) for v in values)}"
-                )
         if isinstance(value, str):
             try:
                 ret = json.loads(value)
@@ -296,16 +284,19 @@ class I18n_JSON(NothingNode):
         else:
             # Forbid dangerous values.
             sanitizer = Query(model=None)
-            for prop in self.raw_value:
+            for prop in (self.attname, *self.raw_value):
+                if prop is None:
+                    continue
                 if "%" in prop:
                     raise ValueError
                 sanitizer.check_alias(prop)
 
             params = []
+            sql = "'{}'::jsonb"
             if self.function is not None:
                 clss = import_class_from_string(self.function)()
                 sql = clss.i18n_as_sql(self, compiler, connection)
-            else:
+            elif self.attname:
                 sql = self.attname
                 for prop, value in self.raw_value.items():
                     escaped_value = (
@@ -325,7 +316,7 @@ class I18n_JSON(NothingNode):
             # If on the other hand the root keys are different, then we assume that we can
             # just completely overwrite the saved object with our new json object
             sql = f"""
-                CASE WHEN {self.attname} ?& ARRAY{list(self.raw_value.keys())}
+                CASE WHEN {self.attname or "'{}'::jsonb"} ?& ARRAY{list(self.raw_value.keys())}
                 THEN {sql}
                 ELSE %s
                 END
@@ -451,15 +442,16 @@ class I18n_JSONField(JSONField):
 
     def get_prep_value(self, value):
         """
-        Perpares the value for insertion into the database
+        Prepares the value for insertion into the database
         """
 
         return I18n_JSON(value, attname=self.attname)
 
     def get_db_prep_save(self, value, connection):
-        """Override to avoid the optimization from Django 4.2 that
-        immediately returns `value` if it is None."""
-        return self.get_db_prep_value(value, connection)
+        if isinstance(value, (str, dict)):
+            return self.get_prep_value(value)
+        # ORM expressions should go through super().get_db_prep_save().
+        return super().get_db_prep_save(value, connection)
 
 
 # Register a lighter-weight serializer sufficient for generating migrations.

@@ -555,8 +555,9 @@ class ImportSingleCsv(BaseImportModule):
                                 nodegroup_depth,
                                 source_description,
                                 operation,
-                                passes_validation
-                            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                                passes_validation,
+                                sortorder
+                            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                             (
                                 nodegroup,
                                 legacyid,
@@ -568,6 +569,7 @@ class ImportSingleCsv(BaseImportModule):
                                 csv_file_name,
                                 "insert",
                                 passes_validation,
+                                0,
                             ),
                         )
 

@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             reverse_sql="select 1;",
         ),
         migrations.RunSQL(
-            sql="update resource_instances a set principaluser_id = b.userid::integer from (select userid, resourceinstanceid from edit_log where edittype = 'create' and userid != '' and userid is not null)b where a.resourceinstanceid::text = b.resourceinstanceid",
+            sql="update resource_instances a set principaluser_id = b.userid::integer from (select userid, resourceinstanceid from edit_log where edittype = 'create' and userid != '' and userid is not null)b where a.resourceinstanceid::text = b.resourceinstanceid and b.userid::integer in (select id from auth_user)",
             reverse_sql="select 1;",
         ),
         # Moved from 10799_geojsongeometry_featureid in 7.6.2
