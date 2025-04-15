@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "10437_node_alias_not_null"),
+        ("models", "11842_userpreferences"),
     ]
 
     forward = """
