@@ -34,7 +34,10 @@ class BulkTileOperation:
         self.entry = entry  # resource or tile
         self.user = user
         self.datatype_factory = DataTypeFactory()
-        self.request = save_kwargs.pop("request")
+        self.request = request
+        if not self.request:
+            self.request = HttpRequest()
+            self.request.user = user
         self.save_kwargs = save_kwargs or {}
         self.transaction_id = uuid.uuid4()
 

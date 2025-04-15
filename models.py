@@ -95,20 +95,14 @@ class SemanticResource(ResourceInstance):
             user=user, edit_type=edit_type, transaction_id=transaction_id
         )
 
-    def save(self, index=False, user=None, **kwargs):
+    def save(self, *, user=None, request=None, index=False, **kwargs):
         with transaction.atomic():
-            self._save_aliased_data(user=user, index=index, **kwargs)
-
-    def clean(self):
-        """Raises a compound ValidationError with any failing tile values."""
-        # Might be able to remove graph_nodes if we can just deal with grouping_node.
-        bulk_operation = BulkTileOperation(entry=self, resource=self)
-        bulk_operation.validate()
+            self._save_aliased_data(user=user, request=request, index=index, **kwargs)
 
     def save_without_related_objects(self, **kwargs):
         return super().save(**kwargs)
 
-    def _save_aliased_data(self, user=None, index=False, **kwargs):
+    def _save_aliased_data(self, *, user=None, request=None, index=False, **kwargs):
         """Raises a compound ValidationError with any failing tile values.
 
         It's not exactly idiomatic for a Django project to clean()
@@ -117,7 +111,9 @@ class SemanticResource(ResourceInstance):
             - the node values are phantom fields.
             - we have other entry points besides DRF.
         """
-        bulk_operation = BulkTileOperation(entry=self, user=user, save_kwargs=kwargs)
+        bulk_operation = BulkTileOperation(
+            entry=self, user=user, request=request, save_kwargs=kwargs
+        )
         bulk_operation.run()
 
         self.refresh_from_db(
@@ -216,11 +212,11 @@ class SemanticTile(TileModel):
         ).annotate(_nodegroup_alias=models.Value(entry_node_alias))
         # TODO: determine if this annotation still needed / remove
 
-    def save(self, index=False, user=None, **kwargs):
+    def save(self, *, user=None, request=None, index=False, **kwargs):
         with transaction.atomic():
             if self.sortorder is None or self.is_fully_provisional():
                 self.set_next_sort_order()
-            self._save_aliased_data(user=user, index=index, **kwargs)
+            self._save_aliased_data(user=user, request=request, index=index, **kwargs)
 
     def save_without_related_objects(self, **kwargs):
         return super().save(**kwargs)
@@ -231,8 +227,10 @@ class SemanticTile(TileModel):
         save_kwargs = {**kwargs, "update_fields": set()}
         return super().save(**save_kwargs)
 
-    def _save_aliased_data(self, *, user=None, index=False, **kwargs):
-        bulk_operation = BulkTileOperation(entry=self, user=user, save_kwargs=kwargs)
+    def _save_aliased_data(self, *, user=None, request=None, index=False, **kwargs):
+        bulk_operation = BulkTileOperation(
+            entry=self, user=user, request=request, save_kwargs=kwargs
+        )
         bulk_operation.run()
 
         # TODO: add unique constraint for TileModel re: sortorder
