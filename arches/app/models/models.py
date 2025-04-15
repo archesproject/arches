@@ -1241,39 +1241,39 @@ class ResourceXResource(SaveSupportsBlindOverwriteMixin, models.Model):
     resourcexid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, db_default=UUID4()
     )
-    resourceinstancefrom = models.ForeignKey(
+    from_resource = models.ForeignKey(
         "ResourceInstance",
         db_column="resourceinstanceidfrom",
         blank=True,
         null=True,
-        related_name="resxres_from",
+        related_name="from_resxres",
         on_delete=models.CASCADE,
         db_constraint=False,
     )
-    resourceinstancefrom_graph = models.ForeignKey(
+    from_resource_graph = models.ForeignKey(
         "GraphModel",
         db_column="resourceinstancefrom_graphid",
         blank=True,
         null=True,
-        related_name="resxres_from",
+        related_name="from_resxres",
         on_delete=models.CASCADE,
         db_constraint=False,
     )
-    resourceinstanceto = models.ForeignKey(
+    to_resource = models.ForeignKey(
         "ResourceInstance",
         db_column="resourceinstanceidto",
         blank=True,
         null=True,
-        related_name="resxres_to",
+        related_name="to_resxres",
         on_delete=models.CASCADE,
         db_constraint=False,
     )
-    resourceinstanceto_graph = models.ForeignKey(
+    to_resource_graph = models.ForeignKey(
         "GraphModel",
         db_column="resourceinstanceto_graphid",
         blank=True,
         null=True,
-        related_name="resxres_to",
+        related_name="to_resxres",
         on_delete=models.CASCADE,
         db_constraint=False,
     )
