@@ -199,10 +199,8 @@ def resource_instance_transform_value_for_tile(self, value, **kwargs):
             graph_config = {}
         return {
             "resourceId": uuid_string,
-            "ontologyProperty": graph_config.get("ontologyProperty", None),
-            "inverseOntologyProperty": graph_config.get(
-                "inverseOntologyProperty", None
-            ),
+            "ontologyProperty": graph_config.get("ontologyProperty", ""),
+            "inverseOntologyProperty": graph_config.get("inverseOntologyProperty", ""),
         }
 
     try:
