@@ -2,25 +2,39 @@
 {% load i18n %}
 
 <!-- Sort Results Selector-->
-<select 
-    style="text-align-last:unset;" 
-    data-bind="
-        options: [
-            {'id':'', 'name':$root.translations.unsorted}, 
-            {'id':'asc', 'name':$root.translations.ascending}, 
-            {'id':'desc', 'name':$root.translations.descending}
-        ],
-        optionsText: 'name', 
-        optionsValue: 'id',
-        select2Query: {
-            select2Config:{
-                value: filter,
-                allowClear: false,
-                minimumResultsForSearch: -1
-        }},
+<form autocomplete="off" class="search-dropdowns-container">
+    <button class="sort-btn" data-bind="
+        html: sortSymbol,
+        click: function() {
+            sortOrder(sortOrder() === 'asc' ? 'desc' : 'asc');
+        },
+        visible: sortBy() !== '',
         attr: {
-            'data-label': $root.translations.sortSearchResults
+            'aria-label': sortOrder() === 'asc' ? $root.translations.descending : $root.translations.ascending
         }
-    ">
-</select>
+    "></button>
+    <div class="search-dropdown">
+        <select data-bind="
+            options: [
+                {'id':'', 'name': $root.translations.unsorted},
+                {'id':'resource_name', 'name':$root.translations.resourceName}, 
+                {'id':'date_created', 'name':$root.translations.dateCreated}, 
+                {'id':'date_last_edited', 'name':$root.translations.dateEdited},
+            ],
+            optionsText: 'name', 
+            optionsValue: 'id',
+            value: sortBy,
+            select2Query: {
+                select2Config:{
+                    value: sortBy,
+                    allowClear: false,
+                    minimumResultsForSearch: -1
+                }},
+                attr: {
+                    'data-label': $root.translations.sortSearchResults
+                }
+                ">
+        </select>
+    </div>
+<form autocomplete="off"></form>
 <!-- End Sort Results Selector-->

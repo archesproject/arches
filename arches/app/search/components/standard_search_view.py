@@ -209,6 +209,13 @@ class StandardSearchView(BaseSearchView):
         sorted_query_obj = search_filter_factory.create_search_query_dict(
             list(self.request.GET.items()) + list(self.request.POST.items())
         )
+
+        if sorted_query_obj.get("sort-by", ""):
+            sorted_query_obj["sort-results"] = {
+                "sort_by": sorted_query_obj.get("sort-by", ""),
+                "sort_order": sorted_query_obj.get("sort-order", "asc"),
+            }
+
         permitted_nodegroups = get_permitted_nodegroups(self.request.user)
         include_provisional = get_provisional_type(self.request)
         try:

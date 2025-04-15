@@ -23,8 +23,7 @@ class ArchesAppConfig(AppConfig):
         import arches.app.signals
 
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "arches.settings")
-        if settings.APP_NAME.lower() == self.name:
-            generate_frontend_configuration()
+        generate_frontend_configuration()
 
 
 if settings.FILE_TYPE_CHECKING not in (None, "lenient", "strict"):

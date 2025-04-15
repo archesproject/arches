@@ -281,6 +281,8 @@ def prepare_search_index(create=False):
                         "provisional": {"type": "boolean"},
                     },
                 },
+                "date_created": {"type": "keyword"},
+                "date_last_edited": {"type": "keyword"},
             },
         },
     }
