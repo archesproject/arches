@@ -21,6 +21,8 @@ class Command(BaseCommand):  # pragma: no cover
             "This will replace the following files in your project:\n"
             "  - <project>/apps.py\n"
             "  - .github/workflows/main.yml\n"
+            "  - tsconfig.json\n"
+            "  - vitest.config.mts\n"
             "  - webpack/webpack-utils/build-filepath-lookup.js\n"
             "  - webpack/webpack.common.js\n"
             "  - webpack/webpack.config.dev.js\n"
@@ -104,6 +106,20 @@ from arches.settings_utils import generate_frontend_configuration"""
                 settings.ROOT_DIR, "install", "arches-templates", "tsconfig.json"
             ),
             os.path.join(settings.APP_ROOT, "..", "tsconfig.json"),
+        )
+        self.stdout.write("Done!")
+
+        # Replaces vitest.config.mts
+        self.stdout.write("Updating vitest.config.mts...")
+
+        if os.path.exists(os.path.join(settings.APP_ROOT, "..", "vitest.config.mts")):
+            os.remove(os.path.join(settings.APP_ROOT, "..", "vitest.config.mts"))
+
+        shutil.copy2(
+            os.path.join(
+                settings.ROOT_DIR, "install", "arches-templates", "vitest.config.mts"
+            ),
+            os.path.join(settings.APP_ROOT, "..", "vitest.config.mts"),
         )
         self.stdout.write("Done!")
 
