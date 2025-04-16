@@ -1,6 +1,4 @@
 from copy import deepcopy
-from functools import lru_cache
-
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
@@ -235,9 +233,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return ret
 
     @staticmethod
-    @lru_cache(maxsize=1)
     def get_nodegroup_aliases():
-        # TODO: uncache this.
         return {
             node.pk: node.alias
             for node in Node.objects.filter(pk=F("nodegroup_id")).only("alias")
