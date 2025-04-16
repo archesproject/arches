@@ -378,7 +378,6 @@ module.exports = () => {
                     {
                         test: /\.css$/,
                         exclude: [
-                            /node_modules/,
                             Path.resolve(__dirname, APP_ROOT, 'media', 'css'),
                             Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'css'),
                             ...archesApplicationsCSSFilepaths

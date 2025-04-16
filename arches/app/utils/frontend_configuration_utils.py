@@ -178,7 +178,7 @@ def _generate_tsconfig_paths():
             "paths": {
                 "@/arches/*": [
                     os.path.join(
-                        ".",
+                        "..",
                         os.path.relpath(
                             root_dir_path,
                             os.path.join(base_path, ".."),
@@ -192,7 +192,7 @@ def _generate_tsconfig_paths():
                 **{
                     os.path.join("@", path_name, "*"): [
                         os.path.join(
-                            ".",
+                            "..",
                             os.path.relpath(path, os.path.join(base_path, "..")),
                             "src",
                             path_name,
@@ -201,7 +201,7 @@ def _generate_tsconfig_paths():
                     ]
                     for path_name, path in path_lookup.items()
                 },
-                "*": ["./node_modules/*"],
+                "*": ["../node_modules/*"],
             }
         },
     }
