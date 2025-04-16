@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "11579_ids_search_filter"),
+        ("models", "11873_model_ordering"),
     ]
 
     operations = [
