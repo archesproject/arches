@@ -19,6 +19,8 @@ function generateConfig(): Promise<UserConfig> {
             '**/cypress/**',
             '**/.{idea,git,cache,output,temp}/**',
             '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
+            '**/build/**',
+            '**/staticfiles/**',
         ];
 
         const rawData = fs.readFileSync(path.join(__dirname, 'frontend_configuration', 'webpack-metadata.json'), 'utf-8');

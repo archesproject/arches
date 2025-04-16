@@ -21,6 +21,8 @@
         "allowImportingTsExtensions": true
     },
     "exclude": [
-        "**/*.test.ts"
+        "**/*.test.ts",
+        "**/build/**",
+        "**/staticfiles/**",
     ]
 }
