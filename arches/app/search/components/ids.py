@@ -1,6 +1,6 @@
 from arches.app.search.elasticsearch_dsl_builder import Bool, Ids
 from arches.app.search.components.base import BaseSearchFilter
-import json
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
 
 details = {
     "searchcomponentid": "f1856bfb-c3c4-4d67-8f23-0aa3eef3a160",
@@ -19,8 +19,10 @@ class IdsFilter(BaseSearchFilter):
 
     def append_dsl(self, search_query_object, **kwargs):
         ids = kwargs.get("querystring", None)
-        if isinstance(ids, str):
-            ids = json.loads(ids)
+        try:
+            ids = JSONDeserializer().deserialize(ids)
+        except:
+            pass
         if isinstance(ids, list) and len(ids):
             ids_query = Bool()
             ids_query.must(Ids(ids=ids))
