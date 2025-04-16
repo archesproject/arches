@@ -4,10 +4,10 @@ from arches.app.utils.betterJSONSerializer import JSONDeserializer
 
 details = {
     "searchcomponentid": "f1856bfb-c3c4-4d67-8f23-0aa3eef3a160",
-    "name": "Ids Filter",
+    "name": "ResourceIds Filter",
     "icon": "",
     "modulename": "ids.py",
-    "classname": "IdsFilter",
+    "classname": "ResourceIdsFilter",
     "type": "ids-filter-type",
     "componentpath": "",
     "componentname": "ids",
@@ -15,7 +15,7 @@ details = {
 }
 
 
-class IdsFilter(BaseSearchFilter):
+class ResourceIdsFilter(BaseSearchFilter):
 
     def append_dsl(self, search_query_object, **kwargs):
         ids = kwargs.get("querystring", None)
