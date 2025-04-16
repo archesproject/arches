@@ -356,6 +356,8 @@ class SemanticResourceQuerySet(models.QuerySet):
 
     def with_related_resource_display_names(self):
         # Future: consider exposing nodegroups param.
+        if arches_version >= "8":
+            return self.prefetch_related("from_resxres__to_resource")
         return self.prefetch_related(
             "resxres_resource_instance_ids_from__resourceinstanceidto"
         )

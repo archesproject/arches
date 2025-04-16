@@ -11,6 +11,7 @@ import uuid
 
 from django.utils.translation import get_language, gettext as _
 
+from arches import __version__ as arches_version
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -35,16 +36,28 @@ def resource_instance_list_to_json(self, tile, node):
             continue
         copy = {**inner_val}
         lang = get_language()
-        for rxr in tile._enriched_resource.resxres_resource_instance_ids_from.all():
-            if rxr.resourceinstanceidto_id == uuid.UUID(inner_val["resourceId"]):
-                if not rxr.resourceinstanceidto:
-                    msg = f"Missing ResourceXResource target: {rxr.resourceinstanceidto_id}"
-                    logger.warning(msg)
-                    copy["display_value"] = _("Missing")
+        if arches_version >= "8":
+            for rxr in tile._enriched_resource.from_resxres.all():
+                if rxr.to_resource_id == uuid.UUID(inner_val["resourceId"]):
+                    if not rxr.to_resource:
+                        msg = f"Missing ResourceXResource target: {rxr.to_resource_id}"
+                        logger.warning(msg)
+                        copy["display_value"] = _("Missing")
+                        break
+                    display_val = rxr.to_resource.descriptors[lang]["name"]
+                    copy["display_value"] = display_val
                     break
-                display_val = rxr.resourceinstanceidto.descriptors[lang]["name"]
-                copy["display_value"] = display_val
-                break
+        else:
+            for rxr in tile._enriched_resource.from_resxres.all():
+                if rxr.resourceinstanceidto_id == uuid.UUID(inner_val["resourceId"]):
+                    if not rxr.resourceinstanceidto:
+                        msg = f"Missing ResourceXResource target: {rxr.resourceinstanceidto_id}"
+                        logger.warning(msg)
+                        copy["display_value"] = _("Missing")
+                        break
+                    display_val = rxr.resourceinstanceidto.descriptors[lang]["name"]
+                    copy["display_value"] = display_val
+                    break
         ret.append(copy)
 
     return ret
