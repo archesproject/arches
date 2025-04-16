@@ -55,12 +55,11 @@ const issuePatchItem = async () => {
 
 <style scoped>
 .guide-container {
-    margin: 1rem 1rem 4rem 1rem;
+    margin: 1rem 1rem 4rem 2rem;
     display: flex;
     flex-direction: column;
     gap: 0;
     width: 100%;
-    font-size: small;
 }
 
 .guide-container h4 {
@@ -95,6 +94,5 @@ h4 {
 p {
     font-weight: normal;
     margin-top: 0;
-    font-size: 1.2rem;
 }
 </style>

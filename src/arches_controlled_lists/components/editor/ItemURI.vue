@@ -134,7 +134,7 @@ function tryEdit() {
 
 <style scoped>
 .uri-container {
-    margin: 1rem 1rem 4rem 1rem;
+    margin: 1rem 1rem 4rem 2rem;
     display: flex;
     flex-direction: column;
     width: 100%;

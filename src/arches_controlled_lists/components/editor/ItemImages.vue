@@ -115,7 +115,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
 
 <style scoped>
 .images-container {
-    margin: 1rem 1rem 3rem 1rem;
+    margin: 1rem 1rem 3rem 2rem;
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -166,6 +166,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
     margin-top: 1.5rem;
     display: flex;
     flex-direction: row;
+    flex-flow: wrap;
     gap: 3rem;
 }
 
@@ -182,6 +183,10 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
     /* PrimeVue uses a hidden input for screen readers */
     display: none;
 }
+
+:deep(img) {
+    border: 1px solid var(--p-surface-700);
+ }
 
 :deep(.images .p-button) {
    border-radius: 2px;

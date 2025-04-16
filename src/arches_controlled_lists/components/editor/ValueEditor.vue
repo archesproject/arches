@@ -429,7 +429,7 @@ const focusInput = () => {
 
 <style scoped>
 .value-editor-container {
-    margin: 1rem 1rem 4rem 1rem;
+    margin: 1rem 1rem 4rem 2rem;
     width: 100%;
 }
 
@@ -458,7 +458,6 @@ i {
 p {
     font-weight: normal;
     margin-top: 0;
-    font-size: 1.2rem;
 }
 
 .full-width-pointer {

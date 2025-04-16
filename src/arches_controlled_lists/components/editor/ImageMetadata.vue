@@ -390,17 +390,16 @@ const focusInput = () => {
             </Column>
         </DataTable>
     </div>
-    <div style="display: flex; gap: 1rem">
+    <div style="display: flex; gap: 0.5rem">
         <AddMetadata
             :image
             :labeled-choices
             :make-metadata-editable
         />
         <Button
-            raised
             :severity="shouldUseContrast() ? CONTRAST : DANGER"
             icon="fa fa-trash"
-            :label="$gettext('Delete image')"
+            :label="$gettext('Delete')"
             @click="issueDeleteImage"
         />
     </div>

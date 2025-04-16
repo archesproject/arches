@@ -366,6 +366,7 @@ const acceptNewListShortcutEntry = async () => {
 .move-target {
     height: 2.5rem;
     font-size: unset;
+    border-radius: 2px;
 }
 
 :deep(input) {
