@@ -1,5 +1,6 @@
 import logging
 import sys
+import uuid
 from itertools import chain
 
 from django.db import models, transaction
@@ -165,6 +166,27 @@ class SemanticTile(TileModel):
         if not getattr(self, "_nodegroup_alias", None):
             self._nodegroup_alias = Node.objects.get(pk=self.nodegroup_id).alias
         return self._nodegroup_alias
+
+    @classmethod
+    def deserialize(cls, tile_dict, parent_tile: TileModel | None):
+        """
+        DRF doesn't provide nested writable fields by default,
+        so we have this little deserializer helper. Must be a better way.
+        """
+        attrs = {**tile_dict}
+        if tile_id := attrs.pop("tileid", None):
+            attrs["tileid"] = uuid.UUID(tile_id)
+        if resourceinstance_id := attrs.pop("resourceinstance", None):
+            attrs["resourceinstance_id"] = uuid.UUID(resourceinstance_id)
+        if nodegroup_id := attrs.pop("nodegroup", None):
+            attrs["nodegroup_id"] = uuid.UUID(nodegroup_id)
+        if parenttile_id := attrs.pop("parenttile", None):
+            attrs["parenttile_id"] = uuid.UUID(parenttile_id)
+
+        attrs["parenttile"] = parent_tile
+
+        tile = cls(**attrs)
+        return tile
 
     @classmethod
     def as_nodegroup(

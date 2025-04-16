@@ -129,6 +129,10 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
         ret._graph_nodes = self._graph_nodes
         return ret
 
+    def get_value(self, dictionary):
+        """Avoid the branch that treats MultiPart data input as HTML."""
+        return dictionary.get(self.field_name, empty)
+
     def get_fields(self):
         field_map = super().get_fields()
         self._root_node_aliases = []
@@ -238,6 +242,10 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             node.pk: node.alias
             for node in Node.objects.filter(pk=F("nodegroup_id")).only("alias")
         }
+
+    def get_value(self, dictionary):
+        """Avoid the branch that treats MultiPart data input as HTML."""
+        return dictionary.get(self.field_name, empty)
 
     def get_fields(self):
         nodegroup_alias = (

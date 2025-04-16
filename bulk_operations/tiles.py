@@ -162,12 +162,10 @@ class BulkTileOperation:
         if all(isinstance(tile, TileModel) for tile in new_tiles):
             new_tiles.sort(key=attrgetter("sortorder"))
         else:
-            # DRF doesn't provide nested writable fields by default.
-            # TODO: probably move this to the serializers.
             parent_tile = container if isinstance(container, TileModel) else None
             new_tiles = [
-                SemanticTile(**{**tile, "parenttile": parent_tile})
-                for tile in new_tiles
+                SemanticTile.deserialize(tile_dict, parent_tile=parent_tile)
+                for tile_dict in new_tiles
             ]
         existing_tiles = self.existing_tiles_by_nodegroup_alias[grouping_node.alias]
         if not existing_tiles:
@@ -292,12 +290,14 @@ class BulkTileOperation:
     def _validate_and_patch_from_tile_values(self, tile, *, nodes, languages):
         """Validate data found on ._incoming_tile and move it to .data.
         Update errors_by_node_alias in place."""
-        from arches_querysets.models import SemanticTile
+        from arches_querysets.models import AliasedData, SemanticTile
 
         for node in nodes:
             node_id_str = str(node.pk)
             # TODO: move this somewhere else?
-            if isinstance(tile._incoming_tile, SemanticTile):
+            if isinstance(tile._incoming_tile, SemanticTile) and isinstance(
+                tile._incoming_tile.aliased_data, AliasedData
+            ):
                 value_to_validate = getattr(
                     tile._incoming_tile.aliased_data, node.alias, NOT_PROVIDED
                 )

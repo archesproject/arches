@@ -2,6 +2,8 @@ from rest_framework import parsers
 
 
 class MultiPartJSONParser(parsers.MultiPartParser):
+    """https://stackoverflow.com/a/63398121"""
+
     def parse(self, stream, *args, **kwargs):
         data = super().parse(stream, *args, **kwargs)
 
