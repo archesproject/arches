@@ -66,36 +66,40 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
 
 <template>
     <div class="images-container">
-        <h4>{{ $gettext("Images") }}</h4>
-        <FileUpload
-            accept="image/*"
-            :url="arches.urls.controlled_list_item_image_add"
-            :auto="true"
-            :max-file-size="5e6"
-            :file-limit="10"
-            :preview-width="250"
-            :with-credentials="true"
-            :show-cancel-button="false"
-            :show-upload-button="false"
-            :choose-button-props="{
-                severity: shouldUseContrast() ? CONTRAST : PRIMARY,
-            }"
-            choose-icon="fa fa-plus-circle"
-            :choose-label="$gettext('Upload an image')"
-            name="item_image"
-            :pt="{
-                content: ({ props, state }: FileUploadInternals) => {
-                    const done = [0, 100].includes(state.progress);
-                    return {
-                        style: { display: done ? 'none' : '' },
-                    };
-                },
-                pcChooseButton: { root: { style: { fontSize: 'smaller' } } },
-            }"
-            @before-send="addHeader($event)"
-            @upload="upload($event)"
-            @error="showError($event)"
-        />
+        <div class="images-container-title">
+            <h4>{{ $gettext("Images") }}</h4>
+            <FileUpload
+                class="add-image"
+                accept="image/*"
+                :url="arches.urls.controlled_list_item_image_add"
+                :auto="true"
+                :max-file-size="5e6"
+                :file-limit="10"
+                :preview-width="250"
+                :with-credentials="true"
+                :show-cancel-button="false"
+                :show-upload-button="false"
+                :choose-button-props="{
+                    severity: shouldUseContrast() ? CONTRAST : SECONDARY,
+                }"
+                choose-icon="fa fa-plus-circle"
+                :choose-label="$gettext('Upload an image')"
+                name="item_image"
+                :pt="{
+                    content: ({ props, state }: FileUploadInternals) => {
+                        const done = [0, 100].includes(state.progress);
+                        return {
+                            style: { display: done ? 'none' : '' },
+                        };
+                    },
+                    pcChooseButton: { root: { style: { fontSize: 'smaller' } } },
+                }"
+                @before-send="addHeader($event)"
+                @upload="upload($event)"
+                @error="showError($event)"
+            />
+        </div>
+        <p>{{ $gettext("Optionally, add images that illustrate this item") }}</p>
         <div class="images">
             <ImageEditor
                 v-for="image in item.images"
@@ -117,25 +121,71 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
     width: 100%;
 }
 
-h4 {
-    margin-top: 0;
+.images-container-title {
+    display: flex;
+    align-items: center;
+    gap: 1.0rem;
 }
 
-p {
-    font-size: 1.2rem;
+.p-fileupload-advanced {
+    border: none;
+}
+
+.p-fileupload-header {
+    padding: 0;
+}
+
+.images-container h4 {
+    font-size: 1.66rem;
+    margin: 0;
+    font-weight: 400;
+}
+
+.images-container p {
+    margin: 0;
+    padding: .25rem 0 0 0;
+    color: var(--p-text-muted-color);
+}
+
+:deep(.p-fileupload-header) {
+    padding: 0;
+}
+
+:deep(.images-container-title .p-button) {
+    display: flex;
+    background: var(--p-button-secondary-background);
+    color: var(--p-button-secondary-color);
+    margin-top: 0;
+    font-weight: 400;
+    font-size: smaller;
+    border-radius: 2px;
+    border-color: transparent;
 }
 
 .images {
     margin-top: 1.5rem;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 3rem;
+}
+
+:deep(.images .p-select) {
+    border-radius: 2px;
+}
+
+:deep(.images input) {
+    border-radius: 2px;
 }
 
 :deep(input[type="file"]) {
     /* override arches.css */
     /* PrimeVue uses a hidden input for screen readers */
     display: none;
+}
+
+:deep(.images .p-button) {
+   border-radius: 2px;
+   font-weight: 400;
 }
 
 :deep(.p-fileupload-content:empty) {

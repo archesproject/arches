@@ -55,7 +55,7 @@ const issuePatchItem = async () => {
 
 <style scoped>
 .guide-container {
-    margin: 1rem 1rem 3rem 1rem;
+    margin: 1rem 1rem 4rem 1rem;
     display: flex;
     flex-direction: column;
     gap: 0;

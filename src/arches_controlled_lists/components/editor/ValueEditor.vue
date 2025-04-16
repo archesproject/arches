@@ -423,10 +423,6 @@ const focusInput = () => {
                     </template>
                 </Column>
             </DataTable>
-            <!-- <AddValue
-                :value-type
-                :make-new-value-editable="makeValueEditable"
-            /> -->
         </div>
     </div>
 </template>
