@@ -160,6 +160,8 @@ def file_list_merge_tile_value(self, tile, node_id_str, transformed) -> None:
 
 def file_list_to_representation(self, value):
     """Resolve localized string metadata to a single language value."""
+    if not value:
+        return value
     final_value = copy.deepcopy(value)
     for file_info in final_value:
         for key, val in file_info.items():
