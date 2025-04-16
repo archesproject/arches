@@ -262,11 +262,11 @@ await fetchListsAndPopulateTree();
 <template>
     <div class="controls-container">
         <div>
-            <h2 class="controls-header">
+            <h3 class="controls-header">
                 {{
                     $gettext("Lists Manager")
                 }}
-            </h2>
+            </h3>
         </div>
         <div class="button-controls-container">
             <Button
@@ -296,7 +296,7 @@ await fetchListsAndPopulateTree();
 <style scoped>
 .controls-container {
     padding-bottom: .75rem;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--p-content-border-color);
 }
 
 .controls-header {

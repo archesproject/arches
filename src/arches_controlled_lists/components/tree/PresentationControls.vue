@@ -80,8 +80,8 @@ const { $gettext } = useGettext();
 <style scoped>
 .tree-controls-container {
     padding: 0 0 .5rem 0;
-    background: #fafafa;
-    border-bottom: 1px solid #ddd;
+    background: var(--p-form-field-filled-background);
+    border-bottom: 1px solid var(--p-content-border-color);
 }
 
 .container-title {

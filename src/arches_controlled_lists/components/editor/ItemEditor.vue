@@ -26,9 +26,9 @@ provide(itemKey, item);
 <template>
     <template v-if="item">
         <ItemHeader />
+        <ItemType />
         <ValueEditor :value-type="PREF_LABEL" />
         <ValueEditor :value-type="ALT_LABEL" />
-        <ItemType />
         <ValueEditor :value-category="NOTE" />
         <ItemURI />
         <ItemImages />

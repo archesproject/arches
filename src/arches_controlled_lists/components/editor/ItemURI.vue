@@ -140,29 +140,32 @@ function tryEdit() {
     width: 100%;
 }
 
-h4 {
-    margin-top: 0;
+.uri-container h4 {
+    font-size: 1.66rem;
+    margin: 0;
+    padding: 0.5rem 0 0 0;
+    font-weight: 400;
 }
 
-p {
-    font-weight: normal;
-    margin-top: 0;
-    font-size: 1.2rem;
+.uri-container p {
+    margin: 0;
+    padding: .25rem 0 0 0;
+    color: var(--p-text-muted-color);
 }
 
 input {
     font-size: 1.2rem;
+    border-radius: 2px;
 }
 
 .characteristic {
-    margin: 1rem;
+    margin: .5rem 0 0 0;
     display: flex;
-    align-items: center;
 }
 
 .characteristic input {
-    text-align: center;
     height: 3rem;
+    padding: 1.5rem .5rem;
     width: 100%;
 }
 
