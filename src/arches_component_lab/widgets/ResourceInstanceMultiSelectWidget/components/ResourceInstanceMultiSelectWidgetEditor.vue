@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, watch, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 
 import arches from "arches";
 
@@ -22,7 +22,7 @@ import type {
 } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
-    initialValue: ResourceInstanceReference[] | undefined;
+    initialValue: ResourceInstanceReference[] | null | undefined;
     graphSlug: string;
     nodeAlias: string;
 }>();
@@ -36,31 +36,6 @@ const isLoading = ref(false);
 const resourceResultsPage = ref(0);
 const resourceResultsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
-
-const formFieldRef = useTemplateRef("formFieldRef");
-
-// this watcher is necessary to be able to format the value of the form field when the date picker is updated
-watch(
-    // @ts-expect-error - This is a bug in the PrimeVue types
-    () => formFieldRef.value?.field?.states?.value,
-    (newVal) => {
-        if (!Array.isArray(newVal)) {
-            newVal = [newVal];
-        }
-
-        if (
-            newVal.length &&
-            newVal.every((item: string | object) => typeof item === "string")
-        ) {
-            // @ts-expect-error - This is a bug in the PrimeVue types
-            formFieldRef.value!.field.states.value = options.value.filter(
-                (option) => {
-                    return newVal?.includes(option.resourceId);
-                },
-            );
-        }
-    },
-);
 
 const resourceResultsCurrentCount = computed(() => options.value.length);
 
@@ -147,37 +122,31 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     await getOptions((resourceResultsPage.value || 0) + 1);
 }
 
-// let timeout: ReturnType<typeof setTimeout>;
+function getOption(value: string): ResourceInstanceReference | undefined {
+    const option = options.value.find((option) => option.resourceId == value);
+    return option;
+}
 
 function resolver(e: FormFieldResolverOptions) {
     validate(e);
-    // return new Promise((resolve) => {
-    //     if (timeout) clearTimeout(timeout);
 
-    //     timeout = setTimeout(() => {
-    //         resolve(validate(e));
-    //     }, 500);
-    // });
+    let value = e.value;
+
+    if (!Array.isArray(value)) {
+        value = [value];
+    }
+
+    return {
+        values: {
+            [props.nodeAlias]: options.value.filter((option) => {
+                return value?.includes(option.resourceId);
+            }),
+        },
+    };
 }
 
 function validate(e: FormFieldResolverOptions) {
     console.log("validate", e);
-    // API call to validate the input
-    // if (true) {
-    //     return {};
-    // } else {
-    //     return {
-    //         errors: [
-    //             { message: "This is an error message" },
-    //             { message: "This is also an error message" },
-    //         ],
-    //     };
-    // }
-}
-
-function getOption(value: string): ResourceInstanceReference | undefined {
-    const option = options.value.find((option) => option.resourceId == value);
-    return option;
 }
 </script>
 
@@ -190,7 +159,6 @@ function getOption(value: string): ResourceInstanceReference | undefined {
     </Message>
     <FormField
         v-else
-        ref="formFieldRef"
         v-slot="$field"
         :name="props.nodeAlias"
         :initial-value="
@@ -220,29 +188,31 @@ function getOption(value: string): ResourceInstanceReference | undefined {
             @filter="onFilter"
             @before-show="getOptions(1)"
         >
-            <template
-                #chip="//@ts-expect-error - This is a bug in the PrimeVue types
-                    { value, removeCallback }"
-            >
+            <template #chip="slotProps">
                 <div class="p-multiselect-chip">
                     <span class="p-chip-label">
-                        {{ getOption(value)?.display_value }}
+                        {{ getOption(slotProps.value)?.display_value }}
                     </span>
                     <Button
                         icon="pi pi-pen-to-square"
-                        :href="`${arches.urls.resource_editor}${value}`"
+                        :href="`${arches.urls.resource_editor}${slotProps.value}`"
                         target="_blank"
                         variant="text"
                         as="a"
                         class="p-chip-button"
-                        @click.stop="() => {}"
-                    ></Button>
+                    />
                     <Button
                         icon="pi pi-times-circle"
                         variant="text"
                         class="p-chip-button"
-                        @click.stop="(e) => removeCallback(e, value)"
-                    ></Button>
+                        @click.stop="
+                            (e) =>
+                                (slotProps as any).removeCallback(
+                                    e,
+                                    slotProps.value,
+                                )
+                        "
+                    />
                 </div>
             </template>
         </MultiSelect>

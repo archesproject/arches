@@ -5,37 +5,21 @@ import Message from "primevue/message";
 import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
 
 const props = defineProps<{
-    initialValue: string | undefined;
+    initialValue: string | null | undefined;
     nodeAlias: string;
     graphSlug: string;
 }>();
 
-// let timeout: ReturnType<typeof setTimeout>;
-
 function resolver(e: FormFieldResolverOptions) {
     validate(e);
-    // return new Promise((resolve) => {
-    //     if (timeout) clearTimeout(timeout);
 
-    //     timeout = setTimeout(() => {
-    //         resolve(validate(e));
-    //     }, 500);
-    // });
+    return {
+        values: { [props.nodeAlias]: e.value },
+    };
 }
 
 function validate(e: FormFieldResolverOptions) {
     console.log("validate", e);
-    // API call to validate the input
-    // if (true) {
-    //     return {};
-    // } else {
-    //     return {
-    //         errors: [
-    //             { message: "This is an error message" },
-    //             { message: "This is also an error message" },
-    //         ],
-    //     };
-    // }
 }
 </script>
 

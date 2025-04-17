@@ -56,7 +56,7 @@ export const fetchRelatableResources = async (
     nodeAlias: string,
     page: number,
     filterTerm?: string,
-    initialValues?: ResourceInstanceReference[] | undefined,
+    initialValues?: ResourceInstanceReference[] | null | undefined,
 ) => {
     const params = new URLSearchParams();
 
