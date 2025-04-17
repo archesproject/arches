@@ -137,7 +137,7 @@ function tryEdit() {
     margin: 1rem 1rem 4rem 2rem;
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: 90%;
 }
 
 .uri-container h4 {
@@ -149,7 +149,7 @@ function tryEdit() {
 
 .uri-container p {
     margin: 0;
-    padding: .25rem 0 0 0;
+    padding: .25rem 1rem 0 0;
     color: var(--p-text-muted-color);
 }
 
@@ -184,5 +184,19 @@ input {
 .edit-controls i {
     font-size: var(--p-icon-size);
     padding: 0.5rem;
+}
+
+:deep(i[role=button]) {
+    height: var(--p-button-icon-only-width);
+    width: var(--p-button-icon-only-width);
+    border-radius: 50%;
+    border: 1px solid var(--p-button-secondary-border-color);
+    background: var(--p-button-secondary-background);
+    padding: .67rem;
+}
+
+:deep(i[role=button]:hover) {
+    background: var(--p-button-primary-hover-background);
+    color: var(--p-button-primary-hover-color);
 }
 </style>

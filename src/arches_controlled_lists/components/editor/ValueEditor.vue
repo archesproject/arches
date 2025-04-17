@@ -508,7 +508,7 @@ p {
 }
 
 :deep(.p-button.p-component.p-button-icon-only.p-button-secondary.p-button-rounded.p-button-text.p-datatable-row-editor-cancel:hover) {
-    background: var(--p-button-primary-hover-background);
+    background: var(--p-amber-300);;
     color: var(--p-button-primary-hover-color);
 }
 
@@ -518,13 +518,11 @@ p {
     border-radius: 50%;
     border: 1px solid var(--p-button-secondary-border-color);
     background: var(--p-button-secondary-background);
-    padding: .67rem 0;
+    padding: .67rem;
 }
 
 :deep(i[role=button]:hover) {
     background: var(--p-button-danger-background);
     color: var(--p-button-primary-hover-color);
 }
-
-
 </style>
