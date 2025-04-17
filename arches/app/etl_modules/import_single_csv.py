@@ -23,6 +23,7 @@ from arches.app.utils.file_validator import FileValidator
 from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
+from collections import Counter
 
 class ImportSingleCsv(BaseImportModule):
     def __init__(self, request=None, loadid=None, params=None):
@@ -344,9 +345,7 @@ class ImportSingleCsv(BaseImportModule):
             csv_file_name,
             id_label,
         )
-
         validation = self.validate(loadid)
-        
         if len(validation["data"]) == 0:
             with connection.cursor() as cursor:
                 cursor.execute(
@@ -437,7 +436,7 @@ class ImportSingleCsv(BaseImportModule):
         message = "load event created"
         return {"success": True, "data": message}
 
-    def insert_loadstaging(self,cursor,tile_data,nodegroup,legacyid, resourceid,tileid, loadid, csv_file_name, passes_validation):
+    def insert_loadstaging(self,cursor,tile_data,nodegroup,legacyid, resourceid,tileid, loadid, csv_file_name, passes_validation, count):
         tile_value_json = JSONSerializer().serialize(tile_data)
         node_depth = 0
 
@@ -453,8 +452,9 @@ class ImportSingleCsv(BaseImportModule):
                 nodegroup_depth,
                 source_description,
                 operation,
-                passes_validation
-            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                passes_validation,
+                sortorder
+            ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
             (
                 nodegroup,
                 legacyid,
@@ -466,6 +466,7 @@ class ImportSingleCsv(BaseImportModule):
                 csv_file_name,
                 "insert",
                 passes_validation,
+                count,
             ),
         )
     def error_nodegroupid(self, cursor, dict_by_nodegroup, nodeid, csv_file_name, loadid, tilesid, i):
@@ -533,7 +534,6 @@ class ImportSingleCsv(BaseImportModule):
                     for i in range(len(fieldnames)):
                         if row[i] == 'None':
                             continue
-                            
                         if fieldnames[i] != "" and fieldnames[i] != id_label:
                             
                             current_node = self.get_node_lookup(graphid).get(
@@ -563,7 +563,7 @@ class ImportSingleCsv(BaseImportModule):
                                             "default_direction"
                                         ]
 
-                                        # if row[i] !="None":
+                                        
                                         transformed_value = {
                                             code: {
                                                 "value": row[i],
@@ -615,7 +615,6 @@ class ImportSingleCsv(BaseImportModule):
                                             node,
                                         ),
                                     )
-                                    
                                 if value is not None :
                                     if nodegroupid in dict_by_nodegroup:
                                         dict_by_nodegroup[nodegroupid].append(
@@ -644,7 +643,7 @@ class ImportSingleCsv(BaseImportModule):
                     tilesid=[]
                     nodegroupsid=[]
                     for nodegroup in dict_by_nodegroup:
-
+                        count=0
                         tile_data = self.get_blank_tile_lookup(nodegroup)
                         passes_validation = True
                         for key in tile_data:
@@ -654,11 +653,12 @@ class ImportSingleCsv(BaseImportModule):
                             for key in node:
                                 
                                 if tile_data[key]:
+                                    count=count+1
                                     tileid = uuid.uuid4()
                                     tilesid.append(tileid)
                                     nodegroupsid.append(nodegroup)
 
-                                    self.insert_loadstaging(cursor,tile_data,nodegroup,legacyid, resourceid,tileid, loadid, csv_file_name, passes_validation)
+                                    self.insert_loadstaging(cursor,tile_data,nodegroup,legacyid, resourceid,tileid, loadid, csv_file_name, passes_validation,count)
                                     for other_key in tile_data:
                                         tile_data[other_key] = None
                                     tile_data[key] = node[key]
@@ -670,7 +670,7 @@ class ImportSingleCsv(BaseImportModule):
                         tileid = uuid.uuid4()
                         tilesid.append(tileid)
                         nodegroupsid.append(nodegroup)
-                        self.insert_loadstaging(cursor,tile_data,nodegroup,legacyid, resourceid,tileid, loadid, csv_file_name, passes_validation)
+                        self.insert_loadstaging(cursor,tile_data,nodegroup,legacyid, resourceid,tileid, loadid, csv_file_name, passes_validation, count)
                 listCheckExistNodeId=[]
                 for i, nodeid in enumerate(nodegroupsid):
                     parents = NodeGroup.objects.get(nodegroupid=str(nodeid)).parentnodegroup
@@ -717,7 +717,7 @@ class ImportSingleCsv(BaseImportModule):
                 )
 
         self.delete_from_default_storage(temp_dir)
-
+        
         message = "staging table populated"
         return {"success": True, "data": message}
 

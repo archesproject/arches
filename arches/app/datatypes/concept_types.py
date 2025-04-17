@@ -6,10 +6,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext as _
 from arches.app.models import models
 from arches.app.models import concept
+from arches.app.models.models import Value
 from django.core.cache import cache
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
-from arches.app.models.models import Value
+import re
 from arches.app.datatypes.datatypes import DataTypeFactory, get_value_from_jsonld
 from arches.app.models.concept import (
     get_preflabel_from_valueid,
@@ -441,9 +442,8 @@ class ConceptListDataType(BaseConceptDataType):
 
     def transform_value_for_tile(self, value, **kwargs):
         ret = []
-        for val in csv.reader([value], delimiter=",", quotechar='"'):
-            lines = [line for line in val]
-            for v in lines:
+        for v in re.split(r',\s*(?![^()]*\))', value):
+                
                 try:
                     stripped = v.strip()
                     uuid.UUID(stripped)
