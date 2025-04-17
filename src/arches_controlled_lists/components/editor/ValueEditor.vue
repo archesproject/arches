@@ -386,6 +386,7 @@ const focusInput = () => {
                     style="width: 5%; text-align: center; white-space: nowrap"
                     :pt="{
                         headerCell: { ariaLabel: $gettext('Row edit controls') },
+                        pcRowEditorInit: { }
                     }"
                 >
                     <template #roweditoriniticon>
@@ -408,7 +409,7 @@ const focusInput = () => {
                     </template>
                 </Column>
                 <Column
-                    style="width: 3%; text-align: center"
+                    style="width: 5%; text-align: center; white-space: nowrap"
                     :pt="{ headerCell: { ariaLabel: $gettext('Delete controls') } }"
                 >
                     <template #body="slotProps">
@@ -487,4 +488,43 @@ p {
 :deep(.p-datatable-column-title) {
     font-size: small;
 }
+
+:deep(.p-button-text.p-button-secondary.p-datatable-row-editor-init) {
+    background: var(--p-button-secondary-background);
+}
+
+:deep(.p-button-text.p-button-secondary.p-datatable-row-editor-init) {
+    background: var(--p-button-secondary-background);
+}
+
+:deep(.p-button-text.p-button-secondary.p-datatable-row-editor-init:hover) {
+    background: var(--p-button-primary-hover-background);
+    color: var(--p-button-primary-hover-color);
+}
+
+:deep(.p-button-text.p-button-secondary.p-datatable-row-editor-save:hover) {
+    background: var(--p-button-primary-hover-background);
+    color: var(--p-button-primary-hover-color);
+}
+
+:deep(.p-button.p-component.p-button-icon-only.p-button-secondary.p-button-rounded.p-button-text.p-datatable-row-editor-cancel:hover) {
+    background: var(--p-button-primary-hover-background);
+    color: var(--p-button-primary-hover-color);
+}
+
+:deep(i[role=button]) {
+    height: var(--p-button-icon-only-width);
+    width: var(--p-button-icon-only-width);
+    border-radius: 50%;
+    border: 1px solid var(--p-button-secondary-border-color);
+    background: var(--p-button-secondary-background);
+    padding: .67rem 0;
+}
+
+:deep(i[role=button]:hover) {
+    background: var(--p-button-danger-background);
+    color: var(--p-button-primary-hover-color);
+}
+
+
 </style>

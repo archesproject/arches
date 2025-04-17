@@ -76,7 +76,7 @@ const iconLabel = (item: ControlledListItem) => {
     padding: 0 .5rem 0 0;
     font-weight: 400;
     margin: 0;
-    font-size: 1.75rem;
+    font-size: 1.8rem;
 }
 
 .item-url {
