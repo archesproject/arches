@@ -5,6 +5,7 @@ import { computed, ref, useTemplateRef } from "vue";
 import { useGettext } from "vue3-gettext";
 import { FormField } from "@primevue/forms";
 
+import Button from "primevue/button";
 import Message from "primevue/message";
 import MultiSelect from "primevue/multiselect";
 
