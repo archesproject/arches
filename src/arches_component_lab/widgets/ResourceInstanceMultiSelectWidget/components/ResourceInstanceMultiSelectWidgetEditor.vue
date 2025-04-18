@@ -167,7 +167,6 @@ function validate(e: FormFieldResolverOptions) {
         :resolver="resolver"
     >
         <MultiSelect
-            class="resource-instance-multiselect-widget"
             display="chip"
             option-label="display_value"
             option-value="resourceId"
@@ -183,34 +182,45 @@ function validate(e: FormFieldResolverOptions) {
                 lazy: true,
                 loading: isLoading,
                 onLazyLoad: onLazyLoadResources,
-                resizeDelay: 200,
             }"
             @filter="onFilter"
             @before-show="getOptions(1)"
         >
             <template #chip="slotProps">
-                <div class="p-multiselect-chip">
-                    <span class="p-chip-label">
+                <div style="width: 100%">
+                    <div class="chip-text">
                         {{ getOption(slotProps.value)?.display_value }}
-                    </span>
+                    </div>
+                </div>
+                <div class="button-container">
                     <Button
-                        icon="pi pi-pen-to-square"
-                        :href="`${arches.urls.resource_editor}${slotProps.value}`"
+                        as="a"
+                        icon="pi pi-info-circle"
                         target="_blank"
                         variant="text"
-                        as="a"
-                        class="p-chip-button"
+                        size="small"
+                        style="text-decoration: none"
+                        :href="`${arches.urls.resource_report}${slotProps.value}`"
+                        @click.stop
                     />
                     <Button
-                        icon="pi pi-times-circle"
+                        as="a"
+                        icon="pi pi-pencil"
+                        target="_blank"
                         variant="text"
-                        class="p-chip-button"
+                        size="small"
+                        style="text-decoration: none"
+                        :href="`${arches.urls.resource_editor}${slotProps.value}`"
+                        @click.stop
+                    />
+                    <Button
+                        icon="pi pi-times"
+                        variant="text"
+                        size="small"
                         @click.stop="
-                            (e) =>
-                                (slotProps as any).removeCallback(
-                                    e,
-                                    slotProps.value,
-                                )
+                            (e) => {
+                                slotProps.removeCallback(e, slotProps.value);
+                            }
                         "
                     />
                 </div>
@@ -226,60 +236,37 @@ function validate(e: FormFieldResolverOptions) {
         </Message>
     </FormField>
 </template>
+
 <style scoped>
-:deep(.resource-instance-multiselect-widget .p-multiselect-label) {
-    visibility: visible;
-    display: grid;
-    min-width: 0;
-    min-height: 0;
+.button-container {
+    display: flex;
+    justify-content: flex-end;
 }
 
-:deep(.resource-instance-multiselect-widget .p-multiselect-chip) {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto;
-    align-items: center;
-    min-width: 0;
-    min-height: 0;
+.chip-text {
+    width: min-content;
+    min-width: fit-content;
+    overflow-wrap: anywhere;
+    padding: 0.5rem 1rem;
 }
 
-:deep(.resource-instance-multiselect-widget .p-multiselect-chip .pi) {
-    margin: 0 0.5rem;
+:deep(.p-multiselect-label) {
+    width: inherit;
+    flex-direction: column;
+    white-space: break-spaces;
+    align-items: flex-start;
 }
 
-:deep(.p-chip) {
-    overflow: hidden;
-    min-width: 0;
-    min-height: 0;
+:deep(.p-multiselect-chip-item) {
+    width: inherit;
+    border: 0.125rem solid var(--p-inputtext-border-color);
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+    margin: 0.25rem;
 }
 
-:deep(.p-multiselect-chip .p-chip-button) {
-    text-decoration: none;
-}
-
-:deep(.p-multiselect-option span) {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-:deep(.p-chip-label) {
-    overflow: hidden;
-    word-wrap: nowrap;
-    text-overflow: ellipsis;
-    min-width: 0;
-    max-width: 100%;
-}
-</style>
-
-<!-- 
-    This is a workaround for the checkboxes in the PrimeVue MultiSelect component 
-    setting the FormField value to true/false instead of the selected options.
--->
-<style>
-.p-multiselect-overlay .p-checkbox {
-    pointer-events: none;
-}
-
-.p-multiselect-overlay .p-multiselect-header .p-checkbox {
-    pointer-events: all;
+:deep(.p-multiselect-label-container) {
+    white-space: break-spaces;
+    width: inherit;
 }
 </style>
