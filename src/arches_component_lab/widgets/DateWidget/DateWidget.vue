@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import dayjs from "dayjs";
 import { onMounted, ref } from "vue";
 
 import Message from "primevue/message";
@@ -12,7 +11,6 @@ import {
     fetchWidgetData,
     fetchNodeData,
 } from "@/arches_component_lab/widgets/api.ts";
-import { convertISO8601DatetimeFormatToPrimevueDatetimeFormat } from "@/arches_component_lab/widgets/utils.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
@@ -38,13 +36,10 @@ const configurationError = ref();
 onMounted(async () => {
     try {
         nodeData.value = await fetchNodeData(props.graphSlug, props.nodeAlias);
-
-        const widget = await fetchWidgetData(props.graphSlug, props.nodeAlias);
-        widget.config.datePickerDisplayConfiguration =
-            convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
-                widget.config.dateFormat,
-            );
-        widgetData.value = widget;
+        widgetData.value = await fetchWidgetData(
+            props.graphSlug,
+            props.nodeAlias,
+        );
     } catch (error) {
         configurationError.value = error;
     } finally {
@@ -67,20 +62,14 @@ onMounted(async () => {
 
         <DateWidgetEditor
             v-if="props.mode === EDIT"
-            :initial-value="
-                props.initialValue &&
-                dayjs(props.initialValue).toDate().toString()
-            "
+            :initial-value="props.initialValue"
             :graph-slug="props.graphSlug"
             :node-alias="props.nodeAlias"
             :widget-data="widgetData"
         />
         <DateWidgetViewer
             v-else-if="props.mode === VIEW"
-            :initial-value="
-                props.initialValue &&
-                dayjs(props.initialValue).toDate().toString()
-            "
+            :initial-value="props.initialValue"
             :widget-data="widgetData"
         />
     </template>
