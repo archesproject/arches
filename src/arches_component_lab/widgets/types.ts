@@ -24,3 +24,23 @@ export interface ResourceInstanceResult {
     resourceinstanceid: string;
     display_value: string;
 }
+
+export interface FileReference {
+    url: string;
+    name: string;
+    path: string;
+    size: number;
+    type: string;
+    index: number;
+    width: number;
+    height: number;
+    status: string;
+    content: string;
+    file_id: string;
+    accepted: boolean;
+    lastModified: number;
+    altText: string;
+    attribution: string;
+    description: string;
+    title: string;
+}
