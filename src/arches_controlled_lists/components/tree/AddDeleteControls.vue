@@ -307,18 +307,19 @@ await fetchListsAndPopulateTree();
 }
 
 .button-controls-container {
-    padding: 0 1.0rem;
+    padding: 0 1.5rem;
+    display: flex;
+    gap: 0.5rem;
 }
 
 .list-button {
     height: 3rem;
-    margin: 0.5rem;
+    margin: 0.5rem 0;
     flex: 0.5;
     justify-content: center;
     text-wrap: nowrap;
     font-size: 1.33rem;
     font-weight: 500;
-    min-width: 150px;
     border-radius: 2px 0 0 2px;
 }
 
