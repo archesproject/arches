@@ -82,8 +82,9 @@ const cancel = () => {
             </div>
             
             <!-- TODO https://github.com/archesproject/arches/issues/10847 -->
-            <span class="value-label"
+            <span 
                 v-if="!props.editable"
+                class="value-label"
                 style="font-size: small"
             >
                 {{ $gettext("False") }}

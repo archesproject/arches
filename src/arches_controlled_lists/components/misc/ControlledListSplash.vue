@@ -18,14 +18,8 @@ const { $gettext } = useGettext();
         </div>
 
         <div class="controlled-list-splash-description">
-            <div>
-                {{ $gettext("Use the Controlled List Manager to create new lists of controlled vocabularies, ") }}
-            </div>
-            <div>
-                {{ $gettext("or update an existing list by selecting it from the tree in the sidebar.") }}
-            </div>
-            <div style="padding-top: 2rem;">
-                {{ $gettext("Use Arches Designer to select which node(s) in a model can use a list") }}
+            <div class="splash-note">
+                {{ $gettext("Use the Controlled List Manager to create new lists of controlled vocabularies, or update an existing list by selecting it from the tree in the sidebar. Use Arches Designer to select which node(s) in a model can use a list") }}
             </div>
         </div>
     </div>
@@ -57,6 +51,10 @@ const { $gettext } = useGettext();
     font-size: 2.8rem;
     margin-bottom: .5rem;
     margin-top: 4rem;
+}
+
+.splash-note {
+    max-width: 150ch;
 }
 
 i {

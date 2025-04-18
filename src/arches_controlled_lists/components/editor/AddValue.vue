@@ -104,7 +104,7 @@ const addValue = () => {
     <Button
         class="add-value"
         icon="fa fa-plus-circle"
-        :severity="shouldUseContrast() ? CONTRAST : SECONDARY"
+        :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
         :label="buttonLabel"
         :disabled="isEditing"
         @click="addValue"

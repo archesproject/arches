@@ -80,7 +80,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
                 :show-cancel-button="false"
                 :show-upload-button="false"
                 :choose-button-props="{
-                    severity: shouldUseContrast() ? CONTRAST : SECONDARY,
+                    severity: shouldUseContrast() ? CONTRAST : PRIMARY,
                 }"
                 choose-icon="fa fa-plus-circle"
                 :choose-label="$gettext('Upload an image')"
