@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, watch } from "vue";
+import arches from "arches";
+import { computed, ref, useTemplateRef } from "vue";
 
 import { useGettext } from "vue3-gettext";
 import { FormField } from "@primevue/forms";
@@ -40,36 +41,6 @@ const searchResultsPage = ref(0);
 const searchResultsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
-const formFieldRef = useTemplateRef("formFieldRef");
-
-// this watcher is necessary to be able to format the value of the form field when the date picker is updated
-watch(
-    // @ts-expect-error - This is a bug in the PrimeVue types
-    () => formFieldRef.value?.field?.states?.value,
-    (newVal) => {
-        if (!Array.isArray(newVal)) {
-            newVal = [newVal];
-        }
-
-        if (
-            newVal.length &&
-            newVal.every((item: string | object) => typeof item === "string")
-        ) {
-            // @ts-expect-error - This is a bug in the PrimeVue types
-            formFieldRef.value!.field.states.value = options.value
-                .filter((option) => {
-                    return newVal?.includes(option.id);
-                })
-                .map((option) => {
-                    return {
-                        resourceId: option.id,
-                        ontologyProperty: "",
-                        inverseOntologyProperty: "",
-                    };
-                });
-        }
-    },
-);
 
 const searchResultsCurrentCount = computed(() => options.value.length);
 
@@ -173,6 +144,7 @@ function validate(e: FormFieldResolverOptions) {
     >
         <MultiSelect
             class="concept-resource-select-widget"
+            display="chip"
             option-label="label"
             option-value="id"
             :filter="true"
@@ -214,6 +186,26 @@ function validate(e: FormFieldResolverOptions) {
                         }}
                         ]
                     </span>
+                    <Button
+                        icon="pi pi-pen-to-square"
+                        :href="`${arches.urls.resource_editor}${slotProps.option.id}`"
+                        target="_blank"
+                        variant="text"
+                        as="a"
+                        class="p-chip-button"
+                    />
+                    <Button
+                        icon="pi pi-times-circle"
+                        variant="text"
+                        class="p-chip-button"
+                        @click.stop="
+                            (e) =>
+                                (slotProps as any).removeCallback(
+                                    e,
+                                    slotProps.option,
+                                )
+                        "
+                    />
                 </div>
             </template>
         </MultiSelect>
@@ -228,6 +220,47 @@ function validate(e: FormFieldResolverOptions) {
     </FormField>
 </template>
 <style scoped>
+:deep(.concept-resource-select-widget .p-multiselect-label) {
+    visibility: visible;
+    display: grid;
+    min-width: 0;
+    min-height: 0;
+}
+
+:deep(.concept-resource-select-widget .p-multiselect-chip) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    min-width: 0;
+    min-height: 0;
+}
+
+:deep(.concept-resource-select-widget .p-multiselect-chip .pi) {
+    margin: 0 0.5rem;
+}
+
+:deep(.p-chip) {
+    overflow: hidden;
+    min-width: 0;
+    min-height: 0;
+}
+
+:deep(.p-multiselect-chip .p-chip-button) {
+    text-decoration: none;
+}
+
+:deep(.p-multiselect-option span) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+:deep(.p-chip-label) {
+    overflow: hidden;
+    word-wrap: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
+    max-width: 100%;
+}
 .concept-hierarchy {
     font-size: small;
     color: steelblue;
