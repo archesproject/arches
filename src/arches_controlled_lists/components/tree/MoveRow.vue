@@ -226,7 +226,6 @@ const vRefocusDownArrow = {
         v-if="selectedKeys && node.key in selectedKeys"
         v-tooltip="moveLabels.addChild"
         type="button"
-        raised
         class="add-child-button"
         icon="fa fa-plus"
         :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
@@ -243,7 +242,6 @@ const vRefocusDownArrow = {
             v-refocus-up-arrow
             v-tooltip="moveLabels.moveUp"
             type="button"
-            raised
             class="reorder-button"
             icon="fa fa-caret-up"
             :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
@@ -257,7 +255,6 @@ const vRefocusDownArrow = {
             v-refocus-down-arrow
             v-tooltip="moveLabels.moveDown"
             type="button"
-            raised
             class="reorder-button"
             icon="fa fa-caret-down"
             :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
@@ -270,7 +267,6 @@ const vRefocusDownArrow = {
             v-if="!node.data.name && selectedKeys && node.key in selectedKeys"
             v-tooltip="moveLabels.changeParent"
             type="button"
-            raised
             icon="fa fa-arrows-alt"
             :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
             :aria-label="moveLabels.changeParent"
@@ -282,17 +278,27 @@ const vRefocusDownArrow = {
 
 <style scoped>
 .p-button {
-    height: 2rem;
+    height: 2.5rem;
+    width: 2.5rem;
+    padding: .5rem;
+    border-radius: 2px;
+    border: 1px solid steelblue;
 }
 
 .add-child-button {
-    width: 2rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.33rem;
     border-radius: 50%;
+}
+
+.move-buttons .p-button-icon-only {
+    font-size: 1.33rem;
 }
 
 .move-buttons {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.25rem;
     padding-right: 0.5rem;
 }
 

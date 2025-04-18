@@ -131,18 +131,24 @@ function memoizeLastActiveInput(event: FocusEvent) {
         :pt="{
             messageIcon: {
                 style: { marginTop: 'var(--p-toast-text-gap)' },
-            },
+            }
         }"
     />
     <ConfirmDialog
+        style="border-radius: 0rem;"
         :draggable="false"
         :pt="{
             header: {
                 style: {
                     background: 'var(--p-navigation-header-color)',
                     color: 'white',
-                    borderRadius: '1rem',
-                    marginBottom: '1rem',
+                    borderRadius: '0rem',
+                    marginBottom: '2rem',
+                },
+            },
+            footer: {
+                style: {
+                    marginTop: '2rem',
                 },
             },
             title: {

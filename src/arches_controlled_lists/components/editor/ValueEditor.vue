@@ -268,171 +268,188 @@ const focusInput = () => {
 </script>
 
 <template>
-    <div
-        ref="editorDiv"
-        class="value-editor-container"
-    >
-        <h4>{{ headings.heading }}</h4>
+    <div ref="editorDiv" class="value-editor-container">
+        <div class="value-editor-title">
+            <h4>{{ headings.heading }}</h4>
+            <AddValue
+                :value-type
+                :make-new-value-editable="makeValueEditable"
+            />
+        </div>
         <p>{{ headings.subheading }}</p>
-        <DataTable
-            v-if="values.length"
-            v-model:editing-rows="editingRows"
-            :value="values"
-            data-key="id"
-            edit-mode="row"
-            striped-rows
-            scrollable
-            :style="{ fontSize: 'small' }"
-            @row-edit-cancel="(event) => makeRowUneditable(event.data.id)"
-            @row-edit-init="setRowFocus"
-            @row-edit-save="saveValue"
-        >
-            <!-- Note type select (if this is a note editor) -->
-            <Column
-                v-if="valueCategory"
-                field="valuetype_id"
-                :header="noteTypeHeader"
-                style="width: 20%"
+    
+        <div class="value-editor-table">
+            <DataTable
+                v-if="values.length"
+                v-model:editing-rows="editingRows"
+                :value="values"
+                data-key="id"
+                edit-mode="row"
+                striped-rows
+                scrollable
+                :style="{ fontSize: 'small' }"
+                @row-edit-cancel="(event) => makeRowUneditable(event.data.id)"
+                @row-edit-init="setRowFocus"
+                @row-edit-save="saveValue"
             >
-                <template #editor="{ data, field }">
-                    <Select
-                        v-model="data[field]"
-                        :options="labeledNoteChoices"
-                        option-label="label"
-                        option-value="type"
-                        :pt="{
-                            root: { style: { width: '90%' } },
-                            optionLabel: { style: { fontSize: 'small' } },
-                        }"
-                    />
-                </template>
-                <template #body="slotProps">
-                    {{ noteChoiceLabel(slotProps.data.valuetype_id) }}
-                </template>
-            </Column>
-            <Column
-                field="value"
-                :header="valueHeader"
-                style="width: 60%; min-width: 8rem"
-            >
-                <template #editor="{ data, field }">
-                    <!-- Textarea for notes, input for labels -->
-                    <Textarea
-                        v-if="valueCategory"
-                        v-model="data[field]"
-                        rows="3"
-                        cols="60"
-                        auto-resize
-                        :pt="{
-                            hooks: {
-                                onMounted: focusInput,
-                                onUpdated: focusInput,
-                            },
-                        }"
-                        :style="{ fontSize: 'small' }"
-                    />
-                    <InputText
-                        v-else
-                        v-model="data[field]"
-                        :pt="{
-                            hooks: {
-                                onMounted: focusInput,
-                                onUpdated: focusInput,
-                            },
-                        }"
-                    />
-                </template>
-                <template #body="slotProps">
-                    <span
-                        class="full-width-pointer"
-                        style="white-space: pre-wrap"
-                        @click.stop="
-                            makeValueEditable(slotProps.data, slotProps.index)
-                        "
-                    >
-                        {{ slotProps.data.value }}
-                    </span>
-                </template>
-            </Column>
-            <Column
-                field="language_id"
-                :header="languageHeader"
-                style="width: 12%; height: 5rem"
-            >
-                <template #editor="{ data, field }">
-                    <Select
-                        v-model="data[field]"
-                        :options="arches.languages"
-                        :option-label="
-                            (lang: Language) => `${lang.name} (${lang.code})`
-                        "
-                        option-value="code"
-                        :pt="{ optionLabel: { style: { fontSize: 'small' } } }"
-                    />
-                </template>
-                <template #body="slotProps">
-                    {{
-                        `${languageNameFromCode(slotProps.data.language_id)} (${slotProps.data.language_id})`
-                    }}
-                </template>
-            </Column>
-            <Column
-                :row-editor="true"
-                style="width: 5%; text-align: center; white-space: nowrap"
-                :pt="{
-                    headerCell: { ariaLabel: $gettext('Row edit controls') },
-                }"
-            >
-                <template #roweditoriniticon>
-                    <i
-                        class="fa fa-pencil"
-                        aria-hidden="true"
-                    ></i>
-                </template>
-                <template #roweditorsaveicon>
-                    <i
-                        class="fa fa-check"
-                        aria-hidden="true"
-                    ></i>
-                </template>
-                <template #roweditorcancelicon>
-                    <i
-                        class="fa fa-undo"
-                        aria-hidden="true"
-                    ></i>
-                </template>
-            </Column>
-            <Column
-                style="width: 3%; text-align: center"
-                :pt="{ headerCell: { ariaLabel: $gettext('Delete controls') } }"
-            >
-                <template #body="slotProps">
-                    <i
-                        class="fa fa-trash"
-                        role="button"
-                        tabindex="0"
-                        :aria-label="$gettext('Delete')"
-                        @click="issueDeleteValue(slotProps.data)"
-                        @keyup.enter="issueDeleteValue(slotProps.data)"
-                    ></i>
-                </template>
-            </Column>
-        </DataTable>
-        <AddValue
-            :value-type
-            :make-new-value-editable="makeValueEditable"
-        />
+                <!-- Note type select (if this is a note editor) -->
+                <Column
+                    v-if="valueCategory"
+                    field="valuetype_id"
+                    :header="noteTypeHeader"
+                    style="width: 20%"
+                >
+                    <template #editor="{ data, field }">
+                        <Select
+                            v-model="data[field]"
+                            :options="labeledNoteChoices"
+                            option-label="label"
+                            option-value="type"
+                            :pt="{
+                                root: { style: { width: '90%' } },
+                                optionLabel: { style: { fontSize: 'small' } },
+                            }"
+                        />
+                    </template>
+                    <template #body="slotProps">
+                        {{ noteChoiceLabel(slotProps.data.valuetype_id) }}
+                    </template>
+                </Column>
+                <Column
+                    field="value"
+                    :header="valueHeader"
+                    style="width: 60%; min-width: 8rem"
+                >
+                    <template #editor="{ data, field }">
+                        <!-- Textarea for notes, input for labels -->
+                        <Textarea
+                            v-if="valueCategory"
+                            v-model="data[field]"
+                            rows="3"
+                            cols="60"
+                            auto-resize
+                            :pt="{
+                                hooks: {
+                                    onMounted: focusInput,
+                                    onUpdated: focusInput,
+                                },
+                            }"
+                            :style="{ fontSize: 'small' }"
+                        />
+                        <InputText
+                            v-else
+                            v-model="data[field]"
+                            :pt="{
+                                hooks: {
+                                    onMounted: focusInput,
+                                    onUpdated: focusInput,
+                                },
+                            }"
+                        />
+                    </template>
+                    <template #body="slotProps">
+                        <span
+                            class="full-width-pointer"
+                            style="white-space: pre-wrap"
+                            @click.stop="
+                                makeValueEditable(slotProps.data, slotProps.index)
+                            "
+                        >
+                            {{ slotProps.data.value }}
+                        </span>
+                    </template>
+                </Column>
+                <Column
+                    field="language_id"
+                    :header="languageHeader"
+                    style="width: 12%; height: 5rem"
+                >
+                    <template #editor="{ data, field }">
+                        <Select
+                            v-model="data[field]"
+                            :options="arches.languages"
+                            :option-label="
+                                (lang: Language) => `${lang.name} (${lang.code})`
+                            "
+                            option-value="code"
+                            :pt="{ optionLabel: { style: { fontSize: 'small' } } }"
+                        />
+                    </template>
+                    <template #body="slotProps">
+                        {{
+                            `${languageNameFromCode(slotProps.data.language_id)} (${slotProps.data.language_id})`
+                        }}
+                    </template>
+                </Column>
+                <Column
+                    :row-editor="true"
+                    style="width: 5%; text-align: center; white-space: nowrap"
+                    :pt="{
+                        headerCell: { ariaLabel: $gettext('Row edit controls') },
+                        pcRowEditorInit: { }
+                    }"
+                >
+                    <template #roweditoriniticon>
+                        <i
+                            class="fa fa-pencil"
+                            aria-hidden="true"
+                        ></i>
+                    </template>
+                    <template #roweditorsaveicon>
+                        <i
+                            class="fa fa-check"
+                            aria-hidden="true"
+                        ></i>
+                    </template>
+                    <template #roweditorcancelicon>
+                        <i
+                            class="fa fa-undo"
+                            aria-hidden="true"
+                        ></i>
+                    </template>
+                </Column>
+                <Column
+                    style="width: 5%; text-align: center; white-space: nowrap"
+                    :pt="{ headerCell: { ariaLabel: $gettext('Delete controls') } }"
+                >
+                    <template #body="slotProps">
+                        <i
+                            class="fa fa-trash"
+                            role="button"
+                            tabindex="0"
+                            :aria-label="$gettext('Delete')"
+                            @click="issueDeleteValue(slotProps.data)"
+                            @keyup.enter="issueDeleteValue(slotProps.data)"
+                        ></i>
+                    </template>
+                </Column>
+            </DataTable>
+        </div>
     </div>
 </template>
 
 <style scoped>
 .value-editor-container {
-    margin: 1rem 1rem 3rem 1rem;
+    margin: 1rem 1rem 4rem 2rem;
     width: 100%;
 }
 
-h4 {
-    margin-top: 0;
+.value-editor-title {
+    display: flex;
+    gap: 1rem;
+}
+
+.value-editor-title h4 {
+    font-size: 1.66rem;
+    margin: 0;
+    padding: 0.5rem 0 0 0;
+    font-weight: 400;
+}
+
+.value-editor-container p {
+    margin: 0;
+    padding: .25rem 0 0 0;
+    color: var(--p-text-muted-color);
 }
 
 i {
@@ -442,7 +459,6 @@ i {
 p {
     font-weight: normal;
     margin-top: 0;
-    font-size: 1.2rem;
 }
 
 .full-width-pointer {
@@ -454,13 +470,59 @@ p {
 :deep(td > input) {
     height: 3rem;
     font-size: inherit;
+    border-radius: 2px;
 }
 
 :deep(td > input, textarea) {
     width: 100%;
 }
 
+:deep(.p-textarea) {
+    border-radius: 2px;
+}
+
+:deep(.p-select) {
+    border-radius: 2px;
+}
+
 :deep(.p-datatable-column-title) {
     font-size: small;
+}
+
+:deep(.p-button-text.p-button-secondary.p-datatable-row-editor-init) {
+    background: var(--p-button-secondary-background);
+}
+
+:deep(.p-button-text.p-button-secondary.p-datatable-row-editor-init) {
+    background: var(--p-button-secondary-background);
+}
+
+:deep(.p-button-text.p-button-secondary.p-datatable-row-editor-init:hover) {
+    background: var(--p-button-primary-hover-background);
+    color: var(--p-button-primary-hover-color);
+}
+
+:deep(.p-button-text.p-button-secondary.p-datatable-row-editor-save:hover) {
+    background: var(--p-button-primary-hover-background);
+    color: var(--p-button-primary-hover-color);
+}
+
+:deep(.p-button.p-component.p-button-icon-only.p-button-secondary.p-button-rounded.p-button-text.p-datatable-row-editor-cancel:hover) {
+    background: var(--p-amber-300);;
+    color: var(--p-button-primary-hover-color);
+}
+
+:deep(i[role=button]) {
+    height: var(--p-button-icon-only-width);
+    width: var(--p-button-icon-only-width);
+    border-radius: 50%;
+    border: 1px solid var(--p-button-secondary-border-color);
+    background: var(--p-button-secondary-background);
+    padding: .67rem;
+}
+
+:deep(i[role=button]:hover) {
+    background: var(--p-button-danger-background);
+    color: var(--p-button-primary-hover-color);
 }
 </style>

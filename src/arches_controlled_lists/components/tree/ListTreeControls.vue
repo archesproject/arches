@@ -78,9 +78,10 @@ const expandNode = (node: TreeNode) => {
 <style scoped>
 .controls {
     display: flex;
+    flex-direction: column;
     background: var(--p-content-hover-background);
-    gap: 0.5rem;
-    padding: 0.5rem;
+    gap: 0rem;
+    padding: 0;
     justify-content: space-between;
 }
 </style>

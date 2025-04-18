@@ -76,14 +76,20 @@ const cancel = () => {
 
 <template>
     <div class="characteristic">
-        <h4>{{ props.label }}</h4>
-        <!-- TODO https://github.com/archesproject/arches/issues/10847 -->
-        <span
-            v-if="!props.editable"
-            style="font-size: small"
-        >
-            {{ $gettext("False") }}
-        </span>
+        <div>
+            <div class="value-editor-title">
+                <h4>{{ props.label }}</h4>
+            </div>
+            
+            <!-- TODO https://github.com/archesproject/arches/issues/10847 -->
+            <span 
+                v-if="!props.editable"
+                class="value-label"
+                style="font-size: small"
+            >
+                {{ $gettext("False") }}
+            </span>
+            
         <InputText
             v-else
             v-model="inputValue"
@@ -91,55 +97,74 @@ const cancel = () => {
             type="text"
             :disabled="disabled"
             @keyup.enter="save"
-        />
-        <span
-            v-if="props.editable && !isEditing"
-            class="edit-controls"
-        >
-            <i
-                role="button"
-                tabindex="0"
-                class="fa fa-pencil"
-                :aria-label="$gettext('Edit')"
-                @click="setIsEditing(true)"
-                @keyup.enter="setIsEditing(true)"
-            ></i>
-        </span>
-        <span
-            v-if="props.editable && isEditing"
-            class="edit-controls"
-        >
-            <i
-                role="button"
-                tabindex="0"
-                class="fa fa-check"
-                :aria-label="$gettext('Save edit')"
-                @click="save"
-                @keyup.enter="save"
-            ></i>
-            <i
-                role="button"
-                tabindex="0"
-                class="fa fa-undo"
-                :aria-label="$gettext('Cancel edit')"
-                @click="cancel"
-                @keyup.enter="cancel"
-            ></i>
-        </span>
+            />
+       
+            <span
+                v-if="props.editable && !isEditing"
+                class="edit-controls"
+            >
+                <i
+                    role="button"
+                    tabindex="0"
+                    class="fa fa-pencil"
+                    :aria-label="$gettext('Edit')"
+                    @click="setIsEditing(true)"
+                    @keyup.enter="setIsEditing(true)"
+                ></i>
+            </span>
+            <span
+                v-if="props.editable && isEditing"
+                class="edit-controls"
+            >
+                <i
+                    role="button"
+                    tabindex="0"
+                    class="fa fa-check"
+                    :aria-label="$gettext('Save edit')"
+                    @click="save"
+                    @keyup.enter="save"
+                ></i>
+                <i
+                    role="button"
+                    tabindex="0"
+                    class="fa fa-undo"
+                    :aria-label="$gettext('Cancel edit')"
+                    @click="cancel"
+                    @keyup.enter="cancel"
+                ></i>
+            </span>
+        </div>
     </div>
 </template>
 
 <style scoped>
 input {
     font-size: 1.2rem;
+    border-radius: 2px;
+    margin: 0.5rem 0;
 }
 
 .characteristic {
-    margin: 1rem 1rem 2rem 1rem;
+    margin: 1rem 1rem 2.5rem 1rem;
+}
+
+.value-editor-title {
+    display: flex;
+    gap: 1rem;
+}
+
+.value-editor-title h4 {
+    font-size: 1.66rem;
+    margin: 0;
+    padding: 0.5rem 0 0 0;
+    font-weight: 400;
+}
+
+.value-label {
+    color: var(--p-text-muted-color);
 }
 
 .characteristic input {
-    text-align: center;
     border-width: 2px;
     height: 3rem;
     width: 30rem;

@@ -100,5 +100,6 @@ const abandonMove = () => {
     height: 3rem;
     text-wrap: nowrap;
     font-size: unset;
+    border-radius: 2px;
 }
 </style>

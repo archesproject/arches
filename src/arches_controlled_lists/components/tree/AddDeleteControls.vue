@@ -260,37 +260,79 @@ await fetchListsAndPopulateTree();
 </script>
 
 <template>
-    <Button
-        class="list-button"
-        :label="$gettext('Add New List')"
-        raised
-        :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
-        @click="createList"
-    />
-    <SplitButton
-        class="list-button"
-        :label="$gettext('Delete')"
-        :menu-button-props="{ 'aria-label': $gettext('Delete multiple') }"
-        raised
-        :disabled="!toDelete.length"
-        :severity="shouldUseContrast() ? CONTRAST : DANGER"
-        :model="deleteSelectOptions"
-        :pt="{
-            pcButton: {
-                root: { style: { width: '100%', fontSize: 'inherit' } },
-            },
-        }"
-        @click="confirmDelete"
-    />
+    <div class="controls-container">
+        <div>
+            <h3 class="controls-header">
+                {{
+                    $gettext("Lists Manager")
+                }}
+            </h3>
+        </div>
+        <div class="button-controls-container">
+            <Button
+                class="list-button"
+                :label="$gettext('Add New List')"
+                :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
+                @click="createList"
+            />
+            <SplitButton
+                class="list-button"
+                :label="$gettext('Delete')"
+                :menu-button-props="{ 'aria-label': $gettext('Delete multiple') }"
+                :disabled="!toDelete.length"
+                :severity="shouldUseContrast() ? CONTRAST : DANGER"
+                :model="deleteSelectOptions"
+                :pt="{
+                    pcButton: {
+                        root: { style: { width: '100%', fontSize: 'inherit' } },
+                    },
+                }"
+                @click="confirmDelete"
+            />
+        </div>
+    </div>
 </template>
 
 <style scoped>
+.controls-container {
+    padding-bottom: .75rem;
+    border-bottom: 1px solid var(--p-content-border-color);
+}
+
+.controls-header {
+    padding: 0 0.75rem;
+    margin: 1rem 0 .5rem 1.0rem;
+    font-size: 1.75rem;
+    font-weight: 400;
+}
+
+.button-controls-container {
+    padding: 0 1.5rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
 .list-button {
-    height: 4rem;
-    margin: 0.5rem;
+    height: 3rem;
+    margin: 0.5rem 0;
     flex: 0.5;
     justify-content: center;
     text-wrap: nowrap;
-    font-size: inherit;
+    font-size: 1.33rem;
+    font-weight: 500;
+    border-radius: 2px 0 0 2px;
 }
+
+:deep(.p-splitbutton-button) {
+    border-radius: 2px 0 0 2px;
+}
+
+:deep(.p-splitbutton-dropdown) {
+    border-radius: 0 2px 2px 0;
+}
+
+:deep(.p-tieredmenu) {
+    border-radius: 2px;
+}
+
 </style>

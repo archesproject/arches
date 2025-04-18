@@ -55,17 +55,30 @@ const issuePatchItem = async () => {
 
 <style scoped>
 .guide-container {
-    margin: 1rem 1rem 3rem 1rem;
+    margin: 1rem 1rem 4rem 2rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0;
     width: 100%;
-    font-size: small;
+}
+
+.guide-container h4 {
+    font-size: 1.66rem;
+    margin: 0;
+    padding: 0.5rem 0 0 0;
+    font-weight: 400;
+}
+
+.guide-container p {
+    margin: 0;
+    padding: .25rem 0 0 0;
+    color: var(--p-text-muted-color);
 }
 
 .guide-switch {
     display: inline-flex;
     gap: 1rem;
+    padding: 0.5rem 0 0 0;
     align-items: center;
 }
 
@@ -81,6 +94,5 @@ h4 {
 p {
     font-weight: normal;
     margin-top: 0;
-    font-size: 1.2rem;
 }
 </style>

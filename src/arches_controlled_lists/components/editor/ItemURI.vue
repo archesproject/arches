@@ -134,35 +134,38 @@ function tryEdit() {
 
 <style scoped>
 .uri-container {
-    margin: 1rem 1rem 3rem 1rem;
+    margin: 1rem 1rem 4rem 2rem;
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: 90%;
 }
 
-h4 {
-    margin-top: 0;
+.uri-container h4 {
+    font-size: 1.66rem;
+    margin: 0;
+    padding: 0.5rem 0 0 0;
+    font-weight: 400;
 }
 
-p {
-    font-weight: normal;
-    margin-top: 0;
-    font-size: 1.2rem;
+.uri-container p {
+    margin: 0;
+    padding: .25rem 1rem 0 0;
+    color: var(--p-text-muted-color);
 }
 
 input {
     font-size: 1.2rem;
+    border-radius: 2px;
 }
 
 .characteristic {
-    margin: 1rem;
+    margin: .5rem 0 0 0;
     display: flex;
-    align-items: center;
 }
 
 .characteristic input {
-    text-align: center;
     height: 3rem;
+    padding: 1.5rem .5rem;
     width: 100%;
 }
 
@@ -171,6 +174,7 @@ input {
 }
 
 .edit-controls {
+    padding: 0.5rem 0 0 0;
     margin-left: 1rem;
     display: inline-flex;
     justify-content: space-between;
@@ -180,5 +184,19 @@ input {
 .edit-controls i {
     font-size: var(--p-icon-size);
     padding: 0.5rem;
+}
+
+:deep(i[role=button]) {
+    height: var(--p-button-icon-only-width);
+    width: var(--p-button-icon-only-width);
+    border-radius: 50%;
+    border: 1px solid var(--p-button-secondary-border-color);
+    background: var(--p-button-secondary-background);
+    padding: .67rem;
+}
+
+:deep(i[role=button]:hover) {
+    background: var(--p-button-primary-hover-background);
+    color: var(--p-button-primary-hover-color);
 }
 </style>

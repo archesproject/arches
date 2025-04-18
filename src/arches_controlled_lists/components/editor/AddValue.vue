@@ -103,7 +103,6 @@ const addValue = () => {
 <template>
     <Button
         class="add-value"
-        raised
         icon="fa fa-plus-circle"
         :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
         :label="buttonLabel"
@@ -115,8 +114,12 @@ const addValue = () => {
 <style scoped>
 .add-value {
     display: flex;
-    height: 3rem;
-    margin-top: 1rem;
+    background: var(--p-button-secondary-background);
+    color: var(--p-button-secondary-color);
+    margin-top: 0;
+    font-weight: 400;
     font-size: smaller;
+    border-radius: 2px;
+    border-color: transparent;
 }
 </style>

@@ -251,6 +251,7 @@ function lazyLabelLookup(node: TreeNode) {
                     flexGrow: 1,
                     overflowY: 'hidden',
                     paddingBottom: '5rem',
+                    paddingRight: '0rem',
                 },
             },
             pcFilter: {
@@ -320,5 +321,11 @@ function lazyLabelLookup(node: TreeNode) {
 :deep(.p-tree-filter-input) {
     height: 3.5rem;
     font-size: 1.4rem;
+    border-radius: 2px;
 }
+
+:deep(.p-tree-node) {
+    margin-right: 0.5rem;
+}
+
 </style>

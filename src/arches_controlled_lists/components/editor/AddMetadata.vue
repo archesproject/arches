@@ -75,10 +75,9 @@ const addMetadata = () => {
 <template>
     <Button
         class="add-metadata"
-        raised
         icon="fa fa-plus-circle"
         :severity="shouldUseContrast() ? CONTRAST : PRIMARY"
-        :label="$gettext('Add metadata')"
+        :label="$gettext('Metadata')"
         :disabled="isEditing"
         @click="addMetadata"
     />

@@ -54,7 +54,7 @@ const bestAlternativeText = computed(() => {
             :src="image.url"
             :title="bestTitle"
             :alt="bestAlternativeText"
-            width="200"
+            width="400"
         />
         <ImageMetadata :image="image" />
     </div>

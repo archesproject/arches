@@ -18,15 +18,17 @@ const { $gettext } = useGettext();
         </div>
 
         <div class="controlled-list-splash-description">
-            {{ $gettext("Select a list from the sidebar.") }}
+            <div class="splash-note">
+                {{ $gettext("Use the Controlled List Manager to create new lists of controlled vocabularies, or update an existing list by selecting it from the tree in the sidebar. Use Arches Designer to select which node(s) in a model can use a list") }}
+            </div>
         </div>
     </div>
 </template>
 
 <style scoped>
 .splash-large {
-    width: 10rem;
-    height: 10rem;
+    width: 7.5rem;
+    height: 7.5rem;
 }
 
 .splash-circle {
@@ -37,7 +39,7 @@ const { $gettext } = useGettext();
     text-align: center;
     margin: 5rem 5rem 2rem 5rem;
     border: 1px solid #ddd;
-    padding: 4rem 3rem;
+    padding: 10rem 3rem;
     background: var(--p-content-hover-background);
     border-radius: var(--p-content-border-radius);
     display: flex;
@@ -47,13 +49,17 @@ const { $gettext } = useGettext();
 
 .controlled-list-splash-title {
     font-size: 2.8rem;
-    margin-bottom: 3rem;
-    margin-top: 2.5rem;
+    margin-bottom: .5rem;
+    margin-top: 4rem;
+}
+
+.splash-note {
+    max-width: 150ch;
 }
 
 i {
     color: steelblue;
-    font-size: xx-large;
+    font-size: x-large;
     display: flex;
     height: 100%;
     justify-content: center;
@@ -69,6 +75,10 @@ i {
 
 .controlled-list-splash-description {
     font-size: 1.5rem;
-    font-weight: 500;
+    line-height: 1.15;
+    font-weight: 400;
+    color: var(--p-text-muted-color);
+    padding: 0 10rem;
+    margin-bottom: 10rem;
 }
 </style>

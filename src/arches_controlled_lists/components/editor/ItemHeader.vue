@@ -25,52 +25,73 @@ const iconLabel = (item: ControlledListItem) => {
 </script>
 
 <template>
-    <span class="item-header">
-        <i
-            class="pi pi-tag"
-            :aria-label="$gettext('Item')"
-        ></i>
-        <h3>
-            {{
-                getItemLabel(item, selectedLanguage.code, systemLanguage.code)
-                    .value
-            }}
-        </h3>
-        <span class="item-type">{{ iconLabel(item) }}</span>
-        <a
-            v-if="item.uri"
-            :href="item.uri"
-            rel="noreferrer"
-            target="_blank"
-        >
-            {{ item.uri }}
-        </a>
-    </span>
+    <div class="item-header-container">
+        <div class="item-header">
+            <i
+                class="pi pi-tag item-header-icon"
+                :aria-label="$gettext('Item')"
+            ></i>
+            <h3 class="item-label">
+                {{
+                    getItemLabel(item, selectedLanguage.code, systemLanguage.code)
+                        .value
+                }}
+            </h3>
+            <span class="item-type">{{ iconLabel(item) }}</span>
+        </div>
+        <div class="item-url">
+            <a
+                v-if="item.uri"
+                :href="item.uri"
+                rel="noreferrer"
+                target="_blank"
+            >
+                {{ item.uri }}
+            </a>
+        </div>
+    </div>
 </template>
 
 <style scoped>
-.item-header {
-    display: inline-flex;
-    align-items: center;
-    gap: 1rem;
+.item-header-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0rem;
     margin: 1rem 1rem 0rem 1rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid;
+    border-bottom: 1px solid var(--p-content-border-color);
     width: 100%;
 }
 
-h3 {
+.item-header {
+    display: flex;
+}
+
+.item-header-icon {
+    padding: .5rem .5rem;
+    align-items: baseline;
+}
+
+.item-label {
+    padding: 0 .5rem 0 0;
+    font-weight: 400;
     margin: 0;
+    font-size: 1.8rem;
+}
+
+.item-url {
+    padding: 0 2.25rem;
 }
 
 .item-type {
     font-size: small;
     font-weight: 200;
+    padding: .25rem 0 0 0;
 }
 
 a {
     font-size: small;
-    color: var(--p-text-color);
+    color: var(--p-text-muted-color);
     text-decoration: underline;
 }
 </style>

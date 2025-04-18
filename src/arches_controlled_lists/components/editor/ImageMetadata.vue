@@ -390,17 +390,16 @@ const focusInput = () => {
             </Column>
         </DataTable>
     </div>
-    <div style="display: flex; gap: 1rem">
+    <div style="display: flex; gap: 0.5rem">
         <AddMetadata
             :image
             :labeled-choices
             :make-metadata-editable
         />
         <Button
-            raised
             :severity="shouldUseContrast() ? CONTRAST : DANGER"
             icon="fa fa-trash"
-            :label="$gettext('Delete image')"
+            :label="$gettext('Delete')"
             @click="issueDeleteImage"
         />
     </div>
@@ -432,4 +431,52 @@ const focusInput = () => {
 i {
     font-size: var(--p-icon-size);
 }
+
+:deep(.p-button-text.p-button-secondary.p-datatable-row-editor-save) {
+    background: var(--p-button-secondary-background);
+    border: 1px solid var(--p-button-secondary-border-color);
+    border-radius: 50%;
+}
+
+:deep(.p-button-text.p-button-secondary.p-datatable-row-editor-save:hover) {
+    background: var(--p-button-primary-hover-background);
+    color: var(--p-button-primary-hover-color);
+}
+
+:deep(.p-button-text.p-button-secondary.p-datatable-row-editor-init) {
+    background: var(--p-button-secondary-background);
+    border: 1px solid var(--p-button-secondary-border-color);
+    border-radius: 50%;
+}
+
+:deep(.p-button-text.p-button-secondary.p-datatable-row-editor-init:hover) {
+    background: var(--p-button-primary-hover-background);
+    color: var(--p-button-primary-hover-color);
+}
+
+:deep(.p-button-text.p-button-secondary.p-datatable-row-editor-cancel) {
+    background: var(--p-button-secondary-background);
+    border: 1px solid var(--p-button-secondary-border-color);
+    border-radius: 50%;
+}
+
+:deep(.p-button-text.p-button-secondary.p-datatable-row-editor-cancel:hover) {
+    background: var(--p-amber-300);
+    color: var(--p-button-primary-hover-color);
+}
+
+:deep(i[role=button]) {
+    height: var(--p-button-icon-only-width);
+    width: var(--p-button-icon-only-width);
+    border-radius: 50%;
+    border: 1px solid var(--p-button-secondary-border-color);
+    background: var(--p-button-secondary-background);
+    padding: .67rem;
+}
+
+:deep(i[role=button]:hover) {
+    background: var(--p-button-danger-background);
+    color: var(--p-button-primary-hover-color);
+}
+
 </style>
