@@ -173,7 +173,7 @@ const viewModel = Backbone.View.extend({
                     var resources = rr.related_resources;
                     rr.resource_relationships.forEach(function(relationship) {
                         var res = _.filter(resources, function(resource) {
-                            if (_.contains([relationship.resourceinstanceidto, relationship.resourceinstanceidfrom], resource.resourceinstanceid)) {
+                            if (_.contains([relationship.to_resource, relationship.from_resource], resource.resourceinstanceid)) {
                                 return resource;
                             }
                         });
