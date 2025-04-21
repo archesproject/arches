@@ -119,6 +119,11 @@ async function onLazyLoadResources(event?: VirtualScrollerLazyEvent) {
     await getOptions((searchResultsPage.value || 0) + 1);
 }
 
+function getOption(value: string): SearchResultItem | undefined {
+    const option = options.value.find((option) => option.id == value);
+    return option;
+}
+
 function resolver(e: FormFieldResolverOptions) {
     validate(e);
 }
@@ -144,7 +149,6 @@ function validate(e: FormFieldResolverOptions) {
         :resolver="resolver"
     >
         <MultiSelect
-            class="concept-resource-select-widget"
             display="chip"
             option-label="label"
             option-value="id"
@@ -166,7 +170,7 @@ function validate(e: FormFieldResolverOptions) {
             @filter="onFilter"
         >
             <template #option="slotProps">
-                <div class="flex items-center">
+                <div>
                     <span>
                         {{
                             getItemLabel(
@@ -187,24 +191,43 @@ function validate(e: FormFieldResolverOptions) {
                         }}
                         ]
                     </span>
+                </div>
+            </template>
+            <template #chip="slotProps">
+                <div style="width: 100%">
+                    <div class="chip-text">
+                        {{ getOption(slotProps.value)?.label }}
+                    </div>
+                </div>
+                <div class="button-container">
                     <Button
-                        icon="pi pi-pen-to-square"
-                        :href="`${arches.urls.resource_editor}${slotProps.option.id}`"
+                        as="a"
+                        icon="pi pi-info-circle"
                         target="_blank"
                         variant="text"
-                        as="a"
-                        class="p-chip-button"
+                        size="small"
+                        style="text-decoration: none"
+                        :href="`${arches.urls.resource_report}${slotProps.value}`"
+                        @click.stop
                     />
                     <Button
-                        icon="pi pi-times-circle"
+                        as="a"
+                        icon="pi pi-pencil"
+                        target="_blank"
                         variant="text"
-                        class="p-chip-button"
+                        size="small"
+                        style="text-decoration: none"
+                        :href="`${arches.urls.resource_editor}${slotProps.value}`"
+                        @click.stop
+                    />
+                    <Button
+                        icon="pi pi-times"
+                        variant="text"
+                        size="small"
                         @click.stop="
-                            (e) =>
-                                (slotProps as any).removeCallback(
-                                    e,
-                                    slotProps.option,
-                                )
+                            (e) => {
+                                slotProps.removeCallback(e, slotProps.value);
+                            }
                         "
                     />
                 </div>
@@ -221,47 +244,38 @@ function validate(e: FormFieldResolverOptions) {
     </FormField>
 </template>
 <style scoped>
-:deep(.concept-resource-select-widget .p-multiselect-label) {
-    visibility: visible;
-    display: grid;
-    min-width: 0;
-    min-height: 0;
+.button-container {
+    display: flex;
+    justify-content: flex-end;
 }
 
-:deep(.concept-resource-select-widget .p-multiselect-chip) {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto;
-    align-items: center;
-    min-width: 0;
-    min-height: 0;
+.chip-text {
+    width: min-content;
+    min-width: fit-content;
+    overflow-wrap: anywhere;
+    padding: 0.5rem 1rem;
 }
 
-:deep(.concept-resource-select-widget .p-multiselect-chip .pi) {
-    margin: 0 0.5rem;
+:deep(.p-multiselect-label) {
+    width: inherit;
+    flex-direction: column;
+    white-space: break-spaces;
+    align-items: flex-start;
 }
 
-:deep(.p-chip) {
-    overflow: hidden;
-    min-width: 0;
-    min-height: 0;
+:deep(.p-multiselect-chip-item) {
+    width: inherit;
+    border: 0.125rem solid var(--p-inputtext-border-color);
+    padding: 0.25rem;
+    border-radius: 0.5rem;
+    margin: 0.25rem;
 }
 
-:deep(.p-multiselect-chip .p-chip-button) {
-    text-decoration: none;
+:deep(.p-multiselect-label-container) {
+    white-space: break-spaces;
+    width: inherit;
 }
 
-:deep(.p-multiselect-option span) {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-:deep(.p-chip-label) {
-    overflow: hidden;
-    word-wrap: nowrap;
-    text-overflow: ellipsis;
-    min-width: 0;
-    max-width: 100%;
-}
 .concept-hierarchy {
     font-size: small;
     color: steelblue;
