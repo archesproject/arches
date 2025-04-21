@@ -7,6 +7,7 @@ from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 
 from arches.app.utils.decorators import user_can_read_resource
+from django.db.models import Value, Case, When, Q
 
 
 class RelatableResourcesView(View):
@@ -21,7 +22,7 @@ class RelatableResourcesView(View):
         filter_term = request.GET.get("filter_term", None)
         items_per_page = request.GET.get("items", 25)
         language = get_language()
-
+        initial_values = request.GET.getlist("initialValue", "")
         config = JSONDeserializer().deserialize(node.config.value)
         graphs = [graph["graphid"] for graph in config.get("graphs", [])]
 
@@ -29,21 +30,33 @@ class RelatableResourcesView(View):
             "name", "graphid"
         )
 
-        resources = ResourceInstance.objects.filter(graph_id__in=graphs).order_by(
-            "descriptors__{}__name".format(language)
+        resources = ResourceInstance.objects.filter(graph_id__in=graphs).annotate(
+            order_field=Case(
+                When(resourceinstanceid__in=initial_values, then=Value(0)),
+                default=Value(1),
+            )
         )
 
         query_string = "descriptors__{}__name__icontains".format(language)
 
         if filter_term:
-            resources = resources.filter(**{query_string: filter_term})
+            resources = resources.filter(
+                Q(**{query_string: filter_term})
+                | Q(resourceinstanceid__in=initial_values)
+            )
 
-        paginator = Paginator(resources, items_per_page)
+        paginator = Paginator(
+            resources.order_by(
+                "order_field", "descriptors__{}__name".format(get_language())
+            ),
+            items_per_page,
+        )
         page_object = paginator.get_page(page_number)
         data = [
             {
                 "resourceinstanceid": resource.resourceinstanceid,
                 "display_value": resource.descriptors[language]["name"],
+                "order_field": resource.order_field,
             }
             for resource in page_object
         ]

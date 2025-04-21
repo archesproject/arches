@@ -1,5 +1,7 @@
 import arches from "arches";
 
+import type { ResourceInstanceReference } from "@/arches_component_lab/widgets/types.ts";
+
 export const fetchWidgetData = async (graphSlug: string, nodeAlias: string) => {
     const response = await fetch(
         arches.urls.api_widget_data(graphSlug, nodeAlias),
@@ -54,6 +56,7 @@ export const fetchRelatableResources = async (
     nodeAlias: string,
     page: number,
     filterTerm?: string,
+    initialValues?: ResourceInstanceReference[] | null | undefined,
 ) => {
     const params = new URLSearchParams();
 
@@ -61,7 +64,9 @@ export const fetchRelatableResources = async (
     if (filterTerm) {
         params.append("filter_term", filterTerm);
     }
-
+    initialValues?.forEach((initialValue) =>
+        params.append("initialValue", initialValue.resourceId),
+    );
     const response = await fetch(
         `${arches.urls.api_relatable_resources(
             graphSlug,
