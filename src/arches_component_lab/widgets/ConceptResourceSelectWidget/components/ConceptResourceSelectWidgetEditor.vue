@@ -126,6 +126,26 @@ function getOption(value: string): SearchResultItem | undefined {
 
 function resolver(e: FormFieldResolverOptions) {
     validate(e);
+
+    let value = e.value;
+
+    if (!Array.isArray(value)) {
+        value = [value];
+    }
+
+    return {
+        values: {
+            [props.nodeAlias]: options.value.filter((option) => {
+                return value?.includes(option.id);
+            }).map((option) => {
+                return {
+                    resourceId: option.id,
+                    ontologyProperty: "",
+                    inverseOntologyProperty: "",
+                };
+            }),
+        },
+    };
 }
 
 function validate(e: FormFieldResolverOptions) {
