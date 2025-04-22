@@ -42,7 +42,6 @@ const searchResultsPage = ref(0);
 const searchResultsTotalCount = ref(0);
 const fetchError = ref<string | null>(null);
 
-
 const searchResultsCurrentCount = computed(() => options.value.length);
 
 function clearOptions() {
@@ -135,15 +134,17 @@ function resolver(e: FormFieldResolverOptions) {
 
     return {
         values: {
-            [props.nodeAlias]: options.value.filter((option) => {
-                return value?.includes(option.id);
-            }).map((option) => {
-                return {
-                    resourceId: option.id,
-                    ontologyProperty: "",
-                    inverseOntologyProperty: "",
-                };
-            }),
+            [props.nodeAlias]: options.value
+                .filter((option) => {
+                    return value?.includes(option.id);
+                })
+                .map((option) => {
+                    return {
+                        resourceId: option.id,
+                        ontologyProperty: "",
+                        inverseOntologyProperty: "",
+                    };
+                }),
         },
     };
 }
