@@ -14,13 +14,13 @@ const { buildFilepathLookup } = require('./webpack-utils/build-filepath-lookup')
 
 module.exports = () => {
     return new Promise((resolve, _reject) => {
-        // BEGIN get data from `.frontend-configuration-settings.json`
+        // BEGIN get data from `webpack-metadata.json`
 
-        const rawData = fs.readFileSync(Path.join(__dirname, "..", '.frontend-configuration-settings.json'), 'utf-8');
+        const rawData = fs.readFileSync(Path.join(__dirname, "..", "frontend_configuration", 'webpack-metadata.json'), 'utf-8');
         const parsedData = JSON.parse(rawData);
 
-        console.log('Data imported from .frontend-configuration-settings.json:', parsedData);
-    
+        console.log('Data imported from webpack-metadata.json:', parsedData);
+
         global.APP_ROOT = parsedData['APP_ROOT'];
         global.ARCHES_APPLICATIONS = parsedData['ARCHES_APPLICATIONS'];
         global.ARCHES_APPLICATIONS_PATHS = parsedData['ARCHES_APPLICATIONS_PATHS'];
@@ -30,7 +30,7 @@ module.exports = () => {
         global.PUBLIC_SERVER_ADDRESS = parsedData['PUBLIC_SERVER_ADDRESS'];
         global.WEBPACK_DEVELOPMENT_SERVER_PORT = parsedData['WEBPACK_DEVELOPMENT_SERVER_PORT'];
 
-        // END get data from `.frontend-configuration-settings.json`
+        // END get data from `webpack-metadata.json`
         // BEGIN workaround for handling node_modules paths in arches-core vs projects
 
         let PROJECT_RELATIVE_NODE_MODULES_PATH;
@@ -242,8 +242,8 @@ module.exports = () => {
 
         const universalConstants = {
             APP_ROOT_DIRECTORY: JSON.stringify(APP_ROOT).replace(/\\/g, '/'),
-            ARCHES_CORE_DIRECTORY: JSON.stringify(ROOT_DIR).replace(/\\/g, '/'),
             ARCHES_APPLICATIONS: JSON.stringify(ARCHES_APPLICATIONS),
+            ARCHES_CORE_DIRECTORY: JSON.stringify(ROOT_DIR).replace(/\\/g, '/'),
             SITE_PACKAGES_DIRECTORY: JSON.stringify(SITE_PACKAGES_DIRECTORY).replace(/\\/g, '/'),
         };
 
@@ -266,19 +266,44 @@ module.exports = () => {
                 ...projectEntryPointConfiguration,
                 ...CSSFilepathLookup,
             },
-            devServer: {
-                port: WEBPACK_DEVELOPMENT_SERVER_PORT,
-            },
             output: {
+                assetModuleFilename: 'img/[name].[contenthash][ext]',
+                filename: '[name].[contenthash].js',
+                clean: true,
                 path: Path.resolve(__dirname, APP_ROOT, 'media', 'build'),
                 publicPath: STATIC_URL,
-                libraryTarget: 'amd-require',
-                clean: true,
-                assetModuleFilename: 'img/[hash][ext][query]',
+            },
+            optimization: {
+                splitChunks: {
+                    chunks: 'all',
+                    cacheGroups: {
+                        vendors: {
+                            test: /[\\/]node_modules[\\/]/,
+                            priority: -10,
+                            reuseExistingChunk: true,
+                        },
+                        commons: {
+                            minChunks: 2,
+                            priority: -20,
+                            reuseExistingChunk: true,
+                        },
+                    },
+                },
+                concatenateModules: true,
+                removeAvailableModules: true,
             },
             plugins: [
                 new CleanWebpackPlugin(),
                 new webpack.DefinePlugin(universalConstants),
+                new webpack.DefinePlugin({
+                    ARCHES_URLS: webpack.DefinePlugin.runtimeValue(
+                        () => fs.readFileSync(
+                            Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, '..', 'frontend_configuration', 'urls.json'), 
+                            'utf-8'
+                        ),
+                        true  // should be re-evaluated on rebuild
+                    ),
+                }),
                 new webpack.DefinePlugin({
                     __VUE_OPTIONS_API__: 'true',
                     __VUE_PROD_DEVTOOLS__: 'false',
@@ -289,10 +314,12 @@ module.exports = () => {
                     jQuery: Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, 'jquery', 'dist', 'jquery.min'),
                     jquery: Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, 'jquery', 'dist', 'jquery.min')
                 }),
-                new MiniCssExtractPlugin(),
-                new BundleTracker({ 
+                new MiniCssExtractPlugin({
+                    filename: '[name].[contenthash].css',
+                }),
+                new BundleTracker({
                     path: Path.resolve(__dirname),
-                    filename: 'webpack-stats.json' 
+                    filename: 'webpack-stats.json',
                 }),
                 new VueLoaderPlugin(),
             ],
@@ -450,7 +477,7 @@ module.exports = () => {
                                             if (serverAddress.charAt(serverAddress.length - 1) === '/') {
                                                 serverAddress = serverAddress.slice(0, -1)
                                             }
-                                            
+
                                             resp = await fetch(serverAddress + templatePath);
 
                                             if (resp.status === 500) {
@@ -505,9 +532,11 @@ module.exports = () => {
                         use: Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'raw-loader'),
                     },
                     {
-                        test: /\.(png|svg|jpg|jpeg|gif)$/i,
-                        exclude: /node_modules/,
+                        test: /\.(png|jpe?g|gif|svg)$/,
                         type: 'asset/resource',
+                        generator: {
+                            filename: 'img/[name].[contenthash][ext]',
+                        },
                     },
                 ],
             },

@@ -23,24 +23,17 @@ from django.db import connection, transaction
 
 
 class Command(BaseCommand):
-    """
-    Commands for adding arches test users
-
-    """
-
-    # Silence system checks since this command is the cure for
-    # one of the system checks (arches.E004)
-    requires_system_checks = []
+    """Commands for updating graphs."""
 
     def add_arguments(self, parser):
         parser.add_argument(
             "operation",
             nargs="?",
-            choices=["publish", "create_editable_future_graphs"],
+            choices=["publish", "create_draft_graphs"],
             help="""
             Operation Type
                 'publish' publishes resource models indicated using the --graphs arg.
-                'create_editable_future_graphs' creates an editable_future_graph for resource models indicated using the --graphs arg.
+                'create_draft_graphs' creates an draft_graph for resource models indicated using the --graphs arg.
 
                 Operations apply to all resource models if a --graphs value is not provided,
             """,
@@ -91,16 +84,22 @@ class Command(BaseCommand):
         if options["operation"] == "publish":
             self.publish(options["username"])
 
-        if options["operation"] == "create_editable_future_graphs":
-            self.create_editable_future_graphs()
+        if options["operation"] == "create_draft_graphs":
+            self.create_draft_graphs()
 
-    def create_editable_future_graphs(self):
-        print("\nBEGIN Create editable_future_graphs...")
+    def create_draft_graphs(self):
+        print("\nBEGIN Create draft_graphs...")
 
         with transaction.atomic():
             for graph in self.graphs:
-                print("\nCreating editable_future_graph for %s..." % graph.name)
-                graph.create_editable_future_graph()
+                if graph.source_identifier_id:
+                    print(
+                        "Graph %s already has a draft_graph. Skipping..." % graph.name
+                    )
+                    continue
+
+                print("\nCreating draft_graph for %s..." % graph.name)
+                graph.create_draft_graph()
 
                 print(
                     "%s has been updated! Creating a new publication for %s."
@@ -108,7 +107,7 @@ class Command(BaseCommand):
                 )
                 graph.publish()
 
-            print("\nEND Create editable_future_graphs. Success!")
+            print("\nEND Create draft_graphs. Success!")
 
     def publish(self, username):
         user = User.objects.get(username=username)

@@ -31,7 +31,7 @@ from guardian.exceptions import WrongAppError
 import guardian.shortcuts as gsc
 
 import inspect
-from arches.app.models.models import Node, NodeGroup, TileModel
+from arches.app.models.models import GraphModel, Node, NodeGroup, TileModel
 from django.db.models import Q
 from arches.app.models.system_settings import settings
 from arches.app.models.models import ResourceInstance, MapLayer
@@ -310,7 +310,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         if user.is_authenticated:
             if user.is_superuser:
                 return True
-            if resourceid is not None and resourceid != "":
+            if resourceid or resource:
                 result = self.check_resource_instance_permissions(
                     user, resourceid, "view_resourceinstance", resource=resource
                 )
@@ -338,13 +338,9 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         """
         nodegroups = self.get_nodegroups_by_perm(user, perms)
         graphs = (
-            Node.objects.values("graph_id")
-            .filter(
-                Q(nodegroup__in=nodegroups)
-                & ~Q(graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                & Q(graph__isresource=True)
-            )
-            .values_list("graph_id", flat=True)
+            GraphModel.objects.filter(node__nodegroup__in=nodegroups, isresource=True)
+            .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            .values_list("pk", flat=True)
         )
 
         return list(str(graph) for graph in graphs)
@@ -363,7 +359,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         if user.is_authenticated:
             if user.is_superuser:
                 return True
-            if resourceid:
+            if resourceid or resource:
                 result = self.check_resource_instance_permissions(
                     user, resourceid, "change_resourceinstance", resource=resource
                 )
@@ -399,7 +395,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         if user.is_authenticated:
             if user.is_superuser:
                 return True
-            if resourceid:
+            if resourceid or resource:
                 result = self.check_resource_instance_permissions(
                     user, resourceid, "delete_resourceinstance", resource=resource
                 )
@@ -643,6 +639,9 @@ class PermissionBackend(ObjectPermissionBackend):  # type: ignore
                         "Passed perm has app label of '%s' and "
                         "given obj has '%s'" % (app_label, obj._meta.app_label)
                     )
+
+            if user_obj.is_superuser:
+                return True
 
             obj_checker: ObjectPermissionChecker = CachedObjectPermissionChecker(
                 user_obj, obj

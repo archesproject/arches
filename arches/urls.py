@@ -20,8 +20,7 @@ from arches.app.views.language import LanguageView
 from django.conf.urls.i18n import i18n_patterns
 from django.contrib.auth import views as auth_views
 from django.urls import include, path, re_path
-from arches.app.views import concept, main, map, search, graph, api
-from arches.app.views.api import auth as api_auth, user as api_user
+from arches.app.views import concept, main, search, api
 from arches.app.views.admin import ReIndexResources, ClearUserPermissionCache
 from arches.app.views.etl_manager import ETLManagerView
 from arches.app.views.file import FileView, TempFileView
@@ -57,7 +56,6 @@ from arches.app.views.resource import (
     ResourceActivityStreamCollectionView,
 )
 from arches.app.views.plugin import PluginView
-from arches.app.views.workflow_history import WorkflowHistoryView
 from arches.app.views.concept import RDMView
 from arches.app.views.user import UserManagerView
 from arches.app.views.tile import TileData
@@ -546,11 +544,6 @@ urlpatterns = [
         name="get_graph_models_api",
     ),
     re_path(
-        r"^graph_has_unpublished_changes/(?P<graph_id>%s)$" % (uuid_regex),
-        api.GraphHasUnpublishedChanges.as_view(),
-        name="graph_has_unpublished_changes_api",
-    ),
-    re_path(
         r"^graph_is_active/(?P<graph_id>%s)$" % (uuid_regex),
         api.GraphIsActive.as_view(),
         name="graph_is_active_api",
@@ -570,9 +563,9 @@ urlpatterns = [
         api.Resources.as_view(),
         name="resources",
     ),
-    path("api/login", api_auth.Login.as_view(), name="api_login"),
-    path("api/logout", api_auth.Logout.as_view(), name="api_logout"),
-    path("api/user", api_user.UserView.as_view(), name="api_user"),
+    path("api/login", api.Login.as_view(), name="api_login"),
+    path("api/logout", api.Logout.as_view(), name="api_logout"),
+    path("api/user", api.UserView.as_view(), name="api_user"),
     re_path(
         r"^api/tiles/(?P<tileid>%s|())$" % (uuid_regex),
         api.Tile.as_view(),
@@ -655,7 +648,7 @@ urlpatterns = [
     path("plugins/<slug:slug>/<path:path>", PluginView.as_view(), name="plugins"),
     re_path(
         r"^workflow_history/(?P<workflowid>%s|())$" % uuid_regex,
-        WorkflowHistoryView.as_view(),
+        api.WorkflowHistoryView.as_view(),
         name="workflow_history",
     ),
     re_path(
@@ -781,12 +774,26 @@ urlpatterns = [
         api.SpatialView.as_view(),
         name="spatialview_api",
     ),
-    re_path("^api", api.API404.as_view(), name="api_404"),
+    re_path(
+        r"^api/user_preference/$",
+        api.UserPreferenceListCreateView.as_view(),
+        name="api_user_preference_list_view",
+    ),
+    re_path(
+        r"^api/user_preference/(?P<identifier>%s|())/?$" % uuid_regex,
+        api.UserPreferenceDetailView.as_view(),
+        name="api_user_preference_detail_view",
+    ),
 ]
+
+handler400 = "arches.app.views.main.custom_400"
+handler403 = "arches.app.views.main.custom_403"
+handler404 = "arches.app.views.main.custom_404"
+handler500 = "arches.app.views.main.custom_500"
 
 # This must be included in core to keep webpack happy, but cannot be appended when running a project.
 # See https://github.com/archesproject/arches/pull/10754
-if settings.APP_NAME == "Arches":
+if settings.ROOT_URLCONF == __name__:
     if settings.SHOW_LANGUAGE_SWITCH is True:
         urlpatterns = i18n_patterns(*urlpatterns)
 

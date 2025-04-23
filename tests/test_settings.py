@@ -44,6 +44,7 @@ RESOURCE_GRAPH_LOCATIONS = [
         "graphs",
         "resource_models",
     ),
+    os.path.join(TEST_ROOT, "fixtures", "jsonld_base", "models"),
 ]
 REFERENCE_DATA_FIXTURE_LOCATION = os.path.join(
     TEST_ROOT, "fixtures", "testing_prj", "testing_prj", "pkg", "reference_data"
@@ -88,8 +89,6 @@ LOCAL_BROWSERS = []  # ['Firefox']
 
 ENABLE_USER_SIGNUP = True
 FORCE_USER_SIGNUP_EMAIL_AUTHENTICATION = True
-
-OVERRIDE_RESOURCE_MODEL_LOCK = True
 
 ENABLE_TWO_FACTOR_AUTHENTICATION = False
 FORCE_TWO_FACTOR_AUTHENTICATION = False

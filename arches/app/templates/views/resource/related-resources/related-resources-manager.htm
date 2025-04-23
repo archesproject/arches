@@ -190,7 +190,7 @@
                                             data-bind="text: self.currentResource().displayname + ' (' + self.makeFriendly(self.rootOntologyClass) + ')'"></span>
                                     </div>
                                     <!-- /ko -->
-                                    <!--ko if: self.currentResource().resourceinstanceid === relationship.resourceinstanceidto() -->
+                                    <!--ko if: self.currentResource().resourceinstanceid === relationship.to_resource() -->
                                     <div class="row">
                                         <label class="col-sm-12" style="font-weight: bold;">
                                             <span data-bind="text: $root.translations.inverseRelationshipTo + ' ' + resource.displayname"></span></label>

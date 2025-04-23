@@ -1,15 +1,13 @@
-define([
-    'jquery',
-    'underscore',
-    'knockout',
-    'viewmodels/map',
-    'templates/views/components/map.htm',
-    'bindings/mapbox-gl',
-    'bindings/sortable',
-], function($, _, ko, MapViewModel, mapTemplate) {
-    ko.components.register('arches-map', {
-        viewModel: MapViewModel,
-        template: mapTemplate,
-    });
-    return MapViewModel;
+import _ from 'underscore';
+import ko from 'knockout';
+import MapViewModel from 'viewmodels/map';
+import mapTemplate from 'templates/views/components/map.htm';
+import 'bindings/mapbox-gl';
+import 'bindings/sortable';
+
+ko.components.register('arches-map', {
+    viewModel: MapViewModel,
+    template: mapTemplate,
 });
+
+export default MapViewModel;

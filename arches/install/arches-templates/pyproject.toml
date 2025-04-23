@@ -1,12 +1,12 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools>=77", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "{{ project_name }}"
 readme = "README.md"
 authors = []
-license = {text = "GNU AGPL3"}
+license = "AGPL-3.0-or-later"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python",
@@ -16,11 +16,10 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Framework :: Django",
-    "Framework :: Django :: 5.1",
+    "Framework :: Django :: 5.2",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Information Technology",
-    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
 ]
 requires-python = ">=3.11"
 dependencies = [
@@ -30,12 +29,12 @@ version = "0.0.1"
 
 [project.optional-dependencies]
 dev = [
-    "livereload",
-    "sst",
+    "black==24.4.2",
     "coverage",
     "django-silk==5.1.0",
+    "livereload",
     "pre-commit==3.8.0",
-    "black==24.4.2",
+    "sst",
 ]
 
 [tool.setuptools]

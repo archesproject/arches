@@ -23,11 +23,13 @@ import uuid
 import logging
 import warnings
 from datetime import datetime
-from elasticsearch import Elasticsearch, helpers, ElasticsearchWarning
+from elasticsearch import Elasticsearch, helpers, ElasticsearchWarning, NotFoundError
 from elasticsearch.exceptions import RequestError
 from elasticsearch.helpers import BulkIndexError
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+
+from arches.app.search.mappings import CONCEPTS_INDEX, RESOURCES_INDEX, TERMS_INDEX
 
 
 class SearchEngine(object):
@@ -43,6 +45,99 @@ class SearchEngine(object):
         warnings.filterwarnings("ignore", category=ElasticsearchWarning)
         if "cloud_id" in settings.ELASTICSEARCH_CONNECTION_OPTIONS:
             serializer.utf_encode = True
+
+    def create_snapshot(self, repository, snapshot=None, **kwargs):
+        if snapshot is None:
+            from datetime import datetime
+
+            # input datetime
+            dt = datetime.now()
+            # epoch time
+            epoch_time = datetime(1970, 1, 1)
+
+            # subtract Datetime from epoch datetime
+            delta = dt - epoch_time
+            snapshot = "{}_{}".format(settings.APP_NAME, int(delta.total_seconds()))
+
+        # all indices will be included in the snapshot except concepts - which needs to be
+        # built from scratch because there is no timestamping for concepts
+        indices = self.get_index_names()
+        indices.remove(self._add_prefix(CONCEPTS_INDEX))
+
+        return self.es.snapshot.create(
+            repository=repository,
+            snapshot=snapshot,
+            feature_states=None,
+            include_global_state=False,
+            indices=indices,
+            **kwargs,
+        )
+
+    def get_index_names(self):
+        custom_indexes = [
+            index["name"] for index in settings.ELASTICSEARCH_CUSTOM_INDEXES
+        ]
+
+        raw_indices = [
+            RESOURCES_INDEX,
+            CONCEPTS_INDEX,
+            TERMS_INDEX,
+        ] + custom_indexes
+
+        indices = [self._add_prefix(index) for index in raw_indices]
+        return indices
+
+    def check_snapshot(self, repository, snapshot, **kwargs):
+        try:
+            return (
+                self.es.snapshot.status(
+                    repository=repository, snapshot=snapshot, **kwargs
+                )["snapshots"][0]["state"]
+                == "SUCCESS"
+            )
+        except KeyError:
+            return False
+        except NotFoundError:
+            return False
+
+    def restore_snapshot(self, repository, snapshot, **kwargs):
+        print(
+            self.es.snapshot.restore(
+                repository=repository,
+                snapshot=snapshot,
+                wait_for_completion=True,
+                **kwargs,
+            )
+        )
+
+    def get_snapshot(self, repository_name, snapshot_name, **kwargs):
+        return self.es.snapshot.get(
+            repository=repository_name, snapshot=snapshot_name, **kwargs
+        )
+
+    def restore_status(self):
+        indices = self.get_index_names()
+        indices.remove(self._add_prefix(CONCEPTS_INDEX))
+        index_statuses = self.es.indices.recovery(index=indices)
+        for key in index_statuses.keys():
+            for shard in index_statuses[key]["shards"]:
+                if shard["stage"] != "DONE":
+                    return "in progress"
+        return "done"
+
+    def list_snapshots(self, repository, **kwargs):
+        try:
+            return sorted(
+                [
+                    item["snapshot"]
+                    for item in self.es.snapshot.get(
+                        repository=repository, snapshot="_all", **kwargs
+                    )["snapshots"]
+                ],
+                reverse=True,
+            )
+        except KeyError:
+            return []
 
     def _add_prefix(self, *args, **kwargs):
         if args:

@@ -75,6 +75,14 @@ class BaseDataType(object):
         """
         return value
 
+    def get_interchange_value(self, value, **kwargs):
+        """
+        Transforms values for use in api's that will provide data for programmatic use on the frontend.
+        The interchange value is a shape that is more useful on the frontend than the node value shape.
+        The return value can be more or less complex than the value passed in, depending on the datatype.
+        """
+        return value
+
     def update(self, tile, data, nodeid, action):
         """
         Updates the tile.data value of a given datatype and returns the updated

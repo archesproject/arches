@@ -300,16 +300,9 @@ class ResourceEditorView(MapBaseManagerView):
                 ]
             ]
         else:
-            cards = (
-                graph.cardmodel_set.order_by("sortorder")
-                .filter(nodegroup__in=nodegroups)
-                .prefetch_related(
-                    Prefetch(
-                        "cardxnodexwidget_set",
-                        queryset=models.CardXNodeXWidget.objects.order_by("sortorder"),
-                    )
-                )
-            )
+            cards = graph.cardmodel_set.filter(
+                nodegroup__in=nodegroups
+            ).prefetch_related("cardxnodexwidget_set")
             serialized_cards = JSONSerializer().serializeToPython(cards)
             cardwidgets = []
             for card in cards:
@@ -390,7 +383,7 @@ class ResourceEditorView(MapBaseManagerView):
         context["nav"]["title"] = ""
         context["nav"]["menu"] = nav_menu
 
-        if resourceid not in (None, ""):
+        if resourceid not in (None, "", settings.SYSTEM_SETTINGS_RESOURCE_ID):
             context["nav"]["report_view"] = True
 
         if resourceid == settings.RESOURCE_INSTANCE_ID:
@@ -669,9 +662,19 @@ class ResourceEditLogView(BaseManagerView):
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
             edits = models.EditLog.objects.filter(resourceinstanceid=resourceid)
             permitted_edits = []
+            nodegroup_ids_from_edits = [
+                uuid.UUID(nodegroupid) if nodegroupid else nodegroupid
+                for nodegroupid in edits.values_list("nodegroupid", flat=True)
+            ]
+            nodegroups_for_edits = models.NodeGroup.objects.filter(
+                pk__in=nodegroup_ids_from_edits
+            ).in_bulk()
             for edit in edits:
                 if edit.nodegroupid is not None:
-                    if request.user.has_perm("read_nodegroup", edit.nodegroupid):
+                    edit_nodegroup = nodegroups_for_edits.get(
+                        uuid.UUID(edit.nodegroupid)
+                    )
+                    if request.user.has_perm("read_nodegroup", edit_nodegroup):
                         if edit.newvalue is not None:
                             self.getEditConceptValue(edit.newvalue)
                         if edit.oldvalue is not None:
@@ -679,7 +682,6 @@ class ResourceEditLogView(BaseManagerView):
                         permitted_edits.append(edit)
                 else:
                     permitted_edits.append(edit)
-
             resource = Resource.objects.get(pk=resourceid)
             displayname = resource.displayname()
             cards = Card.objects.filter(
@@ -1049,7 +1051,7 @@ class RelatedResourcesView(BaseManagerView):
 
         return ret
 
-    def get(self, request, resourceid=None):
+    def get(self, request, resourceid=None, include_rr_count=True):
         ret = {}
 
         if self.action == "get_candidates":
@@ -1096,6 +1098,7 @@ class RelatedResourcesView(BaseManagerView):
                     user=request.user,
                     resourceinstance_graphid=resourceinstance_graphid,
                     graphs=self.graphs,
+                    include_rr_count=include_rr_count,
                 )
 
                 ret = self.paginate_related_resources(
@@ -1107,6 +1110,7 @@ class RelatedResourcesView(BaseManagerView):
                     user=request.user,
                     resourceinstance_graphid=resourceinstance_graphid,
                     graphs=self.graphs,
+                    include_rr_count=include_rr_count,
                 )
 
         return JSONResponse(ret)
@@ -1137,13 +1141,8 @@ class RelatedResourcesView(BaseManagerView):
 
     def post(self, request, resourceid=None):
         lang = request.GET.get("lang", request.LANGUAGE_CODE)
-        se = SearchEngineFactory().create()
         res = dict(request.POST)
         relationshiptype = res["relationship_properties[relationshiptype]"][0]
-        datefrom = res["relationship_properties[datestarted]"][0]
-        dateto = res["relationship_properties[dateended]"][0]
-        dateto = None if dateto == "" else dateto
-        datefrom = None if datefrom == "" else datefrom
         notes = res["relationship_properties[notes]"][0]
         root_resourceinstanceid = res["root_resourceinstanceid"]
         instances_to_relate = []
@@ -1185,12 +1184,10 @@ class RelatedResourcesView(BaseManagerView):
             )
             if permitted is True:
                 rr = models.ResourceXResource(
-                    resourceinstanceidfrom=Resource(root_resourceinstanceid[0]),
-                    resourceinstanceidto=Resource(instanceid),
+                    from_resource=Resource(root_resourceinstanceid[0]),
+                    to_resource=Resource(instanceid),
                     notes=notes,
                     relationshiptype=relationshiptype,
-                    datestarted=datefrom,
-                    dateended=dateto,
                 )
                 rr.save()
             else:
@@ -1200,8 +1197,6 @@ class RelatedResourcesView(BaseManagerView):
             rr = models.ResourceXResource.objects.get(pk=relationshipid)
             rr.notes = notes
             rr.relationshiptype = relationshiptype
-            rr.datestarted = datefrom
-            rr.dateended = dateto
             rr.save()
 
         start = request.GET.get("start", 0)

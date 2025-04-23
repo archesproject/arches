@@ -328,10 +328,9 @@ TEMPLATES = build_templates_config(debug=DEBUG)
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    "arches.settings_utils.ArchesApplicationsStaticFilesFinder",
-    "arches.settings_utils.CoreArchesStaticFilesFinderBuildDirectory",
-    "arches.settings_utils.CoreArchesStaticFilesFinderMediaRoot",
-    "arches.settings_utils.CoreArchesStaticFilesFinderNodeModules",
+    "arches.settings_utils.StaticFilesFinderBuildDirectory",
+    "arches.settings_utils.StaticFilesFinderMediaRoot",
+    "arches.settings_utils.StaticFilesFinderNodeModules",
     #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -371,7 +370,7 @@ INSTALLED_APPS = (
     "arches.app.models",
     "arches.management",
     "guardian",
-    "captcha",
+    "django_recaptcha",
     "revproxy",
     "corsheaders",
     "oauth2_provider",
@@ -455,7 +454,12 @@ LOGGING = {
             "handlers": ["file", "console"],
             "level": "WARNING",
             "propagate": True,
-        }
+        },
+        "django.request": {
+            "handlers": ["file", "console"],
+            "level": "WARNING",
+            "propagate": True,
+        },
     },
 }
 
@@ -508,7 +512,7 @@ NOCAPTCHA = True
 SILENCED_SYSTEM_CHECKS = ["guardian.W001"]
 
 if DEBUG is True:
-    SILENCED_SYSTEM_CHECKS += ["captcha.recaptcha_test_key_error"]
+    SILENCED_SYSTEM_CHECKS += ["django_recaptcha.recaptcha_test_key_error"]
 
 # group to assign users who self sign up via the web ui
 USER_SIGNUP_GROUP = "Crowdsource Editor"

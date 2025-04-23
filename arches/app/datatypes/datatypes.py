@@ -12,7 +12,7 @@ import os
 from pathlib import Path
 import ast
 import time
-from datetime import datetime
+from datetime import date, datetime
 from mimetypes import MimeTypes
 
 from django.core.files.images import get_image_dimensions
@@ -727,39 +727,42 @@ class DateDataType(BaseDataType):
                     pass
         return valid_date_format, valid
 
+    def set_timezone(self, value):
+        try:
+            value = value.astimezone()
+        except:
+            # The .astimezone function throws an error on Windows for dates before 1970
+            value = self.backup_astimezone(value)
+        return value.isoformat(timespec="milliseconds")
+
     def transform_value_for_tile(self, value, **kwargs):
         value = None if value == "" else value
         if value is not None:
-            if type(value) == list:
+            if isinstance(value, list):
                 value = value[0]
-            elif (
-                type(value) == str and len(value) < 4 and value.startswith("-") is False
-            ):  # a year before 1000 but not BCE
-                value = value.zfill(4)
-            valid_date_format, valid = self.get_valid_date_format(value)
-            if valid:
-                v = datetime.strptime(value, valid_date_format)
-            else:
-                v = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
-            # The .astimezone() function throws an error on Windows for dates before 1970
-            try:
-                v = v.astimezone()
-            except:
-                v = self.backup_astimezone(v)
-            value = v.isoformat(timespec="milliseconds")
-        return value
+            if isinstance(value, str):
+                if len(value) < 4 and not value.startswith("-"):
+                    # a year before 1000 but not BCE
+                    value = value.zfill(4)
+                valid_date_format, valid = self.get_valid_date_format(value)
+                if valid:
+                    value = datetime.strptime(value, valid_date_format)
+                else:
+                    value = datetime.strptime(value, settings.DATE_IMPORT_EXPORT_FORMAT)
+            if isinstance(value, date):
+                value = datetime(value.year, value.month, value.day)
+
+        return self.set_timezone(value)
 
     def backup_astimezone(self, dt):
         def same_calendar(year):
             new_year = 1971
             while not is_same_calendar(year, new_year):
                 new_year += 1
-                if (
-                    new_year > 2020
-                ):  # should never happen but don't want a infinite loop
-                    raise Exception(
-                        "Backup timezone conversion failed: no matching year found"
-                    )
+                # should never happen but don't want a infinite loop
+                if new_year > 2020:  # pragma: no cover
+                    msg = "Backup timezone conversion failed: no matching year found"
+                    raise Exception(msg)
             return new_year
 
         def is_same_calendar(year1, year2):
@@ -1824,7 +1827,7 @@ class DomainDataType(BaseDomainDataType):
         This snippet will be used in a SQL UPDATE statement.
         """
 
-        sql = i18n_json_field.attname
+        sql = i18n_json_field.attname or "'{}'::jsonb"
         for prop, value in i18n_json_field.raw_value.items():
             escaped_value = json.dumps(value).replace("%", "%%").replace("'", "''")
             if prop == "options":
@@ -2247,21 +2250,31 @@ class ResourceInstanceDataType(BaseDataType):
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)
 
+    def append_in_list_search_filters(self, value, node, query):
+        values_list = value.get("val", [])
+        if values_list:
+            field_name = f"tiles.data.{node.pk}"
+            for val in values_list:
+                match_q = Term(
+                    field=f"tiles.data.{node.pk}.resourceId.keyword",
+                    term=val,
+                )
+
+                match value["op"]:
+                    case "" | "in_list_any":
+                        query.should(match_q)
+                    case "in_list_all":
+                        query.must(match_q)
+                    case "!" | "in_list_none":
+                        query.must_not(match_q)
+            query.filter(Exists(field=field_name))
+
     def append_search_filters(self, value, node, query, request):
         try:
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
-            elif value["val"] != "" and value["val"] != []:
-                # search_query = Match(field="tiles.data.%s.resourceId" % (str(node.pk)), type="phrase", query=value["val"])
-                search_query = Terms(
-                    field="tiles.data.%s.resourceId.keyword" % (str(node.pk)),
-                    terms=value["val"],
-                )
-                if "!" in value["op"]:
-                    query.must_not(search_query)
-                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
-                else:
-                    query.must(search_query)
+            else:
+                self.append_in_list_search_filters(value, node, query)
         except KeyError as e:
             pass
 

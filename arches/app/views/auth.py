@@ -19,7 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import base64
 import io
 
-from django.http import response
 from arches.app.utils.external_oauth_backend import ExternalOauthAuthenticationBackend
 import qrcode
 import pyotp
@@ -33,6 +32,7 @@ from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.debug import sensitive_post_parameters, sensitive_variables
 from django.utils.html import strip_tags
 from django.utils.translation import gettext as _
 from django.utils.http import urlencode
@@ -88,19 +88,23 @@ class LoginView(View):
             )
 
     @method_decorator(
-        ratelimit(
-            key="post:username",
-            rate=(
-                (
-                    "{}/{}".format(
-                        int(settings.RATE_LIMIT.split("/")[0]) * 2,
-                        settings.RATE_LIMIT.split("/")[1],
+        (
+            sensitive_variables(),
+            sensitive_post_parameters(),
+            ratelimit(
+                key="post:username",
+                rate=(
+                    (
+                        "{}/{}".format(
+                            int(settings.RATE_LIMIT.split("/")[0]) * 2,
+                            settings.RATE_LIMIT.split("/")[1],
+                        )
                     )
-                )
-                if isinstance(settings.RATE_LIMIT, str)
-                else settings.RATE_LIMIT
+                    if isinstance(settings.RATE_LIMIT, str)
+                    else settings.RATE_LIMIT
+                ),
+                block=False,
             ),
-            block=False,
         )
     )
     def post(self, request):
@@ -202,13 +206,8 @@ class SignupView(View):
         confirmation_message = ""
 
         if not settings.ENABLE_USER_SIGNUP:
-            raise (
-                Exception(
-                    _(
-                        "User signup has been disabled. Please contact your administrator."
-                    )
-                )
-            )
+            msg = _("User signup has been disabled. Please contact your administrator.")
+            raise Exception(msg)
 
         return render(
             request,
@@ -223,6 +222,12 @@ class SignupView(View):
             },
         )
 
+    @method_decorator(
+        (
+            sensitive_variables(),
+            sensitive_post_parameters(),
+        )
+    )
     def post(self, request):
         showform = True
         confirmation_message = ""
@@ -231,13 +236,8 @@ class SignupView(View):
         form = ArchesUserCreationForm(postdata, enable_captcha=settings.ENABLE_CAPTCHA)
 
         if not settings.ENABLE_USER_SIGNUP:
-            raise (
-                Exception(
-                    _(
-                        "User signup has been disabled. Please contact your administrator."
-                    )
-                )
-            )
+            msg = _("User signup has been disabled. Please contact your administrator.")
+            raise Exception(msg)
 
         if form.is_valid():
             AES = AESCipher(settings.SECRET_KEY)
@@ -311,13 +311,8 @@ class SignupView(View):
 class ConfirmSignupView(View):
     def get(self, request):
         if not settings.ENABLE_USER_SIGNUP:
-            raise (
-                Exception(
-                    _(
-                        "User signup has been disabled. Please contact your administrator."
-                    )
-                )
-            )
+            msg = _("User signup has been disabled. Please contact your administrator.")
+            raise Exception(msg)
 
         link = request.GET.get("link", None)
         AES = AESCipher(settings.SECRET_KEY)
@@ -369,7 +364,13 @@ class ChangePasswordView(View):
         }
         return JSONResponse(messages)
 
-    @method_decorator(ratelimit(key="user", rate=settings.RATE_LIMIT, block=False))
+    @method_decorator(
+        (
+            sensitive_variables(),
+            sensitive_post_parameters(),
+            ratelimit(key="user", rate=settings.RATE_LIMIT, block=False),
+        )
+    )
     def post(self, request):
         messages = {
             "invalid_password": None,
@@ -425,7 +426,13 @@ class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class UserProfileView(View):
-    @method_decorator(ratelimit(key="post:username", rate=settings.RATE_LIMIT))
+    @method_decorator(
+        (
+            sensitive_variables(),
+            sensitive_post_parameters(),
+            ratelimit(key="post:username", rate=settings.RATE_LIMIT),
+        )
+    )
     def post(self, request):
         username = request.POST.get("username", None)
         password = request.POST.get("password", None)
@@ -446,7 +453,13 @@ class UserProfileView(View):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class GetClientIdView(View):
-    @method_decorator(ratelimit(key="post:username", rate=settings.RATE_LIMIT))
+    @method_decorator(
+        (
+            sensitive_variables(),
+            sensitive_post_parameters(),
+            ratelimit(key="post:username", rate=settings.RATE_LIMIT),
+        )
+    )
     def post(self, request):
         if settings.OAUTH_CLIENT_ID == "":
             message = _("Make sure to set your OAUTH_CLIENT_ID in settings.py")
@@ -465,7 +478,13 @@ class GetClientIdView(View):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class ServerSettingView(View):
-    @method_decorator(ratelimit(key="post:username", rate=settings.RATE_LIMIT))
+    @method_decorator(
+        (
+            sensitive_variables(),
+            sensitive_post_parameters(),
+            ratelimit(key="post:username", rate=settings.RATE_LIMIT),
+        )
+    )
     def post(self, request):
         if settings.OAUTH_CLIENT_ID == "":
             message = _("Make sure to set your OAUTH_CLIENT_ID in settings.py")
@@ -573,6 +592,7 @@ class TwoFactorAuthenticationResetView(View):
 
 @method_decorator(never_cache, name="dispatch")
 class TwoFactorAuthenticationLoginView(View):
+    @method_decorator((sensitive_variables(), sensitive_post_parameters()))
     def post(self, request):
         username = request.POST.get("username", None)
         password = request.POST.get("password", None)
@@ -718,6 +738,7 @@ class TwoFactorAuthenticationSettingsView(View):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class Token(View):
+    @method_decorator(sensitive_variables())
     def get(self, request):
         if settings.DEBUG:
             data = {

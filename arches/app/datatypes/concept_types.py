@@ -392,9 +392,8 @@ class ConceptDataType(BaseConceptDataType):
             if value["id"]:
                 return value["id"]
             else:
-                hits = [ident for ident in models.Value.objects.all()]
-                if hits:
-                    return str(hits[0].pk)
+                if arbitrary_value := models.Value.objects.first():
+                    return str(arbitrary_value.pk)
                 else:
                     print(f"No labels for concept: {concept_id}!")
                     return None

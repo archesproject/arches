@@ -3,12 +3,11 @@ import path from 'path';
 import vue from "@vitejs/plugin-vue";
 
 import { fileURLToPath } from 'url';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
-import type { UserConfigExport } from 'vite';
+import type { UserConfig } from 'vitest/config';
 
-
-function generateConfig(): Promise<UserConfigExport> {
+function generateConfig(): Promise<UserConfig> {
     return new Promise((resolve, reject) => {
         const filePath = path.dirname(fileURLToPath(import.meta.url));
 
@@ -20,12 +19,11 @@ function generateConfig(): Promise<UserConfigExport> {
             '**/cypress/**',
             '**/.{idea,git,cache,output,temp}/**',
             '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
+            '**/build/**',
+            '**/staticfiles/**',
         ];
 
-        const rawData = fs.readFileSync(
-            path.join(filePath, '.frontend-configuration-settings.json'), 
-            'utf-8'
-        );
+        const rawData = fs.readFileSync(path.join(__dirname, 'frontend_configuration', 'webpack-metadata.json'), 'utf-8');
         const parsedData = JSON.parse(rawData);
 
         const alias: { [key: string]: string } = {
@@ -43,7 +41,7 @@ function generateConfig(): Promise<UserConfigExport> {
         }
 
         resolve({
-            plugins: [vue()],
+            plugins: [vue() as any],
             test: {
                 alias: alias,
                 coverage: {

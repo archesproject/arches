@@ -13,29 +13,6 @@ article.main-search-container {
         @include break-at(small-desktop-max) {
             max-width: calc(100vw - 50px);
         }
-        .search-tools-container {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            @include break-at(small-desktop-max) {
-                width: 100%;
-            }
-            @include break-at(mobile-small) {
-                height: auto;
-            }
-            .clear-filter {
-                @include break-at(mobile-max) {
-                    width: auto;
-                }
-                span {
-                    @include break-at(mobile-max) {
-                        text-wrap: wrap;
-                        line-height: 13px;
-                        padding: 0;
-                    }
-                }
-            }
-        }
         .search-control-container {
             @include break-at(small-desktop-max) {
                 overflow-y: auto;

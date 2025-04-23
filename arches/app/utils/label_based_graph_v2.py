@@ -191,8 +191,9 @@ class LabelBasedGraph(object):
             datatype_factory = DataTypeFactory()
 
         if not serialized_graph:
-            node = models.Node.objects.get(pk=tile.nodegroup_id)
-            graph = models.GraphModel.objects.get(pk=node.graph_id)
+            graph = models.GraphModel.objects.get(
+                node__nodegroup=tile.nodegroup_id
+            ).select_related("publication")
 
             user_language = translation.get_language()
             published_graph = models.PublishedGraph.objects.get(

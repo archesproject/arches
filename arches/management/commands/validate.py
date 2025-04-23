@@ -18,12 +18,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
 
+from django.conf import settings
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.core.management import BaseCommand, CommandError, call_command
+from django.db import transaction
+from django.db.models import Exists, OuterRef, Q, Subquery
+
 from arches import __version__
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
-from django.core.management.base import BaseCommand, CommandError
-from django.db import transaction
-from django.db.models import Exists, OuterRef
 
 # Command modes
 FIX = "fix"
@@ -31,6 +34,7 @@ VALIDATE = "validate"
 
 # Fix actions
 DELETE_QUERYSET = "delete queryset"
+UPDATE_GRAPH_PUBLICATIONS = "manage.py graph --update"
 
 
 class Command(BaseCommand):
@@ -116,6 +120,41 @@ class Command(BaseCommand):
             ),
             fix_action=DELETE_QUERYSET,
         )
+        self.check_integrity(
+            check=IntegrityCheck.NODEGROUP_WITHOUT_GROUPING_NODE,  # 1013
+            queryset=models.NodeGroup.objects.filter(node__gt=0, grouping_node=None),
+            fix_action=None,
+        )
+        self.check_integrity(
+            check=IntegrityCheck.PUBLICATION_MISSING_FOR_LANGUAGE,  # 1014
+            queryset=(
+                models.GraphModel.objects.filter(
+                    isresource=True,
+                    publication__isnull=False,
+                    source_identifier=None,
+                )
+                .annotate(
+                    publications_in_system_languages=ArrayAgg(
+                        Subquery(
+                            models.PublishedGraph.objects.filter(
+                                pk=OuterRef("publication__publishedgraph"),
+                            )
+                            .values("language")
+                            .distinct()
+                        ),
+                        filter=Q(
+                            publication__publishedgraph__language__in=[
+                                lang[0] for lang in settings.LANGUAGES
+                            ]
+                        ),
+                    )
+                )
+                .filter(
+                    publications_in_system_languages__len__lt=len(settings.LANGUAGES)
+                )
+            ),
+            fix_action=UPDATE_GRAPH_PUBLICATIONS,
+        )
 
     def check_integrity(self, check, queryset, fix_action):
         # 500 not set as a default earlier: None distinguishes whether verbose output implied
@@ -146,9 +185,23 @@ class Command(BaseCommand):
             elif queryset.exists():
                 fix_status = self.style.ERROR("No")  # until actually fixed below
                 # Perform fix action
-                if fix_action is DELETE_QUERYSET:
+                if fix_action == DELETE_QUERYSET:
                     with transaction.atomic():
                         queryset.delete()
+                    fix_status = self.style.SUCCESS("Yes")
+                elif fix_action == UPDATE_GRAPH_PUBLICATIONS:
+                    call_command(
+                        "graph",
+                        "publish",
+                        "--update",
+                        "-g",
+                        ",".join(
+                            str(pk) for pk in queryset.values_list("pk", flat=True)
+                        ),
+                        verbosity=self.options["verbosity"],
+                        stdout=self.stdout,
+                        stderr=self.stderr,
+                    )
                     fix_status = self.style.SUCCESS("Yes")
                 else:
                     raise NotImplementedError

@@ -18,29 +18,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 """This module contains commands for building Arches."""
 
-from operator import index
 from typing import Any, Optional
 from django.core.management.base import BaseCommand
 from arches.app.models.resource import Resource
-from arches.app.models.system_settings import settings
-from arches.app.search.base_index import get_index
 from arches.app.search.elasticsearch_dsl_builder import Query, Term
 from arches.app.search.mappings import (
-    RESOURCE_RELATIONS_INDEX,
     RESOURCES_INDEX,
     TERMS_INDEX,
-    prepare_terms_index,
-    prepare_concepts_index,
-    delete_terms_index,
-    delete_concepts_index,
-    prepare_search_index,
-    delete_search_index,
-    prepare_resource_relations_index,
-    delete_resource_relations_index,
 )
 import arches.app.utils.index_database as index_database_util
 
-from arches.app.models.models import BulkIndexQueue, ResourceInstance, TileModel
+from arches.app.models.models import BulkIndexQueue, ResourceInstance
 
 
 class Command(BaseCommand):
@@ -76,7 +64,6 @@ class Command(BaseCommand):
                 deleteq.add_query(term)
             deleteq.delete(index=TERMS_INDEX, refresh=True)
             deleteq.delete(index=RESOURCES_INDEX, refresh=True)
-            deleteq.delete(index=RESOURCE_RELATIONS_INDEX, refresh=True)
             bulk_index_queue.filter(resourceinstanceid__in=delete_ids).delete()
 
         index_database_util.index_resources_using_singleprocessing(

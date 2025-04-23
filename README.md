@@ -6,13 +6,13 @@ For general inquiries and to get technical support from the wider Arches communi
 
 For general user installation and app documentation, visit [arches.readthedocs.io](https://arches.readthedocs.io).
 
-For the documentation pertaining to the bleeding edge code (what is in the ``master`` branch), visit [arches.readthedocs.io/en/latest](https://arches.readthedocs.io/en/latest).  We welcome new contributors; please see [Contributing to Arches](CONTRIBUTING.md) for details.
+For the documentation pertaining to the version under development, visit [arches.readthedocs.io/en/latest](https://arches.readthedocs.io/en/latest).  We welcome new contributors; please see [Contributing to Arches](CONTRIBUTING.md) for details.
 
 Issue reports are encouraged! [Please read this article](http://polite.technology/reportabug.html) before reporting issues.
 *   [Report a Bug](https://github.com/archesproject/arches/issues/new?template=bug.md)
 *   [File a Feature Ticket](https://github.com/archesproject/arches/issues/new?template=feature.md)
 
-[Version 7.6.3 release notes](https://github.com/archesproject/arches/blob/dev/7.6.x/releases/7.6.3.md)
+[Version 8.0.0 release notes](https://github.com/archesproject/arches/blob/dev/8.0.x/releases/8.0.0.md)
 
 #### Quick Install
 
@@ -64,21 +64,18 @@ Our general release cycle will typically be a functional release (either major i
 The following a general plan for the Arches project. Be aware this plan is tentative and subject to change.
 
 ## 8.0 - Release date: June 15, 2025
-- Activity stream enhancements
 - Support for editing and publishing graphs without having to remove resource instances
 - Support for viewing and restoring previous graph publications
 - Support for configuring currently published graphs
-- Support for search through resource relationships
-- Persistent uris for resource instance and tile data
-- Implementation resource lifecycles
-- Bulk Data Manager CLI interface
-- Migration to MapLibre
+- Functions for Generating URIs as data identifiers
+- Implementation of resource lifecycles
 - Django 5.2 support
 - Python 3.11 becomes minimum Python version
+- RDM officially deprecated in favor of controlled lists
 
 ## 8.0 - Supported Applications
-- Arches References
-- Arches Lingo
+- Arches Controlled Lists, June 15, 2025
+- Arches Lingo, beta version released June 15, 2025 beta. Final 1.0 released August 15,2025 
 
 ## 9.0 - Release date: Sept 15, 2027
 - Full migration to Vue

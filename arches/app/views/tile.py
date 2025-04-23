@@ -21,6 +21,7 @@ import json as jsonparser
 import logging
 import traceback
 import uuid
+from http import HTTPStatus
 import arches.app.utils.zip as arches_zip
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
@@ -77,6 +78,8 @@ class TileData(View):
             message = type(e).__name__
             if hasattr(e, "message") and e.message:
                 message += ": {0}".format(e.message)
+            elif hasattr(e, "messages") and e.messages:
+                message += ": {0}".format(e.messages[0])
         else:
             message = str(e)
         logger.error(
@@ -88,8 +91,16 @@ class TileData(View):
             )
         )
 
+        if isinstance(e, ValidationError):
+            status = HTTPStatus.BAD_REQUEST
+        else:
+            status = HTTPStatus.INTERNAL_SERVER_ERROR
+
         return JSONErrorResponse(
-            _(title), _(str(message)), {"message": message, "title": title}
+            _(title),
+            _(str(message)),
+            {"message": message, "title": title},
+            status=status,
         )
 
     def post(self, request):

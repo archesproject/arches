@@ -1,5 +1,5 @@
-import { definePreset, palette } from "@primevue/themes";
-import Aura from "@primevue/themes/aura";
+import { definePreset, palette } from "@primeuix/themes";
+import Aura from "@primeuix/themes/aura";
 
 const archesColors = Object.freeze({
     blue: "#579ddb",
