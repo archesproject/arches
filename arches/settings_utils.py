@@ -2,7 +2,7 @@ import json
 import os
 from pathlib import Path
 import site
-import sys
+import sys, sysconfig
 
 from django.apps import apps
 from django.conf import settings
@@ -152,22 +152,12 @@ def generate_frontend_configuration():
         arches_app_paths = list_arches_app_paths()
         path_lookup = dict(zip(arches_app_names, arches_app_paths, strict=True))
 
-        site_packages_paths = site.getsitepackages()
-        site_packages_dir = None
-        for path in site_packages_paths:
-            if "site-packages" in path.lower():
-                site_packages_dir = path
-                break
-
-        if not site_packages_dir and site_packages_paths:
-            site_packages_dir = site_packages_paths[0]
-
         frontend_configuration_settings_data = {
             "_comment": "This is a generated file. Do not edit directly.",
             "APP_ROOT": app_root_path,
             "ARCHES_APPLICATIONS": arches_app_names,
             "ARCHES_APPLICATIONS_PATHS": path_lookup,
-            "SITE_PACKAGES_DIRECTORY": site_packages_dir,
+            "SITE_PACKAGES_DIRECTORY": sysconfig.get_path("purelib"),
             "PUBLIC_SERVER_ADDRESS": settings.PUBLIC_SERVER_ADDRESS,
             "ROOT_DIR": root_dir_path,
             "STATIC_URL": settings.STATIC_URL,
