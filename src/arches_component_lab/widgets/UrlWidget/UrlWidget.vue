@@ -13,8 +13,7 @@ import {
 } from "@/arches_component_lab/widgets/api.ts";
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
-import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
-import type { Url } from "@/arches_lingo/types.ts";
+import type { WidgetMode, Url } from "@/arches_component_lab/widgets/types.ts";
 
 const props = withDefaults(
     defineProps<{

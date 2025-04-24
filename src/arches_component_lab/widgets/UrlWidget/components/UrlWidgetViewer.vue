@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Url } from "@/arches_lingo/types.ts";
+import type { Url } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
     value?: Url | null | undefined;

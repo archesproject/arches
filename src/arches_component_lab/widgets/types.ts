@@ -44,3 +44,8 @@ export interface FileReference {
     description: string;
     title: string;
 }
+
+export interface Url {
+    url: string;
+    url_label: string;
+}
