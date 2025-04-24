@@ -1,4 +1,6 @@
 from copy import deepcopy
+from functools import partial
+
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
@@ -484,5 +486,9 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                 only=None,
             ).get(pk=instance_without_tile_data.pk)
             instance_from_factory._as_representation = True
+            # TODO: decide whether to override update() instead of using partial().
+            instance_from_factory.save = partial(
+                instance_from_factory.save, user=self.context["request"].user
+            )
             updated = self.update(instance_from_factory, validated_data)
         return updated
