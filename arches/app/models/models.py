@@ -26,7 +26,7 @@ from arches.app.models.query_expressions import UUID4
 from arches.app.models.utils import add_to_update_fields
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.module_importer import get_class_from_modulename
-from arches.app.utils.storage_filename_generator import get_filename_generator_callable
+from arches.app.utils.storage_filename_generator import get_filename
 from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
@@ -368,7 +368,7 @@ class ResourceRevisionLog(SaveSupportsBlindOverwriteMixin, models.Model):
 
 class File(SaveSupportsBlindOverwriteMixin, models.Model):
     fileid = models.UUIDField(primary_key=True, default=uuid.uuid4, db_default=UUID4())
-    path = models.FileField(upload_to=get_filename_generator_callable)
+    path = models.FileField(upload_to=get_filename)
     tile = models.ForeignKey(
         "TileModel", db_column="tileid", null=True, on_delete=models.CASCADE
     )

@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             model_name="file",
             name="path",
             field=models.FileField(
-                upload_to=arches.app.utils.storage_filename_generator.get_filename_generator_callable
+                upload_to=arches.app.utils.storage_filename_generator.get_filename
             ),
         ),
     ]
