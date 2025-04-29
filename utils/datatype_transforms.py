@@ -36,28 +36,30 @@ def resource_instance_list_to_json(self, tile, node):
             continue
         copy = {**inner_val}
         lang = get_language()
-        if arches_version >= "8":
-            for rxr in tile._enriched_resource.from_resxres.all():
-                if rxr.to_resource_id == uuid.UUID(inner_val["resourceId"]):
-                    if not rxr.to_resource:
-                        msg = f"Missing ResourceXResource target: {rxr.to_resource_id}"
-                        logger.warning(msg)
-                        copy["display_value"] = _("Missing")
-                        break
-                    display_val = rxr.to_resource.descriptors[lang]["name"]
-                    copy["display_value"] = display_val
+        for rxr in (
+            tile._enriched_resource.from_resxres.all()
+            if arches_version >= "8"
+            else tile._enriched_resource.resxres_resource_instance_ids_from.all()
+        ):
+            to_resource_id = (
+                rxr.resourceinstanceidto_id
+                if arches_version < "8"
+                else rxr.to_resource_id
+            )
+            if to_resource_id == uuid.UUID(inner_val["resourceId"]):
+                to_resource = (
+                    rxr.resourceinstanceidto
+                    if arches_version < "8"
+                    else rxr.to_resource
+                )
+                if not to_resource:
+                    msg = f"Missing ResourceXResource target: {to_resource_id}"
+                    logger.warning(msg)
+                    copy["display_value"] = _("Missing")
                     break
-        else:
-            for rxr in tile._enriched_resource.from_resxres.all():
-                if rxr.resourceinstanceidto_id == uuid.UUID(inner_val["resourceId"]):
-                    if not rxr.resourceinstanceidto:
-                        msg = f"Missing ResourceXResource target: {rxr.resourceinstanceidto_id}"
-                        logger.warning(msg)
-                        copy["display_value"] = _("Missing")
-                        break
-                    display_val = rxr.resourceinstanceidto.descriptors[lang]["name"]
-                    copy["display_value"] = display_val
-                    break
+                display_val = to_resource.descriptors[lang]["name"]
+                copy["display_value"] = display_val
+                break
         ret.append(copy)
 
     return ret
