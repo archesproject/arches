@@ -1,7 +1,5 @@
 import os
 
-from django.conf import settings
-
 from arches.app.models.system_settings import settings
 from arches.app.utils import import_class_from_string
 
