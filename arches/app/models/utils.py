@@ -23,5 +23,5 @@ def field_names(instance_or_class):
     return {f.name for f in instance_or_class._meta.fields}
 
 
-def get_filename_generator_class():
+def get_filename_generator_class(instance, filename):
     return import_class_from_string(settings.FILENAME_GENERATOR)
