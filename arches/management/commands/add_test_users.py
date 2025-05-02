@@ -102,6 +102,9 @@ class Command(BaseCommand):
                         assign_perm("add_plugin", user, plugin)
                         assign_perm("delete_plugin", user, plugin)
                         assign_perm("view_plugin", user, plugin)
+                    etl_modules = models.ETLModule.objects.all()
+                    for etl_module in etl_modules:
+                        assign_perm("view_etlmodule", user, etl_module)
                 user.save()
                 print(
                     f"Added test user: {user.username}, password: {profile['password']}"
