@@ -1495,7 +1495,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
         except ResourceInstance.graph.RelatedObjectDoesNotExist:
             pass
 
-        if not hasattr(self, "resource_instance_lifecycle_state"):
+        if not self.resource_instance_lifecycle_state_id:
             self.resource_instance_lifecycle_state = (
                 self.get_initial_resource_instance_lifecycle_state()
             )

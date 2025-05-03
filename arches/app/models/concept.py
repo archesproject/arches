@@ -179,7 +179,9 @@ class Concept(object):
                 exclude = []
 
                 if len(include) > 0:
-                    values = models.Value.objects.filter(concept=self.id)
+                    values = models.Value.objects.filter(
+                        concept=self.id
+                    ).select_related("valuetype")
                     for value in values:
                         if value.valuetype.category in include:
                             self.values.append(ConceptValue(value))
@@ -1586,7 +1588,7 @@ class ConceptValue(object):
         )
 
     def get(self, id=""):
-        self.load(models.Value.objects.get(pk=id))
+        self.load(models.Value.objects.select_related("valuetype").get(pk=id))
         return self
 
     def save(self):

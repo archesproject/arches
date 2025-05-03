@@ -182,9 +182,9 @@ class Graph(models.GraphModel):
         self.cards = {}
         self.widgets = {}
 
-        nodes = self.node_set.all()
+        nodes = self.node_set.prefetch_related("nodegroup")
         edges = self.edge_set.all()
-        cards = self.cardmodel_set.all()
+        cards = self.cardmodel_set.prefetch_related("nodegroup")
 
         edge_lookup = {
             edge["edgeid"]: edge

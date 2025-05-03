@@ -260,7 +260,7 @@ class GraphDesignerView(GraphBaseView):
             graph=self.graph
         ).filter(function__functiontype="primarydescriptors")
 
-        datatypes = models.DDataType.objects.all()
+        datatypes = models.DDataType.objects.select_related("defaultwidget")
         primary_descriptor_function = JSONSerializer().serialize(
             primary_descriptor_functions[0]
             if len(primary_descriptor_functions) > 0

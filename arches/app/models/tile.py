@@ -549,7 +549,9 @@ class Tile(models.TileModel):
                     **kwargs,
                 )
 
-            resource = Resource.objects.get(pk=self.resourceinstance_id)
+            resource = Resource.objects.select_related("graph__publication").get(
+                pk=self.resourceinstance_id
+            )
             resource.save_descriptors(context={"tile": self})
 
             if index:

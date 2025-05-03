@@ -1641,7 +1641,7 @@ class DraftGraphTests(ArchesTestCase):
         }
         models.Node.objects.create(**node_data).save()
 
-        graph = Graph.objects.get(pk=graph_model.pk)
+        graph = Graph.objects.select_related("ontology").get(pk=graph_model.pk)
         graph.save()
         graph.publish()
         return graph
