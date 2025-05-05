@@ -20,6 +20,7 @@ import uuid
 
 from arches.app.views.resource import ResourcePermissionDataView
 from tests.base_test import ArchesTestCase
+from django.db import connection
 from django.urls import reverse
 from arches.app.models.models import EditLog
 from arches.app.models.resource import Resource
@@ -30,7 +31,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.test.utils import sync_overridden_test_settings_to_arches
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-from django.test.utils import override_settings
+from django.test.utils import CaptureQueriesContext, override_settings
 from guardian.shortcuts import (
     assign_perm,
     get_perms,
@@ -180,12 +181,20 @@ class ResourceViewTests(ArchesTestCase):
         rev = ResourcePermissionDataView()
 
         assign_perm("view_resourceinstance", group, self.resource)
-        permissions = rev.get_instance_permissions(self.resource)
+        with CaptureQueriesContext(connection) as queries:
+            permissions = rev.get_instance_permissions(self.resource)
         group_dict = next(
             item for item in permissions["identities"] if item["id"] == group.id
         )
 
         self.assertGreater(len(group_dict["system_permissions"]), 0)
+
+        # Groups should not be individually queried. Instead,
+        # membership should be tested against all prefetched groups.
+        resource_editor_query = [
+            query for query in queries if "Resource Editor" in query["sql"]
+        ]
+        self.assertEqual(resource_editor_query, [])
 
     def test_user_cannot_delete_without_permission(self):
         """

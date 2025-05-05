@@ -121,7 +121,7 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
             raise ValueError("resourceid and resource are mutually incompatible")
         if str(resource.pk) == settings.SYSTEM_SETTINGS_RESOURCE_ID:
             result["resource"] = resource
-            if not user.groups.filter(name="System Administrator").exists():
+            if not self.user_in_group_by_name(user, ["System Administrator"]):
                 result["permitted"] = False
             else:
                 result["permitted"] = True

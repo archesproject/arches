@@ -499,7 +499,7 @@ class ResourcePermissionDataView(View):
                     user_is_resource_editor(user) or user_is_resource_reviewer(user)
                 ),
             }
-            for user in User.objects.all()
+            for user in User.objects.prefetch_related("groups")
         ]
         identities += [
             {

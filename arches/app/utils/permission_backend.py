@@ -177,9 +177,7 @@ def _get_permission_framework():
 
 
 def get_createable_resource_models(user):
-    return GraphModel.objects.filter(
-        pk__in=list(get_createable_resource_types(user))
-    ).all()
+    return GraphModel.objects.filter(pk__in=list(get_createable_resource_types(user)))
 
 
 def assign_perm(perm, user_or_group, obj=None):

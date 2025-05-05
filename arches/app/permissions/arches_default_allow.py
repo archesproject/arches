@@ -131,7 +131,7 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
             "cannot_write": set(),
             "cannot_delete": set(),
         }
-        for user in User.objects.all():
+        for user in User.objects.prefetch_related("groups"):
             default_permissions = self.get_default_permissions(
                 user, resource, all_permissions=True
             )
@@ -270,7 +270,7 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
             result["resource"] = resource
 
             if str(resource.pk) == settings.SYSTEM_SETTINGS_RESOURCE_ID:
-                if not user.groups.filter(name="System Administrator").exists():
+                if not self.user_in_group_by_name(user, ["System Administrator"]):
                     result["permitted"] = False
                     return result
 
