@@ -31,7 +31,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.test.utils import sync_overridden_test_settings_to_arches
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-from django.test.utils import CaptureQueriesContext, override_settings
+from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import (
     assign_perm,
     get_perms,
@@ -163,26 +163,28 @@ class ResourceViewTests(ArchesTestCase):
             response, "/report/" + self.resource_instance_id + "?redirected=true"
         )
 
-    @override_settings(
-        PERMISSION_DEFAULTS={
-            "330802c5-95bd-11e8-b7ac-acde48001122": [
-                {
-                    "id": Group.objects.get(name="Resource Exporter").id,
-                    "type": "group",
-                    "permissions": ["view_resourceinstance"],
-                },
-            ]
-        }
-    )
-    @sync_overridden_test_settings_to_arches()
     def test_get_instance_permissions(self):
         group = Group.objects.get(name="Resource Exporter")
-
         rev = ResourcePermissionDataView()
-
         assign_perm("view_resourceinstance", group, self.resource)
-        with CaptureQueriesContext(connection) as queries:
+
+        with (
+            self.settings(
+                PERMISSION_DEFAULTS={
+                    "330802c5-95bd-11e8-b7ac-acde48001122": [
+                        {
+                            "id": group.id,
+                            "type": "group",
+                            "permissions": ["view_resourceinstance"],
+                        },
+                    ]
+                }
+            ),
+            sync_overridden_test_settings_to_arches(),
+            CaptureQueriesContext(connection) as queries,
+        ):
             permissions = rev.get_instance_permissions(self.resource)
+
         group_dict = next(
             item for item in permissions["identities"] if item["id"] == group.id
         )
