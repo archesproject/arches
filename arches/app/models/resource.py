@@ -713,8 +713,8 @@ class Resource(models.ResourceInstance):
 
         if permit_deletion is True:
             for related_resource in models.ResourceXResource.objects.filter(
-                Q(resourceinstanceidfrom=self.resourceinstanceid)
-                | Q(resourceinstanceidto=self.resourceinstanceid)
+                Q(from_resource_id=self.resourceinstanceid)
+                | Q(to_resource_id=self.resourceinstanceid)
             ):
                 related_resource.delete(deletedResourceId=self.resourceinstanceid)
 
@@ -875,17 +875,17 @@ class Resource(models.ResourceInstance):
             limit,
             resourceinstance_graphid=None,
         ):
-            final_query = Q(resourceinstanceidfrom_id=resourceinstanceid) | Q(
-                resourceinstanceidto_id=resourceinstanceid
+            final_query = Q(from_resource_id=resourceinstanceid) | Q(
+                to_resource_id=resourceinstanceid
             )
 
             if resourceinstance_graphid:
-                to_graph_id_filter = Q(
-                    resourceinstancefrom_graphid_id=str(self.graph_id)
-                ) & Q(resourceinstanceto_graphid_id=resourceinstance_graphid)
+                to_graph_id_filter = Q(from_resource_graph_id=str(self.graph_id)) & Q(
+                    to_resource_graph_id=resourceinstance_graphid
+                )
                 from_graph_id_filter = Q(
-                    resourceinstancefrom_graphid_id=resourceinstance_graphid
-                ) & Q(resourceinstanceto_graphid_id=str(self.graph_id))
+                    from_resource_graph_id=resourceinstance_graphid
+                ) & Q(to_resource_graph_id=str(self.graph_id))
                 final_query = final_query & (to_graph_id_filter | from_graph_id_filter)
 
             return (
@@ -916,8 +916,8 @@ class Resource(models.ResourceInstance):
         )
         all_resource_ids = set()
         for relation in resource_relations["relations"]:
-            all_resource_ids.add(str(relation.resourceinstanceidto_id))
-            all_resource_ids.add(str(relation.resourceinstanceidfrom_id))
+            all_resource_ids.add(str(relation.to_resource_id))
+            all_resource_ids.add(str(relation.from_resource_id))
         exclusive_set, filtered_instances = get_filtered_instances(
             user, se, resources=list(all_resource_ids)
         )
@@ -926,13 +926,13 @@ class Resource(models.ResourceInstance):
 
         for relation in resource_relations["relations"]:
             relation = model_to_dict(relation)
-            resourceid_to = relation["resourceinstanceidto"]
-            resourceid_from = relation["resourceinstanceidfrom"]
-            resourceinstanceto_graphid = relation["resourceinstanceto_graphid"]
-            resourceinstancefrom_graphid = relation["resourceinstancefrom_graphid"]
+            to_resource = relation["to_resource"]
+            from_resource = relation["from_resource"]
+            to_resource_graph = relation["to_resource_graph"]
+            from_resource_graph = relation["from_resource_graph"]
 
-            resourceid_to_permission = str(resourceid_to) not in filtered_instances
-            resourceid_from_permission = str(resourceid_from) not in filtered_instances
+            resourceid_to_permission = str(to_resource) not in filtered_instances
+            resourceid_from_permission = str(from_resource) not in filtered_instances
 
             if exclusive_set:
                 resourceid_to_permission = not (resourceid_to_permission)
@@ -941,8 +941,8 @@ class Resource(models.ResourceInstance):
             if (
                 resourceid_to_permission
                 and resourceid_from_permission
-                and str(resourceinstanceto_graphid) in readable_graphids
-                and str(resourceinstancefrom_graphid) in readable_graphids
+                and str(to_resource_graph) in readable_graphids
+                and str(from_resource_graph) in readable_graphids
             ):
                 permitted_relation_dicts.append(relation)
             else:
@@ -991,8 +991,8 @@ class Resource(models.ResourceInstance):
             )
 
             ret["resource_relationships"].append(relation)
-            instanceids.add(str(resourceid_to))
-            instanceids.add(str(resourceid_from))
+            instanceids.add(str(relation["to_resource"]))
+            instanceids.add(str(relation["from_resource"]))
 
         if str(self.resourceinstanceid) in instanceids:
             instanceids.remove(str(self.resourceinstanceid))
@@ -1009,8 +1009,8 @@ class Resource(models.ResourceInstance):
                     models.ResourceInstance.objects.filter(pk__in=related_resource_ids)
                     .annotate(
                         total_relations=(
-                            Count("resxres_resource_instance_ids_from", distinct=True)
-                            + Count("resxres_resource_instance_ids_to", distinct=True)
+                            Count("from_resxres", distinct=True)
+                            + Count("to_resxres", distinct=True)
                         )
                     )
                     .only("pk")

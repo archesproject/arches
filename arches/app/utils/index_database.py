@@ -20,6 +20,8 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils import import_class_from_string
 from typing import Iterable
 
+from arches.app.models.models import EditLog
+
 
 logger = logging.getLogger(__name__)
 serialized_graphs = {}
@@ -602,3 +604,47 @@ def index_resources_by_transaction(
             transaction_id, len(resourceids), (datetime.now() - start).seconds
         )
     )
+
+
+def index_resources_by_time(
+    start_time,
+    batch_size=settings.BULK_IMPORT_BATCH_SIZE,
+    quiet=False,
+    use_multiprocessing=False,
+    max_subprocesses=0,
+    recalculate_descriptors=False,
+):
+    """
+    Indexes all the resources with a transaction id
+
+    Keyword Arguments:
+    quiet -- Silences the status bar output during certain operations, use in celery operations for example
+    recalculate_descriptors - forces the primary descriptors to be recalculated before (re)indexing
+
+    """
+    start = datetime.now()
+
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """SELECT DISTINCT resourceinstanceid FROM edit_log WHERE timestamp >= %s;""",
+            [start_time],
+        )
+        rows = cursor.fetchall()
+    resourceids = [id for (id,) in rows]
+
+    if use_multiprocessing:
+        index_resources_using_multiprocessing(
+            resourceids=resourceids,
+            batch_size=batch_size,
+            quiet=quiet,
+            max_subprocesses=max_subprocesses,
+            recalculate_descriptors=recalculate_descriptors,
+        )
+    else:
+        index_resources_using_singleprocessing(
+            resources=Resource.objects.filter(pk__in=resourceids),
+            batch_size=batch_size,
+            quiet=quiet,
+            title="time {}".format(start_time),
+            recalculate_descriptors=recalculate_descriptors,
+        )

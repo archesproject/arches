@@ -38,9 +38,7 @@ class Graphs(APIBase):
 
             if get_cards:
                 datatypes = models.DDataType.objects.all()
-                cards = CardProxyModel.objects.filter(graph_id=graph_id).order_by(
-                    "sortorder"
-                )
+                cards = CardProxyModel.objects.filter(graph_id=graph_id)
                 permitted_cards = []
                 for card in cards:
                     if user.has_perm(perm, card.nodegroup):
@@ -49,8 +47,7 @@ class Graphs(APIBase):
                 cardwidgets = [
                     widget
                     for widgets in [
-                        card.cardxnodexwidget_set.order_by("sortorder").all()
-                        for card in permitted_cards
+                        card.cardxnodexwidget_set.all() for card in permitted_cards
                     ]
                     for widget in widgets
                 ]

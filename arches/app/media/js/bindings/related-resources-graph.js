@@ -497,8 +497,8 @@ ko.bindingHandlers.relatedResourcesGraph = {
                         _.each(rr.related_resources, getRelated);
 
                         _.each(rr.resource_relationships, function(resourceRelationships) {
-                            var sourceId = nodeMap[resourceRelationships.resourceinstanceidfrom];
-                            var targetId = nodeMap[resourceRelationships.resourceinstanceidto];
+                            var sourceId = nodeMap[resourceRelationships.from_resource];
+                            var targetId = nodeMap[resourceRelationships.to_resource];
                             var relationshipSource = resourceRelationships.relationshiptype_label;
                             var relationshipTarget = resourceRelationships.relationshiptype_label;
                             if (resourceRelationships.relationshiptype_label.split('/').length === 2) {

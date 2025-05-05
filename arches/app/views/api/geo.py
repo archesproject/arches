@@ -65,14 +65,11 @@ class GeoJSON(APIBase):
         if nodeid:
             node_filter.append(nodeid)
         nodes = nodes.filter(nodeid__in=node_filter)
-        nodes = nodes.order_by("sortorder")
         features = []
         i = 1
         property_tiles = models.TileModel.objects.filter(nodegroup_id__in=nodegroups)
         property_node_map = {}
-        property_nodes = models.Node.objects.filter(
-            nodegroup_id__in=nodegroups
-        ).order_by("sortorder")
+        property_nodes = models.Node.objects.filter(nodegroup_id__in=nodegroups)
         exclusive_set, filtered_instance_ids = get_filtered_instances(
             request.user, self.se, resources=resourceid.split(",")
         )

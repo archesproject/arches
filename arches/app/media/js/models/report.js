@@ -186,8 +186,8 @@ export default AbstractModel.extend({
                 for (var resourceRelationship of value['related_resources']['resource_relationships']) {
                     let relatedResource = value['related_resources']['related_resources'].find(function(resource) {
                         return (
-                            resource.resourceinstanceid === resourceRelationship.resourceinstanceidto
-                            || resource.resourceinstanceid === resourceRelationship.resourceinstanceidfrom
+                            resource.resourceinstanceid === resourceRelationship.to_resource
+                            || resource.resourceinstanceid === resourceRelationship.from_resource
                             || this.attributes && resource.resourceinstanceid === this.attributes.graph.graphid  // self
                         );
                     });

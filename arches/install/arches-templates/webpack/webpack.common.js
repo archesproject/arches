@@ -14,12 +14,12 @@ const { buildFilepathLookup } = require('./webpack-utils/build-filepath-lookup')
 
 module.exports = () => {
     return new Promise((resolve, _reject) => {
-        // BEGIN get data from `.frontend-configuration-settings.json`
+        // BEGIN get data from `webpack-metadata.json`
 
-        const rawData = fs.readFileSync(Path.join(__dirname, "..", '.frontend-configuration-settings.json'), 'utf-8');
+        const rawData = fs.readFileSync(Path.join(__dirname, "..", "frontend_configuration", 'webpack-metadata.json'), 'utf-8');
         const parsedData = JSON.parse(rawData);
 
-        console.log('Data imported from .frontend-configuration-settings.json:', parsedData);
+        console.log('Data imported from webpack-metadata.json:', parsedData);
 
         global.APP_ROOT = parsedData['APP_ROOT'];
         global.ARCHES_APPLICATIONS = parsedData['ARCHES_APPLICATIONS'];
@@ -30,7 +30,7 @@ module.exports = () => {
         global.PUBLIC_SERVER_ADDRESS = parsedData['PUBLIC_SERVER_ADDRESS'];
         global.WEBPACK_DEVELOPMENT_SERVER_PORT = parsedData['WEBPACK_DEVELOPMENT_SERVER_PORT'];
 
-        // END get data from `.frontend-configuration-settings.json`
+        // END get data from `webpack-metadata.json`
         // BEGIN workaround for handling node_modules paths in arches-core vs projects
 
         let PROJECT_RELATIVE_NODE_MODULES_PATH;
@@ -242,8 +242,8 @@ module.exports = () => {
 
         const universalConstants = {
             APP_ROOT_DIRECTORY: JSON.stringify(APP_ROOT).replace(/\\/g, '/'),
-            ARCHES_CORE_DIRECTORY: JSON.stringify(ROOT_DIR).replace(/\\/g, '/'),
             ARCHES_APPLICATIONS: JSON.stringify(ARCHES_APPLICATIONS),
+            ARCHES_CORE_DIRECTORY: JSON.stringify(ROOT_DIR).replace(/\\/g, '/'),
             SITE_PACKAGES_DIRECTORY: JSON.stringify(SITE_PACKAGES_DIRECTORY).replace(/\\/g, '/'),
         };
 
@@ -295,6 +295,15 @@ module.exports = () => {
             plugins: [
                 new CleanWebpackPlugin(),
                 new webpack.DefinePlugin(universalConstants),
+                new webpack.DefinePlugin({
+                    ARCHES_URLS: webpack.DefinePlugin.runtimeValue(
+                        () => fs.readFileSync(
+                            Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, '..', 'frontend_configuration', 'urls.json'), 
+                            'utf-8'
+                        ),
+                        true  // should be re-evaluated on rebuild
+                    ),
+                }),
                 new webpack.DefinePlugin({
                     __VUE_OPTIONS_API__: 'true',
                     __VUE_PROD_DEVTOOLS__: 'false',

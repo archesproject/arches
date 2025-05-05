@@ -10,8 +10,9 @@ import Tooltip from 'primevue/tooltip';
 import { createApp } from 'vue';
 import { createGettext } from "vue3-gettext";
 
-import arches from 'arches';
 import { DEFAULT_THEME } from "@/arches/themes/default.ts";
+import { generateArchesURL } from '@/arches/utils/generate-arches-url.ts';
+
 
 export default async function createVueApplication(vueComponent, themeConfiguration = DEFAULT_THEME) {
     /**
@@ -27,7 +28,8 @@ export default async function createVueApplication(vueComponent, themeConfigurat
      * TODO: cbyrd #10501 - we should add an event listener that will re-fetch i18n data
      * and rebuild the app when a specific event is fired from the LanguageSwitcher component.
     **/
-    return fetch(arches.urls.api_get_frontend_i18n_data).then(function(resp) {
+
+    return fetch(generateArchesURL("get_frontend_i18n_data")).then(function(resp) {
         if (!resp.ok) {
             throw new Error(resp.statusText);
         }

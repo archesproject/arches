@@ -15,8 +15,7 @@ webpack-stats.json
 *.egg-info
 .DS_STORE
 CACHE
-.tsconfig-paths.json
-.frontend-configuration-settings.json
+frontend_configuration
 
 # Packaging
 build/

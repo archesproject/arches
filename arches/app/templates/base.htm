@@ -17,15 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 {% extends "base-root.htm" %}
 
-{% load static %}
 {% load i18n %}
-{% load webpack_static from webpack_loader %}
 {% load render_bundle from webpack_loader %}
-
-<!DOCTYPE html>
-<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
-<!--[if IE 9]> <html lang="en" class="ie9"> <![endif]-->
-<!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->
 
 {% if use_livereload %}
 <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':{{ livereload_port }}/livereload.js?snipver=1"></' + 'script>')</script>
@@ -62,4 +55,3 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block arches_modules %}
     {% include 'javascript.htm' %}
 {% endblock arches_modules %}
-</html>

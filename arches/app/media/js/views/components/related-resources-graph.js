@@ -141,8 +141,8 @@ const viewModel = function(params) {
     };
     var resourceTypeLookup = {};
     var dataToElement = function(data) {
-        data.source = data.resourceinstanceidfrom;
-        data.target = data.resourceinstanceidto;
+        data.source = data.from_resource;
+        data.target = data.to_resource;
         if (data.source) {
             data.id = data.resourcexid;
         } else {

@@ -1,4 +1,4 @@
-resourceinstanceidfrom,resourceinstanceidto,relationshiptype,datestarted,dateended,notes
+from_resource,to_resource,relationshiptype,datestarted,dateended,notes
 f1f131ad-13ac-4a01-8f30-3a2d77c63cdf,0009fbf4-6c72-4c45-96f1-34752900b608,ac41d9be-79db-4256-b368-2f4559cfbe55,1934-05-16,1965-08-16,
 f83cbbdb-e4c3-42c1-99cb-211ac0b8b23c,01038b5c-8877-43c1-8e41-f0eb3c10046e,ac41d9be-79db-4256-b368-2f4559cfbe55,1929-02-20,1986-01-10,
 7ef5e1fa-a045-4402-ab64-000bbcc0d60e,0165e394-2bee-4272-bc12-2166ce9a9c93,ac41d9be-79db-4256-b368-2f4559cfbe55,1926-09-09,1961-01-25,

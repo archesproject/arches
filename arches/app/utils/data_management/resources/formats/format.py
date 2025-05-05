@@ -140,69 +140,59 @@ class Reader(object):
 
                 return newresourceinstanceid
 
-            resourceinstancefrom = validate_resourceinstanceid(
-                relation["resourceinstanceidfrom"], "resourceinstanceidfrom"
+            from_resource = validate_resourceinstanceid(
+                relation["from_resource"], "from_resource"
             )
-            resourceinstanceto = validate_resourceinstanceid(
-                relation["resourceinstanceidto"], "resourceinstanceidto"
+            to_resource = validate_resourceinstanceid(
+                relation["to_resource"], "to_resource"
             )
-            if resourceinstancefrom is not None and resourceinstanceto is not None:
+            if from_resource is not None and to_resource is not None:
                 if (
-                    "resourceinstancefrom_graphid" not in relation
-                    or relation["resourceinstancefrom_graphid"] == ""
-                    or relation["resourceinstancefrom_graphid"] == "None"
+                    "from_resource_graph" not in relation
+                    or relation["from_resource_graph"] == ""
+                    or relation["from_resource_graph"] == "None"
                 ):
                     try:
-                        relation["resourceinstancefrom_graphid"] = (
+                        relation["from_resource_graph"] = (
                             models.ResourceInstance.objects.get(
-                                resourceinstanceid=resourceinstancefrom
+                                resourceinstanceid=from_resource
                             ).graph_id
                         )
                     except ObjectDoesNotExist:
-                        relation["resourceinstancefrom_graphid"] = None
+                        relation["from_resource_graph"] = None
                 if (
-                    "resourceinstanceto_graphid" not in relation
-                    or relation["resourceinstanceto_graphid"] == ""
-                    or relation["resourceinstanceto_graphid"] == "None"
+                    "to_resource_graph" not in relation
+                    or relation["to_resource_graph"] == ""
+                    or relation["to_resource_graph"] == "None"
                 ):
                     try:
-                        relation["resourceinstanceto_graphid"] = (
+                        relation["to_resource_graph"] = (
                             models.ResourceInstance.objects.get(
-                                resourceinstanceid=resourceinstanceto
+                                resourceinstanceid=to_resource
                             ).graph_id
                         )
                     except ObjectDoesNotExist:
-                        relation["resourceinstanceto_graphid"] = None
-                if relation["datestarted"] == "" or relation["datestarted"] == "None":
-                    relation["datestarted"] = None
-                if relation["dateended"] == "" or relation["dateended"] == "None":
-                    relation["dateended"] = None
+                        relation["to_resource_graph"] = None
                 if (
-                    "nodeid" not in relation
-                    or relation["nodeid"] == ""
-                    or relation["nodeid"] == "None"
+                    "node" not in relation
+                    or relation["node"] == ""
+                    or relation["node"] == "None"
                 ):
-                    relation["nodeid"] = None
+                    relation["node"] = None
                 if (
-                    "tileid" not in relation
-                    or relation["tileid"] == ""
-                    or relation["tileid"] == "None"
+                    "tile" not in relation
+                    or relation["tile"] == ""
+                    or relation["tile"] == "None"
                 ):
-                    relation["tileid"] = None
+                    relation["tile"] = None
                 relation = ResourceXResource(
-                    resourceinstanceidfrom=Resource(resourceinstancefrom),
-                    resourceinstanceidto=Resource(resourceinstanceto),
-                    resourceinstancefrom_graphid_id=relation[
-                        "resourceinstancefrom_graphid"
-                    ],
-                    resourceinstanceto_graphid_id=relation[
-                        "resourceinstanceto_graphid"
-                    ],
+                    from_resource=Resource(from_resource),
+                    to_resource=Resource(to_resource),
+                    from_resource_graph_id=relation["from_resource_graph"],
+                    to_resource_graph_id=relation["to_resource_graph"],
                     relationshiptype=str(relation["relationshiptype"]),
                     nodeid=relation["nodeid"],
                     tileid=relation["tileid"],
-                    datestarted=relation["datestarted"],
-                    dateended=relation["dateended"],
                     notes=relation["notes"],
                 )
                 relation.save()

@@ -24,9 +24,9 @@ from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.models.mixins import SaveSupportsBlindOverwriteMixin
 from arches.app.models.query_expressions import UUID4
 from arches.app.models.utils import add_to_update_fields
-from arches.app.utils import import_class_from_string
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.module_importer import get_class_from_modulename
+from arches.app.utils.storage_filename_generator import get_filename
 from arches.app.utils.thumbnail_factory import ThumbnailGeneratorInstance
 
 # can't use "arches.app.models.system_settings.SystemSettings" because of circular refernce issue
@@ -93,6 +93,7 @@ class CardModel(SaveSupportsBlindOverwriteMixin, models.Model):
     class Meta:
         managed = True
         db_table = "cards"
+        ordering = ["sortorder"]
 
 
 class ConstraintModel(SaveSupportsBlindOverwriteMixin, models.Model):
@@ -169,6 +170,7 @@ class CardXNodeXWidget(SaveSupportsBlindOverwriteMixin, models.Model):
         managed = True
         db_table = "cards_x_nodes_x_widgets"
         unique_together = (("node", "card", "widget"),)
+        ordering = ["sortorder"]
 
 
 class Concept(SaveSupportsBlindOverwriteMixin, models.Model):
@@ -366,9 +368,7 @@ class ResourceRevisionLog(SaveSupportsBlindOverwriteMixin, models.Model):
 
 class File(SaveSupportsBlindOverwriteMixin, models.Model):
     fileid = models.UUIDField(primary_key=True, default=uuid.uuid4, db_default=UUID4())
-    path = models.FileField(
-        upload_to=import_class_from_string(settings.FILENAME_GENERATOR)
-    )
+    path = models.FileField(upload_to=get_filename)
     tile = models.ForeignKey(
         "TileModel", db_column="tileid", null=True, on_delete=models.CASCADE
     )
@@ -1008,6 +1008,7 @@ class Node(SaveSupportsBlindOverwriteMixin, models.Model):
     class Meta:
         managed = True
         db_table = "nodes"
+        ordering = ["sortorder"]
         constraints = [
             models.UniqueConstraint(
                 fields=["name", "nodegroup"], name="unique_nodename_nodegroup"
@@ -1238,39 +1239,39 @@ class ResourceXResource(SaveSupportsBlindOverwriteMixin, models.Model):
     resourcexid = models.UUIDField(
         primary_key=True, default=uuid.uuid4, db_default=UUID4()
     )
-    resourceinstanceidfrom = models.ForeignKey(
+    from_resource = models.ForeignKey(
         "ResourceInstance",
         db_column="resourceinstanceidfrom",
         blank=True,
         null=True,
-        related_name="resxres_resource_instance_ids_from",
+        related_name="from_resxres",
         on_delete=models.CASCADE,
         db_constraint=False,
     )
-    resourceinstancefrom_graphid = models.ForeignKey(
+    from_resource_graph = models.ForeignKey(
         "GraphModel",
         db_column="resourceinstancefrom_graphid",
         blank=True,
         null=True,
-        related_name="resxres_resource_instance_fom_graph_id",
+        related_name="from_resxres",
         on_delete=models.CASCADE,
         db_constraint=False,
     )
-    resourceinstanceidto = models.ForeignKey(
+    to_resource = models.ForeignKey(
         "ResourceInstance",
         db_column="resourceinstanceidto",
         blank=True,
         null=True,
-        related_name="resxres_resource_instance_ids_to",
+        related_name="to_resxres",
         on_delete=models.CASCADE,
         db_constraint=False,
     )
-    resourceinstanceto_graphid = models.ForeignKey(
+    to_resource_graph = models.ForeignKey(
         "GraphModel",
         db_column="resourceinstanceto_graphid",
         blank=True,
         null=True,
-        related_name="resxres_resource_instance_to_graph_id",
+        related_name="to_resxres",
         on_delete=models.CASCADE,
         db_constraint=False,
     )
@@ -1278,53 +1279,51 @@ class ResourceXResource(SaveSupportsBlindOverwriteMixin, models.Model):
     notes = models.TextField(blank=True, null=True)
     relationshiptype = models.TextField(blank=True, null=True)
     inverserelationshiptype = models.TextField(blank=True, null=True)
-    tileid = models.ForeignKey(
+    tile = models.ForeignKey(
         "TileModel",
         db_column="tileid",
         blank=True,
         null=True,
-        related_name="resxres_tile_id",
+        related_name="resxres",
         on_delete=models.CASCADE,
     )
-    nodeid = models.ForeignKey(
+    node = models.ForeignKey(
         "Node",
         db_column="nodeid",
         blank=True,
         null=True,
-        related_name="resxres_node_id",
+        related_name="resxres",
         on_delete=models.CASCADE,
     )
-    datestarted = models.DateField(blank=True, null=True)
-    dateended = models.DateField(blank=True, null=True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
 
     def delete(self, *args, **kwargs):
         # update the resource-instance tile by removing any references to a deleted resource
         deletedResourceId = kwargs.pop("deletedResourceId", None)
-        if deletedResourceId and self.tileid and self.nodeid:
+        if deletedResourceId and self.tile and self.node:
             newTileData = []
-            data = self.tileid.data[str(self.nodeid_id)]
+            data = self.tile.data[str(self.node_id)]
             if type(data) != list:
                 data = [data]
             for relatedresourceItem in data:
                 if relatedresourceItem:
                     if relatedresourceItem["resourceId"] != str(deletedResourceId):
                         newTileData.append(relatedresourceItem)
-            self.tileid.data[str(self.nodeid_id)] = newTileData
-            self.tileid.save()
+            self.tile.data[str(self.node_id)] = newTileData
+            self.tile.save()
 
         super(ResourceXResource, self).delete()
 
     def save(self, **kwargs):
         # during package/csv load the ResourceInstance models are not always available
         try:
-            self.resourceinstancefrom_graphid = self.resourceinstanceidfrom.graph
+            self.from_resource_graph = self.from_resource.graph
         except:
             pass
 
         try:
-            self.resourceinstanceto_graphid = self.resourceinstanceidto.graph
+            self.to_resource_graph = self.to_resource.graph
         except:
             pass
 
@@ -2118,6 +2117,7 @@ class Plugin(SaveSupportsBlindOverwriteMixin, models.Model):
     class Meta:
         managed = True
         db_table = "plugins"
+        ordering = ["sortorder"]
 
 
 class WorkflowHistory(models.Model):
@@ -2259,6 +2259,7 @@ class ETLModule(models.Model):
     class Meta:
         managed = True
         db_table = "etl_modules"
+        ordering = ["helpsortorder"]
 
     def get_class_module(self):
         return get_class_from_modulename(

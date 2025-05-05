@@ -2250,21 +2250,31 @@ class ResourceInstanceDataType(BaseDataType):
     def transform_export_values(self, value, *args, **kwargs):
         return json.dumps(value)
 
+    def append_in_list_search_filters(self, value, node, query):
+        values_list = value.get("val", [])
+        if values_list:
+            field_name = f"tiles.data.{node.pk}"
+            for val in values_list:
+                match_q = Term(
+                    field=f"tiles.data.{node.pk}.resourceId.keyword",
+                    term=val,
+                )
+
+                match value["op"]:
+                    case "" | "in_list_any":
+                        query.should(match_q)
+                    case "in_list_all":
+                        query.must(match_q)
+                    case "!" | "in_list_none":
+                        query.must_not(match_q)
+            query.filter(Exists(field=field_name))
+
     def append_search_filters(self, value, node, query, request):
         try:
             if value["op"] == "null" or value["op"] == "not_null":
                 self.append_null_search_filters(value, node, query, request)
-            elif value["val"] != "" and value["val"] != []:
-                # search_query = Match(field="tiles.data.%s.resourceId" % (str(node.pk)), type="phrase", query=value["val"])
-                search_query = Terms(
-                    field="tiles.data.%s.resourceId.keyword" % (str(node.pk)),
-                    terms=value["val"],
-                )
-                if "!" in value["op"]:
-                    query.must_not(search_query)
-                    query.filter(Exists(field="tiles.data.%s" % (str(node.pk))))
-                else:
-                    query.must(search_query)
+            else:
+                self.append_in_list_search_filters(value, node, query)
         except KeyError as e:
             pass
 

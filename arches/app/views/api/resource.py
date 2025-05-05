@@ -686,7 +686,7 @@ class ResourceReport(APIBase):
                     for resource_relationship in resource_relationships:
                         if (
                             related_resource["resourceinstanceid"]
-                            == resource_relationship["resourceinstanceidto"]
+                            == resource_relationship["to_resource"]
                         ):
                             rr_type = (
                                 resource_relationship_types[
@@ -699,7 +699,7 @@ class ResourceReport(APIBase):
                             relationship_summary.append(rr_type)
                         elif (
                             related_resource["resourceinstanceid"]
-                            == resource_relationship["resourceinstanceidfrom"]
+                            == resource_relationship["from_resource"]
                         ):
                             rr_type = (
                                 resource_relationship_types[
@@ -787,7 +787,7 @@ class BulkResourceReport(APIBase):
                     graph_id__in=graph_ids_with_templates_that_preload_resource_data
                 )
                 .select_related("nodegroup")
-                .order_by("sortorder")
+                .prefetch_related("cardxnodexwidget_set")
             )
 
             perm = "read_nodegroup"
@@ -814,10 +814,7 @@ class BulkResourceReport(APIBase):
 
             cardwidgets = [
                 widget
-                for widgets in [
-                    card.cardxnodexwidget_set.order_by("sortorder").all()
-                    for card in graph_cards
-                ]
+                for widgets in [card.cardxnodexwidget_set.all() for card in graph_cards]
                 for widget in widgets
             ]
 

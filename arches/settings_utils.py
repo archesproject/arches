@@ -1,11 +1,7 @@
-import json
 import os
-from pathlib import Path
-import site
 import sys
 
 from django.apps import apps
-from django.conf import settings
 from django.contrib.staticfiles.finders import AppDirectoriesFinder
 
 
@@ -136,95 +132,4 @@ def build_templates_config(
     except Exception as e:
         # Ensures error message is shown if error encountered in webpack build
         sys.stdout.write(str(e))
-        raise e
-
-
-def generate_frontend_configuration():
-    try:
-        app_root_path = os.path.realpath(settings.APP_ROOT)
-        root_dir_path = os.path.realpath(settings.ROOT_DIR)
-
-        arches_app_names = list_arches_app_names()
-        arches_app_paths = list_arches_app_paths()
-        path_lookup = dict(zip(arches_app_names, arches_app_paths, strict=True))
-
-        frontend_configuration_settings_data = {
-            "_comment": "This is a generated file. Do not edit directly.",
-            "APP_ROOT": app_root_path,
-            "APP_RELATIVE_PATH": os.path.relpath(app_root_path),
-            "ARCHES_APPLICATIONS": arches_app_names,
-            "ARCHES_APPLICATIONS_PATHS": path_lookup,
-            "SITE_PACKAGES_DIRECTORY": site.getsitepackages()[0],
-            "PUBLIC_SERVER_ADDRESS": settings.PUBLIC_SERVER_ADDRESS,
-            "ROOT_DIR": root_dir_path,
-            "STATIC_URL": settings.STATIC_URL,
-            "WEBPACK_DEVELOPMENT_SERVER_PORT": settings.WEBPACK_DEVELOPMENT_SERVER_PORT,
-        }
-
-        if str(Path(app_root_path).parent) == root_dir_path:
-            # Running core arches directly without a project, e.g.:
-            # app_root_path: arches/app
-            # root_dir_path: arches
-            base_path = root_dir_path
-        else:
-            base_path = app_root_path
-
-        frontend_configuration_settings_path = os.path.realpath(
-            os.path.join(base_path, "..", ".frontend-configuration-settings.json")
-        )
-        sys.stdout.write(
-            f"Writing frontend configuration to: {frontend_configuration_settings_path} \n"
-        )
-
-        with open(
-            frontend_configuration_settings_path,
-            "w",
-        ) as file:
-            json.dump(frontend_configuration_settings_data, file, indent=4)
-
-        tsconfig_paths_data = {
-            "_comment": "This is a generated file. Do not edit directly.",
-            "compilerOptions": {
-                "paths": {
-                    "@/arches/*": [
-                        os.path.join(
-                            ".",
-                            os.path.relpath(
-                                root_dir_path,
-                                os.path.join(base_path, ".."),
-                            ),
-                            "app",
-                            "src",
-                            "arches",
-                            "*",
-                        )
-                    ],
-                    **{
-                        os.path.join("@", path_name, "*"): [
-                            os.path.join(
-                                ".",
-                                os.path.relpath(path, os.path.join(base_path, "..")),
-                                "src",
-                                path_name,
-                                "*",
-                            )
-                        ]
-                        for path_name, path in path_lookup.items()
-                    },
-                    "*": ["./node_modules/*"],
-                }
-            },
-        }
-
-        tsconfig_path = os.path.realpath(
-            os.path.join(base_path, "..", ".tsconfig-paths.json")
-        )
-        sys.stdout.write(f"Writing tsconfig path data to: {tsconfig_path} \n")
-
-        with open(tsconfig_path, "w") as file:
-            json.dump(tsconfig_paths_data, file, indent=4)
-
-    except Exception as e:
-        # Ensures error message is shown if error encountered
-        sys.stderr.write(str(e))
         raise e

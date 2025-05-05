@@ -648,7 +648,7 @@ class TileTests(ArchesTestCase):
         t = Tile(json)
         t.save(index=False)
 
-        resource_instances = ResourceXResource.objects.filter(tileid=t.tileid)
+        resource_instances = ResourceXResource.objects.filter(tile=t.tileid)
         self.assertEqual(2, len(resource_instances))
 
         for ri in resource_instances:
@@ -659,22 +659,18 @@ class TileTests(ArchesTestCase):
             ):
                 expected = {
                     "inverserelationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P62i_is_depicted_by",
-                    "nodeid_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
+                    "node_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
                     "notes": "",
                     "relationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
-                    "resourceinstancefrom_graphid_id": UUID(
+                    "from_resource_graph_id": UUID(
                         "c35fe0a1-df30-11e8-b280-a4d18cec433a"
                     ),
-                    "resourceinstanceidfrom_id": UUID(
-                        "654bb228-37e7-4beb-b0f9-b59b61b53577"
-                    ),
-                    "resourceinstanceidto_id": UUID(
-                        "e72844fc-7bc0-4851-89ca-5bb1c6b3ba22"
-                    ),
-                    "resourceinstanceto_graphid_id": UUID(
+                    "from_resource_id": UUID("654bb228-37e7-4beb-b0f9-b59b61b53577"),
+                    "to_resource_id": UUID("e72844fc-7bc0-4851-89ca-5bb1c6b3ba22"),
+                    "to_resource_graph_id": UUID(
                         "c35fe0a1-df30-11e8-b280-a4d18cec433a"
                     ),
-                    "tileid_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
+                    "tile_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
                 }
                 self.assertTrue(
                     all(item in ri_dict.items() for item in expected.items())
@@ -682,19 +678,17 @@ class TileTests(ArchesTestCase):
             else:
                 expected = {
                     "inverserelationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P10i_contains",
-                    "nodeid_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
+                    "node_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
                     "notes": "",
                     "relationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P10_falls_within",
-                    "resourceinstancefrom_graphid_id": UUID(
+                    "from_resource_graph_id": UUID(
                         "c35fe0a1-df30-11e8-b280-a4d18cec433a"
                     ),
-                    "resourceinstanceidto_id": UUID(
-                        "92b2db6a-d13f-4cc7-aec7-e4caf91b45f8"
-                    ),
-                    "resourceinstanceto_graphid_id": UUID(
+                    "to_resource_id": UUID("92b2db6a-d13f-4cc7-aec7-e4caf91b45f8"),
+                    "to_resource_graph_id": UUID(
                         "c35fe0a1-df30-11e8-b280-a4d18cec433a"
                     ),
-                    "tileid_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
+                    "tile_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
                 }
                 self.assertTrue(
                     all(item in ri_dict.items() for item in expected.items())
@@ -732,21 +726,17 @@ class TileTests(ArchesTestCase):
         t = Tile(json)
         t.save(index=False)
 
-        resource_instance = ResourceXResource.objects.get(tileid=t.tileid)
+        resource_instance = ResourceXResource.objects.get(tile=t.tileid)
         ri_dict = JSONSerializer().serializeToPython(resource_instance)
         expected = {
             "inverserelationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P10i_contains",
-            "nodeid_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
+            "node_id": UUID("eb115780-e222-11e8-aaed-a4d18cec433a"),
             "notes": "",
             "relationshiptype": "http://www.cidoc-crm.org/cidoc-crm/P62_depicts",
-            "resourceinstancefrom_graphid_id": UUID(
-                "c35fe0a1-df30-11e8-b280-a4d18cec433a"
-            ),
-            "resourceinstanceidto_id": UUID("85b2db6a-d13f-4cc7-aec7-e4caf91b45f7"),
-            "resourceinstanceto_graphid_id": UUID(
-                "c35fe0a1-df30-11e8-b280-a4d18cec433a"
-            ),
-            "tileid_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
+            "from_resource_graph_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
+            "to_resource_id": UUID("85b2db6a-d13f-4cc7-aec7-e4caf91b45f7"),
+            "to_resource_graph_id": UUID("c35fe0a1-df30-11e8-b280-a4d18cec433a"),
+            "tile_id": UUID("edbdef07-77fd-4bb6-9fef-641d4a65abce"),
         }
         self.assertTrue(all(item in ri_dict.items() for item in expected.items()))
 

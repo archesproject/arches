@@ -6,6 +6,8 @@ import shutil
 from django.core.management.base import BaseCommand
 from arches.app.models.system_settings import settings
 
+from arches.app.models.system_settings import settings
+
 
 class Command(BaseCommand):  # pragma: no cover
     """
@@ -19,6 +21,8 @@ class Command(BaseCommand):  # pragma: no cover
             "This will replace the following files in your project:\n"
             "  - <project>/apps.py\n"
             "  - .github/workflows/main.yml\n"
+            "  - tsconfig.json\n"
+            "  - vitest.config.mts\n"
             "  - webpack/webpack-utils/build-filepath-lookup.js\n"
             "  - webpack/webpack.common.js\n"
             "  - webpack/webpack.config.dev.js\n"
@@ -32,6 +36,28 @@ class Command(BaseCommand):  # pragma: no cover
             self.stdout.write("Operation aborted.")
 
     def update_to_v8(self):
+        # Removes:
+        #   `.frontend-configuration-settings.json`
+        #   `.tsconfig-paths.json`
+        #   `declarations.test.ts`
+        for file_to_delete in [
+            ".frontend-configuration-settings.json",
+            ".tsconfig-paths.json",
+        ]:
+            if os.path.exists(os.path.join(settings.APP_ROOT, "..", file_to_delete)):
+                self.stdout.write("Deleting {}".format(file_to_delete))
+                os.remove(os.path.join(settings.APP_ROOT, "..", file_to_delete))
+                self.stdout.write("Done!")
+
+        declarations_test_file_path = os.path.join(
+            settings.APP_ROOT, "src", settings.APP_NAME, "declarations.test.ts"
+        )
+
+        if os.path.exists(declarations_test_file_path):
+            self.stdout.write("Deleting {}".format("declarations.test.ts"))
+            os.remove(declarations_test_file_path)
+            self.stdout.write("Done!")
+
         # Update apps.py to remove generate_frontend_configuration
         to_replace_1 = """
 from django.conf import settings
@@ -67,6 +93,33 @@ from arches.settings_utils import generate_frontend_configuration"""
         shutil.copytree(
             os.path.join(settings.ROOT_DIR, "install", "arches-templates", "webpack"),
             os.path.join(settings.APP_ROOT, "..", "webpack"),
+        )
+
+        # Replaces tsconfig.json
+        self.stdout.write("Updating tsconfig.json...")
+
+        if os.path.exists(os.path.join(settings.APP_ROOT, "..", "tsconfig.json")):
+            os.remove(os.path.join(settings.APP_ROOT, "..", "tsconfig.json"))
+
+        shutil.copy2(
+            os.path.join(
+                settings.ROOT_DIR, "install", "arches-templates", "tsconfig.json"
+            ),
+            os.path.join(settings.APP_ROOT, "..", "tsconfig.json"),
+        )
+        self.stdout.write("Done!")
+
+        # Replaces vitest.config.mts
+        self.stdout.write("Updating vitest.config.mts...")
+
+        if os.path.exists(os.path.join(settings.APP_ROOT, "..", "vitest.config.mts")):
+            os.remove(os.path.join(settings.APP_ROOT, "..", "vitest.config.mts"))
+
+        shutil.copy2(
+            os.path.join(
+                settings.ROOT_DIR, "install", "arches-templates", "vitest.config.mts"
+            ),
+            os.path.join(settings.APP_ROOT, "..", "vitest.config.mts"),
         )
         self.stdout.write("Done!")
 
@@ -105,19 +158,6 @@ from arches.settings_utils import generate_frontend_configuration"""
                 ),
                 os.path.join(settings.APP_ROOT, ".."),
             )
-
-        self.stdout.write("Done!")
-
-        # Removes unnecessary files
-        self.stdout.write("Removing unnecessary files...")
-
-        declarations_test_file_path = os.path.join(
-            settings.APP_ROOT, "src", settings.APP_NAME, "declarations.test.ts"
-        )
-
-        if os.path.exists(declarations_test_file_path):
-            self.stdout.write("Deleting {}".format("declarations.test.ts"))
-            os.remove(declarations_test_file_path)
 
         self.stdout.write("Done!")
 

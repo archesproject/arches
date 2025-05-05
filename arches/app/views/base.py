@@ -41,7 +41,7 @@ class BaseManagerView(TemplateView):
         context["graph_models"] = []
         context["graphs"] = "[]"
         context["plugins"] = []
-        for plugin in models.Plugin.objects.all().order_by("sortorder"):
+        for plugin in models.Plugin.objects.all():
             if self.request.user.has_perm("view_plugin", plugin):
                 context["plugins"].append(plugin)
 

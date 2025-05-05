@@ -24,7 +24,7 @@ var IIIFViewerViewmodel = function(params) {
         return val;
     };
 
-        
+
     this.map = ko.observable();
     this.manifest = ko.observable(params.manifest);
     this.editManifest = ko.observable(!params.manifest);
@@ -41,6 +41,7 @@ var IIIFViewerViewmodel = function(params) {
     this.canvasLabel = ko.observable();
     this.zoomToCanvas = !(params.zoom && params.center);
     this.annotationNodes = ko.observableArray();
+    this.annotationCounts = ko.observable({});
     this.compareMode = ko.observable(false);
     this.primaryCanvas = ko.observable();
     this.canvasObject = ko.observable();
@@ -149,30 +150,118 @@ var IIIFViewerViewmodel = function(params) {
     });
 
     this.buildAnnotationNodes = params.buildAnnotationNodes || function(json) {
+        const nodeProcessingStatus = {};
+
         self.annotationNodes(
             json.map((node) => {
                 const annotations = ko.observableArray();
+                nodeProcessingStatus[node.nodeid] = { processing: false, completed: false };
+
                 const updateAnnotations = async function() {
-                    var canvas = self.canvas();
+                    const canvas = self.canvas();
                     if (canvas) {
                         const annotationsUrl = arches.urls.iiifannotations + '?canvas=' + canvas + '&nodeid=' + node.nodeid;
-                        if(!cachedAnnotations[annotationsUrl]){
-                            const response = await window.fetch(annotationsUrl);
+                        try {
+                            if(!cachedAnnotations[annotationsUrl]){
+                                const response = await window.fetch(annotationsUrl);
+                                const jsonResponse = await response.json();
+                                cachedAnnotations[annotationsUrl] = jsonResponse;
+                            }
+                            const annotation = cachedAnnotations[annotationsUrl];
 
-                            const jsonResponse = await response.json();
-                            cachedAnnotations[annotationsUrl] = jsonResponse;
+                            annotation.features.forEach(function(feature) {
+                                feature.properties.graphName = node['graph_name'];
+                            });
+                            annotations(annotation.features);
+
+                            const counts = {...self.annotationCounts()};
+                            counts[canvas] = annotation.features.length;
+                            self.annotationCounts(counts);
+                        } catch (error) {
+                            console.error('Error loading annotations for current canvas:', error);
                         }
-                        const annotation = cachedAnnotations[annotationsUrl];
-
-                        annotation.features.forEach(function(feature) {
-                            feature.properties.graphName = node['graph_name'];
-                        });
-                        annotations(annotation.features);
-
                     }
                 };
+
+                const preloadAllAnnotations = async function() {
+                    if (nodeProcessingStatus[node.nodeid].processing) {
+                        return; // Avoid concurrent process of the same node
+                    }
+
+                    nodeProcessingStatus[node.nodeid].processing = true;
+
+                    const canvases = self.canvases();
+                    let processedCount = 0;
+
+                    if (canvases && canvases.length > 0) {
+                        const BATCH_SIZE = 20;
+
+                        // batch process
+                        const processBatch = async (startIndex) => {
+                            const endIndex = Math.min(startIndex + BATCH_SIZE, canvases.length);
+                            const batchPromises = [];
+
+                            for (let i = startIndex; i < endIndex; i++) {
+                                const canvas = canvases[i];
+                                const canvasId = self.getCanvasService(canvas);
+
+                                if (canvas && canvasId) {
+                                    const annotationsUrl = arches.urls.iiifannotations + '?canvas=' + canvasId + '&nodeid=' + node.nodeid;
+
+                                    batchPromises.push((async () => {
+                                        try {
+                                            if (!cachedAnnotations[annotationsUrl]) {
+                                                const response = await window.fetch(annotationsUrl);
+                                                const jsonResponse = await response.json();
+                                                cachedAnnotations[annotationsUrl] = jsonResponse;
+                                            }
+                                            // get state before update
+                                            const currentCounts = {...self.annotationCounts()};
+
+                                            if (!currentCounts[canvasId]) {
+                                                currentCounts[canvasId] = 0;
+                                            }
+                                            currentCounts[canvasId] += cachedAnnotations[annotationsUrl].features.length;
+                                            processedCount++;
+
+                                            // update counts progress
+                                            self.annotationCounts(currentCounts);
+                                        } catch (error) {
+                                            processedCount++;
+                                            console.error('Error loading annotations for canvas:', canvasId, error);
+                                        }
+                                    })());
+                                } else {
+                                    processedCount++;
+                                }
+                            }
+                            await Promise.all(batchPromises);
+                            if (endIndex < canvases.length) {
+                                setTimeout(() => processBatch(endIndex), 0);
+                            } else {
+                                // end status
+                                nodeProcessingStatus[node.nodeid].completed = true;
+                                nodeProcessingStatus[node.nodeid].processing = false;
+                            }
+                        };
+                        processBatch(0);
+                    } else {
+                        nodeProcessingStatus[node.nodeid].completed = true;
+                        nodeProcessingStatus[node.nodeid].processing = false;
+                    }
+                };
+
+                const initializeAnnotationLoading = async function() {
+                    //priorize current canvas
+                    await updateAnnotations();
+                    setTimeout(() => preloadAllAnnotations(), 100);
+                };
+
+                self.manifestData.subscribe(initializeAnnotationLoading);
                 self.canvas.subscribe(updateAnnotations);
-                updateAnnotations();
+
+                initializeAnnotationLoading();
+
                 return {
                     name: node['graph_name'] + ' - ' + node.name,
                     icon: node.icon,
@@ -385,7 +474,7 @@ var IIIFViewerViewmodel = function(params) {
             if(item.loading){
                 return "";
             }
-            return $(`<div class="image"><img src="${item.thumbnail}" height="50"/></div><div class="title">${item.label}</div>`); 
+            return $(`<div class="image"><img src="${item.thumbnail}" height="50"/></div><div class="title">${item.label}</div>`);
         },
         templateSelection: function(item) {
             return item?.label;
@@ -401,7 +490,7 @@ var IIIFViewerViewmodel = function(params) {
         ...splitSelectConfig,
         value: this.canvas
     };
-    
+
     this.imageToolConfig = {
         ...splitSelectConfig,
         value: this.imageToolSelector
@@ -447,7 +536,7 @@ var IIIFViewerViewmodel = function(params) {
     if (!params.manifest) params.expandGallery = true;
     this.expandGallery = ko.observable(params.expandGallery);
     this.expandGallery.subscribe(function(expandGallery) {
-        if (expandGallery) { 
+        if (expandGallery) {
             self.compareMode(false);
             self.showGallery(true);
         }
@@ -546,7 +635,7 @@ var IIIFViewerViewmodel = function(params) {
     const loadComparison = () => {
         const map = self.map();
         if(map && canvasLayer.getContainer() && secondaryCanvasLayer?.getContainer() /*self.primaryLayerLoaded && self.secondaryLayerLoaded*/){
-            // remove the control if it's been added to the map already  
+            // remove the control if it's been added to the map already
             if(self.zoomToCanvas){
                 zoomToBounds(map, canvasLayer);
                 //map.fitBounds(canvasLayer.getBounds())
@@ -655,7 +744,7 @@ var IIIFViewerViewmodel = function(params) {
                 secondaryLayers.push(secondaryCanvasLayer);
             }
             secondaryCanvasLayer.addTo(map);
-            
+
             updateCanvasLayerFilter();
         }
     };
@@ -678,7 +767,7 @@ var IIIFViewerViewmodel = function(params) {
     };
 
     this.selectCanvas = function(canvas) {
-        
+
         const service = self.getCanvasService(canvas);
 
         if (service && self.selectPrimaryPanel()) {
@@ -699,7 +788,15 @@ var IIIFViewerViewmodel = function(params) {
     };
 
     this.getCanvasService = function(canvas) {
-        if (canvas.images.length > 0) return canvas.images[0].resource.service['@id'];
+        if (!canvas || !canvas.images || canvas.images.length === 0) return null;
+        try {
+            if (canvas.images[0] && canvas.images[0].resource && canvas.images[0].resource.service) {
+                return canvas.images[0].resource.service['@id'];
+            }
+        } catch (e) {
+            console.error("Error accessing canvas service:", e);
+        }
+        return null;
     };
 
     this.updateCanvas = !self.canvas();
@@ -725,7 +822,7 @@ var IIIFViewerViewmodel = function(params) {
                         self.secondaryCanvas(service);
                         self.secondaryCanvasObject(canvas);
                     }
-                }    
+                }
             }
             self.updateCanvas = true;
             self.origManifestName = self.getManifestDataValue(manifestData, 'label', true);
@@ -749,8 +846,9 @@ var IIIFViewerViewmodel = function(params) {
         if (abortFetchManifest) abortFetchManifest.abort();
     };
 
-    this.getAnnotationCount = function() {
-        return 0;
+    this.getAnnotationCount = function(canvasId) {
+        const counts = self.annotationCounts();
+        return counts && counts[canvasId] ? counts[canvasId] : 0;
     };
 };
 ko.components.register('iiif-viewer', {
