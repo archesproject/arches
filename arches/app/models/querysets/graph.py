@@ -1,8 +1,9 @@
 from slugify import slugify
 import uuid
+
 from django.utils.translation import gettext as _
 from django.db import models
-from arches.app.models.models import GraphModel
+
 from arches.app.models.utils import make_name_unique
 
 

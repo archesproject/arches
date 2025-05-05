@@ -2256,7 +2256,8 @@ class Graph(models.GraphModel):
                     )
         else:
             raise GraphValidationError(
-                _("You must supply a slug for your graph."), 1015
+                _("You must supply a slug for your graph."),
+                IntegrityCheck.GRAPH_MISSING_SLUG.value,
             )
 
     def update_published_graphs(self, user=None, notes=None):
