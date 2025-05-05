@@ -1,4 +1,7 @@
 from abc import abstractmethod, ABCMeta
+from typing import Iterable
+
+from django.contrib.auth.models import User
 
 from arches.app.const import ExtensionType
 from arches.app.models.models import EditLog, GraphModel
@@ -63,7 +66,9 @@ class PermissionFramework(metaclass=ABCMeta):
     def get_permission_backend(self): ...
 
     @abstractmethod
-    def get_restricted_users(self, resource): ...
+    def get_restricted_users(
+        self, resource, *, all_users: Iterable[User] = User.objects.none()
+    ): ...
 
     @abstractmethod
     def get_filtered_instances(
@@ -133,7 +138,9 @@ class PermissionFramework(metaclass=ABCMeta):
     def update_mappings(self): ...
 
     @abstractmethod
-    def get_index_values(self, resource): ...
+    def get_index_values(
+        self, resource, *, all_users: Iterable[User] = User.objects.none()
+    ): ...
 
     @abstractmethod
     def get_permission_inclusions(self): ...
@@ -194,8 +201,10 @@ def _get_permission_backend():
     return _get_permission_framework().get_permission_backend()
 
 
-def get_restricted_users(resource):
-    return _get_permission_framework().get_restricted_users(resource)
+def get_restricted_users(resource, *, all_users: Iterable[User] = User.objects.none()):
+    return _get_permission_framework().get_restricted_users(
+        resource, all_users=all_users
+    )
 
 
 def get_filtered_instances(
@@ -379,8 +388,8 @@ def update_mappings():
     return _get_permission_framework().update_mappings()
 
 
-def get_index_values(resource):
-    return _get_permission_framework().get_index_values(resource)
+def get_index_values(resource, *, all_users: Iterable[User] = User.objects.none()):
+    return _get_permission_framework().get_index_values(resource, all_users=all_users)
 
 
 def get_permission_search_filter(user):

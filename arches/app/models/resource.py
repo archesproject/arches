@@ -471,7 +471,13 @@ class Resource(models.ResourceInstance):
             resource_indexed.send(sender=self.__class__, instance=self)
 
     def get_documents_to_index(
-        self, fetchTiles=True, datatype_factory=None, node_datatypes=None, context=None
+        self,
+        fetchTiles=True,
+        datatype_factory=None,
+        node_datatypes=None,
+        context=None,
+        *,
+        all_users=None,
     ):
         """
         Gets all the documents nessesary to index a single resource
@@ -482,6 +488,7 @@ class Resource(models.ResourceInstance):
         datatype_factory -- refernce to the DataTypeFactory instance
         node_datatypes -- a dictionary of datatypes keyed to node ids
         context -- a string such as "copy" to indicate conditions under which a document is indexed
+        all_users -- an iterable of User objects, e.g. User.objects.prefetch_related("groups")
 
         """
 
@@ -571,7 +578,9 @@ class Resource(models.ResourceInstance):
                 [int(self.principaluser_id)] if self.principaluser_id else []
             )
         }
-        document["permissions"].update(permission_backend.get_index_values(self))
+        document["permissions"].update(
+            permission_backend.get_index_values(self, all_users=all_users)
+        )
 
         document["strings"] = []
         document["dates"] = []

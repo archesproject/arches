@@ -486,6 +486,13 @@ class ResourceTests(ArchesTestCase):
                 ]
                 self.assertEqual(len(tile_selects), 1)
 
+                non_guardian_user_selects = [
+                    q
+                    for q in queries
+                    if q["sql"].endswith('FROM "auth_user"') and "guardian" not in q
+                ]
+                self.assertEqual(len(non_guardian_user_selects), 1)
+
     def test_self_referring_resource_instance_descriptor(self):
         # Create a nodegroup with a string node and a resource-instance node.
         graph = Graph.objects.create_graph(
