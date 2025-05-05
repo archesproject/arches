@@ -1957,6 +1957,9 @@ class DraftGraphTests(ArchesTestCase):
         updated_source_graph = source_graph.update_from_draft_graph(
             draft_graph=draft_graph
         )
+        # update_from_draft_graph() leaves the prior draft graph in an unusable
+        # state. So we fetch it again before working with it.
+        draft_graph = Graph.objects.get(source_identifier=source_graph)
 
         for node in list(draft_graph.nodes.values()):
             if node.name == "Node Type":
