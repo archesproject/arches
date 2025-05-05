@@ -847,6 +847,13 @@ class Language(models.Model):
     class Meta:
         managed = True
         db_table = "languages"
+        constraints = [
+            models.UniqueConstraint(
+                "isdefault",
+                condition=Q(isdefault=True),
+                name="single_default_language",
+            ),
+        ]
 
 
 class NodeGroup(SaveSupportsBlindOverwriteMixin, models.Model):
