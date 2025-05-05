@@ -1,7 +1,11 @@
 import { ALT_LABEL, PREF_LABEL } from "@/arches_component_lab/constants.ts";
 
-import type { Label, Labellable, WithLabels, WithValues } from "@/arches_component_lab/types";
-
+import type {
+    Label,
+    Labellable,
+    WithLabels,
+    WithValues,
+} from "@/arches_component_lab/types";
 
 /* Port of rank_label in arches.app.utils.i18n python module */
 export const rankLabel = (
