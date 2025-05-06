@@ -79,9 +79,8 @@ const { isMultiSelecting, node, iconLabels, moveLabels } = defineProps<{
     moveLabels: MoveLabels;
     node: TreeNode;
 }>();
-// @ts-expect-error vue-tsc can't figure out destructuring here
 const { setDisplayedRow }: { setDisplayedRow: RowSetter } =
-    inject(displayedRowKey);
+    inject(displayedRowKey)!;
 
 const awaitingMove = ref(false);
 // Workaround for autofocusing the new list/label input boxes
