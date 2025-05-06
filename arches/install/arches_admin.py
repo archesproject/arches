@@ -170,12 +170,17 @@ class ArchesProjectCommand(TemplateCommand):
 def command_startproject(args):
     options = vars(args)
     name = options["name"]
+    if not options["directory"]:
+        options["directory"] = name.replace("_", "-")
     directory = options["directory"]
+
+    project_path = os.path.join(os.getcwd(), directory)
+
+    if not os.path.exists(project_path):
+        os.mkdir(project_path)
 
     cmd = ArchesProjectCommand()
     cmd.handle(options)
-
-    project_path = os.path.join(os.getcwd(), (directory if directory else name))
 
     os.chdir(project_path)
     subprocess.call("npm install", shell=True)
