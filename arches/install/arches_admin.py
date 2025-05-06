@@ -122,6 +122,7 @@ class ArchesProjectCommand(TemplateCommand):
             [str(arches.VERSION[0]), str(arches.VERSION[1] + 1), "0"]
         )
         options["project_name_title_case"] = project_name.title().replace("_", "")
+        options["project_name_kebab_case"] = project_name.replace("_", "-")
 
         super(ArchesProjectCommand, self).handle(
             "project", project_name, target, **options
@@ -146,6 +147,10 @@ class ArchesProjectCommand(TemplateCommand):
                 file_data.replace(
                     "{{ project_name_title_case }}",
                     options["project_name_title_case"],
+                )
+                .replace(
+                    "{{ project_name_kebab_case }}",
+                    options["project_name_kebab_case"],
                 )
                 .replace("{{ project_name }}", project_name)
                 .replace(
