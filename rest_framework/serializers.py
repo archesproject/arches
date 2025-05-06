@@ -488,7 +488,7 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             instance_from_factory._as_representation = True
             # TODO: decide whether to override update() instead of using partial().
             instance_from_factory.save = partial(
-                instance_from_factory.save, user=self.context["request"].user
+                instance_from_factory.save, request=self.context["request"]
             )
             updated = self.update(instance_from_factory, validated_data)
         return updated
