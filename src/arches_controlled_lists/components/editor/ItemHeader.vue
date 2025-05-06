@@ -33,8 +33,11 @@ const iconLabel = (item: ControlledListItem) => {
             ></i>
             <h3 class="item-label">
                 {{
-                    getItemLabel(item, selectedLanguage.code, systemLanguage.code)
-                        .value
+                    getItemLabel(
+                        item,
+                        selectedLanguage.code,
+                        systemLanguage.code,
+                    ).value
                 }}
             </h3>
             <span class="item-type">{{ iconLabel(item) }}</span>
@@ -68,12 +71,12 @@ const iconLabel = (item: ControlledListItem) => {
 }
 
 .item-header-icon {
-    padding: .5rem .5rem;
+    padding: 0.5rem 0.5rem;
     align-items: baseline;
 }
 
 .item-label {
-    padding: 0 .5rem 0 0;
+    padding: 0 0.5rem 0 0;
     font-weight: 400;
     margin: 0;
     font-size: 1.8rem;
@@ -86,7 +89,7 @@ const iconLabel = (item: ControlledListItem) => {
 .item-type {
     font-size: small;
     font-weight: 200;
-    padding: .25rem 0 0 0;
+    padding: 0.25rem 0 0 0;
 }
 
 a {

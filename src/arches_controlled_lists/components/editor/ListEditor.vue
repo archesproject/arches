@@ -19,7 +19,10 @@ const { $gettext } = useGettext();
 <template>
     <template v-if="list">
         <div class="controlled-list-header">
-            <i class="pi pi-folder list-header-icon" :aria-label="$gettext('List')"></i>
+            <i
+                class="pi pi-folder list-header-icon"
+                :aria-label="$gettext('List')"
+            ></i>
             <h3 class="list-label">
                 {{ list.name }}
             </h3>
@@ -36,7 +39,9 @@ const { $gettext } = useGettext();
                 :style="{ width: '4rem' }"
             />
             <div class="nodes-container">
-                <h4 class="nodes-container-title">{{ $gettext("List used by these nodes") }}</h4>
+                <h4 class="nodes-container-title">
+                    {{ $gettext("List used by these nodes") }}
+                </h4>
                 <div class="nodes">
                     <div
                         v-for="node in list.nodes"
@@ -68,14 +73,14 @@ const { $gettext } = useGettext();
 }
 
 .list-label {
-    padding: 0 .5rem 0 0;
+    padding: 0 0.5rem 0 0;
     font-weight: 400;
     margin: 0;
     font-size: 1.75rem;
 }
 
 .list-header-icon {
-    padding: .5rem .5rem;
+    padding: 0.5rem 0.5rem;
     align-items: baseline;
 }
 
@@ -84,9 +89,9 @@ const { $gettext } = useGettext();
 }
 
 .nodes-container-title {
-    padding: 0 .5rem 0 0;
+    padding: 0 0.5rem 0 0;
     font-weight: 400;
-    margin: 0 0 .5rem 0;
+    margin: 0 0 0.5rem 0;
     font-size: 1.75rem;
 }
 

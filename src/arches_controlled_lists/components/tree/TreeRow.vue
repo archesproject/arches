@@ -373,5 +373,4 @@ const acceptNewListShortcutEntry = async () => {
     height: 3rem;
     font-size: inherit;
 }
-
 </style>

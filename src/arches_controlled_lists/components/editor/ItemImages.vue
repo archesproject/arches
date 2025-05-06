@@ -92,14 +92,18 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
                             style: { display: done ? 'none' : '' },
                         };
                     },
-                    pcChooseButton: { root: { style: { fontSize: 'smaller' } } },
+                    pcChooseButton: {
+                        root: { style: { fontSize: 'smaller' } },
+                    },
                 }"
                 @before-send="addHeader($event)"
                 @upload="upload($event)"
                 @error="showError($event)"
             />
         </div>
-        <p>{{ $gettext("Optionally, add images that illustrate this item") }}</p>
+        <p>
+            {{ $gettext("Optionally, add images that illustrate this item") }}
+        </p>
         <div class="images">
             <ImageEditor
                 v-for="image in item.images"
@@ -124,7 +128,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
 .images-container-title {
     display: flex;
     align-items: center;
-    gap: 1.0rem;
+    gap: 1rem;
 }
 
 .p-fileupload-advanced {
@@ -143,7 +147,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
 
 .images-container p {
     margin: 0;
-    padding: .25rem 0 0 0;
+    padding: 0.25rem 0 0 0;
     color: var(--p-text-muted-color);
 }
 
@@ -186,11 +190,11 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
 
 :deep(img) {
     border: 1px solid var(--p-surface-700);
- }
+}
 
 :deep(.images .p-button) {
-   border-radius: 2px;
-   font-weight: 400;
+    border-radius: 2px;
+    font-weight: 400;
 }
 
 :deep(.p-fileupload-content:empty) {

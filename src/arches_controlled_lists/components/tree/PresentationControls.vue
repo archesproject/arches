@@ -33,11 +33,17 @@ const { $gettext } = useGettext();
 <template>
     <div class="tree-controls-container">
         <div class="container-title">
-            {{
-                $gettext("Tree controls")
-            }}
+            {{ $gettext("Tree controls") }}
         </div>
-        <div style="text-align: center; display: flex; width: 100%; padding-left: 1rem; padding-right: .5rem;">
+        <div
+            style="
+                text-align: center;
+                display: flex;
+                width: 100%;
+                padding-left: 1rem;
+                padding-right: 0.5rem;
+            "
+        >
             <Button
                 :severity="shouldUseContrast() ? CONTRAST : SECONDARY"
                 class="secondary-button"
@@ -79,7 +85,7 @@ const { $gettext } = useGettext();
 
 <style scoped>
 .tree-controls-container {
-    padding: 0 0 .5rem 0;
+    padding: 0 0 0.5rem 0;
     background: var(--p-form-field-filled-background);
     border-bottom: 1px solid var(--p-content-border-color);
 }

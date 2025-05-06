@@ -280,7 +280,7 @@ const vRefocusDownArrow = {
 .p-button {
     height: 2.5rem;
     width: 2.5rem;
-    padding: .5rem;
+    padding: 0.5rem;
     border-radius: 2px;
     border: 1px solid steelblue;
 }

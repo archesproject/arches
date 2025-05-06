@@ -263,9 +263,7 @@ await fetchListsAndPopulateTree();
     <div class="controls-container">
         <div>
             <h3 class="controls-header">
-                {{
-                    $gettext("Lists Manager")
-                }}
+                {{ $gettext("Lists Manager") }}
             </h3>
         </div>
         <div class="button-controls-container">
@@ -278,7 +276,9 @@ await fetchListsAndPopulateTree();
             <SplitButton
                 class="list-button"
                 :label="$gettext('Delete')"
-                :menu-button-props="{ 'aria-label': $gettext('Delete multiple') }"
+                :menu-button-props="{
+                    'aria-label': $gettext('Delete multiple'),
+                }"
                 :disabled="!toDelete.length"
                 :severity="shouldUseContrast() ? CONTRAST : DANGER"
                 :model="deleteSelectOptions"
@@ -295,13 +295,13 @@ await fetchListsAndPopulateTree();
 
 <style scoped>
 .controls-container {
-    padding-bottom: .75rem;
+    padding-bottom: 0.75rem;
     border-bottom: 1px solid var(--p-content-border-color);
 }
 
 .controls-header {
     padding: 0 0.75rem;
-    margin: 1rem 0 .5rem 1.0rem;
+    margin: 1rem 0 0.5rem 1rem;
     font-size: 1.75rem;
     font-weight: 400;
 }
@@ -334,5 +334,4 @@ await fetchListsAndPopulateTree();
 :deep(.p-tieredmenu) {
     border-radius: 2px;
 }
-
 </style>

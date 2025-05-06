@@ -465,18 +465,17 @@ i {
     color: var(--p-button-primary-hover-color);
 }
 
-:deep(i[role=button]) {
+:deep(i[role="button"]) {
     height: var(--p-button-icon-only-width);
     width: var(--p-button-icon-only-width);
     border-radius: 50%;
     border: 1px solid var(--p-button-secondary-border-color);
     background: var(--p-button-secondary-background);
-    padding: .67rem;
+    padding: 0.67rem;
 }
 
-:deep(i[role=button]:hover) {
+:deep(i[role="button"]:hover) {
     background: var(--p-button-danger-background);
     color: var(--p-button-primary-hover-color);
 }
-
 </style>

@@ -71,7 +71,7 @@ const issuePatchItem = async () => {
 
 .guide-container p {
     margin: 0;
-    padding: .25rem 0 0 0;
+    padding: 0.25rem 0 0 0;
     color: var(--p-text-muted-color);
 }
 

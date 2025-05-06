@@ -80,25 +80,25 @@ const cancel = () => {
             <div class="value-editor-title">
                 <h4>{{ props.label }}</h4>
             </div>
-            
+
             <!-- TODO https://github.com/archesproject/arches/issues/10847 -->
-            <span 
+            <span
                 v-if="!props.editable"
                 class="value-label"
                 style="font-size: small"
             >
                 {{ $gettext("False") }}
             </span>
-            
-        <InputText
-            v-else
-            v-model="inputValue"
-            v-focus
-            type="text"
-            :disabled="disabled"
-            @keyup.enter="save"
+
+            <InputText
+                v-else
+                v-model="inputValue"
+                v-focus
+                type="text"
+                :disabled="disabled"
+                @keyup.enter="save"
             />
-       
+
             <span
                 v-if="props.editable && !isEditing"
                 class="edit-controls"

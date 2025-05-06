@@ -149,7 +149,7 @@ function tryEdit() {
 
 .uri-container p {
     margin: 0;
-    padding: .25rem 1rem 0 0;
+    padding: 0.25rem 1rem 0 0;
     color: var(--p-text-muted-color);
 }
 
@@ -159,13 +159,13 @@ input {
 }
 
 .characteristic {
-    margin: .5rem 0 0 0;
+    margin: 0.5rem 0 0 0;
     display: flex;
 }
 
 .characteristic input {
     height: 3rem;
-    padding: 1.5rem .5rem;
+    padding: 1.5rem 0.5rem;
     width: 100%;
 }
 
@@ -186,16 +186,16 @@ input {
     padding: 0.5rem;
 }
 
-:deep(i[role=button]) {
+:deep(i[role="button"]) {
     height: var(--p-button-icon-only-width);
     width: var(--p-button-icon-only-width);
     border-radius: 50%;
     border: 1px solid var(--p-button-secondary-border-color);
     background: var(--p-button-secondary-background);
-    padding: .67rem;
+    padding: 0.67rem;
 }
 
-:deep(i[role=button]:hover) {
+:deep(i[role="button"]:hover) {
     background: var(--p-button-primary-hover-background);
     color: var(--p-button-primary-hover-color);
 }

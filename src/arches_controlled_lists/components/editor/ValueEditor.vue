@@ -268,7 +268,10 @@ const focusInput = () => {
 </script>
 
 <template>
-    <div ref="editorDiv" class="value-editor-container">
+    <div
+        ref="editorDiv"
+        class="value-editor-container"
+    >
         <div class="value-editor-title">
             <h4>{{ headings.heading }}</h4>
             <AddValue
@@ -277,7 +280,7 @@ const focusInput = () => {
             />
         </div>
         <p>{{ headings.subheading }}</p>
-    
+
         <div class="value-editor-table">
             <DataTable
                 v-if="values.length"
@@ -352,7 +355,10 @@ const focusInput = () => {
                             class="full-width-pointer"
                             style="white-space: pre-wrap"
                             @click.stop="
-                                makeValueEditable(slotProps.data, slotProps.index)
+                                makeValueEditable(
+                                    slotProps.data,
+                                    slotProps.index,
+                                )
                             "
                         >
                             {{ slotProps.data.value }}
@@ -369,10 +375,13 @@ const focusInput = () => {
                             v-model="data[field]"
                             :options="arches.languages"
                             :option-label="
-                                (lang: Language) => `${lang.name} (${lang.code})`
+                                (lang: Language) =>
+                                    `${lang.name} (${lang.code})`
                             "
                             option-value="code"
-                            :pt="{ optionLabel: { style: { fontSize: 'small' } } }"
+                            :pt="{
+                                optionLabel: { style: { fontSize: 'small' } },
+                            }"
                         />
                     </template>
                     <template #body="slotProps">
@@ -385,8 +394,10 @@ const focusInput = () => {
                     :row-editor="true"
                     style="width: 5%; text-align: center; white-space: nowrap"
                     :pt="{
-                        headerCell: { ariaLabel: $gettext('Row edit controls') },
-                        pcRowEditorInit: { }
+                        headerCell: {
+                            ariaLabel: $gettext('Row edit controls'),
+                        },
+                        pcRowEditorInit: {},
                     }"
                 >
                     <template #roweditoriniticon>
@@ -410,7 +421,9 @@ const focusInput = () => {
                 </Column>
                 <Column
                     style="width: 5%; text-align: center; white-space: nowrap"
-                    :pt="{ headerCell: { ariaLabel: $gettext('Delete controls') } }"
+                    :pt="{
+                        headerCell: { ariaLabel: $gettext('Delete controls') },
+                    }"
                 >
                     <template #body="slotProps">
                         <i
@@ -448,7 +461,7 @@ const focusInput = () => {
 
 .value-editor-container p {
     margin: 0;
-    padding: .25rem 0 0 0;
+    padding: 0.25rem 0 0 0;
     color: var(--p-text-muted-color);
 }
 
@@ -507,21 +520,23 @@ p {
     color: var(--p-button-primary-hover-color);
 }
 
-:deep(.p-button.p-component.p-button-icon-only.p-button-secondary.p-button-rounded.p-button-text.p-datatable-row-editor-cancel:hover) {
-    background: var(--p-amber-300);;
+:deep(
+        .p-button.p-component.p-button-icon-only.p-button-secondary.p-button-rounded.p-button-text.p-datatable-row-editor-cancel:hover
+    ) {
+    background: var(--p-amber-300);
     color: var(--p-button-primary-hover-color);
 }
 
-:deep(i[role=button]) {
+:deep(i[role="button"]) {
     height: var(--p-button-icon-only-width);
     width: var(--p-button-icon-only-width);
     border-radius: 50%;
     border: 1px solid var(--p-button-secondary-border-color);
     background: var(--p-button-secondary-background);
-    padding: .67rem;
+    padding: 0.67rem;
 }
 
-:deep(i[role=button]:hover) {
+:deep(i[role="button"]:hover) {
     background: var(--p-button-danger-background);
     color: var(--p-button-primary-hover-color);
 }
