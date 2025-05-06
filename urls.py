@@ -81,3 +81,8 @@ if settings.ROOT_URLCONF == __name__:
         urlpatterns = i18n_patterns(*urlpatterns)
 
     urlpatterns.append(path("i18n/", include("django.conf.urls.i18n")))
+
+handler400 = "arches.app.views.main.custom_400"
+handler403 = "arches.app.views.main.custom_403"
+handler404 = "arches.app.views.main.custom_404"
+handler500 = "arches.app.views.main.custom_500"
