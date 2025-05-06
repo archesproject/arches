@@ -1702,15 +1702,15 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
         related_query_name="child",
     )
     data = JSONField(blank=True, default=dict, db_column="tiledata")
-    nodegroup_id = models.UUIDField(db_column="nodegroupid", null=True)
-    nodegroup = models.ForeignObject(
+    nodegroup = models.ForeignKey(
         NodeGroup,
+        db_column="nodegroupid",
+        db_index=False,
+        db_constraint=False,
         null=True,
         on_delete=models.DO_NOTHING,
         related_name="tiles",
         related_query_name="tile",
-        from_fields=["nodegroup_id"],
-        to_fields=["nodegroupid"],
     )
     sortorder = models.IntegerField(blank=True, null=True, default=0)
     provisionaledits = JSONField(blank=True, null=True, db_column="provisionaledits")
