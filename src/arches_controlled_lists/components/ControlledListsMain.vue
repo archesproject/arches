@@ -29,7 +29,7 @@ import ListHeader from "@/arches_controlled_lists/components/misc/ListHeader.vue
 import MainSplitter from "@/arches_controlled_lists/components/MainSplitter.vue";
 
 import type { Ref } from "vue";
-import type { Language } from "@/arches_vue_utils/types";
+import type { Language } from "@/arches_component_lab/types";
 import type { Selectable } from "@/arches_controlled_lists/types";
 
 const router = useRouter();

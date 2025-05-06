@@ -14,7 +14,7 @@ import {
 import { shouldUseContrast } from "@/arches_controlled_lists/utils.ts";
 
 import type { Ref } from "vue";
-import type { Language } from "@/arches_vue_utils/types";
+import type { Language } from "@/arches_component_lab/types";
 
 const { expandAll, collapseAll } = defineProps<{
     expandAll: () => void;

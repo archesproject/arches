@@ -2,7 +2,7 @@
 import arches from "arches";
 import { computed, inject } from "vue";
 
-import { getItemLabel } from "@/arches_vue_utils/utils.ts";
+import { getItemLabel } from "@/arches_component_lab/utils.ts";
 import {
     itemKey,
     METADATA_CHOICES,
@@ -11,7 +11,7 @@ import {
 import ImageMetadata from "@/arches_controlled_lists/components/editor/ImageMetadata.vue";
 
 import type { Ref } from "vue";
-import type { Language } from "@/arches_vue_utils/types";
+import type { Language } from "@/arches_component_lab/types";
 import type {
     ControlledListItem,
     ControlledListItemImage,

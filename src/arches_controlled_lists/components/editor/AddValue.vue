@@ -5,7 +5,7 @@ import { useGettext } from "vue3-gettext";
 
 import Button from "primevue/button";
 
-import { ALT_LABEL, PREF_LABEL } from "@/arches_vue_utils/constants.ts";
+import { ALT_LABEL, PREF_LABEL } from "@/arches_component_lab/constants.ts";
 import {
     isEditingKey,
     itemKey,
@@ -19,7 +19,7 @@ import {
 } from "@/arches_controlled_lists/utils.ts";
 
 import type { Ref } from "vue";
-import type { Language } from "@/arches_vue_utils/types";
+import type { Language } from "@/arches_component_lab/types";
 import type {
     ControlledListItem,
     IsEditingRefAndSetter,

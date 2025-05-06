@@ -31,7 +31,7 @@ import {
 import type { Ref } from "vue";
 import type { TreeSelectionKeys } from "primevue/tree";
 import type { TreeNode } from "primevue/treenode";
-import type { Language } from "@/arches_vue_utils/types";
+import type { Language } from "@/arches_component_lab/types";
 import type {
     ControlledList,
     ControlledListItem,

@@ -140,7 +140,7 @@ INSTALLED_APPS = (
     "corsheaders",
     "oauth2_provider",
     "django_celery_results",
-    "arches_vue_utils",
+    "arches_component_lab",
     # "silk",
 )
 

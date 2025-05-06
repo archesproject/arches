@@ -5,7 +5,7 @@ import { useGettext } from "vue3-gettext";
 import Button from "primevue/button";
 import { useToast } from "primevue/usetoast";
 
-import { PREF_LABEL } from "@/arches_vue_utils/constants.ts";
+import { PREF_LABEL } from "@/arches_component_lab/constants.ts";
 import { patchList } from "@/arches_controlled_lists/api.ts";
 import {
     CONTRAST,
@@ -29,7 +29,7 @@ import {
 import type { Ref } from "vue";
 import type { TreeExpandedKeys, TreeSelectionKeys } from "primevue/tree";
 import type { TreeNode } from "primevue/treenode";
-import type { Language } from "@/arches_vue_utils/types";
+import type { Language } from "@/arches_component_lab/types";
 import type {
     ControlledList,
     ControlledListItem,

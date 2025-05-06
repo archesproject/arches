@@ -2,7 +2,7 @@
 import { computed, inject } from "vue";
 import { useGettext } from "vue3-gettext";
 
-import { getItemLabel } from "@/arches_vue_utils/utils.ts";
+import { getItemLabel } from "@/arches_component_lab/utils.ts";
 import {
     displayedRowKey,
     selectedLanguageKey,
@@ -11,7 +11,7 @@ import {
 import { dataIsList } from "@/arches_controlled_lists/utils.ts";
 
 import type { Ref } from "vue";
-import type { Language } from "@/arches_vue_utils/types";
+import type { Language } from "@/arches_component_lab/types";
 import type {
     ControlledList,
     ControlledListItem,
