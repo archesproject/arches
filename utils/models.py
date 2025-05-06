@@ -1,7 +1,7 @@
 from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.postgres.fields import ArrayField
 from django.db.models import F, OuterRef
-from django.db.models.fields.json import JSONField
+from django.db.models.fields.json import JSONField, KT
 
 from arches import __version__ as arches_version
 from arches.app.models.models import ResourceInstance, TileModel
@@ -40,7 +40,11 @@ def generate_node_alias_expressions(nodes, *, defer, only, model):
                 base_lookup=f"data__{node.pk}",
             )
         elif issubclass(model, TileModel):
-            tile_values_query = F(f"data__{node.pk}")
+            # TODO: Investigate consistency with prior branch.
+            if node.datatype in {"non-localized-string"}:
+                tile_values_query = KT(f"data__{node.pk}")
+            else:
+                tile_values_query = F(f"data__{node.pk}")
         else:
             raise ValueError
         alias_expressions[node.alias] = tile_values_query
