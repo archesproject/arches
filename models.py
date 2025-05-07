@@ -96,14 +96,14 @@ class SemanticResource(ResourceInstance):
             user=user, edit_type=edit_type, transaction_id=transaction_id
         )
 
-    def save(self, *, request=None, index=False, **kwargs):
+    def save(self, *, request=None, index=True, **kwargs):
         with transaction.atomic():
             self._save_aliased_data(request=request, index=index, **kwargs)
 
     def save_without_related_objects(self, **kwargs):
         return super().save(**kwargs)
 
-    def _save_aliased_data(self, *, request=None, index=False, **kwargs):
+    def _save_aliased_data(self, *, request=None, index=True, **kwargs):
         """Raises a compound ValidationError with any failing tile values.
 
         It's not exactly idiomatic for a Django project to clean()
@@ -237,7 +237,7 @@ class SemanticTile(TileModel):
         ).annotate(_nodegroup_alias=models.Value(entry_node_alias))
         # TODO: determine if this annotation still needed / remove
 
-    def save(self, *, request=None, index=False, **kwargs):
+    def save(self, *, request=None, index=True, **kwargs):
         with transaction.atomic():
             if self.sortorder is None or self.is_fully_provisional():
                 self.set_next_sort_order()
@@ -252,7 +252,7 @@ class SemanticTile(TileModel):
         save_kwargs = {**kwargs, "update_fields": set()}
         return super().save(**save_kwargs)
 
-    def _save_aliased_data(self, *, request=None, index=False, **kwargs):
+    def _save_aliased_data(self, *, request=None, index=True, **kwargs):
         bulk_operation = BulkTileOperation(
             entry=self, request=request, save_kwargs=kwargs
         )
