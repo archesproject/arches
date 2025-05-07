@@ -1,13 +1,28 @@
 from django.contrib.postgres.expressions import ArraySubquery
-from django.db.models import F, OuterRef, TextField
-from django.db.models.fields.json import KT
+from django.contrib.postgres.fields import ArrayField
+from django.db.models import (
+    BooleanField,
+    DateTimeField,
+    F,
+    FloatField,
+    OuterRef,
+    TextField,
+    UUIDField,
+)
+from django.db.models.fields.json import JSONField, KT
+from django.db.models.functions import Cast
 
 from arches import __version__ as arches_version
 from arches.app.models.models import ResourceInstance, TileModel
 from arches.app.models.utils import field_names
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
-from arches_querysets.fields import CardinalityNField
+from arches_querysets.fields import (
+    Cardinality1DateTimeField,
+    Cardinality1JSONField,
+    Cardinality1TextField,
+    CardinalityNField,
+)
 
 
 def field_attnames(instance_or_class):
@@ -34,10 +49,7 @@ def generate_node_alias_expressions(nodes, *, defer, only, model):
             raise ValueError(f'"{node.alias}" clashes with a model field name.')
 
         if issubclass(model, ResourceInstance):
-            tile_values_query = get_tile_values_for_resource(
-                nodegroup=node.nodegroup,
-                base_lookup=f"data__{node.pk}",
-            )
+            tile_values_query = get_tile_values_for_resource(node)
         elif issubclass(model, TileModel):
             # TODO: Investigate consistency with prior branch.
             if node.datatype in {"non-localized-string"}:
@@ -67,7 +79,7 @@ def pop_arches_model_kwargs(kwargs, model_fields):
     return arches_model_data, without_model_data
 
 
-def get_tile_values_for_resource(*, nodegroup, base_lookup):
+def get_tile_values_for_resource(node):
     """
     Return a tile values query expression for use in a ResourceInstanceQuerySet.
 
@@ -76,25 +88,53 @@ def get_tile_values_for_resource(*, nodegroup, base_lookup):
     multiple tiles for cardinality-1 nodegroups might appear if there
     are cardinality-N parents anywhere.
     """
+    expression, field = get_node_value_expression_and_output_field(node)
     tile_query = (
         TileModel.objects.filter(
-            # TODO: after ForeignObject removed, update
-            nodegroup_id=nodegroup.pk,
+            nodegroup_id=node.nodegroup_id,
             resourceinstance_id=OuterRef("resourceinstanceid"),
         )
-        # works for non-localized-string... parameterize...
-        .annotate(as_string=KT(base_lookup))
-        .values("as_string")
+        .annotate(node_value=expression)
+        .values("node_value")
         .order_by("parenttile", "sortorder")
     )
 
-    if all_nodegroups_in_hierarchy_are_cardinality_1(nodegroup):
-        return tile_query
+    if all_nodegroups_in_hierarchy_are_cardinality_1(node.nodegroup):
+        match field:
+            case BooleanField() | FloatField() | ArrayField():
+                output_field = field
+            case DateTimeField():
+                output_field = Cardinality1DateTimeField()
+            case JSONField():
+                output_field = Cardinality1JSONField()
+            case _:
+                output_field = Cardinality1TextField()
+        return Cast(tile_query, output_field=output_field)
 
-    return ArraySubquery(
-        tile_query,
-        output_field=CardinalityNField(base_field=TextField()),
-    )
+    return ArraySubquery(tile_query, output_field=CardinalityNField(base_field=field))
+
+
+def get_node_value_expression_and_output_field(node):
+    match node.datatype:
+        case "boolean":
+            return F(f"data__{node.pk}"), BooleanField()
+        case "number":
+            return F(f"data__{node.pk}"), FloatField()
+        case "non-localized-string":
+            return KT(f"data__{node.pk}"), TextField()
+        case "date":
+            return (
+                Cast(KT(f"data__{node.pk}"), output_field=DateTimeField()),
+                DateTimeField(),
+            )
+        case "string" | "resource-instance" | "resource-instance-list" | "url":
+            return F(f"data__{node.pk}"), JSONField()
+        case "concept":
+            return KT(f"data__{node.pk}"), UUIDField()
+        case "concept-list":
+            return F(f"data__{node.pk}"), JSONField()
+        case _:
+            return F(f"data__{node.pk}"), TextField()
 
 
 def get_nodegroups_here_and_below(start_nodegroup, user=None):

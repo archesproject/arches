@@ -257,3 +257,4 @@ def resource_instance_transform_value_for_tile(self, value, **kwargs):
             return transformed
         if isinstance(value, models.ResourceInstance):
             return [from_id_string(str(value.pk), value.graph_id)]
+        raise

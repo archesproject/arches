@@ -2,7 +2,7 @@ from django.db.models import Lookup
 from django.db.models.lookups import Contains, IContains
 from psycopg2.extensions import AsIs, QuotedString
 
-from arches_querysets.fields import CardinalityNField
+from arches_querysets.fields import Cardinality1JSONField, CardinalityNField
 
 
 class JSONPathFilter:
@@ -44,7 +44,7 @@ class ArrayIContains(IContains):
         )
 
 
-@CardinalityNField.register_lookup
+@Cardinality1JSONField.register_lookup
 class AnyLanguageStartsWith(JSONPathFilter, Lookup):
     lookup_name = "any_lang_startswith"
 
@@ -53,6 +53,42 @@ class AnyLanguageStartsWith(JSONPathFilter, Lookup):
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params = (*lhs_params, *rhs_params)
         return "%s @? '$.*.value ? (@ starts with \"%s\")'" % (lhs, rhs), params
+
+
+@Cardinality1JSONField.register_lookup
+class AnyLanguageIStartsWith(JSONPathFilter, Lookup):
+    lookup_name = "any_lang_istartswith"
+
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        params = (*lhs_params, *rhs_params)
+        return (
+            '%s @? \'$.*.value ? (@ like_regex "^%s" flag "i")\'' % (lhs, rhs),
+            params,
+        )
+
+
+@Cardinality1JSONField.register_lookup
+class AnyLanguageContains(JSONPathFilter, Lookup):
+    lookup_name = "any_lang_contains"
+
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        params = (*lhs_params, *rhs_params)
+        return "%s @? '$.*.value ? (@ like_regex \"%s\")'" % (lhs, rhs), params
+
+
+@Cardinality1JSONField.register_lookup
+class AnyLanguageIContains(JSONPathFilter, Lookup):
+    lookup_name = "any_lang_icontains"
+
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        params = (*lhs_params, *rhs_params)
+        return '%s @? \'$.*.value ? (@ like_regex "%s" flag "i")\'' % (lhs, rhs), params
 
 
 @CardinalityNField.register_lookup
@@ -105,5 +141,20 @@ class ArrayAnyLanguageStartsWith(JSONPathFilter, Lookup):
         params = (*lhs_params, *rhs_params)
         return (
             "TO_JSONB(%s) @? '$[*].*.value ? (@ starts with \"%s\")'" % (lhs, rhs),
+            params,
+        )
+
+
+@CardinalityNField.register_lookup
+class ArrayAnyLanguageIStartsWith(JSONPathFilter, Lookup):
+    lookup_name = "any_lang_istartswith"
+
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        params = (*lhs_params, *rhs_params)
+        return (
+            'TO_JSONB(%s) @? \'$[*].*.value ? (@ like_regex "^%s" flag "i")\''
+            % (lhs, rhs),
             params,
         )
