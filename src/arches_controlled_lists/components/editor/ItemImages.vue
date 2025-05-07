@@ -102,7 +102,7 @@ const showError = (event?: FileUploadErrorEvent | FileUploadUploadEvent) => {
             />
         </div>
         <p>
-            {{ $gettext("Optionally, add images that illustrate this item") }}
+            {{ $gettext("Optionally, add images that illustrate this item.") }}
         </p>
         <div class="images">
             <ImageEditor
