@@ -1300,7 +1300,7 @@ class ResourceReport(APIBase):
             request.GET = get_params
 
             related_resources_response = RelatedResourcesView().get(
-                request, resourceid, include_rr_count=False
+                request, resourceid, include_rr_count=False, graphs=resource_models
             )
             related_resources = json.loads(related_resources_response.content)
 
