@@ -67,8 +67,15 @@ def pop_arches_model_kwargs(kwargs, model_fields):
     return arches_model_data, without_model_data
 
 
-def get_tile_values_for_resource(*, nodegroup, base_lookup) -> ArraySubquery:
-    """Return a tile values query expression for use in a ResourceInstanceQuerySet."""
+def get_tile_values_for_resource(*, nodegroup, base_lookup):
+    """
+    Return a tile values query expression for use in a ResourceInstanceQuerySet.
+
+    Allows shallow filtering, e.g. concepts.filter(uri_content...
+    even if `uri_content` is not in the top nodegroup. For this reason,
+    multiple tiles for cardinality-1 nodegroups might appear if there
+    are cardinality-N parents anywhere.
+    """
     tile_query = (
         TileModel.objects.filter(
             # TODO: after ForeignObject removed, update
@@ -80,6 +87,10 @@ def get_tile_values_for_resource(*, nodegroup, base_lookup) -> ArraySubquery:
         .values("as_string")
         .order_by("parenttile", "sortorder")
     )
+
+    if all_nodegroups_in_hierarchy_are_cardinality_1(nodegroup):
+        return tile_query
+
     return ArraySubquery(
         tile_query,
         output_field=CardinalityNField(base_field=TextField()),
@@ -123,6 +134,19 @@ def filter_nodes_by_highest_parent(nodes, aliases):
             filtered_nodes |= set(nodegroup.node_set.all())
 
     return filtered_nodes
+
+
+def all_nodegroups_in_hierarchy_are_cardinality_1(nodegroup):
+    cardinality_n_found = False
+    breaker = 0
+    test_nodegroup = nodegroup
+    while not cardinality_n_found and test_nodegroup and breaker < 1000:
+        if nodegroup.cardinality == "n":
+            cardinality_n_found = True
+        test_nodegroup = nodegroup.parentnodegroup
+        breaker += 1
+
+    return not cardinality_n_found
 
 
 def get_recursive_prefetches(lookup_str, *, recursive_part, depth):
