@@ -354,7 +354,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="listitemvalue",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     ("language_id__isnull", False),
                     ("valuetype", "image"),
                     _connector="OR",

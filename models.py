@@ -298,7 +298,7 @@ class ListItemValue(models.Model):
                 ),
             ),
             models.CheckConstraint(
-                check=Q(language_id__isnull=False) | Q(valuetype="image"),
+                condition=Q(language_id__isnull=False) | Q(valuetype="image"),
                 name="only_images_nullable_language",
                 violation_error_message=_(
                     "Item values must be associated with a language."
