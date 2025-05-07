@@ -16,9 +16,9 @@ Closes #
 ### Checklist
 <!--- Put an `x` in the boxes that apply. You can also fill these out after creating the PR. If you're unsure about any of them, don't hesitate to ask. We're here to help! This is simply a reminder of what we are going to look for before merging your code.  -->
 -   I targeted one of these branches:
-    - [ ] dev/8.0.x (under development): features, bugfixes not covered below
-    - [ ] dev/7.6.x (main support): regressions, crashing bugs, security issues, major bugs in new features
-    - [ ] dev/6.2.x (extended support): major security issues, data loss issues
+    - [ ] dev/8.1.x (under development): features, bugfixes not covered below
+    - [ ] dev/8.0.x (main support): regressions, crashing bugs, security issues, major bugs in new features
+    - [ ] dev/7.6.x (extended support): major security issues, data loss issues
 -   [ ] I added a changelog in arches/releases
 -   [ ] I submitted a PR to arches-docs (if appropriate)
 -   [ ] Unit tests pass locally with my changes
