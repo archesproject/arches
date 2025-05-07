@@ -81,7 +81,7 @@ const cancel = () => {
                 <h4>{{ props.label }}</h4>
             </div>
 
-            <!-- TODO https://github.com/archesproject/arches/issues/10847 -->
+            <!-- TODO https://github.com/archesproject/arches-controlled-lists/issues/7 -->
             <span
                 v-if="!props.editable"
                 class="value-label"
