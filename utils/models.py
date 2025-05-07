@@ -1,7 +1,6 @@
 from django.contrib.postgres.expressions import ArraySubquery
-from django.contrib.postgres.fields import ArrayField
-from django.db.models import F, OuterRef
-from django.db.models.fields.json import JSONField, KT
+from django.db.models import F, OuterRef, TextField
+from django.db.models.fields.json import KT
 
 from arches import __version__ as arches_version
 from arches.app.models.models import ResourceInstance, TileModel
@@ -72,15 +71,18 @@ def get_tile_values_for_resource(*, nodegroup, base_lookup) -> ArraySubquery:
     """Return a tile values query expression for use in a ResourceInstanceQuerySet."""
     tile_query = (
         TileModel.objects.filter(
+            # TODO: after ForeignObject removed, update
             nodegroup_id=nodegroup.pk,
             resourceinstance_id=OuterRef("resourceinstanceid"),
         )
-        .values(base_lookup)
+        # works for non-localized-string... parameterize...
+        .annotate(as_string=KT(base_lookup))
+        .values("as_string")
         .order_by("parenttile", "sortorder")
     )
     return ArraySubquery(
         tile_query,
-        output_field=CardinalityNField(base_field=ArrayField(JSONField())),
+        output_field=CardinalityNField(base_field=TextField()),
     )
 
 
