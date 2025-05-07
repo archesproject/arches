@@ -1,4 +1,3 @@
-from django.contrib.postgres.fields.array import ArrayExact
 from django.db.models import Lookup
 from django.db.models.lookups import Contains, IContains
 from psycopg2.extensions import AsIs, QuotedString
@@ -13,14 +12,6 @@ class JSONPathFilter:
             raise ValueError("Double quotes are not allowed in JSONPath filters.")
         quoted = AsIs(QuotedString(params[0]).getquoted().decode()[1:-1])
         return rhs, (quoted,)
-
-
-# TODO: needed?
-@CardinalityNField.register_lookup
-class Exact(JSONPathFilter, ArrayExact):
-    def process_rhs(self, compiler, connection):
-        rhs, params = super().process_rhs(compiler, connection)
-        return rhs, [f'"{param}"' for param in params]
 
 
 @CardinalityNField.register_lookup
