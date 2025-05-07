@@ -779,7 +779,9 @@ class ExternalOauth(View):
     @csrf_exempt
     def callback(request):
         next_url = (
-            request.session["next"] if "next" in request.session else settings.LOGIN_REDIRECT_URL
+            request.session["next"]
+            if "next" in request.session
+            else settings.LOGIN_REDIRECT_URL
         )
         user = authenticate(
             request, username=request.session["user"], sso_authentication=True
