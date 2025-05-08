@@ -1,8 +1,13 @@
 from django.db.models import Lookup
-from django.db.models.lookups import Contains, IContains
+from django.db.models.lookups import Contains, IContains, Transform
 from psycopg2.extensions import AsIs, QuotedString
 
-from arches_querysets.fields import Cardinality1JSONField, CardinalityNField
+from arches_querysets.fields import (
+    Cardinality1JSONField,
+    Cardinality1ResourceInstanceField,
+    Cardinality1ResourceInstanceListField,
+    CardinalityNField,
+)
 
 
 class JSONPathFilter:
@@ -89,6 +94,23 @@ class AnyLanguageIContains(JSONPathFilter, Lookup):
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params = (*lhs_params, *rhs_params)
         return '%s @? \'$.*.value ? (@ like_regex "%s" flag "i")\'' % (lhs, rhs), params
+
+
+@Cardinality1ResourceInstanceField.register_lookup
+class ResourceInstanceId(Transform):
+    lookup_name = "id"
+    template = "(%(expressions)s -> 0 -> 'resourceId')"
+
+
+@Cardinality1ResourceInstanceListField.register_lookup
+class ResourceInstanceListContains(JSONPathFilter, Lookup):
+    lookup_name = "contains"
+
+    def as_sql(self, compiler, connection):
+        lhs, lhs_params = self.process_lhs(compiler, connection)
+        rhs, rhs_params = self.process_rhs(compiler, connection)
+        params = (*lhs_params, *rhs_params)
+        return "%s @? '$[*].resourceId ? (@ == \"%s\")'" % (lhs, rhs), params
 
 
 @CardinalityNField.register_lookup

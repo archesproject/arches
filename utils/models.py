@@ -20,8 +20,12 @@ from arches.app.utils.permission_backend import get_nodegroups_by_perm
 from arches_querysets.fields import (
     Cardinality1DateTimeField,
     Cardinality1JSONField,
+    Cardinality1ResourceInstanceField,
+    Cardinality1ResourceInstanceListField,
     Cardinality1TextField,
     CardinalityNField,
+    ResourceInstanceField,
+    ResourceInstanceListField,
 )
 
 
@@ -105,6 +109,10 @@ def get_tile_values_for_resource(node):
                 output_field = field
             case DateTimeField():
                 output_field = Cardinality1DateTimeField()
+            case ResourceInstanceField():
+                output_field = Cardinality1ResourceInstanceField()
+            case ResourceInstanceListField():
+                output_field = Cardinality1ResourceInstanceListField()
             case JSONField():
                 output_field = Cardinality1JSONField()
             case _:
@@ -127,8 +135,12 @@ def get_node_value_expression_and_output_field(node):
                 Cast(KT(f"data__{node.pk}"), output_field=DateTimeField()),
                 DateTimeField(),
             )
-        case "string" | "resource-instance" | "resource-instance-list" | "url":
+        case "string" | "url":
             return F(f"data__{node.pk}"), JSONField()
+        case "resource-instance":
+            return F(f"data__{node.pk}"), ResourceInstanceField()
+        case "resource-instance-list":
+            return F(f"data__{node.pk}"), ResourceInstanceListField()
         case "concept":
             return KT(f"data__{node.pk}"), UUIDField()
         case "concept-list":
