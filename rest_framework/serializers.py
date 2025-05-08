@@ -1,5 +1,5 @@
 from copy import deepcopy
-from functools import partial
+from functools import lru_cache, partial
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
@@ -238,7 +238,9 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         ret._graph_nodes = self._graph_nodes
         return ret
 
+    # TODO: uncache this
     @staticmethod
+    @lru_cache(maxsize=1)
     def get_nodegroup_aliases():
         return {
             node.pk: node.alias

@@ -198,6 +198,7 @@ class SemanticTile(TileModel):
         if self.nodegroup and hasattr(self.nodegroup, "grouping_node"):
             return self.nodegroup.grouping_node.alias
         if not getattr(self, "_nodegroup_alias", None):
+            # TODO: need a 7.6 solution for this for fresh tiles (SemanticTile())
             self._nodegroup_alias = Node.objects.get(pk=self.nodegroup_id).alias
         return self._nodegroup_alias
 
