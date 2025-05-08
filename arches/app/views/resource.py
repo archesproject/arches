@@ -1045,13 +1045,6 @@ class RelatedResourcesView(BaseManagerView):
                 request.GET.get("paginate", "true")
             )  # default to true
             resource = Resource.objects.get(pk=resourceid)
-            if graphs is None:
-                graphs = (
-                    models.GraphModel.objects.all()
-                    .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-                    .exclude(isresource=False)
-                    .exclude(publication=None)
-                )
 
             if paginate:
                 page = (
