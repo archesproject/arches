@@ -71,8 +71,8 @@ class ArchesModelAPIMixin:
                 only=only,
                 resource_ids=self.resource_ids,
                 as_representation=True,
-                # TODO: resource-level nodegroup permissions
-            )
+                user=self.request.user,
+            ).select_related("graph")
         if issubclass(options.model, TileModel):
             qs = options.model.as_nodegroup(
                 self.nodegroup_alias,
@@ -81,7 +81,7 @@ class ArchesModelAPIMixin:
                 as_representation=True,
                 resource_ids=self.resource_ids,
                 user=self.request.user,
-            )
+            ).select_related("resourceinstance__graph")
             if self.resource_ids:
                 return qs.filter(resourceinstance__in=self.resource_ids)
             return qs
@@ -120,6 +120,7 @@ class ArchesModelAPIMixin:
             raise PermissionDenied
         ret.save = partial(ret.save, request=self.request)
         self.graph_nodes = ret._fetched_graph_nodes
+        ret.fill_blanks()
         return ret
 
     def create(self, request, *args, **kwargs):

@@ -2,6 +2,7 @@ import logging
 import sys
 import uuid
 from itertools import chain
+from types import SimpleNamespace
 
 from django.db import models, transaction
 from django.utils.translation import gettext as _
@@ -13,12 +14,13 @@ from arches.app.models.models import (
     ResourceInstance,
     TileModel,
 )
+from arches.app.models.models import Node
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 
 from arches_querysets.bulk_operations.tiles import BulkTileOperation
-from arches_querysets.lookups import *
+from arches_querysets.lookups import *  # registers lookups
 from arches_querysets.querysets import (
     SemanticResourceQuerySet,
     SemanticTileManager,
@@ -34,13 +36,8 @@ from arches_querysets.utils.models import (
 logger = logging.getLogger(__name__)
 
 
-class AliasedData:
-    def __init__(self, **kwargs):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-
-    def __repr__(self):
-        return f"<AliasedData: {vars(self)}>"
+class AliasedData(SimpleNamespace):
+    pass
 
 
 class SemanticResource(ResourceInstance):
@@ -57,6 +54,14 @@ class SemanticResource(ResourceInstance):
         )
         super().__init__(*args, **other_kwargs)
         self.aliased_data = AliasedData(**arches_model_kwargs)
+        # All graph nodes
+        self._fetched_graph_nodes = Node.objects.none()
+        # Nodes that were queried (and passed permissions test)
+        self._queried_nodes = Node.objects.none()
+
+    def save(self, *, request=None, index=True, **kwargs):
+        with transaction.atomic():
+            self._save_aliased_data(request=request, index=index, **kwargs)
 
     @classmethod
     def as_model(
@@ -67,6 +72,7 @@ class SemanticResource(ResourceInstance):
         defer=None,
         only=None,
         as_representation=False,
+        user=None,
     ):
         """Return a chainable QuerySet for a requested graph's instances,
         with tile data annotated onto node and nodegroup aliases.
@@ -79,7 +85,39 @@ class SemanticResource(ResourceInstance):
             defer=defer,
             only=only,
             as_representation=as_representation,
+            user=user,
         )
+
+    def fill_blanks(self):
+        """Initialize empty node values for each top nodegroup lacking a tile."""
+        if not vars(self.aliased_data):
+            raise RuntimeError("aliased_data is empty")
+
+        def find_nodegroup_from_alias(nodegroup_alias):
+            for fetched_node in self._fetched_graph_nodes:
+                if fetched_node.alias == nodegroup_alias:
+                    return fetched_node.nodegroup
+
+        for nodegroup_alias, value in vars(self.aliased_data).items():
+            if value in (None, []):
+                nodegroup = find_nodegroup_from_alias(nodegroup_alias)
+                blank_tile = SemanticTile(
+                    resourceinstance=self,
+                    nodegroup=nodegroup,
+                )
+                blank_tile = blank_tile.from_child_nodegroup(nodegroup)
+            if value == []:
+                value.append(blank_tile)
+            elif value is None:
+                setattr(self.aliased_data, nodegroup_alias, blank_tile)
+
+            # Recurse.
+            if isinstance(value, list):
+                for tile in value:
+                    tile.fill_blanks()
+            else:
+                tile = value or blank_tile
+                tile.fill_blanks()
 
     def save_edit(self, user=None, transaction_id=None):
         """Intended to replace proxy model method eventually."""
@@ -95,10 +133,6 @@ class SemanticResource(ResourceInstance):
         ephemeral_proxy_instance.save_edit(
             user=user, edit_type=edit_type, transaction_id=transaction_id
         )
-
-    def save(self, *, request=None, index=True, **kwargs):
-        with transaction.atomic():
-            self._save_aliased_data(request=request, index=index, **kwargs)
 
     def save_without_related_objects(self, **kwargs):
         return super().save(**kwargs)
@@ -240,6 +274,73 @@ class SemanticTile(TileModel):
             if self.sortorder is None or self.is_fully_provisional():
                 self.set_next_sort_order()
             self._save_aliased_data(request=request, index=index, **kwargs)
+
+    def from_child_nodegroup(self, child_nodegroup):
+        grandchildren = (
+            child_nodegroup.children.all()
+            if arches_version >= "8"
+            else child_nodegroup.nodegroup_set.all()
+        )
+
+        blank_tile = self.__class__(
+            resourceinstance=self.resourceinstance,
+            nodegroup=child_nodegroup,
+            parenttile=self,
+            data={
+                str(node.pk): None
+                for node in child_nodegroup.node_set.all()
+                if node.datatype != "semantic"
+            },
+            **{
+                node.alias: None
+                for node in child_nodegroup.node_set.all()
+                if node.datatype == "semantic"
+            },
+            **{
+                SemanticTile(nodegroup=grandchild_nodegroup).find_nodegroup_alias(): (
+                    self.from_child_nodegroup(grandchild_nodegroup)
+                    if grandchild_nodegroup.cardinality == "1"
+                    else [self.from_child_nodegroup(grandchild_nodegroup)]
+                )
+                for grandchild_nodegroup in grandchildren
+            },
+        )
+        # blank_tile.pk = None
+        return blank_tile
+
+    def fill_blanks(self):
+        """Initialize empty node values for each nodegroup lacking a tile."""
+        if not vars(self.aliased_data):
+            return
+
+        def find_nodegroup_from_alias(nodegroup_alias):
+            for fetched_node in self._fetched_graph_nodes:
+                if (
+                    fetched_node.alias == nodegroup_alias
+                    and fetched_node.nodegroup.parentnodegroup_id == self.nodegroup_id
+                ):
+                    return fetched_node.nodegroup
+            raise Exception
+
+        for alias, value in vars(self.aliased_data).items():
+            try:
+                nodegroup = find_nodegroup_from_alias(alias)
+            except:
+                continue
+            if value in (None, []):
+                blank_tile = self.from_child_nodegroup(nodegroup)
+            if value == []:
+                value.append(blank_tile)
+            elif value is None:
+                setattr(self.aliased_data, alias, blank_tile)
+
+            # Recurse.
+            if isinstance(value, list):
+                for tile in value:
+                    tile.fill_blanks()
+            else:
+                tile = value or blank_tile
+                tile.fill_blanks()
 
     def save_without_related_objects(self, **kwargs):
         return super().save(**kwargs)

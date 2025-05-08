@@ -112,7 +112,18 @@ class SemanticTileQuerySet(models.QuerySet):
             )
 
         # TODO: some of these can just be aliases.
-        return qs.annotate(**node_alias_annotations).order_by("sortorder")
+        qs = qs.annotate(**node_alias_annotations).order_by("sortorder")
+
+        # TODO: move this to SemanticResourceManager.
+        from arches_querysets.models import SemanticResource
+
+        qs = qs.prefetch_related(
+            models.Prefetch(
+                "resourceinstance",
+                SemanticResource.objects.with_related_resource_display_names(),
+            ),
+        )
+        return qs
 
     def _fetch_all(self):
         """Call datatype to_python() methods when materializing the QuerySet.
@@ -120,12 +131,10 @@ class SemanticTileQuerySet(models.QuerySet):
         Memoize fetched nodes.
         Attach child tiles to parent tiles and vice versa.
         """
-        from arches_querysets.models import SemanticResource
 
         super()._fetch_all()
 
         NOT_PROVIDED = object()
-        enriched_resource = None
         checked_for_values_query = False
 
         for tile in self._result_cache:
@@ -133,14 +142,6 @@ class SemanticTileQuerySet(models.QuerySet):
                 if not isinstance(tile, self.model):
                     return
                 checked_for_values_query = True
-            if not enriched_resource:
-                # TODO: add guard: this only makes sense for tiles for a single resource.
-                enriched_resource = (
-                    SemanticResource.objects.filter(pk=tile.resourceinstance_id)
-                    .with_related_resource_display_names()
-                    .get()
-                )
-            tile._enriched_resource = enriched_resource
             tile._queried_nodes = self._queried_nodes
             tile._fetched_graph_nodes = self._fetched_graph_nodes
             for node in self._queried_nodes:
@@ -247,6 +248,7 @@ class SemanticResourceQuerySet(models.QuerySet):
         defer=None,
         only=None,
         as_representation=False,
+        user=None,
     ):
         """Annotates a SemanticResourceQuerySet with tile data unpacked
         and mapped onto nodegroup aliases, e.g.:
@@ -308,13 +310,13 @@ class SemanticResourceQuerySet(models.QuerySet):
         deferred_node_aliases = {
             n.alias
             for n in filter_nodes_by_highest_parent(
-                self._fetched_graph_nodes, defer or []
+                self._fetched_graph_nodes, defer or [], user
             )
         }
         only_node_aliases = {
             n.alias
             for n in filter_nodes_by_highest_parent(
-                self._fetched_graph_nodes, only or []
+                self._fetched_graph_nodes, only or [], user
             )
         }
         node_sql_aliases = generate_node_alias_expressions(
@@ -376,13 +378,14 @@ class SemanticResourceQuerySet(models.QuerySet):
             # Prepare resource annotations.
             # TODO: this might move to a method on AliasedData.
             for grouping_node in grouping_nodes.values():
+                if grouping_node.nodegroup.parentnodegroup_id:
+                    continue
                 default = None if grouping_node.nodegroup.cardinality == "1" else []
                 setattr(resource.aliased_data, grouping_node.alias, default)
 
             # Fill aliased data with top nodegroup data.
             annotated_tiles = getattr(resource, "_annotated_tiles", [])
             for annotated_tile in annotated_tiles:
-                annotated_tile._enriched_resource = resource
                 if annotated_tile.nodegroup.parentnodegroup_id:
                     continue
                 ng_alias = grouping_nodes[annotated_tile.nodegroup_id].alias

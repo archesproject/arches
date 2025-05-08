@@ -176,7 +176,7 @@ def get_nodegroups_here_and_below(start_nodegroup, user=None):
     return accumulator
 
 
-def filter_nodes_by_highest_parent(nodes, aliases):
+def filter_nodes_by_highest_parent(nodes, aliases, user=None):
     filtered_nodes = set()
     for alias in aliases:
         for node in nodes:
@@ -184,7 +184,7 @@ def filter_nodes_by_highest_parent(nodes, aliases):
                 break
         else:
             raise ValueError("Node alias {alias} not found in nodes.")
-        nodegroups = get_nodegroups_here_and_below(node.nodegroup)
+        nodegroups = get_nodegroups_here_and_below(node.nodegroup, user=user)
         for nodegroup in nodegroups:
             filtered_nodes |= set(nodegroup.node_set.all())
 
