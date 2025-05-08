@@ -23,6 +23,7 @@ from arches.settings import *
 from django.utils.translation import gettext_lazy as _
 
 PACKAGE_NAME = "arches"
+APP_ROOT = ""
 TEST_ROOT = os.path.normpath(os.path.join(ROOT_DIR, "..", "tests"))
 STATICFILES_DIRS = []
 

@@ -1,6 +1,7 @@
 import json
 import os
 import sysconfig
+from pathlib import Path
 
 from django.test import TestCase, override_settings
 from django.test.utils import captured_stderr
@@ -18,6 +19,7 @@ class TestFrontendConfigurationGeneration(TestCase):
     """
 
     @override_settings(
+        APP_ROOT=str(Path(settings.ROOT_DIR) / "app"),
         PUBLIC_SERVER_ADDRESS="http://localhost:8000",
         STATIC_URL="/static/",
         WEBPACK_DEVELOPMENT_SERVER_PORT=8080,
