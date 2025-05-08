@@ -23,30 +23,23 @@ class JSONPathFilter:
 class ArrayContains(Contains):
     """Provide a string. Adapted from https://code.djangoproject.com/ticket/34942"""
 
+    like_operator = "LIKE"
+
     def as_sql(self, compiler, connection):
         # Avoid connection.ops.lookup_cast in BuiltinLookup.process_lhs()
         lhs, lhs_params = Lookup.process_lhs(self, compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params = (*lhs_params, *rhs_params)
         return (
-            "EXISTS(SELECT * FROM UNNEST(%s) AS a WHERE a LIKE %s)" % (lhs, rhs),
+            "EXISTS(SELECT * FROM UNNEST(%s) AS a WHERE a %s %s)"
+            % (lhs, self.like_operator, rhs),
             params,
         )
 
 
 @CardinalityNField.register_lookup
 class ArrayIContains(IContains):
-    """Provide a string. Adapted from https://code.djangoproject.com/ticket/34942"""
-
-    def as_sql(self, compiler, connection):
-        # Avoid connection.ops.lookup_cast in BuiltinLookup.process_lhs()
-        lhs, lhs_params = Lookup.process_lhs(self, compiler, connection)
-        rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = (*lhs_params, *rhs_params)
-        return (
-            "EXISTS(SELECT * FROM UNNEST(%s) AS a WHERE a ILIKE %s)" % (lhs, rhs),
-            params,
-        )
+    like_operator = "ILIKE"
 
 
 @Cardinality1JSONField.register_lookup
