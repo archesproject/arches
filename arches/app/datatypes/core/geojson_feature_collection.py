@@ -201,6 +201,8 @@ class GeojsonFeatureCollectionDataType(BaseDataType):
                     features = features + chunks
 
         for feature in features:
+            for sub_feature in feature["features"]:
+                sub_feature["properties"] = {}
             document["geometries"].append(
                 {
                     "geom": feature,
