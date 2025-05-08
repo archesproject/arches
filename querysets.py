@@ -45,7 +45,6 @@ class SemanticTileQuerySet(models.QuerySet):
         defer=None,
         only=None,
         as_representation=False,
-        allow_empty=False,
         depth=20,
         entry_node=None,
     ):
@@ -68,10 +67,6 @@ class SemanticTileQuerySet(models.QuerySet):
         as_representation:
             - True: calls to_representation() / to_json() datatype methods
             - False: calls to_python() datatype methods
-
-        allow_empty = True includes tiles with no data, e.g. in some creation
-        workflows involving creating a blank tile before fetching the richer
-        version from this factory.
         """
         self._as_representation = as_representation
 
@@ -96,10 +91,7 @@ class SemanticTileQuerySet(models.QuerySet):
         self._queried_nodes = [n for n in nodes if n.alias in node_alias_annotations]
         self._entry_node = entry_node
 
-        qs = self
-        qs = qs.filter(nodegroup_id__in={n.nodegroup_id for n in nodes})
-        if not allow_empty:
-            qs = qs.filter(data__has_any_keys=[n.pk for n in self._queried_nodes])
+        qs = self.filter(nodegroup_id__in={n.nodegroup_id for n in nodes})
 
         # Future: see various solutions mentioned here for avoiding
         # "magic number" depth traversal (but the magic number is harmless,
@@ -114,7 +106,6 @@ class SemanticTileQuerySet(models.QuerySet):
                         defer=defer,
                         only=only,
                         as_representation=as_representation,
-                        allow_empty=allow_empty,
                         depth=depth - 1,
                     ),
                 )

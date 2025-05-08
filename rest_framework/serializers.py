@@ -427,7 +427,6 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             graph_slug=self.graph_slug,
             only=None,
             as_representation=True,
-            allow_empty=True,
             user=self.context.get("request").user,
         )
         validated_data["nodegroup_id"] = qs._entry_node.nodegroup_id

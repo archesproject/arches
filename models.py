@@ -198,7 +198,6 @@ class SemanticTile(TileModel):
         defer=None,
         only=None,
         as_representation=False,
-        allow_empty=False,
         user=None,
     ):
         """See `arches.app.models.querysets.TileQuerySet.with_node_values`."""
@@ -232,7 +231,6 @@ class SemanticTile(TileModel):
             defer=defer,
             only=filtered_only,
             as_representation=as_representation,
-            allow_empty=allow_empty,
             entry_node=entry_node,
         ).annotate(_nodegroup_alias=models.Value(entry_node_alias))
         # TODO: determine if this annotation still needed / remove
@@ -258,7 +256,6 @@ class SemanticTile(TileModel):
         )
         bulk_operation.run()
 
-        # TODO: add unique constraint for TileModel re: sortorder
         # TODO: determine whether this should be skippable, and how.
         self.refresh_from_db(
             using=kwargs.get("using", None),
