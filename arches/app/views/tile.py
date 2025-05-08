@@ -105,7 +105,7 @@ class TileData(View):
 
     def post(self, request):
         original_transaction_id = request.POST.get("transaction_id", None)
-        transaction_id = request.POST.get("transaction_id", uuid.uuid1())
+        transaction_id = request.POST.get("transaction_id", uuid.uuid4())
 
         if self.action == "update_tile":
             json = request.POST.get("data", None)

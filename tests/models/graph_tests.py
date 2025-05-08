@@ -1217,7 +1217,7 @@ class GraphTests(ArchesTestCase):
 
         graph = self.test_graph
         new_node = graph.add_node(
-            {"nodeid": uuid.uuid1(), "datatype": "semantic"}
+            {"nodeid": uuid.uuid4(), "datatype": "semantic"}
         )  # A blank node with no ontology class is specified
         graph.add_edge(
             {
@@ -1241,7 +1241,7 @@ class GraphTests(ArchesTestCase):
         graph = self.test_graph
         new_node = graph.add_node(
             {
-                "nodeid": uuid.uuid1(),
+                "nodeid": uuid.uuid4(),
                 "datatype": "semantic",
                 "ontologyclass": "InvalidOntologyClass",
             }

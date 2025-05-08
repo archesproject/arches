@@ -274,7 +274,7 @@ class Graph(models.GraphModel):
         if self.ontology_id is None:
             node.ontologyclass = None
         if node.pk is None:
-            node.pk = uuid.uuid1()
+            node.pk = uuid.uuid4()
         if isinstance(node.pk, str):
             node.pk = uuid.UUID(node.pk)
         if node.istopnode:
@@ -308,7 +308,7 @@ class Graph(models.GraphModel):
         edge.graph = self
 
         if edge.pk is None:
-            edge.pk = uuid.uuid1()
+            edge.pk = uuid.uuid4()
         if self.ontology is None:
             edge.ontologyproperty = None
         self.edges[edge.pk] = edge
@@ -367,7 +367,7 @@ class Graph(models.GraphModel):
         card.graph = self
 
         if card.pk is None:
-            card.pk = uuid.uuid1()
+            card.pk = uuid.uuid4()
 
         self.cards[card.pk] = card
         self.has_unpublished_changes = True
@@ -827,7 +827,7 @@ class Graph(models.GraphModel):
         nodegroup = None
 
         if nodeToAppendTo.nodeid == self.root.nodeid and self.isresource is True:
-            newid = uuid.uuid1()
+            newid = uuid.uuid4()
             nodegroup = models.NodeGroup.objects.create(pk=newid)
             card = models.CardModel.objects.create(
                 nodegroup=nodegroup, name=temp_node_name, graph=self
@@ -843,7 +843,7 @@ class Graph(models.GraphModel):
             )
         else:
             newNode = models.Node(
-                nodeid=uuid.uuid1(),
+                nodeid=uuid.uuid4(),
                 name=temp_node_name,
                 istopnode=False,
                 ontologyclass=None,
@@ -987,7 +987,7 @@ class Graph(models.GraphModel):
                 node.config["advancedStyle"] = ""
                 node.config["advancedStyling"] = False
 
-        copy_of_self.pk = uuid.uuid1()
+        copy_of_self.pk = uuid.uuid4()
         node_map = {}
         card_map = {}
         for node_id in node_ids:
@@ -998,7 +998,7 @@ class Graph(models.GraphModel):
             is_collector = node.is_collector
             if set_source:
                 node.source_identifier_id = node.pk
-            node.pk = uuid.uuid1()
+            node.pk = uuid.uuid4()
             node_map[node_id] = node.pk
 
             if is_collector:
@@ -1012,7 +1012,7 @@ class Graph(models.GraphModel):
                     nodegroup_map[old_nodegroup_id] = node.nodegroup_id
                 for card in copy_of_self.cards.values():
                     if str(card.nodegroup_id) == str(old_nodegroup_id):
-                        new_id = uuid.uuid1()
+                        new_id = uuid.uuid4()
                         if set_source:
                             card.source_identifier_id = card.pk
                         card_map[card.pk] = new_id
@@ -1027,7 +1027,7 @@ class Graph(models.GraphModel):
             if set_source:
                 widget.source_identifier_id = widget.pk
 
-            widget.pk = uuid.uuid1()
+            widget.pk = uuid.uuid4()
             widget.node_id = node_map[widget.node_id]
             widget.card_id = card_map[widget.card_id]
 
@@ -1040,7 +1040,7 @@ class Graph(models.GraphModel):
         for edge_id, edge in copy_of_self.edges.items():
             if set_source:
                 edge.source_identifier_id = edge.pk
-            edge.pk = uuid.uuid1()
+            edge.pk = uuid.uuid4()
             edge.graph = copy_of_self
             copied_domainnode = edge.domainnode
             copied_rangenode = edge.rangenode
