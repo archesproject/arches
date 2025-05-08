@@ -119,7 +119,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <a 
                                 class="application-login" 
                                 id="auth-link" 
-                                href="{% url 'auth' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}"
+                                href="{% url 'auth' %}"
                             >
                                 {% trans "Sign in" %}
                             </a>
@@ -139,7 +139,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <li>
                             <a 
                                 class="application-login" 
-                                href="{% url 'auth' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}"
+                                href="{% url 'auth' %}?logout=true"
                             >
                                 {% trans 'Log off' %}
                             </a>
