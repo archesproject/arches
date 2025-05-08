@@ -1,6 +1,7 @@
 import json
 import os
-from unittest import mock
+import sysconfig
+
 from django.test import TestCase, override_settings
 from django.test.utils import captured_stderr
 from django.conf import settings
@@ -17,8 +18,6 @@ class TestFrontendConfigurationGeneration(TestCase):
     """
 
     @override_settings(
-        APP_ROOT="/arches/app",
-        ROOT_DIR="/arches",
         PUBLIC_SERVER_ADDRESS="http://localhost:8000",
         STATIC_URL="/static/",
         WEBPACK_DEVELOPMENT_SERVER_PORT=8080,
@@ -32,12 +31,12 @@ class TestFrontendConfigurationGeneration(TestCase):
         # Check content of first file
         expected_settings_data = {
             "_comment": "This is a generated file. Do not edit directly.",
-            "APP_ROOT": "/arches/app",
+            "APP_ROOT": settings.APP_ROOT,
             "ARCHES_APPLICATIONS": [],
             "ARCHES_APPLICATIONS_PATHS": {},
-            "SITE_PACKAGES_DIRECTORY": mock.ANY,  # We can't easily mock this
+            "SITE_PACKAGES_DIRECTORY": sysconfig.get_path("purelib"),
             "PUBLIC_SERVER_ADDRESS": "http://localhost:8000",
-            "ROOT_DIR": "/arches",
+            "ROOT_DIR": settings.ROOT_DIR,
             "STATIC_URL": "/static/",
             "WEBPACK_DEVELOPMENT_SERVER_PORT": 8080,
         }

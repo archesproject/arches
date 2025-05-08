@@ -1,7 +1,6 @@
 import json
 import os
 from pathlib import Path
-import site
 import sys, sysconfig
 
 from django.apps import apps
