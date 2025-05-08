@@ -92,6 +92,7 @@ def get_tile_values_for_resource(node):
     multiple tiles for cardinality-1 nodegroups might appear if there
     are cardinality-N parents anywhere.
     """
+    many = any_nodegroup_in_hierarchy_is_cardinality_n(node.nodegroup)
     expression, field = get_node_value_expression_and_output_field(node)
     tile_query = (
         TileModel.objects.filter(
@@ -103,23 +104,25 @@ def get_tile_values_for_resource(node):
         .order_by("parenttile", "sortorder")
     )
 
-    if all_nodegroups_in_hierarchy_are_cardinality_1(node.nodegroup):
-        match field:
-            case BooleanField() | FloatField() | ArrayField():
-                output_field = field
-            case DateTimeField():
-                output_field = Cardinality1DateTimeField()
-            case ResourceInstanceField():
-                output_field = Cardinality1ResourceInstanceField()
-            case ResourceInstanceListField():
-                output_field = Cardinality1ResourceInstanceListField()
-            case JSONField():
-                output_field = Cardinality1JSONField()
-            case _:
-                output_field = Cardinality1TextField()
-        return Cast(tile_query, output_field=output_field)
+    if many:
+        return ArraySubquery(
+            tile_query, output_field=CardinalityNField(base_field=field)
+        )
 
-    return ArraySubquery(tile_query, output_field=CardinalityNField(base_field=field))
+    match field:
+        case BooleanField() | FloatField() | ArrayField():
+            output_field = field
+        case DateTimeField():
+            output_field = Cardinality1DateTimeField()
+        case ResourceInstanceField():
+            output_field = Cardinality1ResourceInstanceField()
+        case ResourceInstanceListField():
+            output_field = Cardinality1ResourceInstanceListField()
+        case JSONField():
+            output_field = Cardinality1JSONField()
+        case _:
+            output_field = Cardinality1TextField()
+    return Cast(tile_query, output_field=output_field)
 
 
 def get_node_value_expression_and_output_field(node):
@@ -188,7 +191,7 @@ def filter_nodes_by_highest_parent(nodes, aliases):
     return filtered_nodes
 
 
-def all_nodegroups_in_hierarchy_are_cardinality_1(nodegroup):
+def any_nodegroup_in_hierarchy_is_cardinality_n(nodegroup):
     cardinality_n_found = False
     breaker = 0
     test_nodegroup = nodegroup
@@ -198,7 +201,7 @@ def all_nodegroups_in_hierarchy_are_cardinality_1(nodegroup):
         test_nodegroup = nodegroup.parentnodegroup
         breaker += 1
 
-    return not cardinality_n_found
+    return cardinality_n_found
 
 
 def get_recursive_prefetches(lookup_str, *, recursive_part, depth):
