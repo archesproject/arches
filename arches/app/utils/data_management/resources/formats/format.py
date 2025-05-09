@@ -4,7 +4,7 @@ import shutil
 import datetime
 from arches.app.models.concept import Concept
 from arches.app.models import models
-from arches.app.models.models import ResourceXResource, Node, TileModel
+from arches.app.models.models import ResourceXResource
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -183,8 +183,6 @@ class Reader(object):
                     or relation["nodeid"] == "None"
                 ):
                     relation["nodeid"] = None
-                else:
-                    relation["nodeid"] = Node(relation["nodeid"])
 
                 if (
                     "tileid" not in relation
@@ -192,8 +190,6 @@ class Reader(object):
                     or relation["tileid"] == "None"
                 ):
                     relation["tileid"] = None
-                else:
-                    relation["tileid"] = TileModel(relation["tileid"])
 
                 relation = ResourceXResource(
                     resourceinstanceidfrom=Resource(resourceinstancefrom),
@@ -205,8 +201,8 @@ class Reader(object):
                         "resourceinstanceto_graphid"
                     ],
                     relationshiptype=str(relation["relationshiptype"]),
-                    nodeid=relation["nodeid"],
-                    tileid=relation["tileid"],
+                    nodeid_id=relation["nodeid"],
+                    tileid_id=relation["tileid"],
                     datestarted=relation["datestarted"],
                     dateended=relation["dateended"],
                     notes=relation["notes"],
