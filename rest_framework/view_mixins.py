@@ -48,6 +48,7 @@ class ArchesModelAPIMixin:
             self.resource_ids = [pk]
         else:
             self.resource_ids = None
+        self.fill_blanks = request.GET.get("fill_blanks", "f").lower().startswith("t")
 
         return super().setup(request, *args, **kwargs)
 
@@ -96,7 +97,7 @@ class ArchesModelAPIMixin:
             "nodegroup_alias": self.nodegroup_alias,
         }
 
-    def get_object(self, permission_callable=None):
+    def get_object(self, permission_callable=None, fill_blanks=False):
         # TODO: discloses existence?
         ret = super().get_object()
         options = self.serializer_class.Meta
@@ -120,13 +121,17 @@ class ArchesModelAPIMixin:
             raise PermissionDenied
         ret.save = partial(ret.save, request=self.request)
         self.graph_nodes = ret._fetched_graph_nodes
-        ret.fill_blanks()
+
+        if fill_blanks:
+            ret.fill_blanks()
+
         return ret
 
     def create(self, request, *args, **kwargs):
         self.get_object = partial(
             self.get_object,
             permission_callable=user_can_edit_resource,
+            fill_blanks=self.fill_blanks,
         )
         return super().create(request, *args, **kwargs)
 
@@ -134,6 +139,7 @@ class ArchesModelAPIMixin:
         self.get_object = partial(
             self.get_object,
             permission_callable=user_can_read_resource,
+            fill_blanks=self.fill_blanks,
         )
         return super().retrieve(request, *args, **kwargs)
 
@@ -141,6 +147,7 @@ class ArchesModelAPIMixin:
         self.get_object = partial(
             self.get_object,
             permission_callable=user_can_edit_resource,
+            fill_blanks=self.fill_blanks,
         )
         return super().update(request, *args, **kwargs)
 
