@@ -5,7 +5,7 @@ from django.utils.translation import gettext as _
 
 from arches import __version__ as arches_version
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import Node
+from arches.app.models.models import Node, ResourceXResource
 
 from arches_querysets.utils import datatype_transforms
 from arches_querysets.utils.models import (
@@ -68,6 +68,8 @@ class SemanticTileQuerySet(models.QuerySet):
             - True: calls to_representation() / to_json() datatype methods
             - False: calls to_python() datatype methods
         """
+        from arches_querysets.models import SemanticResource
+
         self._as_representation = as_representation
 
         deferred_node_aliases = {
@@ -91,7 +93,7 @@ class SemanticTileQuerySet(models.QuerySet):
         self._queried_nodes = [n for n in nodes if n.alias in node_alias_annotations]
         self._entry_node = entry_node
 
-        qs = self.filter(nodegroup_id__in={n.nodegroup_id for n in nodes})
+        qs = self.filter(nodegroup_id__in={n.nodegroup_id for n in self._queried_nodes})
 
         # Future: see various solutions mentioned here for avoiding
         # "magic number" depth traversal (but the magic number is harmless,
@@ -114,13 +116,12 @@ class SemanticTileQuerySet(models.QuerySet):
         # TODO: some of these can just be aliases.
         qs = qs.annotate(**node_alias_annotations).order_by("sortorder")
 
-        # TODO: move this to SemanticResourceManager.
-        from arches_querysets.models import SemanticResource
-
         qs = qs.prefetch_related(
             models.Prefetch(
                 "resourceinstance",
-                SemanticResource.objects.with_related_resource_display_names(),
+                SemanticResource.objects.with_related_resource_display_names(
+                    nodes=self._queried_nodes
+                ),
             ),
         )
         return qs
@@ -347,13 +348,27 @@ class SemanticResourceQuerySet(models.QuerySet):
             ),
         ).annotate(**node_sql_aliases)
 
-    def with_related_resource_display_names(self):
-        # Future: consider exposing nodegroups param.
+    def with_related_resource_display_names(self, nodes=None):
         if arches_version >= "8":
-            return self.prefetch_related("from_resxres__to_resource")
-        return self.prefetch_related(
-            "resxres_resource_instance_ids_from__resourceinstanceidto"
-        )
+            return self.prefetch_related(
+                models.Prefetch(
+                    "from_resxres",
+                    queryset=ResourceXResource.objects.filter(
+                        node__in=nodes
+                    ).prefetch_related("to_resource"),
+                    to_attr="filtered_from_resxres",
+                ),
+            )
+        else:
+            return self.prefetch_related(
+                models.Prefetch(
+                    "resxres_resource_instance_ids_from",
+                    queryset=ResourceXResource.objects.filter(
+                        nodeid__in=nodes
+                    ).prefetch_related("resourceinstanceidto"),
+                    to_attr="filtered_from_resxres",
+                ),
+            )
 
     def _fetch_all(self):
         """
