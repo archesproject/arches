@@ -126,7 +126,7 @@ class Command(BaseCommand):
             action="store",
             dest="clear_index",
             default=True,
-            type=lambda x: str_to_bool(x),
+            type=str_to_bool,
             help="Whether to remove all target resources from the index before reindexing. Accepts 'true'/'false', 'yes'/'no', 'y'/'n', 't'/'f', 'on'/'off', or '1'/'0' (case-insensitive). Default is True.",
         )
 
