@@ -125,7 +125,7 @@ class Command(BaseCommand):
             action="store",
             dest="clear_index",
             default=True,
-            type=lambda x: str(x).lower() == 'true',
+            type=lambda x: str(x).lower() == "true",
             help="Set to True (default) to remove all the resources from the index before the reindexing operation. Set to False to overwrite in place the existing resources in the index.",
         )
 
