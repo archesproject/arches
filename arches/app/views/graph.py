@@ -678,8 +678,11 @@ class CardView(GraphBaseView):
         if self.action == "update_card":
             if data:
                 card = Card(data)
-                card.save()
-                return JSONResponse(card)
+                try:
+                    card.save()
+                    return JSONResponse(card)
+                except Exception as e:
+                    return JSONErrorResponse(content=e.args[0], status=403)
 
         if self.action == "reorder_cards":
             if "cards" in data and len(data["cards"]) > 0:

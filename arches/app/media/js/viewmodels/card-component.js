@@ -125,7 +125,29 @@ define([
         };
 
         this.beforeMove = function(e) {
-            e.cancelDrop = (e.sourceParent!==e.targetParent);
+            if(e.sourceParent === e.targetParent) {
+                const orignalWidgetOrder = [...self.card.widgets()];
+                e.item.card.save(function(response, status, card) {
+                    if(status === 'error') {
+                        params.pageVm.alert(
+                            new AlertViewModel(
+                                'ep-alert-red',
+                                response.responseJSON.title,
+                                response.responseJSON.message,
+                                null,
+                                function(){}
+                            )
+                        );
+                        // we can't use e.cancelDrop because of the async nature of the save
+                        // so we need to manually reset the order of the widgets
+                        // and set the selected widget to the original position
+                        // this is a bit of a hack, but it works
+                        self.card.widgets(orignalWidgetOrder);
+                    }
+                });
+            } else {
+                e.cancelDrop = true;
+            }
         };
 
         this.startDrag = function(e, ui) {

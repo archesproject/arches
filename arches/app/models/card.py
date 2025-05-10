@@ -21,6 +21,8 @@ from django.db import transaction
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ModelForm
+from django.utils.translation import gettext as _
+
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
@@ -202,6 +204,14 @@ class Card(models.CardModel):
 
         """
         with transaction.atomic():
+            if self.graph.publication is not None:
+                ret = {
+                    "title": _("Unable to Save Card"),
+                    "message": _(
+                        "You cannot edit a card in a published graph.  Please unpublish the graph before editing."
+                    ),
+                }
+                raise Exception(ret)
             if self.graph.ontology and self.graph.isresource:
                 edge = self.get_edge_to_parent()
                 if self.ontologyproperty is not None:
