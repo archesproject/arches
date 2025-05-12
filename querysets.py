@@ -126,14 +126,16 @@ class SemanticTileQuerySet(models.QuerySet):
         )
         return qs
 
-    def _fetch_all(self):
+    def _prefetch_related_objects(self):
         """Call datatype to_python() methods when materializing the QuerySet.
         Discard annotations that do not pertain to this nodegroup.
         Memoize fetched nodes.
         Attach child tiles to parent tiles and vice versa.
         """
 
-        super()._fetch_all()
+        # Overriding _fetch_all() doesn't work here: causes dupe child tiles.
+        # Perhaps these manual annotations could be scheduled another way?
+        super()._prefetch_related_objects()
 
         NOT_PROVIDED = object()
         checked_for_values_query = False
