@@ -9,8 +9,9 @@ from django.db.models import (
     TextField,
     UUIDField,
 )
-from django.db.models.fields.json import JSONField, KT
+from django.db.models import JSONField
 from django.db.models.functions import Cast
+from django.db.models.fields.json import KT
 
 from arches import __version__ as arches_version
 from arches.app.models.models import ResourceInstance, TileModel

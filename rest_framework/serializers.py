@@ -5,8 +5,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import transaction
-from django.db.models import fields, F
-from django.db.models.fields.json import JSONField
+from django.db.models import fields, F, JSONField
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 from rest_framework import renderers
