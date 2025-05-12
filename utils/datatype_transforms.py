@@ -36,7 +36,15 @@ def resource_instance_list_to_json(self, tile, node):
             continue
         copy = {**inner_val}
         lang = get_language()
-        for rxr in tile.resourceinstance.filtered_from_resxres:
+        try:
+            rxrs = tile.resourceinstance.filtered_from_resxres
+        except:
+            # TODO: why?
+            if arches_version >= "8":
+                rxrs = tile.resourceinstance.from_resxres.all()
+            else:
+                rxrs = tile.resourceinstance.resxres_resource_instance_ids_from.all()
+        for rxr in rxrs:
             to_resource_id = (
                 rxr.resourceinstanceidto_id
                 if arches_version < "8"
