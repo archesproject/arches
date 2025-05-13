@@ -6,6 +6,8 @@ import uuid
 import pyprind
 import sys
 
+import django
+
 from datetime import datetime
 from django.db import connection, connections
 from django.db.models import prefetch_related_objects, Prefetch, Q, QuerySet
@@ -183,7 +185,9 @@ def index_resources_using_multiprocessing(
     logger.debug(
         f"... resource type batch count (batch size={batch_size}): {len(resource_batches)}"
     )
-    with multiprocessing.Pool(processes=process_count) as pool:
+    with multiprocessing.Pool(
+        processes=process_count, initializer=django.setup
+    ) as pool:
         for resource_batch in resource_batches:
             pool.apply_async(
                 _index_resource_batch,
