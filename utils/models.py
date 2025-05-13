@@ -153,18 +153,11 @@ def get_node_value_expression_and_output_field(node):
             return F(f"data__{node.pk}"), TextField()
 
 
-def get_nodegroups_here_and_below(start_nodegroup, user=None):
+def get_nodegroups_here_and_below(start_nodegroup):
     accumulator = []
-    if user:
-        permitted_nodegroups = get_nodegroups_by_perm(user, "models.read_nodegroup")
 
     def accumulate(nodegroup):
         nonlocal accumulator
-        nonlocal permitted_nodegroups
-        nonlocal user
-        if user and nodegroup.pk not in permitted_nodegroups:
-            return
-
         accumulator.append(nodegroup)
         if arches_version >= "8":
             children_attr = nodegroup.children
@@ -177,7 +170,7 @@ def get_nodegroups_here_and_below(start_nodegroup, user=None):
     return accumulator
 
 
-def filter_nodes_by_highest_parent(nodes, aliases, user=None):
+def filter_nodes_by_highest_parent(nodes, aliases):
     filtered_nodes = set()
     for alias in aliases:
         for node in nodes:
@@ -185,7 +178,7 @@ def filter_nodes_by_highest_parent(nodes, aliases, user=None):
                 break
         else:
             raise ValueError("Node alias {alias} not found in nodes.")
-        nodegroups = get_nodegroups_here_and_below(node.nodegroup, user=user)
+        nodegroups = get_nodegroups_here_and_below(node.nodegroup)
         for nodegroup in nodegroups:
             filtered_nodes |= set(nodegroup.node_set.all())
 

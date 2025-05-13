@@ -17,7 +17,10 @@ from arches.app.models.models import (
 from arches.app.models.models import Node
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
-from arches.app.utils.permission_backend import user_is_resource_reviewer
+from arches.app.utils.permission_backend import (
+    get_nodegroups_by_perm,
+    user_is_resource_reviewer,
+)
 
 from arches_querysets.bulk_operations.tiles import BulkTileOperation
 from arches_querysets.lookups import *  # registers lookups
@@ -238,7 +241,7 @@ class SemanticTile(TileModel):
         """See `arches.app.models.querysets.TileQuerySet.with_node_values`."""
 
         source_graph = GraphWithPrefetching.prepare_for_annotations(
-            graph_slug, resource_ids=resource_ids
+            graph_slug, resource_ids=resource_ids, user=user
         )
         for node in source_graph.node_set.all():
             if node.alias == entry_node_alias:
@@ -248,7 +251,7 @@ class SemanticTile(TileModel):
             raise Node.DoesNotExist(f"graph: {graph_slug} node: {entry_node_alias}")
 
         entry_node_and_nodes_below = []
-        for nodegroup in get_nodegroups_here_and_below(entry_node.nodegroup, user):
+        for nodegroup in get_nodegroups_here_and_below(entry_node.nodegroup):
             entry_node_and_nodes_below.extend(list(nodegroup.node_set.all()))
 
         qs = cls.objects.filter(nodegroup_id=entry_node.pk)
@@ -475,7 +478,7 @@ class GraphWithPrefetching(GraphModel):
         db_table = "graphs"
 
     @classmethod
-    def prepare_for_annotations(cls, graph_slug=None, *, resource_ids=None):
+    def prepare_for_annotations(cls, graph_slug=None, *, resource_ids=None, user=None):
         """Return a graph with necessary prefetches for _prefetch_related_objects()
         and the rest_framework client."""
         if resource_ids and not graph_slug:
@@ -489,9 +492,19 @@ class GraphWithPrefetching(GraphModel):
                 graph_query = cls.objects.filter(slug=graph_slug)
         else:
             raise ValueError("graph_slug or resource_ids must be provided")
+
+        permitted_nodegroups = get_nodegroups_by_perm(user, "models.read_nodegroup")
+        permitted_nodes_prefetch = models.Prefetch(
+            "node_set",
+            queryset=Node.objects.filter(nodegroup__in=permitted_nodegroups),
+            # TODO: consider using to_attr
+            # https://forum.djangoproject.com/t/custom-query-expression-when-prefetching/40183/6
+            # to_attr="permitted_node_set",
+        )
         try:
             if arches_version >= "8":
                 prefetches = [
+                    permitted_nodes_prefetch,
                     "node_set__cardxnodexwidget_set",
                     "node_set__nodegroup__node_set",
                     "node_set__nodegroup__node_set__cardxnodexwidget_set",
@@ -522,6 +535,7 @@ class GraphWithPrefetching(GraphModel):
                 ]
             else:
                 prefetches = [
+                    permitted_nodes_prefetch,
                     "node_set__cardxnodexwidget_set",
                     "node_set__nodegroup__node_set",
                     "node_set__nodegroup__node_set__cardxnodexwidget_set",

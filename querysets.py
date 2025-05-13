@@ -307,19 +307,19 @@ class SemanticResourceQuerySet(models.QuerySet):
         self._as_representation = as_representation
 
         source_graph = GraphWithPrefetching.prepare_for_annotations(
-            graph_slug, resource_ids=resource_ids
+            graph_slug, resource_ids=resource_ids, user=user
         )
         self._fetched_graph_nodes = source_graph.node_set.all()
         deferred_node_aliases = {
             n.alias
             for n in filter_nodes_by_highest_parent(
-                self._fetched_graph_nodes, defer or [], user
+                self._fetched_graph_nodes, defer or []
             )
         }
         only_node_aliases = {
             n.alias
             for n in filter_nodes_by_highest_parent(
-                self._fetched_graph_nodes, only or [], user
+                self._fetched_graph_nodes, only or []
             )
         }
         node_sql_aliases = generate_node_alias_expressions(
