@@ -252,6 +252,15 @@ class SemanticTile(TileModel):
 
         entry_node_and_nodes_below = []
         for nodegroup in get_nodegroups_here_and_below(entry_node.nodegroup):
+            # TODO: evaluate if this is needed.
+            # entry_node_and_nodes_below.extend(
+            #     [
+            #         node
+            #         for node in nodegroup.node_set.all()
+            #         # filtered by permissions, will be more clear after using to_attr=
+            #         if node in source_graph.node_set.all()
+            #     ]
+            # )
             entry_node_and_nodes_below.extend(list(nodegroup.node_set.all()))
 
         qs = cls.objects.filter(nodegroup_id=entry_node.pk)

@@ -81,6 +81,7 @@ class NodeFetcherMixin:
 
     def find_graph_nodes(self):
         # This should really only be used when using drf-spectacular.
+        # Does not check nodegroup permissions.
         if arches_version >= "8":
             return (
                 Node.objects.filter(
@@ -259,11 +260,10 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             # 3. From generic view
             or self.context.get("nodegroup_alias")
         )
-        for node in self.graph_nodes:
-            if node.alias == nodegroup_alias:
-                self._root_node = node
-                break
-        else:
+        nodes_by_node_aliases = {node.alias: node for node in self.graph_nodes}
+        try:
+            self._root_node = nodes_by_node_aliases.get(nodegroup_alias)
+        except KeyError:
             raise RuntimeError("missing root node")
         field_map = super().get_fields()
 
@@ -285,7 +285,10 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                     child_nodegroup_alias = nodegroup_aliases[child_nodegroup.pk]
                 self._child_nodegroup_aliases.append(child_nodegroup_alias)
 
-                if child_nodegroup_alias not in field_map:
+                if (
+                    child_nodegroup_alias in nodes_by_node_aliases
+                    and child_nodegroup not in field_map
+                ):
                     sortorder = 0
                     if child_nodegroup.cardmodel_set.all():
                         sortorder = child_nodegroup.cardmodel_set.all()[0].sortorder
