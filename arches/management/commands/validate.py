@@ -22,7 +22,7 @@ from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.core.management import BaseCommand, CommandError, call_command
 from django.db import transaction
-from django.db.models import Exists, OuterRef, Q, Subquery
+from django.db.models import Count, Exists, OuterRef, Q, Subquery
 
 from arches import __version__
 from arches.app.const import IntegrityCheck
@@ -66,7 +66,16 @@ class Command(BaseCommand):
             type=int,
             default=[],
             choices=choices,
-            help="List the error codes to fix, e.g. --fix 1001 1002 ...",
+            help="List the error codes to fix, e.g. --fix 1012 1013 ...",
+        )
+        parser.add_argument(
+            "--codes",
+            action="extend",
+            nargs="+",
+            type=int,
+            default=[],
+            choices=choices,
+            help="List the error codes to validate, e.g. --codes 1012 1013 ...",
         )
         parser.add_argument(
             "--limit",
@@ -155,12 +164,35 @@ class Command(BaseCommand):
             ),
             fix_action=UPDATE_GRAPH_PUBLICATIONS,
         )
+        self.check_integrity(
+            # Enforced in database as of v8, but here to help during upgrade.
+            check=IntegrityCheck.TOO_MANY_WIDGET_CONFIGS,  # 1016
+            queryset=models.Node.objects.annotate(
+                source_widget_count=Count(
+                    "cardxnodexwidget", filter=Q(source_identifier__isnull=True)
+                ),
+                draft_widget_count=Count(
+                    "cardxnodexwidget", filter=Q(source_identifier__isnull=False)
+                ),
+            ).filter(Q(source_widget_count__gt=1) | Q(draft_widget_count__gt=1)),
+            fix_action=None,
+        )
+        self.check_integrity(
+            check=IntegrityCheck.TOO_FEW_WIDGET_CONFIGS,  # 1017
+            queryset=models.Node.objects.exclude(datatype="semantic")
+            .annotate(widget_count=Count("cardxnodexwidget"))
+            .filter(widget_count__lt=1),
+            fix_action=None,
+        )
 
     def check_integrity(self, check, queryset, fix_action):
         # 500 not set as a default earlier: None distinguishes whether verbose output implied
         limit = self.options["limit"] or 500
 
         if self.mode == VALIDATE:
+            if self.options["codes"] and check.value not in self.options["codes"]:
+                # User didn't request this specific check.
+                return
             # Fixable?
             fix_status = (
                 self.style.MIGRATE_HEADING("Yes")

@@ -170,8 +170,21 @@ class CardXNodeXWidget(SaveSupportsBlindOverwriteMixin, models.Model):
     class Meta:
         managed = True
         db_table = "cards_x_nodes_x_widgets"
-        unique_together = (("node", "card", "widget"),)
         ordering = ["sortorder"]
+        constraints = [
+            # Can't use nulls_distinct=False yet (Postgres 15+ feature)
+            # TODO(Arches 8.2): nulls_distinct=False
+            models.UniqueConstraint(
+                "node",
+                condition=Q(source_identifier__isnull=True),
+                name="unique_node_widget_source",
+            ),
+            models.UniqueConstraint(
+                "node",
+                condition=Q(source_identifier__isnull=False),
+                name="unique_node_widget_draft",
+            ),
+        ]
 
 
 class Concept(SaveSupportsBlindOverwriteMixin, models.Model):
@@ -705,8 +718,17 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
         db_table = "graphs"
 
         constraints = [
+            # Can't use nulls_distinct=False yet (Postgres 15+ feature)
+            # TODO(Arches 8.2): nulls_distinct=False
             models.UniqueConstraint(
-                fields=["slug", "source_identifier"], name="unique_slug"
+                "slug",
+                condition=Q(source_identifier__isnull=True),
+                name="unique_slug_source",
+            ),
+            models.UniqueConstraint(
+                "slug",
+                condition=Q(source_identifier__isnull=False),
+                name="unique_slug_draft",
             ),
             models.CheckConstraint(
                 condition=(
