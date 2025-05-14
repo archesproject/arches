@@ -1,5 +1,6 @@
 from functools import partial
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext as _
 
@@ -136,7 +137,13 @@ class SemanticTileQuerySet(models.QuerySet):
         # Overriding _fetch_all() doesn't work here: causes dupe child tiles.
         # Perhaps these manual annotations could be scheduled another way?
         super()._prefetch_related_objects()
+        try:
+            self._perform_custom_annotations()
+        except (TypeError, ValueError, ValidationError) as e:
+            # These errors are caught by DRF, so re-raise as something else.
+            raise RuntimeError from e
 
+    def _perform_custom_annotations(self):
         NOT_PROVIDED = object()
         checked_for_values_query = False
 
@@ -379,7 +386,13 @@ class SemanticResourceQuerySet(models.QuerySet):
         Memoize fetched grouping node aliases (and graph source nodes).
         """
         super()._fetch_all()
+        try:
+            self._perform_custom_annotations()
+        except (TypeError, ValueError, ValidationError) as e:
+            # These errors are caught by DRF, so re-raise as something else.
+            raise RuntimeError from e
 
+    def _perform_custom_annotations(self):
         grouping_nodes = {}
         for node in self._queried_nodes:
             grouping_node = node.nodegroup.grouping_node
