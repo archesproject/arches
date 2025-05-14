@@ -187,11 +187,10 @@ def filter_nodes_by_highest_parent(nodes, aliases):
 def any_nodegroup_in_hierarchy_is_cardinality_n(nodegroup):
     cardinality_n_found = False
     breaker = 0
-    test_nodegroup = nodegroup
-    while not cardinality_n_found and test_nodegroup and breaker < 1000:
+    while not cardinality_n_found and nodegroup and breaker < 1000:
         if nodegroup.cardinality == "n":
             cardinality_n_found = True
-        test_nodegroup = nodegroup.parentnodegroup
+        nodegroup = nodegroup.parentnodegroup
         breaker += 1
 
     return cardinality_n_found
