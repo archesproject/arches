@@ -501,7 +501,7 @@ class Resource(models.ResourceInstance):
         document["root_ontology_class"] = self.get_root_ontology()
         document["legacyid"] = self.legacyid
         document["resource_instance_lifecycle_state_id"] = str(
-            self.resource_instance_lifecycle_state.pk
+            self.resource_instance_lifecycle_state_id
         )
 
         document["displayname"] = []
