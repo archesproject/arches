@@ -13,7 +13,7 @@ from django.db.models import Value, Case, When, Q
 class RelatableResourcesView(View):
     def get(self, request, graph, node_alias):
         node = Node.objects.get(
-            name=node_alias,
+            alias=node_alias,
             graph__slug=graph,
             graph__is_active=True,
             graph__publication__isnull=False,
