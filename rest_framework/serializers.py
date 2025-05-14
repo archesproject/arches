@@ -431,7 +431,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             graph_slug=self.graph_slug,
             only=None,
             as_representation=True,
-            user=self.context.get("request").user,
+            user=self.context["request"].user,
         )
         validated_data["nodegroup_id"] = qs._entry_node.nodegroup_id
         if validated_data.get("sortorder") is None:
@@ -487,6 +487,7 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             instance_from_factory = options.model.as_model(
                 graph_slug=self.graph_slug,
                 only=None,
+                user=self.context["request"].user,
             ).get(pk=instance_without_tile_data.pk)
             instance_from_factory._as_representation = True
             # TODO: decide whether to override update() instead of using partial().

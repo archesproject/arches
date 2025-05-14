@@ -16,7 +16,6 @@ from django.db.models.fields.json import KT
 from arches import __version__ as arches_version
 from arches.app.models.models import ResourceInstance, TileModel
 from arches.app.models.utils import field_names
-from arches.app.utils.permission_backend import get_nodegroups_by_perm
 
 from arches_querysets.fields import (
     Cardinality1DateTimeField,

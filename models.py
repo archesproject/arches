@@ -157,6 +157,7 @@ class SemanticResource(ResourceInstance):
         self.refresh_from_db(
             using=kwargs.get("using", None),
             fields=kwargs.get("update_fields", None),
+            user=request.user if request else None,
         )
 
         # Instantiate proxy model for now, but refactor & expose this on vanilla model
@@ -170,12 +171,13 @@ class SemanticResource(ResourceInstance):
                 user=request.user, transaction_id=bulk_operation.transaction_id
             )
 
-    def refresh_from_db(self, using=None, fields=None, from_queryset=None):
+    def refresh_from_db(self, using=None, fields=None, from_queryset=None, user=None):
         if from_queryset is None:
             from_queryset = self.__class__.as_model(
                 self.graph.slug,
                 # TODO: only=queried_nodes
                 as_representation=getattr(self, "_as_representation", False),
+                user=user,
             ).filter(pk=self.pk)
         super().refresh_from_db(using, fields, from_queryset)
 
