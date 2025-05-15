@@ -320,7 +320,9 @@ class SemanticTile(TileModel):
                 for grandchild_nodegroup in grandchildren
             },
         )
-        # blank_tile.pk = None
+
+        # Signify that the tile is not yet saved.
+        blank_tile.pk = None
         return blank_tile
 
     def fill_blanks(self):
