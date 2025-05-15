@@ -8,6 +8,8 @@ from django.core.management import call_command
 from arches.app.const import IntegrityCheck
 from arches.app.models.graph import Graph
 from arches.app.models.models import (
+    CardModel,
+    CardXNodeXWidget,
     DDataType,
     Node,
     NodeGroup,
@@ -55,7 +57,7 @@ class ValidateTests(ArchesTestCase):
         datatypes = DDataType.objects.all()
         data_nodes_1 = [
             Node(
-                datatype=datatype,
+                datatype=datatype.pk,
                 alias=datatype.pk,
                 name=datatype.pk,
                 istopnode=False,
@@ -66,7 +68,7 @@ class ValidateTests(ArchesTestCase):
         ]
         data_nodes_n = [
             Node(
-                datatype=datatype,
+                datatype=datatype.pk,
                 alias=datatype.pk + "-n",
                 name=datatype.pk + "-n",
                 istopnode=False,
@@ -75,11 +77,39 @@ class ValidateTests(ArchesTestCase):
             )
             for datatype in datatypes
         ]
-        Node.objects.bulk_create(data_nodes_1 + data_nodes_n)
+        nodes = Node.objects.bulk_create(data_nodes_1 + data_nodes_n)
 
-    def test_too_few_widget_configs(self):
+        cards = [
+            CardModel(
+                graph=cls.graph,
+                nodegroup=nodegroup,
+            )
+            for nodegroup in [cls.nodegroup_1, cls.nodegroup_n]
+        ]
+        cards = CardModel.objects.bulk_create(cards)
+
+        node_widgets = [
+            CardXNodeXWidget(
+                node=node,
+                widget_id=cls.find_default_widget_id(node, datatypes),
+                card=node.nodegroup.cardmodel_set.all()[0],
+            )
+            for node in [n for n in nodes if n.datatype != "semantic"]
+        ]
+        CardXNodeXWidget.objects.bulk_create(node_widgets)
+
+    @classmethod
+    def find_default_widget_id(cls, node, datatypes):
+        for datatype in datatypes:
+            if node.datatype == datatype.pk:
+                return datatype.defaultwidget_id
+        return None
+
+    def test_no_widget_configs(self):
+        CardXNodeXWidget.objects.all().delete()
+
         out = StringIO()
         call_command(
-            "validate", codes=[IntegrityCheck.TOO_FEW_WIDGET_CONFIGS.value], stdout=out
+            "validate", codes=[IntegrityCheck.NO_WIDGET_CONFIGS.value], stdout=out
         )
         self.assertEqual(out.getvalue().count("FAIL"), 1)
