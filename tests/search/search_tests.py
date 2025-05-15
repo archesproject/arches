@@ -189,19 +189,19 @@ class SearchTests(ArchesTestCase):
 
         """
         admin_user = User.objects.get(username="admin")
-        nodeid = "c9b37b7c-17b3-11eb-a708-acde48001122"
-        tileid = "bebffbea-daf6-414e-80c2-530ec88d2705"
-        resourceinstanceid = "745f5e4a-d645-4c50-bafc-c677ea95f060"
-        resource = Resource(uuid.UUID(resourceinstanceid))
-        resource.graph_id = "c9b37a14-17b3-11eb-a708-acde48001122"
+        nodeid = uuid.UUID("c9b37b7c-17b3-11eb-a708-acde48001122")
+        tileid = uuid.UUID("bebffbea-daf6-414e-80c2-530ec88d2705")
+        resourceinstanceid = uuid.UUID("745f5e4a-d645-4c50-bafc-c677ea95f060")
+        resource = Resource(resourceinstanceid)
+        resource.graph_id = uuid.UUID("c9b37a14-17b3-11eb-a708-acde48001122")
 
         resource.save(user=admin_user, transaction_id=uuid.uuid4())
         tile_data = {}
-        tile_data[nodeid] = {
+        tile_data[str(nodeid)] = {
             "en": {"value": "Alpha Gamma Delta Eta Epsilon", "direction": "ltr"}
         }
         new_tile = Tile(
-            tileid=uuid.UUID(tileid),
+            tileid=tileid,
             resourceinstance_id=resourceinstanceid,
             data=tile_data,
             nodegroup_id=nodeid,
