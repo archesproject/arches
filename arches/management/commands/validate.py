@@ -166,7 +166,7 @@ class Command(BaseCommand):
         )
         self.check_integrity(
             # Enforced in database as of v8, but here to help during upgrade.
-            check=IntegrityCheck.TOO_MANY_WIDGET_CONFIGS,  # 1016
+            check=IntegrityCheck.TOO_MANY_WIDGETS,  # 1016
             queryset=models.Node.objects.annotate(
                 source_widget_count=Count(
                     "cardxnodexwidget", filter=Q(source_identifier__isnull=True)
@@ -178,7 +178,7 @@ class Command(BaseCommand):
             fix_action=None,
         )
         self.check_integrity(
-            check=IntegrityCheck.TOO_FEW_WIDGET_CONFIGS,  # 1017
+            check=IntegrityCheck.NO_WIDGETS,  # 1017
             queryset=models.Node.objects.exclude(datatype="semantic")
             .annotate(widget_count=Count("cardxnodexwidget"))
             .filter(widget_count__lt=1),
