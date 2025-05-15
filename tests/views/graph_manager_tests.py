@@ -478,9 +478,7 @@ class GraphManagerViewTests(ArchesTestCase):
 
         """
 
-        self.client.login(username="admin", password="admin")
-        user_id = self.client.session["_auth_user_id"]
-        logged_in_user = get_user_model().objects.get(pk=user_id)
+        logged_in_user = get_user_model().objects.get(username="admin")
         graph = Graph.objects.get(pk="22000000-0000-0000-0000-000000000001")
         graph.publish(user=logged_in_user)
         card = Card.objects.get(pk="bf9ea150-3eaa-11e8-8b2b-c3a348661f61")

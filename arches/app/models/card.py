@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import uuid
 from django.db import transaction
 from django.db.models import Q
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms import ModelForm
 from django.utils.translation import gettext as _
 
@@ -204,14 +204,14 @@ class Card(models.CardModel):
 
         """
         with transaction.atomic():
-            if self.graph.publication is not None:
+            if self.graph.publication_id:
                 ret = {
                     "title": _("Unable to Save Card"),
                     "message": _(
                         "You cannot edit a card in a published graph.  Please unpublish the graph before editing."
                     ),
                 }
-                raise Exception(ret)
+                raise ValidationError(ret)
             if self.graph.ontology and self.graph.isresource:
                 edge = self.get_edge_to_parent()
                 if self.ontologyproperty is not None:

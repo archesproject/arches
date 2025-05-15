@@ -30,7 +30,7 @@ from django.http import HttpResponseNotFound, HttpResponse
 from django.views.generic import View, TemplateView
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -681,7 +681,7 @@ class CardView(GraphBaseView):
                 try:
                     card.save()
                     return JSONResponse(card)
-                except Exception as e:
+                except ValidationError as e:
                     return JSONErrorResponse(content=e.args[0], status=403)
 
         if self.action == "reorder_cards":
