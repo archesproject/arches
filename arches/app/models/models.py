@@ -903,6 +903,10 @@ class Node(SaveSupportsBlindOverwriteMixin, models.Model):
         on_delete=models.SET_NULL,
     )
 
+    def __str__(self):
+        draft_or_published = "Draft" if self.source_identifier else "Published"
+        return f"{self.alias},{self.pk},{draft_or_published},{str(self.graph)}"
+
     def get_child_nodes_and_edges(self):
         """
         gather up the child nodes and edges of this node
