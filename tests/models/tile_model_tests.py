@@ -91,14 +91,14 @@ class TileTests(ArchesTestCase):
         nodegroup.save()
         return TileModel.objects.get(pk=tile.pk)
 
-    def test_tile_repr(self):
+    def test_tile_str(self):
         sample_tile = self.create_tile()
-        self.assertEqual(f"{sample_tile!r}", f"<Statement ({sample_tile.pk})>")
+        self.assertEqual(f"{sample_tile}", f"Statement ({sample_tile.pk})")
 
-    def test_tile_repr_no_nodegroup(self):
+    def test_tile_str_no_nodegroup(self):
         sample_tile = self.create_tile()
         sample_tile.nodegroup = None
-        self.assertEqual(f"{sample_tile!r}", f"<None ({sample_tile.pk})>")
+        self.assertEqual(f"{sample_tile}", f"None ({sample_tile.pk})")
 
     def test_load_from_python_dict(self):
         """
