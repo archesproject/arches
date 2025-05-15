@@ -1,4 +1,5 @@
 import json
+import os
 import uuid
 
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -73,3 +74,39 @@ class GeoJsonDataTypeTest(ArchesTestCase):
 
         with self.subTest(input=map_source):
             self.assertTrue("minzoom" in map_source and "maxzoom" in map_source)
+
+    def test_check_valid_geojson_geom(self):
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+        geojson_filename = os.path.join(
+            "tests", "fixtures", "data", "json", "geojson_with_properties.json"
+        )
+        with open(geojson_filename, "r") as geojson_file:
+            geom_json = geojson_file.read()
+            geom_datatype.check_geojson_value(json.loads(geom_json))
+            geom_datatype.validate(json.loads(geom_json))
+
+    def test_check_geom_property_cleaning(self):
+        geom_datatype = DataTypeFactory().get_instance("geojson-feature-collection")
+        document = {"geometries": [], "points": []}
+        tile = models.TileModel()
+        tile.id = uuid.uuid4()
+        tile.nodegroup_id = uuid.uuid4()
+        geojson_filename = os.path.join(
+            "tests", "fixtures", "data", "json", "geojson_with_properties.json"
+        )
+        with open(geojson_filename, "r") as geojson_file:
+            geom_json = json.loads(geojson_file.read())
+            geom_datatype.validate(geom_json)
+            self.assertEqual(
+                geom_json["features"][0]["properties"]["name"], "Test with properties"
+            )
+            geom_datatype.append_to_document(
+                document=document,
+                nodevalue=geom_json,
+                tile=tile,
+                nodeid=uuid.uuid4(),
+            )
+            for geometry in document["geometries"]:
+                self.assertEqual(geometry["geom"]["properties"], {})
+                for feature in geometry["geom"]["features"]:
+                    self.assertEqual(feature["properties"], {})

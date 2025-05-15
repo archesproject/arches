@@ -33,6 +33,7 @@ from arches.app.search.mappings import (
     delete_resource_relations_index,
 )
 import arches.app.utils.index_database as index_database_util
+from arches.app.utils.string_utils import str_to_bool
 
 logger = logging.getLogger(__name__)
 
@@ -125,7 +126,8 @@ class Command(BaseCommand):
             action="store",
             dest="clear_index",
             default=True,
-            help="Set to True(default) to remove all the resources from the index before the reindexing operation",
+            type=str_to_bool,
+            help="Whether to remove all target resources from the index before reindexing. Accepts 'true'/'false', 'yes'/'no', 'y'/'n', 't'/'f', 'on'/'off', or '1'/'0' (case-insensitive). Default is True.",
         )
 
         parser.add_argument(

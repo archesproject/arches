@@ -975,12 +975,6 @@ class ResourceReportView(MapBaseManagerView):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class RelatedResourcesView(BaseManagerView):
     action = None
-    graphs = (
-        models.GraphModel.objects.all()
-        .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-        .exclude(isresource=False)
-        .exclude(publication=None)
-    )
 
     def paginate_related_resources(self, related_resources, page, request):
         total = related_resources["total"]["value"]
@@ -1020,7 +1014,7 @@ class RelatedResourcesView(BaseManagerView):
 
         return ret
 
-    def get(self, request, resourceid=None, include_rr_count=True):
+    def get(self, request, resourceid=None, include_rr_count=True, graphs=None):
         ret = {}
 
         if self.action == "get_candidates":
@@ -1066,7 +1060,7 @@ class RelatedResourcesView(BaseManagerView):
                     page=page,
                     user=request.user,
                     resourceinstance_graphid=resourceinstance_graphid,
-                    graphs=self.graphs,
+                    graphs=graphs,
                     include_rr_count=include_rr_count,
                 )
 
@@ -1078,7 +1072,7 @@ class RelatedResourcesView(BaseManagerView):
                     lang=lang,
                     user=request.user,
                     resourceinstance_graphid=resourceinstance_graphid,
-                    graphs=self.graphs,
+                    graphs=graphs,
                     include_rr_count=include_rr_count,
                 )
 

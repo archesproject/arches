@@ -1,8 +1,7 @@
 import json
 import os
 from pathlib import Path
-import site
-import sys
+import sys, sysconfig
 
 from django.apps import apps
 from django.conf import settings
@@ -71,7 +70,7 @@ def build_staticfiles_dirs(*, app_root=None, additional_directories=None):
         return tuple(directories)
     except Exception as e:
         # Ensures error message is shown if error encountered in webpack build
-        sys.stdout.write(str(e))
+        sys.stderr.write(str(e))
         raise e
 
 
@@ -139,7 +138,7 @@ def build_templates_config(
         ]
     except Exception as e:
         # Ensures error message is shown if error encountered in webpack build
-        sys.stdout.write(str(e))
+        sys.stderr.write(str(e))
         raise e
 
 
@@ -157,7 +156,7 @@ def generate_frontend_configuration():
             "APP_ROOT": app_root_path,
             "ARCHES_APPLICATIONS": arches_app_names,
             "ARCHES_APPLICATIONS_PATHS": path_lookup,
-            "SITE_PACKAGES_DIRECTORY": site.getsitepackages()[0],
+            "SITE_PACKAGES_DIRECTORY": sysconfig.get_path("purelib"),
             "PUBLIC_SERVER_ADDRESS": settings.PUBLIC_SERVER_ADDRESS,
             "ROOT_DIR": root_dir_path,
             "STATIC_URL": settings.STATIC_URL,
@@ -174,9 +173,6 @@ def generate_frontend_configuration():
 
         frontend_configuration_settings_path = os.path.realpath(
             os.path.join(base_path, "..", ".frontend-configuration-settings.json")
-        )
-        sys.stdout.write(
-            f"Writing frontend configuration to: {frontend_configuration_settings_path} \n"
         )
 
         with open(
@@ -222,7 +218,6 @@ def generate_frontend_configuration():
         tsconfig_path = os.path.realpath(
             os.path.join(base_path, "..", ".tsconfig-paths.json")
         )
-        sys.stdout.write(f"Writing tsconfig path data to: {tsconfig_path} \n")
 
         with open(tsconfig_path, "w") as file:
             json.dump(tsconfig_paths_data, file, indent=4)
