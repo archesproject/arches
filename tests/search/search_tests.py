@@ -182,9 +182,6 @@ class SearchTests(ArchesTestCase):
             print("Failed to parse search result")
         self.assertTrue("terms" in result and len(result["terms"]) == 0)
         remove_perm("no_access_to_nodegroup", self.tester, nodegroup)
-        new_tile.delete()
-        resource.delete()
-        self.sync_es(se)
 
     def test_search_terms_permitted_user(self):
         """
