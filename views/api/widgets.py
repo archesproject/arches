@@ -1,5 +1,3 @@
-import json
-
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
 from django.utils import translation
 from django.views.generic import View
@@ -69,8 +67,17 @@ class WidgetDataView(View):
 
 class NodeDataView(View):
     def get(self, request, graph_slug, node_alias):
-        node = models.Node.objects.get(
-            graph__slug=graph_slug, alias=node_alias, source_identifier_id__isnull=True
+        node = (
+            models.Node.objects.get(
+                graph__slug=graph_slug,
+                alias=node_alias,
+                source_identifier_id__isnull=True,
+            )
+            if getattr(models.Node, "source_identifier_id", False)
+            else models.Node.objects.get(
+                graph__slug=graph_slug,
+                alias=node_alias,
+            )
         )
 
         response = update_i18n_properties(
