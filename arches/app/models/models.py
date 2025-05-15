@@ -1415,11 +1415,8 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
         db_table = "resource_instances"
         permissions = (("no_access_to_resourceinstance", "No Access"),)
 
-    def __repr__(self):
-        return f"<{self.graph.name}: {self.name} ({self.pk})>"
-
     def __str__(self):
-        return repr(self)
+        return f"{self.graph.name}: {self.name} ({self.pk})"
 
     def get_instance_creator_and_edit_permissions(self, user=None):
         creatorid = None
@@ -1746,11 +1743,8 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
         managed = True
         db_table = "tiles"
 
-    def __repr__(self):
-        return f"<{self.find_nodegroup_alias()} ({self.pk})>"
-
     def __str__(self):
-        return repr(self)
+        return f"{self.find_nodegroup_alias()} ({self.pk})"
 
     def find_nodegroup_alias(self):
         if self.nodegroup and self.nodegroup.grouping_node:
