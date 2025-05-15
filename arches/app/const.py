@@ -7,8 +7,8 @@ IntegrityCheckDescriptions = {
     1013: "Node Groups without a grouping node",
     1014: "Publication missing for language",
     1015: "Graphs missing slugs",
-    1016: "Nodes with excess widget configurations",
-    1017: "Nodes with missing widget configurations",
+    1016: "Nodes with excess widgets",
+    1017: "Nodes missing widgets",
 }
 
 
@@ -19,10 +19,10 @@ class IntegrityCheck(Enum):
     NODEGROUP_WITHOUT_GROUPING_NODE = 1013
     PUBLICATION_MISSING_FOR_LANGUAGE = 1014
     GRAPH_MISSING_SLUG = 1015
-    TOO_MANY_WIDGET_CONFIGS = 1016
-    # TOO_FEW_WIDGET_CONFIGS isn't currently a failure condition,
+    TOO_MANY_WIDGETS = 1016
+    # NO_WIDGETS isn't currently an error condition,
     # but it might be in the future.
-    TOO_FEW_WIDGET_CONFIGS = 1017
+    NO_WIDGETS = 1017
 
     def __str__(self):
         return IntegrityCheckDescriptions[self.value]

@@ -2071,6 +2071,35 @@ class Graph(models.GraphModel):
                     )
                     raise GraphValidationError(message)
 
+    def _validate_widget_count(self, node):
+        if node.datatype == "semantic":
+            return
+
+        def pk_getter(widget):
+            """get_widgets() might return a dict or a model instance."""
+            try:
+                return widget.pk
+            except AttributeError:
+                return widget["node_id"]
+
+        widgets = self.get_widgets()
+        config_count = len(
+            [widget for widget in widgets if pk_getter(widget) == node.pk]
+        )
+        if config_count > 1:
+            raise GraphValidationError(
+                _("The node '{alias}' has too many widget configurations.").format(
+                    alias=node.alias
+                ),
+                IntegrityCheck.TOO_MANY_WIDGETS.value,
+            )
+        # This not yet an error condition, but it should be in the future.
+        # elif config_count == 0:
+        #     raise GraphValidationError(
+        #         _("The node '{alias}' has no widget configurations.").format(alias=node.alias),
+        #         IntegrityCheck.NO_WIDGETS.value,
+        #     )
+
     def create_node_alias(self, node):
         """
         Assigns a unique, slugified version of a node's name as that node's alias.
@@ -2160,6 +2189,7 @@ class Graph(models.GraphModel):
 
         for node in self.nodes.values():
             self._validate_node_name(node)
+            self._validate_widget_count(node)
             datatype = datatype_factory.get_instance(node.datatype)
             datatype.validate_node(node)
             if node.exportable is True:

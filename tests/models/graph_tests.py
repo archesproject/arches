@@ -20,11 +20,12 @@ import uuid
 
 from django.contrib.auth.models import User
 from guardian.models import GroupObjectPermission, UserObjectPermission
-from tests.base_test import ArchesTestCase
+
+from arches.app.const import IntegrityCheck
 from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
-from arches.app.models.card import Card
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
+from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
 # python manage.py test tests.models.graph_tests --settings="tests.test_settings"
@@ -36,9 +37,9 @@ class GraphTests(ArchesTestCase):
         super().setUpTestData()
         cls.SINGLE_NODE_GRAPHID = "22000000-0000-0000-0000-000000000000"
         cls.NODE_NODETYPE_GRAPHID = "22000000-0000-0000-0000-000000000001"
-        cls.create_single_node_graph()
-        cls.create_node_node_type_graph()
-        cls.create_test_graph()
+        cls.single_node_graph = cls.create_single_node_graph()
+        cls.node_node_type_graph = cls.create_node_node_type_graph()
+        cls.test_graph = cls.create_test_graph()
 
     @classmethod
     def create_single_node_graph(cls):
@@ -77,6 +78,7 @@ class GraphTests(ArchesTestCase):
         graph = Graph.objects.get(pk=graph_model.pk)
         graph.save()
         graph.publish()
+        return graph
 
     @classmethod
     def create_node_node_type_graph(cls):
@@ -120,7 +122,7 @@ class GraphTests(ArchesTestCase):
             "visible": True,
         }
 
-        models.CardModel.objects.create(**card_data).save()
+        card = models.CardModel.objects.create(**card_data)
         nodes_data = [
             {
                 "config": None,
@@ -150,8 +152,18 @@ class GraphTests(ArchesTestCase):
             },
         ]
 
-        for node in nodes_data:
-            models.Node.objects.create(**node).save()
+        # default_widgets_by_datatype = {
+        #     datatype.pk: datatype.defaultwidget
+        #     for datatype in models.DDataType.objects.select_related("defaultwidget")
+        # }
+        for node_data in nodes_data:
+            node = models.Node.objects.create(**node_data)
+            # This should be uncommented when it will no longer cause failures.
+            # models.CardXNodeXWidget.objects.create(
+            #     card=node.nodegroup.cardmodel_set.all()[0],
+            #     node=node,
+            #     widget=default_widgets_by_datatype[node.datatype],
+            # )
 
         models.NodeGroup.objects.filter(
             pk="20000000-0000-0000-0000-100000000001"
@@ -171,6 +183,7 @@ class GraphTests(ArchesTestCase):
         graph = Graph.objects.get(pk=graph_model.pk)
         graph.save()
         graph.publish()
+        return graph
 
     @classmethod
     def create_test_graph(cls):
@@ -194,8 +207,8 @@ class GraphTests(ArchesTestCase):
         test_graph.save()
         test_graph.publish()
 
-        cls.test_graph = test_graph
         cls.rootNode = test_graph.root
+        return test_graph
 
     def test_new_graph(self):
         name = "TEST NEW GRAPH"
@@ -791,7 +804,7 @@ class GraphTests(ArchesTestCase):
         nodegroups_count_before = models.NodeGroup.objects.count()
         card_count_before = models.CardModel.objects.count()
 
-        # test that data is persisited propertly when creating a new graph
+        # test that data is persisted properly when creating a new graph
         graph = Graph.objects.create_graph(is_resource=False)
 
         nodes_count_after = models.Node.objects.count()
@@ -810,7 +823,7 @@ class GraphTests(ArchesTestCase):
             card_count_after - card_count_before, 2
         )  # one for new graph, one for draft_graph
 
-        # test that data is persisited propertly during an append opertation
+        # test that data is persisted properly during an append opertation
         graph.append_branch(
             "http://www.cidoc-crm.org/cidoc-crm/P1_is_identified_by",
             graphid=self.NODE_NODETYPE_GRAPHID,
@@ -1366,6 +1379,36 @@ class GraphTests(ArchesTestCase):
         with self.assertRaises(GraphValidationError) as cm:
             graph.save()
 
+    def test_graph_validation_of_widget_count(self):
+        # Add missing CardXNodeXWidget instances to the graph
+        # See commented out code in setUpTestData() where this should be done.
+        default_widgets_by_datatype = {
+            datatype.pk: datatype.defaultwidget
+            for datatype in models.DDataType.objects.select_related("defaultwidget")
+        }
+        for node in self.node_node_type_graph.nodes.values():
+            models.CardXNodeXWidget.objects.create(
+                card=node.nodegroup.cardmodel_set.first(),
+                node=node,
+                widget=default_widgets_by_datatype[node.datatype],
+            )
+
+        self.node_node_type_graph.refresh_from_database()
+        self.node_node_type_graph.has_unpublished_changes = True
+        superfluous_widgets = {
+            uid: models.CardXNodeXWidget(node=node)
+            for uid, node in [
+                (uuid.uuid4(), widget.node)
+                for widget in self.node_node_type_graph.widgets.values()
+            ]
+        }
+        self.node_node_type_graph.widgets |= superfluous_widgets
+        self.node_node_type_graph.has_unpublished_changes = True
+
+        with self.assertRaises(GraphValidationError) as cm:
+            self.node_node_type_graph.validate()
+        self.assertEqual(cm.exception.code, IntegrityCheck.TOO_MANY_WIDGETS.value)
+
     def test_add_resource_instance_lifecycle(self):
         resource_instance_lifecycle = {
             "id": "f7a0fd46-4c71-49cb-ae1e-778c96763440",
@@ -1503,9 +1546,9 @@ class DraftGraphTests(ArchesTestCase):
         super().setUpTestData()
         cls.SINGLE_NODE_GRAPHID = "22000000-0000-0000-0000-000000000000"
         cls.NODE_NODETYPE_GRAPHID = "22000000-0000-0000-0000-000000000001"
-        cls.create_single_node_graph()
-        cls.create_node_node_type_graph()
-        cls.create_test_graph()
+        cls.single_node_graph = cls.create_single_node_graph()
+        cls.node_node_type_graph = cls.create_node_node_type_graph()
+        cls.test_graph = cls.create_test_graph()
 
     @classmethod
     def create_single_node_graph(cls):
@@ -1544,6 +1587,7 @@ class DraftGraphTests(ArchesTestCase):
         graph = Graph.objects.get(pk=graph_model.pk)
         graph.save()
         graph.publish()
+        return graph
 
     @classmethod
     def create_node_node_type_graph(cls):
@@ -1587,7 +1631,7 @@ class DraftGraphTests(ArchesTestCase):
             "visible": True,
         }
 
-        models.CardModel.objects.create(**card_data).save()
+        card = models.CardModel.objects.create(**card_data)
         nodes_data = [
             {
                 "config": None,
@@ -1617,8 +1661,17 @@ class DraftGraphTests(ArchesTestCase):
             },
         ]
 
-        for node in nodes_data:
-            models.Node.objects.create(**node).save()
+        default_widgets_by_datatype = {
+            datatype.pk: datatype.defaultwidget
+            for datatype in models.DDataType.objects.select_related("defaultwidget")
+        }
+        for node_data in nodes_data:
+            node = models.Node.objects.create(**node_data)
+            models.CardXNodeXWidget.objects.create(
+                card=card,
+                node=node,
+                widget=default_widgets_by_datatype[node.datatype],
+            )
 
         models.NodeGroup.objects.filter(
             pk="20000000-0000-0000-0000-100000000001"
@@ -1638,6 +1691,7 @@ class DraftGraphTests(ArchesTestCase):
         graph = Graph.objects.get(pk=graph_model.pk)
         graph.save()
         graph.publish()
+        return graph
 
     @classmethod
     def create_test_graph(cls):
@@ -1661,8 +1715,8 @@ class DraftGraphTests(ArchesTestCase):
         test_graph.save()
         test_graph.publish()
 
-        cls.test_graph = test_graph
         cls.rootNode = test_graph.root
+        return test_graph
 
     def _compare_serialized_updated_source_graph_and_serialized_draft_graph(
         self, serialized_updated_source_graph, serialized_draft_graph
@@ -2397,14 +2451,21 @@ class DraftGraphTests(ArchesTestCase):
         draft_graph = updated_source_graph.create_draft_graph()
 
         card = [card for card in draft_graph.cards.values()][0]
-        card_x_node_x_widget = models.CardXNodeXWidget.objects.create(
+        old_draft_widget = (
+            card.cardxnodexwidget_set.filter(
+                node_id=card.nodegroup_id, source_identifier__isnull=False
+            )
+            .get()
+            .source_identifier
+        )
+        new_widget = models.CardXNodeXWidget.objects.create(
             card=card,
             node_id=card.nodegroup_id,
             widget=models.Widget.objects.first(),
             label="Widget name",
         )
-
-        draft_graph.widgets[card_x_node_x_widget.pk] = card_x_node_x_widget
+        draft_graph.widgets.pop(old_draft_widget.pk)
+        draft_graph.widgets[new_widget.pk] = new_widget
 
         draft_graph.save()
 

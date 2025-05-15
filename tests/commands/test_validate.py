@@ -105,11 +105,9 @@ class ValidateTests(ArchesTestCase):
                 return datatype.defaultwidget_id
         return None
 
-    def test_no_widget_configs(self):
+    def test_no_widgets(self):
         CardXNodeXWidget.objects.all().delete()
 
         out = StringIO()
-        call_command(
-            "validate", codes=[IntegrityCheck.NO_WIDGET_CONFIGS.value], stdout=out
-        )
+        call_command("validate", codes=[IntegrityCheck.NO_WIDGETS.value], stdout=out)
         self.assertEqual(out.getvalue().count("FAIL"), 1)
