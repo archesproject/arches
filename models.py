@@ -506,74 +506,76 @@ class GraphWithPrefetching(GraphModel):
         else:
             raise ValueError("graph_slug or resource_ids must be provided")
 
-        permitted_nodegroups = get_nodegroups_by_perm(user, "models.read_nodegroup")
-        permitted_nodes_prefetch = models.Prefetch(
-            "node_set",
-            queryset=Node.objects.filter(nodegroup__in=permitted_nodegroups),
-            # TODO: consider using to_attr
-            # https://forum.djangoproject.com/t/custom-query-expression-when-prefetching/40183/6
-            # to_attr="permitted_node_set",
-        )
+        if arches_version >= "8":
+            prefetches = [
+                "node_set__cardxnodexwidget_set",
+                "node_set__nodegroup__node_set",
+                "node_set__nodegroup__node_set__cardxnodexwidget_set",
+                "node_set__nodegroup__cardmodel_set",
+                *get_recursive_prefetches(
+                    "node_set__nodegroup__children",
+                    depth=12,
+                    recursive_part="children",
+                ),
+                *get_recursive_prefetches(
+                    "node_set__nodegroup__children__node_set",
+                    depth=12,
+                    recursive_part="children",
+                ),
+                *get_recursive_prefetches(
+                    "node_set__nodegroup__children__node_set__cardxnodexwidget_set",
+                    depth=12,
+                    recursive_part="children",
+                ),
+                *get_recursive_prefetches(
+                    "node_set__nodegroup__children__cardmodel_set",
+                    depth=12,
+                    recursive_part="children",
+                ),
+                # TODO: determine if these last two are still used?
+                "node_set__nodegroup__grouping_node__nodegroup",
+                "node_set__nodegroup__children__grouping_node",
+            ]
+        else:
+            prefetches = [
+                "node_set__cardxnodexwidget_set",
+                "node_set__nodegroup__node_set",
+                "node_set__nodegroup__node_set__cardxnodexwidget_set",
+                "node_set__nodegroup__cardmodel_set",
+                *get_recursive_prefetches(
+                    "node_set__nodegroup__nodegroup_set",
+                    depth=12,
+                    recursive_part="nodegroup_set",
+                ),
+                *get_recursive_prefetches(
+                    "node_set__nodegroup__nodegroup_set__node_set",
+                    depth=12,
+                    recursive_part="nodegroup_set",
+                ),
+                *get_recursive_prefetches(
+                    "node_set__nodegroup__nodegroup_set__cardmodel_set",
+                    depth=12,
+                    recursive_part="nodegroup_set",
+                ),
+                *get_recursive_prefetches(
+                    "node_set__nodegroup__nodegroup_set__node_set__cardxnodexwidget_set",
+                    depth=12,
+                    recursive_part="nodegroup_set",
+                ),
+            ]
+
+        if user:
+            permitted_nodegroups = get_nodegroups_by_perm(user, "models.read_nodegroup")
+            permitted_nodes_prefetch = models.Prefetch(
+                "node_set",
+                queryset=Node.objects.filter(nodegroup__in=permitted_nodegroups),
+                # TODO: consider using to_attr
+                # https://forum.djangoproject.com/t/custom-query-expression-when-prefetching/40183/6
+                # to_attr="permitted_node_set",
+            )
+            prefetches.insert(0, permitted_nodes_prefetch)
+
         try:
-            if arches_version >= "8":
-                prefetches = [
-                    permitted_nodes_prefetch,
-                    "node_set__cardxnodexwidget_set",
-                    "node_set__nodegroup__node_set",
-                    "node_set__nodegroup__node_set__cardxnodexwidget_set",
-                    "node_set__nodegroup__cardmodel_set",
-                    *get_recursive_prefetches(
-                        "node_set__nodegroup__children",
-                        depth=12,
-                        recursive_part="children",
-                    ),
-                    *get_recursive_prefetches(
-                        "node_set__nodegroup__children__node_set",
-                        depth=12,
-                        recursive_part="children",
-                    ),
-                    *get_recursive_prefetches(
-                        "node_set__nodegroup__children__node_set__cardxnodexwidget_set",
-                        depth=12,
-                        recursive_part="children",
-                    ),
-                    *get_recursive_prefetches(
-                        "node_set__nodegroup__children__cardmodel_set",
-                        depth=12,
-                        recursive_part="children",
-                    ),
-                    # TODO: determine if these last two are still used?
-                    "node_set__nodegroup__grouping_node__nodegroup",
-                    "node_set__nodegroup__children__grouping_node",
-                ]
-            else:
-                prefetches = [
-                    permitted_nodes_prefetch,
-                    "node_set__cardxnodexwidget_set",
-                    "node_set__nodegroup__node_set",
-                    "node_set__nodegroup__node_set__cardxnodexwidget_set",
-                    "node_set__nodegroup__cardmodel_set",
-                    *get_recursive_prefetches(
-                        "node_set__nodegroup__nodegroup_set",
-                        depth=12,
-                        recursive_part="nodegroup_set",
-                    ),
-                    *get_recursive_prefetches(
-                        "node_set__nodegroup__nodegroup_set__node_set",
-                        depth=12,
-                        recursive_part="nodegroup_set",
-                    ),
-                    *get_recursive_prefetches(
-                        "node_set__nodegroup__nodegroup_set__cardmodel_set",
-                        depth=12,
-                        recursive_part="nodegroup_set",
-                    ),
-                    *get_recursive_prefetches(
-                        "node_set__nodegroup__nodegroup_set__node_set__cardxnodexwidget_set",
-                        depth=12,
-                        recursive_part="nodegroup_set",
-                    ),
-                ]
             graph = graph_query.prefetch_related(*prefetches).get()
         except cls.DoesNotExist as e:
             if sys.version_info >= (3, 11):
