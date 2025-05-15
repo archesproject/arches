@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from datetime import datetime
+from enum import StrEnum, auto
 
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -28,13 +29,16 @@ from arches import __version__
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
 
-# Command modes
-FIX = "fix"
-VALIDATE = "validate"
 
-# Fix actions
-DELETE_QUERYSET = "delete queryset"
-UPDATE_GRAPH_PUBLICATIONS = "manage.py graph --update"
+class CommandModes(StrEnum):
+    FIX = auto()
+    VALIDATE = auto()
+
+
+class FixActions(StrEnum):
+    DELETE_QUERYSET = auto()
+    DEDUPLICATE_WIDGETS_DIFFERING_ONLY_BY_SORTORDER = auto()
+    UPDATE_GRAPH_PUBLICATIONS = auto()
 
 
 class Command(BaseCommand):
@@ -94,10 +98,10 @@ class Command(BaseCommand):
             self.options["verbosity"] = 2
 
         if self.options["fix_all"] or self.options["fix"]:
-            self.mode = FIX
+            self.mode = CommandModes.FIX
             fix_heading = "Fixed?\t"  # Lengthen to match wider "Fixable?" heading
         else:
-            self.mode = VALIDATE
+            self.mode = CommandModes.VALIDATE
             fix_heading = "Fixable?"
 
         if self.options["verbosity"] > 0:
@@ -106,6 +110,8 @@ class Command(BaseCommand):
             self.stdout.write(
                 f"Prepared by Arches {__version__} on {datetime.today().strftime('%c')}"
             )
+            self.stdout.write()
+            self.stdout.write("Run with --verbosity=2 for more details or --help")
             self.stdout.write()
             self.stdout.write(
                 "\t".join(["", "Error", "Rows", fix_heading, "Description"])
@@ -127,7 +133,7 @@ class Command(BaseCommand):
                     models.Node.objects.filter(nodegroup_id=OuterRef("nodegroupid"))
                 )
             ),
-            fix_action=DELETE_QUERYSET,
+            fix_action=FixActions.DELETE_QUERYSET,
         )
         self.check_integrity(
             check=IntegrityCheck.NODEGROUP_WITHOUT_GROUPING_NODE,  # 1013
@@ -162,7 +168,7 @@ class Command(BaseCommand):
                     publications_in_system_languages__len__lt=len(settings.LANGUAGES)
                 )
             ),
-            fix_action=UPDATE_GRAPH_PUBLICATIONS,
+            fix_action=FixActions.UPDATE_GRAPH_PUBLICATIONS,
         )
         self.check_integrity(
             # Enforced in database as of v8, but here to help during upgrade.
@@ -175,7 +181,7 @@ class Command(BaseCommand):
                     "cardxnodexwidget", filter=Q(source_identifier__isnull=False)
                 ),
             ).filter(Q(source_widget_count__gt=1) | Q(draft_widget_count__gt=1)),
-            fix_action=None,
+            fix_action=FixActions.DEDUPLICATE_WIDGETS_DIFFERING_ONLY_BY_SORTORDER,
         )
         self.check_integrity(
             check=IntegrityCheck.NO_WIDGETS,  # 1017
@@ -189,7 +195,7 @@ class Command(BaseCommand):
         # 500 not set as a default earlier: None distinguishes whether verbose output implied
         limit = self.options["limit"] or 500
 
-        if self.mode == VALIDATE:
+        if self.mode == CommandModes.VALIDATE:
             if self.options["codes"] and check.value not in self.options["codes"]:
                 # User didn't request this specific check.
                 return
@@ -217,11 +223,11 @@ class Command(BaseCommand):
             elif queryset.exists():
                 fix_status = self.style.ERROR("No")  # until actually fixed below
                 # Perform fix action
-                if fix_action == DELETE_QUERYSET:
+                if fix_action == FixActions.DELETE_QUERYSET:
                     with transaction.atomic():
                         queryset.delete()
                     fix_status = self.style.SUCCESS("Yes")
-                elif fix_action == UPDATE_GRAPH_PUBLICATIONS:
+                elif fix_action == FixActions.UPDATE_GRAPH_PUBLICATIONS:
                     call_command(
                         "graph",
                         "publish",
@@ -235,6 +241,20 @@ class Command(BaseCommand):
                         stderr=self.stderr,
                     )
                     fix_status = self.style.SUCCESS("Yes")
+                elif (
+                    fix_action
+                    == FixActions.DEDUPLICATE_WIDGETS_DIFFERING_ONLY_BY_SORTORDER
+                ):
+                    problems_remain = (
+                        deduplicate_widgets_differing_only_by_card_and_sortorder(
+                            queryset
+                        )
+                    )
+                    fix_status = (
+                        self.style.MIGRATE_HEADING("Partial")
+                        if problems_remain
+                        else self.style.SUCCESS("Yes")
+                    )
                 else:
                     raise NotImplementedError
             else:
@@ -267,3 +287,30 @@ class Command(BaseCommand):
                             break
 
             self.stdout.write()
+
+
+def deduplicate_widgets_differing_only_by_card_and_sortorder(nodes):
+    class BreakNestedLoops(Exception):
+        pass
+
+    problems_remain = False
+    with transaction.atomic():
+        for node in nodes:
+            try:
+                card = node.nodegroup.cardmodel_set.all()[0]
+                cross = node.cardxnodexwidget_set.filter(card=card).first()
+                for other_cross in node.cardxnodexwidget_set.exclude(pk=cross.pk):
+                    for field, value in vars(other_cross).items():
+                        if field in ("_state", "id", "card_id", "sortorder"):
+                            continue
+                        # If the values differ, we can't deduplicate
+                        # Use str() because I18n_JSON doesn't implement __eq__()
+                        if str(getattr(cross, field)) != str(value):
+                            problems_remain = True
+                            raise BreakNestedLoops
+                    # If we get here, the only difference is sortorder
+                    other_cross.delete()
+            except BreakNestedLoops:
+                continue
+
+    return problems_remain
