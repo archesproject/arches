@@ -38,6 +38,6 @@ class ArchesPermissionFrameworkTestCase(ArchesTestCase):
         cls.group = Group.objects.get(pk=2)
         cls.legacy_load_testing_package()
         cls.framework = cls.FRAMEWORK()
-        resource = Resource.objects.get(pk=cls.resource_instance_id)
-        resource.graph_id = cls.data_type_graphid
-        resource.remove_resource_instance_permissions()
+        cls.resource = Resource.objects.get(pk=cls.resource_instance_id)
+        cls.resource.graph_id = cls.data_type_graphid
+        cls.resource.remove_resource_instance_permissions()

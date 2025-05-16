@@ -28,6 +28,7 @@ from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.querysets.graph import GraphQuerySet
 from arches.app.models.system_settings import settings
+from arches.app.models.utils import make_name_unique
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.bulk_data_deletion import BulkDataDeletion
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -38,7 +39,6 @@ from pyld.jsonld import compact, JsonLdError
 from django.db.models.base import Deferred
 from django.utils import translation
 from guardian.models import GroupObjectPermission, UserObjectPermission
-
 
 logger = logging.getLogger(__name__)
 
@@ -274,7 +274,7 @@ class Graph(models.GraphModel):
         if self.ontology_id is None:
             node.ontologyclass = None
         if node.pk is None:
-            node.pk = uuid.uuid1()
+            node.pk = uuid.uuid4()
         if isinstance(node.pk, str):
             node.pk = uuid.UUID(node.pk)
         if node.istopnode:
@@ -308,7 +308,7 @@ class Graph(models.GraphModel):
         edge.graph = self
 
         if edge.pk is None:
-            edge.pk = uuid.uuid1()
+            edge.pk = uuid.uuid4()
         if self.ontology is None:
             edge.ontologyproperty = None
         self.edges[edge.pk] = edge
@@ -367,7 +367,7 @@ class Graph(models.GraphModel):
         card.graph = self
 
         if card.pk is None:
-            card.pk = uuid.uuid1()
+            card.pk = uuid.uuid4()
 
         self.cards[card.pk] = card
         self.has_unpublished_changes = True
@@ -780,7 +780,7 @@ class Graph(models.GraphModel):
                 node.sourcebranchpublication_id = branch_publication_id
 
                 if node.alias and node.alias in aliases:
-                    node.alias = self.make_name_unique(
+                    node.alias = make_name_unique(
                         node.alias, aliases + branch_aliases, "_n"
                     )
 
@@ -796,7 +796,7 @@ class Graph(models.GraphModel):
             sibling_node_names = [
                 node.name for node in self.get_sibling_nodes(branch_copy.root)
             ]
-            branch_copy.root.name = self.make_name_unique(
+            branch_copy.root.name = make_name_unique(
                 branch_copy.root.name, sibling_node_names
             )
             branch_copy.root.description = branch_graph.description
@@ -811,22 +811,6 @@ class Graph(models.GraphModel):
             else:
                 return branch_copy
 
-    def make_name_unique(self, name, names_to_check, suffix_delimiter="_"):
-        """
-        Makes a name unique among a list of names
-
-        Arguments:
-        name -- the name to check and modfiy to make unique in the list of "names_to_check"
-        names_to_check -- a list of names that "name" should be unique among
-        """
-
-        i = 1
-        temp_node_name = name
-        while temp_node_name in names_to_check:
-            temp_node_name = "{0}{1}{2}".format(name, suffix_delimiter, i)
-            i += 1
-        return temp_node_name
-
     def append_node(self, nodeid=None):
         """
         Appends a single node onto this graph
@@ -837,13 +821,13 @@ class Graph(models.GraphModel):
 
         """
         node_names = [node.name for node in self.nodes.values()]
-        temp_node_name = self.make_name_unique(self.temp_node_name, node_names)
+        temp_node_name = make_name_unique(self.temp_node_name, node_names)
         nodeToAppendTo = self.nodes[uuid.UUID(str(nodeid))] if nodeid else self.root
         card = None
         nodegroup = None
 
         if nodeToAppendTo.nodeid == self.root.nodeid and self.isresource is True:
-            newid = uuid.uuid1()
+            newid = uuid.uuid4()
             nodegroup = models.NodeGroup.objects.create(pk=newid)
             card = models.CardModel.objects.create(
                 nodegroup=nodegroup, name=temp_node_name, graph=self
@@ -859,7 +843,7 @@ class Graph(models.GraphModel):
             )
         else:
             newNode = models.Node(
-                nodeid=uuid.uuid1(),
+                nodeid=uuid.uuid4(),
                 name=temp_node_name,
                 istopnode=False,
                 ontologyclass=None,
@@ -1003,7 +987,7 @@ class Graph(models.GraphModel):
                 node.config["advancedStyle"] = ""
                 node.config["advancedStyling"] = False
 
-        copy_of_self.pk = uuid.uuid1()
+        copy_of_self.pk = uuid.uuid4()
         node_map = {}
         card_map = {}
         for node_id in node_ids:
@@ -1014,7 +998,7 @@ class Graph(models.GraphModel):
             is_collector = node.is_collector
             if set_source:
                 node.source_identifier_id = node.pk
-            node.pk = uuid.uuid1()
+            node.pk = uuid.uuid4()
             node_map[node_id] = node.pk
 
             if is_collector:
@@ -1028,7 +1012,7 @@ class Graph(models.GraphModel):
                     nodegroup_map[old_nodegroup_id] = node.nodegroup_id
                 for card in copy_of_self.cards.values():
                     if str(card.nodegroup_id) == str(old_nodegroup_id):
-                        new_id = uuid.uuid1()
+                        new_id = uuid.uuid4()
                         if set_source:
                             card.source_identifier_id = card.pk
                         card_map[card.pk] = new_id
@@ -1043,7 +1027,7 @@ class Graph(models.GraphModel):
             if set_source:
                 widget.source_identifier_id = widget.pk
 
-            widget.pk = uuid.uuid1()
+            widget.pk = uuid.uuid4()
             widget.node_id = node_map[widget.node_id]
             widget.card_id = card_map[widget.card_id]
 
@@ -1056,7 +1040,7 @@ class Graph(models.GraphModel):
         for edge_id, edge in copy_of_self.edges.items():
             if set_source:
                 edge.source_identifier_id = edge.pk
-            edge.pk = uuid.uuid1()
+            edge.pk = uuid.uuid4()
             edge.graph = copy_of_self
             copied_domainnode = edge.domainnode
             copied_rangenode = edge.rangenode
@@ -2071,7 +2055,7 @@ class Graph(models.GraphModel):
                 aliases = [
                     n.alias for n in self.nodes.values() if node.alias != n.alias
                 ]
-                node.alias = self.make_name_unique(row[0], aliases, "_n")
+                node.alias = make_name_unique(row[0], aliases, "_n")
                 node.hascustomalias = False
         return node.alias
 
@@ -2251,7 +2235,7 @@ class Graph(models.GraphModel):
                 _("The json-ld context you supplied wasn't formatted correctly."), 1006
             )
 
-        if self.slug is not None:
+        if self.slug:
             graphs_with_matching_slug = (
                 models.GraphModel.objects.exclude(slug__isnull=True)
                 .exclude(source_identifier__isnull=False)
@@ -2270,6 +2254,11 @@ class Graph(models.GraphModel):
                         ).format(slug=self.slug),
                         1007,
                     )
+        else:
+            raise GraphValidationError(
+                _("You must supply a slug for your graph."),
+                IntegrityCheck.GRAPH_MISSING_SLUG.value,
+            )
 
     def update_published_graphs(self, user=None, notes=None):
         """

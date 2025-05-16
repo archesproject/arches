@@ -18480,7 +18480,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing",
                 "sortorder": 0
             },
-            "slug": null,
+            "slug": "historic_resource",
             "subtitle": "Describes heritage resources, which includes monuments, buildings, structures, etc.",
             "template_id": "50000000-0000-0000-0000-000000000002",
             "version": ""

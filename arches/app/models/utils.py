@@ -16,3 +16,20 @@ def add_to_update_fields(kwargs, field_name):
 
 def field_names(instance_or_class):
     return {f.name for f in instance_or_class._meta.fields}
+
+
+def make_name_unique(name, names_to_check, suffix_delimiter="_"):
+    """
+    Makes a name unique among a list of names
+
+    Arguments:
+    name -- the name to check and modify to make unique in the list of "names_to_check"
+    names_to_check -- a list of names that "name" should be unique among
+    """
+
+    i = 1
+    temp_name = name
+    while temp_name in names_to_check:
+        temp_name = "{0}{1}{2}".format(name, suffix_delimiter, i)
+        i += 1
+    return temp_name

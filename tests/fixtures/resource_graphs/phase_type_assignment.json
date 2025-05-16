@@ -545,6 +545,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E12_Production",
                 "sortorder": null
             },
+            "slug": "her_monument_phase_type",
             "subtitle": "Describes time span and type for the Heritage Resource",
             "version": ""
         }

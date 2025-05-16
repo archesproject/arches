@@ -18,7 +18,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import os
-import unittest
 import uuid
 from http import HTTPStatus
 
@@ -70,6 +69,8 @@ class ResourceAPITests(ArchesTestCase):
         ) as f:
             json = JSONDeserializer().deserialize(f)
             cls.phase_type_assignment_graph = Graph(json["graph"][0])
+            # https://github.com/archesproject/arches/issues/11955
+            cls.phase_type_assignment_graph.is_active = True
             cls.phase_type_assignment_graph.save()
             cls.phase_type_assignment_graph.publish(user=None)
 
@@ -553,8 +554,6 @@ class ResourceAPITests(ArchesTestCase):
         )
         self.assertEqual(response.status_code, 200)
 
-    # https://github.com/archesproject/arches/issues/11518
-    @unittest.skip(reason="Test was developed against 7.6.x but fails on 8.0.x")
     def test_related_resources_in_resource_report_api(self):
         self.client.login(username="admin", password="admin")
         response = self.client.get(
@@ -568,7 +567,7 @@ class ResourceAPITests(ArchesTestCase):
         for related_graph_set in resp["related_resources"]:
             if len(related_graph_set["resources"]) > 0:
                 detected_relations = len(related_graph_set["resources"])
-        self.assertTrue(detected_relations == 1)
+        self.assertEqual(detected_relations, 1)
 
 
 class ResourceInstanceLifecycleStatesTest(ArchesTestCase):

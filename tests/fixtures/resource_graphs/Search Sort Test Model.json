@@ -255,7 +255,7 @@
                 "source_identifier_id": null,
                 "sourcebranchpublication_id": null
             },
-            "slug": null,
+            "slug": "test_model",
             "source_identifier_id": null,
             "subtitle": {
                 "en": ""

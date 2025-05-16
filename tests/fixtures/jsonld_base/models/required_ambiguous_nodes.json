@@ -632,7 +632,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E3_Condition_State",
                 "sortorder": 0
             },
-            "slug": "req",
+            "slug": "required_ambiguous_nodes",
             "subtitle": {
                 "en": ""
             },

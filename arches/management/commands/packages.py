@@ -1477,7 +1477,7 @@ class Command(BaseCommand):
             create_concepts = True
 
         if len(data_source) > 0:
-            transaction_id = uuid.uuid1()
+            transaction_id = uuid.uuid4()
             for source in data_source:
                 path = utils.get_valid_path(source)
                 if path is not None:

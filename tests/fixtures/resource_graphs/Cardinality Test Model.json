@@ -559,7 +559,8 @@
                 "config": null,
                 "name": "Top Node"
             },
-            "deploymentdate": null
+            "deploymentdate": null,
+            "slug": "cardinality_test_model"
         }
     ],
     "metadata": {

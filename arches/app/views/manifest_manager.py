@@ -205,7 +205,7 @@ class ManifestManagerView(View):
         canvas_label = request.POST.get("canvas_label")
         canvas_id = request.POST.get("canvas_id")
         metadata = request.POST.get("metadata")
-        transaction_id = request.POST.get("transaction_id", uuid.uuid1())
+        transaction_id = request.POST.get("transaction_id", uuid.uuid4())
         selected_canvases = request.POST.get("selected_canvases")
         try:
             metadata = json.loads(request.POST.get("metadata"))

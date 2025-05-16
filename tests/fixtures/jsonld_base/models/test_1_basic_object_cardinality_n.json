@@ -195,7 +195,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
                 "sortorder": 0
             },
-            "slug": "taco",
+            "slug": "test_1_basic_object_cardinality_n",
             "subtitle": {
                 "en": ""
             },

@@ -3,7 +3,7 @@ requires = ["setuptools>=77", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "{{ project_name }}"
+name = "{{ project_name_kebab_case }}"
 readme = "README.md"
 authors = []
 license = "AGPL-3.0-or-later"
@@ -27,7 +27,7 @@ dependencies = [
 ]
 version = "0.0.1"
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
     "black==24.4.2",
     "coverage",

@@ -188,7 +188,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E18_Physical_Thing",
                 "sortorder": 0
             },
-            "slug": null,
+            "slug": "relational_data_model_tests",
             "subtitle": {
                 "en": ""
             },

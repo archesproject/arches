@@ -365,9 +365,9 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                 )
                 if result is not None:
                     if result["permitted"] == "unknown":
-                        return user.groups.filter(
-                            name__in=settings.RESOURCE_EDITOR_GROUPS
-                        ).exists() or self.user_can_edit_model_nodegroups(
+                        return self.user_in_group_by_name(
+                            user, settings.RESOURCE_EDITOR_GROUPS
+                        ) or self.user_can_edit_model_nodegroups(
                             user, result["resource"]
                         )
                     else:
@@ -376,7 +376,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                     return None
 
             return (
-                user.groups.filter(name__in=settings.RESOURCE_EDITOR_GROUPS).exists()
+                self.user_in_group_by_name(user, settings.RESOURCE_EDITOR_GROUPS)
                 or len(self.get_editable_resource_types(user)) > 0
             )
         return False
@@ -410,9 +410,9 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                         )
                         if len(protected_tiles) > 0:
                             return False
-                        return user.groups.filter(
-                            name__in=settings.RESOURCE_EDITOR_GROUPS
-                        ).exists() or self.user_can_delete_model_nodegroups(
+                        return self.user_in_group_by_name(
+                            user, settings.RESOURCE_EDITOR_GROUPS
+                        ) or self.user_can_delete_model_nodegroups(
                             user, result["resource"]
                         )
                     else:
@@ -503,7 +503,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         """
 
         if user.is_authenticated:
-            return user.groups.filter(name="RDM Administrator").exists()
+            return self.user_in_group_by_name(user, ["RDM Administrator"])
         return False
 
     def user_is_resource_editor(self, user: User) -> bool:
@@ -511,24 +511,27 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         Single test for whether a user is in the Resource Editor group
         """
 
-        return user.groups.filter(name="Resource Editor").exists()
+        return self.user_in_group_by_name(user, ["Resource Editor"])
 
     def user_is_resource_reviewer(self, user: User) -> bool:
         """
         Single test for whether a user is in the Resource Reviewer group
         """
 
-        return user.groups.filter(name="Resource Reviewer").exists()
+        return self.user_in_group_by_name(user, ["Resource Reviewer"])
 
     def user_is_resource_exporter(self, user: User) -> bool:
         """
         Single test for whether a user is in the Resource Exporter group
         """
 
-        return user.groups.filter(name="Resource Exporter").exists()
+        return self.user_in_group_by_name(user, ["Resource Exporter"])
 
     def user_in_group_by_name(self, user: User, names: Iterable[str]) -> bool:
-        return bool(user.groups.filter(name__in=names))
+        for group in user.groups.all():
+            if group.name in names:
+                return True
+        return False
 
     def group_required(self, user: User, *group_names: list[str]) -> bool:
         # To fully reimplement this without Django groups, the following group names must (currently) be handled:
@@ -540,7 +543,7 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         #  - System Administrator
 
         if user.is_authenticated:
-            if user.is_superuser or bool(user.groups.filter(name__in=group_names)):
+            if user.is_superuser or self.user_in_group_by_name(user, group_names):
                 return True
         return False
 
@@ -555,9 +558,8 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         """
         default_permissions_for_graph = []
         if isinstance(model, ResourceInstance):
-            default_permissions_for_graph = self.get_all_default_permissions(
-                model
-            )  # default permissions for nodegroups not currently supported
+            # default permissions for nodegroups not currently supported
+            default_permissions_for_graph = self.get_all_default_permissions(model)
 
         if not len(default_permissions_for_graph):
             return []

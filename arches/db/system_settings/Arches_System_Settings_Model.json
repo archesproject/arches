@@ -2466,7 +2466,7 @@
                 "source_identifier_id": null,
                 "sourcebranchpublication_id": null
             },
-            "slug": null,
+            "slug": "arches_system_settings",
             "source_identifier_id": null,
             "subtitle": {
                 "en": "System configuration"

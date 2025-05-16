@@ -2695,6 +2695,7 @@
                 "user_id": null
             },
             "name": "Heritage Resource Model",
+            "slug": "heritage_resource_model",
             "cards_x_nodes_x_widgets": [],
             "cards": [
                 {

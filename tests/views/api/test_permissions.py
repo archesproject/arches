@@ -28,12 +28,13 @@ class InstancePermissionsAPITest(ArchesTestCase):
         )
         cls.graph.save(validate=False)
 
+        cls.resource = ResourceInstance.objects.create(graph=cls.graph)
+
     def test_get_with_anonymous_user(self):
-        resource = ResourceInstance.objects.create(graph=self.graph)
         with CaptureQueriesContext(connection) as queries:
             response = self.client.get(
                 reverse("api_instance_permissions"),
-                QUERY_STRING=f"resourceinstanceid={resource.pk}",
+                QUERY_STRING=f"resourceinstanceid={self.resource.pk}",
             )
         resource_selects = [
             q for q in queries if q["sql"].startswith('SELECT "resource_instances"')
@@ -44,7 +45,6 @@ class InstancePermissionsAPITest(ArchesTestCase):
         )
 
     def test_get_with_resource_editor_role(self):
-        resource = ResourceInstance.objects.create(graph=self.graph)
         editor_group = Group.objects.get(name="Resource Editor")
         test_user = User.objects.create()
         test_user.groups.add(editor_group)
@@ -52,7 +52,7 @@ class InstancePermissionsAPITest(ArchesTestCase):
 
         response = self.client.get(
             reverse("api_instance_permissions"),
-            QUERY_STRING=f"resourceinstanceid={resource.pk}",
+            QUERY_STRING=f"resourceinstanceid={self.resource.pk}",
         )
 
         self.assertEqual(

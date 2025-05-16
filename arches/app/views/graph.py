@@ -18,6 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import zipfile
 import json
+from slugify import slugify
 import uuid
 import logging
 from dateutil import tz
@@ -546,7 +547,9 @@ class GraphDataView(View):
 
                 elif self.action == "export_branch":
                     clone_data = graph.copy(root=data)
-                    clone_data["copy"].slug = None
+                    clone_data["copy"].slug = Graph.objects.generate_slug(
+                        str(clone_data["copy"].slug) or "exported_branch", False
+                    )
                     clone_data["copy"].publication = None
 
                     clone_data["copy"].save()
@@ -562,7 +565,10 @@ class GraphDataView(View):
 
                     clone_data = graph.copy()
                     ret = clone_data["copy"]
-                    ret.slug = None
+                    ret.slug = Graph.objects.generate_slug(
+                        str(clone_data["copy"].slug) or "cloned_model",
+                        clone_data["copy"].isresource,
+                    )
                     ret.publication = None
 
                     ret.save()
