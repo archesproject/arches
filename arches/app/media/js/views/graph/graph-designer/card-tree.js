@@ -168,7 +168,7 @@ define([
                 return;
             },
             beforeMove: function(e) {
-                e.cancelDrop = (e.sourceParent!==e.targetParent);
+                e.cancelDrop = (e.sourceParent !== e.targetParent);
             },
             updateCard: function(parents, card, data) {
                 var updatedCards = [];
@@ -343,7 +343,6 @@ define([
             },
             reorderCards: function(e) {
                 loading(true);
-                const originalCardOrder = [...self.topCards()];
                 var cards = _.map(self.topCards(), function(card, i) {
                     card.model.get('sortorder')(i);
                     return {
@@ -371,7 +370,11 @@ define([
                                 function(){}
                             )
                         );
-                        self.topCards(originalCardOrder);
+                        const undoSort = (array, sourceIndex, targetIndex) => {
+                            const [movedItem] = array.splice(targetIndex, 1);
+                            array.splice(sourceIndex, 0, movedItem);
+                        };
+                        undoSort(self.topCards, e.sourceIndex, e.targetIndex);
                     }
                 });
             },

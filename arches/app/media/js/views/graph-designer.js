@@ -440,7 +440,8 @@ define([
                 permissionTree: viewModel.permissionTree,
                 appliedFunctions: viewModel.appliedFunctions,
                 primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
-                restrictedNodegroups: data.restrictedNodegroups
+                restrictedNodegroups: data.restrictedNodegroups,
+                pageVm: viewModel,
             });
 
             viewModel.graphTree.branchListVisible.subscribe(function(visible) {

@@ -129,7 +129,6 @@ define([
         };
 
         this.reorderWidgets = function(e) {
-            const orignalWidgetOrder = [...self.card.widgets()];
             e.item.card.save(function(response, status, card) {
                 if(status === 'error') {
                     params.pageVm.alert(
@@ -144,7 +143,11 @@ define([
                     // we can't use e.cancelDrop because of the async nature of the save
                     // so we need to manually reset the order of the widgets
                     // and set the selected widget to the original position
-                    self.card.widgets(orignalWidgetOrder);
+                    const undoSort = (array, sourceIndex, targetIndex) => {
+                        const [movedItem] = array.splice(targetIndex, 1);
+                        array.splice(sourceIndex, 0, movedItem);
+                    };
+                    undoSort(self.card.widgets, e.sourceIndex, e.targetIndex);
                 }
             });
         };
