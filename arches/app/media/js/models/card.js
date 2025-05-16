@@ -9,7 +9,7 @@ import CardWidgetModel from 'models/card-widget';
 import CardConstraintsViewModel from 'viewmodels/card-constraints';
 import cardComponentLookup from 'card-components';
 
-export default AbstractModel.extend({
+const CardModel = AbstractModel.extend({
     /**
     * A backbone model to manage card data
     * @augments AbstractModel
@@ -415,3 +415,5 @@ export default AbstractModel.extend({
     }
 
 });
+
+export default CardModel;

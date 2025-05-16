@@ -1,6 +1,5 @@
 /* eslint-disable */
 
-const fetch = require('cross-fetch');
 const fs = require('fs');
 const Path = require('path');
 const webpack = require('webpack');
@@ -54,6 +53,13 @@ module.exports = () => {
             };
         }, {});
 
+        // order is important! Arches core files are overwritten by arches-application files, arches-application files are overwritten by project files
+        const entryPoints = {
+            ...archesCoreEntryPointConfiguration,
+            ...archesApplicationsEntrypointConfiguration,
+            ...projectEntryPointConfiguration,
+        };
+
         // END create entry point configurations
         // BEGIN create JavaScript filepath lookups
 
@@ -79,15 +85,12 @@ module.exports = () => {
 
         // END create JavaScript filepath lookups
         // BEGIN create node modules aliases
-        const parsedPackageJSONFilepaths = {};
-
         let archesCorePackageJSONFilepath = Path.resolve(__dirname, ROOT_DIR, '..', 'package.json');
         if (!fs.existsSync(archesCorePackageJSONFilepath)) {
             archesCorePackageJSONFilepath = Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, 'arches', 'package.json');
         }
 
         const archesCorePackageJSON = require(archesCorePackageJSONFilepath);
-        parsedPackageJSONFilepaths[Path.join(archesCorePackageJSON.name, 'package.json').replace(/\\/g, '/')] = archesCorePackageJSONFilepath;
 
         const parsedArchesCoreNodeModulesAliases = Object.entries(archesCorePackageJSON['nodeModulesPaths']).reduce((acc, [alias, subPath]) => {
             if (subPath.slice(0, 7) === 'plugins') {  // handles for node_modules -esque plugins in arches core
@@ -105,7 +108,6 @@ module.exports = () => {
         const projectJSONFilepath = Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, 'package.json');
         if (fs.existsSync(projectJSONFilepath)) {  // handles running Arches without a project
             projectPackageJSON = require(projectJSONFilepath);
-            parsedPackageJSONFilepaths[Path.join(projectPackageJSON.name, 'package.json').replace(/\\/g, '/')] = projectJSONFilepath;
 
             parsedProjectNodeModulesAliases = Object.entries(projectPackageJSON['nodeModulesPaths']).reduce((acc, [alias, subPath]) => {
                 if (parsedArchesCoreNodeModulesAliases[alias]) {
@@ -135,8 +137,6 @@ module.exports = () => {
                 }
 
                 const archesApplicationPackageJSON = require(archesApplicationJSONFilepath);
-                parsedPackageJSONFilepaths[Path.join(archesApplicationPackageJSON.name, 'package.json').replace(/\\/g, '/')] = archesApplicationJSONFilepath;
-
                 for (const [alias, subPath] of Object.entries(archesApplicationPackageJSON['nodeModulesPaths'])) {
                     if (
                         parsedArchesApplicationsNodeModulesAliases[alias]
@@ -261,31 +261,39 @@ module.exports = () => {
 
         resolve({
             entry: {
-                ...archesCoreEntryPointConfiguration,
-                ...archesApplicationsEntrypointConfiguration,
-                ...projectEntryPointConfiguration,
+                ...entryPoints,
                 ...CSSFilepathLookup,
             },
             output: {
-                assetModuleFilename: 'img/[name].[contenthash][ext]',
-                filename: '[name].[contenthash].js',
+                assetModuleFilename: '[name].[contenthash][ext]',
+                chunkFilename: 'chunks/[name].[contenthash].js',
                 clean: true,
+                filename: '[name].[contenthash].js',
                 path: Path.resolve(__dirname, APP_ROOT, 'media', 'build'),
                 publicPath: STATIC_URL,
             },
             optimization: {
+                moduleIds: 'deterministic',
+                chunkIds: 'deterministic',
+                runtimeChunk: { name: 'chunks/runtime' },
                 splitChunks: {
                     chunks: 'all',
+                    maxInitialRequests: 25,
+                    maxAsyncRequests: 25,
                     cacheGroups: {
                         vendors: {
                             test: /[\\/]node_modules[\\/]/,
+                            enforce: true, 
                             priority: -10,
                             reuseExistingChunk: true,
+                            filename: 'chunks/vendors.[contenthash].js'
                         },
                         commons: {
                             minChunks: 2,
+                            enforce: true, 
                             priority: -20,
                             reuseExistingChunk: true,
+                            filename: 'chunks/commons.[contenthash].js'
                         },
                     },
                 },
@@ -314,6 +322,13 @@ module.exports = () => {
                     jQuery: Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, 'jquery', 'dist', 'jquery.min'),
                     jquery: Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH, 'jquery', 'dist', 'jquery.min')
                 }),
+                ...Object.keys(entryPoints).map(name => {
+                    return new webpack.EntryPlugin(
+                        __dirname,
+                        Path.resolve(__dirname, ROOT_DIR, 'app', 'media', 'js', 'template-loader'),
+                        { name: name },
+                    )
+                }),
                 new MiniCssExtractPlugin({
                     filename: '[name].[contenthash].css',
                 }),
@@ -323,11 +338,6 @@ module.exports = () => {
                 }),
                 new VueLoaderPlugin(),
             ],
-            resolveLoader: {
-                alias: {
-                    text: 'raw-loader'
-                }
-            },
             resolve: {
                 modules: [Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH)],
                 alias: {
@@ -335,7 +345,6 @@ module.exports = () => {
                     ...templateFilepathLookup,
                     ...imageFilepathLookup,
                     ...nodeModulesAliases,
-                    ...parsedPackageJSONFilepaths,
                     '@': [Path.resolve(__dirname, APP_ROOT, 'src'), ...archesApplicationsVuePaths, Path.resolve(__dirname, ROOT_DIR, 'app', 'src')],
                     'node_modules': Path.resolve(__dirname, PROJECT_RELATIVE_NODE_MODULES_PATH),
                     'arches/arches/app': Path.resolve(__dirname, ROOT_DIR, 'app'),  // ensure project-level imports of arches components point to local file
@@ -425,112 +434,31 @@ module.exports = () => {
                         ],
                     },
                     {
-                        test: /\.html?$/i,
-                        exclude: /node_modules/,
-                        loader: Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'html-loader'),
-                        options: {
-                            esModule: false,
-                            minimize: {
-                                removeComments: false,
+                        test: /\.(woff2?|eot|ttf|otf)$/i,
+                        type: 'asset/resource',
+                        generator: {
+                            filename: 'fonts/[name].[contenthash][ext]',
+                        },
+                    },
+                    {
+                        test: /\.htm$/i,
+                        type: 'asset/resource',
+                        generator: {
+                            filename: (pathData) => {
+                                return pathData.module.rawRequest;
                             },
-                            preprocessor: async (content, loaderContext) => {
-                                const resourcePath = loaderContext['resourcePath'];
-
-                                let templatePath;
-
-                                if (resourcePath.includes(APP_ROOT)) {  // project-level component
-                                    templatePath = resourcePath.split(APP_ROOT)[1];
-                                }
-
-                                for (const archesApplicationPath of Object.values(ARCHES_APPLICATIONS_PATHS)) {  // arches application component
-                                    if (!templatePath && resourcePath.includes(archesApplicationPath)) {
-                                        templatePath = resourcePath.split(archesApplicationPath)[1];
-                                    }
-                                }
-
-                                if (!templatePath) {  // arches core component
-                                    templatePath = resourcePath.split(Path.join(ROOT_DIR, 'app'))[1];
-                                }
-
-                                let isTestEnvironment = false;
-                                for (let arg of process.argv) {
-                                    const keyValuePair = arg.split('=');
-                                    const key = keyValuePair[0].toLowerCase();
-
-                                    if (key === 'test') {
-                                        isTestEnvironment = true;
-                                    }
-                                }
-
-                                let resp;
-
-                                console.log(`Loading "${templatePath}" from Django server...`)
-
-                                const renderTemplate = async (failureCount = 0) => {
-                                    /*
-                                        Sometimes Django can choke on the number of requests, this function will 
-                                        continue attempting to render the template until successful or 5 failures.
-                                    */
-                                    if (failureCount < 5) {
-                                        try {
-                                            let serverAddress = PUBLIC_SERVER_ADDRESS;
-                                            if (serverAddress.charAt(serverAddress.length - 1) === '/') {
-                                                serverAddress = serverAddress.slice(0, -1)
-                                            }
-
-                                            resp = await fetch(serverAddress + templatePath);
-
-                                            if (resp.status === 500) {
-                                                throw new Error();
-                                            }
-                                        }
-                                        catch (e) {
-                                            failureCount += 1;
-                                            console.warn(
-                                                '\x1b[33m%s\x1b[0m',  // yellow
-                                                `"${templatePath}" has failed to load. Retrying (${failureCount} / 5)...`
-                                            );
-                                            return await renderTemplate(failureCount = failureCount);
-                                        }
-                                    }
-                                    else {
-                                        if (!isTestEnvironment) {
-                                            loaderContext.emitError(Error(`Unable to fetch ${templatePath} from the Django server.`))
-                                        }
-                                        else {
-                                            console.warn(
-                                                '\x1b[31m%s\x1b[0m',  // red
-                                                `"${templatePath}" has failed to load! Test environment detected, falling back to un-rendered file.`
-                                            );
-                                        }
-
-                                        resp = {
-                                            text: () => (
-                                                new Promise((resolve, _reject) => {
-                                                    /*
-                                                        if run in a test environment, failures will return a empty string which will
-                                                        still allow the bundle to build.
-                                                    */
-
-                                                    resolve(isTestEnvironment ? '' : content);
-                                                })
-                                            )
-                                        };
-                                    }
-                                };
-
-                                await renderTemplate();
-
-                                const responseText = await resp.text();
-                                return responseText;
-                            }
-                        }
+                            publicPath: '',  // this ensures that Knockout can render the template on page load
+                            emit: false,
+                        },
                     },
                     {
                         test: /\.(txt|DS_Store)$/i,
-                        exclude: /node_modules/,
-                        use: Path.join(PROJECT_RELATIVE_NODE_MODULES_PATH, 'raw-loader'),
+                        type: 'asset/resource',
+                        generator: {
+                            emit: false,
+                        },
                     },
+
                     {
                         test: /\.(png|jpe?g|gif|svg)$/,
                         type: 'asset/resource',
