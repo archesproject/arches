@@ -1601,7 +1601,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E1_CRM_Entity",
                 "sortorder": 0
             },
-            "slug": null,
+            "slug": "data_type_testing_model",
             "subtitle": "Testing model created for 4.3 (and in 4.3 pre-release) for testing.  Contains all datatypes outlined in the testing script.",
             "template_id": "50000000-0000-0000-0000-000000000001",
             "version": ""

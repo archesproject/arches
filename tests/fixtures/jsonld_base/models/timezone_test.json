@@ -466,7 +466,7 @@
                 "sortorder": 0,
                 "sourcebranchpublication_id": null
             },
-            "slug": null,
+            "slug": "timezone_test",
             "subtitle": {
                 "en": ""
             },

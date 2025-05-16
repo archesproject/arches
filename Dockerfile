@@ -105,7 +105,7 @@ COPY . ${ARCHES_ROOT}
 WORKDIR ${ARCHES_ROOT}
 
 RUN . ../ENV/bin/activate \
-    && pip install -e '.[dev]' --no-binary :all:
+    && pip install -e . --group dev --no-binary :all:
 
 # Set default workdir
 WORKDIR ${ARCHES_ROOT}

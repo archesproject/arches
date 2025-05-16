@@ -52,6 +52,7 @@ class GraphTests(ArchesTestCase):
             "iconclass": "fa fa-circle",
             "isresource": False,
             "name": "Node",
+            "slug": "node",
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
             "subtitle": "Represents a single node in a graph.",
             "version": "v1",
@@ -89,6 +90,7 @@ class GraphTests(ArchesTestCase):
             "iconclass": "fa fa-angle-double-down",
             "isresource": False,
             "name": "Node/Node Type",
+            "slug": "node_node_type",
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
             "subtitle": "Represents a node and node type pairing",
             "version": "v1",
@@ -230,6 +232,7 @@ class GraphTests(ArchesTestCase):
 
         graph_obj = {
             "name": "TEST GRAPH",
+            "slug": "test_graph",
             "subtitle": "ARCHES TEST GRAPH",
             "author": "Arches",
             "description": "ARCHES TEST GRAPH",
@@ -1214,7 +1217,7 @@ class GraphTests(ArchesTestCase):
 
         graph = self.test_graph
         new_node = graph.add_node(
-            {"nodeid": uuid.uuid1(), "datatype": "semantic"}
+            {"nodeid": uuid.uuid4(), "datatype": "semantic"}
         )  # A blank node with no ontology class is specified
         graph.add_edge(
             {
@@ -1238,7 +1241,7 @@ class GraphTests(ArchesTestCase):
         graph = self.test_graph
         new_node = graph.add_node(
             {
-                "nodeid": uuid.uuid1(),
+                "nodeid": uuid.uuid4(),
                 "datatype": "semantic",
                 "ontologyclass": "InvalidOntologyClass",
             }
@@ -1516,6 +1519,7 @@ class DraftGraphTests(ArchesTestCase):
             "iconclass": "fa fa-circle",
             "isresource": False,
             "name": "Node",
+            "slug": "node",
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
             "subtitle": "Represents a single node in a graph.",
             "version": "v1",
@@ -1553,6 +1557,7 @@ class DraftGraphTests(ArchesTestCase):
             "iconclass": "fa fa-angle-double-down",
             "isresource": False,
             "name": "Node/Node Type",
+            "slug": "node_node_type",
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
             "subtitle": "Represents a node and node type pairing",
             "version": "v1",
@@ -1952,6 +1957,9 @@ class DraftGraphTests(ArchesTestCase):
         updated_source_graph = source_graph.update_from_draft_graph(
             draft_graph=draft_graph
         )
+        # update_from_draft_graph() leaves the prior draft graph in an unusable
+        # state. So we fetch it again before working with it.
+        draft_graph = Graph.objects.get(source_identifier=source_graph)
 
         for node in list(draft_graph.nodes.values()):
             if node.name == "Node Type":

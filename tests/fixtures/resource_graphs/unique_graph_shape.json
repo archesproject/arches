@@ -237,6 +237,7 @@
                 "ontologyclass": "http://www.cidoc-crm.org/cidoc-crm/E82_Actor_Appellation",
                 "sortorder": 0
             },
+            "slug": "api_test_graph_unique",
             "subtitle": "",
             "version": ""
         }

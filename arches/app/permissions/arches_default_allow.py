@@ -1,5 +1,6 @@
 import logging
 import uuid
+from typing import Iterable
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -111,7 +112,12 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         # We do not do set filtering - None is allow-all for sets.
         return None
 
-    def get_restricted_users(self, resource: ResourceInstance) -> dict[str, set[int]]:
+    def get_restricted_users(
+        self,
+        resource: ResourceInstance,
+        *,
+        all_users: Iterable[User] = User.objects.none(),
+    ) -> dict[str, set[int]]:
         """
         Takes a resource instance and identifies which users are explicitly restricted from
         reading, editing, deleting, or accessing it.
@@ -131,7 +137,7 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
             "cannot_write": set(),
             "cannot_delete": set(),
         }
-        for user in User.objects.all():
+        for user in all_users or User.objects.prefetch_related("groups"):
             default_permissions = self.get_default_permissions(
                 user, resource, all_permissions=True
             )
@@ -270,7 +276,7 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
             result["resource"] = resource
 
             if str(resource.pk) == settings.SYSTEM_SETTINGS_RESOURCE_ID:
-                if not user.groups.filter(name="System Administrator").exists():
+                if not self.user_in_group_by_name(user, ["System Administrator"]):
                     result["permitted"] = False
                     return result
 
@@ -327,8 +333,10 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         mappings["users_with_no_access"] = {"type": "integer"}
         return mappings
 
-    def get_index_values(self, resource: Resource):
-        restrictions = self.get_restricted_users(resource)
+    def get_index_values(
+        self, resource: Resource, *, all_users: Iterable[User] = User.objects.none()
+    ):
+        restrictions = self.get_restricted_users(resource, all_users=all_users)
         permissions = {}
         permissions["users_without_read_perm"] = list(restrictions["cannot_read"])
         permissions["users_without_edit_perm"] = list(restrictions["cannot_write"])

@@ -191,8 +191,8 @@ class Reader(object):
                     from_resource_graph_id=relation["from_resource_graph"],
                     to_resource_graph_id=relation["to_resource_graph"],
                     relationshiptype=str(relation["relationshiptype"]),
-                    nodeid=relation["nodeid"],
-                    tileid=relation["tileid"],
+                    node_id=relation["nodeid"],
+                    tile_id=relation["tileid"],
                     notes=relation["notes"],
                 )
                 relation.save()

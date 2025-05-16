@@ -279,7 +279,7 @@
                 "sortorder": 0,
                 "sourcebranchpublication_id": null
             },
-            "slug": null,
+            "slug": "single_csv_bulk_manager_test_model",
             "subtitle": {
                 "en": ""
             },

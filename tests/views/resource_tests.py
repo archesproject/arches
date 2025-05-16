@@ -18,18 +18,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import uuid
 
-from unittest.mock import MagicMock, patch
 from arches.app.views.resource import ResourcePermissionDataView
 from tests.base_test import ArchesTestCase
+from django.db import connection
 from django.urls import reverse
-from arches.app.models.models import EditLog, ResourceInstance
+from arches.app.models.models import EditLog
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from tests.utils.search_test_utils import sync_es
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.betterJSONSerializer import JSONSerializer
+from arches.test.utils import sync_overridden_test_settings_to_arches
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
+from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import (
     assign_perm,
     get_perms,
@@ -62,6 +64,7 @@ class ResourceViewTests(ArchesTestCase):
         for edit in edit_records:
             edit.userid = user.id
             edit.save()
+        cls.resource = Resource.objects.get(pk=cls.resource_instance_id)
 
     def test_resource_instance_permission_assignment(self):
         """
@@ -89,10 +92,7 @@ class ResourceViewTests(ArchesTestCase):
         content_type = "application/x-www-form-urlencoded"
         self.client.post(url, post_data, content_type)
         group = Group.objects.get(pk=payload["selectedIdentities"][0]["id"])
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
-        assigned_perms = get_perms(group, resource)
+        assigned_perms = get_perms(group, self.resource)
         self.assertTrue(
             "change_resourceinstance" in assigned_perms
             and "delete_resourceinstance" in assigned_perms
@@ -123,12 +123,9 @@ class ResourceViewTests(ArchesTestCase):
         post_data = JSONSerializer().serialize(payload)
         content_type = "application/x-www-form-urlencoded"
         group = Group.objects.get(pk=payload["selectedIdentities"][0]["id"])
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
-        assign_perm("delete_resourceinstance", group, resource)
+        assign_perm("delete_resourceinstance", group, self.resource)
         self.client.delete(url, post_data, content_type)
-        assigned_perms = get_perms(group, resource)
+        assigned_perms = get_perms(group, self.resource)
         self.assertTrue(
             "change_resourceinstance" not in assigned_perms
             and "delete_resourceinstance" not in assigned_perms
@@ -144,10 +141,7 @@ class ResourceViewTests(ArchesTestCase):
             "resource_report", kwargs={"resourceid": self.resource_instance_id}
         )
         group = Group.objects.get(pk=2)
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
-        assign_perm("change_resourceinstance", group, resource)
+        assign_perm("change_resourceinstance", group, self.resource)
         with self.assertLogs("django.request", level="WARNING"):
             response = self.client.get(url)
         self.assertTrue(response.status_code == 403)
@@ -162,10 +156,7 @@ class ResourceViewTests(ArchesTestCase):
             "resource_editor", kwargs={"resourceid": self.resource_instance_id}
         )
         group = Group.objects.get(pk=2)
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
-        assign_perm("view_resourceinstance", group, resource)
+        assign_perm("view_resourceinstance", group, self.resource)
         response = self.client.get(url)
 
         self.assertRedirects(
@@ -173,36 +164,39 @@ class ResourceViewTests(ArchesTestCase):
         )
 
     def test_get_instance_permissions(self):
-        default_permissions = MagicMock()
         group = Group.objects.get(name="Resource Exporter")
-        default_permissions.PERMISSION_DEFAULTS = {
-            "330802c5-95bd-11e8-b7ac-acde48001122": [
-                {
-                    "id": group.id,
-                    "type": "group",
-                    "permissions": ["view_resourceinstance"],
-                },
-            ]
-        }
+        rev = ResourcePermissionDataView()
+        assign_perm("view_resourceinstance", group, self.resource)
 
-        with patch(
-            "arches.app.permissions.arches_permission_base.settings",
-            default_permissions,
+        with (
+            self.settings(
+                PERMISSION_DEFAULTS={
+                    "330802c5-95bd-11e8-b7ac-acde48001122": [
+                        {
+                            "id": group.id,
+                            "type": "group",
+                            "permissions": ["view_resourceinstance"],
+                        },
+                    ]
+                }
+            ),
+            sync_overridden_test_settings_to_arches(),
+            CaptureQueriesContext(connection) as queries,
         ):
+            permissions = rev.get_instance_permissions(self.resource)
 
-            resource = ResourceInstance.objects.get(
-                resourceinstanceid=self.resource_instance_id
-            )
+        group_dict = next(
+            item for item in permissions["identities"] if item["id"] == group.id
+        )
 
-            rev = ResourcePermissionDataView()
+        self.assertGreater(len(group_dict["system_permissions"]), 0)
 
-            assign_perm("view_resourceinstance", group, resource)
-            permissions = rev.get_instance_permissions(resource)
-            group_dict = next(
-                item for item in permissions["identities"] if item["id"] == group.id
-            )
-
-            self.assertGreater(len(group_dict["system_permissions"]), 0)
+        # Groups should not be individually queried. Instead,
+        # membership should be tested against all prefetched groups.
+        resource_editor_query = [
+            query for query in queries if "Resource Editor" in query["sql"]
+        ]
+        self.assertEqual(resource_editor_query, [])
 
     def test_user_cannot_delete_without_permission(self):
         """
@@ -214,10 +208,7 @@ class ResourceViewTests(ArchesTestCase):
             "resource_editor", kwargs={"resourceid": self.resource_instance_id}
         )
         group = Group.objects.get(pk=2)
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
-        assign_perm("change_resourceinstance", group, resource)
+        assign_perm("change_resourceinstance", group, self.resource)
         with self.assertLogs("django.request", level="ERROR"):
             response = self.client.delete(url)
         self.assertTrue(response.status_code == 500)
@@ -230,19 +221,16 @@ class ResourceViewTests(ArchesTestCase):
         self.client.login(username="ben", password="Test12345!")
         group = Group.objects.get(pk=2)
         user = User.objects.get(username="ben")
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
         view_url = reverse(
             "resource_report", kwargs={"resourceid": self.resource_instance_id}
         )
         edit_url = reverse(
             "resource_editor", kwargs={"resourceid": self.resource_instance_id}
         )
-        assign_perm("view_resourceinstance", group, resource)
-        assign_perm("change_resourceinstance", group, resource)
-        assign_perm("delete_resourceinstance", group, resource)
-        assign_perm("no_access_to_resourceinstance", user, resource)
+        assign_perm("view_resourceinstance", group, self.resource)
+        assign_perm("change_resourceinstance", group, self.resource)
+        assign_perm("delete_resourceinstance", group, self.resource)
+        assign_perm("no_access_to_resourceinstance", user, self.resource)
         with self.assertLogs("django.request", level="WARNING"):
             view = self.client.get(view_url)
 
@@ -266,10 +254,7 @@ class ResourceViewTests(ArchesTestCase):
             "resource_report", kwargs={"resourceid": self.resource_instance_id}
         )
         group = Group.objects.get(pk=2)
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
-        assign_perm("view_resourceinstance", group, resource)
+        assign_perm("view_resourceinstance", group, self.resource)
         response = self.client.get(url)
         self.assertTrue(response.status_code == 200)
 
@@ -283,10 +268,7 @@ class ResourceViewTests(ArchesTestCase):
             "resource_editor", kwargs={"resourceid": self.resource_instance_id}
         )
         group = Group.objects.get(pk=2)
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
-        assign_perm("change_resourceinstance", group, resource)
+        assign_perm("change_resourceinstance", group, self.resource)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -300,10 +282,7 @@ class ResourceViewTests(ArchesTestCase):
             "resource_editor", kwargs={"resourceid": self.resource_instance_id}
         )
         group = Group.objects.get(pk=2)
-        resource = ResourceInstance.objects.get(
-            resourceinstanceid=self.resource_instance_id
-        )
-        assign_perm("delete_resourceinstance", group, resource)
+        assign_perm("delete_resourceinstance", group, self.resource)
         response = self.client.delete(url)
         self.assertTrue(response.status_code == 200)
 

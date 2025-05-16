@@ -72,6 +72,7 @@ class GraphManagerViewTests(ArchesTestCase):
             "iconclass": "fa fa-angle-double-down",
             "isresource": False,
             "name": "Node/Node Type",
+            "slug": "node_type",
             "ontology_id": "e6e8db47-2ccf-11e6-927e-b8f6b115d7dd",
             "subtitle": "Represents a node and node type pairing",
             "version": "v1",
@@ -157,6 +158,7 @@ class GraphManagerViewTests(ArchesTestCase):
     def create_test_graph(cls):
         test_graph = Graph.objects.create_graph()
         test_graph.name = "TEST GRAPH"
+        test_graph.slug = "test_graph"
         test_graph.subtitle = "ARCHES TEST GRAPH"
         test_graph.author = "Arches"
         test_graph.description = "ARCHES TEST GRAPH"

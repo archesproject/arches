@@ -13,6 +13,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+from typing import Iterable
+
 from django.contrib.auth.models import User
 
 from arches.app.models.models import ResourceInstance
@@ -34,7 +36,12 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
         # We do not do set filtering - None is allow-all for sets.
         return None if user and user.username != "anonymous" else set()
 
-    def get_restricted_users(self, resource: ResourceInstance) -> dict[str, list[int]]:
+    def get_restricted_users(
+        self,
+        resource: ResourceInstance,
+        *,
+        all_users: Iterable[User] = User.objects.none(),
+    ) -> dict[str, list[int]]:
         pass
 
     def get_filtered_instances(
@@ -121,7 +128,7 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
             raise ValueError("resourceid and resource are mutually incompatible")
         if str(resource.pk) == settings.SYSTEM_SETTINGS_RESOURCE_ID:
             result["resource"] = resource
-            if not user.groups.filter(name="System Administrator").exists():
+            if not self.user_in_group_by_name(user, ["System Administrator"]):
                 result["permitted"] = False
             else:
                 result["permitted"] = True
@@ -157,7 +164,9 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
         else:  # for default deny, explicit permissions are required.  Model level permissions are bypassed.
             return False
 
-    def get_index_values(self, resource: Resource):
+    def get_index_values(
+        self, resource: Resource, *, all_users: Iterable[User] = User.objects.none()
+    ):
         permissions = {}
         group_read_allowances = [
             group.id

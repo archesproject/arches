@@ -113,6 +113,7 @@
                 "ontologyclass": null,
                 "sortorder": 0
             },
+            "slug": "graph_with_filelist",
             "subtitle": "",
             "template_id": "50000000-0000-0000-0000-000000000001",
             "version": ""

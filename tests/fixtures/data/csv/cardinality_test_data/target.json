@@ -325,6 +325,7 @@
             "user_id": null
         },
       "name": "Target",
+      "slug": "target",
       "cards_x_nodes_x_widgets": [],
       "cards": [
         {
