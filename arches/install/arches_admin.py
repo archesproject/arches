@@ -124,7 +124,7 @@ class ArchesProjectCommand(TemplateCommand):
         options["project_name_title_case"] = project_name.title().replace("_", "")
         options["project_name_kebab_case"] = project_name.replace("_", "-")
 
-        if options["project_name_kebab_case"] != project_name:
+        if options["project_name_kebab_case"] != project_name and not target:
             self.stdout.write(
                 self.style.NOTICE(
                     f"Renamed the directory from {project_name} to {options['project_name_kebab_case']}. "
