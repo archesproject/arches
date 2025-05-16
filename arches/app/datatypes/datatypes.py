@@ -2042,10 +2042,10 @@ class ResourceInstanceDataType(BaseDataType):
     ):
         errors = []
         if value is not None:
-            resourceXresourceIds = self.get_nodevalues(value)
-            for resourceXresourceId in resourceXresourceIds:
+            relations = self.get_nodevalues(value)
+            for relation in relations:
                 try:
-                    resourceid = resourceXresourceId["resourceId"]
+                    resourceid = relation["resourceId"]
                     uuid.UUID(resourceid)
                     if strict:
                         try:
