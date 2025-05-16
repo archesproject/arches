@@ -185,7 +185,7 @@ def command_startproject(args):
         # The user is supposed to create the --directory themselves. But we
         # should do it for them if the command is the one that invented the
         # --directory argument.
-        # TODO(v8.1): remove (Django 6 creates target dir automatically)
+        # RemovedInArches81Warning (Django 6 creates target dir automatically)
         make_directory = True
         options["directory"] = name.replace("_", "-")
     directory = options["directory"]
