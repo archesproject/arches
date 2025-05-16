@@ -567,7 +567,9 @@ class GraphDataView(View):
                                             }
                                             raise ValidationError(ret)
                                     except ValidationError as e:
-                                        return JSONErrorResponse(content=e.args[0], status=403)
+                                        return JSONErrorResponse(
+                                            content=e.args[0], status=403
+                                        )
                                     sortorder = sortorder + 1
                             ret = data
 
