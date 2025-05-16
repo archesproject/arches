@@ -101,7 +101,8 @@
         <div data-bind="sortable: {
                 data: card.widgets,
                 as: 'widget',
-                beforeMove: self.beforeMove
+                beforeMove: self.beforeMove,
+                afterMove: self.reorderWidgets
             }">
             <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
                     'jstree-last': $index() === (card.widgets().length - 1) && $parent.card.cards().length === 0, 'hide-background': !self.showGrid()

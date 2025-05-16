@@ -167,6 +167,9 @@ define([
             on: function() {
                 return;
             },
+            beforeMove: function(e) {
+                e.cancelDrop = (e.sourceParent!==e.targetParent);
+            },
             updateCard: function(parents, card, data) {
                 var updatedCards = [];
                 _.each(ko.unwrap(parents), function(parent) {
@@ -339,42 +342,38 @@ define([
                 return newCardViewModel;
             },
             reorderCards: function(e) {
-                if (e.sourceParent === e.targetParent) {
-                    loading(true);
-                    const originalCardOrder = [...self.topCards()];
-                    var cards = _.map(self.topCards(), function(card, i) {
-                        card.model.get('sortorder')(i);
-                        return {
-                            id: card.model.id,
-                            name: card.model.get('name')(),
-                            sortorder: i
-                        };
-                    });
-                    $.ajax({
-                        type: 'POST',
-                        data: JSON.stringify({
-                            cards: cards
-                        }),
-                        url: arches.urls.reorder_cards,
-                        complete: function() {
-                            loading(false);
-                        },
-                        error: function(response) {
-                            params.pageVm.alert(
-                                new AlertViewModel(
-                                    'ep-alert-red',
-                                    response.responseJSON.title,
-                                    response.responseJSON.message,
-                                    null,
-                                    function(){}
-                                )
-                            );
-                            self.topCards(originalCardOrder);
-                        }
-                    });
-                } else {
-                    e.cancelDrop = true;
-                }
+                loading(true);
+                const originalCardOrder = [...self.topCards()];
+                var cards = _.map(self.topCards(), function(card, i) {
+                    card.model.get('sortorder')(i);
+                    return {
+                        id: card.model.id,
+                        name: card.model.get('name')(),
+                        sortorder: i
+                    };
+                });
+                $.ajax({
+                    type: 'POST',
+                    data: JSON.stringify({
+                        cards: cards
+                    }),
+                    url: arches.urls.reorder_cards,
+                    complete: function() {
+                        loading(false);
+                    },
+                    error: function(response) {
+                        params.pageVm.alert(
+                            new AlertViewModel(
+                                'ep-alert-red',
+                                response.responseJSON.title,
+                                response.responseJSON.message,
+                                null,
+                                function(){}
+                            )
+                        );
+                        self.topCards(originalCardOrder);
+                    }
+                });
             },
             selection: selection,
             filter: filter,
