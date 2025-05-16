@@ -327,7 +327,8 @@ define([
                 graph: viewModel.graph,
                 appliedFunctions: viewModel.appliedFunctions,
                 primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
-                graphModel: viewModel.graphModel
+                graphModel: viewModel.graphModel,
+                pageVm: viewModel,
             });
 
             viewModel.permissionTree = new CardTreeViewModel({

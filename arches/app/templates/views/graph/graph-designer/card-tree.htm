@@ -43,8 +43,7 @@
                 <ul class="jstree-children card-designer-tree" aria-expanded="true" data-bind="sortable: {
                     data: topCards,
                     as: 'card',
-                    beforeMove: beforeMove,
-                    afterMove: reorderCards
+                    beforeMove: reorderCards,
                 }">
                     <div data-bind="component: {
                         name: self.cardComponentLookup[card.model.component_id()].componentname,

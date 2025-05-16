@@ -688,9 +688,12 @@ class CardView(GraphBaseView):
             if "cards" in data and len(data["cards"]) > 0:
                 with transaction.atomic():
                     for card_data in data["cards"]:
-                        card = models.CardModel.objects.get(pk=card_data["id"])
+                        card = Card.objects.get(pk=card_data["id"])
                         card.sortorder = card_data["sortorder"]
-                        card.save()
+                        try:
+                            card.save()
+                        except ValidationError as e:
+                            return JSONErrorResponse(content=e.args[0], status=403)
                 return JSONResponse(data["cards"])
 
         return HttpResponseNotFound()

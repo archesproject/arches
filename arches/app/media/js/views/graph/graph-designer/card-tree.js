@@ -7,9 +7,10 @@ define([
     'viewmodels/card',
     'models/card-widget',
     'uuid',
+    'viewmodels/alert',
     'bindings/sortable',
     'bindings/scrollTo',
-], function($, _, ko, arches, data, CardViewModel, CardWidgetModel, uuid) {
+], function($, _, ko, arches, data, CardViewModel, CardWidgetModel, uuid, AlertViewModel) {
     var CardTreeViewModel = function(params) {
         var self = this;
         var filter = ko.observable('');
@@ -165,9 +166,6 @@ define([
             rootExpanded: ko.observable(true),
             on: function() {
                 return;
-            },
-            beforeMove: function(e) {
-                e.cancelDrop = (e.sourceParent!==e.targetParent);
             },
             updateCard: function(parents, card, data) {
                 var updatedCards = [];
@@ -340,26 +338,43 @@ define([
                 self.cachedFlatTree = self.flattenTree(self.topCards(), []);
                 return newCardViewModel;
             },
-            reorderCards: function() {
-                loading(true);
-                var cards = _.map(self.topCards(), function(card, i) {
-                    card.model.get('sortorder')(i);
-                    return {
-                        id: card.model.id,
-                        name: card.model.get('name')(),
-                        sortorder: i
-                    };
-                });
-                $.ajax({
-                    type: 'POST',
-                    data: JSON.stringify({
-                        cards: cards
-                    }),
-                    url: arches.urls.reorder_cards,
-                    complete: function() {
-                        loading(false);
-                    }
-                });
+            reorderCards: function(e) {
+                if (e.sourceParent === e.targetParent) {
+                    loading(true);
+                    const originalCardOrder = [...self.topCards()];
+                    var cards = _.map(self.topCards(), function(card, i) {
+                        card.model.get('sortorder')(i);
+                        return {
+                            id: card.model.id,
+                            name: card.model.get('name')(),
+                            sortorder: i
+                        };
+                    });
+                    $.ajax({
+                        type: 'POST',
+                        data: JSON.stringify({
+                            cards: cards
+                        }),
+                        url: arches.urls.reorder_cards,
+                        complete: function() {
+                            loading(false);
+                        },
+                        error: function(response) {
+                            params.pageVm.alert(
+                                new AlertViewModel(
+                                    'ep-alert-red',
+                                    response.responseJSON.title,
+                                    response.responseJSON.message,
+                                    null,
+                                    function(){}
+                                )
+                            );
+                            self.topCards(originalCardOrder);
+                        }
+                    });
+                } else {
+                    e.cancelDrop = true;
+                }
             },
             selection: selection,
             filter: filter,
