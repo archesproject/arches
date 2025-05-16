@@ -555,7 +555,19 @@ class GraphDataView(View):
                                 for node in data["nodes"]:
                                     no = models.Node.objects.get(pk=node["nodeid"])
                                     no.sortorder = sortorder
-                                    no.save()
+                                    try:
+                                        if no.graph.publication_id == None:
+                                            no.save()
+                                        else:
+                                            ret = {
+                                                "title": _("Unable to Save Graph"),
+                                                "message": _(
+                                                    "You cannot edit a published graph.  Please unpublish the graph before editing."
+                                                ),
+                                            }
+                                            raise ValidationError(ret)
+                                    except ValidationError as e:
+                                        return JSONErrorResponse(content=e.args[0], status=403)
                                     sortorder = sortorder + 1
                             ret = data
 

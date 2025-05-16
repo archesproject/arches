@@ -4,8 +4,9 @@ define([
     'underscore',
     'arches',
     'views/tree-view',
+    'viewmodels/alert',
     'bindings/clipboard',
-], function($, ko, _, arches, TreeView) {
+], function($, ko, _, arches, TreeView, AlertViewModel) {
     var loading = ko.observable(false);
 
     var GraphTree = TreeView.extend({
@@ -77,6 +78,7 @@ define([
             this.translations = arches.translations;
             this.showGrid = ko.observable(false);
             this.activeLanguageDir = ko.observable(arches.activeLanguageDir);
+            this.pageVm = options.pageVm;
             TreeView.prototype.initialize.apply(this, arguments);
         },
 
@@ -219,6 +221,7 @@ define([
         },
         reorderNodes: function(e) {
             loading(true);
+            var self = this;
             var nodes = _.map(e.sourceParent(), function(node) {
                 return node.attributes.source;
             });
@@ -230,6 +233,22 @@ define([
                 url: arches.urls.reorder_nodes,
                 complete: function() {
                     loading(false);
+                },
+                error: function(response) {
+                    self.pageVm.alert(
+                        new AlertViewModel(
+                            'ep-alert-red',
+                            response.responseJSON.title,
+                            response.responseJSON.message,
+                            null,
+                            function(){}
+                        )
+                    );
+                    const undoSort = (array, sourceIndex, targetIndex) => {
+                        const [movedItem] = array.splice(targetIndex, 1);
+                        array.splice(sourceIndex, 0, movedItem);
+                    };
+                    undoSort(e.sourceParent, e.sourceIndex, e.targetIndex);
                 }
             });
         },
