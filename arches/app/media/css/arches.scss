@@ -12520,6 +12520,22 @@ a.filter-tools:hover {
         display: none;
     }
 
+    #container {
+      height: auto !important;
+    }
+
+    .resource-component-abstract {
+      height: auto !important;
+      overflow: visible !important;
+    }
+
+    [style*="position: absolute"] {
+      position: static !important;
+    }
+
+    .ep-tools, .some-toolbar {
+      display: none !important;
+    }
 }
 
 .report-toolbar-preview {
