@@ -301,15 +301,10 @@ class SemanticTile(TileModel):
             resourceinstance=self.resourceinstance,
             nodegroup=child_nodegroup,
             parenttile=self,
-            data={
-                str(node.pk): None
+            **{
+                node.alias: self.get_default_value(node)
                 for node in child_nodegroup.node_set.all()
                 if node.datatype != "semantic"
-            },
-            **{
-                node.alias: None
-                for node in child_nodegroup.node_set.all()
-                if node.datatype == "semantic"
             },
             **{
                 SemanticTile(nodegroup=grandchild_nodegroup).find_nodegroup_alias(): (
@@ -358,6 +353,30 @@ class SemanticTile(TileModel):
             else:
                 tile = value or blank_tile
                 tile.fill_blanks()
+
+    @staticmethod
+    def get_default_value(node):
+        # TODO: When ingesting this into core, make this a method on the node.
+        from arches.app.datatypes.datatypes import DataTypeFactory
+
+        widget_config = node.cardxnodexwidget_set.all()[0]
+        localized_config = widget_config.config.serialize()
+        default_value = localized_config.get("defaultValue", None)
+        datatype = DataTypeFactory().get_instance(node.datatype)
+        try:
+            default_value = datatype.get_interchange_value(default_value)
+        except AttributeError:
+            # 7.6: this might be missing.
+            pass
+
+        if node.datatype == "number":
+            # Trying to call float("") breaks the integration with DRF.
+            # There should probably be some validation in the datatype
+            # methods to ensure that poor types don't end up in defaultValue.
+            if default_value == "":
+                default_value = None
+
+        return default_value
 
     def save_without_related_objects(self, **kwargs):
         return super().save(**kwargs)
