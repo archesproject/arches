@@ -311,6 +311,7 @@ define([
                     parentCard: parent,
                     constraints: getBlankConstraint(data.card),
                     topCards: self.topCards,
+                    pageVm: params.pageVm,
                 });
                 parentcards.push(newCardViewModel);
 
@@ -448,7 +449,8 @@ define([
                 userisreviewer: true,
                 perms: ko.observableArray(),
                 permsLiteral: ko.observableArray(),
-                topCards: self.topCards
+                topCards: self.topCards,
+                pageVm: params.pageVm,
             });
         }));
 

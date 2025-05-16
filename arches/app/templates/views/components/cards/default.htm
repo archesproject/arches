@@ -123,9 +123,7 @@
                 data: card.cards,
                 as: 'childCard',
                 beforeMove: self.beforeMove,
-                afterMove: function() {
-                    card.reorderCards();
-                }
+                afterMove: card.reorderCards
             }">
             <div data-bind="css: {
                     'jstree-last': ($index() === ($parent.card.cards().length - 1))
