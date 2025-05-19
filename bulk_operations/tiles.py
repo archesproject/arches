@@ -216,12 +216,13 @@ class BulkTileOperation:
                 children = tile.nodegroup.children.all()
             else:
                 children = tile.nodegroup.nodegroup_set.all()
-                grouping_node = (
-                    Node.objects.filter(pk=tile.nodegroup.pk)
-                    .prefetch_related("node_set")
-                    .get()
-                )
                 for child_nodegroup in children:
+                    # TODO: Obvious N+1 problem here.
+                    grouping_node = (
+                        Node.objects.filter(pk=child_nodegroup.pk)
+                        .prefetch_related("nodegroup__node_set")
+                        .get()
+                    )
                     child_nodegroup.grouping_node = grouping_node
             for child_nodegroup in children:
                 self._update_tile_for_grouping_node(
