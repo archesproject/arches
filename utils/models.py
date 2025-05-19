@@ -13,7 +13,7 @@ from django.db.models import JSONField
 from django.db.models.functions import Cast
 from django.db.models.fields.json import KT
 
-from arches import __version__ as arches_version
+from arches import VERSION as arches_version
 from arches.app.models.models import ResourceInstance, TileModel
 from arches.app.models.utils import field_names
 
@@ -158,7 +158,7 @@ def get_nodegroups_here_and_below(start_nodegroup):
     def accumulate(nodegroup):
         nonlocal accumulator
         accumulator.append(nodegroup)
-        if arches_version >= "8":
+        if arches_version >= (8, 0):
             children_attr = nodegroup.children
         else:
             children_attr = nodegroup.nodegroup_set

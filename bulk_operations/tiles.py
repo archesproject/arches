@@ -9,7 +9,7 @@ from django.db import ProgrammingError, transaction
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 
-from arches import __version__ as arches_version
+from arches import VERSION as arches_version
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Language, Node, TileModel, ResourceInstance
 from arches.app.models.tile import Tile, TileValidationError
@@ -70,7 +70,7 @@ class BulkTileOperation:
         elif isinstance(self.entry, SemanticTile):
             # TODO: look into whether this is repetitive.
             for nodegroup in self.nodegroups:
-                if arches_version >= "8":
+                if arches_version >= (8, 0):
                     lookup[nodegroup.pk] = nodegroup.grouping_node
                 else:
                     for node in nodegroup.node_set.all():
@@ -212,7 +212,7 @@ class BulkTileOperation:
             if tile.nodegroup_id != grouping_node.pk:
                 # TODO: this is a symptom this should be refactored.
                 continue
-            if arches_version >= "8":
+            if arches_version >= (8, 0):
                 children = tile.nodegroup.children.all()
             else:
                 children = tile.nodegroup.nodegroup_set.all()
@@ -477,7 +477,7 @@ class BulkTileOperation:
                 self.entry.dummy_save(**self.save_kwargs)
 
             for upsert_tile in upserts:
-                if arches_version < "8":
+                if arches_version < (8, 0):
                     grouping_node = self.grouping_nodes_by_nodegroup_id[
                         upsert_tile.nodegroup_id
                     ]

@@ -12,7 +12,7 @@ from rest_framework import renderers
 from rest_framework import serializers
 from rest_framework.fields import empty
 
-from arches import __version__ as arches_version
+from arches import VERSION as arches_version
 from arches.app.models.fields.i18n import I18n_JSON, I18n_String
 from arches.app.models.models import Node
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -82,7 +82,7 @@ class NodeFetcherMixin:
     def find_graph_nodes(self):
         # This should really only be used when using drf-spectacular.
         # Does not check nodegroup permissions.
-        if arches_version >= "8":
+        if arches_version >= (8, 0):
             return (
                 Node.objects.filter(
                     graph__slug=self.graph_slug,
@@ -267,7 +267,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             raise RuntimeError("missing root node")
         field_map = super().get_fields()
 
-        if arches_version < "8":
+        if arches_version < (8, 0):
             nodegroup_aliases = self.get_nodegroup_aliases()
 
         # __all__ now includes one level of child nodegroups.
@@ -275,11 +275,11 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         if self.__class__.Meta.fields == "__all__":
             child_query = (
                 self._root_node.nodegroup.children
-                if arches_version >= "8"
+                if arches_version >= (8, 0)
                 else self._root_node.nodegroup.nodegroup_set
             )
             for child_nodegroup in child_query.all():
-                if arches_version >= "8":
+                if arches_version >= (8, 0):
                     child_nodegroup_alias = child_nodegroup.grouping_node.alias
                 else:
                     child_nodegroup_alias = nodegroup_aliases[child_nodegroup.pk]
@@ -463,7 +463,7 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
     def build_relational_field(self, field_name, relation_info):
         ret = super().build_relational_field(field_name, relation_info)
-        if arches_version >= "8" and field_name == "graph":
+        if arches_version >= (8, 0) and field_name == "graph":
             ret[1]["queryset"] = ret[1]["queryset"].filter(
                 graphmodel__slug=self.graph_slug
             )

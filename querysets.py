@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext as _
 
-from arches import __version__ as arches_version
+from arches import VERSION as arches_version
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node, ResourceXResource
 
@@ -18,7 +18,7 @@ from arches_querysets.utils.models import (
 class SemanticTileManager(models.Manager):
     def get_queryset(self):
         qs = super().get_queryset().select_related("nodegroup", "parenttile")
-        if arches_version >= "8":
+        if arches_version >= (8, 0):
             qs = qs.select_related("nodegroup__grouping_node")
         else:
             # Annotate nodegroup_alias on Arches 7.6.
@@ -103,7 +103,7 @@ class SemanticTileQuerySet(models.QuerySet):
         if depth:
             qs = qs.prefetch_related(
                 models.Prefetch(
-                    "children" if arches_version >= "8" else "tilemodel_set",
+                    "children" if arches_version >= (8, 0) else "tilemodel_set",
                     queryset=self.model.objects.get_queryset().with_node_values(
                         nodes=nodes,
                         defer=defer,
@@ -163,7 +163,7 @@ class SemanticTileQuerySet(models.QuerySet):
                             tile, node, tile_val
                         )
                         setattr(tile.aliased_data, node.alias, instance_val)
-            if arches_version >= "8":
+            if arches_version >= (8, 0):
                 fallback = getattr(tile, "children")
             else:
                 fallback = getattr(tile, "tilemodel_set")
@@ -358,7 +358,7 @@ class SemanticResourceQuerySet(models.QuerySet):
         ).annotate(**node_sql_aliases)
 
     def with_related_resource_display_names(self, nodes=None):
-        if arches_version >= "8":
+        if arches_version >= (8, 0):
             return self.prefetch_related(
                 models.Prefetch(
                     "from_resxres",

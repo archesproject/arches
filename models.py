@@ -7,7 +7,7 @@ from types import SimpleNamespace
 from django.db import models, transaction
 from django.utils.translation import gettext as _
 
-from arches import __version__ as arches_version
+from arches import VERSION as arches_version
 from arches.app.models.models import (
     GraphModel,
     Node,
@@ -227,7 +227,7 @@ class SemanticTile(TileModel):
 
         tile = cls(**attrs)
 
-        if arches_version < "8":
+        if arches_version < (8, 0):
             # Simulate the default supplied by v8.
             tile.data = {}
 
@@ -298,7 +298,7 @@ class SemanticTile(TileModel):
     def from_child_nodegroup(self, child_nodegroup):
         grandchildren = (
             child_nodegroup.children.all()
-            if arches_version >= "8"
+            if arches_version >= (8, 0)
             else child_nodegroup.nodegroup_set.all()
         )
 
@@ -521,7 +521,7 @@ class GraphWithPrefetching(GraphModel):
         if resource_ids and not graph_slug:
             graph_query = cls.objects.filter(resourceinstance__in=resource_ids)
         elif graph_slug:
-            if arches_version >= "8":
+            if arches_version >= (8, 0):
                 graph_query = GraphModel.objects.filter(
                     slug=graph_slug, source_identifier=None
                 )
@@ -530,7 +530,7 @@ class GraphWithPrefetching(GraphModel):
         else:
             raise ValueError("graph_slug or resource_ids must be provided")
 
-        if arches_version >= "8":
+        if arches_version >= (8, 0):
             prefetches = [
                 "node_set__cardxnodexwidget_set",
                 "node_set__nodegroup__node_set",
@@ -606,7 +606,7 @@ class GraphWithPrefetching(GraphModel):
                 e.add_note(f"No graph found with slug: {graph_slug}")
             raise
 
-        if arches_version < "8":
+        if arches_version < (8, 0):
             # 7.6: simulate .grouping_node attribute
             grouping_node_map = {}
             for node in graph.node_set.all():

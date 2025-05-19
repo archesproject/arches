@@ -11,7 +11,7 @@ import uuid
 
 from django.utils.translation import get_language, gettext as _
 
-from arches import __version__ as arches_version
+from arches import VERSION as arches_version
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -40,20 +40,20 @@ def resource_instance_list_to_json(self, tile, node):
             rxrs = tile.resourceinstance.filtered_from_resxres
         except:
             # TODO: why?
-            if arches_version >= "8":
+            if arches_version >= (8, 0):
                 rxrs = tile.resourceinstance.from_resxres.all()
             else:
                 rxrs = tile.resourceinstance.resxres_resource_instance_ids_from.all()
         for rxr in rxrs:
             to_resource_id = (
                 rxr.resourceinstanceidto_id
-                if arches_version < "8"
+                if arches_version < (8, 0)
                 else rxr.to_resource_id
             )
             if to_resource_id == uuid.UUID(inner_val["resourceId"]):
                 to_resource = (
                     rxr.resourceinstanceidto
-                    if arches_version < "8"
+                    if arches_version < (8, 0)
                     else rxr.to_resource
                 )
                 if not to_resource:
