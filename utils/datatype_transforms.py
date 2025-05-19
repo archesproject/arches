@@ -86,35 +86,23 @@ def concept_to_json(self, tile, node):
         return self.compile_json(tile, node, **value_data)
 
 
-def concept_list_validate(
-    self,
-    value,
-    row_number=None,
-    source="",
-    node=None,
-    nodeid=None,
-    strict=False,
-    **kwargs,
-):
-    errors = []
-    # iterate list of values and use the concept validation on each one
-    if value is not None:
-        validate_concept = DataTypeFactory().get_instance("concept")
-        for v in value:
-            if isinstance(v, uuid.UUID):
-                val = str(v)
-            else:
-                val = v.strip()
-            errors += validate_concept.validate(val, row_number)
-    return errors
+def concept_transform_value_for_tile(self, value, **kwargs):
+    if isinstance(value, dict) and (value_id := value.get("valueid")):
+        return self.transform_value_for_tile(value_id)
+    return self.transform_value_for_tile(value)
 
 
 def concept_list_transform_value_for_tile(self, value, **kwargs):
     if not isinstance(value, list):
         value = [value]
-    if all(isinstance(inner, uuid.UUID) for inner in value):
-        return [str(inner) for inner in value]
-    return self.transform_value_for_tile(value, **kwargs)
+    concept_id_strings = []
+    for inner in value:
+        if isinstance(inner, dict) and (
+            concept_details := inner.get("concept_details")
+        ):
+            concept_id_strings.extend([detail["valueid"] for detail in concept_details])
+    joined_concept_id_strings = ",".join(concept_id_strings)
+    return self.transform_value_for_tile(joined_concept_id_strings, **kwargs)
 
 
 def concept_list_to_json(self, tile, node):
