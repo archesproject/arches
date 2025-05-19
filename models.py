@@ -424,7 +424,7 @@ class SemanticTile(TileModel):
             if node.datatype == "semantic":
                 continue
             node_id_str = str(node.nodeid)
-            old = original_data[node_id_str]
+            old = original_data.get(node_id_str)
             datatype_instance = datatype_factory.get_instance(node.datatype)
             new = self.data[node_id_str]
             if match_fn := getattr(datatype_instance, "values_match", None):
