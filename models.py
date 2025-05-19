@@ -226,6 +226,11 @@ class SemanticTile(TileModel):
         attrs["parenttile"] = parent_tile
 
         tile = cls(**attrs)
+
+        if arches_version < "8":
+            # Simulate the default supplied by v8.
+            tile.data = {}
+
         return tile
 
     @classmethod
