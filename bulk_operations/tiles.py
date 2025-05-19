@@ -184,22 +184,9 @@ class BulkTileOperation:
                 next_sort_order += 1
                 for node in grouping_node.nodegroup.node_set.all():
                     new_tile.data[str(node.pk)] = None
-
-                parent_tile = new_tile.parenttile
-                exclude = None
-                if parent_tile:
-                    if (
-                        parent_tile.nodegroup_id
-                        != grouping_node.nodegroup.parentnodegroup_id
-                    ):
-                        raise ValueError(
-                            _("Wrong nodegroup for parent tile: {}".format(parent_tile))
-                        )
-                    if parent_tile._state.adding:
-                        exclude = {"parenttile"}
-
                 new_tile._incoming_tile = new_tile
-                new_tile.full_clean(exclude=exclude)
+                # TODO: reimplement correct nodegroup for parenttile check somewhere.
+                new_tile.full_clean(exclude={"parenttile"})
                 self.to_insert.add(new_tile)
             else:
                 original_tile_data_by_tile_id[existing_tile.pk] = {**existing_tile.data}
