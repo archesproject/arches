@@ -2,10 +2,8 @@ from copy import deepcopy
 from functools import lru_cache, partial
 
 from django.conf import settings
-from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
-from django.db import transaction
-from django.db.models import fields, F, JSONField
+from django.db import models, transaction
 from django.utils.translation import gettext as _
 from rest_framework.exceptions import ValidationError
 from rest_framework import renderers
@@ -195,28 +193,25 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
 
 class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     datatype_field_map = {
-        "string": JSONField(null=True),
-        "number": fields.FloatField(null=True),
-        "concept": JSONField(null=True),
-        "concept-list": JSONField(null=True),
-        "date": fields.DateField(null=True),
-        "node-value": fields.CharField(null=True),  # XXX
-        "edtf": fields.CharField(null=True),  # XXX
-        "annotation": fields.CharField(null=True),  # XXX
-        "url": JSONField(null=True),  # XXX
-        "resource-instance": JSONField(null=True),
-        "resource-instance-list": ArrayField(
-            base_field=JSONField(null=True), null=True
-        ),
-        "boolean": fields.BooleanField(null=True),
-        "domain-value": ArrayField(base_field=fields.UUIDField(null=True), null=True),
-        "domain-value-list": ArrayField(
-            base_field=fields.UUIDField(null=True), null=True
-        ),
-        "non-localized-string": fields.CharField(null=True),
-        "geojson-feature-collection": fields.CharField(null=True),  # XXX
-        "file-list": ArrayField(base_field=JSONField(null=True), null=True),
-        "reference": ArrayField(base_field=JSONField(null=True), null=True),
+        "string": models.JSONField(null=True),
+        "number": models.FloatField(null=True),
+        "concept": models.JSONField(null=True),
+        "concept-list": models.JSONField(null=True),
+        "date": models.DateField(null=True),
+        "node-value": models.CharField(null=True),  # XXX
+        "edtf": models.CharField(null=True),  # XXX
+        "annotation": models.CharField(null=True),  # XXX
+        "url": models.JSONField(null=True),  # XXX
+        "resource-instance": models.JSONField(null=True),
+        "resource-instance-list": models.JSONField(null=True),
+        "boolean": models.BooleanField(null=True),
+        "domain-value": models.JSONField(null=True),
+        "domain-value-list": models.JSONField(null=True),
+        "non-localized-string": models.CharField(null=True),
+        "geojson-feature-collection": models.CharField(null=True),  # XXX
+        "file-list": models.JSONField(null=True),
+        # TODO: reference datatype should supply this itself somehow.
+        "reference": models.JSONField(null=True),
     }
 
     class Meta:
@@ -244,7 +239,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     def get_nodegroup_aliases():
         return {
             node.pk: node.alias
-            for node in Node.objects.filter(pk=F("nodegroup_id")).only("alias")
+            for node in Node.objects.filter(pk=models.F("nodegroup_id")).only("alias")
         }
 
     def get_value(self, dictionary):
