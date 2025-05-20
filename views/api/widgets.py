@@ -23,7 +23,6 @@ def update_i18n_properties(response):
     response["config"] = config
     return response
 
-
 class WidgetDataView(View):
     def get(self, request, graph_slug, node_alias):
         if arches_version < "8":
@@ -83,5 +82,50 @@ class NodeDataView(View):
         response = update_i18n_properties(
             JSONDeserializer().deserialize(JSONSerializer().serialize(node))
         )
+
+        return JSONResponse(response)
+
+
+class WidgetDataFromCardView(View):
+    def get(self, request, card_slug):
+        if arches_version < "8":
+            card_x_node_x_widgets = (
+                models.CardXNodeXWidget.objects.filter(
+                    card__slug=card_slug,
+                )
+                .select_related("node")
+                .all()
+            )
+        elif arches_version >= "8":
+            card_x_node_x_widgets = (
+                models.CardXNodeXWidget.objects.filter(
+                    card__slug=card_slug,
+                    node__source_identifier_id__isnull=True,
+                )
+                .select_related("node")
+                .all()
+            )
+
+        response = update_i18n_properties(
+            JSONDeserializer().deserialize(
+                JSONSerializer().serialize(card_x_node_x_widgets)
+            )
+        )
+
+        datatype_factory = DataTypeFactory()
+
+        import pdb; pdb.set_trace()
+
+        for card_x_node_x_widget in card_x_node_x_widgets:
+            datatype = datatype_factory.get_instance(card_x_node_x_widget.node.datatype)
+
+            # When dropping support for v7.6, try/except can be removed
+            try:
+                response["config"]["defaultValue"] = datatype.get_interchange_value(
+                    response["config"].get("defaultValue", None)
+                )
+            except AttributeError:
+                # Handle the case where the datatype does not have a get_interchange_value method
+                pass
 
         return JSONResponse(response)

@@ -10,5 +10,7 @@
     api_relatable_resources='(graph_slug, node_alias) => {return "{% url "api-relatable-resources" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", node_alias)}'
     api_widget_data='(graph_slug, node_alias) => {return "{% url "api-widget-data" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", node_alias)}'
     api_node_data='(graph_slug, node_alias) => {return "{% url "api-node-data" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", node_alias)}'
+    api_card_data='(graph_slug, nodegroup_grouping_node_alias) => {return "{% url "api-card-data" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", nodegroup_grouping_node_alias)}'
+    api_list_widget_data_from_card='(graph_slug, nodegroup_grouping_node_alias) => {return "{% url "api-list-widget-data-from-card" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", nodegroup_grouping_node_alias)}'
 ></div>
 {% endblock arches_urls %}

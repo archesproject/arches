@@ -3,10 +3,12 @@ from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 from django.urls import include, path
 
+from arches_component_lab.views.api.cards import CardDataView
 from arches_component_lab.views.api.relatable_resources import RelatableResourcesView
 from arches_component_lab.views.api.widgets import (
     WidgetDataView,
     NodeDataView,
+    WidgetDataFromCardView,
 )
 
 urlpatterns = [
@@ -24,6 +26,16 @@ urlpatterns = [
         "arches-component-lab/api/node-data/<slug:graph_slug>/<slug:node_alias>",
         NodeDataView.as_view(),
         name="api-node-data",
+    ),
+    path(
+        "arches-component-lab/api/list-widget-data-from-card/<slug:graph_slug>/<slug:nodegroup_grouping_node_alias>",
+        WidgetDataFromCardView.as_view(),
+        name="api-list-widget-data-from-card",
+    ),
+    path(
+        "arches-component-lab/api/card-data/<slug:graph_slug>/<slug:nodegroup_grouping_node_alias>",
+        CardDataView.as_view(),
+        name="api-card-data",
     ),
 ]
 
