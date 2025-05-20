@@ -40,7 +40,7 @@ class BulkTileOperation:
 
         if isinstance(entry, TileModel):
             self.resourceid = self.entry.resourceinstance_id
-            # TODO: write perms
+            # TODO: write perms, but don't falsify self.new_resource_created
             self.nodegroups = get_nodegroups_here_and_below(self.entry.nodegroup)
             existing_tiles = entry.__class__.objects.filter(
                 resourceinstance_id=self.resourceid,
@@ -57,6 +57,7 @@ class BulkTileOperation:
             self.existing_tiles_by_nodegroup_alias[tile.find_nodegroup_alias()].append(
                 tile
             )
+        self.new_resource_created = bool(existing_tiles)
 
     def _get_grouping_node_lookup(self):
         from arches_querysets.models import SemanticResource, SemanticTile
@@ -490,8 +491,7 @@ class BulkTileOperation:
                     newprovisionalvalue=insert_proxy._newprovisionalvalue,
                     provisional_edit_log_details=insert_proxy._provisional_edit_log_details,
                     transaction_id=self.transaction_id,
-                    # TODO: get this information upstream somewhere.
-                    new_resource_created=False,
+                    new_resource_created=self.new_resource_created,
                     note=None,
                 )
             for update_proxy in update_proxies:

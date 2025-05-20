@@ -527,8 +527,12 @@ class GraphWithPrefetching(GraphModel):
 
     @classmethod
     def prepare_for_annotations(cls, graph_slug=None, *, resource_ids=None, user=None):
-        """Return a graph with necessary prefetches for _prefetch_related_objects()
-        and the rest_framework client."""
+        """Return a graph with necessary prefetches for
+        SemanticTile._prefetch_related_objects(), which is what builds the shape
+        of the tile graph.
+
+        This method also checks nodegroup permissions for read.
+        """
         if resource_ids and not graph_slug:
             graph_query = cls.objects.filter(resourceinstance__in=resource_ids)
         elif graph_slug:
