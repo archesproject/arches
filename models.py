@@ -15,6 +15,8 @@ from django.utils.translation import gettext_lazy as _
 
 from arches.app.models.models import DValueType, Language, Node
 from arches.app.models.utils import field_names
+from arches.app.search.elasticsearch_dsl_builder import Term, Query
+from arches.app.search.search_engine_factory import SearchEngineInstance
 from arches.app.utils.file_validator import FileValidator
 from arches.app.utils.i18n import rank_label
 from arches_controlled_lists.querysets import (
@@ -123,6 +125,16 @@ class List(models.Model):
         ListItem.objects.bulk_update(
             reordered_items, fields=["sortorder", "parent_id", "list_id"]
         )
+
+    def index(self):
+        for item in self.list_items.all():
+            item.index()
+
+    def delete_index(self):
+        query = Query(SearchEngineInstance, start=0, limit=10000)
+        term = Term(field="list_id", term=self.id)
+        query.add_query(term)
+        query.delete(index=settings.REFERENCES_INDEX_NAME)
 
 
 class ListItem(models.Model):
@@ -258,6 +270,16 @@ class ListItem(models.Model):
     def find_best_label(self):
         return self.find_best_label_from_set(self.list_item_values.labels())
 
+    def index(self):
+        for label in self.list_item_values.labels():
+            label.index()
+
+    def delete_index(self):
+        query = Query(SearchEngineInstance, start=0, limit=10000)
+        term = Term(field="item_id", term=self.id)
+        query.add_query(term)
+        query.delete(index=settings.REFERENCES_INDEX_NAME)
+
 
 class ListItemValue(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -329,6 +351,27 @@ class ListItemValue(models.Model):
             ret = super().delete()
             self.list_item.ensure_pref_label()
         return ret
+
+    def delete_index(self):
+        query = Query(SearchEngineInstance, start=0, limit=1)
+        term = Term(field="label_id", term=self.id)
+        query.add_query(term)
+        query.delete(index=settings.REFERENCES_INDEX_NAME)
+
+    def index(self):
+        index_data = {
+            "item_id": self.list_item_id,
+            "uri": self.list_item.uri,
+            "label_id": self.pk,
+            "label": self.value,
+            "label_type": self.valuetype_id,
+            "language": self.language_id,
+            "list_id": self.list_item.list_id,
+            "list_name": self.list_item.list.name,
+        }
+        SearchEngineInstance.index_data(
+            index=settings.REFERENCES_INDEX_NAME, body=index_data, idfield="label_id"
+        )
 
 
 class ListItemImage(models.Model):
