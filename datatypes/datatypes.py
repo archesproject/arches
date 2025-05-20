@@ -303,3 +303,24 @@ class ReferenceDataType(BaseDataType):
             raise GraphValidationError(
                 _("A reference datatype node requires a controlled list")
             )
+        
+    def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
+        if "references" not in document:
+            document["references"] = []
+        for reference in self.get_nodevalues(nodevalue):
+            for label in reference["labels"]:
+                document["references"].append(
+                    {
+                        "id": label["id"],
+                        "uri": reference["uri"],
+                        "list_id": reference["list_id"],
+                        "nodegroup_id": tile.nodegroup_id,
+                    }
+                )
+                document["strings"].append(
+                    {
+                        "string": label["value"],
+                        "nodegroup_id": tile.nodegroup_id,
+                        "provisional": provisional,
+                    }
+                )

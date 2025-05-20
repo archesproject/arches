@@ -1,12 +1,13 @@
 from arches.app.search.es_mapping_modifier import EsMappingModifier
 
+REFERENCES_INDEX_PATH = "references"
 
 class ReferencesEsMappingModifier:
     """
     Base class for creating custom sections in the Resource Instance elasticsearch document.
     """
 
-    custom_search_path = "references"
+    custom_search_path = REFERENCES_INDEX_PATH
 
     def __init__(self):
         pass
@@ -19,7 +20,7 @@ class ReferencesEsMappingModifier:
         :return: ES document key
         :rtype String
         """
-        return EsMappingModifier.custom_search_path
+        return REFERENCES_INDEX_PATH
 
     @staticmethod
     def add_search_terms(resourceinstance, document, terms):
@@ -54,6 +55,6 @@ class ReferencesEsMappingModifier:
                 "id": {"type": "keyword"},
                 "uri": {"type": "keyword"},
                 "list_id": {"type": "keyword"},
-                "parent_id": {"type": "keyword"},
+                "nodegroup_id": {"type": "keyword"},
             },
         }

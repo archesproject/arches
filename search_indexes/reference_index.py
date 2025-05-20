@@ -20,4 +20,4 @@ class ReferenceIndex(BaseIndex):
         super(ReferenceIndex, self).prepare_index()
 
     def get_documents_to_index(self, resourceinstance, tiles):
-        return ()
+        return None, None
