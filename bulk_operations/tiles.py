@@ -115,6 +115,7 @@ class BulkTileOperation:
                     grouping_node,
                     self.entry,
                     original_tile_data_by_tile_id,
+                    delete_siblings=True,
                 )
 
         if self.errors_by_node_alias:
