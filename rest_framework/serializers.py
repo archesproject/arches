@@ -392,9 +392,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         queryset=SemanticTile.objects.all(),
         required=False,
         allow_null=True,
-        # Avoid queries to populate dropdowns in browsable API.
-        # https://www.django-rest-framework.org/topics/browsable-api/#handling-choicefield-with-large-numbers-of-items
-        style={"base_template": "input.html"},
+        html_cutoff=0,
     )
     aliased_data = TileAliasedDataSerializer(required=False, allow_null=False)
 
@@ -465,7 +463,12 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return ret
 
     def validate(self, attrs):
-        if "graph" in self.fields and not attrs.get("graph_id"):
+        """Infer the graph if missing from the request."""
+        if (
+            "graph" in self.fields
+            and not attrs.get("graph_id")
+            and not attrs.get("graph")
+        ):
             attrs["graph_id"] = self.fields["graph"].queryset.first().pk
         return attrs
 
