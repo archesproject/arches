@@ -145,13 +145,13 @@ class SemanticTileQuerySet(models.QuerySet):
 
     def _perform_custom_annotations(self):
         NOT_PROVIDED = object()
-        checked_for_values_query = False
 
         for tile in self._result_cache:
-            if not checked_for_values_query:
-                if not isinstance(tile, self.model):
-                    return
-                checked_for_values_query = True
+            if not isinstance(tile, self.model):
+                return
+            break
+
+        for tile in self._result_cache:
             tile._queried_nodes = self._queried_nodes
             tile._fetched_graph_nodes = self._fetched_graph_nodes
             for node in self._queried_nodes:
