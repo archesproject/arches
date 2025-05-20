@@ -302,7 +302,7 @@ class SemanticTile(TileModel):
                 self.set_next_sort_order()
             self._save_aliased_data(request=request, index=index, **kwargs)
 
-    def from_child_nodegroup(self, child_nodegroup):
+    def from_child_nodegroup(self, child_nodegroup, parent_tile=None):
         grandchildren = (
             child_nodegroup.children.all()
             if arches_version >= (8, 0)
@@ -312,7 +312,7 @@ class SemanticTile(TileModel):
         blank_tile = self.__class__(
             resourceinstance=self.resourceinstance,
             nodegroup=child_nodegroup,
-            parenttile=self,
+            parenttile=parent_tile,
             **{
                 node.alias: self.get_default_value(node)
                 for node in child_nodegroup.node_set.all()
@@ -352,7 +352,7 @@ class SemanticTile(TileModel):
             except:
                 continue
             if value in (None, []):
-                blank_tile = self.from_child_nodegroup(nodegroup)
+                blank_tile = self.from_child_nodegroup(nodegroup, self)
             if value == []:
                 value.append(blank_tile)
             elif value is None:
