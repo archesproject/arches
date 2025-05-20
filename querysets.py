@@ -163,6 +163,9 @@ class SemanticTileQuerySet(models.QuerySet):
                             tile, node, tile_val
                         )
                         setattr(tile.aliased_data, node.alias, instance_val)
+                elif node.nodegroup.parentnodegroup_id == tile.nodegroup_id:
+                    empty_value = None if node.nodegroup.cardinality == "1" else []
+                    setattr(tile.aliased_data, node.alias, empty_value)
             if arches_version >= (8, 0):
                 fallback = getattr(tile, "children")
             else:
