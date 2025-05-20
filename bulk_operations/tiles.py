@@ -1,7 +1,6 @@
 import uuid
 from collections import defaultdict
 from functools import partial
-from itertools import chain
 from operator import attrgetter
 
 from django.core.exceptions import ValidationError
@@ -380,10 +379,10 @@ class BulkTileOperation:
             )
             for insert in self.to_insert
         ]
-        update_proxies = Tile.objects.filter(
-            pk__in=[tile.pk for tile in self.to_update]
+        update_proxies = list(
+            Tile.objects.filter(pk__in=[tile.pk for tile in self.to_update])
         )
-        upsert_proxies = chain(insert_proxies, update_proxies)
+        upsert_proxies = insert_proxies + update_proxies
         delete_proxies = Tile.objects.filter(
             pk__in=[tile.pk for tile in self.to_delete]
         )
@@ -438,9 +437,9 @@ class BulkTileOperation:
                     TileModel.objects.bulk_create(self.to_insert), key=attrgetter("pk")
                 )
                 # Pay the cost of a second TileModel -> Tile transform until refactored.
-                refreshed_insert_proxies = Tile.objects.filter(
-                    pk__in=[t.pk for t in inserted]
-                ).order_by("pk")
+                refreshed_insert_proxies = list(
+                    Tile.objects.filter(pk__in=[t.pk for t in inserted]).order_by("pk")
+                )
                 for before, after in zip(
                     insert_proxies, refreshed_insert_proxies, strict=True
                 ):
@@ -448,7 +447,7 @@ class BulkTileOperation:
                     after._provisional_edit_log_details = (
                         before._provisional_edit_log_details
                     )
-                upsert_proxies = refreshed_insert_proxies | update_proxies
+                upsert_proxies = refreshed_insert_proxies + update_proxies
             else:
                 insert_proxies = TileModel.objects.none()
             if self.to_update:
