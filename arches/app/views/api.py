@@ -1299,7 +1299,9 @@ class ResourceReport(APIBase):
             get_params.update({"paginate": "false"})
             request.GET = get_params
 
-            related_resources_response = RelatedResourcesView().get(request, resourceid)
+            related_resources_response = RelatedResourcesView().get(
+                request, resourceid, include_rr_count=False, graphs=resource_models
+            )
             related_resources = json.loads(related_resources_response.content)
 
             related_resources_summary = self._generate_related_resources_summary(

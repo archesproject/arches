@@ -16,7 +16,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
-import os
 import csv
 import datetime
 import logging
@@ -25,11 +24,9 @@ from io import BytesIO
 import re
 from django.contrib.gis.geos import GeometryCollection, GEOSGeometry
 from django.core.files import File
-from django.core.files.storage import default_storage
 from django.utils.translation import gettext as _
-from django.urls import reverse, resolve
+from django.urls import reverse, resolve, get_script_prefix
 from arches.app.models import models
-from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.utils.flatten_dict import flatten_dict
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
@@ -166,7 +163,10 @@ class SearchResultsExporter(object):
 
     def export(self, format, report_link):
         ret = []
-        func, args, kwargs = resolve(reverse("search_results"))
+        search_results_path = reverse("search_results")
+        if search_results_path.startswith(get_script_prefix()):
+            search_results_path = search_results_path.replace(get_script_prefix(), "/")
+        func, args, kwargs = resolve(search_results_path)
         kwargs["request"] = self.search_request
         search_res_json = func(*args, **kwargs)
         if search_res_json.status_code == 500:
@@ -325,8 +325,7 @@ class SearchResultsExporter(object):
         search_history_obj.downloadfile.name = name
         f = BytesIO(zip_stream)
         download = File(f)
-        storage = default_storage
-        storage.save(search_history_obj.downloadfile.name, download)
+        search_history_obj.downloadfile.save(name, download)
         search_history_obj.save()
         return search_history_obj.searchexportid
 

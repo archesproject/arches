@@ -633,6 +633,9 @@ class PermissionBackend(ObjectPermissionBackend):  # type: ignore
                         "given obj has '%s'" % (app_label, obj._meta.app_label)
                     )
 
+            if user_obj.is_superuser:
+                return True
+
             obj_checker: ObjectPermissionChecker = CachedObjectPermissionChecker(
                 user_obj, obj
             )

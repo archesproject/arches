@@ -26,6 +26,7 @@ from tests.base_test import ArchesTestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from arches.app.models.graph import Graph
+from arches.app.models.card import Card
 from arches.app.models.models import Node, NodeGroup, GraphModel, CardModel, Edge
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
@@ -470,3 +471,16 @@ class GraphManagerViewTests(ArchesTestCase):
         self.assertEqual(imported_json[0], [])
         self.assertEqual(imported_json[1]["graphs_saved"], 1)
         self.assertEqual(imported_json[1]["name"], "Cardinality Test Model")
+
+    def test_prevent_card_save_of_published_graph(self):
+        """
+        test to make sure that a card cannot be saved if the graph is published
+
+        """
+
+        logged_in_user = get_user_model().objects.get(username="admin")
+        graph = Graph.objects.get(pk="22000000-0000-0000-0000-000000000001")
+        graph.publish(user=logged_in_user)
+        card = Card.objects.get(pk="bf9ea150-3eaa-11e8-8b2b-c3a348661f61")
+        with self.assertRaises(Exception):
+            card.save()

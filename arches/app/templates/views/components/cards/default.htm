@@ -102,7 +102,7 @@
                 data: card.widgets,
                 as: 'widget',
                 beforeMove: self.beforeMove,
-                afterMove: function() { card.model.save() }
+                afterMove: self.reorderWidgets
             }">
             <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
                     'jstree-last': $index() === (card.widgets().length - 1) && $parent.card.cards().length === 0, 'hide-background': !self.showGrid()
@@ -123,9 +123,7 @@
                 data: card.cards,
                 as: 'childCard',
                 beforeMove: self.beforeMove,
-                afterMove: function() {
-                    card.reorderCards();
-                }
+                afterMove: card.reorderCards
             }">
             <div data-bind="css: {
                     'jstree-last': ($index() === ($parent.card.cards().length - 1))
@@ -173,8 +171,7 @@
         <div data-bind="sortable: {
                 data: card.widgets,
                 as: 'widget',
-                beforeMove: self.beforeMove,
-                afterMove: function() { card.model.save() }
+                beforeMove: self.beforeMove
             }">
             <li role="treeitem" class="jstree-node jstree-leaf" data-bind="css: {
                     'jstree-last': $index() === (card.widgets().length - 1) && $parent.card.cards().length === 0,

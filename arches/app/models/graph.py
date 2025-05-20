@@ -2180,6 +2180,7 @@ class Graph(models.GraphModel):
         """
         Unassigns GraphXPublishedGraph id from Graph
         """
+        self.refresh_from_database()
         self.publication = None
         self.save(validate=False)
 

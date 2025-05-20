@@ -28,7 +28,7 @@ function buildFilepathLookup(path, staticUrlPrefix) {
 
     return getFileList(path).reduce((lookup, file) => {
         // Ignore dotfiles
-        if (file.match(new RegExp(Path.sep + '\\.')) || file.match(/^\./)) {
+        if (Path.basename(file).startsWith('.')) {
             return lookup;
         }
         const extension = file.match(/[^.]+$/).toString();

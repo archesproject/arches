@@ -479,6 +479,48 @@ define([
             });
         };
 
+        this.beforeMove = function(e) {
+            e.cancelDrop = (e.sourceParent!==e.targetParent);
+        };
+
+        this.reorderOverlays = function(e) {
+            const mapOrder = ko.observableArray(e.sourceParent());
+            const newOrder = self.createNewOverlayOrder(mapOrder);
+            self.sendNewOverlayOrder(newOrder)
+        };
+
+        this.keyDownHandler = function (context, e) {
+            // reorder list in the front-end by only using keyboard inputs
+            const li = this
+            const moveOverlays = function (direction) {
+                if (self.overlays().includes(li)) {
+                    const index = self.overlays().indexOf(li);
+                    let newIndex = index
+                    if (direction == "up") {
+                        newIndex--
+                    } else if (direction == "down") {
+                        newIndex++
+                    }
+                    if (newIndex != -1 && newIndex != self.overlays().length) {
+                        const newArr = self.overlays()
+                        newArr.splice(newIndex, 0, newArr.splice(index, 1)[0]);
+                        self.overlays(newArr);
+                    }
+                }
+            }
+
+            if (e.ctrlKey) {
+                switch (e.which) {
+                    case 38:
+                        moveOverlays("up");
+                        break;
+                    case 40:
+                        moveOverlays("down");
+                        break;
+                }
+            }
+        };
+
         this.setupMap = function(map) {
             map.on('load', function() {
                 require(['mapbox-gl', 'mapbox-gl-geocoder'], function(MapboxGl, MapboxGeocoder) {
