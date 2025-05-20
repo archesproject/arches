@@ -229,6 +229,9 @@ class SemanticTile(TileModel):
         attrs["parenttile"] = parent_tile
 
         tile = cls(**attrs)
+        for attr in {"resourceinstance", "nodegroup", "parenttile"}:
+            if attr in tile_dict:
+                tile_dict[attr] = getattr(tile, attr)
 
         if arches_version < (8, 0):
             # Simulate the default supplied by v8.
