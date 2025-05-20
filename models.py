@@ -4,6 +4,7 @@ import uuid
 from itertools import chain
 from types import SimpleNamespace
 
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import models, transaction
 from django.utils.translation import gettext as _
 
@@ -14,7 +15,7 @@ from arches.app.models.models import (
     ResourceInstance,
     TileModel,
 )
-from arches.app.models.models import Node
+from arches.app.models.models import DDataType, Node
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.utils.permission_backend import (
@@ -370,8 +371,12 @@ class SemanticTile(TileModel):
         # TODO: When ingesting this into core, make this a method on the node.
         from arches.app.datatypes.datatypes import DataTypeFactory
 
-        widget_config = node.cardxnodexwidget_set.all()[0]
-        localized_config = widget_config.config.serialize()
+        try:
+            widget_config = node.cardxnodexwidget_set.all()[0].config
+            localized_config = widget_config.serialize()
+        except (IndexError, ObjectDoesNotExist, MultipleObjectsReturned):
+            default_widget = DDataType.objects.get(pk=node.datatype).defaultwidget
+            localized_config = default_widget.defaultconfig
         default_value = localized_config.get("defaultValue", None)
         datatype = DataTypeFactory().get_instance(node.datatype)
         try:
