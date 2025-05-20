@@ -172,14 +172,17 @@ class SemanticResource(ResourceInstance):
             )
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None, user=None):
-        if from_queryset is None:
-            from_queryset = self.__class__.as_model(
-                self.graph.slug,
-                # TODO: only=queried_nodes
-                as_representation=getattr(self, "_as_representation", False),
-                user=user,
-            ).filter(pk=self.pk)
-        super().refresh_from_db(using, fields, from_queryset)
+        if arches_version >= (8, 0):
+            if from_queryset is None:
+                from_queryset = self.__class__.as_model(
+                    self.graph.slug,
+                    # TODO: only=queried_nodes
+                    as_representation=getattr(self, "_as_representation", False),
+                    user=user,
+                ).filter(pk=self.pk)
+            super().refresh_from_db(using, fields, from_queryset)
+        else:
+            super().refresh_from_db(using, fields)
 
 
 class SemanticTile(TileModel):
