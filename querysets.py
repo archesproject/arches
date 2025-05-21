@@ -143,7 +143,7 @@ class SemanticTileQuerySet(models.QuerySet):
             self._perform_custom_annotations()
         except (TypeError, ValueError, ValidationError) as e:
             # These errors are caught by DRF, so re-raise as something else.
-            raise RuntimeError from e
+            raise RuntimeError(e) from e
 
     def _perform_custom_annotations(self):
         NOT_PROVIDED = object()
