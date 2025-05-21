@@ -280,6 +280,14 @@ class ListItem(models.Model):
         query.add_query(term)
         query.delete(index=settings.REFERENCES_INDEX_NAME)
 
+    def get_child_uris(self, uris=[]):
+        uris.append(self.uri)
+        for child in self.children.all():
+            child.get_child_uris(uris)
+        print(self.uri)
+        print(uris)
+        return uris
+
 
 class ListItemValue(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

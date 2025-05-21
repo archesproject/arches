@@ -1,54 +1,55 @@
+from arches.app.search.elasticsearch_dsl_builder import (
+    Bool,
+    Match,
+    Nested,
+    Terms,
+)
 from arches.app.search.es_mapping_modifier import EsMappingModifier
+
+from arches_controlled_lists.models import ListItem
 
 REFERENCES_INDEX_PATH = "references"
 
-class ReferencesEsMappingModifier:
+
+class ReferencesEsMappingModifier(EsMappingModifier):
     """
     Base class for creating custom sections in the Resource Instance elasticsearch document.
     """
 
     custom_search_path = REFERENCES_INDEX_PATH
 
-    def __init__(self):
-        pass
-
     @staticmethod
-    def get_mapping_property():
-        """
-        Identifies the document key where the custom ES document section is located.
+    def add_search_filter(
+        search_query, term, permitted_nodegroups, include_provisional
+    ):
+        if term["type"] == "reference":
+            item = ListItem.objects.get(pk=term["value"])
+            uris = item.get_child_uris(uris=[])
+            references_filter = Bool()
+            references_filter.filter(Terms(field="references.uri", terms=uris))
+            references_filter.filter(
+                Terms(field="references.nodegroup_id", terms=permitted_nodegroups)
+            )
 
-        :return: ES document key
-        :rtype String
-        """
-        return REFERENCES_INDEX_PATH
+            if include_provisional is False:
+                references_filter.must_not(
+                    Match(field="references.provisional", query="true", type="phrase")
+                )
+            elif include_provisional == "only provisional":
+                references_filter.must_not(
+                    Match(field="references.provisional", query="false", type="phrase")
+                )
 
-    @staticmethod
-    def add_search_terms(resourceinstance, document, terms):
-        """
-        Adds the custom ES search document section for the resource instance.
-        :param resourceinstance: resource instance being indexed
-        :param document: Original ES document for the Resource Instance
-        :param terms: ES terms in the document
-        """
-        pass
-
-    @staticmethod
-    def add_search_filter(search_query, term):
-        """
-        Adds to or modifies the term search_query to include the custom search document section as part of the search
-        :param search_query: The original search term query
-        :param term: The search term
-        """
-        pass
+            nested_references_filter = Nested(
+                path="references", query=references_filter
+            )
+            if term["inverted"]:
+                search_query.must_not(nested_references_filter)
+            else:
+                search_query.filter(nested_references_filter)
 
     @staticmethod
     def get_mapping_definition():
-        """
-        Defines the ES structure of the custom search document section. Called when the initial ES resources index is created.
-
-        :return: dict of the custom document section
-        :rtype dict
-        """
         return {
             "type": "nested",
             "properties": {
