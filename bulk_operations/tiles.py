@@ -282,8 +282,6 @@ class BulkTileOperation:
         from arches_querysets.models import AliasedData, SemanticTile
 
         for node in nodes:
-            node_id_str = str(node.pk)
-            # TODO: move this somewhere else?
             if isinstance(tile._incoming_tile, SemanticTile) and isinstance(
                 tile._incoming_tile.aliased_data, AliasedData
             ):
@@ -296,79 +294,99 @@ class BulkTileOperation:
                 )
             if value_to_validate is NOT_PROVIDED:
                 continue
+            self._run_datatype_methods(tile, value_to_validate, node, languages)
 
-            # This ugly section provides hooks to patch in better datatype methods.
-            # It won't live forever.
-            datatype_instance = self.datatype_factory.get_instance(node.datatype)
-            # TODO: pre_structure_tile_data()?
-            # TODO: move this to Tile.full_clean()?
-            # https://github.com/archesproject/arches/issues/10851#issuecomment-2427305853
-            snake_case_datatype = node.datatype.replace("-", "_")
-            if transform_fn := getattr(
-                datatype_transforms,
-                f"{snake_case_datatype}_transform_value_for_tile",
-                None,
-            ):
-                transform_fn = partial(transform_fn, datatype_instance)
-            else:
-                transform_fn = datatype_instance.transform_value_for_tile
-            if merge_fn := getattr(
-                datatype_transforms,
-                f"{snake_case_datatype}_merge_tile_value",
-                None,
-            ):
-                merge_fn = partial(merge_fn, datatype_instance)
-            # no else: this hook only exists in arches-querysets (for now)
-            if clean_fn := getattr(
-                datatype_transforms, f"{snake_case_datatype}_clean", None
-            ):
-                clean_fn = partial(clean_fn, datatype_instance)
-            else:
-                clean_fn = datatype_instance.clean
-            if validate_fn := getattr(
-                datatype_transforms, f"{snake_case_datatype}_validate", None
-            ):
-                validate_fn = partial(validate_fn, datatype_instance)
-            else:
-                validate_fn = datatype_instance.validate
-            if pre_tile_save_fn := getattr(
-                datatype_transforms, f"{snake_case_datatype}_pre_tile_save", None
-            ):
-                pre_tile_save_fn = partial(pre_tile_save_fn, datatype_instance)
-            else:
-                pre_tile_save_fn = datatype_instance.pre_tile_save
+    def _run_datatype_methods(self, tile, value_to_validate, node, languages):
+        """
+        Call datatype methods when merging value_to_validate into the tile.
 
-            if value_to_validate is None:
-                tile.data[node_id_str] = None
-                continue
-            try:
-                transformed = transform_fn(
-                    value_to_validate, languages=languages, **node.config
+        1. transform_value_for_tile()
+        2. merge_tile_value() -- only exists in arches-querysets for now
+        3. clean()
+        4. validate()
+        5. pre_tile_save()
+
+        TODO: pre_structure_tile_data()?
+        TODO: move this to Tile.full_clean()?
+        https://github.com/archesproject/arches/issues/10851#issuecomment-2427305853
+        """
+        node_id_str = str(node.pk)
+        datatype_instance = self.datatype_factory.get_instance(node.datatype)
+
+        transform_fn, merge_fn, clean_fn, validate_fn, pre_tile_save_fn = (
+            self._get_overridden_datatype_methods(datatype_instance)
+        )
+
+        if value_to_validate is None:
+            tile.data[node_id_str] = None
+            return
+        try:
+            transformed = transform_fn(
+                value_to_validate, languages=languages, **node.config
+            )
+        except ValueError:  # BooleanDataType raises.
+            # validate() will handle.
+            transformed = value_to_validate
+
+        # Merge the transformed data into the tile.data.
+        # We just overwrite the old value unless a datatype has another idea.
+        if merge_fn:
+            merge_fn(tile, node_id_str, transformed)
+        else:
+            tile.data[node_id_str] = transformed
+
+        clean_fn(tile, node_id_str)
+
+        if errors := validate_fn(transformed, node=node):
+            self.errors_by_node_alias[node.alias].extend(errors)
+
+        try:
+            pre_tile_save_fn(tile, node_id_str)
+        except TypeError:  # GeoJSONDataType raises.
+            self.errors_by_node_alias[node.alias].append(
+                datatype_instance.create_error_message(
+                    tile.data[node_id_str], None, None, None
                 )
-            except ValueError:  # BooleanDataType raises.
-                # validate() will handle.
-                transformed = value_to_validate
+            )
 
-            # Merge the transformed data into the tile.data.
-            # We just overwrite the old value unless a datatype has another idea.
-            if merge_fn:
-                merge_fn(tile, node_id_str, transformed)
-            else:
-                tile.data[node_id_str] = transformed
+    def _get_overridden_datatype_methods(self, datatype_instance):
+        """
+        Get datatype methods, possibly overridden by more robust ones
+        from arches_querysets.datatype_transforms.
+        """
+        assert datatype_instance.datatype_name
+        snake_dt = datatype_instance.datatype_name.replace("-", "_")
 
-            clean_fn(tile, node_id_str)
+        if transform_fn := getattr(
+            datatype_transforms,
+            f"{snake_dt}_transform_value_for_tile",
+            None,
+        ):
+            transform_fn = partial(transform_fn, datatype_instance)
+        else:
+            transform_fn = datatype_instance.transform_value_for_tile
+        if merge_fn := getattr(
+            datatype_transforms,
+            f"{snake_dt}_merge_tile_value",
+            None,
+        ):
+            merge_fn = partial(merge_fn, datatype_instance)
+        if clean_fn := getattr(datatype_transforms, f"{snake_dt}_clean", None):
+            clean_fn = partial(clean_fn, datatype_instance)
+        else:
+            clean_fn = datatype_instance.clean
+        if validate_fn := getattr(datatype_transforms, f"{snake_dt}_validate", None):
+            validate_fn = partial(validate_fn, datatype_instance)
+        else:
+            validate_fn = datatype_instance.validate
+        if pre_tile_save_fn := getattr(
+            datatype_transforms, f"{snake_dt}_pre_tile_save", None
+        ):
+            pre_tile_save_fn = partial(pre_tile_save_fn, datatype_instance)
+        else:
+            pre_tile_save_fn = datatype_instance.pre_tile_save
 
-            if errors := validate_fn(transformed, node=node):
-                self.errors_by_node_alias[node.alias].extend(errors)
-
-            try:
-                pre_tile_save_fn(tile, node_id_str)
-            except TypeError:  # GeoJSONDataType raises.
-                self.errors_by_node_alias[node.alias].append(
-                    datatype_instance.create_error_message(
-                        tile.data[node_id_str], None, None, None
-                    )
-                )
+        return transform_fn, merge_fn, clean_fn, validate_fn, pre_tile_save_fn
 
     def _persist(self):
         # Instantiate proxy models for now, but TODO: expose this
