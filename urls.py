@@ -11,6 +11,7 @@ from arches_controlled_lists.views import (
     ListItemImageMetadataView,
     ListItemValueView,
     ListOptionsView,
+    SearchTermsView,
 )
 
 urlpatterns = [
@@ -67,6 +68,8 @@ urlpatterns = [
         name="controlled_list_options",
     ),
 ]
+
+urlpatterns.append(path("search/terms", SearchTermsView.as_view(), name="search_terms"))
 
 # Ensure Arches core urls are superseded by project-level urls
 urlpatterns.append(path("", include("arches.urls")))
