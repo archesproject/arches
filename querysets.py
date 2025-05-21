@@ -1,4 +1,6 @@
+import uuid
 from functools import partial
+from slugify import slugify
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -435,3 +437,101 @@ class SemanticResourceQuerySet(models.QuerySet):
         clone._fetched_graph_nodes = self._fetched_graph_nodes
         clone._as_representation = self._as_representation
         return clone
+
+
+class GraphWithPrefetchingQuerySet(models.QuerySet):
+    """Backport of Arches 8.0 GraphQuerySet."""
+
+    def make_name_unique(self, name, names_to_check, suffix_delimiter="_"):
+        """
+        Makes a name unique among a list of names
+
+        Arguments:
+        name -- the name to check and modfiy to make unique in the list of "names_to_check"
+        names_to_check -- a list of names that "name" should be unique among
+        """
+
+        i = 1
+        temp_node_name = name
+        while temp_node_name in names_to_check:
+            temp_node_name = "{0}{1}{2}".format(name, suffix_delimiter, i)
+            i += 1
+        return temp_node_name
+
+    def create(self, *args, **kwargs):
+        raise NotImplementedError(
+            "Use create_graph() to create new Graph instances with proper business logic."
+        )
+
+    def generate_slug(self, name, is_resource):
+        if name:
+            slug = slugify(name, separator="_")
+        else:
+            if is_resource:
+                slug = "new_resource_model"
+            else:
+                slug = "new_branch"
+        existing_slugs = self.values_list("slug", flat=True)
+        slug = self.make_name_unique(slug, existing_slugs, "_")
+
+        return slug
+
+    def create_graph(self, name="", *, slug=None, user=None, is_resource=False):
+        from arches.app.models import models as arches_models
+        from arches.app.models.graph import Graph as OldGraphWithPrefetchingModel
+
+        """
+        Create a new Graph and related objects, encapsulating all creation side effects.
+        """
+        new_id = uuid.uuid4()
+        nodegroup = None
+
+        if not slug:
+            slug = self.generate_slug(name, is_resource)
+
+        graph_model = arches_models.GraphModel(
+            name=name,
+            subtitle="",
+            author=(
+                " ".join(filter(None, [user.first_name, user.last_name]))
+                if user
+                else ""
+            ),
+            description="",
+            version="",
+            isresource=is_resource,
+            iconclass="",
+            ontology=None,
+            slug=slug,
+        )
+        graph_model.save()  # to access side-effects declared in save method
+
+        if not is_resource:
+            nodegroup = arches_models.NodeGroup.objects.create(pk=new_id)
+            arches_models.CardModel.objects.create(
+                nodegroup=nodegroup, name=name, graph=graph_model
+            )
+
+        # root node
+        arches_models.Node.objects.create(
+            pk=new_id,
+            name=name,
+            description="",
+            istopnode=True,
+            ontologyclass=None,
+            datatype="semantic",
+            nodegroup=nodegroup,
+            graph=graph_model,
+        )
+
+        graph = OldGraphWithPrefetchingModel.objects.get(pk=graph_model.graphid)
+
+        graph.publish(
+            user=user,
+            notes=_("Graph created."),
+        )
+        if arches_version >= (8, 0):
+            graph.create_draft_graph()
+
+        # ensures entity returned matches database entity
+        return self.get(pk=graph_model.graphid)

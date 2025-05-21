@@ -15,7 +15,6 @@ from arches.app.models.models import (
     ResourceInstance,
     TileModel,
 )
-from arches.app.models.models import DDataType, Node
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.utils.permission_backend import (
@@ -26,6 +25,7 @@ from arches.app.utils.permission_backend import (
 from arches_querysets.bulk_operations.tiles import BulkTileOperation
 from arches_querysets.lookups import *  # registers lookups
 from arches_querysets.querysets import (
+    GraphWithPrefetchingQuerySet,
     SemanticResourceQuerySet,
     SemanticTileManager,
     SemanticTileQuerySet,
@@ -521,6 +521,8 @@ class SemanticTile(TileModel):
 
 
 class GraphWithPrefetching(GraphModel):
+    objects = GraphWithPrefetchingQuerySet.as_manager()
+
     class Meta:
         proxy = True
         db_table = "graphs"
