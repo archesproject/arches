@@ -31,6 +31,7 @@ from arches_querysets.querysets import (
     SemanticTileQuerySet,
 )
 from arches_querysets.utils.models import (
+    find_nodegroup_by_alias,
     get_recursive_prefetches,
     get_nodegroups_here_and_below,
     pop_arches_model_kwargs,
@@ -96,19 +97,16 @@ class SemanticResource(ResourceInstance):
         if not vars(self.aliased_data):
             raise RuntimeError("aliased_data is empty")
 
-        def find_nodegroup_from_alias(nodegroup_alias):
-            for fetched_node in self._permitted_nodes:
-                if fetched_node.alias == nodegroup_alias:
-                    return fetched_node.nodegroup
-
         for nodegroup_alias, value in vars(self.aliased_data).items():
             if value in (None, []):
-                nodegroup = find_nodegroup_from_alias(nodegroup_alias)
+                nodegroup = find_nodegroup_by_alias(
+                    nodegroup_alias, self._permitted_nodes
+                )
                 blank_tile = SemanticTile(
                     resourceinstance=self,
                     nodegroup=nodegroup,
                 )
-                blank_tile = blank_tile.from_child_nodegroup(nodegroup)
+                blank_tile = blank_tile.fill_blank_tile_from_child_nodegroup(nodegroup)
             if value == []:
                 value.append(blank_tile)
             elif value is None:
@@ -200,6 +198,9 @@ class SemanticTile(TileModel):
         self.aliased_data = arches_model_kwargs.pop(
             "aliased_data", None
         ) or AliasedData(**arches_model_kwargs)
+        self._permitted_nodes = Node.objects.none()
+        # Data-collecting nodes that were queried
+        self._queried_nodes = Node.objects.none()
 
     def find_nodegroup_alias(self):
         # SemanticTileManager provides grouping_node on 7.6
@@ -297,7 +298,7 @@ class SemanticTile(TileModel):
                 self.set_next_sort_order()
             self._save_aliased_data(request=request, index=index, **kwargs)
 
-    def from_child_nodegroup(self, child_nodegroup, parent_tile=None):
+    def fill_blank_tile_from_child_nodegroup(self, child_nodegroup, parent_tile=None):
         grandchildren = (
             child_nodegroup.children.all()
             if arches_version >= (8, 0)
@@ -315,9 +316,11 @@ class SemanticTile(TileModel):
             },
             **{
                 SemanticTile(nodegroup=grandchild_nodegroup).find_nodegroup_alias(): (
-                    self.from_child_nodegroup(grandchild_nodegroup)
+                    self.fill_blank_tile_from_child_nodegroup(grandchild_nodegroup)
                     if grandchild_nodegroup.cardinality == "1"
-                    else [self.from_child_nodegroup(grandchild_nodegroup)]
+                    else [
+                        self.fill_blank_tile_from_child_nodegroup(grandchild_nodegroup)
+                    ]
                 )
                 for grandchild_nodegroup in grandchildren
             },
@@ -347,7 +350,7 @@ class SemanticTile(TileModel):
             except:
                 continue
             if value in (None, []):
-                blank_tile = self.from_child_nodegroup(nodegroup, self)
+                blank_tile = self.fill_blank_tile_from_child_nodegroup(nodegroup, self)
             if value == []:
                 value.append(blank_tile)
             elif value is None:

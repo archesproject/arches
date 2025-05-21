@@ -216,3 +216,10 @@ def get_recursive_prefetches(lookup_str, *, recursive_part, depth):
         recursive_lookup = "__".join([recursive_part] * i)
         prefetches.append(lookup_str.replace(recursive_part, recursive_lookup))
     return prefetches
+
+
+def find_nodegroup_by_alias(nodegroup_alias, permitted_nodes):
+    for fetched_node in permitted_nodes:
+        if fetched_node.alias == nodegroup_alias:
+            return fetched_node.nodegroup
+    raise RuntimeError(nodegroup_alias)
