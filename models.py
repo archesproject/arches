@@ -368,14 +368,16 @@ class SemanticTile(TileModel):
         # TODO: When ingesting this into core, make this a method on the node.
         from arches.app.datatypes.datatypes import DataTypeFactory
 
+        datatype_factory = DataTypeFactory()
+        d_data_type = datatype_factory.datatypes[node.datatype]
+        datatype = datatype_factory.get_instance(node.datatype)
         try:
             widget_config = node.cardxnodexwidget_set.all()[0].config
             localized_config = widget_config.serialize()
         except (IndexError, ObjectDoesNotExist, MultipleObjectsReturned):
-            default_widget = DDataType.objects.get(pk=node.datatype).defaultwidget
+            default_widget = d_data_type.defaultwidget
             localized_config = default_widget.defaultconfig
         default_value = localized_config.get("defaultValue", None)
-        datatype = DataTypeFactory().get_instance(node.datatype)
         try:
             default_value = datatype.get_interchange_value(default_value)
         except AttributeError:

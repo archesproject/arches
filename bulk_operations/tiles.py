@@ -111,7 +111,7 @@ class BulkTileOperation:
             )
         else:
             for grouping_node in self.grouping_nodes_by_nodegroup_id.values():
-                if grouping_node.nodegroup.parentnodegroup:
+                if grouping_node.nodegroup.parentnodegroup_id:
                     continue
                 self._update_tile_for_grouping_node(
                     grouping_node,
