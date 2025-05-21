@@ -131,7 +131,7 @@ class List(models.Model):
             item.index()
 
     def delete_index(self):
-        query = Query(SearchEngineInstance, start=0, limit=10000)
+        query = Query(SearchEngineInstance)
         term = Term(field="list_id", term=self.id)
         query.add_query(term)
         query.delete(index=settings.REFERENCES_INDEX_NAME)
@@ -275,7 +275,7 @@ class ListItem(models.Model):
             label.index()
 
     def delete_index(self):
-        query = Query(SearchEngineInstance, start=0, limit=10000)
+        query = Query(SearchEngineInstance)
         term = Term(field="item_id", term=self.id)
         query.add_query(term)
         query.delete(index=settings.REFERENCES_INDEX_NAME)
@@ -361,7 +361,7 @@ class ListItemValue(models.Model):
         return ret
 
     def delete_index(self):
-        query = Query(SearchEngineInstance, start=0, limit=1)
+        query = Query(SearchEngineInstance)
         term = Term(field="label_id", term=self.id)
         query.add_query(term)
         query.delete(index=settings.REFERENCES_INDEX_NAME)
