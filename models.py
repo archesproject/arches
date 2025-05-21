@@ -10,6 +10,7 @@ from django.utils.translation import gettext as _
 
 from arches import VERSION as arches_version
 from arches.app.models.models import (
+    DDataType,
     GraphModel,
     Node,
     ResourceInstance,
