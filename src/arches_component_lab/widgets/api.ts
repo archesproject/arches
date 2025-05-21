@@ -84,7 +84,10 @@ export const fetchWidgetDataFromCard = async (
     nodegroupGroupingNodeAlias: string,
 ) => {
     const response = await fetch(
-        arches.urls.api_list_widget_data_from_card(graphSlug, nodegroupGroupingNodeAlias),
+        arches.urls.api_list_widget_data_from_card(
+            graphSlug,
+            nodegroupGroupingNodeAlias,
+        ),
     );
 
     try {

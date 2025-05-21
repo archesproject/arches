@@ -18,9 +18,9 @@ import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 const props = withDefaults(
     defineProps<{
         mode: WidgetMode;
-        initialValue: string | null | undefined;
         nodeAlias: string;
         graphSlug: string;
+        initialValue?: string | null;
         showLabel?: boolean;
     }>(),
     {
@@ -49,32 +49,43 @@ onMounted(async () => {
 </script>
 
 <template>
-    <ProgressSpinner
-        v-if="isLoading"
-        style="width: 2em; height: 2em"
-    />
-    <template v-else>
-        <label v-if="props.showLabel">
-            <span>{{ widgetData.label }}</span>
-            <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
-        </label>
+    <div class="widget">
+        <ProgressSpinner
+            v-if="isLoading"
+            style="width: 2em; height: 2em"
+        />
+        <template v-else>
+            <label v-if="props.showLabel">
+                <span>{{ widgetData.label }}</span>
+                <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
+            </label>
 
-        <NonLocalizedStringWidgetEditor
-            v-if="props.mode === EDIT"
-            :initial-value="initialValue"
-            :graph-slug="props.graphSlug"
-            :node-alias="props.nodeAlias"
-        />
-        <NonLocalizedStringWidgetViewer
-            v-else-if="props.mode === VIEW"
-            :value="props.initialValue"
-        />
-    </template>
-    <Message
-        v-if="configurationError"
-        severity="error"
-        size="small"
-    >
-        {{ configurationError.message }}
-    </Message>
+            <NonLocalizedStringWidgetEditor
+                v-if="props.mode === EDIT"
+                :initial-value="initialValue"
+                :graph-slug="props.graphSlug"
+                :node-alias="props.nodeAlias"
+            />
+            <NonLocalizedStringWidgetViewer
+                v-else-if="props.mode === VIEW"
+                :value="props.initialValue"
+            />
+        </template>
+        <Message
+            v-if="configurationError"
+            severity="error"
+            size="small"
+        >
+            {{ configurationError.message }}
+        </Message>
+    </div>
 </template>
+
+<style scoped>
+.widget {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    width: 100%;
+}
+</style>

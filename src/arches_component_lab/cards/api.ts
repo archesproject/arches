@@ -1,6 +1,9 @@
 import arches from "arches";
 
-export const fetchCardData = async (graphSlug: string, nodegroupGroupingNodeAlias: string) => {
+export const fetchCardData = async (
+    graphSlug: string,
+    nodegroupGroupingNodeAlias: string,
+) => {
     const response = await fetch(
         arches.urls.api_card_data(graphSlug, nodegroupGroupingNodeAlias),
     );
