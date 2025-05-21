@@ -1,6 +1,7 @@
 import datetime
 import json
 import logging
+import pgtrigger
 import sys
 import traceback
 import uuid
@@ -23,6 +24,9 @@ from arches.app.const import ExtensionType
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.models.mixins import SaveSupportsBlindOverwriteMixin
 from arches.app.models.query_expressions import UUID4
+from arches.app.models.trigger_functions import (
+    ARCHES_UPDATE_SPATIAL_VIEWS_TRIGGER_FUNCTION,
+)
 from arches.app.models.utils import add_to_update_fields
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.module_importer import get_class_from_modulename
@@ -2383,6 +2387,21 @@ class SpatialView(models.Model):
     class Meta:
         managed = True
         db_table = "spatial_views"
+        triggers = [
+            pgtrigger.Composer(
+                name="__arches_trg_update_spatial_views",
+                when=pgtrigger.After,
+                operation=pgtrigger.Update | pgtrigger.Delete | pgtrigger.Insert,
+                declare=[
+                    ("sv_perform", "text"),
+                    ("valid_geom_nodeid", "boolean"),
+                    ("has_att_nodes", "integer"),
+                    ("valid_att_nodeids", "boolean"),
+                    ("valid_language_count", "integer"),
+                ],
+                func=pgtrigger.Func(ARCHES_UPDATE_SPATIAL_VIEWS_TRIGGER_FUNCTION),
+            )
+        ]
 
     def clean(self):
         """

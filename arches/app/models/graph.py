@@ -36,7 +36,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.i18n import LanguageSynchronizer
 from django.utils.translation import gettext as _
 from pyld.jsonld import compact, JsonLdError
-from django.db.models.base import Deferred
+from django.db.models import Q
 from django.utils import translation
 from guardian.models import GroupObjectPermission, UserObjectPermission
 
@@ -117,6 +117,10 @@ class Graph(models.GraphModel):
 
                 for card in args[0]["cards"]:
                     self.add_card(card)
+
+                for spatial_view in args[0]["spatial_views"]:
+                    spatial_view = models.SpatialView(**spatial_view)
+                    spatial_view.save()
 
                 def check_default_configs(default_configs, configs):
                     if default_configs is not None:
@@ -1960,6 +1964,10 @@ class Graph(models.GraphModel):
             else:
                 ret.pop("group_permissions", None)
 
+            ret["spatial_views"] = models.SpatialView.objects.select_related().filter(
+                Q(geometrynode__graph_id=self.source_identifier_id)
+                | Q(geometrynode__graph_id=self.graphid)
+            )
             ret["domain_connections"] = (
                 self.get_valid_domain_ontology_classes()
                 if "domain_connections" not in exclude
