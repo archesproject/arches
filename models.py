@@ -547,6 +547,7 @@ class GraphWithPrefetching(GraphModel):
         if arches_version >= (8, 0):
             prefetches = [
                 "node_set__cardxnodexwidget_set",
+                "node_set__nodegroup__parentnodegroup",
                 "node_set__nodegroup__node_set",
                 "node_set__nodegroup__node_set__cardxnodexwidget_set",
                 "node_set__nodegroup__cardmodel_set",
@@ -577,6 +578,7 @@ class GraphWithPrefetching(GraphModel):
         else:
             prefetches = [
                 "node_set__cardxnodexwidget_set",
+                "node_set__nodegroup__parentnodegroup",
                 "node_set__nodegroup__node_set",
                 "node_set__nodegroup__node_set__cardxnodexwidget_set",
                 "node_set__nodegroup__cardmodel_set",

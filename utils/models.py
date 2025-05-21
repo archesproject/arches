@@ -53,7 +53,7 @@ def generate_node_alias_expressions(nodes, *, defer, only, model):
             raise ValueError(f'"{node.alias}" clashes with a model field name.')
 
         if issubclass(model, ResourceInstance):
-            tile_values_query = get_tile_values_for_resource(node)
+            tile_values_query = get_tile_values_for_resource(node, nodes)
         elif issubclass(model, TileModel):
             # TODO: Investigate consistency with prior branch.
             if node.datatype in {"non-localized-string"}:
@@ -83,7 +83,7 @@ def pop_arches_model_kwargs(kwargs, model_fields):
     return arches_model_data, without_model_data
 
 
-def get_tile_values_for_resource(node):
+def get_tile_values_for_resource(node, permitted_nodes):
     """
     Return a tile values query expression for use in a ResourceInstanceQuerySet.
 
@@ -92,7 +92,7 @@ def get_tile_values_for_resource(node):
     multiple tiles for cardinality-1 nodegroups might appear if there
     are cardinality-N parents anywhere.
     """
-    many = any_nodegroup_in_hierarchy_is_cardinality_n(node.nodegroup)
+    many = any_nodegroup_in_hierarchy_is_cardinality_n(node.nodegroup, permitted_nodes)
     expression, field = get_node_value_expression_and_output_field(node)
     tile_query = (
         TileModel.objects.filter(
@@ -184,13 +184,21 @@ def filter_nodes_by_highest_parent(nodes, aliases):
     return filtered_nodes
 
 
-def any_nodegroup_in_hierarchy_is_cardinality_n(nodegroup):
+def any_nodegroup_in_hierarchy_is_cardinality_n(nodegroup, permitted_nodes):
+    # Avoid verbose prefetching by just building a lookup locally.
+    parent_nodegroup_lookup = {
+        node.nodegroup.parentnodegroup_id: node.nodegroup.parentnodegroup
+        for node in permitted_nodes
+    }
     cardinality_n_found = False
     breaker = 0
     while not cardinality_n_found and nodegroup and breaker < 1000:
         if nodegroup.cardinality == "n":
             cardinality_n_found = True
-        nodegroup = nodegroup.parentnodegroup
+        if nodegroup.parentnodegroup_id:
+            nodegroup = parent_nodegroup_lookup[nodegroup.parentnodegroup_id]
+        else:
+            nodegroup = None
         breaker += 1
 
     return cardinality_n_found
