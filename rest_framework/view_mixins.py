@@ -120,7 +120,7 @@ class ArchesModelAPIMixin:
             # Not 404, see https://github.com/archesproject/arches/issues/11563
             raise PermissionDenied
         ret.save = partial(ret.save, request=self.request)
-        self.graph_nodes = ret._fetched_graph_nodes
+        self.graph_nodes = ret._permitted_nodes
 
         if fill_blanks:
             ret.fill_blanks()

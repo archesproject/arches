@@ -38,7 +38,7 @@ class SemanticTileQuerySet(models.QuerySet):
         super().__init__(*args, **kwargs)
         self._as_representation = False
         self._queried_nodes = []
-        self._fetched_graph_nodes = []
+        self._permitted_nodes = []
         self._entry_node = None
 
     def with_node_values(
@@ -92,7 +92,7 @@ class SemanticTileQuerySet(models.QuerySet):
             model=self.model,
         )
 
-        self._fetched_graph_nodes = nodes  # (partial) graph below entry point
+        self._permitted_nodes = nodes  # permitted nodes below entry point
         self._queried_nodes = [n for n in nodes if n.alias in node_alias_annotations]
         self._entry_node = entry_node
 
@@ -155,7 +155,7 @@ class SemanticTileQuerySet(models.QuerySet):
 
         for tile in self._result_cache:
             tile._queried_nodes = self._queried_nodes
-            tile._fetched_graph_nodes = self._fetched_graph_nodes
+            tile._permitted_nodes = self._permitted_nodes
             for node in self._queried_nodes:
                 if node.nodegroup_id == tile.nodegroup_id:
                     # This is on the tile itself (ORM annotation).
@@ -192,7 +192,7 @@ class SemanticTileQuerySet(models.QuerySet):
         """Persist private attributes through the life of the QuerySet."""
         clone = super()._clone()
         clone._queried_nodes = self._queried_nodes
-        clone._fetched_graph_nodes = self._fetched_graph_nodes
+        clone._permitted_nodes = self._permitted_nodes
         clone._entry_node = self._entry_node
         clone._as_representation = self._as_representation
         return clone
@@ -253,7 +253,7 @@ class SemanticResourceQuerySet(models.QuerySet):
         super().__init__(*args, **kwargs)
         self._as_representation = False
         self._queried_nodes = []
-        self._fetched_graph_nodes = []
+        self._permitted_nodes = []
 
     def with_nodegroups(
         self,
@@ -321,28 +321,24 @@ class SemanticResourceQuerySet(models.QuerySet):
         source_graph = GraphWithPrefetching.prepare_for_annotations(
             graph_slug, resource_ids=resource_ids, user=user
         )
-        self._fetched_graph_nodes = source_graph.node_set.all()
+        self._permitted_nodes = source_graph.permitted_nodes
         deferred_node_aliases = {
             n.alias
-            for n in filter_nodes_by_highest_parent(
-                self._fetched_graph_nodes, defer or []
-            )
+            for n in filter_nodes_by_highest_parent(self._permitted_nodes, defer or [])
         }
         only_node_aliases = {
             n.alias
-            for n in filter_nodes_by_highest_parent(
-                self._fetched_graph_nodes, only or []
-            )
+            for n in filter_nodes_by_highest_parent(self._permitted_nodes, only or [])
         }
         node_sql_aliases = generate_node_alias_expressions(
-            self._fetched_graph_nodes,
+            self._permitted_nodes,
             defer=deferred_node_aliases,
             only=only_node_aliases,
             model=self.model,
         )
         self._queried_nodes = [
             node
-            for node in self._fetched_graph_nodes
+            for node in self._permitted_nodes
             if node.alias in node_sql_aliases
             and not getattr(node, "source_identifier_id", None)
         ]
@@ -407,7 +403,7 @@ class SemanticResourceQuerySet(models.QuerySet):
             if not isinstance(resource, self.model):
                 # For a .values() query, we will lack instances.
                 continue
-            resource._fetched_graph_nodes = self._fetched_graph_nodes
+            resource._permitted_nodes = self._permitted_nodes
             resource._queried_nodes = self._queried_nodes
 
             # Prepare resource annotations.
@@ -434,7 +430,7 @@ class SemanticResourceQuerySet(models.QuerySet):
         """Persist private attributes through the life of the QuerySet."""
         clone = super()._clone()
         clone._queried_nodes = self._queried_nodes
-        clone._fetched_graph_nodes = self._fetched_graph_nodes
+        clone._permitted_nodes = self._permitted_nodes
         clone._as_representation = self._as_representation
         return clone
 

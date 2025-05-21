@@ -64,7 +64,7 @@ class BulkTileOperation:
 
         lookup = {}
         if isinstance(self.entry, SemanticResource):
-            for node in self.entry._fetched_graph_nodes:
+            for node in self.entry._permitted_nodes:
                 if node.pk == node.nodegroup_id:
                     lookup[node.pk] = node
         elif isinstance(self.entry, SemanticTile):
@@ -73,6 +73,7 @@ class BulkTileOperation:
                 if arches_version >= (8, 0):
                     lookup[nodegroup.pk] = nodegroup.grouping_node
                 else:
+                    # TODO: evaluate permissions when doing write
                     for node in nodegroup.node_set.all():
                         if node.pk == node.nodegroup_id:
                             lookup[node.pk] = node

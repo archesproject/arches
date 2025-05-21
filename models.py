@@ -58,9 +58,8 @@ class SemanticResource(ResourceInstance):
         )
         super().__init__(*args, **other_kwargs)
         self.aliased_data = AliasedData(**arches_model_kwargs)
-        # All graph nodes
-        self._fetched_graph_nodes = Node.objects.none()
-        # Nodes that were queried (and passed permissions test)
+        self._permitted_nodes = Node.objects.none()
+        # Data-collecting nodes that were queried
         self._queried_nodes = Node.objects.none()
 
     def save(self, *, request=None, index=True, **kwargs):
@@ -98,7 +97,7 @@ class SemanticResource(ResourceInstance):
             raise RuntimeError("aliased_data is empty")
 
         def find_nodegroup_from_alias(nodegroup_alias):
-            for fetched_node in self._fetched_graph_nodes:
+            for fetched_node in self._permitted_nodes:
                 if fetched_node.alias == nodegroup_alias:
                     return fetched_node.nodegroup
 
@@ -257,7 +256,7 @@ class SemanticTile(TileModel):
         source_graph = GraphWithPrefetching.prepare_for_annotations(
             graph_slug, resource_ids=resource_ids, user=user
         )
-        for node in source_graph.node_set.all():
+        for node in source_graph.permitted_nodes:
             if node.alias == entry_node_alias:
                 entry_node = node
                 break
@@ -266,16 +265,13 @@ class SemanticTile(TileModel):
 
         entry_node_and_nodes_below = []
         for nodegroup in get_nodegroups_here_and_below(entry_node.nodegroup):
-            # TODO: evaluate if this is needed.
-            # entry_node_and_nodes_below.extend(
-            #     [
-            #         node
-            #         for node in nodegroup.node_set.all()
-            #         # filtered by permissions, will be more clear after using to_attr=
-            #         if node in source_graph.node_set.all()
-            #     ]
-            # )
-            entry_node_and_nodes_below.extend(list(nodegroup.node_set.all()))
+            entry_node_and_nodes_below.extend(
+                [
+                    node
+                    for node in nodegroup.node_set.all()
+                    if node in source_graph.permitted_nodes
+                ]
+            )
 
         qs = cls.objects.filter(nodegroup_id=entry_node.pk)
         if resource_ids:
@@ -338,7 +334,7 @@ class SemanticTile(TileModel):
             return
 
         def find_nodegroup_from_alias(nodegroup_alias):
-            for fetched_node in self._fetched_graph_nodes:
+            for fetched_node in self._permitted_nodes:
                 if (
                     fetched_node.alias == nodegroup_alias
                     and fetched_node.nodegroup.parentnodegroup_id == self.nodegroup_id
@@ -469,7 +465,7 @@ class SemanticTile(TileModel):
         resource = SemanticResource.as_model(
             graph_slug, only=only, resource_ids=[self.resourceinstance_id]
         ).get()
-        for grouping_node in resource._fetched_graph_nodes:
+        for grouping_node in resource._permitted_nodes:
             if grouping_node.pk != grouping_node.nodegroup_id:
                 continue  # not a grouping node
             for node in grouping_node.nodegroup.node_set.all():
@@ -539,7 +535,7 @@ class GraphWithPrefetching(GraphModel):
             graph_query = cls.objects.filter(resourceinstance__in=resource_ids)
         elif graph_slug:
             if arches_version >= (8, 0):
-                graph_query = GraphModel.objects.filter(
+                graph_query = cls.objects.filter(
                     slug=graph_slug, source_identifier=None
                 )
             else:
@@ -610,9 +606,8 @@ class GraphWithPrefetching(GraphModel):
             permitted_nodes_prefetch = models.Prefetch(
                 "node_set",
                 queryset=Node.objects.filter(nodegroup__in=permitted_nodegroups),
-                # TODO: consider using to_attr
-                # https://forum.djangoproject.com/t/custom-query-expression-when-prefetching/40183/6
-                # to_attr="permitted_node_set",
+                # Intentionally not using to_attr until we can make that
+                # play nicely with other prefetches.
             )
             prefetches.insert(0, permitted_nodes_prefetch)
 
@@ -626,10 +621,10 @@ class GraphWithPrefetching(GraphModel):
         if arches_version < (8, 0):
             # 7.6: simulate .grouping_node attribute
             grouping_node_map = {}
-            for node in graph.node_set.all():
+            for node in graph.permitted_nodes:
                 if node.nodegroup_id == node.pk:
                     grouping_node_map[node.pk] = node
-            for node in graph.node_set.all():
+            for node in graph.permitted_nodes:
                 if nodegroup := node.nodegroup:
                     nodegroup.grouping_node = grouping_node_map.get(nodegroup.pk)
                     for child_nodegroup in nodegroup.nodegroup_set.all():
@@ -638,3 +633,8 @@ class GraphWithPrefetching(GraphModel):
                         )
 
         return graph
+
+    @property
+    def permitted_nodes(self):
+        """Permission filtering is accomplished by permitted_nodes_prefetch."""
+        return self.node_set.all()
