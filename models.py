@@ -10,7 +10,6 @@ from django.utils.translation import gettext as _
 
 from arches import VERSION as arches_version
 from arches.app.models.models import (
-    DDataType,
     GraphModel,
     Node,
     ResourceInstance,
@@ -290,8 +289,7 @@ class SemanticTile(TileModel):
             only=filtered_only,
             as_representation=as_representation,
             entry_node=entry_node,
-        ).annotate(_nodegroup_alias=models.Value(entry_node_alias))
-        # TODO: determine if this annotation still needed / remove
+        )
 
     def save(self, *, request=None, index=True, **kwargs):
         with transaction.atomic():
