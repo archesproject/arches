@@ -43,7 +43,7 @@ class SemanticTileQuerySet(models.QuerySet):
 
     def with_node_values(
         self,
-        nodes,
+        permitted_nodes,
         *,
         defer=None,
         only=None,
@@ -77,23 +77,25 @@ class SemanticTileQuerySet(models.QuerySet):
 
         deferred_node_aliases = {
             n.alias
-            for n in nodes
+            for n in permitted_nodes
             if getattr(n.nodegroup, "nodegroup_alias", None) in (defer or [])
         }
         only_node_aliases = {
             n.alias
-            for n in nodes
+            for n in permitted_nodes
             if getattr(n.nodegroup, "nodegroup_alias", None) in (only or [])
         }
         node_alias_annotations = generate_node_alias_expressions(
-            nodes,
+            permitted_nodes,
             defer=deferred_node_aliases,
             only=only_node_aliases,
             model=self.model,
         )
 
-        self._permitted_nodes = nodes  # permitted nodes below entry point
-        self._queried_nodes = [n for n in nodes if n.alias in node_alias_annotations]
+        self._permitted_nodes = permitted_nodes  # permitted nodes below entry point
+        self._queried_nodes = [
+            n for n in permitted_nodes if n.alias in node_alias_annotations
+        ]
         self._entry_node = entry_node
 
         qs = self.filter(nodegroup_id__in={n.nodegroup_id for n in self._queried_nodes})
@@ -107,7 +109,7 @@ class SemanticTileQuerySet(models.QuerySet):
                 models.Prefetch(
                     "children" if arches_version >= (8, 0) else "tilemodel_set",
                     queryset=self.model.objects.get_queryset().with_node_values(
-                        nodes=nodes,
+                        permitted_nodes=permitted_nodes,
                         defer=defer,
                         only=only,
                         as_representation=as_representation,
