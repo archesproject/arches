@@ -34,6 +34,7 @@ from arches_controlled_lists.models import (
     ListItemValue,
     NodeProxy,
 )
+from arches_controlled_lists.search_indexes.reference_index import ReferenceIndex
 
 
 def _prefetch_terms(request):
@@ -400,71 +401,8 @@ class SearchTermsView(APIBase):
         lang = request.GET.get("lang", request.LANGUAGE_CODE)
         search_string = request.GET.get("q", "")
         index = settings.REFERENCES_INDEX_NAME
-        i = 0
-        query = Query(SearchEngineInstance, start=0, limit=0)
-        boolquery = Bool()
 
-        if lang != "*":
-            boolquery.must(Term(field="language", term=lang))
-
-        boolquery.should(
-            Match(field="label", query=search_string.lower(), type="phrase_prefix")
-        )
-        boolquery.should(
-            Match(
-                field="label.folded", query=search_string.lower(), type="phrase_prefix"
-            )
-        )
-        boolquery.should(
-            Match(
-                field="label.folded",
-                query=search_string.lower(),
-                fuzziness="AUTO",
-                prefix_length=settings.SEARCH_TERM_SENSITIVITY,
-            )
-        )
-
-        query.add_query(boolquery)
-
-        base_agg = Aggregation(
-            name="label_agg",
-            type="terms",
-            field="label.raw",
-            size=settings.SEARCH_DROPDOWN_LENGTH,
-            order={"max_score": "desc"},
-        )
-        list_name_agg = Aggregation(
-            name="list_name_agg", type="terms", field="list_name"
-        )
-        item_id_agg = Aggregation(name="item_agg", type="terms", field="item_id")
-        max_score_agg = MaxAgg(name="max_score", script="_score")
-
-        list_name_agg.add_aggregation(item_id_agg)
-        base_agg.add_aggregation(max_score_agg)
-        base_agg.add_aggregation(list_name_agg)
-        base_agg.add_aggregation(max_score_agg)
-        query.add_aggregation(base_agg)
-
-        response_data[index] = []
-        results = query.search(index=index)
-        if results is not None:
-            for result in results["aggregations"]["label_agg"]["buckets"]:
-                label = result["key"]
-                for list_name_agg in result["list_name_agg"]["buckets"]:
-                    list_name = list_name_agg["key"]
-                    for item in list_name_agg["item_agg"]["buckets"]:
-                        response_data[index].append(
-                            {
-                                "type": "reference",
-                                "context": "",
-                                "context_label": list_name,
-                                "id": f"references-{i}",
-                                "text": label,
-                                "value": item["key"],
-                            }
-                        )
-                        i = i + 1
-
+        response_data[index] = ReferenceIndex.get_term_results(search_string, lang=lang)
         json_response.content = json.dumps(response_data).encode("utf-8")
         json_response["Content-Length"] = len(json_response.content)
         return json_response
