@@ -57,9 +57,9 @@ const viewModel = BaseFilter.extend({
 
     updateQuery: function() {
         var terms = _.filter(this.filter.terms(), function(term){
-            return term.type === 'string' || term.type === 'concept' || term.type === 'term';
+            return arches.termSearchTypes.map((a) => a.type).concat(['string']).indexOf(term.type) > -1;
         }, this);
-        
+
         var queryObj = this.query();
         if (terms.length > 0){
             queryObj[componentName] = ko.toJSON(terms);

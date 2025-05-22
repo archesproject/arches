@@ -105,6 +105,19 @@ ELASTICSEARCH_CUSTOM_INDEXES = []
 #     'should_update_asynchronously': False
 # }]
 
+TERM_SEARCH_TYPES = [
+    {
+        "type": "term",
+        "label": _("Term Matches"),
+        "key": "terms",
+    },
+    {
+        "type": "concept",
+        "label": _("Concepts"),
+        "key": "concepts",
+    },
+]
+
 THUMBNAIL_GENERATOR = None  # "arches.app.utils.thumbnail_generator.ThumbnailGenerator"
 GENERATE_THUMBNAILS_ON_DEMAND = (
     False  # True to generate a thumnail on request if it doens't exist

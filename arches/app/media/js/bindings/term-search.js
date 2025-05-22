@@ -24,7 +24,7 @@ ko.bindingHandlers.termSearch = {
                 option.data = item;
                 searchbox.append(option);
                 searchbox.tags.push(option);
-            }); 
+            });
             searchbox.trigger('change');
             if (ko.unwrap(terms).length == 0 && searchbox.tags.length == 0){
                 searchbox.empty();
@@ -83,12 +83,11 @@ ko.bindingHandlers.termSearch = {
                         text: arches.translations.containsTerm(params.term),
                         value: params.term
                     });
-                    if(data.terms.length > 0){
-                        res.push({"text": arches.translations.termSearchTerm, "children": data.terms});
-                    }
-                    if(data.concepts.length > 0){
-                        res.push({"text": arches.translations.termSearchConcept, "children": data.concepts});
-                    }
+                    arches.termSearchTypes.forEach(function(searchType) {
+                        if(data[searchType.key].length > 0){
+                            res.push({"text": searchType.label, "children": data[searchType.key]});
+                        }
+                    });
                     return {
                         results: res
                     };
@@ -99,7 +98,7 @@ ko.bindingHandlers.termSearch = {
                     return result.text;
                 }
                 var markup = [];
-                var indent = result.type === 'concept' || result.type === 'term' ? 'term-search-item indent' : (result.type === 'string' ? 'term-search-item' : 'term-search-group');
+                var indent = arches.termSearchTypes.map((a) => a.type).indexOf(result.type) > -1 ? 'term-search-item indent' : (result.type === 'string' ? 'term-search-item' : 'term-search-group');
                 if (result.type === 'group') {
                     _.each(result.text, function(searchType, i) {
                         var label = searchType === 'concepts' ? arches.translations.termSearchConcept : arches.translations.termSearchTerm;

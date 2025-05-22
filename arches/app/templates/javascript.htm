@@ -1034,6 +1034,7 @@
             {% endfor %}
         }'
         preferred-coordinate-systems="{{ map_info.preferred_coordinate_systems }}"
+        term-search-types="{{ term_search_types }}"
         resources='[{% for resource in resource_graphs %}{
             "maplayerid": "{{resource.graphid}}",
             "graphid": "{{resource.graphid}}",
