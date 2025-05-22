@@ -118,10 +118,11 @@ class Graph(models.GraphModel):
                 for card in args[0]["cards"]:
                     self.add_card(card)
 
-                for spatial_view in args[0]["spatial_views"]:
-                    spatial_view = models.SpatialView(**spatial_view)
-                    spatial_view.full_clean(exclude=["language"])
-                    spatial_view.save()
+                if "spatial_views" in args[0]:
+                    for spatial_view in args[0]["spatial_views"]:
+                        spatial_view = models.SpatialView(**spatial_view)
+                        spatial_view.full_clean(exclude=["language"])
+                        spatial_view.save()
 
                 def check_default_configs(default_configs, configs):
                     if default_configs is not None:
