@@ -625,18 +625,7 @@ class GraphWithPrefetching(GraphModel):
             raise
 
         if arches_version < (8, 0):
-            # 7.6: simulate .grouping_node attribute
-            grouping_node_map = {}
-            for node in graph.permitted_nodes:
-                if node.nodegroup_id == node.pk:
-                    grouping_node_map[node.pk] = node
-            for node in graph.permitted_nodes:
-                if nodegroup := node.nodegroup:
-                    nodegroup.grouping_node = grouping_node_map.get(nodegroup.pk)
-                    for child_nodegroup in nodegroup.nodegroup_set.all():
-                        child_nodegroup.grouping_node = grouping_node_map.get(
-                            child_nodegroup.pk
-                        )
+            graph._annotate_grouping_node()
 
         return graph
 
@@ -644,3 +633,16 @@ class GraphWithPrefetching(GraphModel):
     def permitted_nodes(self):
         """Permission filtering is accomplished by permitted_nodes_prefetch."""
         return self.node_set.all()
+
+    def _annotate_grouping_node(self):
+        grouping_node_map = {}
+        for node in self.permitted_nodes:
+            if node.nodegroup_id == node.pk:
+                grouping_node_map[node.pk] = node
+        for node in self.permitted_nodes:
+            if nodegroup := node.nodegroup:
+                nodegroup.grouping_node = grouping_node_map.get(nodegroup.pk)
+                for child_nodegroup in nodegroup.nodegroup_set.all():
+                    child_nodegroup.grouping_node = grouping_node_map.get(
+                        child_nodegroup.pk
+                    )
