@@ -19,6 +19,10 @@ class ReferencesEsMappingModifier(EsMappingModifier):
     custom_search_path = REFERENCES_INDEX_PATH
 
     @staticmethod
+    def get_mapping_property():
+        return REFERENCES_INDEX_PATH
+
+    @staticmethod
     def add_search_filter(
         search_query, term, permitted_nodegroups, include_provisional
     ):
