@@ -89,6 +89,23 @@ ELASTICSEARCH_CUSTOM_INDEXES = [
         "should_update_asynchronously": True,
     }
 ]
+TERM_SEARCH_TYPES = [
+    {
+        "type": "term",
+        "label": _("Term Matches"),
+        "key": "terms",
+    },
+    {
+        "type": "concept",
+        "label": _("Concepts"),
+        "key": "concepts",
+    },
+    {
+        "type": "reference",
+        "label": _("References"),
+        "key": REFERENCES_INDEX_NAME,
+    },
+]
 
 KIBANA_URL = "http://localhost:5601/"
 KIBANA_CONFIG_BASEPATH = "kibana"  # must match Kibana config.yml setting (server.basePath) but without the leading slash,
