@@ -295,8 +295,6 @@ class ListItem(models.Model):
         uris.append(self.uri)
         for child in self.children.all():
             child.get_child_uris(uris)
-        print(self.uri)
-        print(uris)
         return uris
 
 
