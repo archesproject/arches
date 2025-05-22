@@ -451,7 +451,7 @@ SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
 FIXTURE_DIRS = [os.path.join(APP_ROOT, "..", "tests", "fixtures", "data")]
 
 ES_MAPPING_MODIFIER_CLASSES = [
-    "arches_controlled_lists.search.es_mapping_modifier.ReferencesEsMappingModifier"
+    "arches_controlled_lists.search.references_es_mapping_modifier.ReferencesEsMappingModifier"
 ]
 
 try:

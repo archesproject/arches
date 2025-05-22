@@ -30,22 +30,35 @@ class ReferencesEsMappingModifier(EsMappingModifier):
             item = ListItem.objects.get(pk=term["value"])
             uris = item.get_child_uris(uris=[])
             references_filter = Bool()
-            references_filter.filter(Terms(field="references.uri", terms=uris))
             references_filter.filter(
-                Terms(field="references.nodegroup_id", terms=permitted_nodegroups)
+                Terms(field=f"{REFERENCES_INDEX_PATH}.uri", terms=uris)
+            )
+            references_filter.filter(
+                Terms(
+                    field=f"{REFERENCES_INDEX_PATH}.nodegroup_id",
+                    terms=permitted_nodegroups,
+                )
             )
 
             if include_provisional is False:
                 references_filter.must_not(
-                    Match(field="references.provisional", query="true", type="phrase")
+                    Match(
+                        field=f"{REFERENCES_INDEX_PATH}.provisional",
+                        query="true",
+                        type="phrase",
+                    )
                 )
             elif include_provisional == "only provisional":
                 references_filter.must_not(
-                    Match(field="references.provisional", query="false", type="phrase")
+                    Match(
+                        field=f"{REFERENCES_INDEX_PATH}.provisional",
+                        query="false",
+                        type="phrase",
+                    )
                 )
 
             nested_references_filter = Nested(
-                path="references", query=references_filter
+                path=REFERENCES_INDEX_PATH, query=references_filter
             )
             if term["inverted"]:
                 search_query.must_not(nested_references_filter)
