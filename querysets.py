@@ -413,7 +413,7 @@ class SemanticResourceQuerySet(models.QuerySet):
 
     def _perform_custom_annotations(self):
         grouping_nodes = {}
-        for node in self._queried_nodes:
+        for node in self._permitted_nodes:
             grouping_node = node.nodegroup.grouping_node
             grouping_nodes[grouping_node.pk] = grouping_node
 
