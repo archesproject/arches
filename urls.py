@@ -3,19 +3,29 @@ from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 from django.urls import include, path
 
-from arches_component_lab.views.api.cards import CardDataView
+from arches_component_lab.views.api.card import CardDataView
 from arches_component_lab.views.api.relatable_resources import RelatableResourcesView
 from arches_component_lab.views.api.widgets import (
     WidgetDataView,
     NodeDataView,
-    WidgetDataFromCardView,
 )
+from arches_component_lab.views.api.card_x_node_x_widget import (
+    CardXNodeXWidgetView,
+    CardXNodeXWidgetListFromNodegroupView,
+)
+
+from arches_component_lab.views.api.tile import TileView
 
 urlpatterns = [
     path(
         "arches-component-lab/api/relatable-resources/<slug:graph>/<slug:node_alias>",
         RelatableResourcesView.as_view(),
         name="api-relatable-resources",
+    ),
+    path(
+        "arches-component-lab/api/widget-data/<slug:graph_slug>/<slug:node_alias>",
+        CardXNodeXWidgetView.as_view(),
+        name="api-card-x-node-x-widget",
     ),
     path(
         "arches-component-lab/api/widget-data/<slug:graph_slug>/<slug:node_alias>",
@@ -28,14 +38,19 @@ urlpatterns = [
         name="api-node-data",
     ),
     path(
-        "arches-component-lab/api/list-widget-data-from-card/<slug:graph_slug>/<slug:nodegroup_grouping_node_alias>",
-        WidgetDataFromCardView.as_view(),
-        name="api-list-widget-data-from-card",
+        "arches-component-lab/api/card-x-node-x-widget-list-from-nodegroup/<slug:graph_slug>/<slug:nodegroup_grouping_node_alias>",
+        CardXNodeXWidgetListFromNodegroupView.as_view(),
+        name="api-card-x-node-x-widget-list-from-nodegroup",
     ),
     path(
         "arches-component-lab/api/card-data/<slug:graph_slug>/<slug:nodegroup_grouping_node_alias>",
         CardDataView.as_view(),
         name="api-card-data",
+    ),
+    path(
+        "arches-component-lab/api/tile/<slug:graph>/<slug:nodegroup_alias>/<uuid:pk>",
+        TileView.as_view(),
+        name="api-tile",
     ),
 ]
 

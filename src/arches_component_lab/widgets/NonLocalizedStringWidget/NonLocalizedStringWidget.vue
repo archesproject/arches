@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { ref, watchEffect } from "vue";
 
 import Message from "primevue/message";
 import ProgressSpinner from "primevue/progressspinner";
@@ -8,10 +8,7 @@ import NonLocalizedStringWidgetEditor from "@/arches_component_lab/widgets/NonLo
 import NonLocalizedStringWidgetViewer from "@/arches_component_lab/widgets/NonLocalizedStringWidget/components/NonLocalizedStringWidgetViewer.vue";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
-import {
-    fetchWidgetData,
-    fetchNodeData,
-} from "@/arches_component_lab/widgets/api.ts";
+import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/widgets/api.ts";
 
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
@@ -20,6 +17,7 @@ const props = withDefaults(
         mode: WidgetMode;
         nodeAlias: string;
         graphSlug: string;
+        cardXNodeXWidgetData?: any;
         initialValue?: string | null;
         showLabel?: boolean;
     }>(),
@@ -28,18 +26,22 @@ const props = withDefaults(
     },
 );
 
-const isLoading = ref(true);
-const nodeData = ref();
-const widgetData = ref();
+const isLoading = ref();
+const cardXNodeXWidgetData = ref(props.cardXNodeXWidgetData);
 const configurationError = ref();
 
-onMounted(async () => {
+watchEffect(async () => {
+    if (props.cardXNodeXWidgetData) {
+        return;
+    }
+
+    isLoading.value = true;
+
     try {
-        widgetData.value = await fetchWidgetData(
-            props.graphSlug,
+        cardXNodeXWidgetData.value = await fetchCardXNodeXWidgetData(
             props.nodeAlias,
+            props.graphSlug,
         );
-        nodeData.value = await fetchNodeData(props.graphSlug, props.nodeAlias);
     } catch (error) {
         configurationError.value = error;
     } finally {
@@ -56,8 +58,14 @@ onMounted(async () => {
         />
         <template v-else>
             <label v-if="props.showLabel">
-                <span>{{ widgetData.label }}</span>
-                <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
+                <span>{{ cardXNodeXWidgetData.label }}</span>
+                <span
+                    v-if="
+                        cardXNodeXWidgetData.node.isrequired &&
+                        props.mode === EDIT
+                    "
+                    >*</span
+                >
             </label>
 
             <NonLocalizedStringWidgetEditor

@@ -4,7 +4,10 @@ import { computed, defineAsyncComponent, ref, watchEffect } from "vue";
 import Message from "primevue/message";
 import ProgressSpinner from "primevue/progressspinner";
 
-import { fetchCardData } from "@/arches_component_lab/cards/api.ts";
+import {
+    fetchCardData,
+    fetchTileData,
+} from "@/arches_component_lab/cards/api.ts";
 import { fetchWidgetDataFromCard } from "@/arches_component_lab/widgets/api.ts";
 
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
@@ -19,6 +22,7 @@ const props = defineProps<{
     mode: WidgetMode;
     nodegroupGroupingNodeAlias: string;
     graphSlug: string;
+    tileId?: string;
 }>();
 
 const isLoading = ref();
@@ -26,11 +30,11 @@ const configurationError = ref();
 
 const cardData = ref();
 const cardXNodeXWidgetData = ref();
+const tileData = ref();
 
 interface WidgetEntry {
     component: ReturnType<typeof defineAsyncComponent>;
-    id: string;
-    nodeAlias: string;
+    cardXNodeXWidgetDatum: CardXNodeXWidgetDatum;
 }
 
 interface CardXNodeXWidgetDatum {
@@ -65,8 +69,7 @@ const widgets = computed(() => {
 
             acc.push({
                 component: component,
-                id: cardXNodeXWidgetDatum.id,
-                nodeAlias: cardXNodeXWidgetDatum.node.alias,
+                cardXNodeXWidgetDatum: cardXNodeXWidgetDatum,
             });
 
             return acc;
@@ -79,14 +82,23 @@ watchEffect(async () => {
     isLoading.value = true;
 
     try {
-        cardData.value = await fetchCardData(
+        const cardPromise = fetchCardData(
             props.graphSlug,
             props.nodegroupGroupingNodeAlias,
         );
-        cardXNodeXWidgetData.value = await fetchWidgetDataFromCard(
+        const widgetPromise = fetchWidgetDataFromCard(
             props.graphSlug,
             props.nodegroupGroupingNodeAlias,
         );
+        const tilePromise = fetchTileData(
+            props.graphSlug,
+            props.nodegroupGroupingNodeAlias,
+            props.tileId,
+        );
+
+        cardData.value = await cardPromise;
+        cardXNodeXWidgetData.value = await widgetPromise;
+        tileData.value = await tilePromise;
     } catch (error) {
         configurationError.value = error;
     } finally {
@@ -106,15 +118,16 @@ watchEffect(async () => {
         </Message>
         <template v-else>
             <label>
-                <span>{{ cardXNodeXWidgetData[0].card.name }}</span>
+                <span>{{ cardData.name }}</span>
             </label>
             <component
                 :is="widget.component"
                 v-for="widget in widgets"
-                :key="widget.id"
+                :key="widget.cardXNodeXWidgetDatum.id"
                 :mode="props.mode"
                 :graph-slug="props.graphSlug"
-                :node-alias="widget.nodeAlias"
+                :node-alias="widget.cardXNodeXWidgetDatum.node.alias"
+                :card-x-node-x-widget-data="widget.cardXNodeXWidgetDatum"
             />
         </template>
     </div>

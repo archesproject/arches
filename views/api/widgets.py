@@ -8,6 +8,7 @@ from arches.app.utils.response import JSONResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
 
 
+# TODO: Move this to a util
 def update_i18n_properties(response):
     user_language = translation.get_language()
     config = response["config"]
@@ -24,6 +25,7 @@ def update_i18n_properties(response):
     return response
 
 
+# TODO: Remove this in favor of card_x_node_x_widget.py View
 class WidgetDataView(View):
     def get(self, request, graph_slug, node_alias):
         if arches_version < "8":
@@ -65,6 +67,7 @@ class WidgetDataView(View):
         return JSONResponse(response)
 
 
+# TODO: Replace this with nodes.py view
 class NodeDataView(View):
     def get(self, request, graph_slug, node_alias):
         node = (
@@ -85,65 +88,3 @@ class NodeDataView(View):
         )
 
         return JSONResponse(response)
-
-
-class WidgetDataFromCardView(View):
-    def get(self, request, graph_slug, nodegroup_grouping_node_alias):
-        if arches_version < "8":
-            grouping_node = models.Node.objects.get(
-                graph__slug=graph_slug, alias=nodegroup_grouping_node_alias
-            )
-
-            card_x_node_x_widgets = (
-                models.CardXNodeXWidget.objects.filter(
-                    node__nodegroup=grouping_node.nodegroup
-                )
-                .select_related()  # Eagerly load _all_ related objects
-                .order_by("sortorder")
-            )
-
-        # TODO: Add support for v8
-
-        datatype_factory = DataTypeFactory()
-        card_x_node_x_widget_data = []
-
-        for card_x_node_x_widget in card_x_node_x_widgets:
-            datatype = datatype_factory.get_instance(card_x_node_x_widget.node.datatype)
-
-            card_x_node_x_widget_datum = update_i18n_properties(
-                JSONDeserializer().deserialize(
-                    JSONSerializer().serialize(card_x_node_x_widget)
-                )
-            )
-
-            card_x_node_x_widget_datum["card"] = JSONDeserializer().deserialize(
-                JSONSerializer().serialize(card_x_node_x_widget.card)
-            )
-            del card_x_node_x_widget_datum["card_id"]
-            card_x_node_x_widget_datum["node"] = JSONDeserializer().deserialize(
-                JSONSerializer().serialize(card_x_node_x_widget.node)
-            )
-            del card_x_node_x_widget_datum["node_id"]
-            card_x_node_x_widget_datum["widget"] = JSONDeserializer().deserialize(
-                JSONSerializer().serialize(card_x_node_x_widget.widget)
-            )
-            del card_x_node_x_widget_datum["widget_id"]
-
-            # TODO: update this method to be more generic
-            update_i18n_properties(card_x_node_x_widget_datum)
-
-            # When dropping support for v7.6, try/except can be removed
-            try:
-                card_x_node_x_widget_datum.config["defaultValue"] = (
-                    datatype.get_interchange_value(
-                        card_x_node_x_widget_datum.config.get("defaultValue", None)
-                    )
-                )
-
-            except AttributeError:
-                # Handle the case where the datatype does not have a get_interchange_value method
-                pass
-
-            card_x_node_x_widget_data.append(card_x_node_x_widget_datum)
-
-        return JSONResponse(card_x_node_x_widget_data)
