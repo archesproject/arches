@@ -169,7 +169,7 @@ class SemanticTileQuerySet(models.QuerySet):
                         setattr(tile.aliased_data, node.alias, instance_val)
                 elif node.nodegroup.parentnodegroup_id == tile.nodegroup_id:
                     empty_value = None if node.nodegroup.cardinality == "1" else []
-                    setattr(tile.aliased_data, node.alias, empty_value)
+                    setattr(tile.aliased_data, tile.find_nodegroup_alias(), empty_value)
                 delattr(tile, node.alias)
             if arches_version >= (8, 0):
                 fallback = getattr(tile, "children")
@@ -203,6 +203,8 @@ class SemanticTileQuerySet(models.QuerySet):
                         if node.pk == child_nodegroup.pk:
                             grouping_node = node
                             break
+                    if node.alias == "production_timespan_statement":
+                        breakpoint()
                     setattr(
                         tile.aliased_data,
                         grouping_node.alias,
