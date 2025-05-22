@@ -116,3 +116,4 @@ class ReferenceIndex(BaseIndex):
                             }
                         )
                         i = i + 1
+        return term_results
