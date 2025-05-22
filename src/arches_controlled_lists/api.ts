@@ -94,7 +94,7 @@ export const patchItem = async (
 
 export const patchList = async (
     list: ControlledList,
-    field: "name" | "sortorder" | "children",
+    field: "name" | "sortorder" | "children" | "searchable",
 ) => {
     let body = {};
     switch (field) {
@@ -110,6 +110,9 @@ export const patchList = async (
                 parent_map: makeParentMap(list),
                 sortorder_map: makeSortOrderMap(list),
             };
+            break;
+        case "searchable":
+            body = { searchable: list.searchable };
             break;
     }
 

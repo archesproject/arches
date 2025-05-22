@@ -13,7 +13,7 @@ import type {
 
 // Duck-typing helpers
 export const dataIsList = (data: Selectable) => {
-    return (data as ControlledList).search_only !== undefined;
+    return (data as ControlledList).searchable !== undefined;
 };
 export const dataIsItem = (data: Selectable) => {
     return !dataIsList(data);

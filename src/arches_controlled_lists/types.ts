@@ -83,7 +83,7 @@ export interface ControlledList {
     id: string;
     name: string;
     dynamic: boolean;
-    search_only: boolean;
+    searchable: boolean;
     items: ControlledListItem[];
     nodes: ReferencingNode[];
 }

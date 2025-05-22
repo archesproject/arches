@@ -4,6 +4,7 @@ import { useGettext } from "vue3-gettext";
 
 import { displayedRowKey } from "@/arches_controlled_lists/constants.ts";
 import ListCharacteristic from "@/arches_controlled_lists/components/editor/ListCharacteristic.vue";
+import ListSearchable from "@/arches_controlled_lists/components/editor/ListSearchable.vue";
 import ReferenceNodeLink from "@/arches_controlled_lists/components/editor/ReferenceNodeLink.vue";
 
 import type { Ref } from "vue";
@@ -38,6 +39,7 @@ const { $gettext } = useGettext();
                 :label="$gettext('Dynamic')"
                 :style="{ width: '4rem' }"
             />
+            <ListSearchable />
             <div class="nodes-container">
                 <h4 class="nodes-container-title">
                     {{ $gettext("List used by these nodes") }}

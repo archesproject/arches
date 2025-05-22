@@ -112,7 +112,7 @@ const createList = () => {
         id: newListCounter.value.toString(),
         name: newListFormValue.value,
         dynamic: false,
-        search_only: false,
+        searchable: false,
         items: [],
         nodes: [],
     };

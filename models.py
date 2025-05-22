@@ -35,7 +35,7 @@ class List(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=127, null=False, blank=True)
     dynamic = models.BooleanField(default=False)
-    search_only = models.BooleanField(default=False)
+    searchable = models.BooleanField(default=False)
 
     objects = ListQuerySet.as_manager()
 
@@ -49,6 +49,17 @@ class List(models.Model):
                 sep=" ", timespec="seconds"
             )
 
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        self.delete_index()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.searchable:
+            self.index()
+        else:
+            self.delete_index()
+
     def serialize(self, depth_map=None, flat=False, permitted_nodegroups=None):
         if depth_map is None:
             depth_map = defaultdict(int)
@@ -56,7 +67,7 @@ class List(models.Model):
             "id": str(self.id),
             "name": self.name,
             "dynamic": self.dynamic,
-            "search_only": self.search_only,
+            "searchable": self.searchable,
             "items": sorted(
                 [
                     item.serialize(depth_map, flat)
@@ -344,6 +355,15 @@ class ListItemValue(models.Model):
             self.value = _("New Item: ") + datetime.datetime.now().isoformat(
                 sep=" ", timespec="seconds"
             )
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        self.delete_index()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.list_item.list.searchable:
+            self.index()
 
     def serialize(self):
         return {
