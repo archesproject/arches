@@ -130,6 +130,15 @@ class SearchView(MapBaseManagerView):
         context["export_html_templates"] = (
             HtmlWriter.get_graphids_with_export_template()
         )
+        term_search_types = [
+            {
+                "type": term_search_type["type"],
+                "label": str(term_search_type["label"]),
+                "key": term_search_type["key"],
+            }
+            for term_search_type in settings.TERM_SEARCH_TYPES
+        ]
+        context["term_search_types"] = JSONSerializer().serialize(term_search_types)
 
         return render(request, "views/search.htm", context)
 
