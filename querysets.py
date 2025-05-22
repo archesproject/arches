@@ -172,7 +172,8 @@ class SemanticTileQuerySet(models.QuerySet):
                 fallback = getattr(tile, "children")
             else:
                 fallback = getattr(tile, "tilemodel_set")
-            for child_tile in getattr(tile, "_annotated_tiles", fallback.all()):
+            child_tiles = getattr(tile, "_annotated_tiles", fallback.all())
+            for child_tile in child_tiles:
                 setattr(
                     child_tile.aliased_data,
                     tile.find_nodegroup_alias(),
@@ -187,6 +188,23 @@ class SemanticTileQuerySet(models.QuerySet):
                     setattr(tile.aliased_data, child_nodegroup_alias, children)
                 # Attach parent to this child.
                 setattr(child_tile.aliased_data, tile.find_nodegroup_alias(), tile)
+
+            if not child_tiles:
+                child_nodegroups = (
+                    getattr(tile.nodegroup, "children")
+                    if arches_version >= (8, 0)
+                    else getattr(tile.nodegroup, "nodegroup_set")
+                )
+                for child_nodegroup in child_nodegroups.all():
+                    for node in child_nodegroup.node_set.all():
+                        if node.pk == child_nodegroup.pk:
+                            grouping_node = node
+                            break
+                    setattr(
+                        tile.aliased_data,
+                        grouping_node.alias,
+                        None if child_nodegroup.cardinality == "1" else [],
+                    )
 
     def _clone(self):
         """Persist private attributes through the life of the QuerySet."""
@@ -351,7 +369,7 @@ class SemanticResourceQuerySet(models.QuerySet):
             models.Prefetch(
                 "tilemodel_set",
                 queryset=SemanticTile.objects.with_node_values(
-                    self._queried_nodes,
+                    self._permitted_nodes,
                     as_representation=as_representation,
                 ),
                 to_attr="_annotated_tiles",
