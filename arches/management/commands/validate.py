@@ -36,8 +36,14 @@ class CommandModes(StrEnum):
 
 
 class FixActions(StrEnum):
+    """
+    Note for implementers: the fix action should not leave side effects
+    on the input queryset, as currently factored. (Instead, do things
+    like delete(), or values(), or prefetch_related() that generate clones.)
+    """
+
     DELETE_QUERYSET = auto()
-    DEDUPLICATE_WIDGETS_DIFFERING_ONLY_BY_SORTORDER = auto()
+    DEDUPLICATE_WIDGETS = auto()
     UPDATE_GRAPH_PUBLICATIONS = auto()
 
 
@@ -181,7 +187,7 @@ class Command(BaseCommand):
                     "cardxnodexwidget", filter=Q(source_identifier__isnull=False)
                 ),
             ).filter(Q(source_widget_count__gt=1) | Q(draft_widget_count__gt=1)),
-            fix_action=FixActions.DEDUPLICATE_WIDGETS_DIFFERING_ONLY_BY_SORTORDER,
+            fix_action=FixActions.DEDUPLICATE_WIDGETS,
         )
         self.check_integrity(
             check=IntegrityCheck.NO_WIDGETS,  # 1017
@@ -192,7 +198,8 @@ class Command(BaseCommand):
         )
 
     def check_integrity(self, check, queryset, fix_action):
-        # 500 not set as a default earlier: None distinguishes whether verbose output implied
+        # 500 not set as a default earlier:
+        # None distinguishes whether verbose output implied.
         limit = self.options["limit"] or 500
 
         if self.mode == CommandModes.VALIDATE:
@@ -241,14 +248,9 @@ class Command(BaseCommand):
                         stderr=self.stderr,
                     )
                     fix_status = self.style.SUCCESS("Yes")
-                elif (
-                    fix_action
-                    == FixActions.DEDUPLICATE_WIDGETS_DIFFERING_ONLY_BY_SORTORDER
-                ):
-                    problems_remain = (
-                        deduplicate_widgets_differing_only_by_card_and_sortorder(
-                            queryset
-                        )
+                elif fix_action == FixActions.DEDUPLICATE_WIDGETS:
+                    problems_remain = deduplicate_widgets(
+                        queryset.prefetch_related("nodegroup__cardmodel_set")
                     )
                     fix_status = (
                         self.style.MIGRATE_HEADING("Partial")
@@ -266,6 +268,7 @@ class Command(BaseCommand):
 
         # Print the report (after any requested fixes are made)
         if self.options["verbosity"] > 0:
+            # len() works if the FixAction didn't inadvertently evaluate the qs.
             count = len(queryset)
             result = self.style.ERROR("FAIL") if count else self.style.SUCCESS("PASS")
             # Fix status takes two "columns" so add a tab
@@ -289,7 +292,7 @@ class Command(BaseCommand):
             self.stdout.write()
 
 
-def deduplicate_widgets_differing_only_by_card_and_sortorder(nodes):
+def deduplicate_widgets(nodes):
     class BreakNestedLoops(Exception):
         pass
 
@@ -297,19 +300,29 @@ def deduplicate_widgets_differing_only_by_card_and_sortorder(nodes):
     with transaction.atomic():
         for node in nodes:
             try:
-                card = node.nodegroup.cardmodel_set.all()[0]
-                cross = node.cardxnodexwidget_set.filter(card=card).first()
-                for other_cross in node.cardxnodexwidget_set.exclude(pk=cross.pk):
-                    for field, value in vars(other_cross).items():
+                card = node.nodegroup.cardmodel_set.first()
+                good_cross = node.cardxnodexwidget_set.filter(card=card).first()
+                if not good_cross:
+                    node.cardxnodexwidget_set.all().delete()
+                    continue
+                for test_cross in node.cardxnodexwidget_set.all():
+                    if test_cross.pk == good_cross.pk:
+                        continue
+
+                    if test_cross.card.pk != good_cross.card.pk:
+                        test_cross.delete()
+                        continue
+
+                    for field, value in vars(test_cross).items():
                         if field in ("_state", "id", "card_id", "sortorder"):
                             continue
-                        # If the values differ, we can't deduplicate
-                        # Use str() because I18n_JSON doesn't implement __eq__()
-                        if str(getattr(cross, field)) != str(value):
+                        # If the values differ, we can't deduplicate.
+                        # Use str() because I18n_JSON doesn't implement __eq__().
+                        if str(getattr(test_cross, field)) != str(value):
                             problems_remain = True
                             raise BreakNestedLoops
-                    # If we get here, the only difference is sortorder
-                    other_cross.delete()
+                    # If we get here, the only difference is sortorder.
+                    test_cross.delete()
             except BreakNestedLoops:
                 continue
 
