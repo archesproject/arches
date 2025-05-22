@@ -36,7 +36,6 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.i18n import LanguageSynchronizer
 from django.utils.translation import gettext as _
 from pyld.jsonld import compact, JsonLdError
-from django.db.models import Q
 from django.utils import translation
 from guardian.models import GroupObjectPermission, UserObjectPermission
 

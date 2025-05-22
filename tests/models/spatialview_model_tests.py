@@ -198,13 +198,14 @@ class SpatialViewTests(ArchesTestCase):
             nodeid="7584e966-1cf8-11ef-971a-0242ac130005"
         )
         node_type = spatialview.geometrynode.datatype
+        spatial_view_id = spatialview.spatialviewid
 
         with self.assertRaises(Exception):
             spatialview.full_clean()
             spatialview.save()
 
         with self.assertRaises(SpatialView.DoesNotExist):
-            fetched_spatialview = SpatialView.objects.get(pk=spatialview.spatialviewid)
+            fetched_spatialview = SpatialView.objects.get(pk=spatial_view_id)
 
     def test_create_spatialview_invalid_attributenode(self):
         spatialview = self.generate_valid_spatialview()
@@ -431,27 +432,27 @@ class SpatialViewTriggerTests(TransactionTestCase):
         with connection.cursor() as cursor:
             cursor.execute(
                 f"""
-                SELECT 
-                    gid, 
-                    tileid, 
-                    nodeid, 
-                    geom, 
-                    resourceinstanceid, 
-                    gridref, 
-                    name, 
-                    date, 
-                    concept_list, 
-                    bool, 
-                    non_local_string, 
-                    edtf_date, 
-                    count, 
-                    url, 
-                    domain, 
-                    file, 
-                    concept, 
-                    domain_list, 
-                    other_spatialviews, 
-                    other_models_list 
+                SELECT
+                    gid,
+                    tileid,
+                    nodeid,
+                    geom,
+                    resourceinstanceid,
+                    gridref,
+                    name,
+                    date,
+                    concept_list,
+                    bool,
+                    non_local_string,
+                    edtf_date,
+                    count,
+                    url,
+                    domain,
+                    file,
+                    concept,
+                    domain_list,
+                    other_spatialviews,
+                    other_models_list
                 FROM public.{self.test_spatial_view.slug}_polygon"""
             )
             rows = cursor.fetchall()

@@ -1,7 +1,6 @@
 import datetime
 import json
 import logging
-import os
 import pgtrigger
 import sys
 import traceback
