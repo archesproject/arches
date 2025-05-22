@@ -120,6 +120,7 @@ class Graph(models.GraphModel):
 
                 for spatial_view in args[0]["spatial_views"]:
                     spatial_view = models.SpatialView(**spatial_view)
+                    spatial_view.full_clean(exclude=["language"])
                     spatial_view.save()
 
                 def check_default_configs(default_configs, configs):
@@ -1965,8 +1966,7 @@ class Graph(models.GraphModel):
                 ret.pop("group_permissions", None)
 
             ret["spatial_views"] = models.SpatialView.objects.select_related().filter(
-                Q(geometrynode__graph_id=self.source_identifier_id)
-                | Q(geometrynode__graph_id=self.graphid)
+                geometrynode__graph__in=[self.source_identifier_id, self.graphid]
             )
             ret["domain_connections"] = (
                 self.get_valid_domain_ontology_classes()

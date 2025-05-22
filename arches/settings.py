@@ -375,6 +375,7 @@ INSTALLED_APPS = (
     "corsheaders",
     "oauth2_provider",
     "django_celery_results",
+    "pgtrigger",
 )
 
 # Placing this last ensures any templates provided by Arches Applications

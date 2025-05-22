@@ -1,3 +1,7 @@
+import os
+from pathlib import Path
+
+
 def add_to_update_fields(kwargs, field_name):
     """
     Update the `update_field` arg inside `kwargs` (if present) in-place
@@ -33,3 +37,11 @@ def make_name_unique(name, names_to_check, suffix_delimiter="_"):
         temp_name = "{0}{1}{2}".format(name, suffix_delimiter, i)
         i += 1
     return temp_name
+
+
+def format_file_into_sql(file: str, sql_dir: str):
+    sql_file = Path(__file__).parent / sql_dir / file
+    sql_string = ""
+    with open(sql_file) as file:
+        sql_string = sql_string + "\n" + file.read()
+    return sql_string
