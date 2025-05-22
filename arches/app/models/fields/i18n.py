@@ -245,9 +245,9 @@ class I18n_JSON(NothingNode):
 
         if isinstance(value, str):
             try:
-                ret = json.loads(value)
+                ret = json.loads(value.replace("%%", "%"))
             except:
-                ret = json.loads(json.dumps(value))
+                ret = json.loads(json.dumps(value.replace("%%", "%")))
         elif value is None:
             ret[lang] = None if use_nulls else ""
         elif isinstance(value, I18n_JSON):
