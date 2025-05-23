@@ -2,7 +2,8 @@ from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializ
 from django.utils import translation
 from django.views.generic import View
 
-from arches import __version__ as arches_version
+from arches import VERSION as arches_version
+from django.db.models import Q
 from arches.app.models import models
 from arches.app.utils.response import JSONResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
@@ -26,25 +27,18 @@ def update_i18n_properties(response):
 
 class WidgetDataView(View):
     def get(self, request, graph_slug, node_alias):
-        if arches_version < "8":
-            card_x_node_x_widget = (
-                models.CardXNodeXWidget.objects.filter(
-                    node__graph__slug=graph_slug,
-                    node__alias=node_alias,
-                )
-                .select_related("node")
-                .get()
+        query_filter = Q(
+            node__graph__slug=graph_slug,
+            node__alias=node_alias,
+        )
+        if arches_version >= (8, 0):
+            query_filter = query_filter & Q(
+                node__source_identifier_id__isnull=True,
             )
-        elif arches_version >= "8":
-            card_x_node_x_widget = (
-                models.CardXNodeXWidget.objects.filter(
-                    node__graph__slug=graph_slug,
-                    node__alias=node_alias,
-                    node__source_identifier_id__isnull=True,
-                )
-                .select_related("node")
-                .get()
-            )
+
+        card_x_node_x_widget = models.CardXNodeXWidget.objects.select_related(
+            "node"
+        ).get(query_filter)
 
         response = update_i18n_properties(
             JSONDeserializer().deserialize(
@@ -67,18 +61,15 @@ class WidgetDataView(View):
 
 class NodeDataView(View):
     def get(self, request, graph_slug, node_alias):
-        node = (
-            models.Node.objects.get(
-                graph__slug=graph_slug,
-                alias=node_alias,
+        node_filter = Q(
+            graph__slug=graph_slug,
+            alias=node_alias,
+        )
+        if arches_version >= (8, 0):
+            node_filter = node_filter & Q(
                 source_identifier_id__isnull=True,
             )
-            if getattr(models.Node, "source_identifier_id", False)
-            else models.Node.objects.get(
-                graph__slug=graph_slug,
-                alias=node_alias,
-            )
-        )
+        node = models.Node.objects.get(node_filter)
 
         response = update_i18n_properties(
             JSONDeserializer().deserialize(JSONSerializer().serialize(node))
