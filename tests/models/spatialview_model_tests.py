@@ -20,10 +20,11 @@ import random
 import os, uuid
 from django.test import TransactionTestCase
 from django.test.utils import captured_stdout
-from django.db import connection, connections
+from django.db import connection, connections, transaction
 from django.core import management
 from tests.base_test import ArchesTestCase
 from arches.app.models import models
+from arches.app.models.graph import Graph
 from arches.app.models.models import SpatialView
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from tests import test_settings
@@ -192,20 +193,35 @@ class SpatialViewTests(ArchesTestCase):
 
         spatialview.delete()
 
+    def test_restore_state_from_serialized_graph(self):
+        spatialview = self.generate_valid_spatialview()
+        spatialview.full_clean()
+        spatialview.save()
+
+        graph = Graph.objects.get(pk=spatialview.geometrynode.graph.pk)
+        draft_graph = graph.create_draft_graph()
+
+        # updating graph from draft graph removes all elements
+        # including the serialized graph - then recreates them
+        graph.update_from_draft_graph(draft_graph=draft_graph)
+
+        self.assertTrue(
+            SpatialView.objects.filter(pk=spatialview.spatialviewid).exists()
+        )
+
     def test_create_spatialview_invalid_geometrynode(self):
         spatialview = self.generate_valid_spatialview()
         spatialview.geometrynode = models.Node.objects.get(
             nodeid="7584e966-1cf8-11ef-971a-0242ac130005"
         )
-        node_type = spatialview.geometrynode.datatype
-        spatial_view_id = spatialview.spatialviewid
 
-        with self.assertRaises(Exception):
-            spatialview.full_clean()
-            spatialview.save()
+        with transaction.atomic():
+            with self.assertRaises(Exception):
+                spatialview.full_clean()
+                spatialview.save()
 
         with self.assertRaises(SpatialView.DoesNotExist):
-            fetched_spatialview = SpatialView.objects.get(pk=spatial_view_id)
+            fetched_spatialview = SpatialView.objects.get(pk=spatialview.spatialviewid)
 
     def test_create_spatialview_invalid_attributenode(self):
         spatialview = self.generate_valid_spatialview()
@@ -255,9 +271,10 @@ class SpatialViewTests(ArchesTestCase):
         spatialview = self.generate_valid_spatialview()
         spatialview.slug = "1_invalid"
 
-        with self.assertRaises(Exception):
-            spatialview.full_clean()
-            spatialview.save()
+        with transaction.atomic():
+            with self.assertRaises(Exception):
+                spatialview.full_clean()
+                spatialview.save()
 
         with self.assertRaises(SpatialView.DoesNotExist):
             fetched_spatialview = SpatialView.objects.get(pk=spatialview.spatialviewid)
