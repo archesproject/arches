@@ -7,6 +7,7 @@ import uuid
 import zipfile
 from openpyxl import load_workbook
 
+from django.contrib.auth.models import User
 from django.core.files import File
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -17,7 +18,7 @@ from django.db import connection
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import save_to_tiles
-from arches.app.models.models import ETLModule, Node
+from arches.app.models.models import ETLModule, Node, LoadEvent
 from arches.app.models.system_settings import settings
 from arches.app.utils.decorators import user_created_transaction_match
 from arches.app.utils.file_validator import FileValidator
@@ -63,14 +64,31 @@ class BaseImportModule:
     def reverse_load(self, loadid):
         with connection.cursor() as cursor:
             cursor.execute(
+                """SELECT status FROM load_event WHERE loadid = %s""",
+                [loadid],
+            )
+            original_status = cursor.fetchone()[0]
+            cursor.execute(
                 """UPDATE load_event SET status = %s WHERE loadid = %s""",
                 ("reversing", loadid),
             )
-            resources_changed_count = reverse_edit_log_entries(loadid)
-            cursor.execute(
-                """UPDATE load_event SET status = %s, load_details = load_details::jsonb || ('{"resources_removed":' || %s || '}')::jsonb WHERE loadid = %s""",
-                ("unloaded", resources_changed_count, loadid),
+            user = (
+                User.objects.get(id=self.userid)
+                if self.userid
+                else LoadEvent.objects.get(loadid=loadid).user
             )
+            try:
+                resources_changed_count = reverse_edit_log_entries(loadid, user=user)
+                cursor.execute(
+                    """UPDATE load_event SET status = %s, load_details = load_details::jsonb || ('{"resources_removed":' || %s || '}')::jsonb WHERE loadid = %s""",
+                    ("unloaded", resources_changed_count, loadid),
+                )
+            except Exception as e:
+                cursor.execute(
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""",
+                    (original_status, loadid),
+                )
+                raise e
 
     @method_decorator(user_created_transaction_match, name="dispatch")
     def reverse(self, request, **kwargs):

@@ -438,6 +438,7 @@ class Tile(models.TileModel):
     def save(self, **kwargs):
         request = kwargs.pop("request", None)
         index = kwargs.pop("index", True)
+        recalculate_descriptors = kwargs.pop("recalculate_descriptors", True)
         user = kwargs.pop("user", None)
         new_resource_created = kwargs.pop("new_resource_created", False)
         resource_creation = kwargs.pop("resource_creation", False)
@@ -544,16 +545,20 @@ class Tile(models.TileModel):
                 tile.parenttile = self
                 tile.save(
                     request=request,
+                    user=user,
                     resource_creation=resource_creation,
                     index=False,
+                    recalculate_descriptors=recalculate_descriptors,
+                    transaction_id=transaction_id,
                     **kwargs,
                 )
 
-            resource = Resource.objects.get(pk=self.resourceinstance_id)
-            resource.save_descriptors(context={"tile": self})
-
-            if index:
-                self.index(resource=resource)
+            if index or recalculate_descriptors:
+                resource = Resource.objects.get(pk=self.resourceinstance_id)
+                if recalculate_descriptors:
+                    resource.save_descriptors(context={"tile": self})
+                if index:
+                    self.index(resource=resource)
 
     def populate_missing_nodes(self):
         first_node = next(iter(self.data.items()), None)
@@ -567,13 +572,24 @@ class Tile(models.TileModel):
     def delete(self, *args, **kwargs):
         se = SearchEngineFactory().create()
         request = kwargs.pop("request", None)
+        user = kwargs.pop("user", None)
         index = kwargs.pop("index", True)
+        recalculate_descriptors = kwargs.pop("recalculate_descriptors", True)
         transaction_id = kwargs.pop("transaction_id", None)
         provisional_edit_log_details = kwargs.pop("provisional_edit_log_details", None)
         for tile in self.tiles:
-            tile.delete(*args, request=request, **kwargs)
+            tile.delete(
+                *args,
+                request=request,
+                user=user,
+                recalculate_descriptors=recalculate_descriptors,
+                index=index,
+                transaction_id=transaction_id,
+                **kwargs,
+            )
         try:
-            user = request.user
+            if user is None and request is not None:
+                user = request.user
             user_is_reviewer = user_is_resource_reviewer(user)
         except AttributeError:  # no user
             user = None
@@ -615,11 +631,12 @@ class Tile(models.TileModel):
                     datatype = self.datatype_factory.get_instance(node.datatype)
                     datatype.post_tile_delete(self, nodeid, index=index)
 
-                resource = Resource.objects.get(pk=self.resourceinstance_id)
-                resource.save_descriptors()
-
-                if index:
-                    self.index(resource=resource)
+                if index or recalculate_descriptors:
+                    resource = Resource.objects.get(pk=self.resourceinstance_id)
+                    if recalculate_descriptors:
+                        resource.save_descriptors()
+                    if index:
+                        self.index(resource=resource)
             except IntegrityError as e:
                 logger.error(e)
 

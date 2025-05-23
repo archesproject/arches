@@ -55,7 +55,7 @@ class PrimaryDescriptorsFunction(AbstractPrimaryDescriptorsFunction):
                 and config["nodegroup_id"] != ""
                 and config["nodegroup_id"] is not None
             ):
-                tile = context.get("tile")
+                tile = context.get("tile") if context else None
 
                 if not tile or tile.sortorder:
                     tile = (

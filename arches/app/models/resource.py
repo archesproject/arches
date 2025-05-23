@@ -76,6 +76,8 @@ class Resource(models.ResourceInstance):
         # self.resourceinstancesecurity
         # end from models.ResourceInstance
         self.tiles = []
+        self.fromrelations = []
+        self.torelations = []
         self.descriptor_function = None
         self.serialized_graph = None
         self.node_datatypes = None
@@ -306,8 +308,10 @@ class Resource(models.ResourceInstance):
                 index=False,
                 resource_creation=True,
                 transaction_id=transaction_id,
+                recalculate_descriptors=False,
                 context=context,
             )
+        self.save_descriptors()
 
         if index is True:
             self.index(context)
@@ -675,7 +679,7 @@ class Resource(models.ResourceInstance):
 
         return document, terms
 
-    def delete(self, user={}, index=True, transaction_id=None):
+    def delete(self, user={}, index=True, transaction_id=None, fetch_relations=True):
         """
         Deletes a single resource and any related indexed data
 
@@ -712,11 +716,15 @@ class Resource(models.ResourceInstance):
             permit_deletion = True
 
         if permit_deletion is True:
-            for related_resource in models.ResourceXResource.objects.filter(
-                Q(from_resource_id=self.resourceinstanceid)
-                | Q(to_resource_id=self.resourceinstanceid)
-            ):
-                related_resource.delete(deletedResourceId=self.resourceinstanceid)
+            if fetch_relations:
+                for related_resource in models.ResourceXResource.objects.filter(
+                    Q(from_resource_id=self.resourceinstanceid)
+                    | Q(to_resource_id=self.resourceinstanceid)
+                ).select_related("tile"):
+                    related_resource.delete(deletedResourceId=self.resourceinstanceid)
+            else:
+                for related_resource in self.fromrelations + self.torelations:
+                    related_resource.delete(deletedResourceId=self.resourceinstanceid)
 
             if index:
                 self.delete_index()

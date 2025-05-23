@@ -3,6 +3,7 @@ import json
 import logging
 from urllib.parse import urlsplit, parse_qs
 import uuid
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db import connection
@@ -10,7 +11,7 @@ from django.http import HttpRequest
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
 from arches.app.datatypes.datatypes import DataTypeFactory
-from arches.app.models.models import GraphModel, Node, ETLModule, LoadStaging
+from arches.app.models.models import GraphModel, Node, ETLModule, LoadStaging, LoadEvent
 from arches.app.models.system_settings import settings
 from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
@@ -51,12 +52,17 @@ class BaseBulkEditor:
         self.node_lookup = {}
 
     def reverse_load(self, loadid):
+        user = (
+            User.objects.get(id=self.userid)
+            if self.userid
+            else LoadEvent.objects.get(loadid=loadid).user
+        )
         with connection.cursor() as cursor:
             cursor.execute(
                 """UPDATE load_event SET status = %s WHERE loadid = %s""",
                 ("reversing", loadid),
             )
-            resources_changed_count = reverse_edit_log_entries(loadid)
+            resources_changed_count = reverse_edit_log_entries(loadid, user=user)
             cursor.execute(
                 """UPDATE load_event SET status = %s, load_details = load_details::jsonb || ('{"resources_removed":' || %s || '}')::jsonb WHERE loadid = %s""",
                 ("unloaded", resources_changed_count, loadid),

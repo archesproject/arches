@@ -26,19 +26,19 @@ class SearchSortTests(ArchesTestCase):
 
         Resource.objects.create(
             graph=test_graph,
-            name="B Resource (first created)",
+            name={"en": "B Resource (first created)"},
             resourceinstanceid="8ec120f4-61cd-4fa1-8f9a-3d12cff3176f",
         )
 
         Resource.objects.create(
             graph=test_graph,
-            name="C Resource (second created)",
+            name={"en": "C Resource (second created)"},
             resourceinstanceid="a94c81c5-2047-4b53-8341-495f12bfad95",
         )
 
         Resource.objects.create(
             graph=test_graph,
-            name="A Resource (third created)",
+            name={"en": "A Resource (third created)"},
             resourceinstanceid="09ba8b82-b6db-4ece-9a46-98f6d381a7b2",
         )
 
