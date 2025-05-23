@@ -12,7 +12,6 @@ import uuid
 from django.utils.translation import get_language, gettext as _
 
 from arches import VERSION as arches_version
-from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models import models
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.i18n import rank_label
