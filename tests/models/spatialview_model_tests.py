@@ -200,14 +200,14 @@ class SpatialViewTests(ArchesTestCase):
 
         graph = Graph.objects.get(pk=spatialview.geometrynode.graph.pk)
         draft_graph = graph.create_draft_graph()
+        graph.publish()
 
         # updating graph from draft graph removes all elements
         # including the serialized graph - then recreates them
         graph.update_from_draft_graph(draft_graph=draft_graph)
 
-        self.assertTrue(
-            SpatialView.objects.filter(pk=spatialview.spatialviewid).exists()
-        )
+        # will throw if spatial view doesn't exist
+        spatialview.refresh_from_db()
 
     def test_create_spatialview_invalid_geometrynode(self):
         spatialview = self.generate_valid_spatialview()
