@@ -167,6 +167,9 @@ class CardXNodeXWidget(SaveSupportsBlindOverwriteMixin, models.Model):
             add_to_update_fields(kwargs, "source_identifier_id")
         super(CardXNodeXWidget, self).save(**kwargs)
 
+    def __str__(self):
+        return f"{self.label}"
+
     class Meta:
         managed = True
         db_table = "cards_x_nodes_x_widgets"
