@@ -189,6 +189,7 @@ def any_nodegroup_in_hierarchy_is_cardinality_n(nodegroup, permitted_nodes):
     parent_nodegroup_lookup = {
         node.nodegroup.parentnodegroup_id: node.nodegroup.parentnodegroup
         for node in permitted_nodes
+        if node.nodegroup
     }
     cardinality_n_found = False
     breaker = 0
