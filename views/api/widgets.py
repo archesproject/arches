@@ -1,11 +1,10 @@
-import json
-
-from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
+from django.db.models import Q
 from django.utils import translation
 from django.views.generic import View
 
-from arches import __version__ as arches_version
+from arches import VERSION as arches_version
 from arches.app.models import models
+from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
 from arches.app.utils.response import JSONResponse
 from arches.app.datatypes.datatypes import DataTypeFactory
 
@@ -28,24 +27,35 @@ def update_i18n_properties(response):
 
 class WidgetDataView(View):
     def get(self, request, graph_slug, node_alias):
-        if arches_version < "8":
-            card_x_node_x_widget = (
-                models.CardXNodeXWidget.objects.filter(
-                    node__graph__slug=graph_slug,
-                    node__alias=node_alias,
-                )
-                .select_related("node")
-                .get()
+        query_filter = Q(
+            node__graph__slug=graph_slug,
+            node__alias=node_alias,
+        )
+        if arches_version >= (8, 0):
+            query_filter = query_filter & Q(
+                node__source_identifier_id__isnull=True,
             )
-        elif arches_version >= "8":
-            card_x_node_x_widget = (
-                models.CardXNodeXWidget.objects.filter(
-                    node__graph__slug=graph_slug,
-                    node__alias=node_alias,
-                    node__source_identifier_id__isnull=True,
-                )
-                .select_related("node")
-                .get()
+
+        card_x_node_x_widget = (
+            models.CardXNodeXWidget.objects.select_related("node")
+            .filter(query_filter)
+            .first()
+        )
+
+        if not card_x_node_x_widget:
+            # Supply default widget configuration.
+            nodes = models.Node.objects.filter(graph__slug=graph_slug, alias=node_alias)
+            if arches_version >= (8, 0):
+                nodes = nodes.filter(source_identifier=None)
+            node = nodes.get()
+            datatype_factory = DataTypeFactory()
+            d_data_type = datatype_factory.datatypes[node.datatype]
+            default_widget = d_data_type.defaultwidget
+            card_x_node_x_widget = models.CardXNodeXWidget(
+                node=node,
+                card=node.nodegroup.cardmodel_set.first(),
+                widget=default_widget,
+                config=default_widget.defaultconfig,
             )
 
         response = update_i18n_properties(
@@ -69,9 +79,15 @@ class WidgetDataView(View):
 
 class NodeDataView(View):
     def get(self, request, graph_slug, node_alias):
-        node = models.Node.objects.get(
-            graph__slug=graph_slug, alias=node_alias, source_identifier_id__isnull=True
+        node_filter = Q(
+            graph__slug=graph_slug,
+            alias=node_alias,
         )
+        if arches_version >= (8, 0):
+            node_filter = node_filter & Q(
+                source_identifier_id__isnull=True,
+            )
+        node = models.Node.objects.get(node_filter)
 
         response = update_i18n_properties(
             JSONDeserializer().deserialize(JSONSerializer().serialize(node))
