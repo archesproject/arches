@@ -77,6 +77,7 @@ class Graph(models.GraphModel):
         self.widgets = {}
         self._nodegroups_to_delete = []
         self._functions = []
+        self._spatial_views = []
         self._card_constraints = []
         self._constraints_x_nodes = []
         self.temp_node_name = _("New Node")
@@ -95,6 +96,7 @@ class Graph(models.GraphModel):
                         "user_permissions",
                         "group_permissions",
                         "resource_instance_lifecycle",
+                        "spatial_views",
                     ):
                         setattr(self, key, value)
 
@@ -120,8 +122,7 @@ class Graph(models.GraphModel):
                 if "spatial_views" in args[0]:
                     for spatial_view in args[0]["spatial_views"]:
                         spatial_view = models.SpatialView(**spatial_view)
-                        spatial_view.full_clean(exclude=["language"])
-                        spatial_view.save()
+                        self.add_spatial_view(spatial_view)
 
                 def check_default_configs(default_configs, configs):
                     if default_configs is not None:
@@ -398,6 +399,22 @@ class Graph(models.GraphModel):
 
         return function
 
+    def add_spatial_view(self, spatial_view):
+        """
+        Adds a SpatialView to this graph
+
+        Arguments:
+        spatial_view -- an object representing a SpatialView instance or an actual SpatialView instance
+
+        """
+
+        if not isinstance(spatial_view, models.SpatialView):
+            spatial_view = models.SpatialView(**spatial_view.copy())
+
+        self._spatial_views.append(spatial_view)
+        self.has_unpublished_changes = True
+        return spatial_view
+
     def add_resource_instance_lifecycle(self, resource_instance_lifecycle):
         """
         Adds a ResourceInstanceLifecycle to this graph
@@ -574,6 +591,10 @@ class Graph(models.GraphModel):
                     functionxgraph.save()
                 except:
                     pass
+
+            for spatial_view in self._spatial_views:
+                spatial_view.full_clean(exclude=["language"])
+                spatial_view.save()
 
             # edge case for instantiating a serialized_graph that has a publication
             if self.publication and not len(

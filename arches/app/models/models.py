@@ -2444,15 +2444,6 @@ class SpatialView(models.Model):
                 "One or more attributenodes have a geojson-feature-collection datatype"
             )
 
-        # language must be be a valid language code belonging to the current publication
-        published_graphs = graph.publication.publishedgraph_set.all()
-        if self.language_id not in [
-            published_graph.language_id for published_graph in published_graphs
-        ]:
-            raise ValidationError(
-                "Language must belong to a published graph for the graph of the geometry node"
-            )
-
         # validate the schema is a valid schema in the database
         with connection.cursor() as cursor:
             cursor.execute(
