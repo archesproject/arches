@@ -192,19 +192,21 @@ class SemanticTileQuerySet(models.QuerySet):
                 # Attach parent to this child.
                 setattr(child_tile.aliased_data, tile.find_nodegroup_alias(), tile)
 
-            if not child_tiles:
-                child_nodegroups = (
-                    getattr(tile.nodegroup, "children")
-                    if arches_version >= (8, 0)
-                    else getattr(tile.nodegroup, "nodegroup_set")
-                )
-                for child_nodegroup in child_nodegroups.all():
-                    for node in child_nodegroup.node_set.all():
-                        if node.pk == child_nodegroup.pk:
-                            grouping_node = node
-                            break
-                    if node.alias == "production_timespan_statement":
-                        breakpoint()
+            child_nodegroups = (
+                getattr(tile.nodegroup, "children")
+                if arches_version >= (8, 0)
+                else getattr(tile.nodegroup, "nodegroup_set")
+            )
+            for child_nodegroup in child_nodegroups.all():
+                for node in child_nodegroup.node_set.all():
+                    if node.pk == child_nodegroup.pk:
+                        grouping_node = node
+                        break
+
+                if (
+                    getattr(tile.aliased_data, grouping_node.alias, NOT_PROVIDED)
+                    is NOT_PROVIDED
+                ):
                     setattr(
                         tile.aliased_data,
                         grouping_node.alias,
