@@ -384,7 +384,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
 
 class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
-    tileid = serializers.UUIDField(validators=[], required=False)
+    tileid = serializers.UUIDField(validators=[], required=False, allow_null=True)
     resourceinstance = serializers.PrimaryKeyRelatedField(
         queryset=SemanticResource.objects.all(), required=False, html_cutoff=0
     )
