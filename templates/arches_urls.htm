@@ -14,5 +14,6 @@
     api_node_data='(graph_slug, node_alias) => {return "{% url "api-node-data" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", node_alias)}'
     api_card_data='(graph_slug, nodegroup_grouping_node_alias) => {return "{% url "api-card-data" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", nodegroup_grouping_node_alias)}'
     api_tile='(graph_slug, nodegroup_grouping_node_alias, tile_id) => { return "{% url "api-tile" "----p1" "----p2" "00000000-0000-0000-0000-000000000000" %}".replace("----p1", graph_slug).replace("----p2", nodegroup_grouping_node_alias).replace("00000000-0000-0000-0000-000000000000", tile_id)}'
+    api_tile='(graph_slug, nodegroup_grouping_node_alias) => { return "{% url "api-tile" "----p1" "----p2" %}".replace("----p1", graph_slug).replace("----p2", nodegroup_grouping_node_alias)}'
 ></div>
 {% endblock arches_urls %}

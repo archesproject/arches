@@ -14,7 +14,11 @@ from arches_component_lab.views.api.card_x_node_x_widget import (
     CardXNodeXWidgetListFromNodegroupView,
 )
 
-from arches_component_lab.views.api.tile import TileView
+# from arches_component_lab.views.api.tile import TileView
+
+from arches_querysets.rest_framework.generic_views import (
+    ArchesTileDetailView,
+)
 
 urlpatterns = [
     path(
@@ -49,7 +53,12 @@ urlpatterns = [
     ),
     path(
         "arches-component-lab/api/tile/<slug:graph>/<slug:nodegroup_alias>/<uuid:pk>",
-        TileView.as_view(),
+        ArchesTileDetailView.as_view(),
+        name="api-tile",
+    ),
+    path(
+        "arches-component-lab/api/tile/<slug:graph>/<slug:nodegroup_alias>",
+        ArchesTileDetailView.as_view(),
         name="api-tile",
     ),
 ]

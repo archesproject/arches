@@ -4,13 +4,22 @@ import { computed, defineAsyncComponent, ref, watchEffect } from "vue";
 import Message from "primevue/message";
 import ProgressSpinner from "primevue/progressspinner";
 
+import DefaultCardEditor from "@/arches_component_lab/cards/DefaultCard/components/DefaultCardEditor.vue";
+import DefaultCardViewer from "@/arches_component_lab/cards/DefaultCard/components/DefaultCardViewer.vue";
+
 import {
     fetchCardData,
     fetchTileData,
 } from "@/arches_component_lab/cards/api.ts";
 import { fetchWidgetDataFromCard } from "@/arches_component_lab/widgets/api.ts";
 
+import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
+
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
+import type {
+    CardXNodeXWidgetDatum,
+    WidgetConfiguration,
+} from "@/arches_component_lab/cards/types.ts";
 
 // TODO: Remove this when 7.6 stops being supported
 const deprecatedComponentPathToUpdatedComponentPath: Record<string, string> = {
@@ -25,6 +34,8 @@ const props = defineProps<{
     tileId?: string;
 }>();
 
+const emit = defineEmits(["update:isDirty", "update:tileData"]);
+
 const isLoading = ref();
 const configurationError = ref();
 
@@ -32,27 +43,12 @@ const cardData = ref();
 const cardXNodeXWidgetData = ref();
 const tileData = ref();
 
-interface WidgetEntry {
-    component: ReturnType<typeof defineAsyncComponent>;
-    cardXNodeXWidgetDatum: CardXNodeXWidgetDatum;
-}
-
-interface CardXNodeXWidgetDatum {
-    card: {
-        name: string;
-    };
-    id: string;
-    node: {
-        alias: string;
-    };
-    widget: {
-        component: string;
-    };
-}
-
 const widgets = computed(() => {
     return cardXNodeXWidgetData.value.reduce(
-        (acc: WidgetEntry[], cardXNodeXWidgetDatum: CardXNodeXWidgetDatum) => {
+        (
+            acc: WidgetConfiguration[],
+            cardXNodeXWidgetDatum: CardXNodeXWidgetDatum,
+        ) => {
             if (
                 !deprecatedComponentPathToUpdatedComponentPath[
                     cardXNodeXWidgetDatum.widget.component
@@ -120,14 +116,30 @@ watchEffect(async () => {
             <label>
                 <span>{{ cardData.name }}</span>
             </label>
-            <component
-                :is="widget.component"
-                v-for="widget in widgets"
-                :key="widget.cardXNodeXWidgetDatum.id"
-                :mode="props.mode"
+
+            <DefaultCardEditor
+                v-if="props.mode === EDIT"
+                :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :graph-slug="props.graphSlug"
-                :node-alias="widget.cardXNodeXWidgetDatum.node.alias"
-                :card-x-node-x-widget-data="widget.cardXNodeXWidgetDatum"
+                :mode="props.mode"
+                :nodegroup-grouping-node-alias="
+                    props.nodegroupGroupingNodeAlias
+                "
+                :tile-data="tileData"
+                :widgets="widgets"
+                @update:is-dirty="emit('update:isDirty', $event)"
+                @update:tile-data="emit('update:tileData', $event)"
+            />
+            <DefaultCardViewer
+                v-else-if="props.mode === VIEW"
+                :card-x-node-x-widget-data="cardXNodeXWidgetData"
+                :graph-slug="props.graphSlug"
+                :mode="props.mode"
+                :nodegroup-grouping-node-alias="
+                    props.nodegroupGroupingNodeAlias
+                "
+                :tile-data="tileData"
+                :widgets="widgets"
             />
         </template>
     </div>
