@@ -281,17 +281,17 @@ class Command(BaseCommand):
 
             if self.options["verbosity"] > 1:
                 self.stdout.write("\t" + "-" * 36)
-                if check.value == 1016:
+                if count and check.value == IntegrityCheck.TOO_MANY_WIDGETS.value:
                     self.stdout.write(
                         "\tNode alias,nodeid,draft_or_published,graph,nodegroup,cardxnodexwidgets"
                     )
                 if queryset:
                     for i, n in enumerate(queryset):
                         if i < limit:
-                            if check.value == 1016:
-                                card_set = list(n.cardxnodexwidget_set.all())
+                            if check.value == IntegrityCheck.TOO_MANY_WIDGETS.value:
+                                card_set = n.cardxnodexwidget_set.all()
                                 cards = " & ".join(
-                                    f"{card}({card.pk})" for card in card_set
+                                    f"{card} ({card.pk})" for card in card_set
                                 )
                                 self.stdout.write(f"\t{n},{n.nodegroup.pk},{cards}")
                             else:
