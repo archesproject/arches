@@ -2406,6 +2406,7 @@ class SpatialView(models.Model):
         ]
 
     def clean_fields(self, exclude=None):
+        super().clean_fields(exclude=exclude)
         if exclude is not None:
             if "language" not in exclude:
                 if not PublishedGraph.objects.filter(
