@@ -293,6 +293,12 @@ class SemanticTile(TileModel):
         )
 
     def save(self, *, request=None, index=True, **kwargs):
+        if arches_version < (8, 0) and self.nodegroup:
+            # Cannot supply this too early, as nodegroup might be included
+            # with the request and already instantiated to a fresh object.
+            self.nodegroup.grouping_node = self.nodegroup.node_set.get(
+                pk=models.F("nodegroup")
+            )
         with transaction.atomic():
             if self.sortorder is None or self.is_fully_provisional():
                 self.set_next_sort_order()

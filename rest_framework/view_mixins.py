@@ -82,7 +82,7 @@ class ArchesModelAPIMixin:
                 as_representation=True,
                 resource_ids=self.resource_ids,
                 user=self.request.user,
-            ).select_related("resourceinstance__graph")
+            ).select_related("nodegroup", "resourceinstance__graph")
             if self.resource_ids:
                 return qs.filter(resourceinstance__in=self.resource_ids)
             return qs
