@@ -218,13 +218,19 @@ class SemanticTile(TileModel):
         so we have this little deserializer helper. Must be a better way.
         """
         attrs = {**tile_dict}
-        if tile_id := attrs.pop("tileid", None):
+        if (tile_id := attrs.pop("tileid", None)) and isinstance(tile_id, str):
             attrs["tileid"] = uuid.UUID(tile_id)
-        if resourceinstance_id := attrs.pop("resourceinstance", None):
+        if (resourceinstance_id := attrs.pop("resourceinstance", None)) and isinstance(
+            resourceinstance_id, str
+        ):
             attrs["resourceinstance_id"] = uuid.UUID(resourceinstance_id)
-        if nodegroup_id := attrs.pop("nodegroup", None):
+        if (nodegroup_id := attrs.pop("nodegroup", None)) and isinstance(
+            nodegroup_id, str
+        ):
             attrs["nodegroup_id"] = uuid.UUID(nodegroup_id)
-        if parenttile_id := attrs.pop("parenttile", None):
+        if (parenttile_id := attrs.pop("parenttile", None)) and isinstance(
+            parenttile_id, str
+        ):
             attrs["parenttile_id"] = uuid.UUID(parenttile_id)
 
         attrs["parenttile"] = parent_tile
@@ -232,7 +238,10 @@ class SemanticTile(TileModel):
         tile = cls(**attrs)
         for attr in {"resourceinstance", "nodegroup", "parenttile"}:
             if attr in tile_dict:
-                tile_dict[attr] = getattr(tile, attr)
+                try:
+                    tile_dict[attr] = getattr(tile, attr)
+                except:
+                    pass
 
         if arches_version < (8, 0):
             # Simulate the default supplied by v8.
