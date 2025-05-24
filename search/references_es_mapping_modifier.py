@@ -74,5 +74,6 @@ class ReferencesEsMappingModifier(EsMappingModifier):
                 "uri": {"type": "keyword"},
                 "list_id": {"type": "keyword"},
                 "nodegroup_id": {"type": "keyword"},
+                "provisional": {"type": "boolean"},
             },
         }

@@ -315,6 +315,7 @@ class ReferenceDataType(BaseDataType):
                         "uri": reference["uri"],
                         "list_id": reference["list_id"],
                         "nodegroup_id": tile.nodegroup_id,
+                        "provisional": provisional,
                     }
                 )
                 document["strings"].append(
