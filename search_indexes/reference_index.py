@@ -12,7 +12,8 @@ from arches.app.models.system_settings import settings
 
 
 class ReferenceIndex(BaseIndex):
-    def prepare_index(self):
+    def __init__(self, index_name=None):
+        super(ReferenceIndex, self).__init__(index_name=index_name)
         self.index_metadata = {
             "settings": {
                 "analysis": {
@@ -44,7 +45,6 @@ class ReferenceIndex(BaseIndex):
                 }
             },
         }
-        super(ReferenceIndex, self).prepare_index()
 
     def get_documents_to_index(self, resourceinstance, tiles):
         return None, None
