@@ -1029,7 +1029,9 @@ class TestEsMappingModifier(EsMappingModifier):
         return new_must_element
 
     @staticmethod
-    def add_search_filter(search_query, term):
+    def add_search_filter(
+        search_query, term, permitted_nodegroups, include_provisional
+    ):
         original_must_filter = search_query.dsl["bool"]["must"]
         search_query.dsl["bool"]["must"] = []
         for must_element in original_must_filter:

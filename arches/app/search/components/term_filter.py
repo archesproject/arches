@@ -154,7 +154,9 @@ class TermFilter(BaseSearchFilter):
             for (
                 custom_search_class
             ) in EsMappingModifierFactory.get_es_mapping_modifier_classes():
-                custom_search_class.add_search_filter(search_query, term)
+                custom_search_class.add_search_filter(
+                    search_query, term, permitted_nodegroups, include_provisional
+                )
 
         search_query_object["query"].add_query(search_query)
 

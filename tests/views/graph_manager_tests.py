@@ -277,6 +277,22 @@ class GraphManagerViewTests(ArchesTestCase):
         self.assertEqual(node_.name, "new node name")
         self.assertTrue(node_.is_collector)
 
+    def test_node_reorder(self):
+        self.client.login(username="admin", password="admin")
+        url = reverse("reorder_nodes")
+        reversed_nodes = list(reversed(self.test_graph.nodes.values()))
+        post_data = JSONSerializer().serialize({"nodes": reversed_nodes})
+
+        # Start with an unpublished graph.
+        self.test_graph.publication = None
+        self.test_graph.save()
+        response = self.client.post(url, post_data, "application/json")
+
+        self.assertEqual(
+            [node["sortorder"] for node in response.json()["nodes"]],
+            [0, 1, 2, 3, 4],
+        )
+
     def test_node_delete(self):
         """
         Test delete a node (HERITAGE_RESOURCE_PLACE) via node view
