@@ -23,7 +23,6 @@ class TestFrontendConfigurationGeneration(TestCase):
 
     @override_settings(
         APP_ROOT=str(Path(settings.ROOT_DIR) / "app"),
-        PUBLIC_SERVER_ADDRESS="http://localhost:8000",
         STATIC_URL="/static/",
         WEBPACK_DEVELOPMENT_SERVER_PORT=8080,
     )
@@ -48,7 +47,6 @@ class TestFrontendConfigurationGeneration(TestCase):
             "ARCHES_APPLICATIONS": [],
             "ARCHES_APPLICATIONS_PATHS": {},
             "SITE_PACKAGES_DIRECTORY": sysconfig.get_path("purelib"),
-            "PUBLIC_SERVER_ADDRESS": "http://localhost:8000",
             "ROOT_DIR": settings.ROOT_DIR,
             "STATIC_URL": "/static/",
             "WEBPACK_DEVELOPMENT_SERVER_PORT": 8080,
