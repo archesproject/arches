@@ -44,7 +44,7 @@ var NumberWidget = function(params) {
             }
 
         }
-        return val || self.value();
+        return val || self.value() || null;
     }, self).extend({throttle: 600});
 
     this.value(Number(this.updateVal()));

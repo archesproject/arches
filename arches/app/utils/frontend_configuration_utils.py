@@ -1,8 +1,8 @@
 import json
 import os
 import re
-import site
 import sys
+import sysconfig
 
 from django.conf import settings
 from django.urls import get_resolver, URLPattern, URLResolver
@@ -153,7 +153,7 @@ def _generate_webpack_configuration():
                 "ARCHES_APPLICATIONS_PATHS": dict(
                     zip(arches_app_names, arches_app_paths, strict=True)
                 ),
-                "SITE_PACKAGES_DIRECTORY": site.getsitepackages()[0],
+                "SITE_PACKAGES_DIRECTORY": sysconfig.get_path("purelib"),
                 "ROOT_DIR": root_dir_path,
                 "STATIC_URL": settings.STATIC_URL,
                 "WEBPACK_DEVELOPMENT_SERVER_PORT": settings.WEBPACK_DEVELOPMENT_SERVER_PORT,

@@ -6,6 +6,7 @@ import CardModel from 'models/card';
 import CardWidgetModel from 'models/card-widget';
 import uuid from 'uuid';
 import dispose from 'utils/dispose';
+import AlertViewModel from 'viewmodels/alert';
 import TileViewModel from 'viewmodels/tile';
 import 'utils/set-csrf-token';      
 
@@ -159,6 +160,7 @@ var CardViewModel = function(params) {
         parentCard: params.parentCard,
         expanded: ko.observable(false),
         topCards: params.topCards,
+        pageVm: params.pageVm,
         perms: perms,
         constraints: params.constraints || emptyConstraint,
         permsLiteral: permsLiteral,
@@ -339,7 +341,23 @@ var CardViewModel = function(params) {
                 url: arches.urls.reorder_cards,
                 complete: function() {
                     loading(false);
-                }
+                },
+                error: function(response) {
+                    params.pageVm.alert(
+                        new AlertViewModel(
+                            'ep-alert-red',
+                            response.responseJSON.title,
+                            response.responseJSON.message,
+                            null,
+                            function(){}
+                        )
+                    );
+                    const undoSort = (array, sourceIndex, targetIndex) => {
+                        const [movedItem] = array.splice(targetIndex, 1);
+                        array.splice(sourceIndex, 0, movedItem);
+                    };
+                    undoSort(self.cards, e.sourceIndex, e.targetIndex);
+                },
             });
         },
 

@@ -506,7 +506,8 @@ var GraphDesignerView = BaseManagerView.extend({
             graph: viewModel.graph,
             appliedFunctions: viewModel.appliedFunctions,
             primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
-            graphModel: viewModel.graphModel
+            graphModel: viewModel.graphModel,
+            pageVm: viewModel,
         });
 
         viewModel.permissionTree = new CardTreeViewModel({
@@ -515,6 +516,7 @@ var GraphDesignerView = BaseManagerView.extend({
             isPermissionTree: true,
             appliedFunctions: viewModel.appliedFunctions,
             primaryDescriptorFunction: viewModel.primaryDescriptorFunction,
+            pageVm: viewModel,
             multiselect: true
         });
 

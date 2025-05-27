@@ -3,6 +3,7 @@ import _ from 'underscore';
 import ko from 'knockout';
 import arches from 'arches';
 import data from 'views/graph-designer-data';
+import AlertViewModel from 'viewmodels/alert';
 import CardViewModel from 'viewmodels/card';
 import CardWidgetModel from 'models/card-widget';
 import uuid from 'uuid';
@@ -167,7 +168,7 @@ var CardTreeViewModel = function(params) {
             return;
         },
         beforeMove: function(e) {
-            e.cancelDrop = (e.sourceParent!==e.targetParent);
+            e.cancelDrop = (e.sourceParent !== e.targetParent);
         },
         updateCard: function(parents, card, data) {
             var updatedCards = [];
@@ -310,6 +311,7 @@ var CardTreeViewModel = function(params) {
                 parentCard: parent,
                 constraints: getBlankConstraint(data.card),
                 topCards: self.topCards,
+                pageVm: params.pageVm,
             });
             parentcards.push(newCardViewModel);
 
@@ -340,7 +342,7 @@ var CardTreeViewModel = function(params) {
             self.cachedFlatTree = self.flattenTree(self.topCards(), []);
             return newCardViewModel;
         },
-        reorderCards: function() {
+        reorderCards: function(e) {
             loading(true);
             var cards = _.map(self.topCards(), function(card, i) {
                 card.model.get('sortorder')(i);
@@ -362,7 +364,23 @@ var CardTreeViewModel = function(params) {
                         new Event('reorderCards')
                     );
                     loading(false);
-                }
+                },
+                error: function(response) {
+                    params.pageVm.alert(
+                        new AlertViewModel(
+                            'ep-alert-red',
+                            response.responseJSON.title,
+                            response.responseJSON.message,
+                            null,
+                            function(){}
+                        )
+                    );
+                    const undoSort = (array, sourceIndex, targetIndex) => {
+                        const [movedItem] = array.splice(targetIndex, 1);
+                        array.splice(sourceIndex, 0, movedItem);
+                    };
+                    undoSort(self.topCards, e.sourceIndex, e.targetIndex);
+                },
             });
         },
         selection: selection,
@@ -435,7 +453,8 @@ var CardTreeViewModel = function(params) {
             userisreviewer: true,
             perms: ko.observableArray(),
             permsLiteral: ko.observableArray(),
-            topCards: self.topCards
+            topCards: self.topCards,
+            pageVm: params.pageVm,
         });
     }));
 

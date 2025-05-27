@@ -47,7 +47,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block loading_mask %}
 <div class="loading-mask" data-bind="visible: typeof(loading()) === 'boolean' && loading()"></div>
 
-<div class="loading-mask" style="display: none;" data-bind="visible: typeof(loading()==='string') && loading().length > 0">
+<div class="loading-mask" style="display: none;" data-bind="visible: typeof(loading())==='string' && loading().length > 0">
     <div class="loading-mask-string" data-bind="text: loading"></div>
 </div>
 {% endblock loading_mask %}

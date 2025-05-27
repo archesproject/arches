@@ -3,6 +3,7 @@ import ko from 'knockout';
 import _ from 'underscore';
 import arches from 'arches';
 import TreeView from 'views/tree-view';
+import AlertViewModel from 'viewmodels/alert';
 import 'bindings/clipboard';
 
 
@@ -76,6 +77,7 @@ var GraphTree = TreeView.extend({
         this.translations = arches.translations;
         this.showGrid = ko.observable(false);
         this.activeLanguageDir = ko.observable(arches.activeLanguageDir);
+        this.pageVm = options.pageVm,
         TreeView.prototype.initialize.apply(this, arguments);
     },
 
@@ -238,6 +240,7 @@ var GraphTree = TreeView.extend({
     },
     reorderNodes: function(e) {
         loading(true);
+        var self = this;
         var nodes = _.map(e.sourceParent(), function(node) {
             return node.attributes.source;
         });
@@ -253,6 +256,22 @@ var GraphTree = TreeView.extend({
                     new Event('reorderNodes')
                 );
                 loading(false);
+            },
+            error: function(response) {
+                self.pageVm.alert(
+                    new AlertViewModel(
+                        'ep-alert-red',
+                        response.responseJSON.title,
+                        response.responseJSON.message,
+                        null,
+                        function(){}
+                    )
+                );
+                const undoSort = (array, sourceIndex, targetIndex) => {
+                    const [movedItem] = array.splice(targetIndex, 1);
+                    array.splice(sourceIndex, 0, movedItem);
+                };
+                undoSort(e.sourceParent, e.sourceIndex, e.targetIndex);
             }
         });
     },
