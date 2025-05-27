@@ -12,9 +12,6 @@ REFERENCES_INDEX_PATH = "references"
 
 
 class ReferencesEsMappingModifier(EsMappingModifier):
-    """
-    Base class for creating custom sections in the Resource Instance elasticsearch document.
-    """
 
     custom_search_path = REFERENCES_INDEX_PATH
 
