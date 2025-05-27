@@ -355,6 +355,7 @@ class SemanticResourceQuerySet(models.QuerySet):
             n.alias
             for n in filter_nodes_by_highest_parent(self._permitted_nodes, only or [])
         }
+        breakpoint()
         node_sql_aliases = generate_node_alias_expressions(
             self._permitted_nodes,
             defer=deferred_node_aliases,
@@ -421,6 +422,8 @@ class SemanticResourceQuerySet(models.QuerySet):
     def _perform_custom_annotations(self):
         grouping_nodes = {}
         for node in self._permitted_nodes:
+            if not node.nodegroup:
+                continue
             grouping_node = node.nodegroup.grouping_node
             grouping_nodes[grouping_node.pk] = grouping_node
 
