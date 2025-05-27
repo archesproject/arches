@@ -26,7 +26,6 @@ module.exports = () => {
         global.SITE_PACKAGES_DIRECTORY = parsedData['SITE_PACKAGES_DIRECTORY'];
         global.ROOT_DIR = parsedData['ROOT_DIR'];
         global.STATIC_URL = parsedData['STATIC_URL'];
-        global.PUBLIC_SERVER_ADDRESS = parsedData['PUBLIC_SERVER_ADDRESS'];
         global.WEBPACK_DEVELOPMENT_SERVER_PORT = parsedData['WEBPACK_DEVELOPMENT_SERVER_PORT'];
 
         // END get data from `webpack-metadata.json`

@@ -154,7 +154,6 @@ def _generate_webpack_configuration():
                     zip(arches_app_names, arches_app_paths, strict=True)
                 ),
                 "SITE_PACKAGES_DIRECTORY": site.getsitepackages()[0],
-                "PUBLIC_SERVER_ADDRESS": settings.PUBLIC_SERVER_ADDRESS,
                 "ROOT_DIR": root_dir_path,
                 "STATIC_URL": settings.STATIC_URL,
                 "WEBPACK_DEVELOPMENT_SERVER_PORT": settings.WEBPACK_DEVELOPMENT_SERVER_PORT,
