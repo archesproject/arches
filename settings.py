@@ -81,7 +81,7 @@ ELASTICSEARCH_CONNECTION_OPTIONS = {
 # a prefix to append to all elasticsearch indexes, note: must be lower case
 ELASTICSEARCH_PREFIX = "arches_controlled_lists"
 
-REFERENCES_INDEX_NAME = "references_index"
+REFERENCES_INDEX_NAME = "references"
 ELASTICSEARCH_CUSTOM_INDEXES = [
     {
         "module": "arches_controlled_lists.search_indexes.reference_index.ReferenceIndex",
