@@ -59,16 +59,18 @@ onMounted(async () => {
             <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
         </label>
 
-        <NonLocalizedStringWidgetEditor
-            v-if="props.mode === EDIT"
-            :initial-value="initialValue"
-            :graph-slug="props.graphSlug"
-            :node-alias="props.nodeAlias"
-        />
-        <NonLocalizedStringWidgetViewer
-            v-else-if="props.mode === VIEW"
-            :value="props.initialValue"
-        />
+        <div :class="[nodeAlias, graphSlug].join(' ')">
+            <NonLocalizedStringWidgetEditor
+                v-if="mode === EDIT"
+                :initial-value="initialValue"
+                :graph-slug="props.graphSlug"
+                :node-alias="props.nodeAlias"
+            />
+            <NonLocalizedStringWidgetViewer
+                v-else-if="mode === VIEW"
+                :value="props.initialValue"
+            />
+        </div>
     </template>
     <Message
         v-if="configurationError"

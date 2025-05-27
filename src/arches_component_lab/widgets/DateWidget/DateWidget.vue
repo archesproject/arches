@@ -60,18 +60,20 @@ onMounted(async () => {
             <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
         </label>
 
-        <DateWidgetEditor
-            v-if="props.mode === EDIT"
-            :initial-value="props.initialValue"
-            :graph-slug="props.graphSlug"
-            :node-alias="props.nodeAlias"
-            :widget-data="widgetData"
-        />
-        <DateWidgetViewer
-            v-else-if="props.mode === VIEW"
-            :initial-value="props.initialValue"
-            :widget-data="widgetData"
-        />
+        <div :class="[nodeAlias, graphSlug].join(' ')">
+            <DateWidgetEditor
+                v-if="mode === EDIT"
+                :initial-value="props.initialValue"
+                :graph-slug="props.graphSlug"
+                :node-alias="props.nodeAlias"
+                :widget-data="widgetData"
+            />
+            <DateWidgetViewer
+                v-else-if="mode === VIEW"
+                :initial-value="props.initialValue"
+                :widget-data="widgetData"
+            />
+        </div>
     </template>
     <Message
         v-if="configurationError"
