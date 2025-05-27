@@ -23,13 +23,6 @@ def get_permitted_graphids(permitted_nodegroups):
     for node in Node.objects.filter(nodegroup__in=permitted_nodegroups):
         permitted_graphids.add(str(node.graph_id))
 
-    permitted_graphids = set(
-        str(graphid)
-        for graphid in GraphModel.objects.filter(graphid__in=permitted_graphids)
-        .exclude(publication=None)
-        .values_list("graphid", flat=True)
-    )
-
     return permitted_graphids
 
 

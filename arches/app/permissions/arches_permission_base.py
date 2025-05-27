@@ -37,7 +37,7 @@ import inspect
 from arches.app.models.models import Node, NodeGroup, TileModel
 from django.db.models import Q
 from arches.app.models.system_settings import settings
-from arches.app.models.models import ResourceInstance, MapLayer
+from arches.app.models.models import ResourceInstance, MapLayer, GraphModel
 
 from arches.app.utils.permission_backend import (
     PermissionFramework,
@@ -186,14 +186,38 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
         any_perm -- True to check ANY perm in "perms" or False to check ALL perms
 
         """
-        return list(
-            set(
-                nodegroup.pk
-                for nodegroup in get_nodegroups_by_perm_for_user_or_group(
-                    user, perms, any_perm=any_perm
-                )
-            )
+
+        permitted_nodegroups = get_nodegroups_by_perm_for_user_or_group(
+            user, perms, any_perm=any_perm
         )
+
+        permitted_nodegroup_uids = list(
+            set(nodegroup.pk for nodegroup in permitted_nodegroups)
+        )
+
+        permitted_nodes = Node.objects.filter(nodegroup__in=permitted_nodegroup_uids)
+        permitted_graph_ids = set(str(node.graph_id) for node in permitted_nodes)
+
+        published_permitted_graph_uids = [
+            graphid
+            for graphid in GraphModel.objects.filter(graphid__in=permitted_graph_ids)
+            .exclude(publication=None)
+            .values_list("graphid", flat=True)
+        ]
+
+        published_permitted_node_uids = [
+            node.nodeid
+            for node in permitted_nodes
+            if node.graph_id in published_permitted_graph_uids
+        ]
+
+        published_permitted_nodegroups = [
+            nodegroup_id
+            for nodegroup_id in permitted_nodegroup_uids
+            if nodegroup_id in published_permitted_node_uids
+        ]
+
+        return published_permitted_nodegroups
 
     def get_users_with_perms(
         self,
