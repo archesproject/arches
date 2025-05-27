@@ -63,9 +63,7 @@ onMounted(async () => {
             <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
         </label>
 
-        <div
-            :class="[props.nodeAlias, props.graphSlug].join(' ')"
-        >
+        <div :class="[props.nodeAlias, props.graphSlug].join(' ')">
             <ResourceInstanceSelectWidgetEditor
                 v-if="mode === EDIT"
                 ref="editor"
@@ -75,7 +73,8 @@ onMounted(async () => {
             />
             <ResourceInstanceSelectWidgetViewer
                 v-else-if="mode === VIEW"
-                :value="initialValue" />
+                :value="initialValue"
+            />
         </div>
         <Message
             v-if="configurationError"
