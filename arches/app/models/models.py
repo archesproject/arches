@@ -1,6 +1,7 @@
 import datetime
 import json
 import logging
+import pgtrigger
 import sys
 import traceback
 import uuid
@@ -23,7 +24,7 @@ from arches.app.const import ExtensionType
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.models.mixins import SaveSupportsBlindOverwriteMixin
 from arches.app.models.query_expressions import UUID4
-from arches.app.models.utils import add_to_update_fields
+from arches.app.models.utils import add_to_update_fields, format_file_into_sql
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.storage_filename_generator import get_filename
@@ -2383,6 +2384,38 @@ class SpatialView(models.Model):
     class Meta:
         managed = True
         db_table = "spatial_views"
+        triggers = [
+            pgtrigger.Composer(
+                name="arches_update_spatial_views",
+                when=pgtrigger.After,
+                operation=pgtrigger.Update | pgtrigger.Delete | pgtrigger.Insert,
+                declare=[
+                    ("sv_perform", "text"),
+                    ("valid_geom_nodeid", "boolean"),
+                    ("has_att_nodes", "integer"),
+                    ("valid_att_nodeids", "boolean"),
+                    ("valid_language_count", "integer"),
+                ],
+                func=pgtrigger.Func(
+                    format_file_into_sql(
+                        "arches_update_spatial_views.sql",
+                        "sql/triggers",
+                    )
+                ),
+            )
+        ]
+
+    def clean_fields(self, exclude=None):
+        super().clean_fields(exclude=exclude)
+        if exclude is not None:
+            if "language" not in exclude:
+                if not PublishedGraph.objects.filter(
+                    language=self.language,
+                    publication__graph_id=self.geometrynode.graph.graphid,
+                ).exists():
+                    raise ValidationError(
+                        "Language must belong to a published graph for the graph of the geometry node"
+                    )
 
     def clean(self):
         """
@@ -2409,15 +2442,6 @@ class SpatialView(models.Model):
         ]:
             raise ValidationError(
                 "One or more attributenodes have a geojson-feature-collection datatype"
-            )
-
-        # language must be be a valid language code belonging to the current publication
-        published_graphs = graph.publication.publishedgraph_set.all()
-        if self.language_id not in [
-            published_graph.language_id for published_graph in published_graphs
-        ]:
-            raise ValidationError(
-                "Language must belong to a published graph for the graph of the geometry node"
             )
 
         # validate the schema is a valid schema in the database
