@@ -138,8 +138,17 @@ class List(models.Model):
         )
 
     def index(self):
-        for item in self.list_items.all():
-            item.index()
+        SearchEngineInstance.bulk_index(
+            [
+                SearchEngineInstance.create_bulk_item(
+                    index=settings.REFERENCES_INDEX_NAME,
+                    id=value.id,
+                    data=value.get_index_document(),
+                )
+                for item in self.list_items.all()
+                for value in item.list_item_values.all()
+            ]
+        )
 
     def delete_index(self):
         query = Query(SearchEngineInstance)
@@ -281,16 +290,6 @@ class ListItem(models.Model):
     def find_best_label(self):
         return self.find_best_label_from_set(self.list_item_values.labels())
 
-    def index(self):
-        for label in self.list_item_values.labels():
-            label.index()
-
-    def delete_index(self):
-        query = Query(SearchEngineInstance)
-        term = Term(field="item_id", term=self.id)
-        query.add_query(term)
-        query.delete(index=settings.REFERENCES_INDEX_NAME)
-
     def get_child_uris(self, uris=[]):
         uris.append(self.uri)
         for child in self.children.all():
@@ -384,8 +383,8 @@ class ListItemValue(models.Model):
         query.add_query(term)
         query.delete(index=settings.REFERENCES_INDEX_NAME)
 
-    def index(self):
-        index_data = {
+    def get_index_document(self):
+        return {
             "item_id": self.list_item_id,
             "uri": self.list_item.uri,
             "label_id": self.pk,
@@ -395,8 +394,12 @@ class ListItemValue(models.Model):
             "list_id": self.list_item.list_id,
             "list_name": self.list_item.list.name,
         }
+
+    def index(self):
         SearchEngineInstance.index_data(
-            index=settings.REFERENCES_INDEX_NAME, body=index_data, idfield="label_id"
+            index=settings.REFERENCES_INDEX_NAME,
+            body=self.get_index_document(),
+            idfield="label_id",
         )
 
 
