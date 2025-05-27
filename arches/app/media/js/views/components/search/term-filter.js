@@ -57,7 +57,7 @@ const viewModel = BaseFilter.extend({
 
     updateQuery: function() {
         var terms = _.filter(this.filter.terms(), function(term){
-            return arches.termSearchTypes.map((a) => a.type).concat(['string']).indexOf(term.type) > -1;
+            return arches.termSearchTypes.map((searchType) => searchType.type).concat(['string']).indexOf(term.type) > -1;
         }, this);
 
         var queryObj = this.query();

@@ -98,7 +98,7 @@ ko.bindingHandlers.termSearch = {
                     return result.text;
                 }
                 var markup = [];
-                var indent = arches.termSearchTypes.map((a) => a.type).indexOf(result.type) > -1 ? 'term-search-item indent' : (result.type === 'string' ? 'term-search-item' : 'term-search-group');
+                var indent = arches.termSearchTypes.map((searchType) => searchType.type).indexOf(result.type) > -1 ? 'term-search-item indent' : (result.type === 'string' ? 'term-search-item' : 'term-search-group');
                 if (result.type === 'group') {
                     _.each(result.text, function(searchType, i) {
                         var label = searchType === 'concepts' ? arches.translations.termSearchConcept : arches.translations.termSearchTerm;
