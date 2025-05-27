@@ -67,9 +67,9 @@ urlpatterns = [
         ListOptionsView.as_view(),
         name="controlled_list_options",
     ),
+    path("search/terms", SearchTermsView.as_view(), name="search_terms"),
 ]
 
-urlpatterns.append(path("search/terms", SearchTermsView.as_view(), name="search_terms"))
 
 # Ensure Arches core urls are superseded by project-level urls
 urlpatterns.append(path("", include("arches.urls")))
