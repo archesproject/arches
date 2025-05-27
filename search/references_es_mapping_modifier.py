@@ -27,7 +27,11 @@ class ReferencesEsMappingModifier(EsMappingModifier):
         search_query, term, permitted_nodegroups, include_provisional
     ):
         if term["type"] == "reference":
-            item = ListItem.objects.get(pk=term["value"])
+            item = (
+                ListItem.objects.filter(pk=term["value"])
+                .prefetch_related("__".join(["children" * 10]))
+                .get()
+            )
             uris = item.get_child_uris(uris=[])
             references_filter = Bool()
             references_filter.filter(
