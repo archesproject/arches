@@ -145,7 +145,7 @@ class List(models.Model):
                     id=value.id,
                     data=value.get_index_document(),
                 )
-                for item in self.list_items.all()
+                for item in self.list_items.prefetch_related("list_item_values")
                 for value in item.list_item_values.all()
             ]
         )
