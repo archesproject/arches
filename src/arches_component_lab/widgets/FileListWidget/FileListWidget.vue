@@ -63,9 +63,10 @@ onMounted(async () => {
             <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
         </label>
 
-        <div v-if="mode === EDIT"></div>
-        <div v-if="mode === VIEW">
+        <div :class="[nodeAlias, graphSlug].join(' ')">
+            <div v-if="mode === EDIT"></div>
             <FileListWidgetViewer
+                v-else-if="mode === VIEW"
                 :value="initialValue"
                 :widget-data="widgetData"
             />
