@@ -7,18 +7,10 @@ from django.db import transaction
 from django.db.models import Max
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext as _
+from django.urls import reverse, resolve, get_script_prefix
 
 from arches.app.models.utils import field_names
 from arches.app.models.system_settings import settings
-from arches.app.search.elasticsearch_dsl_builder import (
-    Bool,
-    Query,
-    Term,
-    Match,
-    Aggregation,
-    MaxAgg,
-)
-from arches.app.search.search_engine_factory import SearchEngineInstance
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.decorators import group_required
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
@@ -395,7 +387,13 @@ class ListOptionsView(APIBase):
 
 class SearchTermsView(APIBase):
     def get(self, request):
-        json_response = search_terms(request)
+        search_terms_path = reverse("search_terms")
+        if search_terms_path.startswith(get_script_prefix()):
+            search_terms_path = search_terms_path.replace(get_script_prefix(), "/")
+        func, args, kwargs = resolve(search_terms_path)
+        kwargs["request"] = request
+        json_response = func(*args, **kwargs)
+
         response_content = json_response.content.decode("utf-8")
         response_data = json.loads(response_content)
         lang = request.GET.get("lang", request.LANGUAGE_CODE)
