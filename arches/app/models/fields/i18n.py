@@ -245,9 +245,9 @@ class I18n_JSON(NothingNode):
 
         if isinstance(value, str):
             try:
-                ret = json.loads(value.replace("%%", "%"))
+                ret = json.loads(value)
             except:
-                ret = json.loads(json.dumps(value.replace("%%", "%")))
+                ret = json.loads(json.dumps(value))
         elif value is None:
             ret[lang] = None if use_nulls else ""
         elif isinstance(value, I18n_JSON):
@@ -321,7 +321,7 @@ class I18n_JSON(NothingNode):
                 ELSE %s
                 END
             """
-            params.append(json.dumps(self.to_localized_object()).replace("%", "%%"))
+            params.append(json.dumps(self.to_localized_object()))
 
         return sql, tuple(params)
 

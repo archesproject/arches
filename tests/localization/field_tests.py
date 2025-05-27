@@ -283,6 +283,27 @@ class Customi18nJSONFieldTests(ArchesTestCase):
         j = I18n_JSON(test_json)
         self.assertEqual(str(j), expected_output)
 
+    def test_i18n_json_percent_encoding(self):
+        test_json = json.dumps(
+            {
+                "i18n_properties": ["placeholder"],
+                "placeholder": {"en": "choose one", "es": "elija uno"},
+                "width": "100%",
+                "min_length": 19,
+            }
+        )
+        expected_output = json.dumps(
+            {
+                "i18n_properties": ["placeholder"],
+                "placeholder": "choose one",
+                "width": "100%",
+                "min_length": 19,
+            }
+        )
+        translation.activate("en")
+        j = I18n_JSON(test_json)
+        self.assertEqual(str(j), expected_output)
+
     def test_i18n_json_field(self):
         test_json = {
             "i18n_properties": ["placeholder"],
