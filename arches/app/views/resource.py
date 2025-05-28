@@ -651,9 +651,19 @@ class ResourceEditLogView(BaseManagerView):
             resource_instance = models.ResourceInstance.objects.get(pk=resourceid)
             edits = models.EditLog.objects.filter(resourceinstanceid=resourceid)
             permitted_edits = []
+            nodegroup_ids_from_edits = [
+                uuid.UUID(nodegroupid) if nodegroupid else nodegroupid
+                for nodegroupid in edits.values_list("nodegroupid", flat=True)
+            ]
+            nodegroups_for_edits = models.NodeGroup.objects.filter(
+                pk__in=nodegroup_ids_from_edits
+            ).in_bulk()
             for edit in edits:
                 if edit.nodegroupid is not None:
-                    if request.user.has_perm("read_nodegroup", edit.nodegroupid):
+                    edit_nodegroup = nodegroups_for_edits.get(
+                        uuid.UUID(edit.nodegroupid)
+                    )
+                    if request.user.has_perm("read_nodegroup", edit_nodegroup):
                         if edit.newvalue is not None:
                             self.getEditConceptValue(edit.newvalue)
                         if edit.oldvalue is not None:
@@ -661,7 +671,6 @@ class ResourceEditLogView(BaseManagerView):
                         permitted_edits.append(edit)
                 else:
                     permitted_edits.append(edit)
-
             resource = Resource.objects.get(pk=resourceid)
             displayname = resource.displayname()
             cards = Card.objects.filter(
@@ -930,7 +939,10 @@ class ResourceDescriptors(View):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class ResourceReportView(MapBaseManagerView):
     def get(self, request, resourceid=None):
-        resource = Resource.objects.only("graph_id").get(pk=resourceid)
+        try:
+            resource = Resource.objects.only("graph_id").get(pk=resourceid)
+        except Resource.DoesNotExist:
+            raise Http404(_("Resource does not exist"))
         graph = Graph.objects.get(graphid=resource.graph_id)
 
         try:
@@ -963,12 +975,6 @@ class ResourceReportView(MapBaseManagerView):
 @method_decorator(can_read_resource_instance, name="dispatch")
 class RelatedResourcesView(BaseManagerView):
     action = None
-    graphs = (
-        models.GraphModel.objects.all()
-        .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-        .exclude(isresource=False)
-        .exclude(publication=None)
-    )
 
     def paginate_related_resources(self, related_resources, page, request):
         total = related_resources["total"]["value"]
@@ -1008,7 +1014,7 @@ class RelatedResourcesView(BaseManagerView):
 
         return ret
 
-    def get(self, request, resourceid=None, include_rr_count=True):
+    def get(self, request, resourceid=None, include_rr_count=True, graphs=None):
         ret = {}
 
         if self.action == "get_candidates":
@@ -1054,7 +1060,7 @@ class RelatedResourcesView(BaseManagerView):
                     page=page,
                     user=request.user,
                     resourceinstance_graphid=resourceinstance_graphid,
-                    graphs=self.graphs,
+                    graphs=graphs,
                     include_rr_count=include_rr_count,
                 )
 
@@ -1066,7 +1072,7 @@ class RelatedResourcesView(BaseManagerView):
                     lang=lang,
                     user=request.user,
                     resourceinstance_graphid=resourceinstance_graphid,
-                    graphs=self.graphs,
+                    graphs=graphs,
                     include_rr_count=include_rr_count,
                 )
 

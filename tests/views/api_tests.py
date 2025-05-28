@@ -535,3 +535,27 @@ class ResourceAPITests(ArchesTestCase):
             if len(related_graph_set["resources"]) > 0:
                 detected_relations = len(related_graph_set["resources"])
         self.assertTrue(detected_relations == 1)
+
+    def test_related_resources_api_excludes_unpublished_graphs(self):
+        # Make two calls to ensure changes are not cached.
+        response = self.client.get(
+            reverse(
+                "related_resources",
+                args=(str(self.test_prj_user.pk),),
+            ),
+        )
+        resp = json.loads(response.content)
+        graph_count_before = len(resp["related_resources"]["node_config_lookup"])
+
+        self.data_type_graph.publication = None
+        self.data_type_graph.save()
+
+        response2 = self.client.get(
+            reverse(
+                "related_resources",
+                args=(str(self.test_prj_user.pk),),
+            ),
+        )
+        resp2 = json.loads(response2.content)
+        graph_count_after = len(resp2["related_resources"]["node_config_lookup"])
+        self.assertEqual(graph_count_after, graph_count_before - 1)
