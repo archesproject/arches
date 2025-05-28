@@ -93,7 +93,7 @@ const { $gettext } = useGettext();
 .nodes-container-title {
     padding: 0 0.5rem 0 0;
     font-weight: 400;
-    margin: 0 0 0.5rem 0;
+    margin: 0.5rem 0 0.5rem 0;
     font-size: 1.75rem;
 }
 

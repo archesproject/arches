@@ -141,7 +141,6 @@ const cancel = () => {
 input {
     font-size: 1.2rem;
     border-radius: 2px;
-    margin: 0.5rem 0;
 }
 
 .characteristic {
@@ -156,7 +155,7 @@ input {
 .value-editor-title h4 {
     font-size: 1.66rem;
     margin: 0;
-    padding: 0.5rem 0 0 0;
+    padding: 0.5rem 0 0.5rem 0;
     font-weight: 400;
 }
 
