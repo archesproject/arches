@@ -143,6 +143,7 @@ INSTALLED_APPS = (
     "corsheaders",
     "oauth2_provider",
     "django_celery_results",
+    "pgtrigger",
     # "silk",
     "arches_querysets",  # Ensure the project is listed before any other arches applications
 )
