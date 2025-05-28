@@ -21,7 +21,10 @@ const { $gettext } = useGettext();
             <div class="splash-note">
                 {{
                     $gettext(
-                        "Use the Controlled List Manager to create new lists of controlled vocabularies, or update an existing list by selecting it from the tree in the sidebar. Use Arches Designer to select which node(s) in a model can use a list",
+                        "Use the Controlled List Manager to create new lists of " +
+                            "controlled vocabularies, or update an existing list by " +
+                            "selecting it from the tree in the sidebar. Use Arches " +
+                            "Designer to select which node(s) in a model can use a list.",
                     )
                 }}
             </div>
