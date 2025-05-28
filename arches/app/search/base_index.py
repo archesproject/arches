@@ -190,6 +190,23 @@ class BaseIndex(object):
         else:
             raise NotImplementedError
 
+    @staticmethod
+    def search_terms(document, search_string, lang):
+        """
+        Searches for terms in the index based on the search string and language
+        and appends the results to the provided document.
+
+        Arguments:
+        search_string -- the string to search for
+        lang -- the language to filter results by
+
+        Keyword Arguments:
+        None
+
+        Return: search terms results dictionary
+        """
+        return document
+
 
 def get_index(name):
     for index in settings.ELASTICSEARCH_CUSTOM_INDEXES:

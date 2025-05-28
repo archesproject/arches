@@ -37,6 +37,7 @@ from arches.app.models.models import (
     SearchExportHistory,
 )
 from arches.app.models.concept import Concept, get_preflabel_from_conceptid
+from arches.app.utils import import_class_from_string
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -259,6 +260,17 @@ def search_terms(request):
                     )
                     i = i + 1
 
+    for term_search_type in settings.TERM_SEARCH_TYPES:
+        try:
+            module = term_search_type["module"]
+            index = import_class_from_string(module)
+            index.search_terms(
+                ret,
+                searchString,
+                lang,
+            )
+        except KeyError:
+            pass
     return JSONResponse(ret)
 
 
