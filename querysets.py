@@ -5,6 +5,11 @@ from django.db.models.functions import Cast
 
 
 class ListQuerySet(models.QuerySet):
+    def delete(self, *args, **kwargs):
+        for obj in self:
+            obj.delete_index()
+        return super(ListQuerySet, self).delete(*args, **kwargs)
+
     def annotate_node_fields(self, **kwargs):
         from arches_controlled_lists.models import NodeProxy
 
@@ -25,6 +30,11 @@ class ListQuerySet(models.QuerySet):
 
 
 class ListItemQuerySet(models.QuerySet):
+    def delete(self, *args, **kwargs):
+        for obj in self:
+            obj.delete_index()
+        return super(ListItemQuerySet, self).delete(*args, **kwargs)
+
     def with_list_item_labels(self):
         from arches_controlled_lists.models import ListItemValue
 
@@ -38,6 +48,11 @@ class ListItemQuerySet(models.QuerySet):
 
 
 class ListItemValueQuerySet(models.QuerySet):
+    def delete(self, *args, **kwargs):
+        for obj in self:
+            obj.delete_index()
+        return super(ListItemValueQuerySet, self).delete(*args, **kwargs)
+
     def values_without_images(self):
         return self.exclude(valuetype="image")
 

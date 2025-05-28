@@ -205,6 +205,16 @@ class ListItem(models.Model):
         if not self.uri:
             self.uri = self.generate_uri()
 
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        self.delete_index()
+
+    def delete_index(self):
+        query = Query(SearchEngineInstance)
+        term = Term(field="item_id", term=self.id)
+        query.add_query(term)
+        query.delete(index=settings.REFERENCES_INDEX_NAME)
+
     def generate_uri(self):
         """Similar logic exists in `etl_collections_to_controlled_lists` migration."""
         if not self.id:
@@ -353,10 +363,6 @@ class ListItemValue(models.Model):
                 sep=" ", timespec="seconds"
             )
 
-    def delete(self, *args, **kwargs):
-        super().delete(*args, **kwargs)
-        self.delete_index()
-
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if self.list_item.list.searchable:
@@ -372,14 +378,18 @@ class ListItemValue(models.Model):
         }
 
     def delete(self):
+        pk = self.pk
         with transaction.atomic():
             ret = super().delete()
             self.list_item.ensure_pref_label()
+            self.delete_index(pk=pk)
         return ret
 
-    def delete_index(self):
+    def delete_index(self, pk=None):
+        if pk is None:
+            pk = self.pk
         query = Query(SearchEngineInstance)
-        term = Term(field="label_id", term=self.id)
+        term = Term(field="label_id", term=pk)
         query.add_query(term)
         query.delete(index=settings.REFERENCES_INDEX_NAME)
 
