@@ -52,7 +52,12 @@ class ReferenceIndex(BaseIndex):
         return None, None
 
     @staticmethod
-    def search_terms(search_string, lang, user, term_search_type):
+    def search_terms(
+        search_string,
+        lang,
+        user=None,
+        term_search_type="reference",
+    ):
         index = settings.REFERENCES_INDEX_NAME
         i = 0
         query = Query(SearchEngineInstance, start=0, limit=0)
