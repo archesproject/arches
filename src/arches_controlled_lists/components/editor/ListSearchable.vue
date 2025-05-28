@@ -55,7 +55,7 @@ const save = async () => {
 <template>
     <div class="characteristic">
         <div class="value-editor-title">
-            <h4>{{ $gettext(Searchable?) }}</h4>
+            <h4>{{ $gettext("Searchable?") }}</h4>
         </div>
         <div class="searchable-switch">
             <ToggleSwitch
