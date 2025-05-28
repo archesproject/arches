@@ -11,7 +11,7 @@ import {
     fetchCardData,
     fetchTileData,
 } from "@/arches_component_lab/cards/api.ts";
-import { fetchCardXNodeXWidgetDataFromCard } from "@/arches_component_lab/widgets/api.ts";
+import { fetchCardXNodeXWidgetDataFromNodeGroup } from "@/arches_component_lab/widgets/api.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
@@ -77,10 +77,11 @@ watchEffect(async () => {
             props.graphSlug,
             props.nodegroupGroupingNodeAlias,
         );
-        const cardXNodeXWidgetDataPromise = fetchCardXNodeXWidgetDataFromCard(
-            props.graphSlug,
-            props.nodegroupGroupingNodeAlias,
-        );
+        const cardXNodeXWidgetDataPromise =
+            fetchCardXNodeXWidgetDataFromNodeGroup(
+                props.graphSlug,
+                props.nodegroupGroupingNodeAlias,
+            );
         const tileDataPromise = fetchTileData(
             props.graphSlug,
             props.nodegroupGroupingNodeAlias,

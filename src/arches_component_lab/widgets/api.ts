@@ -100,7 +100,7 @@ export const fetchRelatableResources = async (
     return parsed;
 };
 
-export const fetchCardXNodeXWidgetDataFromCard = async (
+export const fetchCardXNodeXWidgetDataFromNodeGroup = async (
     graphSlug: string,
     nodegroupGroupingNodeAlias: string,
 ) => {

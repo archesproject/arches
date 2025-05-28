@@ -14,8 +14,6 @@ from arches_component_lab.views.api.card_x_node_x_widget import (
     CardXNodeXWidgetListFromNodegroupView,
 )
 
-# from arches_component_lab.views.api.tile import TileView
-
 from arches_querysets.rest_framework.generic_views import (
     ArchesTileDetailView,
 )
