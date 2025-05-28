@@ -10,6 +10,8 @@ from arches.app.search.elasticsearch_dsl_builder import (
 from arches.app.search.search_engine_factory import SearchEngineInstance
 from arches.app.models.system_settings import settings
 
+from arches_controlled_lists.models import List
+
 
 class ReferenceIndex(BaseIndex):
     def __init__(self, index_name=None):
@@ -117,3 +119,16 @@ class ReferenceIndex(BaseIndex):
                         )
                         i = i + 1
         return term_results
+
+    def reindex(
+        self,
+        clear_index=True,
+        batch_size=settings.BULK_IMPORT_BATCH_SIZE,
+        quiet=False,
+    ):
+        if clear_index:
+            self.delete_index()
+            self.prepare_index()
+
+        for list in List.objects.filter(searchable=True):
+            list.index()
