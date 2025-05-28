@@ -110,11 +110,13 @@ TERM_SEARCH_TYPES = [
         "type": "term",
         "label": _("Term Matches"),
         "key": "terms",
+        "module": "arches.app.search.search_term.TermSearch",
     },
     {
         "type": "concept",
         "label": _("Concepts"),
         "key": "concepts",
+        "module": "arches.app.search.search_term.ConceptSearch",
     },
 ]
 
