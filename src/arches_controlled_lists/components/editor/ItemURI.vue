@@ -198,4 +198,9 @@ input {
     background: var(--p-button-primary-hover-background);
     color: var(--p-button-primary-hover-color);
 }
+
+:deep(i.fa-undo[role="button"]:hover) {
+    background: var(--p-amber-300);
+    color: var(--p-button-primary-hover-color);
+}
 </style>

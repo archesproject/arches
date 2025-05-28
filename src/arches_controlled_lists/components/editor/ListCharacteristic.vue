@@ -183,5 +183,17 @@ input {
 .edit-controls i {
     font-size: medium;
     align-self: center;
+    padding: 0.5rem;
+    border-radius: 50%;
+}
+
+.edit-controls i.fa-check:hover {
+    background: var(--p-button-primary-hover-background);
+    color: var(--p-button-primary-hover-color);
+}
+
+.edit-controls i.fa-undo:hover {
+    background: var(--p-amber-300);
+    color: var(--p-button-primary-hover-color);
 }
 </style>
