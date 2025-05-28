@@ -12439,6 +12439,7 @@ a.filter-tools:hover {
     .geocode-container,
     .geometry-tools-container,
     .geometry-editing-notifications,
+    .report-print-date  > .toggle-container,
     #map-widget-container>.map-widget-container {
         display: none;
     }
@@ -12527,14 +12528,6 @@ a.filter-tools:hover {
     .resource-component-abstract {
       height: auto !important;
       overflow: visible !important;
-    }
-
-    [style*="position: absolute"] {
-      position: static !important;
-    }
-
-    .ep-tools, .some-toolbar {
-      display: none !important;
     }
 }
 
