@@ -23,8 +23,9 @@ const props = withDefaults(
         showLabel?: boolean;
     }>(),
     {
-        showLabel: true,
         cardXNodeXWidgetData: undefined,
+        initialValue: undefined,
+        showLabel: true,
     },
 );
 
