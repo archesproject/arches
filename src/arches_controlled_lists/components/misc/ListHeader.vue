@@ -66,7 +66,7 @@ const heading = computed(() => {
     display: flex;
     align-items: center;
     background: var(--p-navigation-header-color);
-    color: var(--p-button-primary-color);
+    color: white;
     height: 5.25rem;
 }
 
