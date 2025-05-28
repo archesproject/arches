@@ -104,6 +104,7 @@ TERM_SEARCH_TYPES = [
         "type": "reference",
         "label": _("References"),
         "key": REFERENCES_INDEX_NAME,
+        "module": "arches_controlled_lists.search_indexes.reference_index.ReferenceIndex",
     },
 ]
 

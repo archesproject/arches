@@ -382,18 +382,3 @@ class ListOptionsView(APIBase):
             item.build_select_option() for item in list_items if item.parent_id is None
         ]
         return JSONResponse(serialized)
-
-
-class SearchTermsView(APIBase):
-    def get(self, request):
-        json_response = search_terms(request)
-        response_content = json_response.content.decode("utf-8")
-        response_data = json.loads(response_content)
-        lang = request.GET.get("lang", request.LANGUAGE_CODE)
-        search_string = request.GET.get("q", "")
-        index = settings.REFERENCES_INDEX_NAME
-
-        response_data[index] = ReferenceIndex.get_term_results(search_string, lang=lang)
-        json_response.content = json.dumps(response_data).encode("utf-8")
-        json_response["Content-Length"] = len(json_response.content)
-        return json_response
