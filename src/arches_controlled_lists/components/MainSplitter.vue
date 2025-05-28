@@ -21,7 +21,7 @@ const { displayedRow } = inject(displayedRowKey) as unknown as {
 </script>
 
 <template>
-    <Splitter style="height: 100%; overflow: hidden">
+    <Splitter>
         <SplitterPanel
             :size="30"
             :min-size="25"
@@ -49,3 +49,11 @@ const { displayedRow } = inject(displayedRowKey) as unknown as {
         </SplitterPanel>
     </Splitter>
 </template>
+
+<style scoped>
+.p-splitter {
+    height: 100%;
+    overflow: hidden;
+    border-radius: 0;
+}
+</style>
