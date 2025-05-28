@@ -182,6 +182,6 @@ input {
 
 .edit-controls i {
     font-size: medium;
-    padding: 0.5rem;
+    align-self: center;
 }
 </style>

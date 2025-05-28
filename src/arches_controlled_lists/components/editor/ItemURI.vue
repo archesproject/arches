@@ -174,7 +174,6 @@ input {
 }
 
 .edit-controls {
-    padding: 0.5rem 0 0 0;
     margin-left: 1rem;
     display: inline-flex;
     justify-content: space-between;
@@ -183,7 +182,7 @@ input {
 
 .edit-controls i {
     font-size: var(--p-icon-size);
-    padding: 0.5rem;
+    align-self: center;
 }
 
 :deep(i[role="button"]) {
