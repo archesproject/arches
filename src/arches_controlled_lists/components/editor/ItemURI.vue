@@ -174,7 +174,7 @@ input {
 }
 
 .edit-controls {
-    margin-left: 1rem;
+    margin-inline-start: 1rem;
     display: inline-flex;
     justify-content: space-between;
     width: 4rem;

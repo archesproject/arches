@@ -71,7 +71,6 @@ const { $gettext } = useGettext();
     margin: 1rem 1rem 0rem 1rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--p-content-border-color);
-    width: 100%;
 }
 
 .list-label {

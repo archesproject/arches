@@ -444,7 +444,6 @@ const focusInput = () => {
 <style scoped>
 .value-editor-container {
     margin: 1rem 1rem 4rem 2rem;
-    width: 100%;
 }
 
 .value-editor-title {

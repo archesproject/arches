@@ -357,7 +357,7 @@ const acceptNewListShortcutEntry = async () => {
 .actions {
     display: inline-flex;
     gap: 1rem;
-    margin-left: 1rem;
+    margin-inline-start: 1rem;
     width: 100%;
     justify-content: space-between;
 }

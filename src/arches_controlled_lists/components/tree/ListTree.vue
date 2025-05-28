@@ -325,6 +325,6 @@ function lazyLabelLookup(node: TreeNode) {
 }
 
 :deep(.p-tree-node) {
-    margin-right: 0.5rem;
+    margin-inline-end: 0.5rem;
 }
 </style>

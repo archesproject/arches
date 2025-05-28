@@ -59,7 +59,6 @@ const issuePatchItem = async () => {
     display: flex;
     flex-direction: column;
     gap: 0;
-    width: 100%;
 }
 
 .guide-container h4 {

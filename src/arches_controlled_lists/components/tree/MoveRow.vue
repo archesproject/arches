@@ -299,7 +299,7 @@ const vRefocusDownArrow = {
 .move-buttons {
     display: flex;
     gap: 0.25rem;
-    padding-right: 0.5rem;
+    padding-inline-end: 0.5rem;
 }
 
 .move-button {
