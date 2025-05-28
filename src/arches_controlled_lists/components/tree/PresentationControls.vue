@@ -66,7 +66,7 @@ const { $gettext } = useGettext();
             >
                 <Select
                     v-model="selectedLanguage"
-                    aria-labelledby="languageSelectLabel"
+                    :aria-label="$gettext('Select language for labels')"
                     :options="arches.languages"
                     :option-label="
                         (lang: Language) => `${lang.name} (${lang.code})`
