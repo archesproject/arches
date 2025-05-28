@@ -119,7 +119,12 @@ class ListView(APIBase):
         if not update_fields and not sortorder_map:
             return JSONResponse(status=HTTPStatus.BAD_REQUEST)
 
-        clist = List(id=list_id, **data)
+        try:
+            clist = List.objects.get(pk=list_id)
+        except List.DoesNotExist:
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
+        for key, value in data.items():
+            setattr(clist, key, value)
 
         exclude_fields = field_names(clist) - update_fields
         try:
