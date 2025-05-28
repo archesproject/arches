@@ -11,13 +11,13 @@ import {
     fetchCardData,
     fetchTileData,
 } from "@/arches_component_lab/cards/api.ts";
-import { fetchWidgetDataFromCard } from "@/arches_component_lab/widgets/api.ts";
+import { fetchCardXNodeXWidgetDataFromCard } from "@/arches_component_lab/widgets/api.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
-import type { WidgetConfiguration } from "@/arches_component_lab/cards/types.ts";
+import type { WidgetComponent } from "@/arches_component_lab/cards/types.ts";
 
 // TODO: Remove this when 7.6 stops being supported
 const deprecatedComponentPathToUpdatedComponentPath: Record<string, string> = {
@@ -43,13 +43,10 @@ const tileData = ref();
 
 const widgets = computed(() => {
     return cardXNodeXWidgetData.value.reduce(
-        (
-            acc: WidgetConfiguration[],
-            cardXNodeXWidgetDatum: CardXNodeXWidget,
-        ) => {
+        (acc: WidgetComponent[], cardXNodeXWidgetData: CardXNodeXWidget) => {
             if (
                 !deprecatedComponentPathToUpdatedComponentPath[
-                    cardXNodeXWidgetDatum.widget.component
+                    cardXNodeXWidgetData.widget.component
                 ]
             ) {
                 return acc;
@@ -57,13 +54,13 @@ const widgets = computed(() => {
 
             const component = defineAsyncComponent(() => {
                 return import(
-                    `@/${deprecatedComponentPathToUpdatedComponentPath[cardXNodeXWidgetDatum.widget.component]}.vue`
+                    `@/${deprecatedComponentPathToUpdatedComponentPath[cardXNodeXWidgetData.widget.component]}.vue`
                 );
             });
 
             acc.push({
                 component: component,
-                cardXNodeXWidgetDatum: cardXNodeXWidgetDatum,
+                cardXNodeXWidgetData: cardXNodeXWidgetData,
             });
 
             return acc;
@@ -76,23 +73,23 @@ watchEffect(async () => {
     isLoading.value = true;
 
     try {
-        const cardPromise = fetchCardData(
+        const cardDataPromise = fetchCardData(
             props.graphSlug,
             props.nodegroupGroupingNodeAlias,
         );
-        const widgetPromise = fetchWidgetDataFromCard(
+        const cardXNodeXWidgetDataPromise = fetchCardXNodeXWidgetDataFromCard(
             props.graphSlug,
             props.nodegroupGroupingNodeAlias,
         );
-        const tilePromise = fetchTileData(
+        const tileDataPromise = fetchTileData(
             props.graphSlug,
             props.nodegroupGroupingNodeAlias,
             props.tileId,
         );
 
-        cardData.value = await cardPromise;
-        cardXNodeXWidgetData.value = await widgetPromise;
-        tileData.value = await tilePromise;
+        cardData.value = await cardDataPromise;
+        cardXNodeXWidgetData.value = await cardXNodeXWidgetDataPromise;
+        tileData.value = await tileDataPromise;
     } catch (error) {
         configurationError.value = error;
     } finally {
@@ -117,26 +114,26 @@ watchEffect(async () => {
 
             <DefaultCardEditor
                 v-if="props.mode === EDIT"
+                v-model:tile-data="tileData"
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :graph-slug="props.graphSlug"
                 :mode="props.mode"
                 :nodegroup-grouping-node-alias="
                     props.nodegroupGroupingNodeAlias
                 "
-                :tile-data="tileData"
                 :widgets="widgets"
                 @update:is-dirty="emit('update:isDirty', $event)"
                 @update:tile-data="emit('update:tileData', $event)"
             />
             <DefaultCardViewer
                 v-else-if="props.mode === VIEW"
+                v-model:tile-data="tileData"
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :graph-slug="props.graphSlug"
                 :mode="props.mode"
                 :nodegroup-grouping-node-alias="
                     props.nodegroupGroupingNodeAlias
                 "
-                :tile-data="tileData"
                 :widgets="widgets"
             />
         </template>
