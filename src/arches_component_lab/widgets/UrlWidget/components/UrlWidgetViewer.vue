@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { Url } from "@/arches_component_lab/widgets/types.ts";
+import type { URLDatatype } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
-    value?: Url | null | undefined;
+    value?: URLDatatype | null | undefined;
 }>();
 </script>
 <template>
