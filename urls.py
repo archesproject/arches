@@ -11,7 +11,6 @@ from arches_controlled_lists.views import (
     ListItemImageMetadataView,
     ListItemValueView,
     ListOptionsView,
-    SearchTermsView,
 )
 
 urlpatterns = [
