@@ -26,7 +26,7 @@ class ReferencesEsMappingModifier(EsMappingModifier):
         if term["type"] == "reference":
             item = (
                 ListItem.objects.filter(pk=term["value"])
-                .prefetch_related("__".join(["children" * 10]))
+                .prefetch_related("__".join(["children"] * 10))
                 .get()
             )
             uris = item.get_child_uris(uris=[])
