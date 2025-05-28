@@ -1,19 +1,7 @@
 import { defineAsyncComponent } from "vue";
-
-export interface CardXNodeXWidgetDatum {
-    card: {
-        name: string;
-    };
-    id: string;
-    node: {
-        alias: string;
-    };
-    widget: {
-        component: string;
-    };
-}
+import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 
 export interface WidgetConfiguration {
     component: typeof defineAsyncComponent;
-    cardXNodeXWidgetDatum: CardXNodeXWidgetDatum;
+    cardXNodeXWidgetDatum: CardXNodeXWidget;
 }

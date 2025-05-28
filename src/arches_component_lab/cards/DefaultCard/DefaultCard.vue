@@ -15,11 +15,9 @@ import { fetchWidgetDataFromCard } from "@/arches_component_lab/widgets/api.ts";
 
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 
+import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
-import type {
-    CardXNodeXWidgetDatum,
-    WidgetConfiguration,
-} from "@/arches_component_lab/cards/types.ts";
+import type { WidgetConfiguration } from "@/arches_component_lab/cards/types.ts";
 
 // TODO: Remove this when 7.6 stops being supported
 const deprecatedComponentPathToUpdatedComponentPath: Record<string, string> = {
@@ -47,7 +45,7 @@ const widgets = computed(() => {
     return cardXNodeXWidgetData.value.reduce(
         (
             acc: WidgetConfiguration[],
-            cardXNodeXWidgetDatum: CardXNodeXWidgetDatum,
+            cardXNodeXWidgetDatum: CardXNodeXWidget,
         ) => {
             if (
                 !deprecatedComponentPathToUpdatedComponentPath[

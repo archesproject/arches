@@ -10,6 +10,7 @@ import NonLocalizedStringWidgetViewer from "@/arches_component_lab/widgets/NonLo
 import { EDIT, VIEW } from "@/arches_component_lab/widgets/constants.ts";
 import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/widgets/api.ts";
 
+import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type { WidgetMode } from "@/arches_component_lab/widgets/types.ts";
 
 const props = withDefaults(
@@ -17,12 +18,13 @@ const props = withDefaults(
         mode: WidgetMode;
         nodeAlias: string;
         graphSlug: string;
-        cardXNodeXWidgetData?: any;
+        cardXNodeXWidgetData?: CardXNodeXWidget;
         initialValue?: string | null;
         showLabel?: boolean;
     }>(),
     {
         showLabel: true,
+        cardXNodeXWidgetData: undefined,
     },
 );
 
@@ -56,6 +58,13 @@ watchEffect(async () => {
             v-if="isLoading"
             style="width: 2em; height: 2em"
         />
+        <Message
+            v-else-if="configurationError"
+            severity="error"
+            size="small"
+        >
+            {{ configurationError.message }}
+        </Message>
         <template v-else>
             <label v-if="props.showLabel">
                 <span>{{ cardXNodeXWidgetData.label }}</span>
@@ -68,24 +77,19 @@ watchEffect(async () => {
                 >
             </label>
 
-            <NonLocalizedStringWidgetEditor
-                v-if="props.mode === EDIT"
-                :initial-value="initialValue"
-                :graph-slug="props.graphSlug"
-                :node-alias="props.nodeAlias"
-            />
-            <NonLocalizedStringWidgetViewer
-                v-else-if="props.mode === VIEW"
-                :value="props.initialValue"
-            />
+            <div :class="[nodeAlias, graphSlug].join(' ')">
+                <NonLocalizedStringWidgetEditor
+                    v-if="mode === EDIT"
+                    :initial-value="initialValue"
+                    :graph-slug="props.graphSlug"
+                    :node-alias="props.nodeAlias"
+                />
+                <NonLocalizedStringWidgetViewer
+                    v-else-if="props.mode === VIEW"
+                    :value="props.initialValue"
+                />
+            </div>
         </template>
-        <Message
-            v-if="configurationError"
-            severity="error"
-            size="small"
-        >
-            {{ configurationError.message }}
-        </Message>
     </div>
 </template>
 

@@ -12,14 +12,13 @@ import { upsertTile } from "@/arches_component_lab/cards/api.ts";
 import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { FormSubmitEvent } from "@primevue/forms";
-import type {
-    CardXNodeXWidgetDatum,
-    WidgetConfiguration,
-} from "@/arches_component_lab/cards/types.ts";
 import type { useFormFieldState } from "@primevue/forms/useform";
 
+import type { WidgetConfiguration } from "@/arches_component_lab/cards/types.ts";
+import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+
 const props = defineProps<{
-    cardXNodeXWidgetData: CardXNodeXWidgetDatum[];
+    cardXNodeXWidgetData: CardXNodeXWidget[];
     graphSlug: string;
     mode: string;
     nodegroupGroupingNodeAlias: string;
@@ -80,6 +79,7 @@ async function save(e: FormSubmitEvent) {
         console.log("Updated tile data:", foo);
         emit("update:tileData", updatedTileData); // or foo?
     } catch (error) {
+        console.error("Failed to save tile data:", error);
         // toast.add({
         //     severity: ERROR,
         //     life: DEFAULT_ERROR_TOAST_LIFE,
