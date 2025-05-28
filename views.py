@@ -128,7 +128,6 @@ class ListView(APIBase):
 
         exclude_fields = field_names(clist) - update_fields
         try:
-            clist._state.adding = False
             clist.full_clean(exclude=exclude_fields)
         except ValidationError as ve:
             return JSONErrorResponse(
