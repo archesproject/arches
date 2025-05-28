@@ -506,10 +506,6 @@ p {
     background: var(--p-button-secondary-background);
 }
 
-:deep(.p-button-text.p-button-secondary.p-datatable-row-editor-init) {
-    background: var(--p-button-secondary-background);
-}
-
 :deep(.p-button-text.p-button-secondary.p-datatable-row-editor-init:hover) {
     background: var(--p-button-primary-hover-background);
     color: var(--p-button-primary-hover-color);
