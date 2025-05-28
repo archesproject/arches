@@ -55,7 +55,11 @@ const save = async () => {
 <template>
     <div class="characteristic">
         <div class="value-editor-title">
-            <h4>{{ $gettext("Searchable?") }}</h4>
+            <label
+                for="searchableSwitch"
+                class="h4"
+                >{{ $gettext("Searchable?") }}</label
+            >
         </div>
         <div class="searchable-switch">
             <ToggleSwitch
@@ -70,6 +74,10 @@ const save = async () => {
 <style scoped>
 .characteristic {
     margin: 1rem 1rem 2.5rem 1rem;
+}
+
+.h4 {
+    font-weight: 400;
 }
 
 .value-editor-title {
