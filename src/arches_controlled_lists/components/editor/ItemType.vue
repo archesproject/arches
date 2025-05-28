@@ -34,6 +34,7 @@ const issuePatchItem = async () => {
             summary: $gettext("Save failed"),
             detail: error instanceof Error ? error.message : undefined,
         });
+        item.value.guide = !item.value.guide;
     }
 };
 </script>
