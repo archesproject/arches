@@ -50,8 +50,9 @@ class List(models.Model):
             )
 
     def delete(self, *args, **kwargs):
+        pk = self.pk
         super().delete(*args, **kwargs)
-        self.delete_index()
+        self.delete_index(pk=pk)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -150,9 +151,11 @@ class List(models.Model):
             ]
         )
 
-    def delete_index(self):
+    def delete_index(self, pk=None):
+        if pk is None:
+            pk = self.pk
         query = Query(SearchEngineInstance)
-        term = Term(field="list_id", term=self.id)
+        term = Term(field="list_id", term=pk)
         query.add_query(term)
         query.delete(index=settings.REFERENCES_INDEX_NAME)
 
@@ -206,12 +209,15 @@ class ListItem(models.Model):
             self.uri = self.generate_uri()
 
     def delete(self, *args, **kwargs):
+        pk = self.pk
         super().delete(*args, **kwargs)
-        self.delete_index()
+        self.delete_index(pk=pk)
 
-    def delete_index(self):
+    def delete_index(self, pk=None):
+        if pk is None:
+            pk = self.pk
         query = Query(SearchEngineInstance)
-        term = Term(field="item_id", term=self.id)
+        term = Term(field="item_id", term=pk)
         query.add_query(term)
         query.delete(index=settings.REFERENCES_INDEX_NAME)
 
