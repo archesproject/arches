@@ -17,9 +17,9 @@ import {
 import type { Ref } from "vue";
 import type { ControlledListItem } from "@/arches_controlled_lists/types";
 
-const { displayedRow: item } = inject(displayedRowKey) as unknown as {
+const { displayedRow: item } = inject<{
     displayedRow: Ref<ControlledListItem>;
-};
+}>(displayedRowKey)!;
 provide(itemKey, item);
 </script>
 

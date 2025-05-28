@@ -40,12 +40,10 @@ import type {
     Selectable,
 } from "@/arches_controlled_lists/types";
 
-const {
-    displayedRow,
-    setDisplayedRow,
-}: { displayedRow: Ref<Selectable>; setDisplayedRow: RowSetter } = inject(
-    displayedRowKey,
-) as unknown as { displayedRow: Ref<Selectable>; setDisplayedRow: RowSetter };
+const { displayedRow, setDisplayedRow } = inject<{
+    displayedRow: Ref<Selectable>;
+    setDisplayedRow: RowSetter;
+}>(displayedRowKey)!;
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 
 const tree = defineModel<TreeNode[]>({ required: true });

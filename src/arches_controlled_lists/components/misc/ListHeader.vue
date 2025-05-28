@@ -20,9 +20,9 @@ import type {
 
 const { $gettext } = useGettext();
 
-const { displayedRow } = inject(displayedRowKey) as unknown as {
-    displayedRow: Ref<Selectable>;
-};
+const { displayedRow } = inject<{ displayedRow: Ref<Selectable> }>(
+    displayedRowKey,
+)!;
 const selectedLanguage = inject(selectedLanguageKey) as Ref<Language>;
 const systemLanguage = inject(systemLanguageKey) as Language;
 

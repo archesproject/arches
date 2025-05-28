@@ -24,9 +24,9 @@ const props = defineProps<{
     editable: boolean;
     label: string;
 }>();
-const { displayedRow: list } = inject(displayedRowKey) as unknown as {
-    displayedRow: Ref<ControlledList>;
-};
+const { displayedRow: list } = inject<{ displayedRow: Ref<ControlledList> }>(
+    displayedRowKey,
+)!;
 const { isEditing, setIsEditing } = inject(
     isEditingKey,
 ) as IsEditingRefAndSetter;

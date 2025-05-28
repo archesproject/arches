@@ -56,9 +56,9 @@ const rerenderTree = ref(0);
 const nextFilterChangeNeedsExpandAll = ref(false);
 const expandedKeysSnapshotBeforeSearch = ref<TreeExpandedKeys>({});
 
-const { setDisplayedRow } = inject(displayedRowKey) as unknown as {
-    setDisplayedRow: RowSetter;
-};
+const { setDisplayedRow } = inject<{ setDisplayedRow: RowSetter }>(
+    displayedRowKey,
+)!;
 
 const route = useRoute();
 

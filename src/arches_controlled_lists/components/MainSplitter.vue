@@ -15,9 +15,9 @@ import ListTree from "@/arches_controlled_lists/components/tree/ListTree.vue";
 import type { Ref } from "vue";
 import type { ControlledList } from "@/arches_controlled_lists/types";
 
-const { displayedRow } = inject(displayedRowKey) as unknown as {
-    displayedRow: Ref<ControlledList>;
-};
+const { displayedRow } = inject<{ displayedRow: Ref<ControlledList> }>(
+    displayedRowKey,
+)!;
 </script>
 
 <template>

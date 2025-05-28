@@ -10,9 +10,9 @@ import ReferenceNodeLink from "@/arches_controlled_lists/components/editor/Refer
 import type { Ref } from "vue";
 import type { ControlledList } from "@/arches_controlled_lists/types";
 
-const { displayedRow: list } = inject(displayedRowKey) as unknown as {
-    displayedRow: Ref<ControlledList>;
-};
+const { displayedRow: list } = inject<{ displayedRow: Ref<ControlledList> }>(
+    displayedRowKey,
+)!;
 
 const { $gettext } = useGettext();
 </script>
