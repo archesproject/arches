@@ -58,8 +58,9 @@ const save = async () => {
             <label
                 for="searchableSwitch"
                 class="h4"
-                >{{ $gettext("Searchable?") }}</label
             >
+                {{ $gettext("Searchable?") }}
+            </label>
         </div>
         <div class="searchable-switch">
             <ToggleSwitch
