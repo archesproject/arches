@@ -52,7 +52,7 @@ class ReferenceIndex(BaseIndex):
         return None, None
 
     @staticmethod
-    def search_terms(document, search_string, lang=settings.LANGUAGE_CODE):
+    def search_terms(search_string, lang, user, term_search_type):
         index = settings.REFERENCES_INDEX_NAME
         i = 0
         query = Query(SearchEngineInstance, start=0, limit=0)
@@ -118,8 +118,7 @@ class ReferenceIndex(BaseIndex):
                             }
                         )
                         i = i + 1
-        document[index] = term_results
-        return document
+        return term_results
 
     def reindex(
         self,
