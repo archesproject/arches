@@ -138,6 +138,8 @@ class ListView(APIBase):
 
         if sortorder_map:
             clist.bulk_update_item_parentage_and_order(parent_map, sortorder_map)
+            if clist.searchable:
+                clist.index()
 
         return JSONResponse(status=HTTPStatus.NO_CONTENT)
 
