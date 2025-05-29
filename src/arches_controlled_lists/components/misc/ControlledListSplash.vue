@@ -84,7 +84,6 @@ i {
     font-size: 1.5rem;
     line-height: 1.15;
     font-weight: 400;
-    color: var(--p-text-muted-color);
     padding: 0 10rem;
     margin-bottom: 10rem;
 }
