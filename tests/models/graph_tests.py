@@ -2393,9 +2393,9 @@ class DraftGraphTests(ArchesTestCase):
         card_count_before = models.CardModel.objects.count()
         card_x_node_x_widget_count_before = models.CardXNodeXWidget.objects.count()
 
-        card = [card for card in draft_graph.cards.values()][0]
-        card.description = "UPDATED_CARD_DESCRIPTION"
-        card.save()
+        original_card = [card for card in draft_graph.cards.values()][0]
+        original_card.description = "UPDATED_CARD_DESCRIPTION"
+        original_card.save()
 
         updated_source_graph = updated_source_graph.update_from_draft_graph(
             draft_graph=draft_graph
@@ -2413,7 +2413,11 @@ class DraftGraphTests(ArchesTestCase):
             serialized_updated_source_graph, serialized_draft_graph
         )
 
-        updated_card = [card for card in updated_source_graph.cards.values()][0]
+        updated_card = [
+            card
+            for card in updated_source_graph.cards.values()
+            if card.pk == original_card.source_identifier_id
+        ][0]
         self.assertEqual(
             updated_card.description.value, '{"en": "UPDATED_CARD_DESCRIPTION"}'
         )
@@ -2458,14 +2462,14 @@ class DraftGraphTests(ArchesTestCase):
             .get()
             .source_identifier
         )
-        new_widget = models.CardXNodeXWidget.objects.create(
+        new_draft_widget = models.CardXNodeXWidget.objects.create(
             card=card,
             node_id=card.nodegroup_id,
             widget=models.Widget.objects.first(),
             label="Widget name",
         )
         draft_graph.widgets.pop(old_draft_widget.pk)
-        draft_graph.widgets[new_widget.pk] = new_widget
+        draft_graph.widgets[new_draft_widget.pk] = new_draft_widget
 
         draft_graph.save()
 
@@ -2480,9 +2484,13 @@ class DraftGraphTests(ArchesTestCase):
         card_count_before = models.CardModel.objects.count()
         card_x_node_x_widget_count_before = models.CardXNodeXWidget.objects.count()
 
-        widget = [widget for widget in draft_graph.widgets.values()][0]
-        widget.label = "UPDATED_WIDGET_NAME"
-        widget.save()
+        updated_widget = [
+            widget
+            for widget in draft_graph.widgets.values()
+            if widget.source_identifier_id == new_draft_widget.pk
+        ][0]
+        updated_widget.label = "UPDATED_WIDGET_NAME"
+        updated_widget.save()
 
         updated_source_graph = updated_source_graph.update_from_draft_graph(
             draft_graph=draft_graph
@@ -2500,8 +2508,12 @@ class DraftGraphTests(ArchesTestCase):
             serialized_updated_source_graph, serialized_draft_graph
         )
 
-        updated_widget = [widget for widget in draft_graph.widgets.values()][0]
-        self.assertEqual(updated_widget.label.value, '{"en": "UPDATED_WIDGET_NAME"}')
+        re_updated_widget = [
+            widget
+            for widget in draft_graph.widgets.values()
+            if widget.source_identifier_id == updated_widget.source_identifier_id
+        ][0]
+        self.assertEqual(re_updated_widget.label.value, '{"en": "UPDATED_WIDGET_NAME"}')
 
         nodegroup_count_after = models.NodeGroup.objects.count()
         node_count_after = models.Node.objects.count()
@@ -2600,10 +2612,9 @@ class DraftGraphTests(ArchesTestCase):
         )
         draft_graph = updated_source_graph.create_draft_graph()
 
-        node = [node for node in draft_graph.nodes.values()][2]
-
-        # fixes flaky test
-        models.NodeGroup.objects.filter(pk=node.pk).delete()
+        node = [
+            node for node in draft_graph.nodes.values() if node.alias == "node_type"
+        ][0]
 
         nodegroup_count_before = models.NodeGroup.objects.count()
 
