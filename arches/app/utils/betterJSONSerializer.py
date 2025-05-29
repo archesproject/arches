@@ -114,7 +114,7 @@ class JSONSerializer(object):
                 else:
                     return self.handle_model(object, **kwargs)
             case Promise():
-                return self.handle_promise(object, **kwargs)
+                return str(object)
             case QuerySet():
                 return [self.handle_object(item, **kwargs) for item in object]
             case bytes():
@@ -231,9 +231,6 @@ class JSONSerializer(object):
                     f.value_from_object(instance), **kwargs
                 )
         return data
-
-    def handle_promise(self, promise, **kwargs):
-        return self.handle_object(DjangoJSONEncoder().default(promise))
 
 
 class JSONDeserializer(object):
