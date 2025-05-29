@@ -166,7 +166,6 @@ INSTALLED_APPS = (
     "django_celery_results",
     "pgtrigger",
     "arches_component_lab",
-    "pgtrigger",
     # "silk",
 )
 
