@@ -138,6 +138,9 @@ class List(models.Model):
             reordered_items, fields=["sortorder", "parent_id", "list_id"]
         )
 
+        if self.searchable:
+            self.index()
+
     def index(self):
         SearchEngineInstance.bulk_index(
             [
