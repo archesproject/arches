@@ -276,7 +276,6 @@ const vRefocusDownArrow = {
     width: 2.5rem;
     padding: 0.5rem;
     border-radius: 2px;
-    border: 1px solid steelblue;
 }
 
 .add-child-button {
