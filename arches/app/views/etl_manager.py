@@ -150,21 +150,18 @@ class ETLManagerView(View):
         elif action == "loadEvent":
             item_per_page = 5
             if user.is_superuser:
-                all_events = (
-                    LoadEvent.objects.all()
-                    .order_by(("-load_start_time"))
-                    .select_related("user", "etl_module")
-                )
+                event_filter = LoadEvent.objects.all()
             else:
-                all_events = (
-                    LoadEvent.objects.filter(user=user)
-                    .order_by(("-load_start_time"))
-                    .select_related("user", "etl_module")
-                )
-            events = Paginator(all_events, item_per_page).page(page).object_list
-            total = len(all_events)
+                event_filter = LoadEvent.objects.filter(user=user)
+
+            filtered_events = event_filter.order_by(
+                ("-load_start_time")
+            ).select_related("user", "etl_module")
+
+            events = Paginator(filtered_events, item_per_page).page(page).object_list
+            total = len(filtered_events)
             paginator, pages = get_paginator(
-                request, all_events, total, page, item_per_page
+                request, filtered_events, total, page, item_per_page
             )
             page = paginator.page(page)
 
