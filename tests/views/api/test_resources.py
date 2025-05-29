@@ -69,8 +69,6 @@ class ResourceAPITests(ArchesTestCase):
         ) as f:
             json = JSONDeserializer().deserialize(f)
             cls.phase_type_assignment_graph = Graph(json["graph"][0])
-            # https://github.com/archesproject/arches/issues/11955
-            cls.phase_type_assignment_graph.is_active = True
             cls.phase_type_assignment_graph.save()
             cls.phase_type_assignment_graph.publish(user=None)
 
