@@ -136,6 +136,7 @@ class ETLManagerView(View):
         nodeid = request.GET.get("nodeid", None)
         error = request.GET.get("error", None)
         page = int(request.GET.get("page", 1))
+        user = request.user
         if action == "modules" or action is None:
             response = []
             for module in ETLModule.objects.all():
@@ -148,11 +149,18 @@ class ETLManagerView(View):
                     response.append(module)
         elif action == "loadEvent":
             item_per_page = 5
-            all_events = (
-                LoadEvent.objects.all()
-                .order_by(("-load_start_time"))
-                .select_related("user", "etl_module")
-            )
+            if user.is_superuser:
+                all_events = (
+                    LoadEvent.objects.all()
+                    .order_by(("-load_start_time"))
+                    .select_related("user", "etl_module")
+                )
+            else:
+                all_events = (
+                    LoadEvent.objects.filter(user=user)
+                    .order_by(("-load_start_time"))
+                    .select_related("user", "etl_module")
+                )
             events = Paginator(all_events, item_per_page).page(page).object_list
             total = len(all_events)
             paginator, pages = get_paginator(
