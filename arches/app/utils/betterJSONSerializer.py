@@ -5,6 +5,7 @@ import json
 import uuid
 from io import StringIO
 from itertools import chain
+
 from django.db.models import Model
 from django.db.models.query import QuerySet
 from django.utils.encoding import smart_str
