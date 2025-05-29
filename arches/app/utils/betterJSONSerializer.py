@@ -5,7 +5,6 @@ import json
 import uuid
 from io import StringIO
 from itertools import chain
-
 from django.db.models import Model
 from django.db.models.query import QuerySet
 from django.utils.encoding import smart_str
@@ -13,6 +12,7 @@ from django.core.serializers.python import Deserializer as PythonDeserializer
 from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.files import File
+from django.utils.functional import Promise
 
 from arches.app.models.fields.i18n import I18n_JSON, I18n_String
 
@@ -112,6 +112,8 @@ class JSONSerializer(object):
                     return self.handle_object(serialize_function(**kwargs), **kwargs)
                 else:
                     return self.handle_model(object, **kwargs)
+            case Promise():
+                return self.handle_promise(object, **kwargs)
             case QuerySet():
                 return [self.handle_object(item, **kwargs) for item in object]
             case bytes():
@@ -229,6 +231,8 @@ class JSONSerializer(object):
                 )
         return data
 
+    def handle_promise(self, promise, **kwargs):
+        return self.handle_object(DjangoJSONEncoder().default(promise))
 
 class JSONDeserializer(object):
     """

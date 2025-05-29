@@ -18,7 +18,7 @@ from django.db.models.constraints import UniqueConstraint
 from django.db.models.expressions import CombinedExpression
 from django.db.models.functions import Concat, Lower
 from django.utils import translation
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _
 
 from arches.app.const import ExtensionType
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
