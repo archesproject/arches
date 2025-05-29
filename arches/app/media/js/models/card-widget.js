@@ -97,7 +97,7 @@ export default AbstractModel.extend({
                 return configJSON;
             },
             write: function(value) {
-                if (window.location.pathname.includes(arches.urls.graph_designer(this.card.get('graph_id')))){
+                if (window.location.pathname.includes('graph_designer')) {
                     var config = this.get('config');
                     for (var key in value) {
                         if (key === 'label') {
