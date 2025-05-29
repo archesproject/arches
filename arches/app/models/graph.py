@@ -1640,7 +1640,7 @@ class Graph(models.GraphModel):
                         }
                     )
                     user_permission_nodegroup_id_to_nodegroup = {
-                        nodegroup.pk: nodegroup
+                        str(nodegroup.pk): nodegroup
                         for nodegroup in user_permission_nodegroups
                     }
 
@@ -1688,7 +1688,7 @@ class Graph(models.GraphModel):
                         }
                     )
                     group_permission_nodegroup_id_to_nodegroup = {
-                        nodegroup.pk: nodegroup
+                        str(nodegroup.pk): nodegroup
                         for nodegroup in group_permission_nodegroups
                     }
 
