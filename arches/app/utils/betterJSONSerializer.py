@@ -235,6 +235,7 @@ class JSONSerializer(object):
     def handle_promise(self, promise, **kwargs):
         return self.handle_object(DjangoJSONEncoder().default(promise))
 
+
 class JSONDeserializer(object):
     """
     Deserialize a stream or string of JSON data.
