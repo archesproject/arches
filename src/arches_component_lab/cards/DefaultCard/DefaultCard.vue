@@ -38,7 +38,7 @@ const isLoading = ref();
 const configurationError = ref();
 
 const cardData = ref();
-const cardXNodeXWidgetData = ref();
+const cardXNodeXWidgetData = ref<CardXNodeXWidget[]>([]);
 const tileData = ref();
 
 const widgets = computed(() => {
