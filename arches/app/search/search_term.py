@@ -15,6 +15,7 @@ from arches.app.search.elasticsearch_dsl_builder import (
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
+    get_nodegroups_by_perm,
 )
 
 
