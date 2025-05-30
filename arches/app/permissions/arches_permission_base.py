@@ -364,6 +364,13 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                     user, resourceid, "change_resourceinstance", resource=resource
                 )
                 if result is not None:
+                    if not result[
+                        "resource"
+                    ].resource_instance_lifecycle_state.can_edit_resource_instances and not user.has_perm(
+                        "models.can_edit_all_resource_instance_lifecycle_states",
+                    ):
+                        return False
+
                     if result["permitted"] == "unknown":
                         return self.user_in_group_by_name(
                             user, settings.RESOURCE_EDITOR_GROUPS
@@ -400,6 +407,16 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
                     user, resourceid, "delete_resourceinstance", resource=resource
                 )
                 if result is not None:
+                    if (
+                        not user.has_perm(
+                            "models.can_delete_all_resource_instance_lifecycle_states"
+                        )
+                        and not result[
+                            "resource"
+                        ].resource_instance_lifecycle_state.can_delete_resource_instances
+                    ):
+                        return False
+
                     if result["permitted"] == "unknown":
                         nodegroups = self.get_nodegroups_by_perm(
                             user, "models.delete_nodegroup"
