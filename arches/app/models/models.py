@@ -565,11 +565,7 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
         if not language:
             language = translation.get_language()
 
-        for published_graph in self.publication.publishedgraph_set.all():
-            if published_graph.language_id == language:
-                return published_graph
-
-        return None
+        return self.publication.find_publication_in_language(language)
 
     def get_cards(self, force_recalculation=False):
         if self.should_use_published_graph() and not force_recalculation:
@@ -809,6 +805,19 @@ class GraphXPublishedGraph(models.Model):
     class Meta:
         managed = True
         db_table = "graphs_x_published_graphs"
+
+    def find_publication_in_language(self, language):
+        if not hasattr(self, "_published_graph_cache"):
+            self._published_graph_cache = {}
+        if language not in self._published_graph_cache:
+            self._published_graph_cache[language] = self.publishedgraph_set.filter(
+                language=language
+            ).first()
+        return self._published_graph_cache[language]
+
+    def refresh_from_db(self, *args, **kwargs):
+        self._published_graph_cache = {}
+        return super().refresh_from_db(*args, **kwargs)
 
 
 class Icon(models.Model):
