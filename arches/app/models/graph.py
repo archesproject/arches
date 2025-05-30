@@ -23,7 +23,7 @@ from contextlib import contextmanager
 from copy import deepcopy
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
-from django.db.models import Q
+from django.db.models import Q, prefetch_related_objects
 from django.db.utils import IntegrityError
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
@@ -1588,10 +1588,12 @@ class Graph(models.GraphModel):
         if self.should_use_published_graph() and not force_recalculation:
             return super().get_nodegroups()
         else:
+            prefetch_related_objects(list(self.nodes.values()), "nodegroup")
             nodegroups = set()
             for node in self.nodes.values():
                 if node.is_collector:
                     nodegroups.add(node.nodegroup)
+            prefetch_related_objects(list(self.cards.values()), "nodegroup")
             for card in self.cards.values():
                 try:
                     nodegroups.add(card.nodegroup)
@@ -1881,6 +1883,8 @@ class Graph(models.GraphModel):
         """
         if self.should_use_published_graph() and not force_recalculation:
             return super().get_cards()
+
+        prefetch_related_objects(list(self.cards.values()), "constraintmodel_set")
 
         cards = []
         for card in self.cards.values():

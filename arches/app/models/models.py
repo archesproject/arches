@@ -589,7 +589,9 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
 
             return [models.CardModel(**card_slug) for card_slug in card_slugs]
         else:
-            return self.cardmodel_set.all()
+            return self.cardmodel_set.select_related("nodegroup").prefetch_related(
+                "constraintmodel_set"
+            )
 
     def get_nodegroups(self, force_recalculation=False):
         if self.should_use_published_graph() and not force_recalculation:
@@ -639,7 +641,7 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
 
             return [models.Node(**node_slug) for node_slug in node_slugs]
         else:
-            return self.node_set.all()
+            return self.node_set.select_related("nodegroup")
 
     def get_functions_x_graphs(self, force_recalculation=False):
         if self.should_use_published_graph() and not force_recalculation:
@@ -724,7 +726,7 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
         else:
             return [
                 card_x_node_x_widget
-                for card in self.cardmodel_set.all()
+                for card in self.cardmodel_set.prefetch_related("cardxnodexwidget_set")
                 for card_x_node_x_widget in card.cardxnodexwidget_set.all()
             ]
 
