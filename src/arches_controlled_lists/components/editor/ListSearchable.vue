@@ -55,10 +55,7 @@ const save = async () => {
 <template>
     <div class="characteristic">
         <div class="value-editor-title">
-            <label
-                for="searchableSwitch"
-                class="h4"
-            >
+            <label for="searchableSwitch">
                 {{ $gettext("Searchable?") }}
             </label>
         </div>
@@ -77,16 +74,12 @@ const save = async () => {
     margin: 1rem 1rem 2.5rem 1rem;
 }
 
-.h4 {
-    font-weight: 400;
-}
-
 .value-editor-title {
     display: flex;
     gap: 1rem;
 }
 
-.value-editor-title h4 {
+.value-editor-title label {
     font-size: 1.66rem;
     margin: 0;
     padding: 0.5rem 0 0 0;
