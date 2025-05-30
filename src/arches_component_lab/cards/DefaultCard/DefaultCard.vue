@@ -147,7 +147,7 @@ watchEffect(async () => {
 .card {
     display: flex;
     flex-direction: column;
-    gap: 0.5em;
+    gap: 0.5rem;
     width: 100%;
 }
 </style>
