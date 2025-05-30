@@ -191,31 +191,18 @@ class ArchesPermissionBase(PermissionFramework, metaclass=ABCMeta):
             user, perms, any_perm=any_perm
         )
 
-        permitted_nodegroup_uids = list(
+        permitted_nodegroup_ids = list(
             set(nodegroup.pk for nodegroup in permitted_nodegroups)
         )
 
-        permitted_nodes = Node.objects.filter(nodegroup__in=permitted_nodegroup_uids)
-        permitted_graph_ids = set(str(node.graph_id) for node in permitted_nodes)
-
-        published_permitted_graph_uids = [
-            graphid
-            for graphid in GraphModel.objects.filter(graphid__in=permitted_graph_ids)
-            .exclude(publication=None)
-            .values_list("graphid", flat=True)
-        ]
-
-        published_permitted_node_uids = [
-            node.nodeid
-            for node in permitted_nodes
-            if node.graph_id in published_permitted_graph_uids
-        ]
-
-        published_permitted_nodegroups = [
-            nodegroup_id
-            for nodegroup_id in permitted_nodegroup_uids
-            if nodegroup_id in published_permitted_node_uids
-        ]
+        published_permitted_nodegroups = list(
+            set(
+                NodeGroup.objects.filter(
+                    pk__in=permitted_nodegroup_ids,
+                    node__graph__publication__isnull=False,
+                ).values_list("pk", flat=True)
+            )
+        )
 
         return published_permitted_nodegroups
 
