@@ -145,7 +145,7 @@ const setParent = async (parentNode: TreeNode) => {
         siblings.push(item);
     } else {
         item.parent_id = parentNode.key;
-        list = findNodeInTree(tree.value, item.list_id).found!.data;
+        list = findNodeInTree(tree.value, parentNode.data.list_id).found!.data;
         siblings = parentNode.data.children;
         siblings.push(item);
     }
