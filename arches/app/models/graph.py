@@ -1480,10 +1480,14 @@ class Graph(models.GraphModel):
                 if nodeid is not None
                 else self.root.ontologyclass
             )
-            ontology_classes = models.OntologyClass.objects.get(
-                source=source, ontology=self.ontology
+            target_up = (
+                models.OntologyClass.objects.filter(
+                    source=source, ontology=self.ontology
+                )
+                .values_list("target__up", flat=True)
+                .first()
             )
-            return ontology_classes.target["up"]
+            return target_up
         else:
             return []
 
