@@ -4,10 +4,10 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "11848_alter_spatialview_geometrynode"),
+        ("models", "11959_unique_node_source_widget"),
     ]
 
-    forward = """
+    forward = r"""
         UPDATE cards_x_nodes_x_widgets
         SET config = jsonb_set(
             config,
