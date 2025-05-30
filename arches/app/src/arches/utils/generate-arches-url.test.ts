@@ -8,18 +8,32 @@ describe("generateArchesURL", () => {
         // @ts-expect-error ARCHES_URLS is defined globally
         global.ARCHES_URLS = {
             example_url: [
-                { url: "/{language_code}/admin/example/{id}", params: ["id"] },
+                {
+                    url: "/{language_code}/admin/example/{id}",
+                    params: ["language_code", "id"],
+                },
             ],
             another_url: [{ url: "/admin/another/{id}", params: ["id"] }],
             multi_interpolation_url: [
                 {
                     url: "/{language_code}/resource/{resource_id}/edit/{field_id}/version/{version_id}",
-                    params: ["resource_id", "field_id", "version_id"],
+                    params: [
+                        "language_code",
+                        "resource_id",
+                        "field_id",
+                        "version_id",
+                    ],
                 },
             ],
             candidate_test: [
-                { url: "/{language_code}/test/{a}", params: ["a"] },
-                { url: "/{language_code}/test/{a}", params: ["a", "b"] },
+                {
+                    url: "/{language_code}/test/{a}",
+                    params: ["language_code", "a", "b"],
+                },
+                {
+                    url: "/{language_code}/test/{a}",
+                    params: ["language_code", "a"],
+                },
             ],
             no_exact_match: [
                 { url: "/test/{id}", params: ["id"] },
@@ -34,12 +48,15 @@ describe("generateArchesURL", () => {
             duplicate_interpolation: [
                 {
                     url: "/{language_code}/repeated/{id}/again/{id}",
-                    params: ["id"],
+                    params: ["language_code", "id"],
                 },
             ],
             plain_url: [{ url: "/plain/url", params: [] }],
             extra_params: [
-                { url: "/{language_code}/extra/{id}", params: ["id"] },
+                {
+                    url: "/{language_code}/extra/{id}",
+                    params: ["language_code", "id"],
+                },
             ],
             invalid_type: "/not/array", // This should trigger an error due to type.
         };

@@ -1,6 +1,6 @@
 export function generateArchesURL(
     urlName: string,
-    urlParams: { [key: string]: string | number } = {},
+    urlParameters: { [key: string]: string | number } = {},
     languageCode?: string,
 ) {
     // @ts-expect-error ARCHES_URLS is defined globally
@@ -10,38 +10,34 @@ export function generateArchesURL(
         throw new Error(`Key '${urlName}' not found in JSON object`);
     }
 
-    const availableParams = Object.keys(urlParams);
-    const candidates = routes.filter(
+    if (!languageCode) {
+        languageCode = document.documentElement.lang;
+    }
+
+    const primaryLanguageCode = languageCode.split("-")[0];
+
+    urlParameters = {
+        ...urlParameters,
+        language_code: primaryLanguageCode,
+    };
+
+    const urlParameterNames = Object.keys(urlParameters);
+    const matchingRoute = routes.find(
         (route: { url: string; params: string[] }) => {
-            return route.params.every((param) => {
-                return availableParams.includes(param);
+            return route.params.every((parameter) => {
+                return urlParameterNames.includes(parameter);
             });
         },
     );
 
-    if (candidates.length === 0) {
+    if (!matchingRoute) {
         throw new Error(
-            `No matching URL pattern for '${urlName}' with provided parameters ${JSON.stringify(urlParams)}`,
+            `No matching URL pattern for '${urlName}' with provided parameters ${JSON.stringify(urlParameters)}`,
         );
     }
 
-    const exactCandidates = candidates.filter((candidate) => {
-        return candidate.params.length === availableParams.length;
-    });
-    const chosen =
-        exactCandidates.length > 0 ? exactCandidates[0] : candidates[0];
-
-    let url = chosen.url;
-    if (url.includes("{language_code}")) {
-        if (!languageCode) {
-            languageCode = document.documentElement.lang;
-        }
-
-        languageCode = languageCode.split("-")[0];
-        url = url.replace("{language_code}", languageCode);
-    }
-
-    Object.entries(urlParams).forEach(([key, value]) => {
+    let url = matchingRoute.url;
+    Object.entries(urlParameters).forEach(([key, value]) => {
         url = url.replace(new RegExp(`{${key}}`, "g"), String(value));
     });
 
