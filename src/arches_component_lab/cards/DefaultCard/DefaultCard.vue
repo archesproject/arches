@@ -23,6 +23,8 @@ import type { WidgetComponent } from "@/arches_component_lab/cards/types.ts";
 const deprecatedComponentPathToUpdatedComponentPath: Record<string, string> = {
     "views/components/widgets/text":
         "arches_component_lab/widgets/NonLocalizedStringWidget/NonLocalizedStringWidget",
+    "views/components/widgets/non-localized-text":
+        "arches_component_lab/widgets/NonLocalizedStringWidget/NonLocalizedStringWidget",
 };
 
 const props = defineProps<{
