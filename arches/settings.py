@@ -116,7 +116,7 @@ TERM_SEARCH_TYPES = [
         "type": "concept",
         "label": _("Concepts"),
         "key": "concepts",
-        "module": "arches.app.search.search_term.ConceptSearch",
+        "module": "arches.app.search.concept_search.ConceptSearch",
     },
 ]
 
