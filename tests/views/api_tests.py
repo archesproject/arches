@@ -577,7 +577,7 @@ class ResourceAPITests(ArchesTestCase):
         graph_count_after = len(resp2["related_resources"]["node_config_lookup"])
         self.assertEqual(graph_count_after, graph_count_before - 1)
 
-    def test_bulk_disambiguated_resources_permissions(self):
+    def test_bulk_disambiguated_resource_endpoint(self):
         user = User.objects.get(username="ben")
         self.client.force_login(user)
         response = self.client.get(
