@@ -651,20 +651,21 @@ class Graph(models.GraphModel):
             except Graph.DoesNotExist:
                 pass  # no draft_graph to delete
 
-            for nodegroup in self.get_nodegroups(force_recalculation=True):
-                nodegroup.delete()
-
-            for edge in self.edges.values():
-                edge.delete()
-
-            for node in self.nodes.values():
-                node.delete()
-
-            for card in self.cards.values():
-                card.delete()
-
-            for widget in self.widgets.values():
-                widget.delete()
+            models.NodeGroup.objects.filter(
+                pk__in=[ng.pk for ng in self.get_nodegroups(force_recalculation=True)]
+            ).delete()
+            models.Edge.objects.filter(
+                pk__in=[edge.pk for edge in self.edges.values()]
+            ).delete()
+            models.Node.objects.filter(
+                pk__in=[node.pk for node in self.nodes.values()]
+            ).delete()
+            models.CardModel.objects.filter(
+                pk__in=[card.pk for card in self.cards.values()]
+            ).delete()
+            models.CardXNodeXWidget.objects.filter(
+                pk__in=[widget.pk for widget in self.widgets.values()]
+            ).delete()
 
             for function_x_graph in self.functions_x_graphs:
                 function_x_graph.delete()
