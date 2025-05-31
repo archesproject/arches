@@ -4,8 +4,8 @@ import { onMounted, ref } from "vue";
 import Message from "primevue/message";
 import ProgressSpinner from "primevue/progressspinner";
 
-import UrlWidgetEditor from "@/arches_component_lab/widgets/UrlWidget/components/UrlWidgetEditor.vue";
-import UrlWidgetViewer from "@/arches_component_lab/widgets/UrlWidget/components/UrlWidgetViewer.vue";
+import URLWidgetEditor from "@/arches_component_lab/widgets/URLWidget/components/URLWidgetEditor.vue";
+import URLWidgetViewer from "@/arches_component_lab/widgets/URLWidget/components/URLWidgetViewer.vue";
 
 import {
     fetchWidgetData,
@@ -61,14 +61,14 @@ onMounted(async () => {
         </label>
 
         <div v-if="mode === EDIT">
-            <UrlWidgetEditor
+            <URLWidgetEditor
                 :initial-value="initialValue"
                 :node-alias="props.nodeAlias"
                 :graph-slug="props.graphSlug"
             />
         </div>
         <div v-if="mode === VIEW">
-            <UrlWidgetViewer :value="initialValue" />
+            <URLWidgetViewer :value="initialValue" />
         </div>
         <Message
             v-if="configurationError"
