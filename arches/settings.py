@@ -373,7 +373,6 @@ AUTHENTICATION_BACKENDS = (
 
 INSTALLED_APPS = (
     "webpack_loader",
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -395,7 +394,10 @@ INSTALLED_APPS = (
 
 # Placing this last ensures any templates provided by Arches Applications
 # take precedence over core arches templates in arches/app/templates.
-INSTALLED_APPS += ("arches.app",)
+INSTALLED_APPS += (
+    "arches.app",
+    "django.contrib.admin",
+)
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
