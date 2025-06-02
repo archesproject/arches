@@ -295,6 +295,11 @@ class Resource(models.ResourceInstance):
                 newvalue=f"{self.resource_instance_lifecycle_state.name} ({self.resource_instance_lifecycle_state.id})",
                 transaction_id=transaction_id,
             )
+            self.run_lifecycle_handlers(
+                current_resource_instance_lifecycle_state,
+                request=request,
+                context=context,
+            )
             self.index(context)
             return
 
@@ -312,6 +317,27 @@ class Resource(models.ResourceInstance):
 
         if index is True:
             self.index(context)
+
+    def run_lifecycle_handlers(
+        self, current_lifecycle_state, request=None, context=None
+    ):
+        for function in [
+            function_x_graph.function.get_class_module()(function_x_graph.config, None)
+            for function_x_graph in models.FunctionXGraph.objects.filter(
+                graph_id=self.graph_id,
+                function__functiontype="lifecyclehandler",
+            ).select_related("function")
+        ]:
+            try:
+                function.update_lifecycle_state(
+                    self,
+                    current_state=current_lifecycle_state,
+                    new_state=self.resource_instance_lifecycle_state,
+                    request=request,
+                    context=context,
+                )
+            except NotImplementedError:
+                pass
 
     def load_tiles(self, user=None, perm="read_nodegroup"):
         """
