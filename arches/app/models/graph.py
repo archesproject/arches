@@ -30,7 +30,7 @@ from arches.app.models import models
 from arches.app.models.card import Card
 from arches.app.models.querysets.graph import GraphQuerySet
 from arches.app.models.system_settings import settings
-from arches.app.models.utils import make_name_unique
+from arches.app.models.utils import get_field_names_for_bulk_insert, make_name_unique
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.bulk_data_deletion import BulkDataDeletion
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -500,8 +500,12 @@ class Graph(models.GraphModel):
         with transaction.atomic():
             super(Graph, self).save()
 
-            for nodegroup in self.get_nodegroups():
-                nodegroup.save()
+            models.NodeGroup.objects.bulk_create(
+                self.get_nodegroups(),
+                update_conflicts=True,
+                update_fields=get_field_names_for_bulk_insert(models.NodeGroup),
+                unique_fields={"pk"},
+            )
 
             se = SearchEngineFactory().create()
             datatype_factory = DataTypeFactory()
@@ -535,33 +539,61 @@ class Graph(models.GraphModel):
                         branch_node.save()
 
             else:
+                nodes_to_update = []
                 for node in self.nodes.values():
                     self.update_es_node_mapping(node, datatype_factory, se)
-                    node.save()
+                    node.clean()
+                    nodes_to_update.append(node)
+                models.Node.objects.bulk_create(
+                    nodes_to_update,
+                    update_conflicts=True,
+                    update_fields=get_field_names_for_bulk_insert(models.Node),
+                    unique_fields={"pk"},
+                )
 
-            for edge in self.edges.values():
-                edge.save()
+            models.Edge.objects.bulk_create(
+                self.edges.values(),
+                update_conflicts=True,
+                update_fields=get_field_names_for_bulk_insert(models.Edge),
+                unique_fields={"pk"},
+            )
 
-            for card in self.cards.values():
-                card.save()
+            models.CardModel.objects.bulk_create(
+                self.cards.values(),
+                update_conflicts=True,
+                update_fields=get_field_names_for_bulk_insert(models.CardModel),
+                unique_fields={"pk"},
+            )
 
-            for function_x_graph in self.functions_x_graphs:
-                function_x_graph.save()
+            models.ConstraintModel.objects.bulk_create(
+                self._card_constraints,
+                update_conflicts=True,
+                update_fields=get_field_names_for_bulk_insert(models.ConstraintModel),
+                unique_fields={"pk"},
+            )
 
-            for constraint in self._card_constraints:
-                constraint.save()
-
+            constraint_x_nodes_to_update = []
             for constraint_x_node in self._constraints_x_nodes:
                 node_constraint = models.ConstraintXNode()
-                node_constraint.node = models.Node.objects.get(
-                    pk=constraint_x_node["node"]
-                )
+                node_constraint.node_id = constraint_x_node["node"]
                 node_constraint.constraint = constraint_x_node["constraint"]
-                node_constraint.save()
+                constraint_x_nodes_to_update.append(constraint_x_node)
 
-            if self.widgets:
-                for widget in self.widgets.values():
-                    widget.save()
+            models.ConstraintXNode.objects.bulk_create(
+                constraint_x_nodes_to_update,
+                update_conflicts=True,
+                update_fields=get_field_names_for_bulk_insert(models.ConstraintXNode),
+                unique_fields={"pk"},
+            )
+
+            models.CardXNodeXWidget.objects.bulk_create(
+                self.widgets.values(),
+                update_conflicts=True,
+                update_fields=get_field_names_for_bulk_insert(models.CardXNodeXWidget),
+                unique_fields={"pk"},
+            )
+
+            # There aren't many of these last little fellas, so we avoid bulk ops.
 
             for function_x_graph in self.functions_x_graphs:
                 # Right now this only saves a functionxgraph record if the function is present in the database. Otherwise it silently fails.
