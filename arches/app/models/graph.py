@@ -481,14 +481,13 @@ class Graph(models.GraphModel):
 
     def update_es_node_mapping(self, node, datatype_factory, se):
         if self.isresource:
-            already_saved = models.Node.objects.filter(pk=node.nodeid).exists()
             saved_node_datatype = None
-            if already_saved:
-                saved_node = models.Node.objects.get(pk=node.nodeid)
+            target_node_id = node.source_identifier_id or node.nodeid
+            if saved_node := models.Node.objects.filter(pk=target_node_id).first():
                 saved_node_datatype = saved_node.datatype
             if saved_node_datatype != node.datatype:
                 datatype = datatype_factory.get_instance(node.datatype)
-                datatype_mapping = datatype.get_es_mapping(node.nodeid)
+                datatype_mapping = datatype.get_es_mapping(target_node_id)
                 if (
                     datatype_mapping
                     and datatype_factory.datatypes[node.datatype].defaultwidget

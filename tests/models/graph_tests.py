@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import uuid
+from unittest import mock
 
 from django.contrib.auth.models import User
 from guardian.models import GroupObjectPermission, UserObjectPermission
@@ -1964,6 +1965,22 @@ class DraftGraphTests(ArchesTestCase):
 
         self.assertFalse(source_graph.has_unpublished_changes)
         self.assertEqual(source_graph.name, "TEST RESOURCE")
+
+    @mock.patch("arches.app.search.search.SearchEngine.create_mapping")
+    def test_saving_draft_graph_does_not_create_es_mapping(self, mocked_create_mapping):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        result = source_graph.append_node()
+        result["node"].datatype = "string"
+        source_graph.save()
+        mocked_create_mapping.assert_called_once()
+
+        draft_graph = source_graph.create_draft_graph()
+        draft_graph.save()
+
+        mocked_create_mapping.assert_called_once()
 
     def test_update_empty_graph_from_draft_graph(self):
         source_graph = Graph.objects.create_graph(
