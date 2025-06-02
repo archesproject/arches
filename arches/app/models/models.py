@@ -1755,7 +1755,10 @@ class TileModel(SaveSupportsBlindOverwriteMixin, models.Model):  # Tile
         return None
 
     def is_fully_provisional(self):
-        return bool(self.provisionaledits and not any(self.data.values()))
+        return bool(
+            self.provisionaledits
+            and not any(val is not None for val in self.data.values())
+        )
 
     def save(self, **kwargs):
         if self.sortorder is None or self.is_fully_provisional():
