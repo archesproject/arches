@@ -34,15 +34,10 @@ from guardian.exceptions import WrongAppError
 import guardian.shortcuts as gsc
 
 import inspect
-from arches.app.models.models import (
-    Node,
-    NodeGroup,
-    TileModel,
-    ResourceInstance,
-    MapLayer,
-)
+from arches.app.models.models import Node, NodeGroup, TileModel
 from django.db.models import Q
 from arches.app.models.system_settings import settings
+from arches.app.models.models import ResourceInstance, MapLayer
 
 from arches.app.utils.permission_backend import (
     PermissionFramework,
