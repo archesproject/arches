@@ -7,6 +7,7 @@ from django.db import transaction
 from arches.management.commands.packages import Command as PackagesCommand
 from arches.app.models import models
 from arches_controlled_lists.models import List, ListItem, ListItemValue
+from arches_controlled_lists.utils.skos import SKOSReader
 
 
 class Command(PackagesCommand):
@@ -37,36 +38,49 @@ class Command(PackagesCommand):
         if options["operation"] == "export_controlled_lists":
             self.export_controlled_lists(options["dest_dir"], options["file_name"])
 
+        if options["operation"] == "import_rdf_xml":
+            self.import_
+
     def import_controlled_lists(self, source):
-        created_instances_pks = []
-        if os.path.exists(source):
-            wb = openpyxl.load_workbook(source)
-            with transaction.atomic():
-                for sheet in wb.sheetnames:
-                    if sheet == "List":
-                        created_instances_pks.extend(
-                            self.import_sheet_to_model(wb[sheet], List)
-                        )
-                    elif sheet == "ListItem":
-                        created_instances_pks.extend(
-                            self.import_sheet_to_model(wb[sheet], ListItem)
-                        )
-                    elif sheet == "ListItemValue":
-                        created_instances_pks.extend(
-                            self.import_sheet_to_model(wb[sheet], ListItemValue)
-                        )
-                # validate all data
-                for model in [
-                    List,
-                    ListItem,
-                    ListItemValue,
-                ]:
-                    for instance in model.objects.filter(pk__in=created_instances_pks):
-                        instance.full_clean()
-                self.stdout.write("Data imported successfully from {0}".format(source))
+        if source.lower().endswith(".xml"):
+            skos = SKOSReader()
+            rdf = skos.read_file(source)
+            concepts = skos.save_controlled_lists_from_skos(rdf)
+
+        elif source.lower().endswith(".xlsx"):
+            created_instances_pks = []
+            if os.path.exists(source):
+                wb = openpyxl.load_workbook(source)
+                with transaction.atomic():
+                    for sheet in wb.sheetnames:
+                        if sheet == "List":
+                            created_instances_pks.extend(
+                                self.import_sheet_to_model(wb[sheet], List)
+                            )
+                        elif sheet == "ListItem":
+                            created_instances_pks.extend(
+                                self.import_sheet_to_model(wb[sheet], ListItem)
+                            )
+                        elif sheet == "ListItemValue":
+                            created_instances_pks.extend(
+                                self.import_sheet_to_model(wb[sheet], ListItemValue)
+                            )
+                    # validate all data
+                    for model in [
+                        List,
+                        ListItem,
+                        ListItemValue,
+                    ]:
+                        for instance in model.objects.filter(
+                            pk__in=created_instances_pks
+                        ):
+                            instance.full_clean()
+                    self.stdout.write(
+                        "Data imported successfully from {0}".format(source)
+                    )
         else:
             self.stdout.write(
-                "The source file does not exist. Please rerun this command with a valid source file."
+                "The source file does not exist or is not the correct format. Please rerun this command with a valid source file."
             )
 
     def import_sheet_to_model(self, sheet, model):
