@@ -37,7 +37,8 @@ class ExtensionType(Enum):
     PERMISSIONS_FRAMEWORKS = "permissions"
 
 
-class ResourceLifecycleStates(Enum):
+@unique
+class DefaultLifecycleStates(Enum):
     PERPETUAL = UUID("4e2a6b8e-2489-4377-9c9f-29cfbd3e76c8")
     STANDARD = UUID("7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75")
     DRAFT = UUID("9375c9a7-dad2-4f14-a5c1-d7e329fdde4f")

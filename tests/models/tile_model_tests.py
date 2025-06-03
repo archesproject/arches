@@ -21,7 +21,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from tests.base_test import ArchesTestCase
 from django.contrib.auth.models import User
 from django.http import HttpRequest
-from arches.app.const import ResourceLifecycleStates
+from arches.app.const import DefaultLifecycleStates
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile, TileCardinalityError, TileValidationError
 from arches.app.models.resource import Resource
@@ -60,7 +60,7 @@ class TileTests(ArchesTestCase):
                 legacyid=CardinalityTestGraph.RESOURCE1.value,
                 graph_id=CardinalityTestGraph.GRAPH_ID.value,
                 createdtime="1/1/2000",
-                resource_instance_lifecycle_state_id=ResourceLifecycleStates.PERPETUAL.value,
+                resource_instance_lifecycle_state_id=DefaultLifecycleStates.PERPETUAL.value,
             )
         )
         resources.append(
@@ -69,7 +69,7 @@ class TileTests(ArchesTestCase):
                 legacyid=AllDatatypesTestGraph.RESOURCE1.value,
                 graph_id=AllDatatypesTestGraph.GRAPH_ID.value,
                 createdtime="1/1/2000",
-                resource_instance_lifecycle_state_id=ResourceLifecycleStates.PERPETUAL.value,
+                resource_instance_lifecycle_state_id=DefaultLifecycleStates.PERPETUAL.value,
             )
         )
         resources = ResourceInstance.objects.bulk_create(resources)
