@@ -412,23 +412,20 @@ class TileTests(ArchesTestCase):
             },
         }
 
-        authoritative_tile = Tile(json)
-        authoritative_tile.save(index=False)
+        tile = Tile(json)
+        tile.save(index=False)
 
         user = User.objects.create_user(
             username="testuser", password="TestingTesting123!"
         )
         login = self.client.login(username="testuser", password="TestingTesting123!")
-        provisional_tile = Tile.objects.get(
-            resourceinstance_id=authoritative_tile.resourceinstance_id
-        )
 
-        provisional_tile.data["088e7d2c-c8c1-11ed-a172-0242ac130009"] = True
+        tile.data["088e7d2c-c8c1-11ed-a172-0242ac130009"] = True
 
         request = HttpRequest()
         request.user = user
-        provisional_tile.save(index=False, request=request)
-        self.assertFalse(provisional_tile.is_fully_provisional())
+        tile.save(index=False, request=request)
+        self.assertIs(tile.is_fully_provisional(), False)
 
     def test_tile_cardinality(self):
         """
