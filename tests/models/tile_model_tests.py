@@ -45,6 +45,7 @@ class TileTests(ArchesTestCase):
         "rdf_export_document_model",
         "rdf_export_object_model",
         "Cardinality Test Model",
+        "All_Datatypes",
     ]
 
     @classmethod
@@ -52,7 +53,18 @@ class TileTests(ArchesTestCase):
         super().setUpTestData()
         sql = """
         INSERT INTO public.resource_instances(resourceinstanceid, legacyid, graphid, createdtime)
-            VALUES ('40000000-0000-0000-0000-000000000000', '40000000-0000-0000-0000-000000000000', '2f7f8e40-adbc-11e6-ac7f-14109fd34195', '1/1/2000');
+            VALUES ('40000000-0000-0000-0000-000000000000',
+                '40000000-0000-0000-0000-000000000000',
+                '2f7f8e40-adbc-11e6-ac7f-14109fd34195',
+                '1/1/2000'
+            );
+        
+        INSERT INTO public.resource_instances(resourceinstanceid, legacyid, graphid, createdtime)
+            VALUES ('44000000-0000-0000-0000-000000000000',
+                '44000000-0000-0000-0000-000000000000',
+                'd71a8f56-987f-4fd1-87b5-538378740f15',
+                '1/1/2000'
+            );
 
         INSERT INTO node_groups(nodegroupid, legacygroupid, cardinality)
             VALUES ('99999999-0000-0000-0000-000000000001', '', 'n');
@@ -355,6 +367,39 @@ class TileTests(ArchesTestCase):
         obj.refresh_from_db()  # give test opportunity to fail on Django 4.2+
 
         self.assertEqual(obj.sortorder, 1)
+
+    def test_is_fully_provisional(self):
+        """
+        Tests that a tile is marked as fully provisional even if it has falsey values in its data.
+        """
+        json = {
+            "resourceinstance_id": "44000000-0000-0000-0000-000000000000",
+            "parenttile_id": "",
+            "nodegroup_id": "fa6614e4-c8c0-11ed-a172-0242ac130009",
+            "tileid": "",
+            "data": {
+                "fa6614e4-c8c0-11ed-a172-0242ac130009": False,
+                "088e7d2c-c8c1-11ed-a172-0242ac130009": None,
+            },
+        }
+
+        authoritative_tile = Tile(json)
+        authoritative_tile.save(index=False)
+
+        user = User.objects.create_user(
+            username="testuser", password="TestingTesting123!"
+        )
+        login = self.client.login(username="testuser", password="TestingTesting123!")
+        provisional_tile = Tile.objects.get(
+            resourceinstance_id=authoritative_tile.resourceinstance_id
+        )
+
+        provisional_tile.data["088e7d2c-c8c1-11ed-a172-0242ac130009"] = True
+
+        request = HttpRequest()
+        request.user = user
+        provisional_tile.save(index=False, request=request)
+        self.assertIs(provisional_tile.is_fully_provisional(), False)
 
     def test_tile_cardinality(self):
         """

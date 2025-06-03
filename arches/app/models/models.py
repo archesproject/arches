@@ -1358,7 +1358,9 @@ class TileModel(models.Model):  # Tile
             self.tileid = uuid.uuid4()
 
     def is_fully_provisional(self):
-        return bool(self.provisionaledits and not any(self.data.values()))
+        return bool(self.provisionaledits) and not any(
+            val is not None for val in self.data.values()
+        )
 
     def set_missing_keys_to_none(self):
         any_key_set = False
