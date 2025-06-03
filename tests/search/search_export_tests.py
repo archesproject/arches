@@ -1,9 +1,11 @@
 import uuid
 import csv
 import io
+import os
 import time
 from base64 import b64encode
 from http import HTTPStatus
+from pathlib import Path
 from arches.app.models import models
 from arches.app.models.tile import Tile
 from arches.app.search.elasticsearch_dsl_builder import Query
@@ -12,6 +14,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.search_export import SearchResultsExporter
 from arches.app.utils.skos import SKOSReader
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from django.urls import get_script_prefix, reverse, set_script_prefix
@@ -123,6 +126,8 @@ class SearchExportTests(ArchesTestCase):
         request.user = self.user
         exporter = SearchResultsExporter(search_request=request)
         result, info = exporter.export(format="tilecsv", report_link="false")
+        path = Path(settings.MEDIA_ROOT) / "export_deliverables" / "test.zip"
+        self.addCleanup(os.remove, path)
         uuid = exporter.write_export_zipfile(result, info, "test")
         self.assertIsNotNone(uuid)
 
