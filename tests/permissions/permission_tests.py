@@ -44,45 +44,6 @@ class PermissionTests(ArchesTestCase):
         cls.resource.graph_id = cls.data_type_graphid
         cls.resource.remove_resource_instance_permissions()
 
-    @classmethod
-    def add_users(cls):
-        profiles = (
-            {
-                "name": "ben",
-                "email": "ben@test.com",
-                "password": "Test12345!",
-                "groups": ["Graph Editor", "Resource Editor"],
-            },
-            {
-                "name": "sam",
-                "email": "sam@test.com",
-                "password": "Test12345!",
-                "groups": ["Graph Editor", "Resource Editor", "Resource Reviewer"],
-            },
-            {
-                "name": "jim",
-                "email": "jim@test.com",
-                "password": "Test12345!",
-                "groups": ["Graph Editor", "Resource Editor"],
-            },
-        )
-
-        for profile in profiles:
-            try:
-                user = User.objects.create_user(
-                    username=profile["name"],
-                    email=profile["email"],
-                    password=profile["password"],
-                )
-                user.save()
-
-                for group_name in profile["groups"]:
-                    group = Group.objects.get(name=group_name)
-                    group.user_set.add(user)
-
-            except Exception as e:
-                print(e)
-
     def test_user_cannot_view_without_permission(self):
         """
         Tests if a user is allowed to view a resource with implicit permissions and explicit permissions, but

@@ -14,7 +14,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from tests.base_test import ArchesTestCase
-from tests.utils.permission_test_utils import add_users
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
 from arches.app.models.resource import Resource
@@ -32,7 +31,7 @@ class ArchesPermissionFrameworkTestCase(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        add_users()
+        cls.add_users()
         cls.expected_resource_count = 2
         cls.user = User.objects.get(username="ben")
         cls.group = Group.objects.get(pk=2)

@@ -23,6 +23,8 @@ from django.db import connection
 from django.core import management
 from django.test import TestCase
 from django.test.utils import captured_stdout
+from django.contrib.auth.models import User
+from django.contrib.auth.models import Group
 
 from arches.app.models.graph import Graph
 from arches.app.models.models import Ontology
@@ -201,3 +203,48 @@ class ArchesTestCase(TestCase):
         with connection.cursor() as cursor:
             cursor.execute(sql)
         super().tearDownClass()
+
+    @classmethod
+    def add_users(cls):
+        profiles = (
+            {
+                "name": "testuser",
+                "email": "test@test.com",
+                "password": "TestingTesting123!",
+                "groups": [],
+            },
+            {
+                "name": "ben",
+                "email": "ben@test.com",
+                "password": "Test12345!",
+                "groups": ["Graph Editor", "Resource Editor"],
+            },
+            {
+                "name": "sam",
+                "email": "sam@test.com",
+                "password": "Test12345!",
+                "groups": ["Graph Editor", "Resource Editor", "Resource Reviewer"],
+            },
+            {
+                "name": "jim",
+                "email": "jim@test.com",
+                "password": "Test12345!",
+                "groups": ["Graph Editor", "Resource Editor"],
+            },
+        )
+
+        for profile in profiles:
+            try:
+                user = User.objects.create_user(
+                    username=profile["name"],
+                    email=profile["email"],
+                    password=profile["password"],
+                )
+                user.save()
+
+                for group_name in profile["groups"]:
+                    group = Group.objects.get(name=group_name)
+                    group.user_set.add(user)
+
+            except Exception as e:
+                print(e)

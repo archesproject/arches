@@ -37,8 +37,6 @@ from guardian.shortcuts import (
     get_perms,
 )
 
-from tests.utils.permission_test_utils import add_users
-
 # these tests can be run from the command line via
 # python manage.py test tests.views.resource_tests --settings="tests.test_settings"
 
@@ -54,7 +52,7 @@ class ResourceViewTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        add_users()
+        cls.add_users()
         cls.legacy_load_testing_package()
         cls.expected_resource_count = 2
         user = User.objects.get(username="ben")

@@ -53,6 +53,7 @@ class TileTests(ArchesTestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        cls.add_users()
         resources = []
         resources.append(
             ResourceInstance(
@@ -279,10 +280,6 @@ class TileTests(ArchesTestCase):
 
         """
 
-        self.user = User.objects.create_user(
-            username="testuser", password="TestingTesting123!"
-        )
-
         json = {
             "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
@@ -297,6 +294,7 @@ class TileTests(ArchesTestCase):
 
         provisional_tile = Tile(json)
         request = HttpRequest()
+        self.user = User.objects.get(username="testuser")
         request.user = self.user
         provisional_tile.save(index=False, request=request)
 
@@ -333,9 +331,7 @@ class TileTests(ArchesTestCase):
 
         t = Tile(json)
         t.save(index=False)
-        self.user = User.objects.create_user(
-            username="testuser", password="TestingTesting123!"
-        )
+        self.user = User.objects.get(username="testuser")
         login = self.client.login(username="testuser", password="TestingTesting123!")
         tiles = Tile.objects.filter(
             resourceinstance_id=CardinalityTestGraph.RESOURCE1.value
@@ -372,9 +368,7 @@ class TileTests(ArchesTestCase):
         self.assertEqual(provisionaledits[str(self.user.id)]["status"], "review")
 
     def test_update_sortorder_provisional_tile(self):
-        self.user = User.objects.create_user(
-            username="testuser", password="TestingTesting123!"
-        )
+        self.user = User.objects.get(username="testuser")
         json = {
             "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
@@ -417,9 +411,7 @@ class TileTests(ArchesTestCase):
         tile = Tile(json)
         tile.save(index=False)
 
-        user = User.objects.create_user(
-            username="testuser", password="TestingTesting123!"
-        )
+        user = User.objects.get(username="testuser")
         login = self.client.login(username="testuser", password="TestingTesting123!")
 
         tile.data[str(AllDatatypesTestGraph.BOOLEAN_SWITCH_NODE.value)] = True
@@ -487,9 +479,7 @@ class TileTests(ArchesTestCase):
             },
         }
 
-        user = User.objects.create_user(
-            username="testuser", password="TestingTesting123!"
-        )
+        user = User.objects.get(username="testuser")
         provisional_tile = Tile(json)
         request = HttpRequest()
         request.user = user
@@ -521,9 +511,7 @@ class TileTests(ArchesTestCase):
             },
         }
 
-        user = User.objects.create_user(
-            username="testuser", password="TestingTesting123!"
-        )
+        user = User.objects.get(username="testuser")
         provisional_tile = Tile(json)
         request = HttpRequest()
         request.user = user
@@ -549,9 +537,7 @@ class TileTests(ArchesTestCase):
             },
         }
 
-        owner = User.objects.create_user(
-            username="testuser", password="TestingTesting123!"
-        )
+        owner = User.objects.get(username="testuser")
         reviewer = User.objects.get(username="admin")
 
         tile1 = Tile(json)
@@ -600,9 +586,7 @@ class TileTests(ArchesTestCase):
             },
         }
 
-        provisional_user = User.objects.create_user(
-            username="testuser", password="TestingTesting123!"
-        )
+        provisional_user = User.objects.get(username="testuser")
         reviewer = User.objects.get(username="admin")
 
         tile = Tile(json)
