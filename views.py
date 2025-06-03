@@ -206,14 +206,18 @@ class ListItemView(APIBase):
 
     def patch(self, request, item_id):
         data = JSONDeserializer().deserialize(request.body)
-        item = ListItem(id=item_id, **data)
+        try:
+            item = ListItem.objects.get(pk=item_id)
+        except ListItem.DoesNotExist:
+            return JSONErrorResponse(status=HTTPStatus.NOT_FOUND)
+        for key, value in data.items():
+            setattr(item, key, value)
 
         update_fields = set(data)
         if not update_fields:
             return JSONErrorResponse(status=HTTPStatus.BAD_REQUEST)
         exclude_fields = field_names(item) - update_fields
         try:
-            item._state.adding = False
             item.full_clean(exclude=exclude_fields)
             with transaction.atomic():
                 item.save(update_fields=update_fields)
