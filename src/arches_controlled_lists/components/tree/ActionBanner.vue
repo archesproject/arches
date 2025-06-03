@@ -87,7 +87,7 @@ const abandonMove = () => {
 <style scoped>
 .action-banner {
     background: var(--p-amber-300);
-    color: black;
+    color: var(--p-slate-950);
     font-weight: 800;
     height: 5rem;
     font-size: small;
