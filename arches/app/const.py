@@ -1,4 +1,5 @@
 from enum import Enum, unique
+from uuid import UUID
 
 
 IntegrityCheckDescriptions = {
@@ -34,3 +35,11 @@ class ExtensionType(Enum):
     FUNCTIONS = "functions"
     SEARCH_COMPONENTS = "search_components"
     PERMISSIONS_FRAMEWORKS = "permissions"
+
+
+class ResourceLifecycleStates(Enum):
+    PERPETUAL = UUID("4e2a6b8e-2489-4377-9c9f-29cfbd3e76c8")
+    STANDARD = UUID("7e3cce56-fbfb-4a4b-8e83-59b9f9e7cb75")
+    DRAFT = UUID("9375c9a7-dad2-4f14-a5c1-d7e329fdde4f")
+    ACTIVE = UUID("f75bb034-36e3-4ab4-8167-f520cf0b4c58")
+    RETIRED = UUID("d95d9c0e-0e2c-4450-93a3-d788b91abcc8")
