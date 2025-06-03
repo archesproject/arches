@@ -16,6 +16,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import uuid
 from datetime import datetime
 from enum import StrEnum, auto
 
@@ -308,6 +309,7 @@ def deduplicate_widgets(nodes):
         pass
 
     problems_remain = False
+    graph_ids_to_republish: set[uuid.UUID] = set()
     with transaction.atomic():
         for node in nodes:
             try:
@@ -321,6 +323,7 @@ def deduplicate_widgets(nodes):
                         continue
 
                     if test_cross.card.pk != good_cross.card.pk:
+                        graph_ids_to_republish.add(test_cross.node.graph_id)
                         test_cross.delete()
                         continue
 
@@ -333,8 +336,15 @@ def deduplicate_widgets(nodes):
                             problems_remain = True
                             raise BreakNestedLoops
                     # If we get here, the only difference is sortorder.
+                    graph_ids_to_republish.add(test_cross.node.graph_id)
                     test_cross.delete()
             except BreakNestedLoops:
                 continue
+
+        for graph in models.Graph.objects.filter(
+            pk__in=graph_ids_to_republish,
+            source_identifier=None,
+        ):
+            graph.publish(notes="Deduplicated card_x_node_x_widgets")
 
     return problems_remain
