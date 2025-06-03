@@ -152,11 +152,11 @@ class ListView(APIBase):
         )
         errors = [
             _(
-                "{controlled_list} could not be deleted: still in use by {graph} - {node}".format(
-                    controlled_list=list_to_delete.name,
-                    graph=node.graph.name,
-                    node=node.name,
-                )
+                "{controlled_list} could not be deleted: still in use by {graph} - {node}"
+            ).format(
+                controlled_list=list_to_delete.name,
+                graph=node.graph.name,
+                node=node.name,
             )
             for node in nodes_using_list
         ]

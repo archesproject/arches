@@ -125,12 +125,12 @@ class ReferenceDataType(BaseDataType):
         if isinstance(e, TypeError) and e.args:
             # Localize the error raised by the dataclass constructor.
             if "__init__() missing" in e.args[0]:
-                message = _(
-                    "Missing required value(s): {}".format(e.args[0].split(": ")[-1])
+                message = _("Missing required value(s): {}").format(
+                    e.args[0].split(": ")[-1]
                 )
             elif "unexpected keyword argument" in e.args[0]:
-                message = _(
-                    "Unexpected value: {}".format(e.args[0].split("argument ")[-1])
+                message = _("Unexpected value: {}").format(
+                    e.args[0].split("argument ")[-1]
                 )
         elif isinstance(e, ValueError) and e.args:
             message = e.args[0]
