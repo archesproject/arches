@@ -190,13 +190,14 @@ class Command(BaseCommand):
             ).filter(Q(source_widget_count__gt=1) | Q(draft_widget_count__gt=1)),
             fix_action=FixActions.DEDUPLICATE_WIDGETS,
         )
-        self.check_integrity(
-            check=IntegrityCheck.NO_WIDGETS,  # 1017
-            queryset=models.Node.objects.exclude(datatype="semantic")
-            .annotate(widget_count=Count("cardxnodexwidget"))
-            .filter(widget_count__lt=1),
-            fix_action=None,
-        )
+        # This is not currently an error condition, so don't show it.
+        # self.check_integrity(
+        #     check=IntegrityCheck.NO_WIDGETS,  # 1017
+        #     queryset=models.Node.objects.exclude(datatype="semantic")
+        #     .annotate(widget_count=Count("cardxnodexwidget"))
+        #     .filter(widget_count__lt=1),
+        #     fix_action=None,
+        # )
 
     def check_integrity(self, check, queryset, fix_action):
         # 500 not set as a default earlier:
