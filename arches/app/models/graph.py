@@ -57,28 +57,13 @@ class Graph(models.GraphModel):
 
     def __init__(self, *args, **kwargs):
         super(Graph, self).__init__(*args, **kwargs)
-        # from models.GraphModel
-        # self.graphid = None
-        # self.name = ''
-        # self.description = ''
-        # self.deploymentfile = ''
-        # self.author = ''
-        # self.deploymentdate = None
-        # self.version = ''
-        # self.isresource = False
-        # self.iconclass = ''
-        # self.color = ''
-        # self.subtitle = ''
-        # self.ontology = None
-        # self.functions = []
-        # end from models.GraphModel
         self.root = None
         self.nodes = {}
         self.edges = {}
         self.cards = {}
         self.widgets = {}
+        self.functions_x_graphs = []
         self._nodegroups_to_delete = []
-        self._functions = []
         self._spatial_views = []
         self._card_constraints = []
         self._constraints_x_nodes = []
@@ -92,7 +77,8 @@ class Graph(models.GraphModel):
                         "nodes",
                         "edges",
                         "cards",
-                        "functions",
+                        "functions",  # needed for django reverse
+                        "functions_x_graphs",
                         "is_editable",
                         "publication",
                         "user_permissions",
@@ -136,16 +122,17 @@ class Graph(models.GraphModel):
                     return configs
 
                 if "functions_x_graphs" in args[0]:
-                    for function in args[0]["functions_x_graphs"]:
-                        function_x_graph_config = function["config"]
+                    for function_x_graph in args[0]["functions_x_graphs"]:
+                        function_x_graph_config = function_x_graph["config"]
                         default_config = models.Function.objects.get(
-                            functionid=function["function_id"]
+                            functionid=function_x_graph["function_id"]
                         ).defaultconfig
-                        function["config"] = check_default_configs(
+                        function_x_graph["config"] = check_default_configs(
                             default_config, function_x_graph_config
                         )
+                        function_x_graph["graph_id"] = self.graphid
 
-                        self.add_function(function)
+                        self.add_function_x_graph(function_x_graph)
 
                 self.populate_null_nodegroups()
 
@@ -167,7 +154,7 @@ class Graph(models.GraphModel):
                 for node in self.nodes.values():
                     if node.istopnode:
                         self.root = node
-
+                self.functions_x_graphs = super().get_functions_x_graphs()
                 self.edges = {edge.pk: edge for edge in super().get_edges()}
                 # This resolves a tricky pointer issue with `append_branch`
                 # and possibly other functions as well. This block should
@@ -383,24 +370,26 @@ class Graph(models.GraphModel):
 
         return card
 
-    def add_function(self, function):
+    def add_function_x_graph(self, function_x_graph):
         """
         Adds a FunctionXGraph record to this graph
 
         Arguments:
-        function -- an object representing a FunctionXGraph instance or an actual FunctionXGraph instance
+        function_x_graph -- an object representing a FunctionXGraph instance or an actual FunctionXGraph instance
 
         """
 
-        if not isinstance(function, models.FunctionXGraph):
-            function = models.FunctionXGraph(**function.copy())
+        if not isinstance(function_x_graph, models.FunctionXGraph):
+            function_x_graph = models.FunctionXGraph(**function_x_graph.copy())
 
-        function.graph = self
+        function_x_graph.graph = self
 
-        self._functions.append(function)
+        self.functions_x_graphs.append(function_x_graph)
         self.has_unpublished_changes = True
 
-        return function
+        function_x_graph.pk = uuid.uuid4()
+
+        return function_x_graph
 
     def add_spatial_view(self, spatial_view):
         """
@@ -556,6 +545,9 @@ class Graph(models.GraphModel):
             for card in self.cards.values():
                 card.save()
 
+            for function_x_graph in self.functions_x_graphs:
+                function_x_graph.save()
+
             for constraint in self._card_constraints:
                 constraint.save()
 
@@ -571,24 +563,26 @@ class Graph(models.GraphModel):
                 for widget in self.widgets.values():
                     widget.save()
 
-            for functionxgraph in self._functions:
+            for function_x_graph in self.functions_x_graphs:
                 # Right now this only saves a functionxgraph record if the function is present in the database. Otherwise it silently fails.
-                if functionxgraph.function_id in [
+                if function_x_graph.function_id in [
                     str(id)
                     for id in models.Function.objects.values_list(
                         "functionid", flat=True
                     )
                 ]:
 
-                    previous_functionxgraph_list = models.FunctionXGraph.objects.filter(
-                        function_id=functionxgraph.function_id, graph_id=self.pk
+                    previous_function_x_graph_list = (
+                        models.FunctionXGraph.objects.filter(
+                            function_id=function_x_graph.function_id, graph_id=self.pk
+                        )
                     )
-                    if len(previous_functionxgraph_list):
-                        previous_functionxgraph = previous_functionxgraph_list[0]
-                        previous_functionxgraph.delete()
+                    if len(previous_function_x_graph_list):
+                        previous_function_x_graph = previous_function_x_graph_list[0]
+                        previous_function_x_graph.delete()
 
                 try:
-                    functionxgraph.save()
+                    function_x_graph.save()
                 except:
                     pass
 
@@ -671,6 +665,9 @@ class Graph(models.GraphModel):
 
             for widget in self.widgets.values():
                 widget.delete()
+
+            for function_x_graph in self.functions_x_graphs:
+                function_x_graph.delete()
 
         self.has_unpublished_changes = True
 
@@ -930,19 +927,6 @@ class Graph(models.GraphModel):
                 str_forms_config = str_forms_config.replace(str(k), str(v))
         return json.loads(str_forms_config)
 
-    def copy_functions(self, other_graph, id_maps=[]):
-        """
-        Copies the graph_x_function relationships from a different graph and relates
-        the same functions to this graph.
-
-        """
-        for function_x_graph in other_graph.functionxgraph_set.all():
-            config_copy = self.replace_config_ids(function_x_graph.config, id_maps)
-            function_copy = models.FunctionXGraph(
-                function=function_x_graph.function, config=config_copy, graph=self
-            )
-            function_copy.save()
-
     def copy(self, root=None, set_source=False):
         """
         returns an unsaved copy of self
@@ -1110,6 +1094,13 @@ class Graph(models.GraphModel):
         for node in copy_of_self.nodes.values():
             node.config = self.replace_config_ids(
                 node.config, [node_map, nodegroup_map]
+            )
+
+        for function_x_graph in copy_of_self.functions_x_graphs:
+            function_x_graph.pk = uuid.uuid4()
+            function_x_graph.graph = copy_of_self
+            function_x_graph.config = self.replace_config_ids(
+                function_x_graph.config, [node_map, nodegroup_map]
             )
 
         return {
@@ -2000,10 +1991,10 @@ class Graph(models.GraphModel):
                 if "domain_connections" not in exclude
                 else ret.pop("domain_connections", None)
             )
-            ret["functions"] = (
+            ret["functions_x_graphs"] = (
                 models.FunctionXGraph.objects.filter(graph_id=self.graphid)
-                if "functions" not in exclude
-                else ret.pop("functions", None)
+                if "functions_x_graphs" not in exclude
+                else ret.pop("functions_x_graphs", None)
             )
 
             parentproperties = {self.root.nodeid: ""}
@@ -2635,6 +2626,12 @@ class Graph(models.GraphModel):
                 "relatable_resource_model_ids"
             ]
         ]
+
+        for function_x_graph in serialized_draft_graph["functions_x_graphs"]:
+            if "config" in function_x_graph:
+                function_x_graph["config"] = self.replace_config_ids(
+                    function_x_graph["config"], [node_id_to_node_source_identifier_id]
+                )
 
         return self.restore_state_from_serialized_graph(serialized_draft_graph)
 

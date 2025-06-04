@@ -370,7 +370,38 @@ class GraphTests(ArchesTestCase):
         graph.save()
         graph.publish()
 
+        node_dict = {}
+        for key, value in graph.nodes.items():
+            node_dict[str(key)] = str(value.nodeid)
+
+        graph.add_function_x_graph(
+            {
+                "id": str(uuid.uuid4()),
+                "function_id": str(uuid.uuid4()),
+                "graph_id": graph.graphid,
+                "config": {"test": node_dict},
+            }
+        )
+
         graph_copy = graph.copy()["copy"]
+
+        # confirm that both graphs have the same number of functions_x_graphs
+        self.assertEqual(len(graph.functions_x_graphs), 1)
+        self.assertEqual(len(graph_copy.functions_x_graphs), 1)
+
+        # confirm that the copied graph's functions_x_graphs config is not identical
+        # (nodeids should be different)
+        self.assertNotEqual(
+            graph.functions_x_graphs[0].config, graph_copy.functions_x_graphs[0].config
+        )
+
+        # these checks ensure that the copied functions config's nodeids were replaced
+        # with the mapped ones in the new copied graph.
+        for key in list(graph.nodes.keys()):
+            self.assertIn(str(key), graph.functions_x_graphs[0].config["test"])
+
+        for key in list(graph_copy.nodes.keys()):
+            self.assertIn(str(key), graph_copy.functions_x_graphs[0].config["test"])
 
         self.assertEqual(len(graph_copy.nodes), 3)
         self.assertEqual(len(graph_copy.edges), 2)

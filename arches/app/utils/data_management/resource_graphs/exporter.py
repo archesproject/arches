@@ -190,7 +190,7 @@ def get_graphs_for_export(graphids=None):
     for resource_graph in resource_graph_query:
         function_ids = []
         for function in resource_graph["functions"]:
-            function_ids.append(function["function_id"])
+            function_ids.append(function)
         resource_graph["functions_x_graphs"] = JSONSerializer().serializeToPython(
             get_function_x_graph_data_for_export(
                 function_ids, resource_graph["graphid"]

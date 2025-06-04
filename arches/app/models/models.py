@@ -635,6 +635,31 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
         else:
             return self.node_set.all()
 
+    def get_functions_x_graphs(self, force_recalculation=False):
+        if self.should_use_published_graph() and not force_recalculation:
+            published_graph = self.get_published_graph()
+
+            function_slugs = []
+            for function_dict in published_graph.serialized_graph["functions_x_graphs"]:
+                function_slug = {}
+
+                for key, value in function_dict.items():
+                    if isinstance(value, str):
+                        try:
+                            value = uuid.UUID(value)
+                        except ValueError:
+                            pass
+                    function_slug[key] = value
+
+                function_slugs.append(function_slug)
+
+            return [
+                models.FunctionXGraph(**function_dict)
+                for function_dict in function_slugs
+            ]
+        else:
+            return self.functionxgraph_set.all()
+
     def get_edges(self, force_recalculation=False):
         if self.should_use_published_graph() and not force_recalculation:
             published_graph = self.get_published_graph()

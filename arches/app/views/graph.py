@@ -548,10 +548,6 @@ class GraphDataView(View):
                     ret.save()
                     ret.publish()
 
-                    ret.copy_functions(
-                        graph, [clone_data["nodes"], clone_data["nodegroups"]]
-                    )
-
                 elif self.action == "reorder_nodes":
                     json = request.body
                     if json is not None:
@@ -929,7 +925,7 @@ class FunctionManagerView(GraphBaseView):
     action = ""
 
     def get(self, request, graphid):
-        self.graph = Graph.objects.get(graphid=graphid)
+        self.graph = Graph.objects.get(source_identifier_id=graphid)
 
         if self.graph.isresource:
             context = self.get_context_data(
@@ -972,7 +968,7 @@ class FunctionManagerView(GraphBaseView):
                     pk=item["id"],
                     defaults={
                         "function_id": item["function_id"],
-                        "graph_id": graphid,
+                        "graph_id": self.graph.graphid,
                         "config": item["config"],
                     },
                 )
