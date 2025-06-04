@@ -3,7 +3,6 @@ Module to hold improved versions of datatype methods
 until we can verify correctness/desirability & upstream the changes.
 """
 
-import ast
 import copy
 import json
 import logging
@@ -220,12 +219,6 @@ def resource_instance_transform_value_for_tile(self, value, **kwargs):
             value = [value]
             raise TypeError
         return json.loads(value)
-    except ValueError:
-        # do this if json (invalid) is formatted with single quotes, re #6390
-        try:
-            return ast.literal_eval(value)
-        except:
-            return value
     except TypeError:
         if isinstance(value, list):
             transformed = []
