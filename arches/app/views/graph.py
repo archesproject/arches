@@ -111,8 +111,9 @@ class GraphSettingsView(GraphBaseView):
             }
         )
 
+    @transaction.atomic
     def post(self, request, graphid):
-        graph = Graph.objects.get(graphid=graphid)
+        graph = Graph.objects.filter(graphid=graphid).select_for_update().get()
         data = JSONDeserializer().deserialize(request.body)
 
         for key, value in data.get("graph").items():
@@ -159,32 +160,32 @@ class GraphSettingsView(GraphBaseView):
             nodegroup_ids_to_serialized_nodegroups[
                 serialized_nodegroup["nodegroupid"]
             ] = serialized_nodegroup
+
+        for nodegroup in models.NodeGroup.objects.filter(
+            nodegroupid__in=nodegroup_ids_to_serialized_nodegroups.keys()
+        ):
+            nodegroup.cardinality = nodegroup_ids_to_serialized_nodegroups[
+                str(nodegroup.nodegroupid)
+            ]["cardinality"]
+            nodegroup.save()
+            node.save()
+
         try:
-            with transaction.atomic():
-                for nodegroup in models.NodeGroup.objects.filter(
-                    nodegroupid__in=nodegroup_ids_to_serialized_nodegroups.keys()
-                ):
-                    nodegroup.cardinality = nodegroup_ids_to_serialized_nodegroups[
-                        str(nodegroup.nodegroupid)
-                    ]["cardinality"]
-                    nodegroup.save()
-
-                node.save()
-                graph.save()
-                graph.refresh_from_database()
-
-            return JSONResponse(
-                {
-                    "success": True,
-                    "graph": graph,
-                    "relatable_resource_ids": [
-                        res.nodeid for res in node.get_relatable_resources()
-                    ],
-                }
-            )
-
+            graph.save()
         except GraphValidationError as e:
             return JSONErrorResponse(e.title, e.message)
+
+        graph.refresh_from_database()
+
+        return JSONResponse(
+            {
+                "success": True,
+                "graph": graph,
+                "relatable_resource_ids": [
+                    res.nodeid for res in node.get_relatable_resources()
+                ],
+            }
+        )
 
 
 @method_decorator(group_required("Graph Editor"), name="dispatch")
@@ -791,7 +792,9 @@ class CardView(GraphBaseView):
         if self.action == "update_card":
             if data:
                 card = Card(data)
-                card.save()
+                with transaction.atomic():
+                    Card.objects.filter(pk=card.pk).select_for_update().get()
+                    card.save()
                 return JSONResponse(card)
 
         if self.action == "reorder_cards":
