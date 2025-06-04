@@ -56,6 +56,7 @@ SYSTEM_SETINGS_GRAPH_ID = "ff623370-fa12-11e6-b98b-6c4008b05c4c"
 
 class ArchesTestCase(TestCase):
     graph_fixtures = []
+    test_users = {}
     """
     Similar to TestCase.fixtures, but uses ResourceGraphImporter to avoid flushing.
     Uses the name of the .json file (case-sensitive), not graph name.
@@ -115,6 +116,8 @@ class ArchesTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         LanguageSynchronizer.synchronize_settings_with_db(update_published_graphs=False)
+        for user in User.objects.all():
+            cls.test_users[user.username] = user
         cls.loadOntology()
         if not cls.graph_fixtures:
             return
@@ -234,17 +237,14 @@ class ArchesTestCase(TestCase):
         )
 
         for profile in profiles:
-            try:
-                user = User.objects.create_user(
-                    username=profile["name"],
-                    email=profile["email"],
-                    password=profile["password"],
-                )
-                user.save()
+            user = User.objects.create_user(
+                username=profile["name"],
+                email=profile["email"],
+                password=profile["password"],
+            )
 
-                for group_name in profile["groups"]:
-                    group = Group.objects.get(name=group_name)
-                    group.user_set.add(user)
+            for group_name in profile["groups"]:
+                group = Group.objects.get(name=group_name)
+                group.user_set.add(user)
 
-            except Exception as e:
-                print(e)
+            cls.test_users[profile["name"]] = user
