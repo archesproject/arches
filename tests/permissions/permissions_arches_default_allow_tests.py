@@ -213,9 +213,9 @@ class ArchesDefaultAllowPermissionsTests(ArchesPermissionFrameworkTestCase):
             "no_access_to_resourceinstance", self.group, self.resource
         )
         ben = self.user
-        jim = User.objects.get(username="jim")
-        sam = User.objects.get(username="sam")
-        admin = User.objects.get(username="admin")
+        jim = self.test_users["jim"]
+        sam = self.test_users["sam"]
+        admin = self.test_users["admin"]
         self.framework.assign_perm("view_resourceinstance", ben, self.resource)
         self.framework.assign_perm("change_resourceinstance", jim, self.resource)
 

@@ -55,7 +55,7 @@ class ResourceViewTests(ArchesTestCase):
         cls.add_users()
         cls.legacy_load_testing_package()
         cls.expected_resource_count = 2
-        user = User.objects.get(username="ben")
+        user = cls.test_users["ben"]
         edit_records = EditLog.objects.filter(
             resourceinstanceid=cls.resource_instance_id
         ).filter(edittype="create")
@@ -218,7 +218,7 @@ class ResourceViewTests(ArchesTestCase):
         """
         self.client.login(username="ben", password="Test12345!")
         group = Group.objects.get(pk=2)
-        user = User.objects.get(username="ben")
+        user = self.test_users["ben"]
         view_url = reverse(
             "resource_report", kwargs={"resourceid": self.resource_instance_id}
         )
@@ -306,7 +306,7 @@ class ResourceViewTests(ArchesTestCase):
 
     def test_get_related_resource(self):
         se = SearchEngineFactory().create()
-        user = User.objects.get(username="admin")
+        user = self.test_users["admin"]
         en_preflabel = "is related to"
         person_resourceid = "b6754e7a-7f18-40d1-93fe-61763d37d55e"
         person_resource = Resource(

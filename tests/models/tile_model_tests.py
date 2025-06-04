@@ -253,7 +253,7 @@ class TileTests(ArchesTestCase):
 
         """
 
-        self.user = User.objects.get(username="admin")
+        user = self.test_users["admin"]
 
         json = {
             "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
@@ -269,7 +269,7 @@ class TileTests(ArchesTestCase):
 
         authoritative_tile = Tile(json)
         request = HttpRequest()
-        request.user = self.user
+        request.user = user
         authoritative_tile.save(index=False, request=request)
 
         self.assertEqual(authoritative_tile.is_provisional(), False)
@@ -294,8 +294,8 @@ class TileTests(ArchesTestCase):
 
         provisional_tile = Tile(json)
         request = HttpRequest()
-        self.user = User.objects.get(username="testuser")
-        request.user = self.user
+        user = self.test_users["testuser"]
+        request.user = user
         provisional_tile.save(index=False, request=request)
 
         self.assertEqual(provisional_tile.is_provisional(), True)
@@ -331,8 +331,11 @@ class TileTests(ArchesTestCase):
 
         t = Tile(json)
         t.save(index=False)
-        self.user = User.objects.get(username="testuser")
-        login = self.client.login(username="testuser", password="TestingTesting123!")
+        user = self.test_users["testuser"]
+        login = self.client.login(
+            username=user.username,
+            password=user.password,
+        )
         tiles = Tile.objects.filter(
             resourceinstance_id=CardinalityTestGraph.RESOURCE1.value
         )
@@ -344,7 +347,7 @@ class TileTests(ArchesTestCase):
                 "en": {"value": "PROVISIONAL", "direction": "ltr"}
             }
         request = HttpRequest()
-        request.user = self.user
+        request.user = user
         provisional_tile.save(index=False, request=request)
         tiles = Tile.objects.filter(
             resourceinstance_id=CardinalityTestGraph.RESOURCE1.value
@@ -364,11 +367,11 @@ class TileTests(ArchesTestCase):
             "AUTHORITATIVE",
             provisional_tile,
         )
-        self.assertEqual(provisionaledits[str(self.user.id)]["action"], "update")
-        self.assertEqual(provisionaledits[str(self.user.id)]["status"], "review")
+        self.assertEqual(provisionaledits[str(user.id)]["action"], "update")
+        self.assertEqual(provisionaledits[str(user.id)]["status"], "review")
 
     def test_update_sortorder_provisional_tile(self):
-        self.user = User.objects.get(username="testuser")
+        user = self.test_users["testuser"]
         json = {
             "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
@@ -382,7 +385,7 @@ class TileTests(ArchesTestCase):
         }
         provisional_tile = Tile(json)
         request = HttpRequest()
-        request.user = self.user
+        request.user = user
         provisional_tile.save(index=False, request=request)
         self.assertEqual(provisional_tile.sortorder, 0)
 
@@ -411,8 +414,11 @@ class TileTests(ArchesTestCase):
         tile = Tile(json)
         tile.save(index=False)
 
-        user = User.objects.get(username="testuser")
-        login = self.client.login(username="testuser", password="TestingTesting123!")
+        user = self.test_users["testuser"]
+        login = self.client.login(
+            username=user.username,
+            password=user.password,
+        )
 
         tile.data[str(AllDatatypesTestGraph.BOOLEAN_SWITCH_NODE.value)] = True
 
@@ -428,7 +434,7 @@ class TileTests(ArchesTestCase):
 
         """
 
-        self.user = User.objects.get(username="admin")
+        user = self.test_users["admin"]
         first_json = {
             "resourceinstance_id": CardinalityTestGraph.RESOURCE1.value,
             "parenttile_id": "",
@@ -442,7 +448,7 @@ class TileTests(ArchesTestCase):
         }
         first_tile = Tile(first_json)
         request = HttpRequest()
-        request.user = self.user
+        request.user = user
         first_tile.save(index=False, request=request)
 
         second_json = {
@@ -479,7 +485,7 @@ class TileTests(ArchesTestCase):
             },
         }
 
-        user = User.objects.get(username="testuser")
+        user = self.test_users["testuser"]
         provisional_tile = Tile(json)
         request = HttpRequest()
         request.user = user
@@ -511,7 +517,7 @@ class TileTests(ArchesTestCase):
             },
         }
 
-        user = User.objects.get(username="testuser")
+        user = self.test_users["testuser"]
         provisional_tile = Tile(json)
         request = HttpRequest()
         request.user = user
@@ -537,8 +543,8 @@ class TileTests(ArchesTestCase):
             },
         }
 
-        owner = User.objects.get(username="testuser")
-        reviewer = User.objects.get(username="admin")
+        owner = self.test_users["testuser"]
+        reviewer = self.test_users["admin"]
 
         tile1 = Tile(json)
         owner_request = HttpRequest()
@@ -586,8 +592,8 @@ class TileTests(ArchesTestCase):
             },
         }
 
-        provisional_user = User.objects.get(username="testuser")
-        reviewer = User.objects.get(username="admin")
+        provisional_user = self.test_users["testuser"]
+        reviewer = self.test_users["admin"]
 
         tile = Tile(json)
         reviewer_request = HttpRequest()
