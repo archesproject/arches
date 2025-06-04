@@ -148,7 +148,7 @@ class Card(models.CardModel):
                     for card in args[0]["cards"]:
                         self.cards.append(Card(card))
 
-                if "constraints":
+                if "constraints" in args[0]:
                     self.update_constraints(args[0]["constraints"])
 
                 if "widgets" in args[0]:

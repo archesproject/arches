@@ -793,7 +793,7 @@ class CardView(GraphBaseView):
             if data:
                 card = Card(data)
                 with transaction.atomic():
-                    Card.objects.filter(pk=card.pk).select_for_update().get()
+                    Card.objects.filter(pk=card.pk).select_for_update().first()
                     card.save()
                 return JSONResponse(card)
 
