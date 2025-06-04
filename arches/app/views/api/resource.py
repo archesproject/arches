@@ -31,7 +31,7 @@ from arches.app.utils.permission_backend import (
     get_nodegroups_by_perm,
 )
 from arches.app.utils.permission_backend import get_nodegroups_by_perm
-from arches.app.utils.permission_backend import user_is_resource_editor
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
 from arches.app.views.api import APIBase
 from arches.app.views.resource import (
@@ -484,7 +484,7 @@ class ResourceInstanceLifecycleState(APIBase):
         return JSONResponse(resource_instance.resource_instance_lifecycle_state)
 
     def post(self, request, resourceid):
-        if not user_is_resource_editor(request.user):
+        if not user_is_resource_reviewer(request.user):
             return JSONErrorResponse(
                 _("Request Failed"), _("Permission Denied"), status=403
             )
