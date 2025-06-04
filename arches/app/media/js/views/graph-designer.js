@@ -11,6 +11,7 @@ import AlertViewModel from 'viewmodels/alert';
 import JsonErrorAlertViewModel from 'viewmodels/alert-json';
 import GraphModel from 'models/graph';
 import ReportModel from 'models/report';
+import ariaUtils from 'utils/aria';
 import GraphTree from 'views/graph/graph-designer/graph-tree';
 import NodeFormView from 'views/graph/graph-designer/node-form';
 import BranchListView from 'views/graph/graph-manager/branch-list';
@@ -231,6 +232,8 @@ var GraphDesignerView = BaseManagerView.extend({
                     // set max z-index on card alert panel so user can acknowledge that graph has been updated && trigger page reload
                     const cardAlertPanel = document.querySelector('#card-alert-panel');
                     cardAlertPanel.style.zIndex = 2147483647;
+                    const focusButton = document.querySelector('#card-alert-panel button:first-of-type');
+                    ariaUtils.shiftFocus(focusButton);
                     
                     viewModel.graphPublicationNotes(null);
                     viewModel.shouldShowPublishModal(false);
@@ -330,6 +333,8 @@ var GraphDesignerView = BaseManagerView.extend({
                     // set max z-index on card alert panel so user can acknowledge that graph has been updated && trigger page reload
                     const cardAlertPanel = document.querySelector('#card-alert-panel');
                     cardAlertPanel.style.zIndex = 2147483647;
+                    const focusButton = document.querySelector('#card-alert-panel button:first-of-type');
+                    ariaUtils.shiftFocus(focusButton);
                     
                     viewModel.shouldShowUpdatePublishedGraphsButton(false);
                     viewModel.graphPublicationNotes(null);
