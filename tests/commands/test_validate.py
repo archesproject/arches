@@ -1,11 +1,11 @@
 # these tests can be run from the command line via
 # python manage.py test tests.commands.test_validate --settings="tests.test_settings"
 
-# from io import StringIO
+from io import StringIO
 
-# from django.core.management import call_command
+from django.core.management import call_command
 
-# from arches.app.const import IntegrityCheck
+from arches.app.const import IntegrityCheck
 from arches.app.models.graph import Graph
 from arches.app.models.models import (
     CardModel,
@@ -105,9 +105,9 @@ class ValidateTests(ArchesTestCase):
                 return datatype.defaultwidget_id
         return None
 
-    # def test_no_widgets(self):
-    #     CardXNodeXWidget.objects.all().delete()
-
-    #     out = StringIO()
-    #     call_command("validate", codes=[IntegrityCheck.NO_WIDGETS.value], stdout=out)
-    #     self.assertEqual(out.getvalue().count("FAIL"), 1)
+    def test_too_many_widgets_pass(self):
+        out = StringIO()
+        call_command(
+            "validate", codes=[IntegrityCheck.TOO_MANY_WIDGETS.value], stdout=out
+        )
+        self.assertEqual(out.getvalue().count("PASS"), 1)
