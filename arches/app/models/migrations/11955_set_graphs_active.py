@@ -6,15 +6,14 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("models", "12002_percent_sign_fix"),
+        ("models", "11954_add_related_names_for_draft_entities"),
     ]
 
     def set_active_true(apps, schema_editor):
         GraphModel = apps.get_model("models", "GraphModel")
         # Select published graphs without any draft graphs.
         GraphModel.objects.filter(
-            # "graphmodel" is the default related_name for GraphModel.source_identifier
-            graphmodel__isnull=True,
+            draft=None,
             publication__isnull=False,
         ).update(is_active=True)
 

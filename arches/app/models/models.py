@@ -78,6 +78,7 @@ class CardModel(SaveSupportsBlindOverwriteMixin, models.Model):
         blank=True,
         null=True,
         on_delete=models.CASCADE,
+        related_name="draft",
     )
 
     def __init__(self, *args, **kwargs):
@@ -159,6 +160,7 @@ class CardXNodeXWidget(SaveSupportsBlindOverwriteMixin, models.Model):
         blank=True,
         null=True,
         on_delete=models.CASCADE,
+        related_name="draft",
     )
 
     def save(self, **kwargs):
@@ -290,6 +292,7 @@ class Edge(SaveSupportsBlindOverwriteMixin, models.Model):
         blank=True,
         null=True,
         on_delete=models.CASCADE,
+        related_name="draft",
     )
 
     def __init__(self, *args, **kwargs):
@@ -511,6 +514,7 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
         null=True,
         on_delete=models.CASCADE,
         to="models.graphmodel",
+        related_name="draft",
     )
     has_unpublished_changes = models.BooleanField(default=False)
     resource_instance_lifecycle = models.ForeignKey(
@@ -897,6 +901,7 @@ class Node(SaveSupportsBlindOverwriteMixin, models.Model):
         blank=True,
         null=True,
         on_delete=models.CASCADE,
+        related_name="draft",
     )
     sourcebranchpublication = models.ForeignKey(
         GraphXPublishedGraph,
