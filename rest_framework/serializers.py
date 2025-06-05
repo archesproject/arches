@@ -1,4 +1,3 @@
-from copy import deepcopy
 from functools import lru_cache, partial
 
 from django.conf import settings
@@ -16,6 +15,7 @@ from arches.app.models.models import Node
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 from arches_querysets.models import AliasedData, SemanticResource, SemanticTile
+from arches_querysets.rest_framework import interchange_fields
 
 
 # Workaround for I18n_string fields
@@ -181,7 +181,8 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
         return field_names
 
     def to_internal_value(self, data):
-        return AliasedData(**data)
+        attrs = super().to_internal_value(data)
+        return AliasedData(**attrs)
 
     def validate(self, attrs):
         if hasattr(self, "initial_data") and (
@@ -192,26 +193,19 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
 
 
 class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
-    datatype_field_map = {
-        "string": models.JSONField(null=True),
-        "number": models.FloatField(null=True),
-        "concept": models.JSONField(null=True),
-        "concept-list": models.JSONField(null=True),
-        "date": models.DateField(null=True),
-        "node-value": models.CharField(null=True),  # XXX
-        "edtf": models.CharField(null=True),  # XXX
-        "annotation": models.CharField(null=True),  # XXX
-        "url": models.JSONField(null=True),  # XXX
-        "resource-instance": models.JSONField(null=True),
-        "resource-instance-list": models.JSONField(null=True),
-        "boolean": models.BooleanField(null=True),
-        "domain-value": models.JSONField(null=True),
-        "domain-value-list": models.JSONField(null=True),
-        "non-localized-string": models.CharField(null=True),
-        "geojson-feature-collection": models.CharField(null=True),  # XXX
-        "file-list": models.JSONField(null=True),
-        # TODO: reference datatype should supply this itself somehow.
-        "reference": models.JSONField(null=True),
+    datatype_field_mapping = {
+        "number": models.FloatField,
+        "date": models.DateField,
+        "boolean": models.BooleanField,
+        "non-localized-string": models.CharField,
+    }
+    serializer_field_mapping = {
+        **serializers.ModelSerializer.serializer_field_mapping,
+        models.JSONField: interchange_fields.JSONField,
+        models.FloatField: interchange_fields.FloatField,
+        models.DateField: interchange_fields.DateField,
+        models.BooleanField: interchange_fields.BooleanField,
+        models.CharField: interchange_fields.CharField,
     }
 
     class Meta:
@@ -316,22 +310,20 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                 f"Node with alias {field_name} not found in graph {self.graph_slug}"
             )
 
-        model_field = deepcopy(self.datatype_field_map[node.datatype])
-        if model_field is None:
-            if node.nodegroup.grouping_node == node:
-                sortorder = 0
-                if node.nodegroup.cardmodel_set.all():
-                    sortorder = node.nodegroup.cardmodel_set.all()[0].sortorder
-                model_field = _make_tile_serializer(
-                    slug=self.graph_slug,
-                    nodegroup_alias=node.alias,
-                    cardinality=node.nodegroup.cardinality,
-                    graph_nodes=self.graph_nodes,
-                    sortorder=sortorder,
-                )
-            else:
-                msg = _("Field missing for datatype: {}").format(node.datatype)
-                raise NotImplementedError(msg)
+        if node.datatype == "semantic" and node.nodegroup.grouping_node == node:
+            sortorder = 0
+            if node.nodegroup.cardmodel_set.all():
+                sortorder = node.nodegroup.cardmodel_set.all()[0].sortorder
+            model_field = _make_tile_serializer(
+                slug=self.graph_slug,
+                nodegroup_alias=node.alias,
+                cardinality=node.nodegroup.cardinality,
+                graph_nodes=self.graph_nodes,
+                sortorder=sortorder,
+            )
+        else:
+            klass = self.datatype_field_mapping.get(node.datatype, models.JSONField)
+            model_field = klass(null=True)
         model_field.model = model_class
         model_field.blank = not node.isrequired
         try:

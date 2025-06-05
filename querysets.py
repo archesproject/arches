@@ -1,5 +1,4 @@
 import uuid
-from functools import partial
 from slugify import slugify
 
 from django.core.exceptions import ValidationError
@@ -7,14 +6,15 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 from arches import VERSION as arches_version
-from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.models import Node, ResourceXResource
 
-from arches_querysets.utils import datatype_transforms
+from arches_querysets.datatypes.datatypes import DataTypeFactory
 from arches_querysets.utils.models import (
     generate_node_alias_expressions,
     filter_nodes_by_highest_parent,
 )
+
+NOT_PROVIDED = object()
 
 
 class SemanticTileManager(models.Manager):
@@ -68,7 +68,7 @@ class SemanticTileQuerySet(models.QuerySet):
             Fine-quality calf or lamb parchment ...
 
         as_representation:
-            - True: calls to_representation() / to_json() datatype methods
+            - True: calls to_json() datatype methods
             - False: calls to_python() datatype methods
         """
         from arches_querysets.models import SemanticResource
@@ -148,8 +148,6 @@ class SemanticTileQuerySet(models.QuerySet):
             raise RuntimeError(e) from e
 
     def _perform_custom_annotations(self):
-        NOT_PROVIDED = object()
-
         for tile in self._result_cache:
             if not isinstance(tile, self.model):
                 return
@@ -161,12 +159,11 @@ class SemanticTileQuerySet(models.QuerySet):
             for node in self._queried_nodes:
                 if node.nodegroup_id == tile.nodegroup_id:
                     # This is on the tile itself (ORM annotation).
-                    tile_val = getattr(tile, node.alias, NOT_PROVIDED)
-                    if tile_val is not NOT_PROVIDED:
-                        instance_val = self._get_node_value_for_python_annotation(
-                            tile, node, tile_val
-                        )
-                        setattr(tile.aliased_data, node.alias, instance_val)
+                    node_val = getattr(tile, node.alias, NOT_PROVIDED)
+                    instance_val = self._get_node_value_for_python_annotation(
+                        tile, node, node_val
+                    )
+                    setattr(tile.aliased_data, node.alias, instance_val)
                 elif node.nodegroup.parentnodegroup_id == tile.nodegroup_id:
                     empty_value = None if node.nodegroup.cardinality == "1" else []
                     setattr(tile.aliased_data, tile.find_nodegroup_alias(), empty_value)
@@ -222,53 +219,34 @@ class SemanticTileQuerySet(models.QuerySet):
         clone._as_representation = self._as_representation
         return clone
 
-    def _get_node_value_for_python_annotation(self, tile, node, tile_val):
+    def _get_node_value_for_python_annotation(self, tile, node, node_val):
         datatype_instance = DataTypeFactory().get_instance(node.datatype)
 
         if self._as_representation:
-            snake_case_datatype = node.datatype.replace("-", "_")
-            if repr_fn := getattr(
-                datatype_transforms,
-                f"{snake_case_datatype}_to_representation",
-                None,
-            ):
-                instance_val = repr_fn(datatype_instance, tile_val)
-            elif repr_fn := getattr(datatype_instance, "to_representation", None):
-                instance_val = repr_fn(tile_val)
-            elif tile_val and node.datatype in {
-                # Some datatypes have to_json() methods that fit our purpose.
-                "resource-instance",
-                "resource-instance-list",
-                "concept",
-                "concept-list",
-            }:
-                if to_json_fn := getattr(
-                    datatype_transforms,
-                    f"{snake_case_datatype}_to_json",
-                    None,
-                ):
-                    to_json_fn = partial(to_json_fn, datatype_instance)
-                else:
-                    to_json_fn = datatype_instance.to_json
-                try:
-                    to_json_result = to_json_fn(tile, node)
-                except TypeError:  # StringDataType workaround.
-                    tile.data[str(node.pk)] = {}
-                    to_json_result = to_json_fn(tile, node)
-                instance_val = to_json_result
-            else:
-                instance_val = tile_val
+            # Ordinarily we assume tiles always have all keys, but we've
+            # seen problems in the wild.
+            if str(node.pk) not in tile.data:
+                tile.data[str(node.pk)] = None
+            instance_val = {
+                "display_value": datatype_instance.to_json(tile, node)[
+                    "@display_value"
+                ],
+                "interchange_value": datatype_instance.get_interchange_value(node_val),
+            }
+            if instance_val["display_value"] in (None, ""):
+                # TODO: upstream this into datatype methods.
+                instance_val["display_value"] = _("(Empty)")
         else:
-            if py_fn := getattr(datatype_instance, "to_python", None):
-                instance_val = py_fn(tile_val)
+            if hasattr(datatype_instance, "to_python"):
+                instance_val = datatype_instance.to_python(node_val)
             elif node.datatype == "resource-instance":
                 # TODO: move, once dust settles.
-                if tile_val is None or len(tile_val) != 1:
-                    instance_val = tile_val
+                if node_val is None or len(node_val) != 1:
+                    instance_val = node_val
                 else:
-                    instance_val = tile_val[0]
+                    instance_val = node_val[0]
             else:
-                instance_val = tile_val
+                instance_val = node_val
 
         return instance_val
 
@@ -336,8 +314,9 @@ class SemanticResourceQuerySet(models.QuerySet):
 
         Provisional edits are completely ignored for the purposes of querying.
 
-        as_representation = True skips calling to_python() datatype methods and calls
-        to_representation() / to_json() depending on the datatype.
+        as_representation:
+            - True: calls to_json() datatype methods
+            - False: calls to_python() datatype methods
         """
         from arches_querysets.models import GraphWithPrefetching, SemanticTile
 

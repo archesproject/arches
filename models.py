@@ -23,6 +23,7 @@ from arches.app.utils.permission_backend import (
 )
 
 from arches_querysets.bulk_operations.tiles import BulkTileOperation
+from arches_querysets.datatypes.datatypes import DataTypeFactory
 from arches_querysets.lookups import *  # registers lookups
 from arches_querysets.querysets import (
     GraphWithPrefetchingQuerySet,
@@ -393,8 +394,6 @@ class SemanticTile(TileModel):
     @staticmethod
     def get_default_value(node):
         # TODO: When ingesting this into core, make this a method on the node.
-        from arches.app.datatypes.datatypes import DataTypeFactory
-
         datatype_factory = DataTypeFactory()
         d_data_type = datatype_factory.datatypes[node.datatype]
         datatype = datatype_factory.get_instance(node.datatype)
@@ -448,7 +447,6 @@ class SemanticTile(TileModel):
     def _tile_update_is_noop(self, original_data):
         """Skipping no-op tile saves avoids regenerating RxR rows, at least
         given the current implementation that doesn't serialize them."""
-        from arches.app.datatypes.datatypes import DataTypeFactory
 
         datatype_factory = DataTypeFactory()
         # Not object-oriented because TileModel.nodegroup is a property.
