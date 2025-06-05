@@ -49,12 +49,13 @@ def resource_instance_list_to_json(self, tile, node):
                 else rxr.to_resource_id
             )
             if to_resource_id == uuid.UUID(inner_val["resourceId"]):
-                to_resource = (
-                    rxr.resourceinstanceidto
-                    if arches_version < (8, 0)
-                    else rxr.to_resource
-                )
-                if not to_resource:
+                try:
+                    to_resource = (
+                        rxr.resourceinstanceidto
+                        if arches_version < (8, 0)
+                        else rxr.to_resource
+                    )
+                except models.ResourceInstance.DoesNotExist:
                     msg = f"Missing ResourceXResource target: {to_resource_id}"
                     logger.warning(msg)
                     copy["display_value"] = _("Missing")
