@@ -848,7 +848,7 @@ class ResourceTiles(View):
         search_term = request.GET.get("term", None)
         permitted_tiles = []
         perm = "read_nodegroup"
-        tiles = models.TileModel.objects.filter(
+        tiles = Tile.objects.filter(
             resourceinstance_id=resourceid,
             # Get tiles only from the latest graph publication.
             resourceinstance__graph_publication=models.F(
@@ -856,17 +856,19 @@ class ResourceTiles(View):
             ),
         )
         if nodeid is not None:
-            node = models.Node.objects.get(pk=nodeid)
-            tiles = tiles.filter(nodegroup_id=node.nodegroup_id)
+            tiles = tiles.filter(nodegroup__node=nodeid)
+        if include_display_values:
+            tiles = tiles.select_related("nodegroup").prefetch_related(
+                "nodegroup__node_set"
+            )
 
         for tile in tiles:
             if request.user.has_perm(perm, tile.nodegroup):
-                tile = Tile.objects.get(pk=tile.tileid)
                 tile.filter_by_perm(request.user, perm)
                 tile_dict = model_to_dict(tile)
                 if include_display_values:
                     tile_dict["display_values"] = []
-                    for node in models.Node.objects.filter(nodegroup=tile.nodegroup):
+                    for node in tile.nodegroup.node_set.all():
                         if str(node.nodeid) in tile.data:
                             datatype = datatype_factory.get_instance(node.datatype)
                             display_value = datatype.get_display_value(tile, node)
