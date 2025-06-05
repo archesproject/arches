@@ -216,7 +216,7 @@ class ReferenceDataType(BaseDataType):
                         labels.append(label.get("value", ""))
         return ", ".join(labels)
 
-    def get_interchange_value(self, value):
+    def get_interchange_value(self, value, **kwargs):
         """
         Expects tile representation of reference datatype:
         [
