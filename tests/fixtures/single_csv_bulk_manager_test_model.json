@@ -118,6 +118,7 @@
             "functions_x_graphs": [],
             "graphid": "1bc910b3-99dc-4a5c-8168-61c9e1975658",
             "iconclass": "",
+            "is_active": true,
             "is_editable": true,
             "isresource": true,
             "jsonldcontext": null,

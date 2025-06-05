@@ -456,6 +456,7 @@
             ],
             "graphid": "fd0a5907-e11b-11e8-821b-a4d18cec433a",
             "iconclass": "",
+            "is_active": true,
             "is_editable": false,
             "isactive": true,
             "isresource": true,

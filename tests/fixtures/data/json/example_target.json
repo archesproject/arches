@@ -231,6 +231,7 @@
         }
       ],
       "iconclass": "",
+      "is_active": true,
       "functions": [],
       "nodegroups": [
         {

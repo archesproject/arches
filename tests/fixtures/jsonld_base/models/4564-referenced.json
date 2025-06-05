@@ -50,6 +50,7 @@
                 "user_id": null
             },
             "iconclass": "",
+            "is_active": true,
             "is_editable": true,
             "isresource": true,
             "jsonldcontext": null,

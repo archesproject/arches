@@ -133,6 +133,7 @@
                 "user_id": null
             },
             "iconclass": "",
+            "is_active": true,
             "is_editable": false,
             "isresource": true,
             "jsonldcontext": null,

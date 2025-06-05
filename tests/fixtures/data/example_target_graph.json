@@ -230,6 +230,7 @@
                 }
             ],
             "iconclass": "",
+            "is_active": true,
             "functions": [],
             "nodegroups": [
                 {
@@ -679,7 +680,28 @@
                     "datatype": "geojson-feature-collection",
                     "nodegroup_id": "2b7d0a87-b8fb-11e6-84a5-026d961c88e6",
                     "graph_id": "99417385-b8fa-11e6-84a5-026d961c88e6",
-                    "config": {"pointColor": "rgba(130, 130, 130, 0.7)", "pointHaloColor": "rgba(200, 200, 200, 0.5)", "radius": 2, "haloRadius": 4, "lineColor": "rgba(130, 130, 130, 0.7)", "lineHaloColor": "rgba(200, 200, 200, 0.5)", "weight": 2, "haloWeight": 4, "fillColor": "rgba(130, 130, 130, 0.5)", "outlineColor": "rgba(200, 200, 200, 0.7)", "outlineWeight": 2, "layerActivated": true, "addToMap": false, "layerIcon": "", "layerName": "", "clusterDistance": 20, "clusterMaxZoom": 5, "clusterMinPoints": 3, "advancedStyling": false, "advancedStyle": ""},
+                    "config": {
+                        "pointColor": "rgba(130, 130, 130, 0.7)",
+                        "pointHaloColor": "rgba(200, 200, 200, 0.5)",
+                        "radius": 2,
+                        "haloRadius": 4,
+                        "lineColor": "rgba(130, 130, 130, 0.7)",
+                        "lineHaloColor": "rgba(200, 200, 200, 0.5)",
+                        "weight": 2,
+                        "haloWeight": 4,
+                        "fillColor": "rgba(130, 130, 130, 0.5)",
+                        "outlineColor": "rgba(200, 200, 200, 0.7)",
+                        "outlineWeight": 2,
+                        "layerActivated": true,
+                        "addToMap": false,
+                        "layerIcon": "",
+                        "layerName": "",
+                        "clusterDistance": 20,
+                        "clusterMaxZoom": 5,
+                        "clusterMinPoints": 3,
+                        "advancedStyling": false,
+                        "advancedStyle": ""
+                    },
                     "parentproperty": "P87_is_identified_by",
                     "name": "Spatial Coordinates Geometry"
                 },
