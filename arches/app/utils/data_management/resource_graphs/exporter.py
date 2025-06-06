@@ -148,19 +148,19 @@ def get_graphs_for_export(graphids=None):
         resource_graphs = (
             Graph.objects.all()
             .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-            .exclude(source_identifier__isnull=True)
+            .exclude(source_identifier__isnull=False)
         )
     elif graphids[0] == "resource_models":
         resource_graphs = (
             Graph.objects.filter(isresource=True)
             .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-            .exclude(source_identifier__isnull=True)
+            .exclude(source_identifier__isnull=False)
         )
     elif graphids[0] == "branches":
         resource_graphs = (
             Graph.objects.filter(isresource=False)
             .exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-            .exclude(source_identifier__isnull=True)
+            .exclude(source_identifier__isnull=False)
         )
     else:
         try:
