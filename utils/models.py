@@ -148,6 +148,8 @@ def get_node_value_expression_and_output_field(node):
             return KT(f"data__{node.pk}"), UUIDField()
         case "concept-list":
             return F(f"data__{node.pk}"), JSONField()
+        case "node-value":
+            return KT(f"data__{node.pk}"), UUIDField()
         case _:
             return F(f"data__{node.pk}"), TextField()
 
