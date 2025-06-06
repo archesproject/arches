@@ -26,6 +26,6 @@ class DataTypeFactory(datatypes.DataTypeFactory):
             instance = super().get_instance(datatype)
 
         if arches_version < (8, 0) and not hasattr(instance, "get_interchange_value"):
-            instance.get_interchange_value = lambda value: value
+            instance.get_interchange_value = lambda value, **kwargs: value
 
         return instance

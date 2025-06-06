@@ -58,29 +58,20 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
                 return [from_id_string(str(value.pk), value.graph_id)]
             raise
 
-    def get_display_value(self, tile, node):
-        # TODO(jtw): fix
-        return ResourceInstanceListDataType.get_display_value(self, tile, node)
-
     def to_json(self, tile, node):
-        return ResourceInstanceListDataType.to_json(self, tile, node)
+        details = self.get_details(tile, node)
+        return {
+            "@display_value": self.get_display_value(tile, node, details=details),
+            "@details": details,
+        }
 
-    def get_interchange_value(self, value, **kwargs):
-        if not value:
-            return None
-        return value[0]["resourceId"]
+    def get_display_value(self, tile, node, *, details=None, **kwargs):
+        if details is None:
+            details = self.get_details(tile, node)
+        return ", ".join([detail["display_value"] for detail in details])
 
-
-class ResourceInstanceListDataType(datatypes.ResourceInstanceListDataType):
-    def transform_value_for_tile(self, value, **kwargs):
-        # TODO(jtw): fix
-        return ResourceInstanceDataType.transform_value_for_tile(self, value, **kwargs)
-
-    def to_json(self, tile, node):
-        return {"@display_value": self.get_display_value(tile, node)}
-
-    def get_display_value(self, tile, node, **kwargs):
-        display_values = []
+    def get_details(self, tile, node):
+        resource_details = []
         for inner_val in tile.data.get(str(node.nodeid)) or []:
             if not inner_val:
                 continue
@@ -111,15 +102,42 @@ class ResourceInstanceListDataType(datatypes.ResourceInstanceListDataType):
                     except models.ResourceInstance.DoesNotExist:
                         msg = f"Missing ResourceXResource target: {to_resource_id}"
                         logger.warning(msg)
-                        display_values.append(_("Missing"))
+                        resource_details.append(
+                            {
+                                "resourceId": to_resource_id,
+                                "display_value": _("Missing"),
+                            }
+                        )
                         break
-                    display_val = to_resource.descriptors[lang]["name"]
-                    display_values.append(display_val)
+                    # TODO: gracefully handle missing language.
+                    display_value = to_resource.descriptors[lang]["name"]
+                    resource_details.append(
+                        {
+                            "resourceId": to_resource_id,
+                            "display_value": display_value,
+                        }
+                    )
                     break
 
-        return ", ".join(display_values)
+        return resource_details
 
-    def get_interchange_value(self, value, **kwargs):
+    def get_interchange_value(self, value, *, details, **kwargs):
         if not value:
-            return None
-        return [inner["resourceId"] for inner in value]
+            return []
+        if details is None:
+            self.get_details(value)
+        resource_display_value_map = {
+            str(detail["resourceId"]): detail["display_value"] for detail in details
+        }
+        return [
+            {
+                "resourceId": inner["resourceId"],
+                "display_value": resource_display_value_map[inner["resourceId"]],
+            }
+            for inner in value
+        ]
+
+
+class ResourceInstanceListDataType(ResourceInstanceDataType):
+    def collects_multiple_values(self):
+        return True

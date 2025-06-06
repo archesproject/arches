@@ -227,11 +227,12 @@ class SemanticTileQuerySet(models.QuerySet):
             # seen problems in the wild.
             if str(node.pk) not in tile.data:
                 tile.data[str(node.pk)] = None
+            compiled_json = datatype_instance.to_json(tile, node)
             instance_val = {
-                "display_value": datatype_instance.to_json(tile, node)[
-                    "@display_value"
-                ],
-                "interchange_value": datatype_instance.get_interchange_value(node_val),
+                "display_value": compiled_json["@display_value"],
+                "interchange_value": datatype_instance.get_interchange_value(
+                    node_val, details=compiled_json.get("@details")
+                ),
             }
             if instance_val["display_value"] in (None, ""):
                 # TODO: upstream this into datatype methods.
