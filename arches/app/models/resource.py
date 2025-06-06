@@ -329,7 +329,7 @@ class Resource(models.ResourceInstance):
             ).select_related("function")
         ]:
             try:
-                function.update_lifecycle_state(
+                function.on_update_lifecycle_state(
                     self,
                     current_state=current_lifecycle_state,
                     new_state=self.resource_instance_lifecycle_state,

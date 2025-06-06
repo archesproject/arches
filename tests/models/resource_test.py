@@ -346,10 +346,10 @@ class ResourceTests(ArchesTestCase):
             True,
         )
 
-    @patch("arches.app.functions.base.BaseFunction.update_lifecycle_state")
-    def test_run_lifecycle_functions(self, mock_update_lifecycle_state):
+    @patch("arches.app.functions.base.BaseFunction.on_update_lifecycle_state")
+    def test_run_lifecycle_functions(self, mock_on_update_lifecycle_state):
         self.test_resource.run_lifecycle_handlers(self.state2)
-        mock_update_lifecycle_state.assert_called_once()
+        mock_on_update_lifecycle_state.assert_called_once()
 
     def test_get_node_value_string(self):
         """
