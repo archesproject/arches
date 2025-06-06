@@ -39,6 +39,8 @@ from pyld.jsonld import compact, JsonLdError
 from django.utils import translation
 from guardian.models import GroupObjectPermission, UserObjectPermission
 
+from arches.app.models.fields.i18n import I18n_JSON
+
 logger = logging.getLogger(__name__)
 
 
@@ -923,7 +925,10 @@ class Graph(models.GraphModel):
         Replaces node, nodegroup, card, and formids in configuration json objects during
         graph cloning/copying
         """
-        str_forms_config = json.dumps(config)
+        if isinstance(config, I18n_JSON):
+            str_forms_config = str(config)
+        else:
+            str_forms_config = json.dumps(config)
         for map in maps:
             for k, v in map.items():
                 str_forms_config = str_forms_config.replace(str(k), str(v))

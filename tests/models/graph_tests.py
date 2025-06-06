@@ -1551,6 +1551,62 @@ class GraphTests(ArchesTestCase):
             "rgba(200, 130, 130, 0.7)",
         )
 
+    def test_node_configs_updated(self):
+        """
+        test to ensure node configs are updated when a draft graph is created
+
+        """
+        models.GraphModel.objects.create(
+            **{
+                "name": "Test Graph",
+                "graphid": "49a7eea8-2e2b-48e3-8b6e-650f25ec2954",
+                "isresource": True,
+                "slug": "test-graph",
+            }
+        )
+
+        models.NodeGroup.objects.create(pk="88677159-dccf-4629-9210-f6a2a7463552")
+
+        models.Node.objects.create(
+            **{
+                "name": "Top Node",
+                "graph_id": "49a7eea8-2e2b-48e3-8b6e-650f25ec2954",
+                "datatype": "semantic",
+                "istopnode": True,
+                "nodeid": "c1257d42-9275-40df-835e-5b99eee818fa",
+            }
+        )
+
+        models.Node.objects.create(
+            **{
+                "name": "GeoJSON Node",
+                "graph_id": "49a7eea8-2e2b-48e3-8b6e-650f25ec2954",
+                "datatype": "geojson-feature-collection",
+                "istopnode": False,
+                "config": {
+                    "fillColor": "rgba(130, 130, 130, 0.7)",
+                    "nodeid": "c1257d42-9275-40df-835e-5b99eee818fa",
+                },
+                "nodeid": "88677159-dccf-4629-9210-f6a2a7463552",
+                "nodegroup_id": "88677159-dccf-4629-9210-f6a2a7463552",
+            }
+        )
+
+        graph = Graph.objects.get(pk="49a7eea8-2e2b-48e3-8b6e-650f25ec2954")
+        graph.create_draft_graph()
+
+        draft_graph = Graph.objects.get(slug="test-graph", source_identifier=graph.pk)
+        original_geo_node = graph.node_set.get(name="GeoJSON Node")
+        draft_node = draft_graph.node_set.get(name="GeoJSON Node")
+        draft_top_node = draft_graph.node_set.get(name="Top Node")
+
+        # config for node ids should be different between draft and original
+        self.assertNotEqual(
+            original_geo_node.config["nodeid"], draft_node.config["nodeid"]
+        )
+        # node configs should be updated per the new node mapping
+        self.assertEqual(draft_node.config["nodeid"], str(draft_top_node.nodeid))
+
 
 class DraftGraphTests(ArchesTestCase):
     @classmethod
