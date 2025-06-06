@@ -228,6 +228,7 @@ class SemanticTileQuerySet(models.QuerySet):
             if str(node.pk) not in tile.data:
                 tile.data[str(node.pk)] = None
             compiled_json = datatype_instance.to_json(tile, node)
+            # TODO: Evaluate if there is drift between provisional edits here.
             instance_val = {
                 "display_value": compiled_json["@display_value"],
                 "interchange_value": datatype_instance.get_interchange_value(
@@ -239,13 +240,7 @@ class SemanticTileQuerySet(models.QuerySet):
                 instance_val["display_value"] = _("(Empty)")
         else:
             if hasattr(datatype_instance, "to_python"):
-                instance_val = datatype_instance.to_python(node_val)
-            elif node.datatype == "resource-instance":
-                # TODO: move, once dust settles.
-                if node_val is None or len(node_val) != 1:
-                    instance_val = node_val
-                else:
-                    instance_val = node_val[0]
+                instance_val = datatype_instance.to_python(node_val, tile=tile)
             else:
                 instance_val = node_val
 
