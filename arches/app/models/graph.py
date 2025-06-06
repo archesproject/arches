@@ -1106,6 +1106,11 @@ class Graph(models.GraphModel):
 
                 copied_card.config["sortedWidgetIds"] = sorted_widget_ids
 
+        for node in copy_of_self.nodes.values():
+            node.config = self.replace_config_ids(
+                node.config, [node_map, nodegroup_map]
+            )
+
         return {
             "copy": copy_of_self,
             "cards": card_map,
@@ -2499,6 +2504,10 @@ class Graph(models.GraphModel):
             if serialized_node["source_identifier_id"]:
                 serialized_node["nodeid"] = serialized_node["source_identifier_id"]
                 serialized_node["source_identifier_id"] = None
+
+            serialized_node["config"] = self.replace_config_ids(
+                serialized_node["config"], [node_id_to_node_source_identifier_id]
+            )
 
             updated_nodegroup_id = node_id_to_node_source_identifier_id.get(
                 serialized_node["nodegroup_id"]
