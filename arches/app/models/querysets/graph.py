@@ -4,15 +4,11 @@ import uuid
 from django.utils.translation import gettext as _
 from django.db import models
 
+from arches.app.models.system_settings import settings
 from arches.app.models.utils import make_name_unique
 
 
-class GraphQuerySet(models.QuerySet):
-    def create(self, *args, **kwargs):
-        raise NotImplementedError(
-            "Use create_graph() to create new Graph instances with proper business logic."
-        )
-
+class GraphModelQuerySet(models.QuerySet):
     def generate_slug(self, name, is_resource):
         if name:
             slug = slugify(name, separator="_")
@@ -83,3 +79,39 @@ class GraphQuerySet(models.QuerySet):
 
         # ensures entity returned matches database entity
         return self.get(pk=graph_model.graphid)
+
+    def filter_active(self, is_active=True):
+        return self.filter(is_active=is_active)
+
+    def filter_drafts(self, is_draft=True):
+        return self.filter(source_identifier__isnull=not is_draft)
+
+    def exclude_system_settings(self):
+        return self.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+
+    def get_current_graphs(self, exclude_system_settings=True, exclude_inactive=True):
+        query_set = self.filter(isresource=True).filter_drafts(is_draft=False)
+        if exclude_system_settings:
+            query_set = query_set.exclude_system_settings()
+        if exclude_inactive:
+            query_set = query_set.filter_active()
+        return query_set
+
+    def get_resource_models(self, exclude_system_settings=True, exclude_inactive=True):
+        return self.get_current_graphs(
+            exclude_system_settings=exclude_system_settings,
+            exclude_inactive=exclude_inactive,
+        ).filter(isresource=True)
+
+    def get_branches(self, exclude_system_settings=True, exclude_inactive=True):
+        return self.get_current_graphs(
+            exclude_system_settings=exclude_system_settings,
+            exclude_inactive=exclude_inactive,
+        ).filter(isresource=False)
+
+
+class GraphQuerySet(GraphModelQuerySet):
+    def create(self, *args, **kwargs):
+        raise NotImplementedError(
+            "Use create_graph() to create new Graph instances with proper business logic."
+        )
