@@ -8,6 +8,8 @@ import semantic_version
 from datetime import datetime, timedelta
 from django.utils.translation import gettext_lazy as _
 
+from arches import VERSION as arches_version
+
 try:
     from arches.settings import *
 except ImportError:
@@ -143,10 +145,17 @@ INSTALLED_APPS = (
     "corsheaders",
     "oauth2_provider",
     "django_celery_results",
-    "pgtrigger",
     # "silk",
     "arches_querysets",  # Ensure the project is listed before any other arches applications
 )
+
+if arches_version >= (8, 0):
+    INSTALLED_APPS += (
+        "django_recaptcha",
+        "pgtrigger",
+    )
+else:
+    INSTALLED_APPS += ("captcha",)
 
 # Placing this last ensures any templates provided by Arches Applications
 # take precedence over core arches templates in arches/app/templates.
