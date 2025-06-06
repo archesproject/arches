@@ -926,7 +926,9 @@ class Graph(models.GraphModel):
         graph cloning/copying
         """
         if isinstance(config, I18n_JSON):
-            str_forms_config = str(config)
+            str_forms_config = JSONSerializer().serialize(
+                config.serialize(use_raw_i18n_json=True)
+            )
         else:
             str_forms_config = json.dumps(config)
         for map in maps:
