@@ -1,3 +1,4 @@
+import hashlib
 import os
 import datetime
 
@@ -33,7 +34,11 @@ class JsonLDImportTests(ArchesTestCase):
         cls.token = "abc123"
         cls.client = Client(HTTP_AUTHORIZATION="Bearer %s" % cls.token)
 
-        sql_str = CREATE_TOKEN_SQL.format(token=cls.token, user_id=1)
+        sql_str = CREATE_TOKEN_SQL.format(
+            token=cls.token,
+            user_id=1,
+            token_checksum=hashlib.sha256(cls.token.encode("utf-8")).hexdigest(),
+        )
         with connection.cursor() as cursor:
             cursor.execute(sql_str)
 

@@ -45,8 +45,8 @@ OAUTH_CLIENT_SECRET = "7fos0s7qIhFqUmalDI1QiiYj0rAtEdVMY4hYQDQjOxltbRCBW3dIydOeM
         ap9Ke2aaAZaeMPejzafPSj96ID"
 CREATE_TOKEN_SQL = """
         INSERT INTO public.oauth2_provider_accesstoken(
-            token, expires, scope, application_id, user_id, created, updated)
-            VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018');
+            token, expires, scope, application_id, user_id, created, updated, token_checksum)
+            VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018', '{token_checksum}');
     """
 DELETE_TOKEN_SQL = (
     "DELETE FROM public.oauth2_provider_accesstoken WHERE application_id = 44;"

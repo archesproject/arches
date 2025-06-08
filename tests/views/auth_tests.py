@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import base64
+import hashlib
 from tests.base_test import (
     ArchesTestCase,
     OAUTH_CLIENT_ID,
@@ -62,7 +63,11 @@ class AuthTests(ArchesTestCase):
         cls.oauth_client_id = OAUTH_CLIENT_ID
         cls.oauth_client_secret = OAUTH_CLIENT_SECRET
 
-        sql_str = CREATE_TOKEN_SQL.format(token=cls.token, user_id=cls.user.pk)
+        sql_str = CREATE_TOKEN_SQL.format(
+            token=cls.token,
+            user_id=cls.user.pk,
+            token_checksum=hashlib.sha256(cls.token.encode("utf-8")).hexdigest(),
+        )
         with connection.cursor() as cursor:
             cursor.execute(sql_str)
 
