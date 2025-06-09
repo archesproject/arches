@@ -29,6 +29,11 @@ def resource_instance_list_to_json(self, tile, node):
         return []
     ret = []
 
+    def handle_missing_data(to_resource_id, copy):
+        msg = f"Missing ResourceXResource target: {to_resource_id}"
+        logger.warning(msg)
+        copy["display_value"] = _("Missing")
+
     for inner_val in data.get(str(node.nodeid)):
         if not inner_val:
             continue
@@ -56,9 +61,10 @@ def resource_instance_list_to_json(self, tile, node):
                         else rxr.to_resource
                     )
                 except models.ResourceInstance.DoesNotExist:
-                    msg = f"Missing ResourceXResource target: {to_resource_id}"
-                    logger.warning(msg)
-                    copy["display_value"] = _("Missing")
+                    handle_missing_data(to_resource_id, copy)
+                    break
+                if to_resource is None:
+                    handle_missing_data(to_resource_id, copy)
                     break
                 display_val = to_resource.descriptors[lang]["name"]
                 copy["display_value"] = display_val
