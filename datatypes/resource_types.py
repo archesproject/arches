@@ -87,6 +87,10 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
             else:
                 rxrs = tile.resourceinstance.resxres_resource_instance_ids_from.all()
 
+        def handle_missing_data(to_resource_id):
+            msg = f"Missing ResourceXResource target: {to_resource_id}"
+            logger.warning(msg)
+
         for inner_val in value:
             if not inner_val:
                 continue
@@ -104,8 +108,10 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
                             else rxr.to_resource
                         )
                     except models.ResourceInstance.DoesNotExist:
-                        msg = f"Missing ResourceXResource target: {to_resource_id}"
-                        logger.warning(msg)
+                        handle_missing_data(to_resource_id)
+                        break
+                    if to_resource is None:
+                        handle_missing_data(to_resource_id)
                         break
                     related_resources.append(to_resource)
                     break
