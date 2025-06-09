@@ -14,10 +14,8 @@ class StringDataType(datatypes.StringDataType):
             return self.compile_json(tile, node)
         return {"@display_value": None}
 
-    def resolve(self, value):
+    def resolve(self, value: dict):
         """Resolve localized values to a single one."""
-        if not value or not isinstance(value, dict):
-            return ""
         lang_val_pairs = [(lang, obj["value"]) for lang, obj in value.items()]
         if not lang_val_pairs:
             return
@@ -29,4 +27,6 @@ class StringDataType(datatypes.StringDataType):
         return ranked[0][1]
 
     def get_interchange_value(self, value, **kwargs):
-        return self.resolve(value)
+        if not value or not isinstance(value, dict):
+            return {}
+        return value
