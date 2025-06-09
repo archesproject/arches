@@ -148,6 +148,8 @@ class BulkTileOperation:
             new_tiles = aliased_data.get(grouping_node.alias, NOT_PROVIDED)
         else:
             new_tiles = getattr(aliased_data, grouping_node.alias, NOT_PROVIDED)
+        if new_tiles is NOT_PROVIDED:
+            return
         # Is this grouping node the entry point?
         if (
             isinstance(self.entry, SemanticTile)
