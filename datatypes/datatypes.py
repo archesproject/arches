@@ -28,7 +28,9 @@ class Reference:
 
 
 class ReferenceDataType(BaseDataType):
-    def to_python(self, value: Iterable[Mapping] | None) -> list[Reference] | None:
+    def to_python(
+        self, value: Iterable[Mapping] | None, **kwargs
+    ) -> list[Reference] | None:
         if not value:
             return None
 
