@@ -457,7 +457,9 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     def build_relational_field(self, field_name, relation_info):
         ret = super().build_relational_field(field_name, relation_info)
         if arches_version >= (8, 0) and field_name == "graph":
-            ret[1]["queryset"] = ret[1]["queryset"].filter(draft__slug=self.graph_slug)
+            ret[1]["queryset"] = ret[1]["queryset"].filter(
+                slug=self.graph_slug, source_identifier=None
+            )
         return ret
 
     def validate(self, attrs):
