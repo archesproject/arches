@@ -18,9 +18,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import json
 import os
+import uuid
 
 from tests.base_test import ArchesTestCase
+from tests.utils.permission_test_utils import add_users
 from django.urls import reverse
+from django.contrib.auth.models import User
 from django.core import management
 from django.test.client import RequestFactory
 from django.test.utils import captured_stdout
@@ -38,10 +41,24 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 class ResourceAPITests(ArchesTestCase):
     graph_fixtures = ["Data_Type_Model"]
     data_type_graphid = "330802c5-95bd-11e8-b7ac-acde48001122"
+    non_legacy_resource_instanceid = "eb817333-2010-4cf5-a6e9-88003bfa8b64"
 
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        add_users()
+
+        # add resource and tile not sourced from legacy_load_testing_package
+        cls.non_legacy_resource = Resource.objects.create(
+            pk=uuid.UUID(cls.non_legacy_resource_instanceid),
+            graph_id=cls.data_type_graphid,
+        )
+        models.TileModel.objects.create(
+            nodegroup_id=uuid.UUID("e7364d1e-95c4-11e8-9e7c-acde48001122"),
+            data={"f08a3057-95c4-11e8-9761-acde48001122": 55},
+            resourceinstance=cls.non_legacy_resource,
+        )
+
         cls.legacy_load_testing_package()
         with open(
             os.path.join("tests/fixtures/resource_graphs/unique_graph_shape.json"), "r"
@@ -559,3 +576,14 @@ class ResourceAPITests(ArchesTestCase):
         resp2 = json.loads(response2.content)
         graph_count_after = len(resp2["related_resources"]["node_config_lookup"])
         self.assertEqual(graph_count_after, graph_count_before - 1)
+
+    def test_bulk_disambiguated_resource_endpoint(self):
+        user = User.objects.get(username="ben")
+        self.client.force_login(user)
+        response = self.client.get(
+            reverse("api_bulk_disambiguated_resource_instance"),
+            QUERY_STRING=f"resource_ids={self.non_legacy_resource_instanceid}",
+        )
+        self.assertTrue(
+            response.json()[str(self.non_legacy_resource_instanceid)] is not None
+        )

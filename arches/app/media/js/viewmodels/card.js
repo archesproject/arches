@@ -9,9 +9,10 @@ define([
     'require',
     'uuid',
     'utils/dispose',
+    'viewmodels/alert',
     'viewmodels/tile',
     'utils/set-csrf-token'
-], function($, _, ko, koMapping, arches,  CardModel, CardWidgetModel, require, uuid, dispose) {
+], function($, _, ko, koMapping, arches,  CardModel, CardWidgetModel, require, uuid, dispose, AlertViewModel) {
     /**
     * A viewmodel used for generic cards
     *
@@ -257,7 +258,8 @@ define([
                         perms: perms,
                         permsLiteral: permsLiteral,
                         parentCard: self,
-                        topCards: params.topCards
+                        topCards: params.topCards,
+                        pageVm: params.pageVm,
                     });
                 })
             ),
@@ -325,7 +327,7 @@ define([
                     }
                 });
             },
-            reorderCards: function() {
+            reorderCards: function(e) {
                 loading(true);
                 var cards = _.map(self.cards(), function(card, i) {
                     card.model.get('sortorder')(i);
@@ -343,6 +345,22 @@ define([
                     url: arches.urls.reorder_cards,
                     complete: function() {
                         loading(false);
+                    },
+                    error: function(response) {
+                        params.pageVm.alert(
+                            new AlertViewModel(
+                                'ep-alert-red',
+                                response.responseJSON.title,
+                                response.responseJSON.message,
+                                null,
+                                function(){}
+                            )
+                        );
+                        const undoSort = (array, sourceIndex, targetIndex) => {
+                            const [movedItem] = array.splice(targetIndex, 1);
+                            array.splice(sourceIndex, 0, movedItem);
+                        };
+                        undoSort(self.cards, e.sourceIndex, e.targetIndex);
                     }
                 });
             },

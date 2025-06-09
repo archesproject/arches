@@ -508,6 +508,7 @@ class Command(BaseCommand):
             for nodeid in t.data.keys():
                 datatype = self.node_info[nodeid]["datatype"]
                 datatype.pre_tile_save(t, nodeid)
+                datatype.post_tile_save(t, nodeid, None)
         for resource in self.resources:
             resource.save_edit(edit_type="create")
 

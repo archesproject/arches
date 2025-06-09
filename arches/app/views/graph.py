@@ -30,7 +30,7 @@ from django.http import HttpResponseNotFound, HttpResponse
 from django.views.generic import View, TemplateView
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from arches.app.utils.decorators import group_required
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.response import JSONResponse, JSONErrorResponse
@@ -555,7 +555,21 @@ class GraphDataView(View):
                                 for node in data["nodes"]:
                                     no = models.Node.objects.get(pk=node["nodeid"])
                                     no.sortorder = sortorder
-                                    no.save()
+                                    try:
+                                        if no.graph.publication_id == None:
+                                            no.save()
+                                        else:
+                                            ret = {
+                                                "title": _("Unable to Save Graph"),
+                                                "message": _(
+                                                    "You cannot edit a published graph.  Please unpublish the graph before editing."
+                                                ),
+                                            }
+                                            raise ValidationError(ret)
+                                    except ValidationError as e:
+                                        return JSONErrorResponse(
+                                            content=e.args[0], status=403
+                                        )
                                     sortorder = sortorder + 1
                             ret = data
 
@@ -678,16 +692,22 @@ class CardView(GraphBaseView):
         if self.action == "update_card":
             if data:
                 card = Card(data)
-                card.save()
-                return JSONResponse(card)
+                try:
+                    card.save()
+                    return JSONResponse(card)
+                except ValidationError as e:
+                    return JSONErrorResponse(content=e.args[0], status=403)
 
         if self.action == "reorder_cards":
             if "cards" in data and len(data["cards"]) > 0:
                 with transaction.atomic():
                     for card_data in data["cards"]:
-                        card = models.CardModel.objects.get(pk=card_data["id"])
+                        card = Card.objects.get(pk=card_data["id"])
                         card.sortorder = card_data["sortorder"]
-                        card.save()
+                        try:
+                            card.save()
+                        except ValidationError as e:
+                            return JSONErrorResponse(content=e.args[0], status=403)
                 return JSONResponse(data["cards"])
 
         return HttpResponseNotFound()
