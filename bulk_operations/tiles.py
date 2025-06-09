@@ -88,9 +88,11 @@ class BulkTileOperation:
         try:
             self._persist()
         except ProgrammingError as e:
-            if isinstance(self.entry, TileModel):
-                nodegroup_alias = self.entry.find_nodegroup_alias()
             if e.args and "excess_tiles" in e.args[0]:
+                nodegroup_id = e.args[0].split("nodegroupid: ")[1].split(",")[0]
+                nodegroup_alias = self.grouping_nodes_by_nodegroup_id[
+                    uuid.UUID(nodegroup_id)
+                ].alias
                 msg = _("Tile Cardinality Error")
                 raise ValidationError({nodegroup_alias: msg}) from e
             raise
