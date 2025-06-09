@@ -70,9 +70,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options["graphs"]:
-            self.graphs = [
-                Graph(graphid.strip()) for graphid in options["graphs"].split(",")
-            ]
+            self.graphs = Graph.objects.filter(
+                graphid__in=[
+                    graphid.strip() for graphid in options["graphs"].split(",")
+                ]
+            )
         else:
             self.graphs = Graph.objects.filter(isresource=True).exclude(
                 source_identifier__isnull=False
