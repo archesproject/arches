@@ -7,12 +7,15 @@ from django.db.migrations.serializer import BaseSerializer, Serializer
 from django.db.models import JSONField
 from django.db.models.sql import Query
 from django.db.models.sql.compiler import SQLInsertCompiler, SQLUpdateCompiler
-from django.db.models.sql.where import NothingNode
 from django.utils.translation import get_language
 
 
-class I18n_String(NothingNode):
-    """Subclassing NothingNode works around https://code.djangoproject.com/ticket/34745."""
+class I18n_String:
+    # Add attributes until https://github.com/archesproject/arches/issues/9840
+    contains_aggregate = False
+    contains_over_clause = False
+    contains_column_references = False
+    possibly_multivalued = False
 
     def __init__(self, value=None, lang=None, use_nulls=False, attname=None):
         self.attname = attname
@@ -53,6 +56,15 @@ class I18n_String(NothingNode):
             ret = value
         self.raw_value = ret
 
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
+    ):
+        """
+        Django needs this method to recognize this as both Resolvable & Compilable.
+        https://forum.djangoproject.com/t/revisiting-types-in-django-dep-14/37832/11
+        """
+        return self
+
     def as_sql(self, compiler, connection):
         """
         The "as_sql" method of this class is called by Django when the sql statement
@@ -65,6 +77,8 @@ class I18n_String(NothingNode):
         if (self.value_is_primitive or self.value is None) and isinstance(
             compiler, SQLUpdateCompiler
         ):
+            if self.value is None and not self.use_nulls:
+                self.value = ""
             self.sql = "jsonb_set(" + self.attname + ", %s, %s)"
             params = (f"{{{self.lang}}}", json.dumps(self.value))
         else:
@@ -229,7 +243,13 @@ class I18n_TextField(JSONField):
         return super().get_db_prep_save(value, connection)
 
 
-class I18n_JSON(NothingNode):
+class I18n_JSON:
+    # Add attributes until https://github.com/archesproject/arches/issues/9840
+    contains_aggregate = False
+    contains_over_clause = False
+    contains_column_references = False
+    possibly_multivalued = False
+
     def __init__(self, value=None, lang=None, use_nulls=False, attname=None):
         self.attname = attname
         self.value = value
@@ -265,11 +285,20 @@ class I18n_JSON(NothingNode):
         except:
             pass
 
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
+    ):
+        """
+        Django needs this method to recognize this as both Resolvable & Compilable.
+        https://forum.djangoproject.com/t/revisiting-types-in-django-dep-14/37832/11
+        """
+        return self
+
     def as_sql(self, compiler, connection):
         """
         The "as_sql" method of this class is called by Django when the sql statement
         for each field in a model instance is being generated.
-        If we're inserting a new value then we can just set the localzed column to the json object.
+        If we're inserting a new value then we can just set the localized column to the json object.
         If we're updating a value for a specific language, then use the postgres "jsonb_set" command to do that
         https://www.postgresql.org/docs/9.5/functions-json.html
 

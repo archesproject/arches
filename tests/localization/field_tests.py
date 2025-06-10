@@ -8,7 +8,7 @@ from arches.app.models.fields.i18n import (
     I18n_JSON,
     I18n_JSONField,
 )
-from arches.app.models.models import Node
+from arches.app.models.models import CardModel, Node
 from tests.base_test import ArchesTestCase
 from django.contrib.gis.db import models
 from django.utils import translation
@@ -233,6 +233,34 @@ class Customi18nTextFieldTests(ArchesTestCase):
         self.assertEqual(value, "precisely")
         translation.activate("de")
         self.assertEqual(value, "genau")
+
+    def test_bulk_update_heterogenous_values(self):
+        new_names = [
+            I18n_String(
+                {
+                    "en": "some",
+                    "zh": "json",
+                }
+            ),
+            I18n_String({}),
+            None,
+        ]
+        for_bulk_update = []
+        for i, dt in enumerate(CardModel.objects.all()[:3]):
+            dt.name = new_names[i]
+            for_bulk_update.append(dt)
+
+        CardModel.objects.bulk_update(for_bulk_update, fields=["name"])
+
+        for i, obj in enumerate(for_bulk_update):
+            # None is transformed to {}.
+            new_name_as_string = str(new_names[i] or {})
+            with self.subTest(new_name=new_name_as_string):
+                obj.refresh_from_db()
+                self.assertEqual(
+                    str(obj.name.raw_value).replace("'", '"'),
+                    new_name_as_string.replace("'", '"'),
+                )
 
 
 class Customi18nJSONFieldTests(ArchesTestCase):
@@ -467,8 +495,8 @@ class I18nJSONFieldBulkUpdateTests(ArchesTestCase):
         DDataType.objects.bulk_update(for_bulk_update, fields=["defaultconfig"])
 
         for i, obj in enumerate(for_bulk_update):
-            # None is transformed to {"en": ""}.
-            new_config_as_string = str(new_configs[i] or {"en": ""})
+            # None is transformed to {}.
+            new_config_as_string = str(new_configs[i] or {})
             with self.subTest(new_config=new_config_as_string):
                 obj.refresh_from_db()
                 self.assertEqual(
