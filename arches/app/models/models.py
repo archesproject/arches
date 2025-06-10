@@ -24,7 +24,11 @@ from arches.app.const import ExtensionType
 from arches.app.models.fields.i18n import I18n_TextField, I18n_JSONField
 from arches.app.models.mixins import SaveSupportsBlindOverwriteMixin
 from arches.app.models.query_expressions import UUID4
-from arches.app.models.utils import add_to_update_fields, format_file_into_sql
+from arches.app.models.utils import (
+    add_to_update_fields,
+    format_file_into_sql,
+    get_system_settings_resource_model_id,
+)
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.module_importer import get_class_from_modulename
 from arches.app.utils.storage_filename_generator import get_filename
@@ -348,6 +352,12 @@ class EditLog(SaveSupportsBlindOverwriteMixin, models.Model):
         indexes = [
             models.Index(fields=["transactionid"]),
             models.Index(fields=["resourceinstanceid"]),
+            models.Index(
+                fields=["timestamp"],
+                name="edit_log_timestamp_idx",
+                condition=~Q(resourceclassid=get_system_settings_resource_model_id)
+                & ~Q(note="resource creation"),
+            ),
         ]
 
 

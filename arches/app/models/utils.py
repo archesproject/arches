@@ -45,3 +45,9 @@ def format_file_into_sql(file: str, sql_dir: str):
     with open(sql_file) as file:
         sql_string = sql_string + "\n" + file.read()
     return sql_string
+
+
+def get_system_settings_resource_model_id():
+    from arches.app.models.system_settings import SystemSettings
+
+    return SystemSettings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
