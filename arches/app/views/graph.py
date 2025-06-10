@@ -925,7 +925,7 @@ class FunctionManagerView(GraphBaseView):
     action = ""
 
     def get(self, request, graphid):
-        self.graph = Graph.objects.get(source_identifier_id=graphid)
+        self.graph = Graph.objects.get(graphid=graphid)
 
         if self.graph.isresource:
             context = self.get_context_data(

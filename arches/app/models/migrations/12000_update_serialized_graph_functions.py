@@ -6,7 +6,7 @@ from django.db import migrations
 # This migration is necessary to maintain compatibility with existing 7.6.x published graphs.
 class Migration(migrations.Migration):
 
-    dependencies = [("models", "12103_alter_node_graph")]
+    dependencies = [("models", "10887_loadstaging_nodegroup_nullable")]
 
     forward = r"""
         UPDATE published_graphs
