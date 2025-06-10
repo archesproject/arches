@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import json
 import logging
 import uuid
+from contextlib import contextmanager
 from copy import deepcopy
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
@@ -1606,6 +1607,35 @@ class Graph(models.GraphModel):
                     pass
             return list(nodegroups)
 
+    @contextmanager
+    @transaction.atomic
+    def preserve_staging_records(self):
+        nodegroups = self.get_nodegroups(force_recalculation=True)
+        error_query = models.LoadErrors.objects.filter(nodegroup__in=nodegroups)
+        staging_query = models.LoadStaging.objects.filter(nodegroup__in=nodegroups)
+        error_objs = set(error_query)
+        staging_objs = set(staging_query)
+        error_query.update(nodegroup=None)
+        staging_query.update(nodegroup=None)
+
+        try:
+            yield
+        finally:
+            # Restore the nodegroup references that still exist.
+            all_nodegroup_ids = models.NodeGroup.objects.values_list("pk", flat=True)
+            valid_errors = {
+                obj for obj in error_objs if obj.nodegroup_id in all_nodegroup_ids
+            }
+            valid_stagings = {
+                obj for obj in staging_objs if obj.nodegroup_id in all_nodegroup_ids
+            }
+            invalid_errors = error_objs - valid_errors
+            invalid_stagings = staging_objs - valid_stagings
+            models.LoadErrors.objects.bulk_update(valid_errors, fields=["nodegroup"])
+            models.LoadStaging.objects.bulk_update(valid_stagings, fields=["nodegroup"])
+            models.LoadErrors.objects.filter(pk__in=invalid_errors).delete()
+            models.LoadStaging.objects.filter(pk__in=invalid_stagings).delete()
+
     def update_permissions_from_serialized_graph(self, serialized_graph):
         if (
             "user_permissions" in serialized_graph
@@ -2642,7 +2672,7 @@ class Graph(models.GraphModel):
         """
         Restores a Graph's state from a serialized graph
         """
-        with transaction.atomic():
+        with transaction.atomic(), self.preserve_staging_records():
             self.delete_associated_entities()
 
             for serialized_nodegroup in serialized_graph["nodegroups"]:

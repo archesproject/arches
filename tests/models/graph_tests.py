@@ -26,7 +26,6 @@ from arches.app.const import IntegrityCheck
 from arches.app.models import models
 from arches.app.models.graph import Graph, GraphValidationError
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.models.fields.i18n import I18n_JSONField
 from tests.base_test import ArchesTestCase
 
 # these tests can be run from the command line via
@@ -1992,6 +1991,49 @@ class DraftGraphTests(ArchesTestCase):
 
         self.assertFalse(restored_source_graph.has_unpublished_changes)
         self.assertEqual(restored_source_graph.name, "TEST RESOURCE")
+
+    def test_bulk_data_manager_records_preserved_on_state_restoration(self):
+        source_graph = Graph.objects.create_graph(
+            name="TEST RESOURCE",
+            is_resource=True,
+        )
+        draft_graph = source_graph.get_draft_graph()
+        admin = User.objects.get(username="admin")
+
+        result = draft_graph.append_node()
+        result["node"].datatype = "number"
+        draft_graph.save()
+        updated_source_graph = source_graph.promote_draft_graph_to_active_graph()
+        updated_source_graph.publish(user=admin)
+
+        # Record bulk data manager history.
+        nodegroup = models.NodeGroup.objects.get(
+            node__graph=source_graph, node__datatype="number"
+        )
+        event = models.LoadEvent.objects.create(
+            etl_module=models.ETLModule.objects.first(), user=admin
+        )
+        load_errors = models.LoadErrors.objects.create(
+            load_event=event, nodegroup=nodegroup
+        )
+        load_staging = models.LoadStaging.objects.create(
+            load_event=event, nodegroup=nodegroup
+        )
+
+        published_graph = models.PublishedGraph.objects.get(
+            publication=updated_source_graph.publication,
+            language="en",
+        )
+
+        updated_source_graph.restore_state_from_serialized_graph(
+            published_graph.serialized_graph
+        )
+
+        # The bulk data manager history still exists.
+        load_errors.refresh_from_db()
+        self.assertEqual(load_errors.nodegroup, nodegroup)
+        load_staging.refresh_from_db()
+        self.assertEqual(load_staging.nodegroup, nodegroup)
 
     @mock.patch("arches.app.search.search.SearchEngine.create_mapping")
     def test_saving_draft_graph_does_not_create_es_mapping(self, mocked_create_mapping):
