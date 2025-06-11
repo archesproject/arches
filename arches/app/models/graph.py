@@ -2627,6 +2627,10 @@ class Graph(models.GraphModel):
             ]
         ]
 
+        serialized_draft_graph["functions_x_graphs"] = serialized_source_graph[
+            "functions_x_graphs"
+        ]
+
         for function_x_graph in serialized_draft_graph["functions_x_graphs"]:
             if "config" in function_x_graph:
                 function_x_graph["config"] = self.replace_config_ids(
