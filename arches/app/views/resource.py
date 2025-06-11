@@ -848,7 +848,13 @@ class ResourceTiles(View):
         search_term = request.GET.get("term", None)
         permitted_tiles = []
         perm = "read_nodegroup"
-        tiles = models.TileModel.objects.filter(resourceinstance_id=resourceid)
+        tiles = models.TileModel.objects.filter(
+            resourceinstance_id=resourceid,
+            # Get tiles only from the latest graph publication.
+            resourceinstance__graph_publication=models.F(
+                "resourceinstance__graph__publication"
+            ),
+        )
         if nodeid is not None:
             node = models.Node.objects.get(pk=nodeid)
             tiles = tiles.filter(nodegroup_id=node.nodegroup_id)
