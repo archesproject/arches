@@ -109,6 +109,8 @@ DOCKER = False
 
 PERMISSION_DEFAULTS = {}
 
+CELERY_CHECK_ONLY_INSPECT_BROKER = True
+
 
 try:
     from arches.settings_local import *
