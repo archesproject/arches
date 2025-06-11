@@ -2631,12 +2631,6 @@ class Graph(models.GraphModel):
             "functions_x_graphs"
         ]
 
-        for function_x_graph in serialized_draft_graph["functions_x_graphs"]:
-            if "config" in function_x_graph:
-                function_x_graph["config"] = self.replace_config_ids(
-                    function_x_graph["config"], [node_id_to_node_source_identifier_id]
-                )
-
         return self.restore_state_from_serialized_graph(serialized_draft_graph)
 
     def restore_state_from_serialized_graph(self, serialized_graph):
