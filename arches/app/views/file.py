@@ -5,7 +5,7 @@ from PIL import Image
 from django.utils.translation import gettext as _
 from django.views.generic import View
 from django.shortcuts import redirect
-from arches.app.models.models import File, SearchExportHistory, TempFile
+from arches.app.models.models import File, NodeGroup, SearchExportHistory, TempFile
 from arches.app.models.system_settings import settings
 from django.core.exceptions import PermissionDenied
 from arches.app.utils.response import JSONResponse
@@ -42,6 +42,10 @@ class FileView(View):
                 return redirect(path)
 
         if settings.RESTRICT_MEDIA_ACCESS and not is_search_export_history:
+            try:
+                file.tile.nodegroup
+            except NodeGroup.DoesNotExist:
+                raise PermissionDenied()
             permission = request.user.has_perm("read_nodegroup", file.tile.nodegroup)
             permitted = permission is None or permission is True
             if permitted:
