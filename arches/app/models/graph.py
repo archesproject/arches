@@ -23,6 +23,7 @@ from contextlib import contextmanager
 from copy import deepcopy
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
+from django.db.models import Q
 from django.db.utils import IntegrityError
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
@@ -1611,11 +1612,13 @@ class Graph(models.GraphModel):
     @transaction.atomic
     def preserve_staging_records(self):
         nodegroups = self.get_nodegroups(force_recalculation=True)
-        error_query = models.LoadErrors.objects.filter(nodegroup__in=nodegroups)
+        error_query = models.LoadErrors.objects.filter(
+            Q(nodegroup__in=nodegroups) | Q(node__in=self.nodes.values())
+        )
         staging_query = models.LoadStaging.objects.filter(nodegroup__in=nodegroups)
         error_objs = set(error_query)
         staging_objs = set(staging_query)
-        error_query.update(nodegroup=None)
+        error_query.update(nodegroup=None, node=None)
         staging_query.update(nodegroup=None)
 
         try:
@@ -1629,12 +1632,13 @@ class Graph(models.GraphModel):
             valid_stagings = {
                 obj for obj in staging_objs if obj.nodegroup_id in all_nodegroup_ids
             }
-            invalid_errors = error_objs - valid_errors
-            invalid_stagings = staging_objs - valid_stagings
             models.LoadErrors.objects.bulk_update(valid_errors, fields=["nodegroup"])
             models.LoadStaging.objects.bulk_update(valid_stagings, fields=["nodegroup"])
-            models.LoadErrors.objects.filter(pk__in=invalid_errors).delete()
-            models.LoadStaging.objects.filter(pk__in=invalid_stagings).delete()
+
+            # Restore the node references that still exist.
+            all_node_ids = models.Node.objects.values_list("pk", flat=True)
+            valid_errors = {obj for obj in error_objs if obj.node_id in all_node_ids}
+            models.LoadErrors.objects.bulk_update(valid_errors, fields=["node"])
 
     def update_permissions_from_serialized_graph(self, serialized_graph):
         if (

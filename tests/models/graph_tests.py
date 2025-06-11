@@ -2014,7 +2014,7 @@ class DraftGraphTests(ArchesTestCase):
             etl_module=models.ETLModule.objects.first(), user=admin
         )
         load_errors = models.LoadErrors.objects.create(
-            load_event=event, nodegroup=nodegroup
+            load_event=event, nodegroup=nodegroup, node=result["node"]
         )
         load_staging = models.LoadStaging.objects.create(
             load_event=event, nodegroup=nodegroup
@@ -2032,6 +2032,7 @@ class DraftGraphTests(ArchesTestCase):
         # The bulk data manager history still exists.
         load_errors.refresh_from_db()
         self.assertEqual(load_errors.nodegroup, nodegroup)
+        self.assertEqual(load_errors.node, result["node"])
         load_staging.refresh_from_db()
         self.assertEqual(load_staging.nodegroup, nodegroup)
 
