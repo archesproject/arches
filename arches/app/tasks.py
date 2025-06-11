@@ -252,7 +252,7 @@ def load_excel_data(
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
     except Exception as e:
-        logger.error(e)
+        logger.error(e, exc_info=True)
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         load_event.status = "failed"
         load_event.save()
@@ -328,7 +328,7 @@ def export_excel_data(
         load_event = models.LoadEvent.objects.get(loadid=load_id)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
     except Exception as e:
-        logger.error(e)
+        logger.error(e, exc_info=True)
         load_event = models.LoadEvent.objects.get(loadid=load_id)
         load_event.status = "failed"
         load_event.save()
@@ -416,7 +416,7 @@ def load_single_csv(
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
     except Exception as e:
-        logger.error(e)
+        logger.error(e, exc_info=True)
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         load_event.status = "failed"
         load_event.save()
@@ -445,7 +445,7 @@ def load_json_ld(userid, files, summary, result, temp_dir, loadid, moduleid):
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
     except Exception as e:
-        logger.error(e)
+        logger.error(e, exc_info=True)
         load_event = models.LoadEvent.objects.filter(loadid=loadid).update(
             status="failed"
         )
@@ -491,7 +491,7 @@ def edit_bulk_string_data(
         load_event = models.LoadEvent.objects.get(loadid=load_id)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
     except Exception as e:
-        logger.error(e)
+        logger.error(e, exc_info=True)
         load_event = models.LoadEvent.objects.get(loadid=load_id)
         load_event.status = "failed"
         load_event.save()
@@ -533,7 +533,7 @@ def edit_bulk_concept_data(
         load_event = models.LoadEvent.objects.get(loadid=load_id)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
     except Exception as e:
-        logger.error(e)
+        logger.error(e, exc_info=True)
         load_event = models.LoadEvent.objects.get(loadid=load_id)
         load_event.status = "failed"
         load_event.save()
@@ -559,7 +559,7 @@ def bulk_data_deletion(userid, load_id, graph_id, nodegroup_id, resourceids):
         load_event = models.LoadEvent.objects.get(loadid=load_id)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
     except Exception as e:
-        logger.error(e)
+        logger.error(e, exc_info=True)
         load_event = models.LoadEvent.objects.get(loadid=load_id)
         load_event.status = "failed"
         load_event.save()
@@ -610,7 +610,7 @@ def run_etl_task(**kwargs):
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         status = _("Completed") if load_event.status == "indexed" else _("Failed")
     except Exception as e:
-        logger.error(e)
+        logger.error(e, exc_info=True)
         load_event = models.LoadEvent.objects.get(loadid=loadid)
         load_event.status = "failed"
         load_event.save()
@@ -725,7 +725,7 @@ def update_resource_instance_data_based_on_graph_diff(
         )
 
     except Exception as e:
-        logger.error(e)
+        logger.error(e, exc_info=True)
         notify_completion(
             _(
                 "Business data update failed. Check the error logs for more information."
