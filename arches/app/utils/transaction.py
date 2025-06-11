@@ -2,7 +2,9 @@ import logging
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.models.models import IIIFManifest, EditLog, WorkflowHistory
-from django.db import transaction, DatabaseError
+
+from django.db import models, transaction, DatabaseError
+from django.utils.translation import gettext as _
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -15,6 +17,14 @@ def reverse_edit_log_entries(transaction_id):
         .order_by("-timestamp")
         .all()
     )
+    resource_ids = [log.resourceinstanceid for log in transaction_changes]
+    out_of_date_resources_exist = (
+        Resource.objects.filter(pk__in=resource_ids)
+        .exclude(graph_publication=models.F("graph__publication"))
+        .exists()
+    )
+    if out_of_date_resources_exist:
+        raise RuntimeError(_("Graph Has Different Publication"))
     number_of_db_changes = 0
     try:
         with transaction.atomic():

@@ -1,7 +1,8 @@
 def looks_like_api_call(request):
     known_api_paths_without_api_signposting = [
-        # Until these are renamed for consistency, just list them.
+        # Until these are renamed or moved for consistency, just list them.
         "arches.app.views.etl_manager",
+        "arches.app.views.transaction",
     ]
     if "/api/" in request.path:
         return True
