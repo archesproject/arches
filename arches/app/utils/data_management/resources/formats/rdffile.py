@@ -1076,7 +1076,7 @@ class JsonLdReader(Reader):
                     if (
                         branch[0]["datatype"].collects_multiple_values()
                         and tile
-                        and str(tile.nodegroup.pk) == branch[0]["nodegroup_id"]
+                        and str(tile.nodegroup_id) == branch[0]["nodegroup_id"]
                     ):
                         # iterating through a root node *-list type
                         pass

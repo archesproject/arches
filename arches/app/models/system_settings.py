@@ -123,7 +123,11 @@ class SystemSettings(LazySettings):
 
         # set any values saved in the instance of the Arches System Settings Graph
         for tile in models.TileModel.objects.filter(
-            resourceinstance__graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+            resourceinstance__graph_id=self.SYSTEM_SETTINGS_RESOURCE_MODEL_ID,
+            # Get tiles only from the latest graph publication.
+            resourceinstance__graph_publication=models.F(
+                "resourceinstance__graph__publication"
+            ),
         ).order_by("sortorder"):
             if tile.nodegroup.cardinality == "1":
                 for node in tile.nodegroup.node_set.all():
