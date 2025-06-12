@@ -1,13 +1,15 @@
-from datetime import datetime
 import json
 import logging
-import pyprind
 import uuid
+
+import pyprind
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import connection
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
+
+import arches.app.tasks as tasks
 from arches.app.etl_modules.base_data_editor import BaseBulkEditor
 from arches.app.etl_modules.decorators import load_data_async
 from arches.app.etl_modules.save import get_resourceids_from_search_url
@@ -15,7 +17,6 @@ from arches.app.models.models import TileModel
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.models.tile import Tile
-import arches.app.tasks as tasks
 from arches.app.utils.index_database import index_resources_by_transaction
 from arches.app.utils.label_based_graph_v2 import LabelBasedGraph as LabelBasedGraphV2
 
@@ -23,7 +24,9 @@ logger = logging.getLogger(__name__)
 
 
 class BulkDataDeletion(BaseBulkEditor):
-    def get_number_of_deletions(self, graph_id, nodegroup_id, resourceids):
+    def get_number_of_deletions(
+        self, graph_id, nodegroup_id, resourceids, delete_empty_tiles
+    ):
         params = {
             "nodegroup_id": nodegroup_id,
             "graph_id": graph_id,
@@ -34,15 +37,16 @@ class BulkDataDeletion(BaseBulkEditor):
         resourceids_query = (
             "AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
         )
+        if delete_empty_tiles:
+            resourceids_query += " AND tiledata='{}'"
         tile_deletion_count = (
             """
             SELECT COUNT(DISTINCT resourceinstanceid), COUNT(tileid)
             FROM tiles
             WHERE nodegroupid = %(nodegroup_id)s
-        """
+            """
             + resourceids_query
         )
-
         resource_deletion_count = """
             SELECT g.name ->> %(language_code)s, COUNT(r.resourceinstanceid)
             FROM resource_instances r, graphs g
@@ -76,10 +80,9 @@ class BulkDataDeletion(BaseBulkEditor):
                 rows = cursor.fetchall()
             number_of_resource = [{"name": i[0], "count": i[1]} for i in rows]
             number_of_tiles = 0
-
         return number_of_resource, number_of_tiles
 
-    def get_sample_data(self, nodegroup_id, resourceids):
+    def get_sample_data(self, nodegroup_id, resourceids, delete_empty_tiles):
         params = {
             "nodegroup_id": nodegroup_id,
             "resourceids": resourceids,
@@ -88,6 +91,8 @@ class BulkDataDeletion(BaseBulkEditor):
         resourceids_query = (
             "AND resourceinstanceid IN %(resourceids)s" if resourceids else ""
         )
+        if delete_empty_tiles:
+            resourceids_query += " AND tiledata='{}'"
         get_sample_resource_ids = (
             """
             SELECT DISTINCT resourceinstanceid
@@ -194,7 +199,9 @@ class BulkDataDeletion(BaseBulkEditor):
 
         return result
 
-    def delete_tiles(self, userid, loadid, nodegroupid, resourceids):
+    def delete_tiles(
+        self, userid, loadid, nodegroupid, resourceids, delete_empty_tiles
+    ):
         result = {"success": False}
         user = User.objects.get(id=userid)
 
@@ -204,7 +211,14 @@ class BulkDataDeletion(BaseBulkEditor):
                     resourceinstance_id__in=resourceids
                 )
             else:
-                tiles = Tile.objects.filter(nodegroup_id=nodegroupid)
+                if delete_empty_tiles:
+                    info_query = {}
+                    tiles = Tile.objects.filter(nodegroup=nodegroupid).filter(
+                        data=info_query
+                    )
+
+                else:
+                    tiles = Tile.objects.filter(nodegroup_id=nodegroupid)
             for tile in tiles.iterator(chunk_size=2000):
                 request = HttpRequest()
                 request.user = user
@@ -243,9 +257,10 @@ class BulkDataDeletion(BaseBulkEditor):
         nodegroup_id = request.POST.get("nodegroup_id", None)
         resourceids = request.POST.get("resourceids", None)
         search_url = request.POST.get("search_url", None)
-
+        delete_empty_tiles = request.POST.get("delete_empty_tiles", None)
         if resourceids:
             resourceids = json.loads(resourceids)
+
         if search_url:
             try:
                 resourceids = get_resourceids_from_search_url(
@@ -263,13 +278,15 @@ class BulkDataDeletion(BaseBulkEditor):
             resourceids = tuple(resourceids)
 
         number_of_resource, number_of_tiles = self.get_number_of_deletions(
-            graph_id, nodegroup_id, resourceids
+            graph_id, nodegroup_id, resourceids, delete_empty_tiles
         )
         result = {"resource": number_of_resource, "tile": number_of_tiles}
 
         if nodegroup_id:
             try:
-                sample_data = self.get_sample_data(nodegroup_id, resourceids)
+                sample_data = self.get_sample_data(
+                    nodegroup_id, resourceids, delete_empty_tiles
+                )
                 result["preview"] = sample_data
             except Exception as e:
                 logger.exception(e)
@@ -283,6 +300,7 @@ class BulkDataDeletion(BaseBulkEditor):
         nodegroup_name = request.POST.get("nodegroup_name", None)
         resourceids = request.POST.get("resourceids", None)
         search_url = request.POST.get("search_url", None)
+        delete_empty_tiles = request.POST.get("delete_empty_tiles", None)
 
         if resourceids:
             resourceids = json.loads(resourceids)
@@ -308,6 +326,7 @@ class BulkDataDeletion(BaseBulkEditor):
             "graph": graph_name,
             "nodegroup": nodegroup_name,
             "search_url": search_url,
+            "info_query": delete_empty_tiles,
         }
 
         with connection.cursor() as cursor:
@@ -317,7 +336,12 @@ class BulkDataDeletion(BaseBulkEditor):
                     response = self.run_bulk_task_async(request, self.loadid)
                 else:
                     response = self.run_bulk_task(
-                        self.userid, self.loadid, graph_id, nodegroup_id, resourceids
+                        self.userid,
+                        self.loadid,
+                        graph_id,
+                        nodegroup_id,
+                        resourceids,
+                        delete_empty_tiles,
                     )
             else:
                 self.log_event(cursor, "failed")
@@ -331,6 +355,7 @@ class BulkDataDeletion(BaseBulkEditor):
         nodegroup_id = request.POST.get("nodegroup_id", None)
         resourceids = request.POST.get("resourceids", None)
         search_url = request.POST.get("search_url", None)
+        delete_empty_tiles = request.POST.get("delete_empty_tiles", None)
 
         if resourceids:
             resourceids = json.loads(resourceids)
@@ -338,7 +363,14 @@ class BulkDataDeletion(BaseBulkEditor):
             resourceids = get_resourceids_from_search_url(search_url, self.request.user)
 
         edit_task = tasks.bulk_data_deletion.apply_async(
-            (self.userid, self.loadid, graph_id, nodegroup_id, resourceids),
+            (
+                self.userid,
+                self.loadid,
+                graph_id,
+                nodegroup_id,
+                resourceids,
+                delete_empty_tiles,
+            ),
         )
         with connection.cursor() as cursor:
             cursor.execute(
@@ -346,12 +378,16 @@ class BulkDataDeletion(BaseBulkEditor):
                 (edit_task.task_id, self.loadid),
             )
 
-    def run_bulk_task(self, userid, loadid, graph_id, nodegroup_id, resourceids):
+    def run_bulk_task(
+        self, userid, loadid, graph_id, nodegroup_id, resourceids, flag_empty
+    ):
         if resourceids:
             resourceids = [uuid.UUID(id) for id in resourceids]
 
         if nodegroup_id:
-            deleted = self.delete_tiles(userid, loadid, nodegroup_id, resourceids)
+            deleted = self.delete_tiles(
+                userid, loadid, nodegroup_id, resourceids, flag_empty
+            )
         elif graph_id or resourceids:
             deleted = self.delete_resources(
                 userid, loadid, graphid=graph_id, resourceids=resourceids

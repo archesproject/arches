@@ -1,20 +1,20 @@
 import importlib
-import os
 import logging
-import shutil
+import os
+from datetime import datetime, timedelta
+from tempfile import NamedTemporaryFile
+
 from celery import shared_task
-from datetime import datetime
-from datetime import timedelta
 from django.contrib.auth.models import User
 from django.core import management
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
+
 from arches.app.models import models
 from arches.app.utils import import_class_from_string
 from arches.app.utils.message_contexts import return_message_context
-from tempfile import NamedTemporaryFile
 
 
 @shared_task
@@ -44,8 +44,8 @@ def message(arg):
 
 @shared_task(bind=True)
 def export_search_results(self, userid, request_values, format, report_link):
-    from arches.app.search.search_export import SearchResultsExporter
     from arches.app.models.system_settings import settings
+    from arches.app.search.search_export import SearchResultsExporter
 
     logger = logging.getLogger(__name__)
     settings.update_from_db()
@@ -545,7 +545,9 @@ def edit_bulk_concept_data(
 
 
 @shared_task
-def bulk_data_deletion(userid, load_id, graph_id, nodegroup_id, resourceids):
+def bulk_data_deletion(
+    userid, load_id, graph_id, nodegroup_id, resourceids, delete_empty_tiles
+):
     from arches.app.etl_modules import bulk_data_deletion
 
     logger = logging.getLogger(__name__)
@@ -553,7 +555,7 @@ def bulk_data_deletion(userid, load_id, graph_id, nodegroup_id, resourceids):
     try:
         BulkDataDeletion = bulk_data_deletion.BulkDataDeletion(loadid=load_id)
         BulkDataDeletion.run_bulk_task(
-            userid, load_id, graph_id, nodegroup_id, resourceids
+            userid, load_id, graph_id, nodegroup_id, resourceids, delete_empty_tiles
         )
 
         load_event = models.LoadEvent.objects.get(loadid=load_id)

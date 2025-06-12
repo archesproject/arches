@@ -87,6 +87,7 @@
                     class="form-control textarea textarea-resizable" spellcheck="false" data-bind="textInput: searchUrl"
                 ></textarea>
             </div>
+            <div data-bind="component: { name: 'views/components/simple-switch', params: { value: deleteEmptyTiles, config: { label: 'Delete empty tiles', subtitle: '' } } }"></div>
             <!-- /ko -->
         </section>
         <div class="etl-module-component-block">
@@ -192,7 +193,7 @@
         <span class="etl-loading-metadata-value" data-bind="text: loadDetails.search_url"></span>
     </div>
     <div>
-        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.deletedData"></span>                
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.deletedData"></span>
         <!-- ko foreach: loadDetails.number_of_delete -->
         <div style="padding-left: 10px;" class="etl-loading-metadata-value" data-bind="text: $root.translations.countOfResourcesDeleted($data.total)"></div>
             <!-- ko foreach: $data.tiles -->
@@ -203,7 +204,7 @@
         <!-- /ko -->
     </div>
     <div data-bind="if: editHistoryUrl">
-        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.listOfDeletedData + ':'"></span>                
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.listOfDeletedData + ':'"></span>
         <span class="etl-loading-metadata-value">
             <a class="etl-status-link" target="_blank" data-bind="text: $root.translations.viewInEditLog, attr: { href: editHistoryUrl }"></a>
         </span>

@@ -34,6 +34,7 @@ define([
         this.resourceids = ko.observable();
         this.searchUrl = ko.observable();
         this.previewing = ko.observable(false);
+        this.deleteEmptyTiles = ko.observable(false);
         this.numberOfResources = ko.observable();
         this.numberOfTiles = ko.observable();
         this.showPreview = ko.observable(false);
@@ -109,6 +110,7 @@ define([
 
         this.addAllFormData = () => {
             if (self.searchUrl()) { self.formData.append('search_url', self.searchUrl()); }
+            if (self.deleteEmptyTiles()) { self.formData.append('delete_empty_tiles', self.deleteEmptyTiles()); }
             if (self.selectedNodegroup()) {
                 self.formData.append('nodegroup_id', self.selectedNodegroup());
                 self.formData.append('nodegroup_name', self.getNodegroupName(self.selectedNodegroup()));
