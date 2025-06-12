@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from django.db import models, transaction
+from django.db import connection, models, transaction
 from django.db.models.expressions import CombinedExpression
 from django.db.models.fields.json import KT
 from django.db.models.functions import Cast
@@ -9,7 +9,6 @@ from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.models.fields.i18n import I18n_JSONField
 from arches.app.models.graph import Graph
 from arches.app.models.models import (
-    GraphModel,
     Language,
     Node,
     Value,
@@ -159,8 +158,6 @@ class Command(BaseCommand):
             )
 
         if len(collections_in_db) > 0:
-            from django.db import connection
-
             cursor = connection.cursor()
             cursor.execute(
                 """
@@ -176,20 +173,20 @@ class Command(BaseCommand):
     def migrate_concept_nodes_to_reference_datatype(self, graph):
         try:
             UUID(graph)
-            query = models.Q(graphid=graph)
+            query = models.Q(graphid=graph, source_identifier=None)
         except ValueError:
-            query = models.Q(slug=graph, source_identifier__isnull=True)
+            query = models.Q(slug=graph, source_identifier=None)
 
         try:
-            source_graph = GraphModel.objects.get(query)
-        except GraphModel.DoesNotExist as e:
+            source_graph = Graph.objects.get(query)
+        except Graph.DoesNotExist as e:
             raise CommandError(e)
 
-        graph_id = source_graph.graphid
+        draft_graph = source_graph.draft.first()
 
         nodes = (
             Node.objects.filter(
-                graph_id=graph_id,
+                graph=draft_graph,
                 datatype__in=["concept", "concept-list"],
                 is_immutable=False,
             )
@@ -292,14 +289,8 @@ class Command(BaseCommand):
                         cross_record.full_clean()
                         cross_record.save()
 
-            source_graph = Graph.objects.get(pk=graph_id)
-
-            # Refresh the nodes to ensure the changes are reflected in the serialized graph
-            for node in source_graph.nodes.values():
-                node.refresh_from_db()
-
-            source_graph.create_draft_graph()
-            source_graph.publish(
+            updated_graph = source_graph.promote_draft_graph_to_active_graph()
+            updated_graph.publish(
                 notes="Migrated concept/concept-list nodes to reference datatype"
             )
 
