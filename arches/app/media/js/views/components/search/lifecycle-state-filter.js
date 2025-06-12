@@ -21,6 +21,7 @@ const viewModel = BaseFilter.extend({
         if (response.ok) {
             const data = await response.json();
             data.forEach(function(lifecycleState) {
+                lifecycleState.name = `${lifecycleState.name} (${lifecycleState.resource_instance_lifecycle.name})`;
                 self.lifecycleStates.push(lifecycleState);
             });
         } else {

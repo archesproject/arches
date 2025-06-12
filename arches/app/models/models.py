@@ -1518,7 +1518,12 @@ class ResourceInstanceLifecycle(models.Model):
         )
 
         ret["resource_instance_lifecycle_states"] = [
-            JSONSerializer().handle_model(resource_instance_lifecycle_state)
+            JSONSerializer().handle_model(
+                resource_instance_lifecycle_state,
+                fields=fields,
+                exclude=exclude,
+                **kwargs,
+            )
             for resource_instance_lifecycle_state in self.resource_instance_lifecycle_states.all()
         ]
 
@@ -1561,11 +1566,21 @@ class ResourceInstanceLifecycleState(models.Model):
 
         # for serialization we shouldn't need to recurse, 1 level down is enough
         ret["next_resource_instance_lifecycle_states"] = [
-            JSONSerializer().handle_model(resource_instance_lifecycle_state)
+            JSONSerializer().handle_model(
+                resource_instance_lifecycle_state,
+                fields=fields,
+                exclude=exclude,
+                **kwargs,
+            )
             for resource_instance_lifecycle_state in self.next_resource_instance_lifecycle_states.all()
         ]
         ret["previous_resource_instance_lifecycle_states"] = [
-            JSONSerializer().handle_model(resource_instance_lifecycle_state)
+            JSONSerializer().handle_model(
+                resource_instance_lifecycle_state,
+                fields=fields,
+                exclude=exclude,
+                **kwargs,
+            )
             for resource_instance_lifecycle_state in self.previous_resource_instance_lifecycle_states.all()
         ]
 
