@@ -2469,6 +2469,7 @@ class SpatialView(models.Model):
                 name="arches_update_spatial_views",
                 when=pgtrigger.After,
                 operation=pgtrigger.Update | pgtrigger.Delete | pgtrigger.Insert,
+                timing=pgtrigger.Deferred,
                 declare=[
                     ("sv_perform", "text"),
                     ("valid_geom_nodeid", "boolean"),
