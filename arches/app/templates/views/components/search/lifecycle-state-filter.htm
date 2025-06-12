@@ -3,8 +3,7 @@
 <div class="resource-selector-button">
     <div class="btn-group btn-group-xs">
         <button 
-            class="btn btn-primary btn-active-primary dropdown-toggle" 
-            style="padding: 2px 10px;"
+            class="btn btn-primary btn-active-primary dropdown-toggle search-btn" 
             data-toggle="dropdown" 
             type="button" 
             aria-expanded="false" 
@@ -13,7 +12,7 @@
             <span data-bind="text: $root.translations.lifecycleState"></span>
             <i class="dropdown-caret fa fa-caret-down" aria-hidden="true"></i>
         </button>
-        <ul id="lifecycle-state-filter-contents" class="dropdown-menu dropdown-menu-right">
+        <ul id="lifecycle-state-filter-contents" class="dropdown-menu dropdown-menu-left">
             <li><a href="#" data-bind="onEnterkeyClick, click: selectLifecycleState.bind($data, null)">
                 <span data-bind="text: $root.translations.allResources"></span>
             </a></li>

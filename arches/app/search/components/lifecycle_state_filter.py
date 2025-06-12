@@ -18,9 +18,7 @@ details = {
 
 
 class LifecycleStateFilter(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def append_dsl(self, search_query_object, **kwargs):
         search_query = Bool()
         resource_instance_lifecycle_state_filter = Bool()
 
@@ -54,4 +52,4 @@ class LifecycleStateFilter(BaseSearchFilter):
             )
 
         search_query.must(resource_instance_lifecycle_state_filter)
-        search_results_object["query"].add_query(search_query)
+        search_query_object["query"].add_query(search_query)

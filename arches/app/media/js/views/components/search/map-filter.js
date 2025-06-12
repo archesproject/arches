@@ -586,13 +586,15 @@ const viewModel = BaseFilter.extend({
             "type": "FeatureCollection",
             "features": []
         });
-        this.map().getSource('geojson-search-buffer-data').setData({
-            "type": "FeatureCollection",
-            "features": []
-        });
-        this.getFilterByType('term-filter-type').removeTag('Map Filter Enabled');
-        this.draw.deleteAll();
-        this.searchGeometries([]);
+        if (this.map()) {
+            this.map().getSource('geojson-search-buffer-data').setData({
+                "type": "FeatureCollection",
+                "features": []
+            });
+            this.getFilterByType('term-filter-type').removeTag('Map Filter Enabled');
+            this.draw.deleteAll();
+            this.searchGeometries([]);
+        }
     },
 
     zoomToAllFeaturesHandler: function(){

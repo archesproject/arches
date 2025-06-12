@@ -34,12 +34,11 @@ const viewModel = BaseFilter.extend({
             this.updateQuery();
         }, this);
 
-        this.filters[componentName](this);
+        this.searchFilterVms[componentName](this);
 
-        if (this.requiredFiltersLoaded() === false) {
-            this.requireFiltersLoadedSubscription = this.requiredFiltersLoaded.subscribe(function() {
+        if (this.searchViewFiltersLoaded() === false) {
+            this.searchViewFiltersLoaded.subscribe(function() {
                 this.restoreState();
-                self.requireFiltersLoadedSubscription.dispose();
             }, this);
         } else {
             this.restoreState();

@@ -501,7 +501,7 @@ class ResourceInstanceLifecycleState(APIBase):
             return JSONErrorResponse(str(e), status=404)
 
         try:
-            original_resource_instance_lifecycle_state = (
+            previous_resource_instance_lifecycle_state = (
                 resource.resource_instance_lifecycle_state
             )
 
@@ -516,7 +516,7 @@ class ResourceInstanceLifecycleState(APIBase):
 
         return JSONResponse(
             {
-                "original_resource_instance_lifecycle_state": original_resource_instance_lifecycle_state,
+                "previous_resource_instance_lifecycle_state": previous_resource_instance_lifecycle_state,
                 "current_resource_instance_lifecycle_state": current_resource_instance_lifecycle_state,
             }
         )
