@@ -25,7 +25,7 @@ define([
                     option.data = item;
                     searchbox.append(option);
                     searchbox.tags.push(option);
-                }); 
+                });
                 searchbox.trigger('change');
                 if (ko.unwrap(terms).length == 0 && searchbox.tags.length == 0){
                     searchbox.empty();
@@ -140,9 +140,9 @@ define([
                     result.text = self.stripMarkup(result.text);
 
                     var context = result.context_label != '' ? '<i class="concept_result_schemaname">(' + _.escape(result.context_label) + ')</i>' : '';
-                    var markup = '<button class="search-tag"><span data-filter="external-filter"><i class="fa fa-minus" style="display:none;"></i>' + result.text + '</span>' + context + '</button>';
+                    var markup = '<button role="button" class="search-tag"><span data-filter="external-filter"><i class="fa fa-minus" style="display:none;"></i>' + result.text + '</span>' + context + '</button>';
                     if (result.inverted()) {
-                        markup = '<button class="search-tag"><span data-filter="external-filter"><i class="fa fa-minus"></i>' + result.text + '</span>' + context + '</button>';
+                        markup = '<button role="button" class="search-tag"><span data-filter="external-filter"><i class="fa fa-minus"></i>' + result.text + '</span>' + context + '</button>';
                     }
                     if (result.type !== 'string' && result.type !== 'concept' && result.type !== 'term') {
                         $(container).addClass('filter-flag');
