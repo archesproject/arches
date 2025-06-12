@@ -25,14 +25,14 @@ import 'bindings/key-events-click';
 
 var SwitchWidget = function(params) {
     params.configKeys = ['subtitle', 'defaultValue'];
-        
+
     WidgetViewModel.apply(this, [params]);
     const originalConfig = this.config();
     this.on = this.config().on || true;
     this.activeLanguage = arches.activeLanguage;
     this.off = this.config().off || false;
     this.null = this.config().null || null;
-    this.localizedSubtitle = ko.observable(this.subtitle()[this.activeLanguage]);
+    this.localizedSubtitle = ko.observable(this.subtitle()?.[this.activeLanguage]);
 
     // chained observable to avoid issues with ko.mapping
     this.localizedSubtitle.subscribe((value) => {
