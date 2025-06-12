@@ -29,21 +29,21 @@
                         </button>
                         <button 
                             class="btn-sm btn btn-info btn-labeled search-btn"
-                            data-bind="click: function() {sharedStateObject.resultsExpanded(!sharedStateObject.resultsExpanded());}"
+                            data-bind="click: function() {sharedStateObject.shouldShowSearchFilters(!sharedStateObject.shouldShowSearchFilters());}"
                         >
                             <span 
                                 data-bind="
-                                    text: sharedStateObject.resultsExpanded() ? &quot;{% trans "Hide Filters" %}&quot; : &quot;{% trans "Show Filters" %}&quot;
+                                    text: sharedStateObject.shouldShowSearchFilters() ? &quot;{% trans "Hide Filters" %}&quot; : &quot;{% trans "Show Filters" %}&quot;
                                 "
                             ></span>
                             <i 
-                                style="font-size: 10px;"
+                                style="font-size: 1rem;"
                                 class="fa fa-chevron-up" 
-                                data-bind="css: sharedStateObject.resultsExpanded() ? 'fa-chevron-up' : 'fa-chevron-down'"
+                                data-bind="css: sharedStateObject.shouldShowSearchFilters() ? 'fa-chevron-up' : 'fa-chevron-down'"
                             ></i>
                         </button>
                     </div>
-                    <div class="search-inline-filters-btns" data-bind="css: { open: sharedStateObject.resultsExpanded }">
+                    <div class="search-inline-filters-btns" data-bind="css: { open: sharedStateObject.shouldShowSearchFilters }">
                         <div class="qa-filter" data-bind="visible: sharedStateObject.userIsReviewer() !== false,
                                 component: {
                                     name: 'provisional-filter',

@@ -5,6 +5,10 @@
 
     .select2-selection__choice {
         line-height: 24px;
+        padding: 0 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
         .filter-flag {
             background-color: #30ad24;
@@ -16,14 +20,17 @@
             color: white;
             vertical-align: top;
             height: 26px;
+            padding: 0;
         
             .fa-minus {
-                margin: 0px 2px 0px 7px;
+                margin: 0px !important;
+                padding-inline-end: 6px;
             }
         }
 
         &__remove {
-            margin: 6px 0px;
+            margin: 0px; 
+            margin-inline-end: 6px;
         }
 
 
