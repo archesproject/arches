@@ -250,7 +250,10 @@ export const vFocus = {
 };
 
 export const shouldUseContrast = () => {
-    return Array.from(document.getElementsByTagName("body")).some(
-        (el) => el.getAttribute("accessibility-mode") === "True",
+    // See rationale at abandoned PR:
+    // https://github.com/archesproject/arches/pull/11327
+    // TODO: get setting from settings API instead
+    return Array.from(document.getElementsByTagName("link")).some((el) =>
+        el.href.endsWith("accessibility.css"),
     );
 };
