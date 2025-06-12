@@ -618,15 +618,34 @@ class ResourceAPITests(ArchesTestCase):
 
 
 class ResourceInstanceLifecycleStatesTest(ArchesTestCase):
+    @patch("arches.app.models.models.ResourceInstanceLifecycle.objects.all")
     @patch("arches.app.models.models.ResourceInstanceLifecycleState.objects.all")
-    def test_get_all_lifecycle_states(self, mock_all):
+    def test_get_all_lifecycle_states(
+        self,
+        mock_resource_instance_lifecycle_state_all,
+        mock_resource_instance_lifecycle_all,
+    ):
+        resource_instance_lifecycle = models.ResourceInstanceLifecycle(
+            id=uuid.uuid4(), name="Test Lifecycle"
+        )
         lifecycle_state1 = models.ResourceInstanceLifecycleState(
-            id=uuid.uuid4(), name="State 1"
+            id=uuid.uuid4(),
+            name="State 1",
+            resource_instance_lifecycle=resource_instance_lifecycle,
         )
         lifecycle_state2 = models.ResourceInstanceLifecycleState(
-            id=uuid.uuid4(), name="State 2"
+            id=uuid.uuid4(),
+            name="State 2",
+            resource_instance_lifecycle=resource_instance_lifecycle,
         )
-        mock_all.return_value = [lifecycle_state1, lifecycle_state2]
+
+        mock_resource_instance_lifecycle_all.return_value = [
+            resource_instance_lifecycle
+        ]
+        mock_resource_instance_lifecycle_state_all.return_value = [
+            lifecycle_state1,
+            lifecycle_state2,
+        ]
 
         response = self.client.get(reverse("api_resource_instance_lifecycle_states"))
         self.assertEqual(response.status_code, 200)
@@ -709,7 +728,7 @@ class ResourceInstanceLifecycleStateTest(ArchesTestCase):
                     "previous_resource_instance_lifecycle_states": [],
                     "resource_instance_lifecycle_id": None,
                 },
-                "original_resource_instance_lifecycle_state": {
+                "previous_resource_instance_lifecycle_state": {
                     "action_label": "",
                     "can_delete_resource_instances": False,
                     "can_edit_resource_instances": False,

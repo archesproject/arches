@@ -881,8 +881,8 @@ class SearchTests(ArchesTestCase):
         self.assertTrue(searchview_component_instance is not None)
 
         search_components = searchview_component_instance.get_searchview_filters()
-        # 13 available components + search-view component
-        self.assertEqual(len(search_components), 14)
+        # 14 available components + search-view component
+        self.assertEqual(len(search_components), 15)
 
     def test_searchview_searchview_component_from_anonymous(self):
         request = HttpRequest()
@@ -895,8 +895,8 @@ class SearchTests(ArchesTestCase):
         self.assertTrue(searchview_component_instance is not None)
 
         search_components = searchview_component_instance.get_searchview_filters()
-        # 13 available components + search-view component
-        self.assertEqual(len(search_components), 14)
+        # 14 available components + search-view component
+        self.assertEqual(len(search_components), 15)
 
     def test_search_bad_json(self):
         request = HttpRequest()
