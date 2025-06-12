@@ -193,22 +193,6 @@ class SpatialViewTests(ArchesTestCase):
 
         spatialview.delete()
 
-    def test_restore_state_from_serialized_graph(self):
-        spatialview = self.generate_valid_spatialview()
-        spatialview.full_clean()
-        spatialview.save()
-
-        graph = Graph.objects.get(pk=spatialview.geometrynode.graph.pk)
-        graph.create_draft_graph()
-        graph.publish()
-
-        # updating graph from draft graph removes all elements
-        # including the serialized graph - then recreates them
-        graph.promote_draft_graph_to_active_graph()
-
-        # will throw if spatial view doesn't exist
-        spatialview.refresh_from_db()
-
     def test_create_spatialview_invalid_geometrynode(self):
         spatialview = self.generate_valid_spatialview()
         spatialview.geometrynode = models.Node.objects.get(
@@ -386,7 +370,7 @@ class SpatialViewTriggerTests(TransactionTestCase):
         spatialview = SpatialView()
         spatialview.spatialviewid = uuid.uuid4()
         spatialview.schema = "public"
-        spatialview.slug = self.spatialview_slug
+        spatialview.slug = "spatialviews_test_" + str(random.randint(1, 1000))
         spatialview.description = "test description"
         spatialview.geometrynode = models.Node.objects.get(
             nodeid="95b2c8de-1cf8-11ef-971a-0242ac130005"
@@ -490,3 +474,19 @@ class SpatialViewTriggerTests(TransactionTestCase):
             self.assertTrue(row[17] == "george, john, ringo, Paul")  # domain_list
             self.assertTrue(row[18] == "Bat Willow")  # other_spatialviews
             self.assertTrue(row[19] == "Other Model 2")  # other_models_list
+
+    def test_restore_state_from_serialized_graph(self):
+        spatialview = self.generate_valid_spatialview()
+        spatialview.full_clean()
+        spatialview.save()
+
+        graph = Graph.objects.get(pk=spatialview.geometrynode.graph.pk)
+        graph.create_draft_graph()
+        graph.publish()
+
+        # updating graph from draft graph removes all elements
+        # including the serialized graph - then recreates them
+        graph.promote_draft_graph_to_active_graph()
+
+        # will throw if spatial view doesn't exist
+        spatialview.refresh_from_db()
