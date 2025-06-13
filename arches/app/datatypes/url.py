@@ -20,7 +20,6 @@ import re
 import json
 from arches.app.models.system_settings import settings
 from arches.app.datatypes.base import BaseDataType
-from arches.app.models.models import Widget
 from arches.app.search.elasticsearch_dsl_builder import Match, Exists, Term
 from arches.app.search.search_term import SearchTerm
 
@@ -31,34 +30,6 @@ from django.utils.translation import gettext as _
 
 archesproject = Namespace(settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT)
 cidoc_nm = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
-
-import logging
-
-logger = logging.getLogger(__name__)
-
-default_widget_name = "urldatatype"
-default_url_widget = None
-try:
-    default_url_widget = Widget.objects.get(name=default_widget_name)
-except Widget.DoesNotExist as e:
-    logger.warning(
-        "Setting 'url' datatype's default widget to None ({0} widget not found).".format(
-            default_widget_name
-        )
-    )
-
-details = {
-    "datatype": "url",
-    "iconclass": "fa fa-location-arrow",
-    "modulename": "url.py",
-    "classname": "URLDataType",
-    "defaultwidget": default_url_widget,
-    "defaultconfig": None,
-    "configcomponent": "views/components/datatypes/url",
-    "configname": "url-datatype-config",
-    "isgeometric": False,
-    "issearchable": True,
-}
 
 
 class FailRegexURLMatch(Exception):
