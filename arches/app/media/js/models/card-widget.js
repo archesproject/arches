@@ -91,7 +91,7 @@ export default AbstractModel.extend({
                 var configJSON = {};
                 var config = this.get('config');
                 _.each(this.configKeys(), function(key) {
-                    configJSON[key] = koMapping.toJS(config[key]);
+                    configJSON[key] = ko.unwrap(config[key]);
                 });
                 configJSON.label = this.get('label')();
                 return configJSON;

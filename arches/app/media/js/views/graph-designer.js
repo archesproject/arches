@@ -27,7 +27,7 @@ var GraphDesignerView = BaseManagerView.extend({
     initialize: function(options) {
         var viewModel = options.viewModel;
         viewModel.graphid = ko.observable(data.graphid);
-        viewModel.activeTab = ko.observable('graph');
+        viewModel.activeTab = ko.observable('card');
         viewModel.viewState = ko.observable('design');
         viewModel.helpTemplate(viewData.help);
         viewModel.graphSettingsVisible = ko.observable(false);
@@ -688,7 +688,7 @@ var GraphDesignerView = BaseManagerView.extend({
                     self.graphSettingsViewModel.resource_data(data.resources);
                     self.graphSettingsViewModel.icon_data(data.icons);
                     self.graphSettingsViewModel.jsonCache(self.graphSettingsViewModel.jsonData());
-                    self.graphSettingsViewModel.contentLoading = viewModel.loading;
+                    self.graphSettingsViewModel.contentLoading(ko.unwrap(viewModel.loading));
                     self.graphSettingsVisible(true);
                     viewModel.loading(false);
                 })

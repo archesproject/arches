@@ -22,7 +22,7 @@
             </div>
         </div>
 
-        <div class="node-config-item" style="">
+        <div class="node-config-item">
             <div class="control-label">
                 {% trans "Template" %}
             </div>
@@ -31,12 +31,23 @@
             </div>
         </div>
 
-        <div class="node-config-item" style="">
+        <div class="node-config-item">
             <div class="control-label">
                 {% trans "Visibility" %}
             </div>
             <div class="pad-no">
-                <div data-bind="component: { name: 'views/components/simple-switch', params: {value: visible, config:{label: {% quoted_trans _("Make Widget Visible") %}, subtitle: {% quoted_trans _("Show this widget by default") %}}}}"></div>
+                <div 
+                    data-bind="component: { 
+                        name: 'views/components/simple-switch',
+                        params: {
+                            value: visible, 
+                            config: {
+                                label: {% quoted_trans _("Make Widget Visible") %}, 
+                                subtitle: {% quoted_trans _("Show this widget by default") %}
+                            }
+                        }
+                    }"
+                ></div>
             </div>
         </div>
 

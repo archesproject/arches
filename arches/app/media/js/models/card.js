@@ -201,8 +201,6 @@ const CardModel = AbstractModel.extend({
      */
     parse: function(attributes) {
         var self = this;
-        // console.log(attributes.data.constraints[0].nodes)
-        // console.log(attributes.data.constraints[0].nodes)
         this._attributes = attributes;
 
         _.each(attributes.data, function(value, key) {
@@ -345,10 +343,11 @@ const CardModel = AbstractModel.extend({
             });
             if (originalWidgetData) {
                 widget.configKeys().forEach(function(configKey){
-                    koMapping.fromJS(originalWidgetData.config[configKey], widget.config[configKey]);
+                    widget.config[configKey] = originalWidgetData.config[configKey];
                 });
                 widget.label(originalWidgetData.label);
                 widget.widget_id(originalWidgetData.widget_id);
+                widget.visible(originalWidgetData.visible);
             }
         }, this);
         this.parse(this._attributes);
