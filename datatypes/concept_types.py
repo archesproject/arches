@@ -26,6 +26,8 @@ class ConceptDataType(concept_types.ConceptDataType):
         return JSONSerializer().serialize(instance)
 
     def get_instance(self, value):
+        if value is None:
+            return None
         try:
             value = uuid.UUID(value)
         except TypeError:
@@ -57,7 +59,7 @@ class ConceptListDataType(concept_types.ConceptListDataType):
         return super().transform_value_for_tile(joined_concept_id_strings, **kwargs)
 
     def to_python(self, value, **kwargs):
-        return self.get_instances(value)
+        return self.get_instances(value) or None
 
     def to_json(self, tile, node):
         return {
