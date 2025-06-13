@@ -119,7 +119,7 @@ def get_tile_values_for_resource(node, permitted_nodes):
     are cardinality-N parents anywhere.
     """
     many = any_nodegroup_in_hierarchy_is_cardinality_n(node.nodegroup, permitted_nodes)
-    expression, field = get_node_value_expression_and_output_field(node)
+    expression, field = get_node_value_expression_and_output_field(node, many)
     tile_query = (
         TileModel.objects.filter(
             nodegroup_id=node.nodegroup_id,
@@ -131,9 +131,7 @@ def get_tile_values_for_resource(node, permitted_nodes):
     )
 
     if many:
-        return ArraySubquery(
-            tile_query, output_field=CardinalityNField(base_field=field)
-        )
+        return ArraySubquery(tile_query)
 
     match field:
         case BooleanField() | FloatField() | ArrayField():
@@ -151,15 +149,17 @@ def get_tile_values_for_resource(node, permitted_nodes):
     return ExpressionWrapper(tile_query, output_field=output_field)
 
 
-def get_node_value_expression_and_output_field(node):
+def get_node_value_expression_and_output_field(node, many: bool):
     node_lookup = f"data__{node.pk}"
     output_field = DATATYPE_OUTPUT_FIELDS.get(node.datatype, TextField())
     if node.datatype in DATATYPES_NEEDING_KEY_TEXT_TRANSFORM:
         default = KT(node_lookup)
     else:
         default = F(node_lookup)
-    if node.datatype in DATATYPES_NEEDING_CAST:
+    if node.datatype in DATATYPES_NEEDING_CAST or many:
         default = Cast(default, output_field=output_field)
+    if many:
+        output_field = ArrayField(base_field=output_field)
     return (
         Case(When(**{node_lookup: None}, then=Value(None)), default=default),
         output_field,
