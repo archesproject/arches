@@ -127,3 +127,32 @@ class ArchesDefaultDenyPermissionTests(ArchesPermissionFrameworkTestCase):
                 )
                 self.assertTrue(result["can_read"])
                 self.assertFalse(result["can_edit"])
+
+    def test_get_search_ui_permissions_list(self):
+
+        with patch.object(
+            self.framework,
+            "get_resource_types_by_perm",
+            Mock(return_value=["330802c5-95bd-11e8-b7ac-acde48001122"]),
+        ):
+            with patch.object(
+                self.framework, "get_editable_resource_types", Mock(return_value=[""])
+            ):
+                user_mock = Mock()
+                user_mock.is_superuser = False
+                results = self.framework.get_search_ui_permissions(
+                    user_mock,
+                    [
+                        {
+                            "_source": {
+                                "permissions": {
+                                    "groups_read": [self.group.id],
+                                    "groups_edit": [],
+                                }
+                            }
+                        }
+                    ],
+                    [self.group.id],
+                )
+                self.assertTrue(results[0]["can_read"])
+                self.assertFalse(results[0]["can_edit"])

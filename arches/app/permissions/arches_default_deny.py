@@ -14,6 +14,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 from __future__ import annotations
+from typing import Union
 
 from django.contrib.auth.models import User
 
@@ -213,9 +214,11 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
         return has_access
 
     def get_search_ui_permissions(
-        self, user: User, search_result: dict, groups: list[str]
-    ) -> dict:
-        result = {}
+        self, user: User, search_results: Union[list, dict], groups: list[str]
+    ) -> Union[list, dict]:
+        """
+        Determintes whether or not read/edit buttons show up in search results.
+        """
         user_can_read = self.get_resource_types_by_perm(
             user,
             [
@@ -224,78 +227,84 @@ class ArchesDefaultDenyPermissionFramework(ArchesPermissionBase):
                 "models.read_nodegroup",
             ],
         )
-
-        # validate permissions structure for search result
-        users_read_exists = (
-            "permissions" in search_result["_source"]
-            and "users_read" in search_result["_source"]["permissions"]
-        )
-        users_edit_exists = (
-            "permissions" in search_result["_source"]
-            and "users_edit" in search_result["_source"]["permissions"]
-        )
-        groups_read_exists = (
-            "permissions" in search_result["_source"]
-            and "groups_read" in search_result["_source"]["permissions"]
-        )
-        groups_edit_exists = (
-            "permissions" in search_result["_source"]
-            and "groups_edit" in search_result["_source"]["permissions"]
-        )
-        result["can_read"] = user.is_superuser or (
-            (
-                groups_read_exists
-                and len(
-                    set(
-                        search_result["_source"]["permissions"]["groups_read"]
-                    ).intersection(set(groups))
-                )
-                > 0
-            )
-            or (
-                users_read_exists
-                and len(
-                    set(
-                        search_result["_source"]["permissions"]["users_read"]
-                    ).intersection(set([user.id]))
-                )
-                > 0
-            )
-            and user_can_read
-        )
-
         user_can_edit = len(self.get_editable_resource_types(user)) > 0
-        result["can_edit"] = (
-            user.is_superuser
-            or (
-                groups_edit_exists
-                and len(
-                    set(
-                        search_result["_source"]["permissions"]["groups_edit"]
-                    ).intersection(set(groups))
-                )
-                > 0
-                and user_can_edit
+        search_results_is_list = isinstance(search_results, list)
+        if search_results_is_list is False:
+            search_results = [search_results]
+        for result in search_results:
+            # validate permissions structure for search result
+            users_read_exists = (
+                "permissions" in result["_source"]
+                and "users_read" in result["_source"]["permissions"]
             )
-            or (
-                users_edit_exists
-                and len(
-                    set(
-                        search_result["_source"]["permissions"]["users_edit"]
-                    ).intersection(set([user.id]))
-                )
-                > 0
-                and user_can_edit
+            users_edit_exists = (
+                "permissions" in result["_source"]
+                and "users_edit" in result["_source"]["permissions"]
             )
-        )
+            groups_read_exists = (
+                "permissions" in result["_source"]
+                and "groups_read" in result["_source"]["permissions"]
+            )
+            groups_edit_exists = (
+                "permissions" in result["_source"]
+                and "groups_edit" in result["_source"]["permissions"]
+            )
 
-        result["is_principal"] = (
-            "permissions" in search_result["_source"]
-            and "principal_user" in search_result["_source"]["permissions"]
-            and user.id in search_result["_source"]["permissions"]["principal_user"]
-        )
+            result["can_read"] = user.is_superuser or (
+                (
+                    groups_read_exists
+                    and len(
+                        set(
+                            result["_source"]["permissions"]["groups_read"]
+                        ).intersection(set(groups))
+                    )
+                    > 0
+                )
+                or (
+                    users_read_exists
+                    and len(
+                        set(
+                            result["_source"]["permissions"]["users_read"]
+                        ).intersection(set([user.id]))
+                    )
+                    > 0
+                )
+                and user_can_read
+            )
 
-        return result
+            result["can_edit"] = (
+                user.is_superuser
+                or (
+                    groups_edit_exists
+                    and len(
+                        set(
+                            result["_source"]["permissions"]["groups_edit"]
+                        ).intersection(set(groups))
+                    )
+                    > 0
+                    and user_can_edit
+                )
+                or (
+                    users_edit_exists
+                    and len(
+                        set(
+                            result["_source"]["permissions"]["users_edit"]
+                        ).intersection(set([user.id]))
+                    )
+                    > 0
+                    and user_can_edit
+                )
+            )
+
+            result["is_principal"] = (
+                "permissions" in result["_source"]
+                and "principal_user" in result["_source"]["permissions"]
+                and user.id in result["_source"]["permissions"]["principal_user"]
+            )
+
+        if search_results_is_list:
+            return search_results
+        return search_results[0]
 
     def user_can_read_resource(self, user: User, resourceid: str | None = None) -> bool:
         """

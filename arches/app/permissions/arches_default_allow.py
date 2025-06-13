@@ -2,6 +2,7 @@ from __future__ import annotations
 import logging
 import uuid
 
+from typing import Union
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
@@ -43,12 +44,11 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
             resource.index()  # type: ignore
 
     def get_search_ui_permissions(
-        self, user: User, search_result: dict, groups
-    ) -> dict:
+        self, user: User, search_results: Union[dict, list], groups
+    ) -> Union[dict, list]:
         """
         Determintes whether or not read/edit buttons show up in search results.
         """
-        result = {}
         user_read_permissions = self.get_resource_types_by_perm(
             user,
             [
@@ -59,54 +59,56 @@ class ArchesDefaultAllowPermissionFramework(ArchesPermissionBase):
         )
 
         user_can_read = len(user_read_permissions) > 0
-
-        # validate permissions structure for search result
-        deny_read_exists = (
-            "permissions" in search_result["_source"]
-            and "users_without_read_perm" in search_result["_source"]["permissions"]
-        )
-        deny_edit_exists = (
-            "permissions" in search_result["_source"]
-            and "users_without_edit_perm" in search_result["_source"]["permissions"]
-        )
-
-        if not deny_read_exists or not deny_edit_exists:
-            logger.warning(
-                """
-                PROBLEM WITH INDEX - it appears that your index permissions are malformed.  
-                This can happen when switching permission frameworks and may cause search 
-                results to appear incorrectly or with invalid permissions.  You can correct it by reindexing arches.
-                """
-            )
-
-        result["can_read"] = (
-            deny_read_exists
-            and (
-                user.id
-                not in search_result["_source"]["permissions"][
-                    "users_without_read_perm"
-                ]
-            )
-        ) and user_can_read
-
         user_can_edit = len(self.get_editable_resource_types(user)) > 0
+        search_results_is_list = isinstance(search_results, list)
+        if search_results_is_list is False:
+            search_results = [search_results]
+        for result in search_results:
 
-        result["can_edit"] = (
-            deny_edit_exists
-            and (
-                user.id
-                not in search_result["_source"]["permissions"][
-                    "users_without_edit_perm"
-                ]
+            # validate permissions structure for search result
+            deny_read_exists = (
+                "permissions" in result["_source"]
+                and "users_without_read_perm" in result["_source"]["permissions"]
             )
-        ) and user_can_edit
+            deny_edit_exists = (
+                "permissions" in result["_source"]
+                and "users_without_edit_perm" in result["_source"]["permissions"]
+            )
 
-        result["is_principal"] = (
-            "permissions" in search_result["_source"]
-            and "principal_user" in search_result["_source"]["permissions"]
-            and user.id in search_result["_source"]["permissions"]["principal_user"]
-        )
-        return result
+            if not deny_read_exists or not deny_edit_exists:
+                logger.warning(
+                    """
+                    PROBLEM WITH INDEX - it appears that your index permissions are malformed.  
+                    This can happen when switching permission frameworks and may cause search 
+                    results to appear incorrectly or with invalid permissions.  You can correct it by reindexing arches.
+                    """
+                )
+
+            result["can_read"] = (
+                deny_read_exists
+                and (
+                    user.id
+                    not in result["_source"]["permissions"]["users_without_read_perm"]
+                )
+            ) and user_can_read
+
+            result["can_edit"] = (
+                deny_edit_exists
+                and (
+                    user.id
+                    not in result["_source"]["permissions"]["users_without_edit_perm"]
+                )
+            ) and user_can_edit
+
+            result["is_principal"] = (
+                "permissions" in result["_source"]
+                and "principal_user" in result["_source"]["permissions"]
+                and user.id in result["_source"]["permissions"]["principal_user"]
+            )
+
+        if search_results_is_list:
+            return search_results
+        return search_results[0]
 
     def get_sets_for_user(self, user: User, perm: str) -> set[str] | None:
         # We do not do set filtering - None is allow-all for sets.
