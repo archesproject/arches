@@ -17,6 +17,7 @@ class DataTypeFactory(datatypes.DataTypeFactory):
             "resource-instance": ResourceInstanceDataType(),
             "resource-instance-list": ResourceInstanceListDataType(),
             "string": StringDataType(),
+            "url": URLDataType(),
         }
 
     def get_instance(self, datatype):
