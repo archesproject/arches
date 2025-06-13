@@ -2,14 +2,18 @@ from django.contrib.postgres.expressions import ArraySubquery
 from django.contrib.postgres.fields import ArrayField
 from django.db.models import (
     BooleanField,
+    Case,
     DateTimeField,
+    ExpressionWrapper,
     F,
     FloatField,
+    JSONField,
     OuterRef,
     TextField,
     UUIDField,
+    Value,
+    When,
 )
-from django.db.models import JSONField
 from django.db.models.functions import Cast
 from django.db.models.fields.json import KT
 
@@ -27,6 +31,28 @@ from arches_querysets.fields import (
     ResourceInstanceField,
     ResourceInstanceListField,
 )
+
+
+DATATYPES_NEEDING_KEY_TEXT_TRANSFORM = {
+    "non-localized-string",
+    "date",
+    "concept",
+    "node-value",
+}
+DATATYPES_NEEDING_CAST = {"boolean", "date", "number"}
+DATATYPE_OUTPUT_FIELDS = {
+    "boolean": BooleanField(),
+    "number": FloatField(),
+    "non-localized-string": TextField(),
+    "date": DateTimeField(),
+    "string": JSONField(),
+    "url": JSONField(),
+    "resource-instance": ResourceInstanceField(),
+    "resource-instance-list": ResourceInstanceListField(),
+    "concept": UUIDField(),
+    "concept-list": JSONField(),
+    "node-value": UUIDField(),
+}
 
 
 def field_attnames(instance_or_class):
@@ -122,36 +148,22 @@ def get_tile_values_for_resource(node, permitted_nodes):
             output_field = Cardinality1JSONField()
         case _:
             output_field = Cardinality1TextField()
-    return Cast(tile_query, output_field=output_field)
+    return ExpressionWrapper(tile_query, output_field=output_field)
 
 
 def get_node_value_expression_and_output_field(node):
-    match node.datatype:
-        case "boolean":
-            return F(f"data__{node.pk}"), BooleanField()
-        case "number":
-            return F(f"data__{node.pk}"), FloatField()
-        case "non-localized-string":
-            return KT(f"data__{node.pk}"), TextField()
-        case "date":
-            return (
-                Cast(KT(f"data__{node.pk}"), output_field=DateTimeField()),
-                DateTimeField(),
-            )
-        case "string" | "url":
-            return F(f"data__{node.pk}"), JSONField()
-        case "resource-instance":
-            return F(f"data__{node.pk}"), ResourceInstanceField()
-        case "resource-instance-list":
-            return F(f"data__{node.pk}"), ResourceInstanceListField()
-        case "concept":
-            return KT(f"data__{node.pk}"), UUIDField()
-        case "concept-list":
-            return F(f"data__{node.pk}"), JSONField()
-        case "node-value":
-            return KT(f"data__{node.pk}"), UUIDField()
-        case _:
-            return F(f"data__{node.pk}"), TextField()
+    node_lookup = f"data__{node.pk}"
+    output_field = DATATYPE_OUTPUT_FIELDS.get(node.datatype, TextField())
+    if node.datatype in DATATYPES_NEEDING_KEY_TEXT_TRANSFORM:
+        default = KT(node_lookup)
+    else:
+        default = F(node_lookup)
+    if node.datatype in DATATYPES_NEEDING_CAST:
+        default = Cast(default, output_field=output_field)
+    return (
+        Case(When(**{node_lookup: None}, then=Value(None)), default=default),
+        output_field,
+    )
 
 
 def get_nodegroups_here_and_below(start_nodegroup):
