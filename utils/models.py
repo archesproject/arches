@@ -22,14 +22,9 @@ from arches.app.models.models import ResourceInstance, TileModel
 from arches.app.models.utils import field_names
 
 from arches_querysets.fields import (
-    Cardinality1DateTimeField,
-    Cardinality1JSONField,
-    Cardinality1ResourceInstanceField,
-    Cardinality1ResourceInstanceListField,
-    Cardinality1TextField,
-    CardinalityNField,
     ResourceInstanceField,
     ResourceInstanceListField,
+    StringField,
 )
 
 
@@ -45,7 +40,7 @@ DATATYPE_OUTPUT_FIELDS = {
     "number": FloatField(),
     "non-localized-string": TextField(),
     "date": DateTimeField(),
-    "string": JSONField(),
+    "string": StringField(),
     "url": JSONField(),
     "resource-instance": ResourceInstanceField(),
     "resource-instance-list": ResourceInstanceListField(),
@@ -119,7 +114,7 @@ def get_tile_values_for_resource(node, permitted_nodes):
     are cardinality-N parents anywhere.
     """
     many = any_nodegroup_in_hierarchy_is_cardinality_n(node.nodegroup, permitted_nodes)
-    expression, field = get_node_value_expression_and_output_field(node, many)
+    expression = get_node_value_expression(node, many)
     tile_query = (
         TileModel.objects.filter(
             nodegroup_id=node.nodegroup_id,
@@ -132,24 +127,11 @@ def get_tile_values_for_resource(node, permitted_nodes):
 
     if many:
         return ArraySubquery(tile_query)
-
-    match field:
-        case BooleanField() | FloatField() | ArrayField():
-            output_field = field
-        case DateTimeField():
-            output_field = Cardinality1DateTimeField()
-        case ResourceInstanceField():
-            output_field = Cardinality1ResourceInstanceField()
-        case ResourceInstanceListField():
-            output_field = Cardinality1ResourceInstanceListField()
-        case JSONField():
-            output_field = Cardinality1JSONField()
-        case _:
-            output_field = Cardinality1TextField()
-    return ExpressionWrapper(tile_query, output_field=output_field)
+    else:
+        return tile_query
 
 
-def get_node_value_expression_and_output_field(node, many: bool):
+def get_node_value_expression(node, many: bool):
     node_lookup = f"data__{node.pk}"
     output_field = DATATYPE_OUTPUT_FIELDS.get(node.datatype, TextField())
     if node.datatype in DATATYPES_NEEDING_KEY_TEXT_TRANSFORM:
@@ -158,12 +140,11 @@ def get_node_value_expression_and_output_field(node, many: bool):
         default = F(node_lookup)
     if node.datatype in DATATYPES_NEEDING_CAST or many:
         default = Cast(default, output_field=output_field)
+    else:
+        default = ExpressionWrapper(default, output_field=output_field)
     if many:
         output_field = ArrayField(base_field=output_field)
-    return (
-        Case(When(**{node_lookup: None}, then=Value(None)), default=default),
-        output_field,
-    )
+    return Case(When(**{node_lookup: None}, then=Value(None)), default=default)
 
 
 def get_nodegroups_here_and_below(start_nodegroup):

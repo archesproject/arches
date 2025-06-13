@@ -3,10 +3,10 @@ from django.db.models.lookups import Contains, IContains, Transform
 from psycopg2.extensions import AsIs, QuotedString
 
 from arches_querysets.fields import (
-    Cardinality1JSONField,
-    Cardinality1ResourceInstanceField,
-    Cardinality1ResourceInstanceListField,
     CardinalityNField,
+    ResourceInstanceListField,
+    ResourceInstanceField,
+    StringField,
 )
 
 
@@ -42,7 +42,7 @@ class ArrayIContains(IContains):
     like_operator = "ILIKE"
 
 
-@Cardinality1JSONField.register_lookup
+@StringField.register_lookup
 class AnyLanguageStartsWith(JSONPathFilter, Lookup):
     lookup_name = "any_lang_startswith"
 
@@ -53,7 +53,7 @@ class AnyLanguageStartsWith(JSONPathFilter, Lookup):
         return "%s @? '$.*.value ? (@ starts with \"%s\")'" % (lhs, rhs), params
 
 
-@Cardinality1JSONField.register_lookup
+@StringField.register_lookup
 class AnyLanguageIStartsWith(JSONPathFilter, Lookup):
     lookup_name = "any_lang_istartswith"
 
@@ -67,7 +67,7 @@ class AnyLanguageIStartsWith(JSONPathFilter, Lookup):
         )
 
 
-@Cardinality1JSONField.register_lookup
+@StringField.register_lookup
 class AnyLanguageContains(JSONPathFilter, Lookup):
     lookup_name = "any_lang_contains"
 
@@ -78,7 +78,7 @@ class AnyLanguageContains(JSONPathFilter, Lookup):
         return "%s @? '$.*.value ? (@ like_regex \"%s\")'" % (lhs, rhs), params
 
 
-@Cardinality1JSONField.register_lookup
+@StringField.register_lookup
 class AnyLanguageIContains(JSONPathFilter, Lookup):
     lookup_name = "any_lang_icontains"
 
@@ -89,13 +89,13 @@ class AnyLanguageIContains(JSONPathFilter, Lookup):
         return '%s @? \'$.*.value ? (@ like_regex "%s" flag "i")\'' % (lhs, rhs), params
 
 
-@Cardinality1ResourceInstanceField.register_lookup
+@ResourceInstanceField.register_lookup
 class ResourceInstanceId(Transform):
     lookup_name = "id"
     template = "(%(expressions)s -> 0 -> 'resourceId')"
 
 
-@Cardinality1ResourceInstanceListField.register_lookup
+@ResourceInstanceListField.register_lookup
 class ResourceInstanceListContains(JSONPathFilter, Lookup):
     lookup_name = "contains"
 
