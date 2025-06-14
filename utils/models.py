@@ -16,12 +16,15 @@ from django.db.models import (
 )
 from django.db.models.functions import Cast
 from django.db.models.fields.json import KT
+from django.utils.functional import cached_property
 
 from arches import VERSION as arches_version
 from arches.app.models.models import ResourceInstance, TileModel
 from arches.app.models.utils import field_names
 
 from arches_querysets.fields import (
+    CardinalityNResourceInstanceField,
+    CardinalityNStringField,
     ResourceInstanceField,
     ResourceInstanceListField,
     StringField,
@@ -48,6 +51,27 @@ DATATYPE_OUTPUT_FIELDS = {
     "concept-list": JSONField(),
     "node-value": UUIDField(),
 }
+
+
+class CardinalityNSubquery(ArraySubquery):
+    @cached_property
+    def output_field(self):
+        match self.query.output_field:
+            case ResourceInstanceField():
+                array_wrapper = CardinalityNResourceInstanceField
+            # case ResourceInstanceListField():
+            #     array_wrapper = CardinalityNResourceInstanceListField
+            case StringField():
+                array_wrapper = CardinalityNStringField
+            # case UUIDField():
+            #     array_wrapper = CardinalityNUUIDField
+            # case JSONField():  # concept-list, url
+            #     array_wrapper = ArrayTextField
+            # case TextField():
+            #     array_wrapper = CardinalityNTextField
+            case _:
+                array_wrapper = ArrayField
+        return array_wrapper(self.query.output_field)
 
 
 def field_attnames(instance_or_class):
@@ -126,7 +150,8 @@ def get_tile_values_for_resource(node, permitted_nodes):
     )
 
     if many:
-        return ArraySubquery(tile_query)
+        # return ArraySubquery(tile_query)
+        return CardinalityNSubquery(tile_query)
     else:
         return tile_query
 
