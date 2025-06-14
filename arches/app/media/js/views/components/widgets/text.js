@@ -192,7 +192,7 @@ const viewModel = function(params) {
         const currentLanguage = self.currentLanguage();
 
         if (self.card && ko.isObservable(self.placeholder)) {
-            const patchedPlaceholder = self.placeholder();
+            const patchedPlaceholder = self.placeholder() || {};
             patchedPlaceholder[currentLanguage.code] = newValue;
             self.placeholder(patchedPlaceholder);
             self.card._card.valueHasMutated();
