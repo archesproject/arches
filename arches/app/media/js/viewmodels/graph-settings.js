@@ -42,6 +42,8 @@ var GraphSettingsViewModel = function(params) {
         return self.nodes().length;
     });
 
+    self.contentLoading = ko.observable(false);
+
     var ontologyClass = self.rootnode.ontologyclass;
     var ontologyClassFriendlyName = self.rootnode.ontologyclass_friendlyname;
 

@@ -90,8 +90,8 @@ export default AbstractModel.extend({
             read: function() {
                 var configJSON = {};
                 var config = this.get('config');
-                _.each(this.configKeys(), function(key) {
-                    configJSON[key] = ko.unwrap(config[key]);
+                this.configKeys().forEach(key => {
+                    configJSON[key] = ko.toJS(this.config[key]);
                 });
                 configJSON.label = this.get('label')();
                 return configJSON;
