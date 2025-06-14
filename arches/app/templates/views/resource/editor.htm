@@ -132,7 +132,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- ko foreach: ko.unwrap(resourceInstanceLifecycleState)['previous_resource_instance_lifecycle_states'] -->
                         <button 
                             class="btn btn-info"
-                            data-bind="click: function() { $parent.updateResourceInstanceLifecycleState($data) }"
+                            data-bind="
+                                click: function() { 
+                                    if (!$parent.isDirty()) {
+                                        $parent.updateResourceInstanceLifecycleState($data) 
+                                    } 
+                                },
+                                disable: $parent.isDirty(),
+                                attr: {
+                                    title: $parent.isDirty() && &quot;{% trans 'Please save or discard your changes before updating the Resource Instance Lifecycle State.' %}&quot;
+                                }
+                            "
                         >
                             <i class="fa fa-arrow-left" aria-hidden="true"></i>
                             <span 
@@ -144,7 +154,17 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- ko foreach: ko.unwrap(resourceInstanceLifecycleState)['next_resource_instance_lifecycle_states'] -->
                         <button 
                             class="btn btn-info"
-                            data-bind="click: function() { $parent.updateResourceInstanceLifecycleState($data) }"
+                            data-bind="
+                                click: function() { 
+                                    if (!$parent.isDirty()) {
+                                        $parent.updateResourceInstanceLifecycleState($data) 
+                                    }
+                                },
+                                disable: $parent.isDirty(),
+                                attr: {
+                                    title: $parent.isDirty() && &quot;{% trans 'Please save or discard your changes before updating the Resource Instance Lifecycle State.' %}&quot;
+                                }
+                            "
                         >
                             <i class="fa fa-arrow-right" aria-hidden="true"></i>
                             <span 

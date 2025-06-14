@@ -188,6 +188,12 @@ var vm = {
     toggleGrid: () => {
         vm.showGrid(!vm.showGrid());
     },
+    isDirty: ko.computed(function() {
+        // This actually returns a flat list of cards and tiles, but still works as expected
+        return flattenTree(topCards, []).some(function(card) {
+            return ko.unwrap(card.dirty)
+        });
+    }),
     activeLanguageDir: ko.observable(arches.activeLanguageDir),
     rootExpanded: ko.observable(true),
     topCards: topCards,

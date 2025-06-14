@@ -23,7 +23,7 @@ from contextlib import contextmanager
 from copy import deepcopy
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, connection
-from django.db.models import Q
+from django.db.models import Q, prefetch_related_objects
 from django.db.utils import IntegrityError
 from arches.app.const import IntegrityCheck
 from arches.app.models import models
@@ -182,9 +182,9 @@ class Graph(models.GraphModel):
         self.cards = {}
         self.widgets = {}
 
-        nodes = self.node_set.all()
+        nodes = self.node_set.prefetch_related("nodegroup")
         edges = self.edge_set.all()
-        cards = self.cardmodel_set.all()
+        cards = self.cardmodel_set.prefetch_related("nodegroup")
 
         edge_lookup = {
             edge["edgeid"]: edge
@@ -1478,10 +1478,14 @@ class Graph(models.GraphModel):
                 if nodeid is not None
                 else self.root.ontologyclass
             )
-            ontology_classes = models.OntologyClass.objects.get(
-                source=source, ontology=self.ontology
+            target_up = (
+                models.OntologyClass.objects.filter(
+                    source=source, ontology=self.ontology
+                )
+                .values_list("target__up", flat=True)
+                .first()
             )
-            return ontology_classes.target["up"]
+            return target_up
         else:
             return []
 
@@ -1586,10 +1590,12 @@ class Graph(models.GraphModel):
         if self.should_use_published_graph() and not force_recalculation:
             return super().get_nodegroups()
         else:
+            prefetch_related_objects(list(self.nodes.values()), "nodegroup")
             nodegroups = set()
             for node in self.nodes.values():
                 if node.is_collector:
                     nodegroups.add(node.nodegroup)
+            prefetch_related_objects(list(self.cards.values()), "nodegroup")
             for card in self.cards.values():
                 try:
                     nodegroups.add(card.nodegroup)
@@ -1879,6 +1885,8 @@ class Graph(models.GraphModel):
         """
         if self.should_use_published_graph() and not force_recalculation:
             return super().get_cards()
+
+        prefetch_related_objects(list(self.cards.values()), "constraintmodel_set")
 
         cards = []
         for card in self.cards.values():

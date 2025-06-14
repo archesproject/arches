@@ -81,7 +81,9 @@ class BaseConceptDataType(BaseDataType):
             return self.value_lookup[valueid]
         except:
             try:
-                self.value_lookup[valueid] = models.Value.objects.get(pk=valueid)
+                self.value_lookup[valueid] = models.Value.objects.select_related(
+                    "concept", "valuetype"
+                ).get(pk=valueid)
                 return self.value_lookup[valueid]
             except ObjectDoesNotExist:
                 return models.Value()
@@ -107,8 +109,7 @@ class BaseConceptDataType(BaseDataType):
         date_range = {}
         cache_value = cache.get("concept-" + str(concept.conceptid), "no result")
         if cache_value == "no result":
-            values = models.Value.objects.filter(concept=concept)
-            for value in values:
+            for value in concept.value_set.select_related("valuetype"):
                 if value.valuetype.valuetype in ("min_year" "max_year"):
                     date_range[value.valuetype.valuetype] = value.value
             if "min_year" in date_range and "max_year" in date_range:

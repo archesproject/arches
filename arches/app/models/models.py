@@ -565,11 +565,7 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
         if not language:
             language = translation.get_language()
 
-        for published_graph in self.publication.publishedgraph_set.all():
-            if published_graph.language_id == language:
-                return published_graph
-
-        return None
+        return self.publication.find_publication_in_language(language)
 
     def get_cards(self, force_recalculation=False):
         if self.should_use_published_graph() and not force_recalculation:
@@ -593,7 +589,9 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
 
             return [models.CardModel(**card_slug) for card_slug in card_slugs]
         else:
-            return self.cardmodel_set.all()
+            return self.cardmodel_set.select_related("nodegroup").prefetch_related(
+                "constraintmodel_set"
+            )
 
     def get_nodegroups(self, force_recalculation=False):
         if self.should_use_published_graph() and not force_recalculation:
@@ -643,7 +641,7 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
 
             return [models.Node(**node_slug) for node_slug in node_slugs]
         else:
-            return self.node_set.all()
+            return self.node_set.select_related("nodegroup")
 
     def get_functions_x_graphs(self, force_recalculation=False):
         if self.should_use_published_graph() and not force_recalculation:
@@ -730,7 +728,7 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
         else:
             return [
                 card_x_node_x_widget
-                for card in self.cardmodel_set.all()
+                for card in self.cardmodel_set.prefetch_related("cardxnodexwidget_set")
                 for card_x_node_x_widget in card.cardxnodexwidget_set.all()
             ]
 
@@ -811,6 +809,19 @@ class GraphXPublishedGraph(models.Model):
     class Meta:
         managed = True
         db_table = "graphs_x_published_graphs"
+
+    def find_publication_in_language(self, language):
+        if not hasattr(self, "_published_graph_cache"):
+            self._published_graph_cache = {}
+        if language not in self._published_graph_cache:
+            self._published_graph_cache[language] = self.publishedgraph_set.filter(
+                language=language
+            ).first()
+        return self._published_graph_cache[language]
+
+    def refresh_from_db(self, *args, **kwargs):
+        self._published_graph_cache = {}
+        return super().refresh_from_db(*args, **kwargs)
 
 
 class Icon(models.Model):
@@ -1504,7 +1515,7 @@ class ResourceInstance(SaveSupportsBlindOverwriteMixin, models.Model):
         except ResourceInstance.graph.RelatedObjectDoesNotExist:
             pass
 
-        if not hasattr(self, "resource_instance_lifecycle_state"):
+        if not self.resource_instance_lifecycle_state_id:
             self.resource_instance_lifecycle_state = (
                 self.get_initial_resource_instance_lifecycle_state()
             )

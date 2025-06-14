@@ -189,7 +189,7 @@ def import_graph(graphs, overwrite_graphs=True, user=None):
 
                 with transaction.atomic():
                     # saves graph publication with serialized graph
-                    graph = Graph.objects.get(
+                    graph = Graph.objects.select_related("ontology").get(
                         pk=graph.graphid, source_identifier_id__isnull=True
                     )  # retrieve graph using the ORM to ensure strings are I18n_Strings
 

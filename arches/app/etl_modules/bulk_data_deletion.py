@@ -205,7 +205,9 @@ class BulkDataDeletion(BaseBulkEditor):
                 )
             else:
                 tiles = Tile.objects.filter(nodegroup_id=nodegroupid)
-            for tile in tiles.iterator(chunk_size=2000):
+            for tile in tiles.select_related("nodegroup__grouping_node").iterator(
+                chunk_size=2000
+            ):
                 request = HttpRequest()
                 request.user = user
                 tile.delete(request=request, index=False, transaction_id=loadid)
