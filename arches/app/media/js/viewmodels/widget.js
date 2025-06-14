@@ -75,7 +75,7 @@ var WidgetViewModel = function(params) {
 
         var forwardSubscription = self[key].subscribe(function(val) {
             if (params.hasOwnProperty('graphDesignerHasDirtyWidget')) {
-                if (val || val === 0) {
+                if (val && val !== params.config()[key]) {
                     params.graphDesignerHasDirtyWidget(true);
                 }
             }
