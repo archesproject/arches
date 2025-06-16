@@ -295,6 +295,13 @@ class BulkTileOperation:
                 )
             if value_to_validate is NOT_PROVIDED:
                 continue
+            if isinstance(value_to_validate, dict):
+                interchange_val = value_to_validate.get(
+                    "interchange_value", NOT_PROVIDED
+                )
+                if interchange_val is not NOT_PROVIDED:
+                    value_to_validate = interchange_val
+
             self._run_datatype_methods(tile, value_to_validate, node, languages)
 
     def _run_datatype_methods(self, tile, value_to_validate, node, languages):
