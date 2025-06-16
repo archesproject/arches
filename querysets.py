@@ -158,11 +158,7 @@ class SemanticTileQuerySet(models.QuerySet):
             tile._permitted_nodes = self._permitted_nodes
             for node in self._queried_nodes:
                 if node.nodegroup_id == tile.nodegroup_id:
-                    # This is on the tile itself (ORM annotation).
-                    node_val = getattr(tile, node.alias, NOT_PROVIDED)
-                    instance_val = self._get_node_value_for_python_annotation(
-                        tile, node, node_val
-                    )
+                    instance_val = self._get_node_value_for_annotation(tile, node)
                     setattr(tile.aliased_data, node.alias, instance_val)
                 elif node.nodegroup.parentnodegroup_id == tile.nodegroup_id:
                     empty_value = None if node.nodegroup.cardinality == "1" else []
@@ -219,16 +215,15 @@ class SemanticTileQuerySet(models.QuerySet):
         clone._as_representation = self._as_representation
         return clone
 
-    def _get_node_value_for_python_annotation(self, tile, node, node_val):
+    def _get_node_value_for_annotation(self, tile, node):
         datatype_instance = DataTypeFactory().get_instance(node.datatype)
 
+        tile_data = datatype_instance.get_tile_data(tile)
+        # Ordinarily we assume tiles always have all keys, but we've
+        # seen problems in the wild.
+        node_val = tile_data.get(str(node.pk), None)
         if self._as_representation:
-            # Ordinarily we assume tiles always have all keys, but we've
-            # seen problems in the wild.
-            if str(node.pk) not in tile.data:
-                tile.data[str(node.pk)] = None
             compiled_json = datatype_instance.to_json(tile, node)
-            # TODO: Evaluate if there is drift between provisional edits here.
             instance_val = {
                 "display_value": compiled_json["@display_value"],
                 "interchange_value": datatype_instance.get_interchange_value(
