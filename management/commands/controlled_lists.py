@@ -183,6 +183,8 @@ class Command(BaseCommand):
             raise CommandError(e)
 
         draft_graph = source_graph.draft.first()
+        if not draft_graph:
+            draft_graph = source_graph.create_draft_graph()
 
         nodes = (
             Node.objects.filter(
