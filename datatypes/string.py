@@ -6,7 +6,12 @@ from arches.app.utils.i18n import rank_label
 
 class StringDataType(datatypes.StringDataType):
     def merge_tile_value(self, tile, node_id_str, transformed) -> None:
-        tile.data[node_id_str] = (tile.data.get(node_id_str) or {}) | transformed
+        """
+        Merge a node value with the existing node values. Useful to
+        accept incoming data without overwriting all data on the target.
+        """
+        data = self.get_tile_data(tile)
+        tile.data[node_id_str] = (data.get(node_id_str) or {}) | transformed
 
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)

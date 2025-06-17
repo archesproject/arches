@@ -34,7 +34,12 @@ class FileListDataType(datatypes.FileListDataType):
         return final_value
 
     def merge_tile_value(self, tile, node_id_str, transformed) -> None:
-        if not (existing_tile_value := tile.data.get(node_id_str)):
+        """
+        Merge a node value with the existing node values. Useful to
+        accept incoming data without overwriting all data on the target.
+        """
+        data = self.get_tile_data(tile)
+        if not (existing_tile_value := data.get(node_id_str)):
             tile.data[node_id_str] = transformed
             return
         for file_info in transformed:
