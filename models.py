@@ -403,7 +403,7 @@ class SemanticTile(TileModel):
         except (IndexError, ObjectDoesNotExist, MultipleObjectsReturned):
             default_widget = d_data_type.defaultwidget
             localized_config = default_widget.defaultconfig
-        default_value = localized_config.get("defaultValue", None)
+        default_value = localized_config.get("defaultValue")
         default_value = datatype.get_interchange_value(default_value)
 
         if node.datatype == "number":

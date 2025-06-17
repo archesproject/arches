@@ -55,7 +55,7 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
                 return [
                     self.from_id_string(
                         str(value.pk),
-                        graph_configs_by_graph_id.get(value.graph_id, None),
+                        graph_configs_by_graph_id.get(value.graph_id),
                     )
                 ]
             raise

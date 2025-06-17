@@ -221,7 +221,7 @@ class SemanticTileQuerySet(models.QuerySet):
         tile_data = datatype_instance.get_tile_data(tile)
         # Ordinarily we assume tiles always have all keys, but we've
         # seen problems in the wild.
-        node_val = tile_data.get(str(node.pk), None)
+        node_val = tile_data.get(str(node.pk))
         if self._as_representation:
             compiled_json = datatype_instance.to_json(tile, node)
             instance_val = {

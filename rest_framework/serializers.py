@@ -347,7 +347,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         except KeyError:
             pass
         try:
-            ret[1]["help_text"] = config.serialize().get("placeholder", None)
+            ret[1]["help_text"] = config.serialize().get("placeholder")
         except KeyError:
             pass
         ret[1]["label"] = label.serialize()
