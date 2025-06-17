@@ -322,8 +322,10 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                 sortorder=sortorder,
             )
         else:
-            klass = self.datatype_field_mapping.get(node.datatype, models.JSONField)
-            model_field = klass(null=True)
+            model_field_class = self.datatype_field_mapping.get(
+                node.datatype, models.JSONField
+            )
+            model_field = model_field_class(null=True)
         model_field.model = model_class
         model_field.blank = not node.isrequired
         try:

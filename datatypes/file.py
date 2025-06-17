@@ -11,6 +11,7 @@ class FileListDataType(datatypes.FileListDataType):
         if not value:
             return value
 
+        language = get_language()
         stringified_list = ",".join([file_info.get("name") for file_info in value])
         final_value = self.transform_value_for_tile(
             stringified_list, languages=languages, **kwargs
@@ -26,9 +27,7 @@ class FileListDataType(datatypes.FileListDataType):
                 for lang in languages:
                     if lang.code not in file_info[key]:
                         file_info[key][lang.code] = {
-                            "value": (
-                                original_val if lang.code == get_language() else ""
-                            ),
+                            "value": original_val if lang.code == language else "",
                             "direction": lang.default_direction,
                         }
 

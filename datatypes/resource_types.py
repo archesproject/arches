@@ -14,21 +14,10 @@ logger = logging.getLogger(__name__)
 
 class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
     def transform_value_for_tile(self, value, **kwargs):
-        def from_id_string(uuid_string, graph_id=None):
-            nonlocal kwargs
-            for graph_config in kwargs.get("graphs", []):
-                if graph_id is None or str(graph_id) == graph_config["graphid"]:
-                    break
-            else:
-                graph_config = {}
-            return {
-                "resourceId": uuid_string,
-                "ontologyProperty": graph_config.get("ontologyProperty", ""),
-                "inverseOntologyProperty": graph_config.get(
-                    "inverseOntologyProperty", ""
-                ),
-            }
-
+        graph_configs_by_graph_id = {
+            graph_config["graphid"]: graph_config
+            for graph_config in kwargs.get("graphs", [])
+        }
         try:
             if isinstance(value, (str, dict)):
                 value = [value]
@@ -37,25 +26,38 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
         except TypeError:
             if isinstance(value, list):
                 transformed = []
-                for inner in value:
-                    match inner:
+                for inner_val in value:
+                    match inner_val:
                         case models.ResourceInstance():
                             transformed.append(
-                                from_id_string(str(inner.pk), inner.graph_id)
+                                self.from_id_string(
+                                    str(inner_val.pk),
+                                    graph_configs_by_graph_id.get(
+                                        inner_val.graph_id, None
+                                    ),
+                                )
                             )
                         case uuid.UUID():
                             # TODO: handle multiple graph configs, requires db?
-                            transformed.append(from_id_string(str(inner)))
+                            transformed.append(self.from_id_string(str(inner_val)))
                         case str():
                             # TODO: handle multiple graph configs, requires db?
-                            transformed.append(from_id_string(inner))
+                            transformed.append(self.from_id_string(inner_val))
                         case dict():
-                            transformed.append(from_id_string(inner.get("resource_id")))
+                            # TODO: handle multiple graph configs, requires db?
+                            transformed.append(
+                                self.from_id_string(inner_val.get("resource_id"))
+                            )
                         case _:
-                            transformed.append(inner)
+                            transformed.append(inner_val)
                 return transformed
             if isinstance(value, models.ResourceInstance):
-                return [from_id_string(str(value.pk), value.graph_id)]
+                return [
+                    self.from_id_string(
+                        str(value.pk),
+                        graph_configs_by_graph_id.get(value.graph_id, None),
+                    )
+                ]
             raise
 
     def to_json(self, tile, node):
@@ -80,12 +82,14 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
             return []
         related_resources = []
         try:
-            rxrs = tile.resourceinstance.filtered_from_resxres
+            relations = tile.resourceinstance.from_resxres_for_queried_nodes
         except:
             if arches_version >= (8, 0):  # TODO: why?
-                rxrs = tile.resourceinstance.from_resxres.all()
+                relations = tile.resourceinstance.from_resxres.all()
             else:
-                rxrs = tile.resourceinstance.resxres_resource_instance_ids_from.all()
+                relations = (
+                    tile.resourceinstance.resxres_resource_instance_ids_from.all()
+                )
 
         def handle_missing_data(to_resource_id):
             msg = f"Missing ResourceXResource target: {to_resource_id}"
@@ -94,23 +98,22 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
         for inner_val in value:
             if not inner_val:
                 continue
-            for rxr in rxrs:
+            for relation in relations:
                 to_resource_id = (
-                    rxr.resourceinstanceidto_id
+                    relation.resourceinstanceidto_id
                     if arches_version < (8, 0)
-                    else rxr.to_resource_id
+                    else relation.to_resource_id
                 )
                 if to_resource_id == uuid.UUID(inner_val["resourceId"]):
                     try:
                         to_resource = (
-                            rxr.resourceinstanceidto
+                            relation.resourceinstanceidto
                             if arches_version < (8, 0)
-                            else rxr.to_resource
+                            else relation.to_resource
                         )
+                        if to_resource is None:
+                            raise models.ResourceInstance.DoesNotExist
                     except models.ResourceInstance.DoesNotExist:
-                        handle_missing_data(to_resource_id)
-                        break
-                    if to_resource is None:
                         handle_missing_data(to_resource_id)
                         break
                     related_resources.append(to_resource)
@@ -122,7 +125,8 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
         lang = get_language()
         value = tile.data.get(str(node.nodeid)) or []
         related_resources_by_id = {
-            rr.pk: rr for rr in self.get_related_resources(tile, value)
+            related_resource.pk: related_resource
+            for related_resource in self.get_related_resources(tile, value)
         }
         ret = []
         for inner_val in value:
@@ -154,6 +158,16 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
             details = self.get_details(value)
         return details[0]["resource_id"]
 
+    @staticmethod
+    def from_id_string(uuid_string, graph_config=None):
+        if graph_config is None:
+            graph_config = {}
+        return {
+            "resourceId": uuid_string,
+            "ontologyProperty": graph_config.get("ontologyProperty", ""),
+            "inverseOntologyProperty": graph_config.get("inverseOntologyProperty", ""),
+        }
+
 
 class ResourceInstanceListDataType(ResourceInstanceDataType):
     def collects_multiple_values(self):
@@ -174,8 +188,10 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         }
         return [
             {
-                "resource_id": inner["resourceId"],
-                "display_value": resource_display_value_map[inner["resourceId"]],
+                "resource_id": resource_dict["resourceId"],
+                "display_value": resource_display_value_map[
+                    resource_dict["resourceId"]
+                ],
             }
-            for inner in value
+            for resource_dict in value
         ]

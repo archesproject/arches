@@ -361,7 +361,7 @@ class SemanticResourceQuerySet(models.QuerySet):
                     queryset=ResourceXResource.objects.filter(
                         node__in=nodes
                     ).prefetch_related("to_resource"),
-                    to_attr="filtered_from_resxres",
+                    to_attr="from_resxres_for_queried_nodes",
                 ),
             )
         else:
@@ -371,7 +371,7 @@ class SemanticResourceQuerySet(models.QuerySet):
                     queryset=ResourceXResource.objects.filter(
                         nodeid__in=nodes
                     ).prefetch_related("resourceinstanceidto"),
-                    to_attr="filtered_from_resxres",
+                    to_attr="from_resxres_for_queried_nodes",
                 ),
             )
 
