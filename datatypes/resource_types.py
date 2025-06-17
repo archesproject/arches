@@ -122,6 +122,8 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
         return related_resources
 
     def get_details(self, tile, node):
+        """Hook for deriving information needed by both the display value
+        and the interchange value."""
         lang = get_language()
         value = tile.data.get(str(node.nodeid)) or []
         related_resources_by_id = {

@@ -20,6 +20,8 @@ class ConceptDataType(concept_types.ConceptDataType):
         }
 
     def get_details(self, tile, node):
+        """Hook for deriving information needed by both the display value
+        and the interchange value."""
         data = self.get_tile_data(tile)
         value = data.get(str(node.nodeid))
         instance = self.get_instance(value)
@@ -68,6 +70,8 @@ class ConceptListDataType(concept_types.ConceptListDataType):
         }
 
     def get_details(self, tile, node):
+        """Hook for deriving information needed by both the display value
+        and the interchange value."""
         data = self.get_tile_data(tile)
         value = data.get(str(node.nodeid))
         instances = self.get_instances(value)
