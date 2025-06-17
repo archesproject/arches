@@ -7,6 +7,8 @@ from arches.app.utils.i18n import rank_label
 
 
 class FileListDataType(datatypes.FileListDataType):
+    localized_metadata_keys = {"altText", "attribution", "description", "title"}
+
     def transform_value_for_tile(self, value, *, languages, **kwargs):
         if not value:
             return value
@@ -19,7 +21,7 @@ class FileListDataType(datatypes.FileListDataType):
 
         for file_info in final_value:
             for key, val in file_info.items():
-                if key not in {"altText", "attribution", "description", "title"}:
+                if key not in self.localized_metadata_keys:
                     continue
                 original_val = val
                 if not isinstance(original_val, dict):
@@ -44,7 +46,7 @@ class FileListDataType(datatypes.FileListDataType):
             return
         for file_info in transformed:
             for key, val in file_info.items():
-                if key not in {"altText", "attribution", "description", "title"}:
+                if key not in self.localized_metadata_keys:
                     continue
                 for existing_file_info in existing_tile_value:
                     if existing_file_info.get("file_id") == file_info.get("file_id"):

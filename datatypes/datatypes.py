@@ -5,20 +5,16 @@ from arches_querysets.datatypes import *
 
 
 class DataTypeFactory(datatypes.DataTypeFactory):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Until we're ready to upstream these changes, we have
-        # to override some core Arches datatypes.
-        self.overridden_datatype_instances = {
-            "concept": ConceptDataType(),
-            "concept-list": ConceptListDataType(),
-            "file-list": FileListDataType(),
-            "resource-instance": ResourceInstanceDataType(),
-            "resource-instance-list": ResourceInstanceListDataType(),
-            "string": StringDataType(),
-            "url": URLDataType(),
-        }
+    # Until we're ready to upstream these changes, override some core datatypes.
+    overridden_datatype_instances = {
+        "concept": ConceptDataType(),
+        "concept-list": ConceptListDataType(),
+        "file-list": FileListDataType(),
+        "resource-instance": ResourceInstanceDataType(),
+        "resource-instance-list": ResourceInstanceListDataType(),
+        "string": StringDataType(),
+        "url": URLDataType(),
+    }
 
     def get_instance(self, datatype):
         try:
