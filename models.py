@@ -292,13 +292,14 @@ class ListItem(models.Model):
     @staticmethod
     def find_best_label_from_set(
         labels: Iterable["ListItemValue" | ReferenceLabel],
+        language=None,
     ) -> str | None:
         ranked_labels = sorted(
             labels,
             key=lambda label: rank_label(
                 kind=label.valuetype_id,
                 source_lang=label.language_id,
-                target_lang=translation.get_language(),
+                target_lang=language or translation.get_language(),
             ),
             reverse=True,
         )

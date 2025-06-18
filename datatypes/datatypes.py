@@ -2,7 +2,7 @@ import uuid
 from dataclasses import asdict, dataclass
 from typing import Iterable, Mapping
 
-from django.utils.translation import get_language, gettext as _
+from django.utils.translation import gettext as _
 
 from arches.app.datatypes.base import BaseDataType
 from arches.app.models.models import Node
@@ -60,17 +60,7 @@ class ReferenceDataType(BaseDataType):
         ]
 
     def to_json(self, tile, node):
-        data = self.get_tile_data(tile)
-        value = data.get(str(node.pk), None)
-        references = self.to_python(value)
-        if not references:
-            display_value = _("(Empty)")
-        else:
-            display_value = [
-                ListItem.find_best_label_from_set(reference.labels)
-                for reference in references
-            ]
-        return {"@display_value": display_value}
+        return {"@display_value": self.get_display_value(tile, node)}
 
     def validate(
         self,
@@ -209,19 +199,18 @@ class ReferenceDataType(BaseDataType):
         return ",".join(value)
 
     def get_display_value(self, tile, node, **kwargs):
-        labels = []
         requested_language = kwargs.pop("language", None)
-        current_language = requested_language or get_language()
-        node_data = self.get_tile_data(tile)[str(node.nodeid)]
-        if node_data:
-            for item in node_data:
-                for label in item["labels"]:
-                    if (
-                        label["language_id"] == current_language
-                        and label["valuetype_id"] == "prefLabel"
-                    ):
-                        labels.append(label.get("value", ""))
-        return ", ".join(labels)
+        node_data = self.get_tile_data(tile)
+        value = node_data.get(str(node.pk), None)
+        references = self.to_python(value)
+        if not references:
+            return _("(Empty)")
+        else:
+            best_labels = [
+                ListItem.find_best_label_from_set(reference.labels, requested_language)
+                for reference in references
+            ]
+            return ", ".join(best_labels)
 
     def get_interchange_value(self, value, **kwargs):
         """
