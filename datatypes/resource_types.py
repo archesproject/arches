@@ -61,11 +61,12 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
             raise
 
     def to_json(self, tile, node):
-        details = self.get_details(tile, node)
-        return {
-            "@display_value": self.get_display_value(tile, node, details=details),
-            "@details": details,
-        }
+        return self.compile_json(tile, node, details=self.get_details(tile, node))
+
+    def compile_json(self, tile, node, *, details=None, **kwargs):
+        ret = {"@display_value": self.get_display_value(tile, node, details=details)}
+        ret.update(kwargs)
+        return ret
 
     def get_display_value(self, tile, node, *, details=None, **kwargs):
         if details is None:
@@ -121,11 +122,11 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
 
         return related_resources
 
-    def get_details(self, tile, node):
+    def get_details(self, tile, node, *, value=None):
         """Hook for deriving information needed by both the display value
         and the interchange value."""
         lang = get_language()
-        value = tile.data.get(str(node.nodeid)) or []
+        value = value or self.get_tile_data(tile).get(str(node.pk)) or []
         related_resources_by_id = {
             related_resource.pk: related_resource
             for related_resource in self.get_related_resources(tile, value)
@@ -157,7 +158,7 @@ class ResourceInstanceDataType(datatypes.ResourceInstanceDataType):
         if not value:
             return None
         if details is None:
-            details = self.get_details(value)
+            details = self.get_details(value=value, **kwargs)
         return details[0]["resource_id"]
 
     @staticmethod
@@ -184,7 +185,7 @@ class ResourceInstanceListDataType(ResourceInstanceDataType):
         if not value:
             return None
         if details is None:
-            details = self.get_details(value)
+            details = self.get_details(value=value, **kwargs)
         resource_display_value_map = {
             str(detail["resource_id"]): detail["display_value"] for detail in details
         }

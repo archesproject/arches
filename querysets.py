@@ -227,7 +227,7 @@ class SemanticTileQuerySet(models.QuerySet):
             instance_val = {
                 "display_value": compiled_json["@display_value"],
                 "interchange_value": datatype_instance.get_interchange_value(
-                    node_val, details=compiled_json.get("@details")
+                    node_val, tile=tile, node=node, details=compiled_json.get("details")
                 ),
             }
             if instance_val["display_value"] in (None, ""):

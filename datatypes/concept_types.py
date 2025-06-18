@@ -13,11 +13,8 @@ class ConceptDataType(concept_types.ConceptDataType):
     def to_python(self, value, **kwargs):
         return self.get_instance(value)
 
-    def to_json(self, tile, node):
-        return {
-            "@display_value": self.get_display_value(tile, node),
-            "@details": self.get_details(tile, node),
-        }
+    def to_json(self, tile, node, **kwargs):
+        return self.compile_json(tile, node, details=self.get_details(tile, node))
 
     def get_details(self, tile, node):
         """Hook for deriving information needed by both the display value
@@ -63,11 +60,8 @@ class ConceptListDataType(concept_types.ConceptListDataType):
     def to_python(self, value, **kwargs):
         return self.get_instances(value) or None
 
-    def to_json(self, tile, node):
-        return {
-            "@display_value": self.get_display_value(tile, node),
-            "@details": self.get_details(tile, node),
-        }
+    def to_json(self, tile, node, **kwargs):
+        return self.compile_json(tile, node, details=self.get_details(tile, node))
 
     def get_details(self, tile, node):
         """Hook for deriving information needed by both the display value

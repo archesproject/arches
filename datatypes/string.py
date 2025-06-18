@@ -17,7 +17,7 @@ class StringDataType(datatypes.StringDataType):
         data = self.get_tile_data(tile)
         if data.get(str(node.nodeid)):
             return self.compile_json(tile, node)
-        return {"@display_value": None}
+        return {"@display_value": _("(Empty)")}
 
     def resolve(self, value: dict):
         """Resolve localized values to a single one."""
