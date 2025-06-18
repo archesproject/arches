@@ -90,3 +90,11 @@ class ConceptListDataType(concept_types.ConceptListDataType):
         if details is None:
             details = [self.get_instances(value)]
         return JSONDeserializer().deserialize(JSONSerializer().serialize(details))
+
+    def get_display_value(self, tile, node, **kwargs):
+        new_values = []
+        data = self.get_tile_data(tile)
+        for val in data.get(str(node.nodeid)) or []:
+            new_val = self.get_value(uuid.UUID(val))
+            new_values.append(new_val.value)
+        return ",".join(new_values)
