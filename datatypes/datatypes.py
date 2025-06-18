@@ -48,6 +48,10 @@ class ReferenceDataType(BaseDataType):
         return references or None
 
     def serialize(self, value):
+        """
+        Unlike to_json() which is concerned with calculating display values, this
+        method simply serializes all the information held in the Reference(s).
+        """
         if value is None:
             return None
         return [
@@ -60,7 +64,7 @@ class ReferenceDataType(BaseDataType):
         value = data.get(str(node.pk), None)
         references = self.to_python(value)
         if not references:
-            display_value = None
+            display_value = _("(Empty)")
         else:
             display_value = [
                 ListItem.find_best_label_from_set(reference.labels)
