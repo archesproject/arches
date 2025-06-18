@@ -59,9 +59,6 @@ class ReferenceDataType(BaseDataType):
             for reference in value
         ]
 
-    def to_json(self, tile, node):
-        return {"@display_value": self.get_display_value(tile, node)}
-
     def validate(
         self,
         value,
