@@ -178,13 +178,6 @@ class ArchesModelAPIMixin:
         except DjangoValidationError as django_error:
             flattened_errors = self.flatten_validation_errors(django_error)
             raise ValidationError(flattened_errors) from django_error
-        # Include the data that was shuffled during validation with the response.
-        # There are some more details to capture here like minted tile ids:
-        # https://github.com/archesproject/arches-querysets/issues/10
-        try:
-            serializer._data = serializer.data | serializer.validated_data
-        except AttributeError:
-            serializer._data = serializer.validated_data
 
     def perform_create(self, serializer):
         self.validate_tile_data_and_save(serializer)

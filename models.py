@@ -170,17 +170,28 @@ class SemanticResource(ResourceInstance):
             )
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None, user=None):
+        if from_queryset is None:
+            from_queryset = self.__class__.as_model(
+                self.graph.slug,
+                only={node.alias for node in self._queried_nodes},
+                as_representation=getattr(self, "_as_representation", False),
+                user=user,
+            )
+        # Filter now so we can patch it out below.
+        from_queryset = from_queryset.filter(pk=self.pk)
         if arches_version >= (8, 0):
-            if from_queryset is None:
-                from_queryset = self.__class__.as_model(
-                    self.graph.slug,
-                    # TODO: only=queried_nodes
-                    as_representation=getattr(self, "_as_representation", False),
-                    user=user,
-                ).filter(pk=self.pk)
+            # Patch out filter(pk=...) so that when refresh_from_db() calls get(),
+            # it populates the cache. TODO: ask on forum about happier path.
+            from_queryset.filter = lambda pk=None: from_queryset
             super().refresh_from_db(using, fields, from_queryset)
+            # Retrieve aliased data from the queryset cache.
+            self.aliased_data = from_queryset[0].aliased_data
         else:
-            super().refresh_from_db(using, fields)
+            # Django 4: good-enough riff on refresh_from_db(), but not bulletproof.
+            db_instance = from_queryset.get()
+            for field in db_instance._meta.concrete_fields:
+                setattr(self, field.attname, getattr(db_instance, field.attname))
+            self.aliased_data = db_instance.aliased_data
 
 
 class SemanticTile(TileModel):
