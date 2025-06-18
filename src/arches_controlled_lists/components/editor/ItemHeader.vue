@@ -71,7 +71,6 @@ const iconLabel = (item: ControlledListItem) => {
 
 .item-header-icon {
     padding: 0.5rem 0.5rem;
-    align-items: baseline;
 }
 
 .item-label {

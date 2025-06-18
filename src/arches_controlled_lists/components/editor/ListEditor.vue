@@ -82,7 +82,6 @@ const { $gettext } = useGettext();
 
 .list-header-icon {
     padding: 0.5rem 0.5rem;
-    align-items: baseline;
 }
 
 .nodes-container {
