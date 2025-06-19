@@ -16,17 +16,19 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 from arches_querysets.datatypes.datatypes import DataTypeFactory
 from arches_querysets.models import AliasedData, SemanticResource, SemanticTile
-from arches_querysets.rest_framework import interchange_fields
-
-
-# Workaround for I18n_string fields
-renderers.JSONRenderer.encoder_class = JSONSerializer
-renderers.JSONOpenAPIRenderer.encoder_class = JSONSerializer
+from arches_querysets.rest_framework import interchange_mixin
 
 
 def _make_tile_serializer(
     *, nodegroup_alias, cardinality, sortorder, slug, graph_nodes, nodes="__all__"
-):
+) -> type:
+    """
+    DRF encourages a declarative programming style with classes. You, as
+    the project implementer, can follow that style if you wish, but we've
+    put some effort toward hiding this complexity from you by generating
+    classes on the fly by default.
+    """
+
     class DynamicTileSerializer(ArchesTileSerializer):
         aliased_data = TileAliasedDataSerializer(
             required=False,
@@ -43,15 +45,27 @@ def _make_tile_serializer(
             fields = nodes
 
     name = "_".join((slug.title(), nodegroup_alias.title(), "TileSerializer"))
-    klass = type(name, (DynamicTileSerializer,), {})
-    ret = klass(
+    serializer_class = type(name, (DynamicTileSerializer,), {})
+    return serializer_class(
         many=cardinality == "n",
         required=False,
         allow_null=True,
         graph_nodes=graph_nodes,
         style={"alias": nodegroup_alias, "sortorder": sortorder},
     )
-    return ret
+
+
+def _wrap_serializer_field(serializer_field_class) -> type:
+    """
+    Ensure every serializer field in DRF's serializer_field_mapping
+    resolves to one of *our* serializer fields with overrides handling
+    interchange_value wrapping and unwrapping.
+    """
+    return type(
+        serializer_field_class.__name__,
+        (interchange_mixin.InterchangeValueMixin, serializer_field_class),
+        {},
+    )
 
 
 class NodeFetcherMixin:
@@ -194,15 +208,9 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
 
 
 class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
-    # Supplement DRF's map of Django model fields to DRF serializer fields
-    # with more specific fields that know to drill into interchange_value.
     serializer_field_mapping = {
-        **serializers.ModelSerializer.serializer_field_mapping,
-        models.JSONField: interchange_fields.JSONField,
-        models.FloatField: interchange_fields.FloatField,
-        models.DateField: interchange_fields.DateField,
-        models.BooleanField: interchange_fields.BooleanField,
-        models.CharField: interchange_fields.CharField,
+        model_field: _wrap_serializer_field(serializer_field)
+        for model_field, serializer_field in serializers.ModelSerializer.serializer_field_mapping.items()
     }
 
     class Meta:
@@ -507,3 +515,8 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             )
             updated = self.update(instance_from_factory, validated_data)
         return updated
+
+
+# Workaround for I18n_string fields
+renderers.JSONRenderer.encoder_class = JSONSerializer
+renderers.JSONOpenAPIRenderer.encoder_class = JSONSerializer
