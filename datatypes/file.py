@@ -1,9 +1,6 @@
-import copy
-
 from django.utils.translation import get_language
 
 from arches.app.datatypes import datatypes
-from arches.app.utils.i18n import rank_label
 
 
 class FileListDataType(datatypes.FileListDataType):
@@ -53,24 +50,3 @@ class FileListDataType(datatypes.FileListDataType):
                         file_info[key] = existing_file_info[key] | val
                     break
         tile.data[node_id_str] = transformed
-
-    def get_display_value(self, tile, node, **kwargs):
-        """Resolve localized string metadata to a single language value."""
-        value = super().get_display_value(tile, node, **kwargs)
-        if not value:
-            return value
-        final_value = copy.deepcopy(value)
-        for file_info in final_value:
-            for key, val in file_info.items():
-                if not isinstance(val, dict):
-                    continue
-                lang_val_pairs = [(lang, lang_val) for lang, lang_val in val.items()]
-                if not lang_val_pairs:
-                    continue
-                ranked = sorted(
-                    lang_val_pairs,
-                    key=lambda pair: rank_label(source_lang=pair[0]),
-                    reverse=True,
-                )
-                file_info[key] = ranked[0][1].get("value")
-        return final_value
