@@ -152,12 +152,6 @@ class SemanticResource(ResourceInstance):
         )
         bulk_operation.run()
 
-        self.refresh_from_db(
-            using=kwargs.get("using", None),
-            fields=kwargs.get("update_fields", None),
-            user=request.user if request else None,
-        )
-
         # Instantiate proxy model for now, but refactor & expose this on vanilla model
         proxy_resource = Resource.objects.get(pk=self.pk)
         proxy_resource.save_descriptors()
@@ -168,6 +162,12 @@ class SemanticResource(ResourceInstance):
             self.save_edit(
                 user=request.user, transaction_id=bulk_operation.transaction_id
             )
+
+        self.refresh_from_db(
+            using=kwargs.get("using"),
+            fields=kwargs.get("update_fields"),
+            user=request.user if request else None,
+        )
 
     def refresh_from_db(self, using=None, fields=None, from_queryset=None, user=None):
         if from_queryset is None:
@@ -435,18 +435,15 @@ class SemanticTile(TileModel):
         )
         bulk_operation.run()
 
-        # TODO: determine whether this should be skippable, and how.
-        self.refresh_from_db(
-            using=kwargs.get("using", None),
-            fields=kwargs.get("update_fields", None),
-        )
-
-        # TODO: refactor & expose this on vanilla model, at which point
-        # we may want to refresh_from_db() here.
         proxy_resource = Resource.objects.get(pk=self.resourceinstance_id)
         proxy_resource.save_descriptors()
         if index:
             proxy_resource.index()
+
+        self.refresh_from_db(
+            using=kwargs.get("using", None),
+            fields=kwargs.get("update_fields", None),
+        )
 
     def _tile_update_is_noop(self, original_data):
         """Skipping no-op tile saves avoids regenerating RxR rows, at least
