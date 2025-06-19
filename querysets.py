@@ -222,6 +222,7 @@ class SemanticTileQuerySet(models.QuerySet):
         # Ordinarily we assume tiles always have all keys, but we've
         # seen problems in the wild.
         node_val = tile_data.get(str(node.pk))
+        empty_values = (None, "", '{"url": "", "url_label": ""}')
         if self._as_representation:
             compiled_json = datatype_instance.to_json(tile, node)
             instance_val = {
@@ -230,8 +231,8 @@ class SemanticTileQuerySet(models.QuerySet):
                     node_val, tile=tile, node=node, details=compiled_json.get("details")
                 ),
             }
-            if instance_val["display_value"] in (None, ""):
-                # TODO: upstream this into datatype methods.
+            if instance_val["display_value"] in empty_values:
+                # TODO: upstream this into datatype methods (another hook?)
                 instance_val["display_value"] = _("(Empty)")
         else:
             if hasattr(datatype_instance, "to_python"):

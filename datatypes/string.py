@@ -13,13 +13,6 @@ class StringDataType(datatypes.StringDataType):
         data = self.get_tile_data(tile)
         tile.data[node_id_str] = (data.get(node_id_str) or {}) | transformed
 
-    def to_json(self, tile, node):
-        """Workaround for https://github.com/archesproject/arches/issues/12275"""
-        data = self.get_tile_data(tile)
-        if data.get(str(node.nodeid)):
-            return self.compile_json(tile, node)
-        return {"@display_value": ""}
-
     def resolve(self, value: dict):
         """Resolve localized values to a single one."""
         lang_val_pairs = [(lang, obj["value"]) for lang, obj in value.items()]

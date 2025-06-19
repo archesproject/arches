@@ -30,6 +30,7 @@ class BulkTileOperation:
         self.errors_by_node_alias = defaultdict(list)
         self.entry = entry  # resource or tile
         self.datatype_factory = DataTypeFactory()
+        self.languages = Language.objects.all()
         self.request = request
         if not self.request:
             self.request = HttpRequest()
@@ -196,7 +197,6 @@ class BulkTileOperation:
                 self.to_update.add(existing_tile)
 
         nodes = grouping_node.nodegroup.node_set.all()
-        languages = Language.objects.all()
         for tile in self.to_insert | self.to_update:
             if tile.nodegroup_id != grouping_node.pk:
                 # TODO: this is a symptom this should be refactored.
@@ -220,11 +220,7 @@ class BulkTileOperation:
                     original_tile_data_by_tile_id=original_tile_data_by_tile_id,
                     delete_siblings=True,
                 )
-            self._validate_and_patch_from_tile_values(
-                tile,
-                nodes=nodes,
-                languages=languages,
-            )
+            self._validate_and_patch_from_tile_values(tile, nodes=nodes)
 
         # https://github.com/archesproject/arches-querysets/issues/11
         # for tile in self.to_insert | self.to_update:
@@ -277,7 +273,7 @@ class BulkTileOperation:
                 pairs.append((NOT_PROVIDED, new_tile))
         return pairs
 
-    def _validate_and_patch_from_tile_values(self, tile, *, nodes, languages):
+    def _validate_and_patch_from_tile_values(self, tile, *, nodes):
         """Validate data found on ._incoming_tile and move it to .data.
         Update errors_by_node_alias in place."""
         from arches_querysets.models import AliasedData, SemanticTile
@@ -302,19 +298,19 @@ class BulkTileOperation:
                 if interchange_val is not NOT_PROVIDED:
                     value_to_validate = interchange_val
 
-            self._run_datatype_methods(tile, value_to_validate, node, languages)
+            self._run_datatype_methods(tile, value_to_validate, node)
 
-    def _run_datatype_methods(self, tile, value_to_validate, node, languages):
+    def _run_datatype_methods(self, tile, value_to_validate, node):
         """
         Call datatype methods when merging value_to_validate into the tile.
 
         1. transform_value_for_tile()
         2. merge_tile_value() -- only exists in arches-querysets for now
-        3. clean()
-        4. validate()
-        5. pre_tile_save()
+        3. pre_structure_tile_data()
+        4. clean()
+        5. validate()
+        6. pre_tile_save()
 
-        TODO: pre_structure_tile_data()?
         TODO: move this to Tile.full_clean()?
         https://github.com/archesproject/arches/issues/10851#issuecomment-2427305853
         """
@@ -326,7 +322,7 @@ class BulkTileOperation:
             return
         try:
             transformed = datatype_instance.transform_value_for_tile(
-                value_to_validate, languages=languages, **node.config
+                value_to_validate, languages=self.languages, **node.config
             )
         except ValueError:  # BooleanDataType raises.
             # validate() will handle.
@@ -338,6 +334,10 @@ class BulkTileOperation:
             datatype_instance.merge_tile_value(tile, node_id_str, transformed)
         else:
             tile.data[node_id_str] = transformed
+
+        datatype_instance.pre_structure_tile_data(
+            tile, node_id_str, languages=self.languages
+        )
 
         datatype_instance.clean(tile, node_id_str)
 
