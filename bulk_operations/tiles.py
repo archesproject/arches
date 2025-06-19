@@ -96,6 +96,7 @@ class BulkTileOperation:
                 msg = _("Tile Cardinality Error")
                 raise ValidationError({nodegroup_alias: msg}) from e
             raise
+        self.after_update_all()
 
     def validate(self):
         self._update_tiles()
@@ -533,3 +534,7 @@ class BulkTileOperation:
                     provisional_edit_log_details=None,
                     transaction_id=self.transaction_id,
                 )
+
+    def after_update_all(self):
+        for datatype in self.datatype_factory.datatype_instances.values():
+            datatype.after_update_all()
