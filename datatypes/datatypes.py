@@ -1,28 +1,30 @@
+from django.db import models
+
 from arches import VERSION as arches_version
 from arches.app.datatypes import datatypes
 
-from arches_querysets.datatypes import *
-
 
 class DataTypeFactory(datatypes.DataTypeFactory):
-    # Until we're ready to upstream these changes, override some core datatypes.
-    overridden_datatype_instances = {
-        "concept": ConceptDataType(),
-        "concept-list": ConceptListDataType(),
-        "file-list": FileListDataType(),
-        "resource-instance": ResourceInstanceDataType(),
-        "resource-instance-list": ResourceInstanceListDataType(),
-        "string": StringDataType(),
-        "url": URLDataType(),
-    }
-
     def get_instance(self, datatype):
-        try:
-            instance = self.overridden_datatype_instances[datatype]
-        except KeyError:
-            instance = super().get_instance(datatype)
+        instance = super().get_instance(datatype)
 
         if arches_version < (8, 0) and not hasattr(instance, "get_interchange_value"):
             instance.get_interchange_value = lambda value, **kwargs: value
 
         return instance
+
+    @staticmethod
+    def get_model_field(instance):
+        if model_field := getattr(instance, "model_field", None):
+            return model_field
+        match instance:
+            case datatypes.NumberDataType():
+                return models.FloatField(null=True)
+            case datatypes.DateDataType():
+                return models.DateField(null=True)
+            case datatypes.BooleanDataType():
+                return models.BooleanField(null=True)
+            case datatypes.NonLocalizedStringDataType():
+                return models.CharField(null=True)
+            case _:
+                return models.JSONField(null=True)

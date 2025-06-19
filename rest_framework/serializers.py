@@ -14,6 +14,7 @@ from arches.app.models.fields.i18n import I18n_JSON, I18n_String
 from arches.app.models.models import Node
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
+from arches_querysets.datatypes.datatypes import DataTypeFactory
 from arches_querysets.models import AliasedData, SemanticResource, SemanticTile
 from arches_querysets.rest_framework import interchange_fields
 
@@ -193,12 +194,8 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
 
 
 class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
-    datatype_field_mapping = {
-        "number": models.FloatField,
-        "date": models.DateField,
-        "boolean": models.BooleanField,
-        "non-localized-string": models.CharField,
-    }
+    # Supplement DRF's map of Django model fields to DRF serializer fields
+    # with more specific fields that know to drill into interchange_value.
     serializer_field_mapping = {
         **serializers.ModelSerializer.serializer_field_mapping,
         models.JSONField: interchange_fields.JSONField,
@@ -322,10 +319,8 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
                 sortorder=sortorder,
             )
         else:
-            model_field_class = self.datatype_field_mapping.get(
-                node.datatype, models.JSONField
-            )
-            model_field = model_field_class(null=True)
+            dt_instance = DataTypeFactory().get_instance(node.datatype)
+            model_field = DataTypeFactory.get_model_field(dt_instance)
         model_field.model = model_class
         model_field.blank = not node.isrequired
         try:
