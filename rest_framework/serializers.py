@@ -439,9 +439,33 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
 
 class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
+    # aliased_data is the only "virtual" field we need to add here, the rest
+    # are inferred by serializers.ModelSerializer. We temporarily define
+    # several fields here to set read_only=True until we can depend on Arches
+    # 8.1 where the model fields set the equivalent editable=False.
     aliased_data = ResourceAliasedDataSerializer(required=False, allow_null=False)
-    # Until dropping support for Arches 7.6, we need to explicitly set read_only=True
     principaluser = serializers.PrimaryKeyRelatedField(
+        allow_null=True,
+        required=False,
+        read_only=True,
+    )
+    name = serializers.JSONField(
+        allow_null=True,
+        required=False,
+        read_only=True,
+        encoder=JSONSerializer,
+    )
+    descriptors = serializers.JSONField(
+        allow_null=True,
+        required=False,
+        read_only=True,
+    )
+    legacyid = serializers.PrimaryKeyRelatedField(
+        allow_null=True,
+        required=False,
+        read_only=True,
+    )
+    graph_publication = serializers.PrimaryKeyRelatedField(
         allow_null=True,
         required=False,
         read_only=True,
