@@ -43,7 +43,7 @@
             </div>
             <div class="search-tools-item">
                 <div class="search-controls-container">
-                    <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {clearQuery();}"><span>{% trans "Clear Filters" %}</span></button>
+                    <button class="btn-sm btn btn-mint btn-labeled clear-filter" data-bind="click: function() {clearQuery();}"><span data-bind="text:$root.translations.clearFilters"></span></button>
                     <div data-bind="component: {
                         name: 'sort-results',
                         params: sharedStateObject
