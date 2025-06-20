@@ -85,7 +85,7 @@ class BulkTileOperation:
     def run(self):
         self.validate()
         try:
-            self._persist()
+            self._save()
         except ProgrammingError as e:
             if e.args and "excess_tiles" in e.args[0]:
                 nodegroup_id = e.args[0].split("nodegroupid: ")[1].split(",")[0]
@@ -106,7 +106,7 @@ class BulkTileOperation:
         """
         original_tile_data_by_tile_id = {}
         if isinstance(self.entry, TileModel):
-            self._update_tile_for_grouping_node(
+            self._update_tile(
                 self.entry.nodegroup.grouping_node,
                 self.entry,
                 original_tile_data_by_tile_id,
@@ -115,7 +115,7 @@ class BulkTileOperation:
             for grouping_node in self.grouping_nodes_by_nodegroup_id.values():
                 if grouping_node.nodegroup.parentnodegroup_id:
                     continue
-                self._update_tile_for_grouping_node(
+                self._update_tile(
                     grouping_node,
                     self.entry,
                     original_tile_data_by_tile_id,
@@ -130,7 +130,7 @@ class BulkTileOperation:
                 }
             )
 
-    def _update_tile_for_grouping_node(
+    def _update_tile(
         self,
         grouping_node,
         container,
@@ -214,13 +214,13 @@ class BulkTileOperation:
                     )
                     child_nodegroup.grouping_node = grouping_node
             for child_nodegroup in children:
-                self._update_tile_for_grouping_node(
+                self._update_tile(
                     grouping_node=child_nodegroup.grouping_node,
                     container=tile._incoming_tile,
                     original_tile_data_by_tile_id=original_tile_data_by_tile_id,
                     delete_siblings=True,
                 )
-            self._validate_and_patch_from_tile_values(tile, nodes=nodes)
+            self._validate_and_patch_incoming_values(tile, nodes=nodes)
 
         # https://github.com/archesproject/arches-querysets/issues/11
         # for tile in self.to_insert | self.to_update:
@@ -273,7 +273,7 @@ class BulkTileOperation:
                 pairs.append((NOT_PROVIDED, new_tile))
         return pairs
 
-    def _validate_and_patch_from_tile_values(self, tile, *, nodes):
+    def _validate_and_patch_incoming_values(self, tile, *, nodes):
         """Validate data found on ._incoming_tile and move it to .data.
         Update errors_by_node_alias in place."""
         from arches_querysets.models import AliasedData, SemanticTile
@@ -353,7 +353,7 @@ class BulkTileOperation:
                 )
             )
 
-    def _persist(self):
+    def _save(self):
         # Instantiate proxy models for now, but TODO: expose this
         # functionality on vanilla models, and in bulk.
         upserts = self.to_insert | self.to_update
