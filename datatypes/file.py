@@ -31,22 +31,3 @@ class FileListDataType(datatypes.FileListDataType):
                         }
 
         return final_value
-
-    def merge_tile_value(self, tile, node_id_str, transformed) -> None:
-        """
-        Merge a node value with the existing node values. Useful to
-        accept incoming data without overwriting all data on the target.
-        """
-        data = self.get_tile_data(tile)
-        if not (existing_tile_value := data.get(node_id_str)):
-            tile.data[node_id_str] = transformed
-            return
-        for file_info in transformed:
-            for key, val in file_info.items():
-                if key not in self.localized_metadata_keys:
-                    continue
-                for existing_file_info in existing_tile_value:
-                    if existing_file_info.get("file_id") == file_info.get("file_id"):
-                        file_info[key] = existing_file_info[key] | val
-                    break
-        tile.data[node_id_str] = transformed

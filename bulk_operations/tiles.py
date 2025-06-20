@@ -305,13 +305,12 @@ class BulkTileOperation:
         Call datatype methods when merging value_to_validate into the tile.
 
         1. transform_value_for_tile()
-        2. merge_tile_value() -- only exists in arches-querysets for now
-        3. pre_structure_tile_data()
-        4. clean()
-        5. validate()
-        6. pre_tile_save()
+        2. pre_structure_tile_data()
+        3. clean()
+        4. validate()
+        5. pre_tile_save()
 
-        TODO: move this to Tile.full_clean()?
+        TODO: move this to BaseDataType.full_clean()?
         https://github.com/archesproject/arches/issues/10851#issuecomment-2427305853
         """
         node_id_str = str(node.pk)
@@ -328,12 +327,8 @@ class BulkTileOperation:
             # validate() will handle.
             transformed = value_to_validate
 
-        # Merge the transformed data into the tile.data.
-        # We just overwrite the old value unless a datatype has another idea.
-        if hasattr(datatype_instance, "merge_tile_value"):
-            datatype_instance.merge_tile_value(tile, node_id_str, transformed)
-        else:
-            tile.data[node_id_str] = transformed
+        # Merge the incoming value.
+        tile.data[node_id_str] = transformed
 
         datatype_instance.pre_structure_tile_data(
             tile, node_id_str, languages=self.languages
