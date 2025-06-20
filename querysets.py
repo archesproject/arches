@@ -219,9 +219,11 @@ class SemanticTileQuerySet(models.QuerySet):
         datatype_instance = DataTypeFactory().get_instance(node.datatype)
 
         tile_data = datatype_instance.get_tile_data(tile)
-        # Ordinarily we assume tiles always have all keys, but we've
-        # seen problems in the wild.
         node_val = tile_data.get(str(node.pk))
+        if node_val is None:
+            # Datatype methods assume tiles always have all keys, but we've
+            # seen problems in the wild.
+            tile_data[str(node.pk)] = None
         empty_values = (None, "", '{"url": "", "url_label": ""}')
         if self._as_representation:
             compiled_json = datatype_instance.to_json(tile, node)
