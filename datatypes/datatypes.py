@@ -3,6 +3,8 @@ from django.db import models
 from arches import VERSION as arches_version
 from arches.app.datatypes import datatypes
 
+from arches_querysets.datatypes import *
+
 
 class DataTypeFactory(datatypes.DataTypeFactory):
     def get_instance(self, datatype):
