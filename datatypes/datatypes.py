@@ -1,4 +1,4 @@
-from django.db import models
+import django.db.models
 
 from arches import VERSION as arches_version
 from arches.app.datatypes import datatypes
@@ -21,12 +21,12 @@ class DataTypeFactory(datatypes.DataTypeFactory):
             return model_field
         match instance:
             case datatypes.NumberDataType():
-                return models.FloatField(null=True)
+                return django.db.models.FloatField(null=True)
             case datatypes.DateDataType():
-                return models.DateField(null=True)
+                return django.db.models.DateField(null=True)
             case datatypes.BooleanDataType():
-                return models.BooleanField(null=True)
+                return django.db.models.BooleanField(null=True)
             case datatypes.NonLocalizedStringDataType():
-                return models.CharField(null=True)
+                return django.db.models.CharField(null=True)
             case _:
-                return models.JSONField(null=True)
+                return django.db.models.JSONField(null=True)
