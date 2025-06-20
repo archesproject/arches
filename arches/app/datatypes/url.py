@@ -120,8 +120,9 @@ class URLDataType(BaseDataType):
 
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
+        value_data = data.get(str(node.nodeid)) or {}
         if data:
-            return self.compile_json(tile, node, **data.get(str(node.nodeid)))
+            return self.compile_json(tile, node, **value_data)
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         if nodevalue.get("url") is not None:

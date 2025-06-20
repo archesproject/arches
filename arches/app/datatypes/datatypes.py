@@ -442,8 +442,9 @@ class StringDataType(BaseDataType):
 
     def to_json(self, tile, node):
         data = self.get_tile_data(tile)
+        value_data = data.get(str(node.nodeid)) or {}
         if data:
-            return self.compile_json(tile, node, **data.get(str(node.nodeid)))
+            return self.compile_json(tile, node, **value_data)
 
     def pre_structure_tile_data(self, tile, nodeid, **kwargs):
         all_language_codes = {lang.code for lang in kwargs["languages"]}
@@ -2139,10 +2140,6 @@ class ResourceInstanceDataType(BaseDataType):
             return None
 
     def to_json(self, tile, node):
-        from arches.app.models.resource import (
-            Resource,
-        )  # import here rather than top to avoid circular import
-
         data = self.get_tile_data(tile)
         if data:
             nodevalue = self.get_nodevalues(data[str(node.nodeid)])
@@ -2155,6 +2152,7 @@ class ResourceInstanceDataType(BaseDataType):
                 except:
                     resourceid = resourceXresource["resourceId"]
                     logger.info(f'Resource with id "{resourceid}" not in the system.')
+            return self.compile_json(tile, node)
 
     def append_to_document(self, document, nodevalue, nodeid, tile, provisional=False):
         nodevalue = self.get_nodevalues(nodevalue)

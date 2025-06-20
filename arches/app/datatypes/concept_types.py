@@ -287,9 +287,12 @@ class ConceptDataType(BaseConceptDataType):
         data = self.get_tile_data(tile)
         if data:
             val = data[str(node.nodeid)]
-            value_data = JSONSerializer().serializeToPython(
-                self.get_value(uuid.UUID(val))
-            )
+            if val is None:
+                value_data = {}
+            else:
+                value_data = JSONSerializer().serializeToPython(
+                    self.get_value(uuid.UUID(val))
+                )
             return self.compile_json(tile, node, **value_data)
 
     def get_rdf_uri(self, node, data, which="r", c=None):
@@ -473,7 +476,7 @@ class ConceptListDataType(BaseConceptDataType):
         new_values = []
         data = self.get_tile_data(tile)
         if data:
-            for val in data[str(node.nodeid)]:
+            for val in data[str(node.nodeid)] or []:
                 new_val = self.get_value(uuid.UUID(val))
                 new_values.append(new_val)
         return self.compile_json(tile, node, concept_details=new_values)
