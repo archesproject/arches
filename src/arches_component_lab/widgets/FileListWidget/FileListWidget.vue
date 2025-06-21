@@ -63,7 +63,6 @@ onMounted(async () => {
             <span>{{ widgetData.label }}</span>
             <span v-if="nodeData.isrequired && props.mode === EDIT">*</span>
         </label>
-
         <div :class="[nodeAlias, graphSlug].join(' ')">
             <FileListWidgetEditor
                 v-if="mode === EDIT"

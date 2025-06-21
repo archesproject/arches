@@ -41,14 +41,14 @@ const formFieldRef = useTemplateRef("formFieldRef");
 const currentValues = ref<FileReference[]>();
 
 onMounted(() => {
-    allowedFileTypes.value = props.nodeData.config.imagesOnly ? "image/*" : "*";
+    const acceptedFiles = props.widgetData.config.acceptedFiles;
+    allowedFileTypes.value = acceptedFiles != "" ? acceptedFiles : null;
 
     // @ts-expect-error - This is a bug in the PrimeVue types
     formFieldRef.value!.field.states.value = {
         newFiles: [],
         deletedFiles: [],
     };
-
     if (props.initialValue) {
         currentValues.value = props.initialValue;
     }
@@ -133,7 +133,6 @@ function deleteImage(fileId: string) {
                     :src="image.url"
                     :alt="image.name"
                 ></Image>
-                <div class="spacer"></div>
                 <Button
                     icon="pi pi-trash"
                     :aria-label="$gettext('delete')"
@@ -144,7 +143,7 @@ function deleteImage(fileId: string) {
             </div>
         </div>
         <FileUpload
-            accept="image/*"
+            :accept="allowedFileTypes"
             :file-limit="currentMax"
             :disabled="currentMax == 0"
             :preview-width="250"
