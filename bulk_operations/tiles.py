@@ -22,7 +22,7 @@ from arches_querysets.utils.models import (
 NOT_PROVIDED = object()
 
 
-class BulkTileOperation:
+class SemanticTileOperation:
     def __init__(self, *, entry, request=None, save_kwargs=None):
         self.to_insert = set()
         self.to_update = set()
@@ -82,7 +82,7 @@ class BulkTileOperation:
 
         return lookup
 
-    def run(self):
+    def validate_and_save_tiles(self):
         self.validate()
         try:
             self._save()
@@ -98,9 +98,6 @@ class BulkTileOperation:
         self.after_update_all()
 
     def validate(self):
-        self._update_tiles()
-
-    def _update_tiles(self):
         """Move values from resource or tile to prefetched tiles, and validate.
         Raises ValidationError if new data fails datatype validation.
         """

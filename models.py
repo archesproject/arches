@@ -22,7 +22,7 @@ from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
 )
 
-from arches_querysets.bulk_operations.tiles import BulkTileOperation
+from arches_querysets.bulk_operations.tiles import SemanticTileOperation
 from arches_querysets.datatypes.datatypes import DataTypeFactory
 from arches_querysets.lookups import *  # registers lookups
 from arches_querysets.querysets import (
@@ -148,10 +148,10 @@ class SemanticResource(ResourceInstance):
             - the node values are phantom fields.
             - we have other entry points besides DRF.
         """
-        bulk_operation = BulkTileOperation(
+        operation = SemanticTileOperation(
             entry=self, request=request, save_kwargs=kwargs
         )
-        bulk_operation.run()
+        operation.validate_and_save_tiles()
 
         # Instantiate proxy model for now, but refactor & expose this on vanilla model
         proxy_resource = Resource.objects.get(pk=self.pk)
@@ -160,9 +160,7 @@ class SemanticResource(ResourceInstance):
             proxy_resource.index()
 
         if request:
-            self.save_edit(
-                user=request.user, transaction_id=bulk_operation.transaction_id
-            )
+            self.save_edit(user=request.user, transaction_id=operation.transaction_id)
 
         self.refresh_from_db(
             using=kwargs.get("using"),
@@ -425,10 +423,10 @@ class SemanticTile(TileModel):
         return super().save(**save_kwargs)
 
     def _save_aliased_data(self, *, request=None, index=True, **kwargs):
-        bulk_operation = BulkTileOperation(
+        operation = SemanticTileOperation(
             entry=self, request=request, save_kwargs=kwargs
         )
-        bulk_operation.run()
+        operation.validate_and_save_tiles()
 
         proxy_resource = Resource.objects.get(pk=self.resourceinstance_id)
         proxy_resource.save_descriptors()
