@@ -63,6 +63,7 @@ class SemanticResource(ResourceInstance):
         self._permitted_nodes = Node.objects.none()
         # Data-collecting nodes that were queried
         self._queried_nodes = Node.objects.none()
+        self._as_representation = False
 
     def save(self, *, request=None, index=True, **kwargs):
         with transaction.atomic():
@@ -107,7 +108,8 @@ class SemanticResource(ResourceInstance):
                     resourceinstance=self,
                     nodegroup=nodegroup,
                 )
-                blank_tile = blank_tile.fill_blank_tile_from_child_nodegroup(nodegroup)
+                blank_tile._as_representation = self._as_representation
+                blank_tile = blank_tile.create_blank_semantic_tile(nodegroup)
             if value == []:
                 value.append(blank_tile)
             elif value is None:
@@ -211,6 +213,7 @@ class SemanticTile(TileModel):
         self._permitted_nodes = Node.objects.none()
         # Data-collecting nodes that were queried
         self._queried_nodes = Node.objects.none()
+        self._as_representation = False
 
     def find_nodegroup_alias(self):
         # SemanticTileManager provides grouping_node on 7.6
@@ -323,33 +326,44 @@ class SemanticTile(TileModel):
                 self.set_next_sort_order()
             self._save_aliased_data(request=request, index=index, **kwargs)
 
-    def fill_blank_tile_from_child_nodegroup(self, child_nodegroup, parent_tile=None):
-        grandchildren = (
-            child_nodegroup.children.all()
+    def create_blank_semantic_tile(self, nodegroup, parent_tile=None):
+        children = (
+            nodegroup.children.all()
             if arches_version >= (8, 0)
-            else child_nodegroup.nodegroup_set.all()
+            else nodegroup.nodegroup_set.all()
         )
 
+        # Initialize a blank tile with nested semantic data.
         blank_tile = self.__class__(
             resourceinstance=self.resourceinstance,
-            nodegroup=child_nodegroup,
+            nodegroup=nodegroup,
             parenttile=parent_tile,
-            **{
-                node.alias: self.get_default_value(node)
-                for node in child_nodegroup.node_set.all()
+            data={
+                str(node.pk): self.get_default_value(node)
+                for node in nodegroup.node_set.all()
                 if node.datatype != "semantic"
             },
             **{
-                SemanticTile(nodegroup=grandchild_nodegroup).find_nodegroup_alias(): (
-                    self.fill_blank_tile_from_child_nodegroup(grandchild_nodegroup)
-                    if grandchild_nodegroup.cardinality == "1"
+                SemanticTile(nodegroup=child_nodegroup).find_nodegroup_alias(): (
+                    self.create_blank_semantic_tile(child_nodegroup, parent_tile=self)
+                    if child_nodegroup.cardinality == "1"
                     else [
-                        self.fill_blank_tile_from_child_nodegroup(grandchild_nodegroup)
+                        self.create_blank_semantic_tile(
+                            child_nodegroup, parent_tile=self
+                        )
                     ]
                 )
-                for grandchild_nodegroup in grandchildren
+                for child_nodegroup in children
             },
         )
+        blank_tile._as_representation = self._as_representation
+
+        # Finalize the aliased data according to the value of self._as_representation.
+        # (e.g. either a dict of display_value & interchange_value, or call to_python().)
+        for node in nodegroup.node_set.all():
+            if node.datatype != "semantic":
+                node_value = blank_tile.data.get(str(node.pk))
+                blank_tile.set_aliased_data(node, node_value)
 
         # Signify that the tile is not yet saved.
         blank_tile.pk = None
@@ -375,7 +389,7 @@ class SemanticTile(TileModel):
             except:
                 continue
             if value in (None, []):
-                blank_tile = self.fill_blank_tile_from_child_nodegroup(nodegroup, self)
+                blank_tile = self.create_blank_semantic_tile(nodegroup, self)
             if value == []:
                 value.append(blank_tile)
             elif value is None:
@@ -533,6 +547,34 @@ class SemanticTile(TileModel):
             }
 
         return oldprovisionalvalue, newprovisionalvalue, provisional_edit_log_details
+
+    def set_aliased_data(self, node, node_value):
+        """Format node_value according to the self._as_representation flag and
+        set it on self.aliased_data."""
+        datatype_instance = DataTypeFactory().get_instance(node.datatype)
+        empty_values = (None, "", '{"url": "", "url_label": ""}')
+
+        if self._as_representation:
+            compiled_json = datatype_instance.to_json(self, node)
+            final_val = {
+                "display_value": compiled_json["@display_value"],
+                "interchange_value": datatype_instance.get_interchange_value(
+                    node_value,
+                    tile=self,
+                    node=node,
+                    details=compiled_json.get("details"),
+                ),
+            }
+            if final_val["display_value"] in empty_values:
+                # TODO: upstream this into datatype methods (another hook?)
+                final_val["display_value"] = _("(Empty)")
+        else:
+            if hasattr(datatype_instance, "to_python"):
+                final_val = datatype_instance.to_python(node_value, tile=self)
+            else:
+                final_val = node_value
+
+        setattr(self.aliased_data, node.alias, final_val)
 
 
 class GraphWithPrefetching(GraphModel):

@@ -156,10 +156,17 @@ class SemanticTileQuerySet(models.QuerySet):
         for tile in self._result_cache:
             tile._queried_nodes = self._queried_nodes
             tile._permitted_nodes = self._permitted_nodes
+            tile._as_representation = self._as_representation
             for node in self._queried_nodes:
                 if node.nodegroup_id == tile.nodegroup_id:
-                    instance_val = self._get_node_value_for_annotation(tile, node)
-                    setattr(tile.aliased_data, node.alias, instance_val)
+                    datatype_instance = DataTypeFactory().get_instance(node.datatype)
+                    tile_data = datatype_instance.get_tile_data(tile)
+                    node_val = tile_data.get(str(node.pk))
+                    if node_val is None:
+                        # Datatype methods assume tiles always have all keys, but we've
+                        # seen problems in the wild.
+                        tile_data[str(node.pk)] = None
+                    tile.set_aliased_data(node, node_val)
                 elif node.nodegroup.parentnodegroup_id == tile.nodegroup_id:
                     empty_value = None if node.nodegroup.cardinality == "1" else []
                     setattr(tile.aliased_data, tile.find_nodegroup_alias(), empty_value)
@@ -214,35 +221,6 @@ class SemanticTileQuerySet(models.QuerySet):
         clone._entry_node = self._entry_node
         clone._as_representation = self._as_representation
         return clone
-
-    def _get_node_value_for_annotation(self, tile, node):
-        datatype_instance = DataTypeFactory().get_instance(node.datatype)
-
-        tile_data = datatype_instance.get_tile_data(tile)
-        node_val = tile_data.get(str(node.pk))
-        if node_val is None:
-            # Datatype methods assume tiles always have all keys, but we've
-            # seen problems in the wild.
-            tile_data[str(node.pk)] = None
-        empty_values = (None, "", '{"url": "", "url_label": ""}')
-        if self._as_representation:
-            compiled_json = datatype_instance.to_json(tile, node)
-            instance_val = {
-                "display_value": compiled_json["@display_value"],
-                "interchange_value": datatype_instance.get_interchange_value(
-                    node_val, tile=tile, node=node, details=compiled_json.get("details")
-                ),
-            }
-            if instance_val["display_value"] in empty_values:
-                # TODO: upstream this into datatype methods (another hook?)
-                instance_val["display_value"] = _("(Empty)")
-        else:
-            if hasattr(datatype_instance, "to_python"):
-                instance_val = datatype_instance.to_python(node_val, tile=tile)
-            else:
-                instance_val = node_val
-
-        return instance_val
 
 
 class SemanticResourceQuerySet(models.QuerySet):
@@ -405,6 +383,7 @@ class SemanticResourceQuerySet(models.QuerySet):
                 continue
             resource._permitted_nodes = self._permitted_nodes
             resource._queried_nodes = self._queried_nodes
+            resource._as_representation = self._as_representation
 
             # Prepare resource annotations.
             # TODO: this might move to a method on AliasedData.
