@@ -12,13 +12,14 @@ const props = withDefaults(
         nodeAlias: string;
         graphSlug: string;
         cardXNodeXWidgetData?: CardXNodeXWidget;
-        value?: string | null;
+        value?: string | null | undefined;
         showLabel?: boolean;
     }>(),
     {
         cardXNodeXWidgetData: undefined,
         initialValue: undefined,
         showLabel: true,
+        value: undefined,
     },
 );
 </script>
@@ -31,17 +32,17 @@ const props = withDefaults(
         :show-label="props.showLabel"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
     >
-        <template #editor="{ cardXNodeXWidgetData }">
+        <template #editor="slotProps">
             <NonLocalizedStringWidgetEditor
-                :card-x-node-x-widget-data="cardXNodeXWidgetData"
+                :card-x-node-x-widget-data="slotProps.cardXNodeXWidgetData"
                 :graph-slug="graphSlug"
                 :node-alias="nodeAlias"
                 :value="props.value"
             />
         </template>
-        <template #viewer="{ cardXNodeXWidgetData }">
+        <template #viewer="slotProps">
             <NonLocalizedStringWidgetViewer
-                :card-x-node-x-widget-data="cardXNodeXWidgetData"
+                :card-x-node-x-widget-data="slotProps.cardXNodeXWidgetData"
                 :value="props.value"
             />
         </template>
