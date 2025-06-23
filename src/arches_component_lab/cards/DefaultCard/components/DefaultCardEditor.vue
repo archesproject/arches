@@ -59,7 +59,7 @@ watch(isDirty, (newValue, oldValue) => {
     }
 });
 
-async function save(e: FormSubmitEvent) {
+async function save(event: FormSubmitEvent) {
     isSaving.value = true;
 
     try {
@@ -67,7 +67,7 @@ async function save(e: FormSubmitEvent) {
             ...props.tileData,
             aliased_data: {
                 ...props.tileData.aliased_data,
-                ...e.values,
+                ...event.values,
             },
         };
 
