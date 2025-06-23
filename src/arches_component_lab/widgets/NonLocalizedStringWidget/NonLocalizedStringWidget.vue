@@ -30,8 +30,6 @@ const props = withDefaults(
         :mode="props.mode"
         :show-label="props.showLabel"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
-        :editor-component="NonLocalizedStringWidgetEditor"
-        :viewer-component="NonLocalizedStringWidgetViewer"
     >
         <template #editor="{ cardXNodeXWidgetData }">
             <NonLocalizedStringWidgetEditor
@@ -41,8 +39,11 @@ const props = withDefaults(
                 :value="props.value"
             />
         </template>
-        <template #viewer>
-            <NonLocalizedStringWidgetViewer :value="props.value" />
+        <template #viewer="{ cardXNodeXWidgetData }">
+            <NonLocalizedStringWidgetViewer
+                :card-x-node-x-widget-data="cardXNodeXWidgetData"
+                :value="props.value"
+            />
         </template>
     </GenericWidget>
 </template>
