@@ -22,7 +22,7 @@ import type {
 } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
-    initialValue: ResourceInstanceReference[] | null | undefined;
+    value: ResourceInstanceReference[] | null | undefined;
     graphSlug: string;
     nodeAlias: string;
 }>();
@@ -44,7 +44,7 @@ onMounted(async () => {
 });
 
 function clearOptions() {
-    options.value = props.initialValue || [];
+    options.value = props.value || [];
 }
 
 function onFilter(event: MultiSelectFilterEvent) {
@@ -61,7 +61,7 @@ async function getOptions(page: number, filterTerm?: string) {
             props.nodeAlias,
             page,
             filterTerm,
-            props.initialValue,
+            props.value,
         );
 
         const references = resourceData.data.map(
@@ -161,9 +161,7 @@ function validate(e: FormFieldResolverOptions) {
         v-else
         v-slot="$field"
         :name="props.nodeAlias"
-        :initial-value="
-            props.initialValue?.map((resource) => resource.resourceId)
-        "
+        :initial-value="props.value?.map((resource) => resource.resourceId)"
         :resolver="resolver"
     >
         <MultiSelect
