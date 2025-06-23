@@ -2,7 +2,7 @@
 import { computed, defineAsyncComponent, ref, watchEffect } from "vue";
 
 import Message from "primevue/message";
-import ProgressSpinner from "primevue/progressspinner";
+import Skeleton from "primevue/skeleton";
 
 import DefaultCardEditor from "@/arches_component_lab/cards/DefaultCard/components/DefaultCardEditor.vue";
 import DefaultCardViewer from "@/arches_component_lab/cards/DefaultCard/components/DefaultCardViewer.vue";
@@ -103,7 +103,10 @@ watchEffect(async () => {
 
 <template>
     <div class="card">
-        <ProgressSpinner v-if="isLoading" />
+        <Skeleton
+            v-if="isLoading"
+            style="height: 10rem"
+        />
         <Message
             v-else-if="configurationError"
             severity="error"

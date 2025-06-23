@@ -6,7 +6,7 @@ import { Form } from "@primevue/forms";
 
 import Button from "primevue/button";
 import Message from "primevue/message";
-import ProgressSpinner from "primevue/progressspinner";
+import Skeleton from "primevue/skeleton";
 
 import { upsertTile } from "@/arches_component_lab/cards/api.ts";
 
@@ -88,7 +88,10 @@ async function save(e: FormSubmitEvent) {
 </script>
 
 <template>
-    <ProgressSpinner v-if="isSaving" />
+    <Skeleton
+        v-if="isSaving"
+        style="height: 10rem"
+    />
     <template v-else>
         <Message
             v-if="saveError"
@@ -99,6 +102,7 @@ async function save(e: FormSubmitEvent) {
         <Form
             ref="form"
             :key="formKey"
+            class="form"
             @submit="save"
         >
             <component
@@ -133,3 +137,10 @@ async function save(e: FormSubmitEvent) {
         </Form>
     </template>
 </template>
+<style scoped>
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+</style>

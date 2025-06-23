@@ -2,7 +2,7 @@
 import { computed, ref, watchEffect } from "vue";
 
 import Message from "primevue/message";
-import ProgressSpinner from "primevue/progressspinner";
+import Skeleton from "primevue/skeleton";
 
 import { fetchCardXNodeXWidgetData } from "@/arches_component_lab/widgets/api.ts";
 
@@ -60,10 +60,14 @@ watchEffect(async () => {
 </script>
 
 <template>
-    <div :class="[graphSlug, nodeAlias, 'widget'].join(' ')">
-        <ProgressSpinner
+    <div
+        class="widget"
+        :graph-slug="graphSlug"
+        :node-alias="nodeAlias"
+    >
+        <Skeleton
             v-if="isLoading"
-            style="width: 2em; height: 2em"
+            style="height: 2rem"
         />
         <Message
             v-else-if="configurationError"
