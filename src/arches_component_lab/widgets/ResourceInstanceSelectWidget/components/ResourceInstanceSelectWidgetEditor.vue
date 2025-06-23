@@ -19,9 +19,9 @@ import type {
 } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
-    initialValue: ResourceInstanceReference | null | undefined;
     graphSlug: string;
     nodeAlias: string;
+    value: ResourceInstanceReference | null | undefined;
 }>();
 
 const { $gettext } = useGettext();
@@ -41,7 +41,7 @@ onMounted(async () => {
 });
 
 function clearOptions() {
-    options.value = props.initialValue ? [props.initialValue] : [];
+    options.value = props.value ? [props.value] : [];
 }
 
 function onFilter(event: MultiSelectFilterEvent) {
@@ -58,7 +58,7 @@ async function getOptions(page: number, filterTerm?: string) {
             props.nodeAlias,
             page,
             filterTerm,
-            props.initialValue ? [props.initialValue] : null,
+            props.value ? [props.value] : null,
         );
 
         const references = resourceData.data.map(
@@ -149,7 +149,7 @@ function validate(e: FormFieldResolverOptions) {
         v-else
         v-slot="$field"
         :name="props.nodeAlias"
-        :initial-value="props.initialValue?.resourceId"
+        :initial-value="props.value?.resourceId"
         :resolver="resolver"
     >
         <Select
