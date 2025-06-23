@@ -5,9 +5,9 @@ import Message from "primevue/message";
 import { FormField, type FormFieldResolverOptions } from "@primevue/forms";
 
 const props = defineProps<{
-    initialValue: string | null | undefined;
     nodeAlias: string;
     graphSlug: string;
+    value: string | null | undefined;
 }>();
 
 function resolver(e: FormFieldResolverOptions) {
@@ -27,7 +27,7 @@ function validate(e: FormFieldResolverOptions) {
     <FormField
         v-slot="$field"
         :name="props.nodeAlias"
-        :initial-value="props.initialValue"
+        :initial-value="props.value"
         :resolver="resolver"
     >
         <InputText

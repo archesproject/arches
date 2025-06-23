@@ -109,7 +109,7 @@ async function save(e: FormSubmitEvent) {
                 :graph-slug="props.graphSlug"
                 :node-alias="widget.cardXNodeXWidgetData.node.alias"
                 :card-x-node-x-widget-data="widget.cardXNodeXWidgetData"
-                :initial-value="
+                :value="
                     tileData.aliased_data[
                         widget.cardXNodeXWidgetData.node.alias
                     ]
