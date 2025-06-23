@@ -5,9 +5,6 @@ import type { FileReference } from "@/arches_component_lab/widgets/types.ts";
 
 const props = defineProps<{
     value: FileReference[] | null | undefined;
-    widgetData: {
-        config: object;
-    };
 }>();
 
 const imageData = computed(() => {

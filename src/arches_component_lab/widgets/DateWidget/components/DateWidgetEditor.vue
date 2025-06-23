@@ -8,15 +8,21 @@ import DatePicker from "primevue/datepicker";
 import Message from "primevue/message";
 
 import { FormField } from "@primevue/forms";
+
 import type { FormFieldResolverOptions } from "@primevue/forms";
+import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 
 const props = defineProps<{
-    initialValue: string | null | undefined;
+    value: string | null | undefined;
     graphSlug: string;
     nodeAlias: string;
-    widgetData: {
+    cardXNodeXWidgetData: CardXNodeXWidget & {
         config: {
             dateFormat: string;
+            datePickerDisplayConfiguration: {
+                dateFormat: string;
+                shouldShowTime: boolean;
+            };
         };
     };
 }>();
@@ -27,7 +33,7 @@ const dateFormat = ref();
 onMounted(() => {
     const convertedDateFormat =
         convertISO8601DatetimeFormatToPrimevueDatetimeFormat(
-            props.widgetData.config.dateFormat,
+            props.cardXNodeXWidgetData.config.dateFormat,
         );
 
     dateFormat.value = convertedDateFormat.dateFormat;
@@ -53,7 +59,7 @@ function formatDate(date: Date | null): string | null {
         return null;
     }
 
-    return dayjs(date).format(props.widgetData.config.dateFormat);
+    return dayjs(date).format(props.cardXNodeXWidgetData.config.dateFormat);
 }
 </script>
 
@@ -62,7 +68,7 @@ function formatDate(date: Date | null): string | null {
         ref="formFieldRef"
         v-slot="$field"
         :name="props.nodeAlias"
-        :initial-value="props.initialValue"
+        :initial-value="props.value"
         :resolver="resolver"
     >
         <DatePicker

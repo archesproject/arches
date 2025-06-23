@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import DatePicker from "primevue/datepicker";
 
+import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
+
 const props = defineProps<{
-    initialValue: string | null | undefined;
-    widgetData: {
+    value: string | null | undefined;
+    cardXNodeXWidgetData: CardXNodeXWidget & {
         config: {
             dateFormat: string;
             datePickerDisplayConfiguration: {
@@ -17,18 +19,19 @@ const props = defineProps<{
 
 <template>
     <DatePicker
-        v-model="props.initialValue as unknown as Date"
+        v-model="props.value as unknown as Date"
         :disabled="true"
         :date-format="
-            props.widgetData.config.datePickerDisplayConfiguration.dateFormat
+            props.cardXNodeXWidgetData.config.datePickerDisplayConfiguration
+                .dateFormat
         "
         :fluid="true"
         :show-time="
-            props.widgetData.config.datePickerDisplayConfiguration
+            props.cardXNodeXWidgetData.config.datePickerDisplayConfiguration
                 .shouldShowTime
         "
         :show-seconds="
-            props.widgetData.config.datePickerDisplayConfiguration
+            props.cardXNodeXWidgetData.config.datePickerDisplayConfiguration
                 .shouldShowTime
         "
     />
