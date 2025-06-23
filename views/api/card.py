@@ -1,7 +1,7 @@
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
 from django.views.generic import View
 
-from arches import __version__ as arches_version
+from arches import VERSION as arches_version
 from arches.app.models import models
 from arches.app.utils.response import JSONResponse
 
@@ -9,13 +9,16 @@ from arches.app.utils.response import JSONResponse
 class CardDataView(View):
     def get(self, request, graph_slug, nodegroup_grouping_node_alias):
 
-        if arches_version < "8":
+        if arches_version < (8, 0):
             card = models.CardModel.objects.filter(
                 graph__slug=graph_slug,
                 nodegroup__node__alias=nodegroup_grouping_node_alias,
             ).get()
-        # TODO: Add support for v8
+        else:
+            node = models.Node.objects.get(alias=nodegroup_grouping_node_alias)
+            card = models.CardModel.objects.get(
+                graph__slug=graph_slug,
+                nodegroup_id=node.nodegroup_id,
+            )
 
-        return JSONResponse(
-            JSONDeserializer().deserialize(JSONSerializer().serialize(card))
-        )
+        return JSONResponse(card)

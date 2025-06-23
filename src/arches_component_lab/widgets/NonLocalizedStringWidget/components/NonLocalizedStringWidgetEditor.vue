@@ -31,6 +31,7 @@ function validate(e: FormFieldResolverOptions) {
         :resolver="resolver"
     >
         <InputText
+            :id="`${props.graphSlug}-${props.nodeAlias}-input`"
             type="text"
             :fluid="true"
         />
