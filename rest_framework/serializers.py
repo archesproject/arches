@@ -15,7 +15,7 @@ from arches.app.models.models import Node
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 from arches_querysets.datatypes.datatypes import DataTypeFactory
-from arches_querysets.models import AliasedData, SemanticResource, SemanticTile
+from arches_querysets.models import AliasedData, ResourceTileTree, TileTree
 from arches_querysets.rest_framework import interchange_mixin
 
 
@@ -39,7 +39,7 @@ def _make_tile_serializer(
         )
 
         class Meta:
-            model = SemanticTile
+            model = TileTree
             graph_slug = slug
             root_node = nodegroup_alias
             fields = nodes
@@ -213,7 +213,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     }
 
     class Meta:
-        model = SemanticTile
+        model = TileTree
         graph_slug = None
         # If None, supply by a route providing a <slug:nodegroup_alias> component
         root_node = None
@@ -381,10 +381,10 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     tileid = serializers.UUIDField(validators=[], required=False, allow_null=True)
     resourceinstance = serializers.PrimaryKeyRelatedField(
-        queryset=SemanticResource.objects.all(), required=False, html_cutoff=0
+        queryset=ResourceTileTree.objects.all(), required=False, html_cutoff=0
     )
     parenttile = serializers.PrimaryKeyRelatedField(
-        queryset=SemanticTile.objects.all(),
+        queryset=TileTree.objects.all(),
         required=False,
         allow_null=True,
         html_cutoff=0,
@@ -392,7 +392,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     aliased_data = TileAliasedDataSerializer(required=False, allow_null=False)
 
     class Meta:
-        model = SemanticTile
+        model = TileTree
         # If None, supply by a route providing a <slug:graph> component
         graph_slug = None
         # If None, supply by a route providing a <slug:nodegroup_alias> component
@@ -476,7 +476,7 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     )
 
     class Meta:
-        model = SemanticResource
+        model = ResourceTileTree
         # If None, supply by a route providing a <slug:graph> component
         graph_slug = None
         nodegroups = "__all__"

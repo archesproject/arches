@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 NOT_PROVIDED = object()
 
 
-class SemanticTileOperation:
+class TileTreeOperation:
     def __init__(self, *, entry, request=None, save_kwargs=None):
         self.to_insert = set()
         self.to_update = set()
@@ -77,14 +77,14 @@ class SemanticTileOperation:
         self.new_resource_created = bool(existing_tiles)
 
     def _get_grouping_node_lookup(self):
-        from arches_querysets.models import SemanticResource, SemanticTile
+        from arches_querysets.models import ResourceTileTree, TileTree
 
         lookup = {}
-        if isinstance(self.entry, SemanticResource):
+        if isinstance(self.entry, ResourceTileTree):
             for node in self.entry._permitted_nodes:
                 if node.pk == node.nodegroup_id:
                     lookup[node.pk] = node
-        elif isinstance(self.entry, SemanticTile):
+        elif isinstance(self.entry, TileTree):
             # TODO: look into whether this is repetitive.
             for nodegroup in self.nodegroups:
                 if arches_version >= (8, 0):
@@ -154,7 +154,7 @@ class SemanticTileOperation:
         original_tile_data_by_tile_id,
         delete_siblings=False,
     ):
-        from arches_querysets.models import SemanticTile
+        from arches_querysets.models import TileTree
 
         if str(grouping_node.nodegroup_id) not in self.editable_nodegroups:
             # Currently also prevents deletes.
@@ -171,7 +171,7 @@ class SemanticTileOperation:
             new_tiles = getattr(aliased_data, grouping_node.alias, NOT_PROVIDED)
         # Is this grouping node the entry point?
         if (
-            isinstance(self.entry, SemanticTile)
+            isinstance(self.entry, TileTree)
             and self.entry.nodegroup_id == grouping_node.pk
         ):
             new_tiles = [container]
@@ -188,7 +188,7 @@ class SemanticTileOperation:
         else:
             parent_tile = container if isinstance(container, TileModel) else None
             new_tiles = [
-                SemanticTile.deserialize(tile_dict, parent_tile=parent_tile)
+                TileTree.deserialize(tile_dict, parent_tile=parent_tile)
                 for tile_dict in new_tiles
             ]
         existing_tiles = self.existing_tiles_by_nodegroup_alias[grouping_node.alias]
@@ -301,10 +301,10 @@ class SemanticTileOperation:
     def _validate_and_patch_incoming_values(self, tile, *, nodes):
         """Validate data found on ._incoming_tile and move it to .data.
         Update errors_by_node_alias in place."""
-        from arches_querysets.models import AliasedData, SemanticTile
+        from arches_querysets.models import AliasedData, TileTree
 
         for node in nodes:
-            if isinstance(tile._incoming_tile, SemanticTile) and isinstance(
+            if isinstance(tile._incoming_tile, TileTree) and isinstance(
                 tile._incoming_tile.aliased_data, AliasedData
             ):
                 value_to_validate = getattr(

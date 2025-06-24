@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
             bases=("models.graphmodel",),
         ),
         migrations.CreateModel(
-            name="SemanticResource",
+            name="ResourceTileTree",
             fields=[],
             options={
                 "db_table": "resource_instances",
@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
             bases=("models.resourceinstance",),
         ),
         migrations.CreateModel(
-            name="SemanticTile",
+            name="TileTree",
             fields=[],
             options={
                 "db_table": "tiles",

@@ -23,14 +23,14 @@ from arches.app.utils.permission_backend import (
     user_is_resource_reviewer,
 )
 
-from arches_querysets.bulk_operations.tiles import SemanticTileOperation
+from arches_querysets.bulk_operations.tiles import TileTreeOperation
 from arches_querysets.datatypes.datatypes import DataTypeFactory
 from arches_querysets.lookups import *  # registers lookups
 from arches_querysets.querysets import (
     GraphWithPrefetchingQuerySet,
-    SemanticResourceQuerySet,
-    SemanticTileManager,
-    SemanticTileQuerySet,
+    ResourceTileTreeQuerySet,
+    TileTreeManager,
+    TileTreeQuerySet,
 )
 from arches_querysets.utils.models import (
     find_nodegroup_by_alias,
@@ -46,9 +46,9 @@ logger = logging.getLogger(__name__)
 class AliasedData(SimpleNamespace):
     """Provides dot access into node values and nested nodegroups.
 
-    >>> SemanticResource.as_model('new_resource_model_1').get(...).aliased_data
+    >>> ResourceTileTree.as_model('new_resource_model_1').get(...).aliased_data
     namespace(string_node={'en': {'value': 'abcde', 'direction': 'ltr'}},
-          child_node=<SemanticTile: child_node (c3637412-9b13-4f05-8f4a-5a80560b8b6e)>)
+          child_node=<TileTree: child_node (c3637412-9b13-4f05-8f4a-5a80560b8b6e)>)
     """
 
     def serialize(self, **kwargs):
@@ -60,8 +60,8 @@ class AliasedData(SimpleNamespace):
         }
 
 
-class SemanticResource(ResourceInstance):
-    objects = SemanticResourceQuerySet.as_manager()
+class ResourceTileTree(ResourceInstance):
+    objects = ResourceTileTreeQuerySet.as_manager()
 
     class Meta:
         proxy = True
@@ -126,10 +126,7 @@ class SemanticResource(ResourceInstance):
                 nodegroup = find_nodegroup_by_alias(
                     nodegroup_alias, self._permitted_nodes
                 )
-                blank_tile = SemanticTile(
-                    resourceinstance=self,
-                    nodegroup=nodegroup,
-                )
+                blank_tile = TileTree(resourceinstance=self, nodegroup=nodegroup)
                 blank_tile._as_representation = self._as_representation
                 blank_tile = blank_tile.create_blank_semantic_tile(nodegroup)
             if value == []:
@@ -172,9 +169,7 @@ class SemanticResource(ResourceInstance):
             - the node values are phantom fields.
             - we have other entry points besides DRF.
         """
-        operation = SemanticTileOperation(
-            entry=self, request=request, save_kwargs=kwargs
-        )
+        operation = TileTreeOperation(entry=self, request=request, save_kwargs=kwargs)
         operation.validate_and_save_tiles()
 
         # Instantiate proxy model for now, but refactor & expose this on vanilla model
@@ -220,8 +215,8 @@ class SemanticResource(ResourceInstance):
             self._annotated_tiles = from_queryset[0]._annotated_tiles
 
 
-class SemanticTile(TileModel):
-    objects = SemanticTileManager.from_queryset(SemanticTileQuerySet)()
+class TileTree(TileModel):
+    objects = TileTreeManager.from_queryset(TileTreeQuerySet)()
 
     class Meta:
         proxy = True
@@ -264,11 +259,10 @@ class SemanticTile(TileModel):
         return JSONSerializer().handle_model(self, **options)
 
     def find_nodegroup_alias(self):
-        # SemanticTileManager provides grouping_node on 7.6
+        # TileTreeManager provides grouping_node on 7.6
         if self.nodegroup and hasattr(self.nodegroup, "grouping_node"):
             return self.nodegroup.grouping_node.alias
         if not getattr(self, "_nodegroup_alias", None):
-            # TODO: need a 7.6 solution for this for fresh tiles (SemanticTile())
             self._nodegroup_alias = Node.objects.get(pk=self.nodegroup_id).alias
         return self._nodegroup_alias
 
@@ -395,7 +389,7 @@ class SemanticTile(TileModel):
                 if node.datatype != "semantic"
             },
             **{
-                SemanticTile(nodegroup=child_nodegroup).find_nodegroup_alias(): (
+                TileTree(nodegroup=child_nodegroup).find_nodegroup_alias(): (
                     self.create_blank_semantic_tile(child_nodegroup, parent_tile=self)
                     if child_nodegroup.cardinality == "1"
                     else [
@@ -484,9 +478,7 @@ class SemanticTile(TileModel):
         return super().save(**save_kwargs)
 
     def _save_aliased_data(self, *, request=None, index=True, **kwargs):
-        operation = SemanticTileOperation(
-            entry=self, request=request, save_kwargs=kwargs
-        )
+        operation = TileTreeOperation(entry=self, request=request, save_kwargs=kwargs)
         operation.validate_and_save_tiles()
 
         proxy_resource = Resource.objects.get(pk=self.resourceinstance_id)
@@ -542,7 +534,7 @@ class SemanticTile(TileModel):
         return copy1 == copy2
 
     def _enrich(self, graph_slug, *, only=None):
-        resource = SemanticResource.as_model(
+        resource = ResourceTileTree.as_model(
             graph_slug, only=only, resource_ids=[self.resourceinstance_id]
         ).get()
         for grouping_node in resource._permitted_nodes:
@@ -634,7 +626,7 @@ class GraphWithPrefetching(GraphModel):
     @classmethod
     def prepare_for_annotations(cls, graph_slug=None, *, resource_ids=None, user=None):
         """Return a graph with necessary prefetches for
-        SemanticTile._prefetch_related_objects(), which is what builds the shape
+        TileTree._prefetch_related_objects(), which is what builds the shape
         of the tile graph.
 
         This method also checks nodegroup permissions for read.
