@@ -1,3 +1,4 @@
+import logging
 import uuid
 from collections import defaultdict
 from operator import attrgetter
@@ -18,6 +19,7 @@ from arches_querysets.utils.models import (
     pop_arches_model_kwargs,
 )
 
+logger = logging.getLogger(__name__)
 
 NOT_PROVIDED = object()
 
@@ -491,4 +493,11 @@ class SemanticTileOperation:
 
     def after_update_all(self):
         for datatype in self.datatype_factory.datatype_instances.values():
-            datatype.after_update_all()
+            try:
+                datatype.after_update_all()
+            except:
+                logger.error(
+                    f"Error in {datatype.__class__.__name__}.after_update_all():",
+                    exc_info=True,
+                )
+                continue
