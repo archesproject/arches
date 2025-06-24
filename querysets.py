@@ -41,7 +41,7 @@ class TileTreeQuerySet(models.QuerySet):
         self._permitted_nodes = []
         self._entry_node = None
 
-    def with_node_values(
+    def get_tiles(
         self,
         permitted_nodes,
         *,
@@ -55,7 +55,7 @@ class TileTreeQuerySet(models.QuerySet):
         Entry point for filtering arches data by nodegroups (instead of grouping by
         resource.)
 
-        >>> statements = TileTree.as_nodegroup("statement", graph_slug="concept")
+        >>> statements = TileTree.get_tiles("statement", graph_slug="concept")
         # TODO: show this with some test node that's actually a localized string.
         >>> results = statements.filter(statement_content__any_lang_startswith="F")
         >>> for result in results:
@@ -108,7 +108,7 @@ class TileTreeQuerySet(models.QuerySet):
             qs = qs.prefetch_related(
                 models.Prefetch(
                     "children" if arches_version >= (8, 0) else "tilemodel_set",
-                    queryset=self.model.objects.get_queryset().with_node_values(
+                    queryset=self.model.objects.get_queryset().get_tiles(
                         permitted_nodes=permitted_nodes,
                         defer=defer,
                         only=only,
@@ -228,7 +228,7 @@ class ResourceTileTreeQuerySet(models.QuerySet):
         self._queried_nodes = []
         self._permitted_nodes = []
 
-    def with_nodegroups(
+    def get_tiles(
         self,
         graph_slug=None,
         *,
@@ -241,15 +241,15 @@ class ResourceTileTreeQuerySet(models.QuerySet):
         """Annotates a ResourceTileTreeQuerySet with tile data unpacked
         and mapped onto nodegroup aliases, e.g.:
 
-        >>> concepts = ResourceTileTree.objects.with_nodegroups("concept")
+        >>> concepts = ResourceTileTree.objects.get_tiles("concept")
 
         With slightly fewer keystrokes:
 
-        >>> concepts = ResourceTileTree.as_model("concept")
+        >>> concepts = ResourceTileTree.get_tiles("concept")
 
         Or direct certain nodegroups with defer/only as in the QuerySet interface:
 
-        >>> partial_concepts = ResourceTileTree.as_model("concept", only=["ng1", "ng2"])
+        >>> partial_concepts = ResourceTileTree.get_tiles("concept", only=["ng1", "ng2"])
 
         Django QuerySet methods are available for efficient queries:
         >>> concepts.count()
@@ -324,7 +324,7 @@ class ResourceTileTreeQuerySet(models.QuerySet):
         return qs.prefetch_related(
             models.Prefetch(
                 "tilemodel_set",
-                queryset=TileTree.objects.with_node_values(
+                queryset=TileTree.objects.get_tiles(
                     self._permitted_nodes,
                     as_representation=as_representation,
                 ),

@@ -67,7 +67,7 @@ class ArchesModelAPIMixin:
                     only = None
             else:
                 only = options.nodegroups
-            return options.model.as_model(
+            return options.model.get_tiles(
                 self.graph_slug,
                 only=only,
                 resource_ids=self.resource_ids,
@@ -75,7 +75,7 @@ class ArchesModelAPIMixin:
                 user=self.request.user,
             ).select_related("graph")
         if issubclass(options.model, TileModel):
-            qs = options.model.as_nodegroup(
+            qs = options.model.get_tiles(
                 self.nodegroup_alias,
                 graph_slug=self.graph_slug,
                 only=fields,

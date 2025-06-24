@@ -46,7 +46,7 @@ logger = logging.getLogger(__name__)
 class AliasedData(SimpleNamespace):
     """Provides dot access into node values and nested nodegroups.
 
-    >>> ResourceTileTree.as_model('new_resource_model_1').get(...).aliased_data
+    >>> ResourceTileTree.get_tiles('new_resource_model_1').get(...).aliased_data
     namespace(string_node={'en': {'value': 'abcde', 'direction': 'ltr'}},
           child_node=<TileTree: child_node (c3637412-9b13-4f05-8f4a-5a80560b8b6e)>)
     """
@@ -92,7 +92,7 @@ class ResourceTileTree(ResourceInstance):
             self._save_aliased_data(request=request, index=index, **kwargs)
 
     @classmethod
-    def as_model(
+    def get_tiles(
         cls,
         graph_slug=None,
         *,
@@ -105,9 +105,9 @@ class ResourceTileTree(ResourceInstance):
         """Return a chainable QuerySet for a requested graph's instances,
         with tile data annotated onto node and nodegroup aliases.
 
-        See `arches.app.models.querysets.ResourceInstanceQuerySet.with_nodegroups`.
+        See `arches_querysets.querysets.ResourceTileTreeQuerySet.get_tiles`.
         """
-        return cls.objects.with_nodegroups(
+        return cls.objects.get_tiles(
             graph_slug,
             resource_ids=resource_ids,
             defer=defer,
@@ -190,7 +190,7 @@ class ResourceTileTree(ResourceInstance):
     def refresh_from_db(self, using=None, fields=None, from_queryset=None, user=None):
         del self._annotated_tiles
         if from_queryset is None:
-            from_queryset = self.__class__.as_model(
+            from_queryset = self.__class__.get_tiles(
                 self.graph.slug,
                 only={node.alias for node in self._queried_nodes},
                 as_representation=getattr(self, "_as_representation", False),
@@ -305,7 +305,7 @@ class TileTree(TileModel):
         return tile
 
     @classmethod
-    def as_nodegroup(
+    def get_tiles(
         cls,
         entry_node_alias,
         *,
@@ -316,7 +316,7 @@ class TileTree(TileModel):
         as_representation=False,
         user=None,
     ):
-        """See `arches.app.models.querysets.TileQuerySet.with_node_values`."""
+        """See `arches_querysets.querysets.TileTreeQuerySet.get_tiles`."""
 
         source_graph = GraphWithPrefetching.prepare_for_annotations(
             graph_slug, resource_ids=resource_ids, user=user
@@ -351,7 +351,7 @@ class TileTree(TileModel):
             if not only or branch_node.alias in only
         ]
 
-        return qs.with_node_values(
+        return qs.get_tiles(
             entry_node_and_nodes_below,
             defer=defer,
             only=filtered_only,
@@ -534,7 +534,7 @@ class TileTree(TileModel):
         return copy1 == copy2
 
     def _enrich(self, graph_slug, *, only=None):
-        resource = ResourceTileTree.as_model(
+        resource = ResourceTileTree.get_tiles(
             graph_slug, only=only, resource_ids=[self.resourceinstance_id]
         ).get()
         for grouping_node in resource._permitted_nodes:

@@ -423,7 +423,7 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
 
     def create(self, validated_data):
         options = self.__class__.Meta
-        qs = options.model.as_nodegroup(
+        qs = options.model.get_tiles(
             self.nodegroup_alias,
             graph_slug=self.graph_slug,
             only=None,
@@ -510,7 +510,7 @@ class ArchesResourceSerializer(serializers.ModelSerializer, NodeFetcherMixin):
             # TODO: decide on "blank" interface.
             instance_without_tile_data = options.model.mro()[1](**without_tile_data)
             instance_without_tile_data.save()
-            instance_from_factory = options.model.as_model(
+            instance_from_factory = options.model.get_tiles(
                 graph_slug=self.graph_slug,
                 only=None,
                 as_representation=True,
