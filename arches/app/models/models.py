@@ -653,14 +653,19 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
                     "functions_x_graphs"
                 ]:
                     function_slug = {}
-
-                    for key, value in function_dict.items():
-                        if isinstance(value, str):
-                            try:
-                                value = uuid.UUID(value)
-                            except ValueError:
-                                pass
-                        function_slug[key] = value
+                    try:
+                        for key, value in function_dict.items():
+                            if isinstance(value, str):
+                                try:
+                                    value = uuid.UUID(value)
+                                except ValueError:
+                                    pass
+                            function_slug[key] = value
+                    except AttributeError:
+                        return [
+                            function_x_graph
+                            for function_x_graph in self.functionxgraph_set.all()
+                        ]
 
                     function_slugs.append(function_slug)
 
