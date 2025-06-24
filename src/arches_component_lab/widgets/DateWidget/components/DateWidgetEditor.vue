@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, useTemplateRef } from "vue";
 
 import dayjs from "dayjs";
 import { convertISO8601DatetimeFormatToPrimevueDatetimeFormat } from "@/arches_component_lab/widgets/utils.ts";
@@ -27,9 +27,9 @@ const props = defineProps<{
     };
 }>();
 
-const emit = defineEmits<{
-    (event: "update:value", value: string | null): void;
-}>();
+const emit = defineEmits(["update:isDirty", "update:value"]);
+
+const formFieldRef = useTemplateRef("formField");
 
 const shouldShowTime = ref(false);
 const dateFormat = ref();
@@ -44,14 +44,16 @@ onMounted(() => {
     shouldShowTime.value = convertedDateFormat.shouldShowTime;
 });
 
-function resolver(e: FormFieldResolverOptions) {
-    validate(e);
+function resolver(event: FormFieldResolverOptions) {
+    validate(event);
 
-    emit("update:value", e.value);
+    // @ts-expect-error This is a bug with PrimeVue types
+    emit("update:isDirty", Boolean(formFieldRef.value!.fieldAttrs.dirty));
+    emit("update:value", event.value);
 
     return {
         values: {
-            [props.nodeAlias]: formatDate(e.value),
+            [props.nodeAlias]: formatDate(event.value),
         },
     };
 }
@@ -71,13 +73,14 @@ function formatDate(date: Date | null): string | null {
 
 <template>
     <FormField
-        ref="formFieldRef"
+        ref="formField"
         v-slot="$field"
         :name="props.nodeAlias"
         :initial-value="props.value"
         :resolver="resolver"
     >
         <DatePicker
+            :id="`${props.graphSlug}-${props.nodeAlias}-input`"
             icon-display="input"
             :date-format="dateFormat"
             :fluid="true"

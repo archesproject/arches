@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, useTemplateRef } from "vue";
 
 import arches from "arches";
 
@@ -27,13 +27,13 @@ const props = defineProps<{
     nodeAlias: string;
 }>();
 
-const emit = defineEmits<{
-    (event: "update:value", value: ResourceInstanceReference[]): void;
-}>();
+const emit = defineEmits(["update:isDirty", "update:value"]);
 
 const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidget config
+
+const formFieldRef = useTemplateRef("formField");
 
 const options = ref<ResourceInstanceReference[]>([]);
 const isLoading = ref(false);
@@ -140,6 +140,8 @@ function resolver(e: FormFieldResolverOptions) {
         value = [value];
     }
 
+    // @ts-expect-error This is a bug with PrimeVue types
+    emit("update:isDirty", Boolean(formFieldRef.value!.fieldAttrs.dirty));
     emit("update:value", value);
 
     return {
@@ -165,12 +167,14 @@ function validate(e: FormFieldResolverOptions) {
     </Message>
     <FormField
         v-else
+        ref="formField"
         v-slot="$field"
         :name="props.nodeAlias"
         :initial-value="props.value?.map((resource) => resource.resourceId)"
         :resolver="resolver"
     >
         <MultiSelect
+            :id="`${props.graphSlug}-${props.nodeAlias}-input`"
             display="chip"
             option-label="display_value"
             option-value="resourceId"

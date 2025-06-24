@@ -26,7 +26,7 @@ const props = withDefaults(
     },
 );
 
-const emit = defineEmits(["update:value"]);
+const emit = defineEmits(["update:isDirty", "update:value"]);
 </script>
 
 <template>
@@ -43,11 +43,8 @@ const emit = defineEmits(["update:value"]);
                 :graph-slug="graphSlug"
                 :node-alias="nodeAlias"
                 :value="props.value"
-                @update:value="
-                    (value) => {
-                        emit('update:value', value);
-                    }
-                "
+                @update:value="emit('update:value', $event)"
+                @update:is-dirty="emit('update:isDirty', $event)"
             />
         </template>
         <template #viewer="slotProps">

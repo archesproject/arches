@@ -24,7 +24,7 @@ const props = withDefaults(
     },
 );
 
-// const emit = defineEmits(["update:value"]);
+// const emit = defineEmits(["update:isDirty", "update:value"]);
 </script>
 
 <template>
