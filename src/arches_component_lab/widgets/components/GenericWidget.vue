@@ -104,6 +104,7 @@ watchEffect(async () => {
                     <span>{{ cardXNodeXWidgetData.label }}</span>
                     <i
                         v-if="shouldShowRequiredAsterisk"
+                        aria-hidden="true"
                         class="pi pi-asterisk"
                         style="font-size: 0.75rem; padding-top: 0.25rem"
                     />
