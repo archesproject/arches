@@ -142,12 +142,12 @@ class SemanticTileQuerySet(models.QuerySet):
         # Perhaps these manual annotations could be scheduled another way?
         super()._prefetch_related_objects()
         try:
-            self._perform_custom_annotations()
+            self._set_aliased_data()
         except (TypeError, ValueError, ValidationError) as e:
             # These errors are caught by DRF, so re-raise as something else.
             raise RuntimeError(e) from e
 
-    def _perform_custom_annotations(self):
+    def _set_aliased_data(self):
         for tile in self._result_cache:
             if not isinstance(tile, self.model):
                 return
@@ -171,47 +171,45 @@ class SemanticTileQuerySet(models.QuerySet):
                     empty_value = None if node.nodegroup.cardinality == "1" else []
                     setattr(tile.aliased_data, tile.find_nodegroup_alias(), empty_value)
                 delattr(tile, node.alias)
-            if arches_version >= (8, 0):
-                fallback = getattr(tile, "children")
+
+            self._set_child_tile_data(tile)
+
+    def _set_child_tile_data(self, tile):
+        if arches_version >= (8, 0):
+            fallback = getattr(tile, "children")
+        else:
+            fallback = getattr(tile, "tilemodel_set")
+        for child_tile in getattr(tile, "_annotated_tiles", fallback.all()):
+            child_nodegroup_alias = child_tile.find_nodegroup_alias()
+            if child_tile.nodegroup.cardinality == "1":
+                setattr(tile.aliased_data, child_nodegroup_alias, child_tile)
             else:
-                fallback = getattr(tile, "tilemodel_set")
-            child_tiles = getattr(tile, "_annotated_tiles", fallback.all())
-            for child_tile in child_tiles:
+                children = getattr(tile.aliased_data, child_nodegroup_alias, [])
+                children.append(child_tile)
+                setattr(tile.aliased_data, child_nodegroup_alias, children)
+            # Attach parent to this child.
+            child_tile.parent = tile
+
+        child_nodegroups = (
+            getattr(tile.nodegroup, "children")
+            if arches_version >= (8, 0)
+            else getattr(tile.nodegroup, "nodegroup_set")
+        )
+        for child_nodegroup in child_nodegroups.all():
+            for node in child_nodegroup.node_set.all():
+                if node.pk == child_nodegroup.pk:
+                    grouping_node = node
+                    break
+
+            if (
+                getattr(tile.aliased_data, grouping_node.alias, NOT_PROVIDED)
+                is NOT_PROVIDED
+            ):
                 setattr(
-                    child_tile.aliased_data,
-                    tile.find_nodegroup_alias(),
-                    child_tile.parenttile,
+                    tile.aliased_data,
+                    grouping_node.alias,
+                    None if child_nodegroup.cardinality == "1" else [],
                 )
-                child_nodegroup_alias = child_tile.find_nodegroup_alias()
-                if child_tile.nodegroup.cardinality == "1":
-                    setattr(tile.aliased_data, child_nodegroup_alias, child_tile)
-                else:
-                    children = getattr(tile.aliased_data, child_nodegroup_alias, [])
-                    children.append(child_tile)
-                    setattr(tile.aliased_data, child_nodegroup_alias, children)
-                # Attach parent to this child.
-                setattr(child_tile.aliased_data, tile.find_nodegroup_alias(), tile)
-
-            child_nodegroups = (
-                getattr(tile.nodegroup, "children")
-                if arches_version >= (8, 0)
-                else getattr(tile.nodegroup, "nodegroup_set")
-            )
-            for child_nodegroup in child_nodegroups.all():
-                for node in child_nodegroup.node_set.all():
-                    if node.pk == child_nodegroup.pk:
-                        grouping_node = node
-                        break
-
-                if (
-                    getattr(tile.aliased_data, grouping_node.alias, NOT_PROVIDED)
-                    is NOT_PROVIDED
-                ):
-                    setattr(
-                        tile.aliased_data,
-                        grouping_node.alias,
-                        None if child_nodegroup.cardinality == "1" else [],
-                    )
 
     def _clone(self):
         """Persist private attributes through the life of the QuerySet."""

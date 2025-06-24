@@ -17,6 +17,7 @@ from arches.app.models.models import (
 )
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.permission_backend import (
     get_nodegroups_by_perm,
     user_is_resource_reviewer,
@@ -43,7 +44,20 @@ logger = logging.getLogger(__name__)
 
 
 class AliasedData(SimpleNamespace):
-    pass
+    """Provides dot access into node values and nested nodegroups.
+
+    >>> SemanticResource.as_model('new_resource_model_1').get(...).aliased_data
+    namespace(string_node={'en': {'value': 'abcde', 'direction': 'ltr'}},
+          child_node=<SemanticTile: child_node (c3637412-9b13-4f05-8f4a-5a80560b8b6e)>)
+    """
+
+    def serialize(self, **kwargs):
+        serializer = JSONSerializer()
+        serializer.force_recalculation = kwargs.get("force_recalculation", False)
+        return {
+            key: serializer.handle_object(val, **kwargs)
+            for key, val in vars(self).items()
+        }
 
 
 class SemanticResource(ResourceInstance):
@@ -64,6 +78,14 @@ class SemanticResource(ResourceInstance):
         # Data-collecting nodes that were queried
         self._queried_nodes = Node.objects.none()
         self._as_representation = False
+
+    @property
+    def aliased_data(self):
+        return self._aliased_data
+
+    @aliased_data.setter
+    def aliased_data(self, value):
+        self._aliased_data = value
 
     def save(self, *, request=None, index=True, **kwargs):
         with transaction.atomic():
@@ -95,7 +117,7 @@ class SemanticResource(ResourceInstance):
         )
 
     def fill_blanks(self):
-        """Initialize empty node values for each top nodegroup lacking a tile."""
+        """Initialize a blank tile with empty values for each nodegroup lacking a tile."""
         if not vars(self.aliased_data):
             raise RuntimeError("aliased_data is empty")
 
@@ -210,10 +232,33 @@ class SemanticTile(TileModel):
         self.aliased_data = arches_model_kwargs.pop(
             "aliased_data", None
         ) or AliasedData(**arches_model_kwargs)
+        self._parent = None
         self._permitted_nodes = Node.objects.none()
         # Data-collecting nodes that were queried
         self._queried_nodes = Node.objects.none()
         self._as_representation = False
+
+    @property
+    def aliased_data(self):
+        return self._aliased_data
+
+    @aliased_data.setter
+    def aliased_data(self, value):
+        self._aliased_data = value
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, parent):
+        self._parent = parent
+
+    def serialize(self, **kwargs):
+        """Prevent serialization of properties (would cause cycles)."""
+        options = {**kwargs}
+        options["exclude"] = {"data", "parent"} | set(options.pop("exclude", {}))
+        return JSONSerializer().handle_model(self, **options)
 
     def find_nodegroup_alias(self):
         # SemanticTileManager provides grouping_node on 7.6
