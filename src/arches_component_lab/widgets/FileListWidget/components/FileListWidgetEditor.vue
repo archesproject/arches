@@ -7,9 +7,9 @@ import FileUpload from "primevue/fileupload";
 import Image from "primevue/image";
 import Button from "primevue/button";
 import { FormField } from "@primevue/forms";
-import {
-    type FileUploadRemoveEvent,
-    type FileUploadSelectEvent,
+import type {
+    FileUploadRemoveEvent,
+    FileUploadSelectEvent,
 } from "primevue/fileupload";
 import type { FormFieldResolverOptions } from "@primevue/forms";
 import type { FileReference } from "@/arches_component_lab/widgets/types.ts";
@@ -121,15 +121,15 @@ function deleteImage(fileId: string) {
         :initial-value="props.initialValue"
         :resolver="resolver"
     >
-        <div class="uploadedImagesContainer">
+        <div class="uploaded-images-container">
             <div
                 v-for="image in currentValues"
                 :key="image.file_id"
-                class="uploadedImageRow"
+                class="uploaded-image-row"
             >
                 <Image
                     :key="image.file_id"
-                    class="uploadedImage"
+                    class="uploaded-image"
                     :src="image.url"
                     :alt="image.name"
                 ></Image>
@@ -137,7 +137,6 @@ function deleteImage(fileId: string) {
                     icon="pi pi-trash"
                     :aria-label="$gettext('delete')"
                     severity="danger"
-                    outlined
                     @click="deleteImage(image.file_id)"
                 />
             </div>
@@ -168,20 +167,18 @@ function deleteImage(fileId: string) {
     </FormField>
 </template>
 <style scoped>
-:deep(.uploadedImage img) {
-    max-width: 6rem;
-    max-height: 6rem;
-}
-
-:deep(.uploadedImageRow) {
+.uploaded-images-container {
     display: flex;
+    flex-direction: column;
 }
 
-:deep(.uploadedImageRow .spacer) {
-    flex: 1;
+:deep(.uploaded-image img) {
+    width: 100%;
+    height: auto;
+    max-width: 12rem;
 }
 
-.uploadedImageContainer {
+:deep(.uploaded-image-row) {
     display: flex;
 }
 </style>

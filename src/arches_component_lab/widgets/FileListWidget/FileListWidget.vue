@@ -18,13 +18,18 @@ import type {
     FileReference,
 } from "@/arches_component_lab/widgets/types.ts";
 
-const props = defineProps<{
-    mode: WidgetMode;
-    initialValue: FileReference[] | null | undefined;
-    nodeAlias: string;
-    graphSlug: string;
-    showLabel?: boolean;
-}>();
+const props = withDefaults(
+    defineProps<{
+        mode: WidgetMode;
+        initialValue: FileReference[] | null | undefined;
+        nodeAlias: string;
+        graphSlug: string;
+        showLabel?: boolean;
+    }>(),
+    {
+        showLabel: true,
+    },
+);
 
 const isLoading = ref(true);
 const nodeData = ref();
