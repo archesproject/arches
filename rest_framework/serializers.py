@@ -424,8 +424,8 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     def create(self, validated_data):
         options = self.__class__.Meta
         qs = options.model.get_tiles(
-            self.nodegroup_alias,
             graph_slug=self.graph_slug,
+            nodegroup_alias=self.nodegroup_alias,
             only=None,
             as_representation=True,
             user=self.context["request"].user,

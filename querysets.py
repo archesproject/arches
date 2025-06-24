@@ -43,8 +43,10 @@ class TileTreeQuerySet(models.QuerySet):
 
     def get_tiles(
         self,
-        permitted_nodes,
+        graph_slug,
+        nodegroup_alias=None,
         *,
+        permitted_nodes,
         defer=None,
         only=None,
         as_representation=False,
@@ -55,7 +57,7 @@ class TileTreeQuerySet(models.QuerySet):
         Entry point for filtering arches data by nodegroups (instead of grouping by
         resource.)
 
-        >>> statements = TileTree.get_tiles("statement", graph_slug="concept")
+        >>> statements = TileTree.get_tiles("concept", "statement")
         # TODO: show this with some test node that's actually a localized string.
         >>> results = statements.filter(statement_content__any_lang_startswith="F")
         >>> for result in results:
@@ -109,6 +111,7 @@ class TileTreeQuerySet(models.QuerySet):
                 models.Prefetch(
                     "children" if arches_version >= (8, 0) else "tilemodel_set",
                     queryset=self.model.objects.get_queryset().get_tiles(
+                        graph_slug=graph_slug,
                         permitted_nodes=permitted_nodes,
                         defer=defer,
                         only=only,
@@ -325,7 +328,8 @@ class ResourceTileTreeQuerySet(models.QuerySet):
             models.Prefetch(
                 "tilemodel_set",
                 queryset=TileTree.objects.get_tiles(
-                    self._permitted_nodes,
+                    graph_slug=graph_slug,
+                    permitted_nodes=self._permitted_nodes,
                     as_representation=as_representation,
                 ),
                 to_attr="_annotated_tiles",

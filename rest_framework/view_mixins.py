@@ -76,8 +76,8 @@ class ArchesModelAPIMixin:
             ).select_related("graph")
         if issubclass(options.model, TileModel):
             qs = options.model.get_tiles(
+                self.graph_slug,
                 self.nodegroup_alias,
-                graph_slug=self.graph_slug,
                 only=fields,
                 as_representation=True,
                 resource_ids=self.resource_ids,

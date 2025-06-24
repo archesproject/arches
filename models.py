@@ -94,7 +94,7 @@ class ResourceTileTree(ResourceInstance):
     @classmethod
     def get_tiles(
         cls,
-        graph_slug=None,
+        graph_slug,
         *,
         resource_ids=None,
         defer=None,
@@ -103,7 +103,7 @@ class ResourceTileTree(ResourceInstance):
         user=None,
     ):
         """Return a chainable QuerySet for a requested graph's instances,
-        with tile data annotated onto node and nodegroup aliases.
+        with tile data keyed by node and nodegroup aliases.
 
         See `arches_querysets.querysets.ResourceTileTreeQuerySet.get_tiles`.
         """
@@ -307,9 +307,9 @@ class TileTree(TileModel):
     @classmethod
     def get_tiles(
         cls,
-        entry_node_alias,
-        *,
         graph_slug,
+        nodegroup_alias,
+        *,
         resource_ids=None,
         defer=None,
         only=None,
@@ -322,11 +322,11 @@ class TileTree(TileModel):
             graph_slug, resource_ids=resource_ids, user=user
         )
         for node in source_graph.permitted_nodes:
-            if node.alias == entry_node_alias:
+            if node.alias == nodegroup_alias:
                 entry_node = node
                 break
         else:
-            raise Node.DoesNotExist(f"graph: {graph_slug} node: {entry_node_alias}")
+            raise Node.DoesNotExist(f"graph: {graph_slug} node: {nodegroup_alias}")
 
         if not entry_node.nodegroup:
             raise ValueError(f'"{entry_node_alias}" is a top node.')
@@ -352,7 +352,9 @@ class TileTree(TileModel):
         ]
 
         return qs.get_tiles(
-            entry_node_and_nodes_below,
+            graph_slug=graph_slug,
+            nodegroup_alias=nodegroup_alias,
+            permitted_nodes=entry_node_and_nodes_below,
             defer=defer,
             only=filtered_only,
             as_representation=as_representation,
