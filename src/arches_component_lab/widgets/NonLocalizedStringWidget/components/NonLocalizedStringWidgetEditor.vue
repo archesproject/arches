@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useTemplateRef } from "vue";
+
 import InputText from "primevue/inputtext";
 import Message from "primevue/message";
 
@@ -10,11 +12,15 @@ const props = defineProps<{
     value: string | null | undefined;
 }>();
 
-const emit = defineEmits(["update:value"]);
+const emit = defineEmits(["update:isDirty", "update:value"]);
+
+const formFieldRef = useTemplateRef("formField");
 
 function resolver(event: FormFieldResolverOptions) {
     validate(event);
 
+    // @ts-expect-error This is a bug with PrimeVue types
+    emit("update:isDirty", Boolean(formFieldRef.value!.fieldAttrs.dirty));
     emit("update:value", event.value);
 
     return {
@@ -29,6 +35,7 @@ function validate(e: FormFieldResolverOptions) {
 
 <template>
     <FormField
+        ref="formField"
         v-slot="$field"
         :name="props.nodeAlias"
         :initial-value="props.value"

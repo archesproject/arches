@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref, useTemplateRef, watch } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { Form } from "@primevue/forms";
@@ -13,7 +13,6 @@ import { upsertTile } from "@/arches_component_lab/cards/api.ts";
 import { EDIT } from "@/arches_component_lab/widgets/constants.ts";
 
 import type { FormSubmitEvent } from "@primevue/forms";
-import type { useFormFieldState } from "@primevue/forms/useform";
 
 import type { WidgetComponent } from "@/arches_component_lab/cards/types.ts";
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
@@ -35,24 +34,26 @@ const emit = defineEmits(["update:isDirty", "update:tileData"]);
 const { $gettext } = useGettext();
 
 const formKey = ref(0);
-const formRef = useTemplateRef("form");
-
-const localData = reactive({ ...props.tileData.aliased_data });
 
 const isSaving = ref(false);
 const saveError = ref();
 
+const localData = reactive({ ...props.tileData.aliased_data });
+
+const widgetDirtyStates = reactive(
+    props.widgets.reduce(
+        (acc, widget) => {
+            acc[widget.cardXNodeXWidgetData.node.alias] = false;
+            return acc;
+        },
+        {} as Record<string, boolean>,
+    ),
+);
+
 const isDirty = computed(() => {
-    // @ts-expect-error This is a bug with PrimeVue types
-    const states = formRef.value?.states;
-
-    if (!states) {
-        return false;
-    }
-
-    return Object.values(states).some((state) => {
-        return (state as useFormFieldState).dirty;
-    });
+    return Object.values(widgetDirtyStates).some(
+        (widgetDirtyState) => widgetDirtyState,
+    );
 });
 
 watch(isDirty, (newValue, oldValue) => {
@@ -62,8 +63,13 @@ watch(isDirty, (newValue, oldValue) => {
 });
 
 function resetForm() {
-    formKey.value += 1;
     Object.assign(localData, props.tileData.aliased_data);
+
+    Object.keys(widgetDirtyStates).forEach((key) => {
+        widgetDirtyStates[key] = false;
+    });
+
+    formKey.value += 1;
 }
 
 async function save(_event: FormSubmitEvent) {
@@ -109,7 +115,6 @@ async function save(_event: FormSubmitEvent) {
             {{ saveError.message }}
         </Message>
         <Form
-            ref="form"
             :key="formKey"
             class="form"
             @submit="save"
@@ -120,6 +125,9 @@ async function save(_event: FormSubmitEvent) {
                 :key="widget.cardXNodeXWidgetData.id"
                 v-model:value="
                     localData[widget.cardXNodeXWidgetData.node.alias]
+                "
+                v-model:is-dirty="
+                    widgetDirtyStates[widget.cardXNodeXWidgetData.node.alias]
                 "
                 :mode="props.mode"
                 :graph-slug="props.graphSlug"
