@@ -185,7 +185,8 @@ class SemanticTileOperation:
                 new_tile.sortorder = next_sort_order
                 next_sort_order += 1
                 for node in grouping_node.nodegroup.node_set.all():
-                    new_tile.data[str(node.pk)] = None
+                    if node.datatype != "semantic":
+                        new_tile.data[str(node.pk)] = new_tile.get_default_value(node)
                 new_tile._incoming_tile = new_tile
                 # TODO: reimplement correct nodegroup for parenttile check somewhere.
                 new_tile.full_clean(exclude={"parenttile"})
