@@ -649,7 +649,9 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
 
             function_slugs = []
             if "functions_x_graphs" in published_graph.serialized_graph:
-                for function_dict in published_graph.serialized_graph["functions_x_graphs"]:
+                for function_dict in published_graph.serialized_graph[
+                    "functions_x_graphs"
+                ]:
                     function_slug = {}
 
                     for key, value in function_dict.items():
