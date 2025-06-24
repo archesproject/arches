@@ -648,18 +648,19 @@ class GraphModel(SaveSupportsBlindOverwriteMixin, models.Model):
             published_graph = self.get_published_graph()
 
             function_slugs = []
-            for function_dict in published_graph.serialized_graph["functions_x_graphs"]:
-                function_slug = {}
+            if "functions_x_graphs" in published_graph.serialized_graph:
+                for function_dict in published_graph.serialized_graph["functions_x_graphs"]:
+                    function_slug = {}
 
-                for key, value in function_dict.items():
-                    if isinstance(value, str):
-                        try:
-                            value = uuid.UUID(value)
-                        except ValueError:
-                            pass
-                    function_slug[key] = value
+                    for key, value in function_dict.items():
+                        if isinstance(value, str):
+                            try:
+                                value = uuid.UUID(value)
+                            except ValueError:
+                                pass
+                        function_slug[key] = value
 
-                function_slugs.append(function_slug)
+                    function_slugs.append(function_slug)
 
             return [
                 models.FunctionXGraph(**function_dict)
