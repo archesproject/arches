@@ -24,6 +24,10 @@ const props = defineProps<{
     value: ResourceInstanceReference | null | undefined;
 }>();
 
+const emit = defineEmits<{
+    (event: "update:value", value: ResourceInstanceReference | null): void;
+}>();
+
 const { $gettext } = useGettext();
 
 const itemSize = 36; // in future iteration this should be declared in the CardXNodeXWidget config
@@ -123,6 +127,8 @@ function resolver(e: FormFieldResolverOptions) {
     validate(e);
 
     let value = e.value;
+
+    emit("update:value", value);
 
     return {
         values: {

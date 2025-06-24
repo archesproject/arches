@@ -32,6 +32,8 @@ const props = withDefaults(
         value: undefined,
     },
 );
+
+const emit = defineEmits(["update:value"]);
 </script>
 
 <template>
@@ -50,6 +52,11 @@ const props = withDefaults(
                 :graph-slug="graphSlug"
                 :node-alias="nodeAlias"
                 :value="props.value"
+                @update:value="
+                    (value) => {
+                        emit('update:value', value);
+                    }
+                "
             />
         </template>
         <template #viewer="slotProps">

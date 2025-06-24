@@ -10,11 +10,15 @@ const props = defineProps<{
     value: string | null | undefined;
 }>();
 
-function resolver(e: FormFieldResolverOptions) {
-    validate(e);
+const emit = defineEmits(["update:value"]);
+
+function resolver(event: FormFieldResolverOptions) {
+    validate(event);
+
+    emit("update:value", event.value);
 
     return {
-        values: { [props.nodeAlias]: e.value },
+        values: { [props.nodeAlias]: event.value },
     };
 }
 

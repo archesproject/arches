@@ -23,6 +23,8 @@ const props = withDefaults(
         value: undefined,
     },
 );
+
+// const emit = defineEmits(["update:value"]);
 </script>
 
 <template>

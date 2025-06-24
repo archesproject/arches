@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, watch } from "vue";
+import { computed, reactive, ref, useTemplateRef, watch } from "vue";
 import { useGettext } from "vue3-gettext";
 
 import { Form } from "@primevue/forms";
@@ -37,6 +37,8 @@ const { $gettext } = useGettext();
 const formKey = ref(0);
 const formRef = useTemplateRef("form");
 
+const localData = reactive({ ...props.tileData.aliased_data });
+
 const isSaving = ref(false);
 const saveError = ref();
 
@@ -59,7 +61,12 @@ watch(isDirty, (newValue, oldValue) => {
     }
 });
 
-async function save(event: FormSubmitEvent) {
+function resetForm() {
+    formKey.value += 1;
+    Object.assign(localData, props.tileData.aliased_data);
+}
+
+async function save(_event: FormSubmitEvent) {
     isSaving.value = true;
 
     try {
@@ -67,7 +74,7 @@ async function save(event: FormSubmitEvent) {
             ...props.tileData,
             aliased_data: {
                 ...props.tileData.aliased_data,
-                ...event.values,
+                ...localData,
             },
         };
 
@@ -77,6 +84,8 @@ async function save(event: FormSubmitEvent) {
             updatedTileData,
             props.tileData.tileid,
         );
+
+        Object.assign(localData, updatedTileData.aliased_data);
 
         emit("update:tileData", upsertedTileData);
     } catch (error) {
@@ -109,15 +118,13 @@ async function save(event: FormSubmitEvent) {
                 :is="widget.component"
                 v-for="widget in widgets"
                 :key="widget.cardXNodeXWidgetData.id"
+                v-model:value="
+                    localData[widget.cardXNodeXWidgetData.node.alias]
+                "
                 :mode="props.mode"
                 :graph-slug="props.graphSlug"
                 :node-alias="widget.cardXNodeXWidgetData.node.alias"
                 :card-x-node-x-widget-data="widget.cardXNodeXWidgetData"
-                :value="
-                    tileData.aliased_data[
-                        widget.cardXNodeXWidgetData.node.alias
-                    ]
-                "
             />
 
             <div style="display: flex">
@@ -131,12 +138,13 @@ async function save(event: FormSubmitEvent) {
                     v-if="mode === EDIT"
                     type="button"
                     :label="$gettext('Cancel')"
-                    @click="formKey++"
+                    @click="resetForm"
                 />
             </div>
         </Form>
     </template>
 </template>
+
 <style scoped>
 .form {
     display: flex;

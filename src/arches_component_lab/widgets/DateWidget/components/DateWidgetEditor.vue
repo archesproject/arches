@@ -27,6 +27,10 @@ const props = defineProps<{
     };
 }>();
 
+const emit = defineEmits<{
+    (event: "update:value", value: string | null): void;
+}>();
+
 const shouldShowTime = ref(false);
 const dateFormat = ref();
 
@@ -42,6 +46,8 @@ onMounted(() => {
 
 function resolver(e: FormFieldResolverOptions) {
     validate(e);
+
+    emit("update:value", e.value);
 
     return {
         values: {
