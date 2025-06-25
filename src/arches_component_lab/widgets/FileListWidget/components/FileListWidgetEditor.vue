@@ -44,11 +44,6 @@ onMounted(() => {
     const acceptedFiles = props.widgetData.config.acceptedFiles;
     allowedFileTypes.value = acceptedFiles != "" ? acceptedFiles : null;
 
-    // @ts-expect-error - This is a bug in the PrimeVue types
-    formFieldRef.value!.field.states.value = {
-        newFiles: [],
-        deletedFiles: [],
-    };
     if (props.initialValue) {
         currentValues.value = props.initialValue;
     }
@@ -72,7 +67,7 @@ function select(event: FileUploadSelectEvent) {
     // @ts-expect-error - This is a bug in the PrimeVue types
     formFieldRef.value!.field.states.value = {
         // @ts-expect-error - This is a bug in the PrimeVue types
-        ...formFieldRef.value!.field.states.value,
+        ...(formFieldRef.value!.field.states.value ?? {}),
         newFiles: event.files,
     };
 }
@@ -81,7 +76,7 @@ function remove(event: FileUploadRemoveEvent) {
     // @ts-expect-error - This is a bug in the PrimeVue types
     formFieldRef.value!.field.states.value = {
         // @ts-expect-error - This is a bug in the PrimeVue types
-        ...formFieldRef.value!.field.states.value,
+        ...(formFieldRef.value!.field.states.value ?? {}),
         newFiles: event.files,
     };
 }
@@ -94,10 +89,10 @@ function deleteImage(fileId: string) {
     // @ts-expect-error - This is a bug in the PrimeVue types
     formFieldRef.value!.field.states.value = {
         // @ts-expect-error - This is a bug in the PrimeVue types
-        ...formFieldRef.value!.field.states.value,
+        ...(formFieldRef.value!.field.states.value ?? {}),
         deletedFiles: [
             // @ts-expect-error - This is a bug in the PrimeVue types
-            ...formFieldRef.value!.field.states.value.deletedFiles,
+            ...(formFieldRef.value!.field.states.value?.deletedFiles ?? []),
             fileId,
         ],
     };
@@ -169,7 +164,6 @@ function deleteImage(fileId: string) {
 <style scoped>
 .uploaded-images-container {
     display: flex;
-    flex-direction: column;
 }
 
 :deep(.uploaded-image img) {
