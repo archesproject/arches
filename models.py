@@ -260,7 +260,7 @@ class TileTree(TileModel):
 
     def find_nodegroup_alias(self):
         # TileTreeManager provides grouping_node on 7.6
-        if self.nodegroup and hasattr(self.nodegroup, "grouping_node"):
+        if self.nodegroup_id and hasattr(self.nodegroup, "grouping_node"):
             return self.nodegroup.grouping_node.alias
         if not getattr(self, "_nodegroup_alias", None):
             self._nodegroup_alias = Node.objects.get(pk=self.nodegroup_id).alias
@@ -396,7 +396,9 @@ class TileTree(TileModel):
                 if node.datatype != "semantic"
             },
             **{
-                TileTree(nodegroup=child_nodegroup).find_nodegroup_alias(): (
+                self.find_nodegroup_from_alias_or_pk(
+                    pk=child_nodegroup.pk
+                )._nodegroup_alias: (
                     self.create_blank_tile(child_nodegroup, parent_tile=self)
                     if child_nodegroup.cardinality == "1"
                     else [self.create_blank_tile(child_nodegroup, parent_tile=self)]
@@ -422,7 +424,7 @@ class TileTree(TileModel):
 
         for alias, value in vars(self.aliased_data).items():
             try:
-                nodegroup = self.find_nodegroup_from_alias(alias)
+                nodegroup = self.find_nodegroup_from_alias_or_pk(alias=alias)
             except RuntimeError:  # possibly not permitted
                 continue
             if value in (None, []):
@@ -442,11 +444,11 @@ class TileTree(TileModel):
                 if isinstance(tile, TileTree):
                     tile.fill_blanks()
 
-    def find_nodegroup_from_alias(self, nodegroup_alias):
+    def find_nodegroup_from_alias_or_pk(self, alias=None, *, pk=None):
+        """Some of this complexity can be removed when dropping 7.6."""
         for permitted_node in self._permitted_nodes:
-            if permitted_node.alias == nodegroup_alias:
-                if arches_version < (8, 0):
-                    permitted_node.nodegroup._nodegroup_alias = nodegroup_alias
+            if permitted_node.alias == alias or permitted_node.pk == pk:
+                permitted_node.nodegroup._nodegroup_alias = permitted_node.alias
                 return permitted_node.nodegroup
         raise RuntimeError
 
