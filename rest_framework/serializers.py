@@ -196,8 +196,7 @@ class ResourceAliasedDataSerializer(serializers.Serializer, NodeFetcherMixin):
         return field_names
 
     def to_internal_value(self, data):
-        attrs = super().to_internal_value(data)
-        return AliasedData(**attrs)
+        return AliasedData(**data)
 
     def validate(self, attrs):
         if hasattr(self, "initial_data") and (
@@ -365,8 +364,7 @@ class TileAliasedDataSerializer(serializers.ModelSerializer, NodeFetcherMixin):
         return ret
 
     def to_internal_value(self, data):
-        attrs = super().to_internal_value(data)
-        return AliasedData(**attrs)
+        return AliasedData(**data)
 
     def validate(self, attrs):
         if hasattr(self, "initial_data") and (
