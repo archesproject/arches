@@ -12,7 +12,7 @@ class FileListDataType(datatypes.FileListDataType):
 
         language = get_language()
         stringified_list = ",".join([file_info.get("name") for file_info in value])
-        final_value = self.transform_value_for_tile(
+        final_value = super().transform_value_for_tile(
             stringified_list, languages=languages, **kwargs
         )
 
