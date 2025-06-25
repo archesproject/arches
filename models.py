@@ -128,7 +128,7 @@ class ResourceTileTree(ResourceInstance):
                 )
                 blank_tile = TileTree(resourceinstance=self, nodegroup=nodegroup)
                 blank_tile._as_representation = self._as_representation
-                blank_tile = blank_tile.create_blank_semantic_tile(nodegroup)
+                blank_tile = blank_tile.create_blank_tile(nodegroup)
             if value == []:
                 value.append(blank_tile)
             elif value is None:
@@ -373,7 +373,7 @@ class TileTree(TileModel):
                 self.set_next_sort_order()
             self._save_aliased_data(request=request, index=index, **kwargs)
 
-    def create_blank_semantic_tile(self, nodegroup, parent_tile=None):
+    def create_blank_tile(self, nodegroup, parent_tile=None):
         children = (
             nodegroup.children.all()
             if arches_version >= (8, 0)
@@ -392,13 +392,9 @@ class TileTree(TileModel):
             },
             **{
                 TileTree(nodegroup=child_nodegroup).find_nodegroup_alias(): (
-                    self.create_blank_semantic_tile(child_nodegroup, parent_tile=self)
+                    self.create_blank_tile(child_nodegroup, parent_tile=self)
                     if child_nodegroup.cardinality == "1"
-                    else [
-                        self.create_blank_semantic_tile(
-                            child_nodegroup, parent_tile=self
-                        )
-                    ]
+                    else [self.create_blank_tile(child_nodegroup, parent_tile=self)]
                 )
                 for child_nodegroup in children
             },
@@ -434,7 +430,7 @@ class TileTree(TileModel):
             except:
                 continue
             if value in (None, []):
-                blank_tile = self.create_blank_semantic_tile(nodegroup, self)
+                blank_tile = self.create_blank_tile(nodegroup, self)
             if value == []:
                 value.append(blank_tile)
             elif value is None:
