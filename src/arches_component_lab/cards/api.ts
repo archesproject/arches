@@ -3,10 +3,10 @@ import Cookies from "js-cookie";
 
 export const fetchCardData = async (
     graphSlug: string,
-    nodegroupGroupingNodeAlias: string,
+    nodegroupAlias: string,
 ) => {
     const response = await fetch(
-        arches.urls.api_card_data(graphSlug, nodegroupGroupingNodeAlias),
+        arches.urls.api_card_data(graphSlug, nodegroupAlias),
     );
 
     try {
@@ -22,11 +22,11 @@ export const fetchCardData = async (
 
 export const fetchTileData = async (
     graphSlug: string,
-    nodegroupGroupingNodeAlias: string,
+    nodegroupAlias: string,
     tileId: string | undefined,
 ) => {
     const response = await fetch(
-        arches.urls.api_tile(graphSlug, nodegroupGroupingNodeAlias, tileId),
+        arches.urls.api_tile(graphSlug, nodegroupAlias, tileId),
     );
 
     try {
@@ -42,11 +42,11 @@ export const fetchTileData = async (
 
 export const upsertTile = async (
     graphSlug: string,
-    nodegroupGroupingNodeAlias: string,
+    nodegroupAlias: string,
     data: Record<string, unknown>,
     tileId?: string,
 ) => {
-    const args = [graphSlug, nodegroupGroupingNodeAlias];
+    const args = [graphSlug, nodegroupAlias];
 
     if (tileId) {
         args.push(tileId);

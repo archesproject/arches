@@ -21,7 +21,7 @@ const props = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidget[];
     graphSlug: string;
     mode: string;
-    nodegroupGroupingNodeAlias: string;
+    nodegroupAlias: string;
     tileData: {
         tileid: string;
         aliased_data: Record<string, unknown>;
@@ -86,7 +86,7 @@ async function save(_event: FormSubmitEvent) {
 
         const upsertedTileData = await upsertTile(
             props.graphSlug,
-            props.nodegroupGroupingNodeAlias,
+            props.nodegroupAlias,
             updatedTileData,
             props.tileData.tileid,
         );

@@ -29,7 +29,7 @@ const deprecatedComponentPathToUpdatedComponentPath: Record<string, string> = {
 
 const props = defineProps<{
     mode: WidgetMode;
-    nodegroupGroupingNodeAlias: string;
+    nodegroupAlias: string;
     graphSlug: string;
     tileId?: string;
 }>();
@@ -77,16 +77,16 @@ watchEffect(async () => {
     try {
         const cardDataPromise = fetchCardData(
             props.graphSlug,
-            props.nodegroupGroupingNodeAlias,
+            props.nodegroupAlias,
         );
         const cardXNodeXWidgetDataPromise =
             fetchCardXNodeXWidgetDataFromNodeGroup(
                 props.graphSlug,
-                props.nodegroupGroupingNodeAlias,
+                props.nodegroupAlias,
             );
         const tileDataPromise = fetchTileData(
             props.graphSlug,
-            props.nodegroupGroupingNodeAlias,
+            props.nodegroupAlias,
             props.tileId,
         );
 
@@ -124,9 +124,7 @@ watchEffect(async () => {
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :graph-slug="props.graphSlug"
                 :mode="props.mode"
-                :nodegroup-grouping-node-alias="
-                    props.nodegroupGroupingNodeAlias
-                "
+                :nodegroup-alias="props.nodegroupAlias"
                 :widgets="widgets"
                 @update:is-dirty="emit('update:isDirty', $event)"
                 @update:tile-data="emit('update:tileData', $event)"
@@ -137,9 +135,7 @@ watchEffect(async () => {
                 :card-x-node-x-widget-data="cardXNodeXWidgetData"
                 :graph-slug="props.graphSlug"
                 :mode="props.mode"
-                :nodegroup-grouping-node-alias="
-                    props.nodegroupGroupingNodeAlias
-                "
+                :nodegroup-alias="props.nodegroupAlias"
                 :widgets="widgets"
             />
         </template>

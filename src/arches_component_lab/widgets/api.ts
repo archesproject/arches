@@ -102,12 +102,12 @@ export const fetchRelatableResources = async (
 
 export const fetchCardXNodeXWidgetDataFromNodeGroup = async (
     graphSlug: string,
-    nodegroupGroupingNodeAlias: string,
+    nodegroupAlias: string,
 ) => {
     const response = await fetch(
         arches.urls.api_card_x_node_x_widget_list_from_nodegroup(
             graphSlug,
-            nodegroupGroupingNodeAlias,
+            nodegroupAlias,
         ),
     );
 
