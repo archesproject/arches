@@ -93,32 +93,24 @@ class NodeFetcherMixin:
         return self._graph_nodes
 
     def find_graph_nodes(self):
-        # This should really only be used when using drf-spectacular.
+        # TODO(next): factor this out and get it only once.
         # Does not check nodegroup permissions.
+        node_filters = models.Q(
+            graph__slug=self.graph_slug,
+            nodegroup__isnull=False,
+        )
+        children = "nodegroup_set"
         if arches_version >= (8, 0):
-            return (
-                Node.objects.filter(
-                    graph__slug=self.graph_slug,
-                    graph__source_identifier=None,
-                    nodegroup__isnull=False,
-                )
-                .select_related("nodegroup")
-                .prefetch_related(
-                    "nodegroup__node_set",
-                    "nodegroup__children",
-                    "nodegroup__children__grouping_node",
-                    "cardxnodexwidget_set",
-                )
-            )
+            node_filters &= models.Q(source_identifier=None)
+            children = "children"
+
         return (
-            Node.objects.filter(
-                graph__slug=self.graph_slug,
-                nodegroup__isnull=False,
-            )
+            Node.objects.filter(node_filters)
             .select_related("nodegroup")
             .prefetch_related(
                 "nodegroup__node_set",
-                "nodegroup__nodegroup_set",
+                "nodegroup__cardmodel_set",
+                f"nodegroup__{children}",
                 "cardxnodexwidget_set",
             )
         )

@@ -225,7 +225,7 @@ def any_nodegroup_in_hierarchy_is_cardinality_n(nodegroup, permitted_nodes):
     return cardinality_n_found
 
 
-def get_recursive_prefetches(lookup_str, *, recursive_part, depth):
+def get_recursive_prefetches(lookup_str, *, recursive_part="children", depth):
     """
     Future: see various solutions mentioned here for avoiding
     "magic number" depth traversal (but the magic number is harmless,

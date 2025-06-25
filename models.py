@@ -650,64 +650,35 @@ class GraphWithPrefetching(GraphModel):
             raise ValueError("graph_slug or resource_ids must be provided")
 
         if arches_version >= (8, 0):
-            prefetches = [
-                "node_set__cardxnodexwidget_set",
-                "node_set__nodegroup__parentnodegroup",
-                "node_set__nodegroup__node_set",
-                "node_set__nodegroup__node_set__cardxnodexwidget_set",
-                "node_set__nodegroup__cardmodel_set",
-                *get_recursive_prefetches(
-                    "node_set__nodegroup__children",
-                    depth=12,
-                    recursive_part="children",
-                ),
-                *get_recursive_prefetches(
-                    "node_set__nodegroup__children__node_set",
-                    depth=12,
-                    recursive_part="children",
-                ),
-                *get_recursive_prefetches(
-                    "node_set__nodegroup__children__node_set__cardxnodexwidget_set",
-                    depth=12,
-                    recursive_part="children",
-                ),
-                *get_recursive_prefetches(
-                    "node_set__nodegroup__children__cardmodel_set",
-                    depth=12,
-                    recursive_part="children",
-                ),
-                # TODO: determine if these last two are still used?
-                "node_set__nodegroup__grouping_node__nodegroup",
-                "node_set__nodegroup__children__grouping_node",
-            ]
+            children = "children"
         else:
-            prefetches = [
-                "node_set__cardxnodexwidget_set",
-                "node_set__nodegroup__parentnodegroup",
-                "node_set__nodegroup__node_set",
-                "node_set__nodegroup__node_set__cardxnodexwidget_set",
-                "node_set__nodegroup__cardmodel_set",
-                *get_recursive_prefetches(
-                    "node_set__nodegroup__nodegroup_set",
-                    depth=12,
-                    recursive_part="nodegroup_set",
-                ),
-                *get_recursive_prefetches(
-                    "node_set__nodegroup__nodegroup_set__node_set",
-                    depth=12,
-                    recursive_part="nodegroup_set",
-                ),
-                *get_recursive_prefetches(
-                    "node_set__nodegroup__nodegroup_set__cardmodel_set",
-                    depth=12,
-                    recursive_part="nodegroup_set",
-                ),
-                *get_recursive_prefetches(
-                    "node_set__nodegroup__nodegroup_set__node_set__cardxnodexwidget_set",
-                    depth=12,
-                    recursive_part="nodegroup_set",
-                ),
-            ]
+            children = "nodegroup_set"
+
+        prefetches = [
+            "node_set__cardxnodexwidget_set",
+            "node_set__nodegroup__parentnodegroup",
+            "node_set__nodegroup__node_set",
+            "node_set__nodegroup__node_set__cardxnodexwidget_set",
+            "node_set__nodegroup__cardmodel_set",
+            *get_recursive_prefetches(
+                f"node_set__nodegroup__{children}", depth=12, recursive_part=children
+            ),
+            *get_recursive_prefetches(
+                f"node_set__nodegroup__{children}__node_set",
+                depth=12,
+                recursive_part=children,
+            ),
+            *get_recursive_prefetches(
+                f"node_set__nodegroup__{children}__cardmodel_set",
+                depth=12,
+                recursive_part=children,
+            ),
+            *get_recursive_prefetches(
+                f"node_set__nodegroup__{children}__node_set__cardxnodexwidget_set",
+                depth=12,
+                recursive_part=children,
+            ),
+        ]
 
         if user:
             permitted_nodegroups = get_nodegroups_by_perm(user, "models.read_nodegroup")
@@ -726,8 +697,7 @@ class GraphWithPrefetching(GraphModel):
                 e.add_note(f"No graph found with slug: {graph_slug}")
             raise
 
-        if arches_version < (8, 0):
-            graph._annotate_grouping_node()
+        graph._annotate_grouping_node()
 
         return graph
 
@@ -744,7 +714,12 @@ class GraphWithPrefetching(GraphModel):
         for node in self.permitted_nodes:
             if nodegroup := node.nodegroup:
                 nodegroup.grouping_node = grouping_node_map.get(nodegroup.pk)
-                for child_nodegroup in nodegroup.nodegroup_set.all():
+                children = (
+                    nodegroup.children.all()
+                    if arches_version >= (8, 0)
+                    else nodegroup.nodegroup_set.all()
+                )
+                for child_nodegroup in children:
                     child_nodegroup.grouping_node = grouping_node_map.get(
                         child_nodegroup.pk
                     )
