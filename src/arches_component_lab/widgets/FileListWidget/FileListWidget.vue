@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import GenericWidget from "@/arches_component_lab/widgets/components/GenericWidget.vue";
 import FileListWidgetViewer from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetViewer.vue";
+import FileListWidgetEditor from "@/arches_component_lab/widgets/FileListWidget/components/FileListWidgetEditor.vue";
 
 import type { CardXNodeXWidget } from "@/arches_component_lab/types.ts";
 import type {
@@ -13,7 +14,14 @@ const props = withDefaults(
         mode: WidgetMode;
         nodeAlias: string;
         graphSlug: string;
-        cardXNodeXWidgetData?: CardXNodeXWidget;
+        cardXNodeXWidgetData: CardXNodeXWidget & {
+            config: {
+                acceptedFiles: string;
+                maxFilesize: number;
+                rerender: boolean;
+                label: string;
+            };
+        };
         value?: FileReference[] | null | undefined;
         showLabel?: boolean;
     }>(),
@@ -24,7 +32,7 @@ const props = withDefaults(
     },
 );
 
-// const emit = defineEmits(["update:isDirty", "update:value"]);
+const emit = defineEmits(["update:isDirty", "update:value"]);
 </script>
 
 <template>
@@ -35,6 +43,16 @@ const props = withDefaults(
         :show-label="props.showLabel"
         :card-x-node-x-widget-data="cardXNodeXWidgetData"
     >
+        <template #editor="slotProps">
+            <FileListWidgetEditor
+                :card-x-node-x-widget-data="slotProps.cardXNodeXWidgetData"
+                :graph-slug="props.graphSlug"
+                :node-alias="props.nodeAlias"
+                :value="props.value"
+                @update:value="emit('update:value', $event)"
+                @update:is-dirty="emit('update:isDirty', $event)"
+            />
+        </template>
         <template #viewer="slotProps">
             <FileListWidgetViewer
                 :card-x-node-x-widget-data="slotProps.cardXNodeXWidgetData"
