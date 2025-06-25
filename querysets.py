@@ -291,7 +291,7 @@ class ResourceTileTreeQuerySet(models.QuerySet):
 
         self._as_representation = as_representation
 
-        source_graph = GraphWithPrefetching.prepare_for_annotations(
+        source_graph = GraphWithPrefetching.prefetch(
             graph_slug, resource_ids=resource_ids, user=user
         )
         self._permitted_nodes = source_graph.permitted_nodes

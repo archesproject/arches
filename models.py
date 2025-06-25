@@ -318,7 +318,7 @@ class TileTree(TileModel):
     ):
         """See `arches_querysets.querysets.TileTreeQuerySet.get_tiles`."""
 
-        source_graph = GraphWithPrefetching.prepare_for_annotations(
+        source_graph = GraphWithPrefetching.prefetch(
             graph_slug, resource_ids=resource_ids, user=user
         )
         for node in source_graph.permitted_nodes:
@@ -622,7 +622,7 @@ class GraphWithPrefetching(GraphModel):
         db_table = "graphs"
 
     @classmethod
-    def prepare_for_annotations(cls, graph_slug=None, *, resource_ids=None, user=None):
+    def prefetch(cls, graph_slug=None, *, resource_ids=None, user=None):
         """Return a graph with necessary prefetches for
         TileTree._prefetch_related_objects(), which is what builds the shape
         of the tile graph.
