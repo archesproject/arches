@@ -9,19 +9,22 @@ import type {
     FileReference,
 } from "@/arches_component_lab/widgets/types.ts";
 
+interface FileListCardXNodeXWidgetData extends CardXNodeXWidget {
+    config: {
+        acceptedFiles: string;
+        maxFiles: number;
+        maxFilesize: number;
+        rerender: boolean;
+        label: string;
+    };
+}
+
 const props = withDefaults(
     defineProps<{
         mode: WidgetMode;
         nodeAlias: string;
         graphSlug: string;
-        cardXNodeXWidgetData: CardXNodeXWidget & {
-            config: {
-                acceptedFiles: string;
-                maxFilesize: number;
-                rerender: boolean;
-                label: string;
-            };
-        };
+        cardXNodeXWidgetData: FileListCardXNodeXWidgetData | undefined;
         value?: FileReference[] | null | undefined;
         showLabel?: boolean;
     }>(),
@@ -45,7 +48,9 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
     >
         <template #editor="slotProps">
             <FileListWidgetEditor
-                :card-x-node-x-widget-data="slotProps.cardXNodeXWidgetData"
+                :card-x-node-x-widget-data="
+                    slotProps.cardXNodeXWidgetData as FileListCardXNodeXWidgetData
+                "
                 :graph-slug="props.graphSlug"
                 :node-alias="props.nodeAlias"
                 :value="props.value"
@@ -55,7 +60,9 @@ const emit = defineEmits(["update:isDirty", "update:value"]);
         </template>
         <template #viewer="slotProps">
             <FileListWidgetViewer
-                :card-x-node-x-widget-data="slotProps.cardXNodeXWidgetData"
+                :card-x-node-x-widget-data="
+                    slotProps.cardXNodeXWidgetData as FileListCardXNodeXWidgetData
+                "
                 :value="props.value"
             />
         </template>

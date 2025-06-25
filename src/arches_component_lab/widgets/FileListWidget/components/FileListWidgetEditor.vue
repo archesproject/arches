@@ -25,16 +25,10 @@ const props = defineProps<{
     cardXNodeXWidgetData: CardXNodeXWidget & {
         config: {
             acceptedFiles: string;
+            maxFiles: number;
             maxFilesize: number;
             rerender: boolean;
             label: string;
-        };
-    };
-    nodeData: {
-        config: {
-            imagesOnly: boolean;
-            maxFiles: number;
-            maxFileSize: number;
         };
     };
 }>();
@@ -59,10 +53,11 @@ onMounted(() => {
 const currentMax = computed(() => {
     if (currentValues.value) {
         return (
-            props.nodeData.config.maxFiles - (currentValues.value.length ?? 0)
+            props.cardXNodeXWidgetData.config.maxFiles -
+            (currentValues.value.length ?? 0)
         );
     } else {
-        return props.nodeData.config.maxFiles;
+        return props.cardXNodeXWidgetData.config.maxFiles;
     }
 });
 
