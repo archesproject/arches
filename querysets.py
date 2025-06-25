@@ -87,7 +87,7 @@ class TileTreeQuerySet(models.QuerySet):
             for n in permitted_nodes
             if getattr(n.nodegroup, "nodegroup_alias", None) in (only or [])
         }
-        node_alias_annotations = generate_node_alias_expressions(
+        node_alias_expressions = generate_node_alias_expressions(
             permitted_nodes,
             defer=deferred_node_aliases,
             only=only_node_aliases,
@@ -96,7 +96,7 @@ class TileTreeQuerySet(models.QuerySet):
 
         self._permitted_nodes = permitted_nodes  # permitted nodes below entry point
         self._queried_nodes = [
-            n for n in permitted_nodes if n.alias in node_alias_annotations
+            n for n in permitted_nodes if n.alias in node_alias_expressions
         ]
         self._entry_node = entry_node
 
@@ -121,8 +121,7 @@ class TileTreeQuerySet(models.QuerySet):
                 )
             )
 
-        # TODO: some of these can just be aliases.
-        qs = qs.annotate(**node_alias_annotations).order_by("sortorder")
+        qs = qs.alias(**node_alias_expressions).order_by("sortorder")
 
         qs = qs.prefetch_related(
             models.Prefetch(
@@ -135,12 +134,7 @@ class TileTreeQuerySet(models.QuerySet):
         return qs
 
     def _prefetch_related_objects(self):
-        """Call datatype to_python() methods when materializing the QuerySet.
-        Discard annotations that do not pertain to this nodegroup.
-        Memoize fetched nodes.
-        Attach child tiles to parent tiles and vice versa.
-        """
-
+        """Hook into QuerySet evaluation to customize the result."""
         # Overriding _fetch_all() doesn't work here: causes dupe child tiles.
         # Perhaps these manual annotations could be scheduled another way?
         super()._prefetch_related_objects()
@@ -151,6 +145,9 @@ class TileTreeQuerySet(models.QuerySet):
             raise RuntimeError(e) from e
 
     def _set_aliased_data(self):
+        """Call datatype to_python() methods when materializing the QuerySet.
+        Memoize fetched nodes. Attach child tiles to parent tiles and vice versa.
+        """
         for tile in self._result_cache:
             if not isinstance(tile, self.model):
                 return
@@ -173,7 +170,6 @@ class TileTreeQuerySet(models.QuerySet):
                 elif node.nodegroup.parentnodegroup_id == tile.nodegroup_id:
                     empty_value = None if node.nodegroup.cardinality == "1" else []
                     setattr(tile.aliased_data, tile.find_nodegroup_alias(), empty_value)
-                delattr(tile, node.alias)
 
             self._set_child_tile_data(tile)
 
@@ -334,7 +330,7 @@ class ResourceTileTreeQuerySet(models.QuerySet):
                 ),
                 to_attr="_annotated_tiles",
             ),
-        ).annotate(**node_sql_aliases)
+        ).alias(**node_sql_aliases)
 
     def with_related_resource_display_names(self, nodes=None):
         if arches_version >= (8, 0):
@@ -359,19 +355,20 @@ class ResourceTileTreeQuerySet(models.QuerySet):
             )
 
     def _fetch_all(self):
+        """Hook into QuerySet evaluation to customize the result."""
+        super()._fetch_all()
+        try:
+            self._set_aliased_data()
+        except (TypeError, ValueError, ValidationError) as e:
+            # These errors are caught by DRF, so re-raise as something else.
+            raise RuntimeError from e
+
+    def _set_aliased_data(self):
         """
         Attach top-level tiles to resource instances.
         Attach resource instances to all fetched tiles.
         Memoize fetched grouping node aliases (and graph source nodes).
         """
-        super()._fetch_all()
-        try:
-            self._perform_custom_annotations()
-        except (TypeError, ValueError, ValidationError) as e:
-            # These errors are caught by DRF, so re-raise as something else.
-            raise RuntimeError from e
-
-    def _perform_custom_annotations(self):
         grouping_nodes = {}
         for node in self._permitted_nodes:
             if not node.nodegroup:
@@ -387,8 +384,7 @@ class ResourceTileTreeQuerySet(models.QuerySet):
             resource._queried_nodes = self._queried_nodes
             resource._as_representation = self._as_representation
 
-            # Prepare resource annotations.
-            # TODO: this might move to a method on AliasedData.
+            # Prepare empty aliased data containers.
             for grouping_node in grouping_nodes.values():
                 if grouping_node.nodegroup.parentnodegroup_id:
                     continue
@@ -396,16 +392,15 @@ class ResourceTileTreeQuerySet(models.QuerySet):
                 setattr(resource.aliased_data, grouping_node.alias, default)
 
             # Fill aliased data with top nodegroup data.
-            annotated_tiles = getattr(resource, "_annotated_tiles", [])
-            for annotated_tile in annotated_tiles:
+            for annotated_tile in getattr(resource, "_annotated_tiles", []):
                 if annotated_tile.nodegroup.parentnodegroup_id:
                     continue
-                ng_alias = grouping_nodes[annotated_tile.nodegroup_id].alias
+                nodegroup_alias = grouping_nodes[annotated_tile.nodegroup_id].alias
                 if annotated_tile.nodegroup.cardinality == "n":
-                    tile_array = getattr(resource.aliased_data, ng_alias)
+                    tile_array = getattr(resource.aliased_data, nodegroup_alias)
                     tile_array.append(annotated_tile)
                 else:
-                    setattr(resource.aliased_data, ng_alias, annotated_tile)
+                    setattr(resource.aliased_data, nodegroup_alias, annotated_tile)
 
     def _clone(self):
         """Persist private attributes through the life of the QuerySet."""
@@ -416,7 +411,8 @@ class ResourceTileTreeQuerySet(models.QuerySet):
         return clone
 
 
-class GraphWithPrefetchingQuerySet(models.QuerySet):
+# TODO (arches_version): remove when dropping 7.6
+class GraphWithPrefetchingQuerySet(models.QuerySet):  # pragma: no cover
     """Backport of Arches 8.0 GraphQuerySet."""
 
     def make_name_unique(self, name, names_to_check, suffix_delimiter="_"):
