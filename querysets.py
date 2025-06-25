@@ -22,6 +22,7 @@ class TileTreeManager(models.Manager):
         qs = super().get_queryset().select_related("nodegroup", "parenttile")
         if arches_version >= (8, 0):
             qs = qs.select_related("nodegroup__grouping_node")
+            qs = qs.prefetch_related("nodegroup__children__node_set")
         else:
             # Annotate nodegroup_alias on Arches 7.6.
             qs = qs.annotate(
@@ -30,6 +31,7 @@ class TileTreeManager(models.Manager):
                     nodegroup__tilemodel=models.OuterRef("tileid"),
                 ).values("alias")[:1]
             )
+            qs = qs.prefetch_related("nodegroup__nodegroup_set__node_set")
         return qs
 
 
