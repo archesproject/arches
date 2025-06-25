@@ -11,7 +11,7 @@ from rest_framework.fields import empty
 
 from arches import VERSION as arches_version
 from arches.app.models.fields.i18n import I18n_JSON, I18n_String
-from arches.app.models.models import Node
+from arches.app.models.models import Node, NodeGroup
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 from arches_querysets.datatypes.datatypes import DataTypeFactory
@@ -382,6 +382,9 @@ class ArchesTileSerializer(serializers.ModelSerializer, NodeFetcherMixin):
     tileid = serializers.UUIDField(validators=[], required=False, allow_null=True)
     resourceinstance = serializers.PrimaryKeyRelatedField(
         queryset=ResourceTileTree.objects.all(), required=False, html_cutoff=0
+    )
+    nodegroup = serializers.PrimaryKeyRelatedField(
+        queryset=NodeGroup.objects.all(), required=False, html_cutoff=0
     )
     parenttile = serializers.PrimaryKeyRelatedField(
         queryset=TileTree.objects.all(),
