@@ -156,9 +156,7 @@ class TileTreeQuerySet(models.QuerySet):
             break
 
         for tile in self._result_cache:
-            tile._queried_nodes = self._queried_nodes
-            tile._permitted_nodes = self._permitted_nodes
-            tile._as_representation = self._as_representation
+            tile.sync_private_attributes(self)
             for node in self._queried_nodes:
                 if node.nodegroup_id == tile.nodegroup_id:
                     datatype_instance = DataTypeFactory().get_instance(node.datatype)
@@ -190,6 +188,7 @@ class TileTreeQuerySet(models.QuerySet):
                 setattr(tile.aliased_data, child_nodegroup_alias, children)
             # Attach parent to this child.
             child_tile.parent = tile
+            child_tile.sync_private_attributes(tile)
 
         child_nodegroups = (
             getattr(tile.nodegroup, "children")

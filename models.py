@@ -127,7 +127,7 @@ class ResourceTileTree(ResourceInstance):
                     nodegroup_alias, self._permitted_nodes
                 )
                 blank_tile = TileTree(resourceinstance=self, nodegroup=nodegroup)
-                blank_tile._as_representation = self._as_representation
+                blank_tile.sync_private_attributes(self)
                 blank_tile = blank_tile.create_blank_tile(nodegroup)
             if value == []:
                 value.append(blank_tile)
@@ -373,6 +373,11 @@ class TileTree(TileModel):
                 self.set_next_sort_order()
             self._save_aliased_data(request=request, index=index, **kwargs)
 
+    def sync_private_attributes(self, source):
+        self._as_representation = source._as_representation
+        self._queried_nodes = source._queried_nodes
+        self._permitted_nodes = source._permitted_nodes
+
     def create_blank_tile(self, nodegroup, parent_tile=None):
         children = (
             nodegroup.children.all()
@@ -399,7 +404,7 @@ class TileTree(TileModel):
                 for child_nodegroup in children
             },
         )
-        blank_tile._as_representation = self._as_representation
+        blank_tile.sync_private_attributes(self)
 
         # Finalize the aliased data according to the value of self._as_representation.
         # (e.g. either a dict of display_value & interchange_value, or call to_python().)
@@ -415,19 +420,10 @@ class TileTree(TileModel):
         if not vars(self.aliased_data):
             return
 
-        def find_nodegroup_from_alias(nodegroup_alias):
-            for fetched_node in self._permitted_nodes:
-                if (
-                    fetched_node.alias == nodegroup_alias
-                    and fetched_node.nodegroup.parentnodegroup_id == self.nodegroup_id
-                ):
-                    return fetched_node.nodegroup
-            raise Exception
-
         for alias, value in vars(self.aliased_data).items():
             try:
-                nodegroup = find_nodegroup_from_alias(alias)
-            except:
+                nodegroup = self.find_nodegroup_from_alias(alias)
+            except RuntimeError:  # possibly not permitted
                 continue
             if value in (None, []):
                 blank_tile = self.create_blank_tile(nodegroup, self)
@@ -439,10 +435,20 @@ class TileTree(TileModel):
             # Recurse.
             if isinstance(value, list):
                 for tile in value:
-                    tile.fill_blanks()
+                    if isinstance(tile, TileTree):
+                        tile.fill_blanks()
             else:
                 tile = value or blank_tile
-                tile.fill_blanks()
+                if isinstance(tile, TileTree):
+                    tile.fill_blanks()
+
+    def find_nodegroup_from_alias(self, nodegroup_alias):
+        for permitted_node in self._permitted_nodes:
+            if permitted_node.alias == nodegroup_alias:
+                if arches_version < (8, 0):
+                    permitted_node.nodegroup._nodegroup_alias = nodegroup_alias
+                return permitted_node.nodegroup
+        raise RuntimeError
 
     @staticmethod
     def get_default_value(node):
